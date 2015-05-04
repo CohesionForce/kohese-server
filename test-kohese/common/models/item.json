@@ -16,7 +16,18 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "children": {
+      "type": "hasMany",
+      "model": "Item",
+      "foreignKey": "parentId"
+    },
+    "parent": {
+      "type": "belongsTo",
+      "model": "Item",
+      "foreignKey": "parentId"
+    }
+  },
   "acls": [],
   "methods": []
 }
