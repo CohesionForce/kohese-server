@@ -1,0 +1,36 @@
+<h1>Item List</h1>
+<hr>
+<form name="itemForm" novalidate ng-submit="addItem()">
+  <div class="form-group"
+      ng-class="{'has-error': itemForm.title.$invalid
+        && itemForm.title.$dirty}">
+    <input type="text" class="form-control focus" name="title"
+        placeholder="Title" autocomplete="off" required
+        ng-model="newItem.title">
+    <span class="has-error control-label" ng-show="
+        itemForm.title$invalid && itemForm.title.$dirty">
+      Title is required.
+    </span>
+    <input type="text" class="form-control focus" name="description"
+        placeholder="Description" autocomplete="off" required
+        ng-model="newItem.description">
+    <span class="has-error control-label" ng-show="
+        itemForm.description$invalid && itemForm.description.$dirty">
+      Description is required.
+    </span>
+    <input type="int" class="form-control focus" name="parentId"
+        placeholder="Parent Id" autocomplete="off" required
+        ng-model="newItem.parentId">
+    <span class="has-error control-label" ng-show="
+        itemForm.parentId$invalid && itemForm.parentId.$dirty">
+      Parent Id is required.
+    </span>
+  </div>
+  <button class="btn btn-default" ng-disabled="itemForm.$invalid">Add</button>
+</form>
+<hr>
+<div class="list-group">
+  <a class="list-group-item" ng-repeat="item in items">{{item.id}} | {{item.title}} | {{item.description}} | {{item.parentId}}&nbsp;
+    <i class="glyphicon glyphicon-remove pull-right"
+        ng-click="removeItem(item)"></i></a>
+</div>

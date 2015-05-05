@@ -16,6 +16,13 @@ app.start = function() {
 boot(app, __dirname, function(err) {
   if (err) throw err;
 
+  //-- Mount static files here--
+  //All static middleware should be registered at the end, as all requests
+  //passing the static middleware are hitting the file system
+  //Example:
+  var path = require('path');
+  app.use(loopback.static(path.resolve(__dirname, '../client')));
+
   // start the server if `$ node server.js`
   if (require.main === module)
     app.start();
