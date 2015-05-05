@@ -2,6 +2,7 @@
   "name": "Item",
   "base": "PersistedModel",
   "idInjection": true,
+  "strict": true,
   "properties": {
     "title": {
       "type": "string",
