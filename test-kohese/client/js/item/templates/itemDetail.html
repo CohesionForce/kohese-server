@@ -1,0 +1,36 @@
+<form name="itemForm" class="form-horizontal">
+
+<!-- TBD: This should only be displayed on an edit action and should not be editable  
+<div class="control-group" ng-class="{error: itemForm.id.$invalid}">
+    <label class="control-label" for="Id">Id</label>
+    <div class="controls">
+        <input type="text" ng-model="editedItem.id" id="Id">
+    </div>
+</div>
+ -->
+<div class="control-group" ng-class="{error: itemForm.title.$invalid}">
+    <label class="control-label" for="Title">Title</label>
+    <div class="controls">
+        <input type="text" ng-model="editedItem.title" id="Title">
+    </div>
+</div>
+<div class="control-group" ng-class="{error: itemForm.description.$invalid}">
+    <label class="control-label" for="Description">Description</label>
+    <div class="controls">
+        <input type="text" ng-model="editedItem.description" id="Description">
+    </div>
+</div>
+<div class="control-group" ng-class="{error: itemForm.parentId.$invalid}">
+    <label class="control-label" for="Parent">Parent</label>
+    <div class="controls">
+        <input type="text" ng-model="editedItem.parentId" id="Parent">
+    </div>
+</div>
+<div class="form-actions">
+    <button ng-click="addItem()" class="btn btn-primary">
+        Submit
+    </button>
+    <a href="#/" class="btn">Cancel</a>
+    <button ng-click="evaluate()" class="btn">Evaluate</button>
+</div>
+</form>

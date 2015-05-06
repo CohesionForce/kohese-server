@@ -7,11 +7,27 @@ angular
   ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider,
       $urlRouterProvider) {
+
     $stateProvider
-      .state('item', {
-        url: '',
+      .state('listItems', {
+        url: '/',
         templateUrl: 'js/item/templates/item.html',
         controller: 'ItemCtrl'
+      })
+      .state('newItem', {
+        url: '/newItem',
+        templateUrl: 'js/item/templates/itemDetail.html',
+        controller: 'ItemCtrl'
+      })
+      .state('editItem', {
+        url: '/editItem',
+        templateUrl: 'js/item/templates/itemDetail.html',
+        controller: 'ItemCtrl'
       });
-    $urlRouterProvider.otherwise('item');
+
+    $urlRouterProvider
+//      .when('/', { controller: ItemCtrl, templateUrl: 'js/item/templates/item.html' })
+//      .when('/newItem', { controller: ItemCtrl, templateUrl: 'js/item/templates/itemDetail.html' })
+//      .when('/editItem', { controller: ItemCtrl, templateUrl: 'js/item/templates/itemDetail.html' })
+      .otherwise('/');
   }]);

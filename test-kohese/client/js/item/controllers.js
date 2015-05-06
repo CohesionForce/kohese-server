@@ -2,9 +2,9 @@
 
 angular
   .module('app')
-  .controller('ItemCtrl', ['$scope', '$state', 'Item', function($scope,
-      $state, Item) {
-    $scope.todos = [];
+  .controller('ItemCtrl', ['$scope', '$state', '$location', 'Item', function($scope,
+      $state, $location, Item) {
+    $scope.items = [];
     function getItems() {
       Item
         .find()
@@ -16,16 +16,24 @@ angular
     getItems();
 
     $scope.addItem = function() {
-      Item
-        .create($scope.newItem)
-        .$promise
-        .then(function(item) {
-          $scope.newItem = '';
-          $scope.itemForm.content.$setPristine();
-          $('.focus').focus(); //JQuery hack for refocusing text input
-          getItems();
-        });
-    };
+        Item
+          .create($scope.editedItem)
+          .$promise
+          .then(function(item) {
+            $scope.editedItem = '';
+            $location.path('/');
+          });
+      };
+
+    $scope.evaluate = function() {
+    	$scope.evaluated = true;
+    }
+    
+    $scope.editItem = function(item) {
+    	// TBD:  need to determine which scope this is in
+        $scope.editedItem = item;
+        $location.path('/editItem');
+      };
 
     $scope.removeItem = function(item) {
       Item
