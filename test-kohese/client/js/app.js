@@ -9,25 +9,26 @@ angular
       $urlRouterProvider) {
 
     $stateProvider
-      .state('listItems', {
+      .state('items', {
         url: '/',
         templateUrl: 'js/item/templates/item.html',
         controller: 'ItemCtrl'
-      })
+      });
+    $stateProvider    
       .state('newItem', {
-        url: '/newItem',
+//        parent: 'items',
+    	url: '/newItem',
         templateUrl: 'js/item/templates/itemDetail.html',
         controller: 'ItemCtrl'
-      })
+      });
+    $stateProvider    
       .state('editItem', {
+//        parent: 'items',
         url: '/editItem',
         templateUrl: 'js/item/templates/itemDetail.html',
         controller: 'ItemCtrl'
       });
 
     $urlRouterProvider
-//      .when('/', { controller: ItemCtrl, templateUrl: 'js/item/templates/item.html' })
-//      .when('/newItem', { controller: ItemCtrl, templateUrl: 'js/item/templates/itemDetail.html' })
-//      .when('/editItem', { controller: ItemCtrl, templateUrl: 'js/item/templates/itemDetail.html' })
       .otherwise('/');
   }]);

@@ -15,6 +15,10 @@ angular
     }
     getItems();
 
+    $scope.openAddItem = function() {
+        $state.go('newItem');
+      }
+
     $scope.addItem = function() {
         Item
           .create($scope.editedItem)
@@ -26,6 +30,7 @@ angular
       };
 
     $scope.evaluate = function() {
+    	// TBD:  need to determine which scope this is in
     	$scope.evaluated = true;
     }
     
