@@ -12,21 +12,21 @@ angular
       .state('items', {
         url: '/',
         templateUrl: 'js/item/templates/item.html',
-        controller: 'ItemCtrl'
+        controller: 'ItemController'
       });
     $stateProvider    
       .state('newItem', {
 //        parent: 'items',
     	url: '/newItem',
         templateUrl: 'js/item/templates/itemDetail.html',
-        controller: 'ItemCtrl'
+        controller: 'ItemEditController'
       });
     $stateProvider    
       .state('editItem', {
 //        parent: 'items',
-        url: '/editItem',
+        url: '/editItem/:itemId',
         templateUrl: 'js/item/templates/itemDetail.html',
-        controller: 'ItemCtrl'
+        controller: 'ItemEditController'
       });
 
     $urlRouterProvider

@@ -2,7 +2,7 @@
 
 angular
   .module('app')
-  .controller('ItemCtrl', ['$scope', '$state', '$location', 'Item', function($scope,
+  .controller('ItemController', ['$scope', '$state', '$location', 'Item', function($scope,
       $state, $location, Item) {
     $scope.items = [];
     function getItems() {
@@ -15,29 +15,13 @@ angular
     }
     getItems();
 
-    $scope.openAddItem = function() {
+    $scope.newItem = function() {
         $state.go('newItem');
       }
 
-    $scope.addItem = function() {
-        Item
-          .create($scope.editedItem)
-          .$promise
-          .then(function(item) {
-            $scope.editedItem = '';
-            $location.path('/');
-          });
-      };
-
-    $scope.evaluate = function() {
-    	// TBD:  need to determine which scope this is in
-    	$scope.evaluated = true;
-    }
-    
     $scope.editItem = function(item) {
     	// TBD:  need to determine which scope this is in
-        $scope.editedItem = item;
-        $location.path('/editItem');
+        $state.go('editItem', {itemId: item.id});
       };
 
     $scope.removeItem = function(item) {
@@ -49,3 +33,33 @@ angular
         });
     };
   }]);
+
+angular
+.module('app')
+.controller('ItemEditController', ['$scope', '$state', '$location', 'Item'	, function($scope,
+    $state, $location, Item) {
+
+    $scope.editedItem = null;
+    
+	function getItem() {
+		if ($state.params.hasOwnProperty('itemId')){
+          Item
+            .findById({id: $state.params.itemId})
+            .$promise
+            .then(function(results) {
+              $scope.editedItem = results;
+            });
+		}
+      }
+      getItem();
+
+    $scope.upsertItem = function() {
+        Item
+          .upsert($scope.editedItem)
+          .$promise
+          .then(function(updatedItem) {
+             $state.go('items');
+          });
+      };
+
+}]);

@@ -7,7 +7,7 @@
         <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
         <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
         <th><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
-        <th><i class="glyphicon glyphicon-plus pull-right" ng-click="openAddItem()"></i></th>
+        <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
     </thead>
     <tbody>
         <tr ng-repeat="item in items  | filter:itemQuery | orderBy:itemSortField">
