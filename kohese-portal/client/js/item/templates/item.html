@@ -10,7 +10,7 @@
         <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
     </thead>
     <tbody>
-        <tr ng-repeat="item in items  | filter:itemQuery | orderBy:itemSortField">
+        <tr ng-repeat="item in items  | filter:itemQuery | orderBy:itemSortField" ng-click="editItem(item)">
             <td>{{item.id}}</td>
             <td>{{item.title}}</td>
             <td>{{item.description}}</td>

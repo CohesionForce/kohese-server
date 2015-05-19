@@ -18,7 +18,7 @@
         <textarea type="text" ng-model="editedItem.description" id="Description"/>
     </div>
 </div>
-<div class="control-group" ng-class="{error: itemForm.parentId.$invalid}">
+<div class="control-group"  ng-click="editItem({id:editedItem.parentId})" ng-class="{error: itemForm.parentId.$invalid}">
     <label class="control-label" for="Parent">Parent</label>
     <div class="controls">
         <input type="text" ng-model="editedItem.parentId" id="Parent" ng-disabled="true"/>
