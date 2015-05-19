@@ -4,6 +4,11 @@
   "idInjection": true,
   "strict": true,
   "properties": {
+     "id": {
+      "id": true,
+      "type": "string",
+      "defaultFn": "guid"
+    },
     "title": {
       "type": "string",
       "required": true
@@ -12,8 +17,8 @@
       "type": "string"
     },
     "parentId": {
-      "type": "number",
-      "default": 0
+      "type": "string",
+      "default": ""
     }
   },
   "validations": [],
