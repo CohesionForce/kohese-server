@@ -16,6 +16,14 @@ angular
     }
     getItems();
 
+    $scope.cancel = function() {
+      if (angular.isDefined($state.params.parentId)){
+        $state.go('editItem', {itemId: $state.params.parentId});
+   	  } else {
+        $state.go('items');        		 
+       }
+     }
+    	 
     $scope.newItem = function() {
         $state.go('newItem');
       }
@@ -72,6 +80,9 @@ angular
       getItem();
 
     $scope.upsertItem = function() {
+    	if (angular.isUndefined($state.params.parentId)){
+    		$scope.editedItem.parentId = "ROOT";
+    	}
         Item
           .upsert($scope.editedItem)
           .$promise
@@ -83,7 +94,15 @@ angular
         	 }
           });
       };
-      
+
+    $scope.cancel = function() {
+      if (angular.isDefined($state.params.parentId)){
+        $state.go('editItem', {itemId: $state.params.parentId});
+   	  } else {
+        $state.go('items');        		 
+       }
+     }
+    	 
       $scope.newItem = function() {
           $state.go('newItem', {parentId: $scope.editedItem.id});
         }
@@ -91,7 +110,7 @@ angular
       $scope.editItem = function(item) {
           $state.go('editItem', {itemId: item.id});
         };
-
+  
       $scope.removeItem = function(item) {
         Item
           .deleteById(item)
