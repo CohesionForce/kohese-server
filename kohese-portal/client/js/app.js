@@ -17,7 +17,7 @@ angular
     $stateProvider    
       .state('newItem', {
 //        parent: 'items',
-    	url: '/newItem',
+    	url: '/newItem?parentId',
         templateUrl: 'js/item/templates/itemDetail.html',
         controller: 'ItemEditController'
       });
