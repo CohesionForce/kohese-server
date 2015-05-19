@@ -1,6 +1,7 @@
 <h2>{{listTitle}}</h2>
 <hr>
-<div class="pull-left">Search:<input ng-model="itemQuery", type="text"/></div>
+<div class="container">Search:<input ng-model="itemQuery", type="text"/></div>
+<hr>
 <table class="table table-striped table-condensed table-hover">
     <thead>
         <th><a href="" ng-click="itemSortField = 'id'">Id</a></th>
@@ -10,12 +11,12 @@
         <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
     </thead>
     <tbody>
-        <tr ng-repeat="item in items  | filter:itemQuery | orderBy:itemSortField" ng-click="editItem(item)">
+        <tr ng-repeat="item in items  | filter:itemQuery | orderBy:itemSortField"">
             <td>{{item.id}}</td>
             <td>{{item.title}}</td>
             <td>{{item.description}}</td>
             <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{item.parentId}}</td>
-            <td class="pull-right">
+            <td style="width:50px" class="pull-right">
               <i class="glyphicon glyphicon-pencil" ng-click="editItem(item)"></i>
               <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)"></i>
             </td>
