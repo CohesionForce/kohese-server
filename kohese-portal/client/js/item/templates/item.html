@@ -11,13 +11,12 @@
         <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
     </thead>
     <tbody>
-        <tr ng-repeat="item in items  | filter:itemQuery | orderBy:itemSortField"">
-            <td>{{item.id}}</td>
-            <td>{{item.title}}</td>
-            <td>{{item.description}}</td>
+        <tr ng-repeat="item in items  | filter:itemQuery | orderBy:itemSortField">
+            <td ng-click="editItem(item)">{{item.id}}</td>
+            <td ng-bind-html="item.title | highlight:itemQuery">{{item.title}}</td>
+            <td ng-bind-html="item.description | highlight:itemQuery">{{item.description}}</td>
             <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{item.parentId}}</td>
-            <td style="width:50px" class="pull-right">
-              <i class="glyphicon glyphicon-pencil" ng-click="editItem(item)"></i>
+            <td class="pull-right">
               <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)"></i>
             </td>
         </tr>
