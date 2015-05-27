@@ -1,12 +1,14 @@
 {
   "name": "Item",
   "base": "PersistedModel",
+  "strict": "validate",
   "idInjection": true,
-  "strict": true,
+  "persistUndefinedAsNull": true,
+  "trackChanges": true,
   "properties": {
-     "id": {
-      "id": true,
+    "id": {
       "type": "string",
+      "id": true,
       "defaultFn": "guid"
     },
     "title": {
@@ -27,6 +29,11 @@
       "type": "hasMany",
       "model": "Item",
       "foreignKey": "parentId"
+    },
+    "children2": {
+      "type": "referencesMany",
+      "model": "Item",
+      "property": "childrenIds"
     },
     "parent": {
       "type": "belongsTo",

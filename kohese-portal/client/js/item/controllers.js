@@ -80,9 +80,6 @@ angular
       getItem();
 
     $scope.upsertItem = function() {
-    	if (angular.isUndefined($state.params.parentId)){
-    		$scope.editedItem.parentId = "ROOT";
-    	}
         Item
           .upsert($scope.editedItem)
           .$promise
