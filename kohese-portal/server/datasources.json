@@ -3,5 +3,9 @@
     "name": "db",
     "connector": "memory",
     "file": "db.json"
+  },
+  "kdb_mongo": {
+    "name": "kdb_mongo",
+    "connector": "mongodb"
   }
 }
