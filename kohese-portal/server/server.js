@@ -29,9 +29,9 @@ boot(app, __dirname, function(err) {
     app.io = require('socket.io')(app.start());
     app.io.on('connection', function(socket){
       console.log('a user connected: %s', socket.id);
-      socket.on('chat message', function(msg){
+      socket.on('change', function(msg){
           console.log('message(' + socket.id + ')' + msg);
-          app.io.emit('chat message', socket.id + ':' + msg);
+          app.io.emit('change', socket.id + ':' + msg);
       });
       socket.on('disconnect', function(){
           console.log('user disconnected: %s', socket.id);
