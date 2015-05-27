@@ -22,7 +22,7 @@
   },
   "files": {
     "loopback#static": {
-      "params": "$!../client/chat"
+      "params": "$!../client/change"
     }
   },
   "final": {
