@@ -18,10 +18,10 @@
         <textarea rows="4" cols="50" type="text" ng-model="editedItem.description" id="Description"/>
     </div>
 </div>
-<div class="control-group"  ng-click="editItem({id:editedItem.parentId})" ng-class="{error: itemForm.parentId.$invalid}">
-    <label class="control-label" for="Parent">Parent</label>
+<div class="control-group" ng-class="{error: itemForm.parentId.$invalid}">
+    <label class="control-label" for="Parent" ng-click="editItem({id:editedItem.parentId})">Parent</label>
     <div class="controls">
-        <input type="text" ng-model="editedItem.parentId" id="Parent" ng-disabled="true"/>
+        <input type="text" ng-model="editedItem.parentId" id="Parent"/>
     </div>
 </div>
 <div class="form-actions">
