@@ -1,7 +1,5 @@
 module.exports = function(Item) {
 
-	//var io = require('socket.io');
-	//var app = require('loopback');
 	var app = require('../../server/server.js');
 	
 	Item.observe('after save', function(ctx, next) {
