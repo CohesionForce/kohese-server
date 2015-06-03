@@ -1,0 +1,40 @@
+
+<h2>{{listTitle}}</h2>
+<hr>
+    <input type="checkbox" ng-model="showAsTree" ng-init="showAsTree=false" name="showAsTreeInput"/> Show As Tree
+<hr>
+
+<div ng-show="showAsTree">
+    <button ng-click="my_tree.expand_all()" class="btn btn-default btn-sm">Expand All</button>
+    <button ng-click="my_tree.collapse_all()" class="btn btn-default btn-sm">Collapse All</button>
+    <input class="input-sm pull-right" type="text" ng-model="filterString" placeholder="Filter" />
+    <tree-grid tree-data="tree_data" tree-control="my_tree" col-defs="col_defs" expand-on="expanding_property" on-select="my_tree_handler(branch)" expand-level="2" icon-leaf= "glyphicon glyphicon-globe"></tree-grid>
+
+</div>
+
+<div ng-show="!showAsTree">
+<div class="container">Search:<input ng-model="filterString" type="text" placeholder="Filter"/> <div class="pull-right">Showing {{filteredItems.length}} of {{items.length}}</div></div>
+
+<hr>
+<table class="table table-striped table-condensed table-hover">
+    <thead>
+        <th><a href="" ng-click="itemSortField = 'id'">Id</a></th>
+        <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
+        <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
+        <th ng-hide="isEdit"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
+        <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
+    </thead>
+    <tbody>
+        <tr ng-repeat="item in filteredItems = (items  | filter:filterString) | orderBy:itemSortField">
+            <td ng-click="editItem(item)">{{item.id}}</td>
+            <td ng-bind-html="item.title | highlight:filterString">{{item.title}}</td>
+            <td ng-bind-html="item.description | highlight:filterString">{{item.description}}</td>
+            <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{treeObjs[item.parentId].title}}</td>
+            <td class="pull-right">
+              <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)"></i>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</div>

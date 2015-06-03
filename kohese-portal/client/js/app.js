@@ -3,7 +3,8 @@
 angular
   .module('app', [
     'lbServices',
-    'ui.router'
+    'ui.router',
+    'treeGrid'
   ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider,
       $urlRouterProvider) {
@@ -11,7 +12,7 @@ angular
     $stateProvider
       .state('items', {
         url: '/',
-        templateUrl: 'js/item/templates/item.html',
+        templateUrl: 'js/item/templates/itemTree.html',
         controller: 'ItemController'
       });
     $stateProvider    
