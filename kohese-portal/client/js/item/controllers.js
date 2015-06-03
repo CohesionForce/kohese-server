@@ -58,7 +58,7 @@ angular
             field: "description",
             displayName: "Description",
     		sortable : false,
-    		cellTemplate: "<span ng-style='{width: 50%}'>{{ row.branch[col.field] }}</span>",
+    		cellTemplate: "<span>{{ row.branch[col.field] | limitTo:70 }}<span ng-show=\"row.branch[col.field].length>70\">...</span></span>",
 //    		cellTemplate: "<textarea cols=\"70\" type=\"text\" ng-model=\"row.branch[col.field]\"/>",
 //    			"<img ng-click="cellTemplateScope.click('example')" ng-src="{{ row.branch[col.field] }}" />",
     		filterable: true
