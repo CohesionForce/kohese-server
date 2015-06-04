@@ -7,6 +7,7 @@ angular
     $scope.items = [];
     $scope.tree_data = [];
     $scope.my_tree = {};
+    $scope.filterString = "";
     
     $scope.listTitle = "Item List"
     function getItems() {
@@ -87,6 +88,8 @@ angular
         while (i < len) {
         	var itemProxy = {};
             itemProxy.data = data[i++];
+            itemProxy.id = itemProxy.data.id;
+            itemProxy.parentId = itemProxy.data.parentId;
             itemProxy.title = itemProxy.data.title;
             itemProxy.description = itemProxy.data.description;
             primaryKey = itemProxy.data[primaryIdName];
