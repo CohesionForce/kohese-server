@@ -1,39 +1,104 @@
-<form name="itemForm" class="form-horizontal">
 
-<div class="control-group" ng-class="{error: itemForm.id.$invalid}" ng-show="isEdit">
-    <label class="control-label" for="Id">Id</label>
-    <div class="controls">
-        <input type="text" ng-model="editedItem.id" id="Id" ng-disabled="true"/>
-    </div>
-</div>
-<div class="control-group" ng-class="{error: itemForm.title.$invalid}">
-    <label class="control-label" for="Title">Title</label>
-    <div class="controls">
-        <input type="text" ng-model="editedItem.title" id="Title"/>
-    </div>
-</div>
-<div class="control-group" ng-class="{error: itemForm.description.$invalid}">
-    <label class="control-label" for="Description">Description</label>
-    <div class="controls">
-        <textarea rows="4" cols="50" type="text" ng-model="editedItem.description" id="Description"/>
-    </div>
-</div>
-<div class="control-group" ng-class="{error: itemForm.parentId.$invalid}">
-    <label class="control-label" for="Parent" ng-click="editItem({id:editedItem.parentId})">Parent</label>
-    <div class="controls">
-        <input type="text" ng-model="editedItem.parentId" id="Parent"/>
-    </div>
-</div>
-<div class="form-actions">
-    <button ng-click="upsertItem()" class="btn btn-primary">
-        Update
-    </button>
-    <button ng-click="cancel()" class="btn btn-primary">
-        Cancel
-    </button>
-</div>
-</form>
+<div class="panel panel-default">
+	<div class="panel-heading">Item Information</div>
+	<!-- /.panel-heading -->
+	<div class="panel-body">
+		<!-- Nav tabs -->
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#details" data-toggle="tab">Details</a></li>
+			<li><a href="#children" data-toggle="tab">Children</a></li>
+			<li><a href="#analysis" data-toggle="tab">Analysis</a></li>
+			<li><a href="#history" data-toggle="tab">History</a></li>
+			<li><a href="#journal" data-toggle="tab">Journal</a></li>
+		</ul>
 
-<div ng-show="isEdit">
-  <ng-include src="'js/item/templates/item.html'"/>
+		<!-- Tab panes -->
+		<div class="tab-content">
+			<div class="tab-pane fade in active" id="details">
+				<form name="itemForm" class="form-horizontal">
+
+					<div class="control-group" ng-class="{error: itemForm.id.$invalid}"
+						ng-show="isEdit">
+						<label class="control-label" for="Id">Id</label>
+						<div class="controls">
+							<input type="text" ng-model="editedItem.id" id="Id"
+								ng-disabled="true" />
+						</div>
+					</div>
+					<div class="control-group"
+						ng-class="{error: itemForm.title.$invalid}">
+						<label class="control-label" for="Title">Title</label>
+						<div class="controls">
+							<input type="text" ng-model="editedItem.title" id="Title" />
+						</div>
+					</div>
+					<div class="control-group"
+						ng-class="{error: itemForm.description.$invalid}">
+						<label class="control-label" for="Description">Description</label>
+						<div class="controls">
+							<textarea rows="4" cols="50" type="text"
+								ng-model="editedItem.description" id="Description" />
+						</div>
+					</div>
+					<div class="control-group"
+						ng-class="{error: itemForm.parentId.$invalid}">
+						<label class="control-label" for="Parent"
+							ng-click="editItem({id:editedItem.parentId})">Parent</label>
+						<div class="controls">
+							<input type="text" ng-model="editedItem.parentId" id="Parent" />
+						</div>
+					</div>
+					<div class="form-actions">
+						<button ng-click="upsertItem()" class="btn btn-primary">
+							Update</button>
+						<button ng-click="cancel()" class="btn btn-primary">
+							Cancel</button>
+					</div>
+				</form>
+			</div>
+			<div class="tab-pane fade" id="children">
+				<div ng-show="isEdit">
+					<ng-include src="'js/item/templates/item.html'" />
+				</div>
+			</div>
+			<div class="tab-pane fade" id="analysis">
+				<h4>Analysis Tab</h4>
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+					enim ad minim veniam, quis nostrud exercitation ullamco laboris
+					nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+					culpa qui officia deserunt mollit anim id est laborum.</p>
+			</div>
+			<div class="tab-pane fade" id="history">
+				<h4>History Tab</h4>
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+					enim ad minim veniam, quis nostrud exercitation ullamco laboris
+					nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+					culpa qui officia deserunt mollit anim id est laborum.</p>
+			</div>
+			<div class="tab-pane fade" id="journal">
+				<h4>Journal Tab</h4>
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+					enim ad minim veniam, quis nostrud exercitation ullamco laboris
+					nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+					culpa qui officia deserunt mollit anim id est laborum.</p>
+			</div>
+		</div>
+	</div>
+	<!-- /.panel-body -->
 </div>
+<!-- /.panel -->
+
+
+
+
+
+
