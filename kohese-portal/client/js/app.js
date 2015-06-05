@@ -12,22 +12,34 @@ angular
     $stateProvider
       .state('items', {
         url: '/',
-        templateUrl: 'js/item/templates/itemTree.html',
-        controller: 'ItemController'
+        views: {
+        	"list@": {
+                templateUrl: 'js/item/templates/itemTree.html',
+                controller: 'ItemController'        		
+        	}
+        }
       });
     $stateProvider    
       .state('newItem', {
 //        parent: 'items',
     	url: '/newItem?parentId',
-        templateUrl: 'js/item/templates/itemDetail.html',
-        controller: 'ItemEditController'
+        views: {
+        	"detail@": {
+                templateUrl: 'js/item/templates/itemDetail.html',
+                controller: 'ItemEditController'
+        	}
+        }
       });
     $stateProvider    
       .state('editItem', {
 //        parent: 'items',
         url: '/editItem/:itemId',
-        templateUrl: 'js/item/templates/itemDetail.html',
-        controller: 'ItemEditController'
+        views: {
+        	"detail@": {
+                templateUrl: 'js/item/templates/itemDetail.html',
+                controller: 'ItemEditController'
+        	}
+        }
       });
 
     $urlRouterProvider
