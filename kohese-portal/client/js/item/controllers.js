@@ -204,3 +204,12 @@ angular
       };
 
 }]);
+
+angular
+.module('app')
+.controller('NavigationController', ['$scope', '$state', '$location', 'Item', function($scope,
+    $state, $location, Item) {
+
+    $('#side-menu').metisMenu();
+
+}]);

@@ -4,7 +4,8 @@ angular
   .module('app', [
     'lbServices',
     'ui.router',
-    'treeGrid'
+    'treeGrid',
+    'ui.layout'
   ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider,
       $urlRouterProvider) {
@@ -21,7 +22,7 @@ angular
       });
     $stateProvider    
       .state('newItem', {
-//        parent: 'items',
+        parent: 'items',
     	url: '/newItem?parentId',
         views: {
         	"detail@": {
@@ -32,7 +33,7 @@ angular
       });
     $stateProvider    
       .state('editItem', {
-//        parent: 'items',
+        parent: 'items',
         url: '/editItem/:itemId',
         views: {
         	"detail@": {
