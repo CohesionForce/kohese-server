@@ -4,17 +4,8 @@
 	<!-- /.panel-heading -->
 	<div class="panel-body">
 		<!-- Nav tabs -->
-		<ul class="nav nav-tabs">
-			<li class="active"><a href="#details" data-toggle="tab">Details</a></li>
-			<li><a href="#children" data-toggle="tab">Children</a></li>
-			<li><a href="#analysis" data-toggle="tab">Analysis</a></li>
-			<li><a href="#history" data-toggle="tab">History</a></li>
-			<li><a href="#journal" data-toggle="tab">Journal</a></li>
-		</ul>
-
-		<!-- Tab panes -->
-		<div class="tab-content">
-			<div class="tab-pane fade in active" id="details">
+		<tabset>
+			<tab heading="Details">
 				<form name="itemForm" class="form-horizontal">
 
 					<div class="control-group" ng-class="{error: itemForm.id.$invalid}"
@@ -55,13 +46,13 @@
 							Cancel</button>
 					</div>
 				</form>
-			</div>
-			<div class="tab-pane fade" id="children">
+			</tab>
+			<tab heading="Children">
 				<div ng-show="isEdit">
 					<ng-include src="'js/item/templates/item.html'" />
 				</div>
-			</div>
-			<div class="tab-pane fade" id="analysis">
+			</tab>
+			<tab heading="Analysis">
 				<h4>Analysis Tab</h4>
 				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
 					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -70,8 +61,8 @@
 					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
 					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
 					culpa qui officia deserunt mollit anim id est laborum.</p>
-			</div>
-			<div class="tab-pane fade" id="history">
+			</tab>
+			<tab heading="History">
 				<h4>History Tab</h4>
 				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
 					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -80,8 +71,8 @@
 					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
 					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
 					culpa qui officia deserunt mollit anim id est laborum.</p>
-			</div>
-			<div class="tab-pane fade" id="journal">
+			</tab>
+			<tab heading="Journal">
 				<h4>Journal Tab</h4>
 				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
 					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -90,8 +81,8 @@
 					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
 					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
 					culpa qui officia deserunt mollit anim id est laborum.</p>
-			</div>
-		</div>
+			</tab>
+		</tabset>
 	</div>
 	<!-- /.panel-body -->
 </div>

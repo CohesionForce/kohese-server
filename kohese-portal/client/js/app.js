@@ -5,7 +5,8 @@ angular
     'lbServices',
     'ui.router',
     'treeGrid',
-    'ui.layout'
+    'ui.layout',
+    'ui.bootstrap'
   ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider,
       $urlRouterProvider) {

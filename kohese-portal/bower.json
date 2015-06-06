@@ -26,6 +26,8 @@
     "angular-bootstrap-grid-tree": "https://github.com/CohesionForce/tree-grid-directive.git",
     "font-awesome": "~4.3.0",
     "metisMenu": "~2.0.2",
-    "angular-ui-layout": "~1.0.5"
+    "angular-ui-layout": "~1.0.5",
+    "ui.bootstrap": "~0.13.0",
+    "angular-bootstrap": "~0.13.0"
   }
 }
