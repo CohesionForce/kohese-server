@@ -7,15 +7,6 @@
 		<tabset>
 			<tab heading="Details">
 				<form name="itemForm" class="form-horizontal">
-
-					<div class="control-group" ng-class="{error: itemForm.id.$invalid}"
-						ng-show="isEdit">
-						<label class="control-label" for="Id">Id</label>
-						<div class="controls">
-							<input type="text" ng-model="editedItem.id" id="Id"
-								ng-disabled="true" />
-						</div>
-					</div>
 					<div class="control-group"
 						ng-class="{error: itemForm.title.$invalid}">
 						<label class="control-label" for="Title">Title</label>
@@ -29,6 +20,14 @@
 						<div class="controls">
 							<textarea rows="4" cols="50" type="text"
 								ng-model="editedItem.description" id="Description" />
+						</div>
+					</div>
+					<div class="control-group" ng-class="{error: itemForm.id.$invalid}"
+						ng-show="isEdit">
+						<label class="control-label" for="Id">Id</label>
+						<div class="controls">
+							<input type="text" ng-model="editedItem.id" id="Id"
+								ng-disabled="true" />
 						</div>
 					</div>
 					<div class="control-group"
