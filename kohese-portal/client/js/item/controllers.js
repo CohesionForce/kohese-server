@@ -6,6 +6,7 @@ angular
       $state, $location, Item) {
     $scope.items = [];
     $scope.tree_data = [];
+    $scope.tree = [];
     $scope.my_tree = {};
     $scope.filterString = "";
     
@@ -16,7 +17,8 @@ angular
         .$promise
         .then(function(results) {
           $scope.items = results;
-          $scope.tree_data = getTree($scope.items, 'id', 'parentId');
+          $scope.tree = convertListToTree($scope.items, 'id', 'parentId');
+          $scope.tree_data = $scope.tree.data;
         });
     }
     getItems();
@@ -70,43 +72,45 @@ angular
         console.log('you clicked on', branch)
     }
 
-    function getTree(data, primaryIdName, parentIdName) {
-        if (!data || data.length == 0 || !primaryIdName || !parentIdName)
+    function convertListToTree(dataList, primaryIdName, parentIdName) {
+        if (!dataList || dataList.length == 0 || !primaryIdName || !parentIdName)
             return [];
 
-        var tree = [],
-            rootIds = [],
-            item = data[0],
+        var rootIds = [],
+            item = dataList[0],
             primaryKey = item[primaryIdName],
             parentId,
             parent,
-            len = data.length,
+            len = dataList.length,
             i = 0;
 
-        $scope.treeObjs = {};
+        var tree = {};
+        tree.data = [];
+        tree.objs = {};
         
         while (i < len) {
         	var itemProxy = {};
-            itemProxy.data = data[i++];
+            primaryKey = dataList[i][primaryIdName];
+        	if(angular.isDefined(tree.objs[primaryKey])){
+        		// Some forward declaration occurred, so copy the existing data
+        		itemProxy = tree.objs[primaryKey];
+        	}
+            itemProxy.data = dataList[i++];
             itemProxy.id = itemProxy.data.id;
             itemProxy.parentId = itemProxy.data.parentId;
             itemProxy.title = itemProxy.data.title;
             itemProxy.description = itemProxy.data.description;
             primaryKey = itemProxy.data[primaryIdName];
-        	if(angular.isDefined($scope.treeObjs[primaryKey])){
-        		// Some forward declaration of children occurred, so copy them here
-        		itemProxy.children = $scope.treeObjs[primaryKey].children;
-        	}
-            $scope.treeObjs[primaryKey] = itemProxy;
+            tree.objs[primaryKey] = itemProxy;
             parentId = itemProxy.data[parentIdName];
 
             if (parentId) {
-            	if(angular.isDefined($scope.treeObjs[parentId])){
-                    parent = $scope.treeObjs[parentId];            		
+            	if(angular.isDefined(tree.objs[parentId])){
+                    parent = tree.objs[parentId];            		
             	} else {
             		// Create the parent before it is found
             		parent = {};
-            		$scope.treeObjs[parentId] = parent;
+            		tree.objs[parentId] = parent;
             	}  
 
                 if (parent.children) {
@@ -120,7 +124,7 @@ angular
         }
 
         for (var i = 0; i < rootIds.length; i++) {
-            tree.push($scope.treeObjs[rootIds[i]]);
+            tree.data.push(tree.objs[rootIds[i]]);
         };
 
         return tree;

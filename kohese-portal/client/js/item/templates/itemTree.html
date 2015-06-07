@@ -26,7 +26,7 @@
             <td ng-click="editItem(item)">{{item.id}}</td>
             <td ng-bind-html="item.title | highlight:filterString">{{item.title}}</td>
             <td ng-bind-html="item.description | highlight:filterString">{{item.description}}</td>
-            <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{treeObjs[item.parentId].title}}</td>
+            <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{tree.objs[item.parentId].title}}</td>
             <td class="pull-right">
               <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)"></i>
             </td>
