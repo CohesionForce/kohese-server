@@ -1,10 +1,11 @@
-<div>
-    <input type="checkbox" ng-model="showAsTree" ng-init="showAsTree=true" name="showAsTreeInput"/> Show As Tree
-    <button ng-click="tree_control.expand_all()" class="btn btn-default btn-sm" ng-show="showAsTree">Expand All</button>
-    <button ng-click="tree_control.collapse_all()" class="btn btn-default btn-sm" ng-show="showAsTree">Collapse All</button>
+<div style="padding: 5px;">
+    <input type="checkbox" ng-model="showAsTree" ng-init="showAsTree=true" name="showAsTreeInput" style="margin: 5px"/> Show As Tree
+    <button ng-click="tree_control.expand_all()" class="btn btn-default btn-sm" ng-show="showAsTree" style="margin: 5px">Expand All</button>
+    <button ng-click="tree_control.collapse_all()" class="btn btn-default btn-sm" ng-show="showAsTree" style="margin: 5px">Collapse All</button>
     <span class="pull-right">
-      <input class="input-sm" type="text" ng-model="filterString" placeholder="Filter" />
-      <div>Showing {{filteredItems.length}} of {{items.length}}</div>
+      <span>Showing {{filteredItems.length}} of {{items.length}}</span>
+      <input class="input-sm" type="text" ng-model="filterString" placeholder="Filter" style="margin: 5px"/>
+
     </span>
 </div>
 
