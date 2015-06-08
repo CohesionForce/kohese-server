@@ -10,7 +10,7 @@
 </div>
 
 <div ng-show="showAsTree">
-    <tree-grid tree-data="tree_data" tree-control="tree_control" col-defs="col_defs" expand-on="expanding_property" on-select="my_tree_handler(branch)" icon-leaf= "glyphicon glyphicon-list-alt" expand-level="4"/>
+    <tree-grid tree-data="tree_data" tree-control="tree_control" col-defs="col_defs" expand-on="expanding_property" on-click="item_click_handler(branch)" icon-leaf= "glyphicon glyphicon-list-alt" expand-level="4"/>
 </div>
 
 <div ng-show="!showAsTree">

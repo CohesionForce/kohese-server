@@ -39,6 +39,10 @@ angular
         $state.go('editItem', {itemId: item.id});
       };
 
+    $scope.editItemById = function(id) {
+        $state.go('editItem', {itemId: id});
+      };
+
     $scope.removeItem = function(item) {
       Item
         .deleteById(item)
@@ -62,14 +66,11 @@ angular
             displayName: "Description",
     		sortable : false,
     		cellTemplate: "<span>{{ row.branch[col.field] | limitTo:70 }}<span ng-show=\"row.branch[col.field].length>70\">...</span></span>",
-//    		cellTemplate: "<textarea cols=\"70\" type=\"text\" ng-model=\"row.branch[col.field]\"/>",
-//    			"<img ng-click="cellTemplateScope.click('example')" ng-src="{{ row.branch[col.field] }}" />",
     		filterable: true
         }
     ];
 
-    $scope.my_tree_handler = function (branch) {
-        console.log('you clicked on', branch);
+    $scope.item_click_handler = function (branch) {
         $state.go('editItem', {itemId: branch.data.id});
     }
 
