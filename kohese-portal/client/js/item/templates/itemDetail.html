@@ -11,14 +11,14 @@
 						ng-class="{error: itemForm.title.$invalid}">
 						<label class="control-label" for="Title">Title</label>
 						<div class="controls">
-							<input type="text" ng-model="editedItem.title" id="Title" />
+							<input type="text" ng-model="editedItem.title" id="Title" style="width:100%"/>
 						</div>
 					</div>
 					<div class="control-group"
 						ng-class="{error: itemForm.description.$invalid}">
 						<label class="control-label" for="Description">Description</label>
 						<div class="controls">
-							<textarea rows="4" cols="50" type="text"
+							<textarea style="width:100%; height: 150px;" type="text"
 								ng-model="editedItem.description" id="Description" />
 						</div>
 					</div>
