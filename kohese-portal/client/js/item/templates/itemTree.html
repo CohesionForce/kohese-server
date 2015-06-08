@@ -1,7 +1,7 @@
 <div>
     <input type="checkbox" ng-model="showAsTree" ng-init="showAsTree=true" name="showAsTreeInput"/> Show As Tree
-    <button ng-click="my_tree.expand_all()" class="btn btn-default btn-sm" ng-show="showAsTree">Expand All</button>
-    <button ng-click="my_tree.collapse_all()" class="btn btn-default btn-sm" ng-show="showAsTree">Collapse All</button>
+    <button ng-click="tree_control.expand_all()" class="btn btn-default btn-sm" ng-show="showAsTree">Expand All</button>
+    <button ng-click="tree_control.collapse_all()" class="btn btn-default btn-sm" ng-show="showAsTree">Collapse All</button>
     <span class="pull-right">
       <input class="input-sm" type="text" ng-model="filterString" placeholder="Filter" />
       <div>Showing {{filteredItems.length}} of {{items.length}}</div>
@@ -9,7 +9,7 @@
 </div>
 
 <div ng-show="showAsTree">
-    <tree-grid tree-data="tree_data" tree-control="my_tree" col-defs="col_defs" expand-on="expanding_property" on-select="my_tree_handler(branch)" icon-leaf= "glyphicon glyphicon-list-alt" expand-level="4"/>
+    <tree-grid tree-data="tree_data" tree-control="tree_control" col-defs="col_defs" expand-on="expanding_property" on-select="my_tree_handler(branch)" icon-leaf= "glyphicon glyphicon-list-alt" expand-level="4"/>
 </div>
 
 <div ng-show="!showAsTree">

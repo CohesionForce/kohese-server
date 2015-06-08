@@ -7,7 +7,7 @@ angular
     $scope.items = [];
     $scope.tree_data = [];
     $scope.tree = [];
-    $scope.my_tree = {};
+    $scope.tree_control = {};
     $scope.filterString = "";
     
     $scope.listTitle = "Item List"
@@ -69,7 +69,7 @@ angular
     ];
 
     $scope.my_tree_handler = function (branch) {
-        console.log('you clicked on', branch)
+        console.log('you clicked on', branch);
     }
 
     function convertListToTree(dataList, primaryIdName, parentIdName) {
@@ -77,8 +77,7 @@ angular
             return [];
 
         var rootIds = [],
-            item = dataList[0],
-            primaryKey = item[primaryIdName],
+            primaryKey,
             parentId,
             parent,
             len = dataList.length,
@@ -113,7 +112,7 @@ angular
             		tree.objs[parentId] = parent;
             	}  
 
-                if (parent.children) {
+            	if (parent.children) {
                     parent.children.push(itemProxy);
                 } else {
                     parent.children = [itemProxy];
