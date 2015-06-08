@@ -70,6 +70,7 @@ angular
 
     $scope.my_tree_handler = function (branch) {
         console.log('you clicked on', branch);
+        $state.go('editItem', {itemId: branch.data.id});
     }
 
     function convertListToTree(dataList, primaryIdName, parentIdName) {
