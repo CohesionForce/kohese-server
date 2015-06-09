@@ -9,8 +9,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="item in filteredItems = (items  | filter:itemQuery) | orderBy:itemSortField">
-            <td ng-click="editItem(item)">{{item.id}}</td>
-            <td ng-bind-html="item.title | highlight:itemQuery">{{item.title}}</td>
+            <td ng-click="editItem(item)" ng-bind-html="item.title | highlight:itemQuery">{{item.title}}</td>
             <td ng-bind-html="item.description | highlight:itemQuery">{{item.description}}</td>
             <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{item.parentId}}</td>
             <td class="pull-right">
