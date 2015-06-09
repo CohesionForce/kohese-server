@@ -10,7 +10,7 @@
 			<div>
 				<div style="width: 50%; float: left">
 					<span class="control-group"
-						ng-class="{error: itemForm.id.$invalid}" ng-show="isEdit">
+						ng-class="{error: itemForm.id.$invalid}">
 						<label class="control-label" for="Id">Id</label>
 						<div class="controls">
 							<input style="width: 90%;" type="text" ng-model="editedItem.id"
@@ -25,7 +25,7 @@
 						ng-click="editItem({id:editedItem.parentId})">Parent Id</label>
 						<div class="controls">
 							<input style="width: 90%;" type="text"
-								ng-model="editedItem.parentId" id="Parent" />
+								ng-model="editedItem.parentId" id="Parent" ng-disabled="!enableEdit"/>
 						</div>
 					</span>
 				</div>
@@ -34,7 +34,7 @@
 						ng-class="{error: itemForm.title.$invalid}">
 						<label class="control-label" for="Title">Title</label>
 						<div class="controls">
-							<input type="text" ng-model="editedItem.title" id="Title" style="width:100%"/>
+							<input type="text" ng-model="editedItem.title" id="Title" ng-disabled="!enableEdit" style="width:100%"/>
 						</div>
 					</div>
 					<div class="control-group"
@@ -42,13 +42,15 @@
 						<label class="control-label" for="Description">Description</label>
 						<div class="controls">
 							<textarea style="width:100%; max-width:100%; height:90px;" type="text"
-								ng-model="editedItem.description" id="Description" />
+								ng-model="editedItem.description" ng-disabled="!enableEdit" id="Description" />
 						</div>
 					</div>
 					<div class="form-actions">
-						<button ng-click="upsertItem()" class="btn btn-primary">
+						<button ng-click="enableEdit=true" ng-disabled="enableEdit" class="btn btn-primary">
+							Edit</button>
+						<button ng-click="upsertItem()" ng-disabled="!enableEdit" class="btn btn-primary">
 							Update</button>
-						<button ng-click="cancel()" class="btn btn-primary">
+						<button ng-click="enableEdit=false; cancel()" ng-disabled="!enableEdit" class="btn btn-primary">
 							Cancel</button>
 					</div>
 				</form>
@@ -57,6 +59,16 @@
 				<div ng-show="isEdit">
 					<ng-include src="'js/item/templates/item.html'" />
 				</div>
+			</tab>
+			<tab heading="Relations">
+				<h4>Relations Tab</h4>
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+					enim ad minim veniam, quis nostrud exercitation ullamco laboris
+					nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+					culpa qui officia deserunt mollit anim id est laborum.</p>
 			</tab>
 			<tab heading="Analysis">
 				<h4>Analysis Tab</h4>

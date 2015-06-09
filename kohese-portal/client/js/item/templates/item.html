@@ -5,7 +5,7 @@
         <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
         <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
         <th ng-hide="isEdit"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
-        <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
+        <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()" ng-show="enableEdit"></i></th>
     </thead>
     <tbody>
         <tr ng-repeat="item in filteredItems = (items  | filter:itemQuery) | orderBy:itemSortField">
@@ -14,7 +14,7 @@
             <td ng-bind-html="item.description | highlight:itemQuery">{{item.description}}</td>
             <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{item.parentId}}</td>
             <td class="pull-right">
-              <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)"></i>
+              <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)" ng-show="enableEdit"></i>
             </td>
         </tr>
     </tbody>

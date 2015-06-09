@@ -119,6 +119,7 @@ angular
                 } else {
                     parent.children = [itemProxy];
                 }
+//            	itemProxy.parentRef = parent;
             } else {
                 rootIds.push(primaryKey);
             }
@@ -140,9 +141,11 @@ angular
 
     $scope.listTitle = "Children"
     $scope.editedItem = new Item;
-    
+    $scope.enableEdit = false;
+
     if (angular.isDefined($state.params.parentId)){
     	$scope.editedItem.parentId = $state.params.parentId;
+    	$scope.enableEdit=true;
     }
     
     $scope.items = [];
@@ -187,7 +190,7 @@ angular
       if (angular.isDefined($state.params.parentId)){
         $state.go('editItem', {itemId: $state.params.parentId});
    	  } else {
-        $state.go('items');        		 
+        $state.go('editItem', {itemId: $scope.editedItem.id});
        }
      }
     	 
