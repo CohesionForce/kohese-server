@@ -2,14 +2,14 @@
 
 angular
   .module('app')
-  .controller('ItemController', ['$scope', '$state', '$location', 'Item', function($scope,
-      $state, $location, Item) {
+  .controller('ItemController', ['$scope', '$state', '$location', 'Item', 'socket', function($scope,
+      $state, $location, Item, socket) {
     $scope.items = [];
     $scope.tree_data = [];
     $scope.tree = [];
     $scope.tree_control = {};
     $scope.filterString = "";
-    
+
     $scope.listTitle = "Item List"
     function getItems() {
       Item
@@ -27,10 +27,10 @@ angular
       if (angular.isDefined($state.params.parentId)){
         $state.go('editItem', {itemId: $state.params.parentId});
    	  } else {
-        $state.go('items');        		 
+        $state.go('items');
        }
      }
-    	 
+
     $scope.newItem = function() {
         $state.go('newItem');
       }
@@ -88,7 +88,7 @@ angular
         var tree = {};
         tree.data = [];
         tree.objs = {};
-        
+
         while (i < len) {
         	var itemProxy = {};
             primaryKey = dataList[i][primaryIdName];
@@ -107,12 +107,12 @@ angular
 
             if (parentId) {
             	if(angular.isDefined(tree.objs[parentId])){
-                    parent = tree.objs[parentId];            		
+                    parent = tree.objs[parentId];
             	} else {
             		// Create the parent before it is found
             		parent = {};
             		tree.objs[parentId] = parent;
-            	}  
+            	}
 
             	if (parent.children) {
                     parent.children.push(itemProxy);
@@ -132,6 +132,10 @@ angular
         return tree;
     }
 
+  socket.on('change', function(msg){
+    getItems();
+  })
+
   }]);
 
 angular
@@ -147,9 +151,9 @@ angular
     	$scope.editedItem.parentId = $state.params.parentId;
     	$scope.enableEdit=true;
     }
-    
+
     $scope.items = [];
-    
+
     function getChildren() {
       Item.children($scope.editedItem)
         .$promise
@@ -181,7 +185,7 @@ angular
         	 if (angular.isDefined($state.params.parentId)){
                  $state.go('editItem', {itemId: $state.params.parentId});
         	 } else {
-                 $state.go('items');        		 
+                 $state.go('items');
         	 }
           });
       };
@@ -193,7 +197,7 @@ angular
         $state.go('editItem', {itemId: $scope.editedItem.id});
        }
      }
-    	 
+
       $scope.newItem = function() {
           $state.go('newItem', {parentId: $scope.editedItem.id});
         }
@@ -201,7 +205,7 @@ angular
       $scope.editItem = function(item) {
           $state.go('editItem', {itemId: item.id});
         };
-  
+
       $scope.removeItem = function(item) {
         Item
           .deleteById(item)
@@ -210,6 +214,8 @@ angular
             getChildren();
           });
       };
+
+
 
 }]);
 

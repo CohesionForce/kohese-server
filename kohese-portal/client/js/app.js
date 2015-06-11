@@ -6,7 +6,9 @@ angular
     'ui.router',
     'treeGrid',
     'ui.layout',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'btford.socket-io'
+
   ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider,
       $urlRouterProvider) {
@@ -17,11 +19,11 @@ angular
         views: {
         	"list@": {
                 templateUrl: 'js/item/templates/itemTree.html',
-                controller: 'ItemController'        		
+                controller: 'ItemController'
         	}
         }
       });
-    $stateProvider    
+    $stateProvider
       .state('newItem', {
         parent: 'items',
     	url: '/newItem?parentId',
@@ -32,7 +34,7 @@ angular
         	}
         }
       });
-    $stateProvider    
+    $stateProvider
       .state('editItem', {
         parent: 'items',
         url: '/editItem/:itemId',
@@ -51,9 +53,12 @@ angular
     return function(text, phrase) {
       if(text !== null){
           if (phrase) text = text.replace(new RegExp('('+phrase+')', 'gi'),
-          '<span class="highlighted">$1</span>');    	 
+          '<span class="highlighted">$1</span>');
       }
 
       return $sce.trustAsHtml(text);
     }
+  })
+  .factory('socket', function (socketFactory) {
+    return socketFactory();
   });
