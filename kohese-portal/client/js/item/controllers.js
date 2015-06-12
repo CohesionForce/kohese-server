@@ -2,8 +2,8 @@
 
 angular
   .module('app')
-  .controller('ItemController', ['$scope', '$state', '$location', 'Item', 'socket', function($scope,
-      $state, $location, Item, socket) {
+  .controller('ItemController', ['$scope', '$state', '$location', 'Item', 'ItemRepository', function($scope,
+      $state, $location, Item, ItemRepository) {
     $scope.items = [];
     $scope.tree_data = [];
     $scope.tree = [];
@@ -131,10 +131,6 @@ angular
 
         return tree;
     }
-
-  socket.on('change', function(msg){
-    getItems();
-  })
 
   }]);
 

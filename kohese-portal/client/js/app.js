@@ -3,6 +3,7 @@
 angular
   .module('app', [
     'lbServices',
+    'itemServices',
     'ui.router',
     'treeGrid',
     'ui.layout',
