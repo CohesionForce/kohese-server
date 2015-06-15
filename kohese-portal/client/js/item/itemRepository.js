@@ -7,6 +7,7 @@ var module = angular.module("itemServices", []);
 module.service("ItemRepository", [ 'Item', 'socket', function(Item, socket) {
 
 	var tree = {};
+    var currentItem = {};
 	
 	socket.on('change', function(msg) {
 		var msgStruct = JSON.parse(msg);
@@ -26,6 +27,14 @@ module.service("ItemRepository", [ 'Item', 'socket', function(Item, socket) {
 	;
 	fetchItems();
 
+    function setCurrentItem (item){
+    	currentItem = item;
+    }
+
+    function getCurrentItem() {
+    	return currentItem;
+    }
+    
 	function getChildren(ofId) {
 		Item.children(ofId).$promise.then(function(results) {
 			// TBD:  This needs to be a specific location instead of a global
@@ -104,6 +113,8 @@ module.service("ItemRepository", [ 'Item', 'socket', function(Item, socket) {
     }
     
     return {
-    	internalTree : tree    
+    	internalTree : tree,
+    	setCurrentItem: setCurrentItem,
+    	getCurrentItem: getCurrentItem    
     }
 } ]);

@@ -138,8 +138,8 @@ angular
 
 angular
 .module('app')
-.controller('ItemEditController', ['$scope', '$state', '$location', 'Item'	, function($scope,
-    $state, $location, Item) {
+.controller('ItemEditController', ['$scope', '$state', '$location', 'Item', 'ItemRepository', function($scope,
+    $state, $location, Item, ItemRepository) {
 
     $scope.listTitle = "Children"
     $scope.editedItem = new Item;
@@ -169,6 +169,7 @@ angular
             .then(function(results) {
               $scope.isEdit = true;
               $scope.editedItem = results;
+              ItemRepository.setCurrentItem($scope.editedItem);
               getChildren();
             });
 		}
