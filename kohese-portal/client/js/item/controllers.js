@@ -10,6 +10,8 @@ angular
     $scope.tree_control = {};
     $scope.filterString = "";
 
+    $scope.newTree = ItemRepository.internalTree;
+    
     $scope.listTitle = "Item List"
     function getItems() {
       Item
@@ -119,7 +121,7 @@ angular
                 } else {
                     parent.children = [itemProxy];
                 }
-//            	itemProxy.parentRef = parent;
+            	// TBD: itemProxy.parentRef = parent;
             } else {
                 rootIds.push(primaryKey);
             }

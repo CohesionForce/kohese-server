@@ -6,8 +6,8 @@ var module = angular.module("itemServices", []);
 
 module.service("ItemRepository", [ 'Item', 'socket', function(Item, socket) {
 
-	var items = [];
-
+	var tree = {};
+	
 	socket.on('change', function(msg) {
 		var msgStruct = JSON.parse(msg);
 		console.log("ItemRepository Detected Change:  " + msgStruct);
@@ -18,18 +18,18 @@ module.service("ItemRepository", [ 'Item', 'socket', function(Item, socket) {
 
 	function fetchItems() {
 		Item.find().$promise.then(function(results) {
-			items = results;
-			// $scope.tree = convertListToTree($scope.items, 'id', 'parentId');
+			convertListToTree(results, 'id', 'parentId');
 			// $scope.tree_data = $scope.tree.data;
-			console.log("items.length: " + items.length);
+			// console.log("items.length: " + items.length);
 		});
 	}
 	;
 	fetchItems();
 
-	function getChildren() {
-		Item.children($scope.editedItem).$promise.then(function(results) {
-			$scope.items = results;
+	function getChildren(ofId) {
+		Item.children(ofId).$promise.then(function(results) {
+			// TBD:  This needs to be a specific location instead of a global
+			tmpChildList = results;
 		});
 	}
 
@@ -41,7 +41,69 @@ module.service("ItemRepository", [ 'Item', 'socket', function(Item, socket) {
 			// $scope.editedItem = results;
 			// getChildren();
 			console.log("Received:" + results);
-		});
+		});	
+		
 	}
 
+    function convertListToTree(dataList, primaryIdName, parentIdName) {
+        if (!dataList || dataList.length == 0 || !primaryIdName || !parentIdName)
+            return [];
+
+        var rootIds = [],
+            primaryKey,
+            parentId,
+            parent,
+            len = dataList.length,
+            i = 0;
+
+        tree.items = dataList;
+        tree.data = [];
+        tree.objs = {};
+
+        while (i < len) {
+        	var itemProxy = {};
+            primaryKey = dataList[i][primaryIdName];
+        	if(angular.isDefined(tree.objs[primaryKey])){
+        		// Some forward declaration occurred, so copy the existing data
+        		itemProxy = tree.objs[primaryKey];
+        	}
+            itemProxy.data = dataList[i++];
+            itemProxy.id = itemProxy.data.id;
+            itemProxy.parentId = itemProxy.data.parentId;
+            itemProxy.title = itemProxy.data.title;
+            itemProxy.description = itemProxy.data.description;
+            primaryKey = itemProxy.data[primaryIdName];
+            tree.objs[primaryKey] = itemProxy;
+            parentId = itemProxy.data[parentIdName];
+
+            if (parentId) {
+            	if(angular.isDefined(tree.objs[parentId])){
+                    parent = tree.objs[parentId];
+            	} else {
+            		// Create the parent before it is found
+            		parent = {};
+            		tree.objs[parentId] = parent;
+            	}
+
+            	if (parent.children) {
+                    parent.children.push(itemProxy);
+                } else {
+                    parent.children = [itemProxy];
+                }
+            	
+            	// itemProxy.parentRef = parent;
+            } else {
+                rootIds.push(primaryKey);
+            }
+        }
+
+        for (var i = 0; i < rootIds.length; i++) {
+            tree.data.push(tree.objs[rootIds[i]]);
+        };
+
+    }
+    
+    return {
+    	internalTree : tree    
+    }
 } ]);
