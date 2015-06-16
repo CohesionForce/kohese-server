@@ -11,9 +11,9 @@
   <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()" ng-show="enableEdit"></i></th>
   </thead>
   <tbody>
-  <tr ng-repeat="item in filteredItems = (items  | filter:itemQuery) | orderBy:itemSortField">
-    <td ng-click="editItem(item)" ng-bind-html="item.title | highlight:itemQuery"/>
-    <td ng-bind-html="item.description | highlight:itemQuery"/>
+  <tr ng-repeat="item in filteredItems = (items  | filter:filterString) | orderBy:itemSortField">
+    <td ng-click="editItem(item)" ng-bind-html="item.title | highlight:filterString"/>
+            <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=true" ng-bind-html="item.description | highlight:filterString"></td>
     <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{item.parentId}}</td>
     <td class="pull-right">
       <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)" ng-show="enableEdit"></i>

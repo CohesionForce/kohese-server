@@ -356,3 +356,17 @@ table.dataTable thead .sorting:after {
 .panel-yellow a:hover {
     color: #df8a13;
 }
+
+.trim-info {
+    max-width: 50em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;  
+    position: relative;
+}
+
+.trim-info-visible {
+    max-width: 50em;
+    white-space: wrap;  
+    position: relative;
+}

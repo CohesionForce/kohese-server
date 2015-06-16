@@ -1,7 +1,8 @@
 <div style="padding: 5px;">
-    <input type="checkbox" ng-model="showAsTree" ng-init="showAsTree=true" name="showAsTreeInput" style="margin: 5px"/> Show As Tree
-    <button ng-click="tree_control.expand_all()" class="btn btn-default btn-sm" ng-show="showAsTree" style="margin: 5px">Expand All</button>
-    <button ng-click="tree_control.collapse_all()" class="btn btn-default btn-sm" ng-show="showAsTree" style="margin: 5px">Collapse All</button>
+    <input type="checkbox" ng-model="showAsTree" ng-init="showAsTree=false" name="showAsTreeInput" style="margin: 5px"/> Show As Tree
+    <input type="checkbox" ng-model="showAsTreeList" ng-init="showAsTreeList=true" name="showAsTreeListInput" style="margin: 5px"/> Show As Tree List {{}}
+    <button ng-click="tree_control.expand_all()" class="btn btn-default btn-sm" ng-disabled="!showAsTree || showAsTreeList" style="margin: 5px">Expand All</button>
+    <button ng-click="tree_control.collapse_all()" class="btn btn-default btn-sm" ng-disabled="!showAsTree || showAsTreeList" style="margin: 5px">Collapse All</button>
     <span class="pull-right">
       <span>Showing {{filteredItems.length}} of {{items.length}}</span>
       <input class="input-sm" type="text" ng-model="filterString" placeholder="Filter" style="margin: 5px"/>
@@ -9,23 +10,23 @@
     </span>
 </div>
 
-<div ng-show="showAsTree">
+<div ng-show="showAsTree && !showAsTreeList">
     <tree-grid tree-data="tree_data" tree-control="tree_control" col-defs="col_defs" expand-on="expanding_property" on-click="item_click_handler(branch)" icon-leaf= "glyphicon glyphicon-list-alt" expand-level="4"/>
 </div>
 
-<div ng-show="!showAsTree">
+<div ng-show="!showAsTree || showAsTreeList">
 <table class="table tree-grid table-striped table-condensed table-hover">
     <thead>
         <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
         <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
-        <th ng-hide="isEdit"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
+        <th ng-show="!showAsTreeList" ng-hide="isEdit"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
         <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
     </thead>
     <tbody>
         <tr id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row" ng-repeat="itemProxy in filteredItems = (newTree.rows | filter:filterString)">
-            <td ng-click="editItem(itemProxy.item)" class="indented" ng-bind-html="itemProxy.item.title | highlight:filterString">nothing here</td>
-            <td ng-bind-html="itemProxy.item.description | highlight:filterString">{{itemProxy.item.description}}</td>
-            <td ng-click="editItem({id:itemProxy.item.parentId})" ng-hide="isEdit">{{tree.objs[itemProxy.item.parentId].title}}</td>
+            <td ng-click="editItem(itemProxy.item)" ng-class="{indented:showAsTreeList}" ng-bind-html="itemProxy.item.title | highlight:filterString"></td>
+            <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false" ng-bind-html="itemProxy.item.description | highlight:filterString"></td>
+            <td ng-show="!showAsTreeList" ng-click="editItem({id:itemProxy.item.parentId})">{{tree.objs[itemProxy.item.parentId].title}}</td>
             <td class="pull-right">
               <i class="glyphicon glyphicon-remove" ng-click="removeItem(itemProxy.item)"></i>
             </td>
