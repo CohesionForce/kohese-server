@@ -61,8 +61,8 @@ module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
     
   }
 
-  function convertListToTree(dataList, primaryIdName, parentIdName) {
-    if (!dataList || dataList.length == 0 || !primaryIdName || !parentIdName)
+  function convertListToTree(dataList, primaryIdFieldName, parentIdFieldName) {
+    if (!dataList || dataList.length == 0 || !primaryIdFieldName || !parentIdFieldName)
       return [];
 
     var rootIds = [],
@@ -73,24 +73,19 @@ module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
         i = 0;
 
     tree.items = dataList;
-    tree.data = [];
+    tree.roots = [];
     tree.objs = {};
 
     while (i < len) {
       var itemProxy = {};
-      primaryKey = dataList[i][primaryIdName];
+      primaryKey = dataList[i][primaryIdFieldName];
       if(angular.isDefined(tree.objs[primaryKey])){
         // Some forward declaration occurred, so copy the existing data
         itemProxy = tree.objs[primaryKey];
       }
-      itemProxy.data = dataList[i++];
-      itemProxy.id = itemProxy.data.id;
-      itemProxy.parentId = itemProxy.data.parentId;
-      itemProxy.title = itemProxy.data.title;
-      itemProxy.description = itemProxy.data.description;
-      primaryKey = itemProxy.data[primaryIdName];
+      itemProxy.item = dataList[i++];
       tree.objs[primaryKey] = itemProxy;
-      parentId = itemProxy.data[parentIdName];
+      parentId = itemProxy.item[parentIdFieldName];
 
       if (parentId) {
         if (angular.isDefined(tree.objs[parentId])){
@@ -107,18 +102,51 @@ module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
            parent.children = [itemProxy];
         }
               
-        // itemProxy.parentRef = parent;
+        itemProxy.parentRef = parent;
       } else {
-        rootIds.push(primaryKey);
+        tree.roots.push(itemProxy);
       }
     }
 
-    for (var i = 0; i < rootIds.length; i++) {
-      tree.data.push(tree.objs[rootIds[i]]);
-    };
-
+    updateTreeRows();
   }
+
+  function updateTreeRows() {
+    var rowStack = [];
     
+    for(var idx = tree.roots.length - 1; idx >= 0; idx--){
+      rowStack.push(tree.roots[idx]);
+    }
+    
+    tree.rows = [];
+    var node;
+    while (node = rowStack.pop()) {
+      if (angular.isDefined(node.parentRef)){
+        node.level = node.parentRef.level + 1;
+        // TBD: temporary remove the parentRef.
+        node.parentRef = {};
+      } else {
+        node.level = 1;
+      }
+      tree.rows.push(node);
+      
+      if (angular.isDefined(node.children)){
+        for(var childIdx = node.children.length - 1; childIdx >= 0; childIdx--){
+          rowStack.push(node.children[childIdx]);
+        }  
+      }
+    }
+    
+    for(id in tree.objs){
+      if(angular.isUndefined(tree.objs[id].level)){
+        console.log("Warning:  Node parent is missing for " + id);
+        console.log(tree.objs[id]);
+      }
+    }
+    
+  }
+
+  
   return {
     internalTree : tree,
     setCurrentItem: setCurrentItem,

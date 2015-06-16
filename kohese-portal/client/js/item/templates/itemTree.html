@@ -14,7 +14,7 @@
 </div>
 
 <div ng-show="!showAsTree">
-<table class="table table-striped table-condensed table-hover">
+<table class="table tree-grid table-striped table-condensed table-hover">
     <thead>
         <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
         <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
@@ -22,12 +22,12 @@
         <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
     </thead>
     <tbody>
-        <tr id="{{item.id}}" ng-repeat="item in filteredItems = (items  | filter:filterString) | orderBy:itemSortField">
-            <td ng-click="editItem(item)" ng-bind-html="item.title | highlight:filterString">{{item.title}}</td>
-            <td ng-bind-html="item.description | highlight:filterString">{{item.description}}</td>
-            <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{tree.objs[item.parentId].title}}</td>
+        <tr id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row" ng-repeat="itemProxy in filteredItems = (newTree.rows | filter:filterString)">
+            <td ng-click="editItem(itemProxy.item)" class="indented" ng-bind-html="itemProxy.item.title | highlight:filterString">nothing here</td>
+            <td ng-bind-html="itemProxy.item.description | highlight:filterString">{{itemProxy.item.description}}</td>
+            <td ng-click="editItem({id:itemProxy.item.parentId})" ng-hide="isEdit">{{tree.objs[itemProxy.item.parentId].title}}</td>
             <td class="pull-right">
-              <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)"></i>
+              <i class="glyphicon glyphicon-remove" ng-click="removeItem(itemProxy.item)"></i>
             </td>
         </tr>
     </tbody>
