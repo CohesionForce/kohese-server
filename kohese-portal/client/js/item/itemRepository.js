@@ -4,7 +4,7 @@
 
 var module = angular.module("itemServices", []);
 
-module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
+module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item, socket, $rootScope) {
 
   var tree = {};
   var currentItem = {};
@@ -36,6 +36,7 @@ module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
 
   function setCurrentItem (item){
     currentItem = item;
+    $rootScope.$broadcast('currentItemUpdate', currentItem);
   }
 
   function getCurrentItem() {
