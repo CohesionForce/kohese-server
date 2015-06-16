@@ -2,8 +2,8 @@
 
 angular
   .module('app')
-  .controller('ItemController', ['$scope', '$state', '$location', 'Item', 'ItemRepository', function($scope,
-      $state, $location, Item, ItemRepository) {
+  .controller('ItemController', ['$scope', '$state', '$location', 'Item', 'ItemRepository', '$anchorScroll',
+    function($scope, $state, $location, Item, ItemRepository, $anchorScroll) {
     $scope.items = [];
     $scope.tree_data = [];
     $scope.tree = [];
@@ -133,6 +133,14 @@ angular
 
         return tree;
     }
+
+      $scope.$on('currentItemUpdate', function(event, data){
+          console.log(event);
+          console.log(data.id);
+          $location.hash(data.id);
+          $anchorScroll()
+        }
+      )
 
   }]);
 
