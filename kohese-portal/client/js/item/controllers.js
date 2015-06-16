@@ -11,7 +11,7 @@ angular
     $scope.filterString = "";
 
     $scope.newTree = ItemRepository.internalTree;
-    
+
     $scope.listTitle = "Item List"
     function getItems() {
       Item

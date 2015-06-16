@@ -1,14 +1,14 @@
 /**
- * 
+ *
  */
 
 var module = angular.module("itemServices", []);
 
-module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
+module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item, socket, $rootScope) {
 
   var tree = {};
   var currentItem = {};
-  
+
   socket.on('item/create', function(notification) {
     console.log("IR Item Created:  " + notification);
     console.log("Id:  " + notification.id);
@@ -31,17 +31,18 @@ module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
       convertListToTree(results, 'id', 'parentId');
     });
   }
-  
+
   fetchItems();
 
   function setCurrentItem (item){
     currentItem = item;
+    $rootScope.$broadcast('currentItemUpdate', currentItem);
   }
 
   function getCurrentItem() {
     return currentItem;
   }
-    
+
   function getChildren(ofId) {
     Item.children(ofId).$promise.then(function(results) {
       // TBD:  This needs to be a specific location instead of a global
@@ -57,8 +58,8 @@ module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
       // TBD: $scope.editedItem = results;
       // getChildren();
       console.log("Received:" + results);
-    });  
-    
+    });
+
   }
 
   function convertListToTree(dataList, primaryIdName, parentIdName) {
@@ -106,7 +107,7 @@ module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
         } else {
            parent.children = [itemProxy];
         }
-              
+
         // itemProxy.parentRef = parent;
       } else {
         rootIds.push(primaryKey);
@@ -118,10 +119,10 @@ module.service("ItemRepository", ['Item', 'socket', function(Item, socket) {
     };
 
   }
-    
+
   return {
     internalTree : tree,
     setCurrentItem: setCurrentItem,
-    getCurrentItem: getCurrentItem    
+    getCurrentItem: getCurrentItem
   }
 } ]);
