@@ -6,32 +6,35 @@ module.exports = function(Item) {
 		  if (ctx.instance) {
 		    console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.title);
 		    var notification = new Object;
-		    if (ctx.isNewInstance) {
-			    notification.type = 'create';
-
-		    } else {
-			    notification.type = 'update';		    	
-		    }
 		    notification.model = ctx.Model.modelName;
 		    notification.id = ctx.instance.id;
 		    notification.ctx = ctx;
-		    console.log(JSON.stringify(notification));
+		    console.log("Change Instance:" + JSON.stringify(notification));
+        if (ctx.isNewInstance) {
+          notification.type = 'create';
+          app.io.emit('item/create', notification);
+        } else {
+          notification.type = 'update';         
+          app.io.emit('item/update', notification);
+        }
 		    app.io.emit('change', JSON.stringify(notification));
 		  } else {
 		    console.log('Updated %s matching %j',
 		      ctx.Model.pluralModelName,
 		      ctx.where);
 		    var notification = new Object;
-		    if (ctx.isNewInstance) {
-			    notification.type = 'create';
-
-		    } else {
-			    notification.type = 'update';		    	
-		    }
 		    notification.model = ctx.Model.modelName;
 		    notification.id = ctx.where.id;
 		    notification.ctx = ctx;
-		    console.log(JSON.stringify(notification));
+        if (ctx.isNewInstance) {
+          notification.type = 'create';
+          app.io.emit('item/create', notification);
+
+        } else {
+          notification.type = 'update';         
+          app.io.emit('item/update', notification);
+        }
+        console.log("Change Multiple: " + JSON.stringify(notification));
 		    app.io.emit('change', JSON.stringify(notification));
 		  }
 		  next();
@@ -50,7 +53,8 @@ module.exports = function(Item) {
 		    notification.model = ctx.Model.modelName;
 		    notification.id = ctx.where.id;
 		    notification.ctx = ctx;
-		    console.log(JSON.stringify(notification));
+		    console.log("Change: " + JSON.stringify(notification));
+        app.io.emit('item/delete', notification);
 		    app.io.emit('change', JSON.stringify(notification));
 		  }
 		  next();
