@@ -199,7 +199,7 @@ angular
       if (angular.isDefined($state.params.parentId)){
         $state.go('editItem', {itemId: $state.params.parentId});
    	  } else {
-        $state.go('editItem', {itemId: $scope.editedItem.id});
+        ItemRepository.fetchItem($scope.editedItem.id);
        }
      }
 
