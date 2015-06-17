@@ -8,7 +8,8 @@ angular
     'treeGrid',
     'ui.layout',
     'ui.bootstrap',
-    'btford.socket-io'
+    'btford.socket-io',
+    'nav-directives'
 
   ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider,
