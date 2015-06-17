@@ -151,7 +151,10 @@ angular
 
     $scope.listTitle = "Children"
     $scope.editedItem = new Item;
+    $scope.itemProxy = {};
     $scope.enableEdit = false;
+
+    $scope.newTree = ItemRepository.internalTree;
 
     if (angular.isDefined($state.params.parentId)){
     	$scope.editedItem.parentId = $state.params.parentId;
@@ -168,21 +171,16 @@ angular
         });
     }
 
-	function getItem() {
-		$scope.isEdit = false;
-		if (angular.isDefined($state.params.itemId)){
-          Item
-            .findById({id: $state.params.itemId})
-            .$promise
-            .then(function(results) {
-              $scope.isEdit = true;
-              $scope.editedItem = results;
-              ItemRepository.setCurrentItem($scope.editedItem);
-              getChildren();
-            });
-		}
-      }
-      getItem();
+	  function getItem() {
+		  $scope.isEdit = false;
+		  if (angular.isDefined($state.params.itemId)){
+		    $scope.isEdit = true;
+	      $scope.itemProxy = ItemRepository.getItem($state.params.itemId);
+	      $scope.editedItem = $scope.itemProxy.item;
+	      ItemRepository.setCurrentItem($scope.editedItem);
+		  }
+	  }
+    getItem();
 
     $scope.upsertItem = function() {
         Item
@@ -221,8 +219,6 @@ angular
             getChildren();
           });
       };
-
-
 
 }]);
 

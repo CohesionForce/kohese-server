@@ -1,5 +1,5 @@
 <span class="pull-right">
-      <span>Showing {{filteredItems.length}} of {{items.length}}</span>
+      <span>Showing {{filteredItems.length}} of {{itemProxy.children.length}}</span>
       <input class="input-sm" type="text" ng-model="filterString" placeholder="Filter" style="margin: 5px"/>
 
     </span>
@@ -11,12 +11,12 @@
   <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()" ng-show="enableEdit"></i></th>
   </thead>
   <tbody>
-  <tr ng-repeat="item in filteredItems = (items  | filter:filterString) | orderBy:itemSortField">
-    <td ng-click="editItem(item)" ng-bind-html="item.title | highlight:filterString"/>
-            <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=true" ng-bind-html="item.description | highlight:filterString"></td>
-    <td ng-click="editItem({id:item.parentId})" ng-hide="isEdit">{{item.parentId}}</td>
+  <tr ng-repeat="proxy in filteredItems = (itemProxy.children  | filter:filterString) | orderBy:itemSortField">
+    <td ng-click="editItem(proxy.item)" ng-bind-html="proxy.item.title | highlight:filterString"/>
+            <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=true" ng-bind-html="proxy.item.description | highlight:filterString"></td>
+    <td ng-click="editItem({id:proxy.item.parentId})" ng-hide="isEdit">{{proxy.item.parentId}}</td>
     <td class="pull-right">
-      <i class="glyphicon glyphicon-remove" ng-click="removeItem(item)" ng-show="enableEdit"></i>
+      <i class="glyphicon glyphicon-remove" ng-click="removeItem(proxy.item)" ng-show="enableEdit"></i>
     </td>
   </tr>
   </tbody>

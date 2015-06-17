@@ -58,8 +58,11 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       // TBD: $scope.editedItem = results;
       // getChildren();
       console.log("Received:" + results);
-    });  
-    
+    });      
+  }
+  
+  function getItem(byId) {
+    return tree.objs[byId];
   }
 
   function convertListToTree(dataList, primaryIdFieldName, parentIdFieldName) {
@@ -128,7 +131,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
         lostProxy.item = new Item;
         lostProxy.item.title = "Lost Item: " + id;
         lostProxy.item.description = "Found children nodes referencing this node as a parent.";
-        lostProxy.id = id;
+        lostProxy.item.id = id;
         lostProxy.parentId = "LOST+FOUND"
         lostProxy.parentRef = tree.objs[lostAndFound.item.id];
         lostAndFound.children.push(lostProxy);
@@ -180,6 +183,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
   
   return {
     internalTree : tree,
+    getItem : getItem,
     setCurrentItem: setCurrentItem,
     getCurrentItem: getCurrentItem    
   }
