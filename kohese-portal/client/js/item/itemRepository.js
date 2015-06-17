@@ -58,7 +58,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       var temp = results;
       var proxy = tree.objs[byId];
       // Copy the results into the current proxy
-      for (key in proxy.item){
+      for (var key in proxy.item){
         if(!_.isEqual(proxy.item[key],results[key])){
           proxy.item[key]=results[key];
         }
@@ -128,7 +128,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     tree.roots.push(lostAndFound);
     
     // Gather unconnected nodes into Lost And Found
-    for(id in tree.objs){
+    for(var id in tree.objs){
       if(angular.isUndefined(tree.objs[id].item)){
         var lostProxy = tree.objs[id];
         lostProxy.item = new Item;
@@ -178,7 +178,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     }
     
     // Detect any remaining unconnected nodes
-    for(id in tree.objs){
+    for(var id in tree.objs){
       if(angular.isUndefined(tree.objs[id].level)){
         console.log("Warning:  Node parent is missing for " + id);
         console.log(tree.objs[id]);

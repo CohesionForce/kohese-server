@@ -42,11 +42,11 @@ angular
 
     $scope.expandAll = function(){
       // Set all nodes to expanded
-      for(id in $scope.collapsed){
+      for(var id in $scope.collapsed){
         $scope.collapsed[id] = false;
       }
       // Set all nodes to visible
-      for(id in $scope.hidden){
+      for(var id in $scope.hidden){
         $scope.hidden[id] = false;
       }
     }
