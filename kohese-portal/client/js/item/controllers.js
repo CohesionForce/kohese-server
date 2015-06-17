@@ -9,6 +9,8 @@ angular
     $scope.tree = [];
     $scope.tree_control = {};
     $scope.filterString = "";
+    $scope.hidden = {};
+    $scope.collapsed = {};
 
     $scope.newTree = ItemRepository.internalTree;
 
@@ -143,7 +145,37 @@ angular
       )
     $scope.syncLocation = function(){
         $anchorScroll();
-    }  
+    }
+      
+    $scope.changeVisibility = function(){
+      console.log(this);
+      $scope.collapsed[this.itemProxy.item.id] = !$scope.collapsed[this.itemProxy.item.id];
+      var isNowCollapsed = $scope.collapsed[this.itemProxy.item.id];
+      var childIdStack = [];
+      var childId = "";
+      var proxy = this.itemProxy;
+
+      // Add immediate descendants to stack
+      for(var idx=0; idx < proxy.children.length; idx++){
+        childId = proxy.children[idx].item.id;
+        childIdStack.push(childId);
+      }        
+
+      while (childId = childIdStack.pop()){
+        if(isNowCollapsed && !$scope.hidden[childId]){
+          // New state is collapsed
+          $scope.collapsed[childId] = true;
+          proxy = ItemRepository.getItem(childId);
+          for(var idx=0; idx < proxy.children.length; idx++){
+            var grandChildId = proxy.children[idx].item.id;
+            childIdStack.push(grandChildId);
+          }        
+        }
+        $scope.hidden[childId] = isNowCollapsed;
+      }
+
+    
+    }
 
   }]);
 
