@@ -24,6 +24,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
   socket.on('item/delete', function(notification) {
     console.log("IR Item Deleted:  " + notification);
     console.log("Id:  " + notification.id);
+    
   });
 
   function fetchItems() {
@@ -58,6 +59,14 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       // TBD: $scope.editedItem = results;
       // getChildren();
       console.log("Received:" + results);
+      var temp = results;
+      var proxy = tree.objs[byId];
+      // Copy the results into the current proxy
+      for (key in proxy.item){
+        if(!_.isEqual(proxy.item[key],results[key])){
+          proxy.item[key]=results[key];
+        }
+      }
     });      
   }
   
@@ -144,16 +153,20 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
   function updateTreeRows() {
     var rowStack = [];
     
+    // Push the nodes onto the rowStack in reverse order
     for(var idx = tree.roots.length - 1; idx >= 0; idx--){
       rowStack.push(tree.roots[idx]);
     }
     
     tree.rows = [];
     var node;
+    
+    // Process each node from the top of the stack.  This will behave like
+    // a pre-ordered depth first iteration over the tree.
     while (node = rowStack.pop()) {
       if (angular.isDefined(node.parentRef)){
         node.level = node.parentRef.level + 1;
-        // TBD: temporary remove the parentRef.
+        // TBD: remove the parentRef to prevent recursion issues in Angular
         node.parentRef = {};
       } else {
         node.level = 1;
@@ -164,9 +177,13 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
         for(var childIdx = node.children.length - 1; childIdx >= 0; childIdx--){
           rowStack.push(node.children[childIdx]);
         }  
+      } else {
+        // Create an empty children list
+        node.children=[];
       }
     }
     
+    // Detect any remaining unconnected nodes
     for(id in tree.objs){
       if(angular.isUndefined(tree.objs[id].level)){
         console.log("Warning:  Node parent is missing for " + id);
@@ -184,6 +201,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
   return {
     internalTree : tree,
     getItem : getItem,
+    fetchItem : fetchItem,
     setCurrentItem: setCurrentItem,
     getCurrentItem: getCurrentItem    
   }
