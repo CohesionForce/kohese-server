@@ -3,6 +3,7 @@
     <input type="checkbox" ng-model="showAsTreeList" ng-init="showAsTreeList=true" name="showAsTreeListInput" style="margin: 5px"/> Show As Tree List {{}}
     <button ng-click="tree_control.expand_all()" class="btn btn-default btn-sm" ng-disabled="!showAsTree || showAsTreeList" style="margin: 5px">Expand All</button>
     <button ng-click="tree_control.collapse_all()" class="btn btn-default btn-sm" ng-disabled="!showAsTree || showAsTreeList" style="margin: 5px">Collapse All</button>
+    <button ng-click="syncLocation()" class="btn btn-default btn-sm" style="margin: 5px">Sync Location</button>
     <span class="pull-right">
       <span>Showing {{filteredItems.length}} of {{items.length}}</span>
       <input class="input-sm" type="text" ng-model="filterString" placeholder="Filter" style="margin: 5px"/>

@@ -138,9 +138,12 @@ angular
           console.log(event);
           console.log(data.id);
           $location.hash(data.id);
-          $anchorScroll()
+          $anchorScroll();
         }
       )
+    $scope.syncLocation = function(){
+        $anchorScroll();
+    }  
 
   }]);
 
