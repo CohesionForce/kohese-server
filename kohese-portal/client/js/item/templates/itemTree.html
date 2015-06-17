@@ -23,8 +23,8 @@
         <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
     </thead>
     <tbody>
-        <tr id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row" ng-repeat="itemProxy in filteredItems = (newTree.rows | filter:filterString)">
-            <td ng-click="editItem(itemProxy.item)" ng-class="{indented:showAsTreeList}" ng-bind-html="itemProxy.item.title | highlight:filterString"></td>
+        <tr ng-init="visible=true" id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row" ng-repeat="itemProxy in filteredItems = (newTree.rows | filter:filterString)">
+            <td><a><i ng-click="expanded=!expanded" ng-init="expanded=true; collapsable=(itemProxy.children.length > 0)" ng-class="{'indented tree-icon':showAsTreeList, 'glyphicon fa icon-minus glyphicon-minus fa-minus': collapsable && expanded, 'glyphicon fa icon-plus glyphicon-plus fa-plus': collapsable && !expanded, 'glyphicon glyphicon-list-alt': !collapsable}"></i></a><span ng-click="editItem(itemProxy.item)" ng-class="{'indented tree-label':showAsTreeList}" ng-bind-html="(itemProxy.item.title | highlight:filterString)"/></td>
             <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false" ng-bind-html="itemProxy.item.description | highlight:filterString"></td>
             <td ng-show="!showAsTreeList" ng-click="editItem({id:itemProxy.item.parentId})">{{tree.objs[itemProxy.item.parentId].title}}</td>
             <td class="pull-right">

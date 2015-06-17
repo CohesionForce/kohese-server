@@ -109,6 +109,32 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       }
     }
 
+    // Create Lost And Found Node
+    var lostAndFound = {};
+    lostAndFound.item = new Item;
+    lostAndFound.item.title = "Lost-And-Found";
+    lostAndFound.item.description = "Collection of node(s) that are no longer connected.";
+    lostAndFound.item.id = "LOST+FOUND";
+    lostAndFound.children = [];
+    tree.objs[lostAndFound.item.id] = lostAndFound;
+    tree.roots.push(lostAndFound);
+    
+    // Gather unconnected nodes into Lost And Found
+    for(id in tree.objs){
+      if(angular.isUndefined(tree.objs[id].item)){
+        console.log("Warning:  Found " + id);
+        console.log(tree.objs[id]);
+        var lostProxy = tree.objs[id];
+        lostProxy.item = new Item;
+        lostProxy.item.title = "Lost Item: " + id;
+        lostProxy.item.description = "Found children nodes referencing this node as a parent.";
+        lostProxy.id = id;
+        lostProxy.parentId = "LOST+FOUND"
+        lostProxy.parentRef = tree.objs[lostAndFound.item.id];
+        lostAndFound.children.push(lostProxy);
+      }
+    }
+
     updateTreeRows();
   }
 
@@ -141,6 +167,10 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     for(id in tree.objs){
       if(angular.isUndefined(tree.objs[id].level)){
         console.log("Warning:  Node parent is missing for " + id);
+        console.log(tree.objs[id]);
+      }
+      if(angular.isUndefined(tree.objs[id].item)){
+        console.log("Warning:  Found " + id);
         console.log(tree.objs[id]);
       }
     }
