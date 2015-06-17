@@ -23,7 +23,6 @@
     "bootstrap": "~3.3.4",
     "angular-ui-router": "~0.2.14",
     "angular": "~1.3.15",
-    "angular-bootstrap-grid-tree": "https://github.com/CohesionForce/tree-grid-directive.git",
     "font-awesome": "~4.3.0",
     "metisMenu": "~2.0.2",
     "angular-ui-layout": "~1.0.5",

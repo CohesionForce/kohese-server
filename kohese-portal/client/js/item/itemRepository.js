@@ -52,13 +52,9 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
   }
 
   function fetchItem(byId) {
-    console.log("Fetching: " + byId);
     Item.findById({
       id : byId
     }).$promise.then(function(results) {
-      // TBD: $scope.editedItem = results;
-      // getChildren();
-      console.log("Received:" + results);
       var temp = results;
       var proxy = tree.objs[byId];
       // Copy the results into the current proxy
@@ -134,8 +130,6 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     // Gather unconnected nodes into Lost And Found
     for(id in tree.objs){
       if(angular.isUndefined(tree.objs[id].item)){
-        console.log("Warning:  Found " + id);
-        console.log(tree.objs[id]);
         var lostProxy = tree.objs[id];
         lostProxy.item = new Item;
         lostProxy.item.title = "Lost Item: " + id;

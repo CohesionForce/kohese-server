@@ -5,7 +5,6 @@ angular
     'lbServices',
     'itemServices',
     'ui.router',
-    'treeGrid',
     'ui.layout',
     'ui.bootstrap',
     'btford.socket-io',
