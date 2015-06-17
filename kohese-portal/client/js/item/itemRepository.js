@@ -160,8 +160,6 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     while (node = rowStack.pop()) {
       if (angular.isDefined(node.parentRef)){
         node.level = node.parentRef.level + 1;
-        // TBD: remove the parentRef to prevent recursion issues in Angular
-        node.parentRef = {};
       } else {
         node.level = 1;
       }
