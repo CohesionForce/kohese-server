@@ -10,22 +10,18 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
   var currentItem = {};
   
   socket.on('item/create', function(notification) {
-    console.log("IR Item Created:  " + notification);
-    console.log("Id:  " + notification.id);
+    console.log("::: Received notification of Item Created:  " + notification.id);
     fetchItem(notification.id);
   });
 
   socket.on('item/update', function(notification) {
-    console.log("IR Item Updated:  " + notification);
-    console.log("Id:  " + notification.id);
+    console.log("::: Received notification of Item Updated:  " + notification.id);
     fetchItem(notification.id);
   });
 
   socket.on('item/delete', function(notification) {
-    console.log("IR Item Deleted:  " + notification);
-    console.log("Id:  " + notification.id);
+    console.log("::: Received notification of Item Deleted:  " + notification.id);
     removeItemFromTree(notification.id);
-    
   });
 
   function fetchItems() {

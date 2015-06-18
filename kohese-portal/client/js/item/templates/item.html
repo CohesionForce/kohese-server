@@ -8,7 +8,7 @@
   <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
   <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
   <th ng-hide="isEdit"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
-  <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()" ng-show="enableEdit"></i></th>
+  <th><i class="glyphicon glyphicon-plus pull-right" ng-click="newItem()"></i></th>
   </thead>
   <tbody>
   <tr ng-repeat="proxy in filteredItems = (itemProxy.children  | filter:filterString) | orderBy:itemSortField">
@@ -16,7 +16,7 @@
             <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=true" ng-bind-html="proxy.item.description | highlight:filterString"></td>
     <td ng-click="editItem({id:proxy.item.parentId})" ng-hide="isEdit">{{proxy.item.parentId}}</td>
     <td class="pull-right">
-      <i class="glyphicon glyphicon-remove" ng-click="removeItem(proxy.item)" ng-show="enableEdit"></i>
+      <i class="glyphicon glyphicon-remove" ng-click="removeItem(proxy.item)"></i>
     </td>
   </tr>
   </tbody>

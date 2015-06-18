@@ -153,7 +153,7 @@ angular
           .deleteById(item)
           .$promise
           .then(function() {
-            console.log("*** TBD:  Need to confirm removal logic")
+            // TBD:  May need to do something special if the delete fails
           });
       };
 
