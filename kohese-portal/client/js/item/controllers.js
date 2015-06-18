@@ -61,29 +61,31 @@ angular
     }
     
     function changeVisibilityOn (proxy){
-      $scope.collapsed[proxy.item.id] = !$scope.collapsed[proxy.item.id];
-      var isNowCollapsed = $scope.collapsed[proxy.item.id];
-      var childIdStack = [];
-      var childId = "";
+      if ($scope.showAsTree){
+        $scope.collapsed[proxy.item.id] = !$scope.collapsed[proxy.item.id];
+        var isNowCollapsed = $scope.collapsed[proxy.item.id];
+        var childIdStack = [];
+        var childId = "";
 
-      // Add immediate descendants to stack
-      for(var idx=0; idx < proxy.children.length; idx++){
-        childId = proxy.children[idx].item.id;
-        childIdStack.push(childId);
-      }        
+        // Add immediate descendants to stack
+        for(var idx=0; idx < proxy.children.length; idx++){
+          childId = proxy.children[idx].item.id;
+          childIdStack.push(childId);
+        }        
 
-      while (childId = childIdStack.pop()){
-        if(isNowCollapsed && !$scope.hidden[childId]){
-          // New state is collapsed
-          $scope.collapsed[childId] = true;
-          proxy = ItemRepository.getItem(childId);
-          for(var idx=0; idx < proxy.children.length; idx++){
-            var grandChildId = proxy.children[idx].item.id;
-            childIdStack.push(grandChildId);
-          }        
-        }
-        $scope.hidden[childId] = isNowCollapsed;
-      }    
+        while (childId = childIdStack.pop()){
+          if(isNowCollapsed && !$scope.hidden[childId]){
+            // New state is collapsed
+            $scope.collapsed[childId] = true;
+            proxy = ItemRepository.getItem(childId);
+            for(var idx=0; idx < proxy.children.length; idx++){
+              var grandChildId = proxy.children[idx].item.id;
+              childIdStack.push(grandChildId);
+            }        
+          }
+          $scope.hidden[childId] = isNowCollapsed;
+        }    
+      }
     }
     
     $scope.changeVisibility = function(){
