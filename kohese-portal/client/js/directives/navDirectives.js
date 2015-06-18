@@ -2,28 +2,33 @@
  * Created by josh on 6/17/15.
  */
 
-var app = angular.module('nav-directives', [])
+(function () {
 
-app.directive('appBar', function(){
-  return {
-    restrict: 'EA',
-    templateUrl: 'js/directives/appBar.html'
-  }
-})
-
-app.directive('sideNav', function(){
-  return {
-    restrict: 'EA',
-    templateUrl: 'js/directives/navigation.html'
-  }
-})
-
-app.directive('collapsingMenu', function(){
-  return {
-    restrict: 'A',
-    link: function(scope, element, attribute){
-      console.log('Metis Menu Link');
-      element.metisMenu();
+  var app = angular.module('nav-directives', []);
+  var appBarDirective = function () {
+    return {
+      restrict: 'EA',
+      templateUrl: 'js/directives/appBar.html'
     }
-  }
-});
+  };
+  var sideNavDirective = function () {
+    return {
+      restrict: 'EA',
+      templateUrl: 'js/directives/navigation.html'
+    }
+  };
+  var collapsingMenuDirective = function () {
+    return {
+      restrict: 'A',
+      link: function (scope, element, attribute) {
+        element.metisMenu();
+      }
+    }
+  };
+
+  app
+    .directive('appBar', appBarDirective)
+    .directive('sideNav', sideNavDirective)
+    .directive('collapsingMenu', collapsingMenuDirective);
+
+}());
