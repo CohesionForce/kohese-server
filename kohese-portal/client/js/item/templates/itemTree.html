@@ -6,7 +6,6 @@
     <span class="pull-right">
       <span>Showing {{filteredItems.length}} of {{newTree.rows.length}}</span>
       <input class="input-sm" type="text" ng-model="filterString" placeholder="Filter" style="margin: 5px"/>
-
     </span>
 </div>
 
@@ -20,7 +19,7 @@
     </thead>
     <tbody>
         <tr ng-init="visible=true" id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row" ng-repeat="itemProxy in filteredItems = (newTree.rows | filter:filterString)" ng-show="!hidden[itemProxy.item.id]">
-            <td><a style="margin: 8px" ng-show="showAsTree"><i ng-click="changeVisibility()" ng-init="collapsed[itemProxy.item.id]=false; collapsable=(itemProxy.children.length > 0)" ng-class="{'indented tree-icon':showAsTree, 'glyphicon fa icon-minus glyphicon-minus fa-minus': collapsable && !collapsed[itemProxy.item.id], 'glyphicon fa icon-plus glyphicon-plus fa-plus': collapsable && collapsed[itemProxy.item.id], 'glyphicon glyphicon-list-alt': !collapsable}"></i></a><span ng-click="editItem(itemProxy.item)" ng-class="{'indented tree-label':showAsTree}" ng-bind-html="(itemProxy.item.title | highlight:filterString)"/></td>
+            <td><a style="margin: 8px" ng-show="showAsTree"><i ng-click="changeVisibility()" ng-init="collapsed[itemProxy.item.id]=false" ng-class="{'indented tree-icon':showAsTree, 'glyphicon fa icon-minus glyphicon-minus fa-minus': (itemProxy.children.length > 0) && !collapsed[itemProxy.item.id], 'glyphicon fa icon-plus glyphicon-plus fa-plus': (itemProxy.children.length > 0) && collapsed[itemProxy.item.id], 'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}"></i></a><span ng-click="editItem(itemProxy.item)" ng-class="{'indented tree-label':showAsTree}" ng-bind-html="(itemProxy.item.title | highlight:filterString)"/></td>
             <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false" ng-bind-html="itemProxy.item.description | highlight:filterString"></td>
             <td ng-show="!showAsTree" ng-click="editItem({id:itemProxy.item.parentId})">{{tree.objs[itemProxy.item.parentId].title}}</td>
             <td class="pull-right">

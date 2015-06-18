@@ -24,7 +24,7 @@ angular
         .deleteById(item)
         .$promise
         .then(function() {
-          getItems();
+          console.log("::: Item has been deleted: " + item.id);
         });
     };
 
