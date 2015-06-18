@@ -29,8 +29,6 @@ angular
     };
 
     $scope.$on('currentItemUpdate', function(event, data){
-        console.log(event);
-        console.log(data.id);
         $location.hash(data.id);
         $anchorScroll();
       }

@@ -199,13 +199,6 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       }
       
       tree.rows = newTreeRows;
-/*
-      if (angular.isUndefined(tree.rows)){
-        tree.rows = newTreeRows;
-      } else {
-        console.log("*** TBD:  Need to update tree.rows");
-      }
-*/
     }
     
     // Detect any remaining unconnected nodes
