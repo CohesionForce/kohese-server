@@ -53,7 +53,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       id : byId
     }).$promise.then(function(results) {
       var temp = results;
-      var proxy = tree.objs[byId];
+      var proxy = tree.proxyMap[byId];
       
       if (angular.isDefined(proxy)){
         // Copy the results into the current proxy
@@ -67,9 +67,9 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       }
     });      
   }
-  
+
   function getItem(byId) {
-    return tree.objs[byId];
+    return tree.proxyMap[byId];
   }
 
   function addItemToTree(item){
@@ -90,7 +90,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       parentProxy.children = _.reject(parentProxy.children, function(childProxy) { return childProxy.item.id === byId; });
     }
     
-    delete tree.objs[byId];
+    delete tree.proxyMap[byId];
     
     updateTreeRows();
   }
@@ -98,21 +98,21 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
   function createItemProxy(forItem){
     var itemProxy = {};
     var primaryKey = forItem.id;
-    if(angular.isDefined(tree.objs[primaryKey])){
+    if(angular.isDefined(tree.proxyMap[primaryKey])){
       // Some forward declaration occurred, so copy the existing data
-      itemProxy = tree.objs[primaryKey];
+      itemProxy = tree.proxyMap[primaryKey];
     }
     itemProxy.item = forItem;
-    tree.objs[primaryKey] = itemProxy;
+    tree.proxyMap[primaryKey] = itemProxy;
     var parentId = itemProxy.item.parentId;
 
     if (parentId) {
-      if (angular.isDefined(tree.objs[parentId])){
-        parent = tree.objs[parentId];
+      if (angular.isDefined(tree.proxyMap[parentId])){
+        parent = tree.proxyMap[parentId];
       } else {
         // Create the parent before it is found
         parent = {};
-        tree.objs[parentId] = parent;
+        tree.proxyMap[parentId] = parent;
       }
 
       if (parent.children) {
@@ -129,9 +129,8 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     if (!dataList || dataList.length == 0 || !primaryIdFieldName || !parentIdFieldName)
       return [];
 
-    tree.items = dataList;
     tree.roots = [];
-    tree.objs = {};
+    tree.proxyMap = {};
 
     for(var idx = 0; idx < dataList.length; idx++){
       createItemProxy(dataList[idx]);  
@@ -144,18 +143,18 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     lostAndFound.item.description = "Collection of node(s) that are no longer connected.";
     lostAndFound.item.id = "LOST+FOUND";
     lostAndFound.children = [];
-    tree.objs[lostAndFound.item.id] = lostAndFound;
+    tree.proxyMap[lostAndFound.item.id] = lostAndFound;
     tree.roots.push(lostAndFound);
     
     // Gather unconnected nodes into Lost And Found
-    for(var id in tree.objs){
-      if(angular.isUndefined(tree.objs[id].item)){
-        var lostProxy = tree.objs[id];
+    for(var id in tree.proxyMap){
+      if(angular.isUndefined(tree.proxyMap[id].item)){
+        var lostProxy = tree.proxyMap[id];
         lostProxy.item = new Item;
         lostProxy.item.title = "Lost Item: " + id;
         lostProxy.item.description = "Found children nodes referencing this node as a parent.";
         lostProxy.item.id = id;
-        lostProxy.parentId = "LOST+FOUND"
+        lostProxy.item.parentId = "LOST+FOUND"
         lostAndFound.children.push(lostProxy);
       }
     }
@@ -198,14 +197,14 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     }
     
     // Detect any remaining unconnected nodes
-    for(var id in tree.objs){
-      if(angular.isUndefined(tree.objs[id].level)){
+    for(var id in tree.proxyMap){
+      if(angular.isUndefined(tree.proxyMap[id].level)){
         console.log("Warning:  Node parent is missing for " + id);
-        console.log(tree.objs[id]);
+        console.log(tree.proxyMap[id]);
       }
-      if(angular.isUndefined(tree.objs[id].item)){
+      if(angular.isUndefined(tree.proxyMap[id].item)){
         console.log("Warning:  Found " + id);
-        console.log(tree.objs[id]);
+        console.log(tree.proxyMap[id]);
       }
     }
     
