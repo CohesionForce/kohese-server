@@ -24,13 +24,11 @@ angular
         .deleteById(item)
         .$promise
         .then(function() {
-          getItems();
+          console.log("::: Item has been deleted: " + item.id);
         });
     };
 
     $scope.$on('currentItemUpdate', function(event, data){
-        console.log(event);
-        console.log(data.id);
         $location.hash(data.id);
         $anchorScroll();
       }
@@ -42,11 +40,11 @@ angular
 
     $scope.expandAll = function(){
       // Set all nodes to expanded
-      for(id in $scope.collapsed){
+      for(var id in $scope.collapsed){
         $scope.collapsed[id] = false;
       }
       // Set all nodes to visible
-      for(id in $scope.hidden){
+      for(var id in $scope.hidden){
         $scope.hidden[id] = false;
       }
     }
@@ -155,7 +153,7 @@ angular
           .deleteById(item)
           .$promise
           .then(function() {
-            console.log("*** TBD:  Need to confirm removal logic")
+            // TBD:  May need to do something special if the delete fails
           });
       };
 

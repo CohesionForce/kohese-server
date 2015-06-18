@@ -10,21 +10,18 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
   var currentItem = {};
   
   socket.on('item/create', function(notification) {
-    console.log("IR Item Created:  " + notification);
-    console.log("Id:  " + notification.id);
+    console.log("::: Received notification of Item Created:  " + notification.id);
     fetchItem(notification.id);
   });
 
   socket.on('item/update', function(notification) {
-    console.log("IR Item Updated:  " + notification);
-    console.log("Id:  " + notification.id);
+    console.log("::: Received notification of Item Updated:  " + notification.id);
     fetchItem(notification.id);
   });
 
   socket.on('item/delete', function(notification) {
-    console.log("IR Item Deleted:  " + notification);
-    console.log("Id:  " + notification.id);
-    
+    console.log("::: Received notification of Item Deleted:  " + notification.id);
+    removeItemFromTree(notification.id);
   });
 
   function fetchItems() {
@@ -57,11 +54,16 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     }).$promise.then(function(results) {
       var temp = results;
       var proxy = tree.objs[byId];
-      // Copy the results into the current proxy
-      for (key in proxy.item){
-        if(!_.isEqual(proxy.item[key],results[key])){
-          proxy.item[key]=results[key];
-        }
+      
+      if (angular.isDefined(proxy)){
+        // Copy the results into the current proxy
+        for (var key in proxy.item){
+          if(!_.isEqual(proxy.item[key],results[key])){
+            proxy.item[key]=results[key];
+          }
+        }        
+      } else {
+        addItemToTree(results);
       }
     });      
   }
@@ -70,53 +72,71 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     return tree.objs[byId];
   }
 
+  function addItemToTree(item){
+    
+    // Create the proxy and add it to tree structures
+    createItemProxy(item);
+    
+    // Add the node to the tree rows
+    updateTreeRows();
+    
+  }
+  
+  function removeItemFromTree(byId){
+    var itemProxy = getItem(byId);
+    var parentProxy = getItem(itemProxy.item.parentId);
+    
+    if(parentProxy){
+      parentProxy.children = _.reject(parentProxy.children, function(childProxy) { return childProxy.item.id === byId; });
+    }
+    
+    delete tree.objs[byId];
+    
+    updateTreeRows();
+  }
+  
+  function createItemProxy(forItem){
+    var itemProxy = {};
+    var primaryKey = forItem.id;
+    if(angular.isDefined(tree.objs[primaryKey])){
+      // Some forward declaration occurred, so copy the existing data
+      itemProxy = tree.objs[primaryKey];
+    }
+    itemProxy.item = forItem;
+    tree.objs[primaryKey] = itemProxy;
+    var parentId = itemProxy.item.parentId;
+
+    if (parentId) {
+      if (angular.isDefined(tree.objs[parentId])){
+        parent = tree.objs[parentId];
+      } else {
+        // Create the parent before it is found
+        parent = {};
+        tree.objs[parentId] = parent;
+      }
+
+      if (parent.children) {
+         parent.children.push(itemProxy);
+      } else {
+         parent.children = [itemProxy];
+      }              
+    } else {
+      tree.roots.push(itemProxy);
+    }
+  }
+  
   function convertListToTree(dataList, primaryIdFieldName, parentIdFieldName) {
     if (!dataList || dataList.length == 0 || !primaryIdFieldName || !parentIdFieldName)
       return [];
-
-    var rootIds = [],
-        primaryKey,
-        parentId,
-        parent,
-        len = dataList.length,
-        i = 0;
 
     tree.items = dataList;
     tree.roots = [];
     tree.objs = {};
 
-    while (i < len) {
-      var itemProxy = {};
-      primaryKey = dataList[i][primaryIdFieldName];
-      if(angular.isDefined(tree.objs[primaryKey])){
-        // Some forward declaration occurred, so copy the existing data
-        itemProxy = tree.objs[primaryKey];
-      }
-      itemProxy.item = dataList[i++];
-      tree.objs[primaryKey] = itemProxy;
-      parentId = itemProxy.item[parentIdFieldName];
-
-      if (parentId) {
-        if (angular.isDefined(tree.objs[parentId])){
-          parent = tree.objs[parentId];
-        } else {
-          // Create the parent before it is found
-          parent = {};
-          tree.objs[parentId] = parent;
-        }
-
-        if (parent.children) {
-           parent.children.push(itemProxy);
-        } else {
-           parent.children = [itemProxy];
-        }
-              
-        itemProxy.parentRef = parent;
-      } else {
-        tree.roots.push(itemProxy);
-      }
+    for(var idx = 0; idx < dataList.length; idx++){
+      createItemProxy(dataList[idx]);  
     }
-
+    
     // Create Lost And Found Node
     var lostAndFound = {};
     lostAndFound.item = new Item;
@@ -128,7 +148,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     tree.roots.push(lostAndFound);
     
     // Gather unconnected nodes into Lost And Found
-    for(id in tree.objs){
+    for(var id in tree.objs){
       if(angular.isUndefined(tree.objs[id].item)){
         var lostProxy = tree.objs[id];
         lostProxy.item = new Item;
@@ -136,7 +156,6 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
         lostProxy.item.description = "Found children nodes referencing this node as a parent.";
         lostProxy.item.id = id;
         lostProxy.parentId = "LOST+FOUND"
-        lostProxy.parentRef = tree.objs[lostAndFound.item.id];
         lostAndFound.children.push(lostProxy);
       }
     }
@@ -152,20 +171,19 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       rowStack.push(tree.roots[idx]);
     }
     
-    tree.rows = [];
+    newTreeRows = [];
     var node;
     
     // Process each node from the top of the stack.  This will behave like
     // a pre-ordered depth first iteration over the tree.
     while (node = rowStack.pop()) {
-      if (angular.isDefined(node.parentRef)){
-        node.level = node.parentRef.level + 1;
-        // TBD: remove the parentRef to prevent recursion issues in Angular
-        node.parentRef = {};
+      var parentRef = getItem(node.item.parentId);
+      if (angular.isDefined(parentRef)){
+        node.level = parentRef.level + 1;
       } else {
         node.level = 1;
       }
-      tree.rows.push(node);
+      newTreeRows.push(node);
       
       if (angular.isDefined(node.children)){
         for(var childIdx = node.children.length - 1; childIdx >= 0; childIdx--){
@@ -175,10 +193,12 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
         // Create an empty children list
         node.children=[];
       }
+      
+      tree.rows = newTreeRows;
     }
     
     // Detect any remaining unconnected nodes
-    for(id in tree.objs){
+    for(var id in tree.objs){
       if(angular.isUndefined(tree.objs[id].level)){
         console.log("Warning:  Node parent is missing for " + id);
         console.log(tree.objs[id]);
