@@ -22,7 +22,6 @@ app.directive('collapsingMenu', function(){
   return {
     restrict: 'A',
     link: function(scope, element, attribute){
-      console.log('Metis Menu Link');
       element.metisMenu();
     }
   }
