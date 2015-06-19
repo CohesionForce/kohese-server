@@ -56,12 +56,46 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       var proxy = tree.proxyMap[byId];
       
       if (angular.isDefined(proxy)){
+
         // Copy the results into the current proxy
         for (var key in proxy.item){
           if(!_.isEqual(proxy.item[key],results[key])){
             proxy.item[key]=results[key];
           }
         }        
+
+        // Determine if the parent changed
+        var parentProxy = tree.parentOf[byId];
+        if(parentProxy.item.id !== results.parentId){
+          var newParentId = results.parentId;
+          
+          if(parentProxy){
+            parentProxy.children = _.reject(parentProxy.children, function(childProxy) { return childProxy.item.id === byId; });
+          }
+
+          var newParentProxy = getItem(newParentId);
+          
+          if(newParentProxy){
+            newParentProxy.children.push(proxy);
+          } else {
+            // Parent not found, so create one
+            newParentProxy = {};
+            tree.proxyMap[newParentId] = newParentProxy;
+            newParentProxy.children = [proxy];
+            attachToLostAndFound(newParentId);
+          }
+          tree.parentOf[byId] = newParentProxy;
+          
+          // Determine if the old parent was in LostAndFound
+          if (parentProxy.item.parentId === "LOST+FOUND"){
+            if (parentProxy.children.length == 0){
+              // All unallocated children have been moved or deleted
+              removeItemFromTree(parentProxy.item.id);
+            }
+          }
+          updateTreeRows();
+        }
+      
       } else {
         addItemToTree(results);
       }
@@ -119,7 +153,10 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
          parent.children.push(itemProxy);
       } else {
          parent.children = [itemProxy];
-      }              
+      }
+      
+      tree.parentOf[primaryKey] = parent;
+      
     } else {
       tree.roots.push(itemProxy);
     }
@@ -131,6 +168,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
 
     tree.roots = [];
     tree.proxyMap = {};
+    tree.parentOf ={};
 
     for(var idx = 0; idx < dataList.length; idx++){
       createItemProxy(dataList[idx]);  
@@ -149,19 +187,26 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     // Gather unconnected nodes into Lost And Found
     for(var id in tree.proxyMap){
       if(angular.isUndefined(tree.proxyMap[id].item)){
-        var lostProxy = tree.proxyMap[id];
-        lostProxy.item = new Item;
-        lostProxy.item.title = "Lost Item: " + id;
-        lostProxy.item.description = "Found children nodes referencing this node as a parent.";
-        lostProxy.item.id = id;
-        lostProxy.item.parentId = "LOST+FOUND"
-        lostAndFound.children.push(lostProxy);
+        attachToLostAndFound(id);
       }
     }
 
     updateTreeRows();
   }
 
+  function attachToLostAndFound (byId) {
+    var lostProxy = tree.proxyMap[byId];
+    lostProxy.item = new Item;
+    lostProxy.item.title = "Lost Item: " + byId;
+    lostProxy.item.description = "Found children nodes referencing this node as a parent.";
+    lostProxy.item.id = byId;
+    lostProxy.item.parentId = "LOST+FOUND";
+    
+    var lostAndFound = getItem(lostProxy.item.parentId)
+    lostAndFound.children.push(lostProxy);    
+    tree.parentOf[byId] = lostAndFound;
+  }
+  
   function updateTreeRows() {
     var rowStack = [];
     
