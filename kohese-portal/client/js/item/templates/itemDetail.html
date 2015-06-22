@@ -5,9 +5,10 @@
 	<div class="panel-body">
 		<!-- Nav tabs -->
 		<tabset>
-			<tab heading="Details">
-				<form name="itemForm" class="form-horizontal">
-			<div>
+			<tab>
+			  <tab-heading>Details <span ng-show="itemForm.$dirty">(*)</span></tab-heading>
+              <form name="itemForm" class="form-horizontal">
+			  <div>
 				<div style="width: 50%; float: left">
 					<span class="control-group"
 						ng-class="{error: itemForm.id.$invalid}">
@@ -48,7 +49,7 @@
 					<div class="form-actions">
 						<button ng-click="enableEdit=true" ng-disabled="enableEdit" class="btn btn-primary">
 							Edit</button>
-						<button ng-click="upsertItem()" ng-disabled="!enableEdit" class="btn btn-primary">
+						<button ng-click="upsertItem()" ng-disabled="!enableEdit || itemForm.$pristine" class="btn btn-primary">
 							Update</button>
 						<button ng-click="enableEdit=false; cancel()" ng-disabled="!enableEdit" class="btn btn-primary">
 							Cancel</button>
