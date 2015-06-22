@@ -138,7 +138,10 @@ angular
       if (angular.isDefined($state.params.parentId)){
         $state.go('editItem', {itemId: $state.params.parentId});
    	  } else {
-        ItemRepository.fetchItem($scope.editedItem.id);
+   	    if(this.itemForm.$dirty){
+          ItemRepository.fetchItem($scope.editedItem.id);
+          this.itemForm.$setPristine();
+   	    }
        }
      }
 
