@@ -67,6 +67,7 @@ body {
   position: absolute;
   overflow: auto;
   bottom: 356px;
+  top: 50px;
 }
 
 #bottom-content {
