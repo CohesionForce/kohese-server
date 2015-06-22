@@ -5,36 +5,38 @@
  */
 
 body {
-    background-color: #f8f8f8;
+  background-color: #f8f8f8;
 }
 
 .glyphicon-remove:hover {
-  cursor:pointer;
+  cursor: pointer;
 }
 
 #wrapper {
-    width: 100%;
+  width: 100%;
 }
 
 #page-wrapper {
-    padding: 0 15px;
-    min-height: 568px;
-    background-color: #fff;
+  padding: 0;
+  background-color: #fff;
 }
 
-@media(min-width:768px) {
-    #page-wrapper {
-        position: inherit;
-        margin: 0 0 0 250px;
-        padding: 0 30px;
-        border-left: 1px solid #e7e7e7;
-    }
+@media (min-width: 768px) {
+  #page-wrapper {
+    position: inherit;
+    margin: 0 0 0 250px;
+    padding: 0 30px;
+    border-left: 1px solid #e7e7e7;
+  }
 }
 
 .content {
-  position: relative;
-  bottom: 200px;
-  margin: 0 0 0 250px;
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+  left:250px;
+  right: 0;
+  overflow: auto;
 }
 
 .trim-info {
@@ -51,13 +53,28 @@ body {
   position: relative;
 }
 
-
 #content-resizer {
   position: absolute;
   height: 6px;
-  bottom: 130px;
-  left: 0;
+  left: 250px;
+  bottom:350px;
   right: 0;
   background-color: #666;
   cursor: n-resize;
+}
+
+#top-content {
+  position: absolute;
+  overflow: auto;
+  bottom: 356px;
+}
+
+#bottom-content {
+  position: absolute;
+  overflow: auto;
+  bottom: 0;
+  right: 0;
+  left: 250px;
+  height: 350px;
+  width: 100%;
 }

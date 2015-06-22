@@ -35,11 +35,17 @@
       <side-nav></side-nav>
    </nav>
 
-        <div id="page-wrapper" style="padding-left:5px; ">
-            <div class="wrapper" style="">
-                <div class="container-fluid">
-                  <div  ui-view="list" style="overflow:auto; height:350px;"></div>
-                  <div  ui-view="detail" style="overflow:auto; height:350px;"></div>
+        <div id="page-wrapper">
+            <div class="wrapper">
+                <div id="content" class="container-fluid">
+                  <div id="top-content" ui-view="list"></div>
+                  <div id="bottom-content" ui-view="detail"></div>
+                  <div id="content-resizer"
+                       resizer="horizontal"
+                       resizer-height="6"
+                       resizer-top="#top-content"
+                       resizer-bottom="#bottom-content">
+                  </div>
                 </div>
             </div>
         </div>
@@ -69,6 +75,7 @@
     <script src="js/common/lb-services.js"></script>
     <script src="js/sb-admin-2.js"></script>
     <script src="js/directives/navDirectives.js"></script>
+    <script src="js/directives/resizer.js"></script>
 
 
   </body>

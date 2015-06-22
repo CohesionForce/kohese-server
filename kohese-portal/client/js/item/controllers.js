@@ -2,8 +2,8 @@
 
 angular
   .module('app')
-  .controller('ItemController', ['$scope', '$state', '$location', 'Item', 'ItemRepository', '$anchorScroll',
-    function($scope, $state, $location, Item, ItemRepository, $anchorScroll) {
+  .controller('ItemController', ['$scope', '$state', '$location', 'Item', 'ItemRepository', '$anchorScroll', '$rootScope',
+    function($scope, $state, $location, Item, ItemRepository, $anchorScroll, $rootScope) {
 
     $scope.filterString = "";
     $scope.hidden = {};
@@ -17,6 +17,7 @@ angular
 
     $scope.editItem = function(item) {
         $state.go('editItem', {itemId: item.id});
+        $rootScope.$broadcast('enterItem');
       };
 
     $scope.removeItem = function(item) {
@@ -48,7 +49,7 @@ angular
         $scope.hidden[id] = false;
       }
     }
-    
+
     $scope.collapseAll = function(){
       // Collapse all root nodes that are current expanded
       for(var idx=0; idx < $scope.newTree.roots.length; idx++){
@@ -56,10 +57,10 @@ angular
         if (!$scope.collapsed[rootNode.item.id]){
           changeVisibilityOn(rootNode);
         }
-      }        
+      }
 
     }
-    
+
     function changeVisibilityOn (proxy){
       if ($scope.showAsTree){
         $scope.collapsed[proxy.item.id] = !$scope.collapsed[proxy.item.id];
@@ -71,7 +72,7 @@ angular
         for(var idx=0; idx < proxy.children.length; idx++){
           childId = proxy.children[idx].item.id;
           childIdStack.push(childId);
-        }        
+        }
 
         while (childId = childIdStack.pop()){
           if(isNowCollapsed && !$scope.hidden[childId]){
@@ -81,13 +82,13 @@ angular
             for(var idx=0; idx < proxy.children.length; idx++){
               var grandChildId = proxy.children[idx].item.id;
               childIdStack.push(grandChildId);
-            }        
+            }
           }
           $scope.hidden[childId] = isNowCollapsed;
-        }    
+        }
       }
     }
-    
+
     $scope.changeVisibility = function(){
       changeVisibilityOn(this.itemProxy);
     }

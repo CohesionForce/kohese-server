@@ -8,8 +8,8 @@ angular
     'ui.layout',
     'ui.bootstrap',
     'btford.socket-io',
-    'nav-directives'
-
+    'nav-directives',
+    'mc.resizer'
   ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider,
       $urlRouterProvider) {
