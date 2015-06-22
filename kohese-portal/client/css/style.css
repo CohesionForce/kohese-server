@@ -67,7 +67,7 @@ body {
   position: absolute;
   overflow: auto;
   bottom: 356px;
-  top: 50px;
+  top: 100px;
 }
 
 #bottom-content {
@@ -77,5 +77,12 @@ body {
   right: 0;
   left: 250px;
   height: 350px;
-  width: 100%;
+  width: 82.5%;
+}
+
+#tree-action-bar {
+  position: fixed;
+  top:50px;
+  left: 250px;
+  width: 82.5%;
 }
