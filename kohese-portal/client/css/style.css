@@ -25,7 +25,7 @@ body {
   #page-wrapper {
     position: inherit;
     margin: 0 0 0 250px;
-    padding: 0 30px;
+    padding: 0;
     border-left: 1px solid #e7e7e7;
   }
 }
@@ -78,6 +78,7 @@ body {
   left: 250px;
   height: 350px;
   width: 82.5%;
+  background-color: white;
 }
 
 #tree-action-bar {
