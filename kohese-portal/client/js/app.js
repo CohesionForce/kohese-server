@@ -38,7 +38,7 @@ angular
     $stateProvider
       .state('editItem', {
         parent: 'items',
-        url: '/editItem/:itemId',
+        url: '/editItem',
         views: {
         	"detail@": {
                 templateUrl: 'js/item/templates/itemDetail.html',

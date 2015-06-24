@@ -5,6 +5,7 @@ angular.module('mc.resizer', [])
   .directive('resizer', function ($document) {
 
     return function ($scope, $element, $attrs) {
+      var y;
 
       $element.on('mousedown', function (event) {
         event.preventDefault();
@@ -36,7 +37,7 @@ angular.module('mc.resizer', [])
 
         } else {
           // Handle horizontal resizer
-          var y = window.innerHeight - event.pageY;
+          y = window.innerHeight - event.pageY;
 
           $element.css({
             bottom: y + 'px'
@@ -49,6 +50,7 @@ angular.module('mc.resizer', [])
             height: y + 'px'
           });
         }
+
       }
 
       function mouseup() {
@@ -56,11 +58,11 @@ angular.module('mc.resizer', [])
         $document.unbind('mouseup', mouseup);
       }
 
-      //$scope.on('enterItem', function (event) {
-      //  $attrs.resizerBottom.css({
-      //    bottom: (window.innerHeight - $attrs.resizerTop.height) + 'px'
+      //$scope.$on('enterItem', function (event) {
+      //  $($attrs.resizerBottom).css({
+      //    height: y + 'px'
       //  });
-      //  console.log("item entered, resizing");
+      //  console.log($($attrs.resizerBottom).css.height + ":" + y);
       //})
 
     }
