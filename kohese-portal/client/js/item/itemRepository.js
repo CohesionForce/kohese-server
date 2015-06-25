@@ -4,7 +4,7 @@
 
 var module = angular.module("itemServices", []);
 
-module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item, socket, $rootScope) {
+module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', function(Item, Analysis, socket, $rootScope) {
 
   var tree = {};
   var currentItem = {};
@@ -99,6 +99,23 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
       } else {
         addItemToTree(results);
       }
+    });      
+  }
+
+  function fetchAnalysis(byId) {
+    var proxy = tree.proxyMap[byId];
+    proxy.analysis = {};
+    
+    Analysis.findById({
+      id : byId
+    }).$promise.then(function(results) {
+      var temp = results;
+      var proxy = tree.proxyMap[byId];
+     
+      if (angular.isDefined(proxy)){
+        proxy.analysis = results;        
+      }
+
     });      
   }
 
@@ -260,6 +277,7 @@ module.service("ItemRepository", ['Item', 'socket', '$rootScope', function(Item,
     internalTree : tree,
     getItem : getItem,
     fetchItem : fetchItem,
+    fetchAnalysis : fetchAnalysis,
     setCurrentItem: setCurrentItem,
     getCurrentItem: getCurrentItem    
   }

@@ -116,6 +116,7 @@ angular
 
     $scope.$on('editItem', function (event, itemId) {
       $scope.isEdit = true;
+      ItemRepository.fetchAnalysis(itemId);
       $scope.itemProxy = ItemRepository.getItem(itemId);
       $scope.editedItem = $scope.itemProxy.item;
       ItemRepository.setCurrentItem($scope.editedItem);
@@ -131,6 +132,7 @@ angular
       $scope.isEdit = false;
       if (angular.isDefined($state.params.itemId)) {
         $scope.isEdit = true;
+        ItemRepository.fetchAnalysis($scope.editedItem.id);
         $scope.itemProxy = ItemRepository.getItem($scope.editedItem.id);
         //$scope.editedItem = $scope.itemProxy.item;
         ItemRepository.setCurrentItem($scope.editedItem);
