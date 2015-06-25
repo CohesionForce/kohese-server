@@ -1097,27 +1097,27 @@ module.factory(
           method: "GET"
         },
 
-        // INTERNAL. Use Item.analyses() instead.
-        "prototype$__get__analyses": {
-          url: urlBase + "/Items/:id/analyses",
+        // INTERNAL. Use Item.analysis() instead.
+        "prototype$__get__analysis": {
+          url: urlBase + "/Items/:id/analysis",
           method: "GET"
         },
 
-        // INTERNAL. Use Item.analyses.create() instead.
-        "prototype$__create__analyses": {
-          url: urlBase + "/Items/:id/analyses",
+        // INTERNAL. Use Item.analysis.create() instead.
+        "prototype$__create__analysis": {
+          url: urlBase + "/Items/:id/analysis",
           method: "POST"
         },
 
-        // INTERNAL. Use Item.analyses.update() instead.
-        "prototype$__update__analyses": {
-          url: urlBase + "/Items/:id/analyses",
+        // INTERNAL. Use Item.analysis.update() instead.
+        "prototype$__update__analysis": {
+          url: urlBase + "/Items/:id/analysis",
           method: "PUT"
         },
 
-        // INTERNAL. Use Item.analyses.destroy() instead.
-        "prototype$__destroy__analyses": {
-          url: urlBase + "/Items/:id/analyses",
+        // INTERNAL. Use Item.analysis.destroy() instead.
+        "prototype$__destroy__analysis": {
+          url: urlBase + "/Items/:id/analysis",
           method: "DELETE"
         },
 
@@ -2793,27 +2793,27 @@ module.factory(
         };
     /**
      * @ngdoc object
-     * @name lbServices.Item.analyses
-     * @header lbServices.Item.analyses
+     * @name lbServices.Item.analysis
+     * @header lbServices.Item.analysis
      * @object
      * @description
      *
-     * The object `Item.analyses` groups methods
+     * The object `Item.analysis` groups methods
      * manipulating `Analysis` instances related to `Item`.
      *
-     * Call {@link lbServices.Item#analyses Item.analyses()}
+     * Call {@link lbServices.Item#analysis Item.analysis()}
      * to query all related instances.
      */
 
 
         /**
          * @ngdoc method
-         * @name lbServices.Item#analyses
+         * @name lbServices.Item#analysis
          * @methodOf lbServices.Item
          *
          * @description
          *
-         * Fetches hasOne relation analyses.
+         * Fetches hasOne relation analysis.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -2836,20 +2836,20 @@ module.factory(
          * This usually means the response is a `Analysis` object.)
          * </em>
          */
-        R.analyses = function() {
+        R.analysis = function() {
           var TargetResource = $injector.get("Analysis");
-          var action = TargetResource["::get::Item::analyses"];
+          var action = TargetResource["::get::Item::analysis"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.Item.analyses#create
-         * @methodOf lbServices.Item.analyses
+         * @name lbServices.Item.analysis#create
+         * @methodOf lbServices.Item.analysis
          *
          * @description
          *
-         * Creates a new instance in analyses of this model.
+         * Creates a new instance in analysis of this model.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -2874,20 +2874,20 @@ module.factory(
          * This usually means the response is a `Analysis` object.)
          * </em>
          */
-        R.analyses.create = function() {
+        R.analysis.create = function() {
           var TargetResource = $injector.get("Analysis");
-          var action = TargetResource["::create::Item::analyses"];
+          var action = TargetResource["::create::Item::analysis"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.Item.analyses#destroy
-         * @methodOf lbServices.Item.analyses
+         * @name lbServices.Item.analysis#destroy
+         * @methodOf lbServices.Item.analysis
          *
          * @description
          *
-         * Deletes analyses of this model.
+         * Deletes analysis of this model.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -2905,20 +2905,20 @@ module.factory(
          *
          * This method returns no data.
          */
-        R.analyses.destroy = function() {
+        R.analysis.destroy = function() {
           var TargetResource = $injector.get("Analysis");
-          var action = TargetResource["::destroy::Item::analyses"];
+          var action = TargetResource["::destroy::Item::analysis"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.Item.analyses#update
-         * @methodOf lbServices.Item.analyses
+         * @name lbServices.Item.analysis#update
+         * @methodOf lbServices.Item.analysis
          *
          * @description
          *
-         * Update analyses of this model.
+         * Update analysis of this model.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -2943,9 +2943,9 @@ module.factory(
          * This usually means the response is a `Analysis` object.)
          * </em>
          */
-        R.analyses.update = function() {
+        R.analysis.update = function() {
           var TargetResource = $injector.get("Analysis");
-          var action = TargetResource["::update::Item::analyses"];
+          var action = TargetResource["::update::Item::analysis"];
           return action.apply(R, arguments);
         };
 
@@ -3827,27 +3827,27 @@ module.factory(
           method: "PUT"
         },
 
-        // INTERNAL. Use Item.analyses() instead.
-        "::get::Item::analyses": {
-          url: urlBase + "/Items/:id/analyses",
+        // INTERNAL. Use Item.analysis() instead.
+        "::get::Item::analysis": {
+          url: urlBase + "/Items/:id/analysis",
           method: "GET"
         },
 
-        // INTERNAL. Use Item.analyses.create() instead.
-        "::create::Item::analyses": {
-          url: urlBase + "/Items/:id/analyses",
+        // INTERNAL. Use Item.analysis.create() instead.
+        "::create::Item::analysis": {
+          url: urlBase + "/Items/:id/analysis",
           method: "POST"
         },
 
-        // INTERNAL. Use Item.analyses.update() instead.
-        "::update::Item::analyses": {
-          url: urlBase + "/Items/:id/analyses",
+        // INTERNAL. Use Item.analysis.update() instead.
+        "::update::Item::analysis": {
+          url: urlBase + "/Items/:id/analysis",
           method: "PUT"
         },
 
-        // INTERNAL. Use Item.analyses.destroy() instead.
-        "::destroy::Item::analyses": {
-          url: urlBase + "/Items/:id/analyses",
+        // INTERNAL. Use Item.analysis.destroy() instead.
+        "::destroy::Item::analysis": {
+          url: urlBase + "/Items/:id/analysis",
           method: "DELETE"
         },
       }
