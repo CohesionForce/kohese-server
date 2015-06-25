@@ -14,12 +14,13 @@ angular
       $state.go('editItem', {});
 
       $scope.newItem = function () {
-        $state.go('newItem');
-      }
+        $rootScope.$broadcast('newItem')
+        console.log("NEW ITEM!!")
+      };
 
       $scope.editItem = function (item) {
         $rootScope.$broadcast('editItem', item.id);
-      }
+      };
 
 
       $scope.removeItem = function (item) {
@@ -109,7 +110,7 @@ angular
     $scope.newTree = ItemRepository.internalTree;
 
     $scope.$on('newItem', function(event, parentId) {
-      $scope.editedItem = new Item;
+      $scope.editedItem = {};
       $scope.editedItem.parentId = parentId;
       $scope.enableEdit = true;
     });
@@ -140,19 +141,14 @@ angular
     getItem();
 
     $scope.upsertItem = function () {
+      var itemForm = this.itemForm;
       Item
         .upsert($scope.editedItem)
         .$promise
         .then(function (updatedItem) {
-          console.log("Item saved!")
-          this.itemForm.$setPristine();
+            ItemRepository.fetchItem($scope.editedItem.id);
+            itemForm.$setPristine();
         });
-      // if (angular.isDefined($state.params.parentId)){
-      //       $state.go('editItem', {itemId: $state.params.parentId});
-      // } else {
-      //       $state.go('items');
-      // }
-      //});
     };
 
     $scope.cancel = function () {
