@@ -108,6 +108,12 @@ angular
 
     $scope.newTree = ItemRepository.internalTree;
 
+    $scope.$on('newItem', function(event, parentId) {
+      $scope.editedItem = new Item;
+      $scope.editedItem.parentId = parentId;
+      $scope.enableEdit = true;
+    });
+
     $scope.$on('editItem', function (event, itemId) {
       $scope.isEdit = true;
       $scope.itemProxy = ItemRepository.getItem(itemId);
@@ -161,7 +167,7 @@ angular
     }
 
     $scope.newItem = function () {
-      $state.go('newItem', {parentId: $scope.editedItem.id});
+      $rootScope.$broadcast('newItem', $scope.editedItem.id)
     }
 
     $scope.editItem = function (item) {
