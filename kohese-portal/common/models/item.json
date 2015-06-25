@@ -39,6 +39,11 @@
       "type": "belongsTo",
       "model": "Item",
       "foreignKey": "parentId"
+    },
+    "analyses": {
+      "type": "hasOne",
+      "model": "Analysis",
+      "foreignKey": "id"
     }
   },
   "acls": [],
