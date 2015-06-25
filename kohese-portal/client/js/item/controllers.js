@@ -18,7 +18,7 @@ angular
       }
 
       $scope.editItem = function (item) {
-        $rootScope.$broadcast('editItem', item);
+        $rootScope.$broadcast('editItem', item.id);
       }
 
 
@@ -108,10 +108,10 @@ angular
 
     $scope.newTree = ItemRepository.internalTree;
 
-    $scope.$on('editItem', function (event, item) {
-      $scope.editedItem = item;
+    $scope.$on('editItem', function (event, itemId) {
       $scope.isEdit = true;
-      $scope.itemProxy = ItemRepository.getItem($scope.editedItem.id);
+      $scope.itemProxy = ItemRepository.getItem(itemId);
+      $scope.editedItem = $scope.itemProxy.item;
       ItemRepository.setCurrentItem($scope.editedItem);
 
     });
@@ -165,7 +165,7 @@ angular
     }
 
     $scope.editItem = function (item) {
-      $rootScope.$broadcast('editItem', item);
+      $rootScope.$broadcast('editItem', item.id);
       console.log("Item edit: Edit Item");
     }
 
@@ -178,15 +178,9 @@ angular
         });
     };
 
+
+
   }
   ])
 ;
 
-angular
-  .module('app')
-  .controller('NavigationController', ['$scope', '$state', '$location', 'Item', function ($scope,
-                                                                                          $state, $location, Item) {
-
-    $('#side-menu').metisMenu();
-
-  }]);
