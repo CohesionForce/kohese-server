@@ -14,8 +14,7 @@ angular
       $state.go('editItem', {});
 
       $scope.newItem = function () {
-        $rootScope.$broadcast('newItem')
-        console.log("NEW ITEM!!")
+        $rootScope.$broadcast('newItem');
       };
 
       $scope.editItem = function (item) {
@@ -106,6 +105,7 @@ angular
     $scope.listTitle = "Children"
     $scope.editedItem = new Item;
     $scope.enableEdit = false;
+    $scope.defaultTab = {active: true};
 
     $scope.newTree = ItemRepository.internalTree;
 
@@ -121,6 +121,7 @@ angular
       $scope.itemProxy = ItemRepository.getItem(itemId);
       $scope.editedItem = $scope.itemProxy.item;
       ItemRepository.setCurrentItem($scope.editedItem);
+      $scope.defaultTab.active = true;
 
     });
 
