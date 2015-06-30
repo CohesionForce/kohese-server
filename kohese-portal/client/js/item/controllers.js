@@ -39,29 +39,29 @@ angular
 
       $scope.syncLocation = function () {
         $anchorScroll();
-      }
+      };
 
       $scope.expandAll = function () {
         // Set all nodes to expanded
-        for (var id in $scope.collapsed) {
+        for (let id in $scope.collapsed) {
           $scope.collapsed[id] = false;
         }
         // Set all nodes to visible
-        for (var id in $scope.hidden) {
+        for (let id in $scope.hidden) {
           $scope.hidden[id] = false;
         }
-      }
+      };
 
       $scope.collapseAll = function () {
         // Collapse all root nodes that are current expanded
-        for (var idx = 0; idx < $scope.newTree.roots.length; idx++) {
-          var rootNode = $scope.newTree.roots[idx];
+        for (let id = 0; id < $scope.newTree.roots.length; id++) {
+          var rootNode = $scope.newTree.roots[id];
           if (!$scope.collapsed[rootNode.item.id]) {
             changeVisibilityOn(rootNode);
           }
         }
 
-      }
+      };
 
       function changeVisibilityOn(proxy) {
         if ($scope.showAsTree) {
@@ -71,8 +71,8 @@ angular
           var childId = "";
 
           // Add immediate descendants to stack
-          for (var idx = 0; idx < proxy.children.length; idx++) {
-            childId = proxy.children[idx].item.id;
+          for (let id = 0; id < proxy.children.length; id++) {
+            childId = proxy.children[id].item.id;
             childIdStack.push(childId);
           }
 
@@ -102,7 +102,7 @@ angular
   .controller('ItemEditController', ['$scope', '$state', '$location', 'Item', 'ItemRepository', '$rootScope',
     function ($scope, $state, $location, Item, ItemRepository, $rootScope) {
 
-    $scope.listTitle = "Children"
+    $scope.listTitle = "Children";
     $scope.editedItem = new Item;
     $scope.enableEdit = false;
     $scope.defaultTab = {active: true};
@@ -130,19 +130,6 @@ angular
       $scope.enableEdit = true;
     }
 
-    function getItem() {
-      $scope.isEdit = false;
-      if (angular.isDefined($state.params.itemId)) {
-        $scope.isEdit = true;
-        ItemRepository.fetchAnalysis($scope.editedItem.id);
-        $scope.itemProxy = ItemRepository.getItem($scope.editedItem.id);
-        //$scope.editedItem = $scope.itemProxy.item;
-        ItemRepository.setCurrentItem($scope.editedItem);
-      }
-    }
-
-    getItem();
-
     $scope.upsertItem = function () {
       var itemForm = this.itemForm;
       Item
@@ -163,16 +150,16 @@ angular
           this.itemForm.$setPristine();
         }
       }
-    }
+    };
 
     $scope.newItem = function () {
       $rootScope.$broadcast('newItem', $scope.editedItem.id)
-    }
+    };
 
     $scope.editItem = function (item) {
       $rootScope.$broadcast('editItem', item.id);
       console.log("Item edit: Edit Item");
-    }
+    };
 
     $scope.removeItem = function (item) {
       Item
