@@ -15,14 +15,48 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
+            // Core dependencies
             'client/vendor/angular/angular.js',
             'client/vendor/angular-mocks/angular-mocks.js',
+            'client/vendor/angular-resource/angular-resource.js',
             'client/vendor/jquery/dist/jquery.js',
             'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+
+            // Module Dependencies
+            'client/js/common/lb-services.js',
+            'client/js/item/itemRepository.js',
+            "client/js/directives/resizer.js",
+            "client/js/directives/navDirectives.js",
+            "client/js/sb-admin-2.js",
+            "client/vendor/angular-ui-router/release/angular-ui-router.js",
+            "client/vendor/angular-ui-layout/ui-layout.js",
+            "client/vendor/angular-bootstrap/ui-bootstrap-tpls.js",
+            "client/vendor/socket.io-client/socket.io.js",
+            "client/vendor/angular-socket-io/socket.js",
+
+
+            //"client/vendor/angular/angular.js",
+            //"client/vendor/angular-resource/angular-resource.js",
+            //"client/vendor/angular-ui-router/release/angular-ui-router.js",
+            //"client/vendor/angular-bootstrap/ui-bootstrap-tpls.js",
+            //"client/vendor/underscore/underscore.js",
+            //"client/vendor/raf/index.js" type="text/javascript" ,
+            //"client/vendor/socket.io-client/socket.io.js",
+            //"client/vendor/angular-socket-io/socket.js",
+            //"client/vendor/angular-ui-layout/ui-layout.js" type="text/javascript" ,
+            //"client/js/app.js",
+            //"client/js/item/controllers.js",
+            //"client/js/item/itemRepository.js",
+            //"client/js/common/lb-services.js",
+            //"client/js/sb-admin-2.js",
+            //"client/js/directives/navDirectives.js",
+            //"client/js/directives/resizer.js",
+
             'client/js/app.js',
-            'client/vendor/angular-resource/angular-resource.js',
-            'common/*',
-            'tests/*.js'
+
+            //Test files
+            'tests/*.js',
+            'tests/controllers/*.js'
         ],
 
 
@@ -60,13 +94,14 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
+        browsers: ['Chrome', 'PhantomJS'],
 
         plugins: [
 
+            'karma-phantomjs-launcher',
             'karma-chrome-launcher',
             'karma-jasmine-jquery',
-            'karma-jasmine',
+            'karma-jasmine'
 
         ],
 
