@@ -6,6 +6,7 @@ angular
     function ($scope, $state, $location, Item, ItemRepository, $anchorScroll, $rootScope) {
 
       $scope.filterString = "";
+      $scope.analysisFilterString = "";
       $scope.hidden = {};
       $scope.collapsed = {};
 

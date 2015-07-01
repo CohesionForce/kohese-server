@@ -8,6 +8,10 @@ body {
   background-color: #f8f8f8;
 }
 
+.highlighted {
+  background: yellow;
+}
+
 .glyphicon-remove:hover {
   cursor: pointer;
 }

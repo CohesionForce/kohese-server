@@ -63,37 +63,55 @@
 			</tab>
 			<tab heading="Relations">
 				<h4>Relations Tab</h4>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-					enim ad minim veniam, quis nostrud exercitation ullamco laboris
-					nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-					culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p><b>This tab is under construction.</b></p>
 			</tab>
 			<tab heading="Analysis">
 				<h4>Analysis Tab</h4>
-				<p>{{itemProxy.analysis.raw}}</p>
-			</tab>
+		        <span class="pull-right">
+					<input class="input-sm" type="text" ng-model="analysisFilterString"
+							placeholder="Filter" style="margin: 5px" />
+				</span>
+
+				<table
+					class="table table-striped table-condensed table-hover">
+					<thead>
+						<th><a href="" ng-click="itemSortField = 'begin'">Begin</a></th>
+						<th><a href="" ng-click="itemSortField = 'end'">End</a></th>
+						<th><a href="" ng-click="itemSortField = 'type'">Type</a></th>
+						<th><a href="" ng-click="itemSortField = 'Text'">Text</a></th>
+					</thead>
+					<tbody>
+						<tr id="Sentence-{{sentence.begin}}" 
+							ng-repeat="sentence in itemProxy.analysis.raw._views._InitialView.Sentence | filter:analysisFilterString">
+						    <td>{{sentence.begin}}</td>
+						    <td>{{sentence.end}}</td>
+						    <td>Sentence</td>
+						    <td ng-bind-html="sentence.text | highlight:analysisFilterString"></td>
+						</tr>
+						<tr id="Chunk-{{chunk.begin}}" 
+							ng-repeat="chunk in itemProxy.analysis.raw._views._InitialView.Chunk | filter:analysisFilterString">
+						    <td>{{chunk.begin}}</td>
+						    <td>{{chunk.end}}</td>
+						    <td>{{chunk.chunkType}}</td>
+						    <td ng-bind-html="chunk.text | highlight:analysisFilterString"></td>
+						</tr>
+						<tr id="Token-{{token.begin}}" 
+							ng-repeat="token in itemProxy.analysis.raw._views._InitialView.Token | filter:analysisFilterString">
+						    <td>{{token.begin}}</td>
+						    <td>{{token.end}}</td>
+						    <td>{{token.pos}}</td>
+						    <td ng-bind-html="token.text | highlight:analysisFilterString"></td>
+						</tr>
+					</tbody>
+				</table>
+		</tab>
 			<tab heading="History">
 				<h4>History Tab</h4>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-					enim ad minim veniam, quis nostrud exercitation ullamco laboris
-					nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-					culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p><b>This tab is under construction.</b></p>
 			</tab>
 			<tab heading="Journal">
 				<h4>Journal Tab</h4>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-					do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-					enim ad minim veniam, quis nostrud exercitation ullamco laboris
-					nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-					reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-					pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-					culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p><b>This tab is under construction.</b></p>
 			</tab>
 		</tabset>
 	</div>
