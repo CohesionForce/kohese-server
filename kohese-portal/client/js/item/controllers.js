@@ -43,19 +43,19 @@ angular
 
       $scope.expandAll = function () {
         // Set all nodes to expanded
-        for (let id in $scope.collapsed) {
-          $scope.collapsed[id] = false;
+        for (var index in $scope.collapsed) {
+          $scope.collapsed[index] = false;
         }
         // Set all nodes to visible
-        for (let id in $scope.hidden) {
-          $scope.hidden[id] = false;
+        for (var index in $scope.hidden) {
+          $scope.hidden[index] = false;
         }
       };
 
       $scope.collapseAll = function () {
         // Collapse all root nodes that are current expanded
-        for (let id = 0; id < $scope.newTree.roots.length; id++) {
-          var rootNode = $scope.newTree.roots[id];
+        for (var index = 0; index < $scope.newTree.roots.length; index++) {
+          var rootNode = $scope.newTree.roots[index];
           if (!$scope.collapsed[rootNode.item.id]) {
             changeVisibilityOn(rootNode);
           }
@@ -71,8 +71,8 @@ angular
           var childId = "";
 
           // Add immediate descendants to stack
-          for (let id = 0; id < proxy.children.length; id++) {
-            childId = proxy.children[id].item.id;
+          for (var index = 0; index < proxy.children.length; index++) {
+            childId = proxy.children[index].item.id;
             childIdStack.push(childId);
           }
 
@@ -81,8 +81,8 @@ angular
               // New state is collapsed
               $scope.collapsed[childId] = true;
               proxy = ItemRepository.getItem(childId);
-              for (var idx = 0; idx < proxy.children.length; idx++) {
-                var grandChildId = proxy.children[idx].item.id;
+              for (var index = 0; index < proxy.children.length; index++) {
+                var grandChildId = proxy.children[index].item.id;
                 childIdStack.push(grandChildId);
               }
             }
