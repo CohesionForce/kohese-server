@@ -110,13 +110,54 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       id : byId
     }).$promise.then(function(results) {
       var temp = results;
-      var proxy = tree.proxyMap[byId];
      
       if (angular.isDefined(proxy)){
-        proxy.analysis = results;        
+        proxy.analysis = results;
+        consolidateAnalysis(proxy);
       }
 
+    }, function(errorResults){
+      proxy.analysis = {};
     });      
+  }
+  
+  function consolidateAnalysis(onProxy){
+    onProxy.analysisList = [];
+    var sentenceCount = onProxy.analysis.raw._views._InitialView.Sentence.length;
+    var chunkCount = onProxy.analysis.raw._views._InitialView.Chunk.length;
+    var tokenCount = onProxy.analysis.raw._views._InitialView.Token.length;
+    var chunkIndex = 0;
+    var tokenIndex = 0;
+    var nextChunk = {};
+    var nextToken = {};
+    
+    for (var sentenceIndex = 0; sentenceIndex < sentenceCount; sentenceIndex++){
+      var sentence = onProxy.analysis.raw._views._InitialView.Sentence[sentenceIndex];
+      sentence.displayType = "Sentence";
+      sentence.displayId = "Sentence-" + sentenceIndex;
+      sentence.displayLevel = 1;
+      onProxy.analysisList.push(sentence);
+      
+      nextChunk = onProxy.analysis.raw._views._InitialView.Chunk[chunkIndex];
+      while((chunkIndex < chunkCount) && (nextChunk.end <= sentence.end)){
+        nextChunk.displayType = lookup[nextChunk.chunkType] + " (" + nextChunk.chunkType + ")";
+        nextChunk.displayId = "Chunk-" + chunkIndex; 
+        nextChunk.displayLevel = 2;
+        onProxy.analysisList.push(nextChunk);
+        
+        nextToken = onProxy.analysis.raw._views._InitialView.Token[tokenIndex];
+        while((tokenIndex < tokenCount) && (nextToken.end <= nextChunk.end)){
+          nextToken.displayType = lookup[nextToken.pos] + " (" + nextToken.pos + ")";
+          nextToken.displayId = "Token-" + chunkIndex; 
+          nextToken.displayLevel = 3;
+          onProxy.analysisList.push(nextToken);
+          
+          nextToken = onProxy.analysis.raw._views._InitialView.Token[++tokenIndex];
+        }
+        
+        nextChunk = onProxy.analysis.raw._views._InitialView.Chunk[++chunkIndex];
+      }
+    }
   }
 
   function getItem(byId) {
@@ -272,6 +313,66 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     
   }
 
+  var lookup = {};
+  lookup.CC = "Coordinating Conjuction";
+  lookup.LS = "List Item";
+  lookup.PRPS = "Possessive Pronoun";
+  lookup.VBD = "Past Tense Verb";
+  lookup.CD = "Cardinal Number";
+  lookup.MD = "Modal";
+  lookup.RB = "Adverb";
+  lookup.VBG = "Present Participle Verb";
+  lookup.DT = "Determiner";
+  lookup.NN = "Noun";
+  lookup.RBR = "Comparative Adverb";
+  lookup.VBN = "Past Participle Verb";
+  lookup.EX = "Existential There";
+  lookup.NNS = "Plural Noun";
+  lookup.RBS = "Superlative Adverb";
+  lookup.VBP = "Non-3rd Present Verb";
+  lookup.FW = "Foreign Word";
+  lookup.NNP = "Proper Noun";
+  lookup.RP = "Particle";
+  lookup.VBZ = "3rd Person Present Verb";
+  lookup.IN = "Preposition";
+  lookup.NNPS = "Plural Proper Noun";
+  lookup.SYM = "Symbol";
+  lookup.WDT = "WH Determiner";
+  lookup.JJ = "Adjective";
+  lookup.PDT = "Predeterminer";
+  lookup.TO = "To";
+  lookup.WP = "WH Pronoun";
+  lookup.JJR = "Comparative Adjective";
+  lookup.POS = "Possessive Ending";
+  lookup.UH = "Interjection";
+  lookup.WPS = "Possessive WH Pronoun";
+  lookup.JJS = "Superlative Adjective";
+  lookup.PRP = "Personal Pronoun";
+  lookup.VB = "Verb";
+  lookup.WRB = "WH Adverb";
+  lookup.ADJP = "Adjective";
+  lookup.NP = "Noun";
+  lookup.UCP = "Unlike Coordinated Phrase";
+  lookup.ADVP = "Adverb";
+  lookup.NX = "Head Noun";
+  lookup.VP = "Verb";
+  lookup.CONJP = "Conjunction";
+  lookup.PP = "Prepositional";
+  lookup.WHADJP = "WH Adjective";
+  lookup.FRAG = "Fragment";
+  lookup.PRN = "Parenthetical";
+  lookup.WHAVP = "WH Adverb";
+  lookup.INTJ = "Interjection";
+  lookup.PRT = "Particle";
+  lookup.WHNP = "WH Noun";
+  lookup.LST = "List";
+  lookup.QP = "Quantifier";
+  lookup.WHPP = "WH Prepositional";
+  lookup.NAC = "Not A Constituent";
+  lookup.RRC = "Reduced Relative Clause";
+
+  // Does this (X) really exist?
+  lookup.X = "Unknown";
   
   return {
     internalTree : tree,
