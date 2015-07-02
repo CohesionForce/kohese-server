@@ -107,6 +107,10 @@ angular
     $scope.editedItem = new Item;
     $scope.enableEdit = false;
     $scope.defaultTab = {active: true};
+    $scope.showChunksInAnalysis = true;
+    $scope.showTokensInAnalysis = true;
+    $scope.showChunksInDetails = false;
+    $scope.showTokensInDetails = false;
 
     $scope.newTree = ItemRepository.internalTree;
 
