@@ -3827,6 +3827,45 @@ module.factory(
           method: "PUT"
         },
 
+        /**
+         * @ngdoc method
+         * @name lbServices.Analysis#performAnalysis
+         * @methodOf lbServices.Analysis
+         *
+         * @description
+         *
+         * <em>
+         * (The remote method definition does not provide any description.)
+         * </em>
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         *  - `onId` – `{string=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `response` – `{string=}` - 
+         */
+        "performAnalysis": {
+          url: urlBase + "/Analyses/performAnalysis",
+          method: "POST"
+        },
+
         // INTERNAL. Use Item.analysis() instead.
         "::get::Item::analysis": {
           url: urlBase + "/Items/:id/analysis",

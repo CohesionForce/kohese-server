@@ -5,7 +5,7 @@
 var module = angular.module("itemServices", []);
 
 module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', function(Item, Analysis, socket, $rootScope) {
-
+  
   var tree = {};
   var currentItem = {};
 
@@ -120,7 +120,18 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
 
     }, function(errorResults){
       proxy.analysis = {};
+      console.log("*** Analysis not found for:  " + proxy.item.id);
+      performAnalysis(byId);
     });      
+  }
+  
+  function performAnalysis(byId) {
+    Analysis.performAnalysis({
+      onId : byId
+    }).$promise.then(function(results) {
+      console.log("Results for analysis on: " + byId);
+      console.log(results);
+    });
   }
   
   function consolidateAnalysis(onProxy){
