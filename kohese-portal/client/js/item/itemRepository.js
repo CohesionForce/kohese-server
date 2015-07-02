@@ -112,13 +112,83 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       id : byId
     }).$promise.then(function(results) {
       var temp = results;
-      var proxy = tree.proxyMap[byId];
      
       if (angular.isDefined(proxy)){
-        proxy.analysis = results;        
+        proxy.analysis.data = results;
+        consolidateAnalysis(proxy);
       }
 
+    }, function(errorResults){
+      proxy.analysis = {};
     });      
+  }
+  
+  function consolidateAnalysis(onProxy){
+    onProxy.analysis.list = [];
+    var sentenceCount = onProxy.analysis.data.raw._views._InitialView.Sentence.length;
+    var chunkCount = onProxy.analysis.data.raw._views._InitialView.Chunk.length;
+    var tokenCount = onProxy.analysis.data.raw._views._InitialView.Token.length;
+    var chunkIndex = 0;
+    var tokenIndex = 0;
+    var nextChunk = {};
+    var nextToken = {};
+    
+    onProxy.analysis.chunkSummary = {};
+    onProxy.analysis.tokenSummary = {};
+    
+    for (var sentenceIndex = 0; sentenceIndex < sentenceCount; sentenceIndex++){
+      var sentence = onProxy.analysis.data.raw._views._InitialView.Sentence[sentenceIndex];
+      sentence.displayType = "Sentence";
+      sentence.displayId = "Sentence-" + sentenceIndex;
+      sentence.displayLevel = 1;
+      onProxy.analysis.list.push(sentence);
+      
+      nextChunk = onProxy.analysis.data.raw._views._InitialView.Chunk[chunkIndex];
+      while((chunkIndex < chunkCount) && (nextChunk.end <= sentence.end)){
+        nextChunk.displayType = lookup[nextChunk.chunkType] + " (" + nextChunk.chunkType + ")";
+        nextChunk.displayId = "Chunk-" + chunkIndex; 
+        nextChunk.displayLevel = 2;
+        onProxy.analysis.list.push(nextChunk);
+
+        if(angular.isDefined(onProxy.analysis.chunkSummary[nextChunk.text])){
+          onProxy.analysis.chunkSummary[nextChunk.text].count++;
+          onProxy.analysis.chunkSummary[nextChunk.text].list.push(nextChunk);
+        } else {
+          var chunkSummary = {};
+          chunkSummary.text = nextChunk.text;
+          chunkSummary.count = 1;
+          chunkSummary.displayType = "Chunk";
+          chunkSummary.list = [nextChunk];
+          onProxy.analysis.chunkSummary[nextChunk.text] = chunkSummary;
+        }
+        
+        nextToken = onProxy.analysis.data.raw._views._InitialView.Token[tokenIndex];
+        while((tokenIndex < tokenCount) && (nextToken.end <= nextChunk.end)){
+          nextToken.displayType = lookup[nextToken.pos] + " (" + nextToken.pos + ")";
+          nextToken.displayId = "Token-" + chunkIndex; 
+          nextToken.displayLevel = 3;
+          onProxy.analysis.list.push(nextToken);
+          
+          if(angular.isDefined(onProxy.analysis.tokenSummary[nextToken.text])){
+            onProxy.analysis.tokenSummary[nextToken.text].count++;
+            onProxy.analysis.tokenSummary[nextToken.text].list.push(nextToken);
+          } else {
+            var tokenSummary = {};
+            tokenSummary.text = nextToken.text;
+            tokenSummary.count = 1;
+            tokenSummary.displayType = "Token";
+            tokenSummary.list = [nextToken];
+            onProxy.analysis.tokenSummary[nextToken.text] = tokenSummary;
+          }
+          
+          nextToken = onProxy.analysis.data.raw._views._InitialView.Token[++tokenIndex];
+        }
+        
+        nextChunk = onProxy.analysis.data.raw._views._InitialView.Chunk[++chunkIndex];
+      }
+    }
+    
+    onProxy.analysis.summaryList = _.union(_.values(onProxy.analysis.chunkSummary), _.values(onProxy.analysis.tokenSummary));
   }
 
   function getItem(byId) {
@@ -273,6 +343,66 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     
   }
 
+  var lookup = {};
+  lookup.CC = "Coordinating Conjuction";
+  lookup.LS = "List Item";
+  lookup.PRPS = "Possessive Pronoun";
+  lookup.VBD = "Past Tense Verb";
+  lookup.CD = "Cardinal Number";
+  lookup.MD = "Modal";
+  lookup.RB = "Adverb";
+  lookup.VBG = "Present Participle Verb";
+  lookup.DT = "Determiner";
+  lookup.NN = "Noun";
+  lookup.RBR = "Comparative Adverb";
+  lookup.VBN = "Past Participle Verb";
+  lookup.EX = "Existential There";
+  lookup.NNS = "Plural Noun";
+  lookup.RBS = "Superlative Adverb";
+  lookup.VBP = "Non-3rd Present Verb";
+  lookup.FW = "Foreign Word";
+  lookup.NNP = "Proper Noun";
+  lookup.RP = "Particle";
+  lookup.VBZ = "3rd Person Present Verb";
+  lookup.IN = "Preposition";
+  lookup.NNPS = "Plural Proper Noun";
+  lookup.SYM = "Symbol";
+  lookup.WDT = "WH Determiner";
+  lookup.JJ = "Adjective";
+  lookup.PDT = "Predeterminer";
+  lookup.TO = "To";
+  lookup.WP = "WH Pronoun";
+  lookup.JJR = "Comparative Adjective";
+  lookup.POS = "Possessive Ending";
+  lookup.UH = "Interjection";
+  lookup.WPS = "Possessive WH Pronoun";
+  lookup.JJS = "Superlative Adjective";
+  lookup.PRP = "Personal Pronoun";
+  lookup.VB = "Verb";
+  lookup.WRB = "WH Adverb";
+  lookup.ADJP = "Adjective";
+  lookup.NP = "Noun Phrase";
+  lookup.UCP = "Unlike Coordinated Phrase";
+  lookup.ADVP = "Adverb";
+  lookup.NX = "Head Noun";
+  lookup.VP = "Verb Phrase";
+  lookup.CONJP = "Conjunction";
+  lookup.PP = "Prepositional";
+  lookup.WHADJP = "WH Adjective";
+  lookup.FRAG = "Fragment";
+  lookup.PRN = "Parenthetical";
+  lookup.WHAVP = "WH Adverb";
+  lookup.INTJ = "Interjection";
+  lookup.PRT = "Particle";
+  lookup.WHNP = "WH Noun";
+  lookup.LST = "List";
+  lookup.QP = "Quantifier";
+  lookup.WHPP = "WH Prepositional";
+  lookup.NAC = "Not A Constituent";
+  lookup.RRC = "Reduced Relative Clause";
+
+  // Does this (X) really exist?
+  lookup.X = "Unknown";
   
   return {
     internalTree : tree,
