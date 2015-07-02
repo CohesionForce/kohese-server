@@ -112,7 +112,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       var temp = results;
      
       if (angular.isDefined(proxy)){
-        proxy.analysis = results;
+        proxy.analysis.data = results;
         consolidateAnalysis(proxy);
       }
 
@@ -122,42 +122,71 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
   }
   
   function consolidateAnalysis(onProxy){
-    onProxy.analysisList = [];
-    var sentenceCount = onProxy.analysis.raw._views._InitialView.Sentence.length;
-    var chunkCount = onProxy.analysis.raw._views._InitialView.Chunk.length;
-    var tokenCount = onProxy.analysis.raw._views._InitialView.Token.length;
+    onProxy.analysis.list = [];
+    var sentenceCount = onProxy.analysis.data.raw._views._InitialView.Sentence.length;
+    var chunkCount = onProxy.analysis.data.raw._views._InitialView.Chunk.length;
+    var tokenCount = onProxy.analysis.data.raw._views._InitialView.Token.length;
     var chunkIndex = 0;
     var tokenIndex = 0;
     var nextChunk = {};
     var nextToken = {};
     
+    onProxy.analysis.chunkSummary = {};
+    onProxy.analysis.tokenSummary = {};
+    
     for (var sentenceIndex = 0; sentenceIndex < sentenceCount; sentenceIndex++){
-      var sentence = onProxy.analysis.raw._views._InitialView.Sentence[sentenceIndex];
+      var sentence = onProxy.analysis.data.raw._views._InitialView.Sentence[sentenceIndex];
       sentence.displayType = "Sentence";
       sentence.displayId = "Sentence-" + sentenceIndex;
       sentence.displayLevel = 1;
-      onProxy.analysisList.push(sentence);
+      onProxy.analysis.list.push(sentence);
       
-      nextChunk = onProxy.analysis.raw._views._InitialView.Chunk[chunkIndex];
+      nextChunk = onProxy.analysis.data.raw._views._InitialView.Chunk[chunkIndex];
       while((chunkIndex < chunkCount) && (nextChunk.end <= sentence.end)){
         nextChunk.displayType = lookup[nextChunk.chunkType] + " (" + nextChunk.chunkType + ")";
         nextChunk.displayId = "Chunk-" + chunkIndex; 
         nextChunk.displayLevel = 2;
-        onProxy.analysisList.push(nextChunk);
+        onProxy.analysis.list.push(nextChunk);
+
+        if(angular.isDefined(onProxy.analysis.chunkSummary[nextChunk.text])){
+          onProxy.analysis.chunkSummary[nextChunk.text].count++;
+          onProxy.analysis.chunkSummary[nextChunk.text].list.push(nextChunk);
+        } else {
+          var chunkSummary = {};
+          chunkSummary.text = nextChunk.text;
+          chunkSummary.count = 1;
+          chunkSummary.displayType = "Chunk";
+          chunkSummary.list = [nextChunk];
+          onProxy.analysis.chunkSummary[nextChunk.text] = chunkSummary;
+        }
         
-        nextToken = onProxy.analysis.raw._views._InitialView.Token[tokenIndex];
+        nextToken = onProxy.analysis.data.raw._views._InitialView.Token[tokenIndex];
         while((tokenIndex < tokenCount) && (nextToken.end <= nextChunk.end)){
           nextToken.displayType = lookup[nextToken.pos] + " (" + nextToken.pos + ")";
           nextToken.displayId = "Token-" + chunkIndex; 
           nextToken.displayLevel = 3;
-          onProxy.analysisList.push(nextToken);
+          onProxy.analysis.list.push(nextToken);
           
-          nextToken = onProxy.analysis.raw._views._InitialView.Token[++tokenIndex];
+          if(angular.isDefined(onProxy.analysis.tokenSummary[nextToken.text])){
+            onProxy.analysis.tokenSummary[nextToken.text].count++;
+            onProxy.analysis.tokenSummary[nextToken.text].list.push(nextToken);
+          } else {
+            var tokenSummary = {};
+            tokenSummary.text = nextToken.text;
+            tokenSummary.count = 1;
+            tokenSummary.displayType = "Token";
+            tokenSummary.list = [nextToken];
+            onProxy.analysis.tokenSummary[nextToken.text] = tokenSummary;
+          }
+          
+          nextToken = onProxy.analysis.data.raw._views._InitialView.Token[++tokenIndex];
         }
         
-        nextChunk = onProxy.analysis.raw._views._InitialView.Chunk[++chunkIndex];
+        nextChunk = onProxy.analysis.data.raw._views._InitialView.Chunk[++chunkIndex];
       }
     }
+    
+    onProxy.analysis.summaryList = _.union(_.values(onProxy.analysis.chunkSummary), _.values(onProxy.analysis.tokenSummary));
   }
 
   function getItem(byId) {
@@ -351,11 +380,11 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
   lookup.VB = "Verb";
   lookup.WRB = "WH Adverb";
   lookup.ADJP = "Adjective";
-  lookup.NP = "Noun";
+  lookup.NP = "Noun Phrase";
   lookup.UCP = "Unlike Coordinated Phrase";
   lookup.ADVP = "Adverb";
   lookup.NX = "Head Noun";
-  lookup.VP = "Verb";
+  lookup.VP = "Verb Phrase";
   lookup.CONJP = "Conjunction";
   lookup.PP = "Prepositional";
   lookup.WHADJP = "WH Adjective";

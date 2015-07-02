@@ -71,24 +71,43 @@
 							placeholder="Filter" style="margin: 5px" />
 				</span>
 
+				<h4>Analysis Summary</h4>
 				<table
 					class="table tree-grid table-striped table-condensed table-hover">
 					<thead>
-						<th style="width:20%"><a href="" ng-click="itemSortField = 'type'">Type</a></th>
 						<th><a href="" ng-click="itemSortField = 'Text'">Text</a></th>
-						<th><a href="" ng-click="itemSortField = 'begin'">Begin</a></th>
-						<th><a href="" ng-click="itemSortField = 'end'">End</a></th>
+						<th><a href="" ng-click="itemSortField = 'Type'">Type</a></th>
+						<th><a href="" ng-click="itemSortField = 'Count'">Count</a></th>
+					</thead>
+					<tbody>
+						<tr class="tree-grid-row" id="Chunk:{{summary.text}}" 
+							ng-repeat="summary in itemProxy.analysis.summaryList | filter:{text:analysisFilterString} | orderBy:['-count','text']">
+						    <td ng-bind-html="summary.text | highlight:analysisFilterString"></td>
+						    <td>{{summary.displayType}}</td>
+						    <td>{{summary.count}}</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<h4>Analysis Details</h4>
+				<table
+					class="table tree-grid table-striped table-condensed table-hover">
+					<thead>
+						<th style="width:20%"><a href="" ng-click="itemSortField = 'Type'">Type</a></th>
+						<th><a href="" ng-click="itemSortField = 'Text'">Text</a></th>
+						<th><a href="" ng-click="itemSortField = 'Begin'">Begin</a></th>
+						<th><a href="" ng-click="itemSortField = 'End'">End</a></th>
 					</thead>
 					<tbody>
 						<tr class="level-{{listItem.displayLevel}}" class="tree-grid-row" id="{{listItem.displayId}}" 
-							ng-repeat="listItem in itemProxy.analysisList | filter:analysisFilterString">
+							ng-repeat="listItem in itemProxy.analysis.list | filter:{text:analysisFilterString}">
 						    <td class="indented">{{listItem.displayType}}</td>
 						    <td ng-bind-html="listItem.text | highlight:analysisFilterString"></td>
 						    <td>{{listItem.begin}}</td>
 						    <td>{{listItem.end}}</td>
 						</tr>
 					</tbody>
-				</table>
+				</table>				
 		</tab>
 			<tab heading="History">
 				<h4>History Tab</h4>
