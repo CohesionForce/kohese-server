@@ -8,6 +8,8 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
 
   var tree = {};
   var currentItem = {};
+
+  tree.proxyMap = {};
   
   socket.on('item/create', function(notification) {
     console.log("::: Received notification of Item Created:  " + notification.id);
@@ -254,7 +256,6 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       return [];
 
     tree.roots = [];
-    tree.proxyMap = {};
     tree.parentOf ={};
 
     for(var idx = 0; idx < dataList.length; idx++){
@@ -409,6 +410,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     fetchItem : fetchItem,
     fetchAnalysis : fetchAnalysis,
     setCurrentItem: setCurrentItem,
-    getCurrentItem: getCurrentItem    
+    getCurrentItem: getCurrentItem,
+    attachToLostAndFound: attachToLostAndFound
   }
 } ]);

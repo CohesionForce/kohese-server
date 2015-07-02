@@ -34,29 +34,21 @@ module.exports = function (config) {
             "client/vendor/socket.io-client/socket.io.js",
             "client/vendor/angular-socket-io/socket.js",
 
-
-            //"client/vendor/angular/angular.js",
-            //"client/vendor/angular-resource/angular-resource.js",
-            //"client/vendor/angular-ui-router/release/angular-ui-router.js",
-            //"client/vendor/angular-bootstrap/ui-bootstrap-tpls.js",
-            //"client/vendor/underscore/underscore.js",
-            //"client/vendor/raf/index.js" type="text/javascript" ,
-            //"client/vendor/socket.io-client/socket.io.js",
-            //"client/vendor/angular-socket-io/socket.js",
-            //"client/vendor/angular-ui-layout/ui-layout.js" type="text/javascript" ,
-            //"client/js/app.js",
-            //"client/js/item/controllers.js",
-            //"client/js/item/itemRepository.js",
-            //"client/js/common/lb-services.js",
-            //"client/js/sb-admin-2.js",
-            //"client/js/directives/navDirectives.js",
-            //"client/js/directives/resizer.js",
-
+            //Client dependencies
             'client/js/app.js',
+            "client/js/item/controllers.js",
+            'client/js/item/itemRepository.js',
+
+            //Common dependencies
+            //'common/models/item.js',
+
+            //Server dependencies
+            //'server/server.js',
 
             //Test files
             'tests/*.js',
-            'tests/controllers/*.js'
+            'tests/controllers/*.js',
+            'tests/services/*.js'
         ],
 
 
@@ -101,6 +93,7 @@ module.exports = function (config) {
             'karma-phantomjs-launcher',
             'karma-chrome-launcher',
             'karma-jasmine-jquery',
+            //'jasmine-node-karma',
             'karma-jasmine'
 
         ],
