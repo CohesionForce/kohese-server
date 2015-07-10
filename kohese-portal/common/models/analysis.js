@@ -27,7 +27,12 @@ module.exports = function(Analysis) {
           
         });
         res.on('end', function (){
-          cb(null, JSON.parse(response));          
+          var analysis = new Analysis;
+          analysis.id = onId;
+          analysis.raw = JSON.parse(response);
+          analysis.save();
+          
+          cb(null, analysis.raw);          
         });
       }).end();
 
