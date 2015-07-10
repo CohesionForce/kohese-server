@@ -126,11 +126,16 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
   }
   
   function performAnalysis(byId) {
+    var proxy = tree.proxyMap[byId];
     Analysis.performAnalysis({
       onId : byId
     }).$promise.then(function(results) {
       console.log("Results for analysis on: " + byId);
       console.log(results);
+      proxy.analysis.data = results;
+      console.log("Data:");
+      console.log(proxy.analysis.data);
+      consolidateAnalysis(proxy);
     });
   }
   

@@ -1,7 +1,37 @@
 module.exports = function(Analysis) {
 
+  var http = require('http');
+  
   Analysis.performAnalysis = function(onId, cb) {
-    cb(null, 'Analyzing: ' + onId);
+
+    console.log('::: ANALYZING: ' + onId);
+    
+    var options = {
+        host: "localhost",
+        port: 9091,
+        path: '/services/analysis/' + onId,
+        method: 'GET'
+      };
+
+    // console.log('OPTIONS: ' + JSON.stringify(options));
+    
+    http.request(options, function(res) {
+        var response = "";
+        // console.log('STATUS: ' + res.statusCode);
+        // console.log('HEADERS: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+           
+        // console.log('::: BODY: ' /* + chunk*/);
+        response += chunk.toString();
+          
+        });
+        res.on('end', function (){
+          cb(null, JSON.parse(response));          
+        });
+      }).end();
+
+
   }
 
   Analysis.remoteMethod('performAnalysis', {
@@ -10,8 +40,8 @@ module.exports = function(Analysis) {
       type : 'string'
     },
     returns : {
-      arg : 'response',
-      type : 'string'
+      arg : 'raw',
+      type : 'object'
     }
   });
 
