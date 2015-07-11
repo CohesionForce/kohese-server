@@ -1,9 +1,13 @@
 module.exports = function(Analysis) {
 
   var http = require('http');
-  
+//  var app = require('../../server/server.js');
+//  var Item = app.models.Item;
+   
   Analysis.performAnalysis = function(onId, cb) {
 
+   // Item.findById(onId, function(err, item) {console.log(item)});
+    
     console.log('::: ANALYZING: ' + onId);
     
     var options = {
@@ -29,8 +33,15 @@ module.exports = function(Analysis) {
         res.on('end', function (){
           var analysis = new Analysis;
           analysis.id = onId;
-          analysis.raw = JSON.parse(response);
-          analysis.save();
+          try {
+            analysis.raw = JSON.parse(response);
+            analysis.save();            
+          }
+          catch(err) {
+            console.log("*** Error parsing result for: " + onId);
+            console.log("Analysis response:  >>>" + response + "<<<");
+            console.log(err);
+          }
           
           cb(null, analysis.raw);          
         });

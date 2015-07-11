@@ -104,14 +104,15 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     });      
   }
 
-  function fetchAnalysis(byId) {
-    var proxy = tree.proxyMap[byId];
-    proxy.analysis = {};
+  function retrieveAnalysis(forProxy) {
+    var proxy = forProxy;
     
-    if (proxy.item.description) {
+    if (proxy.item.description  && !proxy.analysis) {
       
+      console.log("::: Retrieving analysis for " + proxy.item.id + " - " + proxy.item.title);
+      proxy.analysis = {};
       Analysis.findById({
-        id : byId
+        id : proxy.item.id
       }).$promise.then(function(results) {
         var temp = results;
      
@@ -122,11 +123,19 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
 
       }, function(errorResults){
         proxy.analysis = {};
-        console.log("*** Analysis not found for:  " + proxy.item.id);
-        performAnalysis(byId);
+        console.log("*** Analysis not found for:  " + proxy.item.id + " - " + proxy.item.title);
+        performAnalysis(proxy.item.id);
       });      
     }
-    
+
+    for(var childIdx = 0; childIdx < proxy.children.length; childIdx++){
+      retrieveAnalysis(proxy.children[childIdx]);
+    }  
+  }
+  
+  function fetchAnalysis(byId) {
+    var proxy = tree.proxyMap[byId];
+    retrieveAnalysis(proxy);    
   }
   
   function performAnalysis(byId) {
@@ -134,11 +143,8 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     Analysis.performAnalysis({
       onId : byId
     }).$promise.then(function(results) {
-      console.log("Results for analysis on: " + byId);
-      console.log(results);
       proxy.analysis.data = results;
-      console.log("Data:");
-      console.log(proxy.analysis.data);
+      console.log("::: Analysis performed for: " + proxy.item.id + " - " + proxy.item.title);
       consolidateAnalysis(proxy);
     });
   }
@@ -209,6 +215,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     }
     
     onProxy.analysis.summaryList = _.union(_.values(onProxy.analysis.chunkSummary), _.values(onProxy.analysis.tokenSummary));
+    onProxy.analysis.extendedSummaryList = _.union(_.values(onProxy.analysis.extendedChunkSummary), _.values(onProxy.analysis.extendedTokenSummary));
   }
 
   function getItem(byId) {
