@@ -108,21 +108,25 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     var proxy = tree.proxyMap[byId];
     proxy.analysis = {};
     
-    Analysis.findById({
-      id : byId
-    }).$promise.then(function(results) {
-      var temp = results;
+    if (proxy.item.description) {
+      
+      Analysis.findById({
+        id : byId
+      }).$promise.then(function(results) {
+        var temp = results;
      
-      if (angular.isDefined(proxy)){
-        proxy.analysis.data = results;
-        consolidateAnalysis(proxy);
-      }
+        if (angular.isDefined(proxy)){
+          proxy.analysis.data = results;
+          consolidateAnalysis(proxy);
+        }
 
-    }, function(errorResults){
-      proxy.analysis = {};
-      console.log("*** Analysis not found for:  " + proxy.item.id);
-      performAnalysis(byId);
-    });      
+      }, function(errorResults){
+        proxy.analysis = {};
+        console.log("*** Analysis not found for:  " + proxy.item.id);
+        performAnalysis(byId);
+      });      
+    }
+    
   }
   
   function performAnalysis(byId) {
