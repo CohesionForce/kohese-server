@@ -104,7 +104,7 @@ angular
     function ($scope, $state, $location, Item, ItemRepository, $rootScope) {
 
     $scope.listTitle = "Children";
-    $scope.editedItem = new Item;
+    $scope.editedItem = { description: "No item selected"};
     $scope.enableEdit = false;
     $scope.defaultTab = {active: true};
 
