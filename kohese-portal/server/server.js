@@ -22,6 +22,7 @@ boot(app, __dirname, function(err) {
   //Example:
   var path = require('path');
   app.use(loopback.static(path.resolve(__dirname, '../client')));
+  app.use(loopback.static(__dirname + '../client'))
 
   // start the server if `$ node server.js`
   if (require.main === module) {
