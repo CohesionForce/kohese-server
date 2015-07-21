@@ -1,0 +1,47 @@
+<div>
+    <div id="tree-action-bar">
+        <input type="checkbox" ng-model="tree.showAsTree" name="showAsTreeInput"
+               style="margin: 5px"/> Show As Tree
+        <button ng-click="tree.expandAll()" class="btn btn-default btn-sm" ng-disabled="!tree.showAsTree" style="margin: 5px">
+            Expand All
+        </button>
+        <button ng-click="tree.collapseAll()" class="btn btn-default btn-sm" ng-disabled="!tree.showAsTree" style="margin: 5px">
+            Collapse All
+        </button>
+        <button ng-click="tree.syncLocation()" class="btn btn-default btn-sm" style="margin: 5px">Sync Location</button>
+    <span class="pull-right">
+      <span>Showing {{filteredItems.length}} of {{tree.newTree.rows.length}}</span>
+      <input class="input-sm" type="text" ng-model="tree.filterString" placeholder="Filter" style="margin: 5px"/>
+    </span>
+    </div>
+
+    <div>
+        <table class="table tree-grid table-striped table-condensed table-hover">
+            <thead>
+            <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
+            <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
+            <th ng-show="!tree.showAsTree"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
+            <th><i class="glyphicon glyphicon-plus pull-right" ng-click="tree.newItem()"></i></th>
+            </thead>
+            <tbody>
+            <tr id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row"
+                ng-repeat="itemProxy in filteredItems = (tree.newTree.rows | filter:tree.filterString)"
+                ng-show="!tree.showAsTree || !tree.hidden[itemProxy.item.id]">
+                <td><a style="margin: 8px"><i ng-click="tree.changeVisibilityOn(itemProxy)" ng-init="tree.collapsed[itemProxy.item.id]=false"
+                                              ng-class="{'indented tree-icon':tree.showAsTree, 'glyphicon fa icon-minus glyphicon-minus fa-minus': tree.showAsTree && (itemProxy.children.length > 0) && !tree.collapsed[itemProxy.item.id], 'glyphicon fa icon-plus glyphicon-plus fa-plus': tree.showAsTree && (itemProxy.children.length > 0) && tree.collapsed[itemProxy.item.id], 'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0), 'glyphicon glyphicon-th-list': !tree.showAsTree && (itemProxy.children.length > 0)}"></i></a><span
+                        ng-click="tree.editItem(itemProxy.item)" ng-class="{'indented tree-label':tree.showAsTree}"
+                        ng-bind-html="(itemProxy.item.title | highlight:tree.filterString)"></span>
+                </td>
+                <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
+                    ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false"
+                    ng-bind-html="itemProxy.item.description | highlight:tree.filterString"></td>
+                <td ng-show="!tree.showAsTree" ng-click="editItem({id:itemProxy.item.parentId})">
+                    {{tree.newTree.proxyMap[itemProxy.item.parentId].item.title}}
+                </td>
+                <td><i class="glyphicon glyphicon-remove pull-right" ng-click="removeItem(itemProxy.item)"></i></td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
