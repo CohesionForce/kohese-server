@@ -104,25 +104,38 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     });      
   }
 
+  function retrieveAnalysis(forProxy) {
+    var proxy = forProxy;
+    
+    if (proxy.item.description  && !proxy.analysis) {
+      
+      console.log("::: Retrieving analysis for " + proxy.item.id + " - " + proxy.item.title);
+      proxy.analysis = {};
+      Analysis.findById({
+        id : proxy.item.id
+      }).$promise.then(function(results) {
+        var temp = results;
+     
+        if (angular.isDefined(proxy)){
+          proxy.analysis.data = results;
+          consolidateAnalysis(proxy);
+        }
+
+      }, function(errorResults){
+        proxy.analysis = {};
+        console.log("*** Analysis not found for:  " + proxy.item.id + " - " + proxy.item.title);
+        performAnalysis(proxy.item.id);
+      });      
+    }
+
+    for(var childIdx = 0; childIdx < proxy.children.length; childIdx++){
+      retrieveAnalysis(proxy.children[childIdx]);
+    }  
+  }
+  
   function fetchAnalysis(byId) {
     var proxy = tree.proxyMap[byId];
-    proxy.analysis = {};
-    
-    Analysis.findById({
-      id : byId
-    }).$promise.then(function(results) {
-      var temp = results;
-     
-      if (angular.isDefined(proxy)){
-        proxy.analysis.data = results;
-        consolidateAnalysis(proxy);
-      }
-
-    }, function(errorResults){
-      proxy.analysis = {};
-      console.log("*** Analysis not found for:  " + proxy.item.id);
-      performAnalysis(byId);
-    });      
+    retrieveAnalysis(proxy);    
   }
   
   function performAnalysis(byId) {
@@ -130,11 +143,8 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     Analysis.performAnalysis({
       onId : byId
     }).$promise.then(function(results) {
-      console.log("Results for analysis on: " + byId);
-      console.log(results);
       proxy.analysis.data = results;
-      console.log("Data:");
-      console.log(proxy.analysis.data);
+      console.log("::: Analysis performed for: " + proxy.item.id + " - " + proxy.item.title);
       consolidateAnalysis(proxy);
     });
   }
@@ -205,8 +215,99 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     }
     
     onProxy.analysis.summaryList = _.union(_.values(onProxy.analysis.chunkSummary), _.values(onProxy.analysis.tokenSummary));
+    
+    rollUpAnalysis(onProxy);
+
   }
 
+  function rollUpAnalysis(proxy){
+    console.log("--- Rollup for " + proxy.item.id + " - " + proxy.item.title);
+
+    // Initialize the extendedChunkSummary
+    proxy.analysis.extendedChunkSummary = {};
+    for (var chunkId in proxy.analysis.chunkSummary){
+      var chunkSummary = {};
+      var chunk = proxy.analysis.chunkSummary[chunkId];
+      chunkSummary.text = chunk.text;
+      chunkSummary.count = chunk.count;
+      chunkSummary.displayType = "Chunk";
+      chunkSummary.list = chunk.list.slice();
+      proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
+    }
+    
+    // Initialize the extendedTokenSummary
+    proxy.analysis.extendedTokenSummary = {};
+    for (var tokenId in proxy.analysis.tokenSummary){
+      var tokenSummary = {};
+      var token = proxy.analysis.tokenSummary[tokenId];
+      tokenSummary.text = token.text;
+      tokenSummary.count = token.count;
+      tokenSummary.displayType = "Token";
+      tokenSummary.list = token.list.slice();
+      proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
+    }
+    
+    if(proxy.analysis.list){
+      proxy.analysis.extendedList = proxy.analysis.list.slice();     
+    }
+    
+    for(var childIdx = 0; childIdx < proxy.children.length; childIdx++){
+      var topic = {};
+      topic.displayType = "Item";
+      topic.displayId = proxy.children[childIdx].item.id;
+      topic.text = proxy.children[childIdx].item.title;
+      topic.displayLevel = 1;
+      proxy.analysis.extendedList.push(topic);
+      
+      var child = proxy.children[childIdx];
+      if (child.analysis.list){
+        proxy.analysis.extendedList = proxy.analysis.extendedList.concat(child.analysis.extendedList);
+        
+        for (var chunkId in child.analysis.extendedChunkSummary){
+          var chunk = child.analysis.extendedChunkSummary[chunkId];
+          if(angular.isDefined(proxy.analysis.extendedChunkSummary[chunkId])){
+            proxy.analysis.extendedChunkSummary[chunkId].count += chunk.count;
+            proxy.analysis.extendedChunkSummary[chunkId].list = proxy.analysis.extendedChunkSummary[chunk.text].list.concat(chunk.list);
+          } else {
+            var chunkSummary = {};
+            chunkSummary.text = chunk.text;
+            chunkSummary.count = chunk.count;
+            chunkSummary.displayType = "Chunk";
+            chunkSummary.list = chunk.list.slice();
+            proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
+          }          
+        }
+
+        for (var tokenId in child.analysis.extendedTokenSummary){
+          var token = child.analysis.extendedTokenSummary[tokenId];
+          if(angular.isDefined(proxy.analysis.extendedTokenSummary[tokenId])){
+            proxy.analysis.extendedTokenSummary[tokenId].count += token.count;
+            proxy.analysis.extendedTokenSummary[tokenId].list = proxy.analysis.extendedTokenSummary[token.text].list.concat(token.list);
+          } else {
+            var tokenSummary = {};
+            tokenSummary.text = token.text;
+            tokenSummary.count = token.count;
+            tokenSummary.displayType = "Token";
+            tokenSummary.list = token.list.slice();
+            proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
+          }          
+        }
+      }
+    }  
+
+    proxy.analysis.extendedSummaryList = _.union(_.values(proxy.analysis.extendedChunkSummary), _.values(proxy.analysis.extendedTokenSummary));
+    
+    var parentProxy = getItem(proxy.item.parentId);
+
+    if(parentProxy){
+      console.log("::: Parent found");
+      if(angular.isDefined(parentProxy.analysis)){
+        rollUpAnalysis(parentProxy);
+      }
+    }
+
+  }
+  
   function getItem(byId) {
     return tree.proxyMap[byId];
   }
