@@ -1875,6 +1875,45 @@ module.factory(
           method: "POST"
         },
 
+        /**
+         * @ngdoc method
+         * @name lbServices.Item#performAnalysis
+         * @methodOf lbServices.Item
+         *
+         * @description
+         *
+         * <em>
+         * (The remote method definition does not provide any description.)
+         * </em>
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         *  - `onId` – `{string=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `raw` – `{object=}` - 
+         */
+        "performAnalysis": {
+          url: urlBase + "/Items/performAnalysis",
+          method: "POST"
+        },
+
         // INTERNAL. Use Item.children.findById() instead.
         "::findById::Item::children": {
           url: urlBase + "/Items/:id/children/:fk",
@@ -3825,45 +3864,6 @@ module.factory(
         "prototype$updateAttributes": {
           url: urlBase + "/Analyses/:id",
           method: "PUT"
-        },
-
-        /**
-         * @ngdoc method
-         * @name lbServices.Analysis#performAnalysis
-         * @methodOf lbServices.Analysis
-         *
-         * @description
-         *
-         * <em>
-         * (The remote method definition does not provide any description.)
-         * </em>
-         *
-         * @param {Object=} parameters Request parameters.
-         *
-         *   This method does not accept any parameters.
-         *   Supply an empty object or omit this argument altogether.
-         *
-         * @param {Object} postData Request data.
-         *
-         *  - `onId` – `{string=}` - 
-         *
-         * @param {function(Object,Object)=} successCb
-         *   Success callback with two arguments: `value`, `responseHeaders`.
-         *
-         * @param {function(Object)=} errorCb Error callback with one argument:
-         *   `httpResponse`.
-         *
-         * @returns {Object} An empty reference that will be
-         *   populated with the actual data once the response is returned
-         *   from the server.
-         *
-         * Data properties:
-         *
-         *  - `response` – `{string=}` - 
-         */
-        "performAnalysis": {
-          url: urlBase + "/Analyses/performAnalysis",
-          method: "POST"
         },
 
         // INTERNAL. Use Item.analysis() instead.

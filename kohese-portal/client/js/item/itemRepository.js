@@ -140,7 +140,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
   
   function performAnalysis(byId) {
     var proxy = tree.proxyMap[byId];
-    Analysis.performAnalysis({
+    Item.performAnalysis({
       onId : byId
     }).$promise.then(function(results) {
       proxy.analysis.data = results;
@@ -178,13 +178,13 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
 
         if(angular.isDefined(onProxy.analysis.chunkSummary[nextChunk.text])){
           onProxy.analysis.chunkSummary[nextChunk.text].count++;
-          onProxy.analysis.chunkSummary[nextChunk.text].list.push(nextChunk);
+//          onProxy.analysis.chunkSummary[nextChunk.text].list.push(nextChunk);
         } else {
           var chunkSummary = {};
           chunkSummary.text = nextChunk.text;
           chunkSummary.count = 1;
           chunkSummary.displayType = "Chunk";
-          chunkSummary.list = [nextChunk];
+//          chunkSummary.list = [nextChunk];
           onProxy.analysis.chunkSummary[nextChunk.text] = chunkSummary;
         }
         
@@ -197,13 +197,13 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
           
           if(angular.isDefined(onProxy.analysis.tokenSummary[nextToken.text])){
             onProxy.analysis.tokenSummary[nextToken.text].count++;
-            onProxy.analysis.tokenSummary[nextToken.text].list.push(nextToken);
+//            onProxy.analysis.tokenSummary[nextToken.text].list.push(nextToken);
           } else {
             var tokenSummary = {};
             tokenSummary.text = nextToken.text;
             tokenSummary.count = 1;
             tokenSummary.displayType = "Token";
-            tokenSummary.list = [nextToken];
+//            tokenSummary.list = [nextToken];
             onProxy.analysis.tokenSummary[nextToken.text] = tokenSummary;
           }
           
@@ -215,7 +215,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     }
     
     onProxy.analysis.summaryList = _.union(_.values(onProxy.analysis.chunkSummary), _.values(onProxy.analysis.tokenSummary));
-    
+    onProxy.analysis.extendedSummaryList = onProxy.analysis.summaryList;
     rollUpAnalysis(onProxy);
 
   }
@@ -231,7 +231,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       chunkSummary.text = chunk.text;
       chunkSummary.count = chunk.count;
       chunkSummary.displayType = "Chunk";
-      chunkSummary.list = chunk.list.slice();
+//      chunkSummary.list = chunk.list.slice();
       proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
     }
     
@@ -243,7 +243,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       tokenSummary.text = token.text;
       tokenSummary.count = token.count;
       tokenSummary.displayType = "Token";
-      tokenSummary.list = token.list.slice();
+//      tokenSummary.list = token.list.slice();
       proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
     }
     
@@ -267,13 +267,13 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
           var chunk = child.analysis.extendedChunkSummary[chunkId];
           if(angular.isDefined(proxy.analysis.extendedChunkSummary[chunkId])){
             proxy.analysis.extendedChunkSummary[chunkId].count += chunk.count;
-            proxy.analysis.extendedChunkSummary[chunkId].list = proxy.analysis.extendedChunkSummary[chunk.text].list.concat(chunk.list);
+//            proxy.analysis.extendedChunkSummary[chunkId].list = proxy.analysis.extendedChunkSummary[chunk.text].list.concat(chunk.list);
           } else {
             var chunkSummary = {};
             chunkSummary.text = chunk.text;
             chunkSummary.count = chunk.count;
             chunkSummary.displayType = "Chunk";
-            chunkSummary.list = chunk.list.slice();
+//            chunkSummary.list = chunk.list.slice();
             proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
           }          
         }
@@ -282,13 +282,13 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
           var token = child.analysis.extendedTokenSummary[tokenId];
           if(angular.isDefined(proxy.analysis.extendedTokenSummary[tokenId])){
             proxy.analysis.extendedTokenSummary[tokenId].count += token.count;
-            proxy.analysis.extendedTokenSummary[tokenId].list = proxy.analysis.extendedTokenSummary[token.text].list.concat(token.list);
+//            proxy.analysis.extendedTokenSummary[tokenId].list = proxy.analysis.extendedTokenSummary[token.text].list.concat(token.list);
           } else {
             var tokenSummary = {};
             tokenSummary.text = token.text;
             tokenSummary.count = token.count;
             tokenSummary.displayType = "Token";
-            tokenSummary.list = token.list.slice();
+//            tokenSummary.list = token.list.slice();
             proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
           }          
         }
