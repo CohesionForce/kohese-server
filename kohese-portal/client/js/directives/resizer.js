@@ -58,12 +58,7 @@ angular.module('mc.resizer', [])
         $document.unbind('mouseup', mouseup);
       }
 
-      //$scope.$on('enterItem', function (event) {
-      //  $($attrs.resizerBottom).css({
-      //    height: y + 'px'
-      //  });
-      //  console.log($($attrs.resizerBottom).css.height + ":" + y);
-      //})
+
 
     }
   });
