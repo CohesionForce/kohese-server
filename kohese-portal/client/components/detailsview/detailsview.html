@@ -73,7 +73,7 @@
 
                 <h4>Analysis Summary</h4>
                 <input type="checkbox" ng-model="detailsview.showChunksinSummary" ng-init="detailsview.showChunksinSummary=true" name="showChunksInSummaryInput" style="margin: 5px"/> Show Chunks in Summary
-                <input type="checkbox" ng-model="detailsview.showTokensinSummary" ng-init="detailsview.showTokensinSummary=true" name="showTokensInSummaryInput" style="margin: 5px"/> Show Tokens in Summary
+                <input type="checkbox" ng-model="detailsview.showTokensinSummary" ng-init="detailsview.showTokensinSummary=false" name="showTokensInSummaryInput" style="margin: 5px"/> Show Tokens in Summary
                 <table
                         class="table tree-grid table-striped table-condensed table-hover">
                     <thead>
@@ -84,7 +84,7 @@
                     <tbody>
                     <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
                         ng-hide="((summary.displayType == 'Chunk') && !detailsview.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsview.showTokensinSummary)"
-                        ng-repeat="summary in itemProxy.analysis.summaryList | filter:{text:analysisFilterString} | orderBy:['-count','text']">
+                        ng-repeat="summary in detailsview.itemProxy.analysis.extendedSummaryList | filter:{text:analysisFilterString} | orderBy:['-count','text']">
                         <td ng-click="$parent.analysisFilterString = summary.text" ng-bind-html="summary.text | highlight:analysisFilterString"></td>
                         <td>{{summary.displayType}}</td>
                         <td>{{summary.count}}</td>
@@ -93,7 +93,7 @@
                 </table>
 
                 <h4>Analysis Details</h4>
-                <input type="checkbox" ng-model="showChunksInDetails" ng-init="showChunksInDetails=true" name="showChunksInDetailsInput" style="margin: 5px"/> Show Chunks in Details
+                <input type="checkbox" ng-model="showChunksInDetails" ng-init="showChunksInDetails=false" name="showChunksInDetailsInput" style="margin: 5px"/> Show Chunks in Details
                 <input type="checkbox" ng-model="showTokensInDetails" ng-init="showTokensInDetails=false" name="showTokensInDetailsInput" style="margin: 5px"/> Show Tokens in Details
                 <table
                         class="table tree-grid table-striped table-condensed table-hover">
@@ -105,7 +105,7 @@
                     </thead>
                     <tbody>
                     <tr class="level-{{listItem.displayLevel}}" ng-hide="((listItem.displayLevel == 2) && !showChunksInDetails) || ((listItem.displayLevel == 3) && !showTokensInDetails)" class="tree-grid-row" id="{{listItem.displayId}}"
-                        ng-repeat="listItem in itemProxy.analysis.list | filter:{text:analysisFilterString}">
+                        ng-repeat="listItem in detailsview.itemProxy.analysis.extendedList | filter:{text:analysisFilterString}">
                         <td class="indented">{{listItem.displayType}}</td>
                         <td ng-bind-html="listItem.text | highlight:analysisFilterString"></td>
                         <td>{{listItem.begin}}</td>

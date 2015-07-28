@@ -31,7 +31,7 @@ function DetailsviewController(Item, ItemRepository, $rootScope) {
         $scope.$on('editItem', function (event, itemId) {
             console.log(detailsCtrl);
             detailsCtrl.isEdit = true;
-            //ItemRepository.fetchAnalysis(itemId);
+            ItemRepository.fetchAnalysis(itemId);
             detailsCtrl.itemProxy = ItemRepository.getItem(itemId);
             detailsCtrl.editedItem = detailsCtrl.itemProxy.item;
             ItemRepository.setCurrentItem(detailsCtrl.editedItem);
