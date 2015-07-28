@@ -249,6 +249,8 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     
     if(proxy.analysis.list){
       proxy.analysis.extendedList = proxy.analysis.list.slice();     
+    } else {
+      return;
     }
     
     for(var childIdx = 0; childIdx < proxy.children.length; childIdx++){
