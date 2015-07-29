@@ -1,0 +1,18 @@
+<div id="content" class="container-fluid" ng-controller="ContainerController as containerCtrl">
+    <div id="tabBar">
+        <tabset>
+            <tab ng-repeat="tab in containerCtrl.tabs">
+                    <tab-heading>
+                        {{tab.title}}
+                        <i ng-click=containerCtrl.deleteTab(tab) class="glyphicon glyphicon-remove"></i>
+                    </tab-heading>
+
+                    </button>
+            </tab>
+            <button ng-click="containerCtrl.createTab()" style="height: 40px;">
+                <i class="glyphicon glyphicon-plus"></i>
+            </button>
+        </tabset>
+    </div>
+    <div ng-viewport="container"></div>
+</div>

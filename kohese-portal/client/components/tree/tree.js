@@ -1,6 +1,7 @@
 /**
  * Created by josh on 7/13/15.
  */
+
 angular.module('app.tree', [])
     .controller('TreeController', ['Item', 'ItemRepository', '$anchorScroll', '$rootScope', '$location', TreeController]);
 
