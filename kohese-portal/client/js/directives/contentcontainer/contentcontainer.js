@@ -14,7 +14,7 @@ function ContainerController() {
 
     containerCtrl.createTab = function (title, route) {
         console.log("Tab created");
-        var newTab = new Tab("Tab Tab", route);
+        var newTab = new Tab("Tab", route);
         // hack: will break if we change tab positions
         newTab.position = containerCtrl.tabs.length;
         containerCtrl.tabs.push(newTab);
