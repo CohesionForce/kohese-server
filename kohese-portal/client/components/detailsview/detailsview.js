@@ -7,7 +7,6 @@ angular.module('app.detailsview', [])
 
 function DetailsviewController(Item, ItemRepository, $rootScope) {
 
-    console.log("Before detailsCtrl dec");
     var detailsCtrl = this;
 
     detailsCtrl.listTitle = "Children";
@@ -31,7 +30,6 @@ function DetailsviewController(Item, ItemRepository, $rootScope) {
         $scope.$on('editItem', function (event, itemId) {
             console.log(detailsCtrl);
             detailsCtrl.isEdit = true;
-            ItemRepository.fetchAnalysis(itemId);
             detailsCtrl.itemProxy = ItemRepository.getItem(itemId);
             detailsCtrl.editedItem = detailsCtrl.itemProxy.item;
             ItemRepository.setCurrentItem(detailsCtrl.editedItem);
@@ -40,6 +38,10 @@ function DetailsviewController(Item, ItemRepository, $rootScope) {
         });
     };
 
+    detailsCtrl.fetchAnalysis = function () {
+      ItemRepository.fetchAnalysis(detailsCtrl.editedItem.id);
+    }
+    
     detailsCtrl.upsertItem = function () {
         var itemForm = this.itemForm;
         Item
