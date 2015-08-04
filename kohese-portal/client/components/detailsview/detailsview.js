@@ -7,7 +7,6 @@ angular.module('app.detailsview', [])
 
 function DetailsviewController(Item, ItemRepository, $rootScope) {
 
-    console.log("Before detailsCtrl dec");
     var detailsCtrl = this;
 
     detailsCtrl.listTitle = "Children";
