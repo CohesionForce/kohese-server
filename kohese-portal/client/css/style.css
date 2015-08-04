@@ -72,6 +72,7 @@ body {
   overflow: auto;
   bottom: 356px;
   top: 100px;
+  right: 0;
   width: calc(100% - 250px);
 }
 
