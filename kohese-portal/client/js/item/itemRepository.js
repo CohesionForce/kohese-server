@@ -112,7 +112,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       retrieveAnalysis(proxy.children[childIdx]);
     }  
 
-    if (proxy.item.description  && !proxy.analysis) {
+    if (!proxy.analysis) {
       
       console.log("::: Retrieving analysis for " + proxy.item.id + " - " + proxy.item.title);
       proxy.analysis = {};
