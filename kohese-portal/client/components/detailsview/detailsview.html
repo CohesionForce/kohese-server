@@ -1,5 +1,6 @@
-<div class="panel panel-default"
+<div class="panel panel-default">
     <div class="panel-heading">Item Information
+        <button class="pull-right" ng-click="detailsview.toggleViewType()">Full screen</button>
     </div>
     <!-- /.panel-heading -->
     <div class="panel-body">
@@ -15,7 +16,7 @@
 						<label class="control-label" for="Id">Id</label>
 						<div class="controls">
                             <input style="width: 90%;" type="text" ng-model="detailsview.editedItem.id"
-                                   id="Id" ng-disabled="true" />
+                                   id="Id" ng-disabled="true"/>
                         </div>
 					</span>
                         </div>
@@ -34,46 +35,60 @@
                     <div class="control-group"
                          ng-class="{error: itemForm.title.$invalid}">
                         <label class="control-label" for="Title">Title</label>
+
                         <div class="controls">
-                            <input type="text" ng-model="detailsview.editedItem.title" id="Title" ng-disabled="!enableEdit" style="width:100%"/>
+                            <input type="text" ng-model="detailsview.editedItem.title" id="Title"
+                                   ng-disabled="!enableEdit" style="width:100%"/>
                         </div>
                     </div>
                     <div class="control-group"
                          ng-class="{error: itemForm.description.$invalid}">
                         <label class="control-label" for="Description">Description</label>
+
                         <div class="controls">
 							<textarea style="width:100%; max-width:100%; height:90px;" type="text"
-                                      ng-model="detailsview.editedItem.description" ng-disabled="!enableEdit" id="Description" ></textarea>
+                                      ng-model="detailsview.editedItem.description" ng-disabled="!enableEdit"
+                                      id="Description"></textarea>
                         </div>
                     </div>
                     <div class="form-actions">
                         <button ng-click="detailsview.enableEdit=true" ng-disabled="enableEdit" class="btn btn-primary">
-                            Edit</button>
-                        <button ng-click="detailsview.upsertItem()" ng-disabled="!enableEdit || itemForm.$pristine" class="btn btn-primary">
-                            Update</button>
-                        <button ng-click="detailsview.enableEdit=false; cancel()" ng-disabled="!enableEdit" class="btn btn-primary">
-                            Cancel</button>
+                            Edit
+                        </button>
+                        <button ng-click="detailsview.upsertItem()" ng-disabled="!enableEdit || itemForm.$pristine"
+                                class="btn btn-primary">
+                            Update
+                        </button>
+                        <button ng-click="detailsview.enableEdit=false; cancel()" ng-disabled="!enableEdit"
+                                class="btn btn-primary">
+                            Cancel
+                        </button>
                     </div>
                 </form>
             </tab>
             <tab heading="Children ({{detailsview.itemProxy.children.length}})">
                 <div ng-show="detailsview.isEdit">
-                    <ng-include src="'components/detailsview/item.html'" ></ng-include>
+                    <ng-include src="'components/detailsview/item.html'"></ng-include>
                 </div>
             </tab>
             <tab heading="Relations">
                 <h4>Relations Tab</h4>
+
                 <p><b>This tab is under construction.</b></p>
             </tab>
             <tab heading="Analysis">
 		        <span class="pull-right">
 					<input class="input-sm" type="text" ng-model="analysisFilterString"
-                           placeholder="Filter" style="margin: 5px" />
+                           placeholder="Filter" style="margin: 5px"/>
 				</span>
 
                 <h4>Analysis Summary</h4>
-                <input type="checkbox" ng-model="detailsview.showChunksinSummary" ng-init="detailsview.showChunksinSummary=true" name="showChunksInSummaryInput" style="margin: 5px"/> Show Chunks in Summary
-                <input type="checkbox" ng-model="detailsview.showTokensinSummary" ng-init="detailsview.showTokensinSummary=false" name="showTokensInSummaryInput" style="margin: 5px"/> Show Tokens in Summary
+                <input type="checkbox" ng-model="detailsview.showChunksinSummary"
+                       ng-init="detailsview.showChunksinSummary=true" name="showChunksInSummaryInput"
+                       style="margin: 5px"/> Show Chunks in Summary
+                <input type="checkbox" ng-model="detailsview.showTokensinSummary"
+                       ng-init="detailsview.showTokensinSummary=false" name="showTokensInSummaryInput"
+                       style="margin: 5px"/> Show Tokens in Summary
                 <table
                         class="table tree-grid table-striped table-condensed table-hover">
                     <thead>
@@ -85,7 +100,8 @@
                     <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
                         ng-hide="((summary.displayType == 'Chunk') && !detailsview.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsview.showTokensinSummary)"
                         ng-repeat="summary in detailsview.itemProxy.analysis.extendedSummaryList | filter:{text:analysisFilterString} | orderBy:['-count','text']">
-                        <td ng-click="$parent.analysisFilterString = summary.text" ng-bind-html="summary.text | highlight:analysisFilterString"></td>
+                        <td ng-click="$parent.analysisFilterString = summary.text"
+                            ng-bind-html="summary.text | highlight:analysisFilterString"></td>
                         <td>{{summary.displayType}}</td>
                         <td>{{summary.count}}</td>
                     </tr>
@@ -93,8 +109,10 @@
                 </table>
 
                 <h4>Analysis Details</h4>
-                <input type="checkbox" ng-model="showChunksInDetails" ng-init="showChunksInDetails=false" name="showChunksInDetailsInput" style="margin: 5px"/> Show Chunks in Details
-                <input type="checkbox" ng-model="showTokensInDetails" ng-init="showTokensInDetails=false" name="showTokensInDetailsInput" style="margin: 5px"/> Show Tokens in Details
+                <input type="checkbox" ng-model="showChunksInDetails" ng-init="showChunksInDetails=false"
+                       name="showChunksInDetailsInput" style="margin: 5px"/> Show Chunks in Details
+                <input type="checkbox" ng-model="showTokensInDetails" ng-init="showTokensInDetails=false"
+                       name="showTokensInDetailsInput" style="margin: 5px"/> Show Tokens in Details
                 <table
                         class="table tree-grid table-striped table-condensed table-hover">
                     <thead>
@@ -104,7 +122,9 @@
                     <th><a href="" ng-click="itemSortField = 'End'">End</a></th>
                     </thead>
                     <tbody>
-                    <tr class="level-{{listItem.displayLevel}}" ng-hide="((listItem.displayLevel == 2) && !showChunksInDetails) || ((listItem.displayLevel == 3) && !showTokensInDetails)" class="tree-grid-row" id="{{listItem.displayId}}"
+                    <tr class="level-{{listItem.displayLevel}}"
+                        ng-hide="((listItem.displayLevel == 2) && !showChunksInDetails) || ((listItem.displayLevel == 3) && !showTokensInDetails)"
+                        class="tree-grid-row" id="{{listItem.displayId}}"
                         ng-repeat="listItem in detailsview.itemProxy.analysis.extendedList | filter:{text:analysisFilterString}">
                         <td class="indented">{{listItem.displayType}}</td>
                         <td ng-bind-html="listItem.text | highlight:analysisFilterString"></td>
@@ -116,10 +136,12 @@
             </tab>
             <tab heading="History">
                 <h4>History Tab</h4>
+
                 <p><b>This tab is under construction.</b></p>
             </tab>
             <tab heading="Journal">
                 <h4>Journal Tab</h4>
+
                 <p><b>This tab is under construction.</b></p>
             </tab>
         </tabset>

@@ -38,6 +38,11 @@ function DetailsviewController(Item, ItemRepository, $rootScope) {
             detailsCtrl.defaultTab.active = true;
 
         });
+
+        detailsCtrl.toggleViewType = function(){
+            console.log("Toggle toggled");
+            $scope.$emit("toggleViewType");
+        }
     };
 
     detailsCtrl.upsertItem = function () {
@@ -76,4 +81,6 @@ function DetailsviewController(Item, ItemRepository, $rootScope) {
                 // TBD:  May need to do something special if the delete fails
             });
     }
+
+
 }
