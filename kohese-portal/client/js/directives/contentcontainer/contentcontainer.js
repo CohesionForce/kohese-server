@@ -5,11 +5,13 @@
 function ContainerController() {
     var containerCtrl = this;
 
-    containerCtrl.tabs = [{title: 'Test Tab'}];
+    containerCtrl.tabs = [{title: 'Test Tab', type:'dualview'}];
 
     var Tab = function (title, route) {
         this.title = title;
         this.route = route;
+        // Set default view type
+        this.type = 'dualview'
     };
 
     containerCtrl.createTab = function (title, route) {

@@ -7,7 +7,6 @@ angular
         'lbServices',
         'itemServices',
         'ngNewRouter',
-        'ui.router',
         'ui.layout',
         'ui.bootstrap',
         'btford.socket-io',
@@ -35,8 +34,8 @@ angular
 
 function KoheseController($router) {
     $router.config([
-        {path: '/', redirectTo: '/dv'},
-        {path: '/sv', component: {container: 'singleview'}},
-        {path: '/dv', component: {container: 'dualview'}}
+        {path: '/', redirectTo: '/home/'},
+        {path: '/home', components: {top: 'tree', bottom: 'detailsview'}},
+        {path: '/details', component: {view: 'detailsview'}}
     ])
 }

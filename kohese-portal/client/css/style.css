@@ -71,7 +71,7 @@ body {
   position: absolute;
   overflow: auto;
   bottom: 356px;
-  top: 100px;
+  top: 135px;
   width: calc(100% - 250px);
 }
 
@@ -86,9 +86,4 @@ body {
   background-color: white;
 }
 
-#tree-action-bar {
-  position: fixed;
-  top:50px;
-  left: 250px;
-  width: 82.5%;
-}
+

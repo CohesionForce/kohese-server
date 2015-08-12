@@ -22,6 +22,7 @@
       restrict: 'A',
       link: function (scope, element, attribute) {
         element.metisMenu();
+          console.log("This is the cm link")
       }
     }
   };
