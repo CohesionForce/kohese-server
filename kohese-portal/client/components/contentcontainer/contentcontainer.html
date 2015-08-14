@@ -5,7 +5,7 @@
             <tab ng-repeat="tab in containerCtrl.tabs">
                 <tab-heading>
                     {{tab.title}} - {{$index}}
-                    <i ng-click=containerCtrl.deleteTab(tab) class="glyphicon glyphicon-remove"></i>
+                    <i ng-click="console.log('Click')" class="glyphicon glyphicon-remove"></i>
                 </tab-heading>
                 <tab-body class="tab-body">
                     <!--<button ng-click="tab.type = 'dualview'">Dualview</button>-->
@@ -22,7 +22,7 @@
 
                 </button>
             </tab>
-            <button ng-click="containerCtrl.createTab()" style="height: 40px;">
+            <button onclick="console.log('Click')" style="height: 40px;">
                 <i class="glyphicon glyphicon-plus"></i>
             </button>
         </tabset>

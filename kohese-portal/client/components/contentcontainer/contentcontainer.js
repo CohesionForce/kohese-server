@@ -2,10 +2,13 @@
  * Created by josh on 7/28/15.
  */
 
-function ContainerController($scope) {
+function ContainerController($scope, tabService) {
     var containerCtrl = this;
 
     containerCtrl.tabs = [{title: 'Test Tab', type: 'dualview'}];
+    containerCtrl.tabService = tabService;
+
+    console.log(containerCtrl.tabService.getCurrentTab())
 
     var Tab = function (title, route) {
         var tab = this;
@@ -50,7 +53,7 @@ var ContentContainer = function () {
     }
 };
 
-angular.module('container-directive', [])
+angular.module('container-directive', ['app.tabservice'])
     .controller('ContainerController', ContainerController)
     .directive('contentContainer', ContentContainer);
 
