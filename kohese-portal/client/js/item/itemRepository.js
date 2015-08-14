@@ -107,7 +107,12 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
   function retrieveAnalysis(forProxy) {
     var proxy = forProxy;
     
-    if (proxy.item.description  && !proxy.analysis) {
+    // Fetch records depth first
+    for(var childIdx = 0; childIdx < proxy.children.length; childIdx++){
+      retrieveAnalysis(proxy.children[childIdx]);
+    }  
+
+    if (!proxy.analysis) {
       
       console.log("::: Retrieving analysis for " + proxy.item.id + " - " + proxy.item.title);
       proxy.analysis = {};
@@ -127,10 +132,6 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
         performAnalysis(proxy.item.id);
       });      
     }
-
-    for(var childIdx = 0; childIdx < proxy.children.length; childIdx++){
-      retrieveAnalysis(proxy.children[childIdx]);
-    }  
   }
   
   function fetchAnalysis(byId) {
@@ -143,91 +144,30 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     Item.performAnalysis({
       onId : byId
     }).$promise.then(function(results) {
-      proxy.analysis.data = results;
+      proxy.analysis.data = results.data;
       console.log("::: Analysis performed for: " + proxy.item.id + " - " + proxy.item.title);
       consolidateAnalysis(proxy);
     });
   }
   
   function consolidateAnalysis(onProxy){
-    onProxy.analysis.list = [];
-    var sentenceCount = onProxy.analysis.data.raw._views._InitialView.Sentence.length;
-    var chunkCount = onProxy.analysis.data.raw._views._InitialView.Chunk.length;
-    var tokenCount = onProxy.analysis.data.raw._views._InitialView.Token.length;
-    var chunkIndex = 0;
-    var tokenIndex = 0;
-    var nextChunk = {};
-    var nextToken = {};
-    
-    onProxy.analysis.chunkSummary = {};
-    onProxy.analysis.tokenSummary = {};
-    
-    for (var sentenceIndex = 0; sentenceIndex < sentenceCount; sentenceIndex++){
-      var sentence = onProxy.analysis.data.raw._views._InitialView.Sentence[sentenceIndex];
-      sentence.displayType = "Sentence";
-      sentence.displayId = "Sentence-" + sentenceIndex;
-      sentence.displayLevel = 1;
-      onProxy.analysis.list.push(sentence);
-      
-      nextChunk = onProxy.analysis.data.raw._views._InitialView.Chunk[chunkIndex];
-      while((chunkIndex < chunkCount) && (nextChunk.end <= sentence.end)){
-        nextChunk.displayType = lookup[nextChunk.chunkType] + " (" + nextChunk.chunkType + ")";
-        nextChunk.displayId = "Chunk-" + chunkIndex; 
-        nextChunk.displayLevel = 2;
-        onProxy.analysis.list.push(nextChunk);
-
-        if(angular.isDefined(onProxy.analysis.chunkSummary[nextChunk.text])){
-          onProxy.analysis.chunkSummary[nextChunk.text].count++;
-//          onProxy.analysis.chunkSummary[nextChunk.text].list.push(nextChunk);
-        } else {
-          var chunkSummary = {};
-          chunkSummary.text = nextChunk.text;
-          chunkSummary.count = 1;
-          chunkSummary.displayType = "Chunk";
-//          chunkSummary.list = [nextChunk];
-          onProxy.analysis.chunkSummary[nextChunk.text] = chunkSummary;
-        }
-        
-        nextToken = onProxy.analysis.data.raw._views._InitialView.Token[tokenIndex];
-        while((tokenIndex < tokenCount) && (nextToken.end <= nextChunk.end)){
-          nextToken.displayType = lookup[nextToken.pos] + " (" + nextToken.pos + ")";
-          nextToken.displayId = "Token-" + chunkIndex; 
-          nextToken.displayLevel = 3;
-          onProxy.analysis.list.push(nextToken);
-          
-          if(angular.isDefined(onProxy.analysis.tokenSummary[nextToken.text])){
-            onProxy.analysis.tokenSummary[nextToken.text].count++;
-//            onProxy.analysis.tokenSummary[nextToken.text].list.push(nextToken);
-          } else {
-            var tokenSummary = {};
-            tokenSummary.text = nextToken.text;
-            tokenSummary.count = 1;
-            tokenSummary.displayType = "Token";
-//            tokenSummary.list = [nextToken];
-            onProxy.analysis.tokenSummary[nextToken.text] = tokenSummary;
-          }
-          
-          nextToken = onProxy.analysis.data.raw._views._InitialView.Token[++tokenIndex];
-        }
-        
-        nextChunk = onProxy.analysis.data.raw._views._InitialView.Chunk[++chunkIndex];
-      }
-    }
-    
-    onProxy.analysis.summaryList = _.union(_.values(onProxy.analysis.chunkSummary), _.values(onProxy.analysis.tokenSummary));
-    onProxy.analysis.extendedSummaryList = onProxy.analysis.summaryList;
+    onProxy.analysis.extendedSummaryList = onProxy.analysis.data.summaryList;
     rollUpAnalysis(onProxy);
 
   }
 
   function rollUpAnalysis(proxy){
+    if (!proxy.analysis.data){
+      return;
+    }
+
     console.log("--- Rollup for " + proxy.item.id + " - " + proxy.item.title);
 
     // Initialize the extendedChunkSummary
     proxy.analysis.extendedChunkSummary = {};
-    for (var chunkId in proxy.analysis.chunkSummary){
+    for (var chunkId in proxy.analysis.data.chunkSummary){
       var chunkSummary = {};
-      var chunk = proxy.analysis.chunkSummary[chunkId];
+      var chunk = proxy.analysis.data.chunkSummary[chunkId];
       chunkSummary.text = chunk.text;
       chunkSummary.count = chunk.count;
       chunkSummary.displayType = "Chunk";
@@ -237,9 +177,9 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
     
     // Initialize the extendedTokenSummary
     proxy.analysis.extendedTokenSummary = {};
-    for (var tokenId in proxy.analysis.tokenSummary){
+    for (var tokenId in proxy.analysis.data.tokenSummary){
       var tokenSummary = {};
-      var token = proxy.analysis.tokenSummary[tokenId];
+      var token = proxy.analysis.data.tokenSummary[tokenId];
       tokenSummary.text = token.text;
       tokenSummary.count = token.count;
       tokenSummary.displayType = "Token";
@@ -247,8 +187,8 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
     }
     
-    if(proxy.analysis.list){
-      proxy.analysis.extendedList = proxy.analysis.list.slice();     
+    if(proxy.analysis.data.list){
+      proxy.analysis.extendedList = proxy.analysis.data.list.slice();     
     } else {
       return;
     }
@@ -262,37 +202,40 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       proxy.analysis.extendedList.push(topic);
       
       var child = proxy.children[childIdx];
-      if (child.analysis.list){
-        proxy.analysis.extendedList = proxy.analysis.extendedList.concat(child.analysis.extendedList);
+      if (child.analysis){
         
-        for (var chunkId in child.analysis.extendedChunkSummary){
-          var chunk = child.analysis.extendedChunkSummary[chunkId];
-          if(angular.isDefined(proxy.analysis.extendedChunkSummary[chunkId])){
-            proxy.analysis.extendedChunkSummary[chunkId].count += chunk.count;
-//            proxy.analysis.extendedChunkSummary[chunkId].list = proxy.analysis.extendedChunkSummary[chunk.text].list.concat(chunk.list);
-          } else {
-            var chunkSummary = {};
-            chunkSummary.text = chunk.text;
-            chunkSummary.count = chunk.count;
-            chunkSummary.displayType = "Chunk";
-//            chunkSummary.list = chunk.list.slice();
-            proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
-          }          
-        }
+        if (child.analysis.extendedList){
+          proxy.analysis.extendedList = proxy.analysis.extendedList.concat(child.analysis.extendedList);
+        
+          for (var chunkId in child.analysis.extendedChunkSummary){
+            var chunk = child.analysis.extendedChunkSummary[chunkId];
+            if(angular.isDefined(proxy.analysis.extendedChunkSummary[chunkId])){
+              proxy.analysis.extendedChunkSummary[chunkId].count += chunk.count;
+//              proxy.analysis.extendedChunkSummary[chunkId].list = proxy.analysis.extendedChunkSummary[chunk.text].list.concat(chunk.list);
+            } else {
+              var chunkSummary = {};
+              chunkSummary.text = chunk.text;
+              chunkSummary.count = chunk.count;
+              chunkSummary.displayType = "Chunk";
+//              chunkSummary.list = chunk.list.slice();
+              proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
+            }          
+          }
 
-        for (var tokenId in child.analysis.extendedTokenSummary){
-          var token = child.analysis.extendedTokenSummary[tokenId];
-          if(angular.isDefined(proxy.analysis.extendedTokenSummary[tokenId])){
-            proxy.analysis.extendedTokenSummary[tokenId].count += token.count;
-//            proxy.analysis.extendedTokenSummary[tokenId].list = proxy.analysis.extendedTokenSummary[token.text].list.concat(token.list);
-          } else {
-            var tokenSummary = {};
-            tokenSummary.text = token.text;
-            tokenSummary.count = token.count;
-            tokenSummary.displayType = "Token";
-//            tokenSummary.list = token.list.slice();
-            proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
-          }          
+          for (var tokenId in child.analysis.extendedTokenSummary){
+            var token = child.analysis.extendedTokenSummary[tokenId];
+            if(angular.isDefined(proxy.analysis.extendedTokenSummary[tokenId])){
+              proxy.analysis.extendedTokenSummary[tokenId].count += token.count;
+//              proxy.analysis.extendedTokenSummary[tokenId].list = proxy.analysis.extendedTokenSummary[token.text].list.concat(token.list);
+            } else {
+              var tokenSummary = {};
+              tokenSummary.text = token.text;
+              tokenSummary.count = token.count;
+              tokenSummary.displayType = "Token";
+//              tokenSummary.list = token.list.slice();
+              proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
+            }          
+          }
         }
       }
     }  

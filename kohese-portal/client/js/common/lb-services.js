@@ -1907,7 +1907,7 @@ module.factory(
          *
          * Data properties:
          *
-         *  - `raw` – `{object=}` - 
+         *  - `data` – `{object=}` - 
          */
         "performAnalysis": {
           url: urlBase + "/Items/performAnalysis",
