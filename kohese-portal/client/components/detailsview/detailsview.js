@@ -1,15 +1,16 @@
 /**
  * Created by josh on 7/13/15.
  */
-angular.module('app.detailsview', [])
-    .controller('DetailsviewController', ['Item', 'ItemRepository', '$rootScope', DetailsviewController]);
+angular.module('app.detailsview', ['app.tabservice'])
+    .controller('DetailsviewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', DetailsviewController]);
 
 
-function DetailsviewController(Item, ItemRepository, $rootScope) {
+function DetailsviewController(Item, ItemRepository, $rootScope, tabService) {
 
     console.log("Before detailsCtrl dec");
     var detailsCtrl = this;
 
+    detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.listTitle = "Children";
     detailsCtrl.enableEdit = false;
     detailsCtrl.editedItem = { description: "No item selected"};
@@ -18,6 +19,9 @@ function DetailsviewController(Item, ItemRepository, $rootScope) {
     detailsCtrl.showTokensInAnalysis = true;
     detailsCtrl.showChunksInDetails = false;
     detailsCtrl.showTokensInDetails = false;
+
+    console.log("Details Tab:");
+    console.log(detailsCtrl.tab);
 
     detailsCtrl.activate = function($scope)
     {
@@ -39,10 +43,6 @@ function DetailsviewController(Item, ItemRepository, $rootScope) {
 
         });
 
-        detailsCtrl.toggleViewType = function(){
-            console.log("Toggle toggled");
-            $scope.$emit("toggleViewType");
-        }
     };
 
     detailsCtrl.upsertItem = function () {

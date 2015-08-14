@@ -2,13 +2,12 @@
  * Created by josh on 7/28/15.
  */
 
-function ContainerController($scope, tabService) {
+function ContainerController(tabService) {
     var containerCtrl = this;
 
     containerCtrl.tabs = [{title: 'Test Tab', type: 'dualview'}];
     containerCtrl.tabService = tabService;
-
-    console.log(containerCtrl.tabService.getCurrentTab())
+    containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
 
     var Tab = function (title, route) {
         var tab = this;
@@ -17,6 +16,7 @@ function ContainerController($scope, tabService) {
         // Set default view type
         this.type = 'dualview';
         this.toggleType = function () {
+            console.log("Type toggled");
             if (tab.type == 'dualview') {
                 tab.type = 'singleview';
             } else {
@@ -24,25 +24,22 @@ function ContainerController($scope, tabService) {
             }
 
         };
+    };
 
-        $scope.$on('toggleViewType', function () {
-            console.log("Toggle received");
-        })
+    containerCtrl.createTab = function (title, route) {
+        console.log("Tab created");
+        var newTab = new Tab("Tab", route);
+        // hack: will break if we change tab positions
+        newTab.position = containerCtrl.tabs.length;
+        containerCtrl.tabs.push(newTab);
+    };
 
-        containerCtrl.createTab = function (title, route) {
-            console.log("Tab created");
-            var newTab = new Tab("Tab", route);
-            // hack: will break if we change tab positions
-            newTab.position = containerCtrl.tabs.length;
-            containerCtrl.tabs.push(newTab);
-        };
+    containerCtrl.deleteTab = function (tab) {
+        // hack: will break if we change tab positions
+        containerCtrl.tabs.splice(tab.position, 1);
+    };
 
-        containerCtrl.deleteTab = function (tab) {
-            // hack: will break if we change tab positions
-            containerCtrl.tabs.splice(tab.position, 1);
-        };
 
-    }
 }
 
 var ContentContainer = function () {
@@ -53,7 +50,7 @@ var ContentContainer = function () {
     }
 };
 
-angular.module('container-directive', ['app.tabservice'])
+angular.module('app.contentcontainer', ['app.tabservice'])
     .controller('ContainerController', ContainerController)
     .directive('contentContainer', ContentContainer);
 
