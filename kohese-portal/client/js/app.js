@@ -12,9 +12,7 @@ angular
         'btford.socket-io',
         'nav-directives',
         'mc.resizer',
-        'app.singleview',
-        'app.dualview',
-        'container-directive'
+        'app.contentcontainer'
     ])
     .controller('KoheseController', ['$router', KoheseController])
     .filter('highlight', function ($sce) {
