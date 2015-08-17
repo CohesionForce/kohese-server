@@ -9,6 +9,8 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
 
     var treeCtrl = this;
 
+    console.log("TreeCtrl init");
+
     treeCtrl.filterString = "";
     treeCtrl.analysisFilterString = "";
     treeCtrl.hidden = {};

@@ -10,32 +10,56 @@ angular
         'app.directives.navigation',
         'app.directives.resizer',
         'lbServices',
-        'ngNewRouter',
+        'ui.router',
         'ui.layout',
         'ui.bootstrap',
         'btford.socket-io'
 
     ])
-    .controller('KoheseController', ['$router', KoheseController])
-    .filter('highlight', function ($sce) {
-        return function (text, phrase) {
-            if (text !== null) {
-                if (phrase) text = text.replace(new RegExp('(' + phrase + ')', 'gi'),
-                    '<span class="highlighted">$1</span>');
-            }
+    .controller('KoheseController',  KoheseController)
+    .config(function ($stateProvider, $urlRouterProvider) {
+        $stateProvider
+            .state('kohese', {
+                url: '',
+                templateUrl: '/components/contentcontainer/contentcontainer.html',
+                abstract: true
+            } )
+            .state('kohese.home', {
+                url: '/',
+                views: {
+                    'top': {
+                        templateUrl: '/components/tree/tree.html',
+                        controller: 'TreeController'
+                    },
+                    'bottom': {
+                        templateUrl: '/components/detailsview/detailsview.html',
+                        controller: 'DetailsViewController'
+                    }
 
-            return $sce.trustAsHtml(text);
-        }
+                }
+            });
+
+        $urlRouterProvider.otherwise('/')
     })
+    .filter('highlight', function ($sce) {
+    return function (text, phrase) {
+        if (text !== null) {
+            if (phrase) text = text.replace(new RegExp('(' + phrase + ')', 'gi'),
+                '<span class="highlighted">$1</span>');
+        }
+
+        return $sce.trustAsHtml(text);
+    }
+})
     .factory('socket', function (socketFactory) {
         return socketFactory();
     });
 
 
-function KoheseController($router) {
-    $router.config([
-        {path: '/', redirectTo: '/home/'},
-        {path: '/home', components: {top: 'tree', bottom: 'detailsview'}},
-        {path: '/details', component: {view: 'detailsview'}}
-    ])
+function KoheseController() {
+    //$router.config([
+    //    {path: '/', redirectTo: '/home/'},
+    //    {path: '/home', components: {top: 'tree', bottom: 'detailsview'}},
+    //    {path: '/details', component: {view: 'detailsview'}}
+    //])
 }

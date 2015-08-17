@@ -1,5 +1,4 @@
 <div id="content" class="container-fluid" ng-controller="ContainerController as containerCtrl">
-    <link href="components/contentcontainer/contentcontainer.css" rel="stylesheet" type="text/css">
     <div id="tabBar">
         <tabset>
             <tab ng-repeat="tab in containerCtrl.tabs">
@@ -8,9 +7,8 @@
                     <i ng-click=containerCtrl.deleteTab(tab) class="glyphicon glyphicon-remove"></i>
                 </tab-heading>
                 <tab-body class="tab-body">
-                    <!--<button ng-click="tab.type = 'dualview'">Dualview</button>-->
-                    <!--<button ng-click="tab.type = 'singleview'">Singleview</button>-->
                     <div ng-switch on="tab.type">
+
                         <div ng-switch-when="dualview">
                             <div dual-view></div>
                         </div>

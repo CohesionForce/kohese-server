@@ -2,17 +2,18 @@
  * Created by josh on 7/13/15.
  */
 angular.module('app.detailsview', ['app.services.tabservice'])
-    .controller('DetailsviewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', DetailsviewController]);
+    .controller('DetailsViewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', '$scope', DetailsViewController]);
 
 
-function DetailsviewController(Item, ItemRepository, $rootScope, tabService) {
+function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope) {
 
     var detailsCtrl = this;
+    console.log("DetailsCtrl init");
 
     detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.listTitle = "Children";
     detailsCtrl.enableEdit = false;
-    detailsCtrl.editedItem = { description: "No item selected"};
+    detailsCtrl.editedItem = {description: "No item selected"};
     detailsCtrl.defaultTab = {active: true};
     detailsCtrl.showChunksInAnalysis = true;
     detailsCtrl.showTokensInAnalysis = true;
@@ -22,31 +23,28 @@ function DetailsviewController(Item, ItemRepository, $rootScope, tabService) {
     console.log("Details Tab:");
     console.log(detailsCtrl.tab);
 
-    detailsCtrl.activate = function($scope)
-    {
-        console.log("Activate called");
-        $scope.$on('newItem', function (event, parentId) {
-            detailsCtrl.editedItem = {};
-            detailsCtrl.editedItem.parentId = parentId;
-            detailsCtrl.enableEdit = true;
-        });
 
-        $scope.$on('editItem', function (event, itemId) {
-            console.log(detailsCtrl);
-            detailsCtrl.isEdit = true;
-            detailsCtrl.itemProxy = ItemRepository.getItem(itemId);
-            detailsCtrl.editedItem = detailsCtrl.itemProxy.item;
-            ItemRepository.setCurrentItem(detailsCtrl.editedItem);
-            detailsCtrl.defaultTab.active = true;
+    $scope.$on('newItem', function (event, parentId) {
+        detailsCtrl.editedItem = {};
+        detailsCtrl.editedItem.parentId = parentId;
+        detailsCtrl.enableEdit = true;
+    });
 
-        });
+    $scope.$on('editItem', function (event, itemId) {
+        console.log(detailsCtrl);
+        detailsCtrl.isEdit = true;
+        detailsCtrl.itemProxy = ItemRepository.getItem(itemId);
+        detailsCtrl.editedItem = detailsCtrl.itemProxy.item;
+        ItemRepository.setCurrentItem(detailsCtrl.editedItem);
+        detailsCtrl.defaultTab.active = true;
 
-    };
+    });
+
 
     detailsCtrl.fetchAnalysis = function () {
-      ItemRepository.fetchAnalysis(detailsCtrl.editedItem.id);
-    }
-    
+        ItemRepository.fetchAnalysis(detailsCtrl.editedItem.id);
+    };
+
     detailsCtrl.upsertItem = function () {
         var itemForm = this.itemForm;
         Item

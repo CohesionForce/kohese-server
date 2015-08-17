@@ -5,6 +5,8 @@
 function ContainerController(tabService) {
     var containerCtrl = this;
 
+    console.log("Container is linked")
+
     containerCtrl.tabs = [{title: 'Test Tab', type: 'dualview'}];
     containerCtrl.tabService = tabService;
     containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
@@ -13,7 +15,7 @@ function ContainerController(tabService) {
         var tab = this;
         this.title = title;
         this.route = route;
-        // Set default view type
+        // Flag for determining number of viewports on container
         this.type = 'dualview';
         this.toggleType = function () {
             console.log("Type toggled");
@@ -49,6 +51,12 @@ var ContentContainer = function () {
         templateUrl: 'components/contentcontainer/contentcontainer.html'
     }
 };
+
+/**
+ * Convention exception: This directive is not in the common folder because it is only used on the index level of the
+ * application Eventually it is likely that the content container might be switched on and off based on users location in the
+ * app
+ */
 
 angular.module('app.contentcontainer', ['app.services.tabservice'])
     .controller('ContainerController', ContainerController)

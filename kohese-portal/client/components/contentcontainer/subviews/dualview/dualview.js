@@ -1,5 +1,7 @@
 /**
  * Created by josh on 7/28/15.
+ *
+ * Component specific directive
  */
 
 angular.module('app.contentcontainer')
