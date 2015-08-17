@@ -87,7 +87,7 @@
                         ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:['-count','text']">
                         <td ng-click="detailsCtrl.analysisFilterString = summary.text" ng-bind-html="summary.text | highlight:detailsCtrl.analysisFilterString"></td>
                         <td>{{summary.displayType}}</td>
-                        <td>{{summary.count}}</td>
+                        <td>{{summary.count}} - {{summary.posCount}}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -104,7 +104,7 @@
                     <th><a href="" ng-click="itemSortField = 'End'">End</a></th>
                     </thead>
                     <tbody>
-                    <tr class="level-{{listItem.displayLevel}}" ng-hide="((listItem.displayLevel == 2) && !showChunksInDetails) || ((listItem.displayLevel == 3) && !showTokensInDetails)" class="tree-grid-row" id="{{listItem.displayId}}"
+                    <tr class="level-{{listItem.displayLevel}}" ng-hide="((listItem.displayLevel == 2) && !detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 3) && !detailsCtrl.showTokensInDetails)" class="tree-grid-row" id="{{listItem.displayId}}"
                         ng-repeat="listItem in detailsCtrl.itemProxy.analysis.extendedList | filter:{text:detailsCtrl.analysisFilterString}">
                         <td class="indented">{{listItem.displayType}}</td>
                         <td ng-bind-html="listItem.text | highlight:detailsCtrl.analysisFilterString"></td>
