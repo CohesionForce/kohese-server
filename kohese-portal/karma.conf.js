@@ -23,11 +23,11 @@ module.exports = function (config) {
             'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
 
             // Module Dependencies
-            'client/js/common/lb-services.js',
-            'client/js/item/itemRepository.js',
-            "client/js/directives/resizer.js",
-            "client/js/directives/navDirectives.js",
-            "client/js/sb-admin-2.js",
+            'client/components/common/services/lb-services.js',
+            'client/components/common/services/itemRepository.js',
+            "client/components/common/directives/resizer.js",
+            "client/components/common/directives/navDirectives/navDirectives.js",
+            "client/components/common/sb-admin-2.js",
             "client/vendor/angular-ui-router/release/angular-ui-router.js",
             "client/vendor/angular-ui-layout/ui-layout.js",
             "client/vendor/angular-bootstrap/ui-bootstrap-tpls.js",
@@ -35,9 +35,9 @@ module.exports = function (config) {
             "client/vendor/angular-socket-io/socket.js",
 
             //Client dependencies
-            'client/js/app.js',
+            'client/app.js',
             "client/js/item/controllers.js",
-            'client/js/item/itemRepository.js',
+            'client/components/common/services/itemRepository.js',
 
             //Common dependencies
             //'common/models/item.js',

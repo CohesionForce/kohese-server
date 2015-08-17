@@ -10,6 +10,10 @@
   "User": {
     "dataSource": "db"
   },
+  "UserModel": {
+    "dataSource": "db",
+    "public": true
+  },
   "AccessToken": {
     "dataSource": "db",
     "public": false

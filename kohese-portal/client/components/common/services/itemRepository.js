@@ -170,6 +170,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       var chunk = proxy.analysis.data.chunkSummary[chunkId];
       chunkSummary.text = chunk.text;
       chunkSummary.count = chunk.count;
+      chunkSummary.posCount = chunk.posCount;
       chunkSummary.displayType = "Chunk";
 //      chunkSummary.list = chunk.list.slice();
       proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
@@ -182,6 +183,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
       var token = proxy.analysis.data.tokenSummary[tokenId];
       tokenSummary.text = token.text;
       tokenSummary.count = token.count;
+      tokenSummary.posCount = token.posCount;
       tokenSummary.displayType = "Token";
 //      tokenSummary.list = token.list.slice();
       proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
@@ -216,6 +218,7 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
               var chunkSummary = {};
               chunkSummary.text = chunk.text;
               chunkSummary.count = chunk.count;
+              chunkSummary.posCount = chunk.posCount;
               chunkSummary.displayType = "Chunk";
 //              chunkSummary.list = chunk.list.slice();
               proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
@@ -226,11 +229,19 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
             var token = child.analysis.extendedTokenSummary[tokenId];
             if(angular.isDefined(proxy.analysis.extendedTokenSummary[tokenId])){
               proxy.analysis.extendedTokenSummary[tokenId].count += token.count;
+              for (var pos in token.posCount){
+                if (angular.isDefined(proxy.analysis.extendedTokenSummary[tokenId].posCount[pos])){
+                  proxy.analysis.extendedTokenSummary[tokenId].posCount[pos] += token.posCount[pos];
+                } else {
+                  proxy.analysis.extendedTokenSummary[tokenId].posCount[pos] = token.posCount[pos];
+                }
+              }
 //              proxy.analysis.extendedTokenSummary[tokenId].list = proxy.analysis.extendedTokenSummary[token.text].list.concat(token.list);
             } else {
               var tokenSummary = {};
               tokenSummary.text = token.text;
               tokenSummary.count = token.count;
+              tokenSummary.posCount = token.posCount;
               tokenSummary.displayType = "Token";
 //              tokenSummary.list = token.list.slice();
               proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;

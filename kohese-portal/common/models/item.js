@@ -162,8 +162,15 @@ module.exports = function(Item) {
           chunkSummary.text = nextChunk.text;
           chunkSummary.count = 1;
           chunkSummary.displayType = "Chunk";
+          chunkSummary.posCount = {};
 //          chunkSummary.list = [nextChunk];
           onAnalysis.chunkSummary[nextChunk.text] = chunkSummary;
+        }
+        
+        if(typeof onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType] !== 'undefined'){            
+          onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType]++;
+        } else {
+          onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType] = 1;
         }
         
         nextToken = onAnalysis.raw._views._InitialView.Token[tokenIndex];
@@ -181,8 +188,15 @@ module.exports = function(Item) {
             tokenSummary.text = nextToken.text;
             tokenSummary.count = 1;
             tokenSummary.displayType = "Token";
+            tokenSummary.posCount = {};
 //            tokenSummary.list = [nextToken];
             onAnalysis.tokenSummary[nextToken.text] = tokenSummary;
+          }
+          
+          if(typeof onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos] !== 'undefined'){            
+            onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos]++;
+          } else {
+            onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos] = 1;
           }
           
           nextToken = onAnalysis.raw._views._InitialView.Token[++tokenIndex];
