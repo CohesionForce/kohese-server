@@ -8,13 +8,13 @@
   var appBarDirective = function () {
     return {
       restrict: 'EA',
-      templateUrl: 'js/directives/appBar.html'
+      templateUrl: 'components/common/directives/navDirectives/appBar.html'
     }
   };
   var sideNavDirective = function () {
     return {
       restrict: 'EA',
-      templateUrl: 'js/directives/navigation.html'
+      templateUrl: 'components/common/directives/navDirectives/navigation.html'
     }
   };
   var collapsingMenuDirective = function () {

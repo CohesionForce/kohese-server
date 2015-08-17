@@ -15,6 +15,7 @@ angular
         'app.contentcontainer'
     ])
     .controller('KoheseController', ['$router', KoheseController])
+    .config()
     .filter('highlight', function ($sce) {
         return function (text, phrase) {
             if (text !== null) {
