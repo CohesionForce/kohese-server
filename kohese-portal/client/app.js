@@ -2,20 +2,21 @@
 
 angular
     .module('app', [
+        'app.contentcontainer',
         'app.detailsview',
         'app.tree',
+        'app.services.itemservice',
+        'app.services.tabservice',
+        'app.directives.navigation',
+        'app.directives.resizer',
         'lbServices',
-        'itemServices',
         'ngNewRouter',
         'ui.layout',
         'ui.bootstrap',
-        'btford.socket-io',
-        'nav-directives',
-        'mc.resizer',
-        'app.contentcontainer'
+        'btford.socket-io'
+
     ])
     .controller('KoheseController', ['$router', KoheseController])
-    .config()
     .filter('highlight', function ($sce) {
         return function (text, phrase) {
             if (text !== null) {

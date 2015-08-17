@@ -2,7 +2,7 @@
  * 
  */
 
-var module = angular.module("itemServices", []);
+var module = angular.module("app.services.itemservice", []);
 
 module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', function(Item, Analysis, socket, $rootScope) {
   

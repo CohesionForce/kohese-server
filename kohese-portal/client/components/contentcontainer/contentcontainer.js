@@ -50,7 +50,7 @@ var ContentContainer = function () {
     }
 };
 
-angular.module('app.contentcontainer', ['app.tabservice'])
+angular.module('app.contentcontainer', ['app.services.tabservice'])
     .controller('ContainerController', ContainerController)
     .directive('contentContainer', ContentContainer);
 

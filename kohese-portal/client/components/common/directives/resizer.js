@@ -1,7 +1,7 @@
 /**
  * Created by josh on 6/18/15.
  */
-angular.module('mc.resizer', [])
+angular.module('app.directives.resizer', [])
   .directive('resizer', function ($document) {
 
     return function ($scope, $element, $attrs) {

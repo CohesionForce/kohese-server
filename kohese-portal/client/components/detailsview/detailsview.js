@@ -1,7 +1,7 @@
 /**
  * Created by josh on 7/13/15.
  */
-angular.module('app.detailsview', ['app.tabservice'])
+angular.module('app.detailsview', ['app.services.tabservice'])
     .controller('DetailsviewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', DetailsviewController]);
 
 

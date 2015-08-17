@@ -4,7 +4,7 @@
 
 (function () {
 
-  var app = angular.module('nav-directives', []);
+  var app = angular.module('app.directives.navigation', []);
   var appBarDirective = function () {
     return {
       restrict: 'EA',

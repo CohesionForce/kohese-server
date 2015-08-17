@@ -2,7 +2,7 @@
  * Created by josh on 8/14/15.
  */
 
-angular.module('app.tabservice', [])
+angular.module('app.services.tabservice', [])
     .service('tabService', function tabService(){
         var tService = this;
 
