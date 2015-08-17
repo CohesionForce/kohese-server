@@ -2,10 +2,8 @@
  * Created by josh on 7/28/15.
  */
 
-function ContainerController(tabService) {
+function ContainerController(tabService, $scope) {
     var containerCtrl = this;
-
-    console.log("Container is linked")
 
     containerCtrl.tabs = [{title: 'Test Tab', type: 'dualview'}];
     containerCtrl.tabService = tabService;
@@ -26,6 +24,12 @@ function ContainerController(tabService) {
             }
 
         };
+    };
+
+    containerCtrl.setTab = function(tab) {
+        containerCtrl.tabService.setCurrentTab(tab);
+        $scope.$broadcast('tabSelected');
+        console.log('Event emitted');
     };
 
     containerCtrl.createTab = function (title, route) {

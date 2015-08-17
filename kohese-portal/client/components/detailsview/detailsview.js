@@ -20,9 +20,10 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.showChunksInDetails = false;
     detailsCtrl.showTokensInDetails = false;
 
-    console.log("Details Tab:");
-    console.log(detailsCtrl.tab);
-
+    $scope.$on('tabSelected', function(event){
+        detailsCtrl.tab = tabService.getCurrentTab();
+        console.log(detailsCtrl.tab);
+    });
 
     $scope.$on('newItem', function (event, parentId) {
         detailsCtrl.editedItem = {};

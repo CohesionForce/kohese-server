@@ -14,7 +14,6 @@ angular.module('app.services.tabservice', [])
         };
 
         tService.getCurrentTab = function() {
-            console.log(tService.currentTab);
             return tService.currentTab;
         }
 
