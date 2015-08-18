@@ -1,5 +1,8 @@
 /**
  * Created by josh on 6/18/15.
+ *
+ * Sibling to the resizeable directive. Creates a bar which can resize elements on a page. Requires resizeable directive
+ * when in multi-workspace.
  */
 angular.module('app.directives.resizer', [])
   .directive('resizer', function ($document) {
