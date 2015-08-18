@@ -26,8 +26,8 @@ angular
                 templateUrl: '/components/contentcontainer/contentcontainer.html',
                 abstract: true
             } )
-            .state('kohese.home', {
-                url: '/',
+            .state('kohese.explore', {
+                url: '/explore',
                 views: {
                     'top': {
                         templateUrl: '/components/tree/tree.html',
@@ -39,9 +39,13 @@ angular
                     }
 
                 }
-            });
+            })
+            .state('kohese.investigate', {
+                    url: '/investigate',
+                    templateUrl: '/components/detailsview/detailsview.html'
+                });
 
-        $urlRouterProvider.otherwise('/')
+        $urlRouterProvider.otherwise('/explore')
     })
     .filter('highlight', function ($sce) {
     return function (text, phrase) {
