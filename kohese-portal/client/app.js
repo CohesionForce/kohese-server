@@ -3,12 +3,14 @@
 angular
     .module('app', [
         'app.contentcontainer',
+        'app.contentcontainer.dualview',
         'app.detailsview',
         'app.tree',
         'app.services.itemservice',
         'app.services.tabservice',
         'app.directives.navigation',
         'app.directives.resizer',
+        'app.directives.resizeable',
         'lbServices',
         'ui.router',
         'ui.layout',

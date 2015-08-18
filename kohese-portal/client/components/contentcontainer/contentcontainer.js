@@ -33,7 +33,8 @@ function ContainerController(tabService, $scope) {
     };
 
     containerCtrl.createTab = function (title, route) {
-        console.log("Tab created");
+        tabService.incrementTabs();
+        console.log("Tab " + tabService.getTabId() + " created");
         var newTab = new Tab("Tab", route);
         // hack: will break if we change tab positions
         newTab.position = containerCtrl.tabs.length;
@@ -62,7 +63,7 @@ var ContentContainer = function () {
  * app
  */
 
-angular.module('app.contentcontainer', ['app.services.tabservice'])
+angular.module('app.contentcontainer', ['app.services.tabservice', 'app.contentcontainer.dualview'])
     .controller('ContainerController', ContainerController)
     .directive('contentContainer', ContentContainer);
 

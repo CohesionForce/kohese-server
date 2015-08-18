@@ -4,7 +4,18 @@
  * Component specific directive
  */
 
-angular.module('app.contentcontainer')
+
+var DualViewController = function(tabService) {
+
+    var dvCtrl = this;
+
+    dvCtrl.topID = "top-content" + tabService.getTabId();
+    dvCtrl.bottomID = "bottom-content" + tabService.getTabId();
+    console.log(dvCtrl.topID);
+};
+
+angular.module('app.contentcontainer.dualview', ['app.services.tabservice'])
+    .controller('DualViewController', DualViewController)
     .directive('dualView', function(){
         return {
             restrict: "A",

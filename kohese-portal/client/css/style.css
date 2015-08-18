@@ -67,21 +67,19 @@ body {
   cursor: n-resize;
 }
 
-#top-content {
+.top-content {
   position: absolute;
   overflow: auto;
-  bottom: 356px;
   top: 135px;
   width: calc(100% - 250px);
 }
 
-#bottom-content {
+.bottom-content {
   position: absolute;
   overflow: auto;
   bottom: 0;
   right: 0;
   left: 250px;
-  height: 350px;
   width: calc(100% - 250px);
   background-color: white;
 }
