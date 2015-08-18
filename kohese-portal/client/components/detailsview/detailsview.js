@@ -8,7 +8,7 @@ angular.module('app.detailsview', ['app.services.tabservice'])
 function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope) {
 
     var detailsCtrl = this;
-    console.log("DetailsCtrl init");
+    //console.log("DetailsCtrl init");
 
     detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.listTitle = "Children";
@@ -32,7 +32,6 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     });
 
     $scope.$on('editItem', function (event, itemId) {
-        console.log(detailsCtrl);
         detailsCtrl.isEdit = true;
         detailsCtrl.itemProxy = ItemRepository.getItem(itemId);
         detailsCtrl.editedItem = detailsCtrl.itemProxy.item;
@@ -41,6 +40,10 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
 
     });
 
+    detailsCtrl.toggleView = function() {
+        detailsCtrl.tab.toggleType();
+        detailsCtrl.tab.toggleState();
+    };
 
     detailsCtrl.fetchAnalysis = function () {
         ItemRepository.fetchAnalysis(detailsCtrl.editedItem.id);
@@ -71,7 +74,6 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
 
     detailsCtrl.editItem = function (item) {
         $rootScope.$broadcast('editItem', item.id);
-        console.log("Item edit: Edit Item");
     };
 
     detailsCtrl.removeItem = function (item) {

@@ -11,30 +11,39 @@ function ContainerController(tabService, $scope) {
 
     var Tab = function (title, route) {
         var tab = this;
-        this.title = title;
-        this.route = route;
+        tab.title = title;
+        tab.route = route;
+        tab.state = 'kohese.explore';
         // Flag for determining number of viewports on container
-        this.type = 'dualview';
+        tab.type = 'dualview';
         this.toggleType = function () {
-            console.log("Type toggled");
             if (tab.type == 'dualview') {
                 tab.type = 'singleview';
             } else {
                 tab.type = 'dualview';
             }
-
+            console.log(tab.type);
         };
+
+        this.toggleState = function(){
+            if(tab.state === 'kohese.explore') {
+                tab.state = 'kohese.investigate'
+            } else if (tab.state === 'kohese.investigate') {
+                tab.state = 'kohese.explore'
+            }
+            console.log(tab.state);
+        }
     };
 
     containerCtrl.setTab = function(tab) {
         containerCtrl.tabService.setCurrentTab(tab);
         $scope.$broadcast('tabSelected');
-        console.log('Event emitted');
+        //console.log('Event emitted');
     };
 
     containerCtrl.createTab = function (title, route) {
         tabService.incrementTabs();
-        console.log("Tab " + tabService.getTabId() + " created");
+        //console.log("Tab " + tabService.getTabId() + " created");
         var newTab = new Tab("Tab", route);
         // hack: will break if we change tab positions
         newTab.position = containerCtrl.tabs.length;

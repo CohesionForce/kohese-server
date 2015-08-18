@@ -12,7 +12,7 @@ angular.module('app.contentcontainer')
             templateUrl: 'components/contentcontainer/subviews/singleview/singleview.html',
             replace: true,
             link: function (scope, element, attribute) {
-                console.log("Single View is linked")
+                //console.log("Single View is linked")
             }
         };
     });

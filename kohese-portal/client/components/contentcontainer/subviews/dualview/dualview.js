@@ -22,7 +22,7 @@ angular.module('app.contentcontainer.dualview', ['app.services.tabservice'])
             templateUrl: 'components/contentcontainer/subviews/dualview/dualview.html',
             replace: true,
             link: function (scope, element, attribute) {
-                console.log("Dual View is linked")
+                //console.log("Dual View is linked")
             }
         };
     });
