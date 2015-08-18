@@ -11,7 +11,6 @@ var DualViewController = function(tabService) {
 
     dvCtrl.topID = "top-content" + tabService.getTabId();
     dvCtrl.bottomID = "bottom-content" + tabService.getTabId();
-    console.log(dvCtrl.topID);
 };
 
 angular.module('app.contentcontainer.dualview', ['app.services.tabservice'])

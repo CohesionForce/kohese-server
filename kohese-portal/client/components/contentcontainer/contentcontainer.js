@@ -5,9 +5,7 @@
 function ContainerController(tabService, $scope) {
     var containerCtrl = this;
 
-    containerCtrl.tabs = [{title: 'Test Tab', type: 'dualview'}];
     containerCtrl.tabService = tabService;
-    containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
 
     var Tab = function (title, route) {
         var tab = this;
@@ -35,11 +33,9 @@ function ContainerController(tabService, $scope) {
         }
     };
 
-    containerCtrl.setTab = function(tab) {
-        containerCtrl.tabService.setCurrentTab(tab);
-        $scope.$broadcast('tabSelected');
-        //console.log('Event emitted');
-    };
+    containerCtrl.baseTab = new Tab("Tab");
+    containerCtrl.tabs = [containerCtrl.baseTab];
+    containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
 
     containerCtrl.createTab = function (title, route) {
         tabService.incrementTabs();
@@ -48,6 +44,13 @@ function ContainerController(tabService, $scope) {
         // hack: will break if we change tab positions
         newTab.position = containerCtrl.tabs.length;
         containerCtrl.tabs.push(newTab);
+    };
+
+
+    containerCtrl.setTab = function(tab) {
+        containerCtrl.tabService.setCurrentTab(tab);
+        $scope.$broadcast('tabSelected');
+        //console.log('Event emitted');
     };
 
     containerCtrl.deleteTab = function (tab) {

@@ -18,7 +18,7 @@ angular.module('app.services.tabservice', [])
         };
 
         tService.setCurrentTab = function(tab) {
-            console.log("Tab set");
+            //console.log("Tab set");
             tService.currentTab = tab;
         };
 

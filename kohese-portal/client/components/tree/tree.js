@@ -9,7 +9,7 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
 
     var treeCtrl = this;
 
-    console.log("TreeCtrl init");
+    //console.log("TreeCtrl init");
 
     treeCtrl.filterString = "";
     treeCtrl.analysisFilterString = "";
@@ -29,11 +29,11 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
 
     treeCtrl.newItem = function () {
         $rootScope.$broadcast('newItem');
-        console.log("Item Broadcast")
+        //console.log("Item Broadcast")
     };
 
     treeCtrl.editItem = function (item) {
-        console.log("Item Broadcast")
+        //console.log("Item Broadcast")
         $rootScope.$broadcast('editItem', item.id);
     };
 

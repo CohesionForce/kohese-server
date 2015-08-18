@@ -13,7 +13,8 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.listTitle = "Children";
     detailsCtrl.enableEdit = false;
-    detailsCtrl.editedItem = {description: "No item selected"};
+    detailsCtrl.itemProxy = {};
+    detailsCtrl.itemProxy.item = {description: "No item selected"};
     detailsCtrl.defaultTab = {active: true};
     detailsCtrl.showChunksInAnalysis = true;
     detailsCtrl.showTokensInAnalysis = true;
@@ -26,16 +27,15 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     });
 
     $scope.$on('newItem', function (event, parentId) {
-        detailsCtrl.editedItem = {};
-        detailsCtrl.editedItem.parentId = parentId;
+        detailsCtrl.itemProxy.item = {};
+        detailsCtrl.itemProxy.item.parentId = parentId;
         detailsCtrl.enableEdit = true;
     });
 
     $scope.$on('editItem', function (event, itemId) {
         detailsCtrl.isEdit = true;
         detailsCtrl.itemProxy = ItemRepository.getItem(itemId);
-        detailsCtrl.editedItem = detailsCtrl.itemProxy.item;
-        ItemRepository.setCurrentItem(detailsCtrl.editedItem);
+        ItemRepository.setCurrentItem(detailsCtrl.itemProxy.item);
         detailsCtrl.defaultTab.active = true;
 
     });
@@ -46,16 +46,16 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     };
 
     detailsCtrl.fetchAnalysis = function () {
-        ItemRepository.fetchAnalysis(detailsCtrl.editedItem.id);
+        ItemRepository.fetchAnalysis(detailsCtrl.itemProxy.item.id);
     };
 
     detailsCtrl.upsertItem = function () {
         var itemForm = this.itemForm;
         Item
-            .upsert(detailsCtrl.editedItem)
+            .upsert(detailsCtrl.itemProxy.item)
             .$promise
             .then(function (updatedItem) {
-                ItemRepository.fetchItem(detailsCtrl.editedItem.id);
+                ItemRepository.fetchItem(detailsCtrl.itemProxy.item.id);
                 itemForm.$setPristine();
             });
     };
@@ -63,13 +63,13 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.cancel = function () {
 
         if (this.itemForm.$dirty) {
-            ItemRepository.fetchItem(detailsCtrl.editedItem.id);
+            ItemRepository.fetchItem(detailsCtrl.itemProxy.item.id);
             this.itemForm.$setPristine();
         }
     };
 
     detailsCtrl.newItem = function () {
-        $rootScope.$broadcast('newItem', detailsCtrl.editedItem.id)
+        $rootScope.$broadcast('newItem', detailsCtrl.itemProxy.item.id)
     };
 
     detailsCtrl.editItem = function (item) {
