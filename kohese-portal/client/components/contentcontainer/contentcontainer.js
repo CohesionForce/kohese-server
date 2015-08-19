@@ -2,7 +2,7 @@
  * Created by josh on 7/28/15.
  */
 
-function ContainerController(tabService, $scope) {
+function ContainerController(tabService, $scope, $state) {
     var containerCtrl = this;
 
     containerCtrl.tabService = tabService;
@@ -48,7 +48,9 @@ function ContainerController(tabService, $scope) {
 
 
     containerCtrl.setTab = function(tab) {
+        console.log(tab);
         containerCtrl.tabService.setCurrentTab(tab);
+        $state.go(tab.state, {id:tab.route});
         $scope.$broadcast('tabSelected');
         //console.log('Event emitted');
     };

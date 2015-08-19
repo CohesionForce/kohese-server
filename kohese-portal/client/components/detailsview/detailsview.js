@@ -13,6 +13,7 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
 
 
     detailsCtrl.tab = tabService.getCurrentTab();
+    detailsCtrl.tab.route = $stateParams.id;
     detailsCtrl.listTitle = "Children";
     detailsCtrl.enableEdit = false;
     detailsCtrl.itemProxy = {};
