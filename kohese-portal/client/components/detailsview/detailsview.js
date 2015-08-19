@@ -2,42 +2,46 @@
  * Created by josh on 7/13/15.
  */
 angular.module('app.detailsview', ['app.services.tabservice'])
-    .controller('DetailsViewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', '$scope', DetailsViewController]);
+    .controller('DetailsViewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
+        DetailsViewController]);
 
 
-function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope) {
+function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
-    //console.log("DetailsCtrl init");
+    console.log("DetailsCtrl init");
+
 
     detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.listTitle = "Children";
     detailsCtrl.enableEdit = false;
     detailsCtrl.itemProxy = {};
-    detailsCtrl.itemProxy.item = {description: "No item selected"};
     detailsCtrl.defaultTab = {active: true};
     detailsCtrl.showChunksInAnalysis = true;
     detailsCtrl.showTokensInAnalysis = true;
     detailsCtrl.showChunksInDetails = false;
     detailsCtrl.showTokensInDetails = false;
 
-    $scope.$on('tabSelected', function(event){
+    console.log(detailsCtrl.itemProxy.item);
+
+    if(angular.isDefined($stateParams.id)){
+        console.log("State Params Defined");
+        detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
+    }
+
+    $scope.$on('itemRepositoryReady', function(){
+        console.log("Repo Ready");
+        detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
+    });
+
+    $scope.$on('tabSelected', function(){
         detailsCtrl.tab = tabService.getCurrentTab();
-        console.log(detailsCtrl.tab);
     });
 
     $scope.$on('newItem', function (event, parentId) {
         detailsCtrl.itemProxy.item = {};
         detailsCtrl.itemProxy.item.parentId = parentId;
         detailsCtrl.enableEdit = true;
-    });
-
-    $scope.$on('editItem', function (event, itemId) {
-        detailsCtrl.isEdit = true;
-        detailsCtrl.itemProxy = ItemRepository.getItem(itemId);
-        ItemRepository.setCurrentItem(detailsCtrl.itemProxy.item);
-        detailsCtrl.defaultTab.active = true;
-
     });
 
     detailsCtrl.toggleView = function() {

@@ -7,8 +7,6 @@ var module = angular.module("app.services.itemservice", []);
 module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', function(Item, Analysis, socket, $rootScope) {
   
   var tree = {};
-  var currentItem = {};
-
   tree.proxyMap = {};
   
   socket.on('item/create', function(notification) {
@@ -29,19 +27,12 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
   function fetchItems() {
     Item.find().$promise.then(function(results) {
       convertListToTree(results, 'id', 'parentId');
+      $rootScope.$broadcast('itemRepositoryReady')
     });
   }
   
   fetchItems();
 
-  function setCurrentItem (item){
-    currentItem = item;
-    $rootScope.$broadcast('currentItemUpdate', currentItem);
-  }
-
-  function getCurrentItem() {
-    return currentItem;
-  }
     
   function getChildren(ofId) {
     Item.children(ofId).$promise.then(function(results) {
@@ -479,11 +470,9 @@ module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', fu
   
   return {
     internalTree : tree,
-    getItem : getItem,
+    getItemProxy : getItem,
     fetchItem : fetchItem,
     fetchAnalysis : fetchAnalysis,
-    setCurrentItem: setCurrentItem,
-    getCurrentItem: getCurrentItem,
     attachToLostAndFound: attachToLostAndFound
   }
 } ]);
