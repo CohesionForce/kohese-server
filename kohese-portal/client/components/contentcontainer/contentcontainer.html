@@ -1,8 +1,8 @@
 <div id="content" class="container-fluid" ng-controller="ContainerController as containerCtrl">
     <div id="tabBar">
         <tabset>
-            <tab ng-repeat="tab in containerCtrl.tabs">
-                <tab-heading ng-click="containerCtrl.setTab(tab)">
+            <tab ng-click="containerCtrl.setTab(tab)" ng-repeat="tab in containerCtrl.tabs">
+                <tab-heading >
                     {{tab.title}} - {{$index}}
                     <i ng-click=containerCtrl.deleteTab(tab) class="glyphicon glyphicon-remove"></i>
                 </tab-heading>
