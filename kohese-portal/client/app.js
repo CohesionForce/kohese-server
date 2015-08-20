@@ -42,7 +42,8 @@ angular
             })
             .state('kohese.investigate', {
                     url: '/investigate/{id}',
-                    templateUrl: '/components/detailsview/detailsview.html'
+                    templateUrl: '/components/detailsview/detailsview.html',
+                    controller: 'DetailsViewController as detailsCtrl'
                 });
 
         $urlRouterProvider.otherwise('/explore/1')
