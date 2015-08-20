@@ -31,11 +31,11 @@ angular
                 views: {
                     'top': {
                         templateUrl: '/components/tree/tree.html',
-                        controller: 'TreeController'
+                        controller: 'TreeController as treeCtrl'
                     },
                     'bottom': {
                         templateUrl: '/components/detailsview/detailsview.html',
-                        controller: 'DetailsViewController'
+                        controller: 'DetailsViewController as detailsCtrl'
                     }
 
                 }

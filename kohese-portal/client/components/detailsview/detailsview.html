@@ -1,4 +1,4 @@
-<div class="panel panel-default" ng-controller="DetailsViewController as detailsCtrl">
+<div class="panel panel-default">
     <div class="panel-heading">Item Information
         <button ng-if="detailsCtrl.tab.type === 'singleview'" class="pull-right" ui-sref="kohese.explore({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView()">Dual Screen</button>
         <button ng-if="detailsCtrl.tab.type === 'dualview'" class="pull-right" ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView()">Full screen</button>
