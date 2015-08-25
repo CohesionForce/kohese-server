@@ -10,15 +10,4 @@ describe('Explore page', function(){
         page.get();
     });
 
-    describe('tabs', function(){
-
-        it('should create a new tab when add is clicked', function(){
-            page.addTab();
-
-            page.tabs.then(function(result) {
-                expect(result.length).toEqual(2)
-            });
-        });
-    })
-
 });

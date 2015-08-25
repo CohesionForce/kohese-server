@@ -2,16 +2,7 @@
  * Created by josh on 8/25/15.
  */
 
-function IndexPage(){
-
-    this.get = function(){
-        browser.get('/');
-    };
-
-    this.getTitle = function(){
-        return browser.getTitle();
-    }
-}
+var IndexPage = require('./IndexPage')
 
 describe("index", function () {
 
@@ -21,5 +12,28 @@ describe("index", function () {
         // in the video, I used the protractor.getInstance() which was removed shortly thereafter in favor of this browser approach
         page.get();
         expect(page.getTitle()).toBe('Kohese Portal');
+    });
+
+    describe('tabs', function () {
+
+        beforeEach(function(){
+            page.get();
+        });
+
+        it('should create a new tab when add is clicked', function () {
+            page.addTab();
+
+            page.tabs.then(function (result) {
+                expect(result.length).toEqual(2)
+            });
+        });
+
+        it('should delete a tab when remove is clicked', function(){
+            page.addTab();
+            page.removeSecondTab();
+            page.tabs.then(function (result) {
+                expect(result.length).toEqual(1)
+            });
+        })
     });
 });
