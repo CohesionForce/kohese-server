@@ -47,8 +47,8 @@ module.exports = function (config) {
 
             //Test files
             'tests/*.js',
-            'tests/controllers/*.js',
-            'tests/services/*.js'
+            'tests/unit/controllers/*.js',
+            'tests/unit/services/*.js'
         ],
 
 

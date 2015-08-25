@@ -26,9 +26,13 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     console.log(detailsCtrl.itemProxy.item);
 
     if(angular.isDefined($stateParams.id)){
-        console.log("State Params Defined");
+        console.log($stateParams.id);
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
+    } else {
+        console.log("State params undefined");
+        detailsCtrl.itemProxy.item = { description: "No item selected"};
     }
+
 
     $scope.$on('itemRepositoryReady', function(){
         console.log("Repo Ready");
