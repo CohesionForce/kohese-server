@@ -3,7 +3,7 @@ module.exports = function(Item) {
 	var app = require('../../server/server.js');
   var http = require('http');
   var util = require('util');
-  var _und = require('../../client/vendor/underscore/underscore.js');
+  var _und = require('../../node_modules/underscore/underscore.js');
 //  console.log(util.inspect(app.loopback,false,null));
  
 	Item.observe('after save', function(ctx, next) {

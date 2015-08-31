@@ -23,8 +23,8 @@ function ContainerController(tabService, $scope, $state) {
             console.log(tab.type);
         };
 
-        this.toggleState = function(){
-            if(tab.state === 'kohese.explore') {
+        this.toggleState = function () {
+            if (tab.state === 'kohese.explore') {
                 tab.state = 'kohese.investigate'
             } else if (tab.state === 'kohese.investigate') {
                 tab.state = 'kohese.explore'
@@ -47,10 +47,10 @@ function ContainerController(tabService, $scope, $state) {
     };
 
 
-    containerCtrl.setTab = function(tab) {
+    containerCtrl.setTab = function (tab) {
         console.log(tab);
         containerCtrl.tabService.setCurrentTab(tab);
-        $state.go(tab.state, {id:tab.route});
+        $state.go(tab.state, {id: tab.route});
         $scope.$broadcast('tabSelected');
         //console.log('Event emitted');
     };
@@ -71,13 +71,17 @@ var ContentContainer = function () {
     }
 };
 
-/**
- * Convention exception: This directive is not in the common folder because it is only used on the index level of the
- * application Eventually it is likely that the content container might be switched on and off based on users location in the
- * app
- */
 
-angular.module('app.contentcontainer', ['app.services.tabservice', 'app.contentcontainer.dualview'])
-    .controller('ContainerController', ContainerController)
-    .directive('contentContainer', ContentContainer);
+export default () => {
+
+    var containerModule = angular.module('app.contentcontainer', ['app.services.tabservice'])
+        .controller('ContainerController', ContainerController)
+        .directive('contentContainer', ContentContainer);
+
+    require('./subviews/dualview/dualview')(containerModule);
+    require('./subviews/singleview/singleview')(containerModule);
+
+}
+
+
 

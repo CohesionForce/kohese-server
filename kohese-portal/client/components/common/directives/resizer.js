@@ -4,64 +4,66 @@
  * Sibling to the resizeable directive. Creates a bar which can resize elements on a page. Requires resizeable directive
  * when in multi-workspace.
  */
-angular.module('app.directives.resizer', [])
-  .directive('resizer', function ($document) {
 
-    return function ($scope, $element, $attrs) {
-      var y;
+export default () => {
+    angular.module('app.directives.resizer', [])
+        .directive('resizer', function ($document) {
 
-      $element.on('mousedown', function (event) {
-        event.preventDefault();
+            return function ($scope, $element, $attrs) {
+                var y;
 
-        $document.on('mousemove', mousemove);
-        $document.on('mouseup', mouseup);
-      });
+                $element.on('mousedown', function (event) {
+                    event.preventDefault();
 
-      function mousemove(event) {
+                    $document.on('mousemove', mousemove);
+                    $document.on('mouseup', mouseup);
+                });
 
-        if ($attrs.resizer == 'vertical') {
-          // Handle vertical resizer
-          var x = event.pageX;
+                function mousemove(event) {
 
-          if ($attrs.resizerMax && x > $attrs.resizerMax) {
-            x = parseInt($attrs.resizerMax);
-          }
+                    if ($attrs.resizer == 'vertical') {
+                        // Handle vertical resizer
+                        var x = event.pageX;
 
-          $element.css({
-            left: x + 'px'
-          });
+                        if ($attrs.resizerMax && x > $attrs.resizerMax) {
+                            x = parseInt($attrs.resizerMax);
+                        }
 
-          $($attrs.resizerLeft).css({
-            width: x + 'px'
-          });
-          $($attrs.resizerRight).css({
-            left: (x + parseInt($attrs.resizerWidth)) + 'px'
-          });
+                        $element.css({
+                            left: x + 'px'
+                        });
 
-        } else {
-          // Handle horizontal resizer
-          y = window.innerHeight - event.pageY;
+                        $($attrs.resizerLeft).css({
+                            width: x + 'px'
+                        });
+                        $($attrs.resizerRight).css({
+                            left: (x + parseInt($attrs.resizerWidth)) + 'px'
+                        });
 
-          $element.css({
-            bottom: y + 'px'
-          });
+                    } else {
+                        // Handle horizontal resizer
+                        y = window.innerHeight - event.pageY;
 
-          $($attrs.resizerTop).css({
-            bottom: (y + parseInt($attrs.resizerHeight)) + 'px'
-          });
-          $($attrs.resizerBottom).css({
-            height: y + 'px'
-          });
-        }
+                        $element.css({
+                            bottom: y + 'px'
+                        });
 
-      }
+                        $($attrs.resizerTop).css({
+                            bottom: (y + parseInt($attrs.resizerHeight)) + 'px'
+                        });
+                        $($attrs.resizerBottom).css({
+                            height: y + 'px'
+                        });
+                    }
 
-      function mouseup() {
-        $document.unbind('mousemove', mousemove);
-        $document.unbind('mouseup', mouseup);
-      }
+                }
+
+                function mouseup() {
+                    $document.unbind('mousemove', mousemove);
+                    $document.unbind('mouseup', mouseup);
+                }
 
 
-
-    }
-  });
+            }
+        });
+}

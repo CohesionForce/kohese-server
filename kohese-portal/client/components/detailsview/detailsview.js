@@ -1,10 +1,6 @@
 /**
  * Created by josh on 7/13/15.
  */
-angular.module('app.detailsview', ['app.services.tabservice'])
-    .controller('DetailsViewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
-        DetailsViewController]);
-
 
 function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
 
@@ -25,21 +21,21 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
 
     console.log(detailsCtrl.itemProxy.item);
 
-    if(angular.isDefined($stateParams.id)){
+    if (angular.isDefined($stateParams.id)) {
         console.log($stateParams.id);
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
     } else {
         console.log("State params undefined");
-        detailsCtrl.itemProxy.item = { description: "No item selected"};
+        detailsCtrl.itemProxy.item = {description: "No item selected"};
     }
 
 
-    $scope.$on('itemRepositoryReady', function(){
+    $scope.$on('itemRepositoryReady', function () {
         console.log("Repo Ready");
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
     });
 
-    $scope.$on('tabSelected', function(){
+    $scope.$on('tabSelected', function () {
         detailsCtrl.tab = tabService.getCurrentTab();
     });
 
@@ -49,7 +45,7 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
         detailsCtrl.enableEdit = true;
     });
 
-    detailsCtrl.toggleView = function() {
+    detailsCtrl.toggleView = function () {
         detailsCtrl.tab.toggleType();
         detailsCtrl.tab.toggleState();
     };
@@ -95,4 +91,10 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     }
 
 
+}
+
+export default () => {
+    angular.module('app.detailsview', ['app.services.tabservice'])
+        .controller('DetailsViewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
+            DetailsViewController]);
 }

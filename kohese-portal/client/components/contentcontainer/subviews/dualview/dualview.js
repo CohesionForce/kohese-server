@@ -5,7 +5,7 @@
  */
 
 
-var DualViewController = function(tabService) {
+var DualViewController = function (tabService) {
 
     var dvCtrl = this;
 
@@ -13,15 +13,19 @@ var DualViewController = function(tabService) {
     dvCtrl.bottomID = "bottom-content" + tabService.getTabId();
 };
 
-angular.module('app.contentcontainer.dualview', ['app.services.tabservice'])
-    .controller('DualViewController', DualViewController)
-    .directive('dualView', function(){
-        return {
-            restrict: "A",
-            templateUrl: 'components/contentcontainer/subviews/dualview/dualview.html',
-            replace: true,
-            link: function (scope, element, attribute) {
-                //console.log("Dual View is linked")
-            }
-        };
-    });
+
+export default containerModule => {
+
+    containerModule
+        .controller('DualViewController', DualViewController)
+        .directive('dualView', function () {
+            return {
+                restrict: "A",
+                templateUrl: 'components/contentcontainer/subviews/dualview/dualview.html',
+                replace: true,
+                link: function (scope, element, attribute) {
+                    //console.log("Dual View is linked")
+                }
+            };
+        });
+}

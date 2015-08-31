@@ -9,7 +9,6 @@ describe("index", function () {
     var page = new IndexPage();
 
     it("should display the correct title", function () {
-        // in the video, I used the protractor.getInstance() which was removed shortly thereafter in favor of this browser approach
         page.get();
         expect(page.getTitle()).toBe('Kohese Portal');
     });

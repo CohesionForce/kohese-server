@@ -2,9 +2,6 @@
  * Created by josh on 7/13/15.
  */
 
-angular.module('app.tree', [])
-    .controller('TreeController', ['Item', 'ItemRepository', '$anchorScroll', '$rootScope', '$location', TreeController]);
-
 function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $location) {
 
     var treeCtrl = this;
@@ -19,7 +16,7 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
 
     treeCtrl.newTree = ItemRepository.internalTree;
 
-    treeCtrl.activate = function($scope){
+    treeCtrl.activate = function ($scope) {
         $scope.$on('currentItemUpdate', function (event, data) {
                 $location.hash(data.id);
                 $anchorScroll();
@@ -48,7 +45,6 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
     };
 
 
-
     treeCtrl.syncLocation = function () {
         $anchorScroll();
     };
@@ -75,7 +71,7 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
 
     };
 
-    treeCtrl.changeVisibilityOn = function(proxy) {
+    treeCtrl.changeVisibilityOn = function (proxy) {
         if (treeCtrl.showAsTree) {
             treeCtrl.collapsed[proxy.item.id] = !treeCtrl.collapsed[proxy.item.id];
             var isNowCollapsed = treeCtrl.collapsed[proxy.item.id];
@@ -107,4 +103,9 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
         changeVisibilityOn(this.itemProxy);
     }
 
+}
+
+export default () => {
+    angular.module('app.tree', [])
+        .controller('TreeController', ['Item', 'ItemRepository', '$anchorScroll', '$rootScope', '$location', TreeController]);
 }
