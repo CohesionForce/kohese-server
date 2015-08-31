@@ -56,9 +56,15 @@ function ContainerController(tabService, $scope, $state) {
     };
 
     containerCtrl.deleteTab = function (tab) {
-        // hack: will break if we change tab positions
         containerCtrl.tabs.splice(tab.position, 1);
+        updatePositions();
     };
+
+    function updatePositions() {
+        for (var i = 0; i < containerCtrl.tabs.length; i++) {
+            containerCtrl.tabs[i].position = i;
+        }
+    }
 
 
 }
