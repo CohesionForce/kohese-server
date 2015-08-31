@@ -23,7 +23,7 @@
             <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
             <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
             <th ng-show="!treeCtrl.showAsTree"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
-            <th><i class="glyphicon glyphicon-plus pull-right" ng-click="treeCtrl.newItem()"></i></th>
+            <th><i class="glyphicon glyphicon-plus pull-right" ui-sref="kohese.explore.newItem()" ></i></th>
             </thead>
             <tbody>
             <tr id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row"
@@ -32,7 +32,7 @@
                 <td><a style="margin: 8px"><i ng-click="treeCtrl.changeVisibilityOn(itemProxy)"
                                               ng-init="treeCtrl.collapsed[itemProxy.item.id]=false"
                                               ng-class="{'indented tree-icon':treeCtrl.showAsTree, 'glyphicon fa icon-minus glyphicon-minus fa-minus': treeCtrl.showAsTree && (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id], 'glyphicon fa icon-plus glyphicon-plus fa-plus': treeCtrl.showAsTree && (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id], 'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0), 'glyphicon glyphicon-th-list': !treeCtrl.showAsTree && (itemProxy.children.length > 0)}"></i></a><span
-                        ui-sref="kohese.explore({id:itemProxy.item.id})" ng-class="{'indented tree-label':treeCtrl.showAsTree}"
+                        ui-sref="kohese.explore.editItem({id:itemProxy.item.id})" ng-class="{'indented tree-label':treeCtrl.showAsTree}"
                         ng-bind-html="(itemProxy.item.title | highlight:treeCtrl.filterString)"></span>
                 </td>
                 <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"

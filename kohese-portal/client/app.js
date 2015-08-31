@@ -27,7 +27,7 @@ appModule.config(function ($stateProvider, $urlRouterProvider) {
             abstract: true
         })
         .state('kohese.explore', {
-            url: '/explore/{id}',
+            url: '/explore',
             views: {
                 'top': {
                     templateUrl: '/components/tree/tree.html',
@@ -40,13 +40,31 @@ appModule.config(function ($stateProvider, $urlRouterProvider) {
 
             }
         })
+        .state('kohese.explore.editItem', {
+            url: '/edit/{id}',
+            views: {
+                'bottom@kohese': {
+                    templateUrl: '/components/detailsview/detailsview.html',
+                    controller: 'DetailsViewController as detailsCtrl'
+                }
+            }
+        })
+        .state('kohese.explore.newItem', {
+            url: '/new/{id}',
+            views: {
+                'bottom@kohese': {
+                    templateUrl: '/components/detailsview/detailsview.html',
+                    controller: 'DetailsViewController as detailsCtrl'
+                }
+            }
+        })
         .state('kohese.investigate', {
             url: '/investigate/{id}',
             templateUrl: '/components/detailsview/detailsview.html',
             controller: 'DetailsViewController as detailsCtrl'
         });
 
-    $urlRouterProvider.otherwise('/explore/')
+    $urlRouterProvider.otherwise('/explore')
 })
     .filter('highlight', function ($sce) {
         return function (text, phrase) {
