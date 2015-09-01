@@ -38,7 +38,7 @@ export default () => {
         function getChildren(ofId) {
             Item.children(ofId).$promise.then(function (results) {
                 // TBD:  This needs to be a specific location instead of a global
-                tmpChildList = results;
+                var tmpChildList = results;
             });
         }
 
@@ -296,6 +296,7 @@ export default () => {
             }
             itemProxy.item = forItem;
             tree.proxyMap[primaryKey] = itemProxy;
+            var parent = {};
             var parentId = itemProxy.item.parentId;
 
             if (parentId) {
