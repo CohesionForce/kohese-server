@@ -50,7 +50,7 @@ appModule.config(function ($stateProvider, $urlRouterProvider) {
             }
         })
         .state('kohese.explore.create', {
-            url: '/create/{id}',
+            url: '/create/{parentId}',
             views: {
                 'bottom@kohese': {
                     templateUrl: '/components/detailsview/subviews/createitem.html',
