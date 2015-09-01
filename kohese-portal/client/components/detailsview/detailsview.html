@@ -1,80 +1,42 @@
 <div class="panel panel-default">
     <div class="panel-heading">Item Information
-        <button ng-if="detailsCtrl.tab.type === 'singleview'" class="pull-right" ui-sref="kohese.explore({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView()">Dual Screen</button>
-        <button ng-if="detailsCtrl.tab.type === 'dualview'" class="pull-right" ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView()">Full screen</button>
+        <button ng-if="detailsCtrl.tab.type === 'singleview'" class="pull-right"
+                ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView('edit')">Dual
+            Screen
+        </button>
+        <button ng-if="detailsCtrl.tab.type === 'dualview'" class="pull-right"
+                ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView('investigate')">
+            Full screen
+        </button>
     </div>
     <div class="panel-body">
         <!-- Nav tabs -->
         <tabset>
             <tab id="defaultTfab" active="detailsCtrl.defaultTab.active">
                 <tab-heading>Details <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
-                <form name="detailsCtrl.itemForm" class="form-horizontal">
-                    <div>
-                        <div style="width: 50%; float: left">
-					<span class="control-group"
-                          ng-class="{error: detailsCtrl.itemForm.id.$invalid}">
-						<label class="control-label" for="Id">Id</label>
-						<div class="controls">
-                            <input style="width: 90%;" type="text" ng-model="detailsCtrl.itemProxy.item.id"
-                                   id="Id" ng-disabled="true" />
-                        </div>
-					</span>
-                        </div>
-                        <div style="width: 50%; float: right">
-					<span class="control-group"
-                          ng-class="{error: detailsCtrl.itemForm.parentId.$invalid}"> <label
-                            class="control-label" for="ParentId"
-                            ng-click="editItem({id:detailsCtrl.itemProxy.item.parentId})">Parent Id</label>
-						<div class="controls">
-                            <input style="width: 90%;" type="text"
-                                   ng-model="detailsCtrl.itemProxy.item.parentId" id="Parent" ng-disabled="!detailsCtrl.enableEdit"/>
-                        </div>
-					</span>
-                        </div>
-                    </div>
-                    <div class="control-group"
-                         ng-class="{error: detailsCtrl.itemForm.title.$invalid}">
-                        <label class="control-label" for="Title">Title</label>
-                        <div class="controls">
-                            <input type="text" ng-model="detailsCtrl.itemProxy.item.title" id="Title" ng-disabled="!detailsCtrl.enableEdit" style="width:100%"/>
-                        </div>
-                    </div>
-                    <div class="control-group"
-                         ng-class="{error: detailsCtrl.itemForm.description.$invalid}">
-                        <label class="control-label" for="Description">Description</label>
-                        <div class="controls">
-							<textarea style="width:100%; max-width:100%; height:90px;" type="text"
-                                      ng-model="detailsCtrl.itemProxy.item.description" ng-disabled="!detailsCtrl.enableEdit" id="Description" ></textarea>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
-                            Edit</button>
-                        <button ng-click="detailsCtrl.upsertItem()" ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine" class="btn btn-primary">
-                            Update</button>
-                        <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit" class="btn btn-primary">
-                            Cancel</button>
-                    </div>
-                </form>
+                <ng-include src="'components/detailsview/subviews/itemform.html'"></ng-include>
             </tab>
             <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">
-                <div ng-show="detailsCtrl.isEdit">
-                    <ng-include src="'components/detailsview/item.html'" ></ng-include>
-                </div>
+                <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
             </tab>
             <tab heading="Relations">
                 <h4>Relations Tab</h4>
+
                 <p><b>This tab is under construction.</b></p>
             </tab>
             <tab heading="Analysis" select="detailsCtrl.fetchAnalysis()">
 		        <span class="pull-right">
 					<input class="input-sm" type="text" ng-model="detailsCtrl.analysisFilterString"
-                           placeholder="Filter" style="margin: 5px" />
+                           placeholder="Filter" style="margin: 5px"/>
 				</span>
 
                 <h4>Analysis Summary</h4>
-                <input type="checkbox" ng-model="detailsCtrl.showChunksinSummary" ng-init="detailsCtrl.showChunksinSummary=false" name="showChunksInSummaryInput" style="margin: 5px"/> Show Chunks in Summary
-                <input type="checkbox" ng-model="detailsCtrl.showTokensinSummary" ng-init="detailsCtrl.showTokensinSummary=true" name="showTokensInSummaryInput" style="margin: 5px"/> Show Tokens in Summary
+                <input type="checkbox" ng-model="detailsCtrl.showChunksinSummary"
+                       ng-init="detailsCtrl.showChunksinSummary=false" name="showChunksInSummaryInput"
+                       style="margin: 5px"/> Show Chunks in Summary
+                <input type="checkbox" ng-model="detailsCtrl.showTokensinSummary"
+                       ng-init="detailsCtrl.showTokensinSummary=true" name="showTokensInSummaryInput"
+                       style="margin: 5px"/> Show Tokens in Summary
                 <table
                         class="table tree-grid table-striped table-condensed table-hover">
                     <thead>
@@ -86,7 +48,8 @@
                     <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
                         ng-hide="((summary.displayType == 'Chunk') && !detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsCtrl.showTokensinSummary)"
                         ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:['-count','text']">
-                        <td ng-click="detailsCtrl.analysisFilterString = summary.text" ng-bind-html="summary.text | highlight:detailsCtrl.analysisFilterString"></td>
+                        <td ng-click="detailsCtrl.analysisFilterString = summary.text"
+                            ng-bind-html="summary.text | highlight:detailsCtrl.analysisFilterString"></td>
                         <td>{{summary.displayType}}</td>
                         <td>{{summary.count}} - {{summary.posCount}}</td>
                     </tr>
@@ -94,8 +57,12 @@
                 </table>
 
                 <h4>Analysis Details</h4>
-                <input type="checkbox" ng-model="detailsCtrl.showChunksInDetails" ng-init="detailsCtrl.showChunksInDetails=false" name="showChunksInDetailsInput" style="margin: 5px"/> Show Chunks in Details
-                <input type="checkbox" ng-model="detailsCtrl.showTokensInDetails" ng-init="detailsCtrl.showTokensInDetails=false" name="showTokensInDetailsInput" style="margin: 5px"/> Show Tokens in Details
+                <input type="checkbox" ng-model="detailsCtrl.showChunksInDetails"
+                       ng-init="detailsCtrl.showChunksInDetails=false" name="showChunksInDetailsInput"
+                       style="margin: 5px"/> Show Chunks in Details
+                <input type="checkbox" ng-model="detailsCtrl.showTokensInDetails"
+                       ng-init="detailsCtrl.showTokensInDetails=false" name="showTokensInDetailsInput"
+                       style="margin: 5px"/> Show Tokens in Details
                 <table
                         class="table tree-grid table-striped table-condensed table-hover">
                     <thead>
@@ -105,7 +72,9 @@
                     <th><a href="" ng-click="itemSortField = 'End'">End</a></th>
                     </thead>
                     <tbody>
-                    <tr class="level-{{listItem.displayLevel}}" ng-hide="((listItem.displayLevel == 2) && !detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 3) && !detailsCtrl.showTokensInDetails)" class="tree-grid-row" id="{{listItem.displayId}}"
+                    <tr class="level-{{listItem.displayLevel}}"
+                        ng-hide="((listItem.displayLevel == 2) && !detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 3) && !detailsCtrl.showTokensInDetails)"
+                        class="tree-grid-row" id="{{listItem.displayId}}"
                         ng-repeat="listItem in detailsCtrl.itemProxy.analysis.extendedList | filter:{text:detailsCtrl.analysisFilterString}">
                         <td class="indented">{{listItem.displayType}}</td>
                         <td ng-bind-html="listItem.text | highlight:detailsCtrl.analysisFilterString"></td>
@@ -117,10 +86,12 @@
             </tab>
             <tab heading="History">
                 <h4>History Tab</h4>
+
                 <p><b>This tab is under construction.</b></p>
             </tab>
             <tab heading="Journal">
                 <h4>Journal Tab</h4>
+
                 <p><b>This tab is under construction.</b></p>
             </tab>
         </tabset>

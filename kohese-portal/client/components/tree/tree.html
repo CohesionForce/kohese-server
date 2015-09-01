@@ -10,7 +10,8 @@
                 style="margin: 5px">
             Collapse All
         </button>
-        <button ng-click="treeCtrl.syncLocation()" class="btn btn-default btn-sm" style="margin: 5px">Sync Location</button>
+        <button ng-click="treeCtrl.syncLocation()" class="btn btn-default btn-sm" style="margin: 5px">Sync Location
+        </button>
     <span class="pull-right">
       <span>Showing {{filteredItems.length}} of {{treeCtrl.newTree.rows.length}}</span>
       <input class="input-sm" type="text" ng-model="treeCtrl.filterString" placeholder="Filter" style="margin: 5px"/>
@@ -23,17 +24,25 @@
             <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
             <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
             <th ng-show="!treeCtrl.showAsTree"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
-            <th><i class="glyphicon glyphicon-plus pull-right" ui-sref="kohese.explore.newItem()" ></i></th>
+            <th><i class="glyphicon glyphicon-plus pull-right"
+                   ui-sref="kohese.explore.create()"
+                   ng-click="treeCtrl.setTabState('create')"></i></th>
             </thead>
             <tbody>
             <tr id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row"
                 ng-repeat="itemProxy in filteredItems = (treeCtrl.newTree.rows | filter:treeCtrl.filterString)"
                 ng-show="!treeCtrl.showAsTree || !treeCtrl.hidden[itemProxy.item.id]">
-                <td><a style="margin: 8px"><i ng-click="treeCtrl.changeVisibilityOn(itemProxy)"
-                                              ng-init="treeCtrl.collapsed[itemProxy.item.id]=false"
-                                              ng-class="{'indented tree-icon':treeCtrl.showAsTree, 'glyphicon fa icon-minus glyphicon-minus fa-minus': treeCtrl.showAsTree && (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id], 'glyphicon fa icon-plus glyphicon-plus fa-plus': treeCtrl.showAsTree && (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id], 'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0), 'glyphicon glyphicon-th-list': !treeCtrl.showAsTree && (itemProxy.children.length > 0)}"></i></a><span
-                        ui-sref="kohese.explore.editItem({id:itemProxy.item.id})" ng-class="{'indented tree-label':treeCtrl.showAsTree}"
-                        ng-bind-html="(itemProxy.item.title | highlight:treeCtrl.filterString)"></span>
+                <td>
+                    <a style="margin: 8px">
+                        <i ng-click="treeCtrl.changeVisibilityOn(itemProxy)"
+                           ng-init="treeCtrl.collapsed[itemProxy.item.id]=false"
+                           ng-class="{'indented tree-icon':treeCtrl.showAsTree, 'glyphicon fa icon-minus glyphicon-minus fa-minus': treeCtrl.showAsTree && (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id], 'glyphicon fa icon-plus glyphicon-plus fa-plus': treeCtrl.showAsTree && (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id], 'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0), 'glyphicon glyphicon-th-list': !treeCtrl.showAsTree && (itemProxy.children.length > 0)}">
+                        </i></a>
+                    <span
+                            ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
+                            ng-class="{'indented tree-label':treeCtrl.showAsTree}"
+                            ng-bind-html="(itemProxy.item.title | highlight:treeCtrl.filterString)"
+                            ng-click="treeCtrl.setTabState('edit')"></span>
                 </td>
                 <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
                     ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false"

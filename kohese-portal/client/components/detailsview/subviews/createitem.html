@@ -1,0 +1,15 @@
+<div class="panel panel-default">
+    <div class="panel-heading">Create Item
+        <button ng-if="detailsCtrl.tab.type === 'singleview'" class="pull-right"
+                ui-sref="kohese.explore({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView()">
+            Dual Screen
+        </button>
+        <button ng-if="detailsCtrl.tab.type === 'dualview'" class="pull-right"
+                ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView()">
+            Full screen
+        </button>
+    </div>
+    <div class="panel-body">
+    <ng-include src="'components/detailsview/subviews/itemform.html'"></ng-include>
+    </div>
+</div>

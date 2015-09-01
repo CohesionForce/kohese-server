@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $location) {
+function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $scope, $location, tabService) {
 
     var treeCtrl = this;
 
@@ -13,6 +13,7 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
     treeCtrl.hidden = {};
     treeCtrl.collapsed = {};
     treeCtrl.showAsTree = true;
+    treeCtrl.tab = tabService.getCurrentTab();
 
     treeCtrl.newTree = ItemRepository.internalTree;
 
@@ -24,16 +25,14 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
         );
     };
 
-    treeCtrl.newItem = function () {
-        $rootScope.$broadcast('newItem');
-        //console.log("Item Broadcast")
-    };
+    $scope.$on('tabSelected', function () {
+        treeCtrl.tab = tabService.getCurrentTab();
+    });
 
-    treeCtrl.editItem = function (item) {
-        //console.log("Item Broadcast")
-        $rootScope.$broadcast('editItem', item.id);
+    treeCtrl.setTabState = function(state){
+        treeCtrl.tab.setState(state);
+        console.log(treeCtrl.tab);
     };
-
 
     treeCtrl.removeItem = function (item) {
         Item
@@ -106,6 +105,8 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $locati
 }
 
 export default () => {
-    angular.module('app.tree', [])
-        .controller('TreeController', ['Item', 'ItemRepository', '$anchorScroll', '$rootScope', '$location', TreeController]);
+    angular.module('app.tree', ['app.services.tabservice'])
+        .controller('TreeController', ['Item', 'ItemRepository', '$anchorScroll', '$rootScope', '$scope', '$location',
+            'tabService',
+            TreeController]);
 }

@@ -23,11 +23,21 @@ function ContainerController(tabService, $scope, $state) {
             console.log(tab.type);
         };
 
-        this.toggleState = function () {
-            if (tab.state === 'kohese.explore') {
+        this.setState = function (state) {
+            if (state === 'investigate') {
                 tab.state = 'kohese.investigate'
-            } else if (tab.state === 'kohese.investigate') {
+            }
+
+            if (state === 'explore') {
                 tab.state = 'kohese.explore'
+            }
+
+            if (state === 'edit') {
+                tab.state = 'kohese.explore.edit'
+            }
+
+            if (state === 'create') {
+                tab.state = 'kohese.explore.create'
             }
             console.log(tab.state);
         }
@@ -39,9 +49,7 @@ function ContainerController(tabService, $scope, $state) {
 
     containerCtrl.createTab = function (title, route) {
         tabService.incrementTabs();
-        //console.log("Tab " + tabService.getTabId() + " created");
         var newTab = new Tab("Tab", route);
-        // hack: will break if we change tab positions
         newTab.position = containerCtrl.tabs.length;
         containerCtrl.tabs.push(newTab);
     };
@@ -52,7 +60,6 @@ function ContainerController(tabService, $scope, $state) {
         containerCtrl.tabService.setCurrentTab(tab);
         $state.go(tab.state, {id: tab.route});
         $scope.$broadcast('tabSelected');
-        //console.log('Event emitted');
     };
 
     containerCtrl.deleteTab = function (tab) {

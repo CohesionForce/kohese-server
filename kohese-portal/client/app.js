@@ -40,7 +40,7 @@ appModule.config(function ($stateProvider, $urlRouterProvider) {
 
             }
         })
-        .state('kohese.explore.editItem', {
+        .state('kohese.explore.edit', {
             url: '/edit/{id}',
             views: {
                 'bottom@kohese': {
@@ -49,11 +49,11 @@ appModule.config(function ($stateProvider, $urlRouterProvider) {
                 }
             }
         })
-        .state('kohese.explore.newItem', {
-            url: '/new/{id}',
+        .state('kohese.explore.create', {
+            url: '/create/{id}',
             views: {
                 'bottom@kohese': {
-                    templateUrl: '/components/detailsview/detailsview.html',
+                    templateUrl: '/components/detailsview/subviews/createitem.html',
                     controller: 'DetailsViewController as detailsCtrl'
                 }
             }

@@ -5,8 +5,6 @@
 function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
-    console.log("DetailsCtrl init");
-
 
     detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.tab.route = $stateParams.id;
@@ -19,8 +17,6 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.showChunksInDetails = false;
     detailsCtrl.showTokensInDetails = false;
 
-    console.log(detailsCtrl.itemProxy.item);
-
     if (angular.isDefined($stateParams.id)) {
         console.log($stateParams.id);
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
@@ -31,7 +27,6 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
 
 
     $scope.$on('itemRepositoryReady', function () {
-        console.log("Repo Ready");
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
     });
 
@@ -45,9 +40,13 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
         detailsCtrl.enableEdit = true;
     });
 
-    detailsCtrl.toggleView = function () {
+    detailsCtrl.setTabState = function(state) {
+        detailsCtrl.tab.setState(state);
+    };
+
+    detailsCtrl.toggleView = function (state) {
         detailsCtrl.tab.toggleType();
-        detailsCtrl.tab.toggleState();
+        detailsCtrl.tab.setState(state);
     };
 
     detailsCtrl.fetchAnalysis = function () {
