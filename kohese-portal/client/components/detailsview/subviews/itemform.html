@@ -30,6 +30,13 @@
         </div>
     </div>
     <div class="control-group"
+         ng-class="{error: detailsCtrl.itemForm.tags.$invalid}">
+        <label class="control-label" for="Tags">Tags</label>
+        <div class="controls">
+            <input type="text" ng-model="detailsCtrl.itemProxy.item.tags" id="Tags" ng-disabled="!detailsCtrl.enableEdit" style="width:100%"/>
+        </div>
+    </div>
+    <div class="control-group"
          ng-class="{error: detailsCtrl.itemForm.description.$invalid}">
         <label class="control-label" for="Description">Description</label>
         <div class="controls">
