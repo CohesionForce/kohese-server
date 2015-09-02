@@ -70,8 +70,17 @@ appModule.config(function ($stateProvider, $urlRouterProvider) {
 })
     .filter('highlight', function ($sce) {
         return function (text, phrase) {
-            if (text !== null) {
-                if (phrase) text = text.replace(new RegExp('(' + phrase + ')', 'gi'),
+            if (text !== null && phrase !== "") {
+                let cleanedPhrase = phrase;
+                cleanedPhrase = cleanedPhrase.replace(/\\/g,"\\\\");
+                cleanedPhrase = cleanedPhrase.replace(/\[/g,"\\[");
+                cleanedPhrase = cleanedPhrase.replace(/\(/g,"\\(");
+                cleanedPhrase = cleanedPhrase.replace(/\./g,"\\.");
+                cleanedPhrase = cleanedPhrase.replace(/\^/g,"\\^");
+                cleanedPhrase = cleanedPhrase.replace(/\$/g,"\\$");
+                cleanedPhrase = cleanedPhrase.replace(/\|/g,"\\|");
+                cleanedPhrase = cleanedPhrase.replace(/\{/g,"\\{");
+                if (phrase) text = text.replace(new RegExp('(' + cleanedPhrase + ')', 'gi'),
                     '<span class="highlighted">$1</span>');
             }
 
