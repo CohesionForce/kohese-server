@@ -24,10 +24,9 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
     });
 
     $scope.$on('newFilterString', function onNewFilterString(event, string) {
-        if (tabService.getCurrentTab() === treeCtrl.tab) {
             console.log('onNewFilterString');
             treeCtrl.filterString = string;
-        }
+
     });
 
     $scope.$on('tabSelected', function () {
