@@ -7,16 +7,16 @@
   <thead>
   <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
   <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
-  <th ng-hide="isEdit"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
+  <th ><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
   <th><i class="glyphicon glyphicon-plus pull-right"
          ui-sref="kohese.explore.create({parentId: detailsCtrl.itemProxy.item.id})"
          ng-click="detailsCtrl.setTabState('create')"></i></th>
   </thead>
   <tbody>
   <tr ng-repeat="proxy in filteredItems = (detailsCtrl.itemProxy.children  | filter:filterString) | orderBy:itemSortField">
-    <td ng-click="detailsCtrl.editItem(proxy.item)" ng-bind-html="proxy.item.title | highlight:filterString"/>
+    <td ui-sref="kohese.explore.edit({id: proxy.item.id})" ng-bind-html="proxy.item.title | highlight:filterString"/>
             <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=true" ng-bind-html="proxy.item.description | highlight:filterString"></td>
-    <td ng-click="detailsCtrl.editItem({id:proxy.item.parentId})" ng-hide="isEdit">{{proxy.item.parentId}}</td>
+    <td ui-sref="kohese.explore.edit({id: proxy.item.id})">{{proxy.item.parentId}}</td>
     <td class="pull-right">
       <i class="glyphicon glyphicon-remove" ng-click="detailsCtrl.removeItem(proxy.item)"></i>
     </td>

@@ -5,9 +5,11 @@
  */
 
 
-var DualViewController = function (tabService) {
+var DualViewController = function ($scope, tabService) {
 
     var dvCtrl = this;
+    var tab = tabService.getCurrentTab();
+    tab.setScope($scope);
 
     dvCtrl.topID = "top-content" + tabService.getTabId();
     dvCtrl.bottomID = "bottom-content" + tabService.getTabId();

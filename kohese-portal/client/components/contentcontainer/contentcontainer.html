@@ -1,7 +1,7 @@
 <div id="content" ng-controller="ContainerController as containerCtrl">
     <div id="tabBar">
         <tabset>
-            <tab ng-click="containerCtrl.setTab(tab)" ng-repeat="tab in containerCtrl.tabs">
+            <tab ng-click="containerCtrl.setTab(tab)" ng-repeat="tab in containerCtrl.tabs" active="tab.active">
                 <tab-heading >
                     {{tab.title}} - {{$index}}
                     <i ng-click=containerCtrl.deleteTab(tab) class="glyphicon glyphicon-remove"></i>
