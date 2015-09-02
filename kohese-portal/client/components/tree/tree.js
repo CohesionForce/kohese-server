@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $scope, $location, tabService) {
+function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, tabService) {
 
     var treeCtrl = this;
 
@@ -13,23 +13,28 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $scope,
     treeCtrl.hidden = {};
     treeCtrl.collapsed = {};
     treeCtrl.showAsTree = true;
-    treeCtrl.tab = tabService.getCurrentTab();
+    treeCtrl.tab = {};
 
     treeCtrl.newTree = ItemRepository.internalTree;
 
-    treeCtrl.activate = function ($scope) {
-        $scope.$on('currentItemUpdate', function (event, data) {
-                $location.hash(data.id);
-                $anchorScroll();
-            }
-        );
-    };
+
+    $scope.$on('currentItemUpdate', function (event, data) {
+        $location.hash(data.id);
+        $anchorScroll();
+    });
+
+    $scope.$on('newFilterString', function onNewFilterString(event, string) {
+        if (tabService.getCurrentTab() === treeCtrl.tab) {
+            console.log('onNewFilterString');
+            treeCtrl.filterString = string;
+        }
+    });
 
     $scope.$on('tabSelected', function () {
         treeCtrl.tab = tabService.getCurrentTab();
     });
 
-    treeCtrl.setTabState = function(state){
+    treeCtrl.setTabState = function (state) {
         treeCtrl.tab.setState(state);
         console.log(treeCtrl.tab);
     };
@@ -96,7 +101,7 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $scope,
                 treeCtrl.hidden[childId] = isNowCollapsed;
             }
         }
-    }
+    };
 
     treeCtrl.changeVisibility = function () {
         changeVisibilityOn(this.itemProxy);
@@ -106,7 +111,7 @@ function TreeController(Item, ItemRepository, $anchorScroll, $rootScope, $scope,
 
 export default () => {
     angular.module('app.tree', ['app.services.tabservice'])
-        .controller('TreeController', ['Item', 'ItemRepository', '$anchorScroll', '$rootScope', '$scope', '$location',
+        .controller('TreeController', ['Item', 'ItemRepository', '$anchorScroll', '$scope', '$location',
             'tabService',
             TreeController]);
 }

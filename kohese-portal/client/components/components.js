@@ -9,6 +9,7 @@ export default () => {
     require('./tree/tree')();
     require('./detailsview/detailsview')();
     require('./contentcontainer/contentcontainer')();
+    require('./navigationmenu/navigationmenu')();
 
     //Common
 

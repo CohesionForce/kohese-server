@@ -6,6 +6,8 @@ const appModule = angular.module('app', [
     'app.contentcontainer',
     'app.detailsview',
     'app.tree',
+    'app.navigationmenu',
+    'app.services.navigationservice',
     'app.services.itemservice',
     'app.services.tabservice',
     'app.directives.navigation',

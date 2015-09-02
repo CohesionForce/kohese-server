@@ -2,7 +2,7 @@
  * Created by josh on 7/28/15.
  */
 
-function ContainerController(tabService, $scope, $state) {
+function ContainerController(tabService, navigationService, $scope, $state) {
     var containerCtrl = this;
 
     containerCtrl.tabService = tabService;
@@ -14,13 +14,17 @@ function ContainerController(tabService, $scope, $state) {
         tab.state = 'kohese.explore';
         // Flag for determining number of viewports on container
         tab.type = 'dualview';
+        tab.content = {};
+        this.setType = function(type){
+            tab.type = type;
+        };
         this.toggleType = function () {
             if (tab.type == 'dualview') {
                 tab.type = 'singleview';
             } else {
                 tab.type = 'dualview';
             }
-            console.log(tab.type);
+            //console.log(tab.type);
         };
 
         this.setState = function (state) {
@@ -39,9 +43,29 @@ function ContainerController(tabService, $scope, $state) {
             if (state === 'create') {
                 tab.state = 'kohese.explore.create'
             }
-            console.log(tab.state);
+            //console.log(tab.state);
+        };
+        this.updateFilter = function(string){
+            //console.log('update');
+            //console.log(tab);
+            //console.log($scope);
+            $scope.$broadcast('newFilterString', string);
         }
     };
+
+    $scope.$on('navigationEvent', function onNavigationEvent(){
+        let currentTab = tabService.getCurrentTab();
+        console.log('navEvent');
+        console.log(currentTab);
+        if(currentTab.type === 'singleview'){
+            $state.go('kohese.explore');
+            currentTab.setState('explore');
+            currentTab.setType('dualview');
+        }
+        currentTab.updateFilter(navigationService.getFilterString());
+    });
+
+
 
     containerCtrl.baseTab = new Tab("Tab");
     containerCtrl.tabs = [containerCtrl.baseTab];
@@ -56,7 +80,6 @@ function ContainerController(tabService, $scope, $state) {
 
 
     containerCtrl.setTab = function (tab) {
-        console.log(tab);
         containerCtrl.tabService.setCurrentTab(tab);
         $state.go(tab.state, {id: tab.route});
         $scope.$broadcast('tabSelected');
@@ -87,7 +110,9 @@ var ContentContainer = function () {
 
 export default () => {
 
-    var containerModule = angular.module('app.contentcontainer', ['app.services.tabservice'])
+    var containerModule = angular.module('app.contentcontainer', [
+        'app.services.tabservice',
+        'app.services.navigationservice'])
         .controller('ContainerController', ContainerController)
         .directive('contentContainer', ContentContainer);
 
