@@ -8,10 +8,13 @@
   "dependencies": {
     "angular": "^1.4.4",
     "angular-ui-router": "^0.2.15",
+    "body-parser": "^1.13.3",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "errorhandler": "^1.1.1",
+    "express-jwt": "^3.0.1",
     "jquery": "^2.1.4",
+    "jsonwebtoken": "^5.0.5",
     "loopback": "^2.14.0",
     "loopback-boot": "^2.6.5",
     "loopback-connector-mongodb": "^1.8.0",
