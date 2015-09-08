@@ -25,7 +25,19 @@
     "parentId": {
       "type": "string",
       "default": ""
-    }
+    },
+    "originatedBy": {
+      "type": "string"
+    },
+    "originatedOn": {
+      "type": "number"
+    },
+    "modifiedBy": {
+      "type": "string"
+    },
+    "modifiedOn": {
+      "type": "number"
+    }    
   },
   "validations": [],
   "relations": {
