@@ -27,6 +27,7 @@ module.exports = function (app) {
             username: user.username
         }, jwtSecret);
         res.send(token);
+
     });
 
     function authenticate(req, res, next) {
@@ -43,7 +44,15 @@ module.exports = function (app) {
     router.use(function (req, res, next){
         console.log(req.url);
         console.log(req.method);
-        console.log(req.headers.authorization);
+        var fullheader = (req.headers.authorization);
+        var header = fullheader.replace('Bearer ', '');
+        req.headers.koheseUser = jwt.verify(header, jwtSecret);
+        next();
+    });
+
+    router.use(function(req,res,next){
+        console.log(req.headers.koheseUser);
+        next();
     });
 
 

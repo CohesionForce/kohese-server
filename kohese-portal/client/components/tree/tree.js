@@ -13,7 +13,7 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
     treeCtrl.hidden = {};
     treeCtrl.collapsed = {};
     treeCtrl.showAsTree = true;
-    treeCtrl.tab = {};
+    treeCtrl.tab = tabService.getCurrentTab();
 
     treeCtrl.newTree = ItemRepository.internalTree;
 

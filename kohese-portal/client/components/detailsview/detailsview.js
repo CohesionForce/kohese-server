@@ -41,12 +41,6 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
         detailsCtrl.tab = tabService.getCurrentTab();
     });
 
-    $scope.$on('newItem', function (event, parentId) {
-        detailsCtrl.itemProxy.item = {};
-        detailsCtrl.itemProxy.item.parentId = parentId;
-        detailsCtrl.enableEdit = true;
-    });
-
     detailsCtrl.setTabState = function(state) {
         detailsCtrl.tab.setState(state);
     };
@@ -61,13 +55,10 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     };
 
     detailsCtrl.upsertItem = function () {
-        var itemForm = this.itemForm;
-        Item
-            .upsert(detailsCtrl.itemProxy.item)
-            .$promise
+        ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
             .then(function (updatedItem) {
                 ItemRepository.fetchItem(detailsCtrl.itemProxy.item.id);
-                itemForm.$setPristine();
+                detailsCtrl.itemForm.$setPristine();
             });
     };
 
@@ -79,18 +70,8 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
         }
     };
 
-    detailsCtrl.newItem = function () {
-        $rootScope.$broadcast('newItem', detailsCtrl.itemProxy.item.id)
-    };
-
-    detailsCtrl.editItem = function (item) {
-        $rootScope.$broadcast('editItem', item.id);
-    };
-
     detailsCtrl.removeItem = function (item) {
-        Item
-            .deleteById(item)
-            .$promise
+        ItemRepository.deletItem(item)
             .then(function () {
                 // TBD:  May need to do something special if the delete fails
             });

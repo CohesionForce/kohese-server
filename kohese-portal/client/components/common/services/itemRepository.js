@@ -3,6 +3,7 @@
  */
 
 export default () => {
+    var _ = require('../../../../node_modules/underscore/underscore.js')
     var module = angular.module("app.services.itemservice", []);
 
     module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', function (Item, Analysis, socket, $rootScope) {
@@ -258,6 +259,14 @@ export default () => {
 
         }
 
+        function upsertItem(item){
+            return Item.upsert(item).$promise
+        }
+
+        function deleteItem(item){
+           return Item.deleteById(item).$promise
+        }
+
         function getItem(byId) {
             return tree.proxyMap[byId];
         }
@@ -475,6 +484,8 @@ export default () => {
         lookup.X = "Unknown";
 
         return {
+            deleteItem: deleteItem,
+            upsertItem: upsertItem,
             internalTree: tree,
             getItemProxy: getItem,
             fetchItem: fetchItem,
