@@ -1,8 +1,13 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
+var jwt = require('jsonwebtoken');
+var bodyParser = require('body-parser');
+var expressJwt = require('express-jwt');
+var jwtSecret = 'ij2ijo32iro2i3jrod111223';
 
 var app = module.exports = loopback();
 
+app.use(bodyParser.json());
 app.start = function () {
     // start the web server
     return app.listen(function () {
@@ -21,8 +26,8 @@ boot(app, __dirname, function (err) {
     //passing the static middleware are hitting the file system
     //Example:
     var path = require('path');
-    app.use(loopback.static(path.resolve(__dirname, '../client')));
-    app.use(loopback.static(path.resolve(__dirname, '../bower_components')));
+    //app.use(loopback.static(path.resolve(__dirname, '../client')));
+    //app.use(loopback.static(path.resolve(__dirname, '../bower_components')));
 
     // start the server if `$ node server.js`
     if (require.main === module) {

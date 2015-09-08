@@ -8,4 +8,5 @@ export default() => {
     require('./lb-services')();
     require('./itemRepository')();
     require('./navigationService')();
+    require('./authenticationServices')();
 }

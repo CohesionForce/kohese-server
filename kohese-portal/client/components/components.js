@@ -10,6 +10,7 @@ export default () => {
     require('./detailsview/detailsview')();
     require('./contentcontainer/contentcontainer')();
     require('./navigationmenu/navigationmenu')();
+    require('./login/login')();
 
     //Common
 
