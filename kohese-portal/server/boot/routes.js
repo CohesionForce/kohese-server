@@ -42,19 +42,15 @@ module.exports = function (app) {
     }
 
     router.use(function (req, res, next){
-        console.log(req.url);
-        console.log(req.method);
+        console.log("At:      " + Date.now());
+        console.log("Request: " + req.url);
+        console.log("Method:  " + req.method);
         var fullheader = (req.headers.authorization);
         var header = fullheader.replace('Bearer ', '');
         req.headers.koheseUser = jwt.verify(header, jwtSecret);
+        console.log("User:    " + req.header.koheseUser);
         next();
     });
-
-    router.use(function(req,res,next){
-        console.log(req.headers.koheseUser);
-        next();
-    });
-
 
     app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
     app.use(router);
