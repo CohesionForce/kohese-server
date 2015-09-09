@@ -90,3 +90,11 @@ body {
   left: 250px;
   width: 82.5%;
 }
+
+#login-form {
+    text-align: center;
+}
+
+#login-form * {
+    margin: 5px;
+}
