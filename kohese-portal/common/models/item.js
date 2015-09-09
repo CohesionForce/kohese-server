@@ -4,11 +4,17 @@ module.exports = function (Item) {
     var http = require('http');
     var util = require('util');
     var _und = require('../../node_modules/underscore/underscore.js');
-//  console.log(util.inspect(app.loopback,false,null));
+
     Item.beforeRemote('upsert', function(ctx, modelInstance, next){
         console.log('Before remote');
         ctx.req.body.modifiedBy = ctx.req.headers.koheseUser.username;
-        ctx.req.body.modifyTime = Date.now();
+        ctx.req.body.modifiedOn = Date.now();
+        
+        if (ctx.req.body.originatedBy === null) {
+          ctx.req.body.originatedBy = ctx.req.body.modifiedBy;
+          ctx.req.body.originatedOn = ctx.req.body.modifiedOn;
+        }
+
         console.log(ctx.req.body);
         next();
     });
