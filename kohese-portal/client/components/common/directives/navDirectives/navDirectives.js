@@ -2,19 +2,27 @@
  * Created by josh on 6/17/15.
  */
 
-function AppBarController(AuthTokenFactory, $scope) {
+function AppBarController(AuthTokenFactory, $scope, $state) {
     var ctrl = this;
-
-    ctrl.userLoggedIn = AuthTokenFactory.getToken() !== null;
+    checkAuthentication();
 
     $scope.$on('userLoggedIn', function onUserLogin(){
        ctrl.userLoggedIn = true;
     });
 
+    $scope.$on('userLoggedOut', function onUserLogout(){
+        ctrl.userLoggedIn = false;
+    });
+
     ctrl.logout = function () {
         AuthTokenFactory.setToken();
-        ctrl.userLoggedIn = false;
+    };
 
+    function checkAuthentication(){
+        ctrl.userLoggedIn = AuthTokenFactory.getToken() !== null;
+        if(!ctrl.userLoggedIn){
+            $state.go('login');
+        }
     }
 }
 export default () => {

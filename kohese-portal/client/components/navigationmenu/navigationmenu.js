@@ -2,13 +2,23 @@
  * Created by josh on 9/1/15.
  */
 
-function NavigationController($rootScope, navigationService) {
+function NavigationController($rootScope, navigationService, $scope, AuthTokenFactory) {
     var ctrl = this;
+    ctrl.userLoggedIn = AuthTokenFactory.getToken() !== null;
 
     ctrl.search = function(searchString){
         navigationService.setFilterString(searchString);
         $rootScope.$broadcast('navigationEvent');
-    }
+    };
+
+    $scope.$on('userLoggedIn', function onUserLogin(){
+        ctrl.userLoggedIn = true;
+    });
+
+    $scope.$on('userLoggedOut', function onUserLogout(){
+        ctrl.userLoggedIn = false;
+    })
+
 }
 var sideNavDirective = function () {
     return {

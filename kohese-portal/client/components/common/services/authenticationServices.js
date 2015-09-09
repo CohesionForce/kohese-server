@@ -14,7 +14,7 @@ export default () => {
                 })
             }
         })
-        .factory('AuthTokenFactory', function AuthTokenFactory($window) {
+        .factory('AuthTokenFactory', function AuthTokenFactory($window, $rootScope) {
             'use strict';
             var store = $window.localStorage;
             var key = 'auth-token';
@@ -31,8 +31,10 @@ export default () => {
             function setToken(token) {
                 if (token) {
                     store.setItem(key, token);
+                    $rootScope.$broadcast('userLoggedIn');
                 } else {
                     store.removeItem(key);
+                    $rootScope.$broadcast('userLoggedOut');
                 }
             }
         })
