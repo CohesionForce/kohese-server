@@ -1,88 +1,112 @@
+$leftNavWidth: 250px;
+
 body {
   background-color: #f8f8f8;
-  font-family: FontAwesome, arial, sans-serif; }
+  font-family: FontAwesome, arial, sans-serif;
+}
 
 .highlighted {
-  background: yellow; }
+  background: yellow;
+}
 
 .glyphicon-remove:hover {
-  cursor: pointer; }
+  cursor: pointer;
+}
 
 #wrapper {
-  width: 100%; }
+  width: 100%;
+}
 
 #page-wrapper {
   padding: 0;
-  background-color: #fff; }
+  background-color: #fff;
+}
 
 @media (min-width: 768px) {
   #page-wrapper {
     position: inherit;
-    margin: 0 0 0 250px;
+    margin: 0 0 0 $leftNavWidth;
     padding: 0;
-    border-left: 1px solid #e7e7e7; } }
+    border-left: 1px solid #e7e7e7;
+  }
+}
+
 .content {
   position: absolute;
   top: 50px;
   bottom: 0;
-  left: 250px;
+  left: $leftNavWidth;
   right: 0;
-  overflow: auto; }
+  overflow: auto;
+}
 
 .trim-info {
   max-width: 50em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  position: relative; }
+  position: relative;
+}
 
 .trim-info-visible {
   max-width: 50em;
   white-space: pre-wrap;
-  position: relative; }
+  position: relative;
+}
 
 #content-resizer {
   position: absolute;
   height: 6px;
-  left: 250px;
+  left: $leftNavWidth;
   bottom: 350px;
   right: 0;
   background-color: #666;
-  cursor: n-resize; }
+  cursor: n-resize;
+}
 
 .top-content {
   position: absolute;
   overflow: auto;
   top: 135px;
-  width: calc(100% - 250px); }
+  width: calc(100% - 250px);
+}
 
 .bottom-content {
   position: absolute;
   overflow: auto;
   bottom: 0;
   right: 0;
-  left: 250px;
+  left: $leftNavWidth;
   width: calc(100% - 250px);
-  background-color: white; }
+  background-color: white;
+}
 
 #tree-action-bar {
   position: fixed;
   top: 95px;
-  left: 250px;
-  width: 82.5%; }
+  left: $leftNavWidth;
+  width: 82.5%;
+}
 
 #login-form {
-  text-align: center; }
-  #login-form h1 {
+  text-align: center;
+
+  h1 {
     font-size: 60px;
     margin-top: auto;
-    font-family: lobster, arial, sans-serif; }
-  #login-form input {
-    margin: 5px; }
-  #login-form button {
-    margin: 5px; }
-    #login-form button:hover {
-      color: white;
-      background-color: green; }
+    font-family: lobster, arial, sans-serif;
+  }
 
-/*# sourceMappingURL=style.css.map */
+  input {
+    margin: 5px;
+  }
+
+  button {
+    margin: 5px;
+    &:hover {
+      color: white;
+      background-color: green ;
+    }
+  }
+
+}
