@@ -77,20 +77,21 @@ module.exports = function (Item) {
         next();
     });
 
-    Item.performAnalysis = function (onId, cb) {
+    Item.performAnalysis = function (req, onId, cb) {
 
 
         console.log('::: ANALYZING: ' + onId);
+        console.log('--- JWT:       ' + req.headers.authorization);
 
         var options = {
             host: "localhost",
             port: 9091,
             path: '/services/analysis/' + onId,
-            method: 'GET'
+            method: 'GET',
+            headers: {'authorization': req.headers.authorization}
         };
-
+        
         // console.log('OPTIONS: ' + JSON.stringify(options));
-
         http.request(options, function (res) {
             var response = "";
             // console.log('STATUS: ' + res.statusCode);
@@ -129,10 +130,10 @@ module.exports = function (Item) {
     }
 
     Item.remoteMethod('performAnalysis', {
-        accepts: {
-            arg: 'onId',
-            type: 'string'
-        },
+        accepts: [
+           {arg: 'req', type: 'object', 'http': {source: 'req'}},
+           {arg: 'onId', type: 'string'}
+        ],
         returns: {
             arg: 'data',
             type: 'object'
