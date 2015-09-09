@@ -2,7 +2,7 @@
  * Created by josh on 9/8/15.
  */
 
-function LoginController(loginService, AuthTokenFactory, $state){
+function LoginController(loginService, AuthTokenFactory, $state, $rootScope){
     var ctrl = this;
 
     ctrl.login = function(username, password){
@@ -10,6 +10,7 @@ function LoginController(loginService, AuthTokenFactory, $state){
         loginService.login(username, password).then(function success(response){
             AuthTokenFactory.setToken(response.data);
             alert('Login Success');
+            $rootScope.$broadcast('userLoggedIn');
             $state.go('kohese.explore');
         }, function handleError(response){
             alert('Error: ' + response.data);
