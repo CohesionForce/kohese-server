@@ -7,6 +7,8 @@ function AppBarController(AuthTokenFactory, $scope, $state, jwtHelper) {
     ctrl.userName = {};
     checkAuthentication();
 
+    console.log($state.$current);
+
     $scope.$on('userLoggedIn', function onUserLogin(){
        ctrl.userLoggedIn = true;
         ctrl.userName = jwtHelper.decodeToken(AuthTokenFactory.getToken()).username;

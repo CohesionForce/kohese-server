@@ -127,5 +127,18 @@ body {
       background-color: $primaryColor + 100 ;
     }
   }
+}
 
+.trim-info {
+  max-width: 50em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+}
+
+.trim-info-visible {
+  max-width: 50em;
+  white-space: pre-wrap;
+  position: relative;
 }
