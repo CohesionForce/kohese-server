@@ -1,5 +1,8 @@
 .navbar {
-  background: -webkit-linear-gradient(right, #64be95, #005A31); }
+  background: -webkit-linear-gradient(right, #64be95, #005A31);
+  background-image: -moz-linear-gradient(right, #64be95, #005A31);
+  background-image: -ms-linear-gradient(right, #64be95, #005A31);
+  background-image: -o-linear-gradient(right, #64be95, #005A31); }
   .navbar .navbar-brand {
     color: white; }
     .navbar .navbar-brand:hover {

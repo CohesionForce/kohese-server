@@ -6,6 +6,9 @@ $navHover: $secondaryColor + 100;
 
 .navbar {
   background: -webkit-linear-gradient(right, $primaryColor + 100, $primaryColor);
+  background-image: -moz-linear-gradient(right, $primaryColor + 100, $primaryColor);
+  background-image: -ms-linear-gradient(right, $primaryColor + 100, $primaryColor);
+  background-image: -o-linear-gradient(right, $primaryColor + 100, $primaryColor);
   .navbar-brand {
     color: white;
     &:hover {

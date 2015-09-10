@@ -8,7 +8,10 @@ $backgroundColor: #660000;
 $backgroundFade: $backgroundColor;
 
 body {
-  background: -webkit-linear-gradient(bottom, $backgroundColor + 100, $backgroundFade);
+  background-image: -webkit-linear-gradient(bottom, $backgroundColor + 100, $backgroundFade);
+  background-image: -moz-linear-gradient(bottom, $backgroundColor + 100, $backgroundFade);
+  background-image:  -ms-linear-gradient(bottom, $backgroundColor + 100, $backgroundFade);
+  background-image:  -o-linear-gradient(bottom, $backgroundColor + 100, $backgroundFade);
   font-family: FontAwesome, arial, sans-serif;
 }
 
