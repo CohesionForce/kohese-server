@@ -26,10 +26,10 @@
       "type": "string",
       "default": ""
     },
-    "originatedBy": {
+    "createdBy": {
       "type": "string"
     },
-    "originatedOn": {
+    "createdOn": {
       "type": "number"
     },
     "modifiedBy": {

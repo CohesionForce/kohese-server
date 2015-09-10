@@ -15,9 +15,7 @@ module.exports = function (app) {
 
     app.use(bodyParser.json());
 
-    var router = app.loopback.Router();
-
-    router.post('/login', authenticate);
+    app.post('/login', authenticate);
 
     function authenticate(req, res, next) {
         var body = req.body;
@@ -37,21 +35,32 @@ module.exports = function (app) {
         
     }
 
-    router.use(function (req, res, next){
-        console.log("At:      " + Date.now());
-        console.log("Request: " + req.url);
-        console.log("Method:  " + req.method);
-//        console.log("Headers:  ");
-//        console.log(req.headers);
-        var fullheader = (req.headers.authorization);
-        var header = fullheader.replace('Bearer ', '');
-        req.headers.koheseUser = jwt.verify(header, jwtSecret);
-        console.log("User:    " + util.inspect(req.headers.koheseUser,false,null));
-        next();
+    app.use(function(req,res,next){
+      console.log("At:      " + Date.now());
+      console.log("Request: " + req.url);
+      console.log("Method:  " + req.method);
+      console.log("Query:   " + util.inspect(req.query,false,null));
+//      console.log("Headers:  ");
+//      console.log(req.headers);
+      
+      // check to see if the authorization header is missing, but an auth_token was provided
+      if(!req.headers.authorization && req.query.access_token){
+        console.log("::: Creating authorization header from access_token")
+        req.headers.authorization = 'Bearer ' + req.query.access_token;
+      }
+      next();  
+    });
+    
+    app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
+
+    app.use(function (req, res, next){
+      var authHeader = (req.headers.authorization);
+      var header = authHeader.replace('Bearer ', '');
+      req.headers.koheseUser = jwt.verify(header, jwtSecret);
+      console.log("User:    " + util.inspect(req.headers.koheseUser,false,null));
+      next();
     });
 
-    app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
-    app.use(router);
     var restApiRoot = app.get('restApiRoot');
     app.use(restApiRoot, app.loopback.rest());
 };
