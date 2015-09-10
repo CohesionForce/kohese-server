@@ -24,7 +24,7 @@ const appModule = angular.module('app', [
 
 
 appModule
-    .constant('API_URL', 'http://localhost:3000')
+    .constant('API_URL', '')
     .config(function ($httpProvider, $stateProvider, $urlRouterProvider) {
         $httpProvider.interceptors.push('AuthInterceptor');
         $stateProvider
