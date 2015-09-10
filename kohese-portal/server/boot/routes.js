@@ -8,6 +8,7 @@ module.exports = function (app) {
     var loopback = require('loopback');
     var path = require('path');
     var bodyParser = require('body-parser');
+    var util = require('util');
 
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
@@ -16,17 +17,7 @@ module.exports = function (app) {
 
     var router = app.loopback.Router();
 
-    router.get('/testnote', function (req, res) {
-        res.send({title: 'Hello', description: 'World'})
-    });
-
-    router.post('/login', authenticate, function (req, res) {
-        var token = jwt.sign({
-            username: req.body.username
-        }, jwtSecret);
-        console.log("::: Authenticated: " + req.body.username);
-        res.send(token);
-    });
+    router.post('/login', authenticate);
 
     function authenticate(req, res, next) {
         var body = req.body;
@@ -37,19 +28,25 @@ module.exports = function (app) {
         if (body.username != body.password) {
             res.status(401).end('Username or password incorrect');
         }
+        console.log("::: Authenticated: " + req.body.username);
+
+        var token = jwt.sign({
+          username: req.body.username
+        }, jwtSecret);
+        res.send(token);
         
-        next();
     }
 
     router.use(function (req, res, next){
         console.log("At:      " + Date.now());
         console.log("Request: " + req.url);
         console.log("Method:  " + req.method);
-        console.log("Headers:  " + req.headers);
+//        console.log("Headers:  ");
+//        console.log(req.headers);
         var fullheader = (req.headers.authorization);
         var header = fullheader.replace('Bearer ', '');
         req.headers.koheseUser = jwt.verify(header, jwtSecret);
-        console.log("User:    " + req.header.koheseUser);
+        console.log("User:    " + util.inspect(req.headers.koheseUser,false,null));
         next();
     });
 
