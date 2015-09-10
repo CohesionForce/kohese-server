@@ -17,6 +17,7 @@ const appModule = angular.module('app', [
     'app.directives.resizeable',
     'lbServices',
     require('angular-ui-router'),
+    'angular-jwt',
     'ui.bootstrap',
     'btford.socket-io'
 

@@ -13,6 +13,8 @@
       background-color: #99CC99; }
     .navbar .navbar-top-links .dropdown > a > i {
       color: white; }
+    .navbar .navbar-top-links .dropdown > a > span {
+      color: white; }
     .navbar .navbar-top-links .dropdown-messages, .navbar .navbar-top-links .dropdown-tasks, .navbar .navbar-top-links .dropdown-alerts {
       width: 310px;
       margin-left: auto;

@@ -5,6 +5,10 @@ body {
   background-image: -o-linear-gradient(bottom, #ca6464, #660000);
   font-family: FontAwesome, arial, sans-serif; }
 
+.panel-heading i .fa {
+  width: 50px;
+  height: 50px; }
+
 .highlighted {
   background: yellow; }
 
