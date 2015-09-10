@@ -1,78 +1,45 @@
-/*!
- * Start Bootstrap - SB Admin 2 Bootstrap Admin Theme (http://startbootstrap.com)
- * Code licensed under the Apache License v2.0.
- * For details, see http://www.apache.org/licenses/LICENSE-2.0.
- */
-
 body {
-  background-color: #f8f8f8;
-}
+  background: -webkit-linear-gradient(bottom, #ca6464, #660000);
+  font-family: FontAwesome, arial, sans-serif; }
 
 .highlighted {
-  background: yellow;
-}
+  background: yellow; }
 
 .glyphicon-remove:hover {
-  cursor: pointer;
-}
+  cursor: pointer; }
 
 #wrapper {
-  width: 100%;
-}
+  width: 100%; }
 
 #page-wrapper {
   padding: 0;
-  background-color: #fff;
-}
+  background-color: #fff; }
 
 @media (min-width: 768px) {
   #page-wrapper {
     position: inherit;
     margin: 0 0 0 250px;
     padding: 0;
-    border-left: 1px solid #e7e7e7;
-  }
-}
-
-.content {
-  position: absolute;
-  top: 50px;
-  bottom: 0;
-  left:250px;
-  right: 0;
-  overflow: auto;
-}
-
-.trim-info {
-  max-width: 50em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  position: relative;
-}
-
-.trim-info-visible {
-  max-width: 50em;
-  white-space: pre-wrap;
-  position: relative;
-}
+    border-left: 1px solid #e7e7e7; } }
+#content {
+  border-radius: 10px; }
+  #content button {
+    border-radius: 10px; }
 
 #content-resizer {
   position: absolute;
   height: 6px;
   left: 250px;
-  bottom:350px;
+  bottom: 410px;
   right: 0;
-  background-color: #666;
-  cursor: n-resize;
-}
+  background-color: #005A31;
+  cursor: n-resize; }
 
 .top-content {
   position: absolute;
   overflow: auto;
   top: 135px;
-  width: calc(100% - 250px);
-}
+  width: calc(100% - 250px); }
 
 .bottom-content {
   position: absolute;
@@ -81,20 +48,26 @@ body {
   right: 0;
   left: 250px;
   width: calc(100% - 250px);
-  background-color: white;
-}
+  background-color: white; }
 
 #tree-action-bar {
   position: fixed;
-  top:95px;
+  top: 95px;
   left: 250px;
-  width: 82.5%;
-}
+  width: 82.5%; }
 
 #login-form {
-    text-align: center;
-}
+  text-align: center; }
+  #login-form h1 {
+    font-size: 60px;
+    margin-top: auto;
+    font-family: lobster, arial, sans-serif; }
+  #login-form input {
+    margin: 5px; }
+  #login-form button {
+    margin: 5px; }
+    #login-form button:hover {
+      color: white;
+      background-color: green; }
 
-#login-form * {
-    margin: 5px;
-}
+/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,104 @@
+$leftNavWidth: 250px;
+$primaryColor: #005A31;
+$secondaryColor: #A8CD1B;
+$accentColor: #CBE32D;
+$lightColor: #F3FAB6;
+
+$backgroundColor: #660000;
+$backgroundFade: $backgroundColor;
+
+body {
+  background: -webkit-linear-gradient(bottom, $backgroundColor + 100, $backgroundFade);
+  font-family: FontAwesome, arial, sans-serif;
+}
+
+.highlighted {
+  background: yellow;
+}
+
+.glyphicon-remove:hover {
+  cursor: pointer;
+}
+
+#wrapper {
+  width: 100%;
+}
+
+#page-wrapper {
+  padding: 0;
+  background-color: #fff;
+}
+
+@media (min-width: 768px) {
+  #page-wrapper {
+    position: inherit;
+    margin: 0 0 0 $leftNavWidth;
+    padding: 0;
+    border-left: 1px solid #e7e7e7;
+  }
+}
+
+#content {
+  border-radius: 10px;
+  button {
+    border-radius : 10px;
+  }
+}
+
+
+#content-resizer {
+  position: absolute;
+  height: 6px;
+  left: $leftNavWidth;
+  bottom: 410px;
+  right: 0;
+  background-color: $primaryColor;
+  cursor: n-resize;
+}
+
+.top-content {
+  position: absolute;
+  overflow: auto;
+  top: 135px;
+  width: calc(100% - 250px);
+}
+
+.bottom-content {
+  position: absolute;
+  overflow: auto;
+  bottom: 0;
+  right: 0;
+  left: $leftNavWidth;
+  width: calc(100% - 250px);
+  background-color: white;
+}
+
+#tree-action-bar {
+  position: fixed;
+  top: 95px;
+  left: $leftNavWidth;
+  width: 82.5%;
+}
+
+#login-form {
+  text-align: center;
+
+  h1 {
+    font-size: 60px;
+    margin-top: auto;
+    font-family: lobster, arial, sans-serif;
+  }
+
+  input {
+    margin: 5px;
+  }
+
+  button {
+    margin: 5px;
+    &:hover {
+      color: white;
+      background-color: green ;
+    }
+  }
+
+}
