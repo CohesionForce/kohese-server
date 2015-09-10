@@ -28,8 +28,15 @@ body {
   background: yellow;
 }
 
-.glyphicon-remove:hover {
-  cursor: pointer;
+.glyphicon-remove {
+  color: red;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.glyphicon-plus {
+  color: green;
 }
 
 #wrapper {
@@ -85,6 +92,10 @@ body {
   background-color: white;
 }
 
+#add-tab-button {
+  background-color: white;
+}
+
 #tree-action-bar {
   position: fixed;
   top: 95px;
@@ -106,10 +117,14 @@ body {
   }
 
   button {
+    color: white;
+    padding: 10px;
     margin: 5px;
+    width: 20%;
+    background-color: $primaryColor;
     &:hover {
       color: white;
-      background-color: green ;
+      background-color: $primaryColor + 100 ;
     }
   }
 
