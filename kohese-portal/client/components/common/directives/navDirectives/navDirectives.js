@@ -7,8 +7,6 @@ function AppBarController(AuthTokenFactory, $scope, $state, jwtHelper) {
     ctrl.userName = {};
     checkAuthentication();
 
-    console.log($state.$current);
-
     $scope.$on('userLoggedIn', function onUserLogin(){
        ctrl.userLoggedIn = true;
         ctrl.userName = jwtHelper.decodeToken(AuthTokenFactory.getToken()).username;
@@ -17,6 +15,7 @@ function AppBarController(AuthTokenFactory, $scope, $state, jwtHelper) {
 
     $scope.$on('userLoggedOut', function onUserLogout(){
         ctrl.userLoggedIn = false;
+        ctrl.onLoginScreen = true;
     });
 
     ctrl.logout = function () {
@@ -27,6 +26,7 @@ function AppBarController(AuthTokenFactory, $scope, $state, jwtHelper) {
         ctrl.userLoggedIn = AuthTokenFactory.getToken() !== null;
         if(!ctrl.userLoggedIn){
             $state.go('login');
+            ctrl.onLoginScreen = true;
         } else {
             ctrl.userName = jwtHelper.decodeToken(AuthTokenFactory.getToken()).username;
         }

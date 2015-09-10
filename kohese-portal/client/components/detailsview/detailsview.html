@@ -87,7 +87,14 @@
             <tab heading="History">
                 <h4>History Tab</h4>
 
-                <p><b>This tab is under construction.</b></p>
+                <label>Created by: {{detailsCtrl.itemProxy.item.createdBy}}</label>
+                <br/>
+                <label>Created on: {{detailsCtrl.itemProxy.item.createdOn | date : fullDate}}</label>
+                <br/>
+                <label>Modified by: {{detailsCtrl.itemProxy.item.modifiedBy}}</label>
+                <br/>
+                <label>Modified on: {{detailsCtrl.itemProxy.item.modifiedOn | date : fullDate}}</label>
+
             </tab>
             <tab heading="Journal">
                 <h4>Journal Tab</h4>
