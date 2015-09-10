@@ -5,10 +5,10 @@ $accentColor: #CBE32D;
 $lightColor: #F3FAB6;
 
 $backgroundColor: #660000;
-$backgroundFade: #510000;
+$backgroundFade: $backgroundColor;
 
 body {
-  background-color: $backgroundColor;
+  background: -webkit-linear-gradient(bottom, $backgroundColor + 100, $backgroundFade);
   font-family: FontAwesome, arial, sans-serif;
 }
 
