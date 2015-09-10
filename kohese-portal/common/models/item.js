@@ -7,12 +7,12 @@ module.exports = function (Item) {
 
     Item.beforeRemote('upsert', function(ctx, modelInstance, next){
         console.log('Before remote');
-        ctx.req.body.modifiedBy = ctx.req.headers.koheseUser.username;
-        ctx.req.body.modifiedOn = Date.now();
+        ctx.req.body.createdBy = ctx.req.headers.koheseUser.username;
+        ctx.req.body.createdOn = Date.now();
         
         if (ctx.req.body.originatedBy === null) {
           ctx.req.body.originatedBy = ctx.req.body.modifiedBy;
-          ctx.req.body.originatedOn = ctx.req.body.modifiedOn;
+          ctx.req.body.createdOn = ctx.req.body.modifiedOn;
         }
 
         console.log(ctx.req.body);
