@@ -26,13 +26,13 @@ export default () => {
                 if ($attrs.id === topID) {
                     //console.log("Top content connected");
                     $element.css({
-                        bottom: 356 + 'px'
+                        bottom: 416 + 'px'
                     })
                 }
                 if ($attrs.id === bottomID) {
                     //console.log("Bottom Content Connected");
                     $element.css({
-                        height: 350 + 'px'
+                        height: 410 + 'px'
                     })
                 }
             }

@@ -1,5 +1,5 @@
 body {
-  background-color: #f8f8f8;
+  background-color: #660000;
   font-family: FontAwesome, arial, sans-serif; }
 
 .highlighted {
@@ -21,33 +21,18 @@ body {
     margin: 0 0 0 250px;
     padding: 0;
     border-left: 1px solid #e7e7e7; } }
-.content {
-  position: absolute;
-  top: 50px;
-  bottom: 0;
-  left: 250px;
-  right: 0;
-  overflow: auto; }
-
-.trim-info {
-  max-width: 50em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  position: relative; }
-
-.trim-info-visible {
-  max-width: 50em;
-  white-space: pre-wrap;
-  position: relative; }
+#content {
+  border-radius: 10px; }
+  #content button {
+    border-radius: 10px; }
 
 #content-resizer {
   position: absolute;
   height: 6px;
   left: 250px;
-  bottom: 350px;
+  bottom: 410px;
   right: 0;
-  background-color: #666;
+  background-color: #005A31;
   cursor: n-resize; }
 
 .top-content {
