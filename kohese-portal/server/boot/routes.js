@@ -7,14 +7,12 @@ module.exports = function (app) {
     var expressJwt = require('express-jwt');
     var loopback = require('loopback');
     var path = require('path');
-
-    var user = {
-        username: 'user',
-        password: 'user'
-    };
+    var bodyParser = require('body-parser');
 
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
+
+    app.use(bodyParser.json());
 
     var router = app.loopback.Router();
 
@@ -24,20 +22,22 @@ module.exports = function (app) {
 
     router.post('/login', authenticate, function (req, res) {
         var token = jwt.sign({
-            username: user.username
+            username: req.body.username
         }, jwtSecret);
+        console.log("::: Authenticated: " + req.body.username);
         res.send(token);
-
     });
 
     function authenticate(req, res, next) {
         var body = req.body;
+        console.log("::: Checking: " + body.username);
         if (!body.username || !body.password) {
             res.status(400).end('Must provide username or password')
         }
-        if (body.username != user.username || body.password != user.password) {
+        if (body.username != body.password) {
             res.status(401).end('Username or password incorrect');
         }
+        
         next();
     }
 
@@ -45,6 +45,7 @@ module.exports = function (app) {
         console.log("At:      " + Date.now());
         console.log("Request: " + req.url);
         console.log("Method:  " + req.method);
+        console.log("Headers:  " + req.headers);
         var fullheader = (req.headers.authorization);
         var header = fullheader.replace('Bearer ', '');
         req.headers.koheseUser = jwt.verify(header, jwtSecret);
