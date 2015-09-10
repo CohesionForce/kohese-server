@@ -9,7 +9,6 @@ function LoginController(loginService, AuthTokenFactory, $state){
         console.log('Login');
         loginService.login(username, password).then(function success(response){
             AuthTokenFactory.setToken(response.data);
-            alert('Login Success');
             $state.go('kohese.explore');
         }, function handleError(response){
             alert('Error: ' + response.data);
