@@ -9,6 +9,7 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.tab.route = $stateParams.id;
     detailsCtrl.filterString = "";
+    detailsCtrl.analysisFilterString = "";
     detailsCtrl.enableEdit = false;
     detailsCtrl.itemProxy = {};
     detailsCtrl.defaultTab = {active: true};
