@@ -10,8 +10,8 @@ module.exports = function (Item) {
         ctx.req.body.modifiedBy = ctx.req.headers.koheseUser.username;
         ctx.req.body.modifiedOn = Date.now();
         
-        if (ctx.req.body.originatedBy === null) {
-          ctx.req.body.originatedBy = ctx.req.body.modifiedBy;
+        if (ctx.req.body.createdBy === null) {
+          ctx.req.body.createdBy = ctx.req.body.modifiedBy;
           ctx.req.body.createdOn = ctx.req.body.modifiedOn;
         }
 
