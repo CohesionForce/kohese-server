@@ -6,18 +6,21 @@
 						<label class="control-label" for="Id">Id</label>
 						<div class="controls">
                             <input style="width: 90%;" type="text" ng-model="detailsCtrl.itemProxy.item.id"
-                                   id="Id" ng-disabled="true" />
+                                   id="Id" ng-disabled="true"/>
                         </div>
 					</span>
         </div>
         <div style="width: 50%; float: right">
 					<span class="control-group"
-                          ng-class="{error: detailsCtrl.itemForm.parentId.$invalid}"> <label
-                            class="control-label" for="ParentId"
-                            ng-click="editItem({id:detailsCtrl.itemProxy.item.parentId})">Parent Id</label>
+                          ng-class="{error: detailsCtrl.itemForm.parentId.$invalid}">
+                            <label
+                                    ng-click="console.log('click click click')"
+                                    class="control-label" for="Parent"
+                                    ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.parentId})">Parent Id</label>
 						<div class="controls">
                             <input style="width: 90%;" type="text"
-                                   ng-model="detailsCtrl.itemProxy.item.parentId" id="Parent" ng-disabled="!detailsCtrl.enableEdit"/>
+                                   ng-model="detailsCtrl.itemProxy.item.parentId" id="Parent"
+                                   ng-disabled="!detailsCtrl.enableEdit"/>
                         </div>
 					</span>
         </div>
@@ -25,31 +28,42 @@
     <div class="control-group"
          ng-class="{error: detailsCtrl.itemForm.title.$invalid}">
         <label class="control-label" for="Title">Title</label>
+
         <div class="controls">
-            <input type="text" ng-model="detailsCtrl.itemProxy.item.title" id="Title" ng-disabled="!detailsCtrl.enableEdit" style="width:100%"/>
+            <input type="text" ng-model="detailsCtrl.itemProxy.item.title" id="Title"
+                   ng-disabled="!detailsCtrl.enableEdit" style="width:100%"/>
         </div>
     </div>
     <div class="control-group"
          ng-class="{error: detailsCtrl.itemForm.tags.$invalid}">
         <label class="control-label" for="Tags">Tags</label>
+
         <div class="controls">
-            <input type="text" ng-model="detailsCtrl.itemProxy.item.tags" id="Tags" ng-disabled="!detailsCtrl.enableEdit" style="width:100%"/>
+            <input type="text" ng-model="detailsCtrl.itemProxy.item.tags" id="Tags"
+                   ng-disabled="!detailsCtrl.enableEdit" style="width:100%"/>
         </div>
     </div>
     <div class="control-group"
          ng-class="{error: detailsCtrl.itemForm.description.$invalid}">
         <label class="control-label" for="Description">Description</label>
+
         <div class="controls">
 							<textarea style="width:100%; max-width:100%; height:90px;" type="text"
-                                      ng-model="detailsCtrl.itemProxy.item.description" ng-disabled="!detailsCtrl.enableEdit" id="Description" ></textarea>
+                                      ng-model="detailsCtrl.itemProxy.item.description"
+                                      ng-disabled="!detailsCtrl.enableEdit" id="Description"></textarea>
         </div>
     </div>
     <div class="form-actions">
         <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
-            Edit</button>
-        <button ng-click="detailsCtrl.upsertItem()" ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine" class="btn btn-primary">
-            Update</button>
-        <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit" class="btn btn-primary">
-            Cancel</button>
+            Edit
+        </button>
+        <button ng-click="detailsCtrl.upsertItem()"
+                ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine" class="btn btn-primary">
+            Update
+        </button>
+        <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"
+                class="btn btn-primary">
+            Cancel
+        </button>
     </div>
 </form>
