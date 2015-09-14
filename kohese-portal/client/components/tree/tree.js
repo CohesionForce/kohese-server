@@ -6,8 +6,6 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
 
     var treeCtrl = this;
 
-    //console.log("TreeCtrl init");
-
     treeCtrl.filterString = "";
     treeCtrl.analysisFilterString = "";
     treeCtrl.hidden = {};
@@ -24,7 +22,6 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
     });
 
     $scope.$on('newFilterString', function onNewFilterString(event, string) {
-            console.log('onNewFilterString');
             treeCtrl.filterString = string;
 
     });
@@ -35,7 +32,6 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
 
     treeCtrl.setTabState = function (state) {
         treeCtrl.tab.setState(state);
-        console.log(treeCtrl.tab);
     };
 
     treeCtrl.removeItem = function (item) {

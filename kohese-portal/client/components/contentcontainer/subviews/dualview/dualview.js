@@ -11,6 +11,7 @@ var DualViewController = function ($scope, tabService) {
     var tab = tabService.getCurrentTab();
     tab.setScope($scope);
 
+    dvCtrl.resizerID = "resizer" + tabService.getTabId();
     dvCtrl.topID = "top-content" + tabService.getTabId();
     dvCtrl.bottomID = "bottom-content" + tabService.getTabId();
 };

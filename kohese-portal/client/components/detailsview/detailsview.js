@@ -18,17 +18,13 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.showTokensInDetails = false;
 
     if (angular.isDefined($stateParams.id)) {
-        console.log($stateParams.id);
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
     } else if(angular.isDefined($stateParams.parentId)){
         {
             detailsCtrl.itemProxy.item = {};
-            console.log("Parent id defined");
-            console.log(detailsCtrl.itemProxy);
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
         }
     } else {
-        console.log("State params undefined");
         detailsCtrl.itemProxy.item = {description: "No item selected"};
     }
 

@@ -1,9 +1,13 @@
 <div ng-controller="DualViewController as dvCtrl">
     <div class="top-content" resizeable="topContent" id="{{dvCtrl.topID}}" ui-view="top"></div>
-    <div class="bottom-content" resizeable="bottomContent" id="{{dvCtrl.bottomID}}" ui-view="bottom"></div>
+    <div class="bottom-content" resizeable="bottomContent" id="{{dvCtrl.bottomID}}">
+        <div ui-view="bottom"></div>
+    </div>
+
     <div id="content-resizer"
          resizer="horizontal"
          resizer-height="6"
+         resizer-key="{{dvCtrl.resizerID}}"
          resizer-top="#{{dvCtrl.topID}}"
          resizer-bottom="#{{dvCtrl.bottomID}}">
     </div>

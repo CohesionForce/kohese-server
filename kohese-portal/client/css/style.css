@@ -61,6 +61,8 @@ body {
   left: 250px;
   width: calc(100% - 250px);
   background-color: white; }
+  .bottom-content > div {
+    height: 100%; }
 
 #add-tab-button {
   background-color: white; }
