@@ -62,11 +62,14 @@ function ContainerController(tabService, navigationService, $scope, $state) {
             $state.go('kohese.explore');
             currentTab.setState('explore');
             currentTab.setType('dualview');
+            $scope.$on('$viewContentLoaded',
+                function (event) {
+                    currentTab.updateFilter(navigationService.getFilterString());
+                });
+        } else {
+            currentTab.updateFilter(navigationService.getFilterString());
         }
-        $scope.$on('$viewContentLoaded',
-            function (event) {
-                currentTab.updateFilter(navigationService.getFilterString());
-            });
+
     });
 
 
