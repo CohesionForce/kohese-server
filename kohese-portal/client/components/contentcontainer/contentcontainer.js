@@ -16,7 +16,7 @@ function ContainerController(tabService, navigationService, $scope, $state) {
         // Flag for determining number of viewports on container
         tab.type = 'dualview';
         tab.content = {};
-        tab.setType = function(type){
+        tab.setType = function (type) {
             tab.type = type;
         };
         tab.toggleType = function () {
@@ -27,7 +27,7 @@ function ContainerController(tabService, navigationService, $scope, $state) {
             }
             //console.log(tab.type);
         };
-        tab.setScope = function(scope){
+        tab.setScope = function (scope) {
             tab.scope = scope;
         };
 
@@ -49,23 +49,28 @@ function ContainerController(tabService, navigationService, $scope, $state) {
             }
             //console.log(tab.state);
         };
-        tab.updateFilter = function(string){
+        tab.updateFilter = function (string) {
             tab.scope.$broadcast('newFilterString', string);
         }
     };
 
-    $scope.$on('navigationEvent', function onNavigationEvent(){
+    $scope.$on('navigationEvent', function onNavigationEvent() {
         let currentTab = tabService.getCurrentTab();
         console.log('navEvent');
         console.log(currentTab);
-        if(currentTab.type === 'singleview'){
+        if (currentTab.type === 'singleview') {
             $state.go('kohese.explore');
             currentTab.setState('explore');
             currentTab.setType('dualview');
+            $scope.$on('$viewContentLoaded',
+                function (event) {
+                    currentTab.updateFilter(navigationService.getFilterString());
+                });
+        } else {
+            currentTab.updateFilter(navigationService.getFilterString());
         }
-        currentTab.updateFilter(navigationService.getFilterString());
-    });
 
+    });
 
 
     containerCtrl.baseTab = new Tab("Tab");

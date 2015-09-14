@@ -23,7 +23,6 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
 
     $scope.$on('newFilterString', function onNewFilterString(event, string) {
             treeCtrl.filterString = string;
-
     });
 
     $scope.$on('tabSelected', function () {
