@@ -14,6 +14,11 @@ var DualViewController = function ($scope, tabService) {
     dvCtrl.resizerID = "resizer" + tabService.getTabId();
     dvCtrl.topID = "top-content" + tabService.getTabId();
     dvCtrl.bottomID = "bottom-content" + tabService.getTabId();
+
+    $scope.$on('newItemSelected', function onNewItemSelected(event, data){
+        console.log('newItemSelectedEvent');
+        $scope.$broadcast('syncItemLocation', data)
+    })
 };
 
 

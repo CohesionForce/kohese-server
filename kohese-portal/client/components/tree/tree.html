@@ -10,8 +10,8 @@
                 style="margin: 5px">
             Collapse All
         </button>
-        <button ng-click="treeCtrl.syncLocation()" class="btn btn-default btn-sm" style="margin: 5px">Sync Location
-        </button>
+        <i ng-click="treeCtrl.syncLocation()" ng-class="{ 'button-selected' :treeCtrl.locationSynced}" class="btn btn-default btn-sm fa fa-exchange"></i>
+
     <span class="pull-right">
       <span>Showing {{filteredItems.length}} of {{treeCtrl.newTree.rows.length}}</span>
       <input class="input-sm" type="text" ng-model="treeCtrl.filterString" placeholder="Filter" style="margin: 5px"/>

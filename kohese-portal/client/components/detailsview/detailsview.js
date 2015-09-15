@@ -18,6 +18,17 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.showChunksInDetails = false;
     detailsCtrl.showTokensInDetails = false;
 
+    $scope.$on('$stateChangeSuccess' , function(){
+        $scope.$emit('newItemSelected', $stateParams.id);
+        console.log($stateParams.id);
+    });
+
+    if (detailsCtrl.tab.state === 'kohese.explore.create'){
+        detailsCtrl.enableEdit = true;
+        console.log(detailsCtrl.tab);
+        console.log(detailsCtrl.enableEdit);
+    }
+
     if (angular.isDefined($stateParams.id)) {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
     } else if(angular.isDefined($stateParams.parentId)){

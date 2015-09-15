@@ -104,6 +104,10 @@ body {
   top: 95px;
   left: $leftNavWidth;
   width: 82.5%;
+  .button-selected{
+    background-color: $primaryColor + 100;
+    color: white;
+  }
 }
 
 #login-form {

@@ -72,6 +72,9 @@ body {
   top: 95px;
   left: 250px;
   width: 82.5%; }
+  #tree-action-bar .button-selected {
+    background-color: #64be95;
+    color: white; }
 
 #login-form {
   text-align: center; }

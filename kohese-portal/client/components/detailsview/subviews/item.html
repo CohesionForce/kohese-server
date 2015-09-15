@@ -14,7 +14,7 @@
   </thead>
   <tbody>
   <tr ng-repeat="proxy in filteredItems = (detailsCtrl.itemProxy.children  | filter:detailsCtrl.filterString) | orderBy:itemSortField">
-    <td ui-sref="kohese.explore.edit({id: proxy.item.id})" ng-bind-html="proxy.item.title | highlight:detailsCtrl.filterString"/>
+    <td ui-sref="kohese.explore.edit({id: proxy.item.id})" ng-bind-html="proxy.item.title | highlight:detailsCtrl.filterString"></td>
             <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}" ng-dblclick="showDescription=!showDescription" ng-init="showDescription=true" ng-bind-html="proxy.item.description | highlight:detailsCtrl.filterString"></td>
     <td ui-sref="kohese.explore.edit({id: proxy.item.id})">{{proxy.item.parentId}}</td>
     <td class="pull-right">

@@ -4,7 +4,8 @@
 
 function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, tabService) {
 
-    var treeCtrl = this;
+    var treeCtrl = this,
+        syncListener;
 
     treeCtrl.filterString = "";
     treeCtrl.analysisFilterString = "";
@@ -12,17 +13,12 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
     treeCtrl.collapsed = {};
     treeCtrl.showAsTree = true;
     treeCtrl.tab = tabService.getCurrentTab();
+    treeCtrl.locationSynced = false;
 
     treeCtrl.newTree = ItemRepository.internalTree;
 
-
-    $scope.$on('currentItemUpdate', function (event, data) {
-        $location.hash(data.id);
-        $anchorScroll();
-    });
-
     $scope.$on('newFilterString', function onNewFilterString(event, string) {
-            treeCtrl.filterString = string;
+        treeCtrl.filterString = string;
     });
 
     $scope.$on('tabSelected', function () {
@@ -44,7 +40,21 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
 
 
     treeCtrl.syncLocation = function () {
-        $anchorScroll();
+        treeCtrl.locationSynced ? treeCtrl.locationSynced = false : treeCtrl.locationSynced = true;
+        if (treeCtrl.locationSynced) {
+            syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {
+                console.log(data);
+                if (!event.defaultPrevented) {
+
+                    event.defaultPrevented = true;
+                    $location.hash(data);
+                    $anchorScroll();
+                }
+            });
+        } else {
+            //Deregisters listener
+            syncListener();
+        }
     };
 
     treeCtrl.expandAll = function () {
