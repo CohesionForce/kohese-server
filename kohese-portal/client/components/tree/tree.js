@@ -96,7 +96,7 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
                 if (isNowCollapsed && !treeCtrl.hidden[childId]) {
                     // New state is collapsed
                     treeCtrl.collapsed[childId] = true;
-                    proxy = ItemRepository.getItem(childId);
+                    proxy = ItemRepository.getItemProxy(childId);
                     for (var index = 0; index < proxy.children.length; index++) {
                         var grandChildId = proxy.children[index].item.id;
                         childIdStack.push(grandChildId);
