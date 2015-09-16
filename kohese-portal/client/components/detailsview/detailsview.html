@@ -26,8 +26,10 @@
             </tab>
             <tab heading="Analysis" select="detailsCtrl.fetchAnalysis()">
 		        <span class="pull-right">
-					<input class="input-sm" type="text" ng-model="detailsCtrl.analysisFilterString"
+                    <button ng-click="detailsCtrl.getLastFilter()" class="btn btn-default fa fa-chevron-left"> Last Filter</button>
+					<input class="input-sm" type="text" ng-model="detailsCtrl.analysisFilterInput"
                            placeholder="Filter" style="margin: 5px"/>
+                    <button ng-click="detailsCtrl.submitFilter()" class=" btn btn-default fa fa-search"> Submit</button>
 				</span>
 
                 <h4>Analysis Summary</h4>

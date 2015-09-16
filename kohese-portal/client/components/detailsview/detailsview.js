@@ -17,6 +17,7 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.showTokensInAnalysis = true;
     detailsCtrl.showChunksInDetails = false;
     detailsCtrl.showTokensInDetails = false;
+    detailsCtrl.filterList = [];
 
     $scope.$on('$stateChangeSuccess' , function(){
         $scope.$emit('newItemSelected', $stateParams.id);
@@ -70,6 +71,16 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
             });
     };
 
+    detailsCtrl.getLastFilter = function(){
+        detailsCtrl.analysisFilterString = detailsCtrl.filterList.pop();
+        detailsCtrl.analysisFilterInput = detailsCtrl.analysisFilterString;
+    };
+
+    detailsCtrl.submitFilter = function(){
+        detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
+        detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
+    };
+
     detailsCtrl.cancel = function () {
 
         if (this.itemForm.$dirty) {
@@ -79,7 +90,7 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     };
 
     detailsCtrl.removeItem = function (item) {
-        ItemRepository.deletItem(item)
+        ItemRepository.deleteItem(item)
             .then(function () {
                 // TBD:  May need to do something special if the delete fails
             });
