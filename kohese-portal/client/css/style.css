@@ -12,14 +12,6 @@ body {
 .highlighted {
   background: yellow; }
 
-.glyphicon-remove {
-  color: red; }
-  .glyphicon-remove:hover {
-    cursor: pointer; }
-
-.glyphicon-plus {
-  color: green; }
-
 #wrapper {
   width: 100%; }
 
@@ -33,6 +25,15 @@ body {
     margin: 0 0 0 250px;
     padding: 0;
     border-left: 1px solid #e7e7e7; } }
+table th .glyphicon-plus {
+  color: green; }
+  table th .glyphicon-plus:hover {
+    cursor: pointer; }
+table td .glyphicon-remove {
+  color: #ca6464; }
+  table td .glyphicon-remove:hover {
+    cursor: pointer; }
+
 #content {
   border-radius: 10px; }
   #content button {
