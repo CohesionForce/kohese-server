@@ -1,12 +1,13 @@
-<div class="panel panel-default">
-    <div class="panel-heading">Item Information
+<div class="panel">
+    <div class="panel-heading ">
+        <span>Item Information </span>
         <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
            ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})"
-           ng-click="detailsCtrl.toggleView('edit')">
+           ng-click="detailsCtrl.updateTab('edit', itemProxy.item.id, 'dualview')">
         </i>
         <i class="fa fa-arrows-alt pull-right" ng-if="detailsCtrl.tab.type === 'dualview'"
            ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})"
-           ng-click="detailsCtrl.toggleView('investigate')"></i>
+           ng-click="detailsCtrl.updateTab('investigate', itemProxy.item.id, 'singleview')"></i>
 
     </div>
     <div class="panel-body">

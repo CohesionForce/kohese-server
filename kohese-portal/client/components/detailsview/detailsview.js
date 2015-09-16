@@ -50,8 +50,13 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
         detailsCtrl.tab = tabService.getCurrentTab();
     });
 
-    detailsCtrl.setTabState = function(state) {
+    detailsCtrl.updateTab = function(state, id, view) {
         detailsCtrl.tab.setState(state);
+        detailsCtrl.tab.params.id = id;
+        if(view) {
+            detailsCtrl.tab.toggleType();
+            detailsCtrl.tab.setType = view;
+        }
     };
 
     detailsCtrl.toggleView = function (state) {

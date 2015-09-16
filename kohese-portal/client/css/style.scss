@@ -1,4 +1,5 @@
 $leftNavWidth: 250px;
+$topNavHeight: 40px;
 $primaryColor: #005A31;
 $accentColor: #CBE32D;
 $lightColor: #F3FAB6;
@@ -14,11 +15,32 @@ body {
   font-family: FontAwesome, arial, sans-serif;
 }
 
-.panel-heading {
-  i {
-    .fa {
-      width: 50px;
-      height: 50px;
+.btn-default {
+  &:hover {
+    background-color: $primaryColor + 100;
+  }
+}
+
+.panel {
+
+  .panel-title {
+    background-color: $primaryColor + 100;
+    padding: 7px;
+    color: whitesmoke;
+  }
+  .panel-heading {
+    color: whitesmoke;
+    background-color: $secondaryColor + 100;
+    border: 0;
+    padding: 5px 15px 5px 5px;
+    > span {
+      font-weight: bold;
+    }
+    i {
+      .fa {
+        width: 50px;
+        height: 50px;
+      }
     }
   }
 }
@@ -46,8 +68,8 @@ body {
 }
 
 .search-result {
-  padding: 0;
-  .result-creator{
+  margin: 30px;
+  .result-creator {
   }
   .last-modified {
 

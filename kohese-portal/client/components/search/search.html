@@ -1,7 +1,7 @@
 <div>
     <div id="top-action-bar">
         <button ui-sref="kohese.explore" class="btn btn-default fa-chevron-left"> Tree</button>
-        Found {{detailsCtrl.searchResults.length}} matches:
+        Found {{searchCtrl.searchResults.length}} matches:
     </div>
     <div
             ng-click="searchCtrl.updateTab(itemProxy.item.id)"
@@ -9,8 +9,8 @@
             class="search-result card panel panel-default"
             id="{{itemProxy.item.id}}"
             ng-repeat="itemProxy in searchCtrl.searchResults = (searchCtrl.itemStore.rows | filter: {item: { $: searchCtrl.searchString}})">
+        <div class="panel-title result-title">{{itemProxy.item.title}}</div>
         <div class="panel-body">
-            <div class="panel-title result-title">{{itemProxy.item.title}}</div>
             <div class="result-description">{{itemProxy.item.description}}</div>
         </div>
         <div class="panel-footer">

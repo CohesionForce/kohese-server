@@ -5,9 +5,23 @@ body {
   background-image: -o-linear-gradient(bottom, #ca6464, #660000);
   font-family: FontAwesome, arial, sans-serif; }
 
-.panel-heading i .fa {
-  width: 50px;
-  height: 50px; }
+.btn-default:hover {
+  background-color: #64be95; }
+
+.panel .panel-title {
+  background-color: #64be95;
+  padding: 7px;
+  color: whitesmoke; }
+.panel .panel-heading {
+  color: whitesmoke;
+  background-color: #ca6464;
+  border: 0;
+  padding: 5px 15px 5px 5px; }
+  .panel .panel-heading > span {
+    font-weight: bold; }
+  .panel .panel-heading i .fa {
+    width: 50px;
+    height: 50px; }
 
 .highlighted {
   background: yellow; }
@@ -26,7 +40,7 @@ body {
     padding: 0;
     border-left: 1px solid #e7e7e7; } }
 .search-result {
-  padding: 0; }
+  margin: 30px; }
 
 table th .glyphicon-plus {
   color: green; }
