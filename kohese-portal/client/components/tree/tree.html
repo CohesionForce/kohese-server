@@ -1,7 +1,5 @@
 <div>
-    <div id="tree-action-bar">
-        <input type="checkbox" ng-model="treeCtrl.showAsTree" name="showAsTreeInput"
-               style="margin: 5px"/> Show As Tree
+    <div id="top-action-bar">
         <button ng-click="treeCtrl.expandAll()" class="btn btn-default btn-sm" ng-disabled="!treeCtrl.showAsTree"
                 style="margin: 5px">
             Expand All
@@ -42,7 +40,7 @@
                             ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
                             ng-class="{'indented tree-label':treeCtrl.showAsTree}"
                             ng-bind-html="(itemProxy.item.title | highlight:treeCtrl.filterString)"
-                            ng-click="treeCtrl.setTabState('edit')"></span>
+                            ng-click="treeCtrl.updateTab('edit', itemProxy.item.id)"></span>
                 </td>
                 <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
                     ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false"
@@ -50,7 +48,7 @@
                 <td ng-show="!treeCtrl.showAsTree" ng-click="editItem({id:itemProxy.item.parentId})">
                     {{treeCtrl.newTree.proxyMap[itemProxy.item.parentId].item.title}}
                 </td>
-                <td><i class="glyphicon glyphicon-remove pull-right" ng-click="removeItem(itemProxy.item)"></i></td>
+                <td><i class="glyphicon glyphicon-remove pull-right" ng-click="treeCtrl.removeItem(itemProxy.item)"></i></td>
             </tr>
             </tbody>
         </table>

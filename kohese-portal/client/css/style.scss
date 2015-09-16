@@ -45,6 +45,15 @@ body {
   }
 }
 
+.search-result {
+  padding: 0;
+  .result-creator{
+  }
+  .last-modified {
+
+  }
+}
+
 table {
   th {
     .glyphicon-plus {
@@ -106,7 +115,7 @@ table {
   background-color: white;
 }
 
-#tree-action-bar {
+#top-action-bar {
   position: fixed;
   top: 95px;
   left: $leftNavWidth;

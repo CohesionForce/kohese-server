@@ -1,6 +1,6 @@
 'use strict';
 
-require('./components/components')();
+require('./components/components.config')();
 
 const appModule = angular.module('app', [
     'app.contentcontainer',
@@ -8,6 +8,7 @@ const appModule = angular.module('app', [
     'app.tree',
     'app.login',
     'app.navigationmenu',
+    'app.search',
     'app.services.navigationservice',
     'app.services.itemservice',
     'app.services.tabservice',
@@ -67,6 +68,19 @@ appModule
                 views: {
                     'bottom@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',
+                        controller: 'DetailsViewController as detailsCtrl'
+                    }
+                }
+            })
+            .state('kohese.search', {
+                url: '/search/{filter}&{id}',
+                views: {
+                    top: {
+                        templateUrl: '/components/search/search.html',
+                        controller: 'SearchController as searchCtrl'
+                    },
+                    'bottom' : {
+                        templateUrl: '/components/detailsview/detailsview.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
                 }

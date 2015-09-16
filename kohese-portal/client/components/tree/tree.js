@@ -8,7 +8,6 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
         syncListener;
 
     treeCtrl.filterString = "";
-    treeCtrl.analysisFilterString = "";
     treeCtrl.hidden = {};
     treeCtrl.collapsed = {};
     treeCtrl.showAsTree = true;
@@ -25,13 +24,14 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
         treeCtrl.tab = tabService.getCurrentTab();
     });
 
-    treeCtrl.setTabState = function (state) {
+    treeCtrl.updateTab = function (state, id) {
         treeCtrl.tab.setState(state);
+        treeCtrl.tab.params.id = id;
     };
 
     treeCtrl.removeItem = function (item) {
-        Item
-            .deleteById(item)
+        ItemRepository
+            .deleteItem(item)
             .$promise
             .then(function () {
                 console.log("::: Item has been deleted: " + item.id);

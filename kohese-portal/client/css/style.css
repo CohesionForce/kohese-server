@@ -25,6 +25,9 @@ body {
     margin: 0 0 0 250px;
     padding: 0;
     border-left: 1px solid #e7e7e7; } }
+.search-result {
+  padding: 0; }
+
 table th .glyphicon-plus {
   color: green; }
   table th .glyphicon-plus:hover {
@@ -68,12 +71,12 @@ table td .glyphicon-remove {
 #add-tab-button {
   background-color: white; }
 
-#tree-action-bar {
+#top-action-bar {
   position: fixed;
   top: 95px;
   left: 250px;
   width: 82.5%; }
-  #tree-action-bar .button-selected {
+  #top-action-bar .button-selected {
     background-color: #64be95;
     color: white; }
 

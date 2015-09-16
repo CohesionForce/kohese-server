@@ -5,6 +5,7 @@ $secondaryColor: #660000;
 $navHover: $secondaryColor + 100;
 
 .navbar {
+  border: 0px;
   background: -webkit-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -moz-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -ms-linear-gradient(right, $primaryColor + 100, $primaryColor);

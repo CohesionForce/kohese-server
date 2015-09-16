@@ -2,13 +2,19 @@
  * Created by josh on 9/1/15.
  */
 
-function NavigationController($rootScope, navigationService, $scope, AuthTokenFactory) {
+function NavigationController($rootScope, navigationService, $scope, AuthTokenFactory, tabService) {
     var ctrl = this;
     ctrl.userLoggedIn = AuthTokenFactory.getToken() !== null;
 
+    ctrl.searchInput = '';
+
     ctrl.search = function(searchString){
-        navigationService.setFilterString(searchString);
-        $rootScope.$broadcast('navigationEvent');
+        $rootScope.$broadcast('navigationEvent', {
+            state: 'kohese.search',
+            params: {
+                filter: searchString
+            }
+        });
     };
 
     $scope.$on('userLoggedIn', function onUserLogin(){
@@ -31,13 +37,12 @@ var collapsingMenuDirective = function () {
         restrict: 'A',
         link: function (scope, element, attribute) {
             element.metisMenu();
-            //console.log("This is the cm link")
         }
     }
 };
 
 export default () => {
-    angular.module('app.navigationmenu', ['app.services.navigationservice'])
+    angular.module('app.navigationmenu', ['app.services.navigationservice', 'app.services.tabservice'])
         .directive('sideNav', sideNavDirective)
         .directive('collapsingMenu', collapsingMenuDirective)
         .controller('NavigationController', NavigationController);

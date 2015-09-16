@@ -7,15 +7,26 @@ function ContainerController(tabService, navigationService, $scope, $state) {
 
     containerCtrl.tabService = tabService;
 
-    var Tab = function (title, route) {
+    var Tab = function (state, params) {
         var tab = this;
-        tab.title = title;
-        tab.route = route;
-        tab.state = 'kohese.explore';
+        tab.title = 'Tab';
         tab.scope = {};
         // Flag for determining number of viewports on container
         tab.type = 'dualview';
         tab.content = {};
+
+        if (params) {
+            tab.params = params;
+        } else {
+            tab.params = {}
+        }
+
+        if (state) {
+            tab.state = state;
+        } else {
+            tab.state = 'kohese.explore';
+        }
+
         tab.setType = function (type) {
             tab.type = type;
         };
@@ -25,7 +36,6 @@ function ContainerController(tabService, navigationService, $scope, $state) {
             } else {
                 tab.type = 'dualview';
             }
-            //console.log(tab.type);
         };
         tab.setScope = function (scope) {
             tab.scope = scope;
@@ -54,42 +64,38 @@ function ContainerController(tabService, navigationService, $scope, $state) {
         }
     };
 
-    $scope.$on('navigationEvent', function onNavigationEvent() {
-        let currentTab = tabService.getCurrentTab();
-        console.log('navEvent');
-        console.log(currentTab);
-        if (currentTab.type === 'singleview') {
-            $state.go('kohese.explore');
-            currentTab.setState('explore');
-            currentTab.setType('dualview');
-            $scope.$on('$viewContentLoaded',
-                function (event) {
-                    currentTab.updateFilter(navigationService.getFilterString());
-                });
-        } else {
-            currentTab.updateFilter(navigationService.getFilterString());
-        }
-
+    $scope.$on('navigationEvent', function onNavigationEvent(event, data) {
+        let newTab = createTab(data.state, data.params);
+        containerCtrl.setTab(newTab);
     });
 
 
-    containerCtrl.baseTab = new Tab("Tab");
+    //Will need refactoring to account for refreshing the page at some point
+    containerCtrl.baseTab = new Tab();
     containerCtrl.tabs = [containerCtrl.baseTab];
     containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
 
-    containerCtrl.createTab = function (title, route) {
+    containerCtrl.addTab = function(state, params){
+        var tab = createTab(state, params);
+        containerCtrl.setTab(tab);
+    };
+
+    function createTab(state, params) {
         tabService.incrementTabs();
-        var newTab = new Tab("Tab", route);
+        var newTab = new Tab(state, params);
         newTab.position = containerCtrl.tabs.length;
         tabService.setCurrentTab(newTab);
         containerCtrl.tabs.push(newTab);
         newTab.active = true;
-    };
+
+        return newTab;
+    }
 
 
     containerCtrl.setTab = function (tab) {
+        console.log(tab);
         containerCtrl.tabService.setCurrentTab(tab);
-        $state.go(tab.state, {id: tab.route});
+        $state.go(tab.state, tab.params);
         $scope.$broadcast('tabSelected');
     };
 

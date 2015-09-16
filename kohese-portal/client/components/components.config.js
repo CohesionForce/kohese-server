@@ -11,6 +11,7 @@ export default () => {
     require('./contentcontainer/contentcontainer')();
     require('./navigationmenu/navigationmenu')();
     require('./login/login')();
+    require('./search/search')();
 
     //Common
 
