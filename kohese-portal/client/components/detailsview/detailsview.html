@@ -51,7 +51,7 @@
                     <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
                         ng-hide="((summary.displayType == 'Chunk') && !detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsCtrl.showTokensinSummary)"
                         ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:['-count','text']">
-                        <td ng-click="detailsCtrl.analysisFilterString = summary.text"
+                        <td ng-click="detailsCtrl.analysisFilterString = summary.text "
                             ng-bind-html="summary.text | highlight:detailsCtrl.analysisFilterString"></td>
                         <td>{{summary.displayType}}</td>
                         <td>{{summary.count}} - {{summary.posCount}}</td>

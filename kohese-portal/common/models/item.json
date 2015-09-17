@@ -11,7 +11,7 @@
       "id": true,
       "defaultFn": "guid"
     },
-    "title": {
+    "name": {
       "type": "string",
       "required": true
     },

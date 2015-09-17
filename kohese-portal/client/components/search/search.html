@@ -11,7 +11,7 @@
             class="search-result card panel panel-default"
             id="{{itemProxy.item.id}}"
             ng-repeat="itemProxy in searchCtrl.searchResults = (searchCtrl.itemStore.rows | filter: {item: { $: searchCtrl.searchString}})">
-        <div class="panel-title result-title">{{itemProxy.item.title}}</div>
+        <div class="panel-title result-title">{{itemProxy.item.name}}</div>
         <div class="panel-body">
             <div class="result-description">{{itemProxy.item.description}}</div>
         </div>
