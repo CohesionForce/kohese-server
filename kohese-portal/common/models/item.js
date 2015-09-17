@@ -5,21 +5,21 @@ module.exports = function (Item) {
     var util = require('util');
     var _und = require('../../node_modules/underscore/underscore.js');
 
-    Item.beforeRemote('upsert', function(ctx, modelInstance, next){
+    Item.beforeUpsertKohese = function(ctx, modelInstance, next){
         console.log('Before remote');
         ctx.req.body.modifiedBy = ctx.req.headers.koheseUser.username;
         ctx.req.body.modifiedOn = Date.now();
         
-        if (ctx.req.body.createdBy === null) {
+        if (!ctx.req.body.createdBy) {
           ctx.req.body.createdBy = ctx.req.body.modifiedBy;
           ctx.req.body.createdOn = ctx.req.body.modifiedOn;
         }
 
         console.log(ctx.req.body);
         next();
-    });
+    };
 
-    Item.observe('after save', function (ctx, next) {
+    Item.afterSaveKohese = function (ctx, next) {
         if (ctx.instance) {
             console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.title);
             var notification = new Object;
@@ -55,9 +55,9 @@ module.exports = function (Item) {
             app.io.emit('change', JSON.stringify(notification));
         }
         next();
-    });
-
-    Item.observe('after delete', function (ctx, next) {
+    };
+    
+    Item.afterDeleteKohese = function (ctx, next) {
         if (ctx.instance) {
             console.log('Deleted %s #%s#', ctx.Model.modelName, ctx);
             notification.type = 'delete';
@@ -75,7 +75,11 @@ module.exports = function (Item) {
             app.io.emit('change', JSON.stringify(notification));
         }
         next();
-    });
+    };
+
+    Item.beforeRemote('upsert', Item.beforeUpsertKohese);
+    Item.observe('after save', Item.afterSaveKohese);
+    Item.observe('after delete', Item.afterDeleteKohese);
 
     Item.performAnalysis = function (req, onId, cb) {
 
