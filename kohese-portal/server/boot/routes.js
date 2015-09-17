@@ -20,20 +20,28 @@ module.exports = function (app) {
     function authenticate(req, res, next) {
         var body = req.body;
         console.log("::: Checking: " + body.username);
-        if (!body.username || !body.password) {
-            res.status(400).end('Must provide username or password')
-        }
-        if (body.username != body.password) {
-            res.status(401).end('Username or password incorrect');
-        }
-        console.log("::: Authenticated: " + req.body.username);
-
-        var token = jwt.sign({
-          username: req.body.username
-        }, jwtSecret);
-        res.send(token);
         
-    }
+        if (!body.username) {
+          res.status(400).end('Must provide username')
+          return;
+        }
+
+        if (!body.password) {
+          res.status(400).end('Must provide password')
+          return;
+        }
+
+        if (body.username != body.password) {
+            res.status(401).end('Login failed');
+            return;
+        }
+
+        console.log("::: Authenticated: " + req.body.username);
+        var token = jwt.sign({
+            username: req.body.username
+          }, jwtSecret);
+          res.send(token);
+}
 
     app.use(function(req,res,next){
       console.log("At:      " + Date.now());
