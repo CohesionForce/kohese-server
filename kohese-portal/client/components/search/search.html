@@ -1,6 +1,8 @@
 <div>
     <div id="top-action-bar">
-        <button ui-sref="kohese.explore" class="btn btn-default fa-chevron-left"> Tree</button>
+        <button
+                ng-click="searchCtrl.navigateToTree();"
+                class="btn btn-default fa-chevron-left"> Tree</button>
         Found {{searchCtrl.searchResults.length}} matches:
     </div>
     <div

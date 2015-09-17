@@ -7,6 +7,9 @@ body {
 
 .btn-default:hover {
   background-color: #64be95; }
+.btn-default:active {
+  background-color: #64be95;
+  color: whitesmoke; }
 
 .panel .panel-title {
   background-color: #64be95;
