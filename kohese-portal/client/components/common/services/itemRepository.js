@@ -109,7 +109,7 @@ export default () => {
 
             if (!proxy.analysis) {
 
-                console.log("::: Retrieving analysis for " + proxy.item.id + " - " + proxy.item.title);
+                console.log("::: Retrieving analysis for " + proxy.item.id + " - " + proxy.item.name);
                 proxy.analysis = {};
                 Analysis.findById({
                     id: proxy.item.id
@@ -123,7 +123,7 @@ export default () => {
 
                     }, function (errorResults) {
                         proxy.analysis = {};
-                        console.log("*** Analysis not found for:  " + proxy.item.id + " - " + proxy.item.title);
+                        console.log("*** Analysis not found for:  " + proxy.item.id + " - " + proxy.item.name);
                         performAnalysis(proxy.item.id);
                     });
             }
@@ -140,7 +140,7 @@ export default () => {
                 onId: byId
             }).$promise.then(function (results) {
                     proxy.analysis.data = results.data;
-                    console.log("::: Analysis performed for: " + proxy.item.id + " - " + proxy.item.title);
+                    console.log("::: Analysis performed for: " + proxy.item.id + " - " + proxy.item.name);
                     consolidateAnalysis(proxy);
                 });
         }
@@ -156,7 +156,7 @@ export default () => {
                 return;
             }
 
-            console.log("--- Rollup for " + proxy.item.id + " - " + proxy.item.title);
+            console.log("--- Rollup for " + proxy.item.id + " - " + proxy.item.name);
 
             // Initialize the extendedChunkSummary
             proxy.analysis.extendedChunkSummary = {};
@@ -194,7 +194,7 @@ export default () => {
                 var topic = {};
                 topic.displayType = "Item";
                 topic.displayId = proxy.children[childIdx].item.id;
-                topic.text = proxy.children[childIdx].item.title;
+                topic.text = proxy.children[childIdx].item.name;
                 topic.displayLevel = 1;
                 proxy.analysis.extendedList.push(topic);
 
@@ -344,7 +344,7 @@ export default () => {
             // Create Lost And Found Node
             var lostAndFound = {};
             lostAndFound.item = new Item;
-            lostAndFound.item.title = "Lost-And-Found";
+            lostAndFound.item.name = "Lost-And-Found";
             lostAndFound.item.description = "Collection of node(s) that are no longer connected.";
             lostAndFound.item.id = "LOST+FOUND";
             lostAndFound.children = [];
@@ -364,7 +364,7 @@ export default () => {
         function attachToLostAndFound(byId) {
             var lostProxy = tree.proxyMap[byId];
             lostProxy.item = new Item;
-            lostProxy.item.title = "Lost Item: " + byId;
+            lostProxy.item.name = "Lost Item: " + byId;
             lostProxy.item.description = "Found children nodes referencing this node as a parent.";
             lostProxy.item.id = byId;
             lostProxy.item.parentId = "LOST+FOUND";

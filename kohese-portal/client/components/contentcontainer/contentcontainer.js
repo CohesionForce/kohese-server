@@ -44,17 +44,18 @@ function ContainerController(tabService, navigationService, $scope, $state) {
         tab.setState = function (state) {
             if (state === 'investigate') {
                 tab.state = 'kohese.investigate'
-            }
-
-            if (state === 'explore') {
+            } else if (state === 'explore') {
                 tab.state = 'kohese.explore'
-            }
-
-            if (state === 'edit') {
+            } else if (state === 'search') {
+                tab.state = 'kohese.search'
+            } else if (state === 'search') {
+                tab.state = 'kohese.search.edit'
+            } else if (state === 'edit') {
+                // Will remove once references are gone
                 tab.state = 'kohese.explore.edit'
-            }
-
-            if (state === 'create') {
+            } else if (state === 'explore.edit') {
+                tab.state = 'kohese.explore.edit'
+            } else if (state === 'create') {
                 tab.state = 'kohese.explore.create'
             }
             //console.log(tab.state);
@@ -75,7 +76,7 @@ function ContainerController(tabService, navigationService, $scope, $state) {
     containerCtrl.tabs = [containerCtrl.baseTab];
     containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
 
-    containerCtrl.addTab = function(state, params){
+    containerCtrl.addTab = function (state, params) {
         var tab = createTab(state, params);
         containerCtrl.setTab(tab);
     };

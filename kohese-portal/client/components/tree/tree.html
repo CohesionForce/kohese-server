@@ -19,7 +19,7 @@
     <div>
         <table class="table tree-grid table-striped table-condensed table-hover">
             <thead>
-            <th><a href="" ng-click="itemSortField = 'title'">Title</a></th>
+            <th><a href="" ng-click="itemSortField = 'name'">Name</a></th>
             <th><a href="" ng-click="itemSortField = 'description'">Description</a></th>
             <th ng-show="!treeCtrl.showAsTree"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
             <th><i class="glyphicon glyphicon-plus pull-right"
@@ -39,14 +39,14 @@
                     <span
                             ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
                             ng-class="{'indented tree-label':treeCtrl.showAsTree}"
-                            ng-bind-html="(itemProxy.item.title | highlight:treeCtrl.filterString)"
+                            ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filterString)"
                             ng-click="treeCtrl.updateTab('edit', itemProxy.item.id)"></span>
                 </td>
                 <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
                     ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false"
                     ng-bind-html="itemProxy.item.description | highlight:treeCtrl.filterString"></td>
                 <td ng-show="!treeCtrl.showAsTree" ng-click="editItem({id:itemProxy.item.parentId})">
-                    {{treeCtrl.newTree.proxyMap[itemProxy.item.parentId].item.title}}
+                    {{treeCtrl.newTree.proxyMap[itemProxy.item.parentId].item.name}}
                 </td>
                 <td><i class="glyphicon glyphicon-remove pull-right" ng-click="treeCtrl.removeItem(itemProxy.item)"></i></td>
             </tr>
