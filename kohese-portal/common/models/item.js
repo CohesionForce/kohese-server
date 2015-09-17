@@ -29,10 +29,10 @@ module.exports = function (Item) {
             console.log("Change Instance:" + JSON.stringify(notification));
             if (ctx.isNewInstance) {
                 notification.type = 'create';
-                app.io.emit('item/create', notification);
+                app.io.emit(ctx.Model.modelName +'/create', notification);
             } else {
                 notification.type = 'update';
-                app.io.emit('item/update', notification);
+                app.io.emit(ctx.Model.modelName +'/update', notification);
             }
             app.io.emit('change', JSON.stringify(notification));
         } else {
@@ -45,11 +45,11 @@ module.exports = function (Item) {
             notification.ctx = ctx;
             if (ctx.isNewInstance) {
                 notification.type = 'create';
-                app.io.emit('item/create', notification);
+                app.io.emit(ctx.Model.modelName +'/create', notification);
 
             } else {
                 notification.type = 'update';
-                app.io.emit('item/update', notification);
+                app.io.emit(ctx.Model.modelName +'/update', notification);
             }
             console.log("Change Multiple: " + JSON.stringify(notification));
             app.io.emit('change', JSON.stringify(notification));
@@ -71,7 +71,7 @@ module.exports = function (Item) {
             notification.id = ctx.where.id;
             notification.ctx = ctx;
             console.log("Change: " + JSON.stringify(notification));
-            app.io.emit('item/delete', notification);
+            app.io.emit(ctx.Model.modelName +'/delete', notification);
             app.io.emit('change', JSON.stringify(notification));
         }
         next();

@@ -11,17 +11,17 @@ export default () => {
         var tree = {};
         tree.proxyMap = {};
 
-        socket.on('item/create', function (notification) {
+        socket.on('Item/create', function (notification) {
             console.log("::: Received notification of Item Created:  " + notification.id);
             fetchItem(notification.id);
         });
 
-        socket.on('item/update', function (notification) {
+        socket.on('Item/update', function (notification) {
             console.log("::: Received notification of Item Updated:  " + notification.id);
             fetchItem(notification.id);
         });
 
-        socket.on('item/delete', function (notification) {
+        socket.on('Item/delete', function (notification) {
             console.log("::: Received notification of Item Deleted:  " + notification.id);
             removeItemFromTree(notification.id);
         });

@@ -34,5 +34,9 @@
   "Analysis": {
     "dataSource": "db",
     "public": true
+  },
+  "KohesePrincipal": {
+    "dataSource": "db",
+    "public": true
   }
 }

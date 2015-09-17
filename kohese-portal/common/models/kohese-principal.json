@@ -1,0 +1,16 @@
+{
+  "name": "KohesePrincipal",
+  "base": "Item",
+  "idInjection": true,
+  "properties": {
+    "password": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "hidden": ["password"],
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
