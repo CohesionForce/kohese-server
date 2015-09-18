@@ -9,5 +9,4 @@ export default() => {
     require('./itemRepository')();
     require('./navigationService')();
     require('./authenticationServices')();
-    require('./resizerService')();
 }

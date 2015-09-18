@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, tabService) {
+function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $location, tabService) {
 
     var treeCtrl = this,
         syncListener;
@@ -43,79 +43,79 @@ function TreeController(Item, ItemRepository, $anchorScroll, $scope, $location, 
         treeCtrl.locationSynced ? treeCtrl.locationSynced = false : treeCtrl.locationSynced = true;
         if (treeCtrl.locationSynced) {
             syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {
+                console.log('sync');
                 console.log(data);
-                if (!event.defaultPrevented) {
+                $location.hash(data);
+                $anchorScroll()
+            })
+        }
+        else
+            {
+                //Deregisters listener
+                syncListener();
+            }
+        }
+        ;
 
-                    event.defaultPrevented = true;
-                    $location.hash(data);
-                    $anchorScroll();
+        treeCtrl.expandAll = function () {
+            // Set all nodes to expanded
+            for (var index in treeCtrl.collapsed) {
+                treeCtrl.collapsed[index] = false;
+            }
+            // Set all nodes to visible
+            for (var index in treeCtrl.hidden) {
+                treeCtrl.hidden[index] = false;
+            }
+        };
+
+        treeCtrl.collapseAll = function () {
+            // Collapse all root nodes that are current expanded
+            for (var index = 0; index < treeCtrl.newTree.roots.length; index++) {
+                var rootNode = treeCtrl.newTree.roots[index];
+                if (!treeCtrl.collapsed[rootNode.item.id]) {
+                    treeCtrl.changeVisibilityOn(rootNode);
                 }
-            });
-        } else {
-            //Deregisters listener
-            syncListener();
-        }
-    };
-
-    treeCtrl.expandAll = function () {
-        // Set all nodes to expanded
-        for (var index in treeCtrl.collapsed) {
-            treeCtrl.collapsed[index] = false;
-        }
-        // Set all nodes to visible
-        for (var index in treeCtrl.hidden) {
-            treeCtrl.hidden[index] = false;
-        }
-    };
-
-    treeCtrl.collapseAll = function () {
-        // Collapse all root nodes that are current expanded
-        for (var index = 0; index < treeCtrl.newTree.roots.length; index++) {
-            var rootNode = treeCtrl.newTree.roots[index];
-            if (!treeCtrl.collapsed[rootNode.item.id]) {
-                treeCtrl.changeVisibilityOn(rootNode);
-            }
-        }
-
-    };
-
-    treeCtrl.changeVisibilityOn = function (proxy) {
-        if (treeCtrl.showAsTree) {
-            treeCtrl.collapsed[proxy.item.id] = !treeCtrl.collapsed[proxy.item.id];
-            var isNowCollapsed = treeCtrl.collapsed[proxy.item.id];
-            var childIdStack = [];
-            var childId = "";
-
-            // Add immediate descendants to stack
-            for (var index = 0; index < proxy.children.length; index++) {
-                childId = proxy.children[index].item.id;
-                childIdStack.push(childId);
             }
 
-            while (childId = childIdStack.pop()) {
-                if (isNowCollapsed && !treeCtrl.hidden[childId]) {
-                    // New state is collapsed
-                    treeCtrl.collapsed[childId] = true;
-                    proxy = ItemRepository.getItemProxy(childId);
-                    for (var index = 0; index < proxy.children.length; index++) {
-                        var grandChildId = proxy.children[index].item.id;
-                        childIdStack.push(grandChildId);
+        };
+
+        treeCtrl.changeVisibilityOn = function (proxy) {
+            if (treeCtrl.showAsTree) {
+                treeCtrl.collapsed[proxy.item.id] = !treeCtrl.collapsed[proxy.item.id];
+                var isNowCollapsed = treeCtrl.collapsed[proxy.item.id];
+                var childIdStack = [];
+                var childId = "";
+
+                // Add immediate descendants to stack
+                for (var index = 0; index < proxy.children.length; index++) {
+                    childId = proxy.children[index].item.id;
+                    childIdStack.push(childId);
+                }
+
+                while (childId = childIdStack.pop()) {
+                    if (isNowCollapsed && !treeCtrl.hidden[childId]) {
+                        // New state is collapsed
+                        treeCtrl.collapsed[childId] = true;
+                        proxy = ItemRepository.getItemProxy(childId);
+                        for (var index = 0; index < proxy.children.length; index++) {
+                            var grandChildId = proxy.children[index].item.id;
+                            childIdStack.push(grandChildId);
+                        }
                     }
+                    treeCtrl.hidden[childId] = isNowCollapsed;
                 }
-                treeCtrl.hidden[childId] = isNowCollapsed;
             }
+        };
+
+        treeCtrl.changeVisibility = function () {
+            changeVisibilityOn(this.itemProxy);
         }
-    };
 
-    treeCtrl.changeVisibility = function () {
-        changeVisibilityOn(this.itemProxy);
     }
-
-}
 
 export default () => {
     angular.module('app.tree', ['app.services.tabservice'])
-        .controller('TreeController', ['Item', 'ItemRepository', '$anchorScroll', '$scope', '$location',
+        .controller('TreeController', ['Item', 'ItemRepository', '$timeout', '$anchorScroll', '$scope', '$location',
             'tabService',
             TreeController]);
 }

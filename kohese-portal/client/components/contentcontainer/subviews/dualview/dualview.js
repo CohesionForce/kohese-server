@@ -16,7 +16,6 @@ var DualViewController = function ($scope, tabService) {
     dvCtrl.bottomID = "bottom-content" + tabService.getTabId();
 
     $scope.$on('newItemSelected', function onNewItemSelected(event, data){
-        console.log('newItemSelectedEvent');
         $scope.$broadcast('syncItemLocation', data)
     })
 };

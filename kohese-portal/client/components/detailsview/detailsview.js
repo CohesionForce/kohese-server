@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
+function DetailsViewController($state, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
 
@@ -19,20 +19,17 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.showTokensInDetails = false;
     detailsCtrl.filterList = [];
 
-    $scope.$on('$stateChangeSuccess' , function(){
+    $scope.$on('$stateChangeSuccess', function () {
         $scope.$emit('newItemSelected', $stateParams.id);
-        console.log($stateParams.id);
     });
 
-    if (detailsCtrl.tab.state === 'kohese.explore.create'){
+    if (detailsCtrl.tab.state === 'kohese.explore.create') {
         detailsCtrl.enableEdit = true;
-        console.log(detailsCtrl.tab);
-        console.log(detailsCtrl.enableEdit);
     }
 
     if (angular.isDefined($stateParams.id)) {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
-    } else if(angular.isDefined($stateParams.parentId)){
+    } else if (angular.isDefined($stateParams.parentId)) {
         {
             detailsCtrl.itemProxy.item = {};
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
@@ -50,10 +47,10 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
         detailsCtrl.tab = tabService.getCurrentTab();
     });
 
-    detailsCtrl.updateTab = function(state, id, view) {
+    detailsCtrl.updateTab = function (state, id, view) {
         detailsCtrl.tab.setState(state);
         detailsCtrl.tab.params.id = id;
-        if(view) {
+        if (view) {
             detailsCtrl.tab.toggleType();
             detailsCtrl.tab.setType = view;
         }
@@ -71,17 +68,30 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.upsertItem = function () {
         ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
             .then(function (updatedItem) {
-                ItemRepository.fetchItem(detailsCtrl.itemProxy.item.id);
+                ItemRepository.fetchItem(updatedItem.id)
+                    .then(function () {
+                        if (updatedItem.parentId != '') {
+                            $state.go('kohese.explore.edit', {id:updatedItem.parentId})
+                        } else {
+                            $state.go('kohese.explore.edit', {id:updatedItem.id})
+                        }
+                    }
+                )
+                ;
                 detailsCtrl.itemForm.$setPristine();
             });
     };
 
-    detailsCtrl.getLastFilter = function(){
+    detailsCtrl.getLastFilter = function () {
+
         detailsCtrl.analysisFilterString = detailsCtrl.filterList.pop();
+        if (!detailsCtrl.analysisFilterString) {
+            detailsCtrl.analysisFilterString = '';
+        }
         detailsCtrl.analysisFilterInput = detailsCtrl.analysisFilterString;
     };
 
-    detailsCtrl.submitFilter = function(){
+    detailsCtrl.submitFilter = function () {
         detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
         detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
     };
@@ -106,6 +116,6 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
 
 export default () => {
     angular.module('app.detailsview', ['app.services.tabservice'])
-        .controller('DetailsViewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
+        .controller('DetailsViewController', ['$state', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
             DetailsViewController]);
 }

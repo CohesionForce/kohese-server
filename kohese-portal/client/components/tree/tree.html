@@ -24,7 +24,7 @@
             <th ng-show="!treeCtrl.showAsTree"><a href="" ng-click="itemSortField = 'parentId'">Parent</a></th>
             <th><i class="glyphicon glyphicon-plus pull-right"
                    ui-sref="kohese.explore.create()"
-                   ng-click="treeCtrl.setTabState('create')"></i></th>
+                   ng-click="treeCtrl.updateTab('create')"></i></th>
             </thead>
             <tbody>
             <tr id="{{itemProxy.item.id}}" class="level-{{itemProxy.level}}" class="tree-grid-row"

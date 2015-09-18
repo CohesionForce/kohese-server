@@ -43,60 +43,66 @@ export default () => {
             });
         }
 
-        function fetchItem(byId) {
-            Item.findById({
-                id: byId
-            }).$promise.then(function (results) {
-                    var temp = results;
-                    var proxy = tree.proxyMap[byId];
+        function updateItemProxy(results) {
+            var proxy = tree.proxyMap[results.id];
 
-                    if (angular.isDefined(proxy)) {
+            if (angular.isDefined(proxy)) {
 
-                        // Copy the results into the current proxy
-                        for (var key in proxy.item) {
-                            if (!_.isEqual(proxy.item[key], results[key])) {
-                                proxy.item[key] = results[key];
-                            }
-                        }
-
-                        // Determine if the parent changed
-                        var parentProxy = tree.parentOf[byId];
-                        if (parentProxy.item.id !== results.parentId) {
-                            var newParentId = results.parentId;
-
-                            if (parentProxy) {
-                                parentProxy.children = _.reject(parentProxy.children, function (childProxy) {
-                                    return childProxy.item.id === byId;
-                                });
-                            }
-
-                            var newParentProxy = getItem(newParentId);
-
-                            if (newParentProxy) {
-                                newParentProxy.children.push(proxy);
-                            } else {
-                                // Parent not found, so create one
-                                newParentProxy = {};
-                                tree.proxyMap[newParentId] = newParentProxy;
-                                newParentProxy.children = [proxy];
-                                attachToLostAndFound(newParentId);
-                            }
-                            tree.parentOf[byId] = newParentProxy;
-
-                            // Determine if the old parent was in LostAndFound
-                            if (parentProxy.item.parentId === "LOST+FOUND") {
-                                if (parentProxy.children.length == 0) {
-                                    // All unallocated children have been moved or deleted
-                                    removeItemFromTree(parentProxy.item.id);
-                                }
-                            }
-                            updateTreeRows();
-                        }
-
-                    } else {
-                        addItemToTree(results);
+                // Copy the results into the current proxy
+                for (var key in proxy.item) {
+                    if (!_.isEqual(proxy.item[key], results[key])) {
+                        proxy.item[key] = results[key];
                     }
-                });
+                }
+
+                // Determine if the parent changed
+                var parentProxy = tree.parentOf[byId];
+                if (parentProxy.item.id !== results.parentId) {
+                    var newParentId = results.parentId;
+
+                    if (parentProxy) {
+                        parentProxy.children = _.reject(parentProxy.children, function (childProxy) {
+                            return childProxy.item.id === byId;
+                        });
+                    }
+
+                    var newParentProxy = getItem(newParentId);
+
+                    if (newParentProxy) {
+                        newParentProxy.children.push(proxy);
+                    } else {
+                        // Parent not found, so create one
+                        newParentProxy = {};
+                        tree.proxyMap[newParentId] = newParentProxy;
+                        newParentProxy.children = [proxy];
+                        attachToLostAndFound(newParentId);
+                    }
+                    tree.parentOf[byId] = newParentProxy;
+
+                    // Determine if the old parent was in LostAndFound
+                    if (parentProxy.item.parentId === "LOST+FOUND") {
+                        if (parentProxy.children.length == 0) {
+                            // All unallocated children have been moved or deleted
+                            removeItemFromTree(parentProxy.item.id);
+                        }
+                    }
+                }
+                updateTreeRows();
+            } else {
+                addItemToTree(results);
+            }
+        }
+
+        function fetchItem(id) {
+            var promise = Item.findById({
+                id: id
+            }).$promise;
+
+            promise.then(function (results) {
+                updateItemProxy(results, id);
+            });
+
+            return promise;
         }
 
         function retrieveAnalysis(forProxy) {
@@ -259,12 +265,18 @@ export default () => {
 
         }
 
-        function upsertItem(item){
-            return Item.upsert(item).$promise
+        function upsertItem(item) {
+            var promise = Item.upsert(item).$promise;
+
+            promise.then(function (results) {
+                updateItemProxy(results);
+            });
+
+            return promise;
         }
 
-        function deleteItem(item){
-           return Item.deleteById(item).$promise
+        function deleteItem(item) {
+            return Item.deleteById(item).$promise
         }
 
         function getItem(byId) {
@@ -492,6 +504,8 @@ export default () => {
             fetchAnalysis: fetchAnalysis,
             attachToLostAndFound: attachToLostAndFound
         }
-    }]);
+    }
+    ])
+    ;
 
 }
