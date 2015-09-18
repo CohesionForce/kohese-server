@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
+function DetailsViewController($state, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
 
@@ -115,6 +115,6 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
 
 export default () => {
     angular.module('app.detailsview', ['app.services.tabservice'])
-        .controller('DetailsViewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
+        .controller('DetailsViewController', ['$state', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
             DetailsViewController]);
 }
