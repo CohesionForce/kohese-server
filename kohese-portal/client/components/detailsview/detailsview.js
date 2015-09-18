@@ -71,7 +71,7 @@ function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $sc
     detailsCtrl.upsertItem = function () {
         ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
             .then(function (updatedItem) {
-                ItemRepository.fetchItem(detailsCtrl.itemProxy.item.id);
+                ItemRepository.fetchItem(updatedItem.id);
                 detailsCtrl.itemForm.$setPristine();
             });
     };
