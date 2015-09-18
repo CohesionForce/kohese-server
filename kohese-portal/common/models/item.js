@@ -5,23 +5,38 @@ module.exports = function (Item) {
     var util = require('util');
     var _und = require('../../node_modules/underscore/underscore.js');
 
-    Item.beforeUpsertKohese = function(ctx, modelInstance, next){
-        console.log('Before remote');
+    Item.addModificationHistory = function(ctx, modelInstance, next){
+        console.log('::: Before remote - ' + ctx.methodString);
         ctx.req.body.modifiedBy = ctx.req.headers.koheseUser.username;
         ctx.req.body.modifiedOn = Date.now();
-        
-        if (!ctx.req.body.createdBy) {
-          ctx.req.body.createdBy = ctx.req.body.modifiedBy;
-          ctx.req.body.createdOn = ctx.req.body.modifiedOn;
-        }
-
-        console.log(ctx.req.body);
         next();
     };
 
+    Item.beforeSaveKohese = function (ctx, next) {
+      console.log('::: Before save - ' + ctx.Model.modelName);
+      
+      if (ctx.instance){
+        if (ctx.instance.createdBy === null){
+          console.log('::: Updating created fields (instance) - ' + ctx.Model.modelName);
+          ctx.instance.createdBy = ctx.instance.modifiedBy;
+          ctx.instance.createdOn = ctx.instance.modifiedOn;
+        }
+        console.log(ctx.instance);
+      }
+      if (ctx.data){
+        if (ctx.data.createdBy === null){
+          console.log('::: Updating created fields (data) - ' + ctx.Model.modelName);
+          ctx.data.createdBy = ctx.data.modifiedBy;
+          ctx.data.createdOn = ctx.data.modifiedOn;
+        }        
+      }
+      next();
+    }
+    
     Item.afterSaveKohese = function (ctx, next) {
+        console.log('::: After save - ' + ctx.Model.modelName);
         if (ctx.instance) {
-            console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.title);
+            console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.name);
             var notification = new Object;
             notification.model = ctx.Model.modelName;
             notification.id = ctx.instance.id;
@@ -58,6 +73,7 @@ module.exports = function (Item) {
     };
     
     Item.afterDeleteKohese = function (ctx, next) {
+        console.log('::: After delete - ' + ctx.Model.modelName);
         if (ctx.instance) {
             console.log('Deleted %s #%s#', ctx.Model.modelName, ctx);
             notification.type = 'delete';
@@ -77,7 +93,9 @@ module.exports = function (Item) {
         next();
     };
 
-    Item.beforeRemote('upsert', Item.beforeUpsertKohese);
+    Item.beforeRemote('create', Item.addModificationHistory);
+    Item.beforeRemote('upsert', Item.addModificationHistory);
+    Item.observe('before save', Item.beforeSaveKohese);
     Item.observe('after save', Item.afterSaveKohese);
     Item.observe('after delete', Item.afterDeleteKohese);
 

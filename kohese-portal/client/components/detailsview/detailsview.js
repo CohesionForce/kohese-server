@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function DetailsViewController($state, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
+function DetailsViewController(Item, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
 
@@ -19,17 +19,20 @@ function DetailsViewController($state, ItemRepository, $rootScope, tabService, $
     detailsCtrl.showTokensInDetails = false;
     detailsCtrl.filterList = [];
 
-    $scope.$on('$stateChangeSuccess', function () {
+    $scope.$on('$stateChangeSuccess' , function(){
         $scope.$emit('newItemSelected', $stateParams.id);
+        console.log($stateParams.id);
     });
 
-    if (detailsCtrl.tab.state === 'kohese.explore.create') {
+    if (detailsCtrl.tab.state === 'kohese.explore.create'){
         detailsCtrl.enableEdit = true;
+        console.log(detailsCtrl.tab);
+        console.log(detailsCtrl.enableEdit);
     }
 
     if (angular.isDefined($stateParams.id)) {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
-    } else if (angular.isDefined($stateParams.parentId)) {
+    } else if(angular.isDefined($stateParams.parentId)){
         {
             detailsCtrl.itemProxy.item = {};
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
@@ -47,10 +50,10 @@ function DetailsViewController($state, ItemRepository, $rootScope, tabService, $
         detailsCtrl.tab = tabService.getCurrentTab();
     });
 
-    detailsCtrl.updateTab = function (state, id, view) {
+    detailsCtrl.updateTab = function(state, id, view) {
         detailsCtrl.tab.setState(state);
         detailsCtrl.tab.params.id = id;
-        if (view) {
+        if(view) {
             detailsCtrl.tab.toggleType();
             detailsCtrl.tab.setType = view;
         }
@@ -82,16 +85,12 @@ function DetailsViewController($state, ItemRepository, $rootScope, tabService, $
             });
     };
 
-    detailsCtrl.getLastFilter = function () {
-
+    detailsCtrl.getLastFilter = function(){
         detailsCtrl.analysisFilterString = detailsCtrl.filterList.pop();
-        if (!detailsCtrl.analysisFilterString) {
-            detailsCtrl.analysisFilterString = '';
-        }
         detailsCtrl.analysisFilterInput = detailsCtrl.analysisFilterString;
     };
 
-    detailsCtrl.submitFilter = function () {
+    detailsCtrl.submitFilter = function(){
         detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
         detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
     };
@@ -116,6 +115,6 @@ function DetailsViewController($state, ItemRepository, $rootScope, tabService, $
 
 export default () => {
     angular.module('app.detailsview', ['app.services.tabservice'])
-        .controller('DetailsViewController', ['$state', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
+        .controller('DetailsViewController', ['Item', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
             DetailsViewController]);
 }
