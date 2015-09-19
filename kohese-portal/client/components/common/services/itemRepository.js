@@ -125,7 +125,7 @@ export default () => {
 
         function performAnalysis(forProxy) {
 
-            Item.performAnalysis({
+            Analysis.performAnalysis({
                 onId: forProxy.item.id
             }).$promise.then(function (results) {
                     if(!forProxy.analysis){
