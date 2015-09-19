@@ -99,55 +99,76 @@ module.exports = function (Item) {
     Item.observe('after save', Item.afterSaveKohese);
     Item.observe('after delete', Item.afterDeleteKohese);
 
+    function requestAnalysis (req, onId, cb) {
+      console.log('::: ANALYZING: ' + onId);
+
+      var options = {
+          host: "localhost",
+          port: 9091,
+          path: '/services/analysis/' + onId,
+          method: 'GET',
+          headers: {'authorization': req.headers.authorization}
+      };
+      
+      // console.log('OPTIONS: ' + JSON.stringify(options));
+      http.request(options, function (res) {
+          var response = "";
+          // console.log('STATUS: ' + res.statusCode);
+          // console.log('HEADERS: ' + JSON.stringify(res.headers));
+          res.setEncoding('utf8');
+                      
+          res.on('data', function (chunk) {
+
+              // console.log('::: BODY: ' /* + chunk*/);
+              response += chunk.toString();
+
+          });
+          res.on('end', function () {
+              var Analysis = app.models.Analysis;
+              var analysis = new Analysis;
+              analysis.id = onId;
+              try {
+                  analysis.raw = JSON.parse(response);
+                  Item.consolidateAnalysis(analysis);
+                  // delete the raw data
+                  analysis.raw = {};
+                  analysis.save();
+                  console.log('::: ANALYSIS Completed: ' + onId);
+              }
+              catch (err) {
+                  console.log("*** Error parsing result for: " + onId);
+                  console.log("Analysis response:  >>>" + response + "<<<");
+                  console.log(err);
+              }
+
+              cb(null, analysis);
+          });
+      }).on('error', function (err){
+        console.log('*** Error: ' + options);
+        console.log(err);
+        error = new Error('Failure while communicating with Analysis server');
+        error.http_code = 504;
+        error.code = err.code;
+        error.syscall = err.syscall;
+        console.log('*** New error');
+        console.log(error);
+        cb(error,null);
+      }).end();      
+    }
+    
     Item.performAnalysis = function (req, onId, cb) {
-
-
-        console.log('::: ANALYZING: ' + onId);
-        console.log('--- JWT:       ' + req.headers.authorization);
-
-        var options = {
-            host: "localhost",
-            port: 9091,
-            path: '/services/analysis/' + onId,
-            method: 'GET',
-            headers: {'authorization': req.headers.authorization}
-        };
-        
-        // console.log('OPTIONS: ' + JSON.stringify(options));
-        http.request(options, function (res) {
-            var response = "";
-            // console.log('STATUS: ' + res.statusCode);
-            // console.log('HEADERS: ' + JSON.stringify(res.headers));
-            res.setEncoding('utf8');
-            res.on('data', function (chunk) {
-
-                // console.log('::: BODY: ' /* + chunk*/);
-                response += chunk.toString();
-
-            });
-            res.on('end', function () {
-                var Analysis = app.loopback.Application.definition.modelBuilder.models.Analysis;
-
-                var analysis = new Analysis;
-                analysis.id = onId;
-                try {
-                    analysis.raw = JSON.parse(response);
-                    Item.consolidateAnalysis(analysis);
-                    // delete the raw data
-                    analysis.raw = {};
-                    analysis.save();
-                    console.log('::: ANALYSIS Completed: ' + onId);
-                }
-                catch (err) {
-                    console.log("*** Error parsing result for: " + onId);
-                    console.log("Analysis response:  >>>" + response + "<<<");
-                    console.log(err);
-                }
-
-                cb(null, analysis);
-            });
-        }).end();
-
+        var Analysis = app.models.Analysis;
+        Analysis.findById(onId, function(err, analysis) {
+          console.log("::: Analysis for " + onId);
+          
+          if (analysis){
+            console.log("::: Analysis already existed");
+            cb (null, analysis);
+          } else {
+            requestAnalysis (req,onId, cb);
+          }
+      
+        });
 
     }
 
@@ -162,7 +183,10 @@ module.exports = function (Item) {
         }
     });
 
-
+    Item.afterRemoteError('performAnalysis', function( ctx, next) { 
+      ctx.res.status(ctx.error.http_code).end(ctx.error.message);
+     });
+    
     Item.consolidateAnalysis = function (onAnalysis) {
         onAnalysis.list = [];
         var sentenceCount = onAnalysis.raw._views._InitialView.Sentence.length;

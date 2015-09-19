@@ -106,32 +106,15 @@ export default () => {
         }
 
         function retrieveAnalysis(forProxy) {
-            var proxy = forProxy;
 
             // Fetch records depth first
-            for (var childIdx = 0; childIdx < proxy.children.length; childIdx++) {
-                retrieveAnalysis(proxy.children[childIdx]);
+            for (var childIdx = 0; childIdx < forProxy.children.length; childIdx++) {
+                retrieveAnalysis(forProxy.children[childIdx]);
             }
 
-            if (!proxy.analysis) {
-
-                console.log("::: Retrieving analysis for " + proxy.item.id + " - " + proxy.item.name);
-                proxy.analysis = {};
-                Analysis.findById({
-                    id: proxy.item.id
-                }).$promise.then(function (results) {
-                        var temp = results;
-
-                        if (angular.isDefined(proxy)) {
-                            proxy.analysis.data = results;
-                            consolidateAnalysis(proxy);
-                        }
-
-                    }, function (errorResults) {
-                        proxy.analysis = {};
-                        console.log("*** Analysis not found for:  " + proxy.item.id + " - " + proxy.item.name);
-                        performAnalysis(proxy.item.id);
-                    });
+            if (!forProxy.analysis) {
+                console.log("::: Retrieving analysis for " + forProxy.item.id + " - " + forProxy.item.name);
+                performAnalysis(forProxy);
             }
         }
 
@@ -140,14 +123,17 @@ export default () => {
             retrieveAnalysis(proxy);
         }
 
-        function performAnalysis(byId) {
-            var proxy = tree.proxyMap[byId];
+        function performAnalysis(forProxy) {
+
             Item.performAnalysis({
-                onId: byId
+                onId: forProxy.item.id
             }).$promise.then(function (results) {
-                    proxy.analysis.data = results.data;
-                    console.log("::: Analysis performed for: " + proxy.item.id + " - " + proxy.item.name);
-                    consolidateAnalysis(proxy);
+                    if(!forProxy.analysis){
+                      forProxy.analysis = {};
+                    }
+                    forProxy.analysis.data = results.data;
+                    console.log("::: Analysis performed for: " + forProxy.item.id + " - " + forProxy.item.name);
+                    consolidateAnalysis(forProxy);
                 });
         }
 
