@@ -144,13 +144,10 @@ module.exports = function (Item) {
               cb(null, analysis);
           });
       }).on('error', function (err){
-        console.log('*** Error: ' + options);
-        console.log(err);
-        error = new Error('Failure while communicating with Analysis server');
+        error = new Error('*** Failure while communicating with Analysis server');
         error.http_code = 504;
         error.code = err.code;
         error.syscall = err.syscall;
-        console.log('*** New error');
         console.log(error);
         cb(error,null);
       }).end();      
@@ -159,15 +156,12 @@ module.exports = function (Item) {
     Item.performAnalysis = function (req, onId, cb) {
         var Analysis = app.models.Analysis;
         Analysis.findById(onId, function(err, analysis) {
-          console.log("::: Analysis for " + onId);
           
           if (analysis){
-            console.log("::: Analysis already existed");
             cb (null, analysis);
           } else {
             requestAnalysis (req,onId, cb);
-          }
-      
+          }      
         });
 
     }
@@ -216,14 +210,12 @@ module.exports = function (Item) {
 
                 if (typeof onAnalysis.chunkSummary[nextChunk.text] !== 'undefined') {
                     onAnalysis.chunkSummary[nextChunk.text].count++;
-//          onAnalysis.chunkSummary[nextChunk.text].list.push(nextChunk);
                 } else {
                     var chunkSummary = {};
                     chunkSummary.text = nextChunk.text;
                     chunkSummary.count = 1;
                     chunkSummary.displayType = "Chunk";
                     chunkSummary.posCount = {};
-//          chunkSummary.list = [nextChunk];
                     onAnalysis.chunkSummary[nextChunk.text] = chunkSummary;
                 }
 
@@ -242,14 +234,12 @@ module.exports = function (Item) {
 
                     if (typeof onAnalysis.tokenSummary[nextToken.text] !== 'undefined') {
                         onAnalysis.tokenSummary[nextToken.text].count++;
-//            onAnalysis.tokenSummary[nextToken.text].list.push(nextToken);
                     } else {
                         var tokenSummary = {};
                         tokenSummary.text = nextToken.text;
                         tokenSummary.count = 1;
                         tokenSummary.displayType = "Token";
                         tokenSummary.posCount = {};
-//            tokenSummary.list = [nextToken];
                         onAnalysis.tokenSummary[nextToken.text] = tokenSummary;
                     }
 
