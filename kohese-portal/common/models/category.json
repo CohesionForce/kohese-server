@@ -1,0 +1,10 @@
+{
+  "name": "Category",
+  "base": "Item",
+  "idInjection": true,
+  "properties": {},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
