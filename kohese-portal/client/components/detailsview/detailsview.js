@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function DetailsViewController($state, ItemRepository, $rootScope, tabService, $scope, $stateParams) {
+function DetailsViewController($state, ItemRepository, Item, $rootScope, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
 
@@ -34,11 +34,11 @@ function DetailsViewController($state, ItemRepository, $rootScope, tabService, $
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
     } else if(angular.isDefined($stateParams.parentId)){
         {
-            detailsCtrl.itemProxy.item = {};
+            detailsCtrl.itemProxy.item = new Item();
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
         }
     } else {
-        detailsCtrl.itemProxy.item = {description: "No item selected"};
+        detailsCtrl.itemProxy.item = new Item();
     }
 
 
@@ -71,7 +71,7 @@ function DetailsViewController($state, ItemRepository, $rootScope, tabService, $
     detailsCtrl.upsertItem = function () {
         ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
             .then(function (updatedItem) {
-                ItemRepository.fetchItem(updatedItem.id)
+                ItemRepository.fetchItem(updatedItem)
                     .then(function () {
                         if (updatedItem.parentId != '') {
                             $state.go('kohese.explore.edit', {id:updatedItem.parentId})
@@ -98,7 +98,7 @@ function DetailsViewController($state, ItemRepository, $rootScope, tabService, $
     detailsCtrl.cancel = function () {
 
         if (this.itemForm.$dirty) {
-            ItemRepository.fetchItem(detailsCtrl.itemProxy.item.id);
+            ItemRepository.fetchItem(detailsCtrl.itemProxy.item);
             this.itemForm.$setPristine();
         }
     };
@@ -115,6 +115,6 @@ function DetailsViewController($state, ItemRepository, $rootScope, tabService, $
 
 export default () => {
     angular.module('app.detailsview', ['app.services.tabservice'])
-        .controller('DetailsViewController', ['$state', 'ItemRepository', '$rootScope', 'tabService', '$scope', '$stateParams',
+        .controller('DetailsViewController', ['$state', 'ItemRepository', 'Item', '$rootScope', 'tabService', '$scope', '$stateParams',
             DetailsViewController]);
 }

@@ -1,6 +1,18 @@
 <form name="detailsCtrl.itemForm" class="form-horizontal">
     <div>
-        <div style="width: 50%; float: left">
+          <div style="width: 20%; float: left">
+					<span class="control-group"
+                          ng-class="{error: detailsCtrl.itemForm.kind.$invalid}">
+						<label class="control-label" for="Kind">Kind</label>
+						<div class="controls">
+                            <input  ng-if="detailsCtrl.itemProxy.item.constructor.modelName" style="width: 90%;" type="text" ng-model="detailsCtrl.itemProxy.item.constructor.modelName"
+                                   id="Kind" ng-disabled="true"/>
+                            <input  ng-if="!detailsCtrl.itemProxy.item.constructor.modelName" style="width: 90%;" type="text" ng-model="ignoreData" ng-init=""
+                                   id="Kind" ng-disabled="true"/>
+                        </div>
+					</span>
+          </div>
+          <div style="width: 40%; float: left">
 					<span class="control-group"
                           ng-class="{error: detailsCtrl.itemForm.id.$invalid}">
 						<label class="control-label" for="Id">Id</label>
@@ -10,7 +22,7 @@
                         </div>
 					</span>
         </div>
-        <div style="width: 50%; float: right">
+        <div style="width: 40%; float: right">
 					<span class="control-group"
                           ng-class="{error: detailsCtrl.itemForm.parentId.$invalid}">
                             <label

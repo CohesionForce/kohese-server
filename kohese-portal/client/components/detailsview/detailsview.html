@@ -1,6 +1,7 @@
 <div class="panel">
     <div class="panel-heading ">
-        <span>Item Information </span>
+        <span ng-if="detailsCtrl.itemProxy.item.constructor.modelName">{{detailsCtrl.itemProxy.item.constructor.modelName}} Information </span>
+        <span ng-if="!detailsCtrl.itemProxy.item.constructor.modelName">No Item Selected</span>
         <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
            ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})"
            ng-click="detailsCtrl.updateTab('edit', itemProxy.item.id, 'dualview')">

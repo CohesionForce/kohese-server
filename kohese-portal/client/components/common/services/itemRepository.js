@@ -6,42 +6,49 @@ export default () => {
     var _ = require('../../../../node_modules/underscore/underscore.js')
     var module = angular.module("app.services.itemservice", []);
 
-    module.service("ItemRepository", ['Item', 'Analysis', 'socket', '$rootScope', function (Item, Analysis, socket, $rootScope) {
+    module.service("ItemRepository", ['Item', 'Analysis', 'Category', 'KohesePrincipal', 'socket', '$rootScope', function (Item, Analysis, Category, KohesePrincipal, socket, $rootScope) {
 
+        var itemModel = {
+            Item: Item,
+            Category: Category,
+            KohesePrincipal: KohesePrincipal
+        }
+        
         var tree = {};
         tree.proxyMap = {};
 
-        socket.on('Item/create', function (notification) {
-            console.log("::: Received notification of Item Created:  " + notification.id);
-            fetchItem(notification.id);
-        });
+        // Register the listeners for the Item kinds that are being tracked
+        for(var modelName in itemModel){
+          socket.on(modelName + '/create', function (notification) {
+            console.log("::: Received notification of " + notification.model + " Created:  " + notification.id);
+            fetchItemByModel(itemModel[notification.model], notification.id);
+          });
 
-        socket.on('Item/update', function (notification) {
-            console.log("::: Received notification of Item Updated:  " + notification.id);
-            fetchItem(notification.id);
-        });
+          socket.on(modelName + '/update', function (notification) {
+            console.log("::: Received notification of " + notification.model + " Updated:  " + notification.id);
+            fetchItemByModel(itemModel[notification.model], notification.id);
+          });
 
-        socket.on('Item/delete', function (notification) {
-            console.log("::: Received notification of Item Deleted:  " + notification.id);
+          socket.on(modelName + '/delete', function (notification) {
+            console.log("::: Received notification of " + notification.model + " Deleted:  " + notification.id);
             removeItemFromTree(notification.id);
-        });
+          });  
+        }
+        
 
         function fetchItems() {
-            Item.find().$promise.then(function (results) {
-                convertListToTree(results, 'id', 'parentId');
-                $rootScope.$broadcast('itemRepositoryReady')
+            Item.find().$promise.then(function (itemResults) {
+                Category.find().$promise.then(function (categoryResults) {
+                  KohesePrincipal.find().$promise.then(function (principalResults) {
+                  var results = itemResults.concat(categoryResults).concat(principalResults);
+                  convertListToTree(results, 'id', 'parentId');
+                  $rootScope.$broadcast('itemRepositoryReady')
+                  });
+                });
             });
         }
 
         fetchItems();
-
-
-        function getChildren(ofId) {
-            Item.children(ofId).$promise.then(function (results) {
-                // TBD:  This needs to be a specific location instead of a global
-                var tmpChildList = results;
-            });
-        }
 
         function updateItemProxy(results) {
             var proxy = tree.proxyMap[results.id];
@@ -56,13 +63,18 @@ export default () => {
                 }
 
                 // Determine if the parent changed
-                var parentProxy = tree.parentOf[byId];
-                if (parentProxy.item.id !== results.parentId) {
+                var parentProxy = tree.parentOf[results.id];
+                var oldParentId = "";
+                if (parentProxy){
+                  oldParentId = parentProxy.item.id;
+                }
+                
+                if (oldParentId !== results.parentId) {
                     var newParentId = results.parentId;
 
                     if (parentProxy) {
                         parentProxy.children = _.reject(parentProxy.children, function (childProxy) {
-                            return childProxy.item.id === byId;
+                            return childProxy.item.id === results.id;
                         });
                     }
 
@@ -77,10 +89,10 @@ export default () => {
                         newParentProxy.children = [proxy];
                         attachToLostAndFound(newParentId);
                     }
-                    tree.parentOf[byId] = newParentProxy;
+                    tree.parentOf[results.id] = newParentProxy;
 
                     // Determine if the old parent was in LostAndFound
-                    if (parentProxy.item.parentId === "LOST+FOUND") {
+                    if (parentProxy && (parentProxy.item.parentId === "LOST+FOUND")) {
                         if (parentProxy.children.length == 0) {
                             // All unallocated children have been moved or deleted
                             removeItemFromTree(parentProxy.item.id);
@@ -93,16 +105,22 @@ export default () => {
             }
         }
 
-        function fetchItem(id) {
-            var promise = Item.findById({
-                id: id
-            }).$promise;
+        function fetchItemByModel(model,byId) {
+          var promise = itemModel[model.modelName].findById({
+            id: byId
+          }).$promise;
 
-            promise.then(function (results) {
-                updateItemProxy(results, id);
-            });
+          promise.then(function (results) {
+            updateItemProxy(results, byId);
+          });
 
-            return promise;
+          return promise;
+        }
+
+        function fetchItem(item) {
+          var model = item.constructor;
+          
+          return fetchItemByModel(model, item.id);
         }
 
         function retrieveAnalysis(forProxy) {
@@ -252,7 +270,8 @@ export default () => {
         }
 
         function upsertItem(item) {
-            var promise = Item.upsert(item).$promise;
+            console.log("::: Preparing to upsert " + item.constructor.modelName)
+            var promise = item.constructor.upsert(item).$promise;
 
             promise.then(function (results) {
                 updateItemProxy(results);
@@ -262,7 +281,8 @@ export default () => {
         }
 
         function deleteItem(item) {
-            return Item.deleteById(item).$promise
+            console.log("::: Preparing to deleteById " + item.constructor.modelName)
+            return item.constructor.deleteById(item).$promise
         }
 
         function getItem(byId) {
