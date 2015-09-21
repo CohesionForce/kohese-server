@@ -30,11 +30,11 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
     };
 
     treeCtrl.removeItem = function (item) {
+        var itemId = item.id;
         ItemRepository
             .deleteItem(item)
-            .$promise
             .then(function () {
-                console.log("::: Item has been deleted: " + item.id);
+                console.log("::: Item has been deleted: " + itemId);
             });
     };
 
