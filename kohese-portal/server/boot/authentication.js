@@ -11,11 +11,15 @@ module.exports = function enableAuthentication(server) {
     }, function(err, principal) {
       if(principal.length === 0){
         console.log("::: Creating admin account");
-        KohesePrincipal.upsert({
+        var now = Date.now();
+        KohesePrincipal.create({
            name: 'admin',
-           password: "kohese",
+           description: 'Administrator',
+           password: 'kohese',
            createdBy: 'admin',
-           createdOn: Date.now()
+           createdOn: now,
+           modifiedBy: 'admin',
+           modifiedOn: now
           }, function(err, principal){
             console.log("::: Created admin account");
           });
