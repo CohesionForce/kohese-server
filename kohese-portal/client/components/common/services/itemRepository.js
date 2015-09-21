@@ -6,12 +6,12 @@ export default () => {
     var _ = require('underscore');
     var module = angular.module("app.services.itemservice", []);
 
-    module.service("ItemRepository", ['Item', 'Category', 'KohesePrincipal', 'socket', '$rootScope', function (Item, Category, KohesePrincipal, socket, $rootScope) {
+    module.service("ItemRepository", ['Item', 'Category', 'KoheseUser', 'socket', '$rootScope', function (Item, Category, KoheseUser, socket, $rootScope) {
 
         var itemModel = {
             Item: Item,
             Category: Category,
-            KohesePrincipal: KohesePrincipal
+            KoheseUser: KoheseUser
         };
         
         var tree = {};
@@ -39,8 +39,8 @@ export default () => {
         function fetchItems() {
             Item.find().$promise.then(function (itemResults) {
                 Category.find().$promise.then(function (categoryResults) {
-                  KohesePrincipal.find().$promise.then(function (principalResults) {
-                  var results = itemResults.concat(categoryResults).concat(principalResults);
+                  KoheseUser.find().$promise.then(function (userResults) {
+                  var results = itemResults.concat(categoryResults).concat(userResults);
                   convertListToTree(results, 'id', 'parentId');
                   $rootScope.$broadcast('itemRepositoryReady')
                   });

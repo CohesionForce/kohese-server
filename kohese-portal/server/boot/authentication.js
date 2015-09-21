@@ -3,16 +3,16 @@ module.exports = function enableAuthentication(server) {
   server.enableAuth();
   
   server.once('started', function(baseUrl) {
-    var KohesePrincipal = server.models.KohesePrincipal;
+    var KoheseUser = server.models.KoheseUser;
     
-    KohesePrincipal.find({where: {
+    KoheseUser.find({where: {
         name: 'admin'
       }
     }, function(err, principal) {
       if(principal.length === 0){
         console.log("::: Creating admin account");
         var now = Date.now();
-        KohesePrincipal.create({
+        KoheseUser.create({
            name: 'admin',
            description: 'Administrator',
            password: 'kohese',

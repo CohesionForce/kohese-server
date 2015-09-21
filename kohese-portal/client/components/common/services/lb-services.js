@@ -628,113 +628,113 @@ module.factory(
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.findById() instead.
-        "::findById::KohesePrincipal::children": {
-          url: urlBase + "/KohesePrincipals/:id/children/:fk",
+        // INTERNAL. Use KoheseUser.children.findById() instead.
+        "::findById::KoheseUser::children": {
+          url: urlBase + "/KoheseUsers/:id/children/:fk",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.destroyById() instead.
-        "::destroyById::KohesePrincipal::children": {
-          url: urlBase + "/KohesePrincipals/:id/children/:fk",
+        // INTERNAL. Use KoheseUser.children.destroyById() instead.
+        "::destroyById::KoheseUser::children": {
+          url: urlBase + "/KoheseUsers/:id/children/:fk",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.updateById() instead.
-        "::updateById::KohesePrincipal::children": {
-          url: urlBase + "/KohesePrincipals/:id/children/:fk",
+        // INTERNAL. Use KoheseUser.children.updateById() instead.
+        "::updateById::KoheseUser::children": {
+          url: urlBase + "/KoheseUsers/:id/children/:fk",
           method: "PUT"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.findById() instead.
-        "::findById::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/:fk",
+        // INTERNAL. Use KoheseUser.children2.findById() instead.
+        "::findById::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2/:fk",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.destroyById() instead.
-        "::destroyById::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/:fk",
+        // INTERNAL. Use KoheseUser.children2.destroyById() instead.
+        "::destroyById::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2/:fk",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.updateById() instead.
-        "::updateById::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/:fk",
+        // INTERNAL. Use KoheseUser.children2.updateById() instead.
+        "::updateById::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2/:fk",
           method: "PUT"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.link() instead.
-        "::link::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/rel/:fk",
+        // INTERNAL. Use KoheseUser.children2.link() instead.
+        "::link::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2/rel/:fk",
           method: "PUT"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.unlink() instead.
-        "::unlink::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/rel/:fk",
+        // INTERNAL. Use KoheseUser.children2.unlink() instead.
+        "::unlink::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2/rel/:fk",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.exists() instead.
-        "::exists::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/rel/:fk",
+        // INTERNAL. Use KoheseUser.children2.exists() instead.
+        "::exists::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2/rel/:fk",
           method: "HEAD"
         },
 
-        // INTERNAL. Use KohesePrincipal.parent() instead.
-        "::get::KohesePrincipal::parent": {
-          url: urlBase + "/KohesePrincipals/:id/parent",
+        // INTERNAL. Use KoheseUser.parent() instead.
+        "::get::KoheseUser::parent": {
+          url: urlBase + "/KoheseUsers/:id/parent",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children() instead.
-        "::get::KohesePrincipal::children": {
+        // INTERNAL. Use KoheseUser.children() instead.
+        "::get::KoheseUser::children": {
           isArray: true,
-          url: urlBase + "/KohesePrincipals/:id/children",
+          url: urlBase + "/KoheseUsers/:id/children",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.create() instead.
-        "::create::KohesePrincipal::children": {
-          url: urlBase + "/KohesePrincipals/:id/children",
+        // INTERNAL. Use KoheseUser.children.create() instead.
+        "::create::KoheseUser::children": {
+          url: urlBase + "/KoheseUsers/:id/children",
           method: "POST"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.destroyAll() instead.
-        "::delete::KohesePrincipal::children": {
-          url: urlBase + "/KohesePrincipals/:id/children",
+        // INTERNAL. Use KoheseUser.children.destroyAll() instead.
+        "::delete::KoheseUser::children": {
+          url: urlBase + "/KoheseUsers/:id/children",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.count() instead.
-        "::count::KohesePrincipal::children": {
-          url: urlBase + "/KohesePrincipals/:id/children/count",
+        // INTERNAL. Use KoheseUser.children.count() instead.
+        "::count::KoheseUser::children": {
+          url: urlBase + "/KoheseUsers/:id/children/count",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2() instead.
-        "::get::KohesePrincipal::children2": {
+        // INTERNAL. Use KoheseUser.children2() instead.
+        "::get::KoheseUser::children2": {
           isArray: true,
-          url: urlBase + "/KohesePrincipals/:id/children2",
+          url: urlBase + "/KoheseUsers/:id/children2",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.create() instead.
-        "::create::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2",
+        // INTERNAL. Use KoheseUser.children2.create() instead.
+        "::create::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2",
           method: "POST"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.destroyAll() instead.
-        "::delete::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2",
+        // INTERNAL. Use KoheseUser.children2.destroyAll() instead.
+        "::delete::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.count() instead.
-        "::count::KohesePrincipal::children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/count",
+        // INTERNAL. Use KoheseUser.children2.count() instead.
+        "::count::KoheseUser::children2": {
+          url: urlBase + "/KoheseUsers/:id/children2/count",
           method: "GET"
         },
 
@@ -2248,27 +2248,27 @@ module.factory(
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.analysis() instead.
-        "::get::KohesePrincipal::analysis": {
-          url: urlBase + "/KohesePrincipals/:id/analysis",
+        // INTERNAL. Use KoheseUser.analysis() instead.
+        "::get::KoheseUser::analysis": {
+          url: urlBase + "/KoheseUsers/:id/analysis",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.analysis.create() instead.
-        "::create::KohesePrincipal::analysis": {
-          url: urlBase + "/KohesePrincipals/:id/analysis",
+        // INTERNAL. Use KoheseUser.analysis.create() instead.
+        "::create::KoheseUser::analysis": {
+          url: urlBase + "/KoheseUsers/:id/analysis",
           method: "POST"
         },
 
-        // INTERNAL. Use KohesePrincipal.analysis.update() instead.
-        "::update::KohesePrincipal::analysis": {
-          url: urlBase + "/KohesePrincipals/:id/analysis",
+        // INTERNAL. Use KoheseUser.analysis.update() instead.
+        "::update::KoheseUser::analysis": {
+          url: urlBase + "/KoheseUsers/:id/analysis",
           method: "PUT"
         },
 
-        // INTERNAL. Use KohesePrincipal.analysis.destroy() instead.
-        "::destroy::KohesePrincipal::analysis": {
-          url: urlBase + "/KohesePrincipals/:id/analysis",
+        // INTERNAL. Use KoheseUser.analysis.destroy() instead.
+        "::destroy::KoheseUser::analysis": {
+          url: urlBase + "/KoheseUsers/:id/analysis",
           method: "DELETE"
         },
 
@@ -2437,13 +2437,13 @@ module.factory(
 
 /**
  * @ngdoc object
- * @name lbServices.KohesePrincipal
- * @header lbServices.KohesePrincipal
+ * @name lbServices.KoheseUser
+ * @header lbServices.KoheseUser
  * @object
  *
  * @description
  *
- * A $resource object for interacting with the `KohesePrincipal` model.
+ * A $resource object for interacting with the `KoheseUser` model.
  *
  * ## Example
  *
@@ -2453,151 +2453,151 @@ module.factory(
  *
  */
 module.factory(
-  "KohesePrincipal",
+  "KoheseUser",
   ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
-      urlBase + "/KohesePrincipals/:id",
+      urlBase + "/KoheseUsers/:id",
       { 'id': '@id' },
       {
 
-        // INTERNAL. Use KohesePrincipal.children.findById() instead.
+        // INTERNAL. Use KoheseUser.children.findById() instead.
         "prototype$__findById__children": {
-          url: urlBase + "/KohesePrincipals/:id/children/:fk",
+          url: urlBase + "/KoheseUsers/:id/children/:fk",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.destroyById() instead.
+        // INTERNAL. Use KoheseUser.children.destroyById() instead.
         "prototype$__destroyById__children": {
-          url: urlBase + "/KohesePrincipals/:id/children/:fk",
+          url: urlBase + "/KoheseUsers/:id/children/:fk",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.updateById() instead.
+        // INTERNAL. Use KoheseUser.children.updateById() instead.
         "prototype$__updateById__children": {
-          url: urlBase + "/KohesePrincipals/:id/children/:fk",
+          url: urlBase + "/KoheseUsers/:id/children/:fk",
           method: "PUT"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.findById() instead.
+        // INTERNAL. Use KoheseUser.children2.findById() instead.
         "prototype$__findById__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/:fk",
+          url: urlBase + "/KoheseUsers/:id/children2/:fk",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.destroyById() instead.
+        // INTERNAL. Use KoheseUser.children2.destroyById() instead.
         "prototype$__destroyById__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/:fk",
+          url: urlBase + "/KoheseUsers/:id/children2/:fk",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.updateById() instead.
+        // INTERNAL. Use KoheseUser.children2.updateById() instead.
         "prototype$__updateById__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/:fk",
+          url: urlBase + "/KoheseUsers/:id/children2/:fk",
           method: "PUT"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.link() instead.
+        // INTERNAL. Use KoheseUser.children2.link() instead.
         "prototype$__link__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/rel/:fk",
+          url: urlBase + "/KoheseUsers/:id/children2/rel/:fk",
           method: "PUT"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.unlink() instead.
+        // INTERNAL. Use KoheseUser.children2.unlink() instead.
         "prototype$__unlink__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/rel/:fk",
+          url: urlBase + "/KoheseUsers/:id/children2/rel/:fk",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.exists() instead.
+        // INTERNAL. Use KoheseUser.children2.exists() instead.
         "prototype$__exists__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/rel/:fk",
+          url: urlBase + "/KoheseUsers/:id/children2/rel/:fk",
           method: "HEAD"
         },
 
-        // INTERNAL. Use KohesePrincipal.parent() instead.
+        // INTERNAL. Use KoheseUser.parent() instead.
         "prototype$__get__parent": {
-          url: urlBase + "/KohesePrincipals/:id/parent",
+          url: urlBase + "/KoheseUsers/:id/parent",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.analysis() instead.
+        // INTERNAL. Use KoheseUser.analysis() instead.
         "prototype$__get__analysis": {
-          url: urlBase + "/KohesePrincipals/:id/analysis",
+          url: urlBase + "/KoheseUsers/:id/analysis",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.analysis.create() instead.
+        // INTERNAL. Use KoheseUser.analysis.create() instead.
         "prototype$__create__analysis": {
-          url: urlBase + "/KohesePrincipals/:id/analysis",
+          url: urlBase + "/KoheseUsers/:id/analysis",
           method: "POST"
         },
 
-        // INTERNAL. Use KohesePrincipal.analysis.update() instead.
+        // INTERNAL. Use KoheseUser.analysis.update() instead.
         "prototype$__update__analysis": {
-          url: urlBase + "/KohesePrincipals/:id/analysis",
+          url: urlBase + "/KoheseUsers/:id/analysis",
           method: "PUT"
         },
 
-        // INTERNAL. Use KohesePrincipal.analysis.destroy() instead.
+        // INTERNAL. Use KoheseUser.analysis.destroy() instead.
         "prototype$__destroy__analysis": {
-          url: urlBase + "/KohesePrincipals/:id/analysis",
+          url: urlBase + "/KoheseUsers/:id/analysis",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children() instead.
+        // INTERNAL. Use KoheseUser.children() instead.
         "prototype$__get__children": {
           isArray: true,
-          url: urlBase + "/KohesePrincipals/:id/children",
+          url: urlBase + "/KoheseUsers/:id/children",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.create() instead.
+        // INTERNAL. Use KoheseUser.children.create() instead.
         "prototype$__create__children": {
-          url: urlBase + "/KohesePrincipals/:id/children",
+          url: urlBase + "/KoheseUsers/:id/children",
           method: "POST"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.destroyAll() instead.
+        // INTERNAL. Use KoheseUser.children.destroyAll() instead.
         "prototype$__delete__children": {
-          url: urlBase + "/KohesePrincipals/:id/children",
+          url: urlBase + "/KoheseUsers/:id/children",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children.count() instead.
+        // INTERNAL. Use KoheseUser.children.count() instead.
         "prototype$__count__children": {
-          url: urlBase + "/KohesePrincipals/:id/children/count",
+          url: urlBase + "/KoheseUsers/:id/children/count",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2() instead.
+        // INTERNAL. Use KoheseUser.children2() instead.
         "prototype$__get__children2": {
           isArray: true,
-          url: urlBase + "/KohesePrincipals/:id/children2",
+          url: urlBase + "/KoheseUsers/:id/children2",
           method: "GET"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.create() instead.
+        // INTERNAL. Use KoheseUser.children2.create() instead.
         "prototype$__create__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2",
+          url: urlBase + "/KoheseUsers/:id/children2",
           method: "POST"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.destroyAll() instead.
+        // INTERNAL. Use KoheseUser.children2.destroyAll() instead.
         "prototype$__delete__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2",
+          url: urlBase + "/KoheseUsers/:id/children2",
           method: "DELETE"
         },
 
-        // INTERNAL. Use KohesePrincipal.children2.count() instead.
+        // INTERNAL. Use KoheseUser.children2.count() instead.
         "prototype$__count__children2": {
-          url: urlBase + "/KohesePrincipals/:id/children2/count",
+          url: urlBase + "/KoheseUsers/:id/children2/count",
           method: "GET"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#create
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#create
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2624,18 +2624,18 @@ module.factory(
          *
          * <em>
          * (The remote method definition does not provide any description.
-         * This usually means the response is a `KohesePrincipal` object.)
+         * This usually means the response is a `KoheseUser` object.)
          * </em>
          */
         "create": {
-          url: urlBase + "/KohesePrincipals",
+          url: urlBase + "/KoheseUsers",
           method: "POST"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#upsert
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#upsert
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2662,18 +2662,18 @@ module.factory(
          *
          * <em>
          * (The remote method definition does not provide any description.
-         * This usually means the response is a `KohesePrincipal` object.)
+         * This usually means the response is a `KoheseUser` object.)
          * </em>
          */
         "upsert": {
-          url: urlBase + "/KohesePrincipals",
+          url: urlBase + "/KoheseUsers",
           method: "PUT"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#exists
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#exists
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2698,14 +2698,14 @@ module.factory(
          *  - `exists` – `{boolean=}` - 
          */
         "exists": {
-          url: urlBase + "/KohesePrincipals/:id/exists",
+          url: urlBase + "/KoheseUsers/:id/exists",
           method: "GET"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#findById
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#findById
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2729,18 +2729,18 @@ module.factory(
          *
          * <em>
          * (The remote method definition does not provide any description.
-         * This usually means the response is a `KohesePrincipal` object.)
+         * This usually means the response is a `KoheseUser` object.)
          * </em>
          */
         "findById": {
-          url: urlBase + "/KohesePrincipals/:id",
+          url: urlBase + "/KoheseUsers/:id",
           method: "GET"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#find
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#find
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2762,19 +2762,19 @@ module.factory(
          *
          * <em>
          * (The remote method definition does not provide any description.
-         * This usually means the response is a `KohesePrincipal` object.)
+         * This usually means the response is a `KoheseUser` object.)
          * </em>
          */
         "find": {
           isArray: true,
-          url: urlBase + "/KohesePrincipals",
+          url: urlBase + "/KoheseUsers",
           method: "GET"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#findOne
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#findOne
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2796,18 +2796,18 @@ module.factory(
          *
          * <em>
          * (The remote method definition does not provide any description.
-         * This usually means the response is a `KohesePrincipal` object.)
+         * This usually means the response is a `KoheseUser` object.)
          * </em>
          */
         "findOne": {
-          url: urlBase + "/KohesePrincipals/findOne",
+          url: urlBase + "/KoheseUsers/findOne",
           method: "GET"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#updateAll
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#updateAll
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2834,14 +2834,14 @@ module.factory(
          * This method returns no data.
          */
         "updateAll": {
-          url: urlBase + "/KohesePrincipals/update",
+          url: urlBase + "/KoheseUsers/update",
           method: "POST"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#deleteById
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#deleteById
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2864,14 +2864,14 @@ module.factory(
          * This method returns no data.
          */
         "deleteById": {
-          url: urlBase + "/KohesePrincipals/:id",
+          url: urlBase + "/KoheseUsers/:id",
           method: "DELETE"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#count
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#count
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2896,14 +2896,14 @@ module.factory(
          *  - `count` – `{number=}` - 
          */
         "count": {
-          url: urlBase + "/KohesePrincipals/count",
+          url: urlBase + "/KoheseUsers/count",
           method: "GET"
         },
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#prototype$updateAttributes
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#prototype$updateAttributes
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2929,11 +2929,11 @@ module.factory(
          *
          * <em>
          * (The remote method definition does not provide any description.
-         * This usually means the response is a `KohesePrincipal` object.)
+         * This usually means the response is a `KoheseUser` object.)
          * </em>
          */
         "prototype$updateAttributes": {
-          url: urlBase + "/KohesePrincipals/:id",
+          url: urlBase + "/KoheseUsers/:id",
           method: "PUT"
         },
       }
@@ -2943,8 +2943,8 @@ module.factory(
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#updateOrCreate
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#updateOrCreate
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -2971,15 +2971,15 @@ module.factory(
          *
          * <em>
          * (The remote method definition does not provide any description.
-         * This usually means the response is a `KohesePrincipal` object.)
+         * This usually means the response is a `KoheseUser` object.)
          * </em>
          */
         R["updateOrCreate"] = R["upsert"];
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#update
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#update
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -3009,8 +3009,8 @@ module.factory(
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#destroyById
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#destroyById
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -3036,8 +3036,8 @@ module.factory(
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#removeById
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#removeById
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -3064,37 +3064,37 @@ module.factory(
 
     /**
     * @ngdoc property
-    * @name lbServices.KohesePrincipal#modelName
-    * @propertyOf lbServices.KohesePrincipal
+    * @name lbServices.KoheseUser#modelName
+    * @propertyOf lbServices.KoheseUser
     * @description
     * The name of the model represented by this $resource,
-    * i.e. `KohesePrincipal`.
+    * i.e. `KoheseUser`.
     */
-    R.modelName = "KohesePrincipal";
+    R.modelName = "KoheseUser";
 
     /**
      * @ngdoc object
-     * @name lbServices.KohesePrincipal.children
-     * @header lbServices.KohesePrincipal.children
+     * @name lbServices.KoheseUser.children
+     * @header lbServices.KoheseUser.children
      * @object
      * @description
      *
-     * The object `KohesePrincipal.children` groups methods
-     * manipulating `Item` instances related to `KohesePrincipal`.
+     * The object `KoheseUser.children` groups methods
+     * manipulating `Item` instances related to `KoheseUser`.
      *
-     * Call {@link lbServices.KohesePrincipal#children KohesePrincipal.children()}
+     * Call {@link lbServices.KoheseUser#children KoheseUser.children()}
      * to query all related instances.
      */
 
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#children
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#children
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
-         * Queries children of KohesePrincipal.
+         * Queries children of KoheseUser.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -3119,18 +3119,18 @@ module.factory(
          */
         R.children = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::get::KohesePrincipal::children"];
+          var action = TargetResource["::get::KoheseUser::children"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children#count
-         * @methodOf lbServices.KohesePrincipal.children
+         * @name lbServices.KoheseUser.children#count
+         * @methodOf lbServices.KoheseUser.children
          *
          * @description
          *
-         * Counts children of KohesePrincipal.
+         * Counts children of KoheseUser.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -3154,14 +3154,14 @@ module.factory(
          */
         R.children.count = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::count::KohesePrincipal::children"];
+          var action = TargetResource["::count::KoheseUser::children"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children#create
-         * @methodOf lbServices.KohesePrincipal.children
+         * @name lbServices.KoheseUser.children#create
+         * @methodOf lbServices.KoheseUser.children
          *
          * @description
          *
@@ -3192,14 +3192,14 @@ module.factory(
          */
         R.children.create = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::create::KohesePrincipal::children"];
+          var action = TargetResource["::create::KoheseUser::children"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children#destroyAll
-         * @methodOf lbServices.KohesePrincipal.children
+         * @name lbServices.KoheseUser.children#destroyAll
+         * @methodOf lbServices.KoheseUser.children
          *
          * @description
          *
@@ -3223,14 +3223,14 @@ module.factory(
          */
         R.children.destroyAll = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::delete::KohesePrincipal::children"];
+          var action = TargetResource["::delete::KoheseUser::children"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children#destroyById
-         * @methodOf lbServices.KohesePrincipal.children
+         * @name lbServices.KoheseUser.children#destroyById
+         * @methodOf lbServices.KoheseUser.children
          *
          * @description
          *
@@ -3256,14 +3256,14 @@ module.factory(
          */
         R.children.destroyById = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::destroyById::KohesePrincipal::children"];
+          var action = TargetResource["::destroyById::KoheseUser::children"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children#findById
-         * @methodOf lbServices.KohesePrincipal.children
+         * @name lbServices.KoheseUser.children#findById
+         * @methodOf lbServices.KoheseUser.children
          *
          * @description
          *
@@ -3292,14 +3292,14 @@ module.factory(
          */
         R.children.findById = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::findById::KohesePrincipal::children"];
+          var action = TargetResource["::findById::KoheseUser::children"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children#updateById
-         * @methodOf lbServices.KohesePrincipal.children
+         * @name lbServices.KoheseUser.children#updateById
+         * @methodOf lbServices.KoheseUser.children
          *
          * @description
          *
@@ -3332,32 +3332,32 @@ module.factory(
          */
         R.children.updateById = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::updateById::KohesePrincipal::children"];
+          var action = TargetResource["::updateById::KoheseUser::children"];
           return action.apply(R, arguments);
         };
     /**
      * @ngdoc object
-     * @name lbServices.KohesePrincipal.children2
-     * @header lbServices.KohesePrincipal.children2
+     * @name lbServices.KoheseUser.children2
+     * @header lbServices.KoheseUser.children2
      * @object
      * @description
      *
-     * The object `KohesePrincipal.children2` groups methods
-     * manipulating `Item` instances related to `KohesePrincipal`.
+     * The object `KoheseUser.children2` groups methods
+     * manipulating `Item` instances related to `KoheseUser`.
      *
-     * Call {@link lbServices.KohesePrincipal#children2 KohesePrincipal.children2()}
+     * Call {@link lbServices.KoheseUser#children2 KoheseUser.children2()}
      * to query all related instances.
      */
 
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#children2
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#children2
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
-         * Queries children2 of KohesePrincipal.
+         * Queries children2 of KoheseUser.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -3382,18 +3382,18 @@ module.factory(
          */
         R.children2 = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::get::KohesePrincipal::children2"];
+          var action = TargetResource["::get::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#count
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#count
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
-         * Counts children2 of KohesePrincipal.
+         * Counts children2 of KoheseUser.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -3417,14 +3417,14 @@ module.factory(
          */
         R.children2.count = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::count::KohesePrincipal::children2"];
+          var action = TargetResource["::count::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#create
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#create
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
@@ -3455,14 +3455,14 @@ module.factory(
          */
         R.children2.create = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::create::KohesePrincipal::children2"];
+          var action = TargetResource["::create::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#destroyAll
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#destroyAll
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
@@ -3486,14 +3486,14 @@ module.factory(
          */
         R.children2.destroyAll = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::delete::KohesePrincipal::children2"];
+          var action = TargetResource["::delete::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#destroyById
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#destroyById
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
@@ -3519,14 +3519,14 @@ module.factory(
          */
         R.children2.destroyById = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::destroyById::KohesePrincipal::children2"];
+          var action = TargetResource["::destroyById::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#exists
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#exists
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
@@ -3555,14 +3555,14 @@ module.factory(
          */
         R.children2.exists = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::exists::KohesePrincipal::children2"];
+          var action = TargetResource["::exists::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#findById
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#findById
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
@@ -3591,14 +3591,14 @@ module.factory(
          */
         R.children2.findById = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::findById::KohesePrincipal::children2"];
+          var action = TargetResource["::findById::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#link
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#link
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
@@ -3631,14 +3631,14 @@ module.factory(
          */
         R.children2.link = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::link::KohesePrincipal::children2"];
+          var action = TargetResource["::link::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#unlink
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#unlink
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
@@ -3664,14 +3664,14 @@ module.factory(
          */
         R.children2.unlink = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::unlink::KohesePrincipal::children2"];
+          var action = TargetResource["::unlink::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.children2#updateById
-         * @methodOf lbServices.KohesePrincipal.children2
+         * @name lbServices.KoheseUser.children2#updateById
+         * @methodOf lbServices.KoheseUser.children2
          *
          * @description
          *
@@ -3704,14 +3704,14 @@ module.factory(
          */
         R.children2.updateById = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::updateById::KohesePrincipal::children2"];
+          var action = TargetResource["::updateById::KoheseUser::children2"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#parent
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#parent
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -3740,28 +3740,28 @@ module.factory(
          */
         R.parent = function() {
           var TargetResource = $injector.get("Item");
-          var action = TargetResource["::get::KohesePrincipal::parent"];
+          var action = TargetResource["::get::KoheseUser::parent"];
           return action.apply(R, arguments);
         };
     /**
      * @ngdoc object
-     * @name lbServices.KohesePrincipal.analysis
-     * @header lbServices.KohesePrincipal.analysis
+     * @name lbServices.KoheseUser.analysis
+     * @header lbServices.KoheseUser.analysis
      * @object
      * @description
      *
-     * The object `KohesePrincipal.analysis` groups methods
-     * manipulating `Analysis` instances related to `KohesePrincipal`.
+     * The object `KoheseUser.analysis` groups methods
+     * manipulating `Analysis` instances related to `KoheseUser`.
      *
-     * Call {@link lbServices.KohesePrincipal#analysis KohesePrincipal.analysis()}
+     * Call {@link lbServices.KoheseUser#analysis KoheseUser.analysis()}
      * to query all related instances.
      */
 
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal#analysis
-         * @methodOf lbServices.KohesePrincipal
+         * @name lbServices.KoheseUser#analysis
+         * @methodOf lbServices.KoheseUser
          *
          * @description
          *
@@ -3790,14 +3790,14 @@ module.factory(
          */
         R.analysis = function() {
           var TargetResource = $injector.get("Analysis");
-          var action = TargetResource["::get::KohesePrincipal::analysis"];
+          var action = TargetResource["::get::KoheseUser::analysis"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.analysis#create
-         * @methodOf lbServices.KohesePrincipal.analysis
+         * @name lbServices.KoheseUser.analysis#create
+         * @methodOf lbServices.KoheseUser.analysis
          *
          * @description
          *
@@ -3828,14 +3828,14 @@ module.factory(
          */
         R.analysis.create = function() {
           var TargetResource = $injector.get("Analysis");
-          var action = TargetResource["::create::KohesePrincipal::analysis"];
+          var action = TargetResource["::create::KoheseUser::analysis"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.analysis#destroy
-         * @methodOf lbServices.KohesePrincipal.analysis
+         * @name lbServices.KoheseUser.analysis#destroy
+         * @methodOf lbServices.KoheseUser.analysis
          *
          * @description
          *
@@ -3859,14 +3859,14 @@ module.factory(
          */
         R.analysis.destroy = function() {
           var TargetResource = $injector.get("Analysis");
-          var action = TargetResource["::destroy::KohesePrincipal::analysis"];
+          var action = TargetResource["::destroy::KoheseUser::analysis"];
           return action.apply(R, arguments);
         };
 
         /**
          * @ngdoc method
-         * @name lbServices.KohesePrincipal.analysis#update
-         * @methodOf lbServices.KohesePrincipal.analysis
+         * @name lbServices.KoheseUser.analysis#update
+         * @methodOf lbServices.KoheseUser.analysis
          *
          * @description
          *
@@ -3897,7 +3897,7 @@ module.factory(
          */
         R.analysis.update = function() {
           var TargetResource = $injector.get("Analysis");
-          var action = TargetResource["::update::KohesePrincipal::analysis"];
+          var action = TargetResource["::update::KoheseUser::analysis"];
           return action.apply(R, arguments);
         };
 
