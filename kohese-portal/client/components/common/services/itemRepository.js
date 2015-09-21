@@ -12,7 +12,7 @@ export default () => {
             Item: Item,
             Category: Category,
             KohesePrincipal: KohesePrincipal
-        }
+        };
         
         var tree = {};
         tree.proxyMap = {};
