@@ -3,7 +3,7 @@
  */
 
 export default () => {
-    var _ = require('../../../../node_modules/underscore/underscore.js')
+    var _ = require('underscore');
     var module = angular.module("app.services.itemservice", []);
 
     module.service("ItemRepository", ['Item', 'Analysis', 'Category', 'KohesePrincipal', 'socket', '$rootScope', function (Item, Analysis, Category, KohesePrincipal, socket, $rootScope) {

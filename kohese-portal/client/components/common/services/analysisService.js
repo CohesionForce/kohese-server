@@ -3,21 +3,17 @@
  */
 
 export default () => {
-    angular.module('app.services.analysisservice', [])
-        .service('analysisService', function (Analysis) {
+    angular.module('app.services.analysisservice', ['app.services.itemservice'])
+        .service('analysisService', function (Analysis, ItemRepository) {
 
+            var _ = require('underscore');
             var service = this;
 
-            service.fetchAnalysis = function(id) {
-                var proxy = tree.proxyMap[id];
-                retrieveAnalysis(proxy);
-            };
-
-            function retrieveAnalysis(forProxy) {
+            service.fetchAnalysis = function (forProxy) {
 
                 // Fetch records depth first
                 for (var childIdx = 0; childIdx < forProxy.children.length; childIdx++) {
-                    retrieveAnalysis(forProxy.children[childIdx]);
+                   service.fetchAnalysis(forProxy.children[childIdx]);
                 }
 
                 if (!forProxy.analysis) {
@@ -143,7 +139,7 @@ export default () => {
 
                 proxy.analysis.extendedSummaryList = _.union(_.values(proxy.analysis.extendedChunkSummary), _.values(proxy.analysis.extendedTokenSummary));
 
-                var parentProxy = getItem(proxy.item.parentId);
+                var parentProxy = ItemRepository.getItemProxy(proxy.item.parentId);
 
                 if (parentProxy) {
                     console.log("::: Parent found");
@@ -153,5 +149,5 @@ export default () => {
                 }
 
             }
-        })
+        });
 }

@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function DetailsViewController($state, ItemRepository, Item, $rootScope, tabService, $scope, $stateParams) {
+function DetailsViewController($state, ItemRepository, analysisService, Item, $rootScope, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
 
@@ -65,7 +65,7 @@ function DetailsViewController($state, ItemRepository, Item, $rootScope, tabServ
     };
 
     detailsCtrl.fetchAnalysis = function () {
-        ItemRepository.fetchAnalysis(detailsCtrl.itemProxy.item.id);
+        analysisService.fetchAnalysis(detailsCtrl.itemProxy);
     };
 
     detailsCtrl.upsertItem = function () {
@@ -115,6 +115,6 @@ function DetailsViewController($state, ItemRepository, Item, $rootScope, tabServ
 
 export default () => {
     angular.module('app.detailsview', ['app.services.tabservice'])
-        .controller('DetailsViewController', ['$state', 'ItemRepository', 'Item', '$rootScope', 'tabService', '$scope', '$stateParams',
+        .controller('DetailsViewController', ['$state', 'ItemRepository', 'analysisService', 'Item', '$rootScope', 'tabService', '$scope', '$stateParams',
             DetailsViewController]);
 }
