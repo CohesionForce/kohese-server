@@ -16,6 +16,8 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
 
     treeCtrl.newTree = ItemRepository.internalTree;
 
+    treeCtrl.tab.setTitle('Explore');
+
     $scope.$on('newFilterString', function onNewFilterString(event, string) {
         treeCtrl.filterString = string;
     });

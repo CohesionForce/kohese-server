@@ -9,7 +9,7 @@ function ContainerController(tabService, navigationService, $scope, $state) {
 
     var Tab = function (state, params) {
         var tab = this;
-        tab.title = 'Tab';
+        tab.title = 'Explore';
         tab.scope = {};
         // Flag for determining number of viewports on container
         tab.type = 'dualview';
@@ -39,6 +39,10 @@ function ContainerController(tabService, navigationService, $scope, $state) {
         };
         tab.setScope = function (scope) {
             tab.scope = scope;
+        };
+
+        tab.setTitle = function (title){
+            tab.title = title;
         };
 
         tab.setState = function (state) {

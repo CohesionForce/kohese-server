@@ -30,6 +30,10 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
         console.log(detailsCtrl.enableEdit);
     }
 
+    if (detailsCtrl.tab.state === 'kohese.investigate'){
+        detailsCtrl.tab.setTitle('Investigate');
+    }
+
     if (angular.isDefined($stateParams.id)) {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
     } else if(angular.isDefined($stateParams.parentId)){

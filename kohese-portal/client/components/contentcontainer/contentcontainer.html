@@ -3,7 +3,7 @@
         <tabset>
             <tab ng-click="containerCtrl.setTab(tab)" ng-repeat="tab in containerCtrl.tabs" active="tab.active">
                 <tab-heading >
-                    {{tab.title}} - {{$index}}
+                    {{tab.title}}
                     <i ng-click=containerCtrl.deleteTab(tab) class="glyphicon glyphicon-remove"></i>
                 </tab-heading>
                 <tab-body class="tab-body">
