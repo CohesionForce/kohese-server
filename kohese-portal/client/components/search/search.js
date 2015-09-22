@@ -9,6 +9,8 @@ function SearchController(ItemRepository, tabService, $state, $stateParams) {
     ctrl.itemStore = ItemRepository.internalTree;
     ctrl.searchString = $stateParams.filter;
 
+    tab.setTitle('Search - ' + ctrl.searchString);
+
     if($stateParams.id){
         ctrl.currentItem = $stateParams.id;
     }
