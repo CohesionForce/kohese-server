@@ -6,6 +6,7 @@ const appModule = angular.module('app', [
     'app.contentcontainer',
     'app.detailsview',
     'app.tree',
+    'app.admin',
     'app.login',
     'app.navigationmenu',
     'app.search',
@@ -80,7 +81,7 @@ appModule
                         templateUrl: '/components/search/search.html',
                         controller: 'SearchController as searchCtrl'
                     },
-                    'bottom' : {
+                    'bottom': {
                         templateUrl: '/components/detailsview/detailsview.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -90,6 +91,11 @@ appModule
                 url: '/investigate/{id}',
                 templateUrl: '/components/detailsview/detailsview.html',
                 controller: 'DetailsViewController as detailsCtrl'
+            })
+            .state('kohese.admin', {
+                url: '/admin',
+                templateUrl: '/components/admin/admin.html',
+                controller: 'AdminController as adminCtrl'
             });
 
         $urlRouterProvider.otherwise('/explore')

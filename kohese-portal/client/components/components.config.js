@@ -12,6 +12,7 @@ export default () => {
     require('./navigationmenu/navigationmenu')();
     require('./login/login')();
     require('./search/search')();
+    require('./admin/admin')();
 
     //Common
 

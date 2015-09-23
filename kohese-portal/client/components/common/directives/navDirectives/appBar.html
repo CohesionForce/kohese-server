@@ -218,9 +218,11 @@
                 </li>
                 <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
                 </li>
+                <li ng-click="appBarCtrl.navigate('kohese.admin', {}, 'singleview')">
+                    <a><i class="fa fa-user-plus"></i>Admin </a></li>
                 <li class="divider"></li>
                 <li ui-sref="login" ng-click="appBarCtrl.logout()">
-                    <span class="text-center"><i class="fa fa-sign-out fa-fw"></i> Logout</span>
+                    <a class="text-center"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                 </li>
             </ul>
             <!-- /.dropdown-user -->

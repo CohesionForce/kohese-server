@@ -7,13 +7,12 @@ function ContainerController(tabService, navigationService, $scope, $state) {
 
     containerCtrl.tabService = tabService;
 
-    var Tab = function (state, params) {
+    var Tab = function (state, params, type) {
         var tab = this;
         tab.title = 'Explore';
         tab.scope = {};
-        // Flag for determining number of viewports on container
-        tab.type = 'dualview';
         tab.content = {};
+        console.log(type);
 
         if (params) {
             tab.params = params;
@@ -25,6 +24,12 @@ function ContainerController(tabService, navigationService, $scope, $state) {
             tab.state = state;
         } else {
             tab.state = 'kohese.explore';
+        }
+
+        if (type){
+            tab.type = type;
+        } else {
+            tab.type = 'dualview';
         }
 
         tab.setType = function (type) {
@@ -70,8 +75,10 @@ function ContainerController(tabService, navigationService, $scope, $state) {
     };
 
     $scope.$on('navigationEvent', function onNavigationEvent(event, data) {
-        let newTab = createTab(data.state, data.params);
+        console.log(data);
+        let newTab = createTab(data.state, data.params, data.type);
         containerCtrl.setTab(newTab);
+        $state.go(newTab.state);
     });
 
 
@@ -85,9 +92,9 @@ function ContainerController(tabService, navigationService, $scope, $state) {
         containerCtrl.setTab(tab);
     };
 
-    function createTab(state, params) {
+    function createTab(state, params, type) {
         tabService.incrementTabs();
-        var newTab = new Tab(state, params);
+        var newTab = new Tab(state, params, type);
         newTab.position = containerCtrl.tabs.length;
         tabService.setCurrentTab(newTab);
         containerCtrl.tabs.push(newTab);

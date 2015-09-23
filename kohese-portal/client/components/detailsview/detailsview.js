@@ -26,8 +26,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
 
     if (detailsCtrl.tab.state === 'kohese.explore.create'){
         detailsCtrl.enableEdit = true;
-        console.log(detailsCtrl.tab);
-        console.log(detailsCtrl.enableEdit);
     }
 
     if (detailsCtrl.tab.state === 'kohese.investigate'){

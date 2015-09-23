@@ -80,6 +80,25 @@ body {
   }
 }
 
+.admin-screen {
+
+
+  #admin-user-list {
+    float: left;
+    width: 45%;
+    overflow: auto;
+    height: 100%;
+  }
+
+  #admin-user-form {
+    float: right;
+    width: 45%;
+    margin: 5px;
+  }
+
+
+}
+
 table {
   th {
     .glyphicon-plus {

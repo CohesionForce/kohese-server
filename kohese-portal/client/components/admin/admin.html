@@ -1,0 +1,44 @@
+<div class="admin-screen">
+    <div class="panel">
+        <div class="panel-heading">Admin</div>
+        <div class="panel-body">
+            <div id="admin-user-list">
+                <h2>Users:</h2>
+
+                <div class="panel" ng-repeat="user in adminCtrl.users">
+                    <div class="panel-body"></div>
+                    {{user.name}} - {{user.description}}
+                    <div class="panel-footer">
+                        <i ng-click="adminCtrl.deleteUser(user)" class="fa fa-trash"></i>
+                        <i ng-click="adminCtrl.editUser(user)" class="fa fa-edit"></i>
+                    </div>
+                </div>
+
+            </div>
+            <div id="admin-user-form">
+                <button class="btn btn-default"
+                        ng-click="adminCtrl.addUser();"
+                        ng-if="!adminCtrl.addUserForm">Add User
+                </button>
+
+                <div ng-if="adminCtrl.addUserForm || adminCtrl.editUserForm">
+
+                    <h3>{{adminCtrl.currentForm}}</h3>
+
+                    <form>
+                        <label>Username<input ng-model="adminCtrl.usernameInput" type="text"></label>
+                        <br/>
+                        <label>Description<input ng-model="adminCtrl.descriptionInput" type="text"></label>
+                        <br/>
+                        <label>Password<input ng-model="adminCtrl.passwordInput" type="password"></label>
+                        <br/>
+                        <label>Confirm Password<input ng-model="adminCtrl.confirmPasswordInput" type="password"></label>
+                        <br/>
+                    </form>
+                    <button class="btn btn-primary" ng-click="adminCtrl.upsertUser()">Submit</button>
+                    <button class="btn btn-danger" ng-click="adminCtrl.cancelForm()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
