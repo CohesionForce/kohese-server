@@ -32,18 +32,9 @@ var sideNavDirective = function () {
         templateUrl: 'components/navigationmenu/navigation.html'
     }
 };
-var collapsingMenuDirective = function () {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attribute) {
-            element.metisMenu();
-        }
-    }
-};
 
 export default () => {
     angular.module('app.navigationmenu', ['app.services.navigationservice', 'app.services.tabservice'])
         .directive('sideNav', sideNavDirective)
-        .directive('collapsingMenu', collapsingMenuDirective)
         .controller('NavigationController', NavigationController);
 }
