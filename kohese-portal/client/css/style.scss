@@ -82,20 +82,29 @@ body {
 
 .admin-screen {
 
-
   #admin-user-list {
     float: left;
     width: 45%;
     overflow: auto;
     height: 100%;
+
+    .footer-icons {
+      float: right;
+      i {
+        height: 20px;
+        width: 20px;
+      }
+    }
   }
 
   #admin-user-form {
+
     float: right;
     width: 45%;
-    margin: 5px;
+    * {
+      margin: 5px;
+    }
   }
-
 
 }
 

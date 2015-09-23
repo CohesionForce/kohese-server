@@ -50,10 +50,16 @@ body {
   width: 45%;
   overflow: auto;
   height: 100%; }
+  .admin-screen #admin-user-list .footer-icons {
+    float: right; }
+    .admin-screen #admin-user-list .footer-icons i {
+      height: 20px;
+      width: 20px; }
 .admin-screen #admin-user-form {
   float: right;
-  width: 45%;
-  margin: 5px; }
+  width: 45%; }
+  .admin-screen #admin-user-form * {
+    margin: 5px; }
 
 table th .glyphicon-plus {
   color: green; }

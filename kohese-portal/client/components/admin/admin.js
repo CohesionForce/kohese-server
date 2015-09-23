@@ -31,6 +31,7 @@ function AdminController(tabService, $scope, KoheseUser) {
         ctrl.editUserForm = true;
         ctrl.currentForm = 'Edit User';
         ctrl.selectedUser = user;
+        console.log(user);
     };
 
     ctrl.addUser = function(){

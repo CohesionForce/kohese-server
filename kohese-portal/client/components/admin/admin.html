@@ -6,11 +6,18 @@
                 <h2>Users:</h2>
 
                 <div class="panel" ng-repeat="user in adminCtrl.users">
-                    <div class="panel-body"></div>
-                    {{user.name}} - {{user.description}}
+                    <div class="panel-title">
+                        {{user.name}}
+                    </div>
+                    <div class="panel-body">
+                        {{user.description}}
+                    </div>
                     <div class="panel-footer">
+                        Modified on {{user.modifiedOn | date }} by {{user.modifiedBy}}
+                        <div class="footer-icons">
                         <i ng-click="adminCtrl.deleteUser(user)" class="fa fa-trash"></i>
                         <i ng-click="adminCtrl.editUser(user)" class="fa fa-edit"></i>
+                        </div>
                     </div>
                 </div>
 
