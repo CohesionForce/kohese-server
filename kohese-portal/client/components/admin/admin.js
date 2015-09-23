@@ -29,7 +29,9 @@ function AdminController(tabService, $scope, KoheseUser) {
         ctrl.usernameInput = user.name;
         ctrl.descriptionInput = user.description;
         ctrl.editUserForm = true;
-        ctrl.currentForm = 'Edit User'
+        ctrl.currentForm = 'Edit User';
+        ctrl.selectedUser = user;
+        console.log(user);
     };
 
     ctrl.addUser = function(){
@@ -44,19 +46,29 @@ function AdminController(tabService, $scope, KoheseUser) {
     ctrl.cancelForm = function(){
         ctrl.addUserForm = false;
         ctrl.editUserForm = false;
+        ctrl.editedUser = null;
     };
+
+    function updateUserObject(user){
+        user.name = ctrl.usernameInput;
+        user.description = ctrl.descriptionInput;
+        user.password = ctrl.passwordInput
+
+    }
 
     ctrl.upsertUser = function () {
         if (ctrl.passwordInput == ctrl.confirmPasswordInput) {
-            KoheseUser.upsert({
-                name: ctrl.usernameInput,
-                description: ctrl.descriptionInput,
-                password: ctrl.passwordInput
-            }).$promise.then(function (results) {
+            if(!ctrl.editUserForm){
+                ctrl.selectedUser = new KoheseUser();
+            }
+            updateUserObject(ctrl.selectedUser);
+            KoheseUser.upsert(ctrl.selectedUser)
+                .$promise.then(function (results) {
                     fetchUsers();
                 });
             ctrl.addUserForm = false;
             ctrl.editUserForm = false;
+            ctrl.editedUser = null;
             ctrl.usernameInput = '';
             ctrl.descriptionInput = '';
             ctrl.passwordInput = '';
@@ -74,7 +86,6 @@ function AdminController(tabService, $scope, KoheseUser) {
             })
     };
 
-    ctrl.title = 'Admin Controller';
 
 }
 
