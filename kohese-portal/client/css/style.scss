@@ -88,11 +88,64 @@ body {
     overflow: auto;
     height: 100%;
 
-    .footer-icons {
-      float: right;
-      i {
-        height: 20px;
-        width: 20px;
+    .card-container {
+      $card-size : 250px;
+      perspective: 400px;
+      .card {
+        width: $card-size;
+        margin: 20px;
+        transition: all 0.6s ease;
+        transform-style: preserve-3d;
+        border-radius: 30px;
+
+        .front {
+          background-color: $primaryColor;
+          backface-visibility: hidden;
+          height: $card-size;
+          border-radius: 30px;
+          .title {
+            padding: 10px;
+            font-size: 24px;
+            color: white;
+            background-color: $primaryColor + 100
+          }
+
+          .body {
+            color: white;
+            padding: 10px;
+          }
+          .footer {
+            position: absolute;
+            bottom: 0;
+            width: $card-size;
+            padding: 10px;
+            background-color: $primaryColor + 200;
+            color: black;
+          }
+        }
+
+        .back {
+          border-radius: 30px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          padding: 10px;
+          height: $card-size;
+          width: $card-size;
+          transform: rotateY(180deg);
+          background-color: $primaryColor;
+          backface-visibility: hidden;
+          color: white;
+        }
+
+        &:hover {
+          -webkit-transition-delay: .6s;
+          -moz-transition-delay: .6s;
+          -o-transition-delay: .6s;
+          -ms-transition-delay: .6s;
+          transition-delay: .6s;
+          transform: rotateY(180deg);
+        }
       }
     }
   }
@@ -101,6 +154,9 @@ body {
 
     float: right;
     width: 45%;
+    position: fixed;
+    top: 200px;
+    right: 0px;
     * {
       margin: 5px;
     }
