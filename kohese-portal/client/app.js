@@ -18,11 +18,13 @@ const appModule = angular.module('app', [
     'app.directives.navigation',
     'app.directives.resizer',
     'app.directives.resizeable',
+    'app.directives.treerow',
     'lbServices',
     require('angular-ui-router'),
     'angular-jwt',
     'ui.bootstrap',
-    'btford.socket-io'
+    'btford.socket-io',
+    'RecursionHelper'
 
 ]);
 
@@ -102,7 +104,7 @@ appModule
     })
     .filter('highlight', function ($sce) {
         return function (text, phrase) {
-            if (text !== null && phrase !== "") {
+            if (text !== null && angular.isDefined(phrase) && phrase !== "") {
                 let cleanedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
                 if (cleanedPhrase) text = text.replace(new RegExp('(' + cleanedPhrase + ')', 'gi'),
                     '<span class="highlighted">$1</span>');

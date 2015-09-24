@@ -9,4 +9,5 @@ export default() => {
     require('./resizeable')();
     require('./resizer')();
     require('./navDirectives/navDirectives')();
+    require('./knowledgeTree/treeRow')();
 }
