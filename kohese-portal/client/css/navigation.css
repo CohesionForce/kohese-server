@@ -83,6 +83,7 @@
     .sidebar .static-side-panel i {
       padding: 10px; }
   .sidebar .side-pane {
+    display: none;
     position: static;
     z-index: -1;
     -webkit-transform: translateX(-150%);
@@ -108,6 +109,7 @@
     background-color: #660000; }
 
 .side-pane.open {
+  display: block;
   -webkit-transform: translateX(50px);
   -moz-transform: translateX(50px);
   -ms-transform: translateX(50px);

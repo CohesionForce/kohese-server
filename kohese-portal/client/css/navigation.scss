@@ -131,6 +131,7 @@ $leftNavWidth: 50px;
   }
 
   .side-pane {
+    display: none;
     position: static;
     z-index: -1;
     -webkit-transform: translateX(-150%);
@@ -178,6 +179,7 @@ $leftNavWidth: 50px;
 }
 
 .side-pane.open {
+  display: block;
   -webkit-transform: translateX($leftNavWidth);
   -moz-transform: translateX($leftNavWidth);
   -ms-transform: translateX($leftNavWidth);
