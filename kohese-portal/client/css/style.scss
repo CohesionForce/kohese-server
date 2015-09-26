@@ -166,15 +166,11 @@ body {
 
 .knowledge-tree {
     border-collapse: collapse;
-    width: 100%;
+    width: 90%;
+    margin: 0px 20px 0px 20px;
 
     .kt-icon, .kt-label {
 	    cursor: pointer; 
-    }
-    
-    .indented {
-        position: relative; 
-
     }
 }
 
@@ -193,6 +189,11 @@ body {
     line-height: 20px;
     border-bottom: 2px solid #ddd;
 }
+
+.kt-collection .kt-hidden {
+    display: none;
+}
+
 .knowledge-tree .kt-head, .knowledge-tree .kt-item {
 	width: 100%;
 }
@@ -204,7 +205,7 @@ body {
 .knowledge-tree .kt-head {
     font-weight: bold;
     vertical-align: bottom;
-    border-bottom: 2px solid #ddd;  
+    border-bottom: 2px solid #ddd;
 }
 
 .kth-cell, .kti-cell {
@@ -214,28 +215,18 @@ body {
 }
 
 .kti-name {
-  @extend .kti-cell;
-  width: 25%;
+    display: inline-block;
+    vertical-align: top;
+    padding: 5px 0px 5px;
+    width: 40%;
 }
 
 .kti-description {
-  @extend .kti-cell;
-  width: 70%
+    display: inline-block;
+    vertical-align: top;
+    padding: 5px 0px 5px;
+    width: 40%;
 }
-
-.kti-description {
-}
-
-/*
-.knowledge-tree .kt-head .glyphicon-plus {
-  color: green; }
-.knowledge-tree .kt-head .glyphicon-plu:hover {
-    cursor: pointer; }
-.knowledge-tree .kt-item .glyphicon-remove {
-  color: #ca6464; }
-.knowledge-tree .kt-item .glyphicon-remove:hover {
-    cursor: pointer; }
-*/
 
 .knowledge-tree {
   .kt-head {
