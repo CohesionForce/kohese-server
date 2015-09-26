@@ -99,7 +99,6 @@ export default () => {
                         }
                     }
                 }
-                updateTreeRows();
             } else {
                 addItemToTree(results);
             }
@@ -148,9 +147,6 @@ export default () => {
             // Create the proxy and add it to tree structures
             createItemProxy(item);
 
-            // Add the node to the tree rows
-            updateTreeRows();
-
         }
 
         function removeItemFromTree(byId) {
@@ -165,7 +161,6 @@ export default () => {
 
             delete tree.proxyMap[byId];
 
-            updateTreeRows();
         }
 
         function createItemProxy(forItem) {
@@ -230,7 +225,6 @@ export default () => {
                 }
             }
 
-            updateTreeRows();
         }
 
         function attachToLostAndFound(byId) {
@@ -244,54 +238,6 @@ export default () => {
             var lostAndFound = getItem(lostProxy.item.parentId)
             lostAndFound.children.push(lostProxy);
             tree.parentOf[byId] = lostAndFound;
-        }
-
-        function updateTreeRows() {
-            var rowStack = [];
-
-            // Push the nodes onto the rowStack in reverse order
-            for (var idx = tree.roots.length - 1; idx >= 0; idx--) {
-                rowStack.push(tree.roots[idx]);
-            }
-
-            var newTreeRows = [];
-            var node;
-
-            // Process each node from the top of the stack.  This will behave like
-            // a pre-ordered depth first iteration over the tree.
-            while (node = rowStack.pop()) {
-                var parentRef = getItem(node.item.parentId);
-                if (angular.isDefined(parentRef)) {
-                    node.level = parentRef.level + 1;
-                } else {
-                    node.level = 1;
-                }
-                newTreeRows.push(node);
-
-                if (angular.isDefined(node.children)) {
-                    for (var childIdx = node.children.length - 1; childIdx >= 0; childIdx--) {
-                        rowStack.push(node.children[childIdx]);
-                    }
-                } else {
-                    // Create an empty children list
-                    node.children = [];
-                }
-
-                tree.rows = newTreeRows;
-            }
-
-            // Detect any remaining unconnected nodes
-            for (var id in tree.proxyMap) {
-                if (angular.isUndefined(tree.proxyMap[id].level)) {
-                    console.log("Warning:  Node parent is missing for " + id);
-                    console.log(tree.proxyMap[id]);
-                }
-                if (angular.isUndefined(tree.proxyMap[id].item)) {
-                    console.log("Warning:  Found " + id);
-                    console.log(tree.proxyMap[id]);
-                }
-            }
-
         }
 
         var lookup = {};
