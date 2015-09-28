@@ -32,7 +32,7 @@
 </div>
 <div ng-if="itemProxy.children">
     <div class="kt-collection" 
-         ng-repeat="itemProxy in itemProxy.children"
+         ng-repeat="itemProxy in filteredChildren = (itemProxy.children  | filter:treeCtrl.filterString)"
          ng-class="{'kt-hidden' : itemProxy.item.parentId && treeCtrl.collapsed[itemProxy.item.parentId]}">
         <tree-row item-proxy="itemProxy" tree-ctrl="treeCtrl"></tree-row>
     </div>
