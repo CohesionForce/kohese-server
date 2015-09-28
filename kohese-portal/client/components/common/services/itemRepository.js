@@ -37,11 +37,16 @@ export default () => {
         
 
         function fetchItems() {
+            console.log('::: Fetching: ' + Date.now()/1000);
             Item.find().$promise.then(function (itemResults) {
+                console.log('::: Received Items: ' + Date.now()/1000);
                 Category.find().$promise.then(function (categoryResults) {
+                  console.log('::: Received Categories: ' + Date.now()/1000);
                   KoheseUser.find().$promise.then(function (userResults) {
+                  console.log('::: Received Users: ' + Date.now()/1000);  
                   var results = itemResults.concat(categoryResults).concat(userResults);
                   convertListToTree(results, 'id', 'parentId');
+                  console.log('::: List converted: ' + Date.now()/1000);
                   $rootScope.$broadcast('itemRepositoryReady')
                   });
                 });

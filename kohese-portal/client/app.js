@@ -32,6 +32,7 @@ const appModule = angular.module('app', [
 appModule
     .constant('API_URL', '')
     .config(function ($httpProvider, $stateProvider, $urlRouterProvider) {
+        console.log('::: App started: ' + Date.now()/1000);
         $httpProvider.interceptors.push('AuthInterceptor');
         $stateProvider
             .state('login', {
