@@ -102,6 +102,7 @@ body {
   border-collapse: collapse;
   width: calc(100% - 20px);
   margin: 0px 0px 0px 20px;
+  height: calc(100% - 40px);
   max-height: 500px;
   overflow: auto; }
   .knowledge-tree .kt-icon, .knowledge-tree .kt-label {
@@ -175,6 +176,8 @@ table td .glyphicon-remove {
   #page-wrapper #content-container {
     z-index: 2;
     border-radius: 10px; }
+    #page-wrapper #content-container .resizeable {
+      height: inherit; }
     #page-wrapper #content-container button {
       border-radius: 10px; }
     #page-wrapper #content-container #content-resizer {
@@ -186,7 +189,6 @@ table td .glyphicon-remove {
       background-color: #005A31;
       cursor: n-resize; }
     #page-wrapper #content-container .top-content {
-      overflow: auto;
       left: 0;
       width: 100%; }
       #page-wrapper #content-container .top-content #top-action-bar {
