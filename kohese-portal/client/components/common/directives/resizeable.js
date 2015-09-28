@@ -27,7 +27,11 @@ export default () => {
                     //console.log("Top content connected");
                     $element.css({
                         bottom: 416 + 'px'
-                    })
+                    });
+                    $element.css({
+                        height: (window.innerHeight - 510) + 'px'
+                    });
+
                 }
                 if ($attrs.id === bottomID) {
                     //console.log("Bottom Content Connected");

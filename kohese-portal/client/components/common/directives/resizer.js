@@ -52,6 +52,11 @@ export default () => {
                         $($attrs.resizerTop).css({
                             bottom: (y + parseInt($attrs.resizerHeight)) + 'px'
                         });
+
+                        $($attrs.resizerTop).css({
+                            height: (window.innerHeight - y - 100) + 'px'
+                        });
+
                         $($attrs.resizerBottom).css({
                             height: y + 'px'
                         });
