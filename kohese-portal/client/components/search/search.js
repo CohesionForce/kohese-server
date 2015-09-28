@@ -13,7 +13,11 @@ function SearchController(ItemRepository, tabService, $state, $stateParams) {
       ctrl.itemList.push(ctrl.itemStore.proxyMap[key]);
     }
 
+    if (ctrl.searchString !== '') {
     tab.setTitle('Search - ' + ctrl.searchString);
+    } else {
+        tab.setTitle('Search - All')
+    };
 
     if($stateParams.id){
         ctrl.currentItem = $stateParams.id;
