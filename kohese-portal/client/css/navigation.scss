@@ -4,9 +4,15 @@ $accentColor: #99CC99;
 $secondaryColor: #660000;
 $navHover: $secondaryColor + 100;
 
+$leftNavWidth: 50px;
+
 .navbar {
-  height: 30px;
-  border: 0px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 50px;
+  border: 0;
+  width: 100%;
   background: -webkit-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -moz-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -ms-linear-gradient(right, $primaryColor + 100, $primaryColor);
@@ -30,7 +36,7 @@ $navHover: $secondaryColor + 100;
           color: white;
         }
         > span {
-          color:white;
+          color: white;
         }
       }
 
@@ -94,7 +100,7 @@ $navHover: $secondaryColor + 100;
   padding: 5px;
   font-size: 18px;
   background-color: $primaryColor;
-  color:white;
+  color: white;
   i {
     margin-right: 15px;
   }
@@ -102,7 +108,49 @@ $navHover: $secondaryColor + 100;
 
 .sidebar {
   color: whitesmoke;
-  padding-left: 5px;
+  position: relative;
+  top: 50px;
+  left: 0;
+  height: calc(100% - 50px);
+
+  .static-side-panel {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    height: 100%;
+    width: 50px;
+    z-index: 7;
+    background-image: -webkit-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    background-image: -moz-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    background-image: -ms-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    background-image: -o-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    i {
+      padding: 10px;
+    }
+
+  }
+
+  .side-pane {
+    display: none;
+    position: static;
+    z-index: -1;
+    -webkit-transform: translateX(-150%);
+    -moz-transform: translateX(-150%);
+    -ms-transform: translateX(-150%);
+    -o-transform: translateX(-150%);
+    transform: translateX(-150%);
+    transition: transform 0.6s ease;
+    padding-bottom: 50px;
+    width: 250px;
+    height: 900px;
+    border-radius: 10px;
+    background-image: -webkit-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    background-image: -moz-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    background-image: -ms-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    background-image: -o-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+
+  }
+
   .sidebar-nav {
     .navbar-collapse {
       padding-right: 0;
@@ -111,57 +159,37 @@ $navHover: $secondaryColor + 100;
   }
 
   .sidebar-search {
+    border-radius: 10px;
     padding: 15px;
+    background-color: $secondaryColor;
 
   }
 
-  ul {
+  //ul {
+  //
+  //  position: absolute;
+  //  li {
+  //    &:not(.sidebar-search):hover {
+  //      background-color: $navHover;
+  //    }
+  //    border-bottom: 1px solid white;
+  //  }
+  //}
 
-    position: absolute;
-    li {
-      &:not(.sidebar-search):hover {
-        background-color: $navHover;
-      }
-      border-bottom: 1px solid white;
-    }
-  }
+}
 
-  .arrow {
-    float: right;
-  }
-
-  .fa.arrow:before {
-    content: "\f104";
-  }
-
-  .nav-second-level li,
-  .nav-third-level li {
-    border-bottom: 0 !important;
-  }
-
-  .nav-second-level {
-    li {
-      a {
-        padding-left: 37px;
-      }
-    }
-  }
-
-  .nav-third-level {
-    li {
-      a {
-        padding-left: 52px;
-      }
-    }
-  }
-
+.side-pane.open {
+  display: block;
+  -webkit-transform: translateX($leftNavWidth);
+  -moz-transform: translateX($leftNavWidth);
+  -ms-transform: translateX($leftNavWidth);
+  -o-transform: translateX($leftNavWidth);
+  transform: translateX($leftNavWidth);
+  z-index: 10;
 }
 
 @media(min-width: 768px) {
   .sidebar {
-    z-index: -1;
-    position: absolute;
-    width: 245px;
     margin-top: 50px;
   }
 }

@@ -1,4 +1,4 @@
-$leftNavWidth: 250px;
+$leftNavWidth: 50px;
 $topNavHeight: 40px;
 $primaryColor: #005A31;
 $accentColor: #CBE32D;
@@ -8,10 +8,6 @@ $secondaryColor: #660000;
 $secondaryFade: $secondaryColor;
 
 body {
-  background-image: -webkit-linear-gradient(bottom, $secondaryColor + 100, $secondaryFade);
-  background-image: -moz-linear-gradient(bottom, $secondaryColor + 100, $secondaryFade);
-  background-image: -ms-linear-gradient(bottom, $secondaryColor + 100, $secondaryFade);
-  background-image: -o-linear-gradient(bottom, $secondaryColor + 100, $secondaryFade);
   font-family: FontAwesome, arial, sans-serif;
 }
 
@@ -28,6 +24,7 @@ body {
 .panel {
 
   .panel-title {
+    overflow: auto;
     background-color: $primaryColor + 100;
     padding: 7px;
     color: whitesmoke;
@@ -53,15 +50,6 @@ body {
   background: yellow;
 }
 
-#wrapper {
-  width: 100%;
-}
-
-#page-wrapper {
-  padding: 0;
-  background-color: #fff;
-}
-
 @media (min-width: 768px) {
   #page-wrapper {
     position: inherit;
@@ -82,14 +70,16 @@ body {
 
 .admin-screen {
 
+  overflow: auto;
+  width: 100%;
+
   #admin-user-list {
     float: left;
     width: 45%;
-    overflow: auto;
     height: 100%;
 
     .card-container {
-      $card-size : 250px;
+      $card-size: 250px;
       perspective: 400px;
       .card {
         width: $card-size;
@@ -166,8 +156,11 @@ body {
 
 .knowledge-tree {
     border-collapse: collapse;
-    width: calc(100%-40px);
-    margin: 0px 20px 0px 20px;
+    width: calc(100%-20px);
+    margin: 0px 0px 0px 20px;
+    max-height: 250px;
+    overflow: auto;
+    
 
     .kt-icon, .kt-label {
 	    cursor: pointer; 
@@ -268,94 +261,100 @@ table {
   }
 }
 
-#content {
-  border-radius: 10px;
-  button {
+#page-wrapper {
+  position: relative;
+  top: 50px;
+  z-index:1;
+  height: 100%;
+  #content-container {
+    z-index: 2;
     border-radius: 10px;
-  }
-}
+    .nav {
+    }
+    button {
+      border-radius: 10px;
 
-#content-resizer {
-  position: absolute;
-  height: 6px;
-  left: $leftNavWidth;
-  bottom: 410px;
-  right: 0;
-  background-color: $primaryColor;
-  cursor: n-resize;
-}
+    }
+    #content-resizer {
+      position: absolute;
+      height: 6px;
+      left: 0;
+      bottom: 410px;
+      right: 0;
+      background-color: $primaryColor;
+      cursor: n-resize;
+    }
+    .top-content {
+      overflow: auto;
+      left: 0;
+      width: 100%;
 
-.top-content {
-  position: absolute;
-  overflow: auto;
-  top: 135px;
-  width: calc(100% - 250px);
-}
+      #top-action-bar {
+        position: relative;
+        top: 0px;
+        width: 100%;
+        .button-selected {
+          background-color: $primaryColor + 100;
+          color: white;
+        }
+      }
+    }
 
-.bottom-content {
-  position: absolute;
-  overflow: auto;
-  bottom: 0;
-  right: 0;
-  left: $leftNavWidth;
-  width: calc(100% - 250px);
-  background-color: white;
-  > div {
-    height: 100%;
-  }
-}
-
-#add-tab-button {
-  background-color: white;
-}
-
-#top-action-bar {
-  position: fixed;
-  top: 95px;
-  left: $leftNavWidth;
-  width: 82.5%;
-  .button-selected {
-    background-color: $primaryColor + 100;
-    color: white;
-  }
-}
-
-#login-form {
-  text-align: center;
-
-  h1 {
-    font-size: 60px;
-    margin-top: auto;
-    font-family: lobster, arial, sans-serif;
-  }
-
-  input {
-    margin: 5px;
-  }
-
-  button {
-    color: white;
-    padding: 10px;
-    margin: 5px;
-    width: 20%;
-    background-color: $primaryColor;
-    &:hover {
-      color: white;
-      background-color: $primaryColor + 100;
+    .bottom-content {
+      position: absolute;
+      overflow: auto;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      > div {
+        height: 100%;
+      }
     }
   }
 }
 
-.trim-info {
-  max-width: 50em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  position: relative;
-}
+  #add-tab-button {
+    background-color: white;
+  }
 
-.trim-info-visible {
-  max-width: 50em;
-  white-space: pre-wrap;
-  position: relative;
-}
+  #login-form {
+    text-align: center;
+
+    h1 {
+      font-size: 60px;
+      margin-top: auto;
+      font-family: lobster, arial, sans-serif;
+    }
+
+    input {
+      margin: 5px;
+    }
+
+    button {
+      color: white;
+      padding: 10px;
+      margin: 5px;
+      width: 20%;
+      background-color: $primaryColor;
+      &:hover {
+        color: white;
+        background-color: $primaryColor + 100;
+      }
+    }
+  }
+
+  .trim-info {
+    max-width: 50em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .trim-info-visible {
+    max-width: 50em;
+    white-space: pre-wrap;
+    position: relative;
+  }

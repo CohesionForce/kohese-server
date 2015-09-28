@@ -7,11 +7,30 @@
 
 
 export default () => {
-    angular.module('app.directives.resizer', [])
-        .directive('resizer', function ($document) {
+    angular.module('app.directives.resizer', ['app.services.resizerservice'])
+        .directive('resizer', function ($document, resizerService) {
 
             return function ($scope, $element, $attrs) {
                 var y;
+
+                $scope.$on('$stateChangeStart', function(){
+                    resizerService.setY($attrs.resizerKey, y);
+                });
+
+                $scope.$on('$viewContentLoaded',
+                    function (event) {
+                        y = resizerService.getY($attrs.resizerKey);
+                        $element.css({
+                            bottom: y + 'px'
+                        });
+
+                        $($attrs.resizerTop).css({
+                            bottom: (y + parseInt($attrs.resizerHeight)) + 'px'
+                        });
+                        $($attrs.resizerBottom).css({
+                            height: y + 'px'
+                        });
+                    });
 
                 $element.on('mousedown', function (event) {
                     event.preventDefault();

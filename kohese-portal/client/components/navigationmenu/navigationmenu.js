@@ -17,6 +17,10 @@ function NavigationController($rootScope, navigationService, $scope, AuthTokenFa
         });
     };
 
+    ctrl.toggleSideBar = function(){
+        $('.side-pane').toggleClass('open')
+    };
+
     $scope.$on('userLoggedIn', function onUserLogin(){
         ctrl.userLoggedIn = true;
     });

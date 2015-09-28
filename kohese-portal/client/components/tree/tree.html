@@ -15,22 +15,21 @@
 		</span>
 	</div>
 
-	<div>
-		<div class="knowledge-tree">
-			<div class="kt-head">
-				<div class="kth-cell kti-name">Name</div>
-				<div class="kth-cell kti-description">Description</div>
-				<div class="kth-cell pull-right">
-					<i class="glyphicon glyphicon-plus pull-right"
-						ui-sref="kohese.explore.create()"
-						ng-click="treeCtrl.updateTab('create')"></i>
-				</div>
+	<div class="knowledge-tree">
+		<div class="kt-head">
+			<div class="kth-cell kti-name">Name</div>
+			<div class="kth-cell kti-description">Description</div>
+			<div class="kth-cell pull-right">
+				<i class="glyphicon glyphicon-plus pull-right"
+					ui-sref="kohese.explore.create()"
+					ng-click="treeCtrl.updateTab('create')"></i>
 			</div>
-			<div class="kt-body">
-				<div class="kt-collection"
-					ng-repeat="itemProxy in filteredItems = (treeCtrl.newTree.roots | filter:treeCtrl.filterString)">
-                   <tree-row item-proxy="itemProxy" tree-ctrl="treeCtrl"></tree-row>
-			    </div>
+		</div>
+		<div class="kt-body">
+			<div class="kt-collection"
+				ng-repeat="itemProxy in filteredItems = (treeCtrl.newTree.roots | filter:treeCtrl.filterString)">
+				<tree-row item-proxy="itemProxy" tree-ctrl="treeCtrl"></tree-row>
 			</div>
 		</div>
 	</div>
+</div>
