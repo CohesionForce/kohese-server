@@ -16,52 +16,10 @@
 	</div>
 
 	<div>
-
-		<script type="text/ng-template" id="itemTreeRow">
-            <div id="{{itemProxy.item.id}}"
-            	 class="kt-item level-{{itemProxy.level}}"
-	            <div class="kti-name" ng-style="{'font-weight': 'bold'}">
-		          <a style=""> 
-                      <i
-			             ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]"
-			             ng-init="treeCtrl.collapsed[itemProxy.item.id]=false"
-                         class="kt-icon"
-			             ng-class="{'glyphicon fa icon-minus glyphicon-minus fa-minus': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id], 
-                                    'glyphicon fa icon-plus glyphicon-plus fa-plus': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id], 
-                                    'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0), 
-                                    'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}">
-		               </i>
-                  </a> 
-                  <span ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
-			            class="kt-label"
-			            ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filterString)"
-			            ng-click="treeCtrl.updateTab('edit', itemProxy.item.id)">
-                  </span>
-	            </div>
-                <div class="kti-description"
-		             ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
-		             ng-dblclick="showDescription=!showDescription"
-		             ng-init="showDescription=false"
-		             ng-bind-html="itemProxy.item.description | highlight:treeCtrl.filterString"></div>
-	            <div class="kti-cell pull-right">
-		             <i class="glyphicon glyphicon-remove  pull-right"
-			            ng-click="treeCtrl.removeItem(itemProxy.item)"></i>
-                </div>
-         </div>
-
-          <div ng-if="itemProxy.children">
-            <div class="kt-collection" 
-                 ng-repeat="itemProxy in itemProxy.children"
-                 ng-class="{'kt-hidden' : itemProxy.item.parentId && treeCtrl.collapsed[itemProxy.item.parentId]}"
-                 ng-include="'itemTreeRow'">
-            </div>
-          </div>
-        </script>
-
 		<div class="knowledge-tree">
 			<div class="kt-head">
-				<div class="kth-cell">Name</div>
-				<div class="kth-cell">Description</div>
+				<div class="kth-cell kti-name">Name</div>
+				<div class="kth-cell kti-description">Description</div>
 				<div class="kth-cell pull-right">
 					<i class="glyphicon glyphicon-plus pull-right"
 						ui-sref="kohese.explore.create()"
@@ -70,8 +28,9 @@
 			</div>
 			<div class="kt-body">
 				<div class="kt-collection"
-					ng-repeat="itemProxy in treeCtrl.newTree.roots"
-					ng-include="'itemTreeRow'"></div>
+					ng-repeat="itemProxy in treeCtrl.newTree.roots">
+                   <tree-row item-proxy="itemProxy" tree-ctrl="treeCtrl"></tree-row>
+			    </div>
 			</div>
 		</div>
 	</div>

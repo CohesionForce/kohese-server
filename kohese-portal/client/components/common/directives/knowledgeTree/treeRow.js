@@ -3,24 +3,22 @@
  */
 
 export default () => {
-  angular.module('app.directives.treerow', [])
-  .directive('treeRow', function ($compile) {
+  angular.module('app.directives.treerow', ['RecursionHelper'])
+  .directive('treeRow', function (RecursionHelper) {
     return {restrict: 'E',
             scope: {
               itemProxy: '=',
               treeCtrl: '='
             },
             templateUrl: 'components/common/directives/knowledgeTree/treeRow.html',
-            replace: true,
-            link: function(scope, element, attrs){
-//              console.log("::: Processing proxy for " + scope.itemProxy.item.name);
-//              $compile(element);
-            }            
-//            compile: function(element) {
-//              // Use the compile function from the RecursionHelper,
-//              // And return the linking function(s) which it returns
-//              return RecursionHelper.compile(element);
-//            }
+            compile: function(element) {
+              return RecursionHelper.compile(element, function(scope, iElement, iAttrs, controller, transcludeFn){
+//                console.log("compile: " + Date.now()/1000);
+                // Define your normal link function here.
+                // Alternative: instead of passing a function,
+                // you can also pass an object with 
+                // a 'pre'- and 'post'-link function.
+            })}
     };
   });
 }
