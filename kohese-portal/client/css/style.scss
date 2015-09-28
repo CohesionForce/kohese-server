@@ -166,7 +166,7 @@ body {
 
 .knowledge-tree {
     border-collapse: collapse;
-    width: 90%;
+    width: calc(100%-40px);
     margin: 0px 20px 0px 20px;
 
     .kt-icon, .kt-label {
