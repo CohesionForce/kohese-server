@@ -106,6 +106,7 @@ function ContainerController(tabService, navigationService, $scope, $state) {
 
     containerCtrl.setTab = function (tab) {
         console.log(tab);
+        tab.active = true;
         containerCtrl.tabService.setCurrentTab(tab);
         $state.go(tab.state, tab.params);
         $scope.$broadcast('tabSelected');

@@ -7,7 +7,7 @@ function SearchController(ItemRepository, tabService, $state, $stateParams) {
     var tab = tabService.getCurrentTab();
 
     ctrl.itemStore = ItemRepository.internalTree;
-    ctrl.searchString = $stateParams.filter;
+    ctrl.searchString = tab.params.filter;
     ctrl.itemList = [];
     for(var key in ctrl.itemStore.proxyMap){
       ctrl.itemList.push(ctrl.itemStore.proxyMap[key]);
