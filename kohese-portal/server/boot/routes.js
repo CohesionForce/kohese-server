@@ -31,17 +31,19 @@ module.exports = function (app) {
           return;
         }
 
-        if (body.username != body.password) {
-            res.status(401).end('Login failed');
-            return;
-        }
-
-        console.log("::: Authenticated: " + req.body.username);
-        var token = jwt.sign({
+        app.models.KoheseUser.login(body.username, body.password, function processCallback(err, user) {
+          if (err){
+            res.status(401).end('Login failed: ' + err);
+            return;            
+          }
+          
+          console.log("::: Authenticated: " + user.name + " - " + user.description);
+          var token = jwt.sign({
             username: req.body.username
           }, jwtSecret);
           res.send(token);
-}
+        });        
+    }
 
     app.use(function(req,res,next){
       console.log("At:      " + Date.now());
