@@ -3,7 +3,6 @@
   "base": "PersistedModel",
   "strict": "validate",
   "idInjection": true,
-  "persistUndefinedAsNull": true,
   "trackChanges": false,
   "properties": {
     "id": {

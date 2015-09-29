@@ -2,6 +2,7 @@
   "name": "KoheseUser",
   "base": "Item",
   "idInjection": true,
+  "strict": "validate",
   "hidden": [
     "password"
   ],
