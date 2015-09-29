@@ -176,6 +176,7 @@ export default () => {
                 itemProxy = tree.proxyMap[primaryKey];
             }
             itemProxy.item = forItem;
+            itemProxy.children = [];
             tree.proxyMap[primaryKey] = itemProxy;
             var parent = {};
             var parentId = itemProxy.item.parentId;
