@@ -4,7 +4,7 @@
             <tab ng-click="containerCtrl.setTab(tab)" ng-repeat="tab in containerCtrl.tabs" active="tab.active">
                 <tab-heading >
                     {{tab.title}}
-                    <i ng-click=containerCtrl.deleteTab(tab) class="glyphicon glyphicon-remove"></i>
+                    <i ng-click=containerCtrl.deleteTab(tab) class="delete-tab-button glyphicon glyphicon-remove"></i>
                 </tab-heading>
                 <tab-body class="tab-body">
                     <div ng-switch on="tab.type">

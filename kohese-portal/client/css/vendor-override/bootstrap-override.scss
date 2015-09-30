@@ -2,10 +2,11 @@
 
 .btn-default {
   &:hover {
-    background-color: $primaryColor + 100;
+    background-color: $buttonAccentColor;
+    color:white;
   }
   &:active {
-    background-color: $primaryColor + 100;
+    background-color: $buttonAccentColor;
     color: whitesmoke;
   }
 }

@@ -10,14 +10,23 @@
   height: calc(100% - #{$topNavHeight});
   #content-container {
     z-index: 2;
-    border-radius: 10px;
+    border-radius: $baseBorderRadius;
+    .delete-tab-button {
+      margin-left: 2px;
+      padding: 1px;
+      &:hover {
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+      }
+    }
     #add-tab-button {
       background-color: white;
     }
     .nav {
     }
     button {
-      border-radius: 10px;
+      border-radius: $baseBorderRadius;
 
     }
     #content-resizer {
@@ -30,16 +39,20 @@
       cursor: n-resize;
     }
     .top-content {
+      position: relative;
+      top: $topActionBarHeight;
       overflow: auto;
       left: 0;
       width: 100%;
 
       #top-action-bar {
-        position: relative;
-        top: 0px;
+        padding: 1px;
+        position: fixed;
+        top: $tabBarHeight + $topNavHeight;
         width: 100%;
+        height: $topActionBarHeight;
         .button-selected {
-          background-color: $primaryColor + 100;
+          background-color: $buttonAccentColor;
           color: white;
         }
       }
