@@ -36,7 +36,7 @@
     },
     "modifiedOn": {
       "type": "number"
-    }    
+    }
   },
   "validations": [],
   "relations": {
