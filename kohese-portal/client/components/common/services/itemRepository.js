@@ -6,11 +6,13 @@ export default () => {
     var _ = require('underscore');
     var module = angular.module("app.services.itemservice", []);
 
-    module.service("ItemRepository", ['Item', 'Category', 'KoheseUser', 'socket', '$rootScope', function (Item, Category, KoheseUser, socket, $rootScope) {
+    module.service("ItemRepository", ['Item', 'Category', 'Decision', 'Action', 'KoheseUser', 'socket', '$rootScope', function (Item, Category, Decision, Action, KoheseUser, socket, $rootScope) {
 
         var itemModel = {
             Item: Item,
             Category: Category,
+            Decision: Decision,
+            Action: Action,
             KoheseUser: KoheseUser
         };
         
@@ -39,17 +41,23 @@ export default () => {
         function fetchItems() {
             console.log('::: Fetching: ' + Date.now()/1000);
             Item.find().$promise.then(function (itemResults) {
-                console.log('::: Received Items: ' + Date.now()/1000);
-                Category.find().$promise.then(function (categoryResults) {
-                  console.log('::: Received Categories: ' + Date.now()/1000);
-                  KoheseUser.find().$promise.then(function (userResults) {
-                  console.log('::: Received Users: ' + Date.now()/1000);  
-                  var results = itemResults.concat(categoryResults).concat(userResults);
-                  convertListToTree(results, 'id', 'parentId');
-                  console.log('::: List converted: ' + Date.now()/1000);
-                  $rootScope.$broadcast('itemRepositoryReady')
+              console.log('::: Received Items: ' + Date.now()/1000);
+              Category.find().$promise.then(function (categoryResults) {
+                console.log('::: Received Categories: ' + Date.now()/1000);
+                Decision.find().$promise.then(function (decisionResults) {
+                  console.log('::: Received Decisions: ' + Date.now()/1000);  
+                  Action.find().$promise.then(function (actionResults) {
+                    console.log('::: Received Actions: ' + Date.now()/1000);  
+                    KoheseUser.find().$promise.then(function (userResults) {
+                        console.log('::: Received Users: ' + Date.now()/1000);  
+                        var results = itemResults.concat(categoryResults).concat(decisionResults).concat(actionResults).concat(userResults);
+                        convertListToTree(results, 'id', 'parentId');
+                        console.log('::: List converted: ' + Date.now()/1000);
+                        $rootScope.$broadcast('itemRepositoryReady')
+                    });
                   });
                 });
+              });
             });
         }
 
@@ -176,6 +184,9 @@ export default () => {
                 itemProxy = tree.proxyMap[primaryKey];
             }
             itemProxy.item = forItem;
+            if (!itemProxy.children){
+              itemProxy.children = [];              
+            }
             tree.proxyMap[primaryKey] = itemProxy;
             var parent = {};
             var parentId = itemProxy.item.parentId;

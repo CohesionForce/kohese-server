@@ -13,7 +13,7 @@ module.exports = function (Item) {
       console.log('::: Before save - ' + ctx.Model.modelName);
       
       if (ctx.instance){
-        if (ctx.instance.createdBy === null){
+        if (!ctx.instance.createdBy){
           console.log('::: Updating created fields (instance) - ' + ctx.Model.modelName);
           ctx.instance.createdBy = ctx.instance.modifiedBy;
           ctx.instance.createdOn = ctx.instance.modifiedOn;
