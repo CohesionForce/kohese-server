@@ -1,0 +1,11 @@
+@import '../utils/variables';
+
+.btn-default {
+  &:hover {
+    background-color: $primaryColor + 100;
+  }
+  &:active {
+    background-color: $primaryColor + 100;
+    color: whitesmoke;
+  }
+}

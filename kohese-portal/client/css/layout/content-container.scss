@@ -1,0 +1,89 @@
+@import '../utils/variables';
+
+
+#page-wrapper {
+  position: relative;
+  left: $leftNavWidth;
+  top: $topNavHeight;
+  z-index: 1;
+  height: calc(100% - #{$topNavHeight});
+  #content-container {
+    z-index: 2;
+    border-radius: 10px;
+    #add-tab-button {
+      background-color: white;
+    }
+    .nav {
+    }
+    button {
+      border-radius: 10px;
+
+    }
+    #content-resizer {
+      position: absolute;
+      height: 6px;
+      left: 0;
+      bottom: 410px;
+      right: 0;
+      background-color: $primaryColor;
+      cursor: n-resize;
+    }
+    .top-content {
+      overflow: auto;
+      left: 0;
+      width: 100%;
+
+      #top-action-bar {
+        position: relative;
+        top: 0px;
+        width: 100%;
+        .button-selected {
+          background-color: $primaryColor + 100;
+          color: white;
+        }
+      }
+    }
+
+    .bottom-content {
+      position: absolute;
+      overflow: auto;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      > div {
+        height: 100%;
+      }
+    }
+  }
+}
+
+.panel {
+  .panel-title {
+    overflow: auto;
+    background-color: $primaryColor + 100;
+    padding: 7px;
+    color: whitesmoke;
+  }
+  .panel-heading {
+    color: whitesmoke;
+    background-color: $secondaryColor + 100;
+    border: 0;
+    padding: 5px 15px 5px 5px;
+    > span {
+      font-weight: bold;
+    }
+    i {
+      .fa {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  }
+}
+
+.highlighted {
+  background: yellow;
+}
+

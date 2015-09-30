@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAGE,kBAAQ;EACN,gBAAgB,EAAE,OAAmB;AAEvC,mBAAS;EACP,gBAAgB,EAAE,OAAmB;EACrC,KAAK,EAAE,UAAU",
+"sources": ["bootstrap-override.scss"],
+"names": [],
+"file": "bootstrap-override.css"
+}
