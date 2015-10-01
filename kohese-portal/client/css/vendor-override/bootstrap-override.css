@@ -1,7 +1,8 @@
 .btn-default:hover {
-  background-color: #64be95; }
+  background-color: #7dd7ae;
+  color: white; }
 .btn-default:active {
-  background-color: #64be95;
+  background-color: #7dd7ae;
   color: whitesmoke; }
 
 /*# sourceMappingURL=bootstrap-override.css.map */

@@ -13,7 +13,7 @@ export default () => {
             templateUrl: 'components/common/directives/knowledgeTree/treeRow.html',
             compile: function(element) {
               return RecursionHelper.compile(element, function(scope, iElement, iAttrs, controller, transcludeFn){
-//                console.log("compile: " + Date.now()/1000);
+//                console.log("compile: " + scope.itemProxy.item.name + ' ' + Date.now()/1000);
                 // Define your normal link function here.
                 // Alternative: instead of passing a function,
                 // you can also pass an object with 
