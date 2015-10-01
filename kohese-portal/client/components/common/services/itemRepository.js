@@ -319,9 +319,8 @@ export default () => {
 
         return {
             modelTypes: itemModel,
-            deleteItem: deleteItem,
-            upsertItem: upsertItem,
-            internalTree: tree,
+            itemModel: itemModel,
+            getTreeRoot: getTreeRoot,
             getItemProxy: getItem,
             fetchItem: fetchItem,
             attachToLostAndFound: attachToLostAndFound

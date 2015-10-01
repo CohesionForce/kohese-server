@@ -42,7 +42,7 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
       return false;
     }
 
-    treeCtrl.newTree = ItemRepository.internalTree;
+    treeCtrl.treeRoot = ItemRepository.getTreeRoot();
 
     treeCtrl.tab.setTitle('Explore');
 
