@@ -18,23 +18,27 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
     detailsCtrl.showChunksInDetails = false;
     detailsCtrl.showTokensInDetails = false;
     detailsCtrl.filterList = [];
+    detailsCtrl.kindList = ItemRepository.modelTypes;
 
-    $scope.$on('$stateChangeSuccess' , function(){
+    console.log(detailsCtrl.kindList);
+
+    $scope.$on('$stateChangeSuccess', function () {
         $scope.$emit('newItemSelected', $stateParams.id);
         console.log($stateParams.id);
     });
 
-    if (detailsCtrl.tab.state === 'kohese.explore.create'){
+    if (detailsCtrl.tab.state === 'kohese.explore.create') {
         detailsCtrl.enableEdit = true;
     }
 
-    if (detailsCtrl.tab.state === 'kohese.investigate'){
+    if (detailsCtrl.tab.state === 'kohese.investigate') {
         detailsCtrl.tab.setTitle('Investigate');
     }
 
     if (angular.isDefined($stateParams.id)) {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
-    } else if(angular.isDefined($stateParams.parentId)){
+        detailsCtrl.selectedKind = detailsCtrl.itemProxy.item.kind;
+    } else if (angular.isDefined($stateParams.parentId)) {
         {
             detailsCtrl.itemProxy.item = new Item();
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
@@ -52,13 +56,19 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
         detailsCtrl.tab = tabService.getCurrentTab();
     });
 
-    detailsCtrl.updateTab = function(state, id, view) {
+    detailsCtrl.updateTab = function (state, id, view) {
         detailsCtrl.tab.setState(state);
         detailsCtrl.tab.params.id = id;
-        if(view) {
+        if (view) {
             detailsCtrl.tab.toggleType();
             detailsCtrl.tab.setType = view;
         }
+    };
+
+    detailsCtrl.updateItem = function () {
+        console.log(detailsCtrl.selectedKind);
+        console.log('updatedItemKind');
+        detailsCtrl.itemProxy.item = ItemRepository.modelTypes[detailsCtrl.selectedKind].constructor;
     };
 
     detailsCtrl.toggleView = function (state) {
@@ -76,9 +86,9 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
                 ItemRepository.fetchItem(updatedItem)
                     .then(function () {
                         if (updatedItem.parentId != '') {
-                            $state.go('kohese.explore.edit', {id:updatedItem.parentId})
+                            $state.go('kohese.explore.edit', {id: updatedItem.parentId})
                         } else {
-                            $state.go('kohese.explore.edit', {id:updatedItem.id})
+                            $state.go('kohese.explore.edit', {id: updatedItem.id})
                         }
                     }
                 )
@@ -87,12 +97,12 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
             });
     };
 
-    detailsCtrl.getLastFilter = function(){
+    detailsCtrl.getLastFilter = function () {
         detailsCtrl.analysisFilterString = detailsCtrl.filterList.pop();
         detailsCtrl.analysisFilterInput = detailsCtrl.analysisFilterString;
     };
 
-    detailsCtrl.submitFilter = function(){
+    detailsCtrl.submitFilter = function () {
         detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
         detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
     };

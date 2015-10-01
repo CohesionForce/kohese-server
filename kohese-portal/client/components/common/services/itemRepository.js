@@ -318,6 +318,7 @@ export default () => {
         lookup.X = "Unknown";
 
         return {
+            modelTypes: itemModel,
             deleteItem: deleteItem,
             upsertItem: upsertItem,
             internalTree: tree,
