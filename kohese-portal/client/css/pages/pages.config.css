@@ -1,3 +1,82 @@
+.admin-screen {
+  overflow: auto;
+  width: 100%; }
+  .admin-screen #admin-user-list {
+    float: left;
+    width: 45%;
+    height: 100%; }
+    .admin-screen #admin-user-list .card-container {
+      perspective: 400px; }
+      .admin-screen #admin-user-list .card-container .card {
+        width: 250px;
+        margin: 20px;
+        transition: all 0.6s ease;
+        transform-style: preserve-3d;
+        border-radius: 30px; }
+        .admin-screen #admin-user-list .card-container .card .front {
+          background-color: #005A31;
+          backface-visibility: hidden;
+          height: 250px;
+          border-radius: 30px; }
+          .admin-screen #admin-user-list .card-container .card .front .title {
+            padding: 10px;
+            font-size: 24px;
+            color: white;
+            background-color: #64be95; }
+          .admin-screen #admin-user-list .card-container .card .front .body {
+            color: white;
+            padding: 10px; }
+          .admin-screen #admin-user-list .card-container .card .front .footer {
+            position: absolute;
+            bottom: 0;
+            width: 250px;
+            padding: 10px;
+            background-color: #c8fff9;
+            color: black; }
+        .admin-screen #admin-user-list .card-container .card .back {
+          border-radius: 30px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          padding: 10px;
+          height: 250px;
+          width: 250px;
+          transform: rotateY(180deg);
+          background-color: #005A31;
+          backface-visibility: hidden;
+          color: white; }
+        .admin-screen #admin-user-list .card-container .card:hover {
+          -webkit-transition-delay: .6s;
+          -moz-transition-delay: .6s;
+          -o-transition-delay: .6s;
+          -ms-transition-delay: .6s;
+          transition-delay: .6s;
+          transform: rotateY(180deg); }
+  .admin-screen #admin-user-form {
+    float: right;
+    width: 45%;
+    position: fixed;
+    top: 200px;
+    right: 0px; }
+    .admin-screen #admin-user-form * {
+      margin: 5px; }
 
+#login-form {
+  text-align: center; }
+  #login-form h1 {
+    font-size: 60px;
+    margin-top: auto;
+    font-family: lobster, arial, sans-serif; }
+  #login-form input {
+    margin: 5px; }
+  #login-form button {
+    color: white;
+    padding: 10px;
+    margin: 5px;
+    width: 20%;
+    background-color: #005A31; }
+    #login-form button:hover {
+      color: white;
+      background-color: #64be95; }
 
 /*# sourceMappingURL=pages.config.css.map */
