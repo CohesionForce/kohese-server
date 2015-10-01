@@ -18,6 +18,21 @@ export default () => {
         
         var tree = {};
         tree.proxyMap = {};
+        tree.root = {};
+        tree.root.item = {name: "Root of Tree"};
+        tree.root.children=[];
+        tree.parentOf = {};
+        tree.proxyMap[""]=tree.root;
+
+        // Create Lost And Found Node
+        var lostAndFound = {};
+        lostAndFound.item = new Item;
+        lostAndFound.item.name = "Lost-And-Found";
+        lostAndFound.item.description = "Collection of node(s) that are no longer connected.";
+        lostAndFound.item.id = "LOST+FOUND";
+        lostAndFound.children = [];
+        tree.proxyMap[lostAndFound.item.id] = lostAndFound;
+        tree.root.children.push(lostAndFound);
 
         // Register the listeners for the Item kinds that are being tracked
         for(var modelName in itemModel){
@@ -209,7 +224,7 @@ export default () => {
                 tree.parentOf[primaryKey] = parent;
 
             } else {
-                tree.roots.push(itemProxy);
+                tree.root.children.push(itemProxy);
             }
         }
 
@@ -217,22 +232,9 @@ export default () => {
             if (!dataList || dataList.length == 0 || !primaryIdFieldName || !parentIdFieldName)
                 return [];
 
-            tree.roots = [];
-            tree.parentOf = {};
-
             for (var idx = 0; idx < dataList.length; idx++) {
                 createItemProxy(dataList[idx]);
             }
-
-            // Create Lost And Found Node
-            var lostAndFound = {};
-            lostAndFound.item = new Item;
-            lostAndFound.item.name = "Lost-And-Found";
-            lostAndFound.item.description = "Collection of node(s) that are no longer connected.";
-            lostAndFound.item.id = "LOST+FOUND";
-            lostAndFound.children = [];
-            tree.proxyMap[lostAndFound.item.id] = lostAndFound;
-            tree.roots.push(lostAndFound);
 
             // Gather unconnected nodes into Lost And Found
             for (var id in tree.proxyMap) {
@@ -255,75 +257,27 @@ export default () => {
             lostAndFound.children.push(lostProxy);
             tree.parentOf[byId] = lostAndFound;
         }
-
-        var lookup = {};
-        lookup.CC = "Coordinating Conjuction";
-        lookup.LS = "List Item";
-        lookup.PRPS = "Possessive Pronoun";
-        lookup.VBD = "Past Tense Verb";
-        lookup.CD = "Cardinal Number";
-        lookup.MD = "Modal";
-        lookup.RB = "Adverb";
-        lookup.VBG = "Present Participle Verb";
-        lookup.DT = "Determiner";
-        lookup.NN = "Noun";
-        lookup.RBR = "Comparative Adverb";
-        lookup.VBN = "Past Participle Verb";
-        lookup.EX = "Existential There";
-        lookup.NNS = "Plural Noun";
-        lookup.RBS = "Superlative Adverb";
-        lookup.VBP = "Non-3rd Present Verb";
-        lookup.FW = "Foreign Word";
-        lookup.NNP = "Proper Noun";
-        lookup.RP = "Particle";
-        lookup.VBZ = "3rd Person Present Verb";
-        lookup.IN = "Preposition";
-        lookup.NNPS = "Plural Proper Noun";
-        lookup.SYM = "Symbol";
-        lookup.WDT = "WH Determiner";
-        lookup.JJ = "Adjective";
-        lookup.PDT = "Predeterminer";
-        lookup.TO = "To";
-        lookup.WP = "WH Pronoun";
-        lookup.JJR = "Comparative Adjective";
-        lookup.POS = "Possessive Ending";
-        lookup.UH = "Interjection";
-        lookup.WPS = "Possessive WH Pronoun";
-        lookup.JJS = "Superlative Adjective";
-        lookup.PRP = "Personal Pronoun";
-        lookup.VB = "Verb";
-        lookup.WRB = "WH Adverb";
-        lookup.ADJP = "Adjective";
-        lookup.NP = "Noun Phrase";
-        lookup.UCP = "Unlike Coordinated Phrase";
-        lookup.ADVP = "Adverb";
-        lookup.NX = "Head Noun";
-        lookup.VP = "Verb Phrase";
-        lookup.CONJP = "Conjunction";
-        lookup.PP = "Prepositional";
-        lookup.WHADJP = "WH Adjective";
-        lookup.FRAG = "Fragment";
-        lookup.PRN = "Parenthetical";
-        lookup.WHAVP = "WH Adverb";
-        lookup.INTJ = "Interjection";
-        lookup.PRT = "Particle";
-        lookup.WHNP = "WH Noun";
-        lookup.LST = "List";
-        lookup.QP = "Quantifier";
-        lookup.WHPP = "WH Prepositional";
-        lookup.NAC = "Not A Constituent";
-        lookup.RRC = "Reduced Relative Clause";
-
-        // Does this (X) really exist?
-        lookup.X = "Unknown";
+        
+        var getAllItemProxies = function(){
+          var itemProxyList = [];
+          for(var key in tree.proxyMap){
+            itemProxyList.push(tree.proxyMap[key]);
+          }
+          return itemProxyList;
+        }
+        
+        var getTreeRoot = function(){
+          return tree.root;
+        }
 
         return {
-            deleteItem: deleteItem,
-            upsertItem: upsertItem,
-            internalTree: tree,
+            itemModel: itemModel,
+            getTreeRoot: getTreeRoot,
             getItemProxy: getItem,
-            fetchItem: fetchItem,
-            attachToLostAndFound: attachToLostAndFound
+            getAllItemProxies: getAllItemProxies,
+            upsertItem: upsertItem,
+            deleteItem: deleteItem,
+            fetchItem: fetchItem
         }
     }
     ])
