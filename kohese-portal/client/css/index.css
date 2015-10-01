@@ -256,6 +256,9 @@ table td .glyphicon-remove {
 .kt-item:hover {
   background-color: #e5e5e5; }
 
+.kti-filtered {
+  display: none; }
+
 .knowledge-tree .kt-head {
   font-weight: bold;
   vertical-align: bottom;

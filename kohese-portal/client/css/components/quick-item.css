@@ -6,6 +6,10 @@
   top: 25%;
   bottom: 25%;
   width: 50%;
-  height: 50%; }
+  height: 50%;
+  background-color: #F3FAB6;
+  padding: 5px;
+  border-radius: 10px;
+  border: double 1px black; }
 
 /*# sourceMappingURL=quick-item.css.map */
