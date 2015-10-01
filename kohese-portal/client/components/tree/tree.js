@@ -12,6 +12,36 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
     treeCtrl.tab = tabService.getCurrentTab();
     treeCtrl.locationSynced = false;
 
+    function getTypeForFilter(val) {
+      return (val === null) ? 'null' : typeof val;
+    }
+
+    treeCtrl.matchesFilter = function (proxy){
+      if (!treeCtrl.filterString) {
+        return true;
+      } else {
+        var lcFilter = treeCtrl.filterString.toLowerCase();
+        for (var key in proxy.item){
+          if((key.charAt(0) !== '$') && getTypeForFilter(proxy.item[key]) === 'string' && proxy.item[key].toLowerCase().indexOf(lcFilter) !== -1){
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+    
+    treeCtrl.childMatchesFilter = function (proxy){
+      for(var childIdx = 0; childIdx < proxy.children.length; childIdx++){
+        var childProxy = proxy.children[childIdx];
+        if (treeCtrl.matchesFilter(childProxy) || treeCtrl.childMatchesFilter(childProxy)){
+          // exit as soon as the first matching descendant is found
+          return true;
+        }
+      }
+      // no descendant found
+      return false;
+    }
+
     treeCtrl.newTree = ItemRepository.internalTree;
 
     treeCtrl.tab.setTitle('Explore');
