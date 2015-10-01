@@ -1,3 +1,4 @@
+//Palette
 $primaryColor: #005A31;
 $accentColor: #CBE32D;
 $lightColor: #F3FAB6;
@@ -5,5 +6,11 @@ $secondaryColor: #660000;
 $secondaryFade: $secondaryColor;
 $buttonAccentColor: $primaryColor + 125;
 
+//Element Sizes
 $leftNavWidth: 50px;
 $topNavHeight: 50px;
+$sidePaneWidth: 250px;
+$tabBarHeight: 40px;
+$topActionBarHeight: 34px;
+
+$baseBorderRadius : 10px;

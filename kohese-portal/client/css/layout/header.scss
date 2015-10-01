@@ -4,7 +4,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  height: 50px;
+  height: $topNavHeight;
   border: 0;
   width: 100%;
   background: -webkit-linear-gradient(right, $primaryColor + 100, $primaryColor);
@@ -89,7 +89,7 @@
 }
 
 #login-button {
-  height: 50px;
+  height: $topNavHeight;
   width: 100px;
   padding: 5px;
   font-size: 18px;
