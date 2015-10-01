@@ -29,7 +29,7 @@ export default () => {
                         bottom: 416 + 'px'
                     });
                     $element.css({
-                        height: (window.innerHeight - 510) + 'px'
+                        height: (window.innerHeight - 544) + 'px'
                     });
 
                 }
