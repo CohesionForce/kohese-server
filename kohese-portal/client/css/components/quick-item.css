@@ -1,0 +1,11 @@
+.quick-item {
+  position: fixed;
+  z-index: 10;
+  left: 25%;
+  right: 25%;
+  top: 25%;
+  bottom: 25%;
+  width: 50%;
+  height: 50%; }
+
+/*# sourceMappingURL=quick-item.css.map */

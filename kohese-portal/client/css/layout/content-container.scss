@@ -29,6 +29,10 @@
       border-radius: $baseBorderRadius;
 
     }
+
+    .resizeable {
+      height: inherit;
+    }
     #content-resizer {
       position: absolute;
       height: 6px;

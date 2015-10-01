@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,WAAY;EACV,QAAQ,EAAE,KAAK;EACf,OAAO,EAAE,EAAE;EACX,IAAI,EAAC,GAAG;EACR,KAAK,EAAE,GAAG;EACV,GAAG,EAAE,GAAG;EACR,MAAM,EAAE,GAAG;EACX,KAAK,EAAE,GAAG;EACV,MAAM,EAAE,GAAG",
+"sources": ["quick-item.scss"],
+"names": [],
+"file": "quick-item.css"
+}
