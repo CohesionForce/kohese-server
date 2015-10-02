@@ -292,6 +292,7 @@ export default () => {
             getItemProxy: getItem,
             fetchItem: fetchItem,
             upsertItem: upsertItem,
+            deleteItem: deleteItem,
             copyAttributes: copyAttributes,
             attachToLostAndFound: attachToLostAndFound
         }
