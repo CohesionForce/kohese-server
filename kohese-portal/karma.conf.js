@@ -1,105 +1,65 @@
 // Karma configuration
 // Generated on Mon Jun 29 2015 11:25:46 GMT-0500 (CDT)
 
-module.exports = function (config) {
-    config.set({
+module.exports = function(config) {
+	config.set({
 
-        // base path that will be used to resolve all patterns (eg. files, exclude)
-        basePath: '',
+		// base path that will be used to resolve all patterns (eg. files,
+		// exclude)
+		basePath : '',
 
+		// frameworks to use
+		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+		frameworks : [ 'jasmine' ],
 
-        // frameworks to use
-        // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine-jquery', 'jasmine'],
+		files : [ 'node_modules/angular/angular.js',
+				'bower_components/angular-mocks/angular-mocks.js',
+				'bower_components/angular-resource/angular-resource.js',
+				'bower_components/jquery/dist/jquery.js',
+				'client/bundle.js',
+				'tests/unit/components/login-spec.js'],
 
+		// list of files to exclude
+		exclude : [],
 
-        // list of files / patterns to load in the browser
-        files: [
-            // Core dependencies
-            'client/vendor/angular/angular.js',
-            'client/vendor/angular-mocks/angular-mocks.js',
-            'client/vendor/angular-resource/angular-resource.js',
-            'client/vendor/jquery/dist/jquery.js',
-            'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+		// preprocess matching files before serving them to the browser
+		// available preprocessors:
+		// https://npmjs.org/browse/keyword/karma-preprocessor
+		preprocessors : {},
 
-            // Module Dependencies
-            'client/components/common/services/lb-services.js',
-            'client/components/common/services/itemRepository.js',
-            "client/components/common/directives/resizer.js",
-            "client/components/common/directives/navDirectives/navDirectives.js",
-            "client/components/common/sb-admin-2.js",
-            "client/vendor/angular-ui-router/release/angular-ui-router.js",
-            "client/vendor/angular-ui-layout/ui-layout.js",
-            "client/vendor/angular-bootstrap/ui-bootstrap-tpls.js",
-            "client/vendor/socket.io-client/socket.io.js",
-            "client/vendor/angular-socket-io/socket.js",
+		// test results reporter to use
+		// possible values: 'dots', 'progress'
+		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
+		reporters : ['dots', 'junit'],
+		
+		junitReporter : {
+			outputDir: '',
+			outputFile: 'test-results.xml',
+			suite: '' // suite will become the package name attribute in xml testsuite element
+		},
 
-            //Client dependencies
-            'client/app.js',
-            "client/js/item/controllers.js",
-            'client/components/common/services/itemRepository.js',
+		// web server port
+		port : 9876,
 
-            //Common dependencies
-            //'common/models/item.js',
+		// enable / disable colors in the output (reporters and logs)
+		colors : true,
 
-            //Server dependencies
-            //'server/server.js',
+		// level of logging
+		// possible values: config.LOG_DISABLE || config.LOG_ERROR ||
+		// config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+		logLevel : config.LOG_DEBUG,
 
-            //Test files
-            'tests/*.js',
-            'tests/unit/controllers/*.js',
-            'tests/unit/services/*.js'
-        ],
+		// enable / disable watching file and executing tests whenever any file
+		// changes
+		autoWatch : true,
 
+		// start these browsers
+		// available browser launchers:
+		// https://npmjs.org/browse/keyword/karma-launcher
+		browsers : [ 'PhantomJS' ],
 
-        // list of files to exclude
-        exclude: [],
-
-
-        // preprocess matching files before serving them to the browser
-        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {},
-
-
-        // test results reporter to use
-        // possible values: 'dots', 'progress'
-        // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
-
-
-        // web server port
-        port: 9876,
-
-
-        // enable / disable colors in the output (reporters and logs)
-        colors: true,
-
-
-        // level of logging
-        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-        logLevel: config.LOG_INFO,
-
-
-        // enable / disable watching file and executing tests whenever any file changes
-        autoWatch: true,
-
-
-        // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome', 'PhantomJS'],
-
-        plugins: [
-
-            'karma-phantomjs-launcher',
-            'karma-chrome-launcher',
-            'karma-jasmine-jquery',
-            //'jasmine-node-karma',
-            'karma-jasmine'
-
-        ],
-
-        // Continuous Integration mode
-        // if true, Karma captures browsers, runs the tests and exits
-        singleRun: false
-    })
+		// Continuous Integration mode
+		// if true, Karma captures browsers, runs the tests and exits
+		singleRun : true
+	})
 }
