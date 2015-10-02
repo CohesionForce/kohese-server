@@ -20,11 +20,8 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
     detailsCtrl.filterList = [];
     detailsCtrl.kindList = ItemRepository.modelTypes;
 
-    console.log(detailsCtrl.kindList);
-
     $scope.$on('$stateChangeSuccess', function () {
         $scope.$emit('newItemSelected', $stateParams.id);
-        console.log($stateParams.id);
     });
 
     if (detailsCtrl.tab.state === 'kohese.explore.create') {
@@ -33,10 +30,14 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
 
     if (detailsCtrl.tab.state === 'kohese.investigate') {
         detailsCtrl.tab.setTitle('Investigate');
+        detailsCtrl.tab.params = {
+            id : $stateParams.id
+        };
     }
 
     if (angular.isDefined($stateParams.id)) {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
+
     } else if (angular.isDefined($stateParams.parentId)) {
         {
             detailsCtrl.itemProxy.item = new Item();
