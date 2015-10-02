@@ -6,8 +6,9 @@
 						<label class="control-label" for="Kind">Kind</label>
 						<div class="controls">
                             <select id="Kind"
-                                    ng-model="detailsCtrl.selectedKind"
-                                    ng-change="detailsCtrl.updateItem()" >
+                                    ng-model="detailsCtrl.itemProxy.kind"
+                                    ng-change="detailsCtrl.updateItem()"
+                                    ng-disabled="!(detailsCtrl.enableEdit && !detailsCtrl.itemProxy.item.hasOwnProperty('id'))" >
                                 <option ng-repeat="kind in detailsCtrl.kindList">{{kind.modelName}}</option>
                             </select>
                             <!--<input  ng-if="detailsCtrl.itemProxy.item.constructor.modelName" style="width: 90%;" type="text" ng-model="detailsCtrl.itemProxy.item.constructor.modelName"-->

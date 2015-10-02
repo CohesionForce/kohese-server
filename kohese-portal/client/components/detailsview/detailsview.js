@@ -37,7 +37,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
 
     if (angular.isDefined($stateParams.id)) {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
-        detailsCtrl.selectedKind = detailsCtrl.itemProxy.item.kind;
     } else if (angular.isDefined($stateParams.parentId)) {
         {
             detailsCtrl.itemProxy.item = new Item();
@@ -66,9 +65,12 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
     };
 
     detailsCtrl.updateItem = function () {
-        console.log(detailsCtrl.selectedKind);
+        console.log(detailsCtrl.itemProxy.kind);
         console.log('updatedItemKind');
-        detailsCtrl.itemProxy.item = ItemRepository.modelTypes[detailsCtrl.selectedKind].constructor;
+        var newModel = ItemRepository.modelTypes[detailsCtrl.itemProxy.kind];
+        var newItem = new newModel();
+        ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
+        detailsCtrl.itemProxy.item = newItem;
     };
 
     detailsCtrl.toggleView = function (state) {
