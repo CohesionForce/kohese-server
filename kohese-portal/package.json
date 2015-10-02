@@ -35,7 +35,10 @@
     "jasmine-core": "^2.3.4",
     "jshint": "^2.5.6",
     "karma": "^0.12.37",
+    "karma-jasmine": "^0.3.6",
     "karma-junit-reporter": "^0.3.7",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "phantomjs": "^1.9.18",
     "protractor": "^2.2.0",
     "style-loader": "^0.12.3",
     "webpack": "^1.12.0"
