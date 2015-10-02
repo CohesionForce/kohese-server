@@ -1,0 +1,12 @@
+@import '../utils/variables';
+
+.btn-default {
+  &:hover {
+    background-color: $buttonAccentColor;
+    color:white;
+  }
+  &:active {
+    background-color: $buttonAccentColor;
+    color: whitesmoke;
+  }
+}

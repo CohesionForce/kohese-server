@@ -1,0 +1,75 @@
+.knowledge-tree {
+  border-collapse: collapse;
+  width: calc(100% - 20px);
+  margin: 0px 0px 0px 20px;
+  overflow: auto; }
+  .knowledge-tree .kt-icon, .knowledge-tree .kt-label {
+    cursor: pointer; }
+
+.kt-collection .kt-collection {
+  padding-left: 15px; }
+
+.knowledge-tree .kt-item {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  min-height: 20px;
+  line-height: 20px;
+  border-bottom: 2px solid #ddd; }
+
+.kt-collection .kt-hidden {
+  display: none; }
+
+.knowledge-tree .kt-head, .knowledge-tree .kt-item {
+  width: 100%; }
+
+.kt-item:hover {
+  background-color: #e5e5e5; }
+
+.kti-filtered {
+  display: none; }
+
+.knowledge-tree .kt-head {
+  font-weight: bold;
+  vertical-align: bottom;
+  border-bottom: 2px solid #ddd; }
+
+.kth-cell, .kti-cell {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 5px; }
+
+.kti-name {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 5px;
+  width: 40%; }
+
+.kti-description {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 5px;
+  width: 40%; }
+
+.knowledge-tree .kt-head .glyphicon-plus {
+  color: green; }
+  .knowledge-tree .kt-head .glyphicon-plus:hover {
+    cursor: pointer; }
+.knowledge-tree .kt-item .glyphicon-remove {
+  color: #ca6464; }
+  .knowledge-tree .kt-item .glyphicon-remove:hover {
+    cursor: pointer; }
+
+.trim-info {
+  max-width: 50em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative; }
+
+.trim-info-visible {
+  max-width: 50em;
+  white-space: pre-wrap;
+  position: relative; }
+
+/*# sourceMappingURL=tree.css.map */

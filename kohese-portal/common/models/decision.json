@@ -1,0 +1,41 @@
+{
+  "name": "Decision",
+  "base": "Item",
+  "idInjection": true,
+  "properties": {
+    "decisionState": {
+      "type": "string",
+      "required": true,
+      "default": "Proposed"
+    },
+    "approvedBy": {
+      "type": "string"
+    },
+    "approvedOn": {
+      "type": "number"
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "alternatives": {
+      "type": [
+        "string"
+      ]
+    },
+    "costImpact": {
+      "type": "object"
+    },
+    "scheduleImpact": {
+      "type": "object"
+    },
+    "otherImpacts": {
+      "type": [
+        "object"
+      ]
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

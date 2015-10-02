@@ -42,5 +42,13 @@
   "Category": {
     "dataSource": "db",
     "public": true
+  },
+  "Decision": {
+    "dataSource": "db",
+    "public": true
+  },
+  "Action": {
+    "dataSource": "db",
+    "public": true
   }
 }

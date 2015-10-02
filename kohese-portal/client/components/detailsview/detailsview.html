@@ -16,7 +16,7 @@
         <tabset>
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active">
                 <tab-heading>Details <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
-                <ng-include src="'components/detailsview/subviews/itemform.html'"></ng-include>
+                <ng-include src="'components/common/templates/itemform.html'"></ng-include>
             </tab>
             <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">
                 <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>

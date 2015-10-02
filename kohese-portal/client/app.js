@@ -105,7 +105,7 @@ appModule
     })
     .filter('highlight', function ($sce) {
         return function (text, phrase) {
-            if (text !== null && angular.isDefined(phrase) && phrase !== "") {
+            if (text && angular.isDefined(phrase) && phrase !== "") {
                 let cleanedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
                 if (cleanedPhrase) text = text.replace(new RegExp('(' + cleanedPhrase + ')', 'gi'),
                     '<span class="highlighted">$1</span>');

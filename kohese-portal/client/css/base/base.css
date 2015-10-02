@@ -1,0 +1,13 @@
+body {
+  font-family: FontAwesome, arial, sans-serif; }
+
+table th .glyphicon-plus {
+  color: green; }
+  table th .glyphicon-plus:hover {
+    cursor: pointer; }
+table td .glyphicon-remove {
+  color: #ca6464; }
+  table td .glyphicon-remove:hover {
+    cursor: pointer; }
+
+/*# sourceMappingURL=base.css.map */
