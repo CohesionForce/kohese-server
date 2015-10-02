@@ -290,6 +290,7 @@ export default () => {
             itemModel: itemModel,
             getTreeRoot: getTreeRoot,
             getItemProxy: getItem,
+            getAllItemProxies: getAllItemProxies,
             fetchItem: fetchItem,
             upsertItem: upsertItem,
             deleteItem: deleteItem,
