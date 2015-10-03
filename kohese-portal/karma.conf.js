@@ -17,7 +17,7 @@ module.exports = function(config) {
 				'bower_components/angular-resource/angular-resource.js',
 				'bower_components/jquery/dist/jquery.js',
 				'client/bundle.js',
-				'tests/unit/components/login-spec.js'],
+				'tests/unit/components/*-spec.js'],
 
 		// list of files to exclude
 		exclude : [],
@@ -25,12 +25,17 @@ module.exports = function(config) {
 		// preprocess matching files before serving them to the browser
 		// available preprocessors:
 		// https://npmjs.org/browse/keyword/karma-preprocessor
-		preprocessors : {},
+		preprocessors: {
+		      // source files, that you wanna generate coverage for
+		      // do not include tests or libraries
+		      // (these files will be instrumented by Istanbul)
+		      'client/bundle.js': ['coverage']
+		    },
 
-		// test results reporter to use
+		    // test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters : ['dots', 'junit'],
+		reporters : ['dots', 'junit', 'coverage'],
 		
 		junitReporter : {
 			outputDir: '',

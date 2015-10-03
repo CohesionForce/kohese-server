@@ -88,7 +88,9 @@ describe("Login Return", function() {
 	it("Check Login Fail", function() {
 		mockLoginService.pass = false;
 		callData = undefined;
+		spyOn(window, 'alert');
 		loginController.login("failUser", "failUser123");
+		expect(window.alert).toHaveBeenCalledWith('Error: Failed');
 		expect(mockLoginService.username == "failUser").toBe(true);
 		expect(mockLoginService.password == "failUser123").toBe(true);
 		expect(callData).toBe(undefined);
