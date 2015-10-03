@@ -19,17 +19,19 @@ export default () => {
         var tree = {};
         tree.proxyMap = {};
         tree.root = {};
-        tree.root.item = {name: "Root of Tree"};
+        tree.root.item = {};
+        tree.root.item.id = "ROOT";
+        tree.root.item.name = "Root of Knowledge Tree";
         tree.root.children=[];
+        tree.proxyMap[tree.root.item.id] = tree.root;
         tree.parentOf = {};
-        tree.proxyMap[""]=tree.root;
 
         // Create Lost And Found Node
         var lostAndFound = {};
         lostAndFound.item = new Item;
+        lostAndFound.item.id = "LOST+FOUND";
         lostAndFound.item.name = "Lost-And-Found";
         lostAndFound.item.description = "Collection of node(s) that are no longer connected.";
-        lostAndFound.item.id = "LOST+FOUND";
         lostAndFound.children = [];
         tree.proxyMap[lostAndFound.item.id] = lostAndFound;
         tree.root.children.push(lostAndFound);
@@ -66,7 +68,7 @@ export default () => {
                     KoheseUser.find().$promise.then(function (userResults) {
                         console.log('::: Received Users: ' + Date.now()/1000);  
                         var results = itemResults.concat(categoryResults).concat(decisionResults).concat(actionResults).concat(userResults);
-                        convertListToTree(results, 'id', 'parentId');
+                        convertListToTree(results);
                         console.log('::: List converted: ' + Date.now()/1000);
                         $rootScope.$broadcast('itemRepositoryReady')
                     });
@@ -120,7 +122,13 @@ export default () => {
                         });
                     }
 
-                    var newParentProxy = getItem(newParentId);
+                    var newParentProxy;
+                    
+                    if (newParentId === ""){
+                      newParentProxy = tree.root;
+                    } else {
+                      newParentProxy = getItem(newParentId); 
+                    }
 
                     if (newParentProxy) {
                         newParentProxy.children.push(proxy);
@@ -207,17 +215,17 @@ export default () => {
 
         function createItemProxy(forItem) {
             var itemProxy = {};
-            var primaryKey = forItem.id;
-            if (angular.isDefined(tree.proxyMap[primaryKey])) {
+            var itemId = forItem.id;
+            if (angular.isDefined(tree.proxyMap[itemId])) {
                 // Some forward declaration occurred, so copy the existing data
-                itemProxy = tree.proxyMap[primaryKey];
+                itemProxy = tree.proxyMap[itemId];
             }
             itemProxy.kind = forItem.constructor.modelName;
             itemProxy.item = forItem;
             if (!itemProxy.children){
               itemProxy.children = [];              
             }
-            tree.proxyMap[primaryKey] = itemProxy;
+            tree.proxyMap[itemId] = itemProxy;
             var parent = {};
             var parentId = itemProxy.item.parentId;
 
@@ -236,15 +244,16 @@ export default () => {
                     parent.children = [itemProxy];
                 }
 
-                tree.parentOf[primaryKey] = parent;
+                tree.parentOf[itemId] = parent;
 
             } else {
                 tree.root.children.push(itemProxy);
+                tree.parentOf[itemId] = tree.root;
             }
         }
 
-        function convertListToTree(dataList, primaryIdFieldName, parentIdFieldName) {
-            if (!dataList || dataList.length == 0 || !primaryIdFieldName || !parentIdFieldName)
+        function convertListToTree(dataList) {
+            if (!dataList || dataList.length == 0)
                 return [];
 
             for (var idx = 0; idx < dataList.length; idx++) {
@@ -295,7 +304,6 @@ export default () => {
             upsertItem: upsertItem,
             deleteItem: deleteItem,
             copyAttributes: copyAttributes,
-            attachToLostAndFound: attachToLostAndFound
         }
     }
     ])
