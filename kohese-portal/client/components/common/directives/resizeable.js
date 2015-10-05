@@ -8,38 +8,35 @@
  * Once verified it adds an inline style to the element that can then be dynamically modified by the resizer directive.
  */
 
+function Resizeable(tabService) {
+    return function ($scope, $element, $attrs) {
+
+        var topID = "top-content" + tabService.getTabId();
+        var bottomID = "bottom-content" + tabService.getTabId();
+
+        if ($attrs.id === topID) {
+            //console.log("Top content connected");
+
+            // TBD:  Need to find a better way to get the top to fill
+            //       the available space
+            var pwHeight = $("#page-wrapper").height();
+            $element.css({
+                height: (pwHeight - 416 - 6) + 'px'
+            });
+
+        }
+        if ($attrs.id === bottomID) {
+            //console.log("Bottom Content Connected");
+            $element.css({
+                height: 416 + 'px'
+            });
+        }
+    }
+}
+
+
 export default () => {
 
-    var ResizeableController = function (tabService) {
-        var ctrl = this;
-
-    };
-
     angular.module('app.directives.resizeable', ['app.services.tabservice'])
-        .controller('ResizeableController', ResizeableController)
-        .directive('resizeable', function (tabService) {
-            return function ($scope, $element, $attrs) {
-
-                var topID = "top-content" + tabService.getTabId();
-                var bottomID = "bottom-content" + tabService.getTabId();
-
-                if ($attrs.id === topID) {
-                    //console.log("Top content connected");
-
-                    // TBD:  Need to find a better way to get the top to fill
-                    //       the available space
-                    var pwHeight = $("#page-wrapper").height();
-                    $element.css({
-                        height: (pwHeight - 416 - 6) + 'px'
-                    });
-
-                }
-                if ($attrs.id === bottomID) {
-                    //console.log("Bottom Content Connected");
-                    $element.css({
-                        height: 416 + 'px'
-                    });
-                }
-            }
-        });
+        .directive('resizeable', Resizeable);
 }

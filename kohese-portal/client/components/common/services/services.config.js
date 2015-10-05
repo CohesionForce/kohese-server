@@ -7,7 +7,6 @@ export default() => {
     require('./tabService')();
     require('./lb-services')();
     require('./itemRepository')();
-    require('./navigationService')();
     require('./authenticationServices')();
     require('./analysisService')();
 }

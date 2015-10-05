@@ -2,7 +2,7 @@
  * Created by josh on 9/1/15.
  */
 
-function NavigationController($rootScope, navigationService, $scope, AuthTokenFactory, tabService) {
+function NavigationController($rootScope, $scope, AuthTokenFactory, tabService) {
     var ctrl = this;
     ctrl.userLoggedIn = AuthTokenFactory.getToken() !== null;
 
@@ -38,7 +38,7 @@ var sideNavDirective = function () {
 };
 
 export default () => {
-    angular.module('app.navigationmenu', ['app.services.navigationservice', 'app.services.tabservice'])
+    angular.module('app.navigationmenu', [ 'app.services.tabservice'])
         .directive('sideNav', sideNavDirective)
         .controller('NavigationController', NavigationController);
 }

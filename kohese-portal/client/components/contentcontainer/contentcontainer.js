@@ -2,7 +2,7 @@
  * Created by josh on 7/28/15.
  */
 
-function ContainerController(tabService, navigationService, $scope, $state) {
+function ContainerController(tabService, $scope, $state) {
     var containerCtrl = this;
 
     containerCtrl.tabService = tabService;
@@ -138,8 +138,7 @@ var ContentContainer = function () {
 export default () => {
 
     var containerModule = angular.module('app.contentcontainer', [
-        'app.services.tabservice',
-        'app.services.navigationservice'])
+        'app.services.tabservice'])
         .controller('ContainerController', ContainerController)
         .directive('contentContainer', ContentContainer);
 

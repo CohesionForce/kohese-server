@@ -43,22 +43,25 @@ function AppBarController(AuthTokenFactory, $rootScope, tabService, $scope, $sta
         }
     }
 }
+
+function AppBar() {
+    return {
+        restrict: 'EA',
+        templateUrl: 'components/common/directives/navDirectives/appBar.html',
+        controller: 'AppBarController'
+    }
+}
+
 export default () => {
 
     var app = angular.module('app.directives.navigation', [
         'app.services.authentication',
         'app.services.tabservice',
         'angular-jwt']);
-    var appBarDirective = function () {
-        return {
-            restrict: 'EA',
-            templateUrl: 'components/common/directives/navDirectives/appBar.html',
-            controller: 'AppBarController'
-        }
-    };
+
 
     app
-        .directive('appBar', appBarDirective)
+        .directive('appBar', AppBar)
         .controller('AppBarController', AppBarController);
 
 

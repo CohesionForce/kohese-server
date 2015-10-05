@@ -10,7 +10,6 @@ const appModule = angular.module('app', [
     'app.login',
     'app.navigationmenu',
     'app.search',
-    'app.services.navigationservice',
     'app.services.itemservice',
     'app.services.tabservice',
     'app.services.authentication',
