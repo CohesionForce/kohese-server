@@ -1,5 +1,9 @@
 @import '../utils/variables';
 
+:root > body {
+  width: 100%;
+  height: 100%;
+}
 
 #page-wrapper {
   position: relative;
@@ -34,24 +38,21 @@
       height: inherit;
     }
     #content-resizer {
-      position: absolute;
+      position: relative;
       height: 6px;
       left: 0;
-      bottom: 410px;
       right: 0;
       background-color: $primaryColor;
       cursor: n-resize;
     }
     .top-content {
-      position: relative;
-      top: $topActionBarHeight;
       overflow: auto;
       left: 0;
       width: 100%;
+      height: calc(100% - 422px);
 
       #top-action-bar {
         padding: 1px;
-        position: fixed;
         top: $tabBarHeight + $topNavHeight;
         width: 100%;
         height: $topActionBarHeight;
@@ -63,12 +64,13 @@
     }
 
     .bottom-content {
-      position: absolute;
+      position: relative;
       overflow: auto;
       bottom: 0;
       right: 0;
       left: 0;
       width: 100%;
+      height: 416px;
       background-color: white;
       > div {
         height: 100%;

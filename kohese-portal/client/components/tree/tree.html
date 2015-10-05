@@ -1,35 +1,33 @@
-<div class="resizeable">
-	<div id="top-action-bar">
-		<button ng-click="treeCtrl.expandAll()" class="btn btn-default btn-sm"
-			style="margin: 5px">Expand All</button>
-		<button ng-click="treeCtrl.collapseAll()"
-			class="btn btn-default btn-sm" style="margin: 5px">Collapse
-			All</button>
-		<i ng-click="treeCtrl.syncLocation()"
-			ng-class="{ 'button-selected' :treeCtrl.locationSynced}"
-			class="btn btn-default btn-sm fa fa-exchange"></i> <span
-			class="pull-right"> <span>Showing
-				{{filteredItems.length}} of {{treeCtrl.newTree.rows.length}}</span> <input
-			class="input-sm" type="text" ng-model="treeCtrl.filterString"
-			placeholder="Filter" style="margin: 5px" />
-		</span>
-	</div>
+<div id="top-action-bar">
+	<button ng-click="treeCtrl.expandAll()" class="btn btn-default btn-sm"
+		style="margin: 5px">Expand All</button>
+	<button ng-click="treeCtrl.collapseAll()"
+		class="btn btn-default btn-sm" style="margin: 5px">Collapse
+		All</button>
+	<i ng-click="treeCtrl.syncLocation()"
+		ng-class="{ 'button-selected' :treeCtrl.locationSynced}"
+		class="btn btn-default btn-sm fa fa-exchange"></i> <span
+		class="pull-right"> <span>Showing
+			{{filteredItems.length}} of {{treeCtrl.newTree.rows.length}}</span> <input
+		class="input-sm" type="text" ng-model="treeCtrl.filterString"
+		placeholder="Filter" style="margin: 5px" />
+	</span>
+</div>
 
-	<div class="knowledge-tree">
-		<div class="kt-head">
-			<div class="kth-cell kti-name">Name</div>
-			<div class="kth-cell kti-description">Description</div>
-			<div class="kth-cell pull-right">
-				<i class="glyphicon glyphicon-plus pull-right"
-					ui-sref="kohese.explore.create()"
-					ng-click="treeCtrl.updateTab('create')"></i>
-			</div>
+<div class="knowledge-tree">
+	<div class="kt-head">
+		<div class="kth-cell kti-name">Name</div>
+		<div class="kth-cell kti-description">Description</div>
+		<div class="kth-cell pull-right">
+			<i class="glyphicon glyphicon-plus pull-right"
+				ui-sref="kohese.explore.create()"
+				ng-click="treeCtrl.updateTab('create')"></i>
 		</div>
-		<div class="kt-body">
-			<div class="kt-collection"
-				ng-repeat="itemProxy in treeCtrl.treeRoot.children">
-				<tree-row item-proxy="itemProxy" tree-ctrl="treeCtrl"></tree-row>
-			</div>
+	</div>
+	<div class="kt-body">
+		<div class="kt-collection"
+			ng-repeat="itemProxy in treeCtrl.treeRoot.children">
+			<tree-row item-proxy="itemProxy" tree-ctrl="treeCtrl"></tree-row>
 		</div>
 	</div>
 </div>

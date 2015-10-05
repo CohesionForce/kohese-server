@@ -25,19 +25,20 @@ export default () => {
 
                 if ($attrs.id === topID) {
                     //console.log("Top content connected");
+
+                    // TBD:  Need to find a better way to get the top to fill
+                    //       the available space
+                    var pwHeight = $("#page-wrapper").height();
                     $element.css({
-                        bottom: 416 + 'px'
-                    });
-                    $element.css({
-                        height: (window.innerHeight - 544) + 'px'
+                        height: (pwHeight - 416 - 6) + 'px'
                     });
 
                 }
                 if ($attrs.id === bottomID) {
                     //console.log("Bottom Content Connected");
                     $element.css({
-                        height: 410 + 'px'
-                    })
+                        height: 416 + 'px'
+                    });
                 }
             }
         });

@@ -1,8 +1,9 @@
 .knowledge-tree {
   border-collapse: collapse;
+  position: relative;
+  height: calc(100% - 40px);
   width: calc(100% - 20px);
-  margin: 0px 0px 0px 20px;
-  overflow: auto; }
+  margin: 0px 0px 0px 20px; }
   .knowledge-tree .kt-icon, .knowledge-tree .kt-label {
     cursor: pointer; }
 
@@ -22,6 +23,10 @@
 
 .knowledge-tree .kt-head, .knowledge-tree .kt-item {
   width: 100%; }
+
+.kt-body {
+  height: calc(100% - 30px);
+  overflow: auto; }
 
 .kt-item:hover {
   background-color: #e5e5e5; }

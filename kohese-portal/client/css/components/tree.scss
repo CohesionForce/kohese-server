@@ -2,11 +2,11 @@
 
 .knowledge-tree {
   border-collapse: collapse;
+  position: relative;
+  height: calc(100% - 40px);
   width: calc(100% - 20px);
   margin: 0px 0px 0px 20px;
-  overflow: auto;
-
-
+    
   .kt-icon, .kt-label {
     cursor: pointer;
   }
@@ -18,9 +18,6 @@
 }
 
 .knowledge-tree .kt-item {
-  //    border: 1px black solid;
-  //    padding: 10px 10px;
-  //    margin: 10px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -35,6 +32,11 @@
 
 .knowledge-tree .kt-head, .knowledge-tree .kt-item {
   width: 100%;
+}
+
+.kt-body {
+  height: calc(100% - 30px);
+  overflow: auto;
 }
 
 .kt-item:hover {

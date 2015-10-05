@@ -45,16 +45,8 @@ export default () => {
                         // Handle horizontal resizer
                         y = window.innerHeight - event.pageY;
 
-                        $element.css({
-                            bottom: y + 'px'
-                        });
-
                         $($attrs.resizerTop).css({
-                            bottom: (y + parseInt($attrs.resizerHeight)) + 'px'
-                        });
-
-                        $($attrs.resizerTop).css({
-                            height: (window.innerHeight - y - 100) + 'px'
+                            height: (window.innerHeight - y - 90) + 'px'
                         });
 
                         $($attrs.resizerBottom).css({
