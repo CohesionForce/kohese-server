@@ -8,6 +8,7 @@ function AdminController(tabService, $scope, KoheseUser) {
 
 
     ctrl.addUserForm = false;
+    ctrl.editUserForm = false;
     ctrl.users = [];
 
     $scope.$on('$viewContentLoaded', function () {
@@ -46,7 +47,11 @@ function AdminController(tabService, $scope, KoheseUser) {
     ctrl.cancelForm = function(){
         ctrl.addUserForm = false;
         ctrl.editUserForm = false;
-        ctrl.editedUser = null;
+        ctrl.selectedUser = null;
+        ctrl.usernameInput = '';
+        ctrl.descriptionInput = '';
+        ctrl.passwordInput = '';
+        ctrl.confirmPasswordInput = '';
     };
 
     function updateUserObject(user){
@@ -66,13 +71,8 @@ function AdminController(tabService, $scope, KoheseUser) {
                 .$promise.then(function (results) {
                     fetchUsers();
                 });
-            ctrl.addUserForm = false;
-            ctrl.editUserForm = false;
-            ctrl.editedUser = null;
-            ctrl.usernameInput = '';
-            ctrl.descriptionInput = '';
-            ctrl.passwordInput = '';
-            ctrl.confirmPasswordInput = '';
+            ctrl.cancelForm();
+
         } else {
             alert('Passwords do not match');
         }

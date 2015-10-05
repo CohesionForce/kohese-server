@@ -40,7 +40,7 @@
         <div id="admin-user-form">
             <button class="btn btn-default"
                     ng-click="adminCtrl.addUser();"
-                    ng-if="!adminCtrl.addUserForm">Add User
+                    ng-if="!adminCtrl.addUserForm && !adminCtrl.editUserForm">Add User
             </button>
 
             <div ng-if="adminCtrl.addUserForm || adminCtrl.editUserForm">
