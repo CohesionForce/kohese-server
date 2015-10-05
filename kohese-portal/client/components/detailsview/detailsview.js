@@ -31,7 +31,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
     if (detailsCtrl.tab.state === 'kohese.investigate') {
         detailsCtrl.tab.setTitle('Investigate');
         detailsCtrl.tab.params = {
-            id : $stateParams.id
+            id: $stateParams.id
         };
     }
 
@@ -47,6 +47,8 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
         detailsCtrl.itemProxy.item = new Item();
     }
 
+
+    //console.log(detailsCtrl.itemProxy.item);
 
     $scope.$on('itemRepositoryReady', function () {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
@@ -72,6 +74,12 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
         var newItem = new newModel();
         ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
         detailsCtrl.itemProxy.item = newItem;
+    };
+
+    detailsCtrl.addAlternative = function () {
+        var altLength = detailsCtrl.itemProxy.item.alternatives.length;
+        detailsCtrl.itemProxy.item.alternatives[altLength] = {text:''};
+        console.log(detailsCtrl.itemProxy.item.alternatives);
     };
 
     detailsCtrl.toggleView = function (state) {

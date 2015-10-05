@@ -15,8 +15,71 @@
         <!-- Nav tabs -->
         <tabset>
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active">
-                <tab-heading>Details <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
+                <tab-heading>Overview <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
                 <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+            </tab>
+            <tab class="decision-tab">
+                <tab-heading>Decision</tab-heading>
+                <label for="DecisionState">
+                    State
+                    <input id="DecisionState" ng-model="detailsCtrl.itemProxy.item.decisionState" type="text">
+                </label>
+                <label for="ApprovedBy">
+                    Approved By
+                    <input ng-model="detailsCtrl.itemProxy.item.approvedBy" id="ApprovedBy">
+                </label>
+                <label for="ApprovedOn">
+                    Approved On
+                    <input ng-model="detailsCtrl.itemProxy.item.approvedOn" id="ApprovedOn">
+                </label>
+                <br/>
+                <label for="Rationale">
+                    Rationale
+                    <input id="Rationale" ng-model="detailsCtrl.itemProxy.item.rationale">
+                </label>
+                <br>
+                <label>
+                    Alternatives:
+                    <div ng-repeat="alternative in detailsCtrl.itemProxy.item.alternatives track by $index">
+                        <input class="alternative-field" type="text" ng-model="alternative.text">
+                    </div>
+                    <button ng-click="detailsCtrl.addAlternative()" class="btn btn-primary">Add</button>
+                </label>
+            </tab>
+            <tab>
+                <tab-heading>Action</tab-heading>
+                <label for="ActionState">
+                    State:
+                    <input ng-model="detailsCtrl.itemProxy.item.actionState" id="ActionState">
+                </label>
+                <label for="AssignedTo">
+                    Assigned To:
+                    <input ng-model="detailsCtrl.itemProxy.item.assignedTo" id="AssignedTo">
+                </label>
+                <label for="EstimatedStart">
+                    Estimated Start:
+                    <input ng-model="detailsCtrl.itemProxy.item.estimatedStart" id="EstimatedStart">
+                </label>
+                <label for="EstimatedCompletion">
+                    Estimated Completion:
+                    <input ng-model="detailsCtrl.itemProxy.item.estimatedCompletion" id="EstimatedCompletion">
+                </label>
+                <label for="EstimatedHours">
+                    Estimated Hours:
+                    <input ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort" id="EstimatedHours">
+                </label>
+                <label for="ActualStart">
+                    Actual Start:
+                    <input ng-model="detailsCtrl.itemProxy.item.actualStart" id="ActualStart">
+                </label>
+                <label for="ActualCompletion">
+                    Actual Completion:
+                    <input ng-model="detailsCtrl.itemProxy.item.actualCompletion" id="ActualCompletion">
+                </label>
+                <label for="ActualHours">
+                    Actual Hours:
+                    <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts" id="ActualHours">
+                </label>
             </tab>
             <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">
                 <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
@@ -28,7 +91,9 @@
             </tab>
             <tab heading="Analysis" select="detailsCtrl.fetchAnalysis()">
 		        <span class="pull-right">
-                    <button ng-click="detailsCtrl.getLastFilter()" class="btn btn-default fa fa-chevron-left"> Last Filter</button>
+                    <button ng-click="detailsCtrl.getLastFilter()" class="btn btn-default fa fa-chevron-left"> Last
+                        Filter
+                    </button>
 					<input class="input-sm" type="text" ng-model="detailsCtrl.analysisFilterInput"
                            placeholder="Filter" style="margin: 5px"/>
                     <button ng-click="detailsCtrl.submitFilter()" class=" btn btn-default fa fa-search"> Submit</button>
