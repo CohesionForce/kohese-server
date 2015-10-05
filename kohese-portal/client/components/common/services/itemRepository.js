@@ -34,7 +34,6 @@ export default () => {
         lostAndFound.item.description = "Collection of node(s) that are no longer connected.";
         lostAndFound.children = [];
         tree.proxyMap[lostAndFound.item.id] = lostAndFound;
-        tree.root.children.push(lostAndFound);
 
         // Register the listeners for the Item kinds that are being tracked
         for(var modelName in itemModel){
@@ -146,6 +145,12 @@ export default () => {
                         if (parentProxy.children.length == 0) {
                             // All unallocated children have been moved or deleted
                             removeItemFromTree(parentProxy.item.id);
+                            if(lostAndFound.children.length === 0){
+                              // This is the last child on lostAndFound, so make the node unavailable
+                              tree.root.children = _.reject(tree.root.children, function (childProxy) {
+                                return childProxy.item.id === lostAndFound.item.id;
+                              });
+                            }
                         }
                     }
                 }
@@ -202,6 +207,7 @@ export default () => {
         function removeItemFromTree(byId) {
             var itemProxy = getItem(byId);
             var parentProxy = getItem(itemProxy.item.parentId);
+            var children = itemProxy.children;
 
             if (parentProxy) {
                 parentProxy.children = _.reject(parentProxy.children, function (childProxy) {
@@ -210,7 +216,14 @@ export default () => {
             }
 
             delete tree.proxyMap[byId];
-
+            
+            // If there were children to the node that was deleted, add them to lostAndFound
+            if(children.length){
+              var newLostNode = {};
+              newLostNode.children = children;
+              tree.proxyMap[byId] = newLostNode;
+              attachToLostAndFound(byId);
+            }
         }
 
         function createItemProxy(forItem) {
@@ -280,6 +293,11 @@ export default () => {
             var lostAndFound = getItem(lostProxy.item.parentId)
             lostAndFound.children.push(lostProxy);
             tree.parentOf[byId] = lostAndFound;
+            
+            if(lostAndFound.children.length === 1){
+              // This is the first child on lostAndFound, so make the node available
+              tree.root.children.push(lostAndFound);
+            }
         }
 
         var getAllItemProxies = function(){
