@@ -19,7 +19,7 @@
     },
     "alternatives": {
       "type": [
-        "string"
+        "object"
       ]
     },
     "costImpact": {
