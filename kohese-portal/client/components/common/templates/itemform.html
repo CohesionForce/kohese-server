@@ -32,7 +32,6 @@
 					<span class="control-group"
                           ng-class="{error: detailsCtrl.itemForm.parentId.$invalid}">
                             <label
-                                    ng-click="console.log('click click click')"
                                     class="control-label" for="Parent"
                                     ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.parentId})">Parent Id</label>
 						<div class="controls">
@@ -70,18 +69,5 @@
                                       ng-model="detailsCtrl.itemProxy.item.description"
                                       ng-disabled="!detailsCtrl.enableEdit" id="Description"></textarea>
         </div>
-    </div>
-    <div class="form-actions">
-        <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
-            Edit
-        </button>
-        <button ng-click="detailsCtrl.upsertItem()"
-                ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine" class="btn btn-primary">
-            Update
-        </button>
-        <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"
-                class="btn btn-primary">
-            Cancel
-        </button>
     </div>
 </form>
