@@ -31,10 +31,21 @@ var exportKdb = function() {
         }
 
         for(var id in model){
-          var dbRow = model[id];
           var itemFileName = modelDir + "/" + id + ".json";
+          var dbRow = model[id];
           var dbRowItem= JSON.parse(dbRow);
-          fs.writeFileSync(itemFileName, JSON.stringify(dbRowItem, null, '  '), {encoding: 'utf8', flag: 'w'});  
+
+          var oldFileContents = "";
+          if (fs.existsSync(itemFileName)) {
+            oldFileContents = fs.readFileSync(itemFileName, {encoding: 'utf8', flag: 'r'});  
+          }
+
+          var newFileContents = JSON.stringify(dbRowItem, null, '  ');
+
+          if (newFileContents !== oldFileContents) {
+            console.log("+++ Changes detected in " + id + " -> " + dbRowItem.name);
+            fs.writeFileSync(itemFileName, newFileContents, {encoding: 'utf8', flag: 'w'});
+          }
         }
     }
 
