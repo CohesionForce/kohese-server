@@ -5,7 +5,7 @@ echo "::: Importing kdb"
 node ../scripts/import-kdb.js
 
 kdbDiff=`diff db.json kdb-import.json`
-contentDiff=`echo "$kdbDiff" | egrep "^[<>]" | sed -r 's/\: [0-9]+\,$/: NUM/' | cut -f2- -d' ' | sed 's/,$//' | sort | uniq -c | sed 's/^  *//' | egrep -v "^2 "`
+contentDiff=`echo "$kdbDiff" | egrep "^[<>]" | sed -r 's/\: [0-9]+\,?$/: NUM/' | cut -f2- -d' ' | sed 's/,$//' | sort | uniq -c | sed 's/^  *//' | egrep -v "^2 "`| egrep -v "^4  *}$"
 
 #echo "::: kdbDiff"
 #echo "$kdbDiff"
@@ -24,5 +24,5 @@ then
   rm kdb-import.json
 else
   echo "*** Synchronization failed with content differences:"
-  echo "$kdbDiff"
+  echo "$contentDiff"
 fi
