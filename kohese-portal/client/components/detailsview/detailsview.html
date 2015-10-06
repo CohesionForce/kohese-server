@@ -18,7 +18,7 @@
                 <tab-heading>Overview <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
                 <ng-include src="'components/common/templates/itemform.html'"></ng-include>
             </tab>
-            <tab ng-show="detailsCtrl.itemProxy.kind === 'Action' || 'Decision'" class="decision-tab">
+            <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'" class="decision-tab">
                 <tab-heading>Decision</tab-heading>
                 <form name="detailsCtrl.decisionForm">
                     <label for="DecisionState">
@@ -48,7 +48,7 @@
                     </label>
                 </form>
             </tab>
-            <tab>
+            <tab ng-if="detailsCtrl.itemProxy.kind === 'Action'">
                 <tab-heading>Action</tab-heading>
                 <form name="detailsCtrl.actionForm">
                     <label for="ActionState">
