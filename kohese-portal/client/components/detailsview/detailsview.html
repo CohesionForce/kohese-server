@@ -18,25 +18,35 @@
                 <tab-heading>Overview <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
                 <ng-include src="'components/common/templates/itemform.html'"></ng-include>
             </tab>
-            <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'" class="decision-tab">
+            <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'"
+                 class="decision-tab">
                 <tab-heading>Decision</tab-heading>
                 <form name="detailsCtrl.decisionForm">
-                    <label for="DecisionState">
-                        State
-                        <input id="DecisionState" ng-model="detailsCtrl.itemProxy.item.decisionState" type="text">
+                    <label class=control-label" for="DecisionState">
+                        State:
+                        <div class="controls">
+                            <input id="DecisionState" ng-model="detailsCtrl.itemProxy.item.decisionState" type="text">
+                        </div>
                     </label>
-                    <label for="ApprovedBy">
-                        Approved By
-                        <input ng-model="detailsCtrl.itemProxy.item.approvedBy" id="ApprovedBy">
+                    <label class=control-label" for="ApprovedBy">
+
+                        Approved By:
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.approvedBy" id="ApprovedBy">
+                        </div>
                     </label>
-                    <label for="ApprovedOn">
+                    <label class=control-label" for="ApprovedOn">
                         Approved On
-                        <input ng-model="detailsCtrl.itemProxy.item.approvedOn" id="ApprovedOn">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.approvedOn" id="ApprovedOn">
+                        </div>
                     </label>
                     <br/>
-                    <label for="Rationale">
+                    <label class=control-label" for="Rationale">
                         Rationale
-                        <input id="Rationale" ng-model="detailsCtrl.itemProxy.item.rationale">
+                        <div class="controls">
+                            <input id="Rationale" ng-model="detailsCtrl.itemProxy.item.rationale">
+                        </div>
                     </label>
                     <br>
                     <label>
@@ -51,37 +61,55 @@
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Action'">
                 <tab-heading>Action</tab-heading>
                 <form name="detailsCtrl.actionForm">
-                    <label for="ActionState">
+                    <label class=control-label" for="ActionState">
                         State:
-                        <input ng-model="detailsCtrl.itemProxy.item.actionState" id="ActionState">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.actionState" id="ActionState">
+                        </div>
                     </label>
-                    <label for="AssignedTo">
+                    <label class=control-label" for="AssignedTo">
                         Assigned To:
-                        <input ng-model="detailsCtrl.itemProxy.item.assignedTo" id="AssignedTo">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.assignedTo" id="AssignedTo">
+                        </div>
                     </label>
-                    <label for="EstimatedStart">
+                    <br>
+                    <label class=control-label" for="EstimatedStart">
                         Estimated Start:
-                        <input ng-model="detailsCtrl.itemProxy.item.estimatedStart" id="EstimatedStart">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.estimatedStart" id="EstimatedStart">
+                        </div>
                     </label>
-                    <label for="EstimatedCompletion">
+                    <label class=control-label" for="EstimatedCompletion">
                         Estimated Completion:
-                        <input ng-model="detailsCtrl.itemProxy.item.estimatedCompletion" id="EstimatedCompletion">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.estimatedCompletion" id="EstimatedCompletion">
+                        </div>
                     </label>
-                    <label for="EstimatedHours">
+                    <label class=control-label" for="EstimatedHours">
                         Estimated Hours:
-                        <input ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort" id="EstimatedHours">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort" id="EstimatedHours">
+                        </div>
                     </label>
-                    <label for="ActualStart">
+                    <br>
+                    <label class=control-label" for="ActualStart">
                         Actual Start:
-                        <input ng-model="detailsCtrl.itemProxy.item.actualStart" id="ActualStart">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.actualStart" id="ActualStart">
+                        </div>
                     </label>
-                    <label for="ActualCompletion">
+                    <label class=control-label" for="ActualCompletion">
                         Actual Completion:
-                        <input ng-model="detailsCtrl.itemProxy.item.actualCompletion" id="ActualCompletion">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.actualCompletion" id="ActualCompletion">
+                        </div>
                     </label>
-                    <label for="ActualHours">
+                    <label class=control-label" for="ActualHours">
                         Actual Hours:
-                        <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts" id="ActualHours">
+                        <div class="controls">
+                            <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts" id="ActualHours">
+                        </div>
                     </label>
                 </form>
             </tab>
