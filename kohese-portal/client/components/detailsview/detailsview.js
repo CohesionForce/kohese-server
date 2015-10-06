@@ -24,10 +24,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
         $scope.$emit('newItemSelected', $stateParams.id);
     });
 
-    if (detailsCtrl.tab.state === 'kohese.explore.create') {
-        detailsCtrl.enableEdit = true;
-    }
-
     if (detailsCtrl.tab.state === 'kohese.investigate') {
         detailsCtrl.tab.setTitle('Investigate');
         detailsCtrl.tab.params = {
@@ -45,6 +41,10 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
         }
     } else {
         detailsCtrl.itemProxy.item = new Item();
+    }
+
+    if (detailsCtrl.tab.state === 'kohese.explore.create') {
+        detailsCtrl.enableEdit = true;
     }
 
 
@@ -68,12 +68,14 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
     };
 
     detailsCtrl.updateItem = function () {
-        console.log(detailsCtrl.itemProxy.kind);
-        console.log('updatedItemKind');
         var newModel = ItemRepository.modelTypes[detailsCtrl.itemProxy.kind];
         var newItem = new newModel();
         ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
         detailsCtrl.itemProxy.item = newItem;
+        if(detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'){
+            detailsCtrl.itemProxy.item.alternatives = [];
+            detailsCtrl.itemProxy.item.alternatives[0] = {text : ''};
+        }
     };
 
     detailsCtrl.addAlternative = function () {
