@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $location, tabService) {
+function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $location, $window, tabService) {
 
     var treeCtrl = this,
         syncListener;
@@ -11,6 +11,14 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
     treeCtrl.collapsed = {};
     treeCtrl.tab = tabService.getCurrentTab();
     treeCtrl.locationSynced = false;
+
+    treeCtrl.getItemCount = function (){
+      return $('#theKT').find(".kt-item").length;
+    }
+        
+    treeCtrl.getItemMatchedCount = function (){
+      return $('#theKT').find(".kti-filterMatched").length;
+    }
 
     function getTypeForFilter(val) {
       return (val === null) ? 'null' : typeof val;
@@ -103,7 +111,7 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
 
 export default () => {
     angular.module('app.tree', ['app.services.tabservice'])
-        .controller('TreeController', ['Item', 'ItemRepository', '$timeout', '$anchorScroll', '$scope', '$location',
+        .controller('TreeController', ['Item', 'ItemRepository', '$timeout', '$anchorScroll', '$scope', '$location', '$window',
             'tabService',
             TreeController]);
 }

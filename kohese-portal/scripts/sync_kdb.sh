@@ -1,5 +1,10 @@
-echo "::: Exporting kdb"
-node ../scripts/export-kdb.js
+if [ -f "db.json" ]
+then
+  echo "::: Exporting kdb"
+  node ../scripts/export-kdb.js
+else
+  touch db.json
+fi
 
 echo "::: Importing kdb"
 node ../scripts/import-kdb.js

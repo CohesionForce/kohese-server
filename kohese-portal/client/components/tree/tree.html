@@ -8,13 +8,13 @@
 		ng-class="{ 'button-selected' :treeCtrl.locationSynced}"
 		class="btn btn-default btn-sm fa fa-exchange"></i> <span
 		class="pull-right"> <span>Showing
-			{{filteredItems.length}} of {{treeCtrl.newTree.rows.length}}</span> <input
+			{{treeCtrl.getItemMatchedCount()}} of {{treeCtrl.getItemCount()}}</span> <input
 		class="input-sm" type="text" ng-model="treeCtrl.filterString"
 		placeholder="Filter" style="margin: 5px" />
 	</span>
 </div>
 
-<div class="knowledge-tree">
+<div id="theKT" class="knowledge-tree">
 	<div class="kt-head">
 		<div class="kth-cell kti-name">Name</div>
 		<div class="kth-cell kti-description">Description</div>
