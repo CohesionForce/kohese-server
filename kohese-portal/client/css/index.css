@@ -327,6 +327,8 @@ table td .glyphicon-remove {
     width: 500px; }
   .tab-pane label .alternative-field {
     width: 500px; }
+.tab-pane .form-actions {
+  margin-left: 20px; }
 
 .sidebar {
   color: whitesmoke;

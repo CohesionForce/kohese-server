@@ -71,17 +71,4 @@
                                       ng-disabled="!detailsCtrl.enableEdit" id="Description"></textarea>
         </div>
     </div>
-    <div class="form-actions">
-        <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
-            Edit
-        </button>
-        <button ng-click="detailsCtrl.upsertItem()"
-                ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine" class="btn btn-primary">
-            Update
-        </button>
-        <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"
-                class="btn btn-primary">
-            Cancel
-        </button>
-    </div>
 </form>
