@@ -1,30 +1,136 @@
 <div class="panel panel-default">
     <div class="panel-heading">Create Item
         <button ng-if="detailsCtrl.tab.type === 'singleview'" class="pull-right"
-                ui-sref="kohese.explore({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView()">
+                ui-sref="kohese.explore({id:detailsCtrl.itemProxy.item.id})"
+                ng-click="detailsCtrl.toggleView()">
             Dual Screen
         </button>
         <button ng-if="detailsCtrl.tab.type === 'dualview'" class="pull-right"
-                ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})" ng-click="detailsCtrl.toggleView()">
+                ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})"
+                ng-click="detailsCtrl.toggleView()">
             Full screen
         </button>
     </div>
-    <div class="panel-body">
-    <ng-include src="'components/common/templates/itemform.html'"></ng-include>
-        <div class="form-actions">
-            <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
-                Edit
-            </button>
-            <button ng-click="detailsCtrl.upsertItem()"
-                    ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
+    <tabset>
+        <tab>
+            <tab-heading>Overview</tab-heading>
+
+            <div class="panel-body">
+                <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+                <div class="form-actions">
+                    <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit"
+                            class="btn btn-primary">
+                        Edit
+                    </button>
+                    <button ng-click="detailsCtrl.upsertItem()"
+                            ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
                 && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
-                Update
-            </button>
-            <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"
-                    class="btn btn-primary">
-                Cancel
-            </button>
+                        Update
+                    </button>
+                    <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()"
+                            ng-disabled="!detailsCtrl.enableEdit"
+                            class="btn btn-primary">
+                        Cancel
+                    </button>
+                </div>
             </div>
-    </div>
+        </tab>
+        <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'"
+             class="decision-tab">
+            <tab-heading>Decision</tab-heading>
+            <form name="detailsCtrl.decisionForm">
+                <label class=control-label" for="DecisionState">
+                    State:
+                    <div class="controls">
+                        <input id="DecisionState" ng-model="detailsCtrl.itemProxy.item.decisionState" type="text">
+                    </div>
+                </label>
+                <label class=control-label" for="ApprovedBy">
+
+                    Approved By:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.approvedBy" id="ApprovedBy">
+                    </div>
+                </label>
+                <label class=control-label" for="ApprovedOn">
+                    Approved On
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.approvedOn" id="ApprovedOn">
+                    </div>
+                </label>
+                <br/>
+                <label class=control-label" for="Rationale">
+                    Rationale
+                    <div class="controls">
+                        <input id="Rationale" ng-model="detailsCtrl.itemProxy.item.rationale">
+                    </div>
+                </label>
+                <br>
+                <label>
+                    Alternatives:
+                    <div ng-repeat="alternative in detailsCtrl.itemProxy.item.alternatives track by $index">
+                        <input class="alternative-field" type="text" ng-model="alternative.text">
+                    </div>
+                    <button ng-click="detailsCtrl.addAlternative()" class="btn btn-primary">Add</button>
+                </label>
+            </form>
+        </tab>
+        <tab ng-if="detailsCtrl.itemProxy.kind === 'Action'">
+            <tab-heading>Action</tab-heading>
+            <form name="detailsCtrl.actionForm">
+                <label class=control-label" for="ActionState">
+                    State:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.actionState" id="ActionState">
+                    </div>
+                </label>
+                <label class=control-label" for="AssignedTo">
+                    Assigned To:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.assignedTo" id="AssignedTo">
+                    </div>
+                </label>
+                <br>
+                <label class=control-label" for="EstimatedStart">
+                    Estimated Start:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.estimatedStart" id="EstimatedStart">
+                    </div>
+                </label>
+                <label class=control-label" for="EstimatedCompletion">
+                    Estimated Completion:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.estimatedCompletion" id="EstimatedCompletion">
+                    </div>
+                </label>
+                <label class=control-label" for="EstimatedHours">
+                    Estimated Hours:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort" id="EstimatedHours">
+                    </div>
+                </label>
+                <br>
+                <label class=control-label" for="ActualStart">
+                    Actual Start:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.actualStart" id="ActualStart">
+                    </div>
+                </label>
+                <label class=control-label" for="ActualCompletion">
+                    Actual Completion:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.actualCompletion" id="ActualCompletion">
+                    </div>
+                </label>
+                <label class=control-label" for="ActualHours">
+                    Actual Hours:
+                    <div class="controls">
+                        <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts" id="ActualHours">
+                    </div>
+                </label>
+            </form>
+        </tab>
+    </tabset>
+</div>
 
 </div>
