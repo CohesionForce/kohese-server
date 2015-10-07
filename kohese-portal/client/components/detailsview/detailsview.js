@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function DetailsViewController($state, ItemRepository, analysisService, Item, $rootScope, tabService, $scope, $stateParams) {
+function DetailsViewController($state, ItemRepository, analysisService, Item, DecisionService, ActionService, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
 
@@ -19,6 +19,8 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
     detailsCtrl.showTokensInDetails = false;
     detailsCtrl.filterList = [];
     detailsCtrl.kindList = ItemRepository.modelTypes;
+
+    console.log(detailsCtrl.decisionStates);
 
     $scope.$on('$stateChangeSuccess', function () {
         $scope.$emit('newItemSelected', $stateParams.id);
@@ -52,6 +54,9 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
 
     $scope.$on('itemRepositoryReady', function () {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
+        detailsCtrl.decisionStates = DecisionService.getDecisionStates();
+        detailsCtrl.actionStates = ActionService.getActionStates();
+
     });
 
     $scope.$on('tabSelected', function () {
@@ -139,7 +144,9 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, $r
 }
 
 export default () => {
-    angular.module('app.detailsview', ['app.services.tabservice'])
-        .controller('DetailsViewController', ['$state', 'ItemRepository', 'analysisService', 'Item', '$rootScope', 'tabService', '$scope', '$stateParams',
-            DetailsViewController]);
+    angular.module('app.detailsview', [
+        'app.services.tabservice',
+        'app.services.decisionservice',
+        'app.services.actionservice'])
+        .controller('DetailsViewController', DetailsViewController);
 }

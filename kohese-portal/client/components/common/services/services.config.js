@@ -9,4 +9,6 @@ export default() => {
     require('./itemRepository')();
     require('./authenticationServices')();
     require('./analysisService')();
+    require('./kind-services/decision-service')();
+    require('./kind-services/action-service')();
 }

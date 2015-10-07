@@ -32,6 +32,8 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
     lostAndFound.children = [];
     tree.proxyMap[lostAndFound.item.id] = lostAndFound;
 
+    fetchItems();
+
     // Register the listeners for the Item kinds that are being tracked
     for (var modelName in itemModel) {
         socket.on(modelName + '/create', function (notification) {
@@ -49,6 +51,20 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
             removeItemFromTree(notification.id);
         });
     }
+
+    return {
+        modelTypes: itemModel,
+        itemModel: itemModel,
+        getTreeRoot: getTreeRoot,
+        getItemProxy: getItem,
+        getAllItemProxies: getAllItemProxies,
+        fetchItem: fetchItem,
+        upsertItem: upsertItem,
+        deleteItem: deleteItem,
+        copyAttributes: copyAttributes,
+        getChildByNameFrom: getChildByNameFrom,
+        getDecendentsOf: getDecendentsOf
+    };
 
 
     function fetchItems() {
@@ -74,7 +90,7 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
         });
     }
 
-    fetchItems();
+
 
     function copyAttributes(fromItem, toItem) {
 
@@ -194,6 +210,34 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
         return tree.proxyMap[byId];
     }
 
+    function getChildByNameFrom(proxy, name){
+        for(var childIdx in proxy.children){
+            var child = proxy.children[childIdx];
+            if (child.item.name === name){
+                return child;
+            }
+        }
+        return null;
+    }
+
+    function getDecendentsOf(proxy){
+        var proxyStack = [];
+        for(var childIdx = proxy.children.length - 1; childIdx > -1; childIdx--){
+            proxyStack.push(proxy.children[childIdx]);
+        }
+
+        var decendantList = [];
+        var decendant = proxyStack.pop()
+        while(decendant){
+            decendantList.push(decendant);
+            for(var childIdx = decendant.children.length - 1; childIdx > -1; childIdx--){
+                proxyStack.push(decendant.children[childIdx]);
+            }
+            decendant = proxyStack.pop();
+        }
+        return decendantList;
+    }
+
     function addItemToTree(item) {
 
         // Create the proxy and add it to tree structures
@@ -297,7 +341,7 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
         }
     }
 
-    var getAllItemProxies = function () {
+    function getAllItemProxies() {
         var itemProxyList = [];
         for (var key in tree.proxyMap) {
             itemProxyList.push(tree.proxyMap[key]);
@@ -305,21 +349,13 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
         return itemProxyList;
     }
 
-    var getTreeRoot = function () {
+    function getTreeRoot() {
         return tree.root;
     }
 
-    return {
-        modelTypes: itemModel,
-        itemModel: itemModel,
-        getTreeRoot: getTreeRoot,
-        getItemProxy: getItem,
-        getAllItemProxies: getAllItemProxies,
-        fetchItem: fetchItem,
-        upsertItem: upsertItem,
-        deleteItem: deleteItem,
-        copyAttributes: copyAttributes,
-    }
+
+
+
 }
 
 export default () => {

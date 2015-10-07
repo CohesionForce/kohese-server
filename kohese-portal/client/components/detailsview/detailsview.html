@@ -24,9 +24,10 @@
                 <form name="detailsCtrl.decisionForm">
                     <label class=control-label" for="DecisionState">
                         State:
-                        <div class="controls">
-                            <input id="DecisionState" ng-model="detailsCtrl.itemProxy.item.decisionState" type="text">
-                        </div>
+                        <select id="DecisionState"
+                                ng-model="detailsCtrl.itemProxy.item.decisionState" >
+                            <option ng-repeat="state in detailsCtrl.decisionStates">{{state.item.name}}</option>
+                        </select>
                     </label>
                     <label class=control-label" for="ApprovedBy">
 
@@ -63,9 +64,11 @@
                 <form name="detailsCtrl.actionForm">
                     <label class=control-label" for="ActionState">
                         State:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.actionState" id="ActionState">
-                        </div>
+                        <select id="ActionState"
+                                ng-model="detailsCtrl.itemProxy.item.actionState" >
+                            <option ng-repeat="state in detailsCtrl.actionStates">{{state.item.name}}</option>
+                        </select>
+                    </label>
                     </label>
                     <label class=control-label" for="AssignedTo">
                         Assigned To:

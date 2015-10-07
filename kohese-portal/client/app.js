@@ -11,6 +11,8 @@ const appModule = angular.module('app', [
     'app.navigationmenu',
     'app.search',
     'app.services.itemservice',
+    'app.services.decisionservice',
+    'app.services.actionservice',
     'app.services.tabservice',
     'app.services.authentication',
     'app.services.analysisservice',
