@@ -25,9 +25,6 @@
 		</div>
 	</div>
 	<div class="kt-body">
-		<div class="kt-collection"
-			ng-repeat="itemProxy in treeCtrl.treeRoot.children">
-			<tree-row item-proxy="itemProxy" tree-ctrl="treeCtrl"></tree-row>
-		</div>
+        <tree-row tree-ctrl="treeCtrl" proxy-collection="treeCtrl.treeRoot.children"></tree-row>
 	</div>
 </div>
