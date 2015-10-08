@@ -330,6 +330,32 @@ table td .glyphicon-remove {
 .tab-pane .form-actions {
   margin-left: 20px; }
 
+.angucomplete-holder ::-webkit-input-placeholder {
+  /* WebKit, Blink, Edge */
+  color: black; }
+.angucomplete-holder :-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: black;
+  opacity: 1; }
+.angucomplete-holder ::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: black;
+  opacity: 1; }
+.angucomplete-holder :-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: black; }
+.angucomplete-holder .angucomplete-dropdown {
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+  border-radius: 10px;
+  border: 1px black solid;
+  padding: 5px; }
+.angucomplete-holder .angucomplete-selected-row {
+  background-color: #005A31;
+  color: white;
+  padding: 5px; }
+
 .sidebar {
   color: whitesmoke;
   position: relative;

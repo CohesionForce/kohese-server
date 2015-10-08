@@ -13,6 +13,8 @@ const appModule = angular.module('app', [
     'app.services.itemservice',
     'app.services.decisionservice',
     'app.services.actionservice',
+    'app.services.categoryservice',
+    'app.services.userservice',
     'app.services.tabservice',
     'app.services.authentication',
     'app.services.analysisservice',
@@ -25,7 +27,8 @@ const appModule = angular.module('app', [
     'angular-jwt',
     'ui.bootstrap',
     'btford.socket-io',
-    'RecursionHelper'
+    'RecursionHelper',
+    'angucomplete-alt'
 
 ]);
 

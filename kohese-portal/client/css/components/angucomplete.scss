@@ -1,0 +1,37 @@
+@import '../utils/variables';
+
+.angucomplete-holder{
+
+  ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: $fontColor;
+  }
+  :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: $fontColor;
+    opacity:  1;
+  }
+  ::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: $fontColor;
+    opacity:  1;
+  }
+  :-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: $fontColor;
+  }
+  .angucomplete-dropdown {
+    position: absolute;
+    z-index: 10;
+    background-color: white;
+    border-radius: $baseBorderRadius;
+    border: 1px black solid;
+    padding: 5px;
+  }
+
+  .angucomplete-selected-row {
+    background-color: $primaryColor;
+    color: white;
+    padding: 5px;
+  }
+
+}
+
+
+
