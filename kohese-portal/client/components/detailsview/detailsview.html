@@ -29,12 +29,20 @@
                             <option ng-repeat="state in detailsCtrl.decisionStates">{{state.item.name}}</option>
                         </select>
                     </label>
-                    <label class=control-label" for="ApprovedBy">
+                    <label class=control-label">
 
                         Approved By:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.approvedBy" id="ApprovedBy">
-                        </div>
+                        <angucomplete-alt id="ApprovedBy"
+                                          placeholder="{{detailsCtrl.itemProxy.item.approvedBy}}"
+                                          selected-object="detailsCtrl.decisionApproved"
+                                          search-fields="item.name,item.description"
+                                          title-field="item.name"
+                                          description-field="item.description"
+                                          pause="100"
+                                          local-data="detailsCtrl.userList"
+                                          minlength="1"
+                                          match-class="highlight"
+                                ></angucomplete-alt>
                     </label>
                     <label class=control-label" for="ApprovedOn">
                         Approved On
@@ -70,11 +78,19 @@
                         </select>
                     </label>
                     </label>
-                    <label class=control-label" for="AssignedTo">
+                    <label class=control-label">
                         Assigned To:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.assignedTo" id="AssignedTo">
-                        </div>
+                            <angucomplete-alt id="AssignedTo"
+                                              placeholder="{{detailsCtrl.itemProxy.item.assignedTo}}"
+                                              selected-object="detailsCtrl.actionAssigned"
+                                              search-fields="item.name,item.description"
+                                              title-field="item.name"
+                                              description-field="item.description"
+                                              pause="100"
+                                              local-data="detailsCtrl.userList"
+                                              minlength="1"
+                                              match-class="highlight"
+                                    ></angucomplete-alt>
                     </label>
                     <br>
                     <label class=control-label" for="EstimatedStart">

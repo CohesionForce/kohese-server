@@ -2,7 +2,8 @@
  * Created by josh on 7/13/15.
  */
 
-function DetailsViewController($state, ItemRepository, analysisService, Item, DecisionService, ActionService, tabService, $scope, $stateParams) {
+function DetailsViewController($state, ItemRepository, analysisService, Item, DecisionService, ActionService,
+                               CategoryService, UserService, tabService, $scope, $stateParams) {
 
     var detailsCtrl = this;
 
@@ -19,8 +20,10 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
     detailsCtrl.showTokensInDetails = false;
     detailsCtrl.filterList = [];
     detailsCtrl.kindList = ItemRepository.modelTypes;
-
-    console.log(detailsCtrl.decisionStates);
+    detailsCtrl.decisionStates = DecisionService.getDecisionStates();
+    detailsCtrl.actionStates = ActionService.getActionStates();
+    detailsCtrl.categoryTags = CategoryService.getTags();
+    detailsCtrl.userList = UserService.getAllUsers();
 
     $scope.$on('$stateChangeSuccess', function () {
         $scope.$emit('newItemSelected', $stateParams.id);
@@ -50,12 +53,12 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
     }
 
 
-    //console.log(detailsCtrl.itemProxy.item);
-
     $scope.$on('itemRepositoryReady', function () {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
         detailsCtrl.actionStates = ActionService.getActionStates();
+        detailsCtrl.categoryTags = CategoryService.getTags();
+        detailsCtrl.userList = UserService.getAllUsers();
 
     });
 
@@ -70,6 +73,14 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
             detailsCtrl.tab.toggleType();
             detailsCtrl.tab.setType = view;
         }
+    };
+
+    detailsCtrl.actionAssigned = function(selected){
+        detailsCtrl.itemProxy.item.assignedTo = selected.title;
+    };
+
+    detailsCtrl.decisionApproved = function(selected){
+        detailsCtrl.itemProxy.item.approvedBy = selected.title;
     };
 
     detailsCtrl.updateItem = function () {
@@ -87,6 +98,15 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
         var altLength = detailsCtrl.itemProxy.item.alternatives.length;
         detailsCtrl.itemProxy.item.alternatives[altLength] = {text:''};
         console.log(detailsCtrl.itemProxy.item.alternatives);
+    };
+
+    detailsCtrl.tagSelected = function(selected) {
+        if (selected) {
+            //window.alert('You have selected ' + selected);
+            console.log(selected);
+        } else {
+            console.log('cleared');
+        }
     };
 
     detailsCtrl.toggleView = function (state) {
@@ -147,6 +167,8 @@ export default () => {
     angular.module('app.detailsview', [
         'app.services.tabservice',
         'app.services.decisionservice',
-        'app.services.actionservice'])
+        'app.services.actionservice',
+        'app.services.categoryservice',
+        'app.services.userservice'])
         .controller('DetailsViewController', DetailsViewController);
 }

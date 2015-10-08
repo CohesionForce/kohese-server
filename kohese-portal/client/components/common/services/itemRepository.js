@@ -68,20 +68,20 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
 
 
     function fetchItems() {
-        console.log('::: Fetching: ' + Date.now() / 1000);
+        //console.log('::: Fetching: ' + Date.now() / 1000);
         Item.find().$promise.then(function (itemResults) {
-            console.log('::: Received Items: ' + Date.now() / 1000);
+            //console.log('::: Received Items: ' + Date.now() / 1000);
             Category.find().$promise.then(function (categoryResults) {
-                console.log('::: Received Categories: ' + Date.now() / 1000);
+                //console.log('::: Received Categories: ' + Date.now() / 1000);
                 Decision.find().$promise.then(function (decisionResults) {
-                    console.log('::: Received Decisions: ' + Date.now() / 1000);
+                    //console.log('::: Received Decisions: ' + Date.now() / 1000);
                     Action.find().$promise.then(function (actionResults) {
-                        console.log('::: Received Actions: ' + Date.now() / 1000);
+                        //console.log('::: Received Actions: ' + Date.now() / 1000);
                         KoheseUser.find().$promise.then(function (userResults) {
-                            console.log('::: Received Users: ' + Date.now() / 1000);
+                            //console.log('::: Received Users: ' + Date.now() / 1000);
                             var results = itemResults.concat(categoryResults).concat(decisionResults).concat(actionResults).concat(userResults);
                             convertListToTree(results);
-                            console.log('::: List converted: ' + Date.now() / 1000);
+                            //console.log('::: List converted: ' + Date.now() / 1000);
                             $rootScope.$broadcast('itemRepositoryReady')
                         });
                     });
