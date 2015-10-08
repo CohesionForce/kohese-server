@@ -11,6 +11,7 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
     treeCtrl.collapsed = {};
     treeCtrl.tab = tabService.getCurrentTab();
     treeCtrl.locationSynced = false;
+    treeCtrl.lastClone = 0;
 
     treeCtrl.getItemCount = function (){
       return $('#theKT').find(".kt-item").length;

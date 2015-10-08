@@ -2,7 +2,7 @@
      ng-class="{'kt-hidden' : itemProxy.item.parentId && treeCtrl.collapsed[itemProxy.item.parentId]}">
 	<div id="{{itemProxy.item.id}}" class="kt-item"
 		ng-class="{'kti-filtered': !treeCtrl.matchesFilter(itemProxy) && !treeCtrl.childMatchesFilter(itemProxy),
-                'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
+                   'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
 		<div class="kti-name" ng-style="{'font-weight': 'bold'}">
 			<a style=""> <i
 				ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]"
