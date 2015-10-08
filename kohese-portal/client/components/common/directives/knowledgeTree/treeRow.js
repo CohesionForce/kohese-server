@@ -5,7 +5,7 @@
 function TreeRow(RecursionHelper) {
     return {restrict: 'E',
         scope: {
-            itemProxy: '=',
+            proxyCollection: '=',
             treeCtrl: '='
         },
         templateUrl: 'components/common/directives/knowledgeTree/treeRow.html',
