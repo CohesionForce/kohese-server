@@ -11,7 +11,46 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
     treeCtrl.collapsed = {};
     treeCtrl.tab = tabService.getCurrentTab();
     treeCtrl.locationSynced = false;
-    treeCtrl.lastClone = 0;
+    treeCtrl.currentLazyItemIdx = 0;
+    var lazyLimitIncrement = 20;
+    treeCtrl.currentLazyLimit = lazyLimitIncrement;
+    var lazyLimitIncreasePending = false;
+    
+    $scope.$watch('treeCtrl.filterString', function(){
+      postDigest(function(){
+        // Force one more update cycle to get the match count to display
+        $scope.$apply();        
+      });
+    });
+    
+    treeCtrl.allocateLazyItemIdx = function() {
+      var idx = treeCtrl.currentLazyItemIdx;
+      treeCtrl.currentLazyItemIdx++;
+
+      if(!lazyLimitIncreasePending){
+        // New nodes added, need to increase the limit to force a new digest cycle
+        // to load more items if they are available
+        lazyLimitIncreasePending = true;
+        postDigest(function(){
+          treeCtrl.currentLazyLimit = treeCtrl.currentLazyItemIdx + lazyLimitIncrement;          
+//          console.log("::: Increased lazy limit to " + treeCtrl.currentLazyLimit);
+          lazyLimitIncreasePending = false;
+          $scope.$apply();
+        });
+      }
+      
+      return idx;
+    }
+    
+    function postDigest(callback){    
+      var unregister = $scope.$watch(function(){
+//        console.log("::: postDigest at " + treeCtrl.currentLazyItemIdx);
+        unregister();
+        $timeout(function(){
+          callback();
+        },0,false);       
+      });
+    }
 
     treeCtrl.getItemCount = function (){
       return $('#theKT').find(".kt-item").length;

@@ -1,7 +1,8 @@
 <div class="kt-collection" ng-repeat="itemProxy in proxyCollection"
      ng-class="{'kt-hidden' : itemProxy.item.parentId && treeCtrl.collapsed[itemProxy.item.parentId]}">
-	<div id="{{itemProxy.item.id}}" class="kt-item"
-		ng-class="{'kti-filtered': !treeCtrl.matchesFilter(itemProxy) && !treeCtrl.childMatchesFilter(itemProxy),
+	<div id="{{itemProxy.item.id}}" class="kt-item" 
+	     ng-init="lazyIdx=treeCtrl.allocateLazyItemIdx()"
+		 ng-class="{'kti-filtered': !treeCtrl.matchesFilter(itemProxy) && !treeCtrl.childMatchesFilter(itemProxy),
                    'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
 		<div class="kti-name" ng-style="{'font-weight': 'bold'}">
 			<a style=""> <i
@@ -11,7 +12,7 @@
 				ng-class="{'glyphicon fa icon-minus glyphicon-minus fa-minus': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id], 
                            'glyphicon fa icon-plus glyphicon-plus fa-plus': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0),
-                           'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}">
+                           'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}" >
 			</i>
 			</a> <span ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
 				class="kt-label"
@@ -30,7 +31,7 @@
 				ng-click="treeCtrl.removeItem(itemProxy.item)"> </i>
 		</div>
 	</div>
-	<div ng-if="itemProxy.children">
+	<div ng-if="itemProxy.children && lazyIdx<treeCtrl.currentLazyLimit">
 		<tree-row tree-ctrl="treeCtrl" proxy-collection="itemProxy.children"></tree-row>
 	</div>
 </div>
