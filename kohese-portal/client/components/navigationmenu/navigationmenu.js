@@ -15,6 +15,7 @@ function NavigationController($rootScope, $scope, AuthTokenFactory, tabService) 
                 filter: searchString
             }
         });
+        ctrl.toggleSideBar();
     };
 
     ctrl.toggleSideBar = function(){

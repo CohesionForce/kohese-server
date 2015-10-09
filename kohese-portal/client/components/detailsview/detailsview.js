@@ -76,11 +76,15 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
     };
 
     detailsCtrl.actionAssigned = function(selected){
+        if(selected){
         detailsCtrl.itemProxy.item.assignedTo = selected.title;
+        }
     };
 
     detailsCtrl.decisionApproved = function(selected){
+        if(selected){
         detailsCtrl.itemProxy.item.approvedBy = selected.title;
+        }
     };
 
     detailsCtrl.updateItem = function () {
