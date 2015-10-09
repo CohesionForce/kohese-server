@@ -21,116 +21,11 @@
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'"
                  class="decision-tab">
                 <tab-heading>Decision</tab-heading>
-                <form name="detailsCtrl.decisionForm">
-                    <label class=control-label" for="DecisionState">
-                        State:
-                        <select id="DecisionState"
-                                ng-model="detailsCtrl.itemProxy.item.decisionState" >
-                            <option ng-repeat="state in detailsCtrl.decisionStates">{{state.item.name}}</option>
-                        </select>
-                    </label>
-                    <label class=control-label">
-
-                        Approved By:
-                        <angucomplete-alt id="ApprovedBy"
-                                          placeholder="{{detailsCtrl.itemProxy.item.approvedBy}}"
-                                          selected-object="detailsCtrl.decisionApproved"
-                                          search-fields="item.name,item.description"
-                                          title-field="item.name"
-                                          description-field="item.description"
-                                          pause="100"
-                                          local-data="detailsCtrl.userList"
-                                          minlength="1"
-                                          match-class="highlight"
-                                ></angucomplete-alt>
-                    </label>
-                    <label class=control-label" for="ApprovedOn">
-                        Approved On
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.approvedOn" id="ApprovedOn">
-                        </div>
-                    </label>
-                    <br/>
-                    <label class=control-label" for="Rationale">
-                        Rationale
-                        <div class="controls">
-                            <input id="Rationale" ng-model="detailsCtrl.itemProxy.item.rationale">
-                        </div>
-                    </label>
-                    <br>
-                    <label>
-                        Alternatives:
-                        <div ng-repeat="alternative in detailsCtrl.itemProxy.item.alternatives track by $index">
-                            <input class="alternative-field" type="text" ng-model="alternative.text">
-                        </div>
-                        <button ng-click="detailsCtrl.addAlternative()" class="btn btn-primary">Add</button>
-                    </label>
-                </form>
+                <ng-include src="'components/common/templates/decision-form.html'"></ng-include>
             </tab>
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Action'">
                 <tab-heading>Action</tab-heading>
-                <form name="detailsCtrl.actionForm">
-                    <label class=control-label" for="ActionState">
-                        State:
-                        <select id="ActionState"
-                                ng-model="detailsCtrl.itemProxy.item.actionState" >
-                            <option ng-repeat="state in detailsCtrl.actionStates">{{state.item.name}}</option>
-                        </select>
-                    </label>
-                    </label>
-                    <label class=control-label">
-                        Assigned To:
-                            <angucomplete-alt id="AssignedTo"
-                                              placeholder="{{detailsCtrl.itemProxy.item.assignedTo}}"
-                                              selected-object="detailsCtrl.actionAssigned"
-                                              search-fields="item.name,item.description"
-                                              title-field="item.name"
-                                              description-field="item.description"
-                                              pause="100"
-                                              local-data="detailsCtrl.userList"
-                                              minlength="1"
-                                              match-class="highlight"
-                                    ></angucomplete-alt>
-                    </label>
-                    <br>
-                    <label class=control-label" for="EstimatedStart">
-                        Estimated Start:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.estimatedStart" id="EstimatedStart">
-                        </div>
-                    </label>
-                    <label class=control-label" for="EstimatedCompletion">
-                        Estimated Completion:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.estimatedCompletion" id="EstimatedCompletion">
-                        </div>
-                    </label>
-                    <label class=control-label" for="EstimatedHours">
-                        Estimated Hours:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort" id="EstimatedHours">
-                        </div>
-                    </label>
-                    <br>
-                    <label class=control-label" for="ActualStart">
-                        Actual Start:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.actualStart" id="ActualStart">
-                        </div>
-                    </label>
-                    <label class=control-label" for="ActualCompletion">
-                        Actual Completion:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.actualCompletion" id="ActualCompletion">
-                        </div>
-                    </label>
-                    <label class=control-label" for="ActualHours">
-                        Actual Hours:
-                        <div class="controls">
-                            <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts" id="ActualHours">
-                        </div>
-                    </label>
-                </form>
+                <ng-include src="'components/common/templates/action-form.html'"></ng-include>
             </tab>
             <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">
                 <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
