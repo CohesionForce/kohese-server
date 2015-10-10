@@ -101,17 +101,15 @@ describe(
 				expect(adminController.usernameInput).toBe('UserName');
 				expect(adminController.descriptionInput).toBe('User Description');
 				expect(adminController.editUserForm).toBe(true);
-// expect(adminController.passwordInput).toBe('');
-// expect(adminController.confirmPasswordInput).toBe('');
+				expect(adminController.passwordInput).toBe(undefined);
+                expect(adminController.confirmPasswordInput).toBe(undefined);
 				expect(adminController.selectedUser).toBe(user);
 			});
 			
 			// Test Clear form
 			it("Test Clear Form", function() {
 				adminController.cancelForm();
-				// adminController.editedUser is set to null
-				// instead of selectedUser
-// expect(adminController.selectedUser).toBe(null);
+				expect(adminController.selectedUser).toBe(null);
 		        expect(adminController.addUserForm).toBe(false);
 		        expect(adminController.editUserForm).toBe(false);
 			});
@@ -126,8 +124,7 @@ describe(
 		        expect(adminController.confirmPasswordInput).toBe('');
 		        expect(adminController.currentForm).toBe("Add User");
 		        expect(adminController.addUserForm).toBe(true);
-		        // adminController.editUserForm is not set to false
-// expect(adminController.editUserForm).toBe(false);
+		        expect(adminController.editUserForm).toBe(false);
 			});
 			
 			// Test Upsert User
@@ -146,9 +143,7 @@ describe(
 		        expect(adminController.usernameInput).toBe('');
 				expect(adminController.passwordInput).toBe('');
 				expect(adminController.confirmPasswordInput).toBe('');
-				// editedUser is set to null instead of
-				// selectedUser
-// expect(adminController.selectedUser).toBe(user);
+				expect(adminController.selectedUser).toBe(null);
 			});
 			
 			// Test Upsert User
