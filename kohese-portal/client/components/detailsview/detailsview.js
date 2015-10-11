@@ -11,6 +11,8 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
     detailsCtrl.tab.route = $stateParams.id;
     detailsCtrl.filterString = "";
     detailsCtrl.analysisFilterString = "";
+    detailsCtrl.analysisSummarySortField = ['-count','text'];
+    detailsCtrl.analysisDetailsSortField = "";
     detailsCtrl.enableEdit = false;
     detailsCtrl.itemProxy = {};
     detailsCtrl.defaultTab = {active: true};
