@@ -223,5 +223,6 @@ module.exports = function(Analysis) {
 
   // Does this (X) really exist?
   lookup.X = "Unknown";
+  lookup.UNCHUNKED = "Unchunked";
 
 };

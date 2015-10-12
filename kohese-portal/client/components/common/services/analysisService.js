@@ -7,7 +7,25 @@ function AnalysisService(Analysis, ItemRepository) {
 
     var _ = require('underscore');
     var service = this;
+    
+    service.posFilterCriteria = {
+        "Standard": ["RRC","X","NAC","WHPP","QP","LST","WHNP","PRT","INTJ","WHAVP","PRN","FRAG","WHADJP","PP","CONJP","VP","NX","ADVP","UCP","NP","ADJP","WRB","VB","PRP","JJS","WPS","UH","POS","JJR","WP","PDT","JJ","WDT","SYM","NNPS","VBZ","RP","NNP","FW","VBP","RBS","NNS","EX","VBN","RBR","NN","VBG","RB","MD","CD","VBD","PRPS","LS"],
+        "Modal": ["MD"],
+        "No Filter": ["RRC","X","NAC","WHPP","QP","LST","WHNP","PRT","INTJ","WHAVP","PRN","FRAG","WHADJP","PP","CONJP","VP","NX","ADVP","UCP","NP","ADJP","WRB","VB","PRP","JJS","WPS","UH","POS","JJR","WP","TO","PDT","JJ","WDT","SYM","NNPS","IN","VBZ","RP","NNP","FW","VBP","RBS","NNS","EX","VBN","RBR","NN","DT","VBG","RB","MD","CD","VBD","PRPS","LS","CC"],
+        "Nown Phrases": ["NP"],
+        "Verb Phrases": ["VP"]
+    }
 
+    service.filterPOS = function (summary, filterCriteria){
+      for(var pos in summary.posCount){
+        if (filterCriteria.indexOf(pos) != -1){
+          return true;
+        }
+      }
+      console.log("::: " + summary.posCount);
+      return false;
+    }
+    
     service.fetchAnalysis = function (forProxy) {
 
         // Fetch records depth first

@@ -142,6 +142,14 @@
             </tab>
             <tab heading="Analysis" select="detailsCtrl.fetchAnalysis()">
 		        <span class="pull-right">
+		            <label class=control-label" for="posFilter">
+                        POS Filter:
+                        <select id="posFilter"
+                                ng-model="detailsCtrl.analysisPOSFilterName" >
+                            <option ng-repeat="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">{{filterCriteria}}</option>
+                        </select>
+                    </label>
+		            
                     <button ng-click="detailsCtrl.getLastFilter()" class="btn btn-default fa fa-chevron-left"> Last
                         Filter
                     </button>
@@ -160,14 +168,14 @@
                 <table
                         class="table tree-grid table-striped table-condensed table-hover">
                     <thead>
-                    <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
-                    <th>Type</th>
-                    <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
-                    <th>POS Count</th>
+                        <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
+                        <th>Type</th>
+                        <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
+                        <th>POS Count</th>
                     </thead>
                     <tbody>
                     <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
-                        ng-hide="((summary.displayType == 'Chunk') && !detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsCtrl.showTokensinSummary)"
+                        ng-hide="!detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) || ((summary.displayType == 'Chunk') && !detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsCtrl.showTokensinSummary)"
                         ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:detailsCtrl.analysisSummarySortField">
                         <td ng-click="detailsCtrl.analysisFilterInput = summary.text;detailsCtrl.submitFilter()"
                             ng-bind-html="summary.text | highlight:detailsCtrl.analysisFilterString"></td>

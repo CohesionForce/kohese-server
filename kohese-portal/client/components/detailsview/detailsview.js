@@ -26,6 +26,10 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
     detailsCtrl.actionStates = ActionService.getActionStates();
     detailsCtrl.categoryTags = CategoryService.getTags();
     detailsCtrl.userList = UserService.getAllUsers();
+    detailsCtrl.analysisFilterPOS = analysisService.filterPOS;
+    detailsCtrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
+    detailsCtrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
+    detailsCtrl.analysisPOSFilterName = "Standard";
 
     $scope.$on('$stateChangeSuccess', function () {
         $scope.$emit('newItemSelected', $stateParams.id);
