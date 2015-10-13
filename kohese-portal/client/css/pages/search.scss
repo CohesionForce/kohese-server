@@ -3,9 +3,10 @@
 $filterWizardWidth: 350px;
 
 .results-list {
-  width: calc(95% - #{$filterWizardWidth});
+  width: calc(90% - #{$filterWizardWidth});
+  float: left;
   .search-result {
-    margin: 30px;
+    margin: 15px;
   }
   .panel {
     .panel-title {
@@ -19,10 +20,11 @@ $filterWizardWidth: 350px;
 
 .filter-wizard {
   width: $filterWizardWidth;
-  position: absolute;
-  height: 50%;
-  right: 0;
-  top: $topActionBarHeight + 2px;
+  float: right;
+  height: 100%;
+  overflow: auto;
+  padding-bottom: 20px;
+
 
   .panel-title {
     overflow: auto;

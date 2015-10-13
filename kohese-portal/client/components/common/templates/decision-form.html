@@ -2,7 +2,8 @@
     <label class=control-label" for="DecisionState">
         State:
         <select id="DecisionState"
-                ng-model="detailsCtrl.itemProxy.item.decisionState" >
+                ng-disabled="!detailsCtrl.enableEdit"
+                ng-model="detailsCtrl.itemProxy.item.decisionState">
             <option ng-repeat="state in detailsCtrl.decisionStates">{{state.item.name}}</option>
         </select>
     </label>
@@ -10,6 +11,7 @@
 
         Approved By:
         <angucomplete-alt id="ApprovedBy"
+                          disable-input="!detailsCtrl.enableEdit"
                           placeholder="{{detailsCtrl.itemProxy.item.approvedBy}}"
                           selected-object="detailsCtrl.decisionApproved"
                           search-fields="item.name,item.description"
@@ -24,22 +26,32 @@
     <label class=control-label" for="ApprovedOn">
         Approved On
         <div class="controls">
-            <input ng-model="detailsCtrl.itemProxy.item.approvedOn" id="ApprovedOn">
+            <input ng-model="detailsCtrl.itemProxy.item.approvedOn"
+                   ng-disabled="!detailsCtrl.enableEdit"
+                   id="ApprovedOn">
         </div>
     </label>
     <br/>
     <label class=control-label" for="Rationale">
         Rationale
         <div class="controls">
-            <input id="Rationale" ng-model="detailsCtrl.itemProxy.item.rationale">
+            <input id="Rationale"
+                   ng-disabled="!detailsCtrl.enableEdit"
+                   ng-model="detailsCtrl.itemProxy.item.rationale">
         </div>
     </label>
     <br>
     <label>
         Alternatives:
         <div ng-repeat="alternative in detailsCtrl.itemProxy.item.alternatives track by $index">
-            <input class="alternative-field" type="text" ng-model="alternative.text">
+            <input class="alternative-field"
+                   type="text"
+                   ng-disabled="!detailsCtrl.enableEdit"
+                   ng-model="alternative.text">
         </div>
-        <button ng-click="detailsCtrl.addAlternative()" class="btn btn-primary">Add</button>
+        <button ng-click="detailsCtrl.addAlternative()"
+                ng-show="detailsCtrl.enableEdit"
+                class="btn btn-primary">Add
+        </button>
     </label>
 </form>
