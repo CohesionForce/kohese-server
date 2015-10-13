@@ -22,7 +22,7 @@
             </div>
         </div>
     </div>
-    <div class="filter-wizard panel panel-default">
+    <span class="filter-wizard panel panel-default">
         <div class="panel-title">
             Refine Search
         </div>
@@ -36,7 +36,8 @@
                         ng-change="searchCtrl.updateSearchStringFilter()">
             </label>
             <button ng-click="searchCtrl.resetSearch()"
-                    class="btn btn-danger">Reset Search</button>
+                    class="btn btn-danger">Reset Search
+            </button>
             <label>Categories
                 <angucomplete-alt id="Categories"
                                   placeholder="Enter categories"
@@ -56,6 +57,17 @@
                     <option ng-repeat="kind in searchCtrl.kindList">{{kind.modelName}}</option>
                 </select>
             </label>
+
+            <div ng-if="searchCtrl.customFilter.kind === 'Decision' || searchCtrl.customFilter.kind === 'Action'">
+                <h4>Decision</h4>
+                <label class="control-label" for="ActionStates">
+                    State:
+                    <select id="DecisionStates"
+                            ng-model="searchCtrl.customFilter.item.decisionState">
+                        <option ng-repeat="state in searchCtrl.decisionStates">{{state.item.name}}</option>
+                    </select>
+                </label>
+            </div>
 
             <div ng-if="searchCtrl.customFilter.kind === 'Action'">
                 <h4 class="-underline">Action</h4>
@@ -82,5 +94,5 @@
                 </label>
             </div>
         </div>
-    </div>
+    </span>
 </div>

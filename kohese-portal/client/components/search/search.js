@@ -11,6 +11,8 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
     ctrl.kindList = ItemRepository.modelTypes;
     ctrl.userList = UserService.getAllUsers();
     ctrl.actionStates = ActionService.getActionStates();
+    ctrl.decisionStates = DecisionService.getDecisionStates();
+
     ctrl.categories = $filter('categories')(ctrl.itemList);
 
     console.log(ctrl.categories);
