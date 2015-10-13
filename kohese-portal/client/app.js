@@ -81,13 +81,22 @@ appModule
                 }
             })
             .state('kohese.search', {
-                url: '/search/{filter}&{id}',
+                url: '/search/{filter}',
                 views: {
                     top: {
                         templateUrl: '/components/search/search.html',
                         controller: 'SearchController as searchCtrl'
                     },
                     'bottom': {
+                        templateUrl: '/components/detailsview/detailsview.html',
+                        controller: 'DetailsViewController as detailsCtrl'
+                    }
+                }
+            })
+            .state('kohese.search.edit', {
+                url: '/edit/{id}',
+                views: {
+                    'bottom@kohese': {
                         templateUrl: '/components/detailsview/detailsview.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -115,6 +124,19 @@ appModule
             }
 
             return $sce.trustAsHtml(text);
+        }
+    })
+    .filter('categories', function () {
+        return function (input) {
+            var categories = []
+            if (input) {
+                for (var index = 0; index < input.length; index++){
+                    if(input[index].kind === 'Category'){
+                        categories.push(input[index])
+                    }
+                }
+                return categories;
+            }
         }
     })
     .factory('socket', function (socketFactory) {

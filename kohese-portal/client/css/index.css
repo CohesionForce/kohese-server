@@ -216,6 +216,17 @@ table.tree-grid {
   background-color: #7dd7ae;
   color: whitesmoke; }
 
+.panel-heading {
+  color: whitesmoke;
+  background-color: #ca6464;
+  border: 0;
+  padding: 5px 15px 5px 5px; }
+  .panel-heading > span {
+    font-weight: bold; }
+  .panel-heading i .fa {
+    width: 50px;
+    height: 50px; }
+
 body {
   font-family: FontAwesome, arial, sans-serif; }
 
@@ -539,22 +550,6 @@ table td .glyphicon-remove {
       #page-wrapper #content-container .bottom-content > div {
         height: 100%; }
 
-.panel .panel-title {
-  overflow: auto;
-  background-color: #64be95;
-  padding: 7px;
-  color: whitesmoke; }
-.panel .panel-heading {
-  color: whitesmoke;
-  background-color: #ca6464;
-  border: 0;
-  padding: 5px 15px 5px 5px; }
-  .panel .panel-heading > span {
-    font-weight: bold; }
-  .panel .panel-heading i .fa {
-    width: 50px;
-    height: 50px; }
-
 .highlighted {
   background: yellow; }
 
@@ -638,5 +633,29 @@ table td .glyphicon-remove {
     #login-form button:hover {
       color: white;
       background-color: #64be95; }
+
+.results-list {
+  width: calc(95% - 350px); }
+  .results-list .search-result {
+    margin: 30px; }
+  .results-list .panel .panel-title {
+    overflow: auto;
+    background-color: #64be95;
+    padding: 7px;
+    color: whitesmoke; }
+
+.filter-wizard {
+  width: 350px;
+  position: absolute;
+  height: 50%;
+  right: 0;
+  top: 42px; }
+  .filter-wizard .panel-title {
+    overflow: auto;
+    background-color: #660000;
+    padding: 7px;
+    color: whitesmoke; }
+  .filter-wizard .panel-body {
+    padding: 5px; }
 
 /*# sourceMappingURL=index.css.map */

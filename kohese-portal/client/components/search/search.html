@@ -2,21 +2,85 @@
     <div id="top-action-bar">
         <button
                 ng-click="searchCtrl.navigateToTree();"
-                class="btn btn-default fa-chevron-left"> Tree</button>
+                class="btn btn-default fa-chevron-left"> Tree
+        </button>
         Found {{searchCtrl.searchResults.length}} matches:
     </div>
-    <div
-            ng-click="searchCtrl.updateTab(itemProxy.item.id)"
-            ui-sref="kohese.search({id:itemProxy.item.id, filter: searchCtrl.searchString})"
-            class="search-result card panel panel-default"
-            id="{{itemProxy.item.id}}"
-            ng-repeat="itemProxy in searchCtrl.searchResults = (searchCtrl.itemList | filter: {item: { $: searchCtrl.searchString}})">
-        <div class="panel-title result-title">{{itemProxy.item.name}}</div>
-        <div class="panel-body">
-            <div class="result-description">{{itemProxy.item.description}}</div>
+    <div class="results-list">
+        <div
+                ng-click="searchCtrl.updateTab(itemProxy.item.id)"
+                ui-sref="kohese.search.edit({id:itemProxy.item.id})"
+                class="search-result card panel panel-default"
+                id="{{itemProxy.item.id}}"
+                ng-repeat="itemProxy in searchCtrl.searchResults = (searchCtrl.itemList | filter: searchCtrl.customFilter)">
+            <div class="panel-title result-title">{{itemProxy.item.name}}</div>
+            <div class="panel-body">
+                <div class="result-description">{{itemProxy.item.description}}</div>
+            </div>
+            <div class="panel-footer">
+                <span class="last-modified">Last modified: {{itemProxy.item.modifiedOn | date}}</span>
+            </div>
         </div>
-        <div class="panel-footer">
-            <span class="last-modified">Last modified: {{itemProxy.item.modifiedOn | date}}</span>
+    </div>
+    <div class="filter-wizard panel panel-default">
+        <div class="panel-title">
+            Refine Search
+        </div>
+
+        <div class="panel-body">
+            <label>
+                Search
+                <br/>
+                <input
+                        ng-model="searchCtrl.searchString"
+                        ng-change="searchCtrl.updateSearchStringFilter()">
+            </label>
+            <button ng-click="searchCtrl.resetSearch()"
+                    class="btn btn-danger">Reset Search</button>
+            <label>Categories
+                <angucomplete-alt id="Categories"
+                                  placeholder="Enter categories"
+                                  selected-object="searchCtrl.categorySelected"
+                                  search-fields="item.name,item.description"
+                                  title-field="item.name"
+                                  pause="100"
+                                  local-data="searchCtrl.categories"
+                                  minlength="1"
+                                  match-class="highlight"
+                        ></angucomplete-alt>
+            </label>
+
+            <label class="control-label" For="Kind">Kind
+                <select id="Kind"
+                        ng-model="searchCtrl.customFilter.kind">
+                    <option ng-repeat="kind in searchCtrl.kindList">{{kind.modelName}}</option>
+                </select>
+            </label>
+
+            <div ng-if="searchCtrl.customFilter.kind === 'Action'">
+                <h4 class="-underline">Action</h4>
+                <label class="control-label" for="ActionStates">
+                    State:
+                    <select id="ActionStates"
+                            ng-model="searchCtrl.customFilter.item.actionState">
+                        <option ng-repeat="state in searchCtrl.actionStates">{{state.item.name}}</option>
+                    </select>
+                </label>
+                <label class="control-label">
+                    Assigned To:
+                    <angucomplete-alt id="AssignedTo"
+                                      placeholder="Enter user"
+                                      selected-object="searchCtrl.updateAssignedToFilter"
+                                      search-fields="item.name,item.description"
+                                      title-field="item.name"
+                                      description-field="item.description"
+                                      pause="100"
+                                      local-data="searchCtrl.userList"
+                                      minlength="1"
+                                      match-class="highlight"
+                            ></angucomplete-alt>
+                </label>
+            </div>
         </div>
     </div>
 </div>

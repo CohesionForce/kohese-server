@@ -1,10 +1,39 @@
 @import '../utils/variables';
 
-.search-result {
-  margin: 30px;
-  .result-creator {
-  }
-  .last-modified {
+$filterWizardWidth: 350px;
 
+.results-list {
+  width: calc(95% - #{$filterWizardWidth});
+  .search-result {
+    margin: 30px;
+  }
+  .panel {
+    .panel-title {
+      overflow: auto;
+      background-color: $primaryColor + 100;
+      padding: 7px;
+      color: whitesmoke;
+    }
   }
 }
+
+.filter-wizard {
+  width: $filterWizardWidth;
+  position: absolute;
+  height: 50%;
+  right: 0;
+  top: $topActionBarHeight + 2px;
+
+  .panel-title {
+    overflow: auto;
+    background-color: $secondaryColor;
+    padding: 7px;
+    color: whitesmoke;
+  }
+
+  .panel-body {
+    padding: 5px;
+  }
+}
+
+

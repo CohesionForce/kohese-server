@@ -1,4 +1,13 @@
-.search-result {
-  margin: 30px; }
+.results-list {
+  width: calc(100% - 250px); }
+  .results-list .search-result {
+    margin: 30px; }
+
+.filter-wizard {
+  width: 250px;
+  background-color: grey;
+  position: absolute;
+  right: 0;
+  top: 90px; }
 
 /*# sourceMappingURL=search.css.map */
