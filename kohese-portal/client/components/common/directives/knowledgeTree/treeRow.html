@@ -7,7 +7,7 @@
 		<div class="kti-name" ng-style="{'font-weight': 'bold'}">
 			<a style=""> <i
 				ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]"
-				ng-init="treeCtrl.collapsed[itemProxy.item.id]=false"
+				ng-init="treeCtrl.collapsed[itemProxy.item.id]=true"
 				class="kt-icon"
 				ng-class="{'glyphicon fa icon-minus glyphicon-minus fa-minus': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id], 
                            'glyphicon fa icon-plus glyphicon-plus fa-plus': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
