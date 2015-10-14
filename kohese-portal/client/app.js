@@ -111,7 +111,27 @@ appModule
                 url: '/admin',
                 templateUrl: '/components/admin/admin.html',
                 controller: 'AdminController as adminCtrl'
-            });
+            })
+            .state('kohese.admin.actions', {
+                url: '/actions',
+                templateUrl: 'components/admin/subviews/actions.html',
+                controller: 'AdminController as adminCtrl'
+            })
+            .state('kohese.admin.groups', {
+                url: '/groups',
+                templateUrl: 'components/admin/subviews/groups.html',
+                controller: 'AdminController as adminCtrl'
+            })
+            .state('kohese.admin.repository', {
+                url: '/repository',
+                templateUrl: 'components/admin/subviews/repository.html',
+                controller: 'AdminController as adminCtrl'
+            })
+            .state('kohese.admin.users', {
+                url: '/users',
+                templateUrl: 'components/admin/subviews/users.html',
+                controller: 'AdminController as adminCtrl'
+            });;
 
         $urlRouterProvider.otherwise('/explore')
     })
