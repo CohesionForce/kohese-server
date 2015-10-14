@@ -243,6 +243,9 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
         var parentProxy = getItem(itemProxy.item.parentId);
         var children = itemProxy.children;
 
+        if (!itemProxy.item.parentId){
+          parentProxy = tree.root;
+        }
         if (parentProxy) {
             parentProxy.children = _.reject(parentProxy.children, function (childProxy) {
                 return childProxy.item.id === byId;
