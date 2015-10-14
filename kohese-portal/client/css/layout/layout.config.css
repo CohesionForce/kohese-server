@@ -165,7 +165,7 @@
         padding: 1px;
         top: 90px;
         width: 100%;
-        height: 40px; }
+        height: 42px; }
         #page-wrapper #content-container .top-content #top-action-bar .button-selected {
           background-color: #7dd7ae;
           color: white; }
@@ -180,22 +180,6 @@
       background-color: white; }
       #page-wrapper #content-container .bottom-content > div {
         height: 100%; }
-
-.panel .panel-title {
-  overflow: auto;
-  background-color: #64be95;
-  padding: 7px;
-  color: whitesmoke; }
-.panel .panel-heading {
-  color: whitesmoke;
-  background-color: #ca6464;
-  border: 0;
-  padding: 5px 15px 5px 5px; }
-  .panel .panel-heading > span {
-    font-weight: bold; }
-  .panel .panel-heading i .fa {
-    width: 50px;
-    height: 50px; }
 
 .highlighted {
   background: yellow; }

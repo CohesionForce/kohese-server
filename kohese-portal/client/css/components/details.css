@@ -1,0 +1,10 @@
+.tab-pane label {
+  margin: 10px; }
+  .tab-pane label #Rationale {
+    width: 500px; }
+  .tab-pane label .alternative-field {
+    width: 500px; }
+.tab-pane .form-actions {
+  margin-left: 20px; }
+
+/*# sourceMappingURL=details.css.map */
