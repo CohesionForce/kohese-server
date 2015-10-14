@@ -131,10 +131,20 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
     detailsCtrl.upsertItem = function () {
         ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
             .then(function (updatedItem) {
-                ItemRepository.fetchItem(updatedItem);
+              
+                // clear the state of the form
                 detailsCtrl.itemForm.$setPristine();
                 detailsCtrl.enableEdit = false;
-
+                
+                // Check if this is a create
+                if (!detailsCtrl.itemProxy.item.id) {
+                  // Refocus on the parent, if it exists
+                  if (updatedItem.parentId != '') {
+                    $state.go('kohese.explore.edit', {id: updatedItem.parentId})
+                  } else {
+                    $state.go('kohese.explore.edit', {id: updatedItem.id})
+                  }
+                }
             });
     };
 
