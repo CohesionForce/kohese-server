@@ -73,6 +73,7 @@
                         ng-hide="!detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) || ((summary.displayType == 'Chunk') && !detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsCtrl.showTokensinSummary)"
                         ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:detailsCtrl.analysisSummarySortField">
                         <td ng-click="detailsCtrl.analysisFilterInput = summary.text;detailsCtrl.submitFilter()"
+                            class="tree-label"
                             ng-bind-html="summary.text | highlight:detailsCtrl.analysisFilterString"></td>
                         <td>{{summary.displayType}}</td>
                         <td>{{summary.count}}</td>

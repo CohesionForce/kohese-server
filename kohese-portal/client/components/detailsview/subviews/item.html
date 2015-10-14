@@ -15,9 +15,10 @@
     </thead>
     <tbody>
     <tr ng-repeat="proxy in filteredItems = (detailsCtrl.itemProxy.children  | filter:detailsCtrl.filterString) | orderBy:itemSortField">
-        <td>{{proxy.kind}}</td>
+        <td>{{proxy.kind}} <span ng-if="proxy.kind==='Action'"> {{proxy.item.decisionState}}/{{proxy.item.actionState}} </span></td>
         <td ng-click="detailsCtrl.updateTab('edit', proxy.item.id)"
             ui-sref="kohese.explore.edit({id: proxy.item.id})"
+            class="tree-label"
             ng-bind-html="proxy.item.name | highlight:detailsCtrl.filterString"></td>
         <td>{{proxy.item.tags}}</td>
         <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"

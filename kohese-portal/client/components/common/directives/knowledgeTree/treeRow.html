@@ -14,7 +14,7 @@
                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0),
                            'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}" >
 			</i>
-			</a> &lt;{{itemProxy.kind}}&gt; <span ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
+			</a> &lt;{{itemProxy.kind}}&gt; <span ng-if="itemProxy.kind==='Action'">&lt;&lt;{{itemProxy.item.decisionState}}/{{itemProxy.item.actionState}}&gt;&gt;</span> <span ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
 				class="kt-label"
 				ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filterString)"
 				ng-click="treeCtrl.updateTab('edit', itemProxy.item.id)"></span><span
