@@ -1,9 +1,10 @@
 .knowledge-tree {
   border-collapse: collapse;
   position: relative;
-  height: calc(100% - $topActionBarHeight);
+  height: calc(100% - 43px);
   width: calc(100% - 20px);
-  margin: 0px 0px 0px 20px; }
+  margin: 0px 0px 0px 20px;
+  overflow: hidden; }
   .knowledge-tree .kt-icon, .knowledge-tree .kt-label {
     cursor: pointer; }
 
@@ -25,7 +26,7 @@
   width: 100%; }
 
 .kt-body {
-  height: calc(100% - 30px);
+  height: calc(100% - 31px);
   overflow: auto; }
 
 .kt-item:hover {
