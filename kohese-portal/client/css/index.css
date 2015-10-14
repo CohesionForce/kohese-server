@@ -242,7 +242,7 @@ table td .glyphicon-remove {
 .knowledge-tree {
   border-collapse: collapse;
   position: relative;
-  height: calc(100% - 40px);
+  height: calc(100% - $topActionBarHeight);
   width: calc(100% - 20px);
   margin: 0px 0px 0px 20px; }
   .knowledge-tree .kt-icon, .knowledge-tree .kt-label {
@@ -534,7 +534,7 @@ table td .glyphicon-remove {
         padding: 1px;
         top: 90px;
         width: 100%;
-        height: 42px; }
+        height: 43px; }
         #page-wrapper #content-container .top-content #top-action-bar .button-selected {
           background-color: #7dd7ae;
           color: white; }

@@ -21,14 +21,14 @@ function Resizeable(tabService) {
             //       the available space
             var pwHeight = $("#page-wrapper").height();
             $element.css({
-                height: (pwHeight - 416 - 6) + 'px'
+                height: (pwHeight - 461 - 50 - 6) + 'px'
             });
 
         }
         if ($attrs.id === bottomID) {
             //console.log("Bottom Content Connected");
             $element.css({
-                height: 416 + 'px'
+                height: 461 + 'px'
             });
         }
     }
