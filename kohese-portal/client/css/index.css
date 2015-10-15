@@ -229,6 +229,10 @@ table.tree-grid {
 
 body {
   font-family: FontAwesome, arial, sans-serif; }
+  body .two-columns {
+    width: 50%; }
+  body .three-columns {
+    width: 30%; }
 
 table th .glyphicon-plus {
   color: green; }
@@ -333,6 +337,8 @@ table td .glyphicon-remove {
   border-radius: 10px;
   border: double 1px black; }
 
+.tab-pane .absolute {
+  position: absolute; }
 .tab-pane label {
   margin: 10px; }
   .tab-pane label #Rationale {

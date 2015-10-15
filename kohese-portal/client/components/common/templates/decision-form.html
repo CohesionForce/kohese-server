@@ -1,14 +1,14 @@
 <form name="detailsCtrl.decisionForm">
-    <label class=control-label" for="DecisionState">
+    <label class="control-label" for="DecisionState">
         State:
+        <br/>
         <select id="DecisionState"
                 ng-disabled="!detailsCtrl.enableEdit"
                 ng-model="detailsCtrl.itemProxy.item.decisionState">
             <option ng-repeat="state in detailsCtrl.decisionStates">{{state.item.name}}</option>
         </select>
     </label>
-    <label class=control-label">
-
+    <label class="control-label three-columns">
         Approved By:
         <angucomplete-alt id="ApprovedBy"
                           disable-input="!detailsCtrl.enableEdit"
@@ -23,12 +23,26 @@
                           match-class="highlight"
                 ></angucomplete-alt>
     </label>
-    <label class=control-label" for="ApprovedOn">
-        Approved On
+    <br/>
+    <label class="control-label three-columns">
+        Approved On:
         <div class="controls">
-            <input ng-model="detailsCtrl.itemProxy.item.approvedOn"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   id="ApprovedOn">
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.approvedOn"
+                       ng-change="detailsCtrl.convertDate('approvedOn', true)"
+                       is-open="detailsCtrl.approvedOn"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-click="detailsCtrl.openDatePicker($event, 'approvedOn')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+                  </span>
+                </span>
         </div>
     </label>
     <br/>
