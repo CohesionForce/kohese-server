@@ -1,6 +1,6 @@
 <form name="detailsCtrl.itemForm" class="form-horizontal">
     <div>
-          <div style="width: 20%; float: left">
+          <div style="width: 10%; display: inline-block">
 					<span class="control-group"
                           ng-class="{error: detailsCtrl.itemForm.kind.$invalid}">
 						<label class="control-label" for="Kind">Kind</label>
@@ -18,7 +18,7 @@
                         </div>
 					</span>
           </div>
-          <div style="width: 40%; float: left">
+          <div style="width: 20%; display: inline-block">
 					<span class="control-group"
                           ng-class="{error: detailsCtrl.itemForm.id.$invalid}">
 						<label class="control-label" for="Id">Id</label>
@@ -28,7 +28,7 @@
                         </div>
 					</span>
         </div>
-        <div style="width: 40%; float: right">
+        <div style="width: 20%; display: inline-block">
 					<span class="control-group"
                           ng-class="{error: detailsCtrl.itemForm.parentId.$invalid}">
                             <label
@@ -37,7 +37,22 @@
 						<div class="controls">
                             <input style="width: 90%;" type="text"
                                    ng-model="detailsCtrl.itemProxy.item.parentId" id="Parent"
+                                   ng-change="detailsCtrl.updateParentProxy()"
                                    ng-disabled="!detailsCtrl.enableEdit"/>
+                        </div>
+					</span>
+        </div>
+        <div style="width: 45%; display: inline-block">
+					<span class="control-group"
+					      ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.parentId})"
+                          ng-class="{error: detailsCtrl.itemForm.parentId.$invalid}">
+                            <label
+                                    class="control-label" for="Parent Name"
+                                    >Parent Name</label>
+						<div class="controls">
+                            <input style="width: 90%;" type="text"
+                                   ng-model="detailsCtrl.parentProxy.item.name" id="Parent Name"
+                                   ng-disabled="true"/>
                         </div>
 					</span>
         </div>

@@ -15,6 +15,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
     detailsCtrl.analysisDetailsSortField = "";
     detailsCtrl.enableEdit = false;
     detailsCtrl.itemProxy = {};
+    detailsCtrl.parentProxy = {};
     detailsCtrl.defaultTab = {active: true};
     detailsCtrl.showChunksInAnalysis = true;
     detailsCtrl.showTokensInAnalysis = true;
@@ -35,6 +36,14 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
         $scope.$emit('newItemSelected', $stateParams.id);
     });
 
+    detailsCtrl.updateParentProxy = function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId){
+        detailsCtrl.parentProxy = ItemRepository.getItemProxy(detailsCtrl.itemProxy.item.parentId);          
+      } else {
+        detailsCtrl.parentProxy = {};
+      }
+    };
+
     if (detailsCtrl.tab.state === 'kohese.investigate') {
         detailsCtrl.tab.setTitle('Investigate');
         detailsCtrl.tab.params = {
@@ -44,14 +53,16 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
 
     if (angular.isDefined($stateParams.id)) {
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
-
+        detailsCtrl.updateParentProxy();
     } else if (angular.isDefined($stateParams.parentId)) {
         {
             detailsCtrl.itemProxy.item = new Item();
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
+            detailsCtrl.updateParentProxy();
         }
     } else {
         detailsCtrl.itemProxy.item = new Item();
+        detailsCtrl.updateParentProxy();
     }
 
     if (detailsCtrl.tab.state === 'kohese.explore.create') {
@@ -66,8 +77,9 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
         detailsCtrl.categoryTags = CategoryService.getTags();
         detailsCtrl.userList = UserService.getAllUsers();
 
+        detailsCtrl.updateParentProxy();
     });
-
+    
     $scope.$on('tabSelected', function () {
         detailsCtrl.tab = tabService.getCurrentTab();
     });
@@ -98,10 +110,10 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
         var newItem = new newModel();
         ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
         detailsCtrl.itemProxy.item = newItem;
-        if(detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'){
-            detailsCtrl.itemProxy.item.alternatives = [];
-            detailsCtrl.itemProxy.item.alternatives[0] = {text : ''};
-        }
+//        if(detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'){
+//            detailsCtrl.itemProxy.item.alternatives = [];
+//            detailsCtrl.itemProxy.item.alternatives[0] = {text : ''};
+//        }
     };
 
     detailsCtrl.addAlternative = function () {
