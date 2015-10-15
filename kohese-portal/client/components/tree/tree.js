@@ -2,12 +2,19 @@
  * Created by josh on 7/13/15.
  */
 
-function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $location, $window, tabService) {
+function TreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $scope, $location, $window, tabService) {
 
     var treeCtrl = this,
         syncListener;
 
     treeCtrl.filterString = "";
+    treeCtrl.kindFilter = "";
+    treeCtrl.actionStateFilter = "";
+    treeCtrl.actionAssigneeFilter = "";
+    treeCtrl.kindList = ItemRepository.modelTypes;
+    treeCtrl.actionStates = {};
+    treeCtrl.userList = {};
+
     treeCtrl.collapsed = {};
     treeCtrl.tab = tabService.getCurrentTab();
     treeCtrl.locationSynced = false;
@@ -16,7 +23,33 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
     treeCtrl.currentLazyLimit = lazyLimitIncrement;
     var lazyLimitIncreasePending = false;
     
+    $scope.$on('itemRepositoryReady', function () {
+      treeCtrl.actionStates = ActionService.getActionStates();
+      treeCtrl.userList = UserService.getAllUsers();
+  });
+
     $scope.$watch('treeCtrl.filterString', function(){
+      postDigest(function(){
+        // Force one more update cycle to get the match count to display
+        $scope.$apply();        
+      });
+    });
+    
+    $scope.$watch('treeCtrl.kindFilter', function(){
+      postDigest(function(){
+        // Force one more update cycle to get the match count to display
+        $scope.$apply();        
+      });
+    });
+    
+    $scope.$watch('treeCtrl.actionStateFilter', function(){
+      postDigest(function(){
+        // Force one more update cycle to get the match count to display
+        $scope.$apply();        
+      });
+    });
+    
+    $scope.$watch('treeCtrl.actionAssigneeFilter', function(){
       postDigest(function(){
         // Force one more update cycle to get the match count to display
         $scope.$apply();        
@@ -65,9 +98,23 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
     }
 
     treeCtrl.matchesFilter = function (proxy){
-      if (!treeCtrl.filterString) {
+      if (!treeCtrl.filterString && !treeCtrl.kindFilter) {
         return true;
       } else {
+        if(treeCtrl.kindFilter){
+          if (proxy.kind !== treeCtrl.kindFilter){
+            return false;
+          }
+          if (treeCtrl.actionStateFilter && proxy.item.actionState !== treeCtrl.actionStateFilter){
+            return false;
+          }
+          if (treeCtrl.actionAssigneeFilter && proxy.item.assignedTo !== treeCtrl.actionAssigneeFilter){
+            return false;
+          }
+          if (!treeCtrl.filterString){
+            return true;
+          }
+        }
         var lcFilter = treeCtrl.filterString.toLowerCase();
         for (var key in proxy.item){
           if((key.charAt(0) !== '$') && getTypeForFilter(proxy.item[key]) === 'string' && proxy.item[key].toLowerCase().indexOf(lcFilter) !== -1){
@@ -151,7 +198,7 @@ function TreeController(Item, ItemRepository, $timeout, $anchorScroll, $scope, $
 
 export default () => {
     angular.module('app.tree', ['app.services.tabservice'])
-        .controller('TreeController', ['Item', 'ItemRepository', '$timeout', '$anchorScroll', '$scope', '$location', '$window',
+        .controller('TreeController', ['Item', 'ItemRepository', 'ActionService', 'UserService', '$timeout', '$anchorScroll', '$scope', '$location', '$window',
             'tabService',
             TreeController]);
 }
