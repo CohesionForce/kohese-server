@@ -50,5 +50,13 @@
   "Action": {
     "dataSource": "db",
     "public": true
+  },
+  "Observation": {
+    "dataSource": "db",
+    "public": true
+  },
+  "Issue": {
+    "dataSource": "db",
+    "public": true
   }
 }

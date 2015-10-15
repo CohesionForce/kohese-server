@@ -20,11 +20,11 @@
             </tab>
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'"
                  class="decision-tab">
-                <tab-heading>Decision</tab-heading>
+                <tab-heading>Decision <span ng-show="detailsCtrl.decisionForm.$dirty">(*)</span></tab-heading>
                 <ng-include src="'components/common/templates/decision-form.html'"></ng-include>
             </tab>
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Action'">
-                <tab-heading>Action</tab-heading>
+                <tab-heading>Action <span ng-show="detailsCtrl.actionForm.$dirty">(*)</span></tab-heading>
                 <ng-include src="'components/common/templates/action-form.html'"></ng-include>
             </tab>
             <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">

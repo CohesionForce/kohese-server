@@ -3,13 +3,15 @@
  */
 
 
-function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $rootScope) {
+function ItemRepository(Item, Category, Decision, Action, Observation, Issue, KoheseUser, socket, $rootScope) {
     var _ = require('underscore');
     var itemModel = {
         Item: Item,
         Category: Category,
         Decision: Decision,
         Action: Action,
+        Observation: Observation,
+        Issue: Issue,
         KoheseUser: KoheseUser
     };
 
@@ -68,18 +70,22 @@ function ItemRepository(Item, Category, Decision, Action, KoheseUser, socket, $r
 
     function fetchItems() {
         Item.find().$promise.then(function (itemResults) {
-            Category.find().$promise.then(function (categoryResults) {
-                Decision.find().$promise.then(function (decisionResults) {
-                    Action.find().$promise.then(function (actionResults) {
-                        KoheseUser.find().$promise.then(function (userResults) {
-                            var results = itemResults.concat(categoryResults).concat(decisionResults).concat(actionResults).concat(userResults);
-                            convertListToTree(results);
-                            tree.root.initial = getAllItemProxies();
-                            $rootScope.$broadcast('itemRepositoryReady')
-                        });
+          Category.find().$promise.then(function (categoryResults) {
+            Decision.find().$promise.then(function (decisionResults) {
+              Action.find().$promise.then(function (actionResults) {
+                Observation.find().$promise.then(function (observationResults) {
+                  Issue.find().$promise.then(function (issueResults) {
+                    KoheseUser.find().$promise.then(function (userResults) {
+                      var results = itemResults.concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(userResults);
+                      convertListToTree(results);
+                      tree.root.initial = getAllItemProxies();
+                      $rootScope.$broadcast('itemRepositoryReady')
                     });
+                  });
                 });
+              });
             });
+          });
         });
     }
 

@@ -7,10 +7,41 @@
 	<i ng-click="treeCtrl.syncLocation()"
 		ng-class="{ 'button-selected' :treeCtrl.locationSynced}"
 		class="btn btn-default btn-sm fa fa-exchange"> </i>
-	<span class="pull-right"> <span>Showing
-			{{treeCtrl.getItemMatchedCount()}} of {{treeCtrl.getItemCount()}}</span> <input
-		class="input-sm" type="text" ng-model="treeCtrl.filterString"
-		placeholder="Filter" style="margin: 5px" />
+    <span class="pull-right"> 
+	    <span>Showing {{treeCtrl.getItemMatchedCount()}} of {{treeCtrl.getItemCount()}}</span> 
+	    <span class="control-group">
+		    <label class="control-label" for="Kind"> Kind </label>
+		    <span class="controls">
+                <select id="Kind"
+                        ng-model="treeCtrl.kindFilter">
+                    <option></option>    
+                    <option ng-repeat="kind in treeCtrl.kindList">{{kind.modelName}}</option>
+                 </select>
+            </span>
+	    </span>
+	    <span ng-if="treeCtrl.kindFilter === 'Action'" class="control-group">
+		    <label class="control-label" for="ActionState"> State </label>
+		    <span class="controls">
+                <select id="Kind"
+                        ng-model="treeCtrl.actionStateFilter">
+                    <option></option>    
+                    <option ng-repeat="state in treeCtrl.actionStates">{{state.item.name}}</option>
+                 </select>
+            </span>
+	    </span>
+	    <span ng-if="treeCtrl.kindFilter === 'Action'" class="control-group">
+		    <label class="control-label" for="Assignee"> Assignee </label>
+		    <span class="controls">
+                <select id="Kind"
+                        ng-model="treeCtrl.actionAssigneeFilter">
+                    <option></option>    
+                    <option ng-repeat="user in treeCtrl.userList">{{user.item.name}}</option>
+                 </select>
+            </span>
+	    </span>
+	    <input
+		    class="input-sm" type="text" ng-model="treeCtrl.filterString"
+		    placeholder="Filter" style="margin: 5px" />
 	</span>
 </div>
 
