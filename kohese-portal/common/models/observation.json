@@ -1,0 +1,25 @@
+{
+  "name": "Observation",
+  "base": "Item",
+  "idInjection": true,
+  "properties": {
+    "observedBy": {
+      "type": "string",
+      "required": true
+    },
+    "observedOn": {
+      "type": "number",
+      "required": true
+    },
+    "context": {
+      "type": [
+        "string"
+      ],
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

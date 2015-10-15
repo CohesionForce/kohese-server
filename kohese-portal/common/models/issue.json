@@ -1,0 +1,26 @@
+{
+  "name": "Issue",
+  "base": "Observation",
+  "idInjection": true,
+  "properties": {
+    "issueState": {
+      "type": "string",
+      "required": true
+    },
+    "analysisAction": {
+      "type": "string"
+    },
+    "resolutionActions": {
+      "type": [
+        "string"
+      ]
+    },
+    "response": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

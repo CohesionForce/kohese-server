@@ -134,6 +134,12 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
               
                 // clear the state of the form
                 detailsCtrl.itemForm.$setPristine();
+                if(detailsCtrl.decisionForm){
+                  detailsCtrl.decisionForm.$setPristine();
+                }
+                if(detailsCtrl.actionForm){
+                  detailsCtrl.actionForm.$setPristine();
+                }
                 detailsCtrl.enableEdit = false;
                 
                 // Check if this is a create
