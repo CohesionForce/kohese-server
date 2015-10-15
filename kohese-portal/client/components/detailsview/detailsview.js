@@ -171,9 +171,35 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
             .then(function () {
                 // TBD:  May need to do something special if the delete fails
             });
+    };
+
+    //datepicker config
+    detailsCtrl.estimatedStart = false;
+    detailsCtrl.dateOptions = {
+        formatYear: 'yy',
+        startingDay: 1
+    };
+
+    detailsCtrl.openDatePicker = function($event, type){
+        detailsCtrl.date = new Date(detailsCtrl.itemProxy.item.estimatedStart);
+        if($event){
+        $event.preventDefault();
+        $event.stopPropagation();
+        }
+        detailsCtrl[type] = true;
+        console.log(detailsCtrl.estimatedStart);
+    };
+
+    detailsCtrl.convertDate = function(type, end){
+        var date = new Date(detailsCtrl.itemProxy.item[type]);
+        if(end) {
+            // shame.js - I need to refactor this magic number
+            detailsCtrl.itemProxy.item[type] = date.valueOf() + 86399;
+        } else {
+            detailsCtrl.itemProxy.item[type] = date.valueOf();
+        }
+        console.log(detailsCtrl.itemProxy.item[type])
     }
-
-
 }
 
 export default () => {

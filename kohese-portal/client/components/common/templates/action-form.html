@@ -22,55 +22,103 @@
                           match-class="highlight"
                 ></angucomplete-alt>
     </label>
-    <br>
-    <label class=control-label" for="EstimatedStart">
-        Estimated Start:
-        <div class="controls">
-            <input
-                    ng-model="detailsCtrl.itemProxy.item.estimatedStart"
-                    ng-disabled="!detailsCtrl.enableEdit"
-                    id="EstimatedStart">
-        </div>
-    </label>
-    <label class=control-label" for="EstimatedCompletion">
-        Estimated Completion:
-        <div class="controls">
-            <input ng-model="detailsCtrl.itemProxy.item.estimatedCompletion"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   id="EstimatedCompletion">
-        </div>
-    </label>
-    <label class=control-label" for="EstimatedHours">
-        Estimated Hours:
-        <div class="controls">
-            <input ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort"
+
+    <div>
+        <label class="control-label three-columns" >
+            Estimated Start:
+            <span class="input-group ">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.estimatedStart"
+                       ng-change="detailsCtrl.convertDate('estimatedStart')"
+                       is-open="detailsCtrl.estimatedStart"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-click="detailsCtrl.openDatePicker($event, 'estimatedStart')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+              </span>
+            </span>
+        </label>
+        <label class="three-columns control-label">
+            Estimated Completion:
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.estimatedCompletion"
+                       ng-change="detailsCtrl.convertDate('estimatedCompletion', true)"
+                       is-open="detailsCtrl.estimatedCompletion"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-click="detailsCtrl.openDatePicker($event, 'estimatedCompletion')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+              </span>
+            </span>
+        </label>
+        <label class="control-label three-columns absolute" for="EstimatedHours">
+            Estimated Hours:
+            <br/>
+            <input class=""
+                   ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort"
                    ng-disabled="!detailsCtrl.enableEdit"
                    id="EstimatedHours">
-        </div>
-    </label>
-    <br>
-    <label class=control-label" for="ActualStart">
-        Actual Start:
-        <div class="controls">
-            <input ng-model="detailsCtrl.itemProxy.item.actualStart"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   id="ActualStart">
-        </div>
-    </label>
-    <label class=control-label" for="ActualCompletion">
-        Actual Completion:
-        <div class="controls">
-            <input ng-model="detailsCtrl.itemProxy.item.actualCompletion"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   id="ActualCompletion">
-        </div>
-    </label>
-    <label class=control-label" for="ActualHours">
-        Actual Hours:
-        <div class="controls">
-            <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   id="ActualHours">
-        </div>
-    </label>
+        </label>
+    </div>
+    <div>
+        <label class="three-columns control-label">
+            Actual Start:
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.actualStart"
+                       ng-change="detailsCtrl.convertDate('actualStart')"
+                       is-open="detailsCtrl.actualStart"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-click="detailsCtrl.openDatePicker($event, 'actualStart')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+                  </span>
+                </span>
+        </label>
+        <label class="three-columns control-label">
+            Actual Completion:
+            <div class="controls">
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.actualCompletion"
+                       ng-change="detailsCtrl.convertDate('actualCompletion', true)"
+                       is-open="detailsCtrl.actualCompletion"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-click="detailsCtrl.openDatePicker($event, 'actualCompletion')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+                  </span>
+                </span>
+            </div>
+        </label>
+        <label class="control-label absolute three-columns" for="ActualHours">
+            Actual Hours:
+            <div class="controls">
+                <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       id="ActualHours">
+            </div>
+        </label>
+    </div>
 </form>

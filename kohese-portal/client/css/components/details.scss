@@ -1,7 +1,11 @@
 @import '../utils/variables';
 
 .tab-pane {
+  .absolute {
+    position: absolute;
+  }
   label {
+
     margin: 10px;
     #Rationale {
       width: 500px;
@@ -13,5 +17,6 @@
   .form-actions {
     margin-left: 20px;
   }
+
 }
 
