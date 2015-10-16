@@ -1,10 +1,67 @@
 module.exports = function(Analysis) {
   
-  var app = require('../../server/server.js');
   var http = require('http');
   var util = require('util');
   var _und = require('../../node_modules/underscore/underscore.js');
 
+  function requestAnalysisJSON (req, onId, cb){
+    console.log('::: ANALYZING2: ' + onId);
+
+    var requestData = {
+        name: "test data",
+        description: "the quick brown fox (js) jumped over the slow java coder"
+    };
+    
+    var options = {
+        host: "localhost",
+        port: 9091,
+        path: '/services/analysis/' + onId,
+        method: 'POST',
+        json: requestData
+    };
+    
+    // console.log('OPTIONS: ' + JSON.stringify(options));
+    http.request(options, function (res) {
+        var response = "";
+        // console.log('STATUS: ' + res.statusCode);
+        // console.log('HEADERS: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+                    
+        res.on('data', function (chunk) {
+
+            // console.log('::: BODY: ' /* + chunk*/);
+            response += chunk.toString();
+
+        });
+        res.on('end', function () {
+            var analysis = new Analysis;
+            analysis.id = onId + "-new";
+            try {
+                analysis.raw = JSON.parse(response);
+//                Analysis.consolidateAnalysis(analysis);
+                // delete the raw data
+//                analysis.raw = {};
+                analysis.save();
+                console.log('::: ANALYSIS2 Completed: ' + onId);
+            }
+            catch (err) {
+                console.log("*** Error parsing result for: " + onId);
+                console.log("Analysis response:  >>>" + response + "<<<");
+                console.log(err);
+            }
+
+            cb(null, analysis);
+        });
+    }).on('error', function (err){
+      error = new Error('*** Failure while communicating with Analysis server');
+      error.http_code = 504;
+      error.code = err.code;
+      error.syscall = err.syscall;
+      console.log(error);
+      cb(error,null);
+    }).end();          
+  }
+  
   function requestAnalysis (req, onId, cb) {
     console.log('::: ANALYZING: ' + onId);
 
@@ -58,7 +115,8 @@ module.exports = function(Analysis) {
     }).end();      
   }
   
-  Analysis.performAnalysis = function (req, onId, cb) {
+  Analysis.performAnalysis = function (req, forModelKind, onId, cb) {
+      console.log("::: Preparing to analyze " + forModelKind + " " + onId);
       Analysis.findById(onId, function(err, analysis) {
         
         if (analysis){
@@ -73,6 +131,7 @@ module.exports = function(Analysis) {
   Analysis.remoteMethod('performAnalysis', {
       accepts: [
          {arg: 'req', type: 'object', 'http': {source: 'req'}},
+         {arg: 'forModelKind', type: 'string'},
          {arg: 'onId', type: 'string'}
       ],
       returns: {
