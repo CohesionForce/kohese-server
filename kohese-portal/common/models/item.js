@@ -44,6 +44,7 @@ module.exports = function (Item) {
                 notification.type = 'update';
                 global.koheseIO.emit(ctx.Model.modelName +'/update', notification);
             }
+            global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance);
         } else {
             console.log('Updated %s matching %j',
                 ctx.Model.pluralModelName,
@@ -87,6 +88,7 @@ module.exports = function (Item) {
             notification.ctx = ctx;
             console.log("Change: " + JSON.stringify(notification));
             global.koheseIO.emit(ctx.Model.modelName +'/delete', notification);
+            global.koheseKDB.removeModelInstance(ctx.Model.modelName, notification.id);
         }
         next();
     };

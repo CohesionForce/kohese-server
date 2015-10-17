@@ -16,6 +16,9 @@ app.start = function () {
 boot(app, __dirname, function (err) {
     if (err) throw err;
 
+    var kdb = require('./kdb.js');
+    global.koheseKDB = kdb;
+    
     // start the server if `$ node server.js`
     if (require.main === module) {
 
