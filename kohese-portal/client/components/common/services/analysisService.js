@@ -22,7 +22,6 @@ function AnalysisService(Analysis, ItemRepository) {
           return true;
         }
       }
-      console.log("::: " + summary.posCount);
       return false;
     }
     
@@ -42,6 +41,7 @@ function AnalysisService(Analysis, ItemRepository) {
     function performAnalysis(proxy) {
 
         Analysis.performAnalysis({
+            forModelKind: proxy.kind,
             onId: proxy.item.id
         }).$promise.then(function (results) {
                 if (!proxy.analysis) {

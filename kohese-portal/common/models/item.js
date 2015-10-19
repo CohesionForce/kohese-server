@@ -1,6 +1,4 @@
 module.exports = function (Item) {
-
-    var app = require('../../server/server.js');
     
     Item.addModificationHistory = function(ctx, modelInstance, next){
         console.log('::: Before remote - ' + ctx.methodString);
@@ -41,12 +39,12 @@ module.exports = function (Item) {
             console.log("Change Instance:" + JSON.stringify(notification));
             if (ctx.isNewInstance) {
                 notification.type = 'create';
-                app.io.emit(ctx.Model.modelName +'/create', notification);
+                global.koheseIO.emit(ctx.Model.modelName +'/create', notification);
             } else {
                 notification.type = 'update';
-                app.io.emit(ctx.Model.modelName +'/update', notification);
+                global.koheseIO.emit(ctx.Model.modelName +'/update', notification);
             }
-            app.io.emit('change', JSON.stringify(notification));
+            global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance);
         } else {
             console.log('Updated %s matching %j',
                 ctx.Model.pluralModelName,
@@ -57,18 +55,17 @@ module.exports = function (Item) {
             notification.ctx = ctx;
             if (ctx.isNewInstance) {
                 notification.type = 'create';
-                app.io.emit(ctx.Model.modelName +'/create', notification);
+                global.koheseIO.emit(ctx.Model.modelName +'/create', notification);
 
             } else {
                 notification.type = 'update';
-                app.io.emit(ctx.Model.modelName +'/update', notification);
+                global.koheseIO.emit(ctx.Model.modelName +'/update', notification);
             }
             console.log("Change Multiple: " + JSON.stringify(notification));
-            app.io.emit('change', JSON.stringify(notification));
         }
         
         if(ctx.Model.modelName === "Item"){
-          var Analysis = app.models.Analysis;
+          //var Analysis = app.models.Analysis;
           console.log("::: Need to call Analysis update logic")
         }
         
@@ -90,8 +87,8 @@ module.exports = function (Item) {
             notification.id = ctx.where.id;
             notification.ctx = ctx;
             console.log("Change: " + JSON.stringify(notification));
-            app.io.emit(ctx.Model.modelName +'/delete', notification);
-            app.io.emit('change', JSON.stringify(notification));
+            global.koheseIO.emit(ctx.Model.modelName +'/delete', notification);
+            global.koheseKDB.removeModelInstance(ctx.Model.modelName, notification.id);
         }
         next();
     };
