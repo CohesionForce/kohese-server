@@ -14,6 +14,8 @@ const appModule = angular.module('app', [
     'app.services.decisionservice',
     'app.services.actionservice',
     'app.services.categoryservice',
+    'app.services.issueservice',
+    'app.services.observationservice',
     'app.services.userservice',
     'app.services.tabservice',
     'app.services.authentication',
@@ -131,7 +133,7 @@ appModule
                 url: '/users',
                 templateUrl: 'components/admin/subviews/users.html',
                 controller: 'AdminController as adminCtrl'
-            });;
+            });
 
         $urlRouterProvider.otherwise('/explore')
     })

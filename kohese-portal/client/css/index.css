@@ -229,6 +229,8 @@ table.tree-grid {
 
 body {
   font-family: FontAwesome, arial, sans-serif; }
+  body .one-column {
+    width: 100%; }
   body .two-columns {
     width: 50%; }
   body .three-columns {

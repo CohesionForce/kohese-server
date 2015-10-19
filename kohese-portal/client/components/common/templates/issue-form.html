@@ -1,0 +1,94 @@
+<form name="detailsCtrl.issueForm">
+    <label class="control-label" for="IssueState">
+        State:
+        <br/>
+        <select id="IssueState"
+                ng-disabled="!detailsCtrl.enableEdit"
+                ng-model="detailsCtrl.itemProxy.item.issueState">
+            <option ng-repeat="state in detailsCtrl.issueStates">{{state.item.name}}</option>
+        </select>
+    </label>
+    <label class="control-label two-columns" for="Analysis Action">
+        Analysis Action
+            <input id="Analysis Action"
+                   class="one-column"
+                   ng-disabled="!detailsCtrl.enableEdit"
+                   ng-model="detailsCtrl.itemProxy.item.analysisAction">
+    </label>
+    <br/>
+    <div>
+    <label class="control-label three-columns">
+        Observed On:
+        <div class="controls">
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.observedOn"
+                       ng-change="detailsCtrl.convertDate('observedOn', true)"
+                       is-open="detailsCtrl.observedOn"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-click="detailsCtrl.openDatePicker($event, 'observedOn')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+                  </span>
+                </span>
+        </div>
+    </label>
+    <label class="control-label absolute three-columns">
+        Observed By:
+        <angucomplete-alt id="ObservedBy"
+                          disable-input="!detailsCtrl.enableEdit"
+                          placeholder="{{detailsCtrl.itemProxy.item.observedBy}}"
+                          selected-object="detailsCtrl.somethingObserved"
+                          search-fields="item.name,item.description"
+                          title-field="item.name"
+                          description-field="item.description"
+                          pause="100"
+                          local-data="detailsCtrl.userList"
+                          minlength="1"
+                          match-class="highlight"
+                ></angucomplete-alt>
+    </label>
+    </div>
+    <label class="two-columns">
+        Context:
+        <div ng-repeat="action in detailsCtrl.itemProxy.item.context track by $index">
+            <input class="action-field one-column"
+                   type="text"
+                   ng-disabled="!detailsCtrl.enableEdit"
+                   ng-model="action.text">
+        </div>
+        <button ng-click="detailsCtrl.incrementItemInput('context')"
+                ng-show="detailsCtrl.enableEdit"
+                class="btn btn-primary">Add
+        </button>
+    </label>
+    <label class="two-columns">
+        Resolution Actions:
+        <div ng-repeat="action in detailsCtrl.itemProxy.item.resolutionActions track by $index">
+            <input class="action-field one-column"
+                   type="text"
+                   ng-disabled="!detailsCtrl.enableEdit"
+                   ng-model="action.text">
+        </div>
+        <button ng-click="detailsCtrl.incrementItemInput('resolutionActions')"
+                ng-show="detailsCtrl.enableEdit"
+                class="btn btn-primary">Add
+        </button>
+    </label>
+    <br/>
+    <label class="control-label two-columns" for="Response">
+        Response
+        <div>
+            <input id="Response"
+                   class="one-column"
+                   ng-disabled="!detailsCtrl.enableEdit"
+                   ng-model="detailsCtrl.itemProxy.item.response">
+        </div>
+    </label>
+    <br>
+</form>

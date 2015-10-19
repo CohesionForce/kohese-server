@@ -35,6 +35,15 @@
                 </div>
             </div>
         </tab>
+        </tab>
+        <tab ng-if="detailsCtrl.itemProxy.kind === 'Observation'">
+            <tab-heading>Observation</tab-heading>
+            <ng-include src="'components/common/templates/observation-form.html'"></ng-include>
+        </tab>
+        <tab ng-if="detailsCtrl.itemProxy.kind === 'Issue'">
+            <tab-heading>Issue</tab-heading>
+            <ng-include src="'components/common/templates/issue-form.html'"></ng-include>
+        </tab>
         <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'"
              class="decision-tab">
             <tab-heading>Decision</tab-heading>

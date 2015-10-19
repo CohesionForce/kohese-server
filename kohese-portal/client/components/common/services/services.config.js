@@ -11,6 +11,8 @@ export default() => {
     require('./analysisService')();
     require('./kind-services/decision-service')();
     require('./kind-services/action-service')();
+    require('./kind-services/issue-service')();
+    require('./kind-services/observation-service')();
     require('./category-services/category-service')();
     require('./user-services/user-service')();
 }

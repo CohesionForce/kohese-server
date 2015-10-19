@@ -63,7 +63,7 @@
                    ng-disabled="!detailsCtrl.enableEdit"
                    ng-model="alternative.text">
         </div>
-        <button ng-click="detailsCtrl.addAlternative()"
+        <button ng-click="detailsCtrl.incrementItemInput('alternatives')"
                 ng-show="detailsCtrl.enableEdit"
                 class="btn btn-primary">Add
         </button>

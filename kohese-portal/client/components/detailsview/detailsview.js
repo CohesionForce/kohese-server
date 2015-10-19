@@ -2,8 +2,10 @@
  * Created by josh on 7/13/15.
  */
 
-function DetailsViewController($state, ItemRepository, analysisService, Item, DecisionService, ActionService,
-                               CategoryService, UserService, tabService, $scope, $stateParams) {
+
+function DetailsViewController($state, ItemRepository, analysisService, Item, IssueService, ObservationService,
+                               DecisionService, ActionService, CategoryService, UserService, tabService,
+                               $scope, $stateParams) {
 
     var detailsCtrl = this;
 
@@ -25,6 +27,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
     detailsCtrl.kindList = ItemRepository.modelTypes;
     detailsCtrl.decisionStates = DecisionService.getDecisionStates();
     detailsCtrl.actionStates = ActionService.getActionStates();
+    detailsCtrl.issueStates = IssueService.getIssueStates();
     detailsCtrl.categoryTags = CategoryService.getTags();
     detailsCtrl.userList = UserService.getAllUsers();
     detailsCtrl.analysisFilterPOS = analysisService.filterPOS;
@@ -74,8 +77,10 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
         detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
         detailsCtrl.actionStates = ActionService.getActionStates();
+        detailsCtrl.issueStates = IssueService.getIssueStates();
         detailsCtrl.categoryTags = CategoryService.getTags();
         detailsCtrl.userList = UserService.getAllUsers();
+        console.log(detailsCtrl.itemProxy);
 
         detailsCtrl.updateParentProxy();
     });
@@ -116,10 +121,13 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, De
 //        }
     };
 
-    detailsCtrl.addAlternative = function () {
-        var altLength = detailsCtrl.itemProxy.item.alternatives.length;
-        detailsCtrl.itemProxy.item.alternatives[altLength] = {text:''};
-        console.log(detailsCtrl.itemProxy.item.alternatives);
+    detailsCtrl.incrementItemInput = function (type) {
+        if(detailsCtrl.itemProxy.item[type]){
+        var altLength = detailsCtrl.itemProxy.item[type].length;
+        detailsCtrl.itemProxy.item[type][altLength] = {text:''};
+        } else {
+            detailsCtrl.itemProxy.item[type] = [{text: ''}]
+        }
     };
 
     detailsCtrl.tagSelected = function(selected) {
@@ -226,6 +234,8 @@ export default () => {
         'app.services.decisionservice',
         'app.services.actionservice',
         'app.services.categoryservice',
-        'app.services.userservice'])
+        'app.services.userservice',
+        'app.services.issueservice',
+        'app.services.observationservice'])
         .controller('DetailsViewController', DetailsViewController);
 }
