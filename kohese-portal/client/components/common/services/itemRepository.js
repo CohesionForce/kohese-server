@@ -259,12 +259,14 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ko
         }
 
         delete tree.proxyMap[byId];
+        delete tree.parentOf[byId];
 
         // If there were children to the node that was deleted, add them to lostAndFound
         if (children.length) {
             var newLostNode = {};
             newLostNode.children = children;
             tree.proxyMap[byId] = newLostNode;
+            tree.parentOf[byId] = lostAndFound;
             attachToLostAndFound(byId);
         }
     }
@@ -332,6 +334,12 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ko
         lostProxy.item.description = "Found children nodes referencing this node as a parent.";
         lostProxy.item.id = byId;
         lostProxy.item.parentId = "LOST+FOUND";
+        
+        // Make sure parentOf for each child is pointing to this lostProxy
+        for (var childIdx in lostProxy.children){
+          var child = lostProxy.children[childIdx];
+          tree.parentOf[child.item.id] = lostProxy;
+        }
 
         var lostAndFound = getItem(lostProxy.item.parentId)
         lostAndFound.children.push(lostProxy);
