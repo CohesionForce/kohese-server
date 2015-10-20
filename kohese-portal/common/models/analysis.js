@@ -1,225 +1,250 @@
 module.exports = function(Analysis) {
-  
+
   var http = require('http');
   var util = require('util');
   var _und = require('../../node_modules/underscore/underscore.js');
+  var request = require('request');
 
-  function requestAnalysisJSON (req, onId, cb){
-    console.log('::: ANALYZING2: ' + onId);
+  function requestAnalysisJSON(req, forModelKind, onId, cb) {
+    console.log('::: ANALYZING: ' + forModelKind + " - " + onId);
 
-    var requestData = {
-        name: "test data",
-        description: "the quick brown fox (js) jumped over the slow java coder"
-    };
-    
-    var options = {
-        host: "localhost",
-        port: 9091,
-        path: '/services/analysis/' + onId,
-        method: 'POST',
-        json: requestData
-    };
-    
-    // console.log('OPTIONS: ' + JSON.stringify(options));
-    http.request(options, function (res) {
-        var response = "";
-        // console.log('STATUS: ' + res.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(res.headers));
-        res.setEncoding('utf8');
-                    
-        res.on('data', function (chunk) {
+    var instance = global.koheseKDB.retrieveModelInstance(forModelKind, onId);
 
-            // console.log('::: BODY: ' /* + chunk*/);
-            response += chunk.toString();
+    var requestData = {};
+    var analysis = new Analysis;
+    analysis.id = onId;
+    analysis.raw = {};
+    analysis.forModelKind = forModelKind;
+    analysis.name = "Analysis for: " + instance.name;
 
-        });
-        res.on('end', function () {
-            var analysis = new Analysis;
-            analysis.id = onId + "-new";
-            try {
-                analysis.raw = JSON.parse(response);
-//                Analysis.consolidateAnalysis(analysis);
-                // delete the raw data
-//                analysis.raw = {};
-                analysis.save();
-                console.log('::: ANALYSIS2 Completed: ' + onId);
-            }
-            catch (err) {
-                console.log("*** Error parsing result for: " + onId);
-                console.log("Analysis response:  >>>" + response + "<<<");
-                console.log(err);
-            }
+    if (instance.name) {
+      requestData.name = instance.name;
+      analysis.raw.name = {};
+    }
 
-            cb(null, analysis);
-        });
-    }).on('error', function (err){
-      error = new Error('*** Failure while communicating with Analysis server');
-      error.http_code = 504;
-      error.code = err.code;
-      error.syscall = err.syscall;
-      console.log(error);
-      cb(error,null);
-    }).end();          
-  }
-  
-  function requestAnalysis (req, onId, cb) {
-    console.log('::: ANALYZING: ' + onId);
+    if (instance.description) {
+      requestData.description = instance.description;
+      analysis.raw.description = {};
+    }
 
     var options = {
-        host: "localhost",
-        port: 9091,
-        path: '/services/analysis/' + onId,
-        method: 'GET',
-        headers: {'authorization': req.headers.authorization}
+      uri : "http://localhost:9091/services/analysis",
+      method : 'POST',
+      json : true,
+      body : requestData
     };
-    
-    // console.log('OPTIONS: ' + JSON.stringify(options));
-    http.request(options, function (res) {
-        var response = "";
-        // console.log('STATUS: ' + res.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(res.headers));
-        res.setEncoding('utf8');
-                    
-        res.on('data', function (chunk) {
 
-            // console.log('::: BODY: ' /* + chunk*/);
-            response += chunk.toString();
+    console.log('OPTIONS: ' + JSON.stringify(options));
+    request(options, function(analysisError, analysisResponse, analysisBody) {
+      if (analysisError) {
+        error = new Error(
+            '*** Failure while communicating with Analysis server');
+        error.http_code = 504;
+        error.code = err.code;
+        error.syscall = err.syscall;
+        console.log(error);
+        cb(error, null);
 
-        });
-        res.on('end', function () {
-            var analysis = new Analysis;
-            analysis.id = onId;
-            try {
-                analysis.raw = JSON.parse(response);
-                Analysis.consolidateAnalysis(analysis);
-                // delete the raw data
-                analysis.raw = {};
-                analysis.save();
-                console.log('::: ANALYSIS Completed: ' + onId);
-            }
-            catch (err) {
-                console.log("*** Error parsing result for: " + onId);
-                console.log("Analysis response:  >>>" + response + "<<<");
-                console.log(err);
-            }
+        console.log("*** Error:");
+        console.log(error);
+      } else {
+        // console.log("--- Body:");
+        // console.log(analysisBody);
 
-            cb(null, analysis);
-        });
-    }).on('error', function (err){
-      error = new Error('*** Failure while communicating with Analysis server');
-      error.http_code = 504;
-      error.code = err.code;
-      error.syscall = err.syscall;
-      console.log(error);
-      cb(error,null);
-    }).end();      
+        try {
+          var analysisBody;
+          for ( var key in analysisBody) {
+            analysis.raw[key] = JSON.parse(analysisBody[key]);
+          }
+          Analysis.consolidateAnalysis(analysis);
+          // delete the raw data
+          delete analysis.__data.raw;
+          analysis.save();
+          console.log('::: ANALYSIS Completed: ' + onId);
+        } catch (err) {
+          console.log("*** Error parsing result for: " + forModelKind + "- "
+              + onId + " - " + analysis.name);
+          console.log("Analysis response body:  >>>");
+          console.log(analysisBody);
+          console.log("<<<");
+          console.log(err);
+        }
+
+        cb(null, analysis);
+
+      }
+    });
   }
-  
-  Analysis.performAnalysis = function (req, forModelKind, onId, cb) {
-      console.log("::: Preparing to analyze " + forModelKind + " " + onId);
-      Analysis.findById(onId, function(err, analysis) {
-        
-        if (analysis){
-          cb (null, analysis);
-        } else {
-          requestAnalysis (req,onId, cb);
-        }      
-      });
 
+  Analysis.performAnalysis = function(req, forModelKind, onId, cb) {
+    console.log("::: Preparing to analyze " + forModelKind + " " + onId);
+    Analysis.findById(onId, function(err, analysis) {
+
+      if (analysis) {
+        cb(null, analysis);
+      } else {
+        requestAnalysisJSON(req, forModelKind, onId, cb);
+      }
+    });
   }
 
   Analysis.remoteMethod('performAnalysis', {
-      accepts: [
-         {arg: 'req', type: 'object', 'http': {source: 'req'}},
-         {arg: 'forModelKind', type: 'string'},
-         {arg: 'onId', type: 'string'}
-      ],
-      returns: {
-          arg: 'data',
-          type: 'object'
+    accepts : [ {
+      arg : 'req',
+      type : 'object',
+      'http' : {
+        source : 'req'
       }
+    }, {
+      arg : 'forModelKind',
+      type : 'string'
+    }, {
+      arg : 'onId',
+      type : 'string'
+    } ],
+    returns : {
+      arg : 'data',
+      type : 'object'
+    }
   });
 
-  Analysis.afterRemoteError('performAnalysis', function( ctx, next) { 
+  Analysis.afterRemoteError('performAnalysis', function(ctx, next) {
     ctx.res.status(ctx.error.http_code).end(ctx.error.message);
-   });
-  
-  Analysis.consolidateAnalysis = function (onAnalysis) {
-      onAnalysis.list = [];
-      var sentenceCount = onAnalysis.raw._views._InitialView.Sentence.length;
-      var chunkCount = onAnalysis.raw._views._InitialView.Chunk.length;
-      var tokenCount = onAnalysis.raw._views._InitialView.Token.length;
-      var chunkIndex = 0;
-      var tokenIndex = 0;
-      var nextChunk = {};
-      var nextToken = {};
+  });
 
-      onAnalysis.chunkSummary = {};
-      onAnalysis.tokenSummary = {};
+  function addChunkToSummary(onAnalysis, key, chunkIndex, nextChunk) {
+    nextChunk.displayType = lookup[nextChunk.chunkType] + " ("
+        + nextChunk.chunkType + ")";
+    nextChunk.displayId = key + "-Chunk-" + chunkIndex;
+    nextChunk.displayLevel = 2;
+    onAnalysis.list.push(nextChunk);
 
-      for (var sentenceIndex = 0; sentenceIndex < sentenceCount; sentenceIndex++) {
-          var sentence = onAnalysis.raw._views._InitialView.Sentence[sentenceIndex];
+    if (typeof onAnalysis.chunkSummary[nextChunk.text] !== 'undefined') {
+      onAnalysis.chunkSummary[nextChunk.text].count++;
+    } else {
+      var chunkSummary = {};
+      chunkSummary.text = nextChunk.text;
+      chunkSummary.count = 1;
+      chunkSummary.displayType = "Chunk";
+      chunkSummary.posCount = {};
+      onAnalysis.chunkSummary[nextChunk.text] = chunkSummary;
+    }
+
+    if (typeof onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType] !== 'undefined') {
+      onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType]++;
+    } else {
+      onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType] = 1;
+    }
+  }
+
+  function addTokenToSummary(onAnalysis, key, tokenIndex, nextToken) {
+    nextToken.displayType = lookup[nextToken.pos] + " (" + nextToken.pos + ")";
+    nextToken.displayId = key + "-Token-" + tokenIndex;
+    nextToken.displayLevel = 3;
+    onAnalysis.list.push(nextToken);
+
+    if (typeof onAnalysis.tokenSummary[nextToken.text] !== 'undefined') {
+      onAnalysis.tokenSummary[nextToken.text].count++;
+    } else {
+      var tokenSummary = {};
+      tokenSummary.text = nextToken.text;
+      tokenSummary.count = 1;
+      tokenSummary.displayType = "Token";
+      tokenSummary.posCount = {};
+      onAnalysis.tokenSummary[nextToken.text] = tokenSummary;
+    }
+
+    if (typeof onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos] !== 'undefined') {
+      onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos]++;
+    } else {
+      onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos] = 1;
+    }
+  }
+
+  Analysis.consolidateAnalysis = function(onAnalysis) {
+    onAnalysis.list = [];
+    var nextChunk = {};
+    var nextToken = {};
+
+    onAnalysis.chunkSummary = {};
+    onAnalysis.tokenSummary = {};
+
+    for ( var key in onAnalysis.raw) {
+      var rawData = onAnalysis.raw[key];
+      if (rawData._views) {
+        var view = rawData._views._InitialView;
+
+        var chunkIndex = 0;
+        var tokenIndex = 0;
+
+        var sentenceCount = 0;
+        var chunkCount = 0;
+        var tokenCount = 0;
+
+        if (view.Sentence) {
+          sentenceCount = view.Sentence.length;
+        }
+        if (view.Chunk) {
+          chunkCount = view.Chunk.length;
+        }
+        if (view.Token) {
+          tokenCount = view.Token.length;
+        }
+
+        for (var sentenceIndex = 0; sentenceIndex < sentenceCount; sentenceIndex++) {
+          var sentence = view.Sentence[sentenceIndex];
           sentence.displayType = "Sentence";
-          sentence.displayId = "Sentence-" + sentenceIndex;
+          sentence.displayId = key + "-Sentence-" + sentenceIndex;
           sentence.displayLevel = 1;
           onAnalysis.list.push(sentence);
 
-          nextChunk = onAnalysis.raw._views._InitialView.Chunk[chunkIndex];
-          while ((chunkIndex < chunkCount) && (nextChunk.end <= sentence.end)) {
-              nextChunk.displayType = lookup[nextChunk.chunkType] + " (" + nextChunk.chunkType + ")";
-              nextChunk.displayId = "Chunk-" + chunkIndex;
-              nextChunk.displayLevel = 2;
-              onAnalysis.list.push(nextChunk);
-
-              if (typeof onAnalysis.chunkSummary[nextChunk.text] !== 'undefined') {
-                  onAnalysis.chunkSummary[nextChunk.text].count++;
-              } else {
-                  var chunkSummary = {};
-                  chunkSummary.text = nextChunk.text;
-                  chunkSummary.count = 1;
-                  chunkSummary.displayType = "Chunk";
-                  chunkSummary.posCount = {};
-                  onAnalysis.chunkSummary[nextChunk.text] = chunkSummary;
-              }
-
-              if (typeof onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType] !== 'undefined') {
-                  onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType]++;
-              } else {
-                  onAnalysis.chunkSummary[nextChunk.text].posCount[nextChunk.chunkType] = 1;
-              }
-
-              nextToken = onAnalysis.raw._views._InitialView.Token[tokenIndex];
-              while ((tokenIndex < tokenCount) && (nextToken.end <= nextChunk.end)) {
-                  nextToken.displayType = lookup[nextToken.pos] + " (" + nextToken.pos + ")";
-                  nextToken.displayId = "Token-" + chunkIndex;
-                  nextToken.displayLevel = 3;
-                  onAnalysis.list.push(nextToken);
-
-                  if (typeof onAnalysis.tokenSummary[nextToken.text] !== 'undefined') {
-                      onAnalysis.tokenSummary[nextToken.text].count++;
-                  } else {
-                      var tokenSummary = {};
-                      tokenSummary.text = nextToken.text;
-                      tokenSummary.count = 1;
-                      tokenSummary.displayType = "Token";
-                      tokenSummary.posCount = {};
-                      onAnalysis.tokenSummary[nextToken.text] = tokenSummary;
-                  }
-
-                  if (typeof onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos] !== 'undefined') {
-                      onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos]++;
-                  } else {
-                      onAnalysis.tokenSummary[nextToken.text].posCount[nextToken.pos] = 1;
-                  }
-
-                  nextToken = onAnalysis.raw._views._InitialView.Token[++tokenIndex];
-              }
-
-              nextChunk = onAnalysis.raw._views._InitialView.Chunk[++chunkIndex];
+          if (chunkIndex < chunkCount) {
+            nextChunk = view.Chunk[chunkIndex];
           }
-      }
+          while ((chunkIndex < chunkCount) && (nextChunk.end <= sentence.end)) {
 
-      onAnalysis.summaryList = _und.union(_und.values(onAnalysis.chunkSummary), _und.values(onAnalysis.tokenSummary));
+            addChunkToSummary(onAnalysis, key, chunkIndex, nextChunk);
+              
+            if (tokenIndex < tokenCount) {
+              nextToken = view.Token[tokenIndex];
+            }
+            while ((tokenIndex < tokenCount)
+                && (nextToken.end <= nextChunk.end)) {
+
+              addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);
+              
+              // Check for more tokens in this chunk
+              if (tokenIndex < tokenCount) {
+                nextToken = view.Token[++tokenIndex];
+              }
+            }
+
+            // Check for more chunks in this sentence
+            if (chunkIndex < chunkCount) {
+              nextChunk = view.Chunk[++chunkIndex];
+            }
+          }
+          
+          // Check for trailing tokens in the sentence
+          if (tokenIndex < tokenCount) {
+            nextToken = view.Token[tokenIndex];
+          }
+          while ((tokenIndex < tokenCount)
+              && (nextToken.end <= sentence.end)) {
+
+            addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);
+            
+            // Check for more tokens in this chunk
+            if (tokenIndex < tokenCount) {
+              nextToken = view.Token[++tokenIndex];
+            }
+          }
+        }
+      }
+    }
+
+    onAnalysis.summaryList = _und.union(_und.values(onAnalysis.chunkSummary),
+        _und.values(onAnalysis.tokenSummary));
   }
 
   var lookup = {};

@@ -37,9 +37,24 @@ function storeJSONDoc(filePath, doc) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function retrieveModelInstance(modelName, modelInstanceId){
+  console.log("::: Retrieving " + modelName + " - " + modelInstanceId)
+  var modelStore = kdbStore.models[modelName];
+  var instance = JSON.parse(modelStore[modelInstanceId]);
+  return instance;
+}
+
+module.exports.retrieveModelInstance = retrieveModelInstance;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function storeModelInstance(modelName, modelInstance){
   var filePath = exportDirPath + "/" + modelName + "/" + modelInstance.id + ".json";
   storeJSONDoc(filePath, modelInstance);
+
+  var modelStore = kdbStore.models[modelName];
+  modelStore[modelInstance.id] = JSON.stringify(modelInstance);
 }
 
 module.exports.storeModelInstance = storeModelInstance;
@@ -51,6 +66,8 @@ function removeModelInstance(modelName, instanceId){
   var filePath = exportDirPath + "/" + modelName + "/" + instanceId + ".json";
   console.log("::: Removing " + filePath);
   fs.unlinkSync(filePath);
+  var modelStore = kdbStore.models[modelName];
+  delete modelStore[instanceId];
 }
 
 module.exports.removeModelInstance = removeModelInstance;
