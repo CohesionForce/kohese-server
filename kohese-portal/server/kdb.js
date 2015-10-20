@@ -37,10 +37,14 @@ function storeJSONDoc(filePath, doc) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function retrieveModelInstance(modelName, modelInstanceId){
+function retrieveModelInstance(modelName, modelInstanceId) {
   console.log("::: Retrieving " + modelName + " - " + modelInstanceId)
   var modelStore = kdbStore.models[modelName];
-  var instance = JSON.parse(modelStore[modelInstanceId]);
+  var instance;
+
+  if (modelStore[modelInstanceId]) {
+    instance = JSON.parse(modelStore[modelInstanceId]);
+  }
   return instance;
 }
 
