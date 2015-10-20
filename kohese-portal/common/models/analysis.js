@@ -34,7 +34,8 @@ module.exports = function(Analysis) {
       body : requestData
     };
 
-    console.log('OPTIONS: ' + JSON.stringify(options));
+//    console.log('OPTIONS: ' + JSON.stringify(options));
+    
     request(options, function(analysisError, analysisResponse, analysisBody) {
       if (analysisError) {
         error = new Error(
@@ -59,7 +60,7 @@ module.exports = function(Analysis) {
           Analysis.consolidateAnalysis(analysis);
           // delete the raw data
           delete analysis.__data.raw;
-          analysis.save();
+          global.koheseKDB.storeModelInstance("Analysis", analysis);
           console.log('::: ANALYSIS Completed: ' + onId);
         } catch (err) {
           console.log("*** Error parsing result for: " + forModelKind + "- "
@@ -78,14 +79,13 @@ module.exports = function(Analysis) {
 
   Analysis.performAnalysis = function(req, forModelKind, onId, cb) {
     console.log("::: Preparing to analyze " + forModelKind + " " + onId);
-    Analysis.findById(onId, function(err, analysis) {
 
-      if (analysis) {
-        cb(null, analysis);
-      } else {
-        requestAnalysisJSON(req, forModelKind, onId, cb);
-      }
-    });
+    var analysis = global.koheseKDB.retrieveModelInstance("Analysis", onId);
+    if (analysis) {
+      cb(null, analysis);
+    } else {
+      requestAnalysisJSON(req, forModelKind, onId, cb);
+    }
   }
 
   Analysis.remoteMethod('performAnalysis', {
