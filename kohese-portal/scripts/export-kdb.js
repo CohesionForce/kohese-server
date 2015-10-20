@@ -17,6 +17,11 @@ var exportKdb = function() {
     function exportModel(fs, modelName, model) {
         var modelDir = "export/" + modelName;
 
+        if (modelName === "Analysis") {
+          console.log("!!! Skipping export of Analysis");
+          return;
+        }
+
         console.log("::: Exporting Model: " + modelName);
         checkAndCreateDir(fs, modelDir);
 
