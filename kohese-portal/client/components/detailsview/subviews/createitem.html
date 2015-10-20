@@ -17,22 +17,7 @@
 
             <div class="panel-body">
                 <ng-include src="'components/common/templates/itemform.html'"></ng-include>
-                <div class="form-actions">
-                    <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit"
-                            class="btn btn-primary">
-                        Edit
-                    </button>
-                    <button ng-click="detailsCtrl.upsertItem()"
-                            ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
-                && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
-                        Update
-                    </button>
-                    <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()"
-                            ng-disabled="!detailsCtrl.enableEdit"
-                            class="btn btn-primary">
-                        Cancel
-                    </button>
-                </div>
+
             </div>
         </tab>
         </tab>
@@ -55,6 +40,20 @@
             <ng-include src="'components/common/templates/action-form.html'"></ng-include>
         </tab>
     </tabset>
-</div>
-
+    <div class="form-actions">
+        <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit"
+                class="btn btn-primary">
+            Edit
+        </button>
+        <button ng-click="detailsCtrl.upsertItem()"
+                ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
+                && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
+            Update
+        </button>
+        <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()"
+                ng-disabled="!detailsCtrl.enableEdit"
+                class="btn btn-primary">
+            Cancel
+        </button>
+    </div>
 </div>

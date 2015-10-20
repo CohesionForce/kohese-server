@@ -1,14 +1,4 @@
-<form name="detailsCtrl.issueForm">
-    <div>
-    <label class="control-label" for="IssueState">
-        State:
-        <br/>
-        <select id="IssueState"
-                ng-disabled="!detailsCtrl.enableEdit"
-                ng-model="detailsCtrl.itemProxy.item.issueState">
-            <option ng-repeat="state in detailsCtrl.issueStates">{{state.item.name}}</option>
-        </select>
-    </label>
+<form name="detailsCtrl.observationForm">
     <label class="control-label three-columns">
         Observed On:
         <div class="controls">
@@ -45,17 +35,7 @@
                           match-class="highlight"
                 ></angucomplete-alt>
     </label>
-    </div>
-    <label class="control-label two-columns" for="Analysis Action">
-        Analysis Action
-            <textarea id="Analysis Action"
-                   class="one-column"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   ng-model="detailsCtrl.itemProxy.item.analysisAction"></textarea>
-    </label>
     <br/>
-    <div>
-    </div>
     <label class="two-columns">
         Context:
         <div ng-repeat="action in detailsCtrl.itemProxy.item.context track by $index">
@@ -69,28 +49,4 @@
                 class="btn btn-primary">Add
         </button>
     </label>
-    <label class="two-columns">
-        Resolution Actions:
-        <div ng-repeat="action in detailsCtrl.itemProxy.item.resolutionActions track by $index">
-            <input class="action-field one-column"
-                   type="text"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   ng-model="action.text">
-        </div>
-        <button ng-click="detailsCtrl.incrementItemInput('resolutionActions')"
-                ng-show="detailsCtrl.enableEdit"
-                class="btn btn-primary">Add
-        </button>
-    </label>
-    <br/>
-    <label class="control-label two-columns" for="Response">
-        Response
-        <div>
-            <input id="Response"
-                   class="one-column"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   ng-model="detailsCtrl.itemProxy.item.response">
-        </div>
-    </label>
-    <br>
 </form>
