@@ -91,6 +91,9 @@
                 </table>
 
                 <h4>Analysis Details</h4>
+                <input type="checkbox" ng-model="detailsCtrl.showSentencesInDetails"
+                       ng-init="detailsCtrl.showSentencesInDetails=true" name="showSentencesInDetailsInput"
+                       style="margin: 5px"/> Show Sentences in Details
                 <input type="checkbox" ng-model="detailsCtrl.showChunksInDetails"
                        ng-init="detailsCtrl.showChunksInDetails=false" name="showChunksInDetailsInput"
                        style="margin: 5px"/> Show Chunks in Details
@@ -107,7 +110,7 @@
                     </thead>
                     <tbody>
                     <tr class="level-{{listItem.displayLevel}}"
-                        ng-hide="((listItem.displayLevel == 2) && !detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 3) && !detailsCtrl.showTokensInDetails)"
+                        ng-hide="((listItem.displayLevel == 2) && !detailsCtrl.showSentencesInDetails) || ((listItem.displayLevel == 3) && !detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 4) && !detailsCtrl.showTokensInDetails)"
                         class="tree-grid-row" id="{{listItem.displayId}}"
                         ng-repeat="listItem in detailsCtrl.itemProxy.analysis.extendedList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:detailsCtrl.analysisDetailsSortField">
                         <td class="indented">{{listItem.displayType}}</td>

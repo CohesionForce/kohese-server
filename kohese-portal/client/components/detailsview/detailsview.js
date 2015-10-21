@@ -21,6 +21,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     detailsCtrl.defaultTab = {active: true};
     detailsCtrl.showChunksInAnalysis = true;
     detailsCtrl.showTokensInAnalysis = true;
+    detailsCtrl.showSentencesInDetails = true;
     detailsCtrl.showChunksInDetails = false;
     detailsCtrl.showTokensInDetails = false;
     detailsCtrl.filterList = [];

@@ -41,8 +41,8 @@ module.exports = function(Analysis) {
         error = new Error(
             '*** Failure while communicating with Analysis server');
         error.http_code = 504;
-        error.code = err.code;
-        error.syscall = err.syscall;
+        error.code = analysisError.code;
+        error.syscall = analysisError.syscall;
         console.log(error);
         cb(error, null);
 
@@ -116,7 +116,7 @@ module.exports = function(Analysis) {
     nextChunk.displayType = lookup[nextChunk.chunkType] + " ("
         + nextChunk.chunkType + ")";
     nextChunk.displayId = key + "-Chunk-" + chunkIndex;
-    nextChunk.displayLevel = 2;
+    nextChunk.displayLevel = 3;
     onAnalysis.list.push(nextChunk);
 
     if (typeof onAnalysis.chunkSummary[nextChunk.text] !== 'undefined') {
@@ -140,7 +140,7 @@ module.exports = function(Analysis) {
   function addTokenToSummary(onAnalysis, key, tokenIndex, nextToken) {
     nextToken.displayType = lookup[nextToken.pos] + " (" + nextToken.pos + ")";
     nextToken.displayId = key + "-Token-" + tokenIndex;
-    nextToken.displayLevel = 3;
+    nextToken.displayLevel = 4;
     onAnalysis.list.push(nextToken);
 
     if (typeof onAnalysis.tokenSummary[nextToken.text] !== 'undefined') {
@@ -195,7 +195,7 @@ module.exports = function(Analysis) {
           var sentence = view.Sentence[sentenceIndex];
           sentence.displayType = "Sentence";
           sentence.displayId = key + "-Sentence-" + sentenceIndex;
-          sentence.displayLevel = 1;
+          sentence.displayLevel = 2;
           onAnalysis.list.push(sentence);
 
           if (chunkIndex < chunkCount) {

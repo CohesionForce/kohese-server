@@ -27,15 +27,16 @@ function AnalysisService(Analysis, ItemRepository) {
     
     service.fetchAnalysis = function (forProxy) {
 
-        // Fetch records depth first
+        if (!forProxy.analysis) {
+          console.log("::: Retrieving analysis for " + forProxy.item.id + " - " + forProxy.item.name);
+          performAnalysis(forProxy);
+        }
+        
+        // Fetch children
         for (var childIdx = 0; childIdx < forProxy.children.length; childIdx++) {
             service.fetchAnalysis(forProxy.children[childIdx]);
         }
 
-        if (!forProxy.analysis) {
-            console.log("::: Retrieving analysis for " + forProxy.item.id + " - " + forProxy.item.name);
-            performAnalysis(forProxy);
-        }
     }
 
     function performAnalysis(proxy) {
@@ -100,7 +101,7 @@ function AnalysisService(Analysis, ItemRepository) {
 
         for (var childIdx = 0; childIdx < proxy.children.length; childIdx++) {
             var topic = {};
-            topic.displayType = "Item";
+            topic.displayType = proxy.kind;
             topic.displayId = proxy.children[childIdx].item.id;
             topic.text = proxy.children[childIdx].item.name;
             topic.displayLevel = 1;
