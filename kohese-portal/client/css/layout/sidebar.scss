@@ -1,7 +1,5 @@
 @import '../utils/variables';
 
-
-
 .sidebar {
   color: whitesmoke;
   position: relative;
@@ -45,7 +43,7 @@
     background-image: -o-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
 
     li {
-      &:hover{
+      &:hover {
         background-color: $secondaryColor + 100;
       }
     }
@@ -65,6 +63,14 @@
     background-color: $secondaryColor;
 
   }
+}
+
+.sidebar-button {
+  width: 100%;
+  cursor: pointer;
+  border: 1px solid $secondaryColor+50;
+  border-radius: $baseBorderRadius;
+
 }
 
 .side-pane.open {

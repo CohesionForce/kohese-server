@@ -200,7 +200,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     detailsCtrl.estimatedStart = false;
     detailsCtrl.dateOptions = {
         formatYear: 'yy',
-        startingDay: 1
     };
 
     detailsCtrl.openDatePicker = function($event, type){

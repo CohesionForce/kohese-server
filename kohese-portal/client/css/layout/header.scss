@@ -13,6 +13,7 @@
   background-image: -o-linear-gradient(right, $primaryColor + 100, $primaryColor);
   .navbar-brand {
     color: white;
+    cursor: pointer;
     &:hover {
       color: white;
     }
