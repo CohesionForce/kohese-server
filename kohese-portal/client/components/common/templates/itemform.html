@@ -23,7 +23,8 @@
                           ng-class="{error: detailsCtrl.itemForm.id.$invalid}">
 						<label class="control-label" for="Id">Id</label>
 						<div class="controls">
-                            {{detailsCtrl.itemProxy.item.id}}
+                            <input style="width: 90%;" type="text" ng-model="detailsCtrl.itemProxy.item.id"
+                                   id="Id" ng-disabled="true"/>
                         </div>
 					</span>
         </div>
