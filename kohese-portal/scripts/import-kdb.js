@@ -49,7 +49,11 @@ var importKdb = function() {
 
     for (var dirIdx in dirList) {
       var modelName = dirList[dirIdx];
-      readModelDir(fs, kdb, modelName);
+      if (modelName === "Analysis"){
+         console.log("!!! Skipping Analysis");
+      } else {
+         readModelDir(fs, kdb, modelName);
+      }
     }
 
     fs.writeFileSync("kdb-import.json", JSON.stringify(kdb, null, '  '), {encoding: 'utf8', flag: 'w'});  
