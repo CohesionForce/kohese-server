@@ -19,8 +19,8 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     }
 
     treeCtrl.kindList = ItemRepository.modelTypes;
-    treeCtrl.actionStates = {};
-    treeCtrl.userList = {};
+    treeCtrl.actionStates = ActionService.getActionStates();
+    treeCtrl.userList = UserService.getAllUsers();
 
     treeCtrl.collapsed = {};
     treeCtrl.tab = tabService.getCurrentTab();
