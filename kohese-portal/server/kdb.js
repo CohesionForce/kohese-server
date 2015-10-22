@@ -5,6 +5,8 @@
 console.log("::: Begin KDB File Load");
 
 var fs = require('fs');
+var ItemProxy = require('../common/models/item-proxy.js');
+
 var repoDirPath = "kohese-kdb";
 var exportDirPath = repoDirPath + "/export";
 
@@ -56,6 +58,15 @@ module.exports.retrieveModelInstance = retrieveModelInstance;
 function storeModelInstance(modelName, modelInstance){
   var filePath = exportDirPath + "/" + modelName + "/" + modelInstance.id + ".json";
   storeJSONDoc(filePath, modelInstance);
+  
+  var strippedInstance = JSON.parse(JSON.stringify(modelInstance));
+  
+  var proxy = ItemProxy.getProxyFor(modelInstance.id);
+  if (proxy){
+    proxy.updateItem(modelName, strippedInstance);
+  } else {
+    proxy = new ItemProxy(modelName, strippedInstance);
+  }
 
   var modelStore = kdbStore.models[modelName];
   modelStore[modelInstance.id] = JSON.stringify(modelInstance);
@@ -70,6 +81,10 @@ function removeModelInstance(modelName, instanceId){
   var filePath = exportDirPath + "/" + modelName + "/" + instanceId + ".json";
   console.log("::: Removing " + filePath);
   fs.unlinkSync(filePath);
+  
+  var proxy = ItemProxy.getProxyFor(instanceId);
+  proxy.deleteItem();
+  
   var modelStore = kdbStore.models[modelName];
   delete modelStore[instanceId];
 }
@@ -168,6 +183,11 @@ function validateRepositoryStructure () {
     for(var fileIdx in fileList) {
       var fileData = fs.readFileSync(modelDirPath + "/" + fileList[fileIdx], {encoding: 'utf8', flag: 'r'});
       var itemRow =  JSON.parse(fileData);
+      
+      if(modelName !== "Analysis"){
+        var proxy = new ItemProxy(modelName, itemRow);        
+      }
+      
       modelStore[itemRow.id] = JSON.stringify(itemRow);
     }
     kdbStore.ids[modelName] = fileList.length;
@@ -191,6 +211,9 @@ console.log(modelConfig);
 console.log("::: Validating Repository Structure")
 validateRepositoryStructure();
 storeJSONDoc(repoDirPath + "/kdbStore.json", kdbStore);
+var rootProxy = ItemProxy.getRootProxy();
+ItemProxy.gatherUnconnectedProxies();
+rootProxy.dumpProxy();
 
 console.log("::: Reading db.json");
 var lbStore = loadJSONDoc("db.json");

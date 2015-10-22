@@ -157,7 +157,7 @@ function AnalysisService(Analysis, ItemRepository) {
 
         proxy.analysis.extendedSummaryList = _.union(_.values(proxy.analysis.extendedChunkSummary), _.values(proxy.analysis.extendedTokenSummary));
 
-        var parentProxy = ItemRepository.getItemProxy(proxy.item.parentId);
+        var parentProxy = ItemRepository.getProxyFor(proxy.item.parentId);
 
         if (parentProxy) {
             console.log("::: Parent found");

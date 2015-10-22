@@ -42,7 +42,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
 
     detailsCtrl.updateParentProxy = function () {
       if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId){
-        detailsCtrl.parentProxy = ItemRepository.getItemProxy(detailsCtrl.itemProxy.item.parentId);          
+        detailsCtrl.parentProxy = ItemRepository.getProxyFor(detailsCtrl.itemProxy.item.parentId);          
       } else {
         detailsCtrl.parentProxy = {};
       }
@@ -56,7 +56,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     }
 
     if (angular.isDefined($stateParams.id)) {
-        detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
+        detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
         detailsCtrl.updateParentProxy();
     } else if (angular.isDefined($stateParams.parentId)) {
         {
@@ -75,7 +75,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
 
 
     $scope.$on('itemRepositoryReady', function () {
-        detailsCtrl.itemProxy = ItemRepository.getItemProxy($stateParams.id);
+        detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
         detailsCtrl.actionStates = ActionService.getActionStates();
         detailsCtrl.issueStates = IssueService.getIssueStates();
@@ -116,10 +116,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         var newItem = new newModel();
         ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
         detailsCtrl.itemProxy.item = newItem;
-//        if(detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'){
-//            detailsCtrl.itemProxy.item.alternatives = [];
-//            detailsCtrl.itemProxy.item.alternatives[0] = {text : ''};
-//        }
     };
 
     detailsCtrl.incrementItemInput = function (type) {

@@ -10,10 +10,10 @@ function DecisionService(ItemRepository, $rootScope){
     service.getDecisionStates = getDecisionStates;
 
     $rootScope.$on('itemRepositoryReady', function () {
-        var root = ItemRepository.getTreeRoot();
-        var stateProxy = ItemRepository.getChildByNameFrom(root, 'State');
-        var decisionProxy = ItemRepository.getChildByNameFrom(stateProxy,'Decision State');
-        states = ItemRepository.getDecendentsOf(decisionProxy);
+        var root = ItemRepository.getRootProxy();
+        var stateProxy = root.getChildByName('State');
+        var decisionProxy = stateProxy.getChildByName('Decision State');
+        states = decisionProxy.getDecendents();
     });
 
     function getDecisionStates(){

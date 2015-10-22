@@ -137,7 +137,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
       return false;
     }
 
-    treeCtrl.treeRoot = ItemRepository.getTreeRoot();
+    treeCtrl.treeRoot = ItemRepository.getRootProxy();
 
     treeCtrl.tab.setTitle('Explore');
 

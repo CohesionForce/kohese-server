@@ -9,10 +9,10 @@ function IssueService(ItemRepository, $rootScope){
     service.getIssueStates = getIssueStates;
 
     $rootScope.$on('itemRepositoryReady', function () {
-        var root = ItemRepository.getTreeRoot();
-        var stateProxy = ItemRepository.getChildByNameFrom(root, 'State');
-        var issueProxy = ItemRepository.getChildByNameFrom(stateProxy,'Issue State');
-        states = ItemRepository.getDecendentsOf(issueProxy);
+        var root = ItemRepository.getRootProxy();
+        var stateProxy = root.getChildByName('State');
+        var issueProxy = stateProxy.getChildByName('Issue State');
+        states = issueProxy.getDecendents();
     });
 
     function getIssueStates(){

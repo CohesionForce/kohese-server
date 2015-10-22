@@ -80,7 +80,7 @@ module.exports = function (Item) {
             notification.model = ctx.Model.modelName;
             notification.ctx = ctx;
         } else {
-            console.log('Deleted %s #%s#', ctx.Model.modelName, ctx.where);
+            console.log('Deleted %s #%s#', ctx.Model.modelName, ctx.where.id);
             var notification = new Object;
             notification.type = 'delete';
             notification.model = ctx.Model.modelName;

@@ -10,8 +10,9 @@ function CategoryService(ItemRepository, $rootScope){
     service.getTagNames = getTagNames;
 
     $rootScope.$on('itemRepositoryReady', function () {
-        var root = ItemRepository.getTreeRoot();
-        users = ItemRepository.getChildByNameFrom(root, 'Users').children;
+        var root = ItemRepository.getRootProxy();
+        //TBD:  Why is this getting Users?
+        users = root.getChildByName('Users').children;
     });
 
     function getTags(){

@@ -11,8 +11,8 @@ function UserService(ItemRepository, $rootScope){
     service.getAllUsers = getAllUsers;
 
     $rootScope.$on('itemRepositoryReady', function () {
-        var root = ItemRepository.getTreeRoot();
-        users = ItemRepository.getChildByNameFrom(root, 'Users').children;
+        var root = ItemRepository.getRootProxy();
+        users = root.getChildByName('Users').children;
     });
 
     function getAllUsers(){
