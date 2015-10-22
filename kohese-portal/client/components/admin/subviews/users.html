@@ -1,66 +1,62 @@
 <div class="admin-screen">
-    <div class="panel">
-        <div class="panel-heading">Admin</div>
-        <div class="panel-body">
-            <div id="admin-user-list">
-                <h2>Users:</h2>
+    <div class="panel-body">
+        <div id="admin-user-list">
+            <h2>Users:</h2>
 
-                <div class="card-container" ng-repeat="user in adminCtrl.users">
-                    <div class="card">
-                        <div class="front">
-                            <div class="title">
-                                {{user.name}}
-                            </div>
-                            <div class="body">
-                                {{user.description}}
-                            </div>
-                            <div class="footer">
-                                Modified on {{user.modifiedOn | date }} by {{user.modifiedBy}}
+            <div class="card-container" ng-repeat="user in adminCtrl.users">
+                <div class="card">
+                    <div class="front">
+                        <div class="title">
+                            {{user.name}}
+                        </div>
+                        <div class="body">
+                            {{user.description}}
+                        </div>
+                        <div class="footer">
+                            Modified on {{user.modifiedOn | date }} by {{user.modifiedBy}}
 
-                            </div>
                         </div>
-                        <div class="back">
-                            <button class="btn btn-primary"
-                                    ng-click="adminCtrl.deleteUser(user)">
-                                <i  class="fa fa-3x fa-trash"></i>
-                                Delete
-                            </button>
-                            <br/>
-                            <button class="btn btn-primary"
-                                    ng-click="adminCtrl.editUser(user)">
-                                <i  class="fa fa-3x fa-edit"></i>
-                                Edit
-                            </button>
-                        </div>
+                    </div>
+                    <div class="back">
+                        <button class="btn btn-primary"
+                                ng-click="adminCtrl.deleteUser(user)">
+                            <i class="fa fa-3x fa-trash"></i>
+                            Delete
+                        </button>
+                        <br/>
+                        <button class="btn btn-primary"
+                                ng-click="adminCtrl.editUser(user)">
+                            <i class="fa fa-3x fa-edit"></i>
+                            Edit
+                        </button>
                     </div>
                 </div>
             </div>
-
         </div>
-        <div id="admin-user-form">
-            <button class="btn btn-default"
-                    ng-click="adminCtrl.addUser();"
-                    ng-if="!adminCtrl.addUserForm && !adminCtrl.editUserForm">Add User
-            </button>
 
-            <div ng-if="adminCtrl.addUserForm || adminCtrl.editUserForm">
+    </div>
+    <div id="admin-user-form">
+        <button class="btn btn-default"
+                ng-click="adminCtrl.addUser();"
+                ng-if="!adminCtrl.addUserForm && !adminCtrl.editUserForm">Add User
+        </button>
 
-                <h3>{{adminCtrl.currentForm}}</h3>
+        <div ng-if="adminCtrl.addUserForm || adminCtrl.editUserForm">
 
-                <form>
-                    <label>Username<input ng-model="adminCtrl.usernameInput" type="text"></label>
-                    <br/>
-                    <label>Description<input ng-model="adminCtrl.descriptionInput" type="text"></label>
-                    <br/>
-                    <label>Password<input ng-model="adminCtrl.passwordInput" type="password"></label>
-                    <br/>
-                    <label>Confirm Password<input ng-model="adminCtrl.confirmPasswordInput" type="password"></label>
-                    <br/>
-                </form>
-                <button class="btn btn-primary" ng-click="adminCtrl.upsertUser()">Submit</button>
-                <button class="btn btn-danger" ng-click="adminCtrl.cancelForm()">Cancel</button>
-            </div>
+            <h3>{{adminCtrl.currentForm}}</h3>
+
+            <form>
+                <label>Username<input ng-model="adminCtrl.usernameInput" type="text"></label>
+                <br/>
+                <label>Description<input ng-model="adminCtrl.descriptionInput" type="text"></label>
+                <br/>
+                <label>Password<input ng-model="adminCtrl.passwordInput" type="password"></label>
+                <br/>
+                <label>Confirm Password<input ng-model="adminCtrl.confirmPasswordInput" type="password"></label>
+                <br/>
+            </form>
+            <button class="btn btn-primary" ng-click="adminCtrl.upsertUser()">Submit</button>
+            <button class="btn btn-danger" ng-click="adminCtrl.cancelForm()">Cancel</button>
         </div>
     </div>
-</div>
 </div>

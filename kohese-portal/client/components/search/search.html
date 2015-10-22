@@ -13,9 +13,10 @@
                 class="search-result card panel panel-default"
                 id="{{itemProxy.item.id}}"
                 ng-repeat="itemProxy in searchCtrl.searchResults = (searchCtrl.itemList | filter: searchCtrl.customFilter)">
-            <div class="panel-title result-title">{{itemProxy.item.name}}</div>
+            <div class="panel-title result-title">{{itemProxy.parentProxy.item.name}} >> {{itemProxy.item.name}}</div>
             <div class="panel-body">
                 <div class="result-description">{{itemProxy.item.description}}</div>
+                <div ng-if="itemProxy.item.parentId">Parent: {{itemProxy.parentProxy.item.name}} </div>
             </div>
             <div class="panel-footer">
                 <span class="last-modified">Last modified: {{itemProxy.item.modifiedOn | date}}</span>
