@@ -14,7 +14,7 @@
            ng-click="detailsCtrl.updateTab('create')"></i></th>
     </thead>
     <tbody>
-    <tr ng-repeat="proxy in filteredItems = (detailsCtrl.itemProxy.children  | filter:detailsCtrl.filterString) | orderBy:itemSortField">
+    <tr ng-repeat="proxy in filteredItems = (detailsCtrl.itemProxy.children  | filter:{item: {$: detailsCtrl.filterString}}) | orderBy:itemSortField">
         <td>{{proxy.kind}} <span ng-if="proxy.kind==='Action'"> {{proxy.item.decisionState}}/{{proxy.item.actionState}} </span></td>
         <td ng-click="detailsCtrl.updateTab('edit', proxy.item.id)"
             ui-sref="kohese.explore.edit({id: proxy.item.id})"

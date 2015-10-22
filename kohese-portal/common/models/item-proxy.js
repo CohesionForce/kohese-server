@@ -58,11 +58,11 @@ function ItemProxy(kind, forItem){
           parent.children = [this];
       }
 
-      tree.parentOf[itemId] = parent;
+      this.parentProxy = tree.parentOf[itemId] = parent;
 
   } else {
       tree.root.children.push(this);
-      tree.parentOf[itemId] = tree.root;
+      this.parentProxy = tree.parentOf[itemId] = tree.root;
   }
 }
 
@@ -173,7 +173,7 @@ function attachToLostAndFound(byId, children) {
   // Make sure parentOf for each child is pointing to this lostProxy
   for (var childIdx in lostProxy.children){
     var child = lostProxy.children[childIdx];
-    tree.parentOf[child.item.id] = lostProxy;
+    child.parentProxy = tree.parentOf[child.item.id] = lostProxy;
   }
 
   if (tree.lostAndFound.children.length === 1) {
@@ -220,6 +220,7 @@ ItemProxy.prototype.deleteItem = function() {
 
   delete tree.proxyMap[byId];
   delete tree.parentOf[byId];
+  this.parentProxy = {}
 
   // If there were children to the node that was deleted, add them to lostAndFound
   if (children.length) {
@@ -288,7 +289,7 @@ ItemProxy.prototype.updateItem = function (modelKind, withItem) {
 
     if (newParentProxy) {
       newParentProxy.children.push(this);
-      tree.parentOf[this.item.id] = newParentProxy;
+      this.parentProxy = tree.parentOf[this.item.id] = newParentProxy;
     } else {
       // Parent not found, so create one
       attachToLostAndFound(newParentId, [ this ]);
