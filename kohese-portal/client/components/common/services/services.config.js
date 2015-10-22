@@ -15,4 +15,5 @@ export default() => {
     require('./kind-services/observation-service')();
     require('./category-services/category-service')();
     require('./user-services/user-service')();
+    require('./search-service')();
 }

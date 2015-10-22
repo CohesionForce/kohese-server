@@ -2,9 +2,11 @@
  * Created by josh on 9/16/15.
  */
 
-function SearchController(ItemRepository, UserService, DecisionService, ActionService, tabService, $state, $scope, $stateParams, $filter) {
+function SearchController(ItemRepository, UserService, DecisionService, ActionService, tabService, SearchService, $state, $scope, $stateParams, $filter) {
     var ctrl = this;
     var tab = tabService.getCurrentTab();
+    var id = tabService.getTabId();
+
 
     ctrl.searchString = tab.params.filter;
     ctrl.itemList = ItemRepository.getAllItemProxies();
@@ -15,18 +17,27 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
 
     ctrl.categories = $filter('categories')(ctrl.itemList);
 
-    console.log(ctrl.categories);
+    for (var index = 0; index < ctrl.itemList.length; index++) {
+        var currentItem = ctrl.itemList[index];
+        currentItem.parentProxy = ItemRepository.getProxyFor(currentItem.item.parentId);
+    }
+
+    console.log(ctrl.itemList);
 
 
     if (!ctrl.searchString) {
         ctrl.searchString = '';
     }
 
-    ctrl.customFilter = {
-        item: {
-            $: ctrl.searchString
-        }
-    };
+    ctrl.customFilter = SearchService.getFilterObject(id);
+    if (!ctrl.customFilter) {
+        ctrl.customFilter = {
+            item: {
+                $: ctrl.searchString
+            }
+        };
+    }
+
 
     $scope.$on('itemRepositoryReady', function () {
         ctrl.itemList = ItemRepository.getAllItemProxies();
@@ -47,7 +58,7 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
         ctrl.currentItem = $stateParams.id;
     }
 
-    ctrl.resetSearch = function(){
+    ctrl.resetSearch = function () {
         ctrl.customFilter = {
             item: {
                 $: ctrl.searchString
@@ -68,15 +79,20 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
 
     //Filter updates
 
-    ctrl.updateAssignedToFilter = function(selected){
-        if(selected){
+    ctrl.updateAssignedToFilter = function (selected) {
+        if (selected) {
             ctrl.customFilter.item.assignedTo = selected.title;
         }
     };
 
-    ctrl.updateSearchStringFilter = function(){
+    ctrl.updateSearchStringFilter = function () {
         ctrl.customFilter.item.$ = ctrl.searchString;
-    }
+    };
+
+    $scope.$on('$stateChangeStart',
+        function (event, toState, toParams, fromState, fromParams) {
+            SearchService.setFilterObject(ctrl.customFilter, id);
+        })
 
 }
 
@@ -88,6 +104,7 @@ export default () => {
         'app.services.tabservice',
         'app.services.userservice',
         'app.services.actionservice',
-        'app.services.decisionservice'])
+        'app.services.decisionservice',
+        'app.services.searchservice'])
         .controller('SearchController', SearchController)
 }

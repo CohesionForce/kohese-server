@@ -20,6 +20,7 @@ const appModule = angular.module('app', [
     'app.services.tabservice',
     'app.services.authentication',
     'app.services.analysisservice',
+    'app.services.searchservice',
     'app.directives.navigation',
     'app.directives.resizer',
     'app.directives.resizeable',
