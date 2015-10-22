@@ -51,6 +51,7 @@ var importKdb = function() {
       var modelName = dirList[dirIdx];
       if (modelName === "Analysis"){
          console.log("!!! Skipping Analysis");
+         kdb.models["Analysis"] = {};
       } else {
          readModelDir(fs, kdb, modelName);
       }
