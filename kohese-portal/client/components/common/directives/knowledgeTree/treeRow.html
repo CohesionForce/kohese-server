@@ -16,7 +16,7 @@
 			</i>
 			</a> &lt;{{itemProxy.kind}}&gt; <span ng-if="itemProxy.kind==='Action'">&lt;&lt;{{itemProxy.item.decisionState}}/{{itemProxy.item.actionState}}&gt;&gt;</span> <span ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
 				class="kt-label"
-				ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filterString)"
+				ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filter.text)"
 				ng-click="treeCtrl.updateTab('edit', itemProxy.item.id)"></span><span
 				ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
 		</div>
@@ -24,7 +24,7 @@
 			ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
 			ng-dblclick="showDescription=!showDescription"
 			ng-init="showDescription=false"
-			ng-bind-html="itemProxy.item.description | highlight:treeCtrl.filterString">
+			ng-bind-html="itemProxy.item.description | highlight:treeCtrl.filter.text">
 		</div>
 		<div class="kti-cell pull-right">
 			<i class="glyphicon glyphicon-remove  pull-right"

@@ -7,10 +7,13 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     var treeCtrl = this,
         syncListener;
 
-    treeCtrl.filterString = "";
-    treeCtrl.kindFilter = "";
-    treeCtrl.actionStateFilter = "";
-    treeCtrl.actionAssigneeFilter = "";
+    treeCtrl.filter = {
+        text: "",
+        kind: "",
+        actionState: "",
+        actionAssignee: ""
+    }
+    
     treeCtrl.kindList = ItemRepository.modelTypes;
     treeCtrl.actionStates = {};
     treeCtrl.userList = {};
@@ -28,28 +31,28 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
       treeCtrl.userList = UserService.getAllUsers();
   });
 
-    $scope.$watch('treeCtrl.filterString', function(){
+    $scope.$watch('treeCtrl.filter.text', function(){
       postDigest(function(){
         // Force one more update cycle to get the match count to display
         $scope.$apply();        
       });
     });
     
-    $scope.$watch('treeCtrl.kindFilter', function(){
+    $scope.$watch('treeCtrl.filter.kind', function(){
       postDigest(function(){
         // Force one more update cycle to get the match count to display
         $scope.$apply();        
       });
     });
     
-    $scope.$watch('treeCtrl.actionStateFilter', function(){
+    $scope.$watch('treeCtrl.filter.actionState', function(){
       postDigest(function(){
         // Force one more update cycle to get the match count to display
         $scope.$apply();        
       });
     });
     
-    $scope.$watch('treeCtrl.actionAssigneeFilter', function(){
+    $scope.$watch('treeCtrl.filter.actionAssignee', function(){
       postDigest(function(){
         // Force one more update cycle to get the match count to display
         $scope.$apply();        
@@ -98,24 +101,24 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     }
 
     treeCtrl.matchesFilter = function (proxy){
-      if (!treeCtrl.filterString && !treeCtrl.kindFilter) {
+      if (!treeCtrl.filter.text && !treeCtrl.filter.kind) {
         return true;
       } else {
-        if(treeCtrl.kindFilter){
-          if (proxy.kind !== treeCtrl.kindFilter){
+        if(treeCtrl.filter.kind){
+          if (proxy.kind !== treeCtrl.filter.kind){
             return false;
           }
-          if (treeCtrl.actionStateFilter && proxy.item.actionState !== treeCtrl.actionStateFilter){
+          if (treeCtrl.filter.actionState && proxy.item.actionState !== treeCtrl.filter.actionState){
             return false;
           }
-          if (treeCtrl.actionAssigneeFilter && proxy.item.assignedTo !== treeCtrl.actionAssigneeFilter){
+          if (treeCtrl.filter.actionAssignee && proxy.item.assignedTo !== treeCtrl.filter.actionAssignee){
             return false;
           }
-          if (!treeCtrl.filterString){
+          if (!treeCtrl.filter.text){
             return true;
           }
         }
-        var lcFilter = treeCtrl.filterString.toLowerCase();
+        var lcFilter = treeCtrl.filter.text.toLowerCase();
         for (var key in proxy.item){
           if((key.charAt(0) !== '$') && getTypeForFilter(proxy.item[key]) === 'string' && proxy.item[key].toLowerCase().indexOf(lcFilter) !== -1){
             return true;
@@ -140,10 +143,6 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     treeCtrl.treeRoot = ItemRepository.getRootProxy();
 
     treeCtrl.tab.setTitle('Explore');
-
-    $scope.$on('newFilterString', function onNewFilterString(event, string) {
-        treeCtrl.filterString = string;
-    });
 
     $scope.$on('tabSelected', function () {
         treeCtrl.tab = tabService.getCurrentTab();

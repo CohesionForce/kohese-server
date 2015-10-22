@@ -13,34 +13,34 @@
 		    <label class="control-label" for="Kind"> Kind </label>
 		    <span class="controls">
                 <select id="Kind"
-                        ng-model="treeCtrl.kindFilter">
+                        ng-model="treeCtrl.filter.kind">
                     <option></option>    
                     <option ng-repeat="kind in treeCtrl.kindList">{{kind.modelName}}</option>
                  </select>
             </span>
 	    </span>
-	    <span ng-if="treeCtrl.kindFilter === 'Action'" class="control-group">
+	    <span ng-if="treeCtrl.filter.kind === 'Action'" class="control-group">
 		    <label class="control-label" for="ActionState"> State </label>
 		    <span class="controls">
                 <select id="Kind"
-                        ng-model="treeCtrl.actionStateFilter">
+                        ng-model="treeCtrl.filter.actionState">
                     <option></option>    
                     <option ng-repeat="state in treeCtrl.actionStates">{{state.item.name}}</option>
                  </select>
             </span>
 	    </span>
-	    <span ng-if="treeCtrl.kindFilter === 'Action'" class="control-group">
+	    <span ng-if="treeCtrl.filter.kind === 'Action'" class="control-group">
 		    <label class="control-label" for="Assignee"> Assignee </label>
 		    <span class="controls">
                 <select id="Kind"
-                        ng-model="treeCtrl.actionAssigneeFilter">
+                        ng-model="treeCtrl.filter.actionAssignee">
                     <option></option>    
                     <option ng-repeat="user in treeCtrl.userList">{{user.item.name}}</option>
                  </select>
             </span>
 	    </span>
 	    <input
-		    class="input-sm" type="text" ng-model="treeCtrl.filterString"
+		    class="input-sm" type="text" ng-model="treeCtrl.filter.text"
 		    placeholder="Filter" style="margin: 5px" />
 	</span>
 </div>
