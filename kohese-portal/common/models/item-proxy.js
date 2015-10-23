@@ -137,7 +137,7 @@ ItemProxy.dumpAllProxies = function () {
 //
 //////////////////////////////////////////////////////////////////////////
 ItemProxy.getRootProxy = function () {
-  console.log("::: Getting Root Proxy");
+//  console.log("::: IP: Getting Root Proxy");
   return tree.root;
 }
 
