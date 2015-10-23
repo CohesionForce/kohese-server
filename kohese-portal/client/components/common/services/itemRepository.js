@@ -137,9 +137,6 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ko
         for (var idx = 0; idx < dataList.length; idx++) {
             createItemProxy(dataList[idx]);
         }
-
-        // Gather unconnected nodes into Lost And Found
-        ItemProxy.gatherUnconnectedProxies();
     }
 
 }

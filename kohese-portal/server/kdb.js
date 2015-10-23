@@ -212,7 +212,6 @@ console.log("::: Validating Repository Structure")
 validateRepositoryStructure();
 storeJSONDoc(repoDirPath + "/kdbStore.json", kdbStore);
 var rootProxy = ItemProxy.getRootProxy();
-ItemProxy.gatherUnconnectedProxies();
 rootProxy.dumpProxy();
 
 console.log("::: Reading db.json");

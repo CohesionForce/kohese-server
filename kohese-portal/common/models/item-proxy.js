@@ -24,54 +24,93 @@ tree.lostAndFound = new ItemProxy("Internal",{
 //////////////////////////////////////////////////////////////////////////
 function ItemProxy(kind, forItem){
   var itemId = forItem.id;
-  this.children = [];
-  this.kind = kind;
-  this.item = forItem;
   
-//  console.log("::: IP:  Creating new proxy for " + this.item.id + " - " + this.item.name);
-  
-  if (tree.proxyMap[itemId]) {
-      // Some forward declaration occurred, so copy the existing data
-      this.children = tree.proxyMap[itemId].children;
+  var proxy = tree.proxyMap[itemId];
+  if (!proxy) {
+//  console.log("::: IP:  Creating " + forItem.id + " - " + forItem.name + " - " + kind);
+    proxy = this;
+    proxy.children = [];
+    tree.proxyMap[itemId] = proxy;
   }
-  tree.proxyMap[itemId] = this;
-  
-  if (kind === "Internal" || kind === "Placeholder"){
+
+  proxy.kind = kind;
+  proxy.item = forItem;
+
+  if (kind === "Internal"){
     // Don't continue
-    return;
+    return proxy;
   };
   
-  var parent = {};
-  var parentId = this.item.parentId;
+  var parentId = proxy.item.parentId || "ROOT";
 
-  if (parentId) {
-      if (tree.proxyMap[parentId]) {
-          parent = tree.proxyMap[parentId];
-      } else {
-          // Create the parent before it is found
-          parent = new ItemProxy("Placeholder",{id:parentId});
-      }
-
-      if (parent.children) {
-          parent.children.push(this);
-      } else {
-          parent.children = [this];
-      }
-
-      this.parentProxy = tree.parentOf[itemId] = parent;
-
-  } else {
-      tree.root.children.push(this);
-      this.parentProxy = tree.parentOf[itemId] = tree.root;
+  var parent = tree.proxyMap[parentId];
+  
+  if (!parent){
+    // Create the parent before it is found
+    parent = createMissingProxy(parentId);    
   }
+  
+  parent.addChild(proxy);
+  
+  return proxy;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function createMissingProxy(forId) {
+  var lostProxy = new ItemProxy("Internal-Lost", {
+    id : forId,
+    name : "Lost Item: " + forId,
+    description : "Found children nodes referencing this node as a parent.",
+    parentId : "LOST+FOUND"
+  });
+  
+  return lostProxy;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
 ItemProxy.prototype.addChild = function (childProxy){
-  console.log("::: IP:  Adding child " + childProxy.item.name + " to " + this.item.name);
+  if (childProxy.parentProxy == this){
+//    console.log("::: IP:  Child " + childProxy.item.name + " already associated with " + this.item.name);
+    return;
+  }
+//  console.log("::: IP:  Adding child " + childProxy.item.name + " to " + this.item.name);
+  // Determine if this node is already attached to another parent
+  if (childProxy.parentProxy){
+    childProxy.parentProxy.removeChild(childProxy);
+  }
+
   this.children.push(childProxy);
+  childProxy.parentProxy = tree.parentOf[childProxy.item.id] = this;
+  
+  if (this == tree.lostAndFound && tree.lostAndFound.children.length === 1){
+    tree.root.addChild(tree.lostAndFound);    
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+ItemProxy.prototype.removeChild = function (proxy){
+//  console.log("::: IP:  Removing child " + proxy.item.name + " from " + this.item.name);
+  this.children = _.reject(this.children,
+      function(childProxy) {
+    return childProxy.item.id === proxy.item.id;
+  });;
+
+  delete proxy.parentProxy;
+  
+  if (this == tree.lostAndFound && tree.lostAndFound.children.length === 0){
+    tree.root.removeChild(tree.lostAndFound);    
+  }
+
+  if (this.kind === "Internal-Lost" && this.children.length === 0){
+    this.deleteItem();
+  }
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -79,7 +118,7 @@ ItemProxy.prototype.addChild = function (childProxy){
 //////////////////////////////////////////////////////////////////////////
 ItemProxy.getProxyFor = function (id){
   
-  console.log("::: IP:  Getting proxy for " + id);
+//  console.log("::: IP:  Getting proxy for " + id);
   return tree.proxyMap[id];
   
 }
@@ -90,7 +129,7 @@ ItemProxy.getProxyFor = function (id){
 ItemProxy.dumpAllProxies = function () {
   for(var proxyId in tree.proxyMap){
     var proxy = tree.proxyMap[proxyId];
-    console.log("::: Dumping " + proxy.item.id + " - " + proxy.item.name);
+    console.log("::: Dumping " + proxy.item.id + " - " + proxy.item.name + " - " + proxy.kind);
   }
 }
 
@@ -147,7 +186,7 @@ ItemProxy.prototype.dumpProxy = function(indent) {
     childIndent = "| " + thisIndent;
   }
   
-  console.log ("=== " + thisIndent + this.item.id + " - " + this.kind + " - " + this.item.name);
+  console.log ("=== " + thisIndent + this.item.id + " - " + this.item.name + " - " + this.kind );
   
   for(var childIdx in this.children){
     var childProxy = this.children[childIdx];
@@ -158,74 +197,24 @@ ItemProxy.prototype.dumpProxy = function(indent) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function attachToLostAndFound(byId, children) {
-  console.log("!!! Attaching " + byId);
-  var lostProxy = tree.proxyMap[byId];
-  lostProxy = new ItemProxy("Internal-Lost", {
-    id : byId,
-    name : "Lost Item: " + byId,
-    description : "Found children nodes referencing this node as a parent.",
-    parentId : "LOST+FOUND"
-  });
-
-  lostProxy.children = children;
-  
-  // Make sure parentOf for each child is pointing to this lostProxy
-  for (var childIdx in lostProxy.children){
-    var child = lostProxy.children[childIdx];
-    child.parentProxy = tree.parentOf[child.item.id] = lostProxy;
-  }
-
-  if (tree.lostAndFound.children.length === 1) {
-      // This is the first child on lostAndFound, so make the node available
-      console.log("!!! Adding lostAndFound ");
-      tree.root.children.push(tree.lostAndFound);
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
 ItemProxy.prototype.deleteItem = function() {
   var byId = this.item.id;
-  var parentProxy = tree.proxyMap[this.item.parentId];
-  var children = this.children;
 
   console.log("::: Deleting proxy for " + byId);
 
-  if (!this.item.parentId){
-    parentProxy = tree.root;
+  if (this.parentProxy){
+    this.parentProxy.removeChild(this);    
   }
-  if (parentProxy) {
-      parentProxy.children = _.reject(parentProxy.children, function (childProxy) {
-          return childProxy.item.id === byId;
-      });
-
-      // Determine if the old parent was in LostAndFound
-      if (parentProxy && (parentProxy.item.parentId === "LOST+FOUND")) {
-        if (parentProxy.children.length == 0) {
-          // All unallocated children have been moved or deleted
-          parentProxy.deleteItem();
-          if (tree.lostAndFound.children.length === 0) {
-            // This is the last child on lostAndFound, so make the node
-            // unavailable
-            tree.root.children = _.reject(tree.root.children,
-                function(childProxy) {
-                  return childProxy.item.id === tree.lostAndFound.item.id;
-                });
-          }
-        }
-      }
+  
+  if (this.children.length !== 0){
+    console.log("::: -> Node still has children");
+    createMissingProxy(byId);
+  } else {
+    console.log("::: -> Removing all references");
+    delete tree.proxyMap[byId];
+    delete tree.parentOf[byId];    
   }
 
-  delete tree.proxyMap[byId];
-  delete tree.parentOf[byId];
-  this.parentProxy = {}
-
-  // If there were children to the node that was deleted, add them to lostAndFound
-  if (children.length) {
-      attachToLostAndFound(byId, children);
-  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -239,6 +228,17 @@ function copyAttributes(fromItem, toItem) {
           console.log("!!! Updating " + key);
           toItem[key] = fromItem[key];
       }
+  }
+  // Check for unexpected values
+  for (var key in toItem) {
+    if (key !== "__deletedProperty" && toItem.hasOwnProperty(key) && (key.charAt(0) !== '$') && !fromItem.hasOwnProperty(key)) {
+      console.log("!!! Deleted Property: " + key);
+      if (!toItem.__deletedProperty){
+        toItem.__deletedProperty = {};
+      }
+      toItem.__deletedProperty[key] = toItem[key];
+      delete toItem[key];
+    }    
   }
 }
 
@@ -261,69 +261,29 @@ ItemProxy.prototype.updateItem = function (modelKind, withItem) {
   copyAttributes(withItem, this.item);
 
   // Determine if the parent changed
-  var parentProxy = tree.parentOf[this.item.id];
   var oldParentId = "";
-  if (parentProxy) {
-    oldParentId = parentProxy.item.id;
+  if (this.parentProxy) {
+    oldParentId = this.parentProxy.item.id;
   }
 
   var newParentId = withItem.parentId;
   console.log("::: Eval Parent Id old: " + oldParentId + " new: " + newParentId)
   if (oldParentId !== newParentId) {
     console.log("::: Parent Id changed from " + oldParentId + " to " + newParentId)
-    if (parentProxy) {
-      var byId = this.item.id;
-      parentProxy.children = _.reject(parentProxy.children,
-          function(childProxy) {
-            return childProxy.item.id === byId;
-          });
-    }
 
     var newParentProxy;
-
     if (newParentId === "") {
       newParentProxy = tree.root;
     } else {
       newParentProxy = tree.proxyMap[newParentId];
     }
 
-    if (newParentProxy) {
-      newParentProxy.children.push(this);
-      this.parentProxy = tree.parentOf[this.item.id] = newParentProxy;
-    } else {
-      // Parent not found, so create one
-      attachToLostAndFound(newParentId, [ this ]);
+    if (!newParentProxy) {
+      newParentProxy = createMissingProxy(newParentId);
     }
-
-    // Determine if the old parent was in LostAndFound
-    if (parentProxy && (parentProxy.item.parentId === "LOST+FOUND")) {
-      if (parentProxy.children.length == 0) {
-        // All unallocated children have been moved or deleted
-        parentProxy.deleteItem();
-        if (tree.lostAndFound.children.length === 0) {
-          // This is the last child on lostAndFound, so make the node
-          // unavailable
-          tree.root.children = _.reject(tree.root.children,
-              function(childProxy) {
-                return childProxy.item.id === tree.lostAndFound.item.id;
-              });
-        }
-      }
-    }
+    
+    newParentProxy.addChild(this);
   }
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function gatherUnconnectedProxies() {
-  // Gather unconnected nodes into Lost And Found
-  for (var id in tree.proxyMap) {
-      if (tree.proxyMap[id].kind == "Placeholder") {
-          console.log("!!! IP:  Gathering lostAndFound:  " + id);
-          attachToLostAndFound(id, tree.proxyMap[id].children);
-      }
-  }  
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -345,5 +305,3 @@ module.exports.getRootProxy = ItemProxy.getRootProxy;
 module.exports.getProxyFor = ItemProxy.getProxyFor;
 module.exports.getAllItemProxies = ItemProxy.getAllItemProxies;
 module.exports.dumpAllProxies = ItemProxy.dumpAllProxies;
-
-module.exports.gatherUnconnectedProxies = gatherUnconnectedProxies;
