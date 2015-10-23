@@ -6,7 +6,6 @@ var _ = require('underscore');
 
 var tree = {};
 tree.proxyMap = {};
-tree.parentOf = {};
 
 tree.root = new ItemProxy("Internal",{
   id: "ROOT", 
@@ -84,7 +83,7 @@ ItemProxy.prototype.addChild = function (childProxy){
   }
 
   this.children.push(childProxy);
-  childProxy.parentProxy = tree.parentOf[childProxy.item.id] = this;
+  childProxy.parentProxy = this;
   
   if (this == tree.lostAndFound && tree.lostAndFound.children.length === 1){
     tree.root.addChild(tree.lostAndFound);    
@@ -212,7 +211,6 @@ ItemProxy.prototype.deleteItem = function() {
   } else {
     console.log("::: -> Removing all references");
     delete tree.proxyMap[byId];
-    delete tree.parentOf[byId];    
   }
 
 }
