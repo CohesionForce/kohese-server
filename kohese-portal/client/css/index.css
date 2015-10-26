@@ -350,6 +350,10 @@ table td .glyphicon-remove {
 .tab-pane .form-actions {
   margin-left: 20px; }
 
+.active-state {
+  background-color: #64be95;
+  color: white; }
+
 .angucomplete-holder ::-webkit-input-placeholder {
   /* WebKit, Blink, Edge */
   color: black; }
