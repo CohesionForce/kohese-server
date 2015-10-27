@@ -67,7 +67,12 @@ function storeModelInstance(modelName, modelInstance){
       proxy.updateItem(modelName, strippedInstance);
     } else {
       proxy = new ItemProxy(modelName, strippedInstance);
-    }    
+    }
+    // Delete any associated analysis
+    var analysisStore = kdbStore.models["Analysis"];
+    if(analysisStore[modelInstance.id]){
+      removeModelInstance("Analysis", modelInstance.id);
+    }
   }
 
   var modelStore = kdbStore.models[modelName];
@@ -83,9 +88,17 @@ function removeModelInstance(modelName, instanceId){
   var filePath = exportDirPath + "/" + modelName + "/" + instanceId + ".json";
   console.log("::: Removing " + filePath);
   fs.unlinkSync(filePath);
-  
-  var proxy = ItemProxy.getProxyFor(instanceId);
-  proxy.deleteItem();
+
+  if(modelName !== "Analysis"){
+    var proxy = ItemProxy.getProxyFor(instanceId);
+    proxy.deleteItem();
+    
+    // Delete any associated analysis
+    var analysisStore = kdbStore.models["Analysis"];
+    if(analysisStore[instanceId]){
+      removeModelInstance("Analysis", instanceId);
+    }
+  }
   
   var modelStore = kdbStore.models[modelName];
   delete modelStore[instanceId];
