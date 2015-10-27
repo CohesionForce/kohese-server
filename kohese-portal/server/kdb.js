@@ -61,11 +61,18 @@ function storeModelInstance(modelName, modelInstance){
   
   var strippedInstance = JSON.parse(JSON.stringify(modelInstance));
   
-  var proxy = ItemProxy.getProxyFor(modelInstance.id);
-  if (proxy){
-    proxy.updateItem(modelName, strippedInstance);
-  } else {
-    proxy = new ItemProxy(modelName, strippedInstance);
+  if(modelName !== "Analysis"){
+    var proxy = ItemProxy.getProxyFor(modelInstance.id);
+    if (proxy){
+      proxy.updateItem(modelName, strippedInstance);
+    } else {
+      proxy = new ItemProxy(modelName, strippedInstance);
+    }
+    // Delete any associated analysis
+    var analysisStore = kdbStore.models["Analysis"];
+    if(analysisStore[modelInstance.id]){
+      removeModelInstance("Analysis", modelInstance.id);
+    }
   }
 
   var modelStore = kdbStore.models[modelName];
@@ -81,9 +88,17 @@ function removeModelInstance(modelName, instanceId){
   var filePath = exportDirPath + "/" + modelName + "/" + instanceId + ".json";
   console.log("::: Removing " + filePath);
   fs.unlinkSync(filePath);
-  
-  var proxy = ItemProxy.getProxyFor(instanceId);
-  proxy.deleteItem();
+
+  if(modelName !== "Analysis"){
+    var proxy = ItemProxy.getProxyFor(instanceId);
+    proxy.deleteItem();
+    
+    // Delete any associated analysis
+    var analysisStore = kdbStore.models["Analysis"];
+    if(analysisStore[instanceId]){
+      removeModelInstance("Analysis", instanceId);
+    }
+  }
   
   var modelStore = kdbStore.models[modelName];
   delete modelStore[instanceId];
@@ -212,7 +227,7 @@ console.log("::: Validating Repository Structure")
 validateRepositoryStructure();
 storeJSONDoc(repoDirPath + "/kdbStore.json", kdbStore);
 var rootProxy = ItemProxy.getRootProxy();
-rootProxy.dumpProxy();
+//rootProxy.dumpProxy();
 
 console.log("::: Reading db.json");
 var lbStore = loadJSONDoc("db.json");

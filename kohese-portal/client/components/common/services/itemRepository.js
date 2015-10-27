@@ -86,6 +86,10 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ko
         
         if (proxy) {
           proxy.updateItem(withResults.constructor.modelName, withResults);
+          if (proxy.analysis){
+            // delete the analysis in case some of the requisite data was updated
+            delete proxy.analysis;
+          }
         } else {
           proxy = new ItemProxy(withResults.constructor.modelName, withResults);
         }
