@@ -61,11 +61,13 @@ function storeModelInstance(modelName, modelInstance){
   
   var strippedInstance = JSON.parse(JSON.stringify(modelInstance));
   
-  var proxy = ItemProxy.getProxyFor(modelInstance.id);
-  if (proxy){
-    proxy.updateItem(modelName, strippedInstance);
-  } else {
-    proxy = new ItemProxy(modelName, strippedInstance);
+  if(modelName !== "Analysis"){
+    var proxy = ItemProxy.getProxyFor(modelInstance.id);
+    if (proxy){
+      proxy.updateItem(modelName, strippedInstance);
+    } else {
+      proxy = new ItemProxy(modelName, strippedInstance);
+    }    
   }
 
   var modelStore = kdbStore.models[modelName];
@@ -212,7 +214,7 @@ console.log("::: Validating Repository Structure")
 validateRepositoryStructure();
 storeJSONDoc(repoDirPath + "/kdbStore.json", kdbStore);
 var rootProxy = ItemProxy.getRootProxy();
-rootProxy.dumpProxy();
+//rootProxy.dumpProxy();
 
 console.log("::: Reading db.json");
 var lbStore = loadJSONDoc("db.json");
