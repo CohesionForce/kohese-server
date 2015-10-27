@@ -10,6 +10,7 @@ const appModule = angular.module('app', [
     'app.login',
     'app.navigationmenu',
     'app.search',
+    'app.dashboard',
     'app.services.itemservice',
     'app.services.decisionservice',
     'app.services.actionservice',
@@ -50,6 +51,11 @@ appModule
                 url: '',
                 templateUrl: '/components/contentcontainer/contentcontainer.html',
                 abstract: true
+            })
+            .state('kohese.dashboard',{
+                url: '/dashboard',
+                templateUrl: '/components/dashboard/dashboard.html',
+                controller: 'DashboardController as dashCtrl'
             })
             .state('kohese.explore', {
                 url: '/explore',
@@ -136,7 +142,7 @@ appModule
                 controller: 'AdminController as adminCtrl'
             });
 
-        $urlRouterProvider.otherwise('/explore')
+        $urlRouterProvider.otherwise('/dashboard')
     })
     .filter('highlight', function ($sce) {
         return function (text, phrase) {

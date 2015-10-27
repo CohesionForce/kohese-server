@@ -460,7 +460,8 @@ table td .glyphicon-remove {
     color: white;
     cursor: pointer; }
     .navbar .navbar-brand:hover {
-      color: white; }
+      color: white;
+      background-color: #7dd7ae; }
   .navbar .navbar-top-links {
     margin-right: 0; }
     .navbar .navbar-top-links .dropdown > a:hover {
@@ -678,5 +679,24 @@ table td .glyphicon-remove {
     color: whitesmoke; }
   .filter-wizard .panel-body {
     padding: 5px; }
+
+.assignment-accordion {
+  position: absolute;
+  right: 0;
+  width: 50%; }
+  .assignment-accordion .assignment {
+    background-color: #005A31;
+    color: white;
+    padding: 5px;
+    border: 1px solid #7dd7ae; }
+    .assignment-accordion .assignment:hover {
+      cursor: pointer; }
+
+.dashboard-navigation {
+  position: absolute;
+  left: 0;
+  width: 50%; }
+  .dashboard-navigation button {
+    margin: 5px; }
 
 /*# sourceMappingURL=index.css.map */

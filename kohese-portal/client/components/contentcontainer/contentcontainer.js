@@ -9,7 +9,7 @@ function ContainerController(tabService, $scope, $state) {
 
     var Tab = function (state, params, type) {
         var tab = this;
-        tab.title = 'Explore';
+        tab.title = 'Kohese';
         tab.scope = {};
         tab.content = {};
         console.log(type);
@@ -23,13 +23,13 @@ function ContainerController(tabService, $scope, $state) {
         if (state) {
             tab.state = state;
         } else {
-            tab.state = 'kohese.explore';
+            tab.state = 'kohese.dashboard';
         }
 
         if (type){
             tab.type = type;
         } else {
-            tab.type = 'dualview';
+            tab.type = 'singleview';
         }
 
         tab.setType = function (type) {
@@ -78,12 +78,12 @@ function ContainerController(tabService, $scope, $state) {
         console.log(data);
         let newTab = createTab(data.state, data.params, data.type);
         containerCtrl.setTab(newTab);
-        $state.go(newTab.state);
+        $state.go(newTab.state, newTab.params);
     });
 
 
     //Will need refactoring to account for refreshing the page at some point
-    containerCtrl.baseTab = new Tab();
+    containerCtrl.baseTab = new Tab('kohese.dashboard', {}, 'singleview');
     containerCtrl.tabs = [containerCtrl.baseTab];
     containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
 

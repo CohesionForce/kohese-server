@@ -2,7 +2,8 @@
  * Created by josh on 7/13/15.
  */
 
-function TreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $scope, $location, SearchService, tabService) {
+function TreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $scope, $location,
+                        $stateParams,SearchService, tabService) {
 
     var treeCtrl = this,
         syncListener;

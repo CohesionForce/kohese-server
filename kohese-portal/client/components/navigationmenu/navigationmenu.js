@@ -13,7 +13,8 @@ function NavigationController($rootScope, $scope, AuthTokenFactory, tabService) 
             state: 'kohese.search',
             params: {
                 filter: searchString
-            }
+            },
+            type: 'dualview'
         });
         ctrl.toggleSideBar();
     };

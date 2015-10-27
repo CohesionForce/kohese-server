@@ -1,0 +1,26 @@
+@import '../utils/variables';
+
+.assignment-accordion {
+  position: absolute;
+  right: 0;
+  width: 50%;
+
+  .assignment {
+    background-color: $primaryColor;
+    color: white;
+    padding: 5px;
+    border: 1px solid $buttonAccentColor;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.dashboard-navigation {
+  position: absolute;
+  left:0;
+  width: 50%;
+  button {
+    margin: 5px;
+  }
+}

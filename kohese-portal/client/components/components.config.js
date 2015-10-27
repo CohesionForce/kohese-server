@@ -13,6 +13,7 @@ export default () => {
     require('./login/login')();
     require('./search/search')();
     require('./admin/admin')();
+    require('./dashboard/dashboard')();
 
     //Common
 

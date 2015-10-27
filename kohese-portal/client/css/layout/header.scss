@@ -16,6 +16,8 @@
     cursor: pointer;
     &:hover {
       color: white;
+      background-color: $buttonAccentColor;
+
     }
   }
 

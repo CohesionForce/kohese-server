@@ -1,0 +1,53 @@
+<div>
+    <div class="text-center">
+        <h2>
+            Hello {{dashCtrl.currentUser}}
+        </h2>
+    </div>
+    <div class="dashboard-navigation">
+        <button ng-click="dashCtrl.navigate('kohese.explore', {}, 'dualview')"
+                class="btn btn-primary">Explore
+        </button>
+        <br>
+        <button ng-click="dashCtrl.navigate('kohese.search', {}, 'dualview')"
+                class="btn btn-primary">Search
+        </button>
+    </div>
+
+    <div class="text-right assignment-accordion">
+        <accordion>
+            <accordion-group heading="Assigned ({{dashCtrl.assignedItems.length}})">
+                <div class="panel-body"
+                     ng-repeat="itemProxy in dashCtrl.assignedItems = (dashCtrl.itemList | filter: dashCtrl.assignedFilter)">
+                    <span ng-click="dashCtrl.navigate('kohese.explore.edit', { id: itemProxy.item.id}, 'dualview')"
+                          class="assignment">
+                        {{itemProxy.item.name}} </span>
+                </div>
+            </accordion-group>
+            <accordion-group heading="Accepted ({{dashCtrl.acceptedItems.length}})">
+                <div class="panel-body"
+                     ng-repeat="itemProxy in dashCtrl.acceptedItems =(dashCtrl.itemList | filter: dashCtrl.acceptedFilter)">
+                    <span ng-click="dashCtrl.navigate('kohese.explore.edit', { id: itemProxy.item.id}, 'dualview')"
+                          class="assignment">
+                        {{itemProxy.item.name}} </span>
+                </div>
+            </accordion-group>
+            <accordion-group heading="In Work ({{dashCtrl.inWorkItems.length}})">
+                <div class="panel-body"
+                     ng-repeat=" itemProxy in dashCtrl.inWorkItems=(dashCtrl.itemList | filter: dashCtrl.inWorkFilter)">
+                    <span ng-click="dashCtrl.navigate('kohese.explore.edit', { id: itemProxy.item.id}, 'dualview')"
+                          class="assignment">
+                        {{itemProxy.item.name}} </span>
+                </div>
+            </accordion-group>
+            <accordion-group heading="In Verification ({{dashCtrl.inVerificationItems.length}})">
+                <div class="panel-body"
+                     ng-repeat="itemProxy in dashCtrl.inVerificationItems = (dashCtrl.itemList | filter: dashCtrl.inVerificationFilter)">
+                    <span ng-click="dashCtrl.navigate('kohese.explore.edit', { id: itemProxy.item.id}, 'dualview')"
+                          class="assignment">
+                        {{itemProxy.item.name}} </span>
+                </div>
+            </accordion-group>
+    </div>
+</div>
+
