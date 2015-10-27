@@ -16,7 +16,12 @@
         <tabset>
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active">
                 <tab-heading>Overview <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
-                <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+                <div ng-if="detailsCtrl.itemProxy.kind ==='Action'">
+                    <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
+                </div>
+                <div ng-if="detailsCtrl.itemProxy.kind != 'Action'">
+                    <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+                </div>
             </tab>
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Observation'">
                 <tab-heading>Observation</tab-heading>
@@ -31,10 +36,6 @@
                 <tab-heading>Decision <span ng-show="detailsCtrl.decisionForm.$dirty">(*)</span></tab-heading>
                 <ng-include src="'components/common/templates/decision-form.html'"></ng-include>
             </tab>
-            <tab ng-if="detailsCtrl.itemProxy.kind === 'Action'">
-                <tab-heading>Action <span ng-show="detailsCtrl.actionForm.$dirty">(*)</span></tab-heading>
-                <ng-include src="'components/common/templates/action-form.html'"></ng-include>
-            </tab>
             <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">
                 <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
             </tab>
@@ -48,8 +49,10 @@
 		            <label class=control-label" for="posFilter">
                         POS Filter:
                         <select id="posFilter"
-                                ng-model="detailsCtrl.analysisPOSFilterName" >
-                            <option ng-repeat="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">{{filterCriteria}}</option>
+                                ng-model="detailsCtrl.analysisPOSFilterName">
+                            <option ng-repeat="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">
+                                {{filterCriteria}}
+                            </option>
                         </select>
                     </label>
 		            
@@ -71,10 +74,10 @@
                 <table
                         class="table tree-grid table-striped table-condensed table-hover">
                     <thead>
-                        <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
-                        <th>Type</th>
-                        <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
-                        <th>POS Count</th>
+                    <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
+                    <th>Type</th>
+                    <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
+                    <th>POS Count</th>
                     </thead>
                     <tbody>
                     <tr class="tree-grid-row" id="Chunk:{{summary.text}}"

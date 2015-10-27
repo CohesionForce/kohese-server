@@ -17,6 +17,10 @@
   .form-actions {
     margin-left: 20px;
   }
+}
 
+.active-state {
+  background-color: $primaryColor + 100;
+  color: white;
 }
 
