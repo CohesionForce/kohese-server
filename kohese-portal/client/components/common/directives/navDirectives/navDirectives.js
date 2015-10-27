@@ -2,21 +2,11 @@
  * Created by josh on 6/17/15.
  */
 
-function AppBarController(AuthTokenFactory, $rootScope, tabService, $scope, $state, jwtHelper) {
+function AppBarController(AuthTokenFactory, $rootScope, UserService, $state, jwtHelper) {
     var ctrl = this;
     ctrl.userName = {};
     checkAuthentication();
-
-    $scope.$on('userLoggedIn', function onUserLogin() {
-        ctrl.userLoggedIn = true;
-        ctrl.userName = jwtHelper.decodeToken(AuthTokenFactory.getToken()).username;
-        console.log(ctrl.userName);
-    });
-
-    $scope.$on('userLoggedOut', function onUserLogout() {
-        ctrl.userLoggedIn = false;
-        ctrl.onLoginScreen = true;
-    });
+    ctrl.userName = UserService.getCurrentUser();
 
     ctrl.navigate = function (state, params, type) {
         console.log(type);
@@ -56,13 +46,12 @@ export default () => {
 
     var app = angular.module('app.directives.navigation', [
         'app.services.authentication',
+        'app.services.userservice',
         'app.services.tabservice',
         'angular-jwt']);
-
 
     app
         .directive('appBar', AppBar)
         .controller('AppBarController', AppBarController);
-
 
 };

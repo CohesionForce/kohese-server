@@ -16,7 +16,7 @@
         <tabset>
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active">
                 <tab-heading>Overview <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
-                <div ng-if="detailsCtrl.itemProxy.kind ='Action'">
+                <div ng-if="detailsCtrl.itemProxy.kind ==='Action'">
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>
                 <div ng-if="detailsCtrl.itemProxy.kind != 'Action'">
@@ -140,9 +140,6 @@
                 <h4>Journal Tab</h4>
 
                 <p><b>This tab is under construction.</b></p>
-            </tab>
-            <tab heading="New Action Template">
-                <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
             </tab>
         </tabset>
     </div>
