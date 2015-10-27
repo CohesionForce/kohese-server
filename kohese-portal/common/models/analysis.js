@@ -112,6 +112,16 @@ module.exports = function(Analysis) {
     ctx.res.status(ctx.error.http_code).end(ctx.error.message);
   });
 
+  function addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken){
+    // Create a pseudo chunk to associate this token with
+    var pseudoChunk = JSON.parse(JSON.stringify(nextToken));
+    pseudoChunk.chunkType = "XKPC";
+    delete pseudoChunk.pos;
+    
+    addChunkToSummary(onAnalysis, key, "Pseudo-" + tokenIndex, pseudoChunk);
+    addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);    
+  }
+
   function addChunkToSummary(onAnalysis, key, chunkIndex, nextChunk) {
     nextChunk.displayType = lookup[nextChunk.chunkType] + " ("
         + nextChunk.chunkType + ")";
@@ -203,6 +213,17 @@ module.exports = function(Analysis) {
           }
           while ((chunkIndex < chunkCount) && (nextChunk.end <= sentence.end)) {
 
+            while (nextToken && (nextToken.end < nextChunk.begin)){
+              addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken);
+
+              
+              if (tokenIndex < tokenCount) {
+                nextToken = view.Token[++tokenIndex];
+              } else {
+                nextToken = undefined;
+              }
+            }
+
             addChunkToSummary(onAnalysis, key, chunkIndex, nextChunk);
               
             if (tokenIndex < tokenCount) {
@@ -232,7 +253,7 @@ module.exports = function(Analysis) {
           while ((tokenIndex < tokenCount)
               && (nextToken.end <= sentence.end)) {
 
-            addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);
+            addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken);
             
             // Check for more tokens in this chunk
             if (tokenIndex < tokenCount) {
@@ -307,6 +328,6 @@ module.exports = function(Analysis) {
 
   // Does this (X) really exist?
   lookup.X = "Unknown";
-  lookup.UNCHUNKED = "Unchunked";
+  lookup.XKPC = "Pseudo Chunk";
 
 };
