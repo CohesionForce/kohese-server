@@ -8,7 +8,9 @@
   .assignment {
     background-color: $primaryColor;
     color: white;
-    padding: 5px;
+    margin: 5px;
+    padding: 2px;
+    width: 100%;
     border: 1px solid $buttonAccentColor;
     &:hover {
       cursor: pointer;
