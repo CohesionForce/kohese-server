@@ -19,7 +19,7 @@
             <accordion-group heading="Assigned ({{dashCtrl.assignedItems.length}})">
                 <div class="assignment"
                      ng-repeat="itemProxy in dashCtrl.assignedItems = (dashCtrl.itemList | filter: dashCtrl.assignedFilter)">
-                    <span ng-click="dashCtrl.navigate('kohese.explore.edit', { id: itemProxy.item.id}, 'dualview')"
+                    <span ng-click="dashCtrl.navigate('kohese.investigate', { id: itemProxy.item.id}, 'singleview')"
                           >
                         {{itemProxy.item.name}} </span>
                 </div>
@@ -27,7 +27,7 @@
             <accordion-group heading="Accepted ({{dashCtrl.acceptedItems.length}})">
                 <div class="assignment"
                      ng-repeat="itemProxy in dashCtrl.acceptedItems =(dashCtrl.itemList | filter: dashCtrl.acceptedFilter)">
-                    <span ng-click="dashCtrl.navigate('kohese.explore.edit', { id: itemProxy.item.id}, 'dualview')"
+                    <span ng-click="dashCtrl.navigate('kohese.investigate', { id: itemProxy.item.id}, 'singleview')"
                           >
                         {{itemProxy.item.name}} </span>
                 </div>
@@ -35,7 +35,7 @@
             <accordion-group heading="In Work ({{dashCtrl.inWorkItems.length}})">
                 <div class="assignment"
                      ng-repeat=" itemProxy in dashCtrl.inWorkItems=(dashCtrl.itemList | filter: dashCtrl.inWorkFilter)">
-                    <span ng-click="dashCtrl.navigate('kohese.explore.edit', { id: itemProxy.item.id}, 'dualview')"
+                    <span ng-click="dashCtrl.navigate('kohese.investigate', { id: itemProxy.item.id}, 'singleview')"
                          >
                         {{itemProxy.item.name}} </span>
                 </div>
@@ -43,7 +43,7 @@
             <accordion-group heading="In Verification ({{dashCtrl.inVerificationItems.length}})">
                 <div class="assignment"
                      ng-repeat="itemProxy in dashCtrl.inVerificationItems = (dashCtrl.itemList | filter: dashCtrl.inVerificationFilter)">
-                    <span ng-click="dashCtrl.navigate('kohese.explore.edit', { id: itemProxy.item.id}, 'dualview')"
+                    <span ng-click="dashCtrl.navigate('kohese.investigate', { id: itemProxy.item.id}, 'singleview')"
                          >
                         {{itemProxy.item.name}} </span>
                 </div>
