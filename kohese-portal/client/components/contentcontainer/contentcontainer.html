@@ -8,15 +8,14 @@
                 </tab-heading>
                 <tab-body class="tab-body">
 
-                    <div ng-switch on="tab.type">
-
-                        <div ng-switch-when="dualview">
+                    <!--<div ng-switch on="tab.type">-->
+                        <div ng-if="tab.type === 'dualview'">
                             <div dual-view></div>
                         </div>
-                        <div ng-switch-when="singleview">
+                        <div ng-if="tab.type === 'singleview'">
                             <div single-view></div>
                         </div>
-                    </div>
+                    <!--</div>-->
                 </tab-body>
             </tab>
             <button id="add-tab-button" ng-click="containerCtrl.addTab()" style="height: 40px;">

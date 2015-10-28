@@ -2,7 +2,7 @@
  * Created by josh on 10/7/15.
  */
 
-function DecisionService(ItemRepository, $rootScope){
+function DecisionService(ItemRepository, $rootScope) {
 
     var service = this;
     var states = [];
@@ -17,14 +17,15 @@ function DecisionService(ItemRepository, $rootScope){
     });
 
     var root = ItemRepository.getRootProxy();
-    var stateProxy = root.getChildByName('State');
-    var decisionProxy = stateProxy.getChildByName('Decision State');
-    states = decisionProxy.getDecendents();
-
-    function getDecisionStates(){
-        return states;
+        var stateProxy = root.getChildByName('State');
+    if (stateProxy){
+        var decisionProxy = stateProxy.getChildByName('Decision State');
+        states = decisionProxy.getDecendents();
     }
 
+    function getDecisionStates() {
+        return states;
+    }
 
 
 }

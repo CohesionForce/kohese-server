@@ -2,7 +2,7 @@
  * Created by josh on 7/28/15.
  */
 
-function ContainerController(tabService, $scope, $state) {
+function ContainerController(tabService, $scope, $state, $stateParams) {
     var containerCtrl = this;
 
     containerCtrl.tabService = tabService;
@@ -26,7 +26,7 @@ function ContainerController(tabService, $scope, $state) {
             tab.state = 'kohese.dashboard';
         }
 
-        if (type){
+        if (type) {
             tab.type = type;
         } else {
             tab.type = 'singleview';
@@ -46,7 +46,7 @@ function ContainerController(tabService, $scope, $state) {
             tab.scope = scope;
         };
 
-        tab.setTitle = function (title){
+        tab.setTitle = function (title) {
             tab.title = title;
         };
 
@@ -82,8 +82,30 @@ function ContainerController(tabService, $scope, $state) {
     });
 
 
-    //Will need refactoring to account for refreshing the page at some point
-    containerCtrl.baseTab = new Tab('kohese.dashboard', {}, 'singleview');
+    function createBaseTab() {
+        var currentState = $state.current.name;
+
+        if (currentState === 'kohese.explore') {
+            containerCtrl.baseTab = new Tab('kohese.explore', {}, 'dualview');
+        } else if (currentState === 'kohese.explore.edit') {
+            containerCtrl.baseTab = new Tab('kohese.explore.edit', {id: $stateParams.id}, 'dualview')
+        } else if (currentState === 'kohese.explore.create') {
+            containerCtrl.baseTab = new Tab('kohese.explore.create', {parentId: $stateParams.parentId}, 'dualview')
+        } else if (currentState === 'kohese.search') {
+            containerCtrl.baseTab = new Tab('kohese.search', {id: $stateParams.id}, 'dualview')
+        } else if (currentState === 'kohese.search.edit') {
+            containerCtrl.baseTab = new Tab('kohese.search.edit', {id: $stateParams.id}, 'dualview')
+        } else {
+            containerCtrl.baseTab = new Tab('kohese.dashboard', {}, 'singleview')
+        }
+
+    }
+
+
+    createBaseTab();
+
+//Will need refactoring to account for refreshing the page at some point
+
     containerCtrl.tabs = [containerCtrl.baseTab];
     containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
 
@@ -122,7 +144,6 @@ function ContainerController(tabService, $scope, $state) {
             containerCtrl.tabs[i].position = i;
         }
     }
-
 
 }
 

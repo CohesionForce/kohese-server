@@ -86,10 +86,11 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.issueStates = IssueService.getIssueStates();
         detailsCtrl.categoryTags = CategoryService.getTags();
         detailsCtrl.userList = UserService.getAllUsers();
-        console.log(detailsCtrl.itemProxy);
 
         detailsCtrl.updateParentProxy();
-        configureState();
+        if (detailsCtrl.itemProxy) {
+            configureState();
+        }
     });
 
     $scope.$on('tabSelected', function () {

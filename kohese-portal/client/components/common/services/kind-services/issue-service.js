@@ -1,7 +1,7 @@
 /**
  * Created by josh on 10/16/15.
  */
-function IssueService(ItemRepository, $rootScope){
+function IssueService(ItemRepository, $rootScope) {
 
     var service = this;
     var states = [];
@@ -16,16 +16,15 @@ function IssueService(ItemRepository, $rootScope){
     });
 
     var root = ItemRepository.getRootProxy();
-    var stateProxy = root.getChildByName('State');
-    var issueProxy = stateProxy.getChildByName('Issue State');
-    states = issueProxy.getDecendents();
-
-    function getIssueStates(){
-        return states;
+    if (stateProxy) {
+        var stateProxy = root.getChildByName('State');
+        var issueProxy = stateProxy.getChildByName('Issue State');
+        states = issueProxy.getDecendents();
     }
 
-
-
+    function getIssueStates() {
+        return states;
+    }
 }
 
 export default () => {
