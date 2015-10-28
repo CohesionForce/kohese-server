@@ -16,6 +16,11 @@ function DecisionService(ItemRepository, $rootScope){
         states = decisionProxy.getDecendents();
     });
 
+    var root = ItemRepository.getRootProxy();
+    var stateProxy = root.getChildByName('State');
+    var decisionProxy = stateProxy.getChildByName('Decision State');
+    states = decisionProxy.getDecendents();
+
     function getDecisionStates(){
         return states;
     }
