@@ -255,7 +255,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
             detailsCtrl.itemProxy.item.actionState = state;
         }
         detailsCtrl.currentState = state;
-
+        detailsCtrl.upsertItem();
     };
 
     function configureState() {

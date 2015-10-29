@@ -50,7 +50,9 @@
                         POS Filter:
                         <select id="posFilter"
                                 ng-model="detailsCtrl.analysisPOSFilterName">
-                            <option ng-repeat="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">{{filterCriteria}}</option>
+                            <option ng-repeat="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">
+                                {{filterCriteria}}
+                            </option>
                         </select>
                     </label>
 		            
@@ -139,9 +141,15 @@
 
                 <p><b>This tab is under construction.</b></p>
             </tab>
+            <tab heading="New Decision Form">
+                <accordion>
+                    <div ng-include="'components/common/templates/decision-form.new.html'"></div>
+                </accordion>
+            </tab>
         </tabset>
     </div>
-    <div class="form-actions">
+    <!-- /.panel -->
+        <span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'" class="form-actions">
         <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
             Edit
         </button>
@@ -155,6 +163,5 @@
             Cancel
         </button>
         <!-- /.panel-body -->
-    </div>
-    <!-- /.panel -->
+    </span>
 </div>
