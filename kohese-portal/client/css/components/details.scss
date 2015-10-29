@@ -1,6 +1,10 @@
 @import '../utils/variables';
 
 .tab-pane {
+  overflow: auto;
+  //.details-tab {
+  //  width: 80%;
+  //}
   .absolute {
     position: absolute;
   }
@@ -19,8 +23,23 @@
   }
 }
 
+//.details-buttons {
+//  position: absolute;
+//  top: 300px;
+//  right: 0;
+//  button {
+//    margin-bottom: 10px;
+//  }
+//}
+
 .active-state {
   background-color: $primaryColor + 100;
   color: white;
+}
+
+tab {
+  div {
+    overflow: auto;
+  }
 }
 

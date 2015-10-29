@@ -16,10 +16,10 @@
         <tabset>
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active">
                 <tab-heading>Overview <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
-                <div ng-if="detailsCtrl.itemProxy.kind ==='Action'">
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Action'">
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>
-                <div ng-if="detailsCtrl.itemProxy.kind != 'Action'">
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind != 'Action'">
                     <ng-include src="'components/common/templates/itemform.html'"></ng-include>
                 </div>
             </tab>
@@ -34,15 +34,15 @@
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'"
                  class="decision-tab">
                 <tab-heading>Decision <span ng-show="detailsCtrl.decisionForm.$dirty">(*)</span></tab-heading>
-                <ng-include src="'components/common/templates/decision-form.html'"></ng-include>
+                <ng-include class="details-tab" src="'components/common/templates/decision-form.html'"></ng-include>
             </tab>
             <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">
                 <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
             </tab>
             <tab heading="Relations">
-                <h4>Relations Tab</h4>
+                    <h4>Relations Tab</h4>
 
-                <p><b>This tab is under construction.</b></p>
+                    <p><b>This tab is under construction.</b></p>
             </tab>
             <tab heading="Analysis" select="detailsCtrl.fetchAnalysis()">
 		        <span class="pull-right">
@@ -149,7 +149,8 @@
         </tabset>
     </div>
     <!-- /.panel -->
-        <span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'" class="form-actions">
+        <span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'"
+              class="form-actions">
         <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
             Edit
         </button>
@@ -159,7 +160,7 @@
             Update
         </button>
         <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"
-                class="btn btn-primary">
+                class="btn btn-danger">
             Cancel
         </button>
         <!-- /.panel-body -->
