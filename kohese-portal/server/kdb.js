@@ -6,6 +6,7 @@ console.log("::: Begin KDB File Load");
 
 var fs = require('fs');
 var ItemProxy = require('../common/models/item-proxy.js');
+module.exports.ItemProxy = ItemProxy;
 
 var repoDirPath = "kohese-kdb";
 var exportDirPath = repoDirPath + "/export";
