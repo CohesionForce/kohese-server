@@ -187,7 +187,7 @@ ItemProxy.prototype.getDecendents = function() {
   return decendantList;
 }
 
-// ////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 //
 // ////////////////////////////////////////////////////////////////////////
 ItemProxy.prototype.dumpProxy = function(indent) {
@@ -204,6 +204,19 @@ ItemProxy.prototype.dumpProxy = function(indent) {
   for ( var childIdx in this.children) {
     var childProxy = this.children[childIdx];
     childProxy.dumpProxy(childIndent);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// ////////////////////////////////////////////////////////////////////////
+ItemProxy.prototype.dumpProxyNameAndDescription = function() {
+  console.log(this.item.name);
+  console.log(this.item.description);
+
+  for ( var childIdx in this.children) {
+    var childProxy = this.children[childIdx];
+    childProxy.dumpProxyNameAndDescription();
   }
 }
 
