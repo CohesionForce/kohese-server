@@ -48,13 +48,13 @@
                               match-class="highlight"
                     ></angucomplete-alt>
             <button ng-click="detailsCtrl.updateState('Assigned', 'Action')"
-            class="btn btn-primary">Assign
+                    class="btn btn-primary">Assign
             </button>
         </label>
     </div>
 
     <accordion>
-       <div ng-include="'components/common/templates/decision-form.new.html'"></div>
+        <div ng-include="'components/common/templates/decision-form.new.html'"></div>
         <accordion-group heading="Approved"
                          is-open="detailsCtrl.accordion.Approved">
             <label class=control-label">
@@ -129,6 +129,9 @@
                 <br>
                 <button ng-click="detailsCtrl.updateState('In Work', 'Action')"
                         class="btn btn-primary">Begin Work
+                </button>
+                <button ng-click="detailsCtrl.updateState('Pending Reassign','Action')"
+                        class="btn btn-danger"> Reassign
                 </button>
             </div>
         </accordion-group>
