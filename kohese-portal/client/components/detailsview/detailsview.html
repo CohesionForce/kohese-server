@@ -1,6 +1,6 @@
 <div class="panel" style="margin-bottom: 0px">
     <div class="panel-heading ">
-        <span ng-if="detailsCtrl.itemProxy.kind">{{detailsCtrl.itemProxy.kind}} Information </span>
+        <span ng-if="detailsCtrl.itemProxy.kind">{{detailsCtrl.itemProxy.kind}} Information: {{detailsCtrl.itemProxy.item.name}} </span>
         <span ng-if="!detailsCtrl.itemProxy.kind">No Item Selected</span>
         <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
            ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})"
