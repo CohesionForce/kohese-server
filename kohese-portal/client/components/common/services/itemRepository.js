@@ -2,7 +2,7 @@
  *
  */
 
-function ItemRepository(Item, Category, Decision, Action, Observation, Issue, KoheseUser, socket, $rootScope) {
+function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Task, KoheseUser, socket, $rootScope) {
     var _ = require('underscore');
     var ItemProxy = require('../../../../common/models/item-proxy');
     var modelTypes = {
@@ -12,6 +12,7 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ko
         Action: Action,
         Observation: Observation,
         Issue: Issue,
+        Task: Task,
         KoheseUser: KoheseUser
     };
 
@@ -54,10 +55,12 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ko
               Action.find().$promise.then(function (actionResults) {
                 Observation.find().$promise.then(function (observationResults) {
                   Issue.find().$promise.then(function (issueResults) {
-                    KoheseUser.find().$promise.then(function (userResults) {
-                      var results = itemResults.concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(userResults);
-                      convertListToTree(results);
-                      $rootScope.$broadcast('itemRepositoryReady')
+                    Task.find().$promise.then(function (taskResults) {
+                      KoheseUser.find().$promise.then(function (userResults) {
+                        var results = itemResults.concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(taskResults).concat(userResults);
+                        convertListToTree(results);
+                        $rootScope.$broadcast('itemRepositoryReady')
+                      });
                     });
                   });
                 });
