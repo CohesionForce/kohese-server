@@ -134,6 +134,11 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         }
     };
 
+    detailsCtrl.deleteItemInput = function(type, row){
+        var index = detailsCtrl.itemProxy.item[type].indexOf(row);
+        detailsCtrl.itemProxy.item[type].splice(index, 1);
+    };
+
     detailsCtrl.tagSelected = function (selected) {
         if (selected) {
             //window.alert('You have selected ' + selected);
