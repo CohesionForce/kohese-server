@@ -29,10 +29,22 @@
         <label>
             Alternatives:
             <div ng-repeat="alternative in detailsCtrl.itemProxy.item.alternatives track by $index">
-                <input class="alternative-field"
-                       type="text"
-                       ng-disabled="!detailsCtrl.enableEdit"
-                       ng-model="alternative.text">
+                <label>
+                    Name:
+                    <input class="alternative-field"
+                           type="text"
+                           ng-disabled="!detailsCtrl.enableEdit"
+                           ng-model="alternative.name">
+                </label>
+                <label>
+                    Description:
+                    <input class="alternative-field"
+                           type="text"
+                           ng-disabled="!detailsCtrl.enableEdit"
+                           ng-model="alternative.description">
+                </label>
+                <i ng-click="detailsCtrl.deleteItemInput('alternatives', alternative)"
+                   class="glyphicon glyphicon-remove"></i>
             </div>
             <button ng-click="detailsCtrl.incrementItemInput('alternatives')"
                     ng-show="detailsCtrl.enableEdit"
