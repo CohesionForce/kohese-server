@@ -42,7 +42,10 @@
             <input class="action-field one-column"
                    type="text"
                    ng-disabled="!detailsCtrl.enableEdit"
-                   ng-model="action.text">
+                   ng-model="action.id">
+            <i ng-click="detailsCtrl.deleteItemInput('context', action)"
+               class="glyphicon glyphicon-remove"></i>
+
         </div>
         <button ng-click="detailsCtrl.incrementItemInput('context')"
                 ng-show="detailsCtrl.enableEdit"
