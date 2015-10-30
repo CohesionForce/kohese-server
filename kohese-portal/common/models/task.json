@@ -1,0 +1,41 @@
+{
+  "name": "Task",
+  "base": "Item",
+  "idInjection": true,
+  "properties": {
+    "taskState": {
+      "type": "string",
+      "required": true
+    },
+    "predecessors" : {
+      "type": [
+        "object"
+      ]
+    },
+    "assignedTo": {
+      "type": "string"
+    },
+    "estimatedStart": {
+      "type": "number"
+    },
+    "estimatedCompletion": {
+      "type": "number"
+    },
+    "estimatedHoursEffort": {
+      "type": "number"
+    },
+    "actualStart": {
+      "type": "number"
+    },
+    "actualCompletion": {
+      "type": "number"
+    },
+    "actualHoursEffort": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

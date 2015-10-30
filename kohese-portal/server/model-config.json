@@ -58,5 +58,9 @@
   "Issue": {
     "dataSource": "db",
     "public": true
+  },
+  "Task": {
+    "dataSource": "db",
+    "public": true
   }
 }
