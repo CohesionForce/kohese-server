@@ -118,6 +118,12 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         }
     };
 
+    detailsCtrl.somethingObserved = function (selected) {
+        if (selected) {
+            detailsCtrl.itemProxy.item.observedBy = selected.title;
+        }
+    }
+
     detailsCtrl.updateItem = function () {
         var newModel = ItemRepository.modelTypes[detailsCtrl.itemProxy.kind];
         var newItem = new newModel();

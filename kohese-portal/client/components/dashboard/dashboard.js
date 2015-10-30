@@ -32,6 +32,21 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
             assignedTo: ctrl.currentUser
         }
     };
+    ctrl.requiresActionFilter = {
+        item : {
+            issueState: 'Requires Action',
+        }
+    };
+    ctrl.observedIssuesFilter = {
+        item : {
+            issueState: 'Observed'
+        }
+    };
+    ctrl.inAnalysisIssueFilter = {
+        item : {
+            issueState: 'In Analysis'
+        }
+    };
 
 
     ctrl.navigate = function (state, params, type) {
