@@ -141,10 +141,13 @@
 
                 <p><b>This tab is under construction.</b></p>
             </tab>
-            <tab heading="New Decision Form">
+            <tab ng-if="detailsCtrl.itemProxy.kind === 'Decision'" heading="New Decision Form">
                 <accordion>
                     <div ng-include="'components/common/templates/decision-form.new.html'"></div>
                 </accordion>
+            </tab>
+            <tab ng-if="detailsCtrl.itemProxy.kind === 'Task''" heading="Task Form">
+                <div ng-include="'components/common/templates/task-form.html'"></div>
             </tab>
         </tabset>
     </div>

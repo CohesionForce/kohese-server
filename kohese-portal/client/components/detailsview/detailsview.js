@@ -122,6 +122,12 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         if (selected) {
             detailsCtrl.itemProxy.item.observedBy = selected.title;
         }
+    };
+
+    detailsCtrl.taskAssigned = function (selected) {
+        if (selected) {
+            detailsCtrl.itemProxy.item.assignedTo = selected.title;
+        }
     }
 
     detailsCtrl.updateItem = function () {
@@ -140,7 +146,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         }
     };
 
-    detailsCtrl.deleteItemInput = function(type, row){
+    detailsCtrl.deleteItemInput = function (type, row) {
         var index = detailsCtrl.itemProxy.item[type].indexOf(row);
         detailsCtrl.itemProxy.item[type].splice(index, 1);
     };
@@ -264,6 +270,8 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
                 detailsCtrl.accordion[state] = true;
             }
             detailsCtrl.itemProxy.item.actionState = state;
+        } else if (type === 'Task') {
+            detailsCtrl.itemProxy.item.taskState = state;
         }
         detailsCtrl.currentState = state;
         detailsCtrl.upsertItem();
