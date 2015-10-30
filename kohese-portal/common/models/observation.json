@@ -13,7 +13,7 @@
     },
     "context": {
       "type": [
-        "string"
+        "object"
       ],
       "required": true
     }

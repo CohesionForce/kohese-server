@@ -20,7 +20,7 @@
     },
     "categories": {
       "type": [
-        "string"
+        "object"
       ]
     },
     "description": {

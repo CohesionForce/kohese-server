@@ -2643,6 +2643,8 @@ module.factory(
          *
          *  - `req` – `{object=}` - 
          *
+         *  - `forModelKind` – `{string=}` - 
+         *
          *  - `onId` – `{string=}` - 
          *
          * @param {function(Object,Object)=} successCb
