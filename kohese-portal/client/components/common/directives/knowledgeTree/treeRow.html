@@ -14,12 +14,17 @@
                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0),
                            'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}" >
 			</i>
-			</a> &lt;{{itemProxy.kind}}&gt; <span ng-if="itemProxy.kind==='Action'">&lt;&lt;{{itemProxy.item.decisionState}}/{{itemProxy.item.actionState}}&gt;&gt;</span> <span ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
+			</a> &lt;{{itemProxy.kind}}&gt; <span ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
 				class="kt-label"
 				ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filter.text)"
 				ng-click="treeCtrl.updateTab('edit', itemProxy.item.id)"></span><span
 				ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
 		</div>
+		<div class="kti-cell kti-state">
+            <span ng-if="itemProxy.kind==='Decision'">{{itemProxy.item.decisionState}}</span>
+            <span ng-if="itemProxy.kind==='Action'">{{itemProxy.item.decisionState}}/{{itemProxy.item.actionState}}</span>
+            <span ng-if="itemProxy.kind==='Task'">{{itemProxy.item.taskState}}</span>
+        </div>
 		<div class="kti-description"
 			ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
 			ng-dblclick="showDescription=!showDescription"

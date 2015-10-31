@@ -51,11 +51,17 @@
   padding: 5px 0px 5px;
   width: 40%; }
 
+.kti-state {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 5px;
+  width: 10%; }
+
 .kti-description {
   display: inline-block;
   vertical-align: top;
   padding: 5px 0px 5px;
-  width: 40%; }
+  width: 30%; }
 
 .knowledge-tree .kt-head .glyphicon-plus {
   color: green; }
@@ -92,14 +98,25 @@
   border-radius: 10px;
   border: double 1px black; }
 
-.tab-pane label {
-  margin: 10px; }
-  .tab-pane label #Rationale {
-    width: 500px; }
-  .tab-pane label .alternative-field {
-    width: 500px; }
-.tab-pane .form-actions {
-  margin-left: 20px; }
+.tab-pane {
+  overflow: auto; }
+  .tab-pane .absolute {
+    position: absolute; }
+  .tab-pane label {
+    margin: 10px; }
+    .tab-pane label #Rationale {
+      width: 500px; }
+    .tab-pane label .alternative-field {
+      width: 500px; }
+  .tab-pane .form-actions {
+    margin-left: 20px; }
+
+.active-state {
+  background-color: #64be95;
+  color: white; }
+
+tab div {
+  overflow: auto; }
 
 .angucomplete-holder ::-webkit-input-placeholder {
   /* WebKit, Blink, Edge */
