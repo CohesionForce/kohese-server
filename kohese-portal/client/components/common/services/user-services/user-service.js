@@ -5,36 +5,47 @@
 function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory){
 
     const service = this;
-    var users = [];
-    var currentUser = jwtHelper.decodeToken(AuthTokenFactory.getToken()).username;
+    var users = {};
+
+    var currentUser = "";
+    var userLoggedIn = false;
 
     service.getAllUsers = getAllUsers;
     service.getCurrentUser = getCurrentUser;
 
     function getAllUsers(){
-       return users;
+      return users.children;
     }
 
     function getCurrentUser(){
-        return currentUser;
+      return currentUser;
+    }
+    
+    function setCurrentUser(){
+      var authToken = AuthTokenFactory.getToken();
+      if (authToken){
+        currentUser = jwtHelper.decodeToken(authToken).username;        
+      } else {
+        currentUser = "";
+      }
     }
 
     $rootScope.$on('itemRepositoryReady', function () {
-        var root = ItemRepository.getRootProxy();
-        users = root.getChildByName('Users').children;
+      var root = ItemRepository.getRootProxy();
+      users = root.getChildByName('Users');
     });
 
     $rootScope.$on('userLoggedIn', function onUserLogin() {
-        ctrl.userLoggedIn = true;
-        ctrl.userName = jwtHelper.decodeToken(AuthTokenFactory.getToken()).username;
-        console.log(ctrl.userName);
+      userLoggedIn = true;
+      setCurrentUser();
+      console.log('::: Logged in as ' + currentUser);
     });
 
     $rootScope.$on('userLoggedOut', function onUserLogout() {
-        ctrl.userLoggedIn = false;
-        ctrl.onLoginScreen = true;
+      userLoggedIn = false;
     });
 
+    setCurrentUser();
     console.log(currentUser);
 }
 
