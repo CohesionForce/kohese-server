@@ -23,11 +23,22 @@ boot(app, __dirname, function (err) {
     if (require.main === module) {
 
         // app.start();
-        global.koheseIO = require('socket.io')(app.start());
-        global.koheseIO.on('connection', function (socket) {
-            console.log('a user connected: %s', socket.id);
+        var decodeAuthToken = require('./boot/routes.js').decodeAuthToken;
+        global.KoheseIO = require('socket.io')(app.start());
+        global.KoheseIO.on('connection', function (socket) {
+            console.log('>>> session %s connected from %s', socket.id, socket.handshake.address);
+            
+            socket.on('authenticate', function(request) {
+              socket.koheseUser = decodeAuthToken(request.token); 
+              console.log('>>>> session %s is user %s', socket.id, socket.koheseUser.username);
+              socket.emit('authenticated');
+            });
             socket.on('disconnect', function () {
-                console.log('user disconnected: %s', socket.id);
+              var username = "Unknown";
+              if (socket.koheseUser){
+                username = socket.koheseUser.username;
+              }
+              console.log('>>> session %s: user %s disconnected from %s', socket.id, username, socket.handshake.address);
             });
         });
     }

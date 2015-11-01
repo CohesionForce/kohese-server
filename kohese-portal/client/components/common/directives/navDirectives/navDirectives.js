@@ -2,7 +2,7 @@
  * Created by josh on 6/17/15.
  */
 
-function AppBarController(AuthTokenFactory, $rootScope, UserService, $state, jwtHelper) {
+function AppBarController(AuthTokenFactory, $rootScope, KoheseIO, UserService, $state, jwtHelper) {
     var ctrl = this;
     ctrl.userName = {};
     checkAuthentication();
@@ -21,7 +21,14 @@ function AppBarController(AuthTokenFactory, $rootScope, UserService, $state, jwt
 
     ctrl.logout = function () {
         AuthTokenFactory.setToken();
+        KoheseIO.disconnect();
+        ctrl.onLoginScreen = true;
+        ctrl.userLoggedIn = null;
     };
+    
+    $rootScope.$on('userLoggedIn', function() {
+      checkAuthentication();
+    });
 
     function checkAuthentication() {
         ctrl.userLoggedIn = AuthTokenFactory.getToken() !== null;
@@ -29,6 +36,7 @@ function AppBarController(AuthTokenFactory, $rootScope, UserService, $state, jwt
             $state.go('login');
             ctrl.onLoginScreen = true;
         } else {
+            ctrl.onLoginScreen = false;
             ctrl.userName = jwtHelper.decodeToken(AuthTokenFactory.getToken()).username;
         }
     }
