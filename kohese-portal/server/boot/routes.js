@@ -63,6 +63,12 @@ module.exports = function (app) {
     
     app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
 
+    function decodeAuthToken(authToken){
+      var decodedToken = jwt.verify(authToken, jwtSecret);
+      return decodedToken;
+    }
+    module.exports.decodeAuthToken = decodeAuthToken;
+    
     app.use(function (req, res, next){
       var authHeader = (req.headers.authorization);
       var header = authHeader.replace('Bearer ', '');
