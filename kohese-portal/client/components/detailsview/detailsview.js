@@ -206,7 +206,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
                         detailsCtrl.actionForm.$setPristine();
                     }
                     detailsCtrl.enableEdit = false;
-                    
+
                 });
         };
 

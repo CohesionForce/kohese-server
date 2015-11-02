@@ -1,19 +1,19 @@
 <div>
-        <span ng-if="detailsCtrl.itemProxy.kind === 'Decision'" class="form-actions">
-        <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
-            Edit
-        </button>
-        <button ng-click="detailsCtrl.upsertItem()"
-                ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
-                && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
-            Update
-        </button>
-        <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"
-                class="btn btn-danger">
-            Cancel
-        </button>
+        <!--<span ng-if="detailsCtrl.itemProxy.kind === 'Decision'" class="form-actions">-->
+        <!--<button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">-->
+            <!--Edit-->
+        <!--</button>-->
+        <!--<button ng-click="detailsCtrl.upsertItem()"-->
+                <!--ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine-->
+                <!--&& detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">-->
+            <!--Update-->
+        <!--</button>-->
+        <!--<button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"-->
+                <!--class="btn btn-danger">-->
+            <!--Cancel-->
+        <!--</button>-->
         <!-- /.panel-body -->
-    </span>
+    <!--</span>-->
     <accordion-group heading="Proposed"
                      is-open="detailsCtrl.accordion.Proposed">
         <ng-include src="'components/common/templates/itemform.html'"></ng-include>
