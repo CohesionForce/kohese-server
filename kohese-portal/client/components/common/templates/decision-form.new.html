@@ -1,22 +1,13 @@
 <div>
-        <!--<span ng-if="detailsCtrl.itemProxy.kind === 'Decision'" class="form-actions">-->
-        <!--<button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">-->
-            <!--Edit-->
-        <!--</button>-->
-        <!--<button ng-click="detailsCtrl.upsertItem()"-->
-                <!--ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine-->
-                <!--&& detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">-->
-            <!--Update-->
-        <!--</button>-->
-        <!--<button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"-->
-                <!--class="btn btn-danger">-->
-            <!--Cancel-->
-        <!--</button>-->
-        <!-- /.panel-body -->
-    <!--</span>-->
+    <h4>Overview:</h4>
+    <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+    <h4 ng-if="detailsCtrl.itemProxy.kind === 'Decision'">State: {{detailsCtrl.itemProxy.item.decisionState}}</h4>
+    <h4 ng-if="detailsCtrl.itemProxy.kind === 'Action'">
+        State: {{detailsCtrl.currentState}}
+    </h4>
     <accordion-group heading="Proposed"
                      is-open="detailsCtrl.accordion.Proposed">
-        <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+
         <label class=control-label" for="Rationale">
             Rationale
             <div class="controls">

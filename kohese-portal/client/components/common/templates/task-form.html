@@ -1,5 +1,6 @@
 <div>
     <h4>Overview:</h4>
+
     <div class="text-center" ng-if="detailsCtrl.itemProxy.item.taskState === 'Assigned'
                                     && detailsCtrl.currentUser === detailsCtrl.itemProxy.item.assignedTo">
         Do you you accept this task?
@@ -36,32 +37,33 @@
     </div>
     <div ng-include="'components/common/templates/itemform.html'"></div>
 
+    <h4>State: {{detailsCtrl.itemProxy.item.taskState}}</h4>
     <accordion>
-        <accordion-group heading="Proposed"></accordion-group>
-        <label class=control-label">
-            Assigned To:
-            <angucomplete-alt id="AssignedTo"
-                              disable-input="!detailsCtrl.enableEdit"
-                              placeholder="{{detailsCtrl.itemProxy.item.assignedTo}}"
-                              selected-object="detailsCtrl.taskAssigned"
-                              search-fields="item.name,item.description"
-                              title-field="item.name"
-                              description-field="item.description"
-                              pause="100"
-                              local-data="detailsCtrl.userList"
-                              minlength="1"
-                              match-class="highlight"
-                    ></angucomplete-alt>
-        </label>
-        <button ng-click="detailsCtrl.updateState('Assigned', 'Task')"
-                class="btn btn-primary">Assign
-        </button>
-    </accordion>
-    <accordion-group heading="Accepted"
-                     is-open="detailsCtrl.accordion.Accepted">
-        <div>
-            <label class="control-label three-columns">
-                Estimated Start:
+        <accordion-group heading="Proposed">
+            <label class=control-label">
+                Assigned To:
+                <angucomplete-alt id="AssignedTo"
+                                  disable-input="!detailsCtrl.enableEdit"
+                                  placeholder="{{detailsCtrl.itemProxy.item.assignedTo}}"
+                                  selected-object="detailsCtrl.taskAssigned"
+                                  search-fields="item.name,item.description"
+                                  title-field="item.name"
+                                  description-field="item.description"
+                                  pause="100"
+                                  local-data="detailsCtrl.userList"
+                                  minlength="1"
+                                  match-class="highlight"
+                        ></angucomplete-alt>
+            </label>
+            <button ng-click="detailsCtrl.updateState('Assigned', 'Task')"
+                    class="btn btn-primary">Assign
+            </button>
+        </accordion-group>
+        <accordion-group heading="Accepted"
+                         is-open="detailsCtrl.accordion.Accepted">
+            <div>
+                <label class="control-label three-columns">
+                    Estimated Start:
             <span class="input-group ">
                 <input type="text"
                        class="form-control"
@@ -78,9 +80,9 @@
                 </button>
               </span>
             </span>
-            </label>
-            <label class="three-columns control-label">
-                Estimated Completion:
+                </label>
+                <label class="three-columns control-label">
+                    Estimated Completion:
             <span class="input-group">
                 <input type="text"
                        class="form-control"
@@ -97,28 +99,28 @@
                 </button>
               </span>
             </span>
-            </label>
-            <label class="control-label three-columns absolute" for="EstimatedHours">
-                Estimated Hours:
-                <br/>
-                <input class=""
-                       ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort"
-                       ng-disabled="!detailsCtrl.enableEdit"
-                       id="EstimatedHours">
-            </label>
-            <br>
-            <button ng-click="detailsCtrl.updateState('In Work', 'Task')"
-                    class="btn btn-primary">Begin Work
-            </button>
-            <button ng-click="detailsCtrl.updateState('Pending Reassign','Task')"
-                    class="btn btn-danger"> Reassign
-            </button>
-        </div>
-    </accordion-group>
-    <accordion-group heading="In Work"
-                     is-open="detailsCtrl.accordion.InWork">
-        <label class="three-columns control-label">
-            Actual Start:
+                </label>
+                <label class="control-label three-columns absolute" for="EstimatedHours">
+                    Estimated Hours:
+                    <br/>
+                    <input class=""
+                           ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort"
+                           ng-disabled="!detailsCtrl.enableEdit"
+                           id="EstimatedHours">
+                </label>
+                <br>
+                <button ng-click="detailsCtrl.updateState('In Work', 'Task')"
+                        class="btn btn-primary">Begin Work
+                </button>
+                <button ng-click="detailsCtrl.updateState('Pending Reassign','Task')"
+                        class="btn btn-danger"> Reassign
+                </button>
+            </div>
+        </accordion-group>
+        <accordion-group heading="In Work"
+                         is-open="detailsCtrl.accordion.InWork">
+            <label class="three-columns control-label">
+                Actual Start:
             <span class="input-group">
                 <input type="text"
                        class="form-control"
@@ -135,10 +137,10 @@
                 </button>
                   </span>
                 </span>
-        </label>
-        <label class="three-columns control-label">
-            Actual Completion:
-            <div class="controls">
+            </label>
+            <label class="three-columns control-label">
+                Actual Completion:
+                <div class="controls">
             <span class="input-group">
                 <input type="text"
                        class="form-control"
@@ -155,19 +157,19 @@
                 </button>
                   </span>
                 </span>
-            </div>
-        </label>
-        <label class="control-label absolute three-columns" for="ActualHours">
-            Actual Hours:
-            <div class="controls">
-                <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts"
-                       ng-disabled="!detailsCtrl.enableEdit"
-                       id="ActualHours">
-            </div>
-        </label>
-        <br>
-        <button ng-click="detailsCtrl.updateState('Completed', 'Task')"
-                class="btn btn-primary">Task Completed
-        </button>
-    </accordion-group>
+                </div>
+            </label>
+            <label class="control-label absolute three-columns" for="ActualHours">
+                Actual Hours:
+                <div class="controls">
+                    <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts"
+                           ng-disabled="!detailsCtrl.enableEdit"
+                           id="ActualHours">
+                </div>
+            </label>
+            <br>
+            <button ng-click="detailsCtrl.updateState('Completed', 'Task')"
+                    class="btn btn-primary">Task Completed
+            </button>
+        </accordion-group>
 </div>

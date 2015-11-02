@@ -33,9 +33,19 @@
                 <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Action'">
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>
-                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind != 'Action'">
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind != 'Action' &&
+                detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Task'">
                     <ng-include src="'components/common/templates/itemform.html'"></ng-include>
                 </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Task'">
+                    <ng-include src="'components/common/templates/task-form.html'"></ng-include>
+                </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Decision'">
+                    <accordion>
+                        <ng-include src="'components/common/templates/decision-form.new.html'"></ng-include>
+                    </accordion>
+                </div>
+
             </tab>
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Observation'">
                 <tab-heading>Observation</tab-heading>
@@ -155,31 +165,23 @@
 
                 <p><b>This tab is under construction.</b></p>
             </tab>
-            <tab ng-if="detailsCtrl.itemProxy.kind === 'Decision'" heading="New Decision Form">
-                <accordion>
-                    <div ng-include="'components/common/templates/decision-form.new.html'"></div>
-                </accordion>
-            </tab>
-            <tab ng-if="detailsCtrl.itemProxy.kind === 'Task'" heading="Task Form">
-                <div ng-include="'components/common/templates/task-form.html'"></div>
-            </tab>
         </tabset>
     </div>
     <!-- /.panel -->
-        <!--<span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'"-->
-              <!--class="form-actions">-->
-        <!--<button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">-->
-            <!--Edit-->
-        <!--</button>-->
-        <!--<button ng-click="detailsCtrl.upsertItem()"-->
-                <!--ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine-->
-                <!--&& detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">-->
-            <!--Update-->
-        <!--</button>-->
-        <!--<button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"-->
-                <!--class="btn btn-danger">-->
-            <!--Cancel-->
-        <!--</button>-->
-        <!-- /.panel-body -->
+    <!--<span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'"-->
+    <!--class="form-actions">-->
+    <!--<button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">-->
+    <!--Edit-->
+    <!--</button>-->
+    <!--<button ng-click="detailsCtrl.upsertItem()"-->
+    <!--ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine-->
+    <!--&& detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">-->
+    <!--Update-->
+    <!--</button>-->
+    <!--<button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"-->
+    <!--class="btn btn-danger">-->
+    <!--Cancel-->
+    <!--</button>-->
+    <!-- /.panel-body -->
     </span>
 </div>

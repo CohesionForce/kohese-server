@@ -1,25 +1,4 @@
 <div ng-init="detailsCtrl.itemProxy.item.decisionState = 'Proposed'">
-    <h3>
-        Status: {{detailsCtrl.currentState}}
-            <!--<span class="form-actions">-->
-        <!--<button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">-->
-            <!--Edit-->
-        <!--</button>-->
-        <!--<button ng-click="detailsCtrl.upsertItem()"-->
-                <!--ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine-->
-                <!--&& detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">-->
-            <!--Update-->
-        <!--</button>-->
-        <!--<button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"-->
-                <!--class="btn btn-danger">-->
-            <!--Cancel-->
-        <!--</button>-->
-        <!--&lt;!&ndash; /.panel-body &ndash;&gt;-->
-    <!--</span>-->
-    </h3>
-
-    <br>
-
     <div class="text-center" ng-if="detailsCtrl.itemProxy.item.actionState === 'Assigned'
                                     && detailsCtrl.currentUser === detailsCtrl.itemProxy.item.assignedTo">
         Do you you accept this assignment?
