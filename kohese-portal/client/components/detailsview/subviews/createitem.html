@@ -45,10 +45,15 @@
                 class="btn btn-primary">
             Edit
         </button>
-        <button ng-click="detailsCtrl.upsertItem()"
+        <button ng-click="detailsCtrl.createItem('parent')"
                 ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
                 && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
-            Update
+            <i class="fa fa-chevron-left"></i> Save + Return
+        </button>
+        <button ng-click="detailsCtrl.createItem('child')"
+                ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
+                && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
+            Save + Enter <i class="fa fa-chevron-right"></i>
         </button>
         <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()"
                 ng-disabled="!detailsCtrl.enableEdit"

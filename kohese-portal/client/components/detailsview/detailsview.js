@@ -97,81 +97,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.tab = tabService.getCurrentTab();
     });
 
-    detailsCtrl.updateTab = function (state, id, view) {
-        detailsCtrl.tab.setState(state);
-        detailsCtrl.tab.params.id = id;
-        if (view) {
-            detailsCtrl.tab.toggleType();
-            detailsCtrl.tab.setType = view;
-        }
-    };
-
-    detailsCtrl.actionAssigned = function (selected) {
-        if (selected) {
-            detailsCtrl.itemProxy.item.assignedTo = selected.title;
-        }
-    };
-
-    detailsCtrl.decisionApproved = function (selected) {
-        if (selected) {
-            detailsCtrl.itemProxy.item.approvedBy = selected.title;
-        }
-    };
-
-    detailsCtrl.somethingObserved = function (selected) {
-        if (selected) {
-            detailsCtrl.itemProxy.item.observedBy = selected.title;
-        }
-    };
-
-    detailsCtrl.taskAssigned = function (selected) {
-        if (selected) {
-            detailsCtrl.itemProxy.item.assignedTo = selected.title;
-        }
-    }
-
-    detailsCtrl.updateItem = function () {
-        var newModel = ItemRepository.modelTypes[detailsCtrl.itemProxy.kind];
-        var newItem = new newModel();
-        ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
-        detailsCtrl.itemProxy.item = newItem;
-    };
-
-    detailsCtrl.incrementItemInput = function (type) {
-        if (detailsCtrl.itemProxy.item[type]) {
-            var altLength = detailsCtrl.itemProxy.item[type].length;
-            detailsCtrl.itemProxy.item[type][altLength] = {text: ''};
-        } else {
-            detailsCtrl.itemProxy.item[type] = [{text: ''}]
-        }
-    };
-
-    detailsCtrl.deleteItemInput = function (type, row) {
-        var index = detailsCtrl.itemProxy.item[type].indexOf(row);
-        detailsCtrl.itemProxy.item[type].splice(index, 1);
-    };
-
-    detailsCtrl.tagSelected = function (selected) {
-        if (selected) {
-            //window.alert('You have selected ' + selected);
-            console.log(selected);
-        } else {
-            console.log('cleared');
-        }
-    };
-
-    detailsCtrl.toggleView = function (state) {
-        detailsCtrl.tab.toggleType();
-        detailsCtrl.tab.setState(state);
-    };
-
-    detailsCtrl.fetchAnalysis = function () {
-        analysisService.fetchAnalysis(detailsCtrl.itemProxy);
-    };
-
-    console.log(detailsCtrl.itemProxy);
-
-    detailsCtrl.upsertItem = function () {
+    detailsCtrl.createItem = function (navigationType) {
         ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
             .then(function (updatedItem) {
 
@@ -185,139 +111,226 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
                 }
                 detailsCtrl.enableEdit = false;
 
-                // Check if this is a create
-                if (!detailsCtrl.itemProxy.item.id) {
-                    // Refocus on the parent, if it exists
-                    if (updatedItem.parentId != '') {
-                        $state.go('kohese.explore.edit', {id: updatedItem.parentId})
-                    } else {
-                        $state.go('kohese.explore.edit', {id: updatedItem.id})
-                    }
+                if (navigationType === 'parent') {
+                    $state.go('kohese.explore.edit', {id: updatedItem.parentId})
+                } else if (navigationType === 'child') {
+                    $state.go('kohese.explore.edit', {id: updatedItem.id})
                 }
-            });
-    };
+            })
+    }
 
-    detailsCtrl.getLastFilter = function () {
-        detailsCtrl.analysisFilterString = detailsCtrl.filterList.pop();
-        detailsCtrl.analysisFilterInput = detailsCtrl.analysisFilterString;
-    };
-
-    detailsCtrl.submitFilter = function () {
-        detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
-        detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
-    };
-
-    detailsCtrl.cancel = function () {
-
-        if (this.itemForm.$dirty) {
-            ItemRepository.fetchItem(detailsCtrl.itemProxy.item);
-            this.itemForm.$setPristine();
-        }
-    };
-
-    detailsCtrl.removeItem = function (item) {
-        ItemRepository.deleteItem(item)
-            .then(function () {
-                // TBD:  May need to do something special if the delete fails
-            });
-    };
-
-    //datepicker config
-    detailsCtrl.estimatedStart = false;
-    detailsCtrl.dateOptions = {
-        formatYear: 'yy'
-    };
-
-    detailsCtrl.openDatePicker = function ($event, type) {
-        detailsCtrl.date = new Date(detailsCtrl.itemProxy.item.estimatedStart);
-        if ($event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-        }
-        detailsCtrl[type] = true;
-        console.log(detailsCtrl.estimatedStart);
-    };
-
-    detailsCtrl.convertDate = function (type, end) {
-        var date = new Date(detailsCtrl.itemProxy.item[type]);
-        if (end) {
-            // shame.js - I need to refactor this magic number
-            detailsCtrl.itemProxy.item[type] = date.valueOf() + 86399;
-        } else {
-            detailsCtrl.itemProxy.item[type] = date.valueOf();
-        }
-        console.log(detailsCtrl.itemProxy.item[type])
-    };
-
-    detailsCtrl.updateState = function (state, type) {
-        detailsCtrl.currentState = state;
-        if (type === 'Decision') {
-            detailsCtrl.itemProxy.item.decisionState = state;
-            if (detailsCtrl.itemProxy.item.decisionState === 'In Analysis') {
-                detailsCtrl.accordion.InAnalysis = true;
-            } else if (detailsCtrl.itemProxy.item.decisionState === 'In Review') {
-                detailsCtrl.accordion.InReview = true;
-            } else {
-                detailsCtrl.accordion[detailsCtrl.itemProxy.item.decisionState] = true;
+        detailsCtrl.updateTab = function (state, id, view) {
+            detailsCtrl.tab.setState(state);
+            detailsCtrl.tab.params.id = id;
+            if (view) {
+                detailsCtrl.tab.toggleType();
+                detailsCtrl.tab.setType = view;
             }
-        } else if (type === 'Action') {
-            if (detailsCtrl.itemProxy.item.actionState === 'In Work') {
-                detailsCtrl.accordion.InWork = true;
+        };
 
-            } else if (detailsCtrl.itemProxy.item.actionState === 'In Verification') {
-                detailsCtrl.accordion.InVerification = true;
-            } else {
-                detailsCtrl.accordion[state] = true;
+        detailsCtrl.actionAssigned = function (selected) {
+            if (selected) {
+                detailsCtrl.itemProxy.item.assignedTo = selected.title;
             }
-            detailsCtrl.itemProxy.item.actionState = state;
-        } else if (type === 'Task') {
-            detailsCtrl.itemProxy.item.taskState = state;
-        }
-        detailsCtrl.currentState = state;
-        detailsCtrl.upsertItem();
-    };
+        };
 
-    function configureState() {
-        detailsCtrl.accordion = {};
-        if (detailsCtrl.itemProxy.item.actionState === 'Proposed'
-            && detailsCtrl.itemProxy.item.decisionState != 'Proposed') {
-            if (detailsCtrl.itemProxy.item.decisionState === 'In Analysis') {
-                detailsCtrl.accordion.InAnalysis = true;
-                detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
+        detailsCtrl.decisionApproved = function (selected) {
+            if (selected) {
+                detailsCtrl.itemProxy.item.approvedBy = selected.title;
             }
-            if (detailsCtrl.itemProxy.item.decisionState === 'In Review') {
-                detailsCtrl.accordion.InReview = true;
-                detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
-            } else {
-                detailsCtrl.accordion[detailsCtrl.itemProxy.item.decisionState] = true;
-                detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
+        };
+
+        detailsCtrl.somethingObserved = function (selected) {
+            if (selected) {
+                detailsCtrl.itemProxy.item.observedBy = selected.title;
+            }
+        };
+
+        detailsCtrl.taskAssigned = function (selected) {
+            if (selected) {
+                detailsCtrl.itemProxy.item.assignedTo = selected.title;
             }
         }
-        else {
-            if (detailsCtrl.itemProxy.item.actionState != 'In Work'
-                && detailsCtrl.itemProxy.item.actionState != 'Pending Reassign') {
-                detailsCtrl.accordion[detailsCtrl.itemProxy.item.actionState] = true;
-                detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
+
+        detailsCtrl.updateItem = function () {
+            var newModel = ItemRepository.modelTypes[detailsCtrl.itemProxy.kind];
+            var newItem = new newModel();
+            ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
+            detailsCtrl.itemProxy.item = newItem;
+        };
+
+        detailsCtrl.incrementItemInput = function (type) {
+            if (detailsCtrl.itemProxy.item[type]) {
+                var altLength = detailsCtrl.itemProxy.item[type].length;
+                detailsCtrl.itemProxy.item[type][altLength] = {text: ''};
             } else {
+                detailsCtrl.itemProxy.item[type] = [{text: ''}]
+            }
+        };
+
+        detailsCtrl.deleteItemInput = function (type, row) {
+            var index = detailsCtrl.itemProxy.item[type].indexOf(row);
+            detailsCtrl.itemProxy.item[type].splice(index, 1);
+        };
+
+        detailsCtrl.tagSelected = function (selected) {
+            if (selected) {
+                //window.alert('You have selected ' + selected);
+                console.log(selected);
+            } else {
+                console.log('cleared');
+            }
+        };
+
+        detailsCtrl.toggleView = function (state) {
+            detailsCtrl.tab.toggleType();
+            detailsCtrl.tab.setState(state);
+        };
+
+        detailsCtrl.fetchAnalysis = function () {
+            analysisService.fetchAnalysis(detailsCtrl.itemProxy);
+        };
+
+        console.log(detailsCtrl.itemProxy);
+
+        detailsCtrl.upsertItem = function () {
+            ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
+                .then(function (updatedItem) {
+
+                    // clear the state of the form
+                    detailsCtrl.itemForm.$setPristine();
+                    if (detailsCtrl.decisionForm) {
+                        detailsCtrl.decisionForm.$setPristine();
+                    }
+                    if (detailsCtrl.actionForm) {
+                        detailsCtrl.actionForm.$setPristine();
+                    }
+                    detailsCtrl.enableEdit = false;
+                    
+                });
+        };
+
+        detailsCtrl.getLastFilter = function () {
+            detailsCtrl.analysisFilterString = detailsCtrl.filterList.pop();
+            detailsCtrl.analysisFilterInput = detailsCtrl.analysisFilterString;
+        };
+
+        detailsCtrl.submitFilter = function () {
+            detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
+            detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
+        };
+
+        detailsCtrl.cancel = function () {
+
+            if (this.itemForm.$dirty) {
+                ItemRepository.fetchItem(detailsCtrl.itemProxy.item);
+                this.itemForm.$setPristine();
+            }
+        };
+
+        detailsCtrl.removeItem = function (item) {
+            ItemRepository.deleteItem(item)
+                .then(function () {
+                    // TBD:  May need to do something special if the delete fails
+                });
+        };
+
+        //datepicker config
+        detailsCtrl.estimatedStart = false;
+        detailsCtrl.dateOptions = {
+            formatYear: 'yy'
+        };
+
+        detailsCtrl.openDatePicker = function ($event, type) {
+            detailsCtrl.date = new Date(detailsCtrl.itemProxy.item.estimatedStart);
+            if ($event) {
+                $event.preventDefault();
+                $event.stopPropagation();
+            }
+            detailsCtrl[type] = true;
+            console.log(detailsCtrl.estimatedStart);
+        };
+
+        detailsCtrl.convertDate = function (type, end) {
+            var date = new Date(detailsCtrl.itemProxy.item[type]);
+            if (end) {
+                // shame.js - I need to refactor this magic number
+                detailsCtrl.itemProxy.item[type] = date.valueOf() + 86399;
+            } else {
+                detailsCtrl.itemProxy.item[type] = date.valueOf();
+            }
+            console.log(detailsCtrl.itemProxy.item[type])
+        };
+
+        detailsCtrl.updateState = function (state, type) {
+            detailsCtrl.currentState = state;
+            if (type === 'Decision') {
+                detailsCtrl.itemProxy.item.decisionState = state;
+                if (detailsCtrl.itemProxy.item.decisionState === 'In Analysis') {
+                    detailsCtrl.accordion.InAnalysis = true;
+                } else if (detailsCtrl.itemProxy.item.decisionState === 'In Review') {
+                    detailsCtrl.accordion.InReview = true;
+                } else {
+                    detailsCtrl.accordion[detailsCtrl.itemProxy.item.decisionState] = true;
+                }
+            } else if (type === 'Action') {
                 if (detailsCtrl.itemProxy.item.actionState === 'In Work') {
                     detailsCtrl.accordion.InWork = true;
-                    detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
 
-                }
-                if (detailsCtrl.itemProxy.item.actionState === 'In Verification') {
+                } else if (detailsCtrl.itemProxy.item.actionState === 'In Verification') {
                     detailsCtrl.accordion.InVerification = true;
-                    detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
+                } else {
+                    detailsCtrl.accordion[state] = true;
+                }
+                detailsCtrl.itemProxy.item.actionState = state;
+            } else if (type === 'Task') {
+                detailsCtrl.itemProxy.item.taskState = state;
+            }
+            detailsCtrl.currentState = state;
+            detailsCtrl.upsertItem();
+        };
+
+        function configureState() {
+            detailsCtrl.accordion = {};
+            if (detailsCtrl.itemProxy.item.actionState === 'Proposed'
+                && detailsCtrl.itemProxy.item.decisionState != 'Proposed') {
+                if (detailsCtrl.itemProxy.item.decisionState === 'In Analysis') {
+                    detailsCtrl.accordion.InAnalysis = true;
+                    detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
+                }
+                if (detailsCtrl.itemProxy.item.decisionState === 'In Review') {
+                    detailsCtrl.accordion.InReview = true;
+                    detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
+                } else {
+                    detailsCtrl.accordion[detailsCtrl.itemProxy.item.decisionState] = true;
+                    detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
                 }
             }
+            else {
+                if (detailsCtrl.itemProxy.item.actionState != 'In Work'
+                    && detailsCtrl.itemProxy.item.actionState != 'Pending Reassign') {
+                    detailsCtrl.accordion[detailsCtrl.itemProxy.item.actionState] = true;
+                    detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
+                } else {
+                    if (detailsCtrl.itemProxy.item.actionState === 'In Work') {
+                        detailsCtrl.accordion.InWork = true;
+                        detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
+
+                    }
+                    if (detailsCtrl.itemProxy.item.actionState === 'In Verification') {
+                        detailsCtrl.accordion.InVerification = true;
+                        detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
+                    }
+                }
+            }
+
         }
 
-    }
 
-
-    if (detailsCtrl.itemProxy) {
-        configureState();
+        if (detailsCtrl.itemProxy) {
+            configureState();
+        }
     }
-}
 
 export default () => {
     angular.module('app.detailsview', [
