@@ -33,3 +33,11 @@ git log --name-status
 git log --name-only
 # or
 git log --stat
+
+# to find which commit deleted a file
+git log --diff-filter=D --summary -- <filename>
+
+# to restore the file
+git checkout <commit>~1 <filename>
+# or to git a specific version
+git checkout <commit before it was deleted> <filename>
