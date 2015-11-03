@@ -1,4 +1,4 @@
-<div class="panel" style="margin-bottom: 0px">
+<div class="panel" style="margin-bottom: 0px; height: 100%">
     <div class="panel-heading ">
         <span ng-if="detailsCtrl.itemProxy.kind">{{detailsCtrl.itemProxy.kind}} Information: {{detailsCtrl.itemProxy.item.name}} </span>
         <span ng-if="!detailsCtrl.itemProxy.kind">No Item Selected</span>
@@ -25,9 +25,9 @@
                ng-click="detailsCtrl.updateTab('investigate', itemProxy.item.id, 'singleview')"></i>
         </span>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" style="height: calc(100% - 30px); overflow:hidden">
         <!-- Nav tabs -->
-        <tabset>
+        <tabset id="details-tabs" style="height:100%">
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active">
                 <tab-heading>Overview <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
                 <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Action'">
