@@ -1,0 +1,18 @@
+@import '../utils/variables';
+
+body {
+  #layout-bottom {
+    height: calc(100% - #{$topNavHeight});
+    
+    > div {
+      display: inline-block;
+      height: inherit;
+    }
+    
+    #page-wrapper {
+      z-index: 1;
+      width: calc(100% - #{$leftNavWidth});
+      height: calc(100% - #{$topNavHeight});
+    }
+  }
+}

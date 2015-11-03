@@ -1,12 +1,13 @@
 @import '../utils/variables';
 
 .navbar {
-  position: relative;
+  position: fixed;
   top: 0;
   left: 0;
   height: $topNavHeight;
   border: 0;
   width: 100%;
+  margin-bottom: 0;
   background: -webkit-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -moz-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -ms-linear-gradient(right, $primaryColor + 100, $primaryColor);

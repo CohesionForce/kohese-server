@@ -6,10 +6,11 @@
 }
 
 #page-wrapper {
-  position: relative;
-  z-index: 1;
-  width: calc(100% - #{$leftNavWidth});
-  height: calc(100% - #{$topNavHeight});
+
+  position: fixed;
+  top: $topNavHeight;
+  left: $leftNavWidth;
+  
   #content-container {
     z-index: 2;
     border-radius: $baseBorderRadius;

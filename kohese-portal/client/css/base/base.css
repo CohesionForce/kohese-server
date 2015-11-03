@@ -1,5 +1,7 @@
 body {
-  font-family: FontAwesome, arial, sans-serif; }
+  font-family: FontAwesome, arial, sans-serif;
+  height: 100%;
+  overflow: hidden; }
   body .one-column {
     width: 100%; }
   body .two-columns {

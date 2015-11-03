@@ -1,15 +1,17 @@
 .sidebar {
   color: whitesmoke;
-  position: relative;
+  position: fixed;
   left: 0;
-  height: 900px;
+  top: 50px;
+  height: calc(100% - 50px);
   width: 50px;
   min-width: 50px; }
   .sidebar .static-side-panel {
-    position: relative;
+    position: fixed;
+    top: 50px;
     height: 100%;
     width: 50px;
-    z-index: 7;
+    z-index: 50;
     background-image: -webkit-linear-gradient(bottom, #ca6464, #660000);
     background-image: -moz-linear-gradient(bottom, #ca6464, #660000);
     background-image: -ms-linear-gradient(bottom, #ca6464, #660000);
@@ -67,12 +69,13 @@
   z-index: 10; }
 
 .navbar {
-  position: relative;
+  position: fixed;
   top: 0;
   left: 0;
   height: 50px;
   border: 0;
   width: 100%;
+  margin-bottom: 0;
   background: -webkit-linear-gradient(right, #64be95, #005A31);
   background-image: -moz-linear-gradient(right, #64be95, #005A31);
   background-image: -ms-linear-gradient(right, #64be95, #005A31);
@@ -138,10 +141,9 @@
   height: 100%; }
 
 #page-wrapper {
-  position: relative;
-  z-index: 1;
-  width: calc(100% - 50px);
-  height: calc(100% - 50px); }
+  position: fixed;
+  top: 50px;
+  left: 50px; }
   #page-wrapper #content-container {
     z-index: 2;
     border-radius: 10px; }
@@ -192,5 +194,15 @@
 
 .highlighted {
   background: yellow; }
+
+body #layout-bottom {
+  height: calc(100% - 50px); }
+  body #layout-bottom > div {
+    display: inline-block;
+    height: inherit; }
+  body #layout-bottom #page-wrapper {
+    z-index: 1;
+    width: calc(100% - 50px);
+    height: calc(100% - 50px); }
 
 /*# sourceMappingURL=layout.config.css.map */

@@ -2,18 +2,19 @@
 
 .sidebar {
   color: whitesmoke;
-  position: relative;
+  position: fixed;
   left: 0;
-//  height: calc(100% - #{$topNavHeight});
-  height: 900px;
+  top: $topNavHeight;
+  height: calc(100% - #{$topNavHeight});
   width: $leftNavWidth;
   min-width: $leftNavWidth;
 
   .static-side-panel {
-    position: relative;
+    position: fixed;
+    top: $topNavHeight;
     height: 100%;
     width: $leftNavWidth;
-    z-index: 7;
+    z-index: 50;
     background-image: -webkit-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
     background-image: -moz-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
     background-image: -ms-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
