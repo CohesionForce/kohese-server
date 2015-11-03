@@ -1,5 +1,11 @@
 body {
   font-family: FontAwesome, arial, sans-serif; }
+  body .one-column {
+    width: 100%; }
+  body .two-columns {
+    width: 50%; }
+  body .three-columns {
+    width: 30%; }
 
 table th .glyphicon-plus {
   color: green; }

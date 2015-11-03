@@ -1,15 +1,14 @@
-<div class="panel panel-default">
+<div class="panel">
     <div class="panel-heading">Create Item
-        <button ng-if="detailsCtrl.tab.type === 'singleview'" class="pull-right"
-                ui-sref="kohese.explore({id:detailsCtrl.itemProxy.item.id})"
-                ng-click="detailsCtrl.toggleView()">
-            Dual Screen
-        </button>
-        <button ng-if="detailsCtrl.tab.type === 'dualview'" class="pull-right"
-                ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})"
-                ng-click="detailsCtrl.toggleView()">
-            Full screen
-        </button>
+        <span class="pull-right item-actions">
+        <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
+           ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})"
+           ng-click="detailsCtrl.updateTab('edit', itemProxy.item.id, 'dualview')">
+        </i>
+        <i class="fa fa-lg fa-arrows-alt" ng-if="detailsCtrl.tab.type === 'dualview'"
+           ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})"
+           ng-click="detailsCtrl.updateTab('investigate', itemProxy.item.id, 'singleview')"></i>
+            </span>
     </div>
     <tabset>
         <tab>
@@ -39,20 +38,30 @@
             <tab-heading>Action</tab-heading>
             <ng-include src="'components/common/templates/action-form.html'"></ng-include>
         </tab>
+        <tab ng-if="detailsCtrl.itemProxy.kind === 'Task'">
+            <tab-heading>Task</tab-heading>
+            <ng-include src="'components/common/templates/task-form.html'"></ng-include>
+        </tab>
     </tabset>
     <div class="form-actions">
         <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit"
                 class="btn btn-primary">
             Edit
         </button>
-        <button ng-click="detailsCtrl.upsertItem()"
+        <button ng-if="detailsCtrl.itemProxy.item.parentId"
+                ng-click="detailsCtrl.createItem('parent')"
                 ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
                 && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
-            Update
+            <i class="fa fa-chevron-left"></i> Save + Return
+        </button>
+        <button ng-click="detailsCtrl.createItem('child')"
+                ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
+                && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
+            Save + Enter <i class="fa fa-chevron-right"></i>
         </button>
         <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()"
                 ng-disabled="!detailsCtrl.enableEdit"
-                class="btn btn-primary">
+                class="btn btn-danger">
             Cancel
         </button>
     </div>

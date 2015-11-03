@@ -298,11 +298,17 @@ table td .glyphicon-remove {
   padding: 5px 0px 5px;
   width: 40%; }
 
+.kti-state {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 5px;
+  width: 10%; }
+
 .kti-description {
   display: inline-block;
   vertical-align: top;
   padding: 5px 0px 5px;
-  width: 40%; }
+  width: 30%; }
 
 .knowledge-tree .kt-head .glyphicon-plus {
   color: green; }
@@ -339,20 +345,42 @@ table td .glyphicon-remove {
   border-radius: 10px;
   border: double 1px black; }
 
-.tab-pane .absolute {
-  position: absolute; }
-.tab-pane label {
-  margin: 10px; }
-  .tab-pane label #Rationale {
-    width: 500px; }
-  .tab-pane label .alternative-field {
-    width: 500px; }
-.tab-pane .form-actions {
-  margin-left: 20px; }
+.tab-pane {
+  overflow: auto; }
+  .tab-pane .absolute {
+    position: absolute; }
+  .tab-pane label {
+    margin: 10px; }
+    .tab-pane label #Rationale {
+      width: 500px; }
+    .tab-pane label .alternative-field {
+      width: 500px; }
+  .tab-pane .form-actions {
+    margin-left: 20px; }
 
 .active-state {
   background-color: #64be95;
   color: white; }
+
+tab div {
+  overflow: auto; }
+
+.item-actions i {
+  border: 2px solid #ffc8c8;
+  border-radius: 5px;
+  padding: 3px 5px 3px 5px;
+  margin-right: 5px; }
+  .item-actions i:hover {
+    cursor: pointer; }
+.item-actions .fa-stack {
+  margin-right: 5px; }
+  .item-actions .fa-stack .stacked-child {
+    border: none;
+    padding: 0;
+    margin: 0; }
+  .item-actions .fa-stack .stacked-parent {
+    border: none;
+    margin: 0; }
 
 .angucomplete-holder ::-webkit-input-placeholder {
   /* WebKit, Blink, Edge */
@@ -687,7 +715,9 @@ table td .glyphicon-remove {
   .assignment-accordion .assignment {
     background-color: #005A31;
     color: white;
-    padding: 5px;
+    margin: 5px;
+    padding: 2px;
+    width: 100%;
     border: 1px solid #7dd7ae; }
     .assignment-accordion .assignment:hover {
       cursor: pointer; }

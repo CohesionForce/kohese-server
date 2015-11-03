@@ -45,6 +45,12 @@
     padding: 15px;
     background-color: #660000; }
 
+.sidebar-button {
+  width: 100%;
+  cursor: pointer;
+  border: 1px solid #983232;
+  border-radius: 10px; }
+
 .side-pane.open {
   display: block;
   -webkit-transform: translateX(50px);
@@ -69,9 +75,11 @@
   background-image: -ms-linear-gradient(right, #64be95, #005A31);
   background-image: -o-linear-gradient(right, #64be95, #005A31); }
   .navbar .navbar-brand {
-    color: white; }
+    color: white;
+    cursor: pointer; }
     .navbar .navbar-brand:hover {
-      color: white; }
+      color: white;
+      background-color: #7dd7ae; }
   .navbar .navbar-top-links {
     margin-right: 0; }
     .navbar .navbar-top-links .dropdown > a:hover {

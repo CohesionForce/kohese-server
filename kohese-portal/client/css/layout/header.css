@@ -10,9 +10,11 @@
   background-image: -ms-linear-gradient(right, #64be95, #005A31);
   background-image: -o-linear-gradient(right, #64be95, #005A31); }
   .navbar .navbar-brand {
-    color: white; }
+    color: white;
+    cursor: pointer; }
     .navbar .navbar-brand:hover {
-      color: white; }
+      color: white;
+      background-color: #7dd7ae; }
   .navbar .navbar-top-links {
     margin-right: 0; }
     .navbar .navbar-top-links .dropdown > a:hover {

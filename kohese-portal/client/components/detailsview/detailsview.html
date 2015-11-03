@@ -2,14 +2,28 @@
     <div class="panel-heading ">
         <span ng-if="detailsCtrl.itemProxy.kind">{{detailsCtrl.itemProxy.kind}} Information: {{detailsCtrl.itemProxy.item.name}} </span>
         <span ng-if="!detailsCtrl.itemProxy.kind">No Item Selected</span>
-        <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
-           ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})"
-           ng-click="detailsCtrl.updateTab('edit', itemProxy.item.id, 'dualview')">
-        </i>
-        <i class="fa fa-arrows-alt pull-right" ng-if="detailsCtrl.tab.type === 'dualview'"
-           ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})"
-           ng-click="detailsCtrl.updateTab('investigate', itemProxy.item.id, 'singleview')"></i>
-
+        <span class="pull-right item-actions">
+            <i class="fa fa-lg fa-edit"
+               ng-if="!detailsCtrl.enableEdit"
+               ng-click="detailsCtrl.enableEdit=true"></i>
+            <span ng-if="detailsCtrl.enableEdit"
+                  class="fa fa-stack">
+                <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
+                   ng-click="detailsCtrl.enableEdit = false"></i>
+                <i class="fa fa-stack-1x fa-times stacked-child"
+                   ng-click="detailsCtrl.enableEdit = false; detailsCtrl.cancel();"></i>
+            </span>
+            <i class="fa fa-lg fa-save"
+               ng-click="detailsCtrl.upsertItem()"
+                    ></i>
+            <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
+               ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})"
+               ng-click="detailsCtrl.updateTab('edit', itemProxy.item.id, 'dualview')">
+            </i>
+            <i class="fa fa-lg fa-arrows-alt" ng-if="detailsCtrl.tab.type === 'dualview'"
+               ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})"
+               ng-click="detailsCtrl.updateTab('investigate', itemProxy.item.id, 'singleview')"></i>
+        </span>
     </div>
     <div class="panel-body">
         <!-- Nav tabs -->
@@ -19,9 +33,19 @@
                 <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Action'">
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>
-                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind != 'Action'">
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind != 'Action' &&
+                detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Task'">
                     <ng-include src="'components/common/templates/itemform.html'"></ng-include>
                 </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Task'">
+                    <ng-include src="'components/common/templates/task-form.html'"></ng-include>
+                </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Decision'">
+                    <accordion>
+                        <ng-include src="'components/common/templates/decision-form.new.html'"></ng-include>
+                    </accordion>
+                </div>
+
             </tab>
             <tab ng-if="detailsCtrl.itemProxy.kind === 'Observation'">
                 <tab-heading>Observation</tab-heading>
@@ -40,9 +64,9 @@
                 <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
             </tab>
             <tab heading="Relations">
-                    <h4>Relations Tab</h4>
+                <h4>Relations Tab</h4>
 
-                    <p><b>This tab is under construction.</b></p>
+                <p><b>This tab is under construction.</b></p>
             </tab>
             <tab heading="Analysis" select="detailsCtrl.fetchAnalysis()">
 		        <span class="pull-right">
@@ -141,31 +165,23 @@
 
                 <p><b>This tab is under construction.</b></p>
             </tab>
-            <tab ng-if="detailsCtrl.itemProxy.kind === 'Decision'" heading="New Decision Form">
-                <accordion>
-                    <div ng-include="'components/common/templates/decision-form.new.html'"></div>
-                </accordion>
-            </tab>
-            <tab ng-if="detailsCtrl.itemProxy.kind === 'Task'" heading="Task Form">
-                <div ng-include="'components/common/templates/task-form.html'"></div>
-            </tab>
         </tabset>
     </div>
     <!-- /.panel -->
-        <span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'"
-              class="form-actions">
-        <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">
-            Edit
-        </button>
-        <button ng-click="detailsCtrl.upsertItem()"
-                ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine
-                && detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">
-            Update
-        </button>
-        <button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"
-                class="btn btn-danger">
-            Cancel
-        </button>
-        <!-- /.panel-body -->
+    <!--<span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'"-->
+    <!--class="form-actions">-->
+    <!--<button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">-->
+    <!--Edit-->
+    <!--</button>-->
+    <!--<button ng-click="detailsCtrl.upsertItem()"-->
+    <!--ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine-->
+    <!--&& detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">-->
+    <!--Update-->
+    <!--</button>-->
+    <!--<button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"-->
+    <!--class="btn btn-danger">-->
+    <!--Cancel-->
+    <!--</button>-->
+    <!-- /.panel-body -->
     </span>
 </div>

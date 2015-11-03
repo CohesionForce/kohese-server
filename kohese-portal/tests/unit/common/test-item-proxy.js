@@ -76,6 +76,15 @@ var newBItem = JSON.parse(JSON.stringify(b.item));
 b.updateItem("NewTest", newBItem);
 dump("Change b to a NewTest kind");
 
+console.log("::: Preparing to rename an item");
+var ab = new ItemProxy("Test", {id: "ab", name:"AB", parentId:"b"});
+var ac = new ItemProxy("Test", {id: "ac", name:"AC", parentId:"b"});
+dump("Created AB and AC");
+
+var newABItem = JSON.parse(JSON.stringify(ab.item));
+newABItem.name = "New Name";
+ab.updateItem("Item", newABItem);
+dump("AB Name Updated")
 
 
 console.log("::: Finishing Item Proxy Test");

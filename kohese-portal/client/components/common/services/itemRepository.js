@@ -2,39 +2,62 @@
  *
  */
 
-function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Task, KoheseUser, socket, $rootScope) {
+function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Task, KoheseUser, KoheseIO, $rootScope) {
     var _ = require('underscore');
     var ItemProxy = require('../../../../common/models/item-proxy');
     var modelTypes = {
         Item: Item,
-        Category: Category,
         Decision: Decision,
         Action: Action,
+        Task: Task,
         Observation: Observation,
         Issue: Issue,
-        Task: Task,
+        Category: Category,
         KoheseUser: KoheseUser
     };
 
-    fetchItems();
+    function registerKoheseIOListeners(){
+      // Register the listeners for the Item kinds that are being tracked
+      for (var modelName in modelTypes) {
+        KoheseIO.socket.on(modelName + '/create', function (notification) {
+              console.log("::: Received notification of " + notification.model + " Created:  " + notification.id);
+              fetchItemByModel(modelTypes[notification.model], notification.id);
+          });
 
-    // Register the listeners for the Item kinds that are being tracked
-    for (var modelName in modelTypes) {
-        socket.on(modelName + '/create', function (notification) {
-            console.log("::: Received notification of " + notification.model + " Created:  " + notification.id);
-            fetchItemByModel(modelTypes[notification.model], notification.id);
-        });
+        KoheseIO.socket.on(modelName + '/update', function (notification) {
+              console.log("::: Received notification of " + notification.model + " Updated:  " + notification.id);
+              fetchItemByModel(modelTypes[notification.model], notification.id);
+          });
 
-        socket.on(modelName + '/update', function (notification) {
-            console.log("::: Received notification of " + notification.model + " Updated:  " + notification.id);
-            fetchItemByModel(modelTypes[notification.model], notification.id);
-        });
+        KoheseIO.socket.on(modelName + '/delete', function (notification) {
+              console.log("::: Received notification of " + notification.model + " Deleted:  " + notification.id);
+              var proxy = ItemProxy.getProxyFor(notification.id);
+              proxy.deleteItem();
+          });
+      }
 
-        socket.on(modelName + '/delete', function (notification) {
-            console.log("::: Received notification of " + notification.model + " Deleted:  " + notification.id);
-            var proxy = ItemProxy.getProxyFor(notification.id);
-            proxy.deleteItem();
-        });
+      KoheseIO.socket.on('connect_error', function(){
+        console.log("::: IR: Socket IO Connection Error");
+      });
+      
+//      KoheseIO.socket.on('reconnect', function() {
+//        fetchItems();
+//      });
+
+    }
+
+    if (KoheseIO.isAuthenticated){
+      console.log("::: IR: KoheseIO already connected");
+      registerKoheseIOListeners();
+      fetchItems();
+    } else {
+      console.log("::: IR: Listening for KoheseIO connection");
+      var deregister = $rootScope.$on('KoheseIOConnected', function(){
+        console.log("::: IR: KoheseIO Connected");
+        registerKoheseIOListeners();
+        fetchItems();     
+        deregister();
+      });      
     }
 
     return {
@@ -69,8 +92,6 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ta
           });
         });
     }
-
-
 
     function copyAttributes(fromItem, toItem) {
         // TBD: Need to remove
@@ -145,7 +166,6 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ta
             createItemProxy(dataList[idx]);
         }
     }
-
 }
 
 export default () => {
