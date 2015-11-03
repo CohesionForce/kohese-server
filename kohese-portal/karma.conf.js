@@ -31,7 +31,8 @@ module.exports = function(config) {
 		      // do not include tests or libraries
 		      // (these files will be instrumented by Istanbul)
 		      'client/bundle.js': ['coverage'],
-	          'tests/unit/components/*.js': ['browserify']
+	          'tests/unit/components/*.js': ['browserify'],
+	          'tests/unit/mock/*.js': ['browserify']
 		    },
 
 		    // test results reporter to use
