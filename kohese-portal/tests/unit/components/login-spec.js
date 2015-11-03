@@ -1,6 +1,9 @@
 /**
  * New node file
  */
+
+var MockLoginService = require('../mock/MockLoginService');
+
 describe("Login Return", function() {
 
 	var mockLoginService;
@@ -8,8 +11,9 @@ describe("Login Return", function() {
 	var callData;
 	var state;
 	var loginController;
-
-	beforeEach(module('app.login'));
+	var mockLoginService = new MockLoginService();
+	
+	beforeEach(angular.mock.module('app.login'));
 
 	beforeEach(function() {
 
@@ -19,41 +23,6 @@ describe("Login Return", function() {
 			}
 		};
 
-		// Set up the Mock Login Service
-		mockLoginService = {
-
-			// Variable that controls pass/fail
-			pass : true,
-
-			// User name should be the same value passed to the controller
-			username : null,
-			// Password should be the same value passed to the controller
-			password : null,
-
-			// login function called by the controller
-			login : function(name, password) {
-				console.log("mockLoginService.login called with " + name + ":"
-						+ password);
-				this.username = name;
-				this.password = password;
-				
-				// Return an object that works like a promise
-				return {
-					then : function(passFunction, failFunction) {
-						if (mockLoginService.pass) {
-							passFunction({
-								data : "SomeData"
-							});
-						} else {
-							failFunction({
-								data : "Failed"
-							});
-						}
-					}
-				}
-			}
-		}, 
-		
 		// Mock Authorization Token Factory
 		mockAuthTokenFactory = {
 			data : undefined,
@@ -72,6 +41,7 @@ describe("Login Return", function() {
 	}));
 
 	it("Check Login Pass", function() {
+	    console.log('login-spec: Check Login Pass');
 		loginController.login("user", "user123");
 		expect(mockLoginService.username == "user").toBe(true);
 		expect(mockLoginService.password == "user123").toBe(true);
@@ -80,12 +50,14 @@ describe("Login Return", function() {
 	}),
 	
 	it("Check Logout", function() {
-		console.log("Calling loginController.logout()");
+		console.log('login-spec: Check Logout');
 		loginController.logout();
 		expect(mockAuthTokenFactory.data).toBe(undefined);
 	}),
 	
 	it("Check Login Fail", function() {
+	    console.log('login-spec: Check Login Fail');
+	    console.log(mockLoginService);
 		mockLoginService.pass = false;
 		callData = undefined;
 		spyOn(window, 'alert');

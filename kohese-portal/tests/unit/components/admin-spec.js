@@ -1,16 +1,19 @@
 /**
  * New node file
  */
+
+var MockTabService = require('../mock/MockTabService');
+
 describe(
 		"AdminController Test",
 		function() {
 
-			var mockTabService;
 			var adminController;
 			var mockScope;
 			var mockKoheseUser;
 			var mockUserList;
-
+			var mockTabService = new MockTabService();
+			
 			function KoheseUser() {
 				this.name = '';
 				this.description = '';
@@ -53,27 +56,11 @@ describe(
 				return users;
 			}
 
-			beforeEach(module('app.admin'));
+			beforeEach(angular.mock.module('app.admin'));
 
 			beforeEach(inject(function($q) {
 
 				mockUserList = [ 'user1', 'user2', 'user3' ];
-
-				// Set up the Mock Login Service
-				mockTabService = {
-
-					tab : {
-						title : undefined,
-						type : undefined,
-						setTitle : function(newTitle) {
-							tab.title = newTitle;
-						}
-					},
-
-					getCurrentTab : function() {
-						return mockTabService.tab;
-					}
-				};
 
 				mockScope = {
 					$on : function(name, func) {
