@@ -4,8 +4,6 @@
 
 #page-wrapper {
   position: relative;
-  left: 50px;
-  top: 50px;
   z-index: 1;
   width: calc(100% - 50px);
   height: calc(100% - 50px); }

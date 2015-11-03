@@ -7,8 +7,6 @@
 
 #page-wrapper {
   position: relative;
-  left: $leftNavWidth;
-  top: $topNavHeight;
   z-index: 1;
   width: calc(100% - #{$leftNavWidth});
   height: calc(100% - #{$topNavHeight});

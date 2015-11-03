@@ -3,14 +3,14 @@
 .sidebar {
   color: whitesmoke;
   position: relative;
-  top: $topNavHeight;
   left: 0;
-  height: calc(100% - #{$topNavHeight});
+//  height: calc(100% - #{$topNavHeight});
+  height: 900px;
+  width: $leftNavWidth;
+  min-width: $leftNavWidth;
 
   .static-side-panel {
-    position: fixed;
-    top: $topNavHeight;
-    left: 0;
+    position: relative;
     height: 100%;
     width: $leftNavWidth;
     z-index: 7;
@@ -25,6 +25,7 @@
 
   .side-pane {
     display: none;
+    width: $sidePaneWidth;
     position: static;
     z-index: -1;
     -webkit-transform: translateX(-150%);
@@ -51,6 +52,7 @@
   }
 
   .sidebar-nav {
+    height: 900px;
     .navbar-collapse {
       padding-right: 0;
       padding-left: 0;
@@ -63,6 +65,11 @@
     background-color: $secondaryColor;
 
   }
+}
+
+.navbar-collapse {
+  padding-right: 0;
+  padding-left: 0;
 }
 
 .sidebar-button {
@@ -85,6 +92,5 @@
 
 @media(min-width: 768px) {
   .sidebar {
-    margin-top: 50px;
   }
 }

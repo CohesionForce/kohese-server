@@ -18,4 +18,21 @@
 tab div {
   overflow: auto; }
 
+.item-actions i {
+  border: 2px solid #ffc8c8;
+  border-radius: 5px;
+  padding: 3px 5px 3px 5px;
+  margin-right: 5px; }
+  .item-actions i:hover {
+    cursor: pointer; }
+.item-actions .fa-stack {
+  margin-right: 5px; }
+  .item-actions .fa-stack .stacked-child {
+    border: none;
+    padding: 0;
+    margin: 0; }
+  .item-actions .fa-stack .stacked-parent {
+    border: none;
+    margin: 0; }
+
 /*# sourceMappingURL=details.css.map */

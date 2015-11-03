@@ -71,9 +71,9 @@ client/css/pages/login.scss:19
 /var/lib/gems/1.9.1/gems/sass-3.4.18/lib/sass/exec/sass_scss.rb:51:in `process_result'
 /var/lib/gems/1.9.1/gems/sass-3.4.18/lib/sass/exec/base.rb:52:in `parse'
 /var/lib/gems/1.9.1/gems/sass-3.4.18/lib/sass/exec/base.rb:19:in `parse!'
-/var/lib/gems/1.9.1/gems/sass-3.4.18/bin/sass:13:in `<top (required)>'
-/usr/local/bin/sass:23:in `load'
-/usr/local/bin/sass:23:in `<main>'
+/var/lib/gems/1.9.1/gems/sass-3.4.18/bin/scss:13:in `<top (required)>'
+/usr/local/bin/scss:23:in `load'
+/usr/local/bin/scss:23:in `<main>'
 */
 body:before {
   white-space: pre;

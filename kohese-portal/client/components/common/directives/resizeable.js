@@ -21,7 +21,7 @@ function Resizeable(tabService) {
             //       the available space
             var pwHeight = $("#page-wrapper").height();
             $element.css({
-                height: (pwHeight - 461 - 50 - 6) + 'px'
+                height: (pwHeight - 461 - 6) + 'px'
             });
 
         }
