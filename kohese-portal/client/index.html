@@ -24,17 +24,17 @@
     <![endif]-->
 
 </head>
-<body ng-app="app" style="height=100%; overflow:hidden;">
+<body ng-app="app">
 
-    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
         <app-bar></app-bar>
     </nav>
 
-    <div style="height: calc(100% - 50px)">
-        <div style="display:inline-block; height: inherit; width: 50px;">
+    <div id="layout-bottom">
+        <div>
             <side-nav></side-nav>
         </div>
-        <div id="page-wrapper" style="display:inline-block; height: inherit; width: calc(100% - 50px); float: right">
+        <div id="page-wrapper">
             <div ui-view></div>
         </div>
     </div>

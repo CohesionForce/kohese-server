@@ -3,10 +3,9 @@
   height: 100%; }
 
 #page-wrapper {
-  position: relative;
-  z-index: 1;
-  width: calc(100% - 50px);
-  height: calc(100% - 50px); }
+  position: fixed;
+  top: 50px;
+  left: 50px; }
   #page-wrapper #content-container {
     z-index: 2;
     border-radius: 10px; }

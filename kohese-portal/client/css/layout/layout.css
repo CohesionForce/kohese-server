@@ -1,0 +1,11 @@
+body #layout-bottom {
+  height: calc(100% - 50px); }
+  body #layout-bottom > div {
+    display: inline-block;
+    height: inherit; }
+  body #layout-bottom #page-wrapper {
+    z-index: 1;
+    width: calc(100% - 50px);
+    height: calc(100% - 50px); }
+
+/*# sourceMappingURL=layout.css.map */

@@ -1,15 +1,17 @@
 .sidebar {
   color: whitesmoke;
-  position: relative;
+  position: fixed;
   left: 0;
-  height: 900px;
+  top: 50px;
+  height: calc(100% - 50px);
   width: 50px;
   min-width: 50px; }
   .sidebar .static-side-panel {
-    position: relative;
+    position: fixed;
+    top: 50px;
     height: 100%;
     width: 50px;
-    z-index: 7;
+    z-index: 50;
     background-image: -webkit-linear-gradient(bottom, #ca6464, #660000);
     background-image: -moz-linear-gradient(bottom, #ca6464, #660000);
     background-image: -ms-linear-gradient(bottom, #ca6464, #660000);
