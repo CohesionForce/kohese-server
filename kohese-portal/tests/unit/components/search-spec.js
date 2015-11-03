@@ -1,13 +1,25 @@
 /**
  * New node file
  */
+
+var MockItemRepository = require('../mock/MockItemRepository');
+var MockTabService = require('../mock/MockTabService');
+var MockUserService = require('../mock/MockUserService');
+var MockDecisionService = require('../mock/MockDecisionService');
+var MockActionService = require('../mock/MockActionService');
+var MockSearchService = require('../mock/MockSearchService');
+
 describe("Search Controller Test", function() {
 
 	var searchController;
-    var mockTabService; 
-    var mockItemRepository;
-
-	beforeEach(module('app.search'));
+    var mockTabService = new MockTabService();
+    var mockItemRepository = new MockItemRepository();
+    var mockUserService = new MockUserService();
+    var mockDecisionService = new MockDecisionService();
+    var mockActionService = new MockActionService();
+    var mockSearchService = new MockSearchService();
+    
+	beforeEach(angular.mock.module('app.search'));
 
 	beforeEach(function() {
 
@@ -23,45 +35,32 @@ describe("Search Controller Test", function() {
 		stateParams = {
 		    id : "stateParams.id"
 		};
+
+		scope = {
+		    $on : function(name, func) {
+		        
+		    }
+		};
 		
-		mockItemRepository = {
-		    getAllItemProxies : function() {
-		        return []
-		    }    
-		}
-		
-        // Set up the Mock Login Service
-        mockTabService = {
-
-            tab : {
-                title : undefined,
-                type : undefined,
-                state : undefined,
-                setTitle : function(newTitle) {
-                    mockTabService.tab.title = newTitle;
-                },
-                params : {
-                    filter : "This is a filter",
-                    id : "mockTabService.tab.params.id"
-                },
-                setState : function(str) {
-                    mockTabService.tab.state = str;
-                }
-            },
-
-            getCurrentTab : function() {
-                return mockTabService.tab;
-            }
-        };
-
+		filter = function(name) {
+		    return function(something) {
+		        
+		    };
+		};
 	});
 
 	beforeEach(inject(function($controller) {
 		searchController = $controller('SearchController', {
 			ItemRepository : mockItemRepository,
+			UserService: mockUserService,
+			DecisionService: mockDecisionService,
+			ActionService: mockActionService,
 			tabService : mockTabService,
+			SearchService: mockSearchService,
 			$state : state,
-			$stateParams : stateParams });
+			$scope : scope,
+			$stateParams : stateParams,
+			$filter: filter });
 	}));
 
 	it("Check Tree Navigation", function() {

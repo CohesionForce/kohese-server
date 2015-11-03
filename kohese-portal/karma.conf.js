@@ -10,13 +10,14 @@ module.exports = function(config) {
 
 		// frameworks to use
 		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-		frameworks : [ 'jasmine' ],
+		frameworks : [ 'jasmine', 'browserify' ],
 
 		files : [ 'node_modules/angular/angular.js',
 				'bower_components/angular-mocks/angular-mocks.js',
 				'bower_components/angular-resource/angular-resource.js',
 				'bower_components/jquery/dist/jquery.js',
 				'client/bundle.js',
+				'tests/unit/mock/Mock*.js',
 				'tests/unit/components/*-spec.js'],
 
 		// list of files to exclude
@@ -29,7 +30,8 @@ module.exports = function(config) {
 		      // source files, that you wanna generate coverage for
 		      // do not include tests or libraries
 		      // (these files will be instrumented by Istanbul)
-		      'client/bundle.js': ['coverage']
+		      'client/bundle.js': ['coverage'],
+	          'tests/unit/components/*.js': ['browserify']
 		    },
 
 		    // test results reporter to use
