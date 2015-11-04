@@ -30,6 +30,7 @@ function ItemProxy(kind, forItem) {
     // " + kind);
     proxy = this;
     proxy.children = [];
+    proxy.descendantCount = 0;
     tree.proxyMap[itemId] = proxy;
   }
 
@@ -106,6 +107,17 @@ ItemProxy.prototype.addChild = function(childProxy) {
   this.children.splice(insertAt, 0, childProxy);
   childProxy.parentProxy = this;
 
+  // update descendant count
+  var deltaCount = 1 + childProxy.descendantCount;
+  this.descendantCount += deltaCount;
+
+  var ancestorProxy = this.parentProxy;
+  while (ancestorProxy){
+    ancestorProxy.descendantCount += deltaCount;
+    ancestorProxy = ancestorProxy.parentProxy;
+  }
+  
+  // update display of lostAndFound node
   if (this == tree.lostAndFound && tree.lostAndFound.children.length === 1) {
     tree.root.addChild(tree.lostAndFound);
   }
@@ -114,15 +126,26 @@ ItemProxy.prototype.addChild = function(childProxy) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-ItemProxy.prototype.removeChild = function(proxy) {
+ItemProxy.prototype.removeChild = function(childProxy) {
   // console.log("::: IP: Removing child " + proxy.item.name + " from " +
   // this.item.name);
-  this.children = _.reject(this.children, function(childProxy) {
+  this.children = _.reject(this.children, function(proxy) {
     return childProxy.item.id === proxy.item.id;
   });
 
-  delete proxy.parentProxy;
+  delete childProxy.parentProxy;
 
+  // update descendant count
+  var deltaCount = 1 + childProxy.descendantCount;
+  this.descendantCount -= deltaCount;
+
+  var ancestorProxy = this.parentProxy;
+  while (ancestorProxy){
+    ancestorProxy.descendantCount -= deltaCount;
+    ancestorProxy = ancestorProxy.parentProxy;
+  }
+  
+  // update display of lostAndFound node
   if (this == tree.lostAndFound && tree.lostAndFound.children.length === 0) {
     tree.root.removeChild(tree.lostAndFound);
   }

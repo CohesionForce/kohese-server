@@ -36,7 +36,8 @@
 				ng-click="treeCtrl.removeItem(itemProxy.item)"> </i>
 		</div>
 	</div>
-	<div ng-if="itemProxy.children && lazyIdx<treeCtrl.currentLazyLimit">
-		<tree-row tree-ctrl="treeCtrl" proxy-collection="itemProxy.children"></tree-row>
+
+	<div ng-if="itemProxy.children && (!treeCtrl.collapsed[itemProxy.item.id] || treeCtrl.previouslyExpanded[itemProxy.item.id] || (treeCtrl.allExpanded && (lazyIdx < treeCtrl.currentLazyLimit)))">
+		<tree-row tree-ctrl="treeCtrl" proxy-collection="itemProxy.children" ng-init="treeCtrl.previouslyExpanded[itemProxy.item.id]=true"></tree-row>
 	</div>
 </div>

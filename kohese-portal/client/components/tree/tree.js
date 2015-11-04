@@ -23,6 +23,8 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     treeCtrl.actionStates = ActionService.getActionStates();
     treeCtrl.userList = UserService.getAllUsers();
     treeCtrl.collapsed = {};
+    treeCtrl.previouslyExpanded = {};
+    treeCtrl.allExpanded = false;
     treeCtrl.tab = tabService.getCurrentTab();
     treeCtrl.locationSynced = false;
     treeCtrl.currentLazyItemIdx = 0;
@@ -190,12 +192,14 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     ;
 
     treeCtrl.expandAll = function () {
+        treeCtrl.allExpanded = true;
         for (var key in treeCtrl.collapsed) {
             treeCtrl.collapsed[key] = false;
         }
     };
 
     treeCtrl.collapseAll = function () {
+        treeCtrl.allExpanded = false;
         for (var key in treeCtrl.collapsed) {
             treeCtrl.collapsed[key] = true;
         }

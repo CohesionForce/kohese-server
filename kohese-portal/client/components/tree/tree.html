@@ -8,7 +8,7 @@
 		ng-class="{ 'button-selected' :treeCtrl.locationSynced}"
 		class="btn btn-default btn-sm fa fa-exchange"> </i>
     <span class="pull-right"> 
-	    <span>Showing {{treeCtrl.getItemMatchedCount()}} of {{treeCtrl.getItemCount()}}</span> 
+	    <span>Showing {{treeCtrl.getItemMatchedCount()}} of {{treeCtrl.treeRoot.descendantCount}}</span> 
 	    <span class="control-group">
 		    <label class="control-label" for="Kind"> Kind </label>
 		    <span class="controls">
