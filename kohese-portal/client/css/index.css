@@ -427,6 +427,7 @@ tab div {
   color: whitesmoke;
   position: relative;
   top: 50px;
+  width: 50px;
   height: calc(100% - 50px); }
   .sidebar .static-side-panel {
     position: fixed;

@@ -4,6 +4,7 @@
   color: whitesmoke;
   position: relative;
   top: $topNavHeight;
+  width: $leftNavWidth;
   height: calc(100% - #{$topNavHeight});
 
   .static-side-panel {
