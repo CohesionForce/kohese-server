@@ -1,6 +1,7 @@
 body #layout-bottom {
   height: calc(100% - 50px); }
-  body #layout-bottom > div {
+  body #layout-bottom #side-nav-wrapper {
+    z-index: 5;
     display: inline-block;
     height: inherit; }
   body #layout-bottom #page-wrapper {

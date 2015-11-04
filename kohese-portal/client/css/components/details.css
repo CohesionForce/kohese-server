@@ -1,6 +1,15 @@
-.tab-content {
-  height: calc(100% - 43px);
-  overflow-y: auto; }
+#details-panel {
+  margin-bottom: 0px;
+  height: 100%; }
+  #details-panel > .panel-body {
+    height: calc(100% - 30px);
+    overflow: hidden; }
+
+#details-tabs {
+  height: calc(100% - 30px); }
+  #details-tabs .tab-content {
+    height: calc(100% - 43px);
+    overflow-y: auto; }
 
 .tab-pane {
   overflow: auto; }
