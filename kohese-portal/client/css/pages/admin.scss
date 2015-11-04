@@ -1,9 +1,26 @@
 @import '../utils/variables';
 
 .admin-screen {
+  height: 100%;
+  
+  .panel {
+    height: 100%;
+    #admin-view-wrapper {
+      height: calc(100% - 65px);
+      overflow:auto;
+    }
+  }
+  
+}
+
+.users-screen {
 
   overflow: auto;
   width: 100%;
+  
+  panel-body {
+    overflow: auto;
+  }
 
   #admin-user-list {
     float: left;
