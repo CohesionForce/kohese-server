@@ -78,7 +78,33 @@
                     </span>
                 </div>
             </accordion-group>
+        </accordion>
 
+        <accordion>
+            <h4>Tasks:</h4>
+            <accordion-group heading="Assigned ({{dashCtrl.assignedTasks.length}})">
+                <div class="assignment"
+                     ng-repeat="itemProxy in dashCtrl.assignedTasks = (dashCtrl.itemList | filter: dashCtrl.assignedTasksFilter)">
+                    <span ng-click="dashCtrl.navigate('kohese.investigate', {id: itemProxy.item.id}, 'singleview')">
+                        {{itemProxy.item.name}}
+                    </span>
+                </div>
+            </accordion-group>
+            <accordion-group heading="Accepted ({{dashCtrl.acceptedTasks.length}})">
+                <div class="assignment"
+                     ng-repeat="itemProxy in dashCtrl.acceptedTasks =(dashCtrl.itemList | filter: dashCtrl.acceptedTasksFilter)">
+                    <span ng-click="dashCtrl.navigate('kohese.investigate', { id: itemProxy.item.id}, 'singleview')"
+                            >
+                        {{itemProxy.item.name}} </span>
+                </div>
+            </accordion-group>
+            <accordion-group heading="In Work ({{dashCtrl.inWorkTasks.length}})">
+                <div class="assignment"
+                     ng-repeat=" itemProxy in dashCtrl.inWorkTasks = (dashCtrl.itemList | filter: dashCtrl.inWorkTasksFilter)">
+                    <span ng-click="dashCtrl.navigate('kohese.investigate', { id: itemProxy.item.id}, 'singleview')"
+                            >
+                        {{itemProxy.item.name}} </span>
+                </div>
         </accordion>
 
     </div>

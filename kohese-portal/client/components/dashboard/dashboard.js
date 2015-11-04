@@ -47,6 +47,24 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
             issueState: 'In Analysis'
         }
     };
+    ctrl.assignedTasksFilter = {
+        item: {
+            taskState: 'Assigned',
+            assignedTo: ctrl.currentUser
+        }
+    };
+    ctrl.acceptedTasksFilter = {
+        item: {
+            taskState: 'Accepted',
+            assignedTo: ctrl.currentUser
+        }
+    };
+    ctrl.inWorkTasksFilter = {
+        item: {
+            taskState: 'In Work',
+            assignedTo: ctrl.currentUser
+        }
+    };
 
 
     ctrl.navigate = function (state, params, type) {
