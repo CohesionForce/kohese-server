@@ -11,6 +11,10 @@
   top: $topNavHeight;
   left: $leftNavWidth;
   
+  >div {
+    height:100%;
+  }
+  
   #content-container {
     height: 100%;
     z-index: 2;

@@ -561,6 +561,8 @@ tab div {
   position: fixed;
   top: 50px;
   left: 50px; }
+  #page-wrapper > div {
+    height: 100%; }
   #page-wrapper #content-container {
     height: 100%;
     z-index: 2;
