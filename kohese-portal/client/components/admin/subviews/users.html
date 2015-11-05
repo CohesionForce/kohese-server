@@ -1,5 +1,11 @@
 <div class="users-screen">
     <div class="panel-body">
+        <div>
+            <h2>Sessions:</h2>
+            <div class="session-container" ng-repeat="session in adminCtrl.sessions">
+              <div>{{session.username}} - {{session.address}} - {{session.sessionId}}</div>
+            </div>
+        </div>
         <div id="admin-user-list">
             <h2>Users:</h2>
 

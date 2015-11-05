@@ -2,7 +2,7 @@
  * Created by josh on 10/8/15.
  */
 
-function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory){
+function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, KoheseIO){
 
     const service = this;
     var users = {};
@@ -12,6 +12,37 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory){
 
     service.getAllUsers = getAllUsers;
     service.getCurrentUser = getCurrentUser;
+    service.sessions = {};
+
+    function registerSessions(){
+      KoheseIO.socket.on('session/add', function (session) {
+        service.sessions[session.sessionId] = session;
+        console.log("::: Added session %s for %s at %s", session.sessionId, session.username, session.address);
+      });
+      
+      KoheseIO.socket.on('session/remove', function (session) {
+        console.log("::: Removed session %s for %s at %s", session.sessionId, session.username, session.address);
+        delete service.sessions[session.sessionId];
+      });
+      
+      KoheseIO.socket.on('session/list', function (sessionList) {
+        // Remove existing sessions
+        for (var key in service.sessions){
+          console.log("... Removing session" + key);
+          delete service.sessions[key];
+        }
+        
+        for(var sessionIdx in sessionList){
+          var session = sessionList[sessionIdx];
+          console.log("::: Existing session %s for %s at %s", session.sessionId, session.username, session.address);
+          service.sessions[session.sessionId] = session;
+        }
+      });
+      
+    }
+
+    registerSessions();
+
 
     function getAllUsers(){
       return users.children;

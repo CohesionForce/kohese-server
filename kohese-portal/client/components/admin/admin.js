@@ -2,7 +2,7 @@
  * Created by josh on 9/22/15.
  */
 
-function AdminController(tabService, $scope, KoheseUser) {
+function AdminController(tabService, $scope, KoheseUser, UserService) {
     var ctrl = this;
     var tab = tabService.getCurrentTab();
 
@@ -10,6 +10,7 @@ function AdminController(tabService, $scope, KoheseUser) {
     ctrl.addUserForm = false;
     ctrl.editUserForm = false;
     ctrl.users = [];
+    ctrl.sessions = UserService.sessions;
 
     $scope.$on('$viewContentLoaded', function () {
         tab.setTitle('Admin');
