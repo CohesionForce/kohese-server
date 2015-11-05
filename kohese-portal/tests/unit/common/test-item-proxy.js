@@ -14,6 +14,7 @@ function dump(message) {
   ItemProxy.dumpAllProxies();
   console.log("");
   root.dumpProxy();
+  console.log("Root Descendants: " + root.descendantCount);
   console.log("");
   lostAndFound.dumpProxy();
   console.log("-----------------------------------------");

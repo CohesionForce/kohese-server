@@ -4,7 +4,9 @@
 
 console.log("::: Begin KDB File Load");
 
-var fs = require('fs');
+var kdbFS = require('./kdb-fs.js');
+var jsonExt = /\.json$/;
+
 var ItemProxy = require('../common/models/item-proxy.js');
 module.exports.ItemProxy = ItemProxy;
 
@@ -12,30 +14,6 @@ var repoDirPath = "kohese-kdb";
 var exportDirPath = repoDirPath + "/export";
 
 var kdbStore = {};
-
-//////////////////////////////////////////////////////////////////////////
-// 
-//////////////////////////////////////////////////////////////////////////
-function loadJSONDoc(filePath) {
-  
-  console.log("::: Loading " + filePath);
-  
-  var fileData = fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
-  var jsonObject = JSON.parse(fileData);
-
-  return jsonObject;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function storeJSONDoc(filePath, doc) {
-  
-  console.log("::: Storing " + filePath);
-
-  fs.writeFileSync(filePath, JSON.stringify(doc, null, '  '), {encoding: 'utf8', flag: 'w'});  
-}
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -58,7 +36,7 @@ module.exports.retrieveModelInstance = retrieveModelInstance;
 //////////////////////////////////////////////////////////////////////////
 function storeModelInstance(modelName, modelInstance){
   var filePath = exportDirPath + "/" + modelName + "/" + modelInstance.id + ".json";
-  storeJSONDoc(filePath, modelInstance);
+  kdbFS.storeJSONDoc(filePath, modelInstance);
   
   var strippedInstance = JSON.parse(JSON.stringify(modelInstance));
   
@@ -87,8 +65,8 @@ module.exports.storeModelInstance = storeModelInstance;
 //////////////////////////////////////////////////////////////////////////
 function removeModelInstance(modelName, instanceId){
   var filePath = exportDirPath + "/" + modelName + "/" + instanceId + ".json";
-  console.log("::: Removing " + filePath);
-  fs.unlinkSync(filePath);
+
+  kdbFS.removeFile(filePath);
 
   if(modelName !== "Analysis"){
     var proxy = ItemProxy.getProxyFor(instanceId);
@@ -111,53 +89,8 @@ module.exports.removeModelInstance = removeModelInstance;
 //
 //////////////////////////////////////////////////////////////////////////
 function checkAndCreateDir(dirName) {
-  if (!fs.existsSync(dirName)) {
-    console.log("::: Creating " + dirName);
-    fs.mkdirSync(dirName);
-    
-    // Create and empty .gitignore file to ensure directory is present in git
-    fs.writeFileSync(dirName + "/.gitignore","", {encoding: 'utf8', flag: 'w'});
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function deleteFolderRecursive(dirPath) {
-  var files = [];
-  if( fs.existsSync(dirPath) ) {
-      files = fs.readdirSync(dirPath);
-      files.forEach(function(file,index){
-          var curPath = dirPath + "/" + file;
-          if(fs.lstatSync(curPath).isDirectory()) { // recurse
-              deleteFolderRecursive(curPath);
-          } else { // delete file
-              fs.unlinkSync(curPath);
-          }
-      });
-      fs.rmdirSync(dirPath);
-  }
-};
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function getRepositoryFileList(dirPath) {
-  var fileList = fs.readdirSync(dirPath);
-
-  // Ignore the .git file if it exists
-  var gitIdx = fileList.indexOf(".git");
-  if (gitIdx > -1){
-    fileList.splice(gitIdx, 1);
-  }
-
-  // Ignore the .gitignore file if it exists
-  var gitignoreIdx = fileList.indexOf(".gitignore");
-  if (gitignoreIdx > -1){
-    fileList.splice(gitignoreIdx, 1);
-  }
-  
-  return fileList;
+  kdbFS.createDirIfMissing(dirName);
+  kdbFS.createEmptyFileIfMissing(dirName + "/.gitignore");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -167,14 +100,14 @@ function validateRepositoryStructure () {
   checkAndCreateDir(repoDirPath);
   checkAndCreateDir(exportDirPath);
   
-  var modelDirList = getRepositoryFileList(exportDirPath);
+  var modelDirList = kdbFS.getRepositoryFileList(exportDirPath);
   
   // Remove model directories that are no longer needed
   for (var dirIdx in modelDirList) {
     var modelDirName = modelDirList[dirIdx];
     if (!modelConfig[modelDirName]) {
       console.log("::: Removing stored directory for " + modelDirName);
-      deleteFolderRecursive(exportDirPath + "/" + modelDirName);
+      kdbFS.deleteFolderRecursive(exportDirPath + "/" + modelDirName);
     }
   }
   
@@ -189,16 +122,15 @@ function validateRepositoryStructure () {
     models: {}
   };
   
-  var modelDirList = getRepositoryFileList(exportDirPath);
+  var modelDirList = kdbFS.getRepositoryFileList(exportDirPath);
   for(var modelIdx in modelDirList){
     var modelName = modelDirList[modelIdx];
     var modelDirPath = exportDirPath + "/" + modelName;
     var modelStore ={};
     kdbStore.models[modelName] = modelStore;
-    var fileList = getRepositoryFileList(modelDirPath);
+    var fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
     for(var fileIdx in fileList) {
-      var fileData = fs.readFileSync(modelDirPath + "/" + fileList[fileIdx], {encoding: 'utf8', flag: 'r'});
-      var itemRow =  JSON.parse(fileData);
+      var itemRow = kdbFS.loadJSONDoc(modelDirPath + "/" + fileList[fileIdx]);
       
       if(modelName !== "Analysis"){
         var proxy = new ItemProxy(modelName, itemRow);        
@@ -215,7 +147,7 @@ function validateRepositoryStructure () {
 //////////////////////////////////////////////////////////////////////////
 
 // Read the model config
-modelConfig = loadJSONDoc("server/model-config.json");
+modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
 
 // Ignore the loopback _meta
 if (modelConfig._meta) {
@@ -226,12 +158,20 @@ console.log(modelConfig);
 
 console.log("::: Validating Repository Structure")
 validateRepositoryStructure();
-storeJSONDoc(repoDirPath + "/kdbStore.json", kdbStore);
+kdbFS.storeJSONDoc(repoDirPath + "/kdbStore.json", kdbStore);
 var rootProxy = ItemProxy.getRootProxy();
 //rootProxy.dumpProxy();
+console.log("--- Root descendant count: " + rootProxy.descendantCount);
+for(var childIdx in rootProxy.children){
+  var childProxy = rootProxy.children[childIdx];
+  console.log("--- Child descendant count of " + childProxy.item.name + ": " + childProxy.descendantCount);  
+}
 
 console.log("::: Reading db.json");
-var lbStore = loadJSONDoc("db.json");
-storeJSONDoc(repoDirPath + "/lbStore.json", lbStore);
+var lbStore = kdbFS.loadJSONDoc("db.json");
+kdbFS.storeJSONDoc(repoDirPath + "/lbStore.json", lbStore);
+
+var kdbModel = require('./kdb-model.js');
+kdbFS.storeJSONDoc(repoDirPath + "/modelDef.json", kdbModel.modelDef);
 
 console.log("::: End KDB File Load");
