@@ -1,7 +1,13 @@
+git status -s -uno
+git diff -W --word-diff
 
-git diff --word-diff
+untracked=`git status -su`
 
-echo ":::"
-echo "::: Untracked Files"
-echo ":::"
-../scripts/cat_new_items.sh | less
+if [ "" != "$untracked" ]
+then
+  echo ":::"
+  echo "::: Untracked Files"
+  echo ":::"
+  echo "$untracked"
+  ../scripts/cat_new_items.sh | less
+fi

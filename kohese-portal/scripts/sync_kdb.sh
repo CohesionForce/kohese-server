@@ -50,6 +50,25 @@ then
     n|N ) echo "--- No changes fetched";;
     * ) echo "invalid choice"; exit ;;
   esac
+
+  echo "::: Checking status"
+  git_status=`git status -sb`
+  echo "$git_status"
+  git_status_ahead=`git status -sb | head -1 | egrep "\[ahead"`
+
+  if [ "" != "$git_status_ahead" ]
+  then
+    read -p "Push changes (y/n)?  " choice
+    case "$choice" in
+      y|Y )
+        echo "::: Pushing changes upstream"
+        git push origin master
+        ;;
+      n|N ) echo "--- No changes pushed";;
+      * ) echo "invalid choice"; exit ;;
+    esac
+  fi
+
 fi
 
 echo "::: Importing kdb"
