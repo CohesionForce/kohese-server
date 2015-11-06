@@ -8,7 +8,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
                                $scope, $stateParams) {
 
     var detailsCtrl = this;
-
+    
     detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.tab.route = $stateParams.id;
     detailsCtrl.filterString = "";
@@ -97,21 +97,30 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.tab = tabService.getCurrentTab();
     });
 
-    function createItemSetup(type) {
+    function initializeItemStates(type) {
             if (type === 'Action') {
-                detailsCtrl.itemProxy.actionState = 'Proposed';
-                detailsCtrl.itemProxy.decisionState = 'Proposed';
+                if (!detailsCtrl.itemProxy.item.hasOwnProperty("actionState")){
+                  detailsCtrl.itemProxy.item.actionState = 'Proposed';                  
+                }
+                if (!detailsCtrl.itemProxy.item.hasOwnProperty("decisionState")){
+                  detailsCtrl.itemProxy.item.decisionState = 'Proposed';                  
+                }
             } else if (type === 'Decision') {
-                detailsCtrl.itemProxy.item.decisionState = 'Proposed'
+                if (!detailsCtrl.itemProxy.item.hasOwnProperty("decisionState")){
+                  detailsCtrl.itemProxy.item.decisionState = 'Proposed';                  
+                }
             } else if (type === 'Task') {
-                detailsCtrl.itemProxy.item.taskState = 'Proposed';
+                if (!detailsCtrl.itemProxy.item.hasOwnProperty("taskState")){
+                  detailsCtrl.itemProxy.item.taskState = 'Proposed';                  
+                }
             } else if (type === 'Issue') {
-                detailsCtrl.itemProxy.item.issueState = 'Proposed';
+                if (!detailsCtrl.itemProxy.item.hasOwnProperty("issueState")){
+                  detailsCtrl.itemProxy.item.issueState = 'Observed';                  
+                }
             }
     }
 
     detailsCtrl.createItem = function (navigationType) {
-        createItemSetup(detailsCtrl.itemProxy.kind)
         ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
             .then(function (updatedItem) {
 
@@ -130,7 +139,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
                 } else if (navigationType === 'child') {
                     $state.go('kohese.explore.edit', {id: updatedItem.id})
                 }
-            })
+            });
     }
 
     detailsCtrl.updateTab = function (state, id, view) {
@@ -171,6 +180,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         var newItem = new newModel();
         ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
         detailsCtrl.itemProxy.item = newItem;
+        initializeItemStates(detailsCtrl.itemProxy.kind);
     };
 
     detailsCtrl.incrementItemInput = function (type) {
