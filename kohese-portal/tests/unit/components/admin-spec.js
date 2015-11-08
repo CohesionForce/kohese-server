@@ -3,6 +3,7 @@
  */
 
 var MockTabService = require('../mock/MockTabService');
+var MockUserService = require('../mock/MockUserService');
 
 describe(
 		"AdminController Test",
@@ -13,6 +14,7 @@ describe(
 			var mockKoheseUser;
 			var mockUserList;
 			var mockTabService = new MockTabService();
+			var mockUserService = new MockUserService();
 			
 			function KoheseUser() {
 				this.name = '';
@@ -74,7 +76,8 @@ describe(
 				adminController = $controller('AdminController', {
 					tabService : mockTabService,
 					$scope : mockScope,
-					KoheseUser : KoheseUser
+					KoheseUser : KoheseUser,
+					UserService : mockUserService
 				});
 			}));
 

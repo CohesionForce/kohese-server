@@ -17,6 +17,10 @@ function MockTabService() {
         }
     };
 
+    this.getTabId = function() {
+        return "TabID";
+    }
+    
     this.getCurrentTab = function() {
         return service.tab;
     }
