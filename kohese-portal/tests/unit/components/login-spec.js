@@ -3,6 +3,7 @@
  */
 
 var MockLoginService = require('../mock/MockLoginService');
+var MockKoheseIO = require('../mock/MockKoheseIO');
 
 describe("Login Return", function() {
 
@@ -12,6 +13,7 @@ describe("Login Return", function() {
 	var state;
 	var loginController;
 	var mockLoginService = new MockLoginService();
+	var mockKoheseIO = new MockKoheseIO();
 	
 	beforeEach(angular.mock.module('app.login'));
 
@@ -35,6 +37,7 @@ describe("Login Return", function() {
 	beforeEach(inject(function($controller) {
 		loginController = $controller('LoginController', {
 			loginService : mockLoginService,
+			KoheseIO : mockKoheseIO,
 			AuthTokenFactory : mockAuthTokenFactory,
 			$state : state
 		});
