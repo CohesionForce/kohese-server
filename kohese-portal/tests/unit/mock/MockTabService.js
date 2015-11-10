@@ -19,12 +19,19 @@ function MockTabService() {
 
     this.getTabId = function() {
         return "TabID";
-    }
+    };
     
     this.getCurrentTab = function() {
         return service.tab;
-    }
+    };
+    
+    this.setCurrentTab = function(tab) {
+        service.tab = tab;
+    };
 
+    this.incrementTabs = function() {
+        
+    };
 }
 
 module.exports = MockTabService;
