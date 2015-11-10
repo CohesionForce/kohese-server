@@ -17,7 +17,7 @@ function ActionService(ItemRepository, $rootScope) {
 
 
     var root = ItemRepository.getRootProxy();
-        var stateProxy = root.getChildByName('State');
+    var stateProxy = root.getChildByName('State');
     if (stateProxy) {
         var actionProxy = stateProxy.getChildByName('Action State');
         states = actionProxy.getDecendents();
