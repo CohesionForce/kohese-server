@@ -12,7 +12,7 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
         tab.title = 'Kohese';
         tab.scope = {};
         tab.content = {};
-        console.log(type);
+        tab.id = tabService.getTabId();
 
         if (params) {
             tab.params = params;
@@ -66,6 +66,8 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
                 tab.state = 'kohese.explore.edit'
             } else if (state === 'create') {
                 tab.state = 'kohese.explore.create'
+            } else {
+                tab.state = state;
             }
             //console.log(tab.state);
         };
@@ -75,7 +77,6 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     };
 
     $scope.$on('navigationEvent', function onNavigationEvent(event, data) {
-        console.log(data);
         let newTab = createTab(data.state, data.params, data.type);
         containerCtrl.setTab(newTab);
         $state.go(newTab.state, newTab.params);
@@ -95,6 +96,8 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
             containerCtrl.baseTab = new Tab('kohese.search', {id: $stateParams.id}, 'dualview')
         } else if (currentState === 'kohese.search.edit') {
             containerCtrl.baseTab = new Tab('kohese.search.edit', {id: $stateParams.id}, 'dualview')
+        } else if (currentState === 'kohese.search.create') {
+            containerCtrl.baseTab = new Tab('kohese.search.create', {parentId: $stateParams.parentId}, 'dualview')
         } else {
             containerCtrl.baseTab = new Tab('kohese.dashboard', {}, 'singleview')
         }
@@ -127,7 +130,6 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
 
 
     containerCtrl.setTab = function (tab) {
-        console.log(tab);
         tab.active = true;
         containerCtrl.tabService.setCurrentTab(tab);
         $state.go(tab.state, tab.params);

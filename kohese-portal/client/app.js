@@ -22,6 +22,7 @@ const appModule = angular.module('app', [
     'app.services.authentication',
     'app.services.analysisservice',
     'app.services.searchservice',
+    'app.services.navigationservice',
     'app.directives.navigation',
     'app.directives.resizer',
     'app.directives.resizeable',
@@ -89,6 +90,11 @@ appModule
                     }
                 }
             })
+            .state('kohese.create', {
+                url: '/create/{parentId}',
+                templateUrl: '/components/detailsview/subviews/createitem.html',
+                controller: 'DetailsViewController as detailsCtrl'
+            })
             .state('kohese.search', {
                 url: '/search/{filter}',
                 views: {
@@ -107,6 +113,15 @@ appModule
                 views: {
                     'bottom@kohese': {
                         templateUrl: '/components/detailsview/detailsview.html',
+                        controller: 'DetailsViewController as detailsCtrl'
+                    }
+                }
+            })
+            .state('kohese.search.create', {
+                url:'/create/{parentId}',
+                views: {
+                    'bottom@kohese': {
+                        templateUrl: '/components/detailsview/subviews/createitem.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
                 }

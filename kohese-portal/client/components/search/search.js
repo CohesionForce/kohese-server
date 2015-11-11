@@ -22,9 +22,6 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
         currentItem.parentProxy = ItemRepository.getProxyFor(currentItem.item.parentId);
     }
 
-    console.log(ctrl.itemList);
-
-
     if (!ctrl.searchString) {
         ctrl.searchString = '';
     }
@@ -74,7 +71,6 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
     ctrl.updateTab = function (itemId) {
         tab.params.id = itemId;
         ctrl.currentItem = itemId;
-        console.log(ctrl.currentItem)
     };
 
     //Filter updates

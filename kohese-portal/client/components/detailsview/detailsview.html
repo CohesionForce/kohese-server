@@ -3,26 +3,34 @@
         <span ng-if="detailsCtrl.itemProxy.kind">{{detailsCtrl.itemProxy.kind}} Information: {{detailsCtrl.itemProxy.item.name}} </span>
         <span ng-if="!detailsCtrl.itemProxy.kind">No Item Selected</span>
         <span class="pull-right item-actions">
+            <i class="fa fa-lg fa-level-up"
+                    ng-if="detailsCtrl.itemProxy.item.parentId"
+                    ng-click="detailsCtrl.itemProxy = detailsCtrl.parentProxy"
+                    title="Go to Parent"></i>
             <i class="fa fa-lg fa-edit"
                ng-if="!detailsCtrl.enableEdit"
-               ng-click="detailsCtrl.enableEdit=true"></i>
+               ng-click="detailsCtrl.enableEdit=true"
+               title="Edit"></i>
             <span ng-if="detailsCtrl.enableEdit"
                   class="fa fa-stack">
                 <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
-                   ng-click="detailsCtrl.enableEdit = false"></i>
+                   ng-click="detailsCtrl.enableEdit = false"
+                   title="Cancel Edit"></i>
                 <i class="fa fa-stack-1x fa-times stacked-child"
-                   ng-click="detailsCtrl.enableEdit = false; detailsCtrl.cancel();"></i>
+                   ng-click="detailsCtrl.enableEdit = false; detailsCtrl.cancel();"
+                   title="Cancel Edit"></i>
             </span>
             <i class="fa fa-lg fa-save"
                ng-click="detailsCtrl.upsertItem()"
+               title=" Save"
                     ></i>
             <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
-               ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})"
-               ng-click="detailsCtrl.updateTab('edit', itemProxy.item.id, 'dualview')">
+               ng-click="detailsCtrl.updateTab(detailsCtrl.NavigationService.getLastState(detailsCtrl.tab.id), itemProxy.item.id, 'dualview')"
+               title="Split Screen">
             </i>
             <i class="fa fa-lg fa-arrows-alt" ng-if="detailsCtrl.tab.type === 'dualview'"
-               ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})"
-               ng-click="detailsCtrl.updateTab('investigate', itemProxy.item.id, 'singleview')"></i>
+               ng-click="detailsCtrl.updateTab('kohese.investigate', detailsCtrl.itemProxy.item.id, 'singleview')"
+               title="Fullscreen"></i>
         </span>
     </div>
     <div class="panel-body">

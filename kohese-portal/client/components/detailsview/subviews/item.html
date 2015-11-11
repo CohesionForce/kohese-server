@@ -11,8 +11,7 @@
     <th><a href="" ng-click="itemSortField = '-item.tags'">Tags</a></th>
     <th><a href="" ng-click="itemSortField = 'item.description'">Description</a></th>
     <th><i class="glyphicon glyphicon-plus pull-right"
-           ui-sref="kohese.explore.create({parentId: detailsCtrl.itemProxy.item.id})"
-           ng-click="detailsCtrl.updateTab('create')"></i></th>
+           ng-click="detailsCtrl.navigateToCreateForm()"></i></th>
     </thead>
     <tbody>
     <tr ng-repeat="proxy in filteredItems = (detailsCtrl.itemProxy.children  | filter:{item: {$: detailsCtrl.filterString}}) | orderBy:itemSortField">

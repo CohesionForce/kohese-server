@@ -9,7 +9,6 @@ function AppBarController(AuthTokenFactory, $rootScope, KoheseIO, UserService, $
     ctrl.userName = UserService.getCurrentUser();
 
     ctrl.navigate = function (state, params, type) {
-        console.log(type);
         $rootScope.$broadcast('navigationEvent',
             {
                 state: state,

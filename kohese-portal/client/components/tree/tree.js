@@ -178,8 +178,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         treeCtrl.locationSynced ? treeCtrl.locationSynced = false : treeCtrl.locationSynced = true;
         if (treeCtrl.locationSynced) {
             syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {
-                console.log('sync');
-                console.log(data);
+
                 $location.hash(data);
                 $anchorScroll()
             })
