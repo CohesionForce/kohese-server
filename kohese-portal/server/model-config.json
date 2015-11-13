@@ -62,5 +62,9 @@
   "Task": {
     "dataSource": "db",
     "public": true
+  },
+  "Repository": {
+    "dataSource": "db",
+    "public": true
   }
 }

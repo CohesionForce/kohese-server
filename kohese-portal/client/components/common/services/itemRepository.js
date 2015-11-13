@@ -2,10 +2,11 @@
  *
  */
 
-function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Task, KoheseUser, KoheseIO, $rootScope) {
+function ItemRepository(Repository, Item, Category, Decision, Action, Observation, Issue, Task, KoheseUser, KoheseIO, $rootScope) {
     var _ = require('underscore');
     var ItemProxy = require('../../../../common/models/item-proxy');
     var modelTypes = {
+        Repository: Repository,
         Item: Item,
         Decision: Decision,
         Action: Action,
@@ -72,6 +73,7 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ta
     };
 
     function fetchItems() {
+      Repository.find().$promise.then(function (repoResults) {
         Item.find().$promise.then(function (itemResults) {
           Category.find().$promise.then(function (categoryResults) {
             Decision.find().$promise.then(function (decisionResults) {
@@ -80,7 +82,7 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ta
                   Issue.find().$promise.then(function (issueResults) {
                     Task.find().$promise.then(function (taskResults) {
                       KoheseUser.find().$promise.then(function (userResults) {
-                        var results = itemResults.concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(taskResults).concat(userResults);
+                        var results = repoResults.concat(itemResults).concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(taskResults).concat(userResults);
                         convertListToTree(results);
                         $rootScope.$broadcast('itemRepositoryReady')
                       });
@@ -91,6 +93,7 @@ function ItemRepository(Item, Category, Decision, Action, Observation, Issue, Ta
             });
           });
         });
+      });
     }
 
     function copyAttributes(fromItem, toItem) {

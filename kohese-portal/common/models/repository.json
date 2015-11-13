@@ -1,0 +1,15 @@
+{
+  "name": "Repository",
+  "base": "Item",
+  "idInjection": true,
+  "properties": {
+    "origin": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

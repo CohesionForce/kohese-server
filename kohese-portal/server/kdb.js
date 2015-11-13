@@ -10,7 +10,7 @@ var jsonExt = /\.json$/;
 var ItemProxy = require('../common/models/item-proxy.js');
 module.exports.ItemProxy = ItemProxy;
 
-var repoDirPath = "kohese-kdb";
+var repoDirPath = "kdb/kohese-kdb";
 var exportDirPath = repoDirPath + "/export";
 
 var kdbStore = {};

@@ -1,8 +1,8 @@
 
 console.log("::: Begin test nodegit");
 
-var nodegit = require('nodegit'),
-    path = require("path");
+var nodegit = require('nodegit');
+var path = require("path");
 
 function getStatus (repo){
   //This code shows working directory changes similar to git status
@@ -64,7 +64,7 @@ function getCommitDetails (repo, commitOID){
   });
 }
 
-nodegit.Repository.open("kohese-kdb")
+nodegit.Repository.open("kdb/kohese-kdb")
   .then(function(repo) {
     console.log("::: Repo is open");
     
