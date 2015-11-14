@@ -1,14 +1,10 @@
+var jsonExt = /\.json$/;
+var kdbFS = require('../server/kdb-fs.js');
 var importKdb = function() {
 
     function readModelDir(fs, kdb, modelName) {
       var dirName = "export/" + modelName;
-      var fileList = fs.readdirSync(dirName);
-
-      // Ignore the .gitignore file if it exists
-      var gitignoreIdx = fileList.indexOf(".gitignore");
-      if (gitignoreIdx > -1){
-        fileList.splice(gitignoreIdx, 1);
-      }
+      var fileList = kdbFS.getRepositoryFileList(dirName, jsonExt);
 
       kdb.ids[modelName] = fileList.length;
       console.log("::: Found model kind " + modelName + ":  " + kdb.ids[modelName]);
@@ -57,8 +53,6 @@ var importKdb = function() {
       }
     }
 
-    fs.writeFileSync("kdb-import.json", JSON.stringify(kdb, null, '  '), {encoding: 'utf8', flag: 'w'});  
+    fs.writeFileSync("kdb-import.json", JSON.stringify(kdb, null, '  '), {encoding: 'utf8', flag: 'w'});
     
-
-
 }();
