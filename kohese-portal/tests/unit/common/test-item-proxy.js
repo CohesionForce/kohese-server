@@ -87,5 +87,12 @@ newABItem.name = "New Name";
 ab.updateItem("Item", newABItem);
 dump("AB Name Updated")
 
+console.log("::: Getting AB ancestors");
+var abAncestors = ab.getAncestorProxies();
+for (var ancestorIdx in abAncestors){
+  var ancestor = abAncestors[ancestorIdx]
+  console.log(ancestor.item.id + " - " + ancestor.item.name);  
+}
+
 
 console.log("::: Finishing Item Proxy Test");
