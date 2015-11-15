@@ -10,7 +10,25 @@ var jsonExt = /\.json$/;
 var ItemProxy = require('../common/models/item-proxy.js');
 module.exports.ItemProxy = ItemProxy;
 
-var kdbStore = {};
+var kdbStore = {
+    ids: {},
+    models: {}
+  };
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function determineRepoStoragePath(repo){
+  var repoStoragePath;
+  if(repo){
+    console.log("::: Repository => " + repo.item.name);
+    repoStoragePath = repo.repoPath.replace(jsonExt, "");
+  } else {
+    console.log("::: Repository => KDB Data Store");
+    repoStoragePath = exportDirPath;
+  }
+  return repoStoragePath;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -51,13 +69,20 @@ function storeModelInstance(modelName, modelInstance){
   }
 
   repo = proxy.getRepositoryProxy();
-  if(repo){
-    console.log("::: Repository => " + repo.item.name);      
-  } else {
-    console.log("::: Repository => KDB Data Store");          
+  var repoStoragePath = determineRepoStoragePath(repo);
+  
+  console.log(">>> Repo storage: " + repoStoragePath);
+  var filePath = repoStoragePath + "/" + modelName + "/" + modelInstance.id + ".json";
+  
+  if(modelName !== "Analysis" && filePath !== proxy.repoPath){
+    console.log("}}} Old: " + proxy.repoPath);
+    if (proxy.repoPath){
+      kdbFS.removeFile(proxy.repoPath);      
+    }
+    console.log("}}} New: " + filePath);
+    proxy.repoPath = filePath;
   }
-    
-  var filePath = exportDirPath + "/" + modelName + "/" + modelInstance.id + ".json";
+  
   kdbFS.storeJSONDoc(filePath, modelInstance);
   
   var modelStore = kdbStore.models[modelName];
@@ -70,19 +95,20 @@ module.exports.storeModelInstance = storeModelInstance;
 //
 //////////////////////////////////////////////////////////////////////////
 function removeModelInstance(modelName, instanceId){
-  var filePath = exportDirPath + "/" + modelName + "/" + instanceId + ".json";
+  var proxy = ItemProxy.getProxyFor(instanceId);
 
-  kdbFS.removeFile(filePath);
-
-  if(modelName !== "Analysis"){
-    var proxy = ItemProxy.getProxyFor(instanceId);
-    proxy.deleteItem();
-    
+  if(modelName === "Analysis"){
+    var filePath = proxy.repoPath.replace(proxy.kind, "Analysis");
+    kdbFS.removeFile(filePath); 
+  } else {
     // Delete any associated analysis
     var analysisStore = kdbStore.models["Analysis"];
     if(analysisStore[instanceId]){
       removeModelInstance("Analysis", instanceId);
     }
+
+    kdbFS.removeFile(proxy.repoPath);
+    proxy.deleteItem();
   }
   
   var modelStore = kdbStore.models[modelName];
@@ -122,23 +148,19 @@ function validateRepositoryStructure (repoDirPath) {
     checkAndCreateDir(modelDirPath);
   }
   
-  kdbStore = {
-    ids: {},
-    models: {}
-  };
-  
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
   for(var modelIdx in modelDirList){
     var modelName = modelDirList[modelIdx];
     var modelDirPath = repoDirPath + "/" + modelName;
-    var modelStore ={};
-    kdbStore.models[modelName] = modelStore;
+    var modelStore = kdbStore.models[modelName];
     var fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
     for(var fileIdx in fileList) {
-      var itemRow = kdbFS.loadJSONDoc(modelDirPath + "/" + fileList[fileIdx]);
+      var itemPath = modelDirPath + "/" + fileList[fileIdx];
+      var itemRow = kdbFS.loadJSONDoc(itemPath);
       
       if(modelName !== "Analysis"){
-        var proxy = new ItemProxy(modelName, itemRow);        
+        var proxy = new ItemProxy(modelName, itemRow);
+        proxy.repoPath = itemPath;
       }
       
       modelStore[itemRow.id] = JSON.stringify(itemRow);
@@ -165,6 +187,17 @@ if (modelConfig._meta) {
 }
 
 console.log(modelConfig);
+
+var modelKinds = Object.keys(modelConfig);
+modelKinds.sort();
+console.log("::: ModelKinds: " + modelKinds);
+
+for(var modelKindIdx in modelKinds){
+  var modelKind = modelKinds[modelKindIdx];
+  console.log("::: ModelKind: " + modelKind);
+  kdbStore.ids[modelKind] = 0;
+  kdbStore.models[modelKind] = {};
+}
 
 console.log("::: Validating Repository Structure")
 

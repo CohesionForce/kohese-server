@@ -1,15 +1,16 @@
+kdbDir=`pwd`
 echo "::: Importing kdb"
-node ../scripts/import-kdb.js
+cd ../..
+node ./server/kdb.js
 
-kdbDiff=`diff db.json kdb-import.json`
+cd $kdbDir
+kdbDiff=`diff db.json kdbStore.json`
 
 if [ "" == "$kdbDiff" ]
 then
   echo "::: Synchronized files have same content"
-  rm kdb-import.json
 else
   echo "::: Replacing db.json with synchronized copy"
-  cp kdb-import.json db.json
-  rm kdb-import.json
+  cp kdbStore.json db.json
 fi
 

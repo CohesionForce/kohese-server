@@ -12,14 +12,14 @@ function IssueService(ItemRepository, $rootScope) {
         var root = ItemRepository.getRootProxy();
         var stateProxy = root.getChildByName('State');
         var issueProxy = stateProxy.getChildByName('Issue State');
-        states = issueProxy.getDecendents();
+        states = issueProxy.getDescendants();
     });
 
     var root = ItemRepository.getRootProxy();
     var stateProxy = root.getChildByName('State');
     if (stateProxy) {
         var issueProxy = stateProxy.getChildByName('Issue State');
-        states = issueProxy.getDecendents();
+        states = issueProxy.getDescendants();
     }
 
     function getIssueStates() {

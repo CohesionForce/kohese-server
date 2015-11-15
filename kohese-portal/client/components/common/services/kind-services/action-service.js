@@ -12,7 +12,7 @@ function ActionService(ItemRepository, $rootScope) {
         var root = ItemRepository.getRootProxy();
         var stateProxy = root.getChildByName('State');
         var actionProxy = stateProxy.getChildByName('Action State');
-        states = actionProxy.getDecendents();
+        states = actionProxy.getDescendants();
     });
 
 
@@ -20,7 +20,7 @@ function ActionService(ItemRepository, $rootScope) {
     var stateProxy = root.getChildByName('State');
     if (stateProxy) {
         var actionProxy = stateProxy.getChildByName('Action State');
-        states = actionProxy.getDecendents();
+        states = actionProxy.getDescendants();
     }
 
     function getActionStates() {

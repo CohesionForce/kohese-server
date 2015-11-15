@@ -13,14 +13,14 @@ function DecisionService(ItemRepository, $rootScope) {
         var root = ItemRepository.getRootProxy();
         var stateProxy = root.getChildByName('State');
         var decisionProxy = stateProxy.getChildByName('Decision State');
-        states = decisionProxy.getDecendents();
+        states = decisionProxy.getDescendants();
     });
 
     var root = ItemRepository.getRootProxy();
     var stateProxy = root.getChildByName('State');
     if (stateProxy){
         var decisionProxy = stateProxy.getChildByName('Decision State');
-        states = decisionProxy.getDecendents();
+        states = decisionProxy.getDescendants();
     }
 
     function getDecisionStates() {
