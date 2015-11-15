@@ -175,6 +175,15 @@ describe("ItemProxy Test", function()
         ab.updateItem("Item", newABItem);
         dump("AB Name Updated")
     });
+    
+    it("Get Ancestors",function(){
+      console.log("::: Getting AB ancestors");
+      var abAncestors = ab.getAncestorProxies();
+      for (var ancestorIdx in abAncestors){
+        var ancestor = abAncestors[ancestorIdx]
+        console.log(ancestor.item.id + " - " + ancestor.item.name);  
+      }
+    });
 });
 
 describe("suite name", function()
