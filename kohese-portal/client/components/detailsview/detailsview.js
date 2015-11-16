@@ -46,9 +46,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
     }
 
-    detailsCtrl.navigateToParent = function() {
-    };
-
     detailsCtrl.updateParentProxy = function () {
         if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId) {
             detailsCtrl.parentProxy = ItemRepository.getProxyFor(detailsCtrl.itemProxy.item.parentId);

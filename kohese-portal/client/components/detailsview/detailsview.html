@@ -5,7 +5,7 @@
         <span class="pull-right item-actions">
             <i class="fa fa-lg fa-level-up"
                     ng-if="detailsCtrl.itemProxy.item.parentId"
-                    ng-click="detailsCtrl.itemProxy = detailsCtrl.parentProxy"
+                    ng-click="detailsCtrl.updateTab(detailsCtrl.NavigationService.getCurrentState(detailsCtrl.tab.id), detailsCtrl.itemProxy.item.parentId)"
                     title="Go to Parent"></i>
             <i class="fa fa-lg fa-edit"
                ng-if="!detailsCtrl.enableEdit"
