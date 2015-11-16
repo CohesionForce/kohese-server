@@ -4,7 +4,7 @@ describe("ItemProxy Test", function()
     var ItemProxy = require('../../../common/models/item-proxy.js');
     var root = ItemProxy.getRootProxy();
     var lostAndFound = ItemProxy.getProxyFor("LOST+FOUND");
-    var a, aa, newAAItem, bb, b;
+    var a, aa, newAAItem, bb, b, ab;
     console.log(__dirname);
     console.log("::: Starting Item Proxy Test");
 
@@ -158,7 +158,7 @@ describe("ItemProxy Test", function()
     it("Renaming an item", function()
     {
         console.log("::: Preparing to rename an item");
-        var ab = new ItemProxy("Test", {
+        ab = new ItemProxy("Test", {
             id : "ab",
             name : "AB",
             parentId : "b"
