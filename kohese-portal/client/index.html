@@ -11,6 +11,7 @@
 
 
     <link href="css/index.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="angular-toastr/dist/angular-toastr.css">
 
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
@@ -26,16 +27,16 @@
 </head>
 <body ng-app="app">
 
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">
-        <app-bar></app-bar>
-        <side-nav></side-nav>
-    </nav>
+<nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <app-bar></app-bar>
+    <side-nav></side-nav>
+</nav>
 
-    <div id="layout-bottom">
-        <div id="page-wrapper">
-            <div ui-view></div>
-        </div>
+<div id="layout-bottom">
+    <div id="page-wrapper">
+        <div ui-view></div>
     </div>
+</div>
 
 <!--&lt;!&ndash; Third Party Dependencies&ndash;&gt;-->
 <script src="jquery/dist/jquery.js"></script>
@@ -44,11 +45,13 @@
 
 <script src="angular-resource/angular-resource.js"></script>
 <script src="angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="angular-animate/angular-animate.js"></script>
 <script src="socket.io-client/socket.io.js"></script>
 <script src="angular-socket-io/socket.js"></script>
 <script src="angular-jwt/dist/angular-jwt.js"></script>
 <script src="angular-recursion/angular-recursion.js"></script>
 <script src="angucomplete-alt/angucomplete-alt.js"></script>
+<script src="angular-toastr/dist/angular-toastr.tpls.js"></script>
 <script src="bundle.js"></script>
 
 </body>

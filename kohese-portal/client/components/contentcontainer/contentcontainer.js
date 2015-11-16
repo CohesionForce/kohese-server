@@ -107,6 +107,7 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
 
     createBaseTab();
 
+
 //Will need refactoring to account for refreshing the page at some point
 
     containerCtrl.tabs = [containerCtrl.baseTab];

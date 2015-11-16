@@ -33,7 +33,9 @@ const appModule = angular.module('app', [
     'ui.bootstrap',
     'btford.socket-io',
     'RecursionHelper',
-    'angucomplete-alt'
+    'angucomplete-alt',
+    'ngAnimate',
+    'toastr'
 
 ]);
 

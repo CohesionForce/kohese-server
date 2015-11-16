@@ -144,7 +144,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
                     $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItem.id})
                 }
             });
-    }
+    };
 
     detailsCtrl.updateTab = function (state, id, view) {
         console.log(state, id , view);
