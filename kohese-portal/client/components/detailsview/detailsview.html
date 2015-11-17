@@ -42,7 +42,8 @@
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>
                 <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind != 'Action' &&
-                detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Task'">
+                detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Task'
+                && detailsCtrl.itemProxy.kind != 'Repository'">
                     <ng-include src="'components/common/templates/itemform.html'"></ng-include>
                 </div>
                 <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Task'">
@@ -52,6 +53,9 @@
                     <accordion>
                         <ng-include src="'components/common/templates/decision-form.new.html'"></ng-include>
                     </accordion>
+                </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Repository'">
+                    <ng-include src="'components/common/templates/repository-form.html'"></ng-include>
                 </div>
 
             </tab>

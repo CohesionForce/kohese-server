@@ -15,8 +15,12 @@
             <tab-heading>Overview</tab-heading>
 
             <div class="panel-body">
-                <ng-include src="'components/common/templates/itemform.html'"></ng-include>
-
+                <ng-include
+                        ng-if="detailsCtrl.itemProxy.kind != 'Repository'"
+                        src="'components/common/templates/itemform.html'"></ng-include>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Repository'">
+                    <ng-include src="'components/common/templates/repository-form.html'"></ng-include>
+                </div>
             </div>
         </tab>
         </tab>
