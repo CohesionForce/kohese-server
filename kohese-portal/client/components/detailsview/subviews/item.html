@@ -8,6 +8,7 @@
     <th><a href="" ng-click="itemSortField = 'item.kind'">Kind</a></th>
     <th><a href="" ng-click="itemSortField = 'item.name'">Name</a></th>
     <th><a href="" ng-click="itemSortField = 'item.actionState'">State</a></th>
+    <th><a href="" ng-click="itemSortField = 'item.assignedTo'">Assigned To</a></th>
     <th><a href="" ng-click="itemSortField = '-item.tags'">Tags</a></th>
     <th><a href="" ng-click="itemSortField = 'item.description'">Description</a></th>
     <th><i class="glyphicon glyphicon-plus pull-right"
@@ -24,6 +25,7 @@
             <span ng-if="proxy.kind==='Action'">{{proxy.item.decisionState}}/{{proxy.item.actionState}}</span>
             <span ng-if="proxy.kind==='Task'">{{proxy.item.taskState}}</span>
         </td>
+        <td>{{proxy.item.assignedTo}}</td>
         <td>{{proxy.item.tags}}</td>
         <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
             ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false"
