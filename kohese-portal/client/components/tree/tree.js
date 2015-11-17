@@ -31,6 +31,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     var lazyLimitIncrement = 20;
     treeCtrl.currentLazyLimit = lazyLimitIncrement;
     var lazyLimitIncreasePending = false;
+    treeCtrl.isRootDefault = true;
 
     $scope.$on('itemRepositoryReady', function () {
         treeCtrl.actionStates = ActionService.getActionStates();
@@ -152,12 +153,23 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     }
 
     treeCtrl.treeRoot = ItemRepository.getRootProxy();
+    treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
 
     treeCtrl.tab.setTitle('Explore');
 
     $scope.$on('tabSelected', function () {
         treeCtrl.tab = tabService.getCurrentTab();
     });
+
+    treeCtrl.updateRoot = function(newRoot){
+        treeCtrl.treeRoot = newRoot;
+        treeCtrl.isRootDefault = false;
+    };
+
+    treeCtrl.resetRoot = function(){
+        treeCtrl.treeRoot = treeCtrl.absoluteRoot;
+        treeCtrl.isRootDefault = true;
+    };
 
     treeCtrl.updateTab = function (state, id) {
         treeCtrl.tab.setState(state);

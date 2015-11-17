@@ -31,7 +31,9 @@
 			ng-init="showDescription=false"
 			ng-bind-html="itemProxy.item.description | highlight:treeCtrl.filter.text">
 		</div>
-		<div class="kti-cell pull-right">
+		<div class="kti-cell kti-actions pull-right">
+            <i class="fa fa-anchor"
+                    ng-click="treeCtrl.updateRoot(itemProxy)"></i>
 			<i class="glyphicon glyphicon-remove  pull-right"
 				ng-click="treeCtrl.removeItem(itemProxy.item)"> </i>
 		</div>

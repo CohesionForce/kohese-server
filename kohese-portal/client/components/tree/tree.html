@@ -4,6 +4,11 @@
 	<button ng-click="treeCtrl.collapseAll()"
 		class="btn btn-default btn-sm" style="margin: 5px">Collapse
 		All</button>
+    <button
+            class="btn btn-default btn-sm"
+            ng-click="treeCtrl.resetRoot()">
+        Reset Root
+    </button>
 	<i ng-click="treeCtrl.syncLocation()"
 		ng-class="{ 'button-selected' :treeCtrl.locationSynced}"
 		class="btn btn-default btn-sm fa fa-exchange"> </i>
