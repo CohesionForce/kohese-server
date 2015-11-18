@@ -217,15 +217,17 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     };
 
     treeCtrl.collapseChildren = function (itemProxy) {
-        var childrenList = itemProxy.getDescendants()
+        var childrenList = itemProxy.getDescendants();
+        treeCtrl.collapsed[itemProxy.item.id] = true;
         for (var i = 0; i < childrenList.length; i++) {
             var proxy = childrenList[i];
             treeCtrl.collapsed[proxy.item.id] = true;
         }
-    }
+    };
 
     treeCtrl.expandChildren = function (itemProxy) {
         var childrenList = itemProxy.getDescendants();
+        treeCtrl.collapsed[itemProxy.item.id] = false;
         for (var i = 0; i < childrenList.length; i++) {
             var proxy = childrenList[i];
             treeCtrl.collapsed[proxy.item.id] = false;
