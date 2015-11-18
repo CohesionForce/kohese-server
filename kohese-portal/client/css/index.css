@@ -237,6 +237,8 @@ body {
     width: 50%; }
   body .three-columns {
     width: 30%; }
+  body .position-fixed {
+    position: fixed; }
 
 table th .glyphicon-plus {
   color: green; }

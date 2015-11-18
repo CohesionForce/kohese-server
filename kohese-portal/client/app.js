@@ -35,6 +35,7 @@ const appModule = angular.module('app', [
     'RecursionHelper',
     'angucomplete-alt',
     'ngAnimate',
+    'ng-context-menu',
     'toastr'
 
 ]);

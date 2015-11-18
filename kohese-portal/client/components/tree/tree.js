@@ -3,7 +3,7 @@
  */
 
 function TreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $scope, $location,
-                        $stateParams,SearchService, tabService) {
+                        $stateParams, SearchService, tabService) {
 
     var treeCtrl = this,
         syncListener;
@@ -161,12 +161,12 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         treeCtrl.tab = tabService.getCurrentTab();
     });
 
-    treeCtrl.updateRoot = function(newRoot){
+    treeCtrl.updateRoot = function (newRoot) {
         treeCtrl.treeRoot = newRoot;
         treeCtrl.isRootDefault = false;
     };
 
-    treeCtrl.resetRoot = function(){
+    treeCtrl.resetRoot = function () {
         treeCtrl.treeRoot = treeCtrl.absoluteRoot;
         treeCtrl.isRootDefault = true;
     };
@@ -215,6 +215,22 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             treeCtrl.collapsed[key] = true;
         }
     };
+
+    treeCtrl.collapseChildren = function (itemProxy) {
+        var childrenList = itemProxy.getDescendants()
+        for (var i = 0; i < childrenList.length; i++) {
+            var proxy = childrenList[i];
+            treeCtrl.collapsed[proxy.item.id] = true;
+        }
+    }
+
+    treeCtrl.expandChildren = function (itemProxy) {
+        var childrenList = itemProxy.getDescendants();
+        for (var i = 0; i < childrenList.length; i++) {
+            var proxy = childrenList[i];
+            treeCtrl.collapsed[proxy.item.id] = false;
+        }
+    }
 
 }
 
