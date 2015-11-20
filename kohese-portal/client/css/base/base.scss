@@ -20,6 +20,18 @@ body {
   .position-fixed {
     position: fixed;
   }
+
+  .inline-block {
+    display: inline-block;
+  }
+
+  .top-align {
+    vertical-align: top;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }
 }
 
 table {

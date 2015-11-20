@@ -8,7 +8,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
                                $scope, $stateParams) {
 
     var detailsCtrl = this;
-    
+
     detailsCtrl.tab = tabService.getCurrentTab();
     detailsCtrl.tab.route = $stateParams.id;
     detailsCtrl.filterString = "";
@@ -32,6 +32,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     detailsCtrl.categoryTags = CategoryService.getTags();
     detailsCtrl.userList = UserService.getAllUsers();
     detailsCtrl.currentUser = UserService.getCurrentUser();
+    detailsCtrl.proxyList = ItemRepository.getShortFormItemList();
     detailsCtrl.analysisFilterPOS = analysisService.filterPOS;
     detailsCtrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
     detailsCtrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
@@ -87,6 +88,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.issueStates = IssueService.getIssueStates();
         detailsCtrl.categoryTags = CategoryService.getTags();
         detailsCtrl.userList = UserService.getAllUsers();
+        detailsCtrl.proxyList = ItemRepository.getShortFormItemList();
 
         detailsCtrl.updateParentProxy();
         if (detailsCtrl.itemProxy) {
@@ -99,26 +101,26 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     });
 
     function initializeItemStates(type) {
-            if (type === 'Action') {
-                if (!detailsCtrl.itemProxy.item.hasOwnProperty("actionState")){
-                  detailsCtrl.itemProxy.item.actionState = 'Proposed';                  
-                }
-                if (!detailsCtrl.itemProxy.item.hasOwnProperty("decisionState")){
-                  detailsCtrl.itemProxy.item.decisionState = 'Proposed';                  
-                }
-            } else if (type === 'Decision') {
-                if (!detailsCtrl.itemProxy.item.hasOwnProperty("decisionState")){
-                  detailsCtrl.itemProxy.item.decisionState = 'Proposed';                  
-                }
-            } else if (type === 'Task') {
-                if (!detailsCtrl.itemProxy.item.hasOwnProperty("taskState")){
-                  detailsCtrl.itemProxy.item.taskState = 'Proposed';                  
-                }
-            } else if (type === 'Issue') {
-                if (!detailsCtrl.itemProxy.item.hasOwnProperty("issueState")){
-                  detailsCtrl.itemProxy.item.issueState = 'Observed';                  
-                }
+        if (type === 'Action') {
+            if (!detailsCtrl.itemProxy.item.hasOwnProperty("actionState")) {
+                detailsCtrl.itemProxy.item.actionState = 'Proposed';
             }
+            if (!detailsCtrl.itemProxy.item.hasOwnProperty("decisionState")) {
+                detailsCtrl.itemProxy.item.decisionState = 'Proposed';
+            }
+        } else if (type === 'Decision') {
+            if (!detailsCtrl.itemProxy.item.hasOwnProperty("decisionState")) {
+                detailsCtrl.itemProxy.item.decisionState = 'Proposed';
+            }
+        } else if (type === 'Task') {
+            if (!detailsCtrl.itemProxy.item.hasOwnProperty("taskState")) {
+                detailsCtrl.itemProxy.item.taskState = 'Proposed';
+            }
+        } else if (type === 'Issue') {
+            if (!detailsCtrl.itemProxy.item.hasOwnProperty("issueState")) {
+                detailsCtrl.itemProxy.item.issueState = 'Observed';
+            }
+        }
     }
 
     detailsCtrl.createItem = function (navigationType) {
@@ -144,7 +146,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     };
 
     detailsCtrl.updateTab = function (state, id, view) {
-        console.log(state, id , view);
+        console.log(state, id, view);
         detailsCtrl.tab.setState(state);
         detailsCtrl.tab.params.id = id;
         if (view) {
@@ -154,17 +156,17 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.navigate(state, id)
     };
 
-    detailsCtrl.navigateToCreateForm = function(){
-        if (detailsCtrl.tab.type === 'singleview'){
+    detailsCtrl.navigateToCreateForm = function () {
+        if (detailsCtrl.tab.type === 'singleview') {
             detailsCtrl.tab.setState('kohese.create');
             detailsCtrl.tab.params.parentId = detailsCtrl.itemProxy.item.id;
             $state.go('kohese.create', {parentId: detailsCtrl.itemProxy.item.parentId})
         } else {
-            if ($state.current.name === 'kohese.explore.edit' || $state.current.name === 'kohese.explore'){
-            detailsCtrl.tab.setState('kohese.explore.create');
-            detailsCtrl.tab.params.parentId = detailsCtrl.itemProxy.item.id;
-            $state.go('kohese.explore.create', {parentId: detailsCtrl.itemProxy.item.id})
-            } else if ($state.current.name === 'kohese.search' || $state.current.name === 'kohese.search.edit'){
+            if ($state.current.name === 'kohese.explore.edit' || $state.current.name === 'kohese.explore') {
+                detailsCtrl.tab.setState('kohese.explore.create');
+                detailsCtrl.tab.params.parentId = detailsCtrl.itemProxy.item.id;
+                $state.go('kohese.explore.create', {parentId: detailsCtrl.itemProxy.item.id})
+            } else if ($state.current.name === 'kohese.search' || $state.current.name === 'kohese.search.edit') {
                 detailsCtrl.tab.setState('kohese.search.create');
                 detailsCtrl.tab.params.parentId = detailsCtrl.itemProxy.item.id;
                 $state.go('kohese.search.create', {parentId: detailsCtrl.itemProxy.item.id})
@@ -172,12 +174,23 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         }
     };
 
-    detailsCtrl.navigate = function(state, id){
-        if (state){
+    detailsCtrl.navigate = function (state, id) {
+        if (state) {
             $state.go(state, {id: id})
         } else {
             $state.go('kohese.explore.edit', {id: id})
         }
+    };
+
+    /*
+     *
+     * Angucomplete Functions
+     *
+     */
+
+    detailsCtrl.parentChanged = function (selected) {
+        detailsCtrl.itemProxy.item.parentId = selected.description.id;
+        detailsCtrl.updateParentProxy();
     };
 
     detailsCtrl.actionAssigned = function (selected) {
@@ -202,7 +215,13 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         if (selected) {
             detailsCtrl.itemProxy.item.assignedTo = selected.title;
         }
-    }
+    };
+
+    detailsCtrl.analysisActionSelected = function (selected) {
+        if (selected) {
+            detailsCtrl.itemProxy.item.analysisAction = selected
+        }
+    };
 
     detailsCtrl.updateItem = function () {
         var newModel = ItemRepository.modelTypes[detailsCtrl.itemProxy.kind];
@@ -215,9 +234,15 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     detailsCtrl.incrementItemInput = function (type) {
         if (detailsCtrl.itemProxy.item[type]) {
             var altLength = detailsCtrl.itemProxy.item[type].length;
-            detailsCtrl.itemProxy.item[type][altLength] = {text: ''};
+            if (type === 'context') {
+                detailsCtrl.itemProxy.item[type][altLength] = detailsCtrl.contextInput.description;
+            } else if (type === "resolutionActions") {
+                detailsCtrl.itemProxy.item[type][altLength] = detailsCtrl.resolutionActionsInput.description;
+            } else {
+                detailsCtrl.itemProxy.item[type][altLength] = {name: ''};
+            }
         } else {
-            detailsCtrl.itemProxy.item[type] = [{text: ''}]
+            detailsCtrl.itemProxy.item[type] = [{name: ''}]
         }
     };
 
