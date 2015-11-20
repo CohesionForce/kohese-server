@@ -115,7 +115,9 @@
                 class="btn btn-primary">Add
         </button>
         <div ng-repeat="action in detailsCtrl.itemProxy.item.resolutionActions track by $index">
+            <span ng-click="detailsCtrl.navigate(detailsCtrl.NavigationService.getCurrentState(), action.id)">
             {{ action.name }}
+            </span>
             <i ng-click="detailsCtrl.deleteItemInput('resolutionActions', action)"
                class="glyphicon glyphicon-remove"></i>
         </div>
