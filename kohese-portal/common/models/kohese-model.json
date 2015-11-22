@@ -1,0 +1,41 @@
+{
+  "name": "KoheseModel",
+  "base": "Item",
+  "idInjection": true,
+  "properties": {
+    "idInjection": {
+      "type": "boolean",
+      "required": true
+    },
+    "properties": {
+      "type": "object",
+      "required": true
+    },
+    "validations": {
+      "type": [
+        "object"
+      ],
+      "required": true
+    },
+    "relations": {
+      "type": "object",
+      "required": true
+    },
+    "acls": {
+      "type": [
+        "object"
+      ],
+      "required": true
+    },
+    "methods": {
+      "type": [
+        "object"
+      ],
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
