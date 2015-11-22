@@ -218,7 +218,10 @@ for(var childIdx in rootProxy.children){
 
 console.log("::: Reading db.json");
 var lbStore = kdbFS.loadJSONDoc("db.json");
+module.exports.lbStore = lbStore;
+
 kdbFS.storeJSONDoc(kdbDirPath + "/lbStore.json", lbStore);
+
 
 var kdbModel = require('./kdb-model.js');
 kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
