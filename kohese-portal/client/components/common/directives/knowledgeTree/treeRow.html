@@ -1,15 +1,16 @@
 <div
      class="kt-collection" ng-repeat="itemProxy in proxyCollection"
      ng-class="{'kt-hidden' : itemProxy.item.parentId && treeCtrl.collapsed[itemProxy.item.parentId]}"
+     data-target="tree-menu-{{itemProxy.item.id}}"
+     context-menu
         >
     <div class="kt-item"
          id="{{itemProxy.item.id}}"
          ng-init="lazyIdx=treeCtrl.allocateLazyItemIdx()"
          ng-class="{'kti-filtered': !treeCtrl.matchesFilter(itemProxy) && !treeCtrl.childMatchesFilter(itemProxy),
                    'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
-        <div data-target="tree-menu-{{itemProxy.item.id}}"
-             context-menu
-             class="kti-name" ng-style="{'font-weight': 'bold'}">
+        <div class="kti-name"
+                ng-style="{'font-weight': 'bold'}">
             <a style=""> <i
                     ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]"
                     ng-init="treeCtrl.collapsed[itemProxy.item.id]=true"
@@ -51,28 +52,28 @@
     <!-- Dropdown menu-->
     <div class="dropdown position-fixed" id="tree-menu-{{itemProxy.item.id}}">
         <ul class="dropdown-menu" role="menu">
-            <li class="pointer"
+            <li class="pointer context-item"
                 role="menuitem"
                 ng-click="treeCtrl.updateRoot(itemProxy)">
                 <a>
                     Set as root
                 </a>
             </li>
-            <li class="pointer"
+            <li class="pointer context-item"
                 role="menuitem"
                 ui-sref="kohese.explore.create({parentId: itemProxy.item.id})">
                 <a>
                     Create child
                 </a>
             </li>
-            <li class="pointer"
+            <li class="pointer context-item"
                 role="menuitem"
                 ng-click="treeCtrl.collapseChildren(itemProxy)">
                 <a>
                     Collapse children
                 </a>
             </li>
-            <li class="pointer"
+            <li class="pointer context-item"
                 role="menuitem"
                 ng-click="treeCtrl.expandChildren(itemProxy)">
                 <a>

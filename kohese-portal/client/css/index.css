@@ -227,6 +227,9 @@ table.tree-grid {
     width: 50px;
     height: 50px; }
 
+.context-item {
+  border: 1px black solid; }
+
 body {
   font-family: FontAwesome, arial, sans-serif;
   height: 100%;
@@ -239,6 +242,12 @@ body {
     width: 30%; }
   body .position-fixed {
     position: fixed; }
+  body .inline-block {
+    display: inline-block; }
+  body .top-align {
+    vertical-align: top; }
+  body .pointer {
+    cursor: pointer; }
 
 table th .glyphicon-plus {
   color: green; }

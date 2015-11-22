@@ -20,7 +20,7 @@
                 </span>
         </div>
     </label>
-    <label class="control-label absolute three-columns">
+    <label class="control-label three-columns">
         Observed By:
         <angucomplete-alt id="ObservedBy"
                           disable-input="!detailsCtrl.enableEdit"
@@ -37,19 +37,30 @@
     </label>
     <br/>
     <label class="two-columns">
-        Context:
-        <div ng-repeat="action in detailsCtrl.itemProxy.item.context track by $index">
-            <input class="action-field one-column"
-                   type="text"
-                   ng-disabled="!detailsCtrl.enableEdit"
-                   ng-model="action.id">
-            <i ng-click="detailsCtrl.deleteItemInput('context', action)"
-               class="glyphicon glyphicon-remove"></i>
-
-        </div>
+        <label class="control-label">
+            Context:
+            <angucomplete-alt id="Parent"
+                              disable-input="!detailsCtrl.enableEdit"
+                              selected-object="detailsCtrl.contextInput"
+                              placeholder="{{action.item.name}}"
+                              search-fields="name"
+                              title-field="name"
+                              pause="100"
+                              local-data="detailsCtrl.proxyList"
+                              minlength="1"
+                              match-class="highlight"
+                              style="width: 200px;"
+                    ></angucomplete-alt>
+        </label>
         <button ng-click="detailsCtrl.incrementItemInput('context')"
                 ng-show="detailsCtrl.enableEdit"
                 class="btn btn-primary">Add
         </button>
-    </label>
+        <div ng-repeat="context in detailsCtrl.itemProxy.item.context track by $index">
+            <span ng-click="detailsCtrl.navigate(detailsCtrl.NavigationService.getCurrentState(), context.id)">
+            {{ context.name }}
+                </span>
+            <i ng-click="detailsCtrl.deleteItemInput('context', action)"
+               class="glyphicon glyphicon-remove"></i>
+        </div>
 </form>

@@ -5,6 +5,7 @@
 function ItemRepository(Repository, Item, Category, Decision, Action, Observation, Issue, Task, KoheseUser, KoheseIO, $rootScope, toastr) {
     var _ = require('underscore');
     var ItemProxy = require('../../../../common/models/item-proxy');
+    var shortProxyList = [];
     var modelTypes = {
         Repository: Repository,
         Item: Item,
@@ -68,6 +69,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         getRootProxy: ItemProxy.getRootProxy,
         getProxyFor: ItemProxy.getProxyFor,
         getAllItemProxies: ItemProxy.getAllItemProxies,
+        getShortFormItemList : getShortFormItemList,
         fetchItem: fetchItem,
         upsertItem: upsertItem,
         deleteItem: deleteItem,
@@ -86,7 +88,9 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
                                         KoheseUser.find().$promise.then(function (userResults) {
                                             var results = repoResults.concat(itemResults).concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(taskResults).concat(userResults);
                                             convertListToTree(results);
-                                            $rootScope.$broadcast('itemRepositoryReady')
+                                            $rootScope.$broadcast('itemRepositoryReady');
+
+                                            createShortFormItemList();
                                         });
                                     });
                                 });
@@ -96,6 +100,20 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
                 });
             });
         });
+    }
+
+    function createShortFormItemList(){
+        var proxies = ItemProxy.getAllItemProxies();
+        for (var i = 0; i < proxies.length; i++ ){
+            shortProxyList.push({
+                name: proxies[i].item.name,
+                id: proxies[i].item.id
+            })
+        }
+    }
+
+    function getShortFormItemList(){
+        return shortProxyList;
     }
 
     function copyAttributes(fromItem, toItem) {
