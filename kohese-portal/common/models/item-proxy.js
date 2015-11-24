@@ -114,7 +114,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   getRepositoryProxy() {
-    var proxy = this.parent;
+    var proxy = this;
     
     while (proxy && proxy.kind !== "Repository"){
       proxy = proxy.parentProxy;
