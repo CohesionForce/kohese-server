@@ -2,7 +2,7 @@
  * Created by josh on 10/8/15.
  */
 
-function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, KoheseIO){
+function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, KoheseIO, $state) {
 
     const service = this;
     var users = {};
@@ -14,66 +14,65 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, Ko
     service.getCurrentUser = getCurrentUser;
     service.sessions = {};
 
-    function registerSessions(){
-      KoheseIO.socket.on('session/add', function (session) {
-        service.sessions[session.sessionId] = session;
-        console.log("::: Added session %s for %s at %s", session.sessionId, session.username, session.address);
-      });
-      
-      KoheseIO.socket.on('session/remove', function (session) {
-        console.log("::: Removed session %s for %s at %s", session.sessionId, session.username, session.address);
-        delete service.sessions[session.sessionId];
-      });
-      
-      KoheseIO.socket.on('session/list', function (sessionList) {
-        // Remove existing sessions
-        for (var key in service.sessions){
-          console.log("... Removing session" + key);
-          delete service.sessions[key];
+    function registerSessions() {
+        KoheseIO.socket.on('session/add', function (session) {
+            service.sessions[session.sessionId] = session;
+            console.log("::: Added session %s for %s at %s", session.sessionId, session.username, session.address);
+        });
+
+        KoheseIO.socket.on('session/remove', function (session) {
+            console.log("::: Removed session %s for %s at %s", session.sessionId, session.username, session.address);
+            delete service.sessions[session.sessionId];
+        });
+
+        KoheseIO.socket.on('session/list', function (sessionList) {
+            // Remove existing sessions
+            for (var key in service.sessions) {
+                console.log("... Removing session" + key);
+                delete service.sessions[key];
+            }
+
+            for (var sessionIdx in sessionList) {
+                var session = sessionList[sessionIdx];
+                console.log("::: Existing session %s for %s at %s", session.sessionId, session.username, session.address);
+                service.sessions[session.sessionId] = session;
+            }
+        });
+
+    }
+
+
+    function getAllUsers() {
+        return users.children;
+    }
+
+    function getCurrentUser() {
+        return currentUser;
+    }
+
+    function setCurrentUser() {
+        var authToken = AuthTokenFactory.getToken();
+        if (authToken) {
+            currentUser = jwtHelper.decodeToken(authToken).username;
+            registerSessions();
+        } else {
+            $state.go('login');
         }
-        
-        for(var sessionIdx in sessionList){
-          var session = sessionList[sessionIdx];
-          console.log("::: Existing session %s for %s at %s", session.sessionId, session.username, session.address);
-          service.sessions[session.sessionId] = session;
-        }
-      });
-      
-    }
-
-    registerSessions();
-
-
-    function getAllUsers(){
-      return users.children;
-    }
-
-    function getCurrentUser(){
-      return currentUser;
-    }
-    
-    function setCurrentUser(){
-      var authToken = AuthTokenFactory.getToken();
-      if (authToken){
-        currentUser = jwtHelper.decodeToken(authToken).username;        
-      } else {
-        currentUser = "";
-      }
     }
 
     $rootScope.$on('itemRepositoryReady', function () {
-      var root = ItemRepository.getRootProxy();
-      users = root.getChildByName('Users');
+        var root = ItemRepository.getRootProxy();
+        users = root.getChildByName('Users');
     });
 
     $rootScope.$on('userLoggedIn', function onUserLogin() {
-      userLoggedIn = true;
-      setCurrentUser();
-      console.log('::: Logged in as ' + currentUser);
+        userLoggedIn = true;
+        setCurrentUser();
+        console.log('::: Logged in as ' + currentUser);
     });
 
     $rootScope.$on('userLoggedOut', function onUserLogout() {
-      userLoggedIn = false;
+        userLoggedIn = false;
     });
 
     setCurrentUser();
