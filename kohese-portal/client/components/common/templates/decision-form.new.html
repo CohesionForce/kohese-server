@@ -9,30 +9,38 @@
                      is-open="detailsCtrl.accordion.Proposed">
 
         <label class=control-label" for="Rationale">
-            Rationale
-            <div class="controls">
-                <input id="Rationale"
-                       ng-disabled="!detailsCtrl.enableEdit"
-                       ng-model="detailsCtrl.itemProxy.item.rationale">
+            <div class="top-align">
+                Rationale:
             </div>
+                <textarea
+                        rows="1" msd-elastic
+                        id="Rationale"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-model="detailsCtrl.itemProxy.item.rationale"></textarea>
         </label>
         <br>
         <label>
             Alternatives:
             <div ng-repeat="alternative in detailsCtrl.itemProxy.item.alternatives track by $index">
-                <label>
-                    Name:
+                <label class="top-align">
+                    <div>
+                        Name:
+                    </div>
                     <input class="alternative-field"
                            type="text"
                            ng-disabled="!detailsCtrl.enableEdit"
                            ng-model="alternative.name">
                 </label>
-                <label>
-                    Description:
-                    <input class="alternative-field"
-                           type="text"
-                           ng-disabled="!detailsCtrl.enableEdit"
-                           ng-model="alternative.description">
+                <label class="top-align">
+                    <div>
+                        Description:
+                    </div>
+                    <textarea
+                            rows="1" msd-elastic
+                            class="alternative-field"
+                            type="text"
+                            ng-disabled="!detailsCtrl.enableEdit"
+                            ng-model="alternative.description"></textarea>
                 </label>
                 <i ng-click="detailsCtrl.deleteItemInput('alternatives', alternative)"
                    class="glyphicon glyphicon-remove"></i>

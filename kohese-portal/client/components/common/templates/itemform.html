@@ -108,7 +108,9 @@
         <label class="control-label" for="Description">Description</label>
 
         <div class="controls">
-							<textarea style="width:100%; max-width:100%; height:90px;" type="text"
+							<textarea
+                                    rows="1" msd-elastic
+                                    style="width:100%; max-width:100%;"
                                       ng-model="detailsCtrl.itemProxy.item.description"
                                       ng-disabled="!detailsCtrl.enableEdit" id="Description"></textarea>
         </div>

@@ -36,7 +36,8 @@ const appModule = angular.module('app', [
     'angucomplete-alt',
     'ngAnimate',
     'ng-context-menu',
-    'toastr'
+    'toastr',
+    'monospaced.elastic'
 
 ]);
 
