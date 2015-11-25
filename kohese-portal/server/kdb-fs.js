@@ -46,6 +46,18 @@ module.exports.createEmptyFileIfMissing = createEmptyFileIfMissing;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function createGITIgnoreJSONIfMissing(filePath) {
+  if (!fs.existsSync(filePath)) {
+    console.log("::: Creating .gitignore for *.json " + filePath);
+    fs.writeFileSync(filePath, "*.json", {encoding: 'utf8', flag: 'w'});
+  }
+}
+
+module.exports.createGITIgnoreJSONIfMissing = createGITIgnoreJSONIfMissing;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function createDirIfMissing(dirName) {
   if (!fs.existsSync(dirName)) {
     console.log("::: Creating " + dirName);

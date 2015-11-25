@@ -52,6 +52,7 @@ module.exports.retrieveModelInstance = retrieveModelInstance;
 function storeModelInstance(modelName, modelInstance){
 
   var proxy = ItemProxy.getProxyFor(modelInstance.id);
+  var isNewItem = false;
   
   if(modelName !== "Analysis"){
     var strippedInstance = JSON.parse(JSON.stringify(modelInstance));
@@ -59,6 +60,7 @@ function storeModelInstance(modelName, modelInstance){
       proxy.updateItem(modelName, strippedInstance);
     } else {
       proxy = new ItemProxy(modelName, strippedInstance);
+      isNewItem = true;
     }
     
     // Delete any associated analysis
@@ -68,7 +70,11 @@ function storeModelInstance(modelName, modelInstance){
     }
   }
 
-  repo = proxy.getRepositoryProxy();
+  if (modelName === "Repository"){
+    repo = proxy.parentProxy.getRepositoryProxy();
+  } else {
+    repo = proxy.getRepositoryProxy();    
+  }
   var repoStoragePath = determineRepoStoragePath(repo);
   
   console.log(">>> Repo storage: " + repoStoragePath);
@@ -85,6 +91,11 @@ function storeModelInstance(modelName, modelInstance){
   
   kdbFS.storeJSONDoc(filePath, modelInstance);
   
+  if (isNewItem && (modelName === "Repository")){
+    var newRepoDirPath = determineRepoStoragePath(proxy);
+    validateRepositoryStructure(newRepoDirPath);
+  }
+
   var modelStore = kdbStore.models[modelName];
   modelStore[modelInstance.id] = JSON.stringify(modelInstance);
 }
@@ -120,9 +131,13 @@ module.exports.removeModelInstance = removeModelInstance;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function checkAndCreateDir(dirName) {
+function checkAndCreateDir(dirName, ignoreJSONFiles) {
   kdbFS.createDirIfMissing(dirName);
-  kdbFS.createEmptyFileIfMissing(dirName + "/.gitignore");
+  if(ignoreJSONFiles){
+    kdbFS.createGITIgnoreJSONIfMissing(dirName + "/.gitignore")
+  } else {
+    kdbFS.createEmptyFileIfMissing(dirName + "/.gitignore");    
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -145,7 +160,8 @@ function validateRepositoryStructure (repoDirPath) {
   // Check for the model directories
   for(var modelName in modelConfig){
     var modelDirPath = repoDirPath + "/" + modelName;
-    checkAndCreateDir(modelDirPath);
+    var ignoreJSONFiles = (modelName === "Analysis");
+    checkAndCreateDir(modelDirPath, ignoreJSONFiles);
   }
   
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
@@ -218,7 +234,10 @@ for(var childIdx in rootProxy.children){
 
 console.log("::: Reading db.json");
 var lbStore = kdbFS.loadJSONDoc("db.json");
+module.exports.lbStore = lbStore;
+
 kdbFS.storeJSONDoc(kdbDirPath + "/lbStore.json", lbStore);
+
 
 var kdbModel = require('./kdb-model.js');
 kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);

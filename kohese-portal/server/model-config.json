@@ -66,5 +66,9 @@
   "Repository": {
     "dataSource": "db",
     "public": true
+  },
+  "KoheseModel": {
+    "dataSource": "db",
+    "public": true
   }
 }
