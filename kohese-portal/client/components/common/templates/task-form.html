@@ -68,6 +68,7 @@
                 <input type="text"
                        class="form-control"
                        datepicker-popup="dd-MMMM-yyyy"
+                       ng-disabled="!detailsCtrl.enableEdit"
                        ng-model="detailsCtrl.itemProxy.item.estimatedStart"
                        ng-change="detailsCtrl.convertDate('estimatedStart')"
                        is-open="detailsCtrl.estimatedStart"
@@ -75,6 +76,7 @@
                        close-text="Close"/>
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
                         ng-click="detailsCtrl.openDatePicker($event, 'estimatedStart')">
                     <i class="glyphicon glyphicon-calendar"></i>
                 </button>
@@ -87,6 +89,7 @@
                 <input type="text"
                        class="form-control"
                        datepicker-popup="dd-MMMM-yyyy"
+                       ng-disabled="!detailsCtrl.enableEdit"
                        ng-model="detailsCtrl.itemProxy.item.estimatedCompletion"
                        ng-change="detailsCtrl.convertDate('estimatedCompletion', true)"
                        is-open="detailsCtrl.estimatedCompletion"
@@ -94,6 +97,7 @@
                        close-text="Close"/>
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
                         ng-click="detailsCtrl.openDatePicker($event, 'estimatedCompletion')">
                     <i class="glyphicon glyphicon-calendar"></i>
                 </button>
@@ -125,6 +129,7 @@
                 <input type="text"
                        class="form-control"
                        datepicker-popup="dd-MMMM-yyyy"
+                       ng-disabled="!detailsCtrl.enableEdit"
                        ng-model="detailsCtrl.itemProxy.item.actualStart"
                        ng-change="detailsCtrl.convertDate('actualStart')"
                        is-open="detailsCtrl.actualStart"
@@ -132,6 +137,7 @@
                        close-text="Close"/>
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
                         ng-click="detailsCtrl.openDatePicker($event, 'actualStart')">
                     <i class="glyphicon glyphicon-calendar"></i>
                 </button>
@@ -145,6 +151,7 @@
                 <input type="text"
                        class="form-control"
                        datepicker-popup="dd-MMMM-yyyy"
+                       ng-disabled="!detailsCtrl.enableEdit"
                        ng-model="detailsCtrl.itemProxy.item.actualCompletion"
                        ng-change="detailsCtrl.convertDate('actualCompletion', true)"
                        is-open="detailsCtrl.actualCompletion"
@@ -152,6 +159,7 @@
                        close-text="Close"/>
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
                         ng-click="detailsCtrl.openDatePicker($event, 'actualCompletion')">
                     <i class="glyphicon glyphicon-calendar"></i>
                 </button>

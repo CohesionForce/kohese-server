@@ -30,6 +30,7 @@
             <span class="input-group">
                 <input type="text"
                        class="form-control"
+                       ng-disabled="!detailsCtrl.enableEdit"
                        datepicker-popup="dd-MMMM-yyyy"
                        ng-model="detailsCtrl.itemProxy.item.approvedOn"
                        ng-change="detailsCtrl.convertDate('approvedOn', true)"
@@ -38,6 +39,7 @@
                        close-text="Close"/>
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
                         ng-click="detailsCtrl.openDatePicker($event, 'approvedOn')">
                     <i class="glyphicon glyphicon-calendar"></i>
                 </button>
