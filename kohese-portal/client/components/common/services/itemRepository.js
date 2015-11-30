@@ -69,6 +69,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         getRootProxy: ItemProxy.getRootProxy,
         getProxyFor: ItemProxy.getProxyFor,
         getAllItemProxies: ItemProxy.getAllItemProxies,
+        getRepositories: ItemProxy.getRepositories,
         getShortFormItemList : getShortFormItemList,
         fetchItem: fetchItem,
         upsertItem: upsertItem,

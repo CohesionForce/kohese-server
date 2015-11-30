@@ -2,7 +2,7 @@
  * Created by josh on 9/22/15.
  */
 
-function AdminController(tabService, $scope, KoheseUser, UserService) {
+function AdminController(tabService, $state, $scope, KoheseUser, UserService, ItemRepository) {
     var ctrl = this;
     var tab = tabService.getCurrentTab();
 
@@ -11,10 +11,18 @@ function AdminController(tabService, $scope, KoheseUser, UserService) {
     ctrl.editUserForm = false;
     ctrl.users = [];
     ctrl.sessions = UserService.sessions;
+    ctrl.repositoryList = ItemRepository.getRepositories();
+
+    console.log(ctrl.repositoryList)
 
     $scope.$on('$viewContentLoaded', function () {
         tab.setTitle('Admin');
         tab.type = 'singleview';
+    });
+
+    $scope.$on('itemRepositoryReady', function(){
+        ctrl.repositoryList = ItemRepository.getRepositories();
+        console.log(ctrl.repositoryList)
     });
 
     function fetchUsers() {
@@ -26,6 +34,26 @@ function AdminController(tabService, $scope, KoheseUser, UserService) {
 
     fetchUsers();
 
+
+    ctrl.navigate = function (state, id) {
+        if (state) {
+            updateTab('kohese.explore.edit', 'dualview', {id: id})
+            $state.go(state, {id: id})
+        } else {
+            updateTab('kohese.explore.edit', 'dualview', {id: id})
+            $state.go('kohese.explore.edit', {id: id})
+        }
+    };
+
+    function updateTab(state, type, params){
+        if (state){
+            tab.state = state
+        } if (type){
+            tab.type = type;
+        } if (params) {
+            tab.params = params;
+        }
+    }
 
     ctrl.editUser = function(user){
         ctrl.usernameInput = user.name;

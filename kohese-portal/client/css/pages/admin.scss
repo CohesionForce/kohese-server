@@ -3,7 +3,7 @@
 .admin-screen {
   height: 100%;
   
-  .panel {
+  #adminPanel {
     height: 100%;
     #admin-view-wrapper {
       height: calc(100% - 65px);
@@ -13,12 +13,19 @@
   
 }
 
+#repository-screen {
+
+  .repository-panel {
+    margin: 5px;
+  }
+}
+
 .users-screen {
 
   overflow: auto;
   width: 100%;
   
-  panel-body {
+  .panel-body {
     overflow: auto;
   }
 
