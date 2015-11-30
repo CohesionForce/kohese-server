@@ -1544,6 +1544,116 @@ module.factory(
           url: urlBase + "/Repositories/:id/children2/count",
           method: "GET"
         },
+
+        // INTERNAL. Use KoheseModel.children.findById() instead.
+        "::findById::KoheseModel::children": {
+          url: urlBase + "/KoheseModels/:id/children/:fk",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children.destroyById() instead.
+        "::destroyById::KoheseModel::children": {
+          url: urlBase + "/KoheseModels/:id/children/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children.updateById() instead.
+        "::updateById::KoheseModel::children": {
+          url: urlBase + "/KoheseModels/:id/children/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.findById() instead.
+        "::findById::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2/:fk",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.destroyById() instead.
+        "::destroyById::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.updateById() instead.
+        "::updateById::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.link() instead.
+        "::link::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2/rel/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.unlink() instead.
+        "::unlink::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2/rel/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.exists() instead.
+        "::exists::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2/rel/:fk",
+          method: "HEAD"
+        },
+
+        // INTERNAL. Use KoheseModel.parent() instead.
+        "::get::KoheseModel::parent": {
+          url: urlBase + "/KoheseModels/:id/parent",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children() instead.
+        "::get::KoheseModel::children": {
+          isArray: true,
+          url: urlBase + "/KoheseModels/:id/children",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children.create() instead.
+        "::create::KoheseModel::children": {
+          url: urlBase + "/KoheseModels/:id/children",
+          method: "POST"
+        },
+
+        // INTERNAL. Use KoheseModel.children.destroyAll() instead.
+        "::delete::KoheseModel::children": {
+          url: urlBase + "/KoheseModels/:id/children",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children.count() instead.
+        "::count::KoheseModel::children": {
+          url: urlBase + "/KoheseModels/:id/children/count",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children2() instead.
+        "::get::KoheseModel::children2": {
+          isArray: true,
+          url: urlBase + "/KoheseModels/:id/children2",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.create() instead.
+        "::create::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2",
+          method: "POST"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.destroyAll() instead.
+        "::delete::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.count() instead.
+        "::count::KoheseModel::children2": {
+          url: urlBase + "/KoheseModels/:id/children2/count",
+          method: "GET"
+        },
       }
     );
 
@@ -3173,6 +3283,30 @@ module.factory(
         // INTERNAL. Use Repository.analysis.destroy() instead.
         "::destroy::Repository::analysis": {
           url: urlBase + "/Repositories/:id/analysis",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.analysis() instead.
+        "::get::KoheseModel::analysis": {
+          url: urlBase + "/KoheseModels/:id/analysis",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.analysis.create() instead.
+        "::create::KoheseModel::analysis": {
+          url: urlBase + "/KoheseModels/:id/analysis",
+          method: "POST"
+        },
+
+        // INTERNAL. Use KoheseModel.analysis.update() instead.
+        "::update::KoheseModel::analysis": {
+          url: urlBase + "/KoheseModels/:id/analysis",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use KoheseModel.analysis.destroy() instead.
+        "::destroy::KoheseModel::analysis": {
+          url: urlBase + "/KoheseModels/:id/analysis",
           method: "DELETE"
         },
       }
@@ -15357,6 +15491,1512 @@ module.factory(
         R.analysis.update = function() {
           var TargetResource = $injector.get("Analysis");
           var action = TargetResource["::update::Repository::analysis"];
+          return action.apply(R, arguments);
+        };
+
+    return R;
+  }]);
+
+/**
+ * @ngdoc object
+ * @name lbServices.KoheseModel
+ * @header lbServices.KoheseModel
+ * @object
+ *
+ * @description
+ *
+ * A $resource object for interacting with the `KoheseModel` model.
+ *
+ * ## Example
+ *
+ * See
+ * {@link http://docs.angularjs.org/api/ngResource.$resource#example $resource}
+ * for an example of using this object.
+ *
+ */
+module.factory(
+  "KoheseModel",
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
+    var R = Resource(
+      urlBase + "/KoheseModels/:id",
+      { 'id': '@id' },
+      {
+
+        // INTERNAL. Use KoheseModel.children.findById() instead.
+        "prototype$__findById__children": {
+          url: urlBase + "/KoheseModels/:id/children/:fk",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children.destroyById() instead.
+        "prototype$__destroyById__children": {
+          url: urlBase + "/KoheseModels/:id/children/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children.updateById() instead.
+        "prototype$__updateById__children": {
+          url: urlBase + "/KoheseModels/:id/children/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.findById() instead.
+        "prototype$__findById__children2": {
+          url: urlBase + "/KoheseModels/:id/children2/:fk",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.destroyById() instead.
+        "prototype$__destroyById__children2": {
+          url: urlBase + "/KoheseModels/:id/children2/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.updateById() instead.
+        "prototype$__updateById__children2": {
+          url: urlBase + "/KoheseModels/:id/children2/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.link() instead.
+        "prototype$__link__children2": {
+          url: urlBase + "/KoheseModels/:id/children2/rel/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.unlink() instead.
+        "prototype$__unlink__children2": {
+          url: urlBase + "/KoheseModels/:id/children2/rel/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.exists() instead.
+        "prototype$__exists__children2": {
+          url: urlBase + "/KoheseModels/:id/children2/rel/:fk",
+          method: "HEAD"
+        },
+
+        // INTERNAL. Use KoheseModel.parent() instead.
+        "prototype$__get__parent": {
+          url: urlBase + "/KoheseModels/:id/parent",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.analysis() instead.
+        "prototype$__get__analysis": {
+          url: urlBase + "/KoheseModels/:id/analysis",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.analysis.create() instead.
+        "prototype$__create__analysis": {
+          url: urlBase + "/KoheseModels/:id/analysis",
+          method: "POST"
+        },
+
+        // INTERNAL. Use KoheseModel.analysis.update() instead.
+        "prototype$__update__analysis": {
+          url: urlBase + "/KoheseModels/:id/analysis",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use KoheseModel.analysis.destroy() instead.
+        "prototype$__destroy__analysis": {
+          url: urlBase + "/KoheseModels/:id/analysis",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children() instead.
+        "prototype$__get__children": {
+          isArray: true,
+          url: urlBase + "/KoheseModels/:id/children",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children.create() instead.
+        "prototype$__create__children": {
+          url: urlBase + "/KoheseModels/:id/children",
+          method: "POST"
+        },
+
+        // INTERNAL. Use KoheseModel.children.destroyAll() instead.
+        "prototype$__delete__children": {
+          url: urlBase + "/KoheseModels/:id/children",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children.count() instead.
+        "prototype$__count__children": {
+          url: urlBase + "/KoheseModels/:id/children/count",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children2() instead.
+        "prototype$__get__children2": {
+          isArray: true,
+          url: urlBase + "/KoheseModels/:id/children2",
+          method: "GET"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.create() instead.
+        "prototype$__create__children2": {
+          url: urlBase + "/KoheseModels/:id/children2",
+          method: "POST"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.destroyAll() instead.
+        "prototype$__delete__children2": {
+          url: urlBase + "/KoheseModels/:id/children2",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use KoheseModel.children2.count() instead.
+        "prototype$__count__children2": {
+          url: urlBase + "/KoheseModels/:id/children2/count",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#create
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `KoheseModel` object.)
+         * </em>
+         */
+        "create": {
+          url: urlBase + "/KoheseModels",
+          method: "POST"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#upsert
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Update an existing model instance or insert a new one into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `KoheseModel` object.)
+         * </em>
+         */
+        "upsert": {
+          url: urlBase + "/KoheseModels",
+          method: "PUT"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#exists
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Check whether a model instance exists in the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `exists` – `{boolean=}` - 
+         */
+        "exists": {
+          url: urlBase + "/KoheseModels/:id/exists",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#findById
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Find a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         *  - `filter` – `{object=}` - Filter defining fields and include
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `KoheseModel` object.)
+         * </em>
+         */
+        "findById": {
+          url: urlBase + "/KoheseModels/:id",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#find
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Find all instances of the model matched by filter from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `KoheseModel` object.)
+         * </em>
+         */
+        "find": {
+          isArray: true,
+          url: urlBase + "/KoheseModels",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#findOne
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Find first instance of the model matched by filter from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `KoheseModel` object.)
+         * </em>
+         */
+        "findOne": {
+          url: urlBase + "/KoheseModels/findOne",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#updateAll
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Update instances of the model matched by where from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `where` – `{object=}` - Criteria to match model instances
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        "updateAll": {
+          url: urlBase + "/KoheseModels/update",
+          method: "POST"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#deleteById
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Delete a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        "deleteById": {
+          url: urlBase + "/KoheseModels/:id",
+          method: "DELETE"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#count
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Count instances of the model matched by where from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `where` – `{object=}` - Criteria to match model instances
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `count` – `{number=}` - 
+         */
+        "count": {
+          url: urlBase + "/KoheseModels/count",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#prototype$updateAttributes
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Update attributes for a model instance and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `KoheseModel` object.)
+         * </em>
+         */
+        "prototype$updateAttributes": {
+          url: urlBase + "/KoheseModels/:id",
+          method: "PUT"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#createChangeStream
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Create a change stream.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         *  - `options` – `{object=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `changes` – `{ReadableStream=}` - 
+         */
+        "createChangeStream": {
+          url: urlBase + "/KoheseModels/change-stream",
+          method: "POST"
+        },
+      }
+    );
+
+
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#updateOrCreate
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Update an existing model instance or insert a new one into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `KoheseModel` object.)
+         * </em>
+         */
+        R["updateOrCreate"] = R["upsert"];
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#update
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Update instances of the model matched by where from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `where` – `{object=}` - Criteria to match model instances
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R["update"] = R["updateAll"];
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#destroyById
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Delete a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R["destroyById"] = R["deleteById"];
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#removeById
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Delete a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R["removeById"] = R["deleteById"];
+
+
+    /**
+    * @ngdoc property
+    * @name lbServices.KoheseModel#modelName
+    * @propertyOf lbServices.KoheseModel
+    * @description
+    * The name of the model represented by this $resource,
+    * i.e. `KoheseModel`.
+    */
+    R.modelName = "KoheseModel";
+
+    /**
+     * @ngdoc object
+     * @name lbServices.KoheseModel.children
+     * @header lbServices.KoheseModel.children
+     * @object
+     * @description
+     *
+     * The object `KoheseModel.children` groups methods
+     * manipulating `Item` instances related to `KoheseModel`.
+     *
+     * Call {@link lbServices.KoheseModel#children KoheseModel.children()}
+     * to query all related instances.
+     */
+
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#children
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Queries children of KoheseModel.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::get::KoheseModel::children"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children#count
+         * @methodOf lbServices.KoheseModel.children
+         *
+         * @description
+         *
+         * Counts children of KoheseModel.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `where` – `{object=}` - Criteria to match model instances
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `count` – `{number=}` - 
+         */
+        R.children.count = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::count::KoheseModel::children"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children#create
+         * @methodOf lbServices.KoheseModel.children
+         *
+         * @description
+         *
+         * Creates a new instance in children of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children.create = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::create::KoheseModel::children"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children#destroyAll
+         * @methodOf lbServices.KoheseModel.children
+         *
+         * @description
+         *
+         * Deletes all children of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.children.destroyAll = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::delete::KoheseModel::children"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children#destroyById
+         * @methodOf lbServices.KoheseModel.children
+         *
+         * @description
+         *
+         * Delete a related item by id for children.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.children.destroyById = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::destroyById::KoheseModel::children"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children#findById
+         * @methodOf lbServices.KoheseModel.children
+         *
+         * @description
+         *
+         * Find a related item by id for children.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children.findById = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::findById::KoheseModel::children"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children#updateById
+         * @methodOf lbServices.KoheseModel.children
+         *
+         * @description
+         *
+         * Update a related item by id for children.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children.updateById = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::updateById::KoheseModel::children"];
+          return action.apply(R, arguments);
+        };
+    /**
+     * @ngdoc object
+     * @name lbServices.KoheseModel.children2
+     * @header lbServices.KoheseModel.children2
+     * @object
+     * @description
+     *
+     * The object `KoheseModel.children2` groups methods
+     * manipulating `Item` instances related to `KoheseModel`.
+     *
+     * Call {@link lbServices.KoheseModel#children2 KoheseModel.children2()}
+     * to query all related instances.
+     */
+
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#children2
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Queries children2 of KoheseModel.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children2 = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::get::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#count
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Counts children2 of KoheseModel.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `where` – `{object=}` - Criteria to match model instances
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `count` – `{number=}` - 
+         */
+        R.children2.count = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::count::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#create
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Creates a new instance in children2 of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children2.create = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::create::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#destroyAll
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Deletes all children2 of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.children2.destroyAll = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::delete::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#destroyById
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Delete a related item by id for children2.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children2
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.children2.destroyById = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::destroyById::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#exists
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Check the existence of children2 relation to an item by id.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children2
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children2.exists = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::exists::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#findById
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Find a related item by id for children2.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children2
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children2.findById = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::findById::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#link
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Add a related item by id for children2.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children2
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method does not accept any data. Supply an empty object.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children2.link = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::link::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#unlink
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Remove the children2 relation to an item by id.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children2
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.children2.unlink = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::unlink::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.children2#updateById
+         * @methodOf lbServices.KoheseModel.children2
+         *
+         * @description
+         *
+         * Update a related item by id for children2.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `fk` – `{*}` - Foreign key for children2
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.children2.updateById = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::updateById::KoheseModel::children2"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#parent
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Fetches belongsTo relation parent.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `refresh` – `{boolean=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Item` object.)
+         * </em>
+         */
+        R.parent = function() {
+          var TargetResource = $injector.get("Item");
+          var action = TargetResource["::get::KoheseModel::parent"];
+          return action.apply(R, arguments);
+        };
+    /**
+     * @ngdoc object
+     * @name lbServices.KoheseModel.analysis
+     * @header lbServices.KoheseModel.analysis
+     * @object
+     * @description
+     *
+     * The object `KoheseModel.analysis` groups methods
+     * manipulating `Analysis` instances related to `KoheseModel`.
+     *
+     * Call {@link lbServices.KoheseModel#analysis KoheseModel.analysis()}
+     * to query all related instances.
+     */
+
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel#analysis
+         * @methodOf lbServices.KoheseModel
+         *
+         * @description
+         *
+         * Fetches hasOne relation analysis.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         *  - `refresh` – `{boolean=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Analysis` object.)
+         * </em>
+         */
+        R.analysis = function() {
+          var TargetResource = $injector.get("Analysis");
+          var action = TargetResource["::get::KoheseModel::analysis"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.analysis#create
+         * @methodOf lbServices.KoheseModel.analysis
+         *
+         * @description
+         *
+         * Creates a new instance in analysis of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Analysis` object.)
+         * </em>
+         */
+        R.analysis.create = function() {
+          var TargetResource = $injector.get("Analysis");
+          var action = TargetResource["::create::KoheseModel::analysis"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.analysis#destroy
+         * @methodOf lbServices.KoheseModel.analysis
+         *
+         * @description
+         *
+         * Deletes analysis of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.analysis.destroy = function() {
+          var TargetResource = $injector.get("Analysis");
+          var action = TargetResource["::destroy::KoheseModel::analysis"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.KoheseModel.analysis#update
+         * @methodOf lbServices.KoheseModel.analysis
+         *
+         * @description
+         *
+         * Update analysis of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Item id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Analysis` object.)
+         * </em>
+         */
+        R.analysis.update = function() {
+          var TargetResource = $injector.get("Analysis");
+          var action = TargetResource["::update::KoheseModel::analysis"];
           return action.apply(R, arguments);
         };
 
