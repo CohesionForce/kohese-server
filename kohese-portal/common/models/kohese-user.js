@@ -94,10 +94,4 @@ module.exports = function(KoheseUser) {
   KoheseUser.beforeRemote('create', KoheseUser.addModificationHistory);
   KoheseUser.beforeRemote('upsert', KoheseUser.addModificationHistory);
 
-  KoheseUser.observe('before save', function(ctx, next) {
-    console.log('::: Before save - checking on password');
-    next();
-
-  });
-
 };

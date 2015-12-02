@@ -44,7 +44,7 @@ module.exports = function (Item) {
                 notification.type = 'update';
                 global.KoheseIO.emit(ctx.Model.modelName +'/update', notification);
             }
-            global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance);
+            global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance.toObject());
         } else {
             console.log('Updated %s matching %j',
                 ctx.Model.pluralModelName,
