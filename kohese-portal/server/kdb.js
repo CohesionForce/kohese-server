@@ -217,10 +217,13 @@ for(var modelKindIdx in modelKinds){
 
 console.log("::: Validating Repository Structure")
 
-var kdbDirPath = "kdb/kohese-kdb";
+var kdbDirPath = "kdb";
 checkAndCreateDir(kdbDirPath);
 
-var exportDirPath = kdbDirPath + "/export";
+var koheseKDBDirPath = kdbDirPath + "/kohese-kdb";
+checkAndCreateDir(koheseKDBDirPath);
+
+var exportDirPath = koheseKDBDirPath + "/export";
 validateRepositoryStructure(exportDirPath);
 
 kdbFS.storeJSONDoc(kdbDirPath + "/kdbStore.json", kdbStore);

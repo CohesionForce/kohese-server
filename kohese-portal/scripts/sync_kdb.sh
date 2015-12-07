@@ -7,7 +7,7 @@ kdbDir=`pwd`
 if [ -f "db.json" ]
 then
   echo "::: Exporting kdb"
-  cd ../..
+  cd ..
   node ./scripts/export-kdb.js
   cd $kdbDir
 else
@@ -16,6 +16,7 @@ fi
 
 if [ "-git" == "$1" ]
 then
+  cd kohese-kdb
   echo "::: Checking for local changes"
   changes=`git status -s`
   git status -s | less
@@ -73,6 +74,7 @@ then
     esac
   fi
 
+  cd ..
 fi
 
 echo "::: Checking for updates to db.json"

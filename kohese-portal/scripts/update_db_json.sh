@@ -1,6 +1,6 @@
 kdbDir=`pwd`
 echo "::: Importing kdb"
-cd ../..
+cd ..
 node ./server/kdb.js
 
 cd $kdbDir
