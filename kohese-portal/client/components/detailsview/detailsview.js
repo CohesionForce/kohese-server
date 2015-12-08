@@ -10,80 +10,67 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     var detailsCtrl = this;
 
     detailsCtrl.tab = tabService.getCurrentTab();
-    detailsCtrl.tab.route = $stateParams.id;
-    detailsCtrl.filterString = "";
-    detailsCtrl.analysisFilterString = "";
-    detailsCtrl.analysisSummarySortField = ['-count', 'text'];
-    detailsCtrl.analysisDetailsSortField = "";
-    detailsCtrl.enableEdit = false;
-    detailsCtrl.itemProxy = {};
-    detailsCtrl.parentProxy = {};
-    detailsCtrl.defaultTab = {active: true};
-    detailsCtrl.showChunksInAnalysis = true;
-    detailsCtrl.showTokensInAnalysis = true;
-    detailsCtrl.showSentencesInDetails = true;
-    detailsCtrl.showChunksInDetails = false;
-    detailsCtrl.showTokensInDetails = false;
-    detailsCtrl.filterList = [];
-    detailsCtrl.kindList = ItemRepository.modelTypes;
-    detailsCtrl.decisionStates = DecisionService.getDecisionStates();
-    detailsCtrl.actionStates = ActionService.getActionStates();
-    detailsCtrl.issueStates = IssueService.getIssueStates();
-    detailsCtrl.categoryTags = CategoryService.getTags();
-    detailsCtrl.userList = UserService.getAllUsers();
-    detailsCtrl.currentUser = UserService.getCurrentUser();
-    detailsCtrl.proxyList = ItemRepository.getShortFormItemList();
-    detailsCtrl.analysisFilterPOS = analysisService.filterPOS;
-    detailsCtrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
-    detailsCtrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
-    detailsCtrl.analysisPOSFilterName = "Standard";
-    detailsCtrl.NavigationService = NavigationService;
+    var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
 
-    $scope.$on('$stateChangeSuccess', function () {
-        $scope.$emit('newItemSelected', $stateParams.id);
-    });
+    if (!controllerRestored) {
+        console.log("Controller not restored")
+        detailsCtrl.tab = tabService.getCurrentTab();
+        detailsCtrl.tab.route = $stateParams.id;
+        detailsCtrl.filterString = "";
+        detailsCtrl.analysisFilterString = "";
+        detailsCtrl.analysisSummarySortField = ['-count', 'text'];
+        detailsCtrl.analysisDetailsSortField = "";
+        detailsCtrl.enableEdit = false;
+        detailsCtrl.itemProxy = {};
+        detailsCtrl.parentProxy = {};
+        detailsCtrl.defaultTab = {active: true};
+        detailsCtrl.showChunksInAnalysis = true;
+        detailsCtrl.showTokensInAnalysis = true;
+        detailsCtrl.showSentencesInDetails = true;
+        detailsCtrl.showChunksInDetails = false;
+        detailsCtrl.showTokensInDetails = false;
+        detailsCtrl.filterList = [];
+        detailsCtrl.kindList = ItemRepository.modelTypes;
+        detailsCtrl.decisionStates = DecisionService.getDecisionStates();
+        detailsCtrl.actionStates = ActionService.getActionStates();
+        detailsCtrl.issueStates = IssueService.getIssueStates();
+        detailsCtrl.categoryTags = CategoryService.getTags();
+        detailsCtrl.userList = UserService.getAllUsers();
+        detailsCtrl.currentUser = UserService.getCurrentUser();
+        detailsCtrl.proxyList = ItemRepository.getShortFormItemList();
+        detailsCtrl.analysisFilterPOS = analysisService.filterPOS;
+        detailsCtrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
+        detailsCtrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
+        detailsCtrl.analysisPOSFilterName = "Standard";
+        detailsCtrl.NavigationService = NavigationService;
+        detailsCtrl.updateParentProxy = updateParentProxy;
+        if (angular.isDefined($stateParams.id)) {
+            detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
 
-    if ($stateParams.id) {
-        detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
+            detailsCtrl.updateParentProxy();
+        } else if (angular.isDefined($stateParams.parentId)) {
+            {
+                detailsCtrl.itemProxy.item = new Item();
+                detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
+                detailsCtrl.updateParentProxy();
+            }
+        } else {
+            detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.updateParentProxy();
+        }
+
+        if (detailsCtrl.tab.state === 'kohese.explore.create') {
+            detailsCtrl.enableEdit = true;
+        }
     }
 
     detailsCtrl.getProxyFor = function (id) {
       return ItemRepository.getProxyFor(id);
-    }
-    
-    detailsCtrl.updateParentProxy = function () {
-        if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId) {
-            detailsCtrl.parentProxy = ItemRepository.getProxyFor(detailsCtrl.itemProxy.item.parentId);
-        } else {
-            detailsCtrl.parentProxy = {};
-        }
     };
 
-    if (detailsCtrl.tab.state === 'kohese.investigate') {
-        detailsCtrl.tab.setTitle('Investigate');
-        detailsCtrl.tab.params = {
-            id: $stateParams.id
-        };
-    }
-
-    if (angular.isDefined($stateParams.id)) {
-        detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
-        detailsCtrl.updateParentProxy();
-    } else if (angular.isDefined($stateParams.parentId)) {
-        {
-            detailsCtrl.itemProxy.item = new Item();
-            detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
-            detailsCtrl.updateParentProxy();
-        }
-    } else {
-        detailsCtrl.itemProxy.item = new Item();
-        detailsCtrl.updateParentProxy();
-    }
-
-    if (detailsCtrl.tab.state === 'kohese.explore.create') {
-        detailsCtrl.enableEdit = true;
-    }
-
+    $scope.$on('$stateChangeSuccess', function () {
+        $scope.$emit('newItemSelected', $stateParams.id);
+    });
 
     $scope.$on('itemRepositoryReady', function () {
         detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
@@ -101,8 +88,31 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     });
 
     $scope.$on('tabSelected', function () {
-        detailsCtrl.tab = tabService.getCurrentTab();
+        tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
     });
+
+    detailsCtrl.updateParentProxy = function () {
+        if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId) {
+            detailsCtrl.parentProxy = ItemRepository.getProxyFor(detailsCtrl.itemProxy.item.parentId);
+        } else {
+            detailsCtrl.parentProxy = {};
+        }
+    };
+
+    if (detailsCtrl.tab.state === 'kohese.investigate') {
+        detailsCtrl.tab.setTitle('Investigate');
+        detailsCtrl.tab.params = {
+            id: $stateParams.id
+        };
+    }
+
+    function updateParentProxy() {
+        if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId) {
+            detailsCtrl.parentProxy = ItemRepository.getProxyFor(detailsCtrl.itemProxy.item.parentId);
+        } else {
+            detailsCtrl.parentProxy = {};
+        }
+    };
 
     function initializeItemStates(type) {
         if (type === 'Action') {
@@ -150,7 +160,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     };
 
     detailsCtrl.updateTab = function (state, id, view) {
-        console.log(state, id, view);
         detailsCtrl.tab.setState(state);
         detailsCtrl.tab.params.id = id;
         if (view) {
@@ -236,7 +245,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     };
 
     detailsCtrl.incrementItemInput = function (type) {
-      
       if(!detailsCtrl.itemProxy.item[type]){
         detailsCtrl.itemProxy.item[type] = [];
       }
@@ -247,22 +255,12 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.itemProxy.item[type].push({id: detailsCtrl.resolutionActionsInput.description.id});
       } else {
         detailsCtrl.itemProxy.item[type].push({name: ''});
-      }
-      
+      }   
     };
 
     detailsCtrl.deleteItemInput = function (type, row) {
         var index = detailsCtrl.itemProxy.item[type].indexOf(row);
         detailsCtrl.itemProxy.item[type].splice(index, 1);
-    };
-
-    detailsCtrl.tagSelected = function (selected) {
-        if (selected) {
-            //window.alert('You have selected ' + selected);
-            console.log(selected);
-        } else {
-            console.log('cleared');
-        }
     };
 
     detailsCtrl.toggleView = function (state) {
@@ -273,8 +271,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     detailsCtrl.fetchAnalysis = function () {
         analysisService.fetchAnalysis(detailsCtrl.itemProxy);
     };
-
-    console.log(detailsCtrl.itemProxy);
 
     detailsCtrl.upsertItem = function () {
         ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
@@ -318,7 +314,10 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
             });
     };
 
-    //datepicker config
+    //
+    // Datepicker config
+    //
+
     detailsCtrl.estimatedStart = false;
     detailsCtrl.dateOptions = {
         formatYear: 'yy'
@@ -331,7 +330,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
             $event.stopPropagation();
         }
         detailsCtrl[type] = true;
-        console.log(detailsCtrl.estimatedStart);
     };
 
     detailsCtrl.convertDate = function (type, end) {
@@ -342,7 +340,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         } else {
             detailsCtrl.itemProxy.item[type] = date.valueOf();
         }
-        console.log(detailsCtrl.itemProxy.item[type])
     };
 
     detailsCtrl.updateState = function (state, type) {

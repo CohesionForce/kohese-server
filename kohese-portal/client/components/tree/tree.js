@@ -2,36 +2,40 @@
  * Created by josh on 7/13/15.
  */
 
-function TreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $scope, $location,
-                        $stateParams, SearchService, tabService) {
+function TreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
+                        $scope, $location, $stateParams, SearchService, tabService) {
 
     var treeCtrl = this,
         syncListener;
-    var id = tabService.getTabId();
+    treeCtrl.tab = tabService.getCurrentTab();
+    var controllerRestored = tabService.restoreControllerData(treeCtrl.tab.id, 'treeCtrl', this);
 
-    treeCtrl.filter = SearchService.getFilterObject(id);
-    if (!treeCtrl.filter) {
-        treeCtrl.filter = {
-            text: "",
-            kind: "",
-            actionState: "",
-            actionAssignee: ""
-        };
+    if (!controllerRestored) {
+        treeCtrl.kindList = ItemRepository.modelTypes;
+        treeCtrl.actionStates = ActionService.getActionStates();
+        treeCtrl.userList = UserService.getAllUsers();
+        treeCtrl.collapsed = {};
+        treeCtrl.previouslyExpanded = {};
+        treeCtrl.allExpanded = false;
+        treeCtrl.locationSynced = false;
+        treeCtrl.currentLazyItemIdx = 0;
+        treeCtrl.lazyLimitIncrement = 20;
+        treeCtrl.currentLazyLimit = treeCtrl.lazyLimitIncrement;
+        treeCtrl.lazyLimitIncreasePending = false;
+        treeCtrl.isRootDefault = true;
+        treeCtrl.filter = SearchService.getFilterObject(treeCtrl.tab.id);
+        treeCtrl.treeRoot = ItemRepository.getRootProxy();
+        treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
+    } else {
+        console.log("Root Check!");
+        console.log(treeCtrl);
     }
 
-    treeCtrl.kindList = ItemRepository.modelTypes;
-    treeCtrl.actionStates = ActionService.getActionStates();
-    treeCtrl.userList = UserService.getAllUsers();
-    treeCtrl.collapsed = {};
-    treeCtrl.previouslyExpanded = {};
-    treeCtrl.allExpanded = false;
-    treeCtrl.tab = tabService.getCurrentTab();
-    treeCtrl.locationSynced = false;
-    treeCtrl.currentLazyItemIdx = 0;
-    var lazyLimitIncrement = 20;
-    treeCtrl.currentLazyLimit = lazyLimitIncrement;
-    var lazyLimitIncreasePending = false;
-    treeCtrl.isRootDefault = true;
+    $scope.$on('stateChangeSuccess', function () {
+        treeCtrl.tab.type = 'dualview';
+        treeCtrl.tab.state = $state.current.name
+        treeCtrl.tab.params = {id: $stateParams.id}
+    });
 
     $scope.$on('itemRepositoryReady', function () {
         treeCtrl.actionStates = ActionService.getActionStates();
@@ -68,27 +72,36 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
 
     $scope.$on('$stateChangeStart',
         function (event, toState, toParams, fromState, fromParams) {
-            SearchService.setFilterObject(treeCtrl.filter, id);
+            SearchService.setFilterObject(treeCtrl.filter, treeCtrl.tab.id);
         });
+
+    if (!treeCtrl.filter) {
+        treeCtrl.filter = {
+            text: "",
+            kind: "",
+            actionState: "",
+            actionAssignee: ""
+        };
+    }
 
     treeCtrl.allocateLazyItemIdx = function () {
         var idx = treeCtrl.currentLazyItemIdx;
         treeCtrl.currentLazyItemIdx++;
 
-        if (!lazyLimitIncreasePending) {
+        if (!treeCtrl.lazyLimitIncreasePending) {
             // New nodes added, need to increase the limit to force a new digest cycle
             // to load more items if they are available
-            lazyLimitIncreasePending = true;
+            treeCtrl.lazyLimitIncreasePending = true;
             postDigest(function () {
-                treeCtrl.currentLazyLimit = treeCtrl.currentLazyItemIdx + lazyLimitIncrement;
+                treeCtrl.currentLazyLimit = treeCtrl.currentLazyItemIdx + treeCtrl.lazyLimitIncrement;
 //          console.log("::: Increased lazy limit to " + treeCtrl.currentLazyLimit);
-                lazyLimitIncreasePending = false;
+                treeCtrl.lazyLimitIncreasePending = false;
                 $scope.$apply();
             });
         }
 
         return idx;
-    }
+    };
 
     function postDigest(callback) {
         var unregister = $scope.$watch(function () {
@@ -102,11 +115,11 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
 
     treeCtrl.getItemCount = function () {
         return $('#theKT').find(".kt-item").length;
-    }
+    };
 
     treeCtrl.getItemMatchedCount = function () {
         return $('#theKT').find(".kti-filterMatched").length;
-    }
+    };
 
     function getTypeForFilter(val) {
         return (val === null) ? 'null' : typeof val;
@@ -138,7 +151,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             }
             return false;
         }
-    }
+    };
 
     treeCtrl.childMatchesFilter = function (proxy) {
         for (var childIdx = 0; childIdx < proxy.children.length; childIdx++) {
@@ -150,15 +163,12 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         }
         // no descendant found
         return false;
-    }
-
-    treeCtrl.treeRoot = ItemRepository.getRootProxy();
-    treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
+    };
 
     treeCtrl.tab.setTitle('Explore');
 
     $scope.$on('tabSelected', function () {
-        treeCtrl.tab = tabService.getCurrentTab();
+        tabService.bundleController(treeCtrl, 'treeCtrl', treeCtrl.tab.id)
     });
 
     treeCtrl.updateRoot = function (newRoot) {
@@ -199,8 +209,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             //Deregisters listener
             syncListener();
         }
-    }
-    ;
+    };
 
     treeCtrl.expandAll = function () {
         treeCtrl.allExpanded = true;

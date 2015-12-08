@@ -1,15 +1,14 @@
 <div>
     <div id="top-action-bar">
         <button
-                ng-click="searchCtrl.navigateToTree();"
+                ng-click="searchCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id);"
                 class="btn btn-default fa-chevron-left"> Tree
         </button>
         Found {{searchCtrl.searchResults.length}} matches:
     </div>
     <div class="results-list">
         <div
-                ng-click="searchCtrl.updateTab(itemProxy.item.id)"
-                ui-sref="kohese.search.edit({id:itemProxy.item.id})"
+                ng-click="searchCtrl.navigate('kohese.search.edit', 'dualview', itemProxy.item.id)"
                 class="search-result card panel panel-default"
                 id="{{itemProxy.item.id}}"
                 ng-repeat="itemProxy in searchCtrl.searchResults = (searchCtrl.itemList | filter: searchCtrl.customFilter)">

@@ -5,24 +5,28 @@
 function AdminController(tabService, $state, $scope, KoheseUser, UserService, ItemRepository) {
     var ctrl = this;
     var tab = tabService.getCurrentTab();
+    var controllerRestored = tabService.restoreControllerData(tab.id, 'adminCtrl', this);
 
+    if (!controllerRestored) {
+        ctrl.addUserForm = false;
+        ctrl.editUserForm = false;
+        ctrl.users = [];
+        ctrl.sessions = UserService.sessions;
+        ctrl.repositoryList = ItemRepository.getRepositories();
+    }
 
-    ctrl.addUserForm = false;
-    ctrl.editUserForm = false;
-    ctrl.users = [];
-    ctrl.sessions = UserService.sessions;
-    ctrl.repositoryList = ItemRepository.getRepositories();
-
-    console.log(ctrl.repositoryList)
 
     $scope.$on('$viewContentLoaded', function () {
         tab.setTitle('Admin');
         tab.type = 'singleview';
     });
 
-    $scope.$on('itemRepositoryReady', function(){
+    $scope.$on('itemRepositoryReady', function () {
         ctrl.repositoryList = ItemRepository.getRepositories();
-        console.log(ctrl.repositoryList)
+    });
+
+    $scope.$on('tabSelected', function () {
+        tabService.bundleController(ctrl, 'adminCtrl', tab.id)
     });
 
     function fetchUsers() {
@@ -35,27 +39,26 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
     fetchUsers();
 
 
-    ctrl.navigate = function (state, id) {
+    ctrl.navigate = function (state, type, id) {
         if (state) {
-            updateTab('kohese.explore.edit', 'dualview', {id: id})
+            updateTab(state, type, {id: id});
             $state.go(state, {id: id})
-        } else {
-            updateTab('kohese.explore.edit', 'dualview', {id: id})
-            $state.go('kohese.explore.edit', {id: id})
         }
     };
 
-    function updateTab(state, type, params){
-        if (state){
+    function updateTab(state, type, params) {
+        if (state) {
             tab.state = state
-        } if (type){
+        }
+        if (type) {
             tab.type = type;
-        } if (params) {
+        }
+        if (params) {
             tab.params = params;
         }
     }
 
-    ctrl.editUser = function(user){
+    ctrl.editUser = function (user) {
         ctrl.usernameInput = user.name;
         ctrl.descriptionInput = user.description;
         ctrl.editUserForm = true;
@@ -63,7 +66,7 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
         ctrl.selectedUser = user;
     };
 
-    ctrl.addUser = function(){
+    ctrl.addUser = function () {
         ctrl.usernameInput = '';
         ctrl.descriptionInput = '';
         ctrl.passwordInput = '';
@@ -72,7 +75,7 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
         ctrl.addUserForm = true;
     };
 
-    ctrl.cancelForm = function(){
+    ctrl.cancelForm = function () {
         ctrl.addUserForm = false;
         ctrl.editUserForm = false;
         ctrl.selectedUser = null;
@@ -82,7 +85,7 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
         ctrl.confirmPasswordInput = '';
     };
 
-    function updateUserObject(user){
+    function updateUserObject(user) {
         user.name = ctrl.usernameInput;
         user.description = ctrl.descriptionInput;
         user.password = ctrl.passwordInput
@@ -91,7 +94,7 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
 
     ctrl.upsertUser = function () {
         if (ctrl.passwordInput == ctrl.confirmPasswordInput) {
-            if(!ctrl.editUserForm){
+            if (!ctrl.editUserForm) {
                 ctrl.selectedUser = new KoheseUser();
             }
             updateUserObject(ctrl.selectedUser);
@@ -107,9 +110,9 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
 
     };
 
-    ctrl.deleteUser = function(user){
+    ctrl.deleteUser = function (user) {
         KoheseUser.delete(user)
-            .$promise.then(function(){
+            .$promise.then(function () {
                 fetchUsers();
             })
     };

@@ -9,10 +9,12 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
 
     var Tab = function (state, params, type) {
         var tab = this;
+        var bundleListener;
         tab.title = 'Kohese';
         tab.scope = {};
         tab.content = {};
         tab.id = tabService.getTabId();
+
 
         if (params) {
             tab.params = params;
@@ -44,6 +46,17 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
         };
         tab.setScope = function (scope) {
             tab.scope = scope;
+            bundleListener = tab.scope.$on('tabSelected', function (event, data) {
+                console.log(data);
+                console.log(tab);
+                if (data === tab.id) {
+                    console.log('Tab Selected :: Bundle Listener');
+                    console.log(tab);
+                    console.log(data);
+                    tab.scope.$broadcast('bundleReady');
+                    bundleListener();
+                }
+            })
         };
 
         tab.setTitle = function (title) {
@@ -69,11 +82,14 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
             } else {
                 tab.state = state;
             }
-            //console.log(tab.state);
         };
         tab.updateFilter = function (string) {
             tab.scope.$broadcast('newFilterString', string);
-        }
+        };
+
+        tab.toggleBundle = function () {
+            bundleListener();
+        };
     };
 
     $scope.$on('navigationEvent', function onNavigationEvent(event, data) {
@@ -131,10 +147,10 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
 
 
     containerCtrl.setTab = function (tab) {
+        $scope.$broadcast('tabSelected', tab.id);
         tab.active = true;
         containerCtrl.tabService.setCurrentTab(tab);
         $state.go(tab.state, tab.params);
-        $scope.$broadcast('tabSelected');
     };
 
     containerCtrl.deleteTab = function (tab) {

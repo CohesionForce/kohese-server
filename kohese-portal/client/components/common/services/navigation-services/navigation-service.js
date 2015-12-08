@@ -30,8 +30,6 @@ function NavigationService($state, tabService, $rootScope){
     $rootScope.$on('$stateChangeSuccess', function(){
         lastState[tabService.getCurrentTab().id] = currentState[tabService.getCurrentTab().id];
         currentState[tabService.getCurrentTab().id] = $state.current.name;
-        console.log(currentState);
-        console.log(lastState);
     })
 }
 
