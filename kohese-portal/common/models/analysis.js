@@ -62,6 +62,9 @@ module.exports = function(Analysis) {
           delete analysis.__data.raw;
           global.koheseKDB.storeModelInstance("Analysis", analysis);
           console.log('::: ANALYSIS Completed: ' + onId);
+
+          cb(null, analysis);
+
         } catch (err) {
           console.log("*** Error parsing result for: " + forModelKind + "- "
               + onId + " - " + analysis.name);
@@ -69,9 +72,15 @@ module.exports = function(Analysis) {
           console.log(analysisBody);
           console.log("<<<");
           console.log(err);
-        }
+          console.log(err.stack);
+          
+          error = new Error(
+          '*** Failure while parsing analysis');
+          error.onId = onId;
+          console.log(error);
+          cb(error, null);
 
-        cb(null, analysis);
+        }
 
       }
     });
