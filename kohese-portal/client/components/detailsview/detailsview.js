@@ -12,8 +12,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     detailsCtrl.tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
 
-
-
     if (!controllerRestored) {
         console.log("Controller not restored")
         detailsCtrl.tab = tabService.getCurrentTab();

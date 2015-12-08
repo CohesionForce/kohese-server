@@ -8,7 +8,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     var treeCtrl = this,
         syncListener;
     treeCtrl.tab = tabService.getCurrentTab();
-    var controllerRestored = tabService.restoreControllerData(treeCtrl.tab.id, 'dashboardCtrl', this);
+    var controllerRestored = tabService.restoreControllerData(treeCtrl.tab.id, 'treeCtrl', this);
 
     if (!controllerRestored) {
         treeCtrl.kindList = ItemRepository.modelTypes;
@@ -24,6 +24,11 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         treeCtrl.lazyLimitIncreasePending = false;
         treeCtrl.isRootDefault = true;
         treeCtrl.filter = SearchService.getFilterObject(treeCtrl.tab.id);
+        treeCtrl.treeRoot = ItemRepository.getRootProxy();
+        treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
+    } else {
+        console.log("Root Check!");
+        console.log(treeCtrl);
     }
 
     $scope.$on('stateChangeSuccess', function () {
@@ -160,9 +165,6 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         return false;
     };
 
-    treeCtrl.treeRoot = ItemRepository.getRootProxy();
-    treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
-
     treeCtrl.tab.setTitle('Explore');
 
     $scope.$on('tabSelected', function () {
@@ -207,8 +209,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             //Deregisters listener
             syncListener();
         }
-    }
-    ;
+    };
 
     treeCtrl.expandAll = function () {
         treeCtrl.allExpanded = true;
