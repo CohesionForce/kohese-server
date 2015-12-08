@@ -47,6 +47,10 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
     }
 
+    detailsCtrl.getProxyFor = function (id) {
+      return ItemRepository.getProxyFor(id);
+    }
+    
     detailsCtrl.updateParentProxy = function () {
         if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId) {
             detailsCtrl.parentProxy = ItemRepository.getProxyFor(detailsCtrl.itemProxy.item.parentId);
@@ -232,18 +236,19 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     };
 
     detailsCtrl.incrementItemInput = function (type) {
-        if (detailsCtrl.itemProxy.item[type]) {
-            var altLength = detailsCtrl.itemProxy.item[type].length;
-            if (type === 'context') {
-                detailsCtrl.itemProxy.item[type][altLength] = detailsCtrl.contextInput.description;
-            } else if (type === "resolutionActions") {
-                detailsCtrl.itemProxy.item[type][altLength] = detailsCtrl.resolutionActionsInput.description;
-            } else {
-                detailsCtrl.itemProxy.item[type][altLength] = {name: ''};
-            }
-        } else {
-            detailsCtrl.itemProxy.item[type] = [{name: ''}]
-        }
+      
+      if(!detailsCtrl.itemProxy.item[type]){
+        detailsCtrl.itemProxy.item[type] = [];
+      }
+      
+      if (type === 'context') {
+        detailsCtrl.itemProxy.item[type].push({id: detailsCtrl.contextInput.description.id});
+      } else if (type === "resolutionActions") {
+        detailsCtrl.itemProxy.item[type].push({id: detailsCtrl.resolutionActionsInput.description.id});
+      } else {
+        detailsCtrl.itemProxy.item[type].push({name: ''});
+      }
+      
     };
 
     detailsCtrl.deleteItemInput = function (type, row) {
