@@ -5,36 +5,17 @@
 function SearchController(ItemRepository, UserService, DecisionService, ActionService, tabService, SearchService, $state, $scope, $stateParams, $filter) {
     var ctrl = this;
     var tab = tabService.getCurrentTab();
-    var id = tabService.getTabId();
+    var controllerRestored = tabService.restoreControllerData(tab.id, 'searchCtrl', this);
 
-
-    ctrl.searchString = tab.params.filter;
-    ctrl.itemList = ItemRepository.getAllItemProxies();
-    ctrl.kindList = ItemRepository.modelTypes;
-    ctrl.userList = UserService.getAllUsers();
-    ctrl.actionStates = ActionService.getActionStates();
-    ctrl.decisionStates = DecisionService.getDecisionStates();
-
-    ctrl.categories = $filter('categories')(ctrl.itemList);
-
-    for (var index = 0; index < ctrl.itemList.length; index++) {
-        var currentItem = ctrl.itemList[index];
-        currentItem.parentProxy = ItemRepository.getProxyFor(currentItem.item.parentId);
+    if (!controllerRestored) {
+        ctrl.searchString = tab.params.filter;
+        ctrl.itemList = ItemRepository.getAllItemProxies();
+        ctrl.kindList = ItemRepository.modelTypes;
+        ctrl.userList = UserService.getAllUsers();
+        ctrl.actionStates = ActionService.getActionStates();
+        ctrl.decisionStates = DecisionService.getDecisionStates();
+        ctrl.categories = $filter('categories')(ctrl.itemList);
     }
-
-    if (!ctrl.searchString) {
-        ctrl.searchString = '';
-    }
-
-    ctrl.customFilter = SearchService.getFilterObject(id);
-    if (!ctrl.customFilter) {
-        ctrl.customFilter = {
-            item: {
-                $: ctrl.searchString
-            }
-        };
-    }
-
 
     $scope.$on('itemRepositoryReady', function () {
         ctrl.itemList = ItemRepository.getAllItemProxies();
@@ -44,6 +25,34 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
         ctrl.userList = UserService.getAllUsers();
     });
 
+    $scope.$on('tabSelected', function () {
+        tabService.bundleController(ctrl, 'searchCtrl', tab.id)
+    });
+
+    $scope.$on('$stateChangeStart',
+        function (event, toState, toParams, fromState, fromParams) {
+            SearchService.setFilterObject(ctrl.customFilter, tab.id);
+        });
+
+    // Commenting out for speed while in development of feature
+    //
+    //for (var index = 0; index < ctrl.itemList.length; index++) {
+    //    var currentItem = ctrl.itemList[index];
+    //    currentItem.parentProxy = ItemRepository.getProxyFor(currentItem.item.parentId);
+    //}
+
+    if (!ctrl.searchString) {
+        ctrl.searchString = '';
+    }
+
+    ctrl.customFilter = SearchService.getFilterObject(tab.id);
+    if (!ctrl.customFilter) {
+        ctrl.customFilter = {
+            item: {
+                $: ctrl.searchString
+            }
+        };
+    }
 
     if (ctrl.searchString !== '') {
         tab.setTitle('Search - ' + ctrl.searchString);
@@ -68,9 +77,11 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
         $state.go('kohese.explore.edit', {id: ctrl.currentItem})
     };
 
-    ctrl.updateTab = function (itemId) {
-        tab.params.id = itemId;
-        ctrl.currentItem = itemId;
+    ctrl.navigate = function (state, type, id) {
+        tab.state = state;
+        tab.type = type || 'dualview';
+        tab.params.id = id;
+        $state.go(state, {id: id})
     };
 
     //Filter updates
@@ -85,10 +96,6 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
         ctrl.customFilter.item.$ = ctrl.searchString;
     };
 
-    $scope.$on('$stateChangeStart',
-        function (event, toState, toParams, fromState, fromParams) {
-            SearchService.setFilterObject(ctrl.customFilter, id);
-        })
 
 }
 

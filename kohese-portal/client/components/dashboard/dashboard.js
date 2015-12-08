@@ -5,66 +5,69 @@
 function DashboardController(UserService, $scope, $rootScope, tabService, ItemRepository) {
     const ctrl = this;
     var currentTab = tabService.getCurrentTab();
+    var controllerRestored = tabService.restoreControllerData(currentTab, 'dashboardCtrl', this);
 
-    ctrl.itemList = ItemRepository.getAllItemProxies();
-    ctrl.currentUser = UserService.getCurrentUser();
-    ctrl.acceptedFilter = {
-        item : {
-            actionState: 'Accepted',
-            assignedTo: ctrl.currentUser
-        }
-    };
-    ctrl.assignedFilter = {
-        item : {
-            actionState: 'Assigned',
-            assignedTo: ctrl.currentUser
-        }
-    };
-    ctrl.inWorkFilter = {
-        item : {
-            actionState: 'In Work',
-            assignedTo: ctrl.currentUser
-        }
-    };
-    ctrl.inVerificationFilter = {
-        item : {
-            actionState: 'In Verification',
-            assignedTo: ctrl.currentUser
-        }
-    };
-    ctrl.requiresActionFilter = {
-        item : {
-            issueState: 'Requires Action',
-        }
-    };
-    ctrl.observedIssuesFilter = {
-        item : {
-            issueState: 'Observed'
-        }
-    };
-    ctrl.inAnalysisIssueFilter = {
-        item : {
-            issueState: 'In Analysis'
-        }
-    };
-    ctrl.assignedTasksFilter = {
-        item: {
-            taskState: 'Assigned',
-            assignedTo: ctrl.currentUser
-        }
-    };
-    ctrl.acceptedTasksFilter = {
-        item: {
-            taskState: 'Accepted',
-            assignedTo: ctrl.currentUser
-        }
-    };
-    ctrl.inWorkTasksFilter = {
-        item: {
-            taskState: 'In Work',
-            assignedTo: ctrl.currentUser
-        }
-    };
+    if (!controllerRestored) {
+        ctrl.itemList = ItemRepository.getAllItemProxies();
+        ctrl.currentUser = UserService.getCurrentUser();
+        ctrl.acceptedFilter = {
+            item: {
+                actionState: 'Accepted',
+                assignedTo: ctrl.currentUser
+            }
+        };
+        ctrl.assignedFilter = {
+            item: {
+                actionState: 'Assigned',
+                assignedTo: ctrl.currentUser
+            }
+        };
+        ctrl.inWorkFilter = {
+            item: {
+                actionState: 'In Work',
+                assignedTo: ctrl.currentUser
+            }
+        };
+        ctrl.inVerificationFilter = {
+            item: {
+                actionState: 'In Verification',
+                assignedTo: ctrl.currentUser
+            }
+        };
+        ctrl.requiresActionFilter = {
+            item: {
+                issueState: 'Requires Action',
+            }
+        };
+        ctrl.observedIssuesFilter = {
+            item: {
+                issueState: 'Observed'
+            }
+        };
+        ctrl.inAnalysisIssueFilter = {
+            item: {
+                issueState: 'In Analysis'
+            }
+        };
+        ctrl.assignedTasksFilter = {
+            item: {
+                taskState: 'Assigned',
+                assignedTo: ctrl.currentUser
+            }
+        };
+        ctrl.acceptedTasksFilter = {
+            item: {
+                taskState: 'Accepted',
+                assignedTo: ctrl.currentUser
+            }
+        };
+        ctrl.inWorkTasksFilter = {
+            item: {
+                taskState: 'In Work',
+                assignedTo: ctrl.currentUser
+            }
+        };
+    }
 
 
     ctrl.navigate = function (state, params, type) {
@@ -75,8 +78,14 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
                 type: type
             });
     };
+
+
     $scope.$on('itemRepositoryReady', function () {
         ctrl.itemList = ItemRepository.getAllItemProxies();
+    });
+
+    $scope.$on('tabSelected', function () {
+        tabService.bundleController(ctrl, 'dashboardCtrl', currentTab.id)
     });
 
 
