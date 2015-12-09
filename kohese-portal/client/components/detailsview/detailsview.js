@@ -15,6 +15,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     // Initialization block
     if (!controllerRestored || detailsCtrl.itemProxy.item.id != $stateParams.id) {
         detailsCtrl.updateParentProxy = updateParentProxy;
+        detailsCtrl.itemProxy = {};
         if (angular.isDefined($stateParams.id)) {
             detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
             detailsCtrl.updateParentProxy();
