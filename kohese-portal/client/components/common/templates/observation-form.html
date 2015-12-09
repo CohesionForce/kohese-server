@@ -58,11 +58,11 @@
                 ng-show="detailsCtrl.enableEdit"
                 class="btn btn-primary">Add
         </button>
-        <div ng-repeat="context in detailsCtrl.itemProxy.item.context track by $index">
+        <div ng-repeat="context in detailsCtrl.itemProxy.item.context track by $index" ng-init="contextProxy=detailsCtrl.getProxyFor(context.id)">
             <span ng-click="detailsCtrl.navigate(detailsCtrl.NavigationService.getCurrentState(), context.id)">
-            {{ context.name }}
+            {{ contextProxy.item.name }}
                 </span>
-            <i ng-click="detailsCtrl.deleteItemInput('context', action)"
+            <i ng-click="detailsCtrl.deleteItemInput('context', context)"
                class="glyphicon glyphicon-remove"></i>
         </div>
 </form>

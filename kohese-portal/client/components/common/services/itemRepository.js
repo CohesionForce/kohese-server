@@ -90,8 +90,6 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
                                             var results = repoResults.concat(itemResults).concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(taskResults).concat(userResults);
                                             convertListToTree(results);
                                             $rootScope.$broadcast('itemRepositoryReady');
-
-                                            createShortFormItemList();
                                         });
                                     });
                                 });
@@ -105,6 +103,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
 
     function createShortFormItemList(){
         var proxies = ItemProxy.getAllItemProxies();
+        shortProxyList=[];
         for (var i = 0; i < proxies.length; i++ ){
             shortProxyList.push({
                 name: proxies[i].item.name,
@@ -114,6 +113,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
     }
 
     function getShortFormItemList(){
+        createShortFormItemList();
         return shortProxyList;
     }
 
