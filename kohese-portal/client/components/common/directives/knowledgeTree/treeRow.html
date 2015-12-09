@@ -20,10 +20,9 @@
                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0),
                            'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}">
             </i>
-            </a> &lt;{{itemProxy.kind}}&gt; <span ui-sref="kohese.explore.edit({id:itemProxy.item.id})"
-                                                  class="kt-label"
+            </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
                                                   ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filter.text)"
-                                                  ng-click="treeCtrl.updateTab('edit', itemProxy.item.id)"></span><span
+                                                  ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id)"></span><span
                 ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
         </div>
         <div class="kti-cell kti-state">

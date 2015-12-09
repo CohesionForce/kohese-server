@@ -243,6 +243,13 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         }
     }
 
+    treeCtrl.navigate = function (state, type, id) {
+        treeCtrl.tab.state = state;
+        treeCtrl.tab.type = type || 'dualview';
+        treeCtrl.tab.params.id = id;
+        $state.go(state, {id: id})
+    };
+
 }
 
 export default () => {

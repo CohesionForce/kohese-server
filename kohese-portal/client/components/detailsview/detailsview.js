@@ -12,8 +12,22 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     detailsCtrl.tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
 
-    if (!controllerRestored) {
-        console.log("Controller not restored")
+    // Initialization block
+    if (!controllerRestored || detailsCtrl.itemProxy.item.id != $stateParams.id) {
+        detailsCtrl.updateParentProxy = updateParentProxy;
+        if (angular.isDefined($stateParams.id)) {
+            detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
+            detailsCtrl.updateParentProxy();
+        } else if (angular.isDefined($stateParams.parentId)) {
+            {
+                detailsCtrl.itemProxy.item = new Item();
+                detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
+                detailsCtrl.updateParentProxy();
+            }
+        } else {
+            detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.updateParentProxy();
+        }
         detailsCtrl.tab = tabService.getCurrentTab();
         detailsCtrl.tab.route = $stateParams.id;
         detailsCtrl.filterString = "";
@@ -21,7 +35,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.analysisSummarySortField = ['-count', 'text'];
         detailsCtrl.analysisDetailsSortField = "";
         detailsCtrl.enableEdit = false;
-        detailsCtrl.itemProxy = {};
         detailsCtrl.parentProxy = {};
         detailsCtrl.defaultTab = {active: true};
         detailsCtrl.showChunksInAnalysis = true;
@@ -43,22 +56,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
         detailsCtrl.analysisPOSFilterName = "Standard";
         detailsCtrl.NavigationService = NavigationService;
-        detailsCtrl.updateParentProxy = updateParentProxy;
-        if (angular.isDefined($stateParams.id)) {
-            detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
-
-            detailsCtrl.updateParentProxy();
-        } else if (angular.isDefined($stateParams.parentId)) {
-            {
-                detailsCtrl.itemProxy.item = new Item();
-                detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
-                detailsCtrl.updateParentProxy();
-            }
-        } else {
-            detailsCtrl.itemProxy.item = new Item();
-            detailsCtrl.updateParentProxy();
-        }
-
         if (detailsCtrl.tab.state === 'kohese.explore.create') {
             detailsCtrl.enableEdit = true;
         }
