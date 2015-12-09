@@ -85,10 +85,8 @@
 		            <label class=control-label" for="posFilter">
                         POS Filter:
                         <select id="posFilter"
-                                ng-model="detailsCtrl.analysisPOSFilterName">
-                            <option ng-repeat="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">
-                                {{filterCriteria}}
-                            </option>
+                                ng-model="detailsCtrl.analysisPOSFilterName"
+                                ng-options="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">
                         </select>
                     </label>
 		            
