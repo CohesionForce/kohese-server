@@ -778,7 +778,9 @@ body #layout-bottom {
 .assignment-accordion {
   position: absolute;
   right: 0;
-  width: 50%; }
+  width: 50%;
+  overflow: auto;
+  height: 100%; }
   .assignment-accordion .assignment {
     background-color: #005A31;
     color: white;
