@@ -4,7 +4,7 @@
 function IssueService(ItemRepository, $rootScope) {
 
     var service = this;
-    var states = [];
+    var states = [{item: {name: ''}}];
 
     service.getIssueStates = getIssueStates;
 
@@ -12,7 +12,7 @@ function IssueService(ItemRepository, $rootScope) {
         var root = ItemRepository.getRootProxy();
         var stateProxy = root.getChildByName('State');
         var issueProxy = stateProxy.getChildByName('Issue State');
-        states = issueProxy.getDescendants();
+        Array.prototype.push.apply(states, issueProxy.getDescendants());
     });
 
     var root = ItemRepository.getRootProxy();

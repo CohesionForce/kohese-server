@@ -10,7 +10,7 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
     if (!controllerRestored) {
         ctrl.searchString = tab.params.filter;
         ctrl.itemList = ItemRepository.getAllItemProxies();
-        ctrl.kindList = ItemRepository.modelTypes;
+        ctrl.kindList = ItemRepository.getModelTypes();
         ctrl.userList = UserService.getAllUsers();
         ctrl.actionStates = ActionService.getActionStates();
         ctrl.decisionStates = DecisionService.getDecisionStates();

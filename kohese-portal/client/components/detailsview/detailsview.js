@@ -40,7 +40,7 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.showChunksInDetails = false;
         detailsCtrl.showTokensInDetails = false;
         detailsCtrl.filterList = [];
-        detailsCtrl.kindList = ItemRepository.modelTypes;
+        detailsCtrl.kindList = ItemRepository.getModelTypes();
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
         detailsCtrl.actionStates = ActionService.getActionStates();
         detailsCtrl.issueStates = IssueService.getIssueStates();

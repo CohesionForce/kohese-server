@@ -65,6 +65,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
     }
 
     return {
+        getModelTypes: getModelTypes,
         modelTypes: modelTypes,
         getRootProxy: ItemProxy.getRootProxy,
         getProxyFor: ItemProxy.getProxyFor,
@@ -99,6 +100,11 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
                 });
             });
         });
+    }
+
+    function getModelTypes(){
+        modelTypes.empty = {modelName: ''};
+        return modelTypes;
     }
 
     function createShortFormItemList(){

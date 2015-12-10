@@ -11,7 +11,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     var controllerRestored = tabService.restoreControllerData(treeCtrl.tab.id, 'treeCtrl', this);
 
     if (!controllerRestored) {
-        treeCtrl.kindList = ItemRepository.modelTypes;
+        treeCtrl.kindList = ItemRepository.getModelTypes();
         treeCtrl.actionStates = ActionService.getActionStates();
         treeCtrl.userList = UserService.getAllUsers();
         treeCtrl.collapsed = {};

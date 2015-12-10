@@ -5,7 +5,7 @@
 function DecisionService(ItemRepository, $rootScope) {
 
     var service = this;
-    var states = [];
+    var states = [{item: {name: ''}}];
 
     service.getDecisionStates = getDecisionStates;
 
@@ -13,7 +13,7 @@ function DecisionService(ItemRepository, $rootScope) {
         var root = ItemRepository.getRootProxy();
         var stateProxy = root.getChildByName('State');
         var decisionProxy = stateProxy.getChildByName('Decision State');
-        states = decisionProxy.getDescendants();
+        Array.prototype.push.apply(states, decisionProxy.getDescendants());
     });
 
     var root = ItemRepository.getRootProxy();

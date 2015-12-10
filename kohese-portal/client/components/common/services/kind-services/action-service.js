@@ -4,7 +4,7 @@
 function ActionService(ItemRepository, $rootScope) {
 
     var service = this;
-    var states = [];
+    var states = [{item: {name: ''}}];
 
     service.getActionStates = getActionStates;
 
@@ -12,7 +12,7 @@ function ActionService(ItemRepository, $rootScope) {
         var root = ItemRepository.getRootProxy();
         var stateProxy = root.getChildByName('State');
         var actionProxy = stateProxy.getChildByName('Action State');
-        states = actionProxy.getDescendants();
+        Array.prototype.push.apply(states, actionProxy.getDescendants());
     });
 
 
