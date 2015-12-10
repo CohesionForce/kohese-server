@@ -140,11 +140,6 @@ appModule
                 templateUrl: '/components/admin/admin.html',
                 controller: 'AdminController as adminCtrl'
             })
-            .state('kohese.admin.actions', {
-                url: '/actions',
-                templateUrl: 'components/admin/subviews/actions.html',
-                controller: 'AdminController as adminCtrl'
-            })
             .state('kohese.admin.groups', {
                 url: '/groups',
                 templateUrl: 'components/admin/subviews/groups.html',
