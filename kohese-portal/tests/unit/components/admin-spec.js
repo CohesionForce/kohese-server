@@ -4,6 +4,8 @@
 
 var MockTabService = require('../mock/MockTabService');
 var MockUserService = require('../mock/MockUserService');
+var MockState = require('../mock/MockState');
+var MockItemRepository = require('../mock/MockItemRepository');
 
 describe(
 		"AdminController Test",
@@ -15,6 +17,8 @@ describe(
 			var mockUserList;
 			var mockTabService = new MockTabService();
 			var mockUserService = new MockUserService();
+			var mockState = new MockState();
+			var mockItemRepository = new MockItemRepository();
 			
 			function KoheseUser() {
 				this.name = '';
@@ -75,9 +79,11 @@ describe(
 			beforeEach(inject(function($controller) {
 				adminController = $controller('AdminController', {
 					tabService : mockTabService,
+					$state : mockState,
 					$scope : mockScope,
 					KoheseUser : KoheseUser,
-					UserService : mockUserService
+					UserService : mockUserService,
+					ItemRepository : mockItemRepository
 				});
 			}));
 
@@ -107,6 +113,7 @@ describe(
 			// Test Add User
 			it("Test Add User", function() {
 		        expect(adminController.addUserForm).toBe(false);
+		        console.log('Calling AdminController.addUser');
 				adminController.addUser();
 				expect(adminController.usernameInput).toBe('');
 		        expect(adminController.descriptionInput).toBe('');

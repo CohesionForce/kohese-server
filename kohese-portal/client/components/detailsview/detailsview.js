@@ -15,19 +15,17 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
     // Initialization block
     if (!controllerRestored || detailsCtrl.itemProxy.item.id != $stateParams.id) {
         detailsCtrl.updateParentProxy = updateParentProxy;
+        detailsCtrl.itemProxy = {};
         if (angular.isDefined($stateParams.id)) {
             detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
-            detailsCtrl.updateParentProxy();
         } else if (angular.isDefined($stateParams.parentId)) {
-            {
-                detailsCtrl.itemProxy.item = new Item();
-                detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
-                detailsCtrl.updateParentProxy();
-            }
+            // This is a check for the create of a new item with the parentId supplied
+            detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
         } else {
             detailsCtrl.itemProxy.item = new Item();
-            detailsCtrl.updateParentProxy();
         }
+        detailsCtrl.updateParentProxy();
         detailsCtrl.tab = tabService.getCurrentTab();
         detailsCtrl.tab.route = $stateParams.id;
         detailsCtrl.filterString = "";
@@ -35,7 +33,6 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.analysisSummarySortField = ['-count', 'text'];
         detailsCtrl.analysisDetailsSortField = "";
         detailsCtrl.enableEdit = false;
-        detailsCtrl.parentProxy = {};
         detailsCtrl.defaultTab = {active: true};
         detailsCtrl.showChunksInAnalysis = true;
         detailsCtrl.showTokensInAnalysis = true;

@@ -6,6 +6,10 @@ function MockItemRepository() {
     
     this.modelTypes = [];
 
+    this.getRepositories = function() {
+        return [];
+    };
+
 }
 
 module.exports = MockItemRepository;
