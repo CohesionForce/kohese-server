@@ -113,6 +113,7 @@ describe(
 			// Test Add User
 			it("Test Add User", function() {
 		        expect(adminController.addUserForm).toBe(false);
+		        console.log('Calling AdminController.addUser');
 				adminController.addUser();
 				expect(adminController.usernameInput).toBe('');
 		        expect(adminController.descriptionInput).toBe('');

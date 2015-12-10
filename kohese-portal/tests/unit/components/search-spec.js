@@ -70,12 +70,21 @@ describe("Search Controller Test", function() {
 	    expect(state.id).toBe(stateParams.id);
 	}),
 	
-	it("Check Tab Update", function() {
-	    searchController.updateTab('item123');
-	    expect(mockTabService.tab.params.id).toBe('item123');
-	    expect(searchController.currentItem).toBe('item123');
-	})
+	it("Check Tree Navigate", function() {
+	    console.log('Create Test for tree navigate');
+	    expect(true).toBe(true);
+	}),
 	
+	it("Check Tree Assigned to Filter", function() {
+        console.log('Create Test for tree navigate');
+        expect(true).toBe(true);
+	}),
+	
+	it("Check Tree Search String Filter", function() {
+        console.log('Create Test Search String Filter');
+        expect(true).toBe(true);
+	});
+
 });
 
 describe("suite name", function() {

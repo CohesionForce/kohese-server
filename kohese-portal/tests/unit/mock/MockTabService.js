@@ -34,7 +34,7 @@ function MockTabService() {
     };
     
     this.restoreControllerData = function(one, two, three) {
-        return service.tab;
+        return false;
     };
 }
 
