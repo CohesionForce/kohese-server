@@ -32,6 +32,10 @@ function MockTabService() {
     this.incrementTabs = function() {
         
     };
+    
+    this.restoreControllerData = function(one, two, three) {
+        return service.tab;
+    };
 }
 
 module.exports = MockTabService;
