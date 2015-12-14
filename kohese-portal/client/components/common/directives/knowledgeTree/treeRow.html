@@ -29,6 +29,7 @@
             <span ng-if="itemProxy.kind==='Decision'">{{itemProxy.item.decisionState}}</span>
             <span ng-if="itemProxy.kind==='Action'">{{itemProxy.item.decisionState}}/{{itemProxy.item.actionState}}</span>
             <span ng-if="itemProxy.kind==='Task'">{{itemProxy.item.taskState}}</span>
+            <span ng-if="itemProxy.kind==='Issue'">{{itemProxy.item.issueState}}</span>
         </div>
         <div class="kti-description"
              ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"

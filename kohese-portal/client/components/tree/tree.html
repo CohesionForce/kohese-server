@@ -27,7 +27,7 @@
 	    <span ng-if="treeCtrl.filter.kind === 'Action'" class="control-group">
 		    <label class="control-label" for="ActionState"> State </label>
 		    <span class="controls">
-                <select id="Kind"
+                <select id="actionState"
                         ng-model="treeCtrl.filter.actionState">
                     <option></option>    
                     <option ng-repeat="state in treeCtrl.actionStates">{{state.item.name}}</option>
@@ -37,7 +37,7 @@
 	    <span ng-if="treeCtrl.filter.kind === 'Action'" class="control-group">
 		    <label class="control-label" for="Assignee"> Assignee </label>
 		    <span class="controls">
-                <select id="Kind"
+                <select id="actionAssignee"
                         ng-model="treeCtrl.filter.actionAssignee">
                     <option></option>    
                     <option ng-repeat="user in treeCtrl.userList">{{user.item.name}}</option>
