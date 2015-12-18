@@ -24,6 +24,7 @@
             <span ng-if="proxy.kind==='Decision'">{{proxy.item.decisionState}}</span>
             <span ng-if="proxy.kind==='Action'">{{proxy.item.decisionState}}/{{proxy.item.actionState}}</span>
             <span ng-if="proxy.kind==='Task'">{{proxy.item.taskState}}</span>
+            <span ng-if="proxy.kind==='Issue'">{{proxy.item.issueState}}</span>
         </td>
         <td>{{proxy.item.assignedTo}}</td>
         <td>{{proxy.item.tags}}</td>
