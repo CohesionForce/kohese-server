@@ -1,15 +1,18 @@
 .admin-screen {
   height: 100%; }
-  .admin-screen .panel {
+  .admin-screen #adminPanel {
     height: 100%; }
-    .admin-screen .panel #admin-view-wrapper {
+    .admin-screen #adminPanel #admin-view-wrapper {
       height: calc(100% - 65px);
       overflow: auto; }
+
+#repository-screen .repository-panel {
+  margin: 5px; }
 
 .users-screen {
   overflow: auto;
   width: 100%; }
-  .users-screen panel-body {
+  .users-screen .panel-body {
     overflow: auto; }
   .users-screen #admin-user-list {
     float: left;

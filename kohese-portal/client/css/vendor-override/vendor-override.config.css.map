@@ -1,7 +1,7 @@
 {
 "version": 3,
-"mappings": "AAGE,kBAAQ;EACN,gBAAgB,ECEA,OAAmB;EDDnC,KAAK,EAAC,KAAK;AAEb,mBAAS;EACP,gBAAgB,ECFA,OAAmB;EDGnC,KAAK,EAAE,UAAU;;AAIrB,cAAe;EACb,KAAK,EAAE,UAAU;EACjB,gBAAgB,EAAE,OAAqB;EACvC,MAAM,EAAE,CAAC;EACT,OAAO,EAAE,gBAAgB;EACzB,qBAAO;IACL,WAAW,EAAE,IAAI;EAGjB,oBAAI;IACF,KAAK,EAAE,IAAI;IACX,MAAM,EAAE,IAAI",
-"sources": ["bootstrap-override.scss","../utils/variables.scss"],
+"mappings": "AAGE,kBAAQ;EACN,gBAAgB,ECEA,OAAmB;EDDnC,KAAK,EAAC,KAAK;AAEb,mBAAS;EACP,gBAAgB,ECFA,OAAmB;EDGnC,KAAK,EAAE,UAAU;;AAIrB,cAAe;EACb,KAAK,EAAE,UAAU;EACjB,gBAAgB,EAAE,OAAqB;EACvC,MAAM,EAAE,CAAC;EACT,OAAO,EAAE,gBAAgB;EACzB,qBAAO;IACL,WAAW,EAAE,IAAI;EAGjB,oBAAI;IACF,KAAK,EAAE,IAAI;IACX,MAAM,EAAE,IAAI;;AExBlB,aAAc;EACZ,MAAM,EAAE,eACV",
+"sources": ["bootstrap-override.scss","../utils/variables.scss","ng-context-menu-override.scss"],
 "names": [],
 "file": "vendor-override.config.css"
 }

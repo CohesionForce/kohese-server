@@ -1,12 +1,16 @@
 @import '../utils/variables';
 
-.knowledge-tree {
+.knowledge-tree-panel {
   border-collapse: collapse;
   position: relative;
   height: calc(100% - 43px);
   width: calc(100% - 20px);
   margin: 0px 0px 0px 20px;
   overflow: hidden;
+}
+
+.knowledge-tree {
+  height: 100%;
     
   .kt-icon, .kt-label {
     cursor: pointer;
@@ -24,13 +28,17 @@
   }
 }
 
+.kti-selected-item {
+  background-color: #7dd7ae;
+}
+
 .knowledge-tree .kt-item {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   min-height: 20px;
   line-height: 20px;
-  border-bottom: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;  
 }
 
 .kt-collection .kt-hidden {

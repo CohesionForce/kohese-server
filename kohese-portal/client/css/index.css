@@ -258,13 +258,16 @@ table td .glyphicon-remove {
   table td .glyphicon-remove:hover {
     cursor: pointer; }
 
-.knowledge-tree {
+.knowledge-tree-panel {
   border-collapse: collapse;
   position: relative;
   height: calc(100% - 43px);
   width: calc(100% - 20px);
   margin: 0px 0px 0px 20px;
   overflow: hidden; }
+
+.knowledge-tree {
+  height: 100%; }
   .knowledge-tree .kt-icon, .knowledge-tree .kt-label {
     cursor: pointer; }
 
@@ -273,6 +276,9 @@ table td .glyphicon-remove {
 
 .kti-actions i {
   margin: 0 5px 0 5px; }
+
+.kti-selected-item {
+  background-color: #7dd7ae; }
 
 .knowledge-tree .kt-item {
   -webkit-box-sizing: border-box;
