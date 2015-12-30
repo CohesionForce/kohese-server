@@ -4,11 +4,13 @@
      data-target="tree-menu-{{itemProxy.item.id}}"
      context-menu
         >
+        
     <div class="kt-item"
          id="{{itemProxy.item.id}}"
          ng-init="lazyIdx=treeCtrl.allocateLazyItemIdx()"
-         ng-class="{'kti-filtered': !treeCtrl.matchesFilter(itemProxy) && !treeCtrl.childMatchesFilter(itemProxy),
-                   'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
+         ng-class="{'kti-selected-item' : itemProxy.item.id === treeCtrl.selectedItemProxy.item.id,
+                    'kti-filtered': !treeCtrl.matchesFilter(itemProxy) && !treeCtrl.childMatchesFilter(itemProxy),
+                    'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
         <div class="kti-name"
                 ng-style="{'font-weight': 'bold'}">
             <a style=""> <i
@@ -24,18 +26,6 @@
                                                   ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filter.text)"
                                                   ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id)"></span><span
                 ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
-        </div>
-        <div class="kti-cell kti-state">
-            <span ng-if="itemProxy.kind==='Decision'">{{itemProxy.item.decisionState}}</span>
-            <span ng-if="itemProxy.kind==='Action'">{{itemProxy.item.decisionState}}/{{itemProxy.item.actionState}}</span>
-            <span ng-if="itemProxy.kind==='Task'">{{itemProxy.item.taskState}}</span>
-            <span ng-if="itemProxy.kind==='Issue'">{{itemProxy.item.issueState}}</span>
-        </div>
-        <div class="kti-description"
-             ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
-             ng-dblclick="showDescription=!showDescription"
-             ng-init="showDescription=false"
-             ng-bind-html="itemProxy.item.description | highlight:treeCtrl.filter.text">
         </div>
         <div class="kti-cell kti-actions pull-right">
             <i class="fa fa-anchor"

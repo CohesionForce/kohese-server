@@ -26,6 +26,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         treeCtrl.filter = SearchService.getFilterObject(treeCtrl.tab.id);
         treeCtrl.treeRoot = ItemRepository.getRootProxy();
         treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
+        treeCtrl.selectedItemProxy = {};
     } else {
         console.log("Root Check!");
         console.log(treeCtrl);
@@ -196,19 +197,28 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     };
 
 
-    treeCtrl.syncLocation = function () {
-        treeCtrl.locationSynced ? treeCtrl.locationSynced = false : treeCtrl.locationSynced = true;
-        if (treeCtrl.locationSynced) {
-            syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {
+    syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {
 
-                $location.hash(data);
-                $anchorScroll()
-            })
+      console.log("::: Sync Item:" + data);
+      treeCtrl.selectedItemProxy = ItemRepository.getProxyFor(data);
+      
+      var ancestorProxy = treeCtrl.selectedItemProxy.parentProxy;
+      while(ancestorProxy && ancestorProxy !== treeCtrl.treeRoot){
+        if(treeCtrl.collapsed[ancestorProxy.item.id] === undefined || treeCtrl.collapsed[ancestorProxy.item.id]){
+//          console.log(">>> Expanding " + ancestorProxy.item.name);
+          treeCtrl.collapsed[ancestorProxy.item.id] = false;
         }
-        else {
-            //Deregisters listener
-            syncListener();
-        }
+        ancestorProxy = ancestorProxy.parentProxy;          
+      }
+      
+      $location.hash(data);
+      $anchorScroll();
+      
+    });
+    
+    treeCtrl.syncLocation = function () {
+//        treeCtrl.locationSynced = !treeCtrl.locationSynced;
+      $anchorScroll();
     };
 
     treeCtrl.expandAll = function () {
@@ -216,6 +226,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         for (var key in treeCtrl.collapsed) {
             treeCtrl.collapsed[key] = false;
         }
+        $scope.$apply();
     };
 
     treeCtrl.collapseAll = function () {
@@ -241,15 +252,18 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             var proxy = childrenList[i];
             treeCtrl.collapsed[proxy.item.id] = false;
         }
-    }
-
-    treeCtrl.navigate = function (state, type, id) {
-        treeCtrl.tab.state = state;
-        treeCtrl.tab.type = type || 'dualview';
-        treeCtrl.tab.params.id = id;
-        $state.go(state, {id: id})
     };
 
+    treeCtrl.navigate = function (state, type, id) {
+      treeCtrl.tab.state = state;
+      treeCtrl.tab.type = type || 'dualview';
+      treeCtrl.tab.params.id = id;
+      $state.go(state, {id: id})
+    };
+
+    treeCtrl.createChildOfSelectedItem = function () {
+      $state.go('kohese.explore.create', {parentId: treeCtrl.selectedItemProxy.item.id})
+    };
 }
 
 export default () => {
