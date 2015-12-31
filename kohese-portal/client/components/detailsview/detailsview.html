@@ -1,3 +1,13 @@
+    <style type="text/css">
+      html, body, .tabset, .tab-content, .tab-pane, .tabbable {
+       height:100%;
+      }
+      
+      .tab-content {
+        height:100%;
+      }
+    </style>
+
 <div id="details-panel" class="panel">
     <div class="panel-heading ">
         <span ng-if="detailsCtrl.itemProxy.kind">{{detailsCtrl.itemProxy.kind}} Information: {{detailsCtrl.itemProxy.item.name}} </span>
@@ -81,7 +91,10 @@
                 <p><b>This tab is under construction.</b></p>
             </tab>
             <tab heading="Analysis" select="detailsCtrl.fetchAnalysis()">
-		        <span class="pull-right">
+              <tab-heading>Analysis</tab-heading>
+              <tab-content style="height:100%; overflow:hidden" >
+                <div style="width:100%">
+		          <span>
 		            <label class=control-label" for="posFilter">
                         POS Filter:
                         <select id="posFilter"
@@ -96,67 +109,74 @@
 					<input class="input-sm" type="text" ng-model="detailsCtrl.analysisFilterInput"
                            placeholder="Filter" style="margin: 5px"/>
                     <button ng-click="detailsCtrl.submitFilter()" class=" btn btn-default fa fa-search"> Submit</button>
-				</span>
+				  </span>
+                </div>
+                <div style="height: calc(100% - 45px); overflow:none; display:block">
+                  <div style="height:100%; width:40%; overflow:auto; display:inline-block;">
+                    <h4>Analysis Summary</h4>
+                    <input type="checkbox" ng-model="detailsCtrl.showChunksinSummary"
+                           ng-init="detailsCtrl.showChunksinSummary=false" name="showChunksInSummaryInput"
+                           style="margin: 5px"/> Show Chunks in Summary
+                    <input type="checkbox" ng-model="detailsCtrl.showTokensinSummary"
+                           ng-init="detailsCtrl.showTokensinSummary=true" name="showTokensInSummaryInput"
+                           style="margin: 5px"/> Show Tokens in Summary
+                    <table
+                          class="table tree-grid table-striped table-condensed table-hover">
+                      <thead>
+                        <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
+                        <th>Type</th>
+                        <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
+                        <th>POS Count</th>
+                      </thead>
+                      <tbody>
+                        <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
+                          ng-hide="!detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) || ((summary.displayType == 'Chunk') && !detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsCtrl.showTokensinSummary)"
+                          ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:detailsCtrl.analysisSummarySortField">
+                          <td ng-click="detailsCtrl.analysisFilterInput = summary.text;detailsCtrl.submitFilter()"
+                              class="tree-label"
+                              ng-bind-html="summary.text | highlight:detailsCtrl.analysisFilterString"></td>
+                          <td>{{summary.displayType}}</td>
+                          <td>{{summary.count}}</td>
+                          <td>{{summary.posCount}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
 
-                <h4>Analysis Summary</h4>
-                <input type="checkbox" ng-model="detailsCtrl.showChunksinSummary"
-                       ng-init="detailsCtrl.showChunksinSummary=false" name="showChunksInSummaryInput"
-                       style="margin: 5px"/> Show Chunks in Summary
-                <input type="checkbox" ng-model="detailsCtrl.showTokensinSummary"
-                       ng-init="detailsCtrl.showTokensinSummary=true" name="showTokensInSummaryInput"
-                       style="margin: 5px"/> Show Tokens in Summary
-                <table
-                        class="table tree-grid table-striped table-condensed table-hover">
-                    <thead>
-                    <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
-                    <th>Type</th>
-                    <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
-                    <th>POS Count</th>
-                    </thead>
-                    <tbody>
-                    <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
-                        ng-hide="!detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) || ((summary.displayType == 'Chunk') && !detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && !detailsCtrl.showTokensinSummary)"
-                        ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:detailsCtrl.analysisSummarySortField">
-                        <td ng-click="detailsCtrl.analysisFilterInput = summary.text;detailsCtrl.submitFilter()"
-                            class="tree-label"
-                            ng-bind-html="summary.text | highlight:detailsCtrl.analysisFilterString"></td>
-                        <td>{{summary.displayType}}</td>
-                        <td>{{summary.count}}</td>
-                        <td>{{summary.posCount}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <h4>Analysis Details</h4>
-                <input type="checkbox" ng-model="detailsCtrl.showSentencesInDetails"
-                       ng-init="detailsCtrl.showSentencesInDetails=true" name="showSentencesInDetailsInput"
-                       style="margin: 5px"/> Show Sentences in Details
-                <input type="checkbox" ng-model="detailsCtrl.showChunksInDetails"
-                       ng-init="detailsCtrl.showChunksInDetails=false" name="showChunksInDetailsInput"
-                       style="margin: 5px"/> Show Chunks in Details
-                <input type="checkbox" ng-model="detailsCtrl.showTokensInDetails"
-                       ng-init="detailsCtrl.showTokensInDetails=false" name="showTokensInDetailsInput"
-                       style="margin: 5px"/> Show Tokens in Details
-                <table
-                        class="table tree-grid table-striped table-condensed table-hover">
-                    <thead>
-                    <th style="width:20%">Type</th>
-                    <th><a href="" ng-click="detailsCtrl.analysisDetailsSortField = 'text'">Text</a></th>
-                    <th>Begin</th>
-                    <th>End</th>
-                    </thead>
-                    <tbody>
-                    <tr class="level-{{listItem.displayLevel}}"
-                        ng-hide="((listItem.displayLevel == 2) && !detailsCtrl.showSentencesInDetails) || ((listItem.displayLevel == 3) && !detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 4) && !detailsCtrl.showTokensInDetails)"
-                        class="tree-grid-row" id="{{listItem.displayId}}"
-                        ng-repeat="listItem in detailsCtrl.itemProxy.analysis.extendedList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:detailsCtrl.analysisDetailsSortField">
-                        <td class="indented">{{listItem.displayType}}</td>
-                        <td ng-bind-html="listItem.text | highlight:detailsCtrl.analysisFilterString"></td>
-                        <td>{{listItem.begin}}</td>
-                        <td>{{listItem.end}}</td>
-                    </tr>
-                    </tbody>
-                </table>
+                  <div class="pull-right" style="height:100%; width:50%; vertical-align: top; display:inline-block; overflow:auto">
+                    <h4>Analysis Details</h4>
+                    <input type="checkbox" ng-model="detailsCtrl.showSentencesInDetails"
+                         ng-init="detailsCtrl.showSentencesInDetails=true" name="showSentencesInDetailsInput"
+                         style="margin: 5px"/> Show Sentences in Details
+                    <input type="checkbox" ng-model="detailsCtrl.showChunksInDetails"
+                         ng-init="detailsCtrl.showChunksInDetails=false" name="showChunksInDetailsInput"
+                         style="margin: 5px"/> Show Chunks in Details
+                    <input type="checkbox" ng-model="detailsCtrl.showTokensInDetails"
+                         ng-init="detailsCtrl.showTokensInDetails=false" name="showTokensInDetailsInput"
+                         style="margin: 5px"/> Show Tokens in Details
+                    <table
+                          class="table tree-grid table-striped table-condensed table-hover">
+                      <thead>
+                        <th style="width:20%">Type</th>
+                        <th><a href="" ng-click="detailsCtrl.analysisDetailsSortField = 'text'">Text</a></th>
+                        <th>Begin</th>
+                        <th>End</th>
+                      </thead>
+                      <tbody>
+                        <tr class="level-{{listItem.displayLevel}}"
+                          ng-hide="((listItem.displayLevel == 2) && !detailsCtrl.showSentencesInDetails) || ((listItem.displayLevel == 3) && !detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 4) && !detailsCtrl.showTokensInDetails)"
+                          class="tree-grid-row" id="{{listItem.displayId}}"
+                          ng-repeat="listItem in detailsCtrl.itemProxy.analysis.extendedList | filter:{text:detailsCtrl.analysisFilterString} | orderBy:detailsCtrl.analysisDetailsSortField">
+                          <td class="indented">{{listItem.displayType}}</td>
+                          <td ng-bind-html="listItem.text | highlight:detailsCtrl.analysisFilterString"></td>
+                          <td>{{listItem.begin}}</td>
+                          <td>{{listItem.end}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </tab-content>
             </tab>
             <tab heading="History">
                 <h4>History Tab</h4>
