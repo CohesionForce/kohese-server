@@ -28,16 +28,17 @@ function AnalysisService(Analysis, ItemRepository) {
     
     service.fetchAnalysis = function (forProxy) {
 
+      // Note:  This logic does a depth first retrieval to decrease the amount of rework associated with roll-up
+      // Fetch children
+        for (var childIdx = 0; childIdx < forProxy.children.length; childIdx++) {
+            service.fetchAnalysis(forProxy.children[childIdx]);
+        }
+
         if (!forProxy.analysis) {
           console.log("::: Retrieving analysis for " + forProxy.item.id + " - " + forProxy.item.name);
           performAnalysis(forProxy);
         }
         
-        // Fetch children
-        for (var childIdx = 0; childIdx < forProxy.children.length; childIdx++) {
-            service.fetchAnalysis(forProxy.children[childIdx]);
-        }
-
     }
 
     function performAnalysis(proxy) {
