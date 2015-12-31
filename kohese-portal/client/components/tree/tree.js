@@ -226,7 +226,6 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         for (var key in treeCtrl.collapsed) {
             treeCtrl.collapsed[key] = false;
         }
-        $scope.$apply();
     };
 
     treeCtrl.collapseAll = function () {
