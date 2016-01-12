@@ -39,6 +39,8 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.showSentencesInDetails = true;
         detailsCtrl.showChunksInDetails = false;
         detailsCtrl.showTokensInDetails = false;
+        detailsCtrl.analysisSummaryItemLimit = 50;
+        detailsCtrl.analysisDetailsItemLimit = 100;
         detailsCtrl.filterList = [];
         detailsCtrl.kindList = ItemRepository.getModelTypes();
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
@@ -292,7 +294,53 @@ function DetailsViewController($state, ItemRepository, analysisService, Item, Is
         detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
         detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
     };
+    
+    detailsCtrl.filterSummaryByDisplayType = function(summary) {
+        return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && (((summary.displayType == 'Chunk') && detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && detailsCtrl.showTokensinSummary));
+    };
 
+    detailsCtrl.filterDetailsByDisplayType = function(listItem) {
+        return (listItem.displayLevel == 1) || ((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails) || ((listItem.displayLevel == 3) && detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 4) && detailsCtrl.showTokensInDetails);
+    };
+
+    detailsCtrl.getSummaryItemCount = function () {
+      return $('#theSummaryBody').find("tr").length;
+    };
+
+    detailsCtrl.getDetailsItemCount = function () {
+      return $('#theDetailsBody').find("tr").length;
+    };
+    
+    $scope.$watch('detailsCtrl.analysisSummaryItemLimit', function () {
+      postDigest(function () {
+          // Force one more update cycle to get the match count to display
+          $scope.$apply();
+      });
+    });
+
+    $scope.$watch('detailsCtrl.analysisFilterString', function () {
+      postDigest(function () {
+          // Force one more update cycle to get the match count to display
+          $scope.$apply();
+      });
+    });
+
+    $scope.$watch('detailsCtrl.analysisDetailsItemLimit', function () {
+      postDigest(function () {
+          // Force one more update cycle to get the match count to display
+          $scope.$apply();
+      });
+    });
+
+    function postDigest(callback) {
+      var unregister = $scope.$watch(function () {
+          unregister();
+          $timeout(function () {
+              callback();
+          }, 0, false);
+      });
+    };
+      
     detailsCtrl.cancel = function () {
 
         if (this.itemForm.$dirty) {
