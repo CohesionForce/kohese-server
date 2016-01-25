@@ -159,6 +159,25 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  visitDescendants(performAction) {
+    var proxyStack = [];
+    for (var childIdx = this.children.length - 1; childIdx > -1; childIdx--) {
+      proxyStack.push(this.children[childIdx]);
+    }
+
+    var decendant = proxyStack.pop()
+    while (decendant) {
+      performAction(decendant);
+      for (var childIdx = decendant.children.length - 1; childIdx > -1; childIdx--) {
+        proxyStack.push(decendant.children[childIdx]);
+      }
+      decendant = proxyStack.pop();
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static dumpAllProxies() {
     for ( var proxyId in tree.proxyMap) {
       var proxy = tree.proxyMap[proxyId];
