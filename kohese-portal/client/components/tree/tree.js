@@ -126,9 +126,13 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         return (val === null) ? 'null' : typeof val;
     }
 
-    treeCtrl.matchesFilter = function (proxy) {
+    treeCtrl.matchesFilter = function (proxy, exact) {
+        if (exact === undefined){
+            exact = false;
+        }
+      
         if (!treeCtrl.filter.text && !treeCtrl.filter.kind) {
-            return true;
+            return !exact;
         } else {
             if (treeCtrl.filter.kind) {
                 if (proxy.kind !== treeCtrl.filter.kind) {

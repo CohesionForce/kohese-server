@@ -10,6 +10,7 @@
          ng-init="lazyIdx=treeCtrl.allocateLazyItemIdx()"
          ng-class="{'kti-selected-item' : itemProxy.item.id === treeCtrl.selectedItemProxy.item.id,
                     'kti-filtered': !treeCtrl.matchesFilter(itemProxy) && !treeCtrl.childMatchesFilter(itemProxy),
+                    'kti-filterMatchedExact': treeCtrl.matchesFilter(itemProxy, true),
                     'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
         <div class="kti-name"
                 ng-style="{'font-weight': 'bold'}">
