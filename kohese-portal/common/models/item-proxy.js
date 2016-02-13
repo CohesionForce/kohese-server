@@ -95,6 +95,23 @@ class ItemProxy {
     }
     return ancestorProxyList;
   }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getDepthFromAncestor(theAncestor) {
+    var ancestorProxy = this.parentProxy;
+    var depth = 1;
+    
+    while (ancestorProxy){
+      if (ancestorProxy === theAncestor){
+        return depth;
+      }
+      ancestorProxy = ancestorProxy.parentProxy;
+      depth++;
+    }
+    return depth;
+  }
   
   //////////////////////////////////////////////////////////////////////////
   //
