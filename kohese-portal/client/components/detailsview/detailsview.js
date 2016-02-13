@@ -3,7 +3,7 @@
  */
 
 
-function DetailsViewController($state, ItemRepository, analysisService, Item, IssueService, NavigationService,
+function DetailsViewController($state, $timeout, ItemRepository, analysisService, Item, IssueService, NavigationService,
                                DecisionService, ActionService, CategoryService, UserService, tabService,
                                $scope, $stateParams) {
 
