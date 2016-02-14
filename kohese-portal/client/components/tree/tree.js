@@ -95,7 +95,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             treeCtrl.lazyLimitIncreasePending = true;
             postDigest(function () {
                 treeCtrl.currentLazyLimit = treeCtrl.currentLazyItemIdx + treeCtrl.lazyLimitIncrement;
-//          console.log("::: Increased lazy limit to " + treeCtrl.currentLazyLimit);
+//                console.log("::: Increased lazy limit to " + treeCtrl.currentLazyLimit);
                 treeCtrl.lazyLimitIncreasePending = false;
                 $scope.$apply();
             });
@@ -106,7 +106,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
 
     function postDigest(callback) {
         var unregister = $scope.$watch(function () {
-//        console.log("::: postDigest at " + treeCtrl.currentLazyItemIdx);
+//            console.log("::: postDigest at " + treeCtrl.currentLazyItemIdx);
             unregister();
             $timeout(function () {
                 callback();
@@ -221,7 +221,6 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     });
     
     treeCtrl.syncLocation = function () {
-//        treeCtrl.locationSynced = !treeCtrl.locationSynced;
       $anchorScroll();
     };
 
