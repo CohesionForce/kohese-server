@@ -17,12 +17,17 @@ function getStatus (repo){
 
       return words.join(" ");
     }
-
+    
+    var repoStatus = [];
+    
     statuses.forEach(function(file) {
       console.log(file.path() + " " + statusToText(file));
+      repoStatus.push({path: file.path(), status: statusToText(file)});
 //      console.log(file);
       console.log(file.status());
     });
+    
+    console.log(repoStatus);
 
   });
 }
@@ -68,11 +73,11 @@ nodegit.Repository.open("kdb/kohese-kdb")
   .then(function(repo) {
     console.log("::: Repo is open");
     
-    //getStatus(repo);
+    getStatus(repo);
     commitWithFileRenames = "facbe3cd973f5d0f39dbe65c5102ba443674db34";
     commitWithSmallerChanges = "43d651aa104fe58c57c53a972e3575c12d278939";
     
-    getCommitDetails(repo, commitWithFileRenames);
+    //getCommitDetails(repo, commitWithFileRenames);
 });
 
 console.log("::: End test nodegit");
