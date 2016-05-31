@@ -51,6 +51,10 @@ then
     y|Y ) 
       echo "::: Fetching upstream changes"
       git fetch origin master
+
+      echo "::: Checking for updates to db.json"
+      ../scripts/update_db_json.sh
+
       ;;
     n|N ) echo "--- No changes fetched";;
     * ) echo "invalid choice"; exit ;;
@@ -75,7 +79,5 @@ then
   fi
 
   cd ..
-fi
 
-echo "::: Checking for updates to db.json"
-../scripts/update_db_json.sh
+fi
