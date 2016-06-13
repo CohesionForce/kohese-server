@@ -1,7 +1,8 @@
 {
   "name": "kohese-portal",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "server/server.js",
+  "license": "EPL-1.0",
   "scripts": {
     "pretest": "jshint ."
   },
@@ -22,6 +23,7 @@
     "loopback-boot": "^2.6.5",
     "loopback-connector-mongodb": "^1.8.0",
     "loopback-datasource-juggler": "^2.19.0",
+    "morgan": "^1.7.0",
     "nodegit": "^0.5.0",
     "request": "^2.65.0",
     "serve-favicon": "^2.0.1",
