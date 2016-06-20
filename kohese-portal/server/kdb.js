@@ -277,7 +277,16 @@ checkAndCreateDir(koheseKDBDirPath);
 var exportDirPath = koheseKDBDirPath + "/export";
 validateRepositoryStructure(exportDirPath);
 
-kdbFS.storeJSONDoc(kdbDirPath + "/kdbStore.json", kdbStore);
+kdbFS.storeJSONDoc(kdbDirPath + "/kdbStoreWithAnalysis.json", kdbStore);
+
+console.log("::: Stripping Analysis from KDBStore");
+var kdbStoreMin = JSON.parse(JSON.stringify(kdbStore));
+console.log(">>> Current Analysis count: "+ kdbStoreMin.ids.Analysis);
+kdbStoreMin.ids.Analysis=0;
+kdbStoreMin.models.Analysis = {};
+kdbFS.storeJSONDoc(kdbDirPath + "/kdbStore.json", kdbStoreMin);
+delete kdbStoreMin;
+
 var rootProxy = ItemProxy.getRootProxy();
 //rootProxy.dumpProxy();
 console.log("--- Root descendant count: " + rootProxy.descendantCount);
