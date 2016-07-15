@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="KoheseTypes" nsURI="http://www.example.org/KoheseTypes" nsPrefix="KoheseTypes">
+  <eClassifiers xsi:type="ecore:EClass" name="Item">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="journal" lowerBound="1"
+        eType="#//Journal" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="item" upperBound="-1" eType="#//Item"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="workflow" upperBound="-1"
+        eType="#//Workflow" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Decision" eSuperTypes="#//Item"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Workflow" eSuperTypes="#//Item">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignment" upperBound="-1"
+        eType="#//Assignment" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Observation" eSuperTypes="#//Item"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Journal">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="observation" upperBound="-1"
+        eType="#//Observation"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Report" eSuperTypes="#//Item"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="#//Decision"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Issue" eSuperTypes="#//Observation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Resolution" eType="#//Action"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Analysis" eType="#//Action"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Measure" eSuperTypes="#//Observation"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment" eSuperTypes="#//Item"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Media" eSuperTypes="#//Item"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Image" eSuperTypes="#//Media"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Document" eSuperTypes="#//Media"/>
+</ecore:EPackage>
