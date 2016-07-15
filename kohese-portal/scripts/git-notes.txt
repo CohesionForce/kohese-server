@@ -29,6 +29,7 @@ git log ..origin/master
 
 # to find the files changed with each commit
 git log --name-status
+git log --name-status <commit>
 # or
 git log --name-only
 # or
