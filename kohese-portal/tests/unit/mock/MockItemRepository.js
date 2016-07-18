@@ -9,6 +9,11 @@ function MockItemRepository() {
     this.getRepositories = function() {
         return [];
     };
+    
+    this.getModelTypes = function() {
+        this.modelTypes.empty = {modelName: ''};
+        return this.modelTypes;
+    };
 
 }
 
