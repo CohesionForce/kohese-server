@@ -41,11 +41,6 @@ kdbDir=`pwd`
       echo "::: Fetching upstream changes"
       git fetch origin master
 
-      echo "::: Checking for updates to db.json"
-      cd ..
-      ../scripts/update_db_json.sh
-      cd $kdbDir
-
       ;;
     n|N ) echo "--- No changes fetched";;
     * ) echo "invalid choice"; exit ;;
