@@ -2,7 +2,6 @@
   "db": {
     "name": "db",
     "connector": "memory",
-    "file": "db.json",
     "connectionTimeout": 1000000
   }
 }

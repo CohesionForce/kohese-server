@@ -22,8 +22,20 @@ boot(app, __dirname, function (err) {
     // start the server if `$ node server.js`
     if (require.main === module) {
 
+        // Load the KDB
         var kdb = require('./kdb.js');
         global.koheseKDB = kdb;
+
+        // Initialize the in-memory loopback data connector
+        var lbMemInitData = kdb.retrieveDataForMemoryConnector();
+        var memConnector = app.dataSources.db.connector;
+        memConnector.ids = lbMemInitData.ids;
+        memConnector.cache = lbMemInitData.cache;
+        delete lbMemInitData;
+   
+        // Setup the KoheseUser relations 
+        var enableAuth = require('./server-enableAuth');
+        enableAuth(app);
     
         // app.start();
         var decodeAuthToken = require('./boot/routes.js').decodeAuthToken;
@@ -61,4 +73,5 @@ boot(app, __dirname, function (err) {
 
     }
 
+    
 });

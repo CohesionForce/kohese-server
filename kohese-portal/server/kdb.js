@@ -18,6 +18,25 @@ var kdbStore = {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function retrieveDataForMemoryConnector(){
+
+  var lbMemConnectorData = {
+      ids: JSON.parse(JSON.stringify(kdbStore.ids)),
+      cache: JSON.parse(JSON.stringify(kdbStore.models))
+  }
+  
+  // Since we do not store the Analysis artifacts in loopback, remove them
+  lbMemConnectorData.ids.Analysis=0;
+  lbMemConnectorData.cache.Analysis = {};
+  
+  return lbMemConnectorData;
+}
+
+module.exports.retrieveDataForMemoryConnector = retrieveDataForMemoryConnector; 
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function determineRepoStoragePath(repo){
   var repoStoragePath;
   if(repo){
@@ -277,27 +296,12 @@ checkAndCreateDir(koheseKDBDirPath);
 var exportDirPath = koheseKDBDirPath + "/export";
 validateRepositoryStructure(exportDirPath);
 
-kdbFS.storeJSONDoc(kdbDirPath + "/kdbStoreWithAnalysis.json", kdbStore);
-
-console.log("::: Stripping Analysis from KDBStore");
-var kdbStoreMin = JSON.parse(JSON.stringify(kdbStore));
-console.log(">>> Current Analysis count: "+ kdbStoreMin.ids.Analysis);
-kdbStoreMin.ids.Analysis=0;
-kdbStoreMin.models.Analysis = {};
-kdbFS.storeJSONDoc(kdbDirPath + "/kdbStore.json", kdbStoreMin);
-delete kdbStoreMin;
-
 var rootProxy = ItemProxy.getRootProxy();
-//rootProxy.dumpProxy();
 console.log("--- Root descendant count: " + rootProxy.descendantCount);
 for(var childIdx in rootProxy.children){
   var childProxy = rootProxy.children[childIdx];
   console.log("--- Child descendant count of " + childProxy.item.name + ": " + childProxy.descendantCount);  
 }
-
-console.log("::: Reading db.json");
-var lbStore = kdbFS.loadJSONDoc("db.json");
-module.exports.lbStore = lbStore;
 
 var kdbModel = require('./kdb-model.js');
 kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);

@@ -1,21 +1,9 @@
 #!/bin/bash -f 
 
-echo "::: Sync KDB Called with: $*"
+echo "::: Sync KDB"
 
 kdbDir=`pwd`
 
-if [ -f "db.json" ]
-then
-  echo "::: Exporting kdb"
-  cd ..
-  node ./scripts/export-kdb.js
-  cd $kdbDir
-else
-  touch db.json
-fi
-
-if [ "-git" == "$1" ]
-then
   cd kohese-kdb
   echo "::: Checking for local changes"
   changes=`git status -s`
@@ -23,6 +11,7 @@ then
 
   if [ "" != "$changes" ]
   then
+    ../scripts/showDeltas.sh
     read -p "Changes detected do you want to add all (y/n)?  " choice
     case "$choice" in 
       y|Y ) git add --all;;
@@ -81,5 +70,3 @@ then
   fi
 
   cd ..
-
-fi
