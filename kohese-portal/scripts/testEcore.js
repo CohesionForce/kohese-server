@@ -19,7 +19,7 @@ function displayModelInfo(model) {
 //////////////////////////////////////////////////////////////////////////
 function processFile(file) {
 	var resourceSet = Ecore.ResourceSet.create();
-	var resource = resourceSet.create({uri : './testFile.kfile'});
+	var resource = resourceSet.create({uri : 'uri-' + file});
 
 	var fileContents = fs.readFileSync(file, 'utf8');
 	try { 
@@ -41,7 +41,11 @@ function processFile(file) {
 	var result = resource.to(Ecore.JSON);
 	console.log("::: JSON Dump of " + file);
 	console.log(util.inspect(result, false, null));
+	console.log("::: XMI Dump of " + file);
+	console.log(resource.to(Ecore.XMI));
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////
 //  Main Processing
@@ -51,7 +55,6 @@ fs = require('fs');
 util = require('util');
 var Ecore = require('ecore/dist/ecore.xmi');
 
-console.log(process.argv.length);
 for(var argidx = 2; argidx < process.argv.length; argidx++) {
 	var fileName = process.argv[argidx];
 	console.log('::: Processing ' + fileName);
