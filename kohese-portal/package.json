@@ -14,6 +14,7 @@
     "body-parser": "^1.13.3",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
+    "ecore": "^0.6.0",
     "errorhandler": "^1.1.1",
     "express-jwt": "^3.0.1",
     "jasmine-node": "^1.14.5",
