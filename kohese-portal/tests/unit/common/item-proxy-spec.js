@@ -185,7 +185,3 @@ describe("ItemProxy Test", function()
       }
     });
 });
-
-describe("suite name", function()
-{
-});
