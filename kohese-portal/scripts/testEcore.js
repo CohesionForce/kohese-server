@@ -8,17 +8,21 @@ var Ecore = require('ecore/dist/ecore.xmi');
 
 console.log(process.argv);
 
-var forFile = '';
+var forModelFile = '';
+var forInstanceFile;
 
 if(process.argv[2]){
-  forFile=process.argv[2];
+  forModelFile=process.argv[2];
 } else {
-  forFile='../kohese-design/model/KoheseTypes.ecore';  
-  console.log('*** Need to supply item id to be dumped.');
-  
+  forModelFile='../kohese-design/model/Kohese.ecore';  
+  console.log('!!! Should supply ecore/xmi file to be dumped.');
 }
 
-console.log("::: Testing Ecore.  Using: " + forFile);
+if (process.argv[3]) {
+  forInstanceFile = process.argv[3];
+}
+
+console.log("::: Testing Ecore.  Using: " + forModelFile);
 
 function displayModelInfo(model) {
   var ePackage = model.get('contents').first();
@@ -35,7 +39,7 @@ function displayModelInfo(model) {
 
 var callback = function(model, err) {
   if (err) {
-      console.log('fail loading model', err);
+      console.log('*** Failed loading model: ', err);
       return;
   }
 
@@ -53,7 +57,7 @@ var callback = function(model, err) {
 var resourceSet = Ecore.ResourceSet.create();
 var resource = resourceSet.create({uri : './testFile.kfile'});
 
-var kModelFile = fs.readFileSync(forFile, 'utf8');
+var kModelFile = fs.readFileSync(forModelFile, 'utf8');
 resource.parse(kModelFile, Ecore.XMI);
 console.log("::: Sync Version");
 //var ePackage2 = resource.get('contents').first();
@@ -61,5 +65,26 @@ console.log("::: Sync Version");
 displayModelInfo(resource);
 
 var result = resource.to(Ecore.JSON);
-console.log("::: JSON Dump of " + forFile);
+console.log("::: JSON Dump of " + forModelFile);
 console.log(util.inspect(result, false, null));
+
+if (forInstanceFile) {
+	console.log('::: Processing instance:  ' + forInstanceFile);
+	
+	var kPackage = resource.get('contents').first();
+	Ecore.EPackage.Registry.register(kPackage);
+	
+	var instanceRS = Ecore.ResourceSet.create();
+	var instanceResource = instanceRS.create({uri : './testFile.kifile'});
+	var kInstanceFile = fs.readFileSync(forInstanceFile, 'utf8');
+	instanceResource.load(kInstanceFile, function(instance, err){
+		if (err) {
+		      console.log('*** Failed loading model instance: ', err);
+		      return;
+		  }
+		
+		var iResult = instance.to(Ecore.JSON);
+		console.log("::: JSON Dump of " + forInstanceFile);
+		console.log(util.inspect(iResult, false, null));
+	}, {format: Ecore.XMI});
+}
