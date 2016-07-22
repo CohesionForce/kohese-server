@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/kohese-design/src" modelPluginID="kohese-design"
+    modelName="Kohese" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="8.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>Kohese.ecore</foreignModel>
+  <genPackages prefix="KoheseModel" disposableProviderFactory="true" ecorePackage="Kohese.ecore#/">
+    <genClasses ecoreClass="Kohese.ecore#//Item">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Kohese.ecore#//Item/journal"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference Kohese.ecore#//Item/child"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Kohese.ecore#//Item/workflow"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Kohese.ecore#//Item/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Kohese.ecore#//Item/id"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Kohese.ecore#//Item/child2"/>
+    </genClasses>
+    <genClasses ecoreClass="Kohese.ecore#//Decision"/>
+    <genClasses ecoreClass="Kohese.ecore#//Workflow">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Kohese.ecore#//Workflow/assignment"/>
+    </genClasses>
+    <genClasses ecoreClass="Kohese.ecore#//Observation"/>
+    <genClasses ecoreClass="Kohese.ecore#//Journal">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Kohese.ecore#//Journal/observation"/>
+    </genClasses>
+    <genClasses ecoreClass="Kohese.ecore#//Report"/>
+    <genClasses ecoreClass="Kohese.ecore#//Action"/>
+    <genClasses ecoreClass="Kohese.ecore#//Issue">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Kohese.ecore#//Issue/Resolution"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Kohese.ecore#//Issue/Analysis"/>
+    </genClasses>
+    <genClasses ecoreClass="Kohese.ecore#//Measure"/>
+    <genClasses ecoreClass="Kohese.ecore#//Assignment"/>
+    <genClasses ecoreClass="Kohese.ecore#//Media"/>
+    <genClasses ecoreClass="Kohese.ecore#//Image"/>
+    <genClasses ecoreClass="Kohese.ecore#//Document"/>
+  </genPackages>
+</genmodel:GenModel>

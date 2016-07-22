@@ -13,4 +13,12 @@
             class="KoheseTypes.KoheseTypesPackage"/>
    </extension>
 
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated Kohese -->
+      <package
+            uri="http://www.kohese.com/KoheseModel"
+            class="KoheseModel.KoheseModelPackage"
+            genModel="model/Kohese.genmodel"/>
+   </extension>
+
 </plugin>
