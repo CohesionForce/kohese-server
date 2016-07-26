@@ -159,6 +159,15 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getItem_ChildByRef() {
+		return (EReference)itemEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getSpecialItem() {
 		return specialItemEClass;
 	}
@@ -311,6 +320,7 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 		itemEClass = createEClass(ITEM);
 		createEReference(itemEClass, ITEM__CHILD);
 		createEAttribute(itemEClass, ITEM__NAME);
+		createEReference(itemEClass, ITEM__CHILD_BY_REF);
 
 		specialItemEClass = createEClass(SPECIAL_ITEM);
 		createEAttribute(specialItemEClass, SPECIAL_ITEM__VALUE);
@@ -367,6 +377,7 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 		initEClass(itemEClass, Item.class, "Item", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getItem_Child(), this.getItem(), null, "child", null, 0, -1, Item.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getItem_Name(), ecorePackage.getEString(), "name", null, 0, 1, Item.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getItem_ChildByRef(), this.getItem(), null, "childByRef", null, 0, -1, Item.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(specialItemEClass, SpecialItem.class, "SpecialItem", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSpecialItem_Value(), ecorePackage.getEInt(), "value", null, 0, 1, SpecialItem.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -389,6 +400,27 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 
 		// Create resource
 		createResource(eNS_URI);
+
+		// Create annotations
+		// http:///org/eclipse/emf/ecore/util/ExtendedMetaData
+		createExtendedMetaDataAnnotations();
+	}
+
+	/**
+	 * Initializes the annotations for <b>http:///org/eclipse/emf/ecore/util/ExtendedMetaData</b>.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void createExtendedMetaDataAnnotations() {
+		String source = "http:///org/eclipse/emf/ecore/util/ExtendedMetaData";	
+		addAnnotation
+		  (getItem_ChildByRef(), 
+		   source, 
+		   new String[] {
+			 "name", "childByRef",
+			 "namespace", ""
+		   });
 	}
 
 } //TestModelPackageImpl

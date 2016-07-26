@@ -17,6 +17,7 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link TestModel.Item#getChild <em>Child</em>}</li>
  *   <li>{@link TestModel.Item#getName <em>Name</em>}</li>
+ *   <li>{@link TestModel.Item#getChildByRef <em>Child By Ref</em>}</li>
  * </ul>
  *
  * @see TestModel.TestModelPackage#getItem()
@@ -65,5 +66,21 @@ public interface Item extends EObject {
 	 * @generated
 	 */
 	void setName(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Child By Ref</b></em>' reference list.
+	 * The list contents are of type {@link TestModel.Item}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Child By Ref</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Child By Ref</em>' reference list.
+	 * @see TestModel.TestModelPackage#getItem_ChildByRef()
+	 * @model extendedMetaData="name='childByRef' namespace=''"
+	 * @generated
+	 */
+	EList<Item> getChildByRef();
 
 } // Item

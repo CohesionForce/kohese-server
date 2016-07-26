@@ -187,9 +187,23 @@
             <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_9xzBFlEnEeaVm8ayqs-lvg" id="(1.0,0.11224489795918367)"/>
             <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_9xzBF1EnEeaVm8ayqs-lvg" id="(0.0,0.11224489795918367)"/>
           </edges>
+          <edges xmi:type="notation:Edge" xmi:id="__Og9sFNLEeasz62JEBufsw" type="4001" element="__MBqYFNLEeasz62JEBufsw" source="_hzQsgFDNEeaVm8ayqs-lvg" target="_hzQsgFDNEeaVm8ayqs-lvg">
+            <children xmi:type="notation:Node" xmi:id="__PDwQFNLEeasz62JEBufsw" type="6001">
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="__PDwQVNLEeasz62JEBufsw" x="7" y="37"/>
+            </children>
+            <children xmi:type="notation:Node" xmi:id="__PE-YFNLEeasz62JEBufsw" type="6002">
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="__PE-YVNLEeasz62JEBufsw" x="2" y="10"/>
+            </children>
+            <children xmi:type="notation:Node" xmi:id="__PFlcFNLEeasz62JEBufsw" type="6003">
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="__PFlcVNLEeasz62JEBufsw" x="-1" y="-33"/>
+            </children>
+            <styles xmi:type="notation:ConnectorStyle" xmi:id="__Og9sVNLEeasz62JEBufsw" routing="Rectilinear"/>
+            <styles xmi:type="notation:FontStyle" xmi:id="__Og9slNLEeasz62JEBufsw" fontColor="7490599" fontName="Ubuntu" fontHeight="8"/>
+            <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="__Og9s1NLEeasz62JEBufsw" points="[59, 24, 59, 24]$[157, 24, 157, 24]$[157, -109, 157, -109]$[-11, -109, -11, -109]$[-11, -49, -11, -49]"/>
+          </edges>
         </data>
       </ownedAnnotationEntries>
-      <ownedDiagramElements xmi:type="diagram:DNodeList" xmi:id="_hxzT8FDNEeaVm8ayqs-lvg" name="Item" tooltipText="" outgoingEdges="_qwJH8FDNEeaVm8ayqs-lvg" incomingEdges="_qwJH8FDNEeaVm8ayqs-lvg _NZehMFDTEeaVm8ayqs-lvg _RHnm4FDTEeaVm8ayqs-lvg" width="12" height="10">
+      <ownedDiagramElements xmi:type="diagram:DNodeList" xmi:id="_hxzT8FDNEeaVm8ayqs-lvg" name="Item" tooltipText="" outgoingEdges="_qwJH8FDNEeaVm8ayqs-lvg __MBqYFNLEeasz62JEBufsw" incomingEdges="_qwJH8FDNEeaVm8ayqs-lvg _NZehMFDTEeaVm8ayqs-lvg _RHnm4FDTEeaVm8ayqs-lvg __MBqYFNLEeasz62JEBufsw" width="12" height="10">
         <target xmi:type="ecore:EClass" href="TestModel.ecore#//Item"/>
         <semanticElements xmi:type="ecore:EClass" href="TestModel.ecore#//Item"/>
         <arrangeConstraints>KEEP_LOCATION</arrangeConstraints>
@@ -370,6 +384,20 @@
             <customFeatures>labelSize</customFeatures>
           </centerLabelStyle>
           <endLabelStyle xmi:type="diagram:EndLabelStyle" xmi:id="_9xffElEnEeaVm8ayqs-lvg" showIcon="false" labelColor="39,76,114">
+            <customFeatures>labelSize</customFeatures>
+          </endLabelStyle>
+        </ownedStyle>
+        <actualMapping xmi:type="description_1:EdgeMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Entities']/@defaultLayer/@edgeMappings[name='EC_EReference']"/>
+      </ownedDiagramElements>
+      <ownedDiagramElements xmi:type="diagram:DEdge" xmi:id="__MBqYFNLEeasz62JEBufsw" name="[0..*] childByRef" sourceNode="_hxzT8FDNEeaVm8ayqs-lvg" targetNode="_hxzT8FDNEeaVm8ayqs-lvg">
+        <target xmi:type="ecore:EReference" href="TestModel.ecore#//Item/childByRef"/>
+        <semanticElements xmi:type="ecore:EReference" href="TestModel.ecore#//Item/childByRef"/>
+        <ownedStyle xmi:type="diagram:EdgeStyle" xmi:id="__MDfkFNLEeasz62JEBufsw" routingStyle="manhattan" strokeColor="0,0,0">
+          <description xmi:type="style:EdgeStyleDescription" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Entities']/@defaultLayer/@edgeMappings[name='EC_EReference']/@style"/>
+          <centerLabelStyle xmi:type="diagram:CenterLabelStyle" xmi:id="__MDfkVNLEeasz62JEBufsw" showIcon="false">
+            <customFeatures>labelSize</customFeatures>
+          </centerLabelStyle>
+          <endLabelStyle xmi:type="diagram:EndLabelStyle" xmi:id="__MDfklNLEeasz62JEBufsw" showIcon="false" labelColor="39,76,114">
             <customFeatures>labelSize</customFeatures>
           </endLabelStyle>
         </ownedStyle>

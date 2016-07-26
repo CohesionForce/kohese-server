@@ -85,13 +85,22 @@ public interface TestModelPackage extends EPackage {
 	int ITEM__NAME = 1;
 
 	/**
+	 * The feature id for the '<em><b>Child By Ref</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ITEM__CHILD_BY_REF = 2;
+
+	/**
 	 * The number of structural features of the '<em>Item</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ITEM_FEATURE_COUNT = 2;
+	int ITEM_FEATURE_COUNT = 3;
 
 	/**
 	 * The number of operations of the '<em>Item</em>' class.
@@ -130,6 +139,15 @@ public interface TestModelPackage extends EPackage {
 	 * @ordered
 	 */
 	int SPECIAL_ITEM__NAME = ITEM__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Child By Ref</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SPECIAL_ITEM__CHILD_BY_REF = ITEM__CHILD_BY_REF;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute.
@@ -185,6 +203,15 @@ public interface TestModelPackage extends EPackage {
 	 * @ordered
 	 */
 	int ANOTHER_ITEM__NAME = ITEM__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Child By Ref</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANOTHER_ITEM__CHILD_BY_REF = ITEM__CHILD_BY_REF;
 
 	/**
 	 * The feature id for the '<em><b>Test</b></em>' attribute.
@@ -395,6 +422,17 @@ public interface TestModelPackage extends EPackage {
 	EAttribute getItem_Name();
 
 	/**
+	 * Returns the meta object for the reference list '{@link TestModel.Item#getChildByRef <em>Child By Ref</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Child By Ref</em>'.
+	 * @see TestModel.Item#getChildByRef()
+	 * @see #getItem()
+	 * @generated
+	 */
+	EReference getItem_ChildByRef();
+
+	/**
 	 * Returns the meta object for class '{@link TestModel.SpecialItem <em>Special Item</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -591,6 +629,14 @@ public interface TestModelPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute ITEM__NAME = eINSTANCE.getItem_Name();
+
+		/**
+		 * The meta object literal for the '<em><b>Child By Ref</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ITEM__CHILD_BY_REF = eINSTANCE.getItem_ChildByRef();
 
 		/**
 		 * The meta object literal for the '{@link TestModel.impl.SpecialItemImpl <em>Special Item</em>}' class.

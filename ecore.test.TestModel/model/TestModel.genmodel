@@ -9,6 +9,7 @@
     <genClasses ecoreClass="TestModel.ecore#//Item">
       <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference TestModel.ecore#//Item/child"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TestModel.ecore#//Item/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TestModel.ecore#//Item/childByRef"/>
     </genClasses>
     <genClasses ecoreClass="TestModel.ecore#//SpecialItem">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TestModel.ecore#//SpecialItem/value"/>

@@ -19,6 +19,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -31,6 +32,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link TestModel.impl.ItemImpl#getChild <em>Child</em>}</li>
  *   <li>{@link TestModel.impl.ItemImpl#getName <em>Name</em>}</li>
+ *   <li>{@link TestModel.impl.ItemImpl#getChildByRef <em>Child By Ref</em>}</li>
  * </ul>
  *
  * @generated
@@ -65,6 +67,16 @@ public class ItemImpl extends MinimalEObjectImpl.Container implements Item {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getChildByRef() <em>Child By Ref</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getChildByRef()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Item> childByRef;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -123,6 +135,18 @@ public class ItemImpl extends MinimalEObjectImpl.Container implements Item {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<Item> getChildByRef() {
+		if (childByRef == null) {
+			childByRef = new EObjectResolvingEList<Item>(Item.class, this, TestModelPackage.ITEM__CHILD_BY_REF);
+		}
+		return childByRef;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -144,6 +168,8 @@ public class ItemImpl extends MinimalEObjectImpl.Container implements Item {
 				return getChild();
 			case TestModelPackage.ITEM__NAME:
 				return getName();
+			case TestModelPackage.ITEM__CHILD_BY_REF:
+				return getChildByRef();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -164,6 +190,10 @@ public class ItemImpl extends MinimalEObjectImpl.Container implements Item {
 			case TestModelPackage.ITEM__NAME:
 				setName((String)newValue);
 				return;
+			case TestModelPackage.ITEM__CHILD_BY_REF:
+				getChildByRef().clear();
+				getChildByRef().addAll((Collection<? extends Item>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -182,6 +212,9 @@ public class ItemImpl extends MinimalEObjectImpl.Container implements Item {
 			case TestModelPackage.ITEM__NAME:
 				setName(NAME_EDEFAULT);
 				return;
+			case TestModelPackage.ITEM__CHILD_BY_REF:
+				getChildByRef().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -198,6 +231,8 @@ public class ItemImpl extends MinimalEObjectImpl.Container implements Item {
 				return child != null && !child.isEmpty();
 			case TestModelPackage.ITEM__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case TestModelPackage.ITEM__CHILD_BY_REF:
+				return childByRef != null && !childByRef.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
