@@ -22,9 +22,15 @@ function retrieveDataForMemoryConnector(){
 
   var lbMemConnectorData = {
       ids: JSON.parse(JSON.stringify(kdbStore.ids)),
-      cache: JSON.parse(JSON.stringify(kdbStore.models))
+      cache: {}
   }
-  
+ 
+  for(var model in kdbStore.models) {
+    if (model !== "Analysis") {
+      lbMemConnectorData.cache[model] = JSON.parse(JSON.stringify(kdbStore.models[model]));
+    }
+  } 
+
   // Since we do not store the Analysis artifacts in loopback, remove them
   lbMemConnectorData.ids.Analysis=0;
   lbMemConnectorData.cache.Analysis = {};
