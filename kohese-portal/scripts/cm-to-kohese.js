@@ -4,12 +4,19 @@
 var fs = require('fs');
 var util = require('util');
 var commonmark = require('commonmark');
+var http = require('http');
 
 var render = require('./cm-to-kohese-helper.js');
 
 var koheseItems = []; 
 
-text=fs.readFileSync("basic.md", {encoding: 'utf8', flag: 'r'});
+////////// User parameters - See also http options
+
+text=fs.readFileSync("/home/aschneider/Desktop/document ingest testing/MDA112033.md", {encoding: 'utf8', flag: 'r'});
+var rootId = '4473e260-59a5-11e6-b3a4-1b305ee3813e';
+var accessToken = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNDcwMjM4MTc3fQ.cLqE-3Fhds_ErjDNenbG7ItDKqG2GXNzFQ__kUVkAr8';
+
+//////////
 
 var reader = new commonmark.Parser();
 var parsed = reader.parse(text);
@@ -17,19 +24,23 @@ var walker = parsed.walker();
 var event;
 
 var parentStack = [];
-var rootId = '';
-var koheseItem = {name: null, id: null, description: null, parentId: null};
+var koheseItem = {name: null, id: null, description: null, 
+				parentId: null, level: null, tempId: null};
+var tempIdCounter = 1;
 
 while(event = walker.next()) {
 	if(event.entering && event.node.type === 'heading') {
 		// Entering a new header, check if an item is ready to be pushed
-		if(koheseItem.id !== null) {
+		if(koheseItem.tempId !== null) {
 			koheseItem.description = render.getBuffer();
 			koheseItems.push(koheseItem);
 		}
 
-		koheseItem = {name: null, id: null, description: '', parentId: null};
+		koheseItem = {name: null, id: null, description: '', parentId: null, level: null, tempId: null};
 		render.clearBuffer();
+		koheseItem.level = event.node.level;
+		koheseItem.tempId = tempIdCounter;
+		tempIdCounter++;
 		
 		// Check parent stack to get correct parent IDs
 		while(parentStack.length > 0 && event.node.level <= parentStack[parentStack.length - 1].level) {
@@ -37,13 +48,13 @@ while(event = walker.next()) {
 		}
 		if(parentStack.length === 0) {
 			koheseItem.parentId = rootId;
-			koheseItem.id = Math.floor((Math.random() * 1000) + 1)
-			parentStack.push({level: event.node.level, id: koheseItem.id});
+			//koheseItem.id = Math.floor((Math.random() * 1000) + 1)
+			parentStack.push({level: event.node.level, id: koheseItem.tempId});
 			// Temporary random id, to be replaced with kohese uuid
 		} else {
 			koheseItem.parentId = parentStack[parentStack.length - 1].id;
-			koheseItem.id = Math.floor((Math.random() * 1000) + 1);
-			parentStack.push({level: event.node.level, id: koheseItem.id});
+			//koheseItem.id = Math.floor((Math.random() * 1000) + 1);
+			parentStack.push({level: event.node.level, id: koheseItem.tempId});
 			// Temporary random id, to be replaced with kohese uuid
 		}
 
@@ -52,7 +63,7 @@ while(event = walker.next()) {
 		if(event.entering && event.node.type === 'text') {
 			koheseItem.name = event.node.literal;
 		} else {
-			koheseItem.name = '';
+			koheseItem.name = 'BLANK';
 		}
 	}
 
@@ -62,7 +73,7 @@ while(event = walker.next()) {
 	
 	else if(!event.entering && event.node.type === 'document') {
 		//Push a straggling kohese item
-		if(koheseItem.id !== null) {
+		if(koheseItem.tempId !== null) {
 			koheseItem.description = render.getBuffer();
 			koheseItems.push(koheseItem);
 		}
@@ -73,4 +84,97 @@ while(event = walker.next()) {
 	}
 }
 
-console.log(koheseItems);
+// Sort so that level 1 headings are first
+koheseItems.sort(function(item1, item2) { return item1.level - item2.level; });
+
+var topLevel = koheseItems[koheseItems.length - 1].level;
+var filteredItems = [];
+
+for(var i=0; i <= topLevel; i++) {
+	filteredItems[i] = koheseItems.filter(function(item) {
+		return item.level === i;
+	});
+} //filteredItems[i] = array of items at level i
+
+
+function postItems(level) {
+	if(level > topLevel) {
+		console.log('Done posting items!');
+		return;
+	}
+	
+	if(filteredItems[level] === [] || filteredItems[level] === undefined) {
+		console.log('No items to post at level ' + level);
+		postItems(level + 1);
+	}
+	
+	console.log('Posting ' + filteredItems[level].length + ' items');
+	
+	var cleanItems = [];
+	for(var i=0; i < filteredItems[level].length; i++) {
+		cleanItems.push({name: filteredItems[level][i].name, description: filteredItems[level][i].description, parentId: filteredItems[level][i].parentId});
+	}
+	
+	var options = {
+			host: 'localhost',
+			port: 3000,
+			path: '/api/Items/',
+			method: 'POST',
+			headers: {
+				'Authorization': accessToken,
+				'Content-Type': 'application/json;charset=UTF-8',
+				'Content-Length': Buffer.byteLength(JSON.stringify(cleanItems))
+			}
+	};
+	
+	var postRequest = http.request(options, postCallback);
+	postRequest.write(JSON.stringify(cleanItems));
+	postRequest.end();
+	
+	function postCallback(response) {
+		console.log('POST at level ' + level + ' has status ' + response.statusCode);
+		var output = '';
+		response.on('data', function (chunk) {
+			output += chunk;
+		});
+		response.on('end', function() {
+			output = JSON.parse(output);
+			//Set actual item id from Kohese
+			for(var i=0; i < filteredItems[level].length; i++) {
+				filteredItems[level][i].id = output[i].id;
+			}
+			resolveParentIds(level);
+			postItems(level + 1);
+		});
+	};
+}
+
+function resolveParentIds(level) {
+	//Given a level which has proper IDs, this should navigate further
+	//levels and place parentIDs appropriately.
+	if(level + 1 > topLevel) {
+		//No further levels to resolve parent IDs
+		return;
+	}
+	if(filteredItems[level] === undefined || filteredItems[level] === []) {
+		//No parent IDs that need to be resolved
+		return;
+	}
+	
+	var tempIds = [];
+	var parentIds = [];
+	for(var i = 0; i < filteredItems[level].length; i++) {
+		tempIds[i] = filteredItems[level][i].tempId;
+		parentIds[i] = filteredItems[level][i].id;
+	}
+		
+	for(var i = level + 1; i <= topLevel; i++) {
+		for(var j = 0; j < filteredItems[i].length; j++) {
+			var foundId = tempIds.indexOf(filteredItems[i][j].parentId);
+			if(foundId !== -1) {
+				filteredItems[i][j].parentId = parentIds[foundId];
+			}
+		}
+	}
+};
+postItems(1);

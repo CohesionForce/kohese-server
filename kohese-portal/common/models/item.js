@@ -2,8 +2,16 @@ module.exports = function (Item) {
     
     Item.addModificationHistory = function(ctx, modelInstance, next){
         console.log('::: Before remote - ' + ctx.methodString);
-        ctx.req.body.modifiedBy = ctx.req.headers.koheseUser.username;
-        ctx.req.body.modifiedOn = Date.now();
+        console.log(ctx.req.body);
+        if(Array.isArray(ctx.req.body)) {
+        	for(var i=0; i<ctx.req.body.length; i++) {
+        		ctx.req.body[i].modifiedBy = ctx.req.headers.koheseUser.username;
+        		ctx.req.body[i].modifiedOn = Date.now();
+        	}
+        } else {
+        	ctx.req.body.modifiedBy = ctx.req.headers.koheseUser.username;
+            ctx.req.body.modifiedOn = Date.now();
+        }
         next();
     };
 
