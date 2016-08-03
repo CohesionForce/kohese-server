@@ -1,5 +1,7 @@
-/**
- * 
+/** Parses a provided markdown file and renders it into kohese items, then
+ *  sends them to a local kohese server via rest interface.
+ *  
+ *  User must set the file, rootId, and accesToken below.
  */
 var fs = require('fs');
 var util = require('util');
@@ -12,9 +14,9 @@ var koheseItems = [];
 
 ////////// User parameters - See also http options
 
-text=fs.readFileSync("/home/aschneider/Desktop/document ingest testing/MDA112033.md", {encoding: 'utf8', flag: 'r'});
-var rootId = '4473e260-59a5-11e6-b3a4-1b305ee3813e';
-var accessToken = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNDcwMjM4MTc3fQ.cLqE-3Fhds_ErjDNenbG7ItDKqG2GXNzFQ__kUVkAr8';
+text=fs.readFileSync("basic.md", {encoding: 'utf8', flag: 'r'});
+var rootId = '';
+var accessToken = '';
 
 //////////
 
@@ -48,14 +50,11 @@ while(event = walker.next()) {
 		}
 		if(parentStack.length === 0) {
 			koheseItem.parentId = rootId;
-			//koheseItem.id = Math.floor((Math.random() * 1000) + 1)
 			parentStack.push({level: event.node.level, id: koheseItem.tempId});
-			// Temporary random id, to be replaced with kohese uuid
+			// Temporary id, to be replaced with kohese uuid
 		} else {
 			koheseItem.parentId = parentStack[parentStack.length - 1].id;
-			//koheseItem.id = Math.floor((Math.random() * 1000) + 1);
 			parentStack.push({level: event.node.level, id: koheseItem.tempId});
-			// Temporary random id, to be replaced with kohese uuid
 		}
 
 		//Enter text as name, if it exists
@@ -83,9 +82,6 @@ while(event = walker.next()) {
 		console.log('!!! Unknown/Unhandled event: ' + event.node.type + ' - Entering: ' + event.entering);
 	}
 }
-
-// Sort so that level 1 headings are first
-koheseItems.sort(function(item1, item2) { return item1.level - item2.level; });
 
 var topLevel = koheseItems[koheseItems.length - 1].level;
 var filteredItems = [];
