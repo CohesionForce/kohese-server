@@ -11,6 +11,7 @@ module.exports = function (app) {
     var util = require('util');
 
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
+    app.use('/tmp', loopback.static(path.resolve(__dirname, '../../tmp')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
 
     app.use(bodyParser.json());
