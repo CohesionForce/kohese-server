@@ -1,6 +1,7 @@
 module.exports = function(KoheseUser) {
 
   var SALT_WORK_FACTOR = 10;
+  var usersItem;
 
   var bcrypt;
   try {
@@ -14,6 +15,79 @@ module.exports = function(KoheseUser) {
     // Fall back to pure JS impl
     bcrypt = require('bcryptjs');
   }
+  
+  KoheseUser.addParentUsersItem = function(ctx, modelInstance, next){
+      if(!ctx.req.body.parentId) {
+    	  console.log('::: Adding users item as parent');
+    	  ctx.req.body.parentId = usersItem.id;
+      }
+      next();
+  };
+  
+  KoheseUser.beforeRemote('create', KoheseUser.addParentUsersItem);
+  KoheseUser.beforeRemote('upsert', KoheseUser.addParentUsersItem);
+  
+  KoheseUser.checkAndCreateUsersItem = function(server) {
+	    var Item = server.models.Item;
+	    
+	    Item.find({where: {
+	        name: 'Users',
+	        parentId: ''
+	      }
+	    }, function(err, principal) {
+	      if(principal.length === 0){
+	        console.log("::: Creating Users Item");
+	        var now = Date.now();
+	        Item.create({
+	           name: 'Users',
+	           description: 'User accounts',
+	           createdBy: 'admin',
+	           createdOn: now,
+	           modifiedBy: 'admin',
+	           modifiedOn: now
+	          }, function(err, item){
+	            console.log(">>> " + err);
+	            console.log("::: Created Users Item");
+	            console.log(JSON.stringify(item,null,"  "));
+	            usersItem = item;
+	            checkAndCreateAdminAccount();
+	          });
+	        } else {
+	          console.log("::: Users Item already exists");
+	          console.log(JSON.stringify(principal[0],null,"  "));
+	          usersItem = principal[0];
+	          checkAndCreateAdminAccount();
+	        };
+	        
+	    });    
+	  };
+	  
+	  function checkAndCreateAdminAccount() {
+	    
+	    KoheseUser.find({where: {
+	        name: 'admin'
+	      }
+	    }, function(err, principal) {
+	      if(principal.length === 0){
+	        console.log("::: Creating admin account");
+	        var now = Date.now();
+	        KoheseUser.create({
+	           name: 'admin',
+	           description: 'Administrator',
+	           parentId: usersItem.id,
+	           password: 'kohese',
+	           createdBy: 'admin',
+	           createdOn: now,
+	           modifiedBy: 'admin',
+	           modifiedOn: now
+	          }, function(err, principal){
+	            console.log("::: Created admin account");
+	          });
+	        } else {
+	          console.log("::: Admin account already exists");
+	        };
+	    });    
+	  };
 
   KoheseUser.setter.password = function(password) {
     if (password.indexOf('$2a$') === 0 && password.length === 60) {
