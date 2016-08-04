@@ -27,8 +27,9 @@ var event;
 
 var parentStack = [];
 var koheseItem = {name: null, id: null, description: null, 
-				parentId: null, level: null, tempId: null};
+				parentId: null, level: null, tempId: null, itemIds: []};
 var tempIdCounter = 1;
+var topLevel = 0;
 
 while(event = walker.next()) {
 	if(event.entering && event.node.type === 'heading') {
@@ -37,8 +38,14 @@ while(event = walker.next()) {
 			koheseItem.description = render.getBuffer();
 			koheseItems.push(koheseItem);
 		}
-
-		koheseItem = {name: null, id: null, description: '', parentId: null, level: null, tempId: null};
+		
+		if(event.node.level > topLevel) {
+			topLevel = event.node.level;
+		}
+		
+		koheseItem = {name: null, id: null, description: '', 
+					parentId: null, level: null, tempId: null, itemIds: []};
+		
 		render.clearBuffer();
 		koheseItem.level = event.node.level;
 		koheseItem.tempId = tempIdCounter;
@@ -83,7 +90,6 @@ while(event = walker.next()) {
 	}
 }
 
-var topLevel = koheseItems[koheseItems.length - 1].level;
 var filteredItems = [];
 
 for(var i=0; i <= topLevel; i++) {
@@ -96,6 +102,11 @@ for(var i=0; i <= topLevel; i++) {
 function postItems(level) {
 	if(level > topLevel) {
 		console.log('Done posting items!');
+		for(var i=0; i <= topLevel; i++) {
+			addItemstoParents(i);
+		}
+		console.log('itemIds list added... Now PUTing...');
+		putItems();
 		return;
 	}
 	
@@ -152,7 +163,7 @@ function resolveParentIds(level) {
 		//No further levels to resolve parent IDs
 		return;
 	}
-	if(filteredItems[level] === undefined || filteredItems[level] === []) {
+	if(filteredItems[level] === undefined || filteredItems[level].length === 0) {
 		//No parent IDs that need to be resolved
 		return;
 	}
@@ -173,4 +184,70 @@ function resolveParentIds(level) {
 		}
 	}
 };
+
+function addItemstoParents(level) {
+	if(level + 1 > topLevel) {
+		return;
+	}
+	
+	if(filteredItems[level] === undefined || filteredItems[level].length === 0) {
+		return;
+	}
+	
+	var parentIds = [];
+	for(var i = 0; i < filteredItems[level].length; i++) {
+		parentIds[i] = filteredItems[level][i].id;
+	}
+		
+	for(var i = level + 1; i <= topLevel; i++) {
+		for(var j = 0; j < filteredItems[i].length; j++) {
+			var foundId = parentIds.indexOf(filteredItems[i][j].parentId);
+			if(foundId !== -1) {
+				filteredItems[level][foundId].itemIds.push(filteredItems[i][j].id);
+			}
+		}
+	}
+};
+
+function putItems() {
+	// Cleanse and transform filteredItems into a 1-D array
+	var flatItems = [];
+	for(var i=0; i <= topLevel; i++) {
+		for(var j=0; j < filteredItems[i].length; j++) {
+			if(filteredItems[i][j] !== null || filteredItems[i][j] !== undefined) {
+				if(filteredItems[i][j].itemIds.length !== 0) {
+					flatItems.push({name: filteredItems[i][j].name,
+						description: filteredItems[i][j].description,
+						id: filteredItems[i][j].id,
+						parentId: filteredItems[i][j].parentId,
+						itemIds: filteredItems[i][j].itemIds});
+				}
+			}
+		}
+	}
+	
+	// For some reason you can't modify elements via array, only make them
+	for(var i=0; i < flatItems.length; i++) {
+
+		var options = {
+				host: 'localhost',
+				port: 3000,
+				path: '/api/Items/',
+				method: 'PUT',
+				headers: {
+					'Authorization': accessToken,
+					'Content-Type': 'application/json;charset=UTF-8',
+					'Content-Length': Buffer.byteLength(JSON.stringify(flatItems[i]))
+				}
+		};
+
+		var putRequest = http.request(options, function(response) {
+			console.log('PUT request status ' + response.statusCode);
+		});
+
+		putRequest.write(JSON.stringify(flatItems[i]));
+		putRequest.end();
+	}
+};
+
 postItems(1);
