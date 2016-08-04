@@ -48,7 +48,10 @@ var Render = {
 		
 		item: function(node, entering) {
 			if(entering) {
-				this.buffer += '+';
+				for(var i = 0; i < this.listDepth; i++) {
+					this.buffer += '\t';
+				}
+				this.buffer += '+  ';
 			}
 		},
 		
@@ -65,12 +68,21 @@ var Render = {
 			}
 		},
 		
+		listDepth: 0,
 		list: function(node, entering) {
-			//Do nothing?
+			if(entering) {
+				this.listDepth++;
+			} else {
+				this.listDepth--;
+			}
 		},
 		
 		paragraph: function(node, entering) {
-			this.buffer += ' '; // space or \n\n may be valid
+			if(entering) {
+				//nothing on enter?
+			} else {
+				this.buffer += '\n\n'; // space or \n\n may be valid
+			}
 		},
 
 		softbreak: function(node, entering) {

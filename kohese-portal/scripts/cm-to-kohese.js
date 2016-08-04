@@ -110,12 +110,13 @@ function postItems(level) {
 		return;
 	}
 	
-	if(filteredItems[level] === [] || filteredItems[level] === undefined) {
+	if(filteredItems[level] === undefined || filteredItems[level].length === 0) {
 		console.log('No items to post at level ' + level);
 		postItems(level + 1);
+		return;
 	}
 	
-	console.log('Posting ' + filteredItems[level].length + ' items');
+	console.log('Posting ' + filteredItems[level].length + ' items at level ' + level);
 	
 	var cleanItems = [];
 	for(var i=0; i < filteredItems[level].length; i++) {
