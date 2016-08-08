@@ -168,12 +168,32 @@ describe("ItemProxy Test", function()
             name : "AC",
             parentId : "b"
         });
-        dump("Created AB and AC");
+        var ad = new ItemProxy("Test", {
+            id : "ad",
+            name : "AD",
+            parentId : "b"
+        });
+        var ae = new ItemProxy("Test", {
+            id : "ae",
+            name : "AE",
+            parentId : "b"
+        });
+        dump("Created AB - AE");
+
+        var newAEItem = JSON.parse(JSON.stringify(ae.item));
+        newAEItem.name = "A - New Name - AE";
+        ae.updateItem("Item", newAEItem);
+        dump("AE Name Updated")
 
         var newABItem = JSON.parse(JSON.stringify(ab.item));
-        newABItem.name = "New Name";
+        newABItem.name = "New Name - AB";
         ab.updateItem("Item", newABItem);
         dump("AB Name Updated")
+
+        var newAAItem = JSON.parse(JSON.stringify(aa.item));
+        newAAItem.name = "B - New Name - AA";
+        aa.updateItem("Item", newAAItem);
+        dump("AA Name Updated")
     });
     
     it("Get Ancestors",function(){
