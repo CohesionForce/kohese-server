@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link TestModel.impl.SimpleImpl#getName <em>Name</em>}</li>
  *   <li>{@link TestModel.impl.SimpleImpl#getInfo <em>Info</em>}</li>
+ *   <li>{@link TestModel.impl.SimpleImpl#getNewString <em>New String</em>}</li>
  * </ul>
  *
  * @generated
@@ -66,6 +67,26 @@ public class SimpleImpl extends MinimalEObjectImpl.Container implements Simple {
 	 * @ordered
 	 */
 	protected EList<Info> info;
+
+	/**
+	 * The default value of the '{@link #getNewString() <em>New String</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNewString()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NEW_STRING_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getNewString() <em>New String</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNewString()
+	 * @generated
+	 * @ordered
+	 */
+	protected String newString = NEW_STRING_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -124,6 +145,27 @@ public class SimpleImpl extends MinimalEObjectImpl.Container implements Simple {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String getNewString() {
+		return newString;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setNewString(String newNewString) {
+		String oldNewString = newString;
+		newString = newNewString;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TestModelPackage.SIMPLE__NEW_STRING, oldNewString, newString));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -145,6 +187,8 @@ public class SimpleImpl extends MinimalEObjectImpl.Container implements Simple {
 				return getName();
 			case TestModelPackage.SIMPLE__INFO:
 				return getInfo();
+			case TestModelPackage.SIMPLE__NEW_STRING:
+				return getNewString();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -165,6 +209,9 @@ public class SimpleImpl extends MinimalEObjectImpl.Container implements Simple {
 				getInfo().clear();
 				getInfo().addAll((Collection<? extends Info>)newValue);
 				return;
+			case TestModelPackage.SIMPLE__NEW_STRING:
+				setNewString((String)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -183,6 +230,9 @@ public class SimpleImpl extends MinimalEObjectImpl.Container implements Simple {
 			case TestModelPackage.SIMPLE__INFO:
 				getInfo().clear();
 				return;
+			case TestModelPackage.SIMPLE__NEW_STRING:
+				setNewString(NEW_STRING_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -199,6 +249,8 @@ public class SimpleImpl extends MinimalEObjectImpl.Container implements Simple {
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case TestModelPackage.SIMPLE__INFO:
 				return info != null && !info.isEmpty();
+			case TestModelPackage.SIMPLE__NEW_STRING:
+				return NEW_STRING_EDEFAULT == null ? newString != null : !NEW_STRING_EDEFAULT.equals(newString);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -215,6 +267,8 @@ public class SimpleImpl extends MinimalEObjectImpl.Container implements Simple {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
+		result.append(", newString: ");
+		result.append(newString);
 		result.append(')');
 		return result.toString();
 	}

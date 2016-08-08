@@ -64,6 +64,7 @@ public class SimpleItemProvider
 			super.getPropertyDescriptors(object);
 
 			addNamePropertyDescriptor(object);
+			addNewStringPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -84,6 +85,28 @@ public class SimpleItemProvider
 				 TestModelPackage.Literals.SIMPLE__NAME,
 				 true,
 				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the New String feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addNewStringPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Simple_newString_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Simple_newString_feature", "_UI_Simple_type"),
+				 TestModelPackage.Literals.SIMPLE__NEW_STRING,
+				 true,
+				 true,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
 				 null,
@@ -159,6 +182,7 @@ public class SimpleItemProvider
 
 		switch (notification.getFeatureID(Simple.class)) {
 			case TestModelPackage.SIMPLE__NAME:
+			case TestModelPackage.SIMPLE__NEW_STRING:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case TestModelPackage.SIMPLE__INFO:

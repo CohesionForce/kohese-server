@@ -5,7 +5,6 @@ package TestModel.tests;
 import TestModel.Item;
 import TestModel.TestModelFactory;
 import TestModel.TestModelPackage;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -20,7 +19,6 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 import org.eclipse.emf.ecore.util.Diagnostician;
-
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
 /**

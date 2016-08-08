@@ -13,6 +13,7 @@ import TestModel.TestModelPackage;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
@@ -65,6 +66,13 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 	 * @generated
 	 */
 	private EClass subordinateInfoEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EDataType stringEDataType = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -231,6 +239,15 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getSimple_NewString() {
+		return (EAttribute)simpleEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getInfo() {
 		return infoEClass;
 	}
@@ -294,6 +311,15 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EDataType getString() {
+		return stringEDataType;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public TestModelFactory getTestModelFactory() {
 		return (TestModelFactory)getEFactoryInstance();
 	}
@@ -331,6 +357,7 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 		simpleEClass = createEClass(SIMPLE);
 		createEAttribute(simpleEClass, SIMPLE__NAME);
 		createEReference(simpleEClass, SIMPLE__INFO);
+		createEAttribute(simpleEClass, SIMPLE__NEW_STRING);
 
 		infoEClass = createEClass(INFO);
 		createEAttribute(infoEClass, INFO__VALUE);
@@ -340,6 +367,9 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 		subordinateInfoEClass = createEClass(SUBORDINATE_INFO);
 		createEAttribute(subordinateInfoEClass, SUBORDINATE_INFO__TEST);
 		createEAttribute(subordinateInfoEClass, SUBORDINATE_INFO__NAME);
+
+		// Create data types
+		stringEDataType = createEDataType(STRING);
 	}
 
 	/**
@@ -388,6 +418,7 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 		initEClass(simpleEClass, Simple.class, "Simple", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSimple_Name(), ecorePackage.getEString(), "name", null, 0, 1, Simple.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getSimple_Info(), this.getInfo(), null, "info", null, 0, -1, Simple.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSimple_NewString(), this.getString(), "newString", null, 0, 1, Simple.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, !IS_ORDERED);
 
 		initEClass(infoEClass, Info.class, "Info", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getInfo_Value(), ecorePackage.getEInt(), "value", null, 0, 1, Info.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -397,6 +428,9 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 		initEClass(subordinateInfoEClass, SubordinateInfo.class, "SubordinateInfo", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSubordinateInfo_Test(), ecorePackage.getEBoolean(), "test", null, 0, 1, SubordinateInfo.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSubordinateInfo_Name(), ecorePackage.getEString(), "name", null, 0, 1, SubordinateInfo.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		// Initialize data types
+		initEDataType(stringEDataType, String.class, "String", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);
@@ -420,6 +454,14 @@ public class TestModelPackageImpl extends EPackageImpl implements TestModelPacka
 		   new String[] {
 			 "name", "childByRef",
 			 "namespace", ""
+		   });	
+		addAnnotation
+		  (getSimple_NewString(), 
+		   source, 
+		   new String[] {
+			 "kind", "element",
+			 "namespace", "",
+			 "processing", "strict"
 		   });
 	}
 

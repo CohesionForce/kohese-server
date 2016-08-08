@@ -4,6 +4,7 @@ package TestModel;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
@@ -270,13 +271,22 @@ public interface TestModelPackage extends EPackage {
 	int SIMPLE__INFO = 1;
 
 	/**
+	 * The feature id for the '<em><b>New String</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SIMPLE__NEW_STRING = 2;
+
+	/**
 	 * The number of structural features of the '<em>Simple</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SIMPLE_FEATURE_COUNT = 2;
+	int SIMPLE_FEATURE_COUNT = 3;
 
 	/**
 	 * The number of operations of the '<em>Simple</em>' class.
@@ -387,6 +397,17 @@ public interface TestModelPackage extends EPackage {
 	 * @ordered
 	 */
 	int SUBORDINATE_INFO_OPERATION_COUNT = 0;
+
+
+	/**
+	 * The meta object id for the '<em>String</em>' data type.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see java.lang.String
+	 * @see TestModel.impl.TestModelPackageImpl#getString()
+	 * @generated
+	 */
+	int STRING = 6;
 
 
 	/**
@@ -507,6 +528,17 @@ public interface TestModelPackage extends EPackage {
 	EReference getSimple_Info();
 
 	/**
+	 * Returns the meta object for the attribute '{@link TestModel.Simple#getNewString <em>New String</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>New String</em>'.
+	 * @see TestModel.Simple#getNewString()
+	 * @see #getSimple()
+	 * @generated
+	 */
+	EAttribute getSimple_NewString();
+
+	/**
 	 * Returns the meta object for class '{@link TestModel.Info <em>Info</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -580,6 +612,17 @@ public interface TestModelPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getSubordinateInfo_Name();
+
+	/**
+	 * Returns the meta object for data type '{@link java.lang.String <em>String</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for data type '<em>String</em>'.
+	 * @see java.lang.String
+	 * @model instanceClass="java.lang.String"
+	 * @generated
+	 */
+	EDataType getString();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -701,6 +744,14 @@ public interface TestModelPackage extends EPackage {
 		EReference SIMPLE__INFO = eINSTANCE.getSimple_Info();
 
 		/**
+		 * The meta object literal for the '<em><b>New String</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute SIMPLE__NEW_STRING = eINSTANCE.getSimple_NewString();
+
+		/**
 		 * The meta object literal for the '{@link TestModel.impl.InfoImpl <em>Info</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -759,6 +810,16 @@ public interface TestModelPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute SUBORDINATE_INFO__NAME = eINSTANCE.getSubordinateInfo_Name();
+
+		/**
+		 * The meta object literal for the '<em>String</em>' data type.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see java.lang.String
+		 * @see TestModel.impl.TestModelPackageImpl#getString()
+		 * @generated
+		 */
+		EDataType STRING = eINSTANCE.getString();
 
 	}
 

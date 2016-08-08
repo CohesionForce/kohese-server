@@ -17,6 +17,7 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link TestModel.Simple#getName <em>Name</em>}</li>
  *   <li>{@link TestModel.Simple#getInfo <em>Info</em>}</li>
+ *   <li>{@link TestModel.Simple#getNewString <em>New String</em>}</li>
  * </ul>
  *
  * @see TestModel.TestModelPackage#getSimple()
@@ -65,5 +66,32 @@ public interface Simple extends EObject {
 	 * @generated
 	 */
 	EList<Info> getInfo();
+
+	/**
+	 * Returns the value of the '<em><b>New String</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>New String</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>New String</em>' attribute.
+	 * @see #setNewString(String)
+	 * @see TestModel.TestModelPackage#getSimple_NewString()
+	 * @model dataType="TestModel.String" ordered="false"
+	 *        extendedMetaData="kind='element' namespace='' processing='strict'"
+	 * @generated
+	 */
+	String getNewString();
+
+	/**
+	 * Sets the value of the '{@link TestModel.Simple#getNewString <em>New String</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>New String</em>' attribute.
+	 * @see #getNewString()
+	 * @generated
+	 */
+	void setNewString(String value);
 
 } // Simple
