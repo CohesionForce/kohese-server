@@ -85,6 +85,11 @@ describe("ItemProxy Test", function()
             name : "BBB",
             parentId : "bb"
         });
+        
+        var autobb = ItemProxy.getProxyFor('bb');
+        
+        expect(autobb.item.parentId).toBe('LOST+FOUND');
+        
         dump("Added b's");
     });
 
@@ -97,13 +102,22 @@ describe("ItemProxy Test", function()
             parentId : "b"
         });
         dump("Added bb");
+        
+        expect(b.children[0].item.id).toBe('bb');
+        expect(b.item.id).toBe(bb.parentProxy.item.id);
+        
     });
 
     it("Delete a", function()
     {
         console.log("::: Deleting a");
+        
+        expect(root.children[0].item.id).toBe('a');
+        
         a.deleteItem();
         dump("Deleted a");
+        
+        expect(root.children[0].item.id).toBe('b');
     });
 
     it("Changing parent of aa", function()
@@ -115,18 +129,31 @@ describe("ItemProxy Test", function()
         newAAItem.description = "b with changes";
         delete newAAItem.uniq;
         console.log(newAAItem);
+        
+        var temp = aa.item.id;
+        
         aa.updateItem("Test", newAAItem);
         console.log(aa.item);
         dump("Changed aa parent");
+        
+        expect(aa.item.parentId).toBe('b');
+        expect(aa.item.description).toBe('b with changes');
+        expect(aa.item.id).toBe(temp);
     });
 
     it("Deleting description for aa", function()
     {
         console.log("::: Deleting description for aa");
+        
+        var temp = aa.item.id;
+        
         delete newAAItem.description;
         aa.updateItem("Test", newAAItem);
         console.log(aa.item);
         dump("Deleted aa description");
+        
+        expect(aa.item.description).toBe(undefined);
+        expect(aa.item.id).toBe(temp);
     });
 
     it("Changing parent of bb to ROOT", function()
@@ -136,6 +163,10 @@ describe("ItemProxy Test", function()
         newBBItem.parentId = "";
         bb.updateItem("Test", newBBItem);
         dump("Changed bb parent to ROOT");
+        
+        expect(bb.item.parentId).toBe('');
+        expect(bb.parentProxy).toBe(root);
+        expect(root.getChildByName('BB')).toBe(bb);
     });
 
     it("Changing parent of bb to c", function()
@@ -145,6 +176,11 @@ describe("ItemProxy Test", function()
         newBBItem.parentId = "c";
         bb.updateItem("Test", newBBItem);
         dump("Changed bb parent to c");
+        
+        var c = ItemProxy.getProxyFor('c');
+        expect(bb.item.parentId).toBe('c');
+        expect(bb.parentProxy).toBe(c);
+        expect(c.getChildByName('BB')).toBe(bb);
     });
 
     it("Morph b into a NewTest", function()
@@ -153,6 +189,8 @@ describe("ItemProxy Test", function()
         var newBItem = JSON.parse(JSON.stringify(b.item));
         b.updateItem("NewTest", newBItem);
         dump("Change b to a NewTest kind");
+        
+        expect(b.kind).toBe('NewTest');
     });
 
     it("Renaming an item", function()
@@ -179,29 +217,53 @@ describe("ItemProxy Test", function()
             parentId : "b"
         });
         dump("Created AB - AE");
+        
+        var expectArray = JSON.stringify(['aa','ab','ac','ad','ae']);
+        function getChildIds(item) {
+        	var temp = [];
+        	for (var i = 0; i< item.children.length; i++) {
+        		temp.push(item.children[i].item.id);
+        	}
+        	return JSON.stringify(temp);
+        };
+        
+        expect(getChildIds(b)).toBe(expectArray);
 
         var newAEItem = JSON.parse(JSON.stringify(ae.item));
         newAEItem.name = "A - New Name - AE";
         ae.updateItem("Item", newAEItem);
         dump("AE Name Updated")
-
+        
+        expectArray = JSON.stringify(['ae','aa','ab','ac','ad']);
+        expect(getChildIds(b)).toBe(expectArray);
+        
         var newABItem = JSON.parse(JSON.stringify(ab.item));
         newABItem.name = "New Name - AB";
         ab.updateItem("Item", newABItem);
         dump("AB Name Updated")
+        
+        expectArray = JSON.stringify(['ae','aa','ac','ad','ab']);
+        expect(getChildIds(b)).toBe(expectArray);
 
         var newAAItem = JSON.parse(JSON.stringify(aa.item));
         newAAItem.name = "B - New Name - AA";
         aa.updateItem("Item", newAAItem);
         dump("AA Name Updated")
+        
+        expectArray = JSON.stringify(['ae','ac','ad','aa','ab']);
+        expect(getChildIds(b)).toBe(expectArray);
     });
     
     it("Get Ancestors",function(){
       console.log("::: Getting AB ancestors");
       var abAncestors = ab.getAncestorProxies();
+      var expected = ['b', 'ROOT'];
       for (var ancestorIdx in abAncestors){
         var ancestor = abAncestors[ancestorIdx]
         console.log(ancestor.item.id + " - " + ancestor.item.name);  
+        
+        expect(ancestor.item.id).toBe(expected[ancestorIdx]);
       }
+      
     });
 });

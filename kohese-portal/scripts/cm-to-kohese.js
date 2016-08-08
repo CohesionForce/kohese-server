@@ -32,6 +32,18 @@ var tempIdCounter = 1;
 var topLevel = 0;
 
 while(event = walker.next()) {
+	if(event.entering && event.node.type === 'document') {
+		event = walker.next();
+		//Check if document doesn't begin with heading. If not, make an item.
+		if(!(event.entering && event.node.type === 'heading')) {
+			koheseItem.tempId = 0;
+			koheseItem.name = 'Preamble';
+			koheseItem.level = 1;
+			koheseItem.parentId = rootId;
+			koheseItem.description = '';
+		}
+	}
+	
 	if(event.entering && event.node.type === 'heading') {
 		// Entering a new header, check if an item is ready to be pushed
 		if(koheseItem.tempId !== null) {
@@ -64,12 +76,18 @@ while(event = walker.next()) {
 			parentStack.push({level: event.node.level, id: koheseItem.tempId});
 		}
 
-		//Enter text as name, if it exists
 		event = walker.next();
-		if(event.entering && event.node.type === 'text') {
-			koheseItem.name = event.node.literal;
-		} else {
-			koheseItem.name = 'BLANK';
+		
+		//Throw away everything before leaving the heading that isn't text.
+		while(event.node.type !== 'heading') {
+			if(event.entering && event.node.type === 'text') {
+				koheseItem.name = event.node.literal;
+			}
+			event = walker.next();
+		}
+		
+		if(koheseItem.name === null) {
+			koheseItem.name = 'No Heading Title Found';
 		}
 	}
 
