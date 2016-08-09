@@ -23,9 +23,7 @@ class ItemProxy {
 
     var proxy = tree.proxyMap[itemId];
     if (!proxy) {
-      // console.log("::: IP: Creating " + forItem.id + " - " + forItem.name + "
-      // -
-      // " + kind);
+//      console.log("::: IP: Creating " + forItem.id + " - " + forItem.name + " - " + kind);
       proxy = this;
       proxy.children = [];
       proxy.descendantCount = 0;
@@ -50,6 +48,10 @@ class ItemProxy {
     }
 
     parent.addChild(proxy);
+    
+    if (proxy.children){
+      proxy.sortChildren();
+    }
 
     return proxy;
   }
@@ -178,6 +180,10 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   visitDescendants(performAction) {
     var proxyStack = [];
+    
+//    console.log("~~~ Visiting");
+//    this.sortChildren();
+//    
     for (var childIdx = this.children.length - 1; childIdx > -1; childIdx--) {
       proxyStack.push(this.children[childIdx]);
     }
@@ -241,12 +247,11 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   addChild(childProxy) {
     if (childProxy.parentProxy == this) {
-      // console.log("::: IP: Child " + childProxy.item.name + " already
-      // associated with " + this.item.name);
+//      console.log("::: IP: Child " + childProxy.item.name + " already associated with " + this.item.name);
       return;
     }
-    // console.log("::: IP: Adding child " + childProxy.item.name + " to " +
-    // this.item.name);
+//    console.log("::: IP: Adding child " + childProxy.item.name + " to " + this.item.name);
+     
     // Determine if this node is already attached to another parent
     if (childProxy.parentProxy) {
       childProxy.parentProxy.removeChild(childProxy);
@@ -254,16 +259,21 @@ class ItemProxy {
 
     // Determine where to insert the new child
     var insertAt = this.children.length;  
-    for (var childIdx in this.children){
-      if (childProxy.item.name < this.children[childIdx].item.name){
-        insertAt = childIdx;
-        break;
-      }
+    if (!this.item.itemIds){
+        for (var childIdx in this.children){
+            if (childProxy.item.name < this.children[childIdx].item.name){
+              insertAt = childIdx;
+              break;
+            }
+          }
+
+          this.children.splice(insertAt, 0, childProxy);
+          childProxy.parentProxy = this;    	
+    } else {
+        this.children.push(childProxy);
+        childProxy.parentProxy = this;
+        this.sortChildren();
     }
-
-    this.children.splice(insertAt, 0, childProxy);
-    childProxy.parentProxy = this;
-
     // update descendant count
     var deltaCount = 1 + childProxy.descendantCount;
     this.descendantCount += deltaCount;
@@ -317,9 +327,39 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   sortChildren() {
-    this.children.sort(function(a, b){
-      return a.item.name > b.item.name;
-    });
+    if (!this.item.itemIds || this.item.itemIds.length === 0){
+      this.children.sort(function(a, b){
+        if (a.item.name > b.item.name) return 1;
+        if (a.item.name < b.item.name) return -1;
+        return 0;
+      });    	
+    } else {
+    	var itemIds = this.item.itemIds;
+
+    	this.children.sort(function(a, b){
+    		var aIndex = itemIds.indexOf(a.item.id);
+    		var bIndex = itemIds.indexOf(b.item.id);
+    		if (aIndex < 0) {
+          aIndex = itemIds.length; 
+    		}
+        if (bIndex < 0) {
+          bIndex = itemIds.length;
+          // Detect when both items are not in the list
+          if (aIndex === bIndex) {
+            if (a.item.name > b.item.name){
+              aIndex++; 
+            } else if (a.item.name < b.item.name) {
+              bIndex++;
+            }
+          }
+        }
+        
+        if (aIndex > bIndex) return 1;
+        if (aIndex < bIndex) return -1;
+        return 0;
+      });
+
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -336,12 +376,18 @@ class ItemProxy {
       this.kind = newKind;
     }
 
+    // Determine if itemIds array changed
+    var itemIdsChanged = (withItem.itemIds !== this.item.itemIds);
+
     // Copy the withItem into the current proxy
     copyAttributes(withItem, this.item);
 
     // Ensure sort order is maintained
     if(this.parentProxy){
       this.parentProxy.sortChildren();
+    }
+    if(itemIdsChanged){
+      this.sortChildren();
     }
 
     // Determine if the parent changed
@@ -456,7 +502,3 @@ function copyAttributes(fromItem, toItem) {
 //
 //////////////////////////////////////////////////////////////////////////
 module.exports = ItemProxy;
-//module.exports.getRootProxy = ItemProxy.getRootProxy;
-//module.exports.getProxyFor = ItemProxy.getProxyFor;
-//module.exports.getAllItemProxies = ItemProxy.getAllItemProxies;
-//module.exports.dumpAllProxies = ItemProxy.dumpAllProxies;
