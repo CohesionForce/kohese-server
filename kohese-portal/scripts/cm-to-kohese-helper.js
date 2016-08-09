@@ -33,6 +33,10 @@ var Render = {
 //Purposefully omitted as headings are treated differently	
 //		},
 		
+		html_block: function(node, entering) {
+			this.buffer += node.literal;
+		},
+		
 		html_inline: function(node, entering) {
 			this.buffer += node.literal;
 		},
