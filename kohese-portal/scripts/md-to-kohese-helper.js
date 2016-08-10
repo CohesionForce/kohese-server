@@ -1,4 +1,4 @@
-/** The render methods used by cm-to-kohese.js to parse AST back to commonmark.
+/** The render methods used by md-to-kohese.js to parse AST back to commonmark.
  *  Apparently AST to commonmark is implemented in the reference C
  *  implementation, cmark, of commonmark. May then want to use
  *  commonmark.c to determine proper conversion.
