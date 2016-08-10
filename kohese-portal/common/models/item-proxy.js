@@ -163,16 +163,16 @@ class ItemProxy {
       proxyStack.push(this.children[childIdx]);
     }
 
-    var decendantList = [];
-    var decendant = proxyStack.pop()
-    while (decendant) {
-      decendantList.push(decendant);
-      for (var childIdx = decendant.children.length - 1; childIdx > -1; childIdx--) {
-        proxyStack.push(decendant.children[childIdx]);
+    var descendantList = [];
+    var descendant = proxyStack.pop()
+    while (descendant) {
+      descendantList.push(descendant);
+      for (var childIdx = descendant.children.length - 1; childIdx > -1; childIdx--) {
+        proxyStack.push(descendant.children[childIdx]);
       }
-      decendant = proxyStack.pop();
+      descendant = proxyStack.pop();
     }
-    return decendantList;
+    return descendantList;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -181,20 +181,17 @@ class ItemProxy {
   visitDescendants(performAction) {
     var proxyStack = [];
     
-//    console.log("~~~ Visiting");
-//    this.sortChildren();
-//    
     for (var childIdx = this.children.length - 1; childIdx > -1; childIdx--) {
       proxyStack.push(this.children[childIdx]);
     }
 
-    var decendant = proxyStack.pop()
-    while (decendant) {
-      performAction(decendant);
-      for (var childIdx = decendant.children.length - 1; childIdx > -1; childIdx--) {
-        proxyStack.push(decendant.children[childIdx]);
+    var descendant = proxyStack.pop()
+    while (descendant) {
+      performAction(descendant);
+      for (var childIdx = descendant.children.length - 1; childIdx > -1; childIdx--) {
+        proxyStack.push(descendant.children[childIdx]);
       }
-      decendant = proxyStack.pop();
+      descendant = proxyStack.pop();
     }
   }
 
@@ -334,6 +331,7 @@ class ItemProxy {
         return 0;
       });    	
     } else {
+    	// Sort by itemIds list if it is present
     	var itemIds = this.item.itemIds;
 
     	this.children.sort(function(a, b){
