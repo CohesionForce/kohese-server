@@ -2,14 +2,14 @@
  *  sends them to a local kohese server via rest interface.
  *  
  *  User must set the file and rootItem parameters below or via command line:
- *  node cm-to-kohese.js rootItem.parentId filepath rootItem.name
+ *  node md-to-kohese.js rootItem.parentId filepath rootItem.name
  */
 var fs = require('fs');
 var util = require('util');
 var commonmark = require('commonmark');
 var http = require('http');
 
-var render = require('./cm-to-kohese-helper.js');
+var render = require('./md-to-kohese-helper.js');
 
 //////////User parameters - See also http options
 
