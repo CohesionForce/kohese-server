@@ -36,6 +36,9 @@ function getStatus (repo){
 //parents. Since this commit is not a merge, it only has one parent. This is
 //similar to doing `git show`.
 
+function showDelta () {
+}
+
 
 function getCommitDetails (repo, commitOID){
   repo.getCommit(commitOID).then(function(commit) {
@@ -49,15 +52,19 @@ function getCommitDetails (repo, commitOID){
       diffList.forEach(function(diff) {
         diff.patches().then(function(patches) {
           patches.forEach(function(patch) {
+            console.log("::: Analyzing: " + patch.newFile().path());
+            console.log(patch);
             patch.hunks().then(function(hunks) {
+              console.log("::: Got Hunks for: " + patch.newFile().path());
+              console.log(patch);
               hunks.forEach(function(hunk) {
                 hunk.lines().then(function(lines) {
-                  console.log("diff", patch.oldFile().path(),
-                    patch.newFile().path());
-                  console.log(hunk.header().trim());
+//                  console.log("diff", patch.oldFile().path(),
+//                              patch.newFile().path());
+//                  console.log(hunk.header().trim());
                   lines.forEach(function(line) {
-                    console.log(String.fromCharCode(line.origin()) +
-                      line.content().trim());
+//                   console.log(String.fromCharCode(line.origin()) +
+//                      line.content().trim());
                   });
                 });
               });
@@ -69,15 +76,104 @@ function getCommitDetails (repo, commitOID){
   });
 }
 
+var walker;
+var historyCommits = [];
+var commit;
+var fileToAnalyze;
+var repo;
+
+
+
+function walkHistoryForFile(repo, filepath){
+
+  function compileHistory(resultingArrayOfCommits) {
+    console.log("::: rAOC: ");
+    console.log(resultingArrayOfCommits);
+
+    var lastSha;
+    if (historyCommits.length > 0) {
+      lastSha = historyCommits[historyCommits.length - 1].commit.sha();
+      if (
+        resultingArrayOfCommits.length == 1 &&
+        resultingArrayOfCommits[0].commit.sha() == lastSha
+      ) {
+        console.log("ce: " + resultingArrayOfCommits[0].commit.sha());
+        return;
+      }
+    }
+
+    resultingArrayOfCommits.forEach(function(entry) {
+      console.log("c: " + entry.commit.sha());
+      historyCommits.push(entry);
+    });
+
+    lastSha = historyCommits[historyCommits.length - 1].commit.sha();
+
+    walker = repo.createRevWalk();
+    walker.push(lastSha);
+    walker.sorting(nodegit.Revwalk.SORT.TIME);
+
+    return walker.fileHistoryWalk(fileToAnalyze, 500)
+      .then(compileHistory);
+  }
+
+
+  
+  console.log("::: Walking History For: " + filepath);
+  console.log(repo);
+  repo.getMasterCommit()
+  .then(function(firstCommitOnMaster){
+    // History returns an event.
+    
+    console.log("fCoM: ");
+    console.log(firstCommitOnMaster);
+    walker = repo.createRevWalk();
+    walker.push(firstCommitOnMaster.sha());
+    walker.sorting(nodegit.Revwalk.SORT.Time);
+    console.log("sha: " + firstCommitOnMaster.sha());
+    console.log(walker);
+    return walker.fileHistoryWalk(filepath, 500);
+  })
+  .then(compileHistory)
+  .then(function() {
+    var historyResponse = [];
+    historyCommits.forEach(function(entry) {
+      console.log("::: entry");
+      console.log(entry);
+      commit = entry.commit;
+      console.log("commit " + commit.sha());
+      console.log("Author:", commit.author().name() +
+        " <" + commit.author().email() + ">");
+      console.log("Date:", commit.date());
+      console.log("\n    " + commit.message());
+      historyResponse.push({
+        commit: commit.sha(),
+        author: {name: commit.author().name(), email: commit.author().name()},
+        date: commit.date()
+      });
+    });
+    console.log("::: Send this back");
+    console.log(historyResponse);
+  })
+  .done();
+}
+
 nodegit.Repository.open("kdb/kohese-kdb")
+//nodegit.Repository.open(".")
   .then(function(repo) {
     console.log("::: Repo is open");
     
-    getStatus(repo);
+//    getStatus(repo);
     commitWithFileRenames = "facbe3cd973f5d0f39dbe65c5102ba443674db34";
     commitWithSmallerChanges = "43d651aa104fe58c57c53a972e3575c12d278939";
+    commitWithSomeChanges = "b76990f9a91326a2656ed666681b7d5e90e36b6e";
     
-    //getCommitDetails(repo, commitWithFileRenames);
+    
+//    getCommitDetails(repo, commitWithSomeChanges);
+
+    fileToAnalyze= "export/Repository/4a733240-6d21-11e5-ae5b-1ba25b1f580f/Item/c5854ab0-37a4-11e6-a58d-a33a25a82097.json";
+//    fileToAnalyze= "./scripts/testNodeGit.js";
+    walkHistoryForFile(repo, fileToAnalyze);
 });
 
 console.log("::: End test nodegit");
