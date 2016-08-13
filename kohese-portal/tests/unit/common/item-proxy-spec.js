@@ -284,14 +284,10 @@ describe("ItemProxy Test", function() {
     dump("Created D - DE");
 
     var expectArray = JSON.stringify([ 'da', 'db', 'dc', 'dd', 'de', 'dab' ]);
-    function getChildIds(item) {
-      var temp = [];
-      for (var i = 0; i < item.children.length; i++) {
-        temp.push(item.children[i].item.id);
-      }
-      return JSON.stringify(temp);
-    }
-    ;
+    
+    function getChildIds(proxy) {
+      return JSON.stringify(proxy.getOrderedChildIds());
+    };
 
     expect(getChildIds(d)).toBe(expectArray);
 
