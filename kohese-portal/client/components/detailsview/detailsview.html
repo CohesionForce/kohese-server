@@ -183,16 +183,34 @@
                 </div>
               </tab-content>
             </tab>
-            <tab heading="History">
+            <tab heading="History" select="detailsCtrl.getHistory()">
                 <h4>History Tab</h4>
 
-                <label>Created by: {{detailsCtrl.itemProxy.item.createdBy}}</label>
-                <br/>
-                <label>Created on: {{detailsCtrl.itemProxy.item.createdOn | date:'medium'}}</label>
-                <br/>
-                <label>Modified by: {{detailsCtrl.itemProxy.item.modifiedBy}}</label>
-                <br/>
-                <label>Modified on: {{detailsCtrl.itemProxy.item.modifiedOn | date:'medium'}}</label>
+                <div style="width:20%; overflow:auto; display:inline-block;">
+                  <label>Created by: {{detailsCtrl.itemProxy.item.createdBy}}</label>
+                  <label>Created on: {{detailsCtrl.itemProxy.item.createdOn | date:'medium'}}</label>
+                  <label>Modified by: {{detailsCtrl.itemProxy.item.modifiedBy}}</label>
+                  <label>Modified on: {{detailsCtrl.itemProxy.item.modifiedOn | date:'medium'}}</label>
+                </div>
+                <div class="pull-right" style="width:78%; vertical-align: top; display:inline-block; overflow:auto">                
+                  <table>
+                      <thead>
+                        <th style="width:30%">Commit</th>
+                        <th style="width:45%">Message</th>
+                        <th style="width:10%">Author</th>
+                        <th style="width:14%">Date</th>
+                      </thead>
+                      <tbody id="theDetailsBody">
+                        <tr ng-repeat="record in detailsCtrl.itemProxy.history" style="vertical-align: top;">
+                          <td>{{record.commit}}</td>
+                          <td>{{record.message}}</td>
+                          <td>{{record.author}}</td>
+                          <td>{{record.date | date:'medium'}}</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                  <label >{{record}}</label>
+                </div>  
 
             </tab>
             <tab heading="Journal">

@@ -5,6 +5,9 @@
 console.log("::: Begin KDB File Load");
 
 var kdbFS = require('./kdb-fs.js');
+var kdbRepo = require('./kdb-repo.js');
+module.exports.kdbRepo = kdbRepo;
+
 var jsonExt = /\.json$/;
 
 var ItemProxy = require('../common/models/item-proxy.js');
@@ -298,6 +301,15 @@ checkAndCreateDir(kdbDirPath);
 
 var koheseKDBDirPath = kdbDirPath + "/kohese-kdb";
 checkAndCreateDir(koheseKDBDirPath);
+
+var repoList = {};
+module.exports.repoList = repoList;
+
+kdbRepo.openRepo(koheseKDBDirPath,function(repo){
+  console.log(">>> CB from kdb repo");
+  console.log(repo);
+  repoList.main = repo;
+  });
 
 var exportDirPath = koheseKDBDirPath + "/export";
 validateRepositoryStructure(exportDirPath);

@@ -265,7 +265,11 @@ function DetailsViewController($state, $timeout, ItemRepository, analysisService
     };
 
     detailsCtrl.fetchAnalysis = function () {
-        analysisService.fetchAnalysis(detailsCtrl.itemProxy);
+      analysisService.fetchAnalysis(detailsCtrl.itemProxy);
+    };
+
+    detailsCtrl.getHistory = function () {
+      ItemRepository.getHistoryFor(detailsCtrl.itemProxy);
     };
 
     detailsCtrl.upsertItem = function () {

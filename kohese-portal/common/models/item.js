@@ -101,6 +101,45 @@ module.exports = function (Item) {
         next();
     };
 
+    Item.getHistory = function(req, onId, cb) {
+      console.log("::: Getting history for " + onId);
+
+      var instance = global.koheseKDB.ItemProxy.getProxyFor(onId);
+      console.log(instance.repoPath);
+      
+      global.koheseKDB.kdbRepo.walkHistoryForFile(global.koheseKDB.repoList.main, instance.repoPath, function(history){
+        
+        if (history) {
+          cb(null, history);
+        } else {
+          cb({error: "history error"}, null);
+        }        
+      });
+
+      
+    }
+
+    Item.remoteMethod('getHistory', {
+      accepts : [ {
+        arg : 'req',
+        type : 'object',
+        'http' : {
+          source : 'req'
+        }
+      }, {
+        arg : 'onId',
+        type : 'string'
+      } ],
+      returns : {
+        arg : 'data',
+        type : 'object'
+      }
+    });
+
+    Item.afterRemoteError('getHistory', function(ctx, next) {
+      ctx.res.status(ctx.error.http_code).end(ctx.error.message);
+    });
+    
     Item.beforeRemote('create', Item.addModificationHistory);
     Item.beforeRemote('upsert', Item.addModificationHistory);
     Item.observe('before save', Item.beforeSaveKohese);

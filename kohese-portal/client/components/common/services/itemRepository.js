@@ -76,6 +76,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         upsertItem: upsertItem,
         deleteItem: deleteItem,
         copyAttributes: copyAttributes,
+        getHistoryFor: getHistoryFor
     };
 
     function fetchItems() {
@@ -196,6 +197,20 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
             createItemProxy(dataList[idx]);
         }
     }
+    
+    function getHistoryFor(proxy) {
+
+      Item.getHistory({
+          onId: proxy.item.id
+      }).$promise.then(function (results) {
+              if (!proxy.history) {
+                  proxy.history = {};
+              }
+              proxy.history = results.data.history;
+              console.log("::: Hisotry retrieved for: " + proxy.item.id + " - " + proxy.item.name);
+          });
+  }
+
 }
 
 export default () => {
