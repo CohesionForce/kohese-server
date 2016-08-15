@@ -25,10 +25,11 @@
             </i>
             </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
                                                   ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filter.text)"
-                                                  ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id)"></span><span
-                ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
+                                                  ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id)"></span>
+                <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
+                <span ng-if="itemProxy.status"> {{itemProxy.status}}</span>
         </div>
-        <div class="kti-cell kti-actions pull-right">
+        <div class="kti-cell kti-actions pull-right"> 
             <i class="fa fa-anchor"
                ng-click="treeCtrl.updateRoot(itemProxy)"></i>
             <i class="glyphicon glyphicon-remove  pull-right"

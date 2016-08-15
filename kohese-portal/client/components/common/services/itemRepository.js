@@ -92,6 +92,8 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
                                             var results = repoResults.concat(itemResults).concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(taskResults).concat(userResults);
                                             convertListToTree(results);
                                             $rootScope.$broadcast('itemRepositoryReady');
+                                            var rootProxy = ItemProxy.getRootProxy();
+                                            getStatusFor(rootProxy);
                                         });
                                     });
                                 });
@@ -207,9 +209,35 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
                   proxy.history = {};
               }
               proxy.history = results.data.history;
-              console.log("::: Hisotry retrieved for: " + proxy.item.id + " - " + proxy.item.name);
+              console.log("::: History retrieved for: " + proxy.item.id + " - " + proxy.item.name);
           });
-  }
+    }
+
+    function getStatusFor(repo) {
+
+      Item.getStatus({
+          onId: repo.item.id
+      }).$promise.then(function (results) {
+          if (!repo.repoStatus) {
+              repo.repoStatus = {};
+          }
+          repo.repoStatus = results.data;
+          console.log("::: Status retrieved for: " + repo.item.id + " - " + repo.item.name);
+          console.log(repo.repoStatus);
+          for(var rIdx in repo.repoStatus) {
+            var entry = repo.repoStatus[rIdx];
+            console.log("+++ " + rIdx + " - " + entry.id + " - " + entry.status );
+
+            var proxy = ItemProxy.getProxyFor(entry.id);
+            if (proxy) {
+              proxy.status = entry.status              
+            } else {
+              console.log("!!! Item not found for entry: " + rIdx + " - " + entry.id + " - " + entry.status );              
+            }
+            
+          }
+      });
+    }
 
 }
 

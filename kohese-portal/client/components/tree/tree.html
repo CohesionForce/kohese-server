@@ -2,8 +2,7 @@
 	<button ng-click="treeCtrl.expandAll()" class="btn btn-default btn-sm"
 		style="margin: 5px">Expand All</button>
 	<button ng-click="treeCtrl.collapseAll()"
-		class="btn btn-default btn-sm" style="margin: 5px">Collapse
-		All</button>
+		class="btn btn-default btn-sm" style="margin: 5px">Collapse All</button>
     <button
             class="btn btn-default btn-sm"
             ng-click="treeCtrl.resetRoot()">
@@ -44,6 +43,10 @@
                  </select>
             </span>
 	    </span>
+      <span class="control-group">
+        <label class="control-label" for="Status"> Status </label>
+        <input type="checkbox" ng-model="treeCtrl.filter.status"/>
+      </span>	    
 	    <input
 		    class="input-sm" type="text" ng-model="treeCtrl.filter.text"
 		    placeholder="Filter" style="margin: 5px" />

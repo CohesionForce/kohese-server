@@ -308,7 +308,11 @@ module.exports.repoList = repoList;
 kdbRepo.openRepo(koheseKDBDirPath,function(repo){
   console.log(">>> CB from kdb repo");
   console.log(repo);
-  repoList.main = repo;
+  repoList.ROOT = repo;
+  kdbRepo.getStatus(repo, function(repoStatus){
+    console.log(">>> Current repo status")
+    console.log(repoStatus);
+    });
   });
 
 var exportDirPath = koheseKDBDirPath + "/export";

@@ -81,7 +81,8 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             text: "",
             kind: "",
             actionState: "",
-            actionAssignee: ""
+            actionAssignee: "",
+            status: false
         };
     }
 
@@ -131,9 +132,12 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             exact = false;
         }
       
-        if (!treeCtrl.filter.text && !treeCtrl.filter.kind) {
+        if (!treeCtrl.filter.text && !treeCtrl.filter.kind && !treeCtrl.filter.status) {
             return !exact;
         } else {
+            if (treeCtrl.filter.status && (!proxy.status || (proxy.status && proxy.status.length === 0))) {
+                return false;
+            }
             if (treeCtrl.filter.kind) {
                 if (proxy.kind !== treeCtrl.filter.kind) {
                     return false;
