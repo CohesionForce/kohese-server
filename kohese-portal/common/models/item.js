@@ -141,6 +141,7 @@ module.exports = function (Item) {
         type : 'object',
         'http' : {
           source : 'req'
+        
         }
       }, {
         arg : 'onId',
@@ -159,10 +160,10 @@ module.exports = function (Item) {
     //////////////////////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////////////////////
-    Item.getStatus = function(req, onId, cb) {
+    Item.getStatus = function(req, repoId, cb) {
       console.log("::: Getting status");
 
-      var instance = global.koheseKDB.ItemProxy.getProxyFor(onId);
+      var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
       
       global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.repoList.ROOT, function(status){
         
@@ -184,7 +185,7 @@ module.exports = function (Item) {
           source : 'req'
         }
       }, {
-        arg : 'onId',
+        arg : 'repoId',
         type : 'string'
       } ],
       returns : {

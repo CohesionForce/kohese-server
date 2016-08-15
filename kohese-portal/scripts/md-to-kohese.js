@@ -37,10 +37,27 @@ if(process.argv[4]) {
 	rootItem.name = filePath;
 }
 
-text=fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
-var accessToken = 'Bearer ';
-login();
+var text;
+var accessToken;
 
+try {
+	text = fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
+} catch(err) {
+	console.log('Error reading input file.');
+	process.exit();
+}
+
+try { 
+	accessToken = fs.readFileSync('./scripts/token.jwt');
+} catch(err) {
+	console.log('Error reading token file. Please run "node scripts/login.js"');
+	process.exit();
+}
+postRootItem();
+
+////////
+/////  Begin callback functions
+///////
 function begin() {
 
 	var koheseItems = []; 
@@ -332,28 +349,5 @@ function postRootItem() {
 };
 
 function login() {
-	var loginData = '{"username":"admin","password":"kohese"}';
-	var options = {
-			host: 'localhost',
-			port: 3000,
-			path: '/login',
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json;charset=UTF-8',
-				'Content-Length': Buffer.byteLength(loginData)
-			}
-	};
-	var loginRequest = http.request(options, function(response) { 
-		console.log('Login Status: ' + response.statusCode);
-		response.on('data', function (chunk) {
-			accessToken += chunk;
-		});
-		response.on('end', function() {
-			postRootItem(); 
-		});
-
-	});
-
-	loginRequest.write(loginData);
-	loginRequest.end();
+	
 };
