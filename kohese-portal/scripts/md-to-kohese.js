@@ -120,16 +120,18 @@ function begin() {
 			}
 
 			event = walker.next();
+			
+			koheseItem.name = '';
 
 			//Throw away everything before leaving the heading that isn't text.
 			while(event.node.type !== 'heading') {
 				if(event.entering && event.node.type === 'text') {
-					koheseItem.name = event.node.literal;
+					koheseItem.name += event.node.literal;
 				}
 				event = walker.next();
 			}
 
-			if(koheseItem.name === null) {
+			if(koheseItem.name === '') {
 				koheseItem.name = 'No Heading Title Found';
 			}
 		}
