@@ -383,6 +383,31 @@ describe("ItemProxy Test", function() {
     d.updateItem("Test", newDItem);
     dump("Added itemIds");
     expect(getChildIds(d)).toBe(expectArray);
+
+    expectArray = JSON.stringify(['de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dz1', 'dz2', 'dz3', 'db']);
+    d.makeChildrenAutoOrdered();
+    dump("Auto Ordered");
+    expect(getChildIds(d)).toBe(expectArray);
+    expect(d.item.itemIds.length).toBe(0);
+
+
+    expectArray = JSON.stringify(['de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dn', 'dz1', 'dz2', 'dz3', 'db']);
+    var dn = new ItemProxy("Test", {
+      id : "dn",
+      name : "DN",
+      parentId : "d"
+    });
+    dump("Added DN to Auto List");
+    expect(getChildIds(d)).toBe(expectArray);
+
+
+
+    d.makeChildrenManualOrdered();
+    dump("Manual Ordered");
+    expect(getChildIds(d)).toBe(expectArray);
+    expect(d.item.itemIds.length).toBe(12);
+
+
   });
 
   it("Get Ancestors", function() {
