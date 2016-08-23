@@ -3,8 +3,10 @@
  *  implementation, cmark, of commonmark. May then want to use
  *  commonmark.c to determine proper conversion.
  */
-
-var Render = {
+ 
+var Render = function() {
+	
+	return {
 		buffer: '',
 		
 		clearBuffer: function() {
@@ -46,7 +48,12 @@ var Render = {
 				this.buffer += '![';
 			}
 			else {
-				this.buffer += '](' + node.destination + ' "' + node.title + '")';
+				if(node.title) {
+					this.buffer += '](' + node.destination + ' "' + node.title + '")';
+				} else {
+					this.buffer += '](' + node.destination + ')';
+				}
+				
 			}
 		},
 		
@@ -68,7 +75,12 @@ var Render = {
 				this.buffer += '[';
 			}
 			else {
-				this.buffer += '](' + node.destination + ' "' + node.title + '")';
+				if(node.title) {
+					this.buffer += '](' + node.destination + ' "' + node.title + '")';
+				} else {
+					this.buffer += '](' + node.destination + ')';
+				}
+				
 			}
 		},
 		
@@ -90,7 +102,7 @@ var Render = {
 		},
 
 		softbreak: function(node, entering) {
-			this.buffer += ' '; // space or \n may be valid
+			this.buffer += '\n'; // space or \n may be valid
 		},
 		
 		strong: function(node, entering) {
@@ -104,6 +116,7 @@ var Render = {
 		thematic_break: function(node, entering) {
 			this.buffer += '___'; //Need line break?
 		}
+	}
 };
 
 module.exports = Render;

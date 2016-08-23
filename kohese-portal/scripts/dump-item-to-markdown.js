@@ -35,6 +35,7 @@ var displayItem = function(proxy){
   
 };
 
+outputBuffer += document.item.description + "\n\n";
 document.visitDescendants(displayItem);
 
 var dumpFile= "tmp/dump." + forItemId + "." + document.item.name + ".md";

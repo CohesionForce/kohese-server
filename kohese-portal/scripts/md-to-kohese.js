@@ -8,8 +8,9 @@ var fs = require('fs');
 var util = require('util');
 var commonmark = require('commonmark');
 var http = require('http');
-var render = require('./md-to-kohese-helper.js');
+var renderFunc = require('./md-to-kohese-helper.js');
 
+var accessToken;
 
 //This checks to see if this was run via command line rather than required.
 var ranFromCommandLine = require.main === module;
@@ -47,11 +48,9 @@ if ( ranFromCommandLine ) {
 }
 
 function mdToKohese(filePath, rootItem) {
-	
-	console.log('rootItem name: ' + rootItem.name);
 
+	
 	var text;
-	var accessToken;
 
 	try {
 		text = fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
@@ -60,13 +59,16 @@ function mdToKohese(filePath, rootItem) {
 		process.exit();
 	}
 
-	try { 
-		accessToken = fs.readFileSync('./scripts/token.jwt');
-	} catch(err) {
-		console.log('Error reading token file. Please run "node scripts/login.js"');
-		process.exit();
+	// accessToken may be set if this is being used as a module.
+	if(!accessToken) {
+		try { 
+			accessToken = fs.readFileSync('./scripts/token.jwt');
+		} catch(err) {
+			console.log('Error reading token file. Please run "node scripts/login.js"');
+			process.exit();
+		}
 	}
-
+	
 	postRootItem();
 	
 /////  Begin callback functions
@@ -87,7 +89,9 @@ function mdToKohese(filePath, rootItem) {
 		var tempIdCounter = 1;
 		var topLevel = 0;
 
+		var render = renderFunc();
 		while(event = walker.next()) {
+//			console.log('Event: ' + event.node.type + ' Entering: ' + event.entering);
 			if(event.entering && event.node.type === 'document') {
 				event = walker.next();
 				//Check if document begins with heading. If not, make an item.
@@ -173,8 +177,7 @@ function mdToKohese(filePath, rootItem) {
 		if(koheseItems.length === 1 && koheseItems[0].tempId === 0) {
 			console.log('Modifying root item since there is one item.');
 			rootItem.description = koheseItems[0].description;
-//			console.log('!!! ' + rootItem.name);
-//			console.log('!!! ' + rItem.name);
+			
 			var options = {
 					host: 'localhost',
 					port: 3000,
@@ -189,6 +192,10 @@ function mdToKohese(filePath, rootItem) {
 
 			var putRequest = http.request(options, function(response) {
 				console.log('Root modify request status ' + response.statusCode);
+				if (response.statusCode !== 200) {
+					console.log('!!! Unexpected status. Returning...');
+					return;
+				}
 			});
 
 			putRequest.write(JSON.stringify(rootItem));
@@ -249,6 +256,10 @@ function mdToKohese(filePath, rootItem) {
 
 			function postCallback(response) {
 				console.log('POST at level ' + level + ' has status ' + response.statusCode);
+				if (response.statusCode !== 200) {
+					console.log('!!! Unexpected status. Returning...');
+					return;
+				}
 				var output = '';
 				response.on('data', function (chunk) {
 					output += chunk;
@@ -353,7 +364,7 @@ function mdToKohese(filePath, rootItem) {
 				var putRequest = http.request(options, function(response) {
 					if(response.statusCode !== 200) {
 						console.log('Unexpected PUT request status ' + response.statusCode);
-						process.exit();
+						return;
 					}
 				});
 
@@ -381,6 +392,10 @@ function mdToKohese(filePath, rootItem) {
 
 		var putRequest = http.request(options, function(response) {
 			console.log('Root Item POST status ' + response.statusCode);
+			if (response.statusCode !== 200) {
+				console.log('!!! Unexpected status. Returning...');
+				return;
+			}
 			var output = '';
 			response.on('data', function (chunk) {
 				output += chunk;
