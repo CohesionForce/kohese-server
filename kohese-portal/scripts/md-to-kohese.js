@@ -10,12 +10,12 @@ var commonmark = require('commonmark');
 var http = require('http');
 var render = require('./md-to-kohese-helper.js');
 
-var filePath, rootItem;
 
 //This checks to see if this was run via command line rather than required.
 var ranFromCommandLine = require.main === module;
 if ( ranFromCommandLine ) {
 
+	var filePath, rootItem;
 //////////User parameters - See also http options
 
 	filePath = 'scripts/basic.md';
@@ -46,10 +46,9 @@ if ( ranFromCommandLine ) {
 
 }
 
-function mdToKohese(fPath, rItem) {
+function mdToKohese(filePath, rootItem) {
 	
-	filePath = fPath;
-	rootItem = rItem;
+	console.log('rootItem name: ' + rootItem.name);
 
 	var text;
 	var accessToken;
@@ -167,6 +166,35 @@ function mdToKohese(fPath, rItem) {
 				console.log('!!! Unknown/Unhandled event: ' + event.node.type + ' - Entering: ' + event.entering);
 			}
 		}
+		
+//		 If the document did not have any headers, then there is only
+//		 one item to post. In which case we should just modify the 
+//		 root item.
+		if(koheseItems.length === 1 && koheseItems[0].tempId === 0) {
+			console.log('Modifying root item since there is one item.');
+			rootItem.description = koheseItems[0].description;
+//			console.log('!!! ' + rootItem.name);
+//			console.log('!!! ' + rItem.name);
+			var options = {
+					host: 'localhost',
+					port: 3000,
+					path: '/api/Items/',
+					method: 'PUT',
+					headers: {
+						'Authorization': accessToken,
+						'Content-Type': 'application/json;charset=UTF-8',
+						'Content-Length': Buffer.byteLength(JSON.stringify(rootItem))
+					}
+			};
+
+			var putRequest = http.request(options, function(response) {
+				console.log('Root modify request status ' + response.statusCode);
+			});
+
+			putRequest.write(JSON.stringify(rootItem));
+			putRequest.end();
+			return;
+		}
 
 		var filteredItems = [];
 
@@ -190,14 +218,6 @@ function mdToKohese(fPath, rItem) {
 				return;
 			}
 			
-			// If the document did not have any headers, then there is only
-			// one item to post. In which case we should just modify the 
-			// item.
-//			if(koheseItems.length === 1 && koheseItems[0].tempId === 0) {
-//				modifyItem(rootItem, koheseItems[0])
-//				return;
-//			}
-
 			if(filteredItems[level] === undefined || filteredItems[level].length === 0) {
 				console.log('No items to post at level ' + level);
 				postItems(level + 1);
@@ -374,32 +394,7 @@ function mdToKohese(fPath, rItem) {
 		
 		putRequest.write(JSON.stringify(rootItem));
 		putRequest.end();
-	};
-	
-	function modifyItem(root, item) {
-		
-		console.log('Modifying root item since there is one item.');
-		root.description = item.description;
-		
-		var options = {
-				host: 'localhost',
-				port: 3000,
-				path: '/api/Items/',
-				method: 'PUT',
-				headers: {
-					'Authorization': accessToken,
-					'Content-Type': 'application/json;charset=UTF-8',
-					'Content-Length': Buffer.byteLength(JSON.stringify(root))
-				}
-		};
-
-		var putRequest = http.request(options, function(response) {
-			console.log('PUT request status ' + response.statusCode);
-		});
-
-		putRequest.write(JSON.stringify(root));
-		putRequest.end();
-	}
+	};		
 }
 
 module.exports = mdToKohese;

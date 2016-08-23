@@ -18,7 +18,7 @@ if (process.argv[2]) {
 	basePath = process.argv[2]
 } else {
 	console.log('Error: No path provided.');
-	console.log('Usage: node scripts/directory-ingest.js <basePath> <baseName>');
+	console.log('Usage: node scripts/directory-ingest.js <basePath> <parentId> <rootName>');
 	process.exit();
 }
 if (process.argv[3]) {
