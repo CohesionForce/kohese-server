@@ -47,7 +47,7 @@ if ( ranFromCommandLine ) {
 
 }
 
-function mdToKohese(filePath, rootItem) {
+function mdToKohese(filePath, rootItem, callback) {
 
 	
 	var text;
@@ -170,7 +170,7 @@ function mdToKohese(filePath, rootItem) {
 				console.log('!!! Unknown/Unhandled event: ' + event.node.type + ' - Entering: ' + event.entering);
 			}
 		}
-		
+		console.log('md processing done for ' + filePath);
 //		 If the document did not have any headers, then there is only
 //		 one item to post. In which case we should just modify the 
 //		 root item.
@@ -185,7 +185,7 @@ function mdToKohese(filePath, rootItem) {
 					method: 'PUT',
 					headers: {
 						'Authorization': accessToken,
-						'Content-Type': 'application/json;charset=UTF-8',
+						'Content-Type': 'application/json; charset=UTF-8',
 						'Content-Length': Buffer.byteLength(JSON.stringify(rootItem))
 					}
 			};
@@ -195,6 +195,9 @@ function mdToKohese(filePath, rootItem) {
 				if (response.statusCode !== 200) {
 					console.log('!!! Unexpected status. Returning...');
 					return;
+				}
+				if(callback) {
+					callback();
 				}
 			});
 
@@ -347,6 +350,7 @@ function mdToKohese(filePath, rootItem) {
 			}
 
 			// For some reason you can't modify elements via array, only make them
+			var counter = 0;
 			for(var i=0; i < flatItems.length; i++) {
 
 				var options = {
@@ -366,6 +370,25 @@ function mdToKohese(filePath, rootItem) {
 						console.log('Unexpected PUT request status ' + response.statusCode);
 						return;
 					}
+					
+					counter++;
+					if (counter === flatItems.length) {
+						console.log(':::  Order modifications complete');
+						if (callback) {
+							callback();
+						}
+					}
+					
+					// This block never runs?
+//					response.on('end', function() {
+//						counter++;
+//						if (counter === flatItems.length) {
+//							console.log(':::  Order modifications complete');
+//							if (callback) {
+//								callback();
+//							}
+//						}
+//					});
 				});
 
 				putRequest.write(JSON.stringify(flatItems[i]));

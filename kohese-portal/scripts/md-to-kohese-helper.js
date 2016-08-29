@@ -23,6 +23,10 @@ var Render = function() {
 			}
 		},
 		
+		code: function(node, entering) {
+			this.buffer += '`' + node.literal + '`';
+		},
+		
 		code_block: function(node, entering) {
 			this.buffer += '\n```\n';
 		},

@@ -137,6 +137,7 @@ var count = 0;
 for (var i = 0; i < fileList.length; i++) {
 	if (fileListTypes[i] === 'file') {
 		var ext = Path.extname(fileList[i]);
+		console.log('Processing ' + (i + 1) + ' of ' + fileList.length);
 		processToMarkdown(fileList[i], tempFileList[i]);
 		count++;
 	}
@@ -299,6 +300,7 @@ for (var i = 0; i < mdList.length; i++) {
 	}
 }
 
+var mdIdx = 0;
 postRootItem(parentId, rootName, beginUpload);
 
 function beginUpload(item) {
@@ -314,6 +316,29 @@ function beginUpload(item) {
 	console.log('Creating ' + dirList.length + ' directory items...');
 	postDirItem(0);
 	process.on('exit', exitHandler.bind(null,{cleanup:true}));
+}
+
+function uploadMarkdown() {
+	//console.log(mdList);
+	console.log('Now starting markdown upload.');
+	console.log('Uploading ' + (mdIdx + 1) + ' of ' + mdList.length);
+	var md = mdList[mdIdx];
+	var mdRoot = {name: Path.basename(md.path), parentId: md.parentId, description: 'File', itemIds: []};
+	mdToKohese(md.path, mdRoot, next);
+
+	// Uses a call back to ensure mdToKohese happens sequentially as
+	// it is all async.
+	function next() {
+		if (mdIdx === mdList.length - 1) {
+			return;
+		} else {
+			mdIdx++;
+		}
+		console.log('Uploading ' + (mdIdx + 1) + ' of ' + mdList.length);
+		md = mdList[mdIdx];
+		mdRoot = {name: Path.basename(md.path), parentId: md.parentId, description: 'File', itemIds: []};
+		mdToKohese(md.path, mdRoot, next);
+	}
 }
 
 function exitHandler(options, err) {
@@ -392,7 +417,6 @@ function postRootItem(pId, name, callback) {
 function postDirItem(index) {
 	if(index >= dirList.length) {
 		console.log('Done POSTing directories...');
-
 		// Add correct parent Ids to md items
 		for (var i = 0; i < mdList.length; i++) {
 			if(mdList[i].parentId === 0) {
@@ -407,9 +431,7 @@ function postDirItem(index) {
 				}
 			}
 		}
-		//console.log(mdList);
-		console.log('Now starting markdown upload.');
-		uploadMarkdown(0);
+		uploadMarkdown();
 		return;
 	}
 	var dir = dirList[index];
@@ -437,9 +459,9 @@ function postDirItem(index) {
 	};
 
 	var putRequest = http.request(options, function(response) {
-		console.log('Dir Item POST status ' + response.statusCode);
+		//console.log('Dir Item POST status ' + response.statusCode);
 		if (response.statusCode !== 200) {
-			console.log('Unexpected status. Exiting...');
+			console.log('Unexpected status: ' + response.statuscode + ' Exiting...');
 			process.exit();
 		}
 		var output = '';
@@ -449,30 +471,12 @@ function postDirItem(index) {
 		response.on('end', function() {
 			output = JSON.parse(output);
 			dirList[index].id = output.id;
+			//var temp = index + 1;
+			console.log('Posted DIR ' + (index + 1) + ' of ' + dirList.length);
 			postDirItem(index + 1);
 		});
 	});
 
 	putRequest.write(JSON.stringify(dirItem));
 	putRequest.end();
-}
-
-function uploadMarkdown(index) {
-	if (index >= mdList.length) {
-		console.log('::: All markdown uploads queued. Waiting for it to finish');
-		return;
-	}
-
-	var md = mdList[index];
-	var mdRoot = {name: Path.basename(md.path), parentId: md.parentId, description: 'File', itemIds: []}
-//	console.log('Uploading ' + md.path);
-//	mdToKohese(md.path, mdRoot)
-//	uploadMarkdown(index + 1);
-	
-	// Space out the server calls a bit in ms
-	setTimeout(function() {
-		console.log('Uploading ' + md.path);
-		mdToKohese(md.path, mdRoot)
-		uploadMarkdown(index + 1);
-	}, 250);
 }
