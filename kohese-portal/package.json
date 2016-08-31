@@ -4,7 +4,9 @@
   "main": "server/server.js",
   "license": "EPL-1.0",
   "scripts": {
-    "pretest": "jshint ."
+    "pretest": "jshint .",
+    "start": "node .",
+    "dist": "cd dist && node ."
   },
   "dependencies": {
     "angular": "^1.4.4",

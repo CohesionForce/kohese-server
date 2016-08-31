@@ -2,7 +2,7 @@
  *  sends them to a local kohese server via rest interface.
  *  
  *  User must set the file and rootItem parameters below or via command line:
- *  node md-to-kohese.js rootItem.parentId filepath rootItem.name
+ *  node md-to-kohese.js rootItem.parentId filepath rootItem.name --unordered
  */
 var fs = require('fs');
 var util = require('util');
@@ -17,6 +17,7 @@ var ranFromCommandLine = require.main === module;
 if ( ranFromCommandLine ) {
 
 	var filePath, rootItem;
+	var unordered = false;
 //////////User parameters - See also http options
 
 	filePath = 'scripts/basic.md';
@@ -42,12 +43,16 @@ if ( ranFromCommandLine ) {
 	} else {
 		rootItem.name = filePath;
 	}
+	
+	if(process.argv[5] && process.argv[5] === '--unordered') {
+		unordered = true;
+	}
 
-	mdToKohese(filePath, rootItem);
+	mdToKohese(filePath, rootItem, function(){}, unordered);
 
 }
 
-function mdToKohese(filePath, rootItem, callback) {
+function mdToKohese(filePath, rootItem, callback, unordered) {
 
 	
 	var text;
@@ -220,11 +225,20 @@ function mdToKohese(filePath, rootItem, callback) {
 		function postItems(level) {
 			if(level > topLevel) {
 				console.log('Done posting items!');
-				for(var i=0; i <= topLevel; i++) {
-					addItemstoParents(i);
+				
+				if (unordered) {
+					console.log('::: --unordered provided. Skipping ordering.');
+					if(callback) {
+						callback();
+					}
+				} else {
+					for(var i=0; i <= topLevel; i++) {
+						addItemstoParents(i);
+					}
+					console.log('itemIds list added... Now PUTing...');
+					putItems()
 				}
-				console.log('itemIds list added... Now PUTing...');
-				putItems();
+				
 				return;
 			}
 			
@@ -378,17 +392,6 @@ function mdToKohese(filePath, rootItem, callback) {
 							callback();
 						}
 					}
-					
-					// This block never runs?
-//					response.on('end', function() {
-//						counter++;
-//						if (counter === flatItems.length) {
-//							console.log(':::  Order modifications complete');
-//							if (callback) {
-//								callback();
-//							}
-//						}
-//					});
 				});
 
 				putRequest.write(JSON.stringify(flatItems[i]));

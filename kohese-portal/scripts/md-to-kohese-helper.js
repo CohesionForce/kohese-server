@@ -61,12 +61,25 @@ var Render = function() {
 			}
 		},
 		
+		addListTabs: function() {
+			for(var i = 0; i < this.listDepth; i++) {
+				this.buffer += '\t';
+			}
+		},
+		
 		item: function(node, entering) {
+			var listData = node.parent._listData;
 			if(entering) {
-				for(var i = 0; i < this.listDepth; i++) {
-					this.buffer += '\t';
+				this.addListTabs();
+				if(listData.type === 'bullet') {
+					this.buffer += listData.bulletChar;
+				} 
+				if(listData.type === 'ordered') {
+					var number = this.numberEntry[this.numberEntry.length - 1];
+					this.buffer += (number + listData.start) + listData.delimiter;
+					this.numberEntry[this.numberEntry.length - 1]++;
 				}
-				this.buffer += '+  ';
+				this.buffer += ' ';
 			}
 		},
 		
@@ -89,24 +102,46 @@ var Render = function() {
 		},
 		
 		listDepth: 0,
+		numberEntry: [], // This keeps track of what number to print in ordered lists
 		list: function(node, entering) {
+			//console.log(node._listData);
+			//console.log(this.numberEntry);
 			if(entering) {
 				this.listDepth++;
+				this.numberEntry.push(0);
 			} else {
 				this.listDepth--;
+				this.numberEntry.pop();
+				
+				// If it is a sublist, don't add another newline at the end
+				if(node.parent.type !== 'item') {
+					this.buffer += '\n';
+				}
 			}
 		},
 		
 		paragraph: function(node, entering) {
+			var grandparent = node.parent.parent;
+			if(grandparent !== null && grandparent.type == 'list') {
+				if(!entering) {
+					this.buffer += '\n';
+				}
+				return;
+			}
+			
 			if(entering) {
-				//nothing on enter?
+				//this.buffer += '\n';
 			} else {
-				this.buffer += '\n\n'; // space or \n\n may be valid
+				this.buffer += '\n\n';
 			}
 		},
 
 		softbreak: function(node, entering) {
 			this.buffer += '\n'; // space or \n may be valid
+			var grandparent = node.parent.parent;
+			if(grandparent !== null && grandparent.type == 'item') {
+				this.addListTabs();
+			}
 		},
 		
 		strong: function(node, entering) {
