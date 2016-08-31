@@ -31,7 +31,7 @@ boot(app, __dirname, function (err) {
         var memConnector = app.dataSources.db.connector;
         memConnector.ids = lbMemInitData.ids;
         memConnector.cache = lbMemInitData.cache;
-        delete lbMemInitData;
+//        delete lbMemInitData;
    
         // Setup the KoheseUser relations 
         var enableAuth = require('./server-enableAuth');
@@ -68,7 +68,7 @@ boot(app, __dirname, function (err) {
               }
             });
         });
-        console.log("::: KoheseIO Started")
+        console.log("::: KoheseIO Started");
         app.emit('koheseIO-started');
 
     }

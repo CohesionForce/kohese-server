@@ -8,7 +8,7 @@ var modelDef = {};
 module.exports.modelDef = modelDef;
 
 console.log("::: Loading model definitions");
-var modelDefDirPath = "common/models"
+var modelDefDirPath = "common/models";
 var modelDefFileList = kdbFS.getRepositoryFileList(modelDefDirPath, jsonExt);
 
 for(var modelDefIdx in modelDefFileList){

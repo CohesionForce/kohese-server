@@ -2,7 +2,7 @@ module.exports = function(Analysis) {
 
   var http = require('http');
   var util = require('util');
-  var _und = require('../../node_modules/underscore/underscore.js');
+  var _und = require('underscore');
   var request = require('request');
 
   function requestAnalysisJSON(req, forModelKind, onId, cb) {
@@ -38,7 +38,7 @@ module.exports = function(Analysis) {
     
     request(options, function(analysisError, analysisResponse, analysisBody) {
       if (analysisError) {
-        error = new Error(
+        var error = new Error(
             '*** Failure while communicating with Analysis server');
         error.http_code = 504;
         error.code = analysisError.code;
@@ -74,7 +74,7 @@ module.exports = function(Analysis) {
           console.log(err);
           console.log(err.stack);
           
-          error = new Error(
+          var error = new Error(
           '*** Failure while parsing analysis');
           error.onId = onId;
           console.log(error);
@@ -95,7 +95,7 @@ module.exports = function(Analysis) {
     } else {
       requestAnalysisJSON(req, forModelKind, onId, cb);
     }
-  }
+  };
 
   Analysis.remoteMethod('performAnalysis', {
     accepts : [ {
@@ -275,7 +275,7 @@ module.exports = function(Analysis) {
 
     onAnalysis.summaryList = _und.union(_und.values(onAnalysis.chunkSummary),
         _und.values(onAnalysis.tokenSummary));
-  }
+  };
 
   var lookup = {};
   lookup.CC = "Coordinating Conjuction";

@@ -36,7 +36,7 @@ class ItemProxy {
     if (kind === "Internal") {
       // Don't continue
       return proxy;
-    };
+    }
 
     var parentId = proxy.item.parentId || "ROOT";
 
@@ -164,7 +164,7 @@ class ItemProxy {
     }
 
     var descendantList = [];
-    var descendant = proxyStack.pop()
+    var descendant = proxyStack.pop();
     while (descendant) {
       descendantList.push(descendant);
       for (var childIdx = descendant.children.length - 1; childIdx > -1; childIdx--) {
@@ -185,7 +185,7 @@ class ItemProxy {
       proxyStack.push(this.children[childIdx]);
     }
 
-    var descendant = proxyStack.pop()
+    var descendant = proxyStack.pop();
     while (descendant) {
       performAction(descendant);
       for (var childIdx = descendant.children.length - 1; childIdx > -1; childIdx--) {
@@ -440,11 +440,10 @@ class ItemProxy {
     }
 
     var newParentId = withItem.parentId;
-    console
-        .log("::: Eval Parent Id old: " + oldParentId + " new: " + newParentId)
+    console.log("::: Eval Parent Id old: " + oldParentId + " new: " + newParentId);
     if (oldParentId !== newParentId) {
       console.log("::: Parent Id changed from " + oldParentId + " to "
-          + newParentId)
+          + newParentId);
 
       var newParentProxy;
       if (newParentId === "") {

@@ -84,7 +84,7 @@ function deleteFolderRecursive(dirPath) {
       });
       fs.rmdirSync(dirPath);
   }
-};
+}
 
 module.exports.deleteFolderRecursive = deleteFolderRecursive;
 

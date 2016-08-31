@@ -26,7 +26,7 @@ function retrieveDataForMemoryConnector(){
   var lbMemConnectorData = {
       ids: JSON.parse(JSON.stringify(kdbStore.ids)),
       cache: {}
-  }
+  };
  
   for(var model in kdbStore.models) {
     if (model !== "Analysis") {
@@ -74,7 +74,7 @@ function determineRepoStoragePath(repo){
 //
 //////////////////////////////////////////////////////////////////////////
 function retrieveModelInstance(modelName, modelInstanceId) {
-  console.log("::: Retrieving " + modelName + " - " + modelInstanceId)
+  console.log("::: Retrieving " + modelName + " - " + modelInstanceId);
   var modelStore = kdbStore.models[modelName];
   var instance;
 
@@ -110,7 +110,7 @@ function storeModelInstance(modelName, modelInstance){
     }
   }
 
-  repo = proxy.getRepositoryProxy();    
+  var repo = proxy.getRepositoryProxy();    
   var repoStoragePath = determineRepoStoragePath(repo);
   
   console.log(">>> Repo storage: " + repoStoragePath);
@@ -172,7 +172,7 @@ function removeModelInstance(modelName, instanceId){
   var proxy = ItemProxy.getProxyFor(instanceId);
 
   if(modelName === "Analysis"){
-    repo = proxy.getRepositoryProxy();    
+    var repo = proxy.getRepositoryProxy();    
     var repoStoragePath = determineRepoStoragePath(repo);
     var filePath = repoStoragePath + "/" + modelName + "/" + instanceId + ".json";
 
@@ -200,7 +200,7 @@ module.exports.removeModelInstance = removeModelInstance;
 function checkAndCreateDir(dirName, ignoreJSONFiles) {
   kdbFS.createDirIfMissing(dirName);
   if(ignoreJSONFiles){
-    kdbFS.createGITIgnoreJSONIfMissing(dirName + "/.gitignore")
+    kdbFS.createGITIgnoreJSONIfMissing(dirName + "/.gitignore");
   } else {
     kdbFS.createEmptyFileIfMissing(dirName + "/.gitignore");    
   }
@@ -274,7 +274,7 @@ function validateRepositoryStructure (repoDirPath) {
 //////////////////////////////////////////////////////////////////////////
 
 // Read the model config
-modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
+var modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
 
 // Ignore the loopback _meta
 if (modelConfig._meta) {
@@ -294,7 +294,7 @@ for(var modelKindIdx in modelKinds){
   kdbStore.models[modelKind] = {};
 }
 
-console.log("::: Validating Repository Structure")
+console.log("::: Validating Repository Structure");
 
 var kdbDirPath = "kdb";
 checkAndCreateDir(kdbDirPath);

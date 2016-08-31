@@ -23,12 +23,12 @@ module.exports = function (app) {
         console.log("::: Checking: " + body.username);
         
         if (!body.username) {
-          res.status(400).end('Must provide username')
+          res.status(400).end('Must provide username');
           return;
         }
 
         if (!body.password) {
-          res.status(400).end('Must provide password')
+          res.status(400).end('Must provide password');
           return;
         }
 
@@ -56,7 +56,7 @@ module.exports = function (app) {
       
       // check to see if the authorization header is missing, but an auth_token was provided
       if(!req.headers.authorization && req.query.access_token){
-        console.log("::: Creating authorization header from access_token")
+        console.log("::: Creating authorization header from access_token");
         req.headers.authorization = 'Bearer ' + req.query.access_token;
       }
       next();  

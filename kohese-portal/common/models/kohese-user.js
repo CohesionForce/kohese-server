@@ -57,7 +57,7 @@ module.exports = function(KoheseUser) {
 	          console.log(JSON.stringify(principal[0],null,"  "));
 	          usersItem = principal[0];
 	          checkAndCreateAdminAccount();
-	        };
+	        }
 	        
 	    });    
 	  };
@@ -85,9 +85,9 @@ module.exports = function(KoheseUser) {
 	          });
 	        } else {
 	          console.log("::: Admin account already exists");
-	        };
+	        }
 	    });    
-	  };
+	  }
 
   KoheseUser.setter.password = function(password) {
     if (password.indexOf('$2a$') === 0 && password.length === 60) {

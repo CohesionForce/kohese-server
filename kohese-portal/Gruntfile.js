@@ -1,0 +1,127 @@
+var fs = require('fs');
+var BowerWebpackPlugin = require("bower-webpack-plugin");
+var webpack = require("webpack");
+
+module.exports = function(grunt) {
+
+	grunt.initConfig({
+
+		watched: {
+			scripts: {
+				files: [ 'common/**.js', 
+				         'server/**.js',],
+				         tasks: ['uglify','babel',],
+			},
+		},
+		
+		jshint: {
+			server: {
+				files: [{ src: ['server/**/*.js', 'common/**/*.js'] }],
+				options: {
+					esversion: 6,
+					strict: 'implied',
+					sub: true, // Allows for object['key'] rather than object.key
+					laxbreak: true, // Allows for string + to span multiple lines
+					node: true, // Sets the node globals such as require and module
+				},
+			},
+			web: {
+				files: ['client/**/*.js'],
+			},
+		},
+
+		babel: {
+
+			dist: {
+				options: {
+					sourceMap: false,
+					presets: ['es2015'],
+				},
+				files: [{
+					expand: true,
+					src: ['common/**/*.js', 
+					      'server/**/*.js'],
+					      dest: 'tmp/babel/',
+					      ext: '.babel.js',
+				}],
+			},
+		},
+
+		uglify: {
+			options: {
+				mangle: true,
+				compress: true, // This has more options, should check
+				banner: '/* Kohese Server */',
+			},
+			dist: {
+				files: [{ 
+					cwd: 'tmp/babel/',
+					expand: true,
+					src: ['**/*.js'],  // source files mask
+					dest: 'dist/',    // destination folder
+					flatten: false,   // flatten directory structure
+					ext: '.js',   // replace extension
+				}],
+			},
+		},
+
+		copy: {
+			server: { // Copy server config json files
+				files: [{expand: true, src: ['common/**/*.json', 'server/**/*.json', '*.json'], dest: 'dist/'},],
+			},
+			web: { // Copy files required for web site
+				files: [{expand: true,
+					     src: ['client/index.html',
+					           'client/css/**/*.css', 
+					           'client/components/**/*.html',
+					           'bower_components/**/*',
+					           ],
+					     // Should be a better solution to copying bower cmpns.
+					     dest: 'dist/',
+				}],
+			},
+		},
+
+		webpack: { 
+			dist: {
+			context: 'client/',
+			entry: './app.js',
+			output: {
+				path: 'dist/client/',
+				filename: 'bundle.js',
+			},
+			resolve: {
+				modulesDirectories: ['node_modules', 'bower_components'],
+			},
+			//devtool: 'source-map',
+			plugins: [new BowerWebpackPlugin({
+				modulesDirectories: ['bower_components'],
+				manifestFiles: 'bower.json',
+				includes: /.*/,
+				excludes: [],
+				searchResolveModulesDirectories: true,
+			})],
+			module: {
+				loaders: [
+				          {test: /\.js$/, loader: 'babel', query: {compact: true}},
+				          {test: /\.css$/, loader: "style-loader!css-loader"},
+				          {test: /\.less$/, loader: "style!css!less"},
+				          ],
+			},
+		},
+		},
+
+	});
+
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-webpack');
+	grunt.loadNpmTasks('grunt-babel');
+
+	grunt.registerTask('default', ['babel','uglify', 'webpack', 'copy']);
+	grunt.registerTask('babelcopy', ['babel', 'copy:server']);
+	grunt.registerTask('server', ['babel', 'uglify','copy:server']);
+
+};

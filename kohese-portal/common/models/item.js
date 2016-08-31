@@ -40,7 +40,7 @@ module.exports = function (Item) {
         }        
       }
       next();
-    }
+    };
     
     //////////////////////////////////////////////////////////////////////////
     //
@@ -83,7 +83,7 @@ module.exports = function (Item) {
         
         if(ctx.Model.modelName === "Item"){
           //var Analysis = app.models.Analysis;
-          console.log("::: Need to call Analysis update logic")
+          console.log("::: Need to call Analysis update logic");
         }
         
         next();
@@ -133,7 +133,7 @@ module.exports = function (Item) {
       });
 
       
-    }
+    };
 
     Item.remoteMethod('getHistory', {
       accepts : [ {
@@ -175,7 +175,7 @@ module.exports = function (Item) {
       });
 
       
-    }
+    };
 
     Item.remoteMethod('getStatus', {
       accepts : [ {

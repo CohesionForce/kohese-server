@@ -22,3 +22,4 @@ client/bundle.js.map
 bower_components
 /.sass-cache/
 /db.json.*
+tmp/
