@@ -49,7 +49,7 @@ module.exports = function (Item) {
         console.log('::: After save - ' + ctx.Model.modelName);
         if (ctx.instance) {
             console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.name);
-            var notification = new Object;
+            var notification = new Object();
             notification.model = ctx.Model.modelName;
             notification.id = ctx.instance.id;
             notification.ctx = ctx;
@@ -66,7 +66,7 @@ module.exports = function (Item) {
             console.log('Updated %s matching %j',
                 ctx.Model.pluralModelName,
                 ctx.where);
-            var notification = new Object;
+            var notification = new Object();
             notification.model = ctx.Model.modelName;
             notification.id = ctx.where.id;
             notification.ctx = ctx;
@@ -94,6 +94,7 @@ module.exports = function (Item) {
     //////////////////////////////////////////////////////////////////////////
     Item.afterDeleteKohese = function (ctx, next) {
         console.log('::: After delete - ' + ctx.Model.modelName);
+        var notification = new Object();
         if (ctx.instance) {
             console.log('Deleted %s #%s#', ctx.Model.modelName, ctx);
             notification.type = 'delete';
@@ -101,7 +102,6 @@ module.exports = function (Item) {
             notification.ctx = ctx;
         } else {
             console.log('Deleted %s #%s#', ctx.Model.modelName, ctx.where.id);
-            var notification = new Object;
             notification.type = 'delete';
             notification.model = ctx.Model.modelName;
             notification.id = ctx.where.id;

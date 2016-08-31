@@ -11,7 +11,7 @@ module.exports = function(Analysis) {
     var instance = global.koheseKDB.retrieveModelInstance(forModelKind, onId);
 
     var requestData = {};
-    var analysis = new Analysis;
+    var analysis = new Analysis();
     analysis.id = onId;
     analysis.raw = {};
     analysis.forModelKind = forModelKind;

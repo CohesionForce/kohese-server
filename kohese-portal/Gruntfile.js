@@ -22,6 +22,8 @@ module.exports = function(grunt) {
 					strict: 'implied',
 					sub: true, // Allows for object['key'] rather than object.key
 					laxbreak: true, // Allows for string + to span multiple lines
+					shadow: true, // This really shouldn't be used, but variable shadowing is fairly common in the code
+					'-W010': true, //This ignores the preference for object = {} instead of object = new Object()
 					node: true, // Sets the node globals such as require and module
 				},
 			},
@@ -120,8 +122,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-webpack');
 	grunt.loadNpmTasks('grunt-babel');
 
-	grunt.registerTask('default', ['babel','uglify', 'webpack', 'copy']);
-	grunt.registerTask('babelcopy', ['babel', 'copy:server']);
+	grunt.registerTask('default', ['jshint:server','babel','uglify', 'webpack', 'copy']);
 	grunt.registerTask('server', ['babel', 'uglify','copy:server']);
 
 };
