@@ -24,6 +24,7 @@ module.exports = function(grunt) {
 					laxbreak: true, // Allows for string + to span multiple lines
 					shadow: true, // This really shouldn't be used, but variable shadowing is fairly common in the code
 					'-W010': true, //This ignores the preference for object = {} instead of object = new Object()
+					'-W034': true, //Removes complaints about use strict in item-proxy.js
 					node: true, // Sets the node globals such as require and module
 				},
 			},

@@ -2,6 +2,7 @@
  * 
  */
 
+"use strict"; //Required for use of 'class'
 var _ = require('underscore');
 
 var tree = {};
