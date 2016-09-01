@@ -4,27 +4,27 @@ describe("ItemProxy Test", function() {
   var root = ItemProxy.getRootProxy();
   var lostAndFound = ItemProxy.getProxyFor("LOST+FOUND");
   var a, aa, newAAItem, bb, b, ab;
-  console.log(__dirname);
-  console.log("::: Starting Item Proxy Test");
+  // console.log(__dirname);
+  // console.log("::: Starting Item Proxy Test");
 
   dump = function(message) {
-    if (message) {
-      console.log(">>> " + message);
-    }
-
-    ItemProxy.dumpAllProxies();
-    console.log("");
-    root.dumpProxy();
-    console.log("Root Descendants: " + root.descendantCount);
-    console.log("");
-    lostAndFound.dumpProxy();
-    console.log("-----------------------------------------");
+//    if (message) {
+//      // console.log(">>> " + message);
+//    }
+//
+//    ItemProxy.dumpAllProxies();
+//    // console.log("");
+//    root.dumpProxy();
+//    // console.log("Root Descendants: " + root.descendantCount);
+//    // console.log("");
+//    lostAndFound.dumpProxy();
+//    // console.log("-----------------------------------------");
   }
 
   it("Add Node Without Parent", function() {
     dump('--- Beginning state');
     expect(root).toBeDefined();
-    console.log("::: Adding node without parent");
+    // console.log("::: Adding node without parent");
     aa = new ItemProxy("Test", {
       id : "aa",
       name : "AA",
@@ -38,7 +38,7 @@ describe("ItemProxy Test", function() {
   });
 
   it("Add Parent", function() {
-    console.log("::: Adding parent");
+    // console.log("::: Adding parent");
     a = new ItemProxy("Test", {
       id : "a",
       name : "A",
@@ -61,7 +61,7 @@ describe("ItemProxy Test", function() {
   });
 
   it("Add Bs", function() {
-    console.log("::: Adding b, bbb");
+    // console.log("::: Adding b, bbb");
     b = new ItemProxy("Test", {
       id : "b",
       name : "B",
@@ -89,7 +89,7 @@ describe("ItemProxy Test", function() {
   });
 
   it("Adding bb", function() {
-    console.log("::: Adding bb");
+    // console.log("::: Adding bb");
     bb = new ItemProxy("Test", {
       id : "bb",
       name : "BB",
@@ -103,7 +103,7 @@ describe("ItemProxy Test", function() {
   });
 
   it("Delete a", function() {
-    console.log("::: Deleting a");
+    // console.log("::: Deleting a");
 
     expect(root.children[0].item.id).toBe('a');
 
@@ -114,18 +114,18 @@ describe("ItemProxy Test", function() {
   });
 
   it("Changing parent of aa", function() {
-    console.log("::: Changing parent of aa");
-    console.log(aa.item);
+    // console.log("::: Changing parent of aa");
+    // console.log(aa.item);
     newAAItem = JSON.parse(JSON.stringify(aa.item));
     newAAItem.parentId = "b";
     newAAItem.description = "b with changes";
     delete newAAItem.uniq;
-    console.log(newAAItem);
+    // console.log(newAAItem);
 
     var temp = aa.item.id;
 
     aa.updateItem("Test", newAAItem);
-    console.log(aa.item);
+    // console.log(aa.item);
     dump("Changed aa parent");
 
     expect(aa.item.parentId).toBe('b');
@@ -134,13 +134,13 @@ describe("ItemProxy Test", function() {
   });
 
   it("Deleting description for aa", function() {
-    console.log("::: Deleting description for aa");
+    // console.log("::: Deleting description for aa");
 
     var temp = aa.item.id;
 
     delete newAAItem.description;
     aa.updateItem("Test", newAAItem);
-    console.log(aa.item);
+    // console.log(aa.item);
     dump("Deleted aa description");
 
     expect(aa.item.description).toBe(undefined);
@@ -148,7 +148,7 @@ describe("ItemProxy Test", function() {
   });
 
   it("Changing parent of bb to ROOT", function() {
-    console.log("::: Changing parent of bb to ROOT");
+    // console.log("::: Changing parent of bb to ROOT");
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
     newBBItem.parentId = "";
     bb.updateItem("Test", newBBItem);
@@ -160,7 +160,7 @@ describe("ItemProxy Test", function() {
   });
 
   it("Changing parent of bb to c", function() {
-    console.log("::: Changing parent of bb to c");
+    // console.log("::: Changing parent of bb to c");
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
     newBBItem.parentId = "c";
     bb.updateItem("Test", newBBItem);
@@ -173,7 +173,7 @@ describe("ItemProxy Test", function() {
   });
 
   it("Morph b into a NewTest", function() {
-    console.log("::: Morph b into a NewTest");
+    // console.log("::: Morph b into a NewTest");
     var newBItem = JSON.parse(JSON.stringify(b.item));
     b.updateItem("NewTest", newBItem);
     dump("Change b to a NewTest kind");
@@ -182,7 +182,7 @@ describe("ItemProxy Test", function() {
   });
 
   it("Renaming an item", function() {
-    console.log("::: Preparing to rename an item");
+    // console.log("::: Preparing to rename an item");
     var ab = new ItemProxy("Test", {
       id : "ab",
       name : "AB",
@@ -243,8 +243,8 @@ describe("ItemProxy Test", function() {
   });
 
   it("Renaming an ordered item", function() {
-    console.log("::: Preparing to rename an ordered item");
-    console.log("::: Adding d - de");
+    // console.log("::: Preparing to rename an ordered item");
+    // console.log("::: Adding d - de");
     d = new ItemProxy("Test", {
       id : "d",
       name : "D",
@@ -411,13 +411,13 @@ describe("ItemProxy Test", function() {
   });
 
   it("Get Ancestors", function() {
-    console.log("::: Getting AB ancestors");
+    // console.log("::: Getting AB ancestors");
     var ab = ItemProxy.getProxyFor('ab');
     var abAncestors = ab.getAncestorProxies();
     var expected = [ 'b', 'ROOT' ];
     for ( var ancestorIdx in abAncestors) {
       var ancestor = abAncestors[ancestorIdx]
-      console.log(ancestor.item.id + " - " + ancestor.item.name);
+      // console.log(ancestor.item.id + " - " + ancestor.item.name);
 
       expect(ancestor.item.id).toBe(expected[ancestorIdx]);
     }
