@@ -9,11 +9,15 @@ module.exports = function(grunt) {
 		// TODO: Expand this to speed up grunts.
 		// For example, watch the clients and only do webpack if needed
 		watch: {
-			scripts: {
+			server: {
 				files: [ 'common/**.js', 
 				         'server/**.js',],
-				         tasks: ['uglify','babel',],
+				tasks: ['jshint:server']
 			},
+			client: {
+				files: ['client/**/*'],
+				tasks: testClient
+			}
 		},
 
 		jshint: {
@@ -72,7 +76,7 @@ module.exports = function(grunt) {
 
 		copy: {
 			server: { // Copy server config json files
-				files: [{expand: true, src: ['common/**/*.json', 'server/**/*.json', '*.json'], dest: 'dist/'},],
+				files: [{expand: true, src: ['common/**/*.json', 'server/**/*.json', '*.json', '!db.json'], dest: 'dist/'},],
 			},
 			web: { // Copy files required for web site
 				files: [{expand: true,
@@ -160,7 +164,8 @@ module.exports = function(grunt) {
 			jasmineRest: {
 				cmd: 'jasmine',
 				args: ['JASMINE_CONFIG_PATH=tests/jasmineRest.json']
-			}
+			},
+			
 		}
 		
 
@@ -180,12 +185,22 @@ module.exports = function(grunt) {
 	var testServer = ['jshint:server', 'run:jasmineServer', 'run:server', 'run:jasmineRest'];
 	// Run client based tests
 	var testClient = ['webpack', 'browserify', 'jasmine'];
+	var test = [].concat(testServer, testClient);
+	//Prepare the distribution
+	var dist = ['babel', 'uglify', 'webpack', 'copy'];
+	var build = [].concat(test, dist);
 
-	grunt.registerTask('default', ['jshint:server','babel','uglify', 'webpack', 'copy']);
+	//grunt.registerTask('default', ['watch:server', 'watch:client']);
 	grunt.registerTask('server', ['babel', 'uglify','copy:server']);
-	grunt.registerTask('test:server', testServer);
-	grunt.registerTask('test:client', testClient);
-	grunt.registerTask('test', testServer.concat(testClient));
+	grunt.registerTask('test:server', 'Run server related testing.', testServer);
+	grunt.registerTask('test:client', 'Run client related testing.', testClient);
+	grunt.registerTask('test', 'Run server and client tests.', test);
+	grunt.registerTask('dist', 'Prepare Kohese for distribution.', dist);
+	grunt.registerTask('build', 'Run all testing and dist related tasks.', build);
+	
+	grunt.registerTask('default', 'Default task', function() {
+		grunt.log.writeln("Use 'grunt --help' to display available tasks.");
+	});
 	
 	
 

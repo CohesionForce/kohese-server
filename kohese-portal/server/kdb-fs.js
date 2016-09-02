@@ -117,6 +117,12 @@ function getRepositoryFileList(dirPath, fileRegEx) {
   if (gitignoreIdx > -1){
     fileList.splice(gitignoreIdx, 1);
   }
+  
+  //Ignore the .npmignore file if it exists
+  var npmignoreIdx = fileList.indexOf(".npmignore");
+  if (npmignoreIdx > -1){
+    fileList.splice(npmignoreIdx, 1);
+  }
 
   // Filter the list if fileRegEx is supplied
   if (fileRegEx){
