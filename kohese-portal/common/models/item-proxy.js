@@ -80,6 +80,9 @@ class ItemProxy {
   static getProxyFor(id) {
 
     // console.log("::: IP: Getting proxy for " + id);
+	if(id === '') {
+		return tree.root;
+	}
     return tree.proxyMap[id];
 
   }
@@ -134,7 +137,7 @@ class ItemProxy {
   getRepositoryProxy() {
     var proxy = this;
     
-    while (proxy && proxy.kind !== "Repository"){
+    while (proxy && proxy.kind !== "Repository" && proxy.item.id !== 'ROOT'){
       proxy = proxy.parentProxy;
     }
     return proxy;
