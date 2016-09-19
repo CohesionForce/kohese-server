@@ -6,12 +6,12 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 
-		// TODO: Expand this to speed up grunts.
+		// TODO: Expand this to speed up grunts. Or decide not to use it.
 		// For example, watch the clients and only do webpack if needed
 		watch: {
 			server: {
-				files: [ 'common/**.js', 
-				         'server/**.js',],
+				files: [ 'common/**/*.js', 
+				         'server/**/*.js',],
 				tasks: ['jshint:server']
 			},
 			client: {
@@ -157,13 +157,13 @@ module.exports = function(grunt) {
 					// This test logs a bunch of garbage
 					quiet: true
 				},
-				cmd: 'jasmine',
-				args: ['JASMINE_CONFIG_PATH=tests/jasmine.json']
+				cmd: 'node',
+				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=tests/jasmine.json']
 			},
 			
 			jasmineRest: {
-				cmd: 'jasmine',
-				args: ['JASMINE_CONFIG_PATH=tests/jasmineRest.json']
+				cmd: 'node',
+				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=tests/jasmineRest.json']
 			},
 			
 		}

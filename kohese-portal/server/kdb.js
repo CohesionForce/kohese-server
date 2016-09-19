@@ -268,11 +268,13 @@ function validateRepositoryStructure (repoDirPath) {
             
             // Attempt to mount the repository. If unable then make it apparent in the client.
             var subRepoDirPath = repoMount.repoStoragePath;
-            var repoRoot, mountFlag = true;
+            var repoCanBeMounted = true;
+            var repoRoot;
+            
             try {
                 repoRoot = kdbFS.loadJSONDoc(subRepoDirPath + '/' + 'Root.json');
             } catch(err) {
-                mountFlag = false;
+                repoCanBeMounted = false;
                 console.log('!!! Unable to mount repo ' + repoMount.name);
                 delete repoMount.repoStoragePath;
                 repoMount.name = 'Error: ' + repoMount.name;
@@ -281,7 +283,8 @@ function validateRepositoryStructure (repoDirPath) {
                 //proxy.repoPath = itemPath;
                 modelStore[repoMount.id] = JSON.stringify(repoMount);
             }
-            if(mountFlag) {
+            
+            if(repoCanBeMounted) {
                 if(repoMount.name !== repoRoot.name) {
                     console.log('::: Updating mount file to match Root.json');
                     repoMount.name = repoRoot.name;
@@ -352,19 +355,19 @@ if(process.argv[2]) {
 var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
 checkAndCreateDir(koheseKDBDirPath);
 
-// Check if root.json exists in ROOT so that it may be loaded stand alone.
-var rootFile, makeRootJSON = false;
-try {
-	rootFile = kdbFS.loadJSONDoc(koheseKDBDirPath + '/' + 'Root.json');
-} catch(err) {
-	makeRootJSON = true;
-	// TODO: Need to generate a UUID here
-	rootFile = {id: 'e469c990-79d2-11e6-992f-d9d32532604f',origin: 'Root Repo', name: 'Root Repo', description: 'Root Repo'};
-}
-
-if(makeRootJSON) {
-	kdbFS.storeJSONDoc(koheseKDBDirPath + '/' + 'Root.json', rootFile);
-}
+//// Check if root.json exists in ROOT so that it may be loaded stand alone.
+//var rootFile, makeRootJSON = false;
+//try {
+//	rootFile = kdbFS.loadJSONDoc(koheseKDBDirPath + '/' + 'Root.json');
+//} catch(err) {
+//	makeRootJSON = true;
+//	// TODO: Need to generate a UUID here
+//	rootFile = {id: 'TBD-TBD-TBD-TBD-TBD',origin: 'Root Repo', name: 'Root Repo', description: 'Root Repo'};
+//}
+//
+//if(makeRootJSON) {
+//	kdbFS.storeJSONDoc(koheseKDBDirPath + '/' + 'Root.json', rootFile);
+//}
 
 var repoList = {};
 module.exports.repoList = repoList;
