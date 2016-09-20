@@ -226,7 +226,7 @@ function validateRepositoryStructure (repoDirPath) {
   }
   
   // Remove model directories that are no longer needed
-  for (var dirIdx in modelDirList) {
+  for (var dirIdx = 0; dirIdx < modelDirList.length; dirIdx++) {
     var modelDirName = modelDirList[dirIdx];
     if (!modelConfig[modelDirName]) {
       console.log("::: Removing stored directory for " + modelDirName);
@@ -249,7 +249,7 @@ function validateRepositoryStructure (repoDirPath) {
     modelDirList.splice(rootIdx, 1);
   }
   
-  for(var modelIdx in modelDirList){
+  for(var modelIdx = 0; modelIdx < modelDirList.length; modelIdx++){
     var modelName = modelDirList[modelIdx];
     var modelDirPath = repoDirPath + "/" + modelName;
     var modelStore = kdbStore.models[modelName];
@@ -257,7 +257,7 @@ function validateRepositoryStructure (repoDirPath) {
     
     if(modelName === 'Repository') {
         fileList = kdbFS.getRepositoryFileList(modelDirPath, /\.mount$/);
-        for(var fileIdx in fileList) {
+        for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
             var itemPath = modelDirPath + "/" + fileList[fileIdx];
             var repoMount = kdbFS.loadJSONDoc(itemPath);
             
@@ -299,7 +299,7 @@ function validateRepositoryStructure (repoDirPath) {
         }
     } else {
         fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
-        for(var fileIdx in fileList) {
+        for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
           var itemPath = modelDirPath + "/" + fileList[fileIdx];
           var itemRow = kdbFS.loadJSONDoc(itemPath);
           
@@ -346,10 +346,14 @@ console.log("::: Validating Repository Structure");
 var kdbDirPath = "kdb";
 checkAndCreateDir(kdbDirPath);
 
-//Paths may be provided via arguments when starting
+//Paths may be provided via arguments when starting via -kdb=PATH
 var baseRepoPath = 'kohese-kdb/export';
-if(process.argv[2]) {
-    baseRepoPath = process.argv[2];
+for (var i = 2; i < process.argv.length; i++) {
+    var arg = process.argv[i].split('=');
+    if(arg[0] === '-kdb' && arg[1] !=='') {
+        baseRepoPath = arg[1];
+        break;
+    }
 }
 
 var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
