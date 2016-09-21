@@ -345,7 +345,8 @@ console.log("::: Validating Repository Structure");
 
 var kdbDirPath = "kdb";
 checkAndCreateDir(kdbDirPath);
-
+checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
+//TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
 //Paths may be provided via arguments when starting via -kdb=PATH
 var baseRepoPath = 'kohese-kdb/export';
 for (var i = 2; i < process.argv.length; i++) {

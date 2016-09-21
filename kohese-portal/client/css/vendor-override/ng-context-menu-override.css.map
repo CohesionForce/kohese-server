@@ -1,7 +1,0 @@
-{
-"version": 3,
-"mappings": "AAAA,aAAc;EACZ,MAAM,EAAE,eACV",
-"sources": ["ng-context-menu-override.scss"],
-"names": [],
-"file": "ng-context-menu-override.css"
-}
