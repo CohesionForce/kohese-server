@@ -53,6 +53,7 @@
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-run": "^0.6.0",
+    "grunt-sass": "^1.2.1",
     "grunt-webpack": "^1.0.14",
     "jasmine": "^2.5.2",
     "jshint": "^2.5.6",

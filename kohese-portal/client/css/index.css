@@ -182,22 +182,31 @@ table.dataTable thead .sorting:after {
 
 .tree-grid .indented {
   position: relative; }
+
 .tree-grid .level-1 .indented {
   left: 0px; }
+
 .tree-grid .level-2 .indented {
   left: 15px; }
+
 .tree-grid .level-3 .indented {
   left: 30px; }
+
 .tree-grid .level-4 .indented {
   left: 45px; }
+
 .tree-grid .level-5 .indented {
   left: 60px; }
+
 .tree-grid .level-6 .indented {
   left: 75px; }
+
 .tree-grid .level-7 .indented {
   left: 90px; }
+
 .tree-grid .level-8 .indented {
   left: 105px; }
+
 .tree-grid .level-9 .indented {
   left: 120px; }
 
@@ -212,6 +221,7 @@ table.tree-grid {
 .btn-default:hover {
   background-color: #7dd7ae;
   color: white; }
+
 .btn-default:active {
   background-color: #7dd7ae;
   color: whitesmoke; }
@@ -253,6 +263,7 @@ table th .glyphicon-plus {
   color: green; }
   table th .glyphicon-plus:hover {
     cursor: pointer; }
+
 table td .glyphicon-remove {
   color: #ca6464; }
   table td .glyphicon-remove:hover {
@@ -330,6 +341,7 @@ table td .glyphicon-remove {
   color: green; }
   .knowledge-tree .kt-head .glyphicon-plus:hover {
     cursor: pointer; }
+
 .knowledge-tree .kt-item .glyphicon-remove {
   color: #ca6464; }
   .knowledge-tree .kt-item .glyphicon-remove:hover {
@@ -401,6 +413,7 @@ tab div {
   margin-right: 5px; }
   .item-actions i:hover {
     cursor: pointer; }
+
 .item-actions .fa-stack {
   margin-right: 5px; }
   .item-actions .fa-stack .stacked-child {
@@ -414,17 +427,21 @@ tab div {
 .angucomplete-holder ::-webkit-input-placeholder {
   /* WebKit, Blink, Edge */
   color: black; }
+
 .angucomplete-holder :-moz-placeholder {
   /* Mozilla Firefox 4 to 18 */
   color: black;
   opacity: 1; }
+
 .angucomplete-holder ::-moz-placeholder {
   /* Mozilla Firefox 19+ */
   color: black;
   opacity: 1; }
+
 .angucomplete-holder :-ms-input-placeholder {
   /* Internet Explorer 10-11 */
   color: black; }
+
 .angucomplete-holder .angucomplete-dropdown {
   position: absolute;
   z-index: 10;
@@ -432,6 +449,7 @@ tab div {
   border-radius: 10px;
   border: 1px black solid;
   padding: 5px; }
+
 .angucomplete-holder .angucomplete-selected-row {
   background-color: #005A31;
   color: white;
@@ -797,5 +815,3 @@ body #layout-bottom {
   width: 50%; }
   .dashboard-navigation button {
     margin: 5px; }
-
-/*# sourceMappingURL=index.css.map */

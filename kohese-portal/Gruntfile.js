@@ -81,7 +81,7 @@ module.exports = function(grunt) {
 			web: { // Copy files required for web site
 				files: [{expand: true,
 					src: ['client/index.html',
-					      'client/css/**/*.css', 
+					      'client/css/index.css', 
 					      'client/components/**/*.html',
 					      'bower_components/**/*',
 					      ],
@@ -166,6 +166,18 @@ module.exports = function(grunt) {
 				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=tests/jasmineRest.json']
 			},
 			
+		},
+		
+		sass: {
+		    options: {
+		        sourceMap: false
+		    },
+		    dist: {
+		        files: {
+	                'client/css/index.css': ['client/css/index.scss']
+	            } 
+		    }
+		    
 		}
 		
 
@@ -180,15 +192,20 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-babel');
 	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-run');
+	grunt.loadNpmTasks('grunt-sass');
 	
+    //Run web related build commands
+    var client = ['sass', 'webpack'];
 	// Run node server related testing
 	var testServer = ['jshint:server', 'run:jasmineServer', 'run:server', 'run:jasmineRest'];
 	// Run client based tests
-	var testClient = ['webpack', 'browserify', 'jasmine'];
+	var testClient = ['sass','webpack', 'browserify', 'jasmine'];
 	var test = [].concat(testServer, testClient);
 	//Prepare the distribution
-	var dist = ['babel', 'uglify', 'webpack', 'copy'];
+	var dist = ['babel', 'uglify', 'webpack', 'sass', 'copy'];
 	var build = [].concat(test, dist);
+	
+	
 
 	//grunt.registerTask('default', ['watch:server', 'watch:client']);
 	grunt.registerTask('server', ['babel', 'uglify','copy:server']);
@@ -197,6 +214,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('test', 'Run server and client tests.', test);
 	grunt.registerTask('dist', 'Prepare Kohese for distribution.', dist);
 	grunt.registerTask('build', 'Run all testing and dist related tasks.', build);
+	grunt.registerTask('client', 'Run client/web related build tools.', client);
 	
 	grunt.registerTask('default', 'Default task', function() {
 		grunt.log.writeln("Use 'grunt --help' to display available tasks.");
