@@ -1,6 +1,6 @@
 /**
  *  Checks all licenses via license-checker
- *  Uses a user interative prompt unless given with commandline arguments:
+ *  Uses a user interactive prompt unless given with command-line arguments:
  *  node scripts/licenses.js list
  *  node scripts/licenses.js license <licenseName>
  *  node scripts/licenses.js module <moduleName>
@@ -15,8 +15,8 @@ prompt.start();
 //Begin Menus for Prompt
 
 const mainMenu = {properties: {option: {
-    description: '[L]ist Licenses; \n[G]et Modules from License; \nGet [M]odule info; \n[C]hange mode; \nE[x]it',
-    pattern: /^[cCLlGgXxMm]{1}$/, 
+    description: '[L]ist Licenses; \n[G]et Modules from License; \nGet [M]odule info; \n[C]hange mode; \nGet [N]ode Dependency by package; \nE[x]it',
+    pattern: /^[CcGgLlMmNnXx]{1}$/, 
     message: 'Invalid input.',
     required: true
 }}};
@@ -27,6 +27,10 @@ const getModulePrompt = {properties: {license: {
 
 const getModuleInfoPrompt = {properties: {module: {
     description: 'Enter name of module:',
+    required: true}}};
+
+const depPrompt = {properties: {module: {
+    description: 'Enter exact name of module in the form name or name@version:',
     required: true}}};
 
 //End Menus
@@ -66,23 +70,23 @@ var loadData = new Promise(function(resolve, reject) {
             resolve();
         });
     });
-    
+
     var npmPromise = new Promise(function(resolve, reject) {
         var npmls = spawn('npm', ['ls', '-json']);
         var data = '';
         npmls.stdout.on('data', function(chunk) {
             data += chunk;
         });
-//        npmls.stderr.on('data', function(chunk) {
-//            console.error(chunk.toString('utf8'));
-//        });
+//      npmls.stderr.on('data', function(chunk) {
+//      console.error(chunk.toString('utf8'));
+//      });
         npmls.on('close', function() {
             console.log('npm ls done');
             npmList = JSON.parse(data);
             resolve();
         })
     });
-    
+
     Promise.all([nlcPromise, blcPromise, npmPromise]).then(function() {
         resolve();
     });
@@ -92,6 +96,7 @@ loadData.then(function() {
     var mode = 'node';
     var json = licenseStore[mode];
     console.log('List initialized.');
+    
     /* Format of json for licenseStore[mode]: 
      *   ...
      *   name@version: {
@@ -103,10 +108,10 @@ loadData.then(function() {
      *   }
      *   ...
      */
-    
+
     var licensesList = {};
     var counter = {};
-    
+
     function processJSON() {
         licensesList = {};
         counter = {};
@@ -121,10 +126,16 @@ loadData.then(function() {
         }
     }
     processJSON();
-    
+
     if(notInteractive) {
         runNotInteractive();
     }
+    
+    // Register 'beforeExit' event so you dont need makeMenu() after every menu function.
+    process.on('beforeExit', function() {
+        makeMenu();
+    });
+    
     makeMenu();
 
     function makeMenu() {
@@ -157,16 +168,20 @@ loadData.then(function() {
                 console.log('Changing mode to ' + mode);
                 json = licenseStore[mode];
                 processJSON();
-                makeMenu();
+            }
+            if(result.option === 'n' || result.option === 'N') {
+                prompt.get(depPrompt, function(err, result) {
+                    getDepInfo(result.module);
+                })
             }
             if(result.option === 'x' || result.option === 'X') {
                 console.log('Exiting...')
                 process.exit();
             }
-            
+
         });
     }
-    
+
     function listLicenses() {
         var sorted = Object.keys(licensesList).sort(function (a,b) {
             if(a.toLowerCase() <= b.toLowerCase())
@@ -177,9 +192,8 @@ loadData.then(function() {
         for(var i = 0; i < sorted.length; i++) {
             console.log(counter[sorted[i]] + '\t' + sorted[i]);
         }
-        makeMenu();
     }
-    
+
     function getModulesFromLicense(license) {
         var matched = false;
         for(var key in licensesList) {
@@ -191,9 +205,8 @@ loadData.then(function() {
         if(!matched) {
             console.log('No match found.');
         }
-        makeMenu();
     }
-    
+
     function getModuleInfo(module) {
         var matched = false;
         for(var key in json) {
@@ -206,9 +219,84 @@ loadData.then(function() {
         if(!matched) {
             console.log('No match found.');
         }
-        makeMenu();
     }
-    
+
+    function getDepInfo(module) {
+        var moduleChain = getChain(module);
+        printModuleChain(moduleChain);
+
+        function getChain(module) {
+            // module should have form name@version
+            // npm json is keyed by name with name.version as the version.
+            var versionProvided;
+            var name;
+            var version;
+            var split = module.split('@');
+            if(split.length === 1) {
+                versionProvided = false;
+                name = split[0];
+            } else {
+                name = module.split('@')[0];
+                version = module.split('@')[1];
+                versionProvided = true;
+            }
+
+            var parentChain = [];
+            var parentChainIdx = 0;
+            var chain = [];
+
+            buildChain(npmList);
+            return parentChain;
+
+            function buildChain(parent) {
+                var deps = parent.dependencies;
+                if(!deps) {
+                    chain.pop();
+                    return;
+                }
+                for(var key in deps) {
+                    deps[key].name = key + '@' + deps[key].version;
+                    chain.push(deps[key]);
+                    if(name === key && versionProvided && version === deps[key].version) {
+                        // chain is being assigned to an element of parentChain as a reference
+                        // without the slice. This causes a brand new array to be made, apparently.
+                        parentChain[parentChainIdx] = chain.slice(0);
+                        parentChainIdx++;
+                        chain.pop();
+                    } else if(!versionProvided && name === key) {
+                        parentChain[parentChainIdx] = chain.slice(0);
+                        parentChainIdx++;
+                        chain.pop();
+                    } else {
+                        buildChain(deps[key]);
+                    }
+                }
+                chain.pop();
+            }
+        }
+
+        function printModuleChain(moduleChain) {
+            if(moduleChain.length === 0) {
+                console.log('No matches found.');
+                console.log('If you expected matches but found none, then the package may be extraneous.');
+                console.log("Run 'npm prune' to clear all extraneous packages.")
+                return;
+            }
+            for(var i = 0; i < moduleChain.length; i++) {
+                var chain = moduleChain[i];
+                var output = '';
+                for(var j = 0; j < chain.length; j++) {
+                    if(j !== 0 ) {
+                        output += ' ->';
+                    }
+                    output += ' ' + chain[j].name;
+                }
+                console.log((i+1) + '. ' + output + '\n');
+            }
+
+        }
+    }
+
     function runNotInteractive() {
         var offset = 0;
         if(process.argv[2] === 'bower') {
@@ -230,5 +318,6 @@ loadData.then(function() {
         else {
             console.log('Usage: \n*  node scripts/licenses.js list\n*  node scripts/licenses.js license <licenseName>\n*  node scripts/licenses.js module <moduleName>\n*  node scripts/licenses.js bower list/license/module');
         }
+        process.exit();
     }
 });
