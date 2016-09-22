@@ -64,13 +64,13 @@ if (document.item.description || showUndefined) {
 }
 document.visitDescendants(displayItem);
 
-var dumpFile= "tmp/dump." + forItemId + "." + document.item.name + ".md";
+var dumpFile= "reports/dump." + forItemId + "." + document.item.name + ".md";
 fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});
 
 if (outFormat) {
 	console.log('::: Now spawning pandoc...');
-	console.log('::: Creating ' + 'tmp/' + path.basename(dumpFile, '.md') + '.' + outFormat);
-	var pandoc = child.spawnSync('pandoc', ['-f', 'markdown', '-t', outFormat, dumpFile, '-o', 'tmp/' + path.basename(dumpFile, '.md') + '.' + outFormat], { cwd: path.normalize(__dirname + '/..'), encoding : 'utf8' });
+	console.log('::: Creating ' + 'reports/' + path.basename(dumpFile, '.md') + '.' + outFormat);
+	var pandoc = child.spawnSync('pandoc', ['-f', 'markdown', '-t', outFormat, dumpFile, '-o', 'reports/' + path.basename(dumpFile, '.md') + '.' + outFormat], { cwd: path.normalize(__dirname + '/..'), encoding : 'utf8' });
 	if(pandoc.stdout) {
 		console.log(pandoc.stdout);
 	}

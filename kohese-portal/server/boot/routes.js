@@ -9,11 +9,14 @@ module.exports = function (app) {
     var path = require('path');
     var bodyParser = require('body-parser');
     var util = require('util');
+    var serveIndex = require('serve-index');
 
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
-    app.use('/tmp', loopback.static(path.resolve(__dirname, '../../tmp')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
-
+    
+    app.use('/reports', serveIndex('reports', {'icons':true, 'view':'details'}));
+    app.use('/reports', loopback.static(path.resolve(__dirname, '../../reports')));
+    
     app.use(bodyParser.json());
 
     app.post('/login', authenticate);
@@ -77,7 +80,7 @@ module.exports = function (app) {
       console.log("User:    " + util.inspect(req.headers.koheseUser,false,null));
       next();
     });
-
+    
     var restApiRoot = app.get('restApiRoot');
     app.use(restApiRoot, app.loopback.rest());
 };

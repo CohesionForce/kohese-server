@@ -6,6 +6,7 @@
  *  node scripts/licenses.js module <moduleName>
  *  node scripts/licenses.js bower list/license/module
  */
+const spawn = require('child_process').spawn;
 const nlc = require('license-checker');
 const blc = require('bower-license');
 const prompt = require('prompt');
@@ -36,29 +37,62 @@ if(process.argv.length > 2) {
     notInteractive = true;
 }
 
+var npmList;
 var licenseStore = {};
 
-console.log('Initializing licenses...');
-blc.init({start: __dirname + '/..'}, function(bower, err) {
-    if(err) {
-        console.log(err);
-        process.exit();
-    }
-    licenseStore.bower = bower;
+var loadData = new Promise(function(resolve, reject) {
+    console.log('Initializing data...');
+
+    var nlcPromise = new Promise(function(resolve, reject) {
+        nlc.init({start: __dirname + '/..'}, function(err, node) {
+            if(err) {
+                console.log(err);
+                process.exit();
+            }
+            console.log('Node licenses data loaded.');
+            licenseStore['node'] = node;
+            resolve();
+        });
+    });
+
+    var blcPromise = new Promise(function(resolve, reject) {
+        blc.init({start: __dirname + '/..'}, function(bower, err) {
+            if(err) {
+                console.log(err);
+                process.exit();
+            }
+            licenseStore['bower'] = bower;
+            console.log('bower licenses loaded');
+            resolve();
+        });
+    });
+    
+    var npmPromise = new Promise(function(resolve, reject) {
+        var npmls = spawn('npm', ['ls', '-json']);
+        var data = '';
+        npmls.stdout.on('data', function(chunk) {
+            data += chunk;
+        });
+//        npmls.stderr.on('data', function(chunk) {
+//            console.error(chunk.toString('utf8'));
+//        });
+        npmls.on('close', function() {
+            console.log('npm ls done');
+            npmList = JSON.parse(data);
+            resolve();
+        })
+    });
+    
+    Promise.all([nlcPromise, blcPromise, npmPromise]).then(function() {
+        resolve();
+    });
 });
 
-nlc.init({start: __dirname + '/..'}, function(err, node) {
-    if(err) {
-        console.log(err);
-        process.exit();
-    }
+loadData.then(function() {
     var mode = 'node';
-    licenseStore[mode] = node;
     var json = licenseStore[mode];
-    
-    
     console.log('List initialized.');
-    /* Format of json: 
+    /* Format of json for licenseStore[mode]: 
      *   ...
      *   name@version: {
      *       licenses: ,
