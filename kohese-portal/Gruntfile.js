@@ -81,6 +81,7 @@ module.exports = function(grunt) {
 			web: { // Copy files required for web site
 				files: [{expand: true,
 					src: ['client/index.html',
+					      'client/bundle.js',
 					      'client/css/index.css', 
 					      'client/components/**/*.html',
 					      'bower_components/**/*',
@@ -96,7 +97,7 @@ module.exports = function(grunt) {
 				context: 'client/',
 				entry: './app.js',
 				output: {
-					path: 'dist/client/',
+					path: 'client/',
 					filename: 'bundle.js',
 				},
 				resolve: {
@@ -199,11 +200,11 @@ module.exports = function(grunt) {
 	// Run node server related testing
 	var testServer = ['jshint:server', 'run:jasmineServer', 'run:server', 'run:jasmineRest'];
 	// Run client based tests
-	var testClient = ['sass','webpack', 'browserify', 'jasmine'];
+	var testClient = ['browserify', 'jasmine'];
 	var test = [].concat(testServer, testClient);
 	//Prepare the distribution
-	var dist = ['babel', 'uglify', 'webpack', 'sass', 'copy'];
-	var build = [].concat(test, dist);
+	var dist = ['sass', 'webpack', 'babel', 'uglify', 'copy'];
+	var build = [].concat(client, test, ['babel', 'uglify', 'copy']);
 	
 	
 
