@@ -4,13 +4,13 @@ var util = require('util');
 
 var text="# Heading 1\nHow *is* this\n\nAnd **this** too\n\n## Heading 2\n\n* Bullet 1\n* Bullet 2\n    * Bullet 2.1";
 
-//text=fs.readFileSync("reports/samples/prop2.md", {encoding: 'utf8', flag: 'r'});
-//text=fs.readFileSync("reports/samples/prop3.md", {encoding: 'utf8', flag: 'r'});
+//text=fs.readFileSync("tmp/samples/prop2.md", {encoding: 'utf8', flag: 'r'});
+//text=fs.readFileSync("tmp/samples/prop3.md", {encoding: 'utf8', flag: 'r'});
 //text=fs.readFileSync("t.out", {encoding: 'utf8', flag: 'r'});
-//text=fs.readFileSync("reports/samples/tais_srs.md", {encoding: 'utf8', flag: 'r'});
-//text=fs.readFileSync("reports/samples/tais_sadd.md", {encoding: 'utf8', flag: 'r'});
-//text=fs.readFileSync("reports/samples/tais_sadd_extra.md", {encoding: 'utf8', flag: 'r'});
-text=fs.readFileSync("reports/samples/commonmark.spec.txt.md", {encoding: 'utf8', flag: 'r'});
+//text=fs.readFileSync("tmp/samples/tais_srs.md", {encoding: 'utf8', flag: 'r'});
+//text=fs.readFileSync("tmp/samples/tais_sadd.md", {encoding: 'utf8', flag: 'r'});
+//text=fs.readFileSync("tmp/samples/tais_sadd_extra.md", {encoding: 'utf8', flag: 'r'});
+text=fs.readFileSync("tmp/samples/commonmark.spec.txt.md", {encoding: 'utf8', flag: 'r'});
 
 var commonmark = require('commonmark');
 var reader = new commonmark.Parser();

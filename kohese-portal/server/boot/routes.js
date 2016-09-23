@@ -14,8 +14,8 @@ module.exports = function (app) {
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
     
-    app.use('/reports', serveIndex('reports', {'icons':true, 'view':'details'}));
-    app.use('/reports', loopback.static(path.resolve(__dirname, '../../reports')));
+    app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
+    app.use('/reports', loopback.static(path.resolve(__dirname, '../../tmp_reports')));
     
     app.use(bodyParser.json());
 
