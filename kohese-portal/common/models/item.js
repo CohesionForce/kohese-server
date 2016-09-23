@@ -120,10 +120,10 @@ module.exports = function (Item) {
     Item.getHistory = function(req, onId, cb) {
       console.log("::: Getting history for " + onId);
 
-      var instance = global.koheseKDB.ItemProxy.getProxyFor(onId);
-      console.log("::: Getting history for " + instance.repoPath);
+      var proxy = global.koheseKDB.ItemProxy.getProxyFor(onId);
+      console.log("::: Getting history for " + proxy.repoPath);
       
-      global.koheseKDB.kdbRepo.walkHistoryForFile(global.koheseKDB.repoList.ROOT, instance.repoPath, function(history){
+      global.koheseKDB.kdbRepo.walkHistoryForFile(proxy.repoPath, function(history){
         
         if (history) {
           cb(null, history);

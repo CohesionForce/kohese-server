@@ -46,8 +46,9 @@ function getStatus (repo, callback){
 }
 module.exports.getStatus = getStatus;
 
-function walkHistoryForFile(repo, fileToAnalyze, callback){
+function walkHistoryForFile(fileToAnalyze, callback){
   
+  var repo = global.koheseKDB.repoList.ROOT;
   var relativeFileParts = fileToAnalyze.match(repoFileSplitRegEx);
   fileToAnalyze = relativeFileParts[2];
 
