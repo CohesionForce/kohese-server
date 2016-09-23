@@ -8,6 +8,7 @@
  */
 const spawn = require('child_process').spawn;
 const nlc = require('license-checker');
+const nlcProd = require('license-checker');
 const blc = require('bower-license');
 const prompt = require('prompt');
 prompt.start();
@@ -41,11 +42,23 @@ if(process.argv.length > 2) {
     notInteractive = true;
 }
 
-var npmList;
+var npmList = {};
 var licenseStore = {};
 
 var loadData = new Promise(function(resolve, reject) {
     console.log('Initializing data...');
+    
+    var nlcProdPromise = new Promise(function(resolve, reject) {
+        nlcProd.init({start: __dirname + '/..', production: true}, function(err, node) {
+            if(err) {
+                console.log(err);
+                process.exit();
+            }
+            console.log('nodeProduction licenses data loaded.');
+            licenseStore['nodeProduction'] = node;
+            resolve();
+        });
+    });
 
     var nlcPromise = new Promise(function(resolve, reject) {
         nlc.init({start: __dirname + '/..'}, function(err, node) {
@@ -77,17 +90,27 @@ var loadData = new Promise(function(resolve, reject) {
         npmls.stdout.on('data', function(chunk) {
             data += chunk;
         });
-//      npmls.stderr.on('data', function(chunk) {
-//      console.error(chunk.toString('utf8'));
-//      });
         npmls.on('close', function() {
             console.log('npm ls done');
-            npmList = JSON.parse(data);
+            npmList['node'] = JSON.parse(data);
             resolve();
         })
     });
-
-    Promise.all([nlcPromise, blcPromise, npmPromise]).then(function() {
+    
+    var npmProdPromise = new Promise(function(resolve, reject) {
+        var npmls = spawn('npm', ['ls', '-prod', '-json']);
+        var data = '';
+        npmls.stdout.on('data', function(chunk) {
+            data += chunk;
+        });
+        npmls.on('close', function() {
+            console.log('npm ls prod done');
+            npmList['nodeProduction'] = JSON.parse(data);
+            resolve();
+        })
+    });
+    
+    Promise.all([nlcPromise, nlcProdPromise, blcPromise, npmPromise, npmProdPromise]).then(function() {
         resolve();
     });
 });
@@ -142,6 +165,7 @@ loadData.then(function() {
         if(notInteractive){
             process.exit();
         }
+        console.log('Current Mode: ' + mode);
         prompt.get(mainMenu, function(err, result) {
             if(result.option === 'l' || result.option === 'L') {
                 listLicenses();
@@ -158,6 +182,8 @@ loadData.then(function() {
             }
             if(result.option === 'c' || result.option === 'C') {
                 if(mode === 'node') {
+                    mode = 'nodeProduction';
+                } else if(mode === 'nodeProduction') {
                     mode = 'bower';
                 } else if(mode === 'bower') {
                     mode = 'node';
@@ -170,6 +196,10 @@ loadData.then(function() {
                 processJSON();
             }
             if(result.option === 'n' || result.option === 'N') {
+                if(mode === 'bower') {
+                    console.log('bower is not supported with this option');
+                    return;
+                }
                 prompt.get(depPrompt, function(err, result) {
                     getDepInfo(result.module);
                 })
@@ -222,6 +252,10 @@ loadData.then(function() {
     }
 
     function getDepInfo(module) {
+        if(mode === 'bower') {
+            console.log('mode bower not supported');
+            return;
+        }
         var moduleChain = getChain(module);
         printModuleChain(moduleChain);
 
@@ -245,7 +279,7 @@ loadData.then(function() {
             var parentChainIdx = 0;
             var chain = [];
 
-            buildChain(npmList);
+            buildChain(npmList[mode]);
             return parentChain;
 
             function buildChain(parent) {
