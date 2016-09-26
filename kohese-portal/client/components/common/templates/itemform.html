@@ -79,7 +79,7 @@
 
         <div class="controls">
             <input type="text" ng-model="detailsCtrl.itemProxy.item.name" id="name"
-                   ng-disabled="!detailsCtrl.enableEdit" style="width:100%"/>
+                   ng-disabled="!detailsCtrl.enableEdit || (detailsCtrl.itemProxy.item.hasOwnProperty('mounted') && !detailsCtrl.itemProxy.item.mounted)" style="width:100%"/>
         </div>
     </div>
     <div class="control-group"
@@ -100,7 +100,8 @@
         <!--clear-selected="true"-->
         <div class="controls">
             <input type="text" ng-model="detailsCtrl.itemProxy.item.tags" id="Tags"
-                   ng-disabled="!detailsCtrl.enableEdit" style="width:100%"/>
+                   ng-disabled="!detailsCtrl.enableEdit || (detailsCtrl.itemProxy.item.hasOwnProperty('mounted') && !detailsCtrl.itemProxy.item.mounted)" 
+                   style="width:100%"/>
         </div>
     </div>
     <div class="control-group"
@@ -112,7 +113,8 @@
                                     rows="1" msd-elastic
                                     style="width:100%; max-width:100%;"
                                       ng-model="detailsCtrl.itemProxy.item.description"
-                                      ng-disabled="!detailsCtrl.enableEdit" id="Description"></textarea>
+                                      ng-disabled="!detailsCtrl.enableEdit || (detailsCtrl.itemProxy.item.hasOwnProperty('mounted') && !detailsCtrl.itemProxy.item.mounted)" 
+                                      id="Description"></textarea>
         </div>
     </div>
 </form>

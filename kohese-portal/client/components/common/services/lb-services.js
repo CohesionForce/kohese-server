@@ -707,7 +707,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              *  - `req` – `{object=}` -
              *
-             *  - `onId` – `{string=}` -
+             *  - `repoId` – `{string=}` -
              *
              * @param {function(Object,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.

@@ -5,7 +5,11 @@
   "properties": {
     "origin": {
       "type": "string",
-      "required": true
+      "required": false
+    },
+    "mounted": {
+      "type": "boolean",
+      "required": false
     }
   },
   "validations": [],
