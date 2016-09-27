@@ -105,29 +105,24 @@ module.exports.removeFile = removeFile;
 //////////////////////////////////////////////////////////////////////////
 function getRepositoryFileList(dirPath, fileRegEx) {
   var fileList = fs.readdirSync(dirPath);
-
-  // Ignore the .git file if it exists
-  var gitIdx = fileList.indexOf(".git");
-  if (gitIdx > -1){
-    fileList.splice(gitIdx, 1);
-  }
-
-  // Ignore the .gitignore file if it exists
-  var gitignoreIdx = fileList.indexOf(".gitignore");
-  if (gitignoreIdx > -1){
-    fileList.splice(gitignoreIdx, 1);
+  
+  // Ignore the following files if they exist
+  var ignoreList = ['.git', '.gitignore', '.npmignore', 'Root.json', 'mounts.json'];
+  ignoreFiles(ignoreList);
+  function ignoreFiles(names) {
+      var index;
+      for(var i = 0; i < names.length; i++) {
+          index = fileList.indexOf(names[i]);
+          if(index > -1) {
+              fileList.splice(index, 1);
+          }
+      }
   }
   
-  //Ignore the .npmignore file if it exists
-  var npmignoreIdx = fileList.indexOf(".npmignore");
-  if (npmignoreIdx > -1){
-    fileList.splice(npmignoreIdx, 1);
-  }
-
   // Filter the list if fileRegEx is supplied
   if (fileRegEx){
     var filteredList = [];
-    for(var fileIdx in fileList){
+    for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++){
       var fileName = fileList[fileIdx];
       if(fileRegEx.test(fileName)){
         filteredList.push(fileName);

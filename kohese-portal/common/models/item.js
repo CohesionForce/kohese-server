@@ -118,12 +118,12 @@ module.exports = function (Item) {
     //
     //////////////////////////////////////////////////////////////////////////
     Item.getHistory = function(req, onId, cb) {
-      console.log("::: Getting history for " + onId);
+      //console.log("::: Getting history for " + onId);
 
       var proxy = global.koheseKDB.ItemProxy.getProxyFor(onId);
       console.log("::: Getting history for " + proxy.repoPath);
       
-      global.koheseKDB.kdbRepo.walkHistoryForFile(proxy.repoPath, function(history){
+      global.koheseKDB.kdbRepo.walkHistoryForFile(proxy, function(history){
         
         if (history) {
           cb(null, history);
@@ -160,12 +160,11 @@ module.exports = function (Item) {
     //////////////////////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////////////////////
-    Item.getStatus = function(req, repoId, cb) {
-      console.log("::: Getting status");
-
-      var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
+    Item.getStatus = function(req, onId, cb) {
+      console.log("::: Getting status for " + onId);
+      //var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
       
-      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.repoList.ROOT, function(status){
+      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.repoList[onId], function(status){
         
         if (status) {
           cb(null, status);
@@ -185,7 +184,7 @@ module.exports = function (Item) {
           source : 'req'
         }
       }, {
-        arg : 'repoId',
+        arg : 'onId',
         type : 'string'
       } ],
       returns : {

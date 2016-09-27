@@ -54,7 +54,7 @@ function determineRepoStoragePath(repo){
   if(repo && repo.item.id !== 'ROOT'){
     console.log("::: Repository => " + repo.item.name);
     if(repo.repoPath){
-      repoStoragePath = repo.repoPath.replace("/Root.json", "")
+      repoStoragePath = repo.repoPath.replace("/Root.json", "");
       repoStoragePath = repoStoragePath.replace(jsonExt, ""); 
     } else {
       // Must be a new repo
@@ -127,26 +127,28 @@ function storeModelInstance(modelName, modelInstance){
       id: modelInstance.id,
       name: modelInstance.name,
       parentId: modelInstance.parentId,
-      repoStoragePath : repoStoragePath,
-      origin: modelInstance.origin
     };
     
     console.log("::: Repo Mount Information");
     console.log(repoMountData);
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
+    mountList[repoMountData.id] = {'repoStoragePath': repoStoragePath};
+    updateMountFile();
   
     repoStoragePath = determineRepoStoragePath(proxy);
     console.log("::: rSP: " + repoStoragePath);
     
-    if (isNewItem){
-      validateRepositoryStructure(repoStoragePath);
-    }
-
     filePath = repoStoragePath + "/Root.json";
     var repoRootData = JSON.parse(JSON.stringify(modelInstance));
     delete repoRootData.parentId;
     delete repoRootData.repoStoragePath;
+    delete repoRootData.mounted;
+    checkAndCreateDir(repoStoragePath);
     kdbFS.storeJSONDoc(filePath, repoRootData);
+    
+    if (isNewItem){
+        validateRepositoryStructure(repoStoragePath);
+      }
 
   } else {
 
@@ -181,6 +183,23 @@ function removeModelInstance(modelName, instanceId){
     var filePath = repoStoragePath + "/" + modelName + "/" + instanceId + ".json";
 
     kdbFS.removeFile(filePath); 
+  } else if (modelName === 'Repository') {
+      // Delete any associated analysis
+      var analysisStore = kdbStore.models["Analysis"];
+      if(analysisStore[instanceId]){
+        removeModelInstance("Analysis", instanceId);
+      }
+      
+      var parentRepo = proxy.parentProxy.getRepositoryProxy();
+      var parentRepoPath = mountList[parentRepo.item.id].repoStoragePath;
+      
+      kdbFS.removeFile(path.join(parentRepoPath, 'Repository', proxy.item.id + '.json.mount'));
+      delete mountList[proxy.item.id];
+      proxy.deleteItem();
+      updateMountFile();
+      
+      // Should remove the proxies and modelStore instances of all the children, but not delete from disk.
+      
   } else {
     // Delete any associated analysis
     var analysisStore = kdbStore.models["Analysis"];
@@ -218,12 +237,6 @@ function validateRepositoryStructure (repoDirPath) {
 
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
   
-  // Ignore the Root.json file if it exists
-  var rootIdx = modelDirList.indexOf("Root.json");
-  if (rootIdx > -1){
-    modelDirList.splice(rootIdx, 1);
-  }
-  
   // Remove model directories that are no longer needed
   for (var dirIdx = 0; dirIdx < modelDirList.length; dirIdx++) {
     var modelDirName = modelDirList[dirIdx];
@@ -241,12 +254,6 @@ function validateRepositoryStructure (repoDirPath) {
   }
   
   modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
-
-  // Ignore the Root.json file if it exists
-  rootIdx = modelDirList.indexOf("Root.json");
-  if (rootIdx > -1){
-    modelDirList.splice(rootIdx, 1);
-  }
   
   for(var modelIdx = 0; modelIdx < modelDirList.length; modelIdx++){
     var modelName = modelDirList[modelIdx];
@@ -262,11 +269,21 @@ function validateRepositoryStructure (repoDirPath) {
             
             console.log("::: Validating mounted repository: " + repoMount.name);
             
-            // May be useful to do some logic here that verifies the repo topology
-            mountList.push(repoMount);
+            // Check mountFile for the mount path or use a .mount file if necessary
+            var subRepoDirPath;
+            if(mountList[repoMount.id]) {
+                subRepoDirPath = mountList[repoMount.id].repoStoragePath;
+            } else if (repoMount.repoStoragePath){
+                // Does not exist in mountList so need to add and rewrite it
+                mountList[repoMount.id] = {};
+                mountList[repoMount.id].repoStoragePath = repoMount.repoStoragePath;
+                subRepoDirPath = repoMount.repoStoragePath;
+                updateMountFile();
+            } else {
+                throw new Error('Cannot find mount path information for ' + itemPath);
+            }
             
             // Attempt to mount the repository. If unable then make it apparent in the client.
-            var subRepoDirPath = repoMount.repoStoragePath;
             var repoCanBeMounted = true;
             var repoRoot;
             
@@ -276,6 +293,8 @@ function validateRepositoryStructure (repoDirPath) {
                 repoCanBeMounted = false;
                 console.log('!!! Unable to mount repo ' + repoMount.name);
                 delete repoMount.repoStoragePath;
+                mountList[repoMount.id].mounted = false;
+                repoMount.mounted = false;
                 repoMount.name = 'Error: ' + repoMount.name;
                 repoMount.description = 'Error: Unable to load ' + subRepoDirPath;
                 var proxy = new ItemProxy(modelName, repoMount);
@@ -289,11 +308,22 @@ function validateRepositoryStructure (repoDirPath) {
                     repoMount.name = repoRoot.name;
                     kdbFS.storeJSONDoc(itemPath, repoMount);
                 }
-                repoRoot.parentId = repoMount.parentId;
-                var proxy = new ItemProxy(modelName, repoRoot);
-                proxy.repoPath = path.join(subRepoDirPath, 'Root.json');
-                validateRepositoryStructure(subRepoDirPath);
-                modelStore[repoMount.id] = JSON.stringify(repoRoot);
+                // Check to see if it's been mounted already
+                var proxy;
+                if(mountList[repoMount.id].mount) {
+                    proxy = ItemProxy.getProxyFor(repoMount.id);
+                    repoRoot.parentId = repoMount.parentId;
+                    proxy.updateItem('Repository', repoRoot);
+                    modelStore[repoMount.id] = JSON.stringify(repoRoot);
+                } else {
+                    repoRoot.parentId = repoMount.parentId;
+                    mountList[repoMount.id].mounted = true;
+                    repoRoot.mounted = true;
+                    proxy = new ItemProxy(modelName, repoRoot);
+                    proxy.repoPath = path.join(subRepoDirPath, 'Root.json');
+                    validateRepositoryStructure(subRepoDirPath);
+                    modelStore[repoMount.id] = JSON.stringify(repoRoot);
+                }
             }
         }
     } else {
@@ -313,6 +343,17 @@ function validateRepositoryStructure (repoDirPath) {
     }
   kdbStore.ids[modelName] += fileList.length;
   }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function updateMountFile() {
+    var mountFile = JSON.parse(JSON.stringify(mountList));
+    for(var id in mountFile) {
+        delete mountFile[id].mounted;
+    }
+    kdbFS.storeJSONDoc(mountFilePath, mountFile);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -359,45 +400,57 @@ for (var i = 2; i < process.argv.length; i++) {
 var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
 checkAndCreateDir(koheseKDBDirPath);
 
-//// Check if root.json exists in ROOT so that it may be loaded stand alone.
-//var rootFile, makeRootJSON = false;
-//try {
-//	rootFile = kdbFS.loadJSONDoc(koheseKDBDirPath + '/' + 'Root.json');
-//} catch(err) {
-//	makeRootJSON = true;
-//	// TODO: Need to generate a UUID here
-//	rootFile = {id: 'TBD-TBD-TBD-TBD-TBD',origin: 'Root Repo', name: 'Root Repo', description: 'Root Repo'};
-//}
-//
-//if(makeRootJSON) {
-//	kdbFS.storeJSONDoc(koheseKDBDirPath + '/' + 'Root.json', rootFile);
-//}
+// Check to see if a Root.json exists
+try {
+    kdbFS.loadJSONDoc(path.join(koheseKDBDirPath, 'Root.json'));
+} catch(err) {
+    var uuid = require('node-uuid');
+    var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
+    kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
+}
 
+// Check and process mounts.json
+var mountList = {};
+var mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
+try {
+    mountList = kdbFS.loadJSONDoc(mountFilePath);
+} catch(err) {
+    // Do nothing; the mount list will get written when validating if necessary
+}
+
+// Create/validate root repo structure
+validateRepositoryStructure(koheseKDBDirPath);
+
+// Validate the repositories listed inside the mount file
+for(var id in mountList) {
+    if(!mountList[id].mounted && mountList[id].repoStoragePath) {
+        validateRepositoryStructure(mountList[id].repoStoragePath);
+    }
+}
+
+// Load corresponding git repositories
 var repoList = {};
 module.exports.repoList = repoList;
 
-// Temporary fix for the git repo being at kohese-kdb not kohese-kdb/export
-var openRepoPath = koheseKDBDirPath;
-if(baseRepoPath === 'kohese-kdb/export') {
-    openRepoPath = path.join(openRepoPath, '/..');
+if(koheseKDBDirPath === 'kdb/kohese-kdb/export') {
+    kdbRepo.openRepo('kdb/kohese-kdb', repoList, 'ROOT');
+} else {
+    kdbRepo.openRepo(koheseKDBDirPath, repoList, 'ROOT');
 }
 
-kdbRepo.openRepo(openRepoPath,function(repo){
-//  console.log(">>> CB from kdb repo");
-//  console.log(repo);
-  repoList.ROOT = repo;
-  kdbRepo.getStatus(repo, function(repoStatus){
-//    console.log(">>> Current repo status")
-//    console.log(repoStatus);
-    });
-  });
-
-// Create list of mounted repositories.
-var mountList = [];
-
-validateRepositoryStructure(koheseKDBDirPath);
+// Initialize nodegit repo-open promises
+for(var id in mountList) {
+    if(mountList[id].mounted && mountList[id].repoStoragePath) {
+        if(mountList[id].repoStoragePath === 'kdb/kohese-kdb/export') {
+            kdbRepo.openRepo('kdb/kohese-kdb', repoList, id);
+        } else {
+            kdbRepo.openRepo(mountList[id].repoStoragePath, repoList, id);
+        }
+    }
+}
 
 var rootProxy = ItemProxy.getRootProxy();
+rootProxy.repoPath = koheseKDBDirPath;
 console.log("--- Root descendant count: " + rootProxy.descendantCount);
 for(var childIdx in rootProxy.children){
   var childProxy = rootProxy.children[childIdx];

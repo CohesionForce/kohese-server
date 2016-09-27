@@ -27,6 +27,7 @@
     "loopback-connector-mongodb": "^1.8.0",
     "loopback-datasource-juggler": "^2.19.0",
     "morgan": "^1.7.0",
+    "node-uuid": "^1.4.7",
     "nodegit": "^0.14.1",
     "prompt": "^1.0.0",
     "request": "^2.65.0",

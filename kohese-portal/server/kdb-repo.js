@@ -9,14 +9,14 @@ var path = require("path");
 var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
 
-function openRepo(repoPath, callback){
-  console.log("::: Opening repo " + repoPath);
-
-  nodegit.Repository.open(repoPath)
-    .then(function(repo){
-      console.log(">>> Opened repo");
-      console.log(repo);
-      callback(repo);
+function openRepo(repoPath, repoList, id) {
+    console.log("::: Opening repo " + repoPath);
+    nodegit.Repository.open(repoPath)
+    .then(function(repo) {
+        console.log(">>> Opened repo at " + repo.path());
+        repoList[id] = repo;
+    }, function(err) {
+        console.log(err);
     });
 }
 module.exports.openRepo = openRepo;
@@ -46,14 +46,33 @@ function getStatus (repo, callback){
 }
 module.exports.getStatus = getStatus;
 
-function walkHistoryForFile(fileToAnalyze, callback){
+function walkHistoryForFile(proxy, callback){
   
-  var repo = global.koheseKDB.repoList.ROOT;
-  var relativeFileParts = fileToAnalyze.match(repoFileSplitRegEx);
-  fileToAnalyze = relativeFileParts[2];
+  var fileToAnalyze = proxy.repoPath;
+  var repoProxy = proxy.getRepositoryProxy();
+  var repo = global.koheseKDB.repoList[repoProxy.item.id];
+  while(!repo) {
+      if(repoProxy.item.id === 'ROOT'){
+          console.log('!!! Cannot find a git repo containing ' + fileToAnalyze);
+          return;
+      }
+      repoProxy = repoProxy.parentProxy.getRepositoryProxy();
+      repo = global.koheseKDB.repoList[repoProxy.item.id];
+  }
 
-  console.log("::: Walking History for " + fileToAnalyze);
-  console.log(repo);
+  var pathToRepo = repoProxy.repoPath.split('Root.json')[0];
+  //var relativeFileParts = fileToAnalyze.match(repoFileSplitRegEx);
+  var relativeFileParts = fileToAnalyze.split(pathToRepo)[1];
+  //fileToAnalyze = relativeFileParts[2];
+  fileToAnalyze = relativeFileParts;
+  
+  //More hackery to handle that kohese-kdb git repo is in the wrong place
+  if(pathToRepo === 'kdb/kohese-kdb/export') {
+      fileToAnalyze = 'export' + fileToAnalyze;
+      pathToRepo = path.join(pathToRepo, '..');
+  }
+  
+  console.log("::: Walking History for " + fileToAnalyze + ' in ' + pathToRepo);
   var walker;
   var historyCommits = [];
   var commit;
@@ -104,7 +123,14 @@ function walkHistoryForFile(fileToAnalyze, callback){
   .then(function() {
 
     var fileParts = fileToAnalyze.match(itemFileRegEx);
-    var itemId = fileParts[1];
+    var itemId;
+    if(fileParts === null) {
+        // Match failed, likely fileToAnalyze is Root.json
+        fileParts = fileToAnalyze;
+        itemId = fileParts;
+    } else {
+        itemId = fileParts[1];
+    }
 
     var historyResponse = {
         id: itemId,
