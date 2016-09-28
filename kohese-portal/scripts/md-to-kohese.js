@@ -2,7 +2,7 @@
  *  sends them to a local kohese server via rest interface.
  *  
  *  User must set the file and rootItem parameters below or via command line:
- *  node md-to-kohese.js rootItem.parentId filepath rootItem.name --unordered
+ *  node scripts/md-to-kohese.js rootItem.parentId filepath rootItem.name --unordered
  */
 var fs = require('fs');
 var util = require('util');
@@ -15,18 +15,20 @@ var accessToken;
 //This checks to see if this was run via command line rather than required.
 var ranFromCommandLine = require.main === module;
 if ( ranFromCommandLine ) {
+    
+    if(process.argv.length < 4) {
+        console.log('Usage: node scripts/md-to-kohese.js rootItem.parentId filepath rootItem.name [--unordered]');
+        process.exit();
+    }
 
 	var filePath, rootItem;
 	var unordered = false;
-//////////User parameters - See also http options
-
-	filePath = 'scripts/basic.md';
-	rootItem = {name: 'Basic Test 1',
+	
+	rootItem = {name: '',
 			description: '',
 			parentId: '',
 			itemIds: []};
 
-///////// End User Parameters
 
 //	argv[2] sets root item parentId
 	if(process.argv[2]) {
@@ -38,12 +40,12 @@ if ( ranFromCommandLine ) {
 		filePath = process.argv[3];
 	}
 
+// argv[4] sets root item name
 	if(process.argv[4]) {
 		rootItem.name = process.argv[4];
-	} else {
-		rootItem.name = filePath;
-	}
+	} 
 	
+// toggles whether the itemIds array is sent to force the input ordering
 	if(process.argv[5] && process.argv[5] === '--unordered') {
 		unordered = true;
 	}

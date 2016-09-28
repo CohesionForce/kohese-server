@@ -62,8 +62,8 @@ var Render = function() {
 		},
 		
 		addListTabs: function() {
-			for(var i = 0; i < this.listDepth; i++) {
-				this.buffer += '\t';
+			for(var i = 1; i < this.listDepth; i++) {
+				this.buffer += '    ';
 			}
 		},
 		
