@@ -10,10 +10,10 @@ var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
 
 function openRepo(repoPath, repoList, id) {
-    console.log("::: Opening repo " + repoPath);
+    console.log("::: Opening git repo " + repoPath);
     nodegit.Repository.open(repoPath)
     .then(function(repo) {
-        console.log(">>> Opened repo at " + repo.path());
+        console.log(">>> Opened git repo at " + repo.path());
         repoList[id] = repo;
     }, function(err) {
         console.log(err);
