@@ -440,12 +440,14 @@ for (var i = 2; i < process.argv.length; i++) {
 var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
 checkAndCreateDir(koheseKDBDirPath);
 
-// Check to see if a Root.json exists
+// Check to see if a Root.json exists. If not, assume brand new kdb
 try {
     kdbFS.loadJSONDoc(path.join(koheseKDBDirPath, 'Root.json'));
 } catch(err) {
+    console.log('::: Creating a new KDB at ' + koheseKDBDirPath);
     var uuid = require('node-uuid');
     var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
+    createRepoStructure(koheseKDBDirPath)
     kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
 }
 
