@@ -107,7 +107,7 @@ function getRepositoryFileList(dirPath, fileRegEx) {
   var fileList = fs.readdirSync(dirPath);
   
   // Ignore the following files if they exist
-  var ignoreList = ['.git', '.gitignore', '.npmignore', 'Root.json', 'mounts.json'];
+  var ignoreList = ['.git', '.gitignore', '.npmignore', 'Root.json', 'mounts.json', '.project'];
   ignoreFiles(ignoreList);
   function ignoreFiles(names) {
       var index;

@@ -66,12 +66,6 @@ function walkHistoryForFile(proxy, callback){
   //fileToAnalyze = relativeFileParts[2];
   fileToAnalyze = relativeFileParts;
   
-  //More hackery to handle that kohese-kdb git repo is in the wrong place
-  if(pathToRepo === 'kdb/kohese-kdb/export') {
-      fileToAnalyze = 'export' + fileToAnalyze;
-      pathToRepo = path.join(pathToRepo, '..');
-  }
-  
   console.log("::: Walking History for " + fileToAnalyze + ' in ' + pathToRepo);
   var walker;
   var historyCommits = [];

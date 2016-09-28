@@ -73,8 +73,8 @@ function getCommitDetails (repo, commitOID){
                               patch.newFile().path());
                   console.log(hunk.header().trim());
                   lines.forEach(function(line) {
-//                    console.log(String.fromCharCode(line.origin()) +
-//                                line.content().trim());
+                    console.log(String.fromCharCode(line.origin()) +
+                                line.content().trim());
                   });
                 });
               });
@@ -160,21 +160,21 @@ nodegit.Repository.open("kdb/kohese-kdb")
   .then(function(repo) {
     console.log("::: Repo is open");
     
-    getStatus(repo);
+//    getStatus(repo);
 
     commitWithFileRenames = "facbe3cd973f5d0f39dbe65c5102ba443674db34";
     commitWithSmallerChanges = "43d651aa104fe58c57c53a972e3575c12d278939";
     commitWithSomeChanges = "b76990f9a91326a2656ed666681b7d5e90e36b6e";
     
     
-//    getCommitDetails(repo, commitWithSomeChanges);
+    getCommitDetails(repo, commitWithSomeChanges);
 
-    var fileToAnalyze= "export/Repository/4a733240-6d21-11e5-ae5b-1ba25b1f580f/Item/c5854ab0-37a4-11e6-a58d-a33a25a82097.json";
+    var fileToAnalyze= "Repository/4a733240-6d21-11e5-ae5b-1ba25b1f580f/Item/c5854ab0-37a4-11e6-a58d-a33a25a82097.json";
 //    fileToAnalyze= "./scripts/testNodeGit.js";
-    walkHistoryForFile(repo, fileToAnalyze, function (history){
-      console.log("::: History")
-      console.log(history);      
-    });
+//    walkHistoryForFile(repo, fileToAnalyze, function (history){
+//      console.log("::: History")
+//      console.log(history);      
+//    });
 });
 
 console.log("::: End test nodegit");

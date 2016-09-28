@@ -388,7 +388,7 @@ checkAndCreateDir(kdbDirPath);
 checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
 //TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
 //Paths may be provided via arguments when starting via -kdb=PATH
-var baseRepoPath = 'kohese-kdb/export';
+var baseRepoPath = 'kohese-kdb';
 for (var i = 2; i < process.argv.length; i++) {
     var arg = process.argv[i].split('=');
     if(arg[0] === '-kdb' && arg[1] !=='') {
@@ -432,20 +432,12 @@ for(var id in mountList) {
 var repoList = {};
 module.exports.repoList = repoList;
 
-if(koheseKDBDirPath === 'kdb/kohese-kdb/export') {
-    kdbRepo.openRepo('kdb/kohese-kdb', repoList, 'ROOT');
-} else {
-    kdbRepo.openRepo(koheseKDBDirPath, repoList, 'ROOT');
-}
+kdbRepo.openRepo(koheseKDBDirPath, repoList, 'ROOT');
 
 // Initialize nodegit repo-open promises
 for(var id in mountList) {
     if(mountList[id].mounted && mountList[id].repoStoragePath) {
-        if(mountList[id].repoStoragePath === 'kdb/kohese-kdb/export') {
-            kdbRepo.openRepo('kdb/kohese-kdb', repoList, id);
-        } else {
-            kdbRepo.openRepo(mountList[id].repoStoragePath, repoList, id);
-        }
+        kdbRepo.openRepo(mountList[id].repoStoragePath, repoList, id);
     }
 }
 
