@@ -442,7 +442,7 @@ for(var id in mountList) {
 }
 
 var rootProxy = ItemProxy.getRootProxy();
-rootProxy.repoPath = koheseKDBDirPath;
+rootProxy.repoPath = path.join(koheseKDBDirPath, 'Root.json');
 console.log("--- Root descendant count: " + rootProxy.descendantCount);
 for(var childIdx in rootProxy.children){
   var childProxy = rootProxy.children[childIdx];
