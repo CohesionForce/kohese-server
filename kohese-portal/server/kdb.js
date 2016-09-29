@@ -438,17 +438,31 @@ for (var i = 2; i < process.argv.length; i++) {
 }
 
 var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
-checkAndCreateDir(koheseKDBDirPath);
 
 // Check to see if a Root.json exists. If not, assume brand new kdb
 try {
     kdbFS.loadJSONDoc(path.join(koheseKDBDirPath, 'Root.json'));
 } catch(err) {
-    console.log('::: Creating a new KDB at ' + koheseKDBDirPath);
-    var uuid = require('node-uuid');
-    var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
-    createRepoStructure(koheseKDBDirPath)
-    kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
+    // Check to see if a flag was provided to create a new KDB
+    var createFlag = false;
+    for (var i = 2; i < process.argv.length; i++) {
+        if(process.argv[i] === 'create') {
+            createFlag = true;
+        }
+    }
+    // Make a new KDB if the create flag is provided or it's running with the default KDB
+    if(createFlag || koheseKDBDirPath === 'kdb/kohese-kdb') {
+        console.log('::: Creating a new KDB at ' + koheseKDBDirPath);
+        var uuid = require('node-uuid');
+        var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
+        createRepoStructure(koheseKDBDirPath);
+        kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
+    } else {
+        console.log('No KDB found at ' + koheseKDBDirPath);
+        console.log('To create a new KDB, run with the extra argument "create"');
+        console.log('For example, "-kdb=PATH create"');
+        process.exit();
+    }
 }
 
 // Check and process mounts.json
