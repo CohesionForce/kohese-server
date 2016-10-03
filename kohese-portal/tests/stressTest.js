@@ -1,20 +1,23 @@
 /** This script launches as arbitrary number of GET requests against the server
  *  to test server performance under load.
  *  
- *  usage: node tests/stressTest.js <itemId> <numberOfReqs>
+ *  usage: node tests/stressTest.js <itemId> <numberOfReqs> <delayInMS>
  */
 
 const http = require('http');
 
 var itemId;
 var numOfRequests;
+var displayResponse = false;
+var exitOnErrorResponse = false;
 
-if(process.argv[3] && !isNaN(Number(process.argv[3]))) {
+if(process.argv[4] && !isNaN(Number(process.argv[4]))) {
     itemId = process.argv[2];
     numOfRequests = Number(process.argv[3]);
+    delayInMS = Number(process.argv[4]);
     
 } else {
-    console.log('Usage: node tests/stressTest.js <itemId> <numberOfReqs>');
+    console.log('Usage: node tests/stressTest.js <itemId> <numberOfReqs> <delayInMS>');
     process.exit();
 }
 
@@ -24,7 +27,7 @@ var accessToken = getAccessToken();
 
 var successful = 0;
 for(var i = 0; i < numOfRequests; i++) {
-    makeGET(i);
+    setTimeout(makeGET, i*delayInMS, i);
 }
 
 function makeGET(count) {
@@ -40,11 +43,26 @@ function makeGET(count) {
     
     var getRequest = http.request(options, function(response) {
         if(response.statusCode !== 200) {
-            console.log('Failed with status ' + response.statusCode + ' after ' + (count+1) + ' requests.');
-            console.log(successful + ' requests completed successfully.');
-            process.exit();
+            if (displayResponse || exitOnErrorResponse){
+              console.log('*** Received status response ' + response.statusCode + ' after ' + (count+1) + ' requests.');              
+            }
+            if (exitOnErrorResponse){
+              console.log(successful + ' requests completed successfully.');
+              process.exit();
+            }
+            successful++;
         } else {
             successful++;
+
+            if (displayResponse){
+              response.on('data', (chunk) => {
+                console.log("::: Response - " + count);
+                console.log(`BODY: ${chunk}`);
+              });
+              response.on('end', () => {
+                console.log('No more data in response.');
+              });              
+            }
         }
             
         if (count === numOfRequests - 1) {
