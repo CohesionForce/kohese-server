@@ -173,6 +173,10 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         // no descendant found
         return false;
     };
+    
+    treeCtrl.proxyOrChildMatchesFilter = function (proxy) {
+        return (treeCtrl.matchesFilter(proxy) || treeCtrl.childMatchesFilter(proxy));
+    }
 
     treeCtrl.tab.setTitle('Explore');
 

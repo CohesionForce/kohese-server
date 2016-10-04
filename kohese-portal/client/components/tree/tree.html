@@ -55,49 +55,49 @@
 
 <div class="knowledge-tree-panel">
   <div id="theKT" class="knowledge-tree" style="width:45%; display:inline-block">
-	<div class="kt-head">
-		<div class="kth-cell kti-name">Name</div>
-		<div class="kth-cell pull-right">
-			<i class="glyphicon glyphicon-plus pull-right"
-				ui-sref="kohese.explore.create()"
-				ng-click="treeCtrl.updateTab('create')"></i>
-		</div>
-	</div>
+	  <div class="kt-head">
+		  <div class="kth-cell kti-name">Name</div>
+		  <div class="kth-cell pull-right">
+			  <i class="glyphicon glyphicon-plus pull-right"
+				   ui-sref="kohese.explore.create()"
+				   ng-click="treeCtrl.updateTab('create')"></i>
+		  </div>
+	  </div>
 	<div class="kt-body">
         <tree-row tree-ctrl="treeCtrl" proxy-collection="treeCtrl.treeRoot.children"></tree-row>
 	</div>
-  </div>
-  <div style="height:100%; width:54%; vertical-align: top; display:inline-block; overflow:auto"
-       ng-if="treeCtrl.selectedItemProxy.item">
-    <table class="table table-striped table-condensed table-hover">
-      <thead>
-        <th><a href="" ng-click="itemSortField = 'item.kind'">Kind</a></th>
-        <th><a href="" ng-click="itemSortField = 'item.name'">Name</a></th>
-        <th><a href="" ng-click="itemSortField = 'item.actionState'">State</a></th>
-        <th><a href="" ng-click="itemSortField = 'item.assignedTo'">Assigned To</a></th>
-        <th><a href="" ng-click="itemSortField = 'item.tags'">Tags</a></th>
-        <th><i class="glyphicon glyphicon-plus pull-right"
-           ng-click="treeCtrl.createChildOfSelectedItem()"></i></th>
-      </thead>
-      <tbody>
-        <tr ng-repeat="proxy in filteredItems = (treeCtrl.selectedItemProxy.children  | filter:{item: {$: treeCtrl.filter.text}}) | orderBy:itemSortField">
-          <td>{{proxy.kind}}<span ng-if="proxy.children.length > 0"> ({{proxy.children.length}})</span></td>
-          <td ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', proxy.item.id)"
-              class="tree-label"
-              ng-bind-html="proxy.item.name | highlight:treeCtrl.filter.text"></td>
-          <td>
-            <span ng-if="proxy.kind==='Decision'">{{proxy.item.decisionState}}</span>
-            <span ng-if="proxy.kind==='Action'">{{proxy.item.decisionState}}/{{proxy.item.actionState}}</span>
-            <span ng-if="proxy.kind==='Task'">{{proxy.item.taskState}}</span>
-            <span ng-if="proxy.kind==='Issue'">{{proxy.item.issueState}}</span>
-          </td>
-          <td>{{proxy.item.assignedTo}}</td>
-          <td>{{proxy.item.tags}}</td>
-          <td class="pull-right">
-            <i class="glyphicon glyphicon-remove" ng-click="treeCtrl.removeItem(proxy.item)"></i>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>    
+</div>
+<div style="height:100%; width:54%; vertical-align: top; display:inline-block; overflow:auto"
+     ng-if="treeCtrl.selectedItemProxy.item">
+  <table class="table table-striped table-condensed table-hover">
+    <thead>
+      <th><a href="" ng-click="itemSortField = 'item.kind'">Kind</a></th>
+      <th><a href="" ng-click="itemSortField = 'item.name'">Name</a></th>
+      <th><a href="" ng-click="itemSortField = 'item.actionState'">State</a></th>
+      <th><a href="" ng-click="itemSortField = 'item.assignedTo'">Assigned To</a></th>
+      <th><a href="" ng-click="itemSortField = 'item.tags'">Tags</a></th>
+      <th><i class="glyphicon glyphicon-plus pull-right"
+             ng-click="treeCtrl.createChildOfSelectedItem()"></i></th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="proxy in filteredItems = (treeCtrl.selectedItemProxy.children  | filter:treeCtrl.proxyOrChildMatchesFilter) | orderBy:itemSortField">
+        <td>{{proxy.kind}}<span ng-if="proxy.children.length > 0"> ({{proxy.children.length}})</span></td>
+        <td ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', proxy.item.id)"
+            class="tree-label"
+            ng-class="{'kti-filterMatchedExact': treeCtrl.matchesFilter(proxy, true)}"
+            ng-bind-html="proxy.item.name | highlight:treeCtrl.filter.text"></td>
+        <td>
+          <span ng-if="proxy.kind==='Decision'">{{proxy.item.decisionState}}</span>
+          <span ng-if="proxy.kind==='Action'">{{proxy.item.decisionState}}/{{proxy.item.actionState}}</span>
+          <span ng-if="proxy.kind==='Task'">{{proxy.item.taskState}}</span>
+          <span ng-if="proxy.kind==='Issue'">{{proxy.item.issueState}}</span>
+        </td>
+        <td>{{proxy.item.assignedTo}}</td>
+        <td>{{proxy.item.tags}}</td>
+        <td class="pull-right">
+          <i class="glyphicon glyphicon-remove" ng-click="treeCtrl.removeItem(proxy.item)"></i>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
