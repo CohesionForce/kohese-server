@@ -81,6 +81,7 @@ function DetailsViewController($state, $timeout, ItemRepository, analysisService
         if (detailsCtrl.itemProxy) {
             configureState();
         }
+        $scope.$emit('newItemSelected', $stateParams.id);
     });
 
     $scope.$on('tabSelected', function () {

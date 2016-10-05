@@ -9,6 +9,8 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         syncListener;
     treeCtrl.tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(treeCtrl.tab.id, 'treeCtrl', this);
+    
+    var filterTextTimeout;
 
     if (!controllerRestored) {
         treeCtrl.kindList = ItemRepository.getModelTypes();
@@ -44,10 +46,41 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
     });
 
     $scope.$watch('treeCtrl.filter.text', function () {
-        postDigest(function () {
-            // Force one more update cycle to get the match count to display
-            $scope.$apply();
-        });
+        if (filterTextTimeout) {
+          $timeout.cancel(filterTextTimeout);
+        }
+        
+        filterTextTimeout = $timeout(function() {
+          var regexFilter = /^\/(.*)\/([gimy]*)$/;
+          var filterIsRegex = treeCtrl.filter.text.match(regexFilter);
+
+          if (filterIsRegex) {
+            try {
+              treeCtrl.filter.textRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
+              treeCtrl.filter.textRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
+              treeCtrl.filter.invalidRegex = false;              
+            } catch (e) {
+              treeCtrl.filter.invalidRegex = true;
+            }
+          } else {
+            let cleanedPhrase = treeCtrl.filter.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            if(treeCtrl.filter.text !== ""){
+              treeCtrl.filter.textRegex = new RegExp(cleanedPhrase,"i");
+              treeCtrl.filter.textRegexHighlight = new RegExp('(' + cleanedPhrase + ')',"gi");
+              treeCtrl.filter.invalidRegex = false;
+            } else {
+              treeCtrl.filter.textRegex = null;
+              treeCtrl.filter.textRegexHighlight = null;
+              treeCtrl.filter.invalidRegex = false;
+            }
+          }
+
+          postDigest(function () {
+              // Force one more update cycle to get the match count to display
+              $scope.$apply();
+          });
+        }, 1000); // delay 1000 ms
+
     });
 
     $scope.$watch('treeCtrl.filter.kind', function () {
@@ -152,9 +185,9 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
                     return true;
                 }
             }
-            var lcFilter = treeCtrl.filter.text.toLowerCase();
+
             for (var key in proxy.item) {
-                if ((key.charAt(0) !== '$') && getTypeForFilter(proxy.item[key]) === 'string' && proxy.item[key].toLowerCase().indexOf(lcFilter) !== -1) {
+                if ((key.charAt(0) !== '$') && getTypeForFilter(proxy.item[key]) === 'string' && proxy.item[key].match(treeCtrl.filter.textRegex)) {
                     return true;
                 }
             }
@@ -189,9 +222,17 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         treeCtrl.isRootDefault = false;
     };
 
+    treeCtrl.upLevel = function () {
+      if (!treeCtrl.isRootDefault){
+        treeCtrl.treeRoot = treeCtrl.treeRoot.parentProxy;
+        treeCtrl.isRootDefault = (treeCtrl.treeRoot === treeCtrl.absoluteRoot);        
+        console.log("::: Setting root to " + treeCtrl.treeRoot.item.name);
+      }
+    };
+
     treeCtrl.resetRoot = function () {
-        treeCtrl.treeRoot = treeCtrl.absoluteRoot;
-        treeCtrl.isRootDefault = true;
+      treeCtrl.treeRoot = treeCtrl.absoluteRoot;
+      treeCtrl.isRootDefault = true;
     };
 
     treeCtrl.updateTab = function (state, id) {
@@ -208,11 +249,13 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             });
     };
 
-
-    syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {
-
-      console.log("::: Sync Item:" + data);
-      treeCtrl.selectedItemProxy = ItemRepository.getProxyFor(data);
+    treeCtrl.initCollapsed = function (itemId){
+      if (treeCtrl.collapsed[itemId] === undefined){
+        treeCtrl.collapsed[itemId] = !treeCtrl.allExpanded;
+      }
+    }
+    
+    function expandSyncedNodes() {
       
       var ancestorProxy = treeCtrl.selectedItemProxy.parentProxy;
       while(ancestorProxy && ancestorProxy !== treeCtrl.treeRoot){
@@ -223,13 +266,31 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         ancestorProxy = ancestorProxy.parentProxy;          
       }
       
-      $location.hash(data);
+      $location.hash(treeCtrl.selectedItemProxy.item.id);
       $anchorScroll();
+      postDigest(function () {
+        // Force one more update cycle to update display
+        $scope.$apply();
+        $anchorScroll();
+    });
+
+    }
+    
+    syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {
+
+      console.log("::: Sync Item:" + data);
+      treeCtrl.selectedItemProxy = ItemRepository.getProxyFor(data);
       
+      if (treeCtrl.locationSynced){
+        expandSyncedNodes();        
+      }
     });
     
     treeCtrl.syncLocation = function () {
-      $anchorScroll();
+      treeCtrl.locationSynced = !treeCtrl.locationSynced;
+      if(treeCtrl.locationSynced){
+        expandSyncedNodes();
+      }
     };
 
     treeCtrl.expandAll = function () {
@@ -237,6 +298,10 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         for (var key in treeCtrl.collapsed) {
             treeCtrl.collapsed[key] = false;
         }
+    };
+
+    treeCtrl.expandFiltered = function () {
+        treeCtrl.expandMatchingChildren(treeCtrl.treeRoot);
     };
 
     treeCtrl.collapseAll = function () {
@@ -262,6 +327,17 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
             var proxy = childrenList[i];
             treeCtrl.collapsed[proxy.item.id] = false;
         }
+    };
+
+    treeCtrl.expandMatchingChildren = function (itemProxy) {
+      var childrenList = itemProxy.children;
+      treeCtrl.collapsed[itemProxy.item.id] = false;
+      for (var i = 0; i < childrenList.length; i++) {
+          var proxy = childrenList[i];
+          if (treeCtrl.proxyOrChildMatchesFilter(proxy)){
+            treeCtrl.expandMatchingChildren(proxy);
+          }
+      }
     };
 
     treeCtrl.navigate = function (state, type, id) {

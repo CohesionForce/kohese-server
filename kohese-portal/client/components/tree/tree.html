@@ -1,13 +1,16 @@
 <div id="top-action-bar">
 	<button ng-click="treeCtrl.expandAll()" class="btn btn-default btn-sm"
 		style="margin: 5px">Expand All</button>
+	<button ng-click="treeCtrl.expandFiltered()"
+		class="btn btn-default btn-sm" style="margin: 5px">Expand
+		Filtered</button>
 	<button ng-click="treeCtrl.collapseAll()"
-		class="btn btn-default btn-sm" style="margin: 5px">Collapse All</button>
-    <button
-            class="btn btn-default btn-sm"
-            ng-click="treeCtrl.resetRoot()">
-        Reset Root
-    </button>
+		class="btn btn-default btn-sm" style="margin: 5px">Collapse
+		All</button>
+  <button class="btn btn-default btn-sm" ng-click="treeCtrl.upLevel()" ng-disabled="treeCtrl.isRootDefault">
+    Up Level</button>
+  <button class="btn btn-default btn-sm" ng-click="treeCtrl.resetRoot()" ng-disabled="treeCtrl.isRootDefault">
+    Reset Root</button>
 	<i ng-click="treeCtrl.syncLocation()"
 		ng-class="{ 'button-selected' :treeCtrl.locationSynced}"
 		class="btn btn-default btn-sm fa fa-exchange"> </i>
@@ -49,6 +52,7 @@
       </span>	    
 	    <input
 		    class="input-sm" type="text" ng-model="treeCtrl.filter.text"
+		    ng-style="treeCtrl.filter.invalidRegex && {'background-color':'pink'}"
 		    placeholder="Filter" style="margin: 5px" />
 	</span>
 </div>
@@ -85,7 +89,7 @@
         <td ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', proxy.item.id)"
             class="tree-label"
             ng-class="{'kti-filterMatchedExact': treeCtrl.matchesFilter(proxy, true)}"
-            ng-bind-html="proxy.item.name | highlight:treeCtrl.filter.text"></td>
+            ng-bind-html="proxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight"></td>
         <td>
           <span ng-if="proxy.kind==='Decision'">{{proxy.item.decisionState}}</span>
           <span ng-if="proxy.kind==='Action'">{{proxy.item.decisionState}}/{{proxy.item.actionState}}</span>

@@ -16,7 +16,7 @@
                 ng-style="{'font-weight': 'bold'}">
             <a style=""> <i
                     ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]"
-                    ng-init="treeCtrl.collapsed[itemProxy.item.id]=!treeCtrl.allExpanded"
+                    ng-init="treeCtrl.initCollapsed(itemProxy.item.id)"
                     class="kt-icon"
                     ng-class="{'glyphicon fa icon-minus glyphicon-minus fa-minus': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
                            'glyphicon fa icon-plus glyphicon-plus fa-plus': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
@@ -24,7 +24,7 @@
                            'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}">
             </i>
             </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
-                                                  ng-bind-html="(itemProxy.item.name | highlight:treeCtrl.filter.text)"
+                                                  ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
                                                   ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id)"></span>
                 <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
                 <span ng-if="itemProxy.status"> {{itemProxy.status}}</span>
@@ -70,6 +70,13 @@
                 ng-click="treeCtrl.expandChildren(itemProxy)">
                 <a>
                     Expand Children
+                </a>
+            </li>
+            <li class="pointer context-item"
+                role="menuitem"
+                ng-click="treeCtrl.expandMatchingChildren(itemProxy)">
+                <a>
+                    Expand Matching Children
                 </a>
             </li>
         </ul>

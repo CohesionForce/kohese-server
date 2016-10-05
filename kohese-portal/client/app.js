@@ -169,6 +169,16 @@ appModule
             return $sce.trustAsHtml(text);
         }
     })
+    .filter('highlightRegex', function ($sce) {
+        return function (text, phrase) {
+            if (text && angular.isDefined(phrase)) {
+                if (phrase) text = text.replace(phrase,
+                    '<span class="highlighted">$1</span>');
+            }
+
+            return $sce.trustAsHtml(text);
+        }
+    })
     .filter('categories', function () {
         return function (input) {
             var categories = []
