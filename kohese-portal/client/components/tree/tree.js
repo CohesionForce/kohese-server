@@ -164,8 +164,8 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         if (exact === undefined){
             exact = false;
         }
-      
-        if (!treeCtrl.filter.text && !treeCtrl.filter.kind && !treeCtrl.filter.status) {
+
+        if ((treeCtrl.filter.textRegex === null) && !treeCtrl.filter.kind && !treeCtrl.filter.status) {
             return !exact;
         } else {
             if (treeCtrl.filter.status && (!proxy.status || (proxy.status && proxy.status.length === 0))) {
@@ -181,9 +181,10 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
                 if (treeCtrl.filter.actionAssignee && proxy.item.assignedTo !== treeCtrl.filter.actionAssignee) {
                     return false;
                 }
-                if (!treeCtrl.filter.text) {
-                    return true;
-                }
+            }
+
+            if (treeCtrl.filter.textRegex === null) {
+              return true;
             }
 
             for (var key in proxy.item) {
@@ -272,7 +273,7 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
         // Force one more update cycle to update display
         $scope.$apply();
         $anchorScroll();
-    });
+       });
 
     }
     
