@@ -2,6 +2,7 @@
 console.log(process.argv);
 
 var KDB = require('../server/kdb.js');
+var fs = require('fs');
 var parseHeaderName=/(([0-9]*\.*)*)\s*(.*)/;
 var isDescriptionSentence=/^description\-Sentence-(.*)$/;
 
@@ -20,16 +21,17 @@ var document = KDB.ItemProxy.getProxyFor(forItemId);
 console.log("::: Found proxy: " + document.item.name);
 
 
-console.log("KUID,Name,Sentence ID, Text");
+var outputBuffer = "KUID,Name,Tag,Sentence ID, Text\n";
+
 var displayItem = function(proxy){
   var onId = proxy.item.id;
-  var fullItem = proxy.item.id + ",|" + proxy.item.name + "|,|" + "Item" + "|,|" + proxy.item.description + "|";
+  var fullItem = proxy.item.id + ",|" + proxy.item.name + "|,|" + proxy.item.tags + "|,|" + "Item" + "|,|" + proxy.item.description + "|\n";
 
   var nameSplit = proxy.item.name.match(parseHeaderName);
   var itemNum = nameSplit[1];
   var itemNameText = nameSplit[3];
-  console.log(proxy.item.id + ":N,|" + itemNum + "|,|" + "Heading" + "|,|"  + itemNameText + "|");
-  console.log(fullItem);
+  outputBuffer += proxy.item.id + ":N,|" + itemNum + "|,|" + proxy.item.tags + "|,|" + "Heading" + "|,|"  + itemNameText + "|\n";
+  outputBuffer += fullItem;
 
   var analysis = KDB.retrieveModelInstance("Analysis", onId);
 //  console.log("Analysis:");
@@ -40,10 +42,13 @@ var displayItem = function(proxy){
     var listItem = analysis.list[listIdx];
     if(listItem.displayType === 'Sentence' && isDescriptionSentence.test(listItem.displayId)){
       var displayIdSplit = listItem.displayId.match(isDescriptionSentence);
-      console.log(proxy.item.id + ":D" + displayIdSplit[1] + ",|" + itemNum + "|,|" + "Description:" + displayIdSplit[1] + "|,|" + listItem.text + "|");
+      outputBuffer += proxy.item.id + ":D" + displayIdSplit[1] + ",|" + itemNum + "|,|" + proxy.item.tags + "|,|" + "Description:" + displayIdSplit[1] + "|,|" + listItem.text + "|\n";
 //      console.log(listItem);
     }
   }
 };
 
 document.visitDescendants(displayItem);
+
+var dumpFile= "tmp_reports/vcrm." + forItemId + "." + document.item.name + ".csv";
+fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});
