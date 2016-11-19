@@ -3,11 +3,15 @@
  */
 
 
-function DetailsViewController($state, $timeout, ItemRepository, analysisService, Item, IssueService, NavigationService,
+function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisService, Item, IssueService, NavigationService,
                                DecisionService, ActionService, CategoryService, UserService, tabService,
                                $scope, $stateParams) {
 
     var detailsCtrl = this;
+    var commonmark = require('commonmark');
+    var reader = new commonmark.Parser();
+    var writer = new commonmark.HtmlRenderer();
+
 
     detailsCtrl.tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
@@ -80,8 +84,15 @@ function DetailsViewController($state, $timeout, ItemRepository, analysisService
         detailsCtrl.updateParentProxy();
         if (detailsCtrl.itemProxy) {
             configureState();
+            if (detailsCtrl.itemProxy.item.description){
+              var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
+              detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
+              detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);          
+            }
         }
         $scope.$emit('newItemSelected', $stateParams.id);
+
+
     });
 
     $scope.$on('tabSelected', function () {
@@ -336,6 +347,14 @@ function DetailsViewController($state, $timeout, ItemRepository, analysisService
           $scope.$apply();
       });
     });
+    
+    $scope.$watch('detailsCtrl.itemProxy.item.description', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.description){
+        var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
+        detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
+        detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
+      }
+    });
 
     function postDigest(callback) {
       var unregister = $scope.$watch(function () {
@@ -452,7 +471,6 @@ function DetailsViewController($state, $timeout, ItemRepository, analysisService
         }
 
     }
-
 
     if (detailsCtrl.itemProxy) {
         configureState();

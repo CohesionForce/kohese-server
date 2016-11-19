@@ -104,17 +104,23 @@
                    style="width:100%"/>
         </div>
     </div>
-    <div class="control-group"
-         ng-class="{error: detailsCtrl.itemForm.description.$invalid}">
-        <label class="control-label" for="Description">Description</label>
+	<div style="width:100%;">
+		<div class="control-group pull-left" style="width: 49%"
+			ng-class="{error: detailsCtrl.itemForm.description.$invalid}">
+			<label class="control-label" for="Description">Description</label>
 
-        <div class="controls">
-							<textarea
-                                    rows="1" msd-elastic
-                                    style="width:100%; max-width:100%;"
-                                      ng-model="detailsCtrl.itemProxy.item.description"
-                                      ng-disabled="!detailsCtrl.enableEdit || (detailsCtrl.itemProxy.item.hasOwnProperty('mounted') && !detailsCtrl.itemProxy.item.mounted)" 
-                                      id="Description"></textarea>
-        </div>
-    </div>
+			<div class="controls">
+				<textarea rows="1" msd-elastic style="width: 100%; max-width: 100%;"
+					ng-model="detailsCtrl.itemProxy.item.description"
+					ng-disabled="!detailsCtrl.enableEdit || (detailsCtrl.itemProxy.item.hasOwnProperty('mounted') && !detailsCtrl.itemProxy.item.mounted)"
+					id="Description"></textarea>
+			</div>
+		</div>
+		<div class="pull-right" style="width: 49%;;height:64.55vmin">
+			<label class="control-label" for="Description Viewer">Description
+				Viewer</label>
+			<ng-bind-html style="height:100%" ng-bind-html="detailsCtrl.itemDescriptionRendered">
+			</ng-bind-html>
+		</div>
+	</div>
 </form>
