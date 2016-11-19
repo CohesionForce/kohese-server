@@ -37,6 +37,7 @@ const appModule = angular.module('app', [
     'ngAnimate',
     'ng-context-menu',
     'toastr',
+    'ui.tree',
     'monospaced.elastic'
 
 ]);
@@ -67,7 +68,7 @@ appModule
                 views: {
                     'top': {
                         templateUrl: '/components/tree/tree.html',
-                        controller: 'TreeController as treeCtrl'
+                        controller: 'KTreeController as treeCtrl'
                     },
                     'bottom': {
                         templateUrl: '/components/detailsview/detailsview.html',

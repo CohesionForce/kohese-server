@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function TreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
+function KTreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
                         $scope, $location, $stateParams, SearchService, tabService) {
 
     var treeCtrl = this,
@@ -355,5 +355,5 @@ function TreeController(Item, ItemRepository, ActionService, UserService, $timeo
 
 export default () => {
     angular.module('app.tree', ['app.services.tabservice'])
-        .controller('TreeController', TreeController);
+        .controller('KTreeController', KTreeController);
 }
