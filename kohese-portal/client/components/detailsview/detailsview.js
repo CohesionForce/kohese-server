@@ -98,6 +98,17 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     $scope.$on('tabSelected', function () {
         tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
     });
+    
+    detailsCtrl.uiTreeOptions = {
+        dropped : function (event) {
+          
+          if (event.source.index != event.dest.index) {
+            detailsCtrl.itemForm.$dirty = true;
+            detailsCtrl.itemProxy.updateChildrenManualOrder();
+          }
+        }
+    };
+
 
     detailsCtrl.updateParentProxy = function () {
         if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId) {
