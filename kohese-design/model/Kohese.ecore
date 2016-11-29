@@ -6,25 +6,23 @@
         eType="#//Journal" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="child" upperBound="-1"
         eType="#//Item" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="workflow" upperBound="-1"
-        eType="#//Workflow" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="child2" upperBound="-1"
         eType="#//Item"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Decision" eSuperTypes="#//Item"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Workflow" eSuperTypes="#//Item">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="assignment" upperBound="-1"
-        eType="#//Assignment" containment="true"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Workflow" eSuperTypes="#//Decision"/>
   <eClassifiers xsi:type="ecore:EClass" name="Observation" eSuperTypes="#//Item"/>
   <eClassifiers xsi:type="ecore:EClass" name="Journal">
     <eStructuralFeatures xsi:type="ecore:EReference" name="observation" upperBound="-1"
         eType="#//Observation"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Report" eSuperTypes="#//Item"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="#//Decision"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="#//Decision">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignment" upperBound="-1"
+        eType="#//Assignment" containment="true"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Issue" eSuperTypes="#//Observation">
     <eStructuralFeatures xsi:type="ecore:EReference" name="Resolution" eType="#//Action"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="Analysis" eType="#//Action"/>
