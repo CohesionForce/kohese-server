@@ -83,6 +83,27 @@ function retrieveModelInstance(modelName, modelInstanceId) {
 
   if (modelStore[modelInstanceId]) {
     instance = JSON.parse(modelStore[modelInstanceId]);
+  } else if (modelName === "Analysis") {
+    // Check to see if Analysis is on the disk
+    var sourceInstance = ItemProxy.getProxyFor(modelInstanceId);
+    
+    if (sourceInstance) {
+      var repo = sourceInstance.getRepositoryProxy();
+      var analysisPath = determineRepoStoragePath(repo) + "/Analysis/" + modelInstanceId + ".json";
+      var itemRow;
+      
+      try {
+        itemRow = kdbFS.loadJSONDoc(analysisPath);
+      } catch (error){
+        // Do nothing
+        console.log("!!! Analysis for " + modelInstanceId + " not found.");
+      }
+      
+      if(itemRow){
+        modelStore[itemRow.id] = JSON.stringify(itemRow);
+        instance = itemRow;
+      }
+    }
   }
   return instance;
 }
@@ -368,16 +389,18 @@ function validateRepositoryStructure (repoDirPath) {
                              repoStoragePath: subRepoDirPath};
             mountRepository(mountData);
         }
+    } else if (modelName === "Analysis") {
+      
+      // Skip the Analysis results
+      
     } else {
         fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
         for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
           var itemPath = modelDirPath + "/" + fileList[fileIdx];
           var itemRow = kdbFS.loadJSONDoc(itemPath);
           
-          if(modelName !== "Analysis"){
-            var proxy = new ItemProxy(modelName, itemRow);
-            proxy.repoPath = itemPath;
-          }
+          var proxy = new ItemProxy(modelName, itemRow);
+          proxy.repoPath = itemPath;
           
           modelStore[itemRow.id] = JSON.stringify(itemRow);
           
