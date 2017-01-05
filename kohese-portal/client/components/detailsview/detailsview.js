@@ -11,8 +11,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     var commonmark = require('commonmark');
     var reader = new commonmark.Parser();
     var writer = new commonmark.HtmlRenderer();
-
-
+    
     detailsCtrl.tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
 
@@ -33,7 +32,14 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.tab = tabService.getCurrentTab();
         detailsCtrl.tab.route = $stateParams.id;
         detailsCtrl.filterString = "";
+        detailsCtrl.filterTextTimeout;
+
         detailsCtrl.analysisFilterString = "";
+        detailsCtrl.analysisFilterRegex = null;
+        detailsCtrl.invalidAnalysisFilterRegex = false;
+        detailsCtrl.summaryFilterExactMatch = true;
+        detailsCtrl.summaryFilterIgnoreCase = true;
+
         detailsCtrl.analysisSummarySortField = ['-count', 'text'];
         detailsCtrl.analysisDetailsSortField = "";
         detailsCtrl.enableEdit = false;
@@ -43,8 +49,8 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.showSentencesInDetails = true;
         detailsCtrl.showChunksInDetails = false;
         detailsCtrl.showTokensInDetails = false;
-        detailsCtrl.analysisSummaryItemLimit = 50;
-        detailsCtrl.analysisDetailsItemLimit = 100;
+        detailsCtrl.analysisSummaryItemLimit = 100;
+        detailsCtrl.analysisDetailsItemLimit = 1000;
         detailsCtrl.filterList = [];
         detailsCtrl.kindList = ItemRepository.getModelTypes();
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
@@ -99,12 +105,53 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
     });
     
+    $scope.$watch('detailsCtrl.analysisFilterString', function () {
+      console.log(">>> Filter string changed to: " + detailsCtrl.analysisFilterString);
+      if (detailsCtrl.filterTextTimeout) {
+        $timeout.cancel(detailsCtrl.filterTextTimeout);
+      }
+      
+      detailsCtrl.filterTextTimeout = $timeout(function() {
+        var regexFilter = /^\/(.*)\/([gimy]*)$/;
+        var filterIsRegex = detailsCtrl.analysisFilterString.match(regexFilter);
+
+        if (filterIsRegex) {
+          try {
+            detailsCtrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
+            detailsCtrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
+            detailsCtrl.invalidAnalysisFilterRegex = false;              
+          } catch (e) {
+            detailsCtrl.invalidAnalysisFilterRegex = true;
+          }
+        } else {
+          let cleanedPhrase = detailsCtrl.analysisFilterString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          if(detailsCtrl.analysisFilterString !== ""){
+            detailsCtrl.analysisFilterRegex = new RegExp(cleanedPhrase,"i");
+            detailsCtrl.analysisFilterRegexHighlight = new RegExp('(' + cleanedPhrase + ')',"gi");
+            detailsCtrl.invalidAnalysisFilterRegex = false;
+          } else {
+            detailsCtrl.analysisFilterRegex = null;
+            detailsCtrl.analysisFilterRegexHighlight = null;
+            detailsCtrl.invalidAnalysisFilterRegex = false;
+          }
+        }
+
+        postDigest(function () {
+            // Force one more update cycle to get the match count to display
+            $scope.$apply();
+        });
+      }, 1000); // delay 1000 ms
+    });
+
     detailsCtrl.uiTreeOptions = {
         dropped : function (event) {
           
           if (event.source.index != event.dest.index) {
             detailsCtrl.itemForm.$dirty = true;
             detailsCtrl.itemProxy.updateChildrenManualOrder();
+            console.log("))) Source:    " + event.source);
+            console.log("))) Source id: " + event.source.nodeScope.proxy.item.id);
+            console.log("))) Dest   ns: " + event.dest.nodeScope);
           }
         }
     };
@@ -318,16 +365,39 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     };
 
     detailsCtrl.submitFilter = function () {
+
         detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
         detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
     };
     
-    detailsCtrl.filterSummaryByDisplayType = function(summary) {
-        return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && (((summary.displayType == 'Chunk') && detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && detailsCtrl.showTokensinSummary));
+    detailsCtrl.submitSummaryFilter = function (onText) {
+      
+      if (detailsCtrl.summaryFilterExactMatch) {
+        detailsCtrl.analysisFilterInput = "/\\b" + onText + "\\b/";
+        if (detailsCtrl.summaryFilterIgnoreCase) {
+          detailsCtrl.analysisFilterInput += "i";
+        }
+      } else {
+        detailsCtrl.analysisFilterInput = onText;
+      }
+      
+      detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
+      detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
+    };
+  
+    detailsCtrl.filterSummary = function(summary) {
+        return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
+               (((summary.displayType == 'Chunk') && detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && detailsCtrl.showTokensinSummary)) &&
+               ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
     };
 
-    detailsCtrl.filterDetailsByDisplayType = function(listItem) {
-        return (listItem.displayLevel == 1) || ((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails) || ((listItem.displayLevel == 3) && detailsCtrl.showChunksInDetails) || ((listItem.displayLevel == 4) && detailsCtrl.showTokensInDetails);
+    detailsCtrl.filterDetails = function(listItem) {
+        return ((listItem.displayLevel == 1) || 
+                ((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails) || 
+                ((listItem.displayLevel == 3) && detailsCtrl.showChunksInDetails) || 
+                ((listItem.displayLevel == 4) && detailsCtrl.showTokensInDetails)
+                ) &&
+                ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(listItem.text));
     };
 
     detailsCtrl.getSummaryItemCount = function () {
