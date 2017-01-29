@@ -38,8 +38,8 @@ const appModule = angular.module('app', [
     'ng-context-menu',
     'toastr',
     'ui.tree',
-    'monospaced.elastic'
-
+    'monospaced.elastic',
+    'simplemde'
 ]);
 
 

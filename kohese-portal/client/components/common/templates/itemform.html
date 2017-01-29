@@ -110,11 +110,17 @@
 			<label class="control-label" for="Description">Description</label>
 
 			<div class="controls">
-				<textarea rows="1" msd-elastic style="width: 100%; max-width: 100%;"
+				<textarea simplemde rows="1" msd-elastic style="width: 100%; max-width: 100%;"
 					ng-model="detailsCtrl.itemProxy.item.description"
 					ng-disabled="!detailsCtrl.enableEdit || (detailsCtrl.itemProxy.item.hasOwnProperty('mounted') && !detailsCtrl.itemProxy.item.mounted)"
 					id="Description"></textarea>
 			</div>
+			<!-- 
+			<script>
+				var simplemde = new SimpleMDE({ element: document.getElementById("Description") });
+				simplemde.value(detailsCtrl.itemProxy.item.description);
+			</script>
+			 -->
 		</div>
 		<div class="pull-right" style="width: 49%">
 			<label class="control-label" for="Description Viewer">Description
