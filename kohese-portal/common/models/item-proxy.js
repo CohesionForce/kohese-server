@@ -244,6 +244,41 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getDocument(showUndefined) {
+    
+    var outputBuffer = "::: Dump of " + this.item.id + ": " + this.item.name + "\n\n";
+    var document = this;
+
+    var displayItem = function(proxy){
+
+      var depth = proxy.getDepthFromAncestor(document);
+      var hdr = "";
+
+      for(var idx = 0; idx < depth; idx++){
+        hdr += "#";
+      }
+
+      if (proxy.item.description || showUndefined) {
+        outputBuffer += hdr + " " + proxy.item.name + "\n" + proxy.item.description + "\n\n";
+      } else {
+        outputBuffer += hdr + " " + proxy.item.name + "\n\n";
+      }
+      
+      
+    };
+
+    if (this.item.description || showUndefined) {
+      outputBuffer += this.item.description + "\n\n";
+    }
+    this.visitDescendants(displayItem);
+    
+    return outputBuffer;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   addChild(childProxy) {
     if (childProxy.parentProxy == this) {
 //      console.log("::: IP: Child " + childProxy.item.name + " already associated with " + this.item.name);
