@@ -32,4 +32,5 @@
   <eClassifiers xsi:type="ecore:EClass" name="Media" eSuperTypes="#//Item"/>
   <eClassifiers xsi:type="ecore:EClass" name="Image" eSuperTypes="#//Media"/>
   <eClassifiers xsi:type="ecore:EClass" name="Document" eSuperTypes="#//Media"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Repository" eSuperTypes="#//Item"/>
 </ecore:EPackage>

@@ -34,5 +34,6 @@
     <genClasses ecoreClass="Kohese.ecore#//Media"/>
     <genClasses ecoreClass="Kohese.ecore#//Image"/>
     <genClasses ecoreClass="Kohese.ecore#//Document"/>
+    <genClasses ecoreClass="Kohese.ecore#//Repository"/>
   </genPackages>
 </genmodel:GenModel>
