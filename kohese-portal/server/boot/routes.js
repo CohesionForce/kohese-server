@@ -88,7 +88,7 @@ module.exports = function (app) {
        var reqParts = req.url.match(requestRegex);
        if (req.method === "GET" && reqParts && reqParts[2]){
          console.log("::: processing GET request - " + req.method + ' - ' + req.url );
-         console.log("+++ decoding request")
+         console.log("+++ decoding request");
 //         console.log(reqParts);
          var proxy = global.koheseKDB.ItemProxy.getProxyFor(reqParts[2]);
          if (proxy){
