@@ -104,8 +104,8 @@
                    style="width:100%"/>
         </div>
     </div>
-	<div style="width:100%;">
-		<div class="control-group pull-left" style="width: 49%"
+	<div class="row">
+		<div class="col-xs-6 control-group"
 			ng-class="{error: detailsCtrl.itemForm.description.$invalid}">
 			<label class="control-label" for="Description">Description</label>
 
@@ -122,7 +122,7 @@
 			</script>
 			 -->
 		</div>
-		<div class="pull-right" style="width: 49%">
+		<div class="col-xs-6">
 			<label class="control-label" for="Description Viewer">Description
 				Viewer</label>
 			<ng-bind-html style="height:100%" ng-bind-html="detailsCtrl.itemDescriptionRendered">
