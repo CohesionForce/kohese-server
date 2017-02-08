@@ -71,22 +71,10 @@
 
     }
 
-    .resizeable {
-      height: inherit;
-    }
-    #content-resizer {
-      position: relative;
-      height: 6px;
-      left: 0;
-      right: 0;
-      background-color: $primaryColor;
-      cursor: n-resize;
-    }
     .top-content {
       overflow: auto;
       left: 0;
       width: 100%;
-      height: calc(100% - 422px);
 
       #top-action-bar {
         padding: 1px;
@@ -106,7 +94,6 @@
       right: 0;
       left: 0;
       width: 100%;
-      height: 416px;
       background-color: white;
       > div {
         height: 100%;

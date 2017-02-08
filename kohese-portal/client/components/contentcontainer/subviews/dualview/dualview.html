@@ -1,15 +1,11 @@
-<div ng-controller="DualViewController as dvCtrl">
-    <div class="top-content" resizeable="topContent" id="{{dvCtrl.topID}}">
-        <div class ="resizeable" ui-view="top"></div>
-    </div>
-    <div id="content-resizer"
-         resizer="horizontal"
-         resizer-height="6"
-         resizer-key="{{dvCtrl.resizerID}}"
-         resizer-top="#{{dvCtrl.topID}}"
-         resizer-bottom="#{{dvCtrl.bottomID}}">
-    </div>
-    <div class="bottom-content" resizeable="bottomContent" id="{{dvCtrl.bottomID}}">
-        <div ui-view="bottom"></div>
-    </div>
+<div ng-controller="DualViewController as dvCtrl" style="height:inherit">
+	<div split-pane >
+		<div split-pane-component>
+			<div ui-view="top"></div>
+		</div>
+		<div split-pane-divider height="6px"></div>
+		<div split-pane-component height="50%">
+		  <div  ui-view="bottom"></div>
+		</div>
+	</div>
 </div>

@@ -6,9 +6,7 @@
 
 
 export default() => {
-    require('./resizeable')();
     require('./resizeableField')();
-    require('./resizer')();
     require('./navDirectives/navDirectives')();
     require('./knowledgeTree/treeRow')();
 }

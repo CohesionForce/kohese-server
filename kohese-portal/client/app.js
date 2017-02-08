@@ -24,8 +24,6 @@ const appModule = angular.module('app', [
     'app.services.searchservice',
     'app.services.navigationservice',
     'app.directives.navigation',
-    'app.directives.resizer',
-    'app.directives.resizeable',
     'app.directives.treerow',
     'lbServices',
     require('angular-ui-router'),
@@ -39,6 +37,7 @@ const appModule = angular.module('app', [
     'toastr',
     'ui.tree',
     'monospaced.elastic',
+    'shagstrom.angular-split-pane',
     'simplemde'
 ]);
 

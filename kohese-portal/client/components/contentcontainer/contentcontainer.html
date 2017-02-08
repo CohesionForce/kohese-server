@@ -1,4 +1,10 @@
 <div id="content-container" ng-controller="ContainerController as containerCtrl">
+<!--     <div data-split-pane> -->
+<!--       <div data-split-pane-component>top</div> -->
+<!--       <div data-split-pane-divider data-height="5px"></div> -->
+<!--       <div data-split-pane-component data-height="30%">bottom</div> -->
+<!--     </div> -->
+
     <div id="tab-bar">
         <tabset>
             <tab ng-click="containerCtrl.setTab(tab)" ng-repeat="tab in containerCtrl.tabs" active="tab.active">
@@ -6,16 +12,16 @@
                     {{tab.title}}
                     <i ng-click=containerCtrl.deleteTab(tab) class="delete-tab-button glyphicon glyphicon-remove"></i>
                 </tab-heading>
-                <tab-body class="tab-body">
+                <tab-body class="tab-body" style="height:inherit">
 
-                    <!--<div ng-switch on="tab.type">-->
-                        <div ng-if="tab.type === 'dualview'" class="dualview">
+                    <div ng-switch on="tab.type" style="height:inherit">
+                        <div ng-if="tab.type === 'dualview'" class="dualview" style="height:inherit">
                             <div dual-view></div>
                         </div>
                         <div ng-if="tab.type === 'singleview'" class="singleview">
                             <div single-view></div>
                         </div>
-                    <!--</div>-->
+                    </div>
                 </tab-body>
             </tab>
             <button id="add-tab-button" ng-click="containerCtrl.addTab()">

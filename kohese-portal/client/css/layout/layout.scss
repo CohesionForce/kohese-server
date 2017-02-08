@@ -12,6 +12,9 @@ body {
     
     #page-wrapper {
       z-index: 1;
+      position: absolute;
+      top: #{$topNavHeight};
+      left: #{$leftNavWidth};
       width: calc(100% - #{$leftNavWidth});
       height: calc(100% - #{$topNavHeight});
     }
