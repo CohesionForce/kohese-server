@@ -38,33 +38,11 @@ if (!document) {
 
 console.log("::: Found proxy for: " + forItemId + " - " + document.item.name);
 
-//var outputBuffer = "::: Dump of " + forItemId + ": " + document.item.name + "\n\n";
-//
-//var displayItem = function(proxy){
-//
-//  var depth = proxy.getDepthFromAncestor(document);
-//  var hdr = "";
-//
-//  for(var idx = 0; idx < depth; idx++){
-//    hdr += "#";
-//  }
-//
-//  console.log("::: Dumping " + proxy.item.name);
-//  if (proxy.item.description || showUndefined) {
-//	  outputBuffer += hdr + " " + proxy.item.name + "\n" + proxy.item.description + "\n\n";
-//  } else {
-//	  outputBuffer += hdr + " " + proxy.item.name + "\n\n";
-//  }
-//  
-//  
-//};
-//
-//if (document.item.description || showUndefined) {
-//	outputBuffer += document.item.description + "\n\n";
-//}
-//document.visitDescendants(displayItem);
+var reportTime = new Date();
 
-var outputBuffer = document.getDocument(showUndefined);
+var outputBuffer = "::: Dump of " + forItemId + ": " + document.item.name + " at " + reportTime.toDateString() + " " + reportTime.toTimeString() + "\n\n";
+
+outputBuffer += document.getDocument(showUndefined);
 
 var dumpFile= "tmp_reports/dump." + forItemId + "." + document.item.name + ".md";
 fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});

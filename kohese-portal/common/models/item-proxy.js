@@ -246,7 +246,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   getDocument(showUndefined) {
     
-    var outputBuffer = "::: Dump of " + this.item.id + ": " + this.item.name + "\n\n";
+    var outputBuffer = "";
     var document = this;
 
     var displayItem = function(proxy){

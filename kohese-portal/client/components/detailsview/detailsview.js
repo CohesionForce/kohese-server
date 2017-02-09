@@ -11,6 +11,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     var commonmark = require('commonmark');
     var reader = new commonmark.Parser();
     var writer = new commonmark.HtmlRenderer();
+    var docReader = new commonmark.Parser();
+    var docWriter = new commonmark.HtmlRenderer();
+    detailsCtrl.docShowChildren=false;
     
     detailsCtrl.tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
@@ -93,7 +96,12 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             if (detailsCtrl.itemProxy.item.description){
               var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
               detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
-              detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);          
+              detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
+              if(detailsCtrl.docShowChildren){
+                var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
+                detailsCtrl.docRendered = docWriter.render(docParsed);
+                detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);                
+              }
             }
         }
         $scope.$emit('newItemSelected', $stateParams.id);
@@ -103,6 +111,16 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
 
     $scope.$on('tabSelected', function () {
         tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
+    });
+    
+    $scope.$watch('detailsCtrl.docShowChildren', function () {
+      if(detailsCtrl.docShowChildren){
+        var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
+        detailsCtrl.docRendered = docWriter.render(docParsed);
+        detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);
+      } else {
+        detailsCtrl.docRendered = null;
+      }
     });
     
     $scope.$watch('detailsCtrl.analysisFilterString', function () {
@@ -434,6 +452,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
         detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
         detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
+        if(detailsCtrl.docShowChildren){
+          var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
+          detailsCtrl.docRendered = docWriter.render(docParsed);
+          detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);                
+        }
       }
     });
 
