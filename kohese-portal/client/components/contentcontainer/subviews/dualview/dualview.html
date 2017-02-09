@@ -1,11 +1,11 @@
 <div ng-controller="DualViewController as dvCtrl" style="height:inherit">
 	<div split-pane >
 		<div split-pane-component>
-			<div ui-view="top"></div>
+			<div ui-view="top" style="height:inherit; overflow:hidden;"></div>
 		</div>
-		<div split-pane-divider height="6px"></div>
-		<div split-pane-component height="50%">
-		  <div  ui-view="bottom"></div>
+		<div split-pane-divider width="6px"></div>
+		<div split-pane-component width="60%">
+		  <div  ui-view="bottom" style="height:inherit; overflow:hidden;"></div>
 		</div>
 	</div>
 </div>

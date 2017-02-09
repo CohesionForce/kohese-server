@@ -11,7 +11,7 @@
     position: fixed;
     top: $topNavHeight;
     left: 0;
-    height: 100%;
+    height: calc(100% - #{$topNavHeight});
     width: $leftNavWidth;
     z-index: 7;
     background-image: -webkit-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);

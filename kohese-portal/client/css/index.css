@@ -272,7 +272,7 @@ table td .glyphicon-remove {
 .knowledge-tree-panel {
   border-collapse: collapse;
   position: relative;
-  height: calc(100% - 43px);
+  height: calc(100% - 120px);
   width: calc(100% - 20px);
   margin: 0px 0px 0px 20px;
   overflow: hidden; }
@@ -348,14 +348,14 @@ table td .glyphicon-remove {
     cursor: pointer; }
 
 .trim-info {
-  max-width: 50em;
+  max-width: 25em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   position: relative; }
 
 .trim-info-visible {
-  max-width: 50em;
+  max-width: 25em;
   white-space: pre-wrap;
   position: relative; }
 
@@ -465,7 +465,7 @@ tab div {
     position: fixed;
     top: 50px;
     left: 0;
-    height: 100%;
+    height: calc(100% - 50px);
     width: 50px;
     z-index: 7;
     background-image: -webkit-linear-gradient(bottom, #ca6464, #660000);

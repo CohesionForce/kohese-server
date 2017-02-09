@@ -3,7 +3,7 @@
 .knowledge-tree-panel {
   border-collapse: collapse;
   position: relative;
-  height: calc(100% - 43px);
+  height: calc(100% - 120px);
   width: calc(100% - 20px);
   margin: 0px 0px 0px 20px;
   overflow: hidden;
@@ -116,7 +116,7 @@
 }
 
 .trim-info {
-  max-width: 50em;
+  max-width: 25em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -124,7 +124,7 @@
 }
 
 .trim-info-visible {
-  max-width: 50em;
+  max-width: 25em;
   white-space: pre-wrap;
   position: relative;
 }

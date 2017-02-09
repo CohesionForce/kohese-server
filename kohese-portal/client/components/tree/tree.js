@@ -19,7 +19,7 @@ function KTreeController(Item, ItemRepository, ActionService, UserService, $time
         treeCtrl.collapsed = {};
         treeCtrl.previouslyExpanded = {};
         treeCtrl.allExpanded = false;
-        treeCtrl.locationSynced = false;
+        treeCtrl.locationSynced = true;
         treeCtrl.currentLazyItemIdx = 0;
         treeCtrl.lazyLimitIncrement = 20;
         treeCtrl.currentLazyLimit = treeCtrl.lazyLimitIncrement;
