@@ -1,5 +1,5 @@
-<div class="admin-screen">
-    <div class="panel" id="adminPanel">
+<div class="admin-screen" style="height:inherit">
+    <div class="panel" id="adminPanel" style="height:inherit">
         <div class="panel-heading">Admin</div>
         <span>
             <button class="btn btn-primary" ng-click="adminCtrl.navigate('kohese.admin.users', 'singleview')">Users</button>
@@ -7,7 +7,7 @@
             <button class="btn btn-primary" ng-click="adminCtrl.navigate('kohese.admin.repository', 'singleview')">Repository</button>
         </span>
 
-        <div id="admin-view-wrapper">
+        <div id="admin-view-wrapper" style="height:inherit">
             <ui-view></ui-view>
         </div>
     </div>
