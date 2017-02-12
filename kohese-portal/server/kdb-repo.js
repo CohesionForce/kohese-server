@@ -13,10 +13,10 @@ function openRepo(repoPath, repoList, id) {
     console.log("::: Opening git repo " + repoPath);
     nodegit.Repository.open(repoPath)
     .then(function(repo) {
-        console.log(">>> Opened git repo at " + repo.path());
+//        console.log("+++ Opened git repo at " + repo.path());
         repoList[id] = repo;
     }, function(err) {
-        console.log(err);
+//        console.log("!!! " + err);
     });
 }
 module.exports.openRepo = openRepo;
