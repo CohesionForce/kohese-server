@@ -4,6 +4,10 @@ start_time=`date +%y%m%d_%H%M%S`
 portal_log="$start_time.portal.log"
 uima_log="$start_time.uima.log"
 
+echo "::: Check for existing Kohese servers"
+./scripts/checkKohese.sh -kill
+sleep 2
+
 echo "::: Starting Kohese Portal at $start_time"
 
 nohup node . 2>&1 > logs/$portal_log &

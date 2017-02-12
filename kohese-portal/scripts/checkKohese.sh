@@ -1,5 +1,7 @@
 #!/bin/bash -f
 
+params="$*"
+
 function checkProcess {
 
   echo "::: Checking $1"
@@ -10,8 +12,11 @@ function checkProcess {
   if [ "$procPid" != "" ]
   then
     echo "==> Found: $procPS"
-    echo "::: Killing $procPid"
-    kill -9 $procPid
+    if [ "$params" == "-kill" ]
+    then
+      echo "::: Killing $procPid"
+      kill -9 $procPid
+    fi
   fi
 }
 
