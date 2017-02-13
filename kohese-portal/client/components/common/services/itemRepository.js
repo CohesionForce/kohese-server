@@ -76,7 +76,10 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         upsertItem: upsertItem,
         deleteItem: deleteItem,
         copyAttributes: copyAttributes,
-        getHistoryFor: getHistoryFor
+        generateHTMLReportFor: generateHTMLReportFor,
+        generateDOCXReportFor: generateDOCXReportFor,
+        getHistoryFor: getHistoryFor,
+        getStatusFor: getStatusFor
     };
 
     function fetchItems() {
@@ -200,6 +203,24 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         }
     }
     
+    function generateHTMLReportFor(proxy) {
+
+      Item.generateHTMLReport({
+          onId: proxy.item.id
+      }).$promise.then(function (results) {
+              console.log("::: Report results: " + results.data.html);
+          });
+    }
+
+    function generateDOCXReportFor(proxy) {
+
+      Item.generateDOCXReport({
+          onId: proxy.item.id
+      }).$promise.then(function (results) {
+              console.log("::: Report results: " + results.data.docx);
+          });
+    }
+
     function getHistoryFor(proxy) {
 
       Item.getHistory({

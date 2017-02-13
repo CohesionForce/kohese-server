@@ -48,7 +48,14 @@
         <tabset id="details-tabs">
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active" heading="Document">
                 <h4>Document Tab</h4>
-                <div ng-if="detailsCtrl.itemProxy.children.length">
+                <button ng-click="detailsCtrl.generateHTMLReport()" class="btn btn-primary">
+                   Generate HTML Report
+               </button>
+                <button ng-click="detailsCtrl.generateDOCXReport()" class="btn btn-primary">
+                   Generate Word Document
+               </button>
+
+		           <div ng-if="detailsCtrl.itemProxy.children.length">
                   <label class="control-label" for="showChildren"> Show Children </label> <input
                          type="checkbox" ng-checked="detailsCtrl.docShowChildren;detailsCtrl.updatedDoc()"
                          ng-click="detailsCtrl.docShowChildren=!detailsCtrl.docShowChildren" />

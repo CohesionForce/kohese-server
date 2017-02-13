@@ -1,4 +1,9 @@
 module.exports = function (Item) {
+  
+    var fs = require('fs');
+    var path = require('path');
+    var child = require('child_process');
+
     
     //////////////////////////////////////////////////////////////////////////
     //
@@ -194,6 +199,116 @@ module.exports = function (Item) {
     });
 
     Item.afterRemoteError('getStatus', function(ctx, next) {
+      ctx.res.status(ctx.error.http_code).end(ctx.error.message);
+    });
+    
+    //////////////////////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////////////////////
+    Item.generateReport = function(req, forItemId, outFormat, cb) {
+
+      var showUndefined;
+      
+      var proxy = global.koheseKDB.ItemProxy.getProxyFor(forItemId);
+      var result = {};
+
+      if (!proxy){
+        console.log("*** Could not find proxy for: " + forItemId);        
+        cb({error: "Item not found: " + forItemId}, null);
+        return;
+      }
+
+      console.log("::: Found proxy for: " + forItemId + " - " + proxy.item.name);        
+
+      var reportTime = new Date();
+
+      var outputBuffer = "::: Dump of " + forItemId + ": " + proxy.item.name + " at " + reportTime.toDateString() + " " + reportTime.toTimeString() + "\n\n";
+
+      outputBuffer += proxy.getDocument(showUndefined);
+
+      var fileBasename ="dump." + forItemId + "." + proxy.item.name;
+      var dumpFile= "tmp_reports/" + fileBasename + ".md";
+      console.log("::: Creating: " + dumpFile);
+      
+      fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});
+      result.markdown = "reports/" + fileBasename + ".md";
+      
+      if (outFormat) {
+        console.log('::: Now spawning pandoc...');
+        var outFile = 'tmp_reports/' + fileBasename + '.' + outFormat;
+        console.log('::: Creating ' + outFile);
+        var pandoc = child.spawnSync('pandoc', ['-f', 'markdown', '-t', outFormat, dumpFile, '-o', outFile]);
+        if(pandoc.stdout) {
+          console.log(pandoc.stdout);
+        }
+        result[outFormat] = "reports/" + fileBasename + '.' + outFormat;
+        console.log('Pandoc done!');
+      }
+      
+      cb(null, result);
+
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////////////////////
+    Item.generateHTMLReport = function(req, onId, cb) {
+      console.log("::: Generating HTML Report for " + onId);
+
+      Item.generateReport(req, onId, 'html', cb);
+      
+    };
+
+    Item.remoteMethod('generateHTMLReport', {
+      accepts : [ {
+        arg : 'req',
+        type : 'object',
+        'http' : {
+          source : 'req'
+        }
+      }, {
+        arg : 'onId',
+        type : 'string'
+      } ],
+      returns : {
+        arg : 'data',
+        type : 'object'
+      }
+    });
+
+    Item.afterRemoteError('generateHTMLReport', function(ctx, next) {
+      ctx.res.status(ctx.error.http_code).end(ctx.error.message);
+    });
+    
+    //////////////////////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////////////////////
+    Item.generateDOCXReport = function(req, onId, cb) {
+      console.log("::: Generating DOCX Report for " + onId);
+
+
+      Item.generateReport(req, onId, 'docx', cb);
+      
+    };
+
+    Item.remoteMethod('generateDOCXReport', {
+      accepts : [ {
+        arg : 'req',
+        type : 'object',
+        'http' : {
+          source : 'req'
+        }
+      }, {
+        arg : 'onId',
+        type : 'string'
+      } ],
+      returns : {
+        arg : 'data',
+        type : 'object'
+      }
+    });
+
+    Item.afterRemoteError('generateDOCXReport', function(ctx, next) {
       ctx.res.status(ctx.error.http_code).end(ctx.error.message);
     });
     

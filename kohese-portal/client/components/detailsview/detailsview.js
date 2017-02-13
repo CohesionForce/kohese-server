@@ -356,6 +356,14 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
       analysisService.fetchAnalysis(detailsCtrl.itemProxy);
     };
 
+    detailsCtrl.generateHTMLReport = function () {
+      ItemRepository.generateHTMLReportFor(detailsCtrl.itemProxy);
+    };
+
+    detailsCtrl.generateDOCXReport = function () {
+      ItemRepository.generateDOCXReportFor(detailsCtrl.itemProxy);
+    };
+
     detailsCtrl.getHistory = function () {
       ItemRepository.getHistoryFor(detailsCtrl.itemProxy);
     };
