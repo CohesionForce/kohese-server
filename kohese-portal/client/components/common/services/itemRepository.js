@@ -5,6 +5,7 @@
 function ItemRepository(Repository, Item, Category, Decision, Action, Observation, Issue, Task, KoheseUser, KoheseIO, $rootScope, toastr) {
     var _ = require('underscore');
     var ItemProxy = require('../../../../common/models/item-proxy');
+    var createStates = require('../../../../common/models/createStates');
     var shortProxyList = [];
     var modelTypes = {
         Repository: Repository,
