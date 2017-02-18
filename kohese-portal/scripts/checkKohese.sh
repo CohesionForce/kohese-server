@@ -1,7 +1,5 @@
 #!/bin/bash -f
 
-params="$*"
-
 function checkProcess {
 
   echo "::: Checking $1"
@@ -11,14 +9,42 @@ function checkProcess {
 
   if [ "$procPid" != "" ]
   then
-    echo "==> Found: $procPS"
-    if [ "$params" == "-kill" ]
+    echo "==> Found \"$1\" as process $procPid"
+    if [ $verbose ]
+    then
+      echo "::: $procPS"
+    fi
+
+    if [ $kill ]
     then
       echo "::: Killing $procPid"
       kill -9 $procPid
     fi
+  else
+    echo "--- Did not find \"$1\""
   fi
 }
+
+# Main processing
+
+params="$*"
+
+for param in  $*
+do
+  case "$param" in
+
+    -v) 
+      verbose=1
+      ;;
+    -kill) 
+      kill=1
+      ;;
+    *) 
+      echo "*** Unexepcted param:  $param"
+      exit
+      ;;
+  esac
+done
 
 checkProcess "node ."
 checkProcess uima-server
