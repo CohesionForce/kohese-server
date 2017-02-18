@@ -84,11 +84,11 @@ module.exports = function (app) {
     
 //    var requestRegex = /\/api\/([^\/]*)\/([^\/]*)/;
     var requestRegex = /^\/([^\/]*)\/([^\/]*)/;
-    function testGet(req, res, next) {
+    function kdbGet(req, res, next) {
        var reqParts = req.url.match(requestRegex);
        if (req.method === "GET" && reqParts && reqParts[2]){
          console.log("::: processing GET request - " + req.method + ' - ' + req.url );
-         console.log("+++ decoding request");
+//         console.log("+++ decoding request");
 //         console.log(reqParts);
          var proxy = global.koheseKDB.ItemProxy.getProxyFor(reqParts[2]);
          if (proxy){
@@ -103,8 +103,10 @@ module.exports = function (app) {
     }
 
     var restApiRoot = app.get('restApiRoot');
+    
     // Using Item Proxy
-//    app.use(restApiRoot, testGet);
+    app.use(restApiRoot, kdbGet);
+    
     // Using Loopback
     app.use(restApiRoot, app.loopback.rest());
 
