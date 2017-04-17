@@ -1,18 +1,22 @@
 /**
  * Created by josh on 10/8/15.
+ * 
+ *      Service that manages the status of the currently logged in User. 
+ * 
+ *      Contains information related to the authentication status
  */
 
 function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, KoheseIO, $state) {
 
     const service = this;
     var users = {};
-
     var currentUser = "";
     var userLoggedIn = false;
 
     service.getAllUsers = getAllUsers;
     service.getCurrentUser = getCurrentUser;
     service.sessions = {};
+    service.authToken = {};
 
     function registerSessions() {
         KoheseIO.socket.on('session/add', function (session) {
@@ -47,13 +51,13 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, Ko
     }
 
     function getCurrentUser() {
-        return currentUser;
+        return currentUser.username;
     }
 
     function setCurrentUser() {
-        var authToken = AuthTokenFactory.getToken();
-        if (authToken) {
-            currentUser = jwtHelper.decodeToken(authToken).username;
+        service.authToken = AuthTokenFactory.getToken();
+        if (service.authToken) {
+            currentUser = jwtHelper.decodeToken(service.authToken);
             registerSessions();
         } else {
             $state.go('login');
@@ -68,7 +72,7 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, Ko
     $rootScope.$on('userLoggedIn', function onUserLogin() {
         userLoggedIn = true;
         setCurrentUser();
-        console.log('::: Logged in as ' + currentUser);
+        console.log('::: Logged in as ' + currentUser.username);
     });
 
     $rootScope.$on('userLoggedOut', function onUserLogout() {

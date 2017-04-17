@@ -1,8 +1,12 @@
 /**
  * Created by josh on 9/8/15.
+ *  Collection of Authentication and User session related services.
+ *  Likely to be split in the future.
  */
 
-function LoginService($http, API_URL) {
+
+/* Service used by views to log in and out of the kohese portal */
+function LoginService($http, API_URL, AuthTokenFactory, KoheseIO) {
     var service = this;
 
     service.login = function (username, password) {
@@ -11,8 +15,16 @@ function LoginService($http, API_URL) {
             password: password
         })
     }
+    service.logout = function () {
+        AuthTokenFactory.setToken();
+        KoheseIO.disconnect();   
+    }
+    service.checkLoginStatus = function() {
+        return AuthTokenFactory.getToken() !== null;
+    }
 }
 
+/* Factory used to interact with the authentication token stored in local storage */
 function AuthTokenFactory($window, $rootScope) {
     'use strict';
     var store = $window.localStorage;
@@ -38,6 +50,7 @@ function AuthTokenFactory($window, $rootScope) {
     }
 }
 
+/* Interceptor used by router to confirm user is authenticated for the request */
 function AuthInterceptor(AuthTokenFactory) {
     'use strict';
     return {
@@ -57,7 +70,7 @@ function AuthInterceptor(AuthTokenFactory) {
 
 export default () => {
     angular.module('app.services.authentication', [])
-        .service('loginService', LoginService)
+        .service('LoginService', LoginService)
         .factory('AuthTokenFactory', AuthTokenFactory)
         .factory('AuthInterceptor', AuthInterceptor);
 }

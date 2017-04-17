@@ -36,7 +36,7 @@ describe("Login Return", function() {
 
 	beforeEach(inject(function($controller) {
 		loginController = $controller('LoginController', {
-			loginService : mockLoginService,
+			LoginService : mockLoginService,
 			KoheseIO : mockKoheseIO,
 			AuthTokenFactory : mockAuthTokenFactory,
 			$state : state
