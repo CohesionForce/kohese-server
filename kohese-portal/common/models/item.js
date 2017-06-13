@@ -226,7 +226,8 @@ module.exports = function (Item) {
 
       outputBuffer += proxy.getDocument(showUndefined);
 
-      var fileBasename ="dump." + forItemId + "." + proxy.item.name;
+      var itemName = proxy.item.name.replace(/[:\/]/g, " ");
+      var fileBasename ="dump." + forItemId + "." + itemName;
       var dumpFile= "tmp_reports/" + fileBasename + ".md";
       console.log("::: Creating: " + dumpFile);
       

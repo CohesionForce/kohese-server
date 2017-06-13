@@ -44,7 +44,11 @@ var displayItem = function(proxy){
 
 document.visitDescendants(displayItem);
 
-var dumpFile = "tmp_reports/analysis." + forItemId + "." + document.item.name + ".csv";
+var itemName = document.item.name.replace(/[:\/]/g, " ");
+
+var dumpFile = "tmp_reports/analysis." + forItemId + "." + itemName + ".csv";
+
+console.log("::: Writing to " + dumpFile);
 
 fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});
 
