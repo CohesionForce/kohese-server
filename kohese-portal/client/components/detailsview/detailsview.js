@@ -52,7 +52,8 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.showSentencesInDetails = true;
         detailsCtrl.showChunksInDetails = false;
         detailsCtrl.showTokensInDetails = false;
-        detailsCtrl.analysisSummaryItemLimit = 100;
+        detailsCtrl.analysisTokenLimit = 100;
+        detailsCtrl.analysisChunkLimit = 100;
         detailsCtrl.analysisDetailsItemLimit = 1000;
         detailsCtrl.filterList = [];
         detailsCtrl.kindList = ItemRepository.getModelTypes();
@@ -411,10 +412,16 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
       detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
     };
   
-    detailsCtrl.filterSummary = function(summary) {
-        return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
-               (((summary.displayType == 'Chunk') && detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && detailsCtrl.showTokensinSummary)) &&
-               ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
+    detailsCtrl.filterTokens = function(summary) {
+      return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
+             (summary.displayType == 'Token')  &&
+             ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
+    };
+
+    detailsCtrl.filterChunks = function(summary) {
+      return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
+             (summary.displayType == 'Chunk') &&
+             ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
     };
 
     detailsCtrl.filterDetails = function(listItem) {
@@ -426,8 +433,12 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
                 ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(listItem.text));
     };
 
-    detailsCtrl.getSummaryItemCount = function () {
-      return $('#theSummaryBody').find("tr").length;
+    detailsCtrl.getTokenCount = function () {
+      return $('#theTokensBody').find("tr").length;
+    };
+
+    detailsCtrl.getChunkCount = function () {
+      return $('#theChunksBody').find("tr").length;
     };
 
     detailsCtrl.getDetailsItemCount = function () {
