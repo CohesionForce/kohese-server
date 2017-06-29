@@ -414,19 +414,17 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
   
     detailsCtrl.filterTokens = function(summary) {
       return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
-             (summary.displayType == 'Token')  &&
              ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
     };
 
     detailsCtrl.filterChunks = function(summary) {
       return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
-             (summary.displayType == 'Chunk') &&
              ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
     };
 
     detailsCtrl.filterDetails = function(listItem) {
-        return ((listItem.displayLevel == 1) || 
-                ((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails) || 
+        return (listItem.displayLevel == 1) || 
+               (((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails) || 
                 ((listItem.displayLevel == 3) && detailsCtrl.showChunksInDetails) || 
                 ((listItem.displayLevel == 4) && detailsCtrl.showTokensInDetails)
                 ) &&

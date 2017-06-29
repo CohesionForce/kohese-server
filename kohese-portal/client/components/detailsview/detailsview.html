@@ -112,36 +112,34 @@
             </tab>
             <tab heading="Analysis" select="detailsCtrl.fetchAnalysis()">
               <tab-heading>Analysis</tab-heading>
-              <tab-content style="height:100%; overflow:hidden" >
-                <div style="width:100%">
-		          <span>
-		            <label class=control-label" for="posFilter">
-                        POS Filter:
-                        <select id="posFilter"
-                                ng-model="detailsCtrl.analysisPOSFilterName">
-                            <option ng-repeat="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">{{filterCriteria}}</option>
-                        </select>
-                </label>
-		            
-      					<input class="input-sm" type="text" ng-model="detailsCtrl.analysisFilterInput"
-                           placeholder="Filter" style="margin: 5px"/>
-                    <button ng-click="detailsCtrl.submitFilter()" class=" btn btn-default fa fa-search"> Submit</button>
-                    <button ng-click="detailsCtrl.getLastFilter()" class="btn btn-default fa fa-chevron-left"> Last
-                        Filter
-                    </button>
- 	        		</span>
-              <span>
-                <input type="checkbox" ng-model="detailsCtrl.summaryFilterExactMatch"
-                       name="summaryFilterExactMatchInput"
-                       style="margin: 5px"/> Exact Match
-                <input type="checkbox" ng-model="detailsCtrl.summaryFilterIgnoreCase"
-                       name="summaryFilterIgnoreCaseInput"
-                       style="margin: 5px"/> Ignore Case
-              </span>
-  
-                </div>
-                <div style="height: calc(100% - 45px); overflow:none; display:block">
-                  <div style="height:100%; overflow:none; display:inline-block;">
+              <tab-content style="height:100%; width:100%; overflow:hidden" >
+	              <div style="width:100%">
+				          <span>
+				            <label class=control-label" for="posFilter">
+		                        POS Filter:
+		                        <select id="posFilter"
+		                                ng-model="detailsCtrl.analysisPOSFilterName">
+		                            <option ng-repeat="filterCriteria in detailsCtrl.analysisPOSFilterCriteriaList">{{filterCriteria}}</option>
+		                        </select>
+		                </label>
+				            
+		      					<input class="input-sm" type="text" ng-model="detailsCtrl.analysisFilterInput"
+		                           placeholder="Filter" style="margin: 5px"/>
+		                    <button ng-click="detailsCtrl.submitFilter()" class=" btn btn-default fa fa-search"> Submit</button>
+		                    <button ng-click="detailsCtrl.getLastFilter()" class="btn btn-default fa fa-chevron-left"> Last
+		                        Filter
+		                    </button>
+		 	        		</span>
+		              <span>
+		                <input type="checkbox" ng-model="detailsCtrl.summaryFilterExactMatch"
+		                       name="summaryFilterExactMatchInput"
+		                       style="margin: 5px"/> Exact Match
+		                <input type="checkbox" ng-model="detailsCtrl.summaryFilterIgnoreCase"
+		                       name="summaryFilterIgnoreCaseInput"
+		                       style="margin: 5px"/> Ignore Case
+		              </span>
+	              </div>
+	              <div style="height: calc(100% - 45px); width:100%; overflow:none; display:block">
 	                  <div style="height:49%; width:40%; overflow:auto; display:inline-block">
 	                    <div>
 	                      <span><b>Token Summary</b>  ({{detailsCtrl.getTokenCount()}})</span>
@@ -151,7 +149,7 @@
 	                           placeholder="Token Limit" style="margin: 5px"/>
 	                      </span>
 	                    </div>
-	                    <table id="theSummary"
+	                    <table id="theTokensSummary"
 	                           class="table tree-grid table-striped table-condensed table-hover">
 	                      <thead>
 	                        <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
@@ -160,7 +158,7 @@
 	                      </thead>
 	                      <tbody id="theTokensBody">
 	                        <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
-	                          ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:detailsCtrl.filterTokens | orderBy:detailsCtrl.analysisSummarySortField | limitTo:detailsCtrl.analysisTokenLimit">
+	                          ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedTokenSummaryList | filter:detailsCtrl.filterTokens | orderBy:detailsCtrl.analysisSummarySortField | limitTo:detailsCtrl.analysisTokenLimit">
 	                          <td ng-click="detailsCtrl.submitSummaryFilter(summary.text)"
 	                              class="tree-label"
 	                              ng-bind-html="summary.text | highlightRegex:detailsCtrl.analysisFilterRegexHighlight"></td>
@@ -179,7 +177,7 @@
                              placeholder="Chunk Limit" style="margin: 5px"/>
                         </span>
                       </div>
-                      <table id="theSummary"
+                      <table id="theChunksSummary"
                              class="table tree-grid table-striped table-condensed table-hover">
                         <thead>
                           <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
@@ -188,7 +186,7 @@
                         </thead>
                         <tbody id="theChunksBody">
                           <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
-                            ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedSummaryList | filter:detailsCtrl.filterChunks | orderBy:detailsCtrl.analysisSummarySortField | limitTo:detailsCtrl.analysisChunkLimit">
+                            ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedChunkSummaryList | filter:detailsCtrl.filterChunks | orderBy:detailsCtrl.analysisSummarySortField | limitTo:detailsCtrl.analysisChunkLimit">
                             <td ng-click="detailsCtrl.submitSummaryFilter(summary.text)"
                                 class="tree-label"
                                 ng-bind-html="summary.text | highlightRegex:detailsCtrl.analysisFilterRegexHighlight"></td>
@@ -199,7 +197,7 @@
                       </table>
                     </div>
 	
-	                  <div class="pull-right" style="height:50%; width:100% vertical-align: top; display:inline-block; overflow:auto">
+	                  <div style="height:50%; width:100%; overflow:auto">
 	                    <div>
 	                      <span><b>Analysis Details</b>  ({{detailsCtrl.getDetailsItemCount()}})</span>
 	                      <span class="col-xs-4 pull-right"> 
@@ -220,7 +218,7 @@
 	                    <table id="theDetails"
 	                           class="table tree-grid table-striped table-condensed table-hover">
 	                      <thead>
-	                        <th style="width:20%">Type</th>
+	                        <th style="width:15%">Type</th>
 	                        <th><a href="" ng-click="detailsCtrl.analysisDetailsSortField = 'text'">Text</a></th>
 	                      </thead>
 	                      <tbody id="theDetailsBody">

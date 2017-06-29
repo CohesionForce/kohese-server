@@ -78,22 +78,25 @@ function AnalysisService(Analysis, ItemRepository) {
             var chunk = proxy.analysis.data.chunkSummary[chunkId];
             chunkSummary.text = chunk.text;
             chunkSummary.count = chunk.count;
-            chunkSummary.posCount = chunk.posCount;
-            chunkSummary.displayType = "Chunk";
-//      chunkSummary.list = chunk.list.slice();
+            chunkSummary.posCount = {};
+            for (var pos in chunk.posCount) {
+              chunkSummary.posCount[pos] = chunk.posCount[pos]; 
+            }
             proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
         }
 
         // Initialize the extendedTokenSummary
         proxy.analysis.extendedTokenSummary = {};
+
         for (var tokenId in proxy.analysis.data.tokenSummary) {
             var tokenSummary = {};
             var token = proxy.analysis.data.tokenSummary[tokenId];
             tokenSummary.text = token.text;
             tokenSummary.count = token.count;
-            tokenSummary.posCount = token.posCount;
-            tokenSummary.displayType = "Token";
-//      tokenSummary.list = token.list.slice();
+            tokenSummary.posCount = {};
+            for (var pos in token.posCount) {
+              tokenSummary.posCount[pos] = token.posCount[pos]; 
+            }
             proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
         }
 
@@ -121,14 +124,21 @@ function AnalysisService(Analysis, ItemRepository) {
                         var chunk = child.analysis.extendedChunkSummary[chunkId];
                         if (angular.isDefined(proxy.analysis.extendedChunkSummary[chunkId])) {
                             proxy.analysis.extendedChunkSummary[chunkId].count += chunk.count;
-//              proxy.analysis.extendedChunkSummary[chunkId].list = proxy.analysis.extendedChunkSummary[chunk.text].list.concat(chunk.list);
+                            for (var pos in chunk.posCount) {
+                              if (angular.isDefined(proxy.analysis.extendedChunkSummary[chunkId].posCount[pos])) {
+                                  proxy.analysis.extendedChunkSummary[chunkId].posCount[pos] += chunk.posCount[pos];
+                              } else {
+                                  proxy.analysis.extendedChunkSummary[chunkId].posCount[pos] = chunk.posCount[pos];
+                              }
+                          }
                         } else {
                             var chunkSummary = {};
                             chunkSummary.text = chunk.text;
                             chunkSummary.count = chunk.count;
-                            chunkSummary.posCount = chunk.posCount;
-                            chunkSummary.displayType = "Chunk";
-//              chunkSummary.list = chunk.list.slice();
+                            chunkSummary.posCount = {};
+                            for (var pos in chunk.posCount) {
+                              chunkSummary.posCount[pos] = chunk.posCount[pos]; 
+                            }
                             proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
                         }
                     }
@@ -144,14 +154,14 @@ function AnalysisService(Analysis, ItemRepository) {
                                     proxy.analysis.extendedTokenSummary[tokenId].posCount[pos] = token.posCount[pos];
                                 }
                             }
-//              proxy.analysis.extendedTokenSummary[tokenId].list = proxy.analysis.extendedTokenSummary[token.text].list.concat(token.list);
                         } else {
                             var tokenSummary = {};
                             tokenSummary.text = token.text;
                             tokenSummary.count = token.count;
-                            tokenSummary.posCount = token.posCount;
-                            tokenSummary.displayType = "Token";
-//              tokenSummary.list = token.list.slice();
+                            tokenSummary.posCount = {};
+                            for (var pos in token.posCount) {
+                              tokenSummary.posCount[pos] = token.posCount[pos]; 
+                            }
                             proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
                         }
                     }
@@ -159,7 +169,8 @@ function AnalysisService(Analysis, ItemRepository) {
             }
         }
 
-        proxy.analysis.extendedSummaryList = _.union(_.values(proxy.analysis.extendedChunkSummary), _.values(proxy.analysis.extendedTokenSummary));
+        proxy.analysis.extendedTokenSummaryList = _.values(proxy.analysis.extendedTokenSummary);
+        proxy.analysis.extendedChunkSummaryList = _.values(proxy.analysis.extendedChunkSummary);
 
         var parentProxy = ItemRepository.getProxyFor(proxy.item.parentId);
 
