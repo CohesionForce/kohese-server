@@ -140,99 +140,98 @@
 		              </span>
 	              </div>
 	              <div style="height: calc(100% - 45px); width:100%; overflow:none; display:block">
-	                  <div style="height:49%; width:40%; overflow:auto; display:inline-block">
-	                    <div>
-	                      <span><b>Token Summary</b>  ({{detailsCtrl.getTokenCount()}})</span>
-	                      <span class="col-xs-4 pull-right"> 
-	                        <b>Limit</b>
-	                        <input class="input-sm col-xs-6 pull-right" type="number" ng-model="detailsCtrl.analysisTokenLimit"
-	                           placeholder="Token Limit" style="margin: 5px"/>
-	                      </span>
-	                    </div>
-	                    <table id="theTokensSummary"
-	                           class="table tree-grid table-striped table-condensed table-hover">
-	                      <thead>
-	                        <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
-	                        <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
-	                        <th>POS Count</th>
-	                      </thead>
-	                      <tbody id="theTokensBody">
-	                        <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
-	                          ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedTokenSummaryList | filter:detailsCtrl.filterTokens | orderBy:detailsCtrl.analysisSummarySortField | limitTo:detailsCtrl.analysisTokenLimit">
-	                          <td ng-click="detailsCtrl.submitSummaryFilter(summary.text)"
-	                              class="tree-label"
-	                              ng-bind-html="summary.text | highlightRegex:detailsCtrl.analysisFilterRegexHighlight"></td>
-	                          <td>{{summary.count}}</td>
-	                          <td>{{summary.posCount}}</td>
-	                        </tr>
-	                      </tbody>
-	                    </table>
-	                  </div>
-                    <div class="pull-right" style="height:49%; width:59%; vertical-align: top; display:inline-block; overflow:auto">
-                      <div>
-                        <span><b>Chunk Summary</b>  ({{detailsCtrl.getChunkCount()}})</span>
-                        <span class="col-xs-4 pull-right"> 
-                          <b>Limit</b>
-                          <input class="input-sm col-xs-6 pull-right" type="number" ng-model="detailsCtrl.analysisChunkLimit"
-                             placeholder="Chunk Limit" style="margin: 5px"/>
-                        </span>
-                      </div>
-                      <table id="theChunksSummary"
-                             class="table tree-grid table-striped table-condensed table-hover">
-                        <thead>
-                          <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
-                          <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
-                          <th>POS Count</th>
-                        </thead>
-                        <tbody id="theChunksBody">
-                          <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
-                            ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedChunkSummaryList | filter:detailsCtrl.filterChunks | orderBy:detailsCtrl.analysisSummarySortField | limitTo:detailsCtrl.analysisChunkLimit">
-                            <td ng-click="detailsCtrl.submitSummaryFilter(summary.text)"
-                                class="tree-label"
-                                ng-bind-html="summary.text | highlightRegex:detailsCtrl.analysisFilterRegexHighlight"></td>
-                            <td>{{summary.count}}</td>
-                            <td>{{summary.posCount}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                  <div style="height:49%; width:40%; overflow:auto; display:inline-block">
+                    <div>
+                      <span><b>Token Summary</b>  ({{detailsCtrl.getTokenCount()}})</span>
+                      <span class="col-xs-4 pull-right"> 
+                        <b>Limit</b>
+                        <input class="input-sm col-xs-6 pull-right" type="number" ng-model="detailsCtrl.analysisTokenLimit"
+                           placeholder="Token Limit" style="margin: 5px"/>
+                      </span>
                     </div>
-	
-	                  <div style="height:50%; width:100%; overflow:auto">
-	                    <div>
-	                      <span><b>Analysis Details</b>  ({{detailsCtrl.getDetailsItemCount()}})</span>
-	                      <span class="col-xs-4 pull-right"> 
-	                        <b>Limit</b>
-	                        <input class="input-sm col-xs-6 pull-right" type="number" ng-model="detailsCtrl.analysisDetailsItemLimit"
-	                           placeholder="Details Limit" style="margin: 5px"/>
-	                      </span>
-	                    </div>
-	                    <input type="checkbox" ng-model="detailsCtrl.showSentencesInDetails"
-	                         ng-init="detailsCtrl.showSentencesInDetails=true" name="showSentencesInDetailsInput"
-	                         style="margin: 5px"/> Show Sentences in Details
-	                    <input type="checkbox" ng-model="detailsCtrl.showChunksInDetails"
-	                         ng-init="detailsCtrl.showChunksInDetails=false" name="showChunksInDetailsInput"
-	                         style="margin: 5px"/> Show Chunks in Details
-	                    <input type="checkbox" ng-model="detailsCtrl.showTokensInDetails"
-	                         ng-init="detailsCtrl.showTokensInDetails=false" name="showTokensInDetailsInput"
-	                         style="margin: 5px"/> Show Tokens in Details
-	                    <table id="theDetails"
-	                           class="table tree-grid table-striped table-condensed table-hover">
-	                      <thead>
-	                        <th style="width:15%">Type</th>
-	                        <th><a href="" ng-click="detailsCtrl.analysisDetailsSortField = 'text'">Text</a></th>
-	                      </thead>
-	                      <tbody id="theDetailsBody">
-	                        <tr class="level-{{listItem.displayLevel}}"
-	                          class="tree-grid-row" id="{{listItem.displayId}}"
-	                          ng-repeat="listItem in detailsCtrl.itemProxy.analysis.extendedList | filter:detailsCtrl.filterDetails | orderBy:detailsCtrl.analysisDetailsSortField | limitTo:detailsCtrl.analysisDetailsItemLimit">
-	                          <td class="indented">{{listItem.displayType}}</td>
-	                          <td ng-bind-html="listItem.text | highlightRegex:detailsCtrl.analysisFilterRegexHighlight"></td>
-	                        </tr>
-	                      </tbody>
-	                    </table>
-	                  </div>
+                    <table id="theTokensSummary"
+                           class="table tree-grid table-striped table-condensed table-hover">
+                      <thead>
+                        <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
+                        <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
+                        <th>POS Count</th>
+                      </thead>
+                      <tbody id="theTokensBody">
+                        <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
+                          ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedTokenSummaryList | filter:detailsCtrl.filterTokens | orderBy:detailsCtrl.analysisSummarySortField | limitTo:detailsCtrl.analysisTokenLimit">
+                          <td ng-click="detailsCtrl.submitSummaryFilter(summary.text)"
+                              class="tree-label"
+                              ng-bind-html="summary.text | highlightRegex:detailsCtrl.analysisFilterRegexHighlight"></td>
+                          <td>{{summary.count}}</td>
+                          <td>{{summary.posCount}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                </div>
+                   <div class="pull-right" style="height:49%; width:59%; vertical-align: top; display:inline-block; overflow:auto">
+                     <div>
+                       <span><b>Chunk Summary</b>  ({{detailsCtrl.getChunkCount()}})</span>
+                       <span class="col-xs-4 pull-right"> 
+                         <b>Limit</b>
+                         <input class="input-sm col-xs-6 pull-right" type="number" ng-model="detailsCtrl.analysisChunkLimit"
+                            placeholder="Chunk Limit" style="margin: 5px"/>
+                       </span>
+                     </div>
+                     <table id="theChunksSummary"
+                            class="table tree-grid table-striped table-condensed table-hover">
+                       <thead>
+                         <th><a ng-click="detailsCtrl.analysisSummarySortField = 'text'">Text</a></th>
+                         <th><a ng-click="detailsCtrl.analysisSummarySortField = '-count'">Count</a></th>
+                         <th>POS Count</th>
+                       </thead>
+                       <tbody id="theChunksBody">
+                         <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
+                           ng-repeat="summary in detailsCtrl.itemProxy.analysis.extendedChunkSummaryList | filter:detailsCtrl.filterChunks | orderBy:detailsCtrl.analysisSummarySortField | limitTo:detailsCtrl.analysisChunkLimit">
+                           <td ng-click="detailsCtrl.submitSummaryFilter(summary.text)"
+                               class="tree-label"
+                               ng-bind-html="summary.text | highlightRegex:detailsCtrl.analysisFilterRegexHighlight"></td>
+                           <td>{{summary.count}}</td>
+                           <td>{{summary.posCount}}</td>
+                         </tr>
+                       </tbody>
+                     </table>
+                   </div>
+
+                  <div style="height:50%; width:100%; overflow:auto">
+                    <div>
+                      <span><b>Analysis Details</b>  ({{detailsCtrl.getDetailsItemCount()}})</span>
+                      <span class="col-xs-4 pull-right"> 
+                        <b>Limit</b>
+                        <input class="input-sm col-xs-6 pull-right" type="number" ng-model="detailsCtrl.analysisDetailsItemLimit"
+                           placeholder="Details Limit" style="margin: 5px"/>
+                      </span>
+                    </div>
+                    <input type="checkbox" ng-model="detailsCtrl.showSentencesInDetails"
+                         ng-init="detailsCtrl.showSentencesInDetails=true" name="showSentencesInDetailsInput"
+                         style="margin: 5px"/> Show Sentences in Details
+                    <input type="checkbox" ng-model="detailsCtrl.showChunksInDetails"
+                         ng-init="detailsCtrl.showChunksInDetails=false" name="showChunksInDetailsInput"
+                         style="margin: 5px"/> Show Chunks in Details
+                    <input type="checkbox" ng-model="detailsCtrl.showTokensInDetails"
+                         ng-init="detailsCtrl.showTokensInDetails=false" name="showTokensInDetailsInput"
+                         style="margin: 5px"/> Show Tokens in Details
+                    <table id="theDetails"
+                           class="table tree-grid table-striped table-condensed table-hover">
+                      <thead>
+                        <th style="width:15%">Type</th>
+                        <th><a href="" ng-click="detailsCtrl.analysisDetailsSortField = 'text'">Text</a></th>
+                      </thead>
+                      <tbody id="theDetailsBody">
+                        <tr class="level-{{listItem.displayLevel}}"
+                          class="tree-grid-row" id="{{listItem.displayId}}"
+                          ng-repeat="listItem in detailsCtrl.itemProxy.analysis.extendedList | filter:detailsCtrl.filterDetails | orderBy:detailsCtrl.analysisDetailsSortField | limitTo:detailsCtrl.analysisDetailsItemLimit">
+                          <td class="indented">{{listItem.displayType}}</td>
+                          <td ng-bind-html="listItem.text | highlightRegex:detailsCtrl.analysisFilterRegexHighlight"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                 </div>
               </tab-content>
             </tab>
             <tab heading="History" select="detailsCtrl.getHistory()">
