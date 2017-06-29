@@ -312,6 +312,13 @@ function mountRepository(mountData) {
                          description: 'Error: Unable to load ' + mountData.repoStoragePath,
                          mounted: false
         };
+        console.log("::: Looking at mountList");
+        console.log(mountList);
+        console.log("::: Looking at mountData");
+        console.log(mountData);
+        if (!mountList[mountData.id]) {
+            mountList[mountData.id] = {};
+        }
         mountList[mountData.id].mounted = false;
 
         var proxy = new ItemProxy('Repository', errorRepo);
@@ -369,20 +376,16 @@ function validateRepositoryStructure (repoDirPath) {
             
             // Check mountFile for the mount path or use a .mount file if necessary
             if(mountList[repoMount.id]) {
+                console.log("==> in mount list");
                 subRepoDirPath = mountList[repoMount.id].repoStoragePath;
                 if(!mountList[repoMount.id].name) {
                     mountList[repoMount.id].name = repoMount.name;
                     updateMountFile();
                 }
-            } else if (repoMount.repoStoragePath){
-                // Does not exist in mountList so need to add and rewrite it
-                mountList[repoMount.id] = {};
-                mountList[repoMount.id].repoStoragePath = repoMount.repoStoragePath;
-                mountList[repoMount.id].name = repoMount.name;
-                subRepoDirPath = repoMount.repoStoragePath;
-                updateMountFile();
-            } 
+            }
             
+            console.log("==> sRDP: " + subRepoDirPath);
+
             var mountData = {id: repoMount.id,
                              name: repoMount.name,
                              parentId: repoMount.parentId,
