@@ -423,7 +423,10 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     };
 
     detailsCtrl.filterDetails = function(listItem) {
-        return (listItem.displayLevel == 1) || 
+        return ((listItem.displayLevel == 1) && 
+                ((detailsCtrl.analysisFilterRegex === null) || 
+                 (detailsCtrl.analysisFilterRegex.test(listItem.item.name)) || 
+                 (detailsCtrl.analysisFilterRegex.test(listItem.item.description)))) || 
                (((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails) || 
                 ((listItem.displayLevel == 3) && detailsCtrl.showChunksInDetails) || 
                 ((listItem.displayLevel == 4) && detailsCtrl.showTokensInDetails)

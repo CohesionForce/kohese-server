@@ -109,8 +109,9 @@ function AnalysisService(Analysis, ItemRepository) {
         for (var childIdx = 0; childIdx < proxy.children.length; childIdx++) {
             var topic = {};
             topic.displayType = proxy.kind;
-            topic.displayId = proxy.children[childIdx].item.id;
-            topic.text = proxy.children[childIdx].item.name;
+            topic.item = proxy.children[childIdx].item;
+            topic.displayId = topic.item.id;
+            topic.text = topic.item.name;
             topic.displayLevel = 1;
             proxy.analysis.extendedList.push(topic);
 
