@@ -107,6 +107,10 @@ class ItemProxy {
     var ancestorProxy = this.parentProxy;
     var depth = 1;
     
+    if (this === theAncestor){
+      return 0;
+    }
+    
     while (ancestorProxy){
       if (ancestorProxy === theAncestor){
         return depth;
@@ -183,9 +187,7 @@ class ItemProxy {
   visitDescendants(performAction) {
     var proxyStack = [];
     
-    for (var childIdx = this.children.length - 1; childIdx > -1; childIdx--) {
-      proxyStack.push(this.children[childIdx]);
-    }
+    proxyStack.push(this);
 
     var descendant = proxyStack.pop();
     while (descendant) {
@@ -257,19 +259,25 @@ class ItemProxy {
       for(var idx = 0; idx < depth; idx++){
         hdr += "#";
       }
-
-      if (proxy.item.description || showUndefined) {
-        outputBuffer += hdr + " " + proxy.item.name + "\n" + proxy.item.description + "\n\n";
+      
+      if (depth === 0){
+        // Top Node
+        if (proxy.item.description || showUndefined) {
+          outputBuffer += "**" + proxy.item.name + "**  \n" + proxy.item.description + "\n\n";
+        } else {
+          outputBuffer += "**" + proxy.item.name + "**\n\n";
+        }
       } else {
-        outputBuffer += hdr + " " + proxy.item.name + "\n\n";
+        //Child Node
+        if (proxy.item.description || showUndefined) {
+          outputBuffer += hdr + " " + proxy.item.name + "\n" + proxy.item.description + "\n\n";
+        } else {
+          outputBuffer += hdr + " " + proxy.item.name + "\n\n";
+        }        
       }
-      
-      
+
     };
 
-    if (this.item.description || showUndefined) {
-      outputBuffer += this.item.description + "\n\n";
-    }
     this.visitDescendants(displayItem);
     
     return outputBuffer;
