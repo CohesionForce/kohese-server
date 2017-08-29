@@ -25,17 +25,23 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
             KoheseIO.socket.on(modelName + '/create', function (notification) {
                 console.log("::: Received notification of " + notification.model + " Created:  " + notification.id);
                 fetchItemByModel(modelTypes[notification.model], notification.id);
+                var rootProxy = ItemProxy.getRootProxy();
+                getStatusFor(rootProxy);
             });
 
             KoheseIO.socket.on(modelName + '/update', function (notification) {
                 console.log("::: Received notification of " + notification.model + " Updated:  " + notification.id);
                 fetchItemByModel(modelTypes[notification.model], notification.id);
+                var rootProxy = ItemProxy.getRootProxy();
+                getStatusFor(rootProxy);
             });
 
             KoheseIO.socket.on(modelName + '/delete', function (notification) {
                 console.log("::: Received notification of " + notification.model + " Deleted:  " + notification.id);
                 var proxy = ItemProxy.getProxyFor(notification.id);
                 proxy.deleteItem();
+                var rootProxy = ItemProxy.getRootProxy();
+                getStatusFor(rootProxy);
             });
         }
 
