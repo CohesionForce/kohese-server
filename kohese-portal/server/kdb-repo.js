@@ -9,6 +9,9 @@ var path = require("path");
 var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
 
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function openRepo(repoPath, repoList, id) {
     console.log("::: Opening git repo " + repoPath);
     nodegit.Repository.open(repoPath)
@@ -21,6 +24,39 @@ function openRepo(repoPath, repoList, id) {
 }
 module.exports.openRepo = openRepo;
 
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function repoRelativePathOf(proxy){
+  
+  var filePath = proxy.repoPath;
+  var repoProxy = proxy.getRepositoryProxy();
+  var gitRepo = global.koheseKDB.repoList[repoProxy.item.id];
+
+  while(!gitRepo) {
+      if(repoProxy.item.id === 'ROOT'){
+          console.log('!!! Cannot find a git repo containing ' + filePath);
+          return;
+      }
+      repoProxy = repoProxy.parentProxy.getRepositoryProxy();
+      gitRepo = global.koheseKDB.repoList[repoProxy.item.id];
+  }
+
+  var pathToRepo = repoProxy.repoPath.split('Root.json')[0];
+  var relativeFilePath = filePath.split(pathToRepo)[1];
+
+  return {
+    repoProxy: repoProxy,
+    gitRepo: gitRepo,
+    pathToRepo: pathToRepo,
+    relativeFilePath: relativeFilePath
+  };
+}
+module.exports.repoRelativePathOf = repoRelativePathOf;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function getStatus (repo, callback){
   //This code gets working directory changes similar to git status
   repo.getStatusExt().then(function(statuses) {
@@ -46,27 +82,14 @@ function getStatus (repo, callback){
 }
 module.exports.getStatus = getStatus;
 
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function walkHistoryForFile(proxy, callback){
   
-  var fileToAnalyze = proxy.repoPath;
-  var repoProxy = proxy.getRepositoryProxy();
-  var repo = global.koheseKDB.repoList[repoProxy.item.id];
-  while(!repo) {
-      if(repoProxy.item.id === 'ROOT'){
-          console.log('!!! Cannot find a git repo containing ' + fileToAnalyze);
-          return;
-      }
-      repoProxy = repoProxy.parentProxy.getRepositoryProxy();
-      repo = global.koheseKDB.repoList[repoProxy.item.id];
-  }
-
-  var pathToRepo = repoProxy.repoPath.split('Root.json')[0];
-  //var relativeFileParts = fileToAnalyze.match(repoFileSplitRegEx);
-  var relativeFileParts = fileToAnalyze.split(pathToRepo)[1];
-  //fileToAnalyze = relativeFileParts[2];
-  fileToAnalyze = relativeFileParts;
+  repoInfo=repoRelativePathOf(proxy);
   
-  console.log("::: Walking History for " + fileToAnalyze + ' in ' + pathToRepo);
+  console.log("::: Walking History for " + proxy.item.id + ' in ' + repoInfo.pathToRepo + ' at ' + repoInfo.relativeFilePath);
   var walker;
   var historyCommits = [];
   var commit;
@@ -92,11 +115,11 @@ function walkHistoryForFile(proxy, callback){
       // Found at least one commit
       lastSha = historyCommits[historyCommits.length - 1].commit.sha();
 
-      walker = repo.createRevWalk();
+      walker = repoInfo.gitRepo.createRevWalk();
       walker.push(lastSha);
       walker.sorting(nodegit.Revwalk.SORT.TIME);
 
-      return walker.fileHistoryWalk(fileToAnalyze, 500)
+      return walker.fileHistoryWalk(repoInfo.relativeFilePath, 500)
         .then(compileHistory);
     } else {
       // Did not find any commits
@@ -104,23 +127,23 @@ function walkHistoryForFile(proxy, callback){
     }
   }
 
-  repo.getMasterCommit()
+  repoInfo.gitRepo.getMasterCommit()
   .then(function(firstCommitOnMaster){
     // History returns an event.
     
-    walker = repo.createRevWalk();
+    walker = repoInfo.gitRepo.createRevWalk();
     walker.push(firstCommitOnMaster.sha());
     walker.sorting(nodegit.Revwalk.SORT.Time);
-    return walker.fileHistoryWalk(fileToAnalyze, 500);
+    return walker.fileHistoryWalk(repoInfo.relativeFilePath, 500);
   })
   .then(compileHistory)
   .then(function() {
 
-    var fileParts = fileToAnalyze.match(itemFileRegEx);
+    var fileParts = repoInfo.relativeFilePath.match(itemFileRegEx);
     var itemId;
     if(fileParts === null) {
-        // Match failed, likely fileToAnalyze is Root.json
-        fileParts = fileToAnalyze;
+        // Match failed, likely repoInfo.relativeFilePath is Root.json
+        fileParts = repoInfo.relativeFilePath;
         itemId = fileParts;
     } else {
         itemId = fileParts[1];
@@ -147,4 +170,3 @@ function walkHistoryForFile(proxy, callback){
   .done();
 }
 module.exports.walkHistoryForFile = walkHistoryForFile;
-
