@@ -187,9 +187,14 @@ function storeModelInstance(modelName, modelInstance){
     kdbFS.storeJSONDoc(filePath, modelInstance);
 
   }
+  
+  var repoInfo = kdbRepo.repoRelativePathOf(proxy);
+  var status = kdbRepo.getItemStatus(repoInfo.gitRepo, repoInfo.relativeFilePath);
 
   var modelStore = kdbStore.models[modelName];
   modelStore[modelInstance.id] = JSON.stringify(modelInstance);
+  
+  return status;
 }
 
 module.exports.storeModelInstance = storeModelInstance;
@@ -340,7 +345,6 @@ function createRepoStructure(repoDirPath) {
       var ignoreJSONFiles = (modelName === "Analysis");
       checkAndCreateDir(modelDirPath, ignoreJSONFiles);
     }
-    
 }
 
 //////////////////////////////////////////////////////////////////////////

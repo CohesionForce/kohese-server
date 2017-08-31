@@ -27,9 +27,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         } else if (angular.isDefined($stateParams.parentId)) {
             // This is a check for the create of a new item with the parentId supplied
             detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.kind = "Item";
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
         } else {
             detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.kind = "Item";
         }
         detailsCtrl.updateParentProxy();
         detailsCtrl.tab = tabService.getCurrentTab();
@@ -83,7 +85,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     });
 
     $scope.$on('itemRepositoryReady', function () {
-        detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
+        if (angular.isDefined($stateParams.id)) {
+           detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
+        }
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
         detailsCtrl.actionStates = ActionService.getActionStates();
         detailsCtrl.issueStates = IssueService.getIssueStates();
@@ -223,7 +227,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     }
 
     detailsCtrl.createItem = function (navigationType) {
-        ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
+        ItemRepository.upsertItem(detailsCtrl.itemProxy)
             .then(function (updatedItem) {
 
                 // clear the state of the form
@@ -370,7 +374,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     };
 
     detailsCtrl.upsertItem = function () {
-        ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
+        ItemRepository.upsertItem(detailsCtrl.itemProxy)
             .then(function (updatedItem) {
 
                 // clear the state of the form
@@ -492,13 +496,13 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     detailsCtrl.cancel = function () {
 
         if (this.itemForm.$dirty) {
-            ItemRepository.fetchItem(detailsCtrl.itemProxy.item);
+            ItemRepository.fetchItem(detailsCtrl.itemProxy);
             this.itemForm.$setPristine();
         }
     };
 
-    detailsCtrl.removeItem = function (item) {
-        ItemRepository.deleteItem(item)
+    detailsCtrl.removeItem = function (proxy) {
+        ItemRepository.deleteItem(proxy)
             .then(function () {
                 // TBD:  May need to do something special if the delete fails
             });

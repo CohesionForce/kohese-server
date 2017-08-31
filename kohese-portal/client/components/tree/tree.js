@@ -241,10 +241,10 @@ function KTreeController(Item, ItemRepository, ActionService, UserService, $time
         treeCtrl.tab.params.id = id;
     };
 
-    treeCtrl.removeItem = function (item) {
-        var itemId = item.id;
+    treeCtrl.removeItem = function (proxy) {
+        var itemId = proxy.item.id;
         ItemRepository
-            .deleteItem(item)
+            .deleteItem(proxy)
             .then(function () {
                 console.log("::: Item has been deleted: " + itemId);
             });

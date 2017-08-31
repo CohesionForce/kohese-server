@@ -16,13 +16,21 @@ function openRepo(repoPath, repoList, id) {
     console.log("::: Opening git repo " + repoPath);
     nodegit.Repository.open(repoPath)
     .then(function(repo) {
-//        console.log("+++ Opened git repo at " + repo.path());
         repoList[id] = repo;
     }, function(err) {
-//        console.log("!!! " + err);
     });
 }
 module.exports.openRepo = openRepo;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function initializeRepository(repoPath, repoList, id) {
+	nodegit.Repository.init(repoPath, 0).then(function (repo) {
+		repoList[repoPath] = repo;
+	});
+}
+module.exports.initializeRepository = initializeRepository;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -85,9 +93,26 @@ module.exports.getStatus = getStatus;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function getItemStatus(gitRepo, relativeFilePath) {
+	var status = [];
+	var statNum = nodegit.Status.file(gitRepo, relativeFilePath);
+	
+	for (s in nodegit.Status.STATUS) {
+		if ((statNum & nodegit.Status.STATUS[s]) != 0) {
+			status.push(s);
+		}
+	}
+	
+	return status;
+}
+module.exports.getItemStatus = getItemStatus;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function walkHistoryForFile(proxy, callback){
   
-  repoInfo=repoRelativePathOf(proxy);
+  var repoInfo=repoRelativePathOf(proxy);
   
   console.log("::: Walking History for " + proxy.item.id + ' in ' + repoInfo.pathToRepo + ' at ' + repoInfo.relativeFilePath);
   var walker;

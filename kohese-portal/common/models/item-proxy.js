@@ -517,6 +517,11 @@ class ItemProxy {
 
       newParentProxy.addChild(this);
     }
+    
+    if (this.analysis) {
+        // delete the analysis in case some of the requisite data was updated
+        delete this.analysis;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////

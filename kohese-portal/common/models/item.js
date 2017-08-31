@@ -53,11 +53,13 @@ module.exports = function (Item) {
     Item.afterSaveKohese = function (ctx, next) {
         console.log('::: After save - ' + ctx.Model.modelName);
         if (ctx.instance) {
+        	var status = global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance.toObject());
             console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.name);
             var notification = new Object();
             notification.model = ctx.Model.modelName;
             notification.id = ctx.instance.id;
             notification.ctx = ctx;
+            notification.status = status;
             console.log("Change Instance:" + JSON.stringify(notification));
             if (ctx.isNewInstance) {
                 notification.type = 'create';
@@ -66,7 +68,6 @@ module.exports = function (Item) {
                 notification.type = 'update';
                 global.KoheseIO.emit(ctx.Model.modelName +'/update', notification);
             }
-            global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance.toObject());
         } else {
             console.log('Updated %s matching %j',
                 ctx.Model.pluralModelName,
