@@ -24,12 +24,24 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         for (var modelName in modelTypes) {
             KoheseIO.socket.on(modelName + '/create', function (notification) {
                 console.log("::: Received notification of " + notification.model + " Created:  " + notification.id);
-                fetchItemByModel(modelTypes[notification.model], notification.id);
+                var proxy = ItemProxy.getProxyFor(notification.id);
+                if (proxy) {
+                   proxy.updateItem(notification.model, notification.ctx.instance);
+                } else {
+                	proxy = new ItemProxy(notification.model, notification.ctx.instance);
+                }
+                proxy.status = notification.status;
             });
 
             KoheseIO.socket.on(modelName + '/update', function (notification) {
                 console.log("::: Received notification of " + notification.model + " Updated:  " + notification.id);
-                fetchItemByModel(modelTypes[notification.model], notification.id);
+                var proxy = ItemProxy.getProxyFor(notification.id);
+                if (proxy) {
+                   proxy.updateItem(notification.model, notification.ctx.instance);
+                } else {
+                	proxy = new ItemProxy(notification.model, notification.ctx.instance);
+                }
+                proxy.status = notification.status;
             });
 
             KoheseIO.socket.on(modelName + '/delete', function (notification) {
@@ -110,7 +122,6 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
     }
 
     function getModelTypes(){
-        modelTypes.empty = {modelName: ''};
         return modelTypes;
     }
 
@@ -147,19 +158,14 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
 
         if (proxy) {
             proxy.updateItem(withResults.constructor.modelName, withResults);
-            if (proxy.analysis) {
-                // delete the analysis in case some of the requisite data was updated
-                delete proxy.analysis;
-            }
         } else {
             proxy = new ItemProxy(withResults.constructor.modelName, withResults);
         }
     }
 
-    function fetchItemByModel(model, byId) {
-        //TBD:  why is the model only being used to the name?
-        var promise = modelTypes[model.modelName].findById({
-            id: byId
+    function fetchItem(proxy) {
+        var promise = modelTypes[proxy.kind].findById({
+            id: proxy.item.id
         }).$promise;
 
         promise.then(function (results) {
@@ -169,15 +175,10 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         return promise;
     }
 
-    function fetchItem(item) {
-        var model = item.constructor;
-
-        return fetchItemByModel(model, item.id);
-    }
-
-    function upsertItem(item) {
-        console.log("::: Preparing to upsert " + item.constructor.modelName)
-        var promise = item.constructor.upsert(item).$promise;
+    function upsertItem(proxy) {
+        console.log("::: Preparing to upsert " + proxy.kind);
+        var model = modelTypes[proxy.kind];
+        var promise = model.upsert(proxy.item).$promise;
 
         promise.then(function (withResults) {
             updateItemProxy(withResults);
@@ -186,9 +187,10 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         return promise;
     }
 
-    function deleteItem(item) {
-        console.log("::: Preparing to deleteById " + item.constructor.modelName)
-        return item.constructor.deleteById(item).$promise
+    function deleteItem(proxy) {
+        console.log("::: Preparing to deleteById " + proxy.kind);
+        var model = modelTypes[proxy.kind];
+        return model.deleteById(proxy.item).$promise
     }
 
     function createItemProxy(forItem) {

@@ -27,9 +27,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         } else if (angular.isDefined($stateParams.parentId)) {
             // This is a check for the create of a new item with the parentId supplied
             detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.kind = "Item";
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
         } else {
             detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.kind = "Item";
         }
         detailsCtrl.updateParentProxy();
         detailsCtrl.tab = tabService.getCurrentTab();
@@ -52,7 +54,8 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.showSentencesInDetails = true;
         detailsCtrl.showChunksInDetails = false;
         detailsCtrl.showTokensInDetails = false;
-        detailsCtrl.analysisSummaryItemLimit = 100;
+        detailsCtrl.analysisTokenLimit = 100;
+        detailsCtrl.analysisChunkLimit = 100;
         detailsCtrl.analysisDetailsItemLimit = 1000;
         detailsCtrl.filterList = [];
         detailsCtrl.kindList = ItemRepository.getModelTypes();
@@ -82,7 +85,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     });
 
     $scope.$on('itemRepositoryReady', function () {
-        detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
+        if (angular.isDefined($stateParams.id)) {
+           detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
+        }
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
         detailsCtrl.actionStates = ActionService.getActionStates();
         detailsCtrl.issueStates = IssueService.getIssueStates();
@@ -222,7 +227,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     }
 
     detailsCtrl.createItem = function (navigationType) {
-        ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
+        ItemRepository.upsertItem(detailsCtrl.itemProxy)
             .then(function (updatedItem) {
 
                 // clear the state of the form
@@ -369,7 +374,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     };
 
     detailsCtrl.upsertItem = function () {
-        ItemRepository.upsertItem(detailsCtrl.itemProxy.item)
+        ItemRepository.upsertItem(detailsCtrl.itemProxy)
             .then(function (updatedItem) {
 
                 // clear the state of the form
@@ -411,23 +416,34 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
       detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
     };
   
-    detailsCtrl.filterSummary = function(summary) {
-        return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
-               (((summary.displayType == 'Chunk') && detailsCtrl.showChunksinSummary) || ((summary.displayType == 'Token') && detailsCtrl.showTokensinSummary)) &&
-               ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
+    detailsCtrl.filterTokens = function(summary) {
+      return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
+             ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
+    };
+
+    detailsCtrl.filterChunks = function(summary) {
+      return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
+             ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(summary.text));
     };
 
     detailsCtrl.filterDetails = function(listItem) {
-        return ((listItem.displayLevel == 1) || 
-                ((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails) || 
+        return ((listItem.displayLevel == 1) && 
+                ((detailsCtrl.analysisFilterRegex === null) || 
+                 (detailsCtrl.analysisFilterRegex.test(listItem.item.name)) || 
+                 (detailsCtrl.analysisFilterRegex.test(listItem.item.description)))) || 
+               (((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails) || 
                 ((listItem.displayLevel == 3) && detailsCtrl.showChunksInDetails) || 
                 ((listItem.displayLevel == 4) && detailsCtrl.showTokensInDetails)
                 ) &&
                 ((detailsCtrl.analysisFilterRegex === null) || detailsCtrl.analysisFilterRegex.test(listItem.text));
     };
 
-    detailsCtrl.getSummaryItemCount = function () {
-      return $('#theSummaryBody').find("tr").length;
+    detailsCtrl.getTokenCount = function () {
+      return $('#theTokensBody').find("tr").length;
+    };
+
+    detailsCtrl.getChunkCount = function () {
+      return $('#theChunksBody').find("tr").length;
     };
 
     detailsCtrl.getDetailsItemCount = function () {
@@ -480,13 +496,13 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     detailsCtrl.cancel = function () {
 
         if (this.itemForm.$dirty) {
-            ItemRepository.fetchItem(detailsCtrl.itemProxy.item);
+            ItemRepository.fetchItem(detailsCtrl.itemProxy);
             this.itemForm.$setPristine();
         }
     };
 
-    detailsCtrl.removeItem = function (item) {
-        ItemRepository.deleteItem(item)
+    detailsCtrl.removeItem = function (proxy) {
+        ItemRepository.deleteItem(proxy)
             .then(function () {
                 // TBD:  May need to do something special if the delete fails
             });

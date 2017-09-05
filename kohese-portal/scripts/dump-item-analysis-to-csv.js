@@ -2,13 +2,15 @@
 console.log(process.argv);
 
 var KDB = require('../server/kdb.js');
+var fs = require('fs');
 
-var forItemId="db13bfc0-ae41-11e5-af49-9b039241499e";
+var forItemId="ERROR_NO_ID_SUPPLIED";
 if(process.argv[2]){
   forItemId=process.argv[2];
   console.log("::: Changing item id to: " + forItemId);
 } else {
-  console.log("::: Using default item id");
+  console.log("*** Item ID was not supplied");
+  process.exit();
 }
 
 console.log("::: Begin dumping for " + forItemId);
@@ -17,11 +19,11 @@ var document = KDB.ItemProxy.getProxyFor(forItemId);
 console.log("::: Found proxy: " + document.item.name);
 
 
-console.log("KUID,Parent KUID,Child Count,Name,Sentence ID, Text");
+var outputBuffer="KUID,Parent KUID,Child Count,Name,Sentence ID,Type,Text\n";
 var displayItem = function(proxy){
   var onId = proxy.item.id;
   var itemPrefix = proxy.item.id + ",|" + proxy.item.parentId + "|,|" + proxy.children.length + "|,|" + proxy.item.name;
-  console.log(itemPrefix + "|,|" + "N/A" + "|,|" + proxy.item.description + "|");
+  outputBuffer += itemPrefix + "|,|" + "N/A" + "|,|Section|,|" + proxy.item.description + "|\n";
   var analysis = KDB.retrieveModelInstance("Analysis", onId);
 //  console.log("Analysis:");
 //  for(var analysisKey in analysis){
@@ -30,10 +32,23 @@ var displayItem = function(proxy){
   for(var listIdx in analysis.list){
     var listItem = analysis.list[listIdx];
     if(listItem.displayType === 'Sentence'){
-      console.log(itemPrefix + "|,|" + listItem.displayId + "|,|" + listItem.text + "|");
+      outputBuffer += itemPrefix + "|,|" + listItem.displayId + "|,|Sentence|,|" + listItem.text + "|\n";
+//      console.log(listItem);
+    } else if (listItem.chunkType)  {
+      outputBuffer += itemPrefix + "|,|" + listItem.displayId + "|,|" + listItem.displayType + "|,|" + listItem.text + "|\n";
 //      console.log(listItem);
     }
+
   }
 };
 
 document.visitDescendants(displayItem);
+
+var itemName = document.item.name.replace(/[:\/]/g, " ");
+
+var dumpFile = "tmp_reports/analysis." + forItemId + "." + itemName + ".csv";
+
+console.log("::: Writing to " + dumpFile);
+
+fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});
+

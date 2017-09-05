@@ -41,7 +41,7 @@
             ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false"
             ng-bind-html="proxy.item.description | highlight:detailsCtrl.filterString"></td>
         <td class="pull-right">
-            <i class="glyphicon glyphicon-remove" ng-click="detailsCtrl.removeItem(proxy.item)"></i>
+            <i class="glyphicon glyphicon-remove" ng-click="detailsCtrl.removeItem(proxy)"></i>
         </td>
     </tr>
     </tbody>
