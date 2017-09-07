@@ -69,6 +69,17 @@ boot(app, __dirname, function (err) {
                 delete global.KoheseIOSessions[socket.id];                
               }
             });
+
+            socket.on('Item/findById', function(request, callback){
+              console.log('::: session %s: Received findById for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+              console.log(request);
+              var proxy = kdb.ItemProxy.getProxyFor(request.id);
+              callback({
+                kind: proxy.kind,
+                item: proxy.item
+              });
+              console.log("::: Sent findById response for " + request.id);
+            });
         });
         console.log("::: KoheseIO Started");
         app.emit('koheseIO-started');

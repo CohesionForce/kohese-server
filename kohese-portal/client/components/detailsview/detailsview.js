@@ -496,8 +496,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     detailsCtrl.cancel = function () {
 
         if (this.itemForm.$dirty) {
-            ItemRepository.fetchItem(detailsCtrl.itemProxy);
-            this.itemForm.$setPristine();
+            ItemRepository.fetchItem(detailsCtrl.itemProxy)
+            .then((fetchResults) => {
+                this.itemForm.$setPristine();
+                $scope.$apply();
+            });
         }
     };
 

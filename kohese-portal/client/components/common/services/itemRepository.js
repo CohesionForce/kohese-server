@@ -23,29 +23,29 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         // Register the listeners for the Item kinds that are being tracked
         for (var modelName in modelTypes) {
             KoheseIO.socket.on(modelName + '/create', function (notification) {
-                console.log("::: Received notification of " + notification.model + " Created:  " + notification.id);
-                var proxy = ItemProxy.getProxyFor(notification.id);
+                console.log("::: Received notification of " + notification.kind + " Created:  " + notification.item.id);
+                var proxy = ItemProxy.getProxyFor(notification.item.id);
                 if (proxy) {
-                   proxy.updateItem(notification.model, notification.ctx.instance);
+                   proxy.updateItem(notification.kind, notification.item);
                 } else {
-                	proxy = new ItemProxy(notification.model, notification.ctx.instance);
+                	proxy = new ItemProxy(notification.kind, notification.item);
                 }
                 proxy.status = notification.status;
             });
 
             KoheseIO.socket.on(modelName + '/update', function (notification) {
-                console.log("::: Received notification of " + notification.model + " Updated:  " + notification.id);
-                var proxy = ItemProxy.getProxyFor(notification.id);
+                console.log("::: Received notification of " + notification.kind + " Updated:  " + notification.item.id);
+                var proxy = ItemProxy.getProxyFor(notification.item.id);
                 if (proxy) {
-                   proxy.updateItem(notification.model, notification.ctx.instance);
+                   proxy.updateItem(notification.kind, notification.item);
                 } else {
-                	proxy = new ItemProxy(notification.model, notification.ctx.instance);
+                	proxy = new ItemProxy(notification.kind, notification.item);
                 }
                 proxy.status = notification.status;
             });
 
             KoheseIO.socket.on(modelName + '/delete', function (notification) {
-                console.log("::: Received notification of " + notification.model + " Deleted:  " + notification.id);
+                console.log("::: Received notification of " + notification.kind + " Deleted:  " + notification.id);
                 var proxy = ItemProxy.getProxyFor(notification.id);
                 proxy.deleteItem();
             });
@@ -164,12 +164,12 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
     }
 
     function fetchItem(proxy) {
-        var promise = modelTypes[proxy.kind].findById({
-            id: proxy.item.id
-        }).$promise;
 
-        promise.then(function (results) {
-            updateItemProxy(results);
+        var promise = new Promise((resolve, reject) => {
+          KoheseIO.socket.emit('Item/findById', {id: proxy.item.id}, function (response) {
+            resolve(response);
+            proxy.updateItem(response.kind, response.item)
+          });         
         });
 
         return promise;
