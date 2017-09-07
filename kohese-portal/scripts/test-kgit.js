@@ -24,6 +24,14 @@ function testGetItemStatus(repoInfo){
   console.log(itemStatus);  
 }
 
+function testHistory(proxy) {
+  console.log("::: Test History");
+  
+  KDB.kdbRepo.walkHistoryForFile(proxy, function (history) {
+    console.log(history);
+  });
+}
+
 var proxy = KDB.ItemProxy.getProxyFor(forItemId);
 
 var repoInfo = KDB.kdbRepo.repoRelativePathOf(proxy);
@@ -51,6 +59,7 @@ prompt.get(kgitPrompt, function(err, result) {
     console.log("::: Waiting for prompts");
     repoInfo = KDB.kdbRepo.repoRelativePathOf(proxy);
     testGetItemStatus(repoInfo);
+    testHistory(proxy);
   }
 });
 

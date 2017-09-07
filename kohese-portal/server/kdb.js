@@ -345,6 +345,8 @@ function createRepoStructure(repoDirPath) {
       var ignoreJSONFiles = (modelName === "Analysis");
       checkAndCreateDir(modelDirPath, ignoreJSONFiles);
     }
+    
+    return kdbRepo.initializeRepository(repoDirPath);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -377,7 +379,7 @@ function validateRepositoryStructure (repoDirPath) {
             var itemPath = modelDirPath + "/" + fileList[fileIdx];
             var repoMount = kdbFS.loadJSONDoc(itemPath);
             var subRepoDirPath;
-            
+
             // Check mountFile for the mount path or use a .mount file if necessary
             if(mountList[repoMount.id]) {
                 console.log("==> in mount list");
@@ -428,6 +430,56 @@ function updateMountFile() {
     kdbFS.storeJSONDoc(mountFilePath, mountFile);
 }
 
+function openRepositories() {
+	// Check and process mounts.json
+	// TODO Check for file existence prior to loading
+	try {
+	    mountList = kdbFS.loadJSONDoc(mountFilePath);
+	} catch(err) {
+	    // Do nothing; the mount list will get written when validating if necessary
+	}
+
+	// Create/validate root repo structure
+	console.log(">>> Validating Root Repository Structure");
+	validateRepositoryStructure(koheseKDBDirPath);
+
+	// Validate the repositories listed inside the mount file
+	console.log(">>> Mounting and Validating External Repos");
+	for(var id in mountList) {
+	    if(!mountList[id].mounted && mountList[id].repoStoragePath) {
+	        mountRepository({'id': id, name: mountList[id].name, parentId: '', repoStoragePath: mountList[id].repoStoragePath});
+	    }
+	}
+	console.log(">>> Done loading repositories");
+
+	//Load corresponding git repositories
+	kdbRepo.openRepo(koheseKDBDirPath).then(function(repo) {
+		repoList[ItemProxy.getRootProxy().item.id] = repo;
+	});
+
+	// Initialize nodegit repo-open promises
+	for(var id in mountList) {
+	    if(mountList[id].mounted && mountList[id].repoStoragePath) {
+	        kdbRepo.openRepo(mountList[id].repoStoragePath).then(function(repo) {
+	        	repoList[id] = repo;
+	        });
+	    }
+	}
+
+	var rootProxy = ItemProxy.getRootProxy();
+	rootProxy.repoPath = path.join(koheseKDBDirPath, 'Root.json');
+	console.log("--- Root descendant count: " + rootProxy.descendantCount);
+	for(var childIdx in rootProxy.children){
+	  var childProxy = rootProxy.children[childIdx];
+	  console.log("--- Child descendant count of " + childProxy.item.name + ": " + childProxy.descendantCount);  
+	}
+
+	var kdbModel = require('./kdb-model.js');
+	kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
+
+	console.log("::: End KDB File Load");
+}
+
 //////////////////////////////////////////////////////////////////////////
 // main processing
 //////////////////////////////////////////////////////////////////////////
@@ -468,10 +520,15 @@ for (var i = 2; i < process.argv.length; i++) {
 }
 
 var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
+var mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
+var mountList = {};
+var repoList = {};
+module.exports.repoList = repoList;
 
 // Check to see if a Root.json exists. If not, assume brand new kdb
 try {
     kdbFS.loadJSONDoc(path.join(koheseKDBDirPath, 'Root.json'));
+    openRepositories();
 } catch(err) {
     // Check to see if a flag was provided to create a new KDB
     var createFlag = false;
@@ -485,8 +542,10 @@ try {
         console.log('::: Creating a new KDB at ' + koheseKDBDirPath);
         var uuid = require('node-uuid');
         var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
-        createRepoStructure(koheseKDBDirPath);
-        kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
+        createRepoStructure(koheseKDBDirPath).then(function(repo) {
+        	kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
+        	openRepositories();
+        });
     } else {
         console.log('No KDB found at ' + koheseKDBDirPath);
         console.log('To create a new KDB, run with the extra argument "create"');
@@ -495,50 +554,3 @@ try {
     }
 }
 
-// Check and process mounts.json
-var mountList = {};
-var mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
-try {
-    mountList = kdbFS.loadJSONDoc(mountFilePath);
-} catch(err) {
-    // Do nothing; the mount list will get written when validating if necessary
-}
-
-// Create/validate root repo structure
-console.log(">>> Validating Root Repository Structure");
-validateRepositoryStructure(koheseKDBDirPath);
-
-// Validate the repositories listed inside the mount file
-console.log(">>> Mounting and Validating External Repos");
-for(var id in mountList) {
-    if(!mountList[id].mounted && mountList[id].repoStoragePath) {
-        mountRepository({'id': id, name: mountList[id].name, parentId: '', repoStoragePath: mountList[id].repoStoragePath});
-    }
-}
-console.log(">>> Done loading repositories");
-
-// Load corresponding git repositories
-var repoList = {};
-module.exports.repoList = repoList;
-
-kdbRepo.openRepo(koheseKDBDirPath, repoList, 'ROOT');
-
-// Initialize nodegit repo-open promises
-for(var id in mountList) {
-    if(mountList[id].mounted && mountList[id].repoStoragePath) {
-        kdbRepo.openRepo(mountList[id].repoStoragePath, repoList, id);
-    }
-}
-
-var rootProxy = ItemProxy.getRootProxy();
-rootProxy.repoPath = path.join(koheseKDBDirPath, 'Root.json');
-console.log("--- Root descendant count: " + rootProxy.descendantCount);
-for(var childIdx in rootProxy.children){
-  var childProxy = rootProxy.children[childIdx];
-  console.log("--- Child descendant count of " + childProxy.item.name + ": " + childProxy.descendantCount);  
-}
-
-var kdbModel = require('./kdb-model.js');
-kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
-
-console.log("::: End KDB File Load");

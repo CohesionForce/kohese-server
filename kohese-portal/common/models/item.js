@@ -169,8 +169,7 @@ module.exports = function (Item) {
     Item.getStatus = function(req, onId, cb) {
       console.log("::: Getting status for " + onId);
       //var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
-      
-      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.repoList[onId], function(status){
+      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.repoList[ItemProxy.getProxyFor(onId).item.id], function(status){
         
         if (status) {
           cb(null, status);
