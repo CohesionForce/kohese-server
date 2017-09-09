@@ -115,7 +115,8 @@ function KTreeController(Item, ItemRepository, ActionService, UserService, $time
             kind: "",
             actionState: "",
             actionAssignee: "",
-            status: false
+            status: false,
+            dirty: false
         };
     }
 
@@ -165,11 +166,14 @@ function KTreeController(Item, ItemRepository, ActionService, UserService, $time
             exact = false;
         }
 
-        if ((treeCtrl.filter.textRegex === null) && !treeCtrl.filter.kind && !treeCtrl.filter.status) {
+        if ((treeCtrl.filter.textRegex === null) && !treeCtrl.filter.kind && !treeCtrl.filter.status && !treeCtrl.filter.dirty) {
             return !exact;
         } else {
             if (treeCtrl.filter.status && (!proxy.status || (proxy.status && proxy.status.length === 0))) {
                 return false;
+            }
+            if (treeCtrl.filter.dirty && !proxy.dirty) {
+              return false;
             }
             if (treeCtrl.filter.kind) {
                 if (proxy.kind !== treeCtrl.filter.kind) {
