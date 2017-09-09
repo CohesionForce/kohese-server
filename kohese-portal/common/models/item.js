@@ -3,7 +3,7 @@ module.exports = function (Item) {
     var fs = require('fs');
     var path = require('path');
     var child = require('child_process');
-
+    var ItemProxy = require('./item-proxy.js');
     
     //////////////////////////////////////////////////////////////////////////
     //
@@ -172,6 +172,8 @@ module.exports = function (Item) {
         if (status) {
           cb(null, status);
         } else {
+          console.log("*** Error (Returned from getStatus)");
+          console.log(status);
           cb({error: "status error"}, null);
         }        
       });
@@ -197,6 +199,8 @@ module.exports = function (Item) {
     });
 
     Item.afterRemoteError('getStatus', function(ctx, next) {
+      console.log("*** Error (After Remote)");
+      console.log(ctx.error);
       ctx.res.status(ctx.error.http_code).end(ctx.error.message);
     });
     
