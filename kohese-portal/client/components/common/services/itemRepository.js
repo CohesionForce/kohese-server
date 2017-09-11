@@ -31,6 +31,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
                 	proxy = new ItemProxy(notification.kind, notification.item);
                 }
                 proxy.status = notification.status;
+                proxy.dirty = false;
             });
 
             KoheseIO.socket.on(modelName + '/update', function (notification) {
@@ -42,6 +43,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
                 	proxy = new ItemProxy(notification.kind, notification.item);
                 }
                 proxy.status = notification.status;
+                proxy.dirty = false;
             });
 
             KoheseIO.socket.on(modelName + '/delete', function (notification) {
@@ -161,6 +163,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         } else {
             proxy = new ItemProxy(withResults.constructor.modelName, withResults);
         }
+        proxy.dirty = false;
     }
 
     function fetchItem(proxy) {
@@ -168,7 +171,8 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         var promise = new Promise((resolve, reject) => {
           KoheseIO.socket.emit('Item/findById', {id: proxy.item.id}, function (response) {
             resolve(response);
-            proxy.updateItem(response.kind, response.item)
+            proxy.updateItem(response.kind, response.item);
+            proxy.dirty = false;
           });         
         });
 

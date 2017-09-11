@@ -23,7 +23,7 @@
                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0),
                            'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}">
             </i>
-            </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
+            </a> <span ng-if="itemProxy.dirty">*</span>&lt;{{itemProxy.kind}}&gt; <span class="kt-label"
                                                   ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
                                                   ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id)"></span>
                 <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>

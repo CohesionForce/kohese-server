@@ -48,10 +48,16 @@
 						<option ng-repeat="user in treeCtrl.userList">{{user.item.name}}</option>
 				</select>
 			</span>
-		</span> <span class="control-group"> <label class="control-label"
-				for="Modified"> Modified </label> <input type="checkbox"
-				ng-model="treeCtrl.filter.status" />
-		</span> <input class="input-sm" type="text" ng-model="treeCtrl.filter.text"
+		</span> 
+    <span class="control-group"> <label class="control-label"
+        for="Modified"> Modified </label> <input type="checkbox"
+        ng-model="treeCtrl.filter.status" />
+    </span>
+    <span class="control-group"> <label class="control-label"
+        for="Dirty"> Dirty </label> <input type="checkbox"
+        ng-model="treeCtrl.filter.dirty" />
+    </span>
+		<input class="input-sm" type="text" ng-model="treeCtrl.filter.text"
 			ng-style="treeCtrl.filter.invalidRegex && {'background-color':'pink'}"
 			placeholder="Filter" style="margin: 5px" />
 		</span>

@@ -117,6 +117,28 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     $scope.$on('tabSelected', function () {
         tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
     });
+  
+    $scope.$watch('detailsCtrl.itemProxy.dirty', function () {
+      if(detailsCtrl.itemForm.$dirty !== detailsCtrl.itemProxy.dirty){
+        // itemProxy has changed
+        detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
+      }
+    });
+    
+    $scope.$watch('detailsCtrl.itemForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.itemForm){
+        
+        // Detect if itemFrom has been changed
+        if (detailsCtrl.itemForm.$dirty) {
+          detailsCtrl.itemProxy.dirty = detailsCtrl.itemForm.$dirty;
+        }
+        
+        // Detect if existing proxy is already dirty
+        if (!detailsCtrl.itemForm.$dirty && detailsCtrl.itemProxy.dirty){
+          detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
+        }
+      }
+    });
     
     $scope.$watch('detailsCtrl.docShowChildren', function () {
       if(detailsCtrl.docShowChildren){
