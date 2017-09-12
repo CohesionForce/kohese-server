@@ -8,30 +8,37 @@ var path = require("path");
 
 var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
+var repoList = {};
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function openRepo(repoPath) {
-    console.log("::: Opening git repo " + repoPath);
-    return nodegit.Repository.open(repoPath);
+function openRepo(proxy) {
+  var path = proxy.getRepositoryProxy().repoPath.split('Root.json')[0];
+    console.log("::: Opening git repo " + path);
+    return nodegit.Repository.open(path).then(function (repo) {
+      repoList[proxy.item.id] = repo;
+    });
 }
 module.exports.openRepo = openRepo;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function initializeRepository(repoPath) {
-	return nodegit.Repository.init(repoPath, 0);
+function initializeRepository(repoProxy, path) {
+	return nodegit.Repository.init(path, 0).then(function (repo) {
+	  repoList[repoProxy.item.id] = repo;
+	});
 }
 module.exports.initializeRepository = initializeRepository;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function add(repo, path) {
-	return repo.refreshIndex().then(function(index) {
-	   return index.addByPath(path).then(function(result) {
+function add(proxy) {
+  var info = repoRelativePathOf(proxy);
+	return info.gitRepo.refreshIndex().then(function(index) {
+	   return index.addByPath(info.relativeFilePath).then(function(result) {
 	      return index.write();
 	   }).then(function(result) {
 	      return index.writeTree();
@@ -43,18 +50,20 @@ module.exports.add = add;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function commit(repo, treeId, signature, message) {
+function commit(proxy, treeId, signature, message) {
     // TODO Does "HEAD" need to be a variable?
     // TODO Obtaining of treeId
-    return repo.createCommit("HEAD", signature, signature, message, treeId, []);
+  var info = repoRelativePathOf(proxy);
+    return info.gitRepo.createCommit("HEAD", signature, signature, message, treeId, []);
 }
 module.exports.commit = commit;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function push(repo, remoteName) {
-  return repo.getRemote(remoteName).then(function(remote) {
+function push(proxy, remoteName) {
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.getRemote(remoteName).then(function(remote) {
 	  // TODO Does the refs String below need to change?
        return remote.push(["refs/heads/master:refs/heads/master"],
           {
@@ -71,14 +80,15 @@ module.exports.push = push;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function checkout(repo, branchName) {
+function checkout(proxy, branchName) {
   /* TODO Does a non-HEAD checkout capability need to be available?
   Also, what about forcing creation of branch name that already
   exist? */
-  return repo.getHeadCommit().then(function (commit) {
-    return repo.createBranch(branchName, commit, false);
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.getHeadCommit().then(function (commit) {
+    return info.gitRepo.createBranch(branchName, commit, false);
   }).then(function (ref) {
-    return repo.checkoutBranch(ref);
+    return info.gitRepo.checkoutBranch(ref);
   });
 }
 module.exports.checkout = checkout;
@@ -86,9 +96,10 @@ module.exports.checkout = checkout;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function reset(repo, paths) {
-  return repo.getHeadCommit().then(function (commit) {
-    return nodegit.Reset.default(repo, commit, paths);
+function reset(proxy, paths) {
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.getHeadCommit().then(function (commit) {
+    return nodegit.Reset.default(info.gitRepo, commit, paths);
   });
 }
 module.exports.reset = reset;
@@ -96,10 +107,11 @@ module.exports.reset = reset;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function diff(repo) {
-  return repo.getHeadCommit().then(function (commit) {
+function diff(proxy) {
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.getHeadCommit().then(function (commit) {
     return commit.getTree().then(function (tree) {
-       return nodegit.Diff.treeToWorkdirWithIndex(repo, tree, null);
+       return nodegit.Diff.treeToWorkdirWithIndex(info.gitRepo, tree, null);
     });
   }).then(function (diff) {
     var diffContent = [];
@@ -133,37 +145,40 @@ module.exports.diff = diff;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function addRemote(repo, remoteName, remoteUrl) {
-  return nodegit.Remote.create(repo, remoteName, remoteUrl);
+function addRemote(proxy, remoteName, remoteUrl) {
+  var info = repoRelativePathOf(proxy);
+  return nodegit.Remote.create(info.gitRepo, remoteName, remoteUrl);
 }
 module.exports.addRemote = addRemote;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function fetch(repo, remoteName) {
-  return repo.fetch(remoteName, {
+function fetch(proxy, remoteName) {
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.fetch(remoteName, {
     callbacks: {
       credentials: function (url, username) {
         return nodegit.Cred.sshKeyFromAgent(username);
       }
     }
-  })
+  });
 }
 module.exports.fetch = fetch;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function merge(repo, signature) {
-  return Promise.join(repo.getHeadCommit(), repo.getMasterCommit(), function (hc, mc) {
-    var index = nodegit.Merge.commits(repo, hc, mc, null);
+function merge(proxy, signature) {
+  var info = repoRelativePathOf(proxy);
+  return Promise.join(info.gitRepo.getHeadCommit(), info.gitRepo.getMasterCommit(), function (hc, mc) {
+    var index = nodegit.Merge.commits(info.gitRepo, hc, mc, null);
     if (index.hasConflicts()) {
       // TODO Handle conflicts
     }
     
-    return index.writeTreeTo(repo).then(function (treeId) {
-      return repo.createCommit("HEAD", signature, signature, "Merge from master to HEAD.", treeId, [hc, mc])
+    return index.writeTreeTo(info.gitRepo).then(function (treeId) {
+      return info.gitRepo.createCommit("HEAD", signature, signature, "Merge from master to HEAD.", treeId, [hc, mc]);
     });
   });
 }
@@ -172,9 +187,10 @@ module.exports.merge = merge;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function pull(repo, remoteName, signature) {
-  return fetch(repo, remoteName).then(function () {
-    return merge(repo, signature);
+function pull(proxy, remoteName, signature) {
+  var info = repoRelativePathOf(proxy);
+  return fetch(info.gitRepo, remoteName).then(function () {
+    return merge(info.gitRepo, signature);
   });
 }
 module.exports.pull = pull;
@@ -186,7 +202,7 @@ function repoRelativePathOf(proxy){
   
   var filePath = proxy.repoPath;
   var repoProxy = proxy.getRepositoryProxy();
-  var gitRepo = global.koheseKDB.repoList[repoProxy.item.id];
+  var gitRepo = repoList[repoProxy.item.id];
 
   while(!gitRepo) {
       if(!repoProxy.parentProxy){
@@ -195,7 +211,7 @@ function repoRelativePathOf(proxy){
       }
       
       repoProxy = repoProxy.parentProxy.getRepositoryProxy();
-      gitRepo = global.koheseKDB.repoList[repoProxy.item.id];
+      gitRepo = repoList[repoProxy.item.id];
   }
   
   var pathToRepo = repoProxy.repoPath.split('Root.json')[0];
@@ -208,14 +224,14 @@ function repoRelativePathOf(proxy){
     relativeFilePath: relativeFilePath
   };
 }
-module.exports.repoRelativePathOf = repoRelativePathOf;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getStatus (repo, callback){
+function getStatus (proxy, callback){
   //This code gets working directory changes similar to git status
-  repo.getStatusExt().then(function(statuses) {
+  var info = repoRelativePathOf(proxy);
+  info.gitRepo.getStatusExt().then(function(statuses) {
     
     var repoStatus = [];
     
@@ -241,13 +257,14 @@ module.exports.getStatus = getStatus;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getItemStatus(gitRepo, relativeFilePath) {
-	var status = [];
-	var statNum = nodegit.Status.file(gitRepo, relativeFilePath);
+function getItemStatus(proxy) {
+	var info = repoRelativePathOf(proxy);
+  var status = [];
+	var statNum = nodegit.Status.file(info.gitRepo, info.relativeFilePath);
 	
-	for (var s in nodegit.Status.STATUS) {
-		if ((statNum & nodegit.Status.STATUS[s]) != 0) {
-			status.push(s);
+	for (var statusKey in nodegit.Status.STATUS) {
+		if ((statNum & nodegit.Status.STATUS[statusKey]) != 0) {
+			status.push(statusKey);
 		}
 	}
 	

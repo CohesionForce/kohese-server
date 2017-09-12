@@ -54,8 +54,8 @@ module.exports = function (Item) {
     Item.afterSaveKohese = function (ctx, next) {
         console.log('::: After save - ' + ctx.Model.modelName);
         if (ctx.instance) {
-        	var status = global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance.toObject());
-            console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.name);
+        	global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance.toObject()).then(function (status) {
+        	  console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.name);
             var notification = new Object();
             notification.kind = ctx.Model.modelName;
             notification.item = ctx.instance;
@@ -68,6 +68,9 @@ module.exports = function (Item) {
                 notification.type = 'update';
                 kio.server.emit(ctx.Model.modelName +'/update', notification);
             }
+            
+            next();
+        	});
         } else {
             console.log('*** Updated %s matching %j',
                 ctx.Model.pluralModelName,
@@ -85,14 +88,14 @@ module.exports = function (Item) {
                 kio.server.emit(ctx.Model.modelName +'/update', notification);
             }
             console.log("*** Change Multiple: " + JSON.stringify(notification));
+            
+            next();
         }
         
         if(ctx.Model.modelName === "Item"){
           //var Analysis = app.models.Analysis;
           console.log("::: Need to call Analysis update logic");
         }
-        
-        next();
     };
     
     //////////////////////////////////////////////////////////////////////////
@@ -168,7 +171,7 @@ module.exports = function (Item) {
     Item.getStatus = function(req, onId, cb) {
       console.log("::: Getting status for " + onId);
       //var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
-      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.repoList[ItemProxy.getProxyFor(onId).item.id], function(status){
+      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.ItemProxy.getProxyFor(onId), function(status){
         
         if (status) {
           cb(null, status);
@@ -251,7 +254,7 @@ module.exports = function (Item) {
       
       cb(null, result);
 
-    }
+    };
     
     //////////////////////////////////////////////////////////////////////////
     //

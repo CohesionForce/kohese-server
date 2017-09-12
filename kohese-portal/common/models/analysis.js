@@ -60,11 +60,11 @@ module.exports = function(Analysis) {
           Analysis.consolidateAnalysis(analysis);
           // delete the raw data
           delete analysis.__data.raw;
-          global.koheseKDB.storeModelInstance("Analysis", analysis);
-          console.log('::: ANALYSIS Completed: ' + onId);
+          global.koheseKDB.storeModelInstance("Analysis", analysis).then(function (status) {
+            console.log('::: ANALYSIS Completed: ' + onId);
 
-          cb(null, analysis);
-
+            cb(null, analysis);
+          });
         } catch (err) {
           console.log("*** Error parsing result for: " + forModelKind + "- "
               + onId + " - " + analysis.name);
