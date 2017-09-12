@@ -1,4 +1,4 @@
-<div>
+<form name="detailsCtrl.decisionForm">
     <h4>Overview:</h4>
     <ng-include src="'components/common/templates/itemform.html'"></ng-include>
     <h4 ng-if="detailsCtrl.itemProxy.kind === 'Decision'">State: {{detailsCtrl.itemProxy.item.decisionState}}</h4>
@@ -166,4 +166,4 @@
         </button>
         </button>
     </accordion-group>
-</div>
+</form>

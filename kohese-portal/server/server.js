@@ -38,51 +38,16 @@ boot(app, __dirname, function (err) {
         enableAuth(app);
     
         // app.start();
-        var decodeAuthToken = require('./boot/routes.js').decodeAuthToken;
+        console.log("::: Starting Express Services");
         
-        global.KoheseIOSessions = {};
-        global.KoheseIO = require('socket.io')(app.start());
+        var appServer = app.start();
         
-        global.KoheseIO.on('connection', function (socket) {
-            console.log('>>> session %s connected from %s', socket.id, socket.handshake.address);
-            
-            socket.on('authenticate', function(request) {
-              socket.koheseUser = decodeAuthToken(request.token); 
-              console.log('>>>> session %s is user %s', socket.id, socket.koheseUser.username);
-              socket.emit('authenticated');
-              socket.emit('session/list', global.KoheseIOSessions);
-              global.KoheseIOSessions[socket.id] = {
-                  sessionId: socket.id,
-                  address: socket.handshake.address,
-                  username: socket.koheseUser.username
-                };
-              global.KoheseIO.emit('session/add',global.KoheseIOSessions[socket.id]);
-            });
-            socket.on('disconnect', function () {
-              var username = "Unknown";
-              if (socket.koheseUser){
-                username = socket.koheseUser.username;
-              }
-              console.log('>>> session %s: user %s disconnected from %s', socket.id, username, socket.handshake.address);
-              if(global.KoheseIOSessions[socket.id]){
-                socket.broadcast.emit('session/remove',global.KoheseIOSessions[socket.id]);
-                delete global.KoheseIOSessions[socket.id];                
-              }
-            });
-
-            socket.on('Item/findById', function(request, callback){
-              console.log('::: session %s: Received findById for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
-              console.log(request);
-              var proxy = kdb.ItemProxy.getProxyFor(request.id);
-              callback({
-                kind: proxy.kind,
-                item: proxy.item
-              });
-              console.log("::: Sent findById response for " + request.id);
-            });
-        });
+        console.log("::: Starting Kohese IO");
+        var kio = require('./koheseIO.js');
+        var kioServer = kio.Server(appServer);
         console.log("::: KoheseIO Started");
         app.emit('koheseIO-started');
+
         
         // check to see if 'repl' was passed as an argument. If so, start the REPL service
         for (var i = 2; i < process.argv.length; i++) {

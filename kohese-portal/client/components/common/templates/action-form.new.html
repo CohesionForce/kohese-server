@@ -1,4 +1,4 @@
-<div>
+<form name="detailsCtrl.actionForm">
     <div class="text-center" ng-if="detailsCtrl.itemProxy.item.actionState === 'Assigned'
                                     && detailsCtrl.currentUser === detailsCtrl.itemProxy.item.assignedTo">
         Do you you accept this assignment?
@@ -171,7 +171,7 @@
             <label class="control-label top-align three-columns" for="ActualHours">
                 Actual Hours:
                 <div class="controls">
-                    <input ng-model="detailsCtrl.itemProxy.item.actualHoursEfforts"
+                    <input ng-model="detailsCtrl.itemProxy.item.actualHoursEffort"
                            ng-disabled="!detailsCtrl.enableEdit"
                            id="ActualHours">
                 </div>
@@ -204,4 +204,4 @@
                     class="btn btn-danger">Deny</button>
 
     </accordion>
-</div>
+</form>

@@ -4,6 +4,7 @@ module.exports = function (Item) {
     var path = require('path');
     var child = require('child_process');
     var ItemProxy = require('./item-proxy.js');
+    var kio = require('../../server/koheseIO.js');
     
     //////////////////////////////////////////////////////////////////////////
     //
@@ -62,10 +63,10 @@ module.exports = function (Item) {
             console.log("Change Instance:" + JSON.stringify(notification));
             if (ctx.isNewInstance) {
                 notification.type = 'create';
-                global.KoheseIO.emit(ctx.Model.modelName +'/create', notification);
+                kio.server.emit(ctx.Model.modelName +'/create', notification);
             } else {
                 notification.type = 'update';
-                global.KoheseIO.emit(ctx.Model.modelName +'/update', notification);
+                kio.server.emit(ctx.Model.modelName +'/update', notification);
             }
             
             next();
@@ -80,11 +81,11 @@ module.exports = function (Item) {
             notification.ctx = ctx;
             if (ctx.isNewInstance) {
                 notification.type = 'create';
-                global.KoheseIO.emit(ctx.Model.modelName +'/create', notification);
+                kio.server.emit(ctx.Model.modelName +'/create', notification);
 
             } else {
                 notification.type = 'update';
-                global.KoheseIO.emit(ctx.Model.modelName +'/update', notification);
+                kio.server.emit(ctx.Model.modelName +'/update', notification);
             }
             console.log("*** Change Multiple: " + JSON.stringify(notification));
             
@@ -114,7 +115,7 @@ module.exports = function (Item) {
             notification.kind = ctx.Model.modelName;
             notification.id = ctx.where.id;
             console.log("Change: " + JSON.stringify(notification));
-            global.KoheseIO.emit(ctx.Model.modelName +'/delete', notification);
+            kio.server.emit(ctx.Model.modelName +'/delete', notification);
             global.koheseKDB.removeModelInstance(ctx.Model.modelName, notification.id);
         }
         next();
