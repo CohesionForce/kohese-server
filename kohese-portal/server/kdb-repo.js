@@ -282,38 +282,41 @@ function walkHistoryForFile(proxy, callback){
   console.log("::: Walking History for " + proxy.item.id + ' in ' + repoInfo.pathToRepo + ' at ' + repoInfo.relativeFilePath);
   var walker;
   var historyCommits = [];
+  var shaMap = [];
+  var prevSha;
   var commit;
+  var fileName = repoInfo.relativeFilePath;
 
   function compileHistory(resultingArrayOfCommits) {
 
-    var lastSha;
+    resultingArrayOfCommits.forEach(function(entry) {
+      if (!shaMap[entry.commit.sha()]) {
+        historyCommits.push(entry);
+        shaMap[entry.commit.sha()] = entry;
+      }
+    });
+    
     if (historyCommits.length > 0) {
-      lastSha = historyCommits[historyCommits.length - 1].commit.sha();
-      if (
-        resultingArrayOfCommits.length == 1 &&
-        resultingArrayOfCommits[0].commit.sha() == lastSha
-      ) {
+      var entry = historyCommits[historyCommits.length - 1];
+      var lastSha = entry.commit.sha();
+      if (prevSha == lastSha) {
         return;
       }
-    }
-
-    resultingArrayOfCommits.forEach(function(entry) {
-      historyCommits.push(entry);
-    });
-
-    if (historyCommits.length > 0){
-      // Found at least one commit
-      lastSha = historyCommits[historyCommits.length - 1].commit.sha();
+      
+      prevSha = lastSha;
 
       walker = repoInfo.gitRepo.createRevWalk();
       walker.push(lastSha);
       walker.sorting(nodegit.Revwalk.SORT.TIME);
 
-      return walker.fileHistoryWalk(repoInfo.relativeFilePath, 500)
+      /* If this commit was a rename, use the previous name in the history
+      walk. */
+      if (entry.oldName) {
+        fileName = entry.oldName;
+      }
+      
+      return walker.fileHistoryWalk(fileName, 500)
         .then(compileHistory);
-    } else {
-      // Did not find any commits
-      return;
     }
   }
 
