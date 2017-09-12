@@ -194,14 +194,14 @@ function storeModelInstance(modelName, modelInstance){
 
 module.exports.storeModelInstance = storeModelInstance;
 
-function postStore(modelInstance, modelName) {
-  return new Promise(function () {
+function postStore(modelName, modelInstance) {
+  return new Promise(function(resolve, reject) {
     var status = kdbRepo.getItemStatus(ItemProxy.getProxyFor(modelInstance.id));
-
+    
     var modelStore = kdbStore.models[modelName];
     modelStore[modelInstance.id] = JSON.stringify(modelInstance);
     
-    return status;
+    resolve(status);
   });
 }
 
