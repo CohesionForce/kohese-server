@@ -119,16 +119,18 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     });
   
     $scope.$watch('detailsCtrl.itemProxy.dirty', function () {
-      if(detailsCtrl.itemForm.$dirty !== detailsCtrl.itemProxy.dirty){
-        // itemProxy has changed
-        detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
+      if (detailsCtrl.itemProxy && detailsCtrl.itemForm){
+        if(detailsCtrl.itemForm.$dirty !== detailsCtrl.itemProxy.dirty){
+          // itemProxy has changed
+          detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
+        }
       }
     });
-    
+
     $scope.$watch('detailsCtrl.itemForm.$dirty', function () {
       if (detailsCtrl.itemProxy && detailsCtrl.itemForm){
         
-        // Detect if itemFrom has been changed
+        // Detect if itemForm has been changed
         if (detailsCtrl.itemForm.$dirty) {
           detailsCtrl.itemProxy.dirty = detailsCtrl.itemForm.$dirty;
         }
@@ -138,6 +140,50 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
           detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
         }
       }
+    });
+    
+    $scope.$watch('detailsCtrl.decisionForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.decisionForm){
+
+        // Detect if decisionForm has been changed
+        if (detailsCtrl.decisionForm.$dirty) {
+          detailsCtrl.itemForm.$dirty = detailsCtrl.decisionForm.$dirty;
+        }
+        
+      }      
+    });
+    
+    $scope.$watch('detailsCtrl.actionForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.actionForm){
+
+        // Detect if actionForm has been changed
+        if (detailsCtrl.actionForm.$dirty) {
+          detailsCtrl.itemForm.$dirty = detailsCtrl.actionForm.$dirty;
+        }
+        
+      }      
+    });
+    
+    $scope.$watch('detailsCtrl.observationForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.observationForm){
+
+        // Detect if observationForm has been changed
+        if (detailsCtrl.observationForm.$dirty) {
+          detailsCtrl.itemForm.$dirty = detailsCtrl.observationForm.$dirty;
+        }
+        
+      }      
+    });
+    
+    $scope.$watch('detailsCtrl.issueForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.issueForm){
+
+        // Detect if actionForm has been changed
+        if (detailsCtrl.issueForm.$dirty) {
+          detailsCtrl.itemForm.$dirty = detailsCtrl.issueForm.$dirty;
+        }
+        
+      }      
     });
     
     $scope.$watch('detailsCtrl.docShowChildren', function () {
@@ -517,10 +563,16 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
       
     detailsCtrl.cancel = function () {
 
-        if (this.itemForm.$dirty) {
+        if (this.itemProxy.dirty) {
             ItemRepository.fetchItem(detailsCtrl.itemProxy)
             .then((fetchResults) => {
                 this.itemForm.$setPristine();
+                if (this.decisionForm){
+                  this.decisionForm.$setPristine();
+                }
+                if (this.actionForm){
+                  this.actionForm.$setPristine();
+                }
                 $scope.$apply();
             });
         }

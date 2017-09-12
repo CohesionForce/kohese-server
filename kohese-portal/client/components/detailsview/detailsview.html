@@ -97,11 +97,6 @@
                 <tab-heading>Issue</tab-heading>
                 <ng-include src="'components/common/templates/issue-form.html'"></ng-include>
             </tab>
-            <tab ng-if="detailsCtrl.itemProxy.kind === 'Action' || detailsCtrl.itemProxy.kind === 'Decision'"
-                 class="decision-tab">
-                <tab-heading>Decision <span ng-show="detailsCtrl.decisionForm.$dirty">(*)</span></tab-heading>
-                <ng-include class="details-tab" src="'components/common/templates/decision-form.html'"></ng-include>
-            </tab>
             <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">
                 <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
             </tab>
