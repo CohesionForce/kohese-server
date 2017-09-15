@@ -59,8 +59,19 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         });
 
         KoheseIO.socket.on('reconnect', function () {
-            fetchItems();
-            toastr.success('Reconnected!', 'Server Connection!');
+            if (KoheseIO.isAuthenticated) {
+              console.log("::: IR: KoheseIO already authenticated");
+              fetchItems();
+              toastr.success('Reconnected!', 'Server Connection!');
+            } else {
+              console.log("::: IR: Listening for KoheseIO authentication");
+              var deregister = $rootScope.$on('KoheseIOAuthenticated', function () {
+                  console.log("::: IR: KoheseIO Authenticated");
+                  fetchItems();
+                  toastr.success('Reconnected!', 'Server Connection!');
+                  deregister();
+              });
+            }
         });
 
     }
@@ -71,7 +82,7 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         fetchItems();
     } else {
         console.log("::: IR: Listening for KoheseIO connection");
-        var deregister = $rootScope.$on('KoheseIOConnected', function () {
+        var deregister = $rootScope.$on('KoheseIOAuthenticated', function () {
             console.log("::: IR: KoheseIO Connected");
             registerKoheseIOListeners();
             fetchItems();
@@ -98,29 +109,22 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
     };
 
     function fetchItems() {
-        Repository.find().$promise.then(function (repoResults) {
-            Item.find().$promise.then(function (itemResults) {
-                Category.find().$promise.then(function (categoryResults) {
-                    Decision.find().$promise.then(function (decisionResults) {
-                        Action.find().$promise.then(function (actionResults) {
-                            Observation.find().$promise.then(function (observationResults) {
-                                Issue.find().$promise.then(function (issueResults) {
-                                    Task.find().$promise.then(function (taskResults) {
-                                        KoheseUser.find().$promise.then(function (userResults) {
-                                            var results = repoResults.concat(itemResults).concat(categoryResults).concat(decisionResults).concat(actionResults).concat(observationResults).concat(issueResults).concat(taskResults).concat(userResults);
-                                            convertListToTree(results);
-                                            $rootScope.$broadcast('itemRepositoryReady');
-                                            var rootProxy = ItemProxy.getRootProxy();
-                                            getStatusFor(rootProxy);
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
+      KoheseIO.socket.emit('Item/getAll', {}, function (response) {
+        console.log("::: Response for getAll");
+        for(var kind in response.cache){
+          console.log("--- Processing " + kind);
+          var kindList = response.cache[kind];
+          for (var index in kindList){
+            var item = JSON.parse(kindList[index]);
+            var iProxy = new ItemProxy(kind, item);
+          }
+        }
+
+        $rootScope.$broadcast('itemRepositoryReady');
+        var rootProxy = ItemProxy.getRootProxy();
+        getStatusFor(rootProxy);
+
+      });         
     }
 
     function getModelTypes(){
@@ -168,88 +172,91 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
 
     function fetchItem(proxy) {
 
-        var promise = new Promise((resolve, reject) => {
-          KoheseIO.socket.emit('Item/findById', {id: proxy.item.id}, function (response) {
-            resolve(response);
-            proxy.updateItem(response.kind, response.item);
-            proxy.dirty = false;
-          });         
-        });
+      var promise = new Promise((resolve, reject) => {
+        KoheseIO.socket.emit('Item/findById', {id: proxy.item.id}, function (response) {
+          proxy.updateItem(response.kind, response.item);
+          proxy.dirty = false;
+          resolve(response);
+        });         
+      });
 
-        return promise;
+      return promise;
     }
 
     function upsertItem(proxy) {
         console.log("::: Preparing to upsert " + proxy.kind);
-        var model = modelTypes[proxy.kind];
-        var promise = model.upsert(proxy.item).$promise;
-
-        promise.then(function (withResults) {
-            updateItemProxy(withResults);
+        
+        var promise = new Promise((resolve, reject) => {
+          KoheseIO.socket.emit('Item/upsert', {kind: proxy.kind, item:proxy.item}, function (response) {
+            if (response.error){
+              reject(response.error);
+            } else {
+              console.log(response);
+              proxy.updateItem(response.kind, response.item);
+              proxy.dirty = false;
+              resolve(response);              
+            }
+          });         
         });
-
+        
         return promise;
     }
 
     function deleteItem(proxy) {
         console.log("::: Preparing to deleteById " + proxy.kind);
-        var model = modelTypes[proxy.kind];
-        return model.deleteById(proxy.item).$promise
+        
+        var promise = new Promise((resolve, reject) => {
+          KoheseIO.socket.emit('Item/deleteById', {kind: proxy.kind, id: proxy.item.id}, function (response) {
+            if (response.error){
+              reject(response.error);
+            } else {
+//            proxy.updateItem(response.kind, response.item);
+//            proxy.dirty = false;
+              resolve(response);              
+            }
+           });
+        });
+        
+        return promise;
+
     }
 
-    function createItemProxy(forItem) {
-        var iProxy = new ItemProxy(forItem.constructor.modelName, forItem);
-    }
-
-    function convertListToTree(dataList) {
-        if (!dataList || dataList.length == 0)
-            return;
-
-        for (var idx = 0; idx < dataList.length; idx++) {
-            createItemProxy(dataList[idx]);
-        }
-    }
-    
     function generateHTMLReportFor(proxy) {
 
-      Item.generateHTMLReport({
-          onId: proxy.item.id
-      }).$promise.then(function (results) {
-              console.log("::: Report results: " + results.data.html);
-          });
+      KoheseIO.socket.emit('Item/generateReport', {onId: proxy.item.id, format: "html"}, function (results) {
+        console.log("::: Report results: " + results.html);
+      });
+
     }
 
     function generateDOCXReportFor(proxy) {
 
-      Item.generateDOCXReport({
-          onId: proxy.item.id
-      }).$promise.then(function (results) {
-              console.log("::: Report results: " + results.data.docx);
-          });
+      KoheseIO.socket.emit('Item/generateReport', {onId: proxy.item.id, format: "docx"}, function (results) {
+        console.log("::: Report results: " + results.docx);
+      });
+
     }
 
     function getHistoryFor(proxy) {
 
-      Item.getHistory({
-          onId: proxy.item.id
-      }).$promise.then(function (results) {
-              if (!proxy.history) {
-                  proxy.history = {};
-              }
-              proxy.history = results.data.history;
-              console.log("::: History retrieved for: " + proxy.item.id + " - " + proxy.item.name);
-          });
+      KoheseIO.socket.emit('Item/getHistory', {onId: proxy.item.id}, function (results) {
+        if (!proxy.history) {
+          proxy.history = {};
+        }
+        proxy.history = results.history;
+        console.log("::: History retrieved for: " + proxy.item.id + " - " + proxy.item.name);
+        console.log(results);
+      });
     }
 
     function getStatusFor(repo) {
 
-      Item.getStatus({
-          onId: repo.item.id
-      }).$promise.then(function (results) {
+      KoheseIO.socket.emit('Item/getStatus', {repoId: repo.item.id}, function (results) {
+
           if (!repo.repoStatus) {
               repo.repoStatus = {};
           }
-          repo.repoStatus = results.data;
+          repo.repoStatus = results;
           console.log("::: Status retrieved for: " + repo.item.id + " - " + repo.item.name);
           console.log(repo.repoStatus);
           for(var rIdx in repo.repoStatus) {

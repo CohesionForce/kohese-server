@@ -3,6 +3,7 @@ var morgan = require('morgan');
 var boot = require('loopback-boot');
 
 var app = module.exports = loopback();
+global.app = app;
 
 app.use(morgan("short"));
 
@@ -45,6 +46,7 @@ boot(app, __dirname, function (err) {
         console.log("::: Starting Kohese IO");
         var kio = require('./koheseIO.js');
         var kioServer = kio.Server(appServer);
+        var itemServer = require('./kio-itemServer.js');
         console.log("::: KoheseIO Started");
         app.emit('koheseIO-started');
 
