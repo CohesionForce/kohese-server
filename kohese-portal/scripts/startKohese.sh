@@ -10,7 +10,7 @@ sleep 2
 
 echo "::: Starting Kohese Portal at $start_time"
 
-nohup node . $* 2>&1 > logs/$portal_log &
+nohup npm start $* 2>&1 > logs/$portal_log &
 
 rm -f logs/LATEST.portal.log
 ln -s $portal_log logs/LATEST.portal.log 
