@@ -2,7 +2,7 @@
  * Created by josh on 7/13/15.
  */
 
-function KTreeController(Item, ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
+function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
                         $scope, $location, $stateParams, SearchService, tabService) {
 
     var treeCtrl = this,

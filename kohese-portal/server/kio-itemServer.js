@@ -2,6 +2,7 @@ var kio = require("./koheseIO.js");
 var kdb = require("./kdb.js");
 var fs = require('fs');
 var child = require('child_process');
+var itemAnalysis = require('../common/models/analysis.js');
 
 
 console.log("::: Initializing KIO Item Server");
@@ -124,6 +125,18 @@ kio.server.on('connection', function (socket) {
 
   });
   
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Item/performAnalysis', function(request, callback) {
+
+    console.log('::: session %s: Received performAnalysis for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+    console.log(request);
+    
+    itemAnalysis.performAnalysis(request.kind, request.id, callback);
+
+  });
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
  */
 
 
-function AnalysisService(Analysis, ItemRepository) {
+function AnalysisService(ItemRepository) {
 
     var _ = require('underscore');
     var service = this;
@@ -30,32 +30,38 @@ function AnalysisService(Analysis, ItemRepository) {
     
     service.fetchAnalysis = function (forProxy) {
 
-      // Note:  This logic does a depth first retrieval to decrease the amount of rework associated with roll-up
-      // Fetch children
-        for (var childIdx = 0; childIdx < forProxy.children.length; childIdx++) {
-            service.fetchAnalysis(forProxy.children[childIdx]);
-        }
+      var analysisComplete = new Promise((resolve, reject) => {
+        // Note:  This logic does a depth first retrieval to decrease the amount of rework associated with roll-up
+        // Fetch children
+          for (var childIdx = 0; childIdx < forProxy.children.length; childIdx++) {
+              service.fetchAnalysis(forProxy.children[childIdx]);
+          }
 
-        if (!forProxy.analysis) {
-          console.log("::: Retrieving analysis for " + forProxy.item.id + " - " + forProxy.item.name);
-          performAnalysis(forProxy);
-        }
-        
+          if (!forProxy.analysis) {
+            console.log("::: Retrieving analysis for " + forProxy.item.id + " - " + forProxy.item.name);
+            performAnalysis(forProxy).then(function(results){
+              resolve(results);
+            });
+          }
+      });
+
+      return analysisComplete;
     }
 
     function performAnalysis(proxy) {
 
-        Analysis.performAnalysis({
-            forModelKind: proxy.kind,
-            onId: proxy.item.id
-        }).$promise.then(function (results) {
-                if (!proxy.analysis) {
-                    proxy.analysis = {};
-                }
-                proxy.analysis.data = results.data;
-                console.log("::: Analysis performed for: " + proxy.item.id + " - " + proxy.item.name);
-                consolidateAnalysis(proxy);
-            });
+        var analysis = ItemRepository.performAnalysis(proxy)
+        
+        analysis.then(function (results) {
+          if (!proxy.analysis) {
+            proxy.analysis = {};
+          }
+          proxy.analysis.data = results;
+            console.log("::: Analysis performed for: " + proxy.item.id + " - " + proxy.item.name);
+            consolidateAnalysis(proxy);
+          });
+        
+        return analysis;
     }
 
     function consolidateAnalysis(proxy) {

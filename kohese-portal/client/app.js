@@ -25,7 +25,6 @@ const appModule = angular.module('app', [
     'app.services.navigationservice',
     'app.directives.navigation',
     'app.directives.treerow',
-    'lbServices',
     require('angular-ui-router'),
     'angular-jwt',
     'ui.bootstrap',

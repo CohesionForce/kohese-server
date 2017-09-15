@@ -3,7 +3,7 @@
  */
 
 
-function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisService, Item, IssueService, NavigationService,
+function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisService, IssueService, NavigationService,
                                DecisionService, ActionService, CategoryService, UserService, tabService,
                                $scope, $stateParams) {
 
@@ -26,11 +26,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
         } else if (angular.isDefined($stateParams.parentId)) {
             // This is a check for the create of a new item with the parentId supplied
-            detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.item = {};
             detailsCtrl.itemProxy.kind = "Item";
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
         } else {
-            detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.item = {};
             detailsCtrl.itemProxy.kind = "Item";
         }
         detailsCtrl.updateParentProxy();
@@ -394,10 +394,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     };
 
     detailsCtrl.updateItem = function () {
-        var newModel = ItemRepository.modelTypes[detailsCtrl.itemProxy.kind];
-        var newItem = new newModel();
-        ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
-        detailsCtrl.itemProxy.item = newItem;
+        console.log("::: Item kind has been changed to: " + detailsCtrl.itemProxy.kind);
         initializeItemStates(detailsCtrl.itemProxy.kind);
     };
 
@@ -426,7 +423,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     };
 
     detailsCtrl.fetchAnalysis = function () {
-      analysisService.fetchAnalysis(detailsCtrl.itemProxy);
+      analysisService.fetchAnalysis(detailsCtrl.itemProxy).then(function (results){
+        $scope.$apply();
+      });
     };
 
     detailsCtrl.generateHTMLReport = function () {

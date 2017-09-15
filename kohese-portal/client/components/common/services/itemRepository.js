@@ -2,21 +2,21 @@
  *
  */
 
-function ItemRepository(Repository, Item, Category, Decision, Action, Observation, Issue, Task, KoheseUser, KoheseIO, $rootScope, toastr) {
+function ItemRepository(KoheseIO, $rootScope, toastr) {
     var _ = require('underscore');
     var ItemProxy = require('../../../../common/models/item-proxy');
     var createStates = require('../../../../common/models/createStates');
     var shortProxyList = [];
     var modelTypes = {
-        Repository: Repository,
-        Item: Item,
-        Decision: Decision,
-        Action: Action,
-        Task: Task,
-        Observation: Observation,
-        Issue: Issue,
-        Category: Category,
-        KoheseUser: KoheseUser
+        Repository: "Repository",
+        Item: "Item",
+        Decision: "Decision",
+        Action: "Action",
+        Task: "Task",
+        Observation: "Observation",
+        Issue: "Issue",
+        Category: "Category",
+        KoheseUser: "KoheseUser"
     };
 
     function registerKoheseIOListeners() {
@@ -105,7 +105,8 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
         generateHTMLReportFor: generateHTMLReportFor,
         generateDOCXReportFor: generateDOCXReportFor,
         getHistoryFor: getHistoryFor,
-        getStatusFor: getStatusFor
+        getStatusFor: getStatusFor,
+        performAnalysis: performAnalysis
     };
 
     function fetchItems() {
@@ -210,8 +211,6 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
             if (response.error){
               reject(response.error);
             } else {
-//            proxy.updateItem(response.kind, response.item);
-//            proxy.dirty = false;
               resolve(response);              
             }
            });
@@ -274,6 +273,22 @@ function ItemRepository(Repository, Item, Category, Decision, Action, Observatio
       });
     }
 
+    function performAnalysis (forProxy){
+      console.log("::: Performing analysis for " + forProxy.id);
+      
+      var promise = new Promise((resolve, reject) => {
+        KoheseIO.socket.emit('Item/performAnalysis', {kind: forProxy.kind, id:forProxy.item.id}, function (response) {
+          if (response.error){
+            reject(response.error);
+          } else {
+            resolve(response);              
+          }
+        });         
+      });
+      
+      return promise;
+      
+    }
 }
 
 export default () => {
