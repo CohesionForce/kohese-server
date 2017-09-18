@@ -9,12 +9,8 @@
                                     ng-model="detailsCtrl.itemProxy.kind"
                                     ng-change="detailsCtrl.updateItem()"
                                     ng-disabled="!(detailsCtrl.enableEdit && !detailsCtrl.itemProxy.item.hasOwnProperty('id'))">
-                                <option ng-repeat="kind in detailsCtrl.kindList">{{kind.modelName}}</option>
+                                <option ng-repeat="kind in detailsCtrl.kindList">{{kind}}</option>
                             </select>
-                            <!--<input  ng-if="detailsCtrl.itemProxy.item.constructor.modelName" style="width: 90%;" type="text" ng-model="detailsCtrl.itemProxy.item.constructor.modelName"-->
-                            <!--id="Kind" ng-disabled="true"/>-->
-                            <!--<input  ng-if="!detailsCtrl.itemProxy.item.constructor.modelName" style="width: 90%;" type="text" ng-model="ignoreData" ng-init=""-->
-                            <!--id="Kind" ng-disabled="true"/>-->
                         </div>
 					</span>
         </div>
