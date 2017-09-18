@@ -7,6 +7,7 @@
 var repl = require('repl');
 var net = require('net');
 var util = require('util');
+var kio = require('./koheseIO.js');
 
 console.log("::: Starting Remote REPL Interface");
 var replServer = net.createServer(function(socket) {
@@ -51,7 +52,7 @@ function defineCommands(replConsole) {
     replConsole.defineCommand('crash', {
         help: 'crash the server. Why?',
         action: function() {
-            this.outputStream.write(global.KoheseIOSessions);
+            this.outputStream.write(kio.sessions);
             this.displayPrompt();
         }
     });
@@ -59,7 +60,7 @@ function defineCommands(replConsole) {
     replConsole.defineCommand('sessions', {
         help: 'Print list of active client sessions.',
         action: function() {
-            this.outputStream.write(util.inspect(global.KoheseIOSessions) + '\n');
+            this.outputStream.write(util.inspect(kio.sessions) + '\n');
             this.displayPrompt();
         }
     });

@@ -3,7 +3,7 @@
  */
 
 
-function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisService, Item, IssueService, NavigationService,
+function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisService, IssueService, NavigationService,
                                DecisionService, ActionService, CategoryService, UserService, tabService,
                                $scope, $stateParams) {
 
@@ -26,11 +26,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             detailsCtrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
         } else if (angular.isDefined($stateParams.parentId)) {
             // This is a check for the create of a new item with the parentId supplied
-            detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.item = {};
             detailsCtrl.itemProxy.kind = "Item";
             detailsCtrl.itemProxy.item.parentId = $stateParams.parentId;
         } else {
-            detailsCtrl.itemProxy.item = new Item();
+            detailsCtrl.itemProxy.item = {};
             detailsCtrl.itemProxy.kind = "Item";
         }
         detailsCtrl.updateParentProxy();
@@ -116,6 +116,74 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
 
     $scope.$on('tabSelected', function () {
         tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
+    });
+  
+    $scope.$watch('detailsCtrl.itemProxy.dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.itemForm){
+        if(detailsCtrl.itemForm.$dirty !== detailsCtrl.itemProxy.dirty){
+          // itemProxy has changed
+          detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
+        }
+      }
+    });
+
+    $scope.$watch('detailsCtrl.itemForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.itemForm){
+        
+        // Detect if itemForm has been changed
+        if (detailsCtrl.itemForm.$dirty) {
+          detailsCtrl.itemProxy.dirty = detailsCtrl.itemForm.$dirty;
+        }
+        
+        // Detect if existing proxy is already dirty
+        if (!detailsCtrl.itemForm.$dirty && detailsCtrl.itemProxy.dirty){
+          detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
+        }
+      }
+    });
+    
+    $scope.$watch('detailsCtrl.decisionForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.decisionForm){
+
+        // Detect if decisionForm has been changed
+        if (detailsCtrl.decisionForm.$dirty) {
+          detailsCtrl.itemForm.$dirty = detailsCtrl.decisionForm.$dirty;
+        }
+        
+      }      
+    });
+    
+    $scope.$watch('detailsCtrl.actionForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.actionForm){
+
+        // Detect if actionForm has been changed
+        if (detailsCtrl.actionForm.$dirty) {
+          detailsCtrl.itemForm.$dirty = detailsCtrl.actionForm.$dirty;
+        }
+        
+      }      
+    });
+    
+    $scope.$watch('detailsCtrl.observationForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.observationForm){
+
+        // Detect if observationForm has been changed
+        if (detailsCtrl.observationForm.$dirty) {
+          detailsCtrl.itemForm.$dirty = detailsCtrl.observationForm.$dirty;
+        }
+        
+      }      
+    });
+    
+    $scope.$watch('detailsCtrl.issueForm.$dirty', function () {
+      if (detailsCtrl.itemProxy && detailsCtrl.issueForm){
+
+        // Detect if actionForm has been changed
+        if (detailsCtrl.issueForm.$dirty) {
+          detailsCtrl.itemForm.$dirty = detailsCtrl.issueForm.$dirty;
+        }
+        
+      }      
     });
     
     $scope.$watch('detailsCtrl.docShowChildren', function () {
@@ -326,10 +394,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     };
 
     detailsCtrl.updateItem = function () {
-        var newModel = ItemRepository.modelTypes[detailsCtrl.itemProxy.kind];
-        var newItem = new newModel();
-        ItemRepository.copyAttributes(detailsCtrl.itemProxy.item, newItem);
-        detailsCtrl.itemProxy.item = newItem;
+        console.log("::: Item kind has been changed to: " + detailsCtrl.itemProxy.kind);
         initializeItemStates(detailsCtrl.itemProxy.kind);
     };
 
@@ -358,7 +423,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     };
 
     detailsCtrl.fetchAnalysis = function () {
-      analysisService.fetchAnalysis(detailsCtrl.itemProxy);
+      analysisService.fetchAnalysis(detailsCtrl.itemProxy).then(function (results){
+        $scope.$apply();
+      });
     };
 
     detailsCtrl.generateHTMLReport = function () {
@@ -495,9 +562,18 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
       
     detailsCtrl.cancel = function () {
 
-        if (this.itemForm.$dirty) {
-            ItemRepository.fetchItem(detailsCtrl.itemProxy);
-            this.itemForm.$setPristine();
+        if (this.itemProxy.dirty) {
+            ItemRepository.fetchItem(detailsCtrl.itemProxy)
+            .then((fetchResults) => {
+                this.itemForm.$setPristine();
+                if (this.decisionForm){
+                  this.decisionForm.$setPristine();
+                }
+                if (this.actionForm){
+                  this.actionForm.$setPristine();
+                }
+                $scope.$apply();
+            });
         }
     };
 

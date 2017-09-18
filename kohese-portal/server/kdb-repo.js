@@ -8,16 +8,16 @@ var path = require("path");
 
 var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
+var repoList = {};
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function openRepo(repoPath, repoList, id) {
-    console.log("::: Opening git repo " + repoPath);
-    nodegit.Repository.open(repoPath)
-    .then(function(repo) {
-        repoList[id] = repo;
-    }, function(err) {
+function openRepo(proxy) {
+  var path = proxy.getRepositoryProxy().repoPath.split('Root.json')[0];
+    console.log("::: Opening git repo " + path);
+    return nodegit.Repository.open(path).then(function (repo) {
+      repoList[proxy.item.id] = repo;
     });
 }
 module.exports.openRepo = openRepo;
@@ -25,12 +25,175 @@ module.exports.openRepo = openRepo;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function initializeRepository(repoPath, repoList, id) {
-	nodegit.Repository.init(repoPath, 0).then(function (repo) {
-		repoList[repoPath] = repo;
+function initializeRepository(repoProxy, path) {
+	return nodegit.Repository.init(path, 0).then(function (repo) {
+	  repoList[repoProxy.item.id] = repo;
 	});
 }
 module.exports.initializeRepository = initializeRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function add(proxy) {
+  var info = repoRelativePathOf(proxy);
+	return info.gitRepo.refreshIndex().then(function(index) {
+	   return index.addByPath(info.relativeFilePath).then(function(result) {
+	      return index.write();
+	   }).then(function(result) {
+	      return index.writeTree();
+	   });
+	});
+}
+module.exports.add = add;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function commit(proxy, treeId, signature, message) {
+    // TODO Does "HEAD" need to be a variable?
+    // TODO Obtaining of treeId
+  var info = repoRelativePathOf(proxy);
+    return info.gitRepo.createCommit("HEAD", signature, signature, message, treeId, []);
+}
+module.exports.commit = commit;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function push(proxy, remoteName) {
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.getRemote(remoteName).then(function(remote) {
+	  // TODO Does the refs String below need to change?
+       return remote.push(["refs/heads/master:refs/heads/master"],
+          {
+             callbacks: {
+                credentials: function(url, username) {
+                   return nodegit.Cred.sshKeyFromAgent(username);
+                }
+             }
+          });
+       });
+}
+module.exports.push = push;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function checkout(proxy, branchName) {
+  /* TODO Does a non-HEAD checkout capability need to be available?
+  Also, what about forcing creation of branch name that already
+  exist? */
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.getHeadCommit().then(function (commit) {
+    return info.gitRepo.createBranch(branchName, commit, false);
+  }).then(function (ref) {
+    return info.gitRepo.checkoutBranch(ref);
+  });
+}
+module.exports.checkout = checkout;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function reset(proxy, paths) {
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.getHeadCommit().then(function (commit) {
+    return nodegit.Reset.default(info.gitRepo, commit, paths);
+  });
+}
+module.exports.reset = reset;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function diff(proxy) {
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.getHeadCommit().then(function (commit) {
+    return commit.getTree().then(function (tree) {
+       return nodegit.Diff.treeToWorkdirWithIndex(info.gitRepo, tree, null);
+    });
+  }).then(function (diff) {
+    var diffContent = [];
+    return diff.patches().then(function (patches) {
+      var pPatch = [];
+      patches.forEach(function (p) {
+        pPatch.push(p.hunks().then(function (hunks) {
+          var pHunks = [];
+          hunks.forEach(function (h) {
+            pHunks.push(h.lines().then(function (lines) {
+              diffContent.push("diff " + p.oldFile().path() + " " + p.newFile().path());
+              diffContent.push(h.header().trim());
+              lines.forEach(function (l) {
+                diffContent.push(String.fromCharCode(l.origin()) + l.content().trim());
+              });
+            }));
+          });
+
+          return Promise.all(pHunks);
+        }));
+      });
+
+      return Promise.all(pPatch);
+    }).then(function () {
+       return diffContent;
+    });
+  });
+}
+module.exports.diff = diff;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function addRemote(proxy, remoteName, remoteUrl) {
+  var info = repoRelativePathOf(proxy);
+  return nodegit.Remote.create(info.gitRepo, remoteName, remoteUrl);
+}
+module.exports.addRemote = addRemote;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function fetch(proxy, remoteName) {
+  var info = repoRelativePathOf(proxy);
+  return info.gitRepo.fetch(remoteName, {
+    callbacks: {
+      credentials: function (url, username) {
+        return nodegit.Cred.sshKeyFromAgent(username);
+      }
+    }
+  });
+}
+module.exports.fetch = fetch;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function merge(proxy, signature) {
+  var info = repoRelativePathOf(proxy);
+  return Promise.join(info.gitRepo.getHeadCommit(), info.gitRepo.getMasterCommit(), function (hc, mc) {
+    var index = nodegit.Merge.commits(info.gitRepo, hc, mc, null);
+    if (index.hasConflicts()) {
+      // TODO Handle conflicts
+    }
+    
+    return index.writeTreeTo(info.gitRepo).then(function (treeId) {
+      return info.gitRepo.createCommit("HEAD", signature, signature, "Merge from master to HEAD.", treeId, [hc, mc]);
+    });
+  });
+}
+module.exports.merge = merge;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function pull(proxy, remoteName, signature) {
+  var info = repoRelativePathOf(proxy);
+  return fetch(info.gitRepo, remoteName).then(function () {
+    return merge(info.gitRepo, signature);
+  });
+}
+module.exports.pull = pull;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -39,17 +202,18 @@ function repoRelativePathOf(proxy){
   
   var filePath = proxy.repoPath;
   var repoProxy = proxy.getRepositoryProxy();
-  var gitRepo = global.koheseKDB.repoList[repoProxy.item.id];
+  var gitRepo = repoList[repoProxy.item.id];
 
   while(!gitRepo) {
-      if(repoProxy.item.id === 'ROOT'){
+      if(!repoProxy.parentProxy){
           console.log('!!! Cannot find a git repo containing ' + filePath);
           return;
       }
+      
       repoProxy = repoProxy.parentProxy.getRepositoryProxy();
-      gitRepo = global.koheseKDB.repoList[repoProxy.item.id];
+      gitRepo = repoList[repoProxy.item.id];
   }
-
+  
   var pathToRepo = repoProxy.repoPath.split('Root.json')[0];
   var relativeFilePath = filePath.split(pathToRepo)[1];
 
@@ -60,14 +224,14 @@ function repoRelativePathOf(proxy){
     relativeFilePath: relativeFilePath
   };
 }
-module.exports.repoRelativePathOf = repoRelativePathOf;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getStatus (repo, callback){
+function getStatus (proxy, callback){
   //This code gets working directory changes similar to git status
-  repo.getStatusExt().then(function(statuses) {
+  var info = repoRelativePathOf(proxy);
+  info.gitRepo.getStatusExt().then(function(statuses) {
     
     var repoStatus = [];
     
@@ -93,13 +257,14 @@ module.exports.getStatus = getStatus;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getItemStatus(gitRepo, relativeFilePath) {
-	var status = [];
-	var statNum = nodegit.Status.file(gitRepo, relativeFilePath);
+function getItemStatus(proxy) {
+	var info = repoRelativePathOf(proxy);
+  var status = [];
+	var statNum = nodegit.Status.file(info.gitRepo, info.relativeFilePath);
 	
-	for (s in nodegit.Status.STATUS) {
-		if ((statNum & nodegit.Status.STATUS[s]) != 0) {
-			status.push(s);
+	for (var statusKey in nodegit.Status.STATUS) {
+		if ((statNum & nodegit.Status.STATUS[statusKey]) != 0) {
+			status.push(statusKey);
 		}
 	}
 	
@@ -117,38 +282,41 @@ function walkHistoryForFile(proxy, callback){
   console.log("::: Walking History for " + proxy.item.id + ' in ' + repoInfo.pathToRepo + ' at ' + repoInfo.relativeFilePath);
   var walker;
   var historyCommits = [];
+  var shaMap = [];
+  var prevSha;
   var commit;
+  var fileName = repoInfo.relativeFilePath;
 
   function compileHistory(resultingArrayOfCommits) {
 
-    var lastSha;
+    resultingArrayOfCommits.forEach(function(entry) {
+      if (!shaMap[entry.commit.sha()]) {
+        historyCommits.push(entry);
+        shaMap[entry.commit.sha()] = entry;
+      }
+    });
+    
     if (historyCommits.length > 0) {
-      lastSha = historyCommits[historyCommits.length - 1].commit.sha();
-      if (
-        resultingArrayOfCommits.length == 1 &&
-        resultingArrayOfCommits[0].commit.sha() == lastSha
-      ) {
+      var entry = historyCommits[historyCommits.length - 1];
+      var lastSha = entry.commit.sha();
+      if (prevSha == lastSha) {
         return;
       }
-    }
-
-    resultingArrayOfCommits.forEach(function(entry) {
-      historyCommits.push(entry);
-    });
-
-    if (historyCommits.length > 0){
-      // Found at least one commit
-      lastSha = historyCommits[historyCommits.length - 1].commit.sha();
+      
+      prevSha = lastSha;
 
       walker = repoInfo.gitRepo.createRevWalk();
       walker.push(lastSha);
       walker.sorting(nodegit.Revwalk.SORT.TIME);
 
-      return walker.fileHistoryWalk(repoInfo.relativeFilePath, 500)
+      /* If this commit was a rename, use the previous name in the history
+      walk. */
+      if (entry.oldName) {
+        fileName = entry.oldName;
+      }
+      
+      return walker.fileHistoryWalk(fileName, 500)
         .then(compileHistory);
-    } else {
-      // Did not find any commits
-      return;
     }
   }
 

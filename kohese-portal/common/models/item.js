@@ -3,7 +3,8 @@ module.exports = function (Item) {
     var fs = require('fs');
     var path = require('path');
     var child = require('child_process');
-
+    var ItemProxy = require('./item-proxy.js');
+    var kio = require('../../server/koheseIO.js');
     
     //////////////////////////////////////////////////////////////////////////
     //
@@ -53,46 +54,48 @@ module.exports = function (Item) {
     Item.afterSaveKohese = function (ctx, next) {
         console.log('::: After save - ' + ctx.Model.modelName);
         if (ctx.instance) {
-        	var status = global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance.toObject());
-            console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.name);
+        	global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance.toObject()).then(function (status) {
+        	  console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.name);
             var notification = new Object();
-            notification.model = ctx.Model.modelName;
-            notification.id = ctx.instance.id;
-            notification.ctx = ctx;
+            notification.kind = ctx.Model.modelName;
+            notification.item = ctx.instance;
             notification.status = status;
             console.log("Change Instance:" + JSON.stringify(notification));
             if (ctx.isNewInstance) {
                 notification.type = 'create';
-                global.KoheseIO.emit(ctx.Model.modelName +'/create', notification);
+                kio.server.emit(ctx.Model.modelName +'/create', notification);
             } else {
                 notification.type = 'update';
-                global.KoheseIO.emit(ctx.Model.modelName +'/update', notification);
+                kio.server.emit(ctx.Model.modelName +'/update', notification);
             }
+            
+            next();
+        	});
         } else {
-            console.log('Updated %s matching %j',
+            console.log('*** Updated %s matching %j',
                 ctx.Model.pluralModelName,
                 ctx.where);
             var notification = new Object();
-            notification.model = ctx.Model.modelName;
+            notification.kind = ctx.Model.pluralModelName;
             notification.id = ctx.where.id;
             notification.ctx = ctx;
             if (ctx.isNewInstance) {
                 notification.type = 'create';
-                global.KoheseIO.emit(ctx.Model.modelName +'/create', notification);
+                kio.server.emit(ctx.Model.modelName +'/create', notification);
 
             } else {
                 notification.type = 'update';
-                global.KoheseIO.emit(ctx.Model.modelName +'/update', notification);
+                kio.server.emit(ctx.Model.modelName +'/update', notification);
             }
-            console.log("Change Multiple: " + JSON.stringify(notification));
+            console.log("*** Change Multiple: " + JSON.stringify(notification));
+            
+            next();
         }
         
         if(ctx.Model.modelName === "Item"){
           //var Analysis = app.models.Analysis;
           console.log("::: Need to call Analysis update logic");
         }
-        
-        next();
     };
     
     //////////////////////////////////////////////////////////////////////////
@@ -104,16 +107,15 @@ module.exports = function (Item) {
         if (ctx.instance) {
             console.log('Deleted %s #%s#', ctx.Model.modelName, ctx);
             notification.type = 'delete';
-            notification.model = ctx.Model.modelName;
-            notification.ctx = ctx;
+            notification.kind = ctx.Model.modelName;
+            notification.id = ctx.id;
         } else {
             console.log('Deleted %s #%s#', ctx.Model.modelName, ctx.where.id);
             notification.type = 'delete';
-            notification.model = ctx.Model.modelName;
+            notification.kind = ctx.Model.modelName;
             notification.id = ctx.where.id;
-            notification.ctx = ctx;
             console.log("Change: " + JSON.stringify(notification));
-            global.KoheseIO.emit(ctx.Model.modelName +'/delete', notification);
+            kio.server.emit(ctx.Model.modelName +'/delete', notification);
             global.koheseKDB.removeModelInstance(ctx.Model.modelName, notification.id);
         }
         next();
@@ -169,12 +171,13 @@ module.exports = function (Item) {
     Item.getStatus = function(req, onId, cb) {
       console.log("::: Getting status for " + onId);
       //var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
-      
-      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.repoList[onId], function(status){
+      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.ItemProxy.getProxyFor(onId), function(status){
         
         if (status) {
           cb(null, status);
         } else {
+          console.log("*** Error (Returned from getStatus)");
+          console.log(status);
           cb({error: "status error"}, null);
         }        
       });
@@ -200,6 +203,8 @@ module.exports = function (Item) {
     });
 
     Item.afterRemoteError('getStatus', function(ctx, next) {
+      console.log("*** Error (After Remote)");
+      console.log(ctx.error);
       ctx.res.status(ctx.error.http_code).end(ctx.error.message);
     });
     
@@ -249,7 +254,7 @@ module.exports = function (Item) {
       
       cb(null, result);
 
-    }
+    };
     
     //////////////////////////////////////////////////////////////////////////
     //

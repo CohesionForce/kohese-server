@@ -1,17 +1,16 @@
-module.exports = function(Analysis) {
 
   var http = require('http');
   var util = require('util');
   var _und = require('underscore');
   var request = require('request');
 
-  function requestAnalysisJSON(req, forModelKind, onId, cb) {
+  function requestAnalysisJSON(forModelKind, onId, cb) {
     console.log('::: ANALYZING: ' + forModelKind + " - " + onId);
 
     var instance = global.koheseKDB.retrieveModelInstance(forModelKind, onId);
 
     var requestData = {};
-    var analysis = new Analysis();
+    var analysis = new global.app.models.Analysis();
     analysis.id = onId;
     analysis.raw = {};
     analysis.forModelKind = forModelKind;
@@ -44,7 +43,7 @@ module.exports = function(Analysis) {
         error.code = analysisError.code;
         error.syscall = analysisError.syscall;
         console.log(error);
-        cb(error, null);
+        cb({error: error});
 
         console.log("*** Error:");
         console.log(error);
@@ -57,14 +56,14 @@ module.exports = function(Analysis) {
           for ( var key in analysisBody) {
             analysis.raw[key] = JSON.parse(analysisBody[key]);
           }
-          Analysis.consolidateAnalysis(analysis);
+          consolidateAnalysis(analysis);
           // delete the raw data
           delete analysis.__data.raw;
-          global.koheseKDB.storeModelInstance("Analysis", analysis);
-          console.log('::: ANALYSIS Completed: ' + onId);
+          global.koheseKDB.storeModelInstance("Analysis", analysis).then(function (status) {
+            console.log('::: ANALYSIS Completed: ' + onId);
 
-          cb(null, analysis);
-
+            cb(analysis);
+          });
         } catch (err) {
           console.log("*** Error parsing result for: " + forModelKind + "- "
               + onId + " - " + analysis.name);
@@ -78,7 +77,7 @@ module.exports = function(Analysis) {
           '*** Failure while parsing analysis');
           error.onId = onId;
           console.log(error);
-          cb(error, null);
+          cb({error: error});
 
         }
 
@@ -86,40 +85,18 @@ module.exports = function(Analysis) {
     });
   }
 
-  Analysis.performAnalysis = function(req, forModelKind, onId, cb) {
+  function performAnalysis (forModelKind, onId, cb){
+    
     console.log("::: Preparing to analyze " + forModelKind + " " + onId);
 
     var analysis = global.koheseKDB.retrieveModelInstance("Analysis", onId);
     if (analysis) {
-      cb(null, analysis);
+      cb(analysis);
     } else {
-      requestAnalysisJSON(req, forModelKind, onId, cb);
+      requestAnalysisJSON(forModelKind, onId, cb);
     }
-  };
-
-  Analysis.remoteMethod('performAnalysis', {
-    accepts : [ {
-      arg : 'req',
-      type : 'object',
-      'http' : {
-        source : 'req'
-      }
-    }, {
-      arg : 'forModelKind',
-      type : 'string'
-    }, {
-      arg : 'onId',
-      type : 'string'
-    } ],
-    returns : {
-      arg : 'data',
-      type : 'object'
-    }
-  });
-
-  Analysis.afterRemoteError('performAnalysis', function(ctx, next) {
-    ctx.res.status(ctx.error.http_code).end(ctx.error.message);
-  });
+  }
+  module.exports.performAnalysis = performAnalysis;
 
   function addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken){
     // Create a pseudo chunk to associate this token with
@@ -180,7 +157,7 @@ module.exports = function(Analysis) {
     }
   }
 
-  Analysis.consolidateAnalysis = function(onAnalysis) {
+  function consolidateAnalysis(onAnalysis) {
     onAnalysis.list = [];
     var nextChunk = {};
     var nextToken = {};
@@ -338,5 +315,3 @@ module.exports = function(Analysis) {
   // Does this (X) really exist?
   lookup.X = "Unknown";
   lookup.XKPC = "Pseudo Chunk";
-
-};

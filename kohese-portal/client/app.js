@@ -25,7 +25,6 @@ const appModule = angular.module('app', [
     'app.services.navigationservice',
     'app.directives.navigation',
     'app.directives.treerow',
-    'lbServices',
     require('angular-ui-router'),
     'angular-jwt',
     'ui.bootstrap',
@@ -224,12 +223,17 @@ appModule
         socket.on('authenticated', function () {
           isAuthenticated = true;
           console.log('::: KoheseIO is authenticated');
-          $rootScope.$broadcast('KoheseIOConnected');
+          $rootScope.$broadcast('KoheseIOAuthenticated');
         });
         //---------------------
         socket.on('connect', function () {
           //send the jwt
+          console.log('::: KoheseIO is connected')
           socket.emit('authenticate', {token: AuthTokenFactory.getToken()});
+        });
+        socket.on('disconnect', function () {
+          console.log('::: KoheseIO is disconnected')
+          isAuthenticated = false;
         });
       };
       
