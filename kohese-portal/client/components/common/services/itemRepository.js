@@ -193,9 +193,14 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
               reject(response.error);
             } else {
               console.log(response);
-              proxy.updateItem(response.kind, response.item);
+              if(!proxy.updateItem){
+                proxy.item = response.item;
+                proxy = new ItemProxy(response.kind, response.item);
+              } else {
+                proxy.updateItem(response.kind, response.item);
+              }
               proxy.dirty = false;
-              resolve(response);              
+              resolve(proxy);              
             }
           });         
         });
