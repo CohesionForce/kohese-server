@@ -584,6 +584,12 @@ tab div {
   #login-button i {
     margin-right: 15px; }
 
+/* 
+Stylesheet for the content container element and the configurations for the dual view and single view children e
+elements
+
+Created by Josh P
+*/
 :root > body {
   width: 100%;
   height: 100%; }
@@ -647,6 +653,14 @@ tab div {
       background-color: white; }
       #page-wrapper #content-container .bottom-content > div {
         height: 100%; }
+
+.left-content {
+  height: inherit;
+  overflow: hidden; }
+
+.right-content {
+  height: inherit;
+  overflow: hidden; }
 
 .highlighted {
   background: yellow; }
