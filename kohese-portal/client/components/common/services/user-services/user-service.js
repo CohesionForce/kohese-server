@@ -17,6 +17,7 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, Ko
     service.getCurrentUser = getCurrentUser;
     service.sessions = {};
     service.authToken = {};
+    service.getUsersItemId = getUsersItemId;
 
     function registerSessions() {
         KoheseIO.socket.on('session/add', function (session) {
@@ -46,9 +47,13 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, Ko
     }
 
 
+    function getUsersItemId() {
+      return users.item.id;
+  }
+
     function getAllUsers() {
-        return users.children;
-    }
+      return users.children;
+  }
 
     function getCurrentUser() {
         return currentUser.username;

@@ -2,7 +2,7 @@
  * Created by josh on 9/22/15.
  */
 
-function AdminController(tabService, $state, $scope, KoheseUser, UserService, ItemRepository) {
+function AdminController(tabService, $state, $scope, UserService, ItemRepository) {
     var ctrl = this;
     var tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(tab.id, 'adminCtrl', this);
@@ -23,6 +23,7 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
 
     $scope.$on('itemRepositoryReady', function () {
         ctrl.repositoryList = ItemRepository.getRepositories();
+        fetchUsers();
     });
 
     $scope.$on('tabSelected', function () {
@@ -30,10 +31,7 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
     });
 
     function fetchUsers() {
-        KoheseUser.find().$promise.then(function (results) {
-            ctrl.users = results;
-
-        });
+      ctrl.users = UserService.getAllUsers();
     }
 
     fetchUsers();
@@ -58,9 +56,9 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
         }
     }
 
-    ctrl.editUser = function (user) {
-        ctrl.usernameInput = user.name;
-        ctrl.descriptionInput = user.description;
+    ctrl.editUser = function (userProxy) {
+        ctrl.usernameInput = userProxy.name;
+        ctrl.descriptionInput = userProxy.description;
         ctrl.editUserForm = true;
         ctrl.currentForm = 'Edit User';
         ctrl.selectedUser = user;
@@ -73,6 +71,11 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
         ctrl.confirmPasswordInput = '';
         ctrl.currentForm = "Add User";
         ctrl.addUserForm = true;
+        
+        // TODO This will need to move to new KoheseUser in the future
+        ctrl.selectedUser = {};
+        ctrl.selectedUser.item = {parentId: UserService.getUsersItemId()};
+        ctrl.selectedUser.kind = "KoheseUser";
     };
 
     ctrl.cancelForm = function () {
@@ -85,21 +88,16 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
         ctrl.confirmPasswordInput = '';
     };
 
-    function updateUserObject(user) {
-        user.name = ctrl.usernameInput;
-        user.description = ctrl.descriptionInput;
-        user.password = ctrl.passwordInput
-
+    function updateUserObject(userProxy) {
+        userProxy.item.name = ctrl.usernameInput;
+        userProxy.item.description = ctrl.descriptionInput;
+        userProxy.item.password = ctrl.passwordInput
     }
 
     ctrl.upsertUser = function () {
         if (ctrl.passwordInput == ctrl.confirmPasswordInput) {
-            if (!ctrl.editUserForm) {
-                ctrl.selectedUser = new KoheseUser();
-            }
             updateUserObject(ctrl.selectedUser);
-            KoheseUser.upsert(ctrl.selectedUser)
-                .$promise.then(function (results) {
+            ItemRepository.upsertItem(ctrl.selectedUser).then(function (results) {
                     fetchUsers();
                 });
             ctrl.cancelForm();
@@ -110,11 +108,10 @@ function AdminController(tabService, $state, $scope, KoheseUser, UserService, It
 
     };
 
-    ctrl.deleteUser = function (user) {
-        KoheseUser.delete(user)
-            .$promise.then(function () {
-                fetchUsers();
-            })
+    ctrl.deleteUser = function (userProxy) {
+        ItemRepository.deleteItem(userProxy).then(function() {
+            fetchUsers();          
+        });
     };
 
 
