@@ -188,5 +188,52 @@ kio.server.on('connection', function (socket) {
     callback(result);
 
   });
-    
+  
+  socket.on("VersionControl/add", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray; i++) {
+      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+    }
+    kdb.kdbRepo.add(proxies).then(function (results) {
+      var promises = [];
+      for (var i = 0; i < proxies.length; i++) {
+        promises.push(kdb.kdbRepo.getItemStatus(proxies[i]));
+      }
+      
+      Promise.all(promises).then(function (statuses) {
+        var idStatusMap = [];
+        for (var i = 0; i < results.length; i++) {
+          idStatusMap[idsArray[i]] = {
+              addStatus: results[i],
+              status: statuses[i]
+          };
+        }
+        
+        sendResponse(idStatusMap);
+      });
+    }).catch(function (err) {
+      sendResponse({
+        error: err
+      });
+    });
+  });
+  
+  socket.on("VersionControl/commit", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray.length; i++) {
+      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+    }
+//    kdb.kdbRepo.commit(proxies, userName, eMail, message);
+  });
+
+  socket.on("VersionControl/push", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray.length; i++) {
+      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+    }
+//    kdb.kdbRepo.push(proxies, remoteName, userName);
+  });
 });
