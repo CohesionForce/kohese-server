@@ -202,8 +202,10 @@ kio.server.on('connection', function (socket) {
   socket.on("VersionControl/add", function (request, sendResponse) {
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
+    console.log("Version Add");
+    console.log(idsArray);
     for (var i = 0; i < idsArray.length; i++) {
-      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
     kdb.kdbRepo.add(proxies).then(function (results) {
       var promises = [];

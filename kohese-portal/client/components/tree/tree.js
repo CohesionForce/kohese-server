@@ -393,11 +393,14 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     {
         if (proxy.status)
         {
+            console.log(proxy.item.id);
+            console.log(proxy.status);
             // Define the statusflags object on the proxy
             proxy.statusFlags = 
             {
-                modified: false,
-                newItem: false
+                WTModified: false,
+                NewItem: false,
+                IndexModified: false
             }
 
             // Set flags for the returned statuses
@@ -411,6 +414,9 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
                         break;
                     case ("WT_NEW"):
                         proxy.statusFlags.newItem = true;
+                        break;
+                    case ("INDEX_MODIFIED"):
+                        proxy.statusFlags.IndexModified = true;
                         break;
                     default:
                         console.log ("VC Status uncaught")

@@ -5,7 +5,10 @@ function VersionControlService(KoheseIO){
 
     service.stageItems = function(proxyIds) {
         console.log (proxyIds);
-        KoheseIO.socket.emit('VersionControl/add', {proxyIds: proxyIds}, function (results) {
+        var sendProxy = {proxyIds: Array.from(proxyIds)}
+        console.log("Send Proxy");
+        console.log(sendProxy);
+        KoheseIO.socket.emit('VersionControl/add', sendProxy, function (results) {
             console.log("::: Stage results:");
             console.log(results);
           });
