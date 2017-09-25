@@ -262,23 +262,23 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     
     function expandSyncedNodes() {
       
-      var ancestorProxy = treeCtrl.selectedItemProxy.parentProxy;
-      while(ancestorProxy && ancestorProxy !== treeCtrl.treeRoot){
-        if(treeCtrl.collapsed[ancestorProxy.item.id] === undefined || treeCtrl.collapsed[ancestorProxy.item.id]){
-//          console.log(">>> Expanding " + ancestorProxy.item.name);
-          treeCtrl.collapsed[ancestorProxy.item.id] = false;
+      if (treeCtrl.selectedItemProxy){
+        var ancestorProxy = treeCtrl.selectedItemProxy.parentProxy;
+        while(ancestorProxy && ancestorProxy !== treeCtrl.treeRoot){
+          if(treeCtrl.collapsed[ancestorProxy.item.id] === undefined || treeCtrl.collapsed[ancestorProxy.item.id]){
+            treeCtrl.collapsed[ancestorProxy.item.id] = false;
+          }
+          ancestorProxy = ancestorProxy.parentProxy;          
         }
-        ancestorProxy = ancestorProxy.parentProxy;          
-      }
-      
-      $location.hash(treeCtrl.selectedItemProxy.item.id);
-      $anchorScroll();
-      postDigest(function () {
-        // Force one more update cycle to update display
-        $scope.$apply();
+        
+        $location.hash(treeCtrl.selectedItemProxy.item.id);
         $anchorScroll();
-       });
-
+        postDigest(function () {
+          // Force one more update cycle to update display
+          $scope.$apply();
+          $anchorScroll();
+         });        
+      }
     }
     
     syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {

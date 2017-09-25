@@ -1,5 +1,12 @@
 @import '../utils/variables';
 
+/* 
+Stylesheet for the content container element and the configurations for the dual view and single view children e
+elements
+
+Created by Josh P
+*/
+
 :root > body {
   width: 100%;
   height: 100%;
@@ -64,8 +71,6 @@
     #add-tab-button {
       background-color: white;
     }
-    .nav {
-    }
     button {
       border-radius: $baseBorderRadius;
 
@@ -100,6 +105,16 @@
       }
     }
   }
+}
+
+.left-content {
+  height: inherit;
+  overflow: hidden;
+}
+
+.right-content {
+  height: inherit;
+  overflow: hidden;
 }
 
 

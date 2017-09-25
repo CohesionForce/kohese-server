@@ -87,6 +87,16 @@ kio.server.on('connection', function (socket) {
   socket.on('Item/upsert', function(request, callback){
     console.log('::: session %s: Received upsert for %s for user %s at %s', socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
+    
+    request.item.modifiedBy = socket.koheseUser.username;
+    request.item.modifiedOn = Date.now();
+    
+    if(!request.item.createdBy){
+      console.log('::: Updating created fields (instance) - ' + request.kind);
+      request.item.createdBy = request.item.modifiedBy;
+      request.item.createdOn = request.item.modifiedOn;
+    }
+
 
     global.app.models[request.kind].upsert(request.item, {}, function (value, responseHeaders){
       console.log("::: Upsert " + request.id);

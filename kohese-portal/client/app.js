@@ -64,11 +64,11 @@ appModule
             .state('kohese.explore', {
                 url: '/explore',
                 views: {
-                    'top': {
+                    'left': {
                         templateUrl: '/components/tree/tree.html',
                         controller: 'KTreeController as treeCtrl'
                     },
-                    'bottom': {
+                    'right': {
                         templateUrl: '/components/detailsview/detailsview.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -78,7 +78,7 @@ appModule
             .state('kohese.explore.edit', {
                 url: '/edit/{id}',
                 views: {
-                    'bottom@kohese': {
+                    'right@kohese': {
                         templateUrl: '/components/detailsview/detailsview.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -87,7 +87,7 @@ appModule
             .state('kohese.explore.create', {
                 url: '/create/{parentId}',
                 views: {
-                    'bottom@kohese': {
+                    'right@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -101,11 +101,11 @@ appModule
             .state('kohese.search', {
                 url: '/search/{filter}',
                 views: {
-                    top: {
+                    'left': {
                         templateUrl: '/components/search/search.html',
                         controller: 'SearchController as searchCtrl'
                     },
-                    'bottom': {
+                    'right': {
                         templateUrl: '/components/detailsview/detailsview.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -114,7 +114,7 @@ appModule
             .state('kohese.search.edit', {
                 url: '/edit/{id}',
                 views: {
-                    'bottom@kohese': {
+                    'right@kohese': {
                         templateUrl: '/components/detailsview/detailsview.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -123,7 +123,7 @@ appModule
             .state('kohese.search.create', {
                 url:'/create/{parentId}',
                 views: {
-                    'bottom@kohese': {
+                    'right@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
