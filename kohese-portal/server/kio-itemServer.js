@@ -14,11 +14,11 @@ kio.server.on('connection', function (socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/findById', function(request, callback){
+  socket.on('Item/findById', function(request, sendResponse){
     console.log('::: session %s: Received findById for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     var proxy = kdb.ItemProxy.getProxyFor(request.id);
-    callback({
+    sendResponse({
       kind: proxy.kind,
       item: proxy.item
     });
@@ -28,7 +28,7 @@ kio.server.on('connection', function (socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getAll', function(request, callback){
+  socket.on('Item/getAll', function(request, sendResponse){
     var username = "Unknown";
     if (socket.koheseUser){
       username = socket.koheseUser.username;
@@ -37,7 +37,7 @@ kio.server.on('connection', function (socket) {
     console.log(request);
     var kdbStore = kdb.retrieveDataForMemoryConnector();
     console.log("::: Sending getAll response");
-    callback({
+    sendResponse({
       cache: kdbStore.cache
     });
     console.log("::: Sent getAll response");
@@ -46,18 +46,18 @@ kio.server.on('connection', function (socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getStatus', function(request, callback){
+  socket.on('Item/getStatus', function(request, sendResponse){
     var repoProxy = global.koheseKDB.ItemProxy.getProxyFor(request.repoId);
     
     console.log("::: Getting status for repo: " + repoProxy.item.name);
       
     global.koheseKDB.kdbRepo.getStatus(repoProxy, function(status){    
       if (status) {
-        callback(status);
+        sendResponse(status);
       } else {
         console.log("*** Error (Returned from getStatus)");
         console.log(status);
-        callback({error: "status error"});
+        sendResponse({error: "status error"});
       }        
     });
   });
@@ -65,7 +65,7 @@ kio.server.on('connection', function (socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getHistory', function(request, callback){
+  socket.on('Item/getHistory', function(request, sendResponse){
   
     console.log("::: Getting history for " + request.onId);
     var proxy = global.koheseKDB.ItemProxy.getProxyFor(request.onId);
@@ -73,9 +73,9 @@ kio.server.on('connection', function (socket) {
     global.koheseKDB.kdbRepo.walkHistoryForFile(proxy, function(history){
       
       if (history) {
-        callback(history);
+        sendResponse(history);
       } else {
-        callback({error: "history error"});
+        sendResponse({error: "history error"});
       }        
     });
 
@@ -84,7 +84,7 @@ kio.server.on('connection', function (socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/upsert', function(request, callback){
+  socket.on('Item/upsert', function(request, sendResponse){
     console.log('::: session %s: Received upsert for %s for user %s at %s', socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     
@@ -102,13 +102,13 @@ kio.server.on('connection', function (socket) {
       console.log("::: Upsert " + request.id);
       console.log(value);
       console.log(responseHeaders);
-      callback({
+      sendResponse({
         kind: request.kind,
         item: responseHeaders
       });
       console.log("::: Sent Item/upsert response");      
     }, function (httpResponse){
-      callback({error: httpResponse});
+      sendResponse({error: httpResponse});
       console.log("::: Sent Item/upsert error");      
     });
 
@@ -117,19 +117,19 @@ kio.server.on('connection', function (socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/deleteById', function(request, callback){
+  socket.on('Item/deleteById', function(request, sendResponse){
     console.log('::: session %s: Received deleteById for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
 
     global.app.models[request.kind].deleteById(request.id, {}, function (value, responseHeaders){
       console.log("::: Deleted " + request.id);
-      callback({
+      sendResponse({
         success: value,
         headers: responseHeaders
       });
       console.log("::: Sent Item/deleteById response");      
     }, function (httpResponse){
-      callback({error: httpResponse});
+      sendResponse({error: httpResponse});
       console.log("::: Sent Item/deleteById error");      
     });
 
@@ -138,19 +138,19 @@ kio.server.on('connection', function (socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/performAnalysis', function(request, callback) {
+  socket.on('Item/performAnalysis', function(request, sendResponse) {
 
     console.log('::: session %s: Received performAnalysis for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     
-    itemAnalysis.performAnalysis(request.kind, request.id, callback);
+    itemAnalysis.performAnalysis(request.kind, request.id, sendResponse);
 
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/generateReport', function(request, callback) {
+  socket.on('Item/generateReport', function(request, sendResponse) {
 
     var showUndefined;
     var forItemId = request.onId;
@@ -163,7 +163,7 @@ kio.server.on('connection', function (socket) {
 
     if (!proxy){
       console.log("*** Could not find proxy for: " + forItemId);        
-      callback({error: "Item not found: " + forItemId});
+      sendResponse({error: "Item not found: " + forItemId});
       return;
     }
 
@@ -195,8 +195,55 @@ kio.server.on('connection', function (socket) {
       console.log('::: Pandoc done!');
     }
       
-    callback(result);
+    sendResponse(result);
 
   });
-    
+  
+  socket.on("VersionControl/add", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray.length; i++) {
+      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+    }
+    kdb.kdbRepo.add(proxies).then(function (results) {
+      var promises = [];
+      for (var i = 0; i < proxies.length; i++) {
+        promises.push(kdb.kdbRepo.getItemStatus(proxies[i]));
+      }
+      
+      Promise.all(promises).then(function (statuses) {
+        var idStatusMap = [];
+        for (var i = 0; i < results.length; i++) {
+          idStatusMap[idsArray[i]] = {
+              addStatus: results[i],
+              status: statuses[i]
+          };
+        }
+        
+        sendResponse(idStatusMap);
+      });
+    }).catch(function (err) {
+      sendResponse({
+        error: err
+      });
+    });
+  });
+  
+  socket.on("VersionControl/commit", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray.length; i++) {
+      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+    }
+//    kdb.kdbRepo.commit(proxies, userName, eMail, message);
+  });
+
+  socket.on("VersionControl/push", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray.length; i++) {
+      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+    }
+//    kdb.kdbRepo.push(proxies, remoteName, userName);
+  });
 });
