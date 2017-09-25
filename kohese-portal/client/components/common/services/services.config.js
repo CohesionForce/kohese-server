@@ -16,4 +16,5 @@ export default() => {
     require('./user-services/user-service')();
     require('./navigation-services/navigation-service')();
     require('./search-service')();
+    require('./versionControlService')();
 }
