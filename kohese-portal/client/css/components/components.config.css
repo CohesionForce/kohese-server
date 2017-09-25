@@ -1,0 +1,258 @@
+.knowledge-tree-panel {
+  border-collapse: collapse;
+  position: relative;
+  height: calc(100% - 120px);
+  width: calc(100% - 20px);
+  margin: 0px 0px 0px 20px;
+  overflow: hidden;
+}
+
+.knowledge-tree {
+  height: 100%;
+}
+
+.knowledge-tree .kt-icon, .knowledge-tree .kt-label {
+  cursor: pointer;
+}
+
+.kt-collection .kt-collection {
+  padding-left: 15px;
+}
+
+.kti-actions i {
+  margin: 0 5px 0 5px;
+}
+
+.knowledge-tree .kt-item {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  min-height: 20px;
+  line-height: 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+.kt-collection .kt-hidden {
+  display: none;
+}
+
+.knowledge-tree .kt-head, .knowledge-tree .kt-item {
+  width: 100%;
+}
+
+.kt-body {
+  height: calc(100% - 31px);
+  overflow: auto;
+}
+
+.kti-filtered {
+  display: none;
+}
+
+.kti-filterMatchedExact {
+  background-color: #ffffcc;
+}
+
+.kti-selected-item {
+  background-color: #7dd7ae;
+}
+
+.kti-filterMatchedExact.kti-selected-item {
+  background: repeating-linear-gradient(90deg, #ffffcc, #ffffcc 20px, #7dd7ae 20px, #7dd7ae calc(100% - 20px));
+}
+
+.kt-item:hover {
+  background-color: #e5e5e5;
+}
+
+.knowledge-tree .kt-head {
+  font-weight: bold;
+  vertical-align: bottom;
+  border-bottom: 2px solid #ddd;
+}
+
+.kth-cell, .kti-cell {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 5px;
+}
+
+.kti-name {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 5px;
+  width: 80%;
+}
+
+.knowledge-tree .kt-head .glyphicon-plus {
+  color: green;
+}
+
+.knowledge-tree .kt-head .glyphicon-plus:hover {
+  cursor: pointer;
+}
+
+.knowledge-tree .kt-item .glyphicon-remove {
+  color: #ca6464;
+}
+
+.knowledge-tree .kt-item .glyphicon-remove:hover {
+  cursor: pointer;
+}
+
+.trim-info {
+  max-width: 25em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+}
+
+.trim-info-visible {
+  max-width: 25em;
+  white-space: pre-wrap;
+  position: relative;
+}
+
+.quick-item {
+  position: fixed;
+  z-index: 10;
+  left: 25%;
+  right: 25%;
+  top: 25%;
+  bottom: 25%;
+  width: 50%;
+  height: 50%;
+  background-color: #F3FAB6;
+  padding: 5px;
+  border-radius: 10px;
+  border: double 1px black;
+}
+
+#details-panel {
+  margin-bottom: 0px;
+  height: 100%;
+}
+
+#details-panel > .panel-body {
+  height: calc(100% - 30px);
+}
+
+#details-tabs {
+  height: calc(100% - 30px);
+}
+
+#details-tabs .tab-content {
+  height: calc(100% - 43px);
+  overflow-y: auto;
+}
+
+.tab-pane {
+  overflow: auto;
+}
+
+.tab-pane .absolute {
+  position: absolute;
+}
+
+.tab-pane label {
+  margin: 10px;
+}
+
+.tab-pane label #Rationale {
+  width: 500px;
+}
+
+.tab-pane label .alternative-field {
+  width: 500px;
+}
+
+.tab-pane .form-actions {
+  margin-left: 20px;
+}
+
+.active-state {
+  background-color: #64be95;
+  color: white;
+}
+
+tab div {
+  overflow: auto;
+}
+
+.item-actions i {
+  border: 2px solid #ffc8c8;
+  border-radius: 5px;
+  padding: 3px 5px 3px 5px;
+  margin-right: 5px;
+}
+
+.item-actions i:hover {
+  cursor: pointer;
+}
+
+.item-actions .fa-stack {
+  margin-right: 5px;
+}
+
+.item-actions .fa-stack .stacked-child {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-actions .fa-stack .stacked-parent {
+  border: none;
+  margin: 0;
+}
+
+.angucomplete-holder ::-webkit-input-placeholder {
+  /* WebKit, Blink, Edge */
+  color: black;
+}
+
+.angucomplete-holder :-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: black;
+  opacity: 1;
+}
+
+.angucomplete-holder ::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: black;
+  opacity: 1;
+}
+
+.angucomplete-holder :-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: black;
+}
+
+.angucomplete-holder .angucomplete-dropdown {
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+  border-radius: 10px;
+  border: 1px black solid;
+  padding: 5px;
+}
+
+.angucomplete-holder .angucomplete-selected-row {
+  background-color: #005A31;
+  color: white;
+  padding: 5px;
+}
+
+.create-controls {
+  position: absolute;
+  height: inherit;
+  bottom: 0;
+  z-index: 10;
+  background-color: white;
+  width: 95%;
+  padding: 5px 0px 5px 5px;
+  overflow: hidden;
+}
+ 
+
+ /*# sourceMappingURL= components.config.css.map */
