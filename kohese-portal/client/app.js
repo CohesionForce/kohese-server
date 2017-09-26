@@ -18,6 +18,7 @@ const appModule = angular.module('app', [
     'app.services.issueservice',
     'app.services.observationservice',
     'app.services.userservice',
+    'app.services.sessionservice',
     'app.services.tabservice',
     'app.services.authentication',
     'app.services.analysisservice',
