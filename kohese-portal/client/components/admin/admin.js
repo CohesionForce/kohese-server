@@ -57,11 +57,11 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     }
 
     ctrl.editUser = function (userProxy) {
-        ctrl.usernameInput = userProxy.name;
-        ctrl.descriptionInput = userProxy.description;
+        ctrl.usernameInput = userProxy.item.name;
+        ctrl.descriptionInput = userProxy.item.description;
         ctrl.editUserForm = true;
         ctrl.currentForm = 'Edit User';
-        ctrl.selectedUser = user;
+        ctrl.selectedUser = userProxy.item;
     };
 
     ctrl.addUser = function () {
