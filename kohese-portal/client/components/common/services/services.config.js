@@ -14,6 +14,7 @@ export default() => {
     require('./kind-services/observation-service')();
     require('./category-services/category-service')();
     require('./user-services/user-service')();
+    require('./user-services/session-service')();
     require('./navigation-services/navigation-service')();
     require('./search-service')();
 }
