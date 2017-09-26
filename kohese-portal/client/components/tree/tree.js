@@ -3,7 +3,7 @@
  */
 
 function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
-                        $scope, $location, $stateParams, SearchService, tabService, VersionControlService) {
+                        $scope, $location, $stateParams, SearchService, tabService) {
 
     var treeCtrl = this,
         syncListener;
@@ -29,13 +29,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         treeCtrl.treeRoot = ItemRepository.getRootProxy();
         treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
         treeCtrl.selectedItemProxy = {};
-        treeCtrl.versionControlEnabled = false; 
-
-        // NEW View Control
-        treeCtrl.viewList = ["Default","Advanced Filter","Version Control"]; // TO-DO : Probably want to get this from somewhere else so 
-                                                                              // view types can be pulled based on version of Kohese
-        treeCtrl.viewType = "Default";
-        
     } else {
         console.log("Root Check!");
         console.log(treeCtrl);
@@ -362,92 +355,9 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     treeCtrl.createChildOfSelectedItem = function () {
       $state.go('kohese.explore.create', {parentId: treeCtrl.selectedItemProxy.item.id})
     };
-
-    /****** Version Control View Functions */
-
-    /* Called when the user changes views of the tree */
-    treeCtrl.onViewTypeChanged = function()
-    {
-        console.log(treeCtrl.viewType);
-        switch (treeCtrl.viewType)
-            {
-            case "Version Control":
-                treeCtrl.filter.status = true;
-                treeCtrl.filter.dirty = false;
-                treeCtrl.versionControlEnabled = true;
-                treeCtrl.selectedVersionControlNodes = new Set();
-                treeCtrl.expandFiltered()
-                console.log(treeCtrl.filter);
-                break;
-            default : 
-                treeCtrl.filter.status = false;
-                treeCtrl.filter.dirty = false;
-                treeCtrl.versionControlEnabled = false;
-                console.log(treeCtrl.filter);
-            }
-            
-    }
-
-    // Called when the version control view is selected
-    treeCtrl.applyVersionControlTags = function (proxy)
-    {
-        if (proxy.status)
-        {
-            console.log(proxy.item.id);
-            console.log(proxy.status);
-            // Define the statusflags object on the proxy
-            proxy.statusFlags = 
-            {
-                WTModified: false,
-                NewItem: false,
-                IndexModified: false
-            }
-
-            // Set flags for the returned statuses
-            for (var i = 0; i < proxy.status.length; i++ )
-            {
-                status = proxy.status[i];
-                switch (status)
-                {
-                    case ("WT_MODIFIED"):
-                        proxy.statusFlags.modified = true;
-                        break;
-                    case ("WT_NEW"):
-                        proxy.statusFlags.newItem = true;
-                        break;
-                    case ("INDEX_MODIFIED"):
-                        proxy.statusFlags.IndexModified = true;
-                        break;
-                    default:
-                        console.log ("VC Status uncaught")
-                        console.log (status);
-                }      
-            }
-        }
-    }
-
-    treeCtrl.onVersionControlStageChange = function(proxy)
-    {
-        
-        console.log("Version Control Stage Change");
-        if (proxy.selected)
-        {
-            treeCtrl.selectedVersionControlNodes.add(proxy.item.id);
-        } else {
-            treeCtrl.selectedVersionControlNodes.delete(proxy.item.id);
-        }
-
-        console.log(treeCtrl.selectedVersionControlNodes)
-    }
-
-    treeCtrl.stageItems = function()
-        {
-        VersionControlService.stageItems(treeCtrl.selectedVersionControlNodes);
-        console.log("Stage Items");
-        }
 }
 
 export default () => {
-    angular.module('app.tree', ['app.services.tabservice', 'app.services.versioncontrolservice'])
+    angular.module('app.tree', ['app.services.tabservice'])
         .controller('KTreeController', KTreeController);
 }
