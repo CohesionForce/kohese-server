@@ -445,6 +445,12 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         VersionControlService.stageItems(treeCtrl.selectedVersionControlNodes);
         console.log("Stage Items");
         }
+    
+    treeCtrl.commitItems = function()
+        {
+        VersionControlService.commitItems(treeCtrl.selectedVersionControlNodes,
+                                          "Hello, I'm a commit");
+        }
 }
 
 export default () => {

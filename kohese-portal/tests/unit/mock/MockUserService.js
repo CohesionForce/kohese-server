@@ -8,7 +8,7 @@ function MockUserService() {
         return [];
     }
     
-    this.getCurrentUser = function() {
+    this.getCurrentUsername = function() {
         return user;
     }
 }

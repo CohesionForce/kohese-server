@@ -235,16 +235,18 @@ kio.server.on('connection', function (socket) {
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
-//    kdb.kdbRepo.commit(proxies, userName, eMail, message);
+    var a = kdb.kdbRepo.commit(proxies, request.username, request.email, 
+                       request.message);
+    console.log(a);
   });
 
   socket.on("VersionControl/push", function (request, sendResponse) {
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
 //    kdb.kdbRepo.push(proxies, remoteName, userName);
   });

@@ -88,6 +88,9 @@
 					<button class="btn btn-default"
 							ng-click="treeCtrl.stageItems()"
 							ng-disabled="treeCtrl.selectedVersionControlNodes.size === 0">Stage Items</button>
+					<button class="btn btn-default"
+							ng-click="treeCtrl.commitItems()"
+							ng-disabled="treeCtrl.selectedVersionControlNodes.size === 0">Commit Items</button>
 				</span>		
 				<!-- Start Placeholder View -->
 				<span ng-switch-default>

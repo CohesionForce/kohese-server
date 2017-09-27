@@ -11,11 +11,12 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
 
     const service = this;
     var users = {};
-    var currentUser = "";
+    var currentUser = {};
     var userLoggedIn = false;
 
     service.getAllUsers = getAllUsers;
-    service.getCurrentUser = getCurrentUser;
+    service.getCurrentUsername = getCurrentUsername;
+    service.getCurrentUserEmail = getCurrentUserEmail;
     service.authToken = {};
     service.getUsersItemId = getUsersItemId;
 
@@ -27,15 +28,34 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
       return users.children;
   }
 
-    function getCurrentUser() {
-        return currentUser.username;
+    function getCurrentUsername() {
+        return (currentUser.item) ? 
+            currentUser.item.name : "Loading";
+     }
+
+    function getCurrentUserEmail() {
+        if (currentUser.item)
+        {
+            return (currentUser.item.email) ? 
+                currentUser.item.email : "No email specified";
+        }
+        else 
+            return "Loading";
     }
 
     function setCurrentUser() {
         service.authToken = AuthTokenFactory.getToken();
         if (service.authToken) {
-            currentUser = jwtHelper.decodeToken(service.authToken);
+            var decodedToken = jwtHelper.decodeToken(service.authToken);
+            var root = ItemRepository.getRootProxy();
+            var users = root.getChildByName('Users');
+            /* If the users object isn't around we probably are waiting for load
+               We will call this function again when the repo is loaded. */
+            if (users) 
+            {
+            currentUser = users.getChildByName(decodedToken.username);
             SessionService.registerSessions();
+            }
         } else {
             $state.go('login');
         }
@@ -44,6 +64,8 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
     $rootScope.$on('itemRepositoryReady', function () {
         var root = ItemRepository.getRootProxy();
         users = root.getChildByName('Users');
+        setCurrentUser();
+        $rootScope.$broadcast('userLoaded');
     });
 
     $rootScope.$on('userLoggedIn', function onUserLogin() {
@@ -55,6 +77,11 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
     $rootScope.$on('userLoggedOut', function onUserLogout() {
         userLoggedIn = false;
     });
+
+    $rootScope.$on('UserUpdated', function onUserUpdated(event, data) {
+        currentUser = data;
+        console.log(currentUser);
+        });
 
     setCurrentUser();
     console.log(currentUser);

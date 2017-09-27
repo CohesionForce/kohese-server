@@ -133,6 +133,9 @@ module.exports.add = add;
 //////////////////////////////////////////////////////////////////////////
 function commit(proxies, userName, eMail, message) {
   // TODO Does "HEAD" need to be a variable?
+  console.log ("Commit func : 135 kdb-repo");
+  console.log (userName);
+  console.log(eMail);
   var signature = nodegit.Signature.now(userName, eMail);
   var promises = [];
   for (var i = 0; i < proxies.length; i++) {

@@ -2,7 +2,8 @@
  * Created by josh on 9/22/15.
  */
 
-function AdminController(tabService, $state, $scope, UserService, ItemRepository, SessionService) {
+function AdminController(tabService, $state, $scope, UserService, ItemRepository, 
+                         SessionService, $rootScope) {
     var ctrl = this;
     var tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(tab.id, 'adminCtrl', this);
@@ -105,8 +106,10 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     ctrl.upsertUser = function () {
         if (ctrl.passwordInput == ctrl.confirmPasswordInput) {
             updateUserObject(ctrl.selectedUserProxy);
+            console.log(ctrl.selectedUserProxy);
             ItemRepository.upsertItem(ctrl.selectedUserProxy).then(function (results) {
                 fetchUsers();
+                $rootScope.$broadcast('UserUpdated', ctrl.selectedUserProxy)
             });
             ctrl.cancelForm();
         } else {

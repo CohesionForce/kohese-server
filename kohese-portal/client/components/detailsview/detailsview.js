@@ -64,7 +64,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.issueStates = IssueService.getIssueStates();
         detailsCtrl.categoryTags = CategoryService.getTags();
         detailsCtrl.userList = UserService.getAllUsers();
-        detailsCtrl.currentUser = UserService.getCurrentUser();
+        detailsCtrl.currentUser = UserService.getCurrentUsername();
         detailsCtrl.proxyList = ItemRepository.getShortFormItemList();
         detailsCtrl.analysisFilterPOS = analysisService.filterPOS;
         detailsCtrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
@@ -110,9 +110,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             }
         }
         $scope.$emit('newItemSelected', $stateParams.id);
-
-
     });
+
+    $scope.$on('userLoaded', function () {
+        ctrl.userName = UserService.getCurrentUsername();
+      });
 
     $scope.$on('tabSelected', function () {
         tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
