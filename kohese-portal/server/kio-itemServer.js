@@ -207,22 +207,21 @@ kio.server.on('connection', function (socket) {
     for (var i = 0; i < idsArray.length; i++) {
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
-    kdb.kdbRepo.add(proxies).then(function (results) {
+    kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
+      sendResponse(addStatusMap);
+      
       var promises = [];
       for (var i = 0; i < proxies.length; i++) {
         promises.push(kdb.kdbRepo.getItemStatus(proxies[i]));
       }
       
       Promise.all(promises).then(function (statuses) {
-        var idStatusMap = [];
-        for (var i = 0; i < results.length; i++) {
-          idStatusMap[idsArray[i]] = {
-              addStatus: results[i],
-              status: statuses[i]
-          };
+        var gitStatusMap = {};
+        for (var i = 0; i < statuses.length; i++) {
+          gitStatusMap[idsArray[i]] = statuses[i];
         }
         
-        sendResponse(idStatusMap);
+        kio.server.emit("VersionControl/statusUpdated", gitStatusMap);
       });
     }).catch(function (err) {
       sendResponse({
