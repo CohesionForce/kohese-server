@@ -9,7 +9,7 @@ var path = require("path");
 var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
 var repoList = {};
-var stageMap = [];
+var stageMap = {};
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -110,21 +110,45 @@ module.exports.initializeRepository = initializeRepository;
 //
 //////////////////////////////////////////////////////////////////////////
 function add(proxies) {
+  var addStatusMap = {};
+  var repoIndexMap = {};
   var promises = [];
   for (var i = 0; i < proxies.length; i++) {
-    var info = repoRelativePathOf(proxies[i]);
-    promises.push(info.gitRepo.refreshIndex().then(function(index) {
-       return index.addByPath(info.relativeFilePath).then(function(result) {
-          index.write();
-          return result;
-       }).then(function(result) {
-          stageMap[info.gitRepo] = index.writeTree();
-          return result;
-       });
-    }));
+    (function (iIndex) {
+      var info = repoRelativePathOf(proxies[iIndex]);
+      promises.push(info.gitRepo.refreshIndex().then(function(index) {
+         return index.addByPath(info.relativeFilePath).then(function(result) {
+           repoIndexMap[info.gitRepo] = index;
+           var added = false;
+           var indexEntries = index.entries();
+           for (var j = 0; j < indexEntries.length; j++) {
+             if (indexEntries[j].path === info.relativeFilePath) {
+               added = true;
+               break;
+             }
+           }
+           
+           addStatusMap[proxies[iIndex].item.id] = added;
+         });
+      }));
+    })(i);
   }
   
-  return Promise.all(promises);
+  return Promise.all(promises).then(function () {
+    var promises = [];
+    for (var repo in repoIndexMap) {
+      var index = repoIndexMap[repo];
+      promises.push(index.write().then(function (returnVal) {
+        return index.writeTree();
+      }).then(function (writeId) {
+        stageMap[repo] = writeId;
+      }));
+    }
+    
+    return Promise.all(promises);
+  }).then(function () {
+    return addStatusMap;
+  });
 }
 module.exports.add = add;
 
