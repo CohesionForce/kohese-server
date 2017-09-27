@@ -30,6 +30,6 @@ function VersionControlService(KoheseIO, UserService){
 
 export default () => {
 
-    angular.module('app.services.versioncontrolservice', [])
+    angular.module('app.services.versioncontrolservice', ['app.factories.koheseio'])
         .service('VersionControlService', VersionControlService);
 }

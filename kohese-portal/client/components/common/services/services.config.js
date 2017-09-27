@@ -18,4 +18,5 @@ export default() => {
     require('./navigation-services/navigation-service')();
     require('./search-service')();
     require('./versionControlService')();
+    require('./kohese-io')();
 }

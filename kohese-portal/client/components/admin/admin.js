@@ -126,6 +126,6 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
 
 export default () =>
 {
-    angular.module('app.admin', ['app.services.tabservice'])
+    angular.module('app.admin', ['app.services.tabservice', 'app.services.sessionservice'])
            .controller('AdminController', AdminController);
 }

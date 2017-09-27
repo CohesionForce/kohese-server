@@ -39,7 +39,7 @@ function SessionService(KoheseIO) {
 
 export default () => {
     
-        angular.module('app.services.sessionservice', [])
+        angular.module('app.services.sessionservice', ['app.factories.koheseio'])
             .service('SessionService', SessionService);
     }
     
