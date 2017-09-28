@@ -30,6 +30,10 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
                 } else {
                 	proxy = new ItemProxy(notification.kind, notification.item);
                 }
+
+                $rootScope.$emit('Version Control Node Updated', 
+                    {status: notification.status, id: notification.item.id});
+
                 proxy.status = notification.status;
                 proxy.dirty = false;
             });
@@ -42,6 +46,10 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
                 } else {
                 	proxy = new ItemProxy(notification.kind, notification.item);
                 }
+
+                $rootScope.$emit('Version Control Node Updated', 
+                  {status: notification.status, id: notification.item.id});
+
                 proxy.status = notification.status;
                 proxy.dirty = false;
             });
@@ -57,6 +65,8 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
           for (var id in gitStatusMap) {
             var proxy = ItemProxy.getProxyFor(id);
             proxy.status = gitStatusMap[id];
+
+            $rootScope.$emit('Version Control Status Updated', gitStatusMap);
           }
         });
 
