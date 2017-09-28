@@ -202,27 +202,13 @@ kio.server.on('connection', function (socket) {
   socket.on("VersionControl/add", function (request, sendResponse) {
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
-    console.log("Version Add");
-    console.log(idsArray);
     for (var i = 0; i < idsArray.length; i++) {
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
+    
     kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
       sendResponse(addStatusMap);
-      
-      var promises = [];
-      for (var i = 0; i < proxies.length; i++) {
-        promises.push(kdb.kdbRepo.getItemStatus(proxies[i]));
-      }
-      
-      Promise.all(promises).then(function (statuses) {
-        var gitStatusMap = {};
-        for (var i = 0; i < statuses.length; i++) {
-          gitStatusMap[idsArray[i]] = statuses[i];
-        }
-        
-        kio.server.emit("VersionControl/statusUpdated", gitStatusMap);
-      });
+      sendStatusUpdates(proxies);
     }).catch(function (err) {
       sendResponse({
         error: err
@@ -236,9 +222,16 @@ kio.server.on('connection', function (socket) {
     for (var i = 0; i < idsArray.length; i++) {
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
-    var a = kdb.kdbRepo.commit(proxies, request.username, request.email, 
-                       request.message);
-    console.log(a);
+    
+    kdb.kdbRepo.commit(proxies, request.username, request.email, 
+      request.message).then(function (commitIdMap) {
+        sendResponse(commitIdMap);
+        sendStatusUpdates(proxies);
+    }).catch(function (err) {
+      sendResponse({
+        error: err
+      });
+    });
   });
 
   socket.on("VersionControl/push", function (request, sendResponse) {
@@ -250,3 +243,19 @@ kio.server.on('connection', function (socket) {
 //    kdb.kdbRepo.push(proxies, remoteName, userName);
   });
 });
+
+function sendStatusUpdates(proxies) {
+  var promises = [];
+  for (var i = 0; i < proxies.length; i++) {
+    promises.push(kdb.kdbRepo.getItemStatus(proxies[i]));
+  }
+  
+  Promise.all(promises).then(function (statuses) {
+    var statusMap = {};
+    for (var i = 0; i < statuses.length; i++) {
+      statusMap[proxies[i].item.id] = statuses[i];
+    }
+    
+    kio.server.emit("VersionControl/statusUpdated", statusMap);
+  });
+}

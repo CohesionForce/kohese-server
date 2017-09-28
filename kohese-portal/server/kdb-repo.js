@@ -157,23 +157,29 @@ module.exports.add = add;
 //////////////////////////////////////////////////////////////////////////
 function commit(proxies, userName, eMail, message) {
   // TODO Does "HEAD" need to be a variable?
-  console.log ("Commit func : 135 kdb-repo");
-  console.log (userName);
-  console.log(eMail);
+  var commitIdMap = {};
   var signature = nodegit.Signature.now(userName, eMail);
   var promises = [];
   for (var i = 0; i < proxies.length; i++) {
     var info = repoRelativePathOf(proxies[i]);
     var repo = info.gitRepo;
-    promises.push(repo.getHeadCommit().then(function (commit) {
-      if (stageMap[repo]) {  
-        repo.createCommit("HEAD", signature, signature, message, stageMap[repo], [commit]);
-        delete stageMap[repo];
-      }
-    }));
+    (function (iIndex) {
+      promises.push(repo.getHeadCommit().then(function (commit) {
+        if (stageMap[repo]) {  
+          var p = repo.createCommit("HEAD", signature, signature, message,
+              stageMap[repo], [commit]).then(function (commitId) {
+            commitIdMap[proxies[iIndex].item.id] = commitId;
+          });
+          delete stageMap[repo];
+          return p;
+        }
+      }));
+    })(i);
   }
   
-  return Promise.all(promises);
+  return Promise.all(promises).then(function () {
+    return commitIdMap;
+  });
 }
 module.exports.commit = commit;
 
