@@ -186,24 +186,31 @@ module.exports.commit = commit;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function push(proxies, remoteName) {
+function push(proxies, remoteName, userName) {
+  var pushStatusMap = {};
   var promises = [];
   for (var i = 0; i < proxies.length; i++) {
     var info = repoRelativePathOf(proxies[i]);
-    promises.push(info.gitRepo.getRemote(remoteName).then(function(remote) {
-      // TODO Does the refs String below need to change?
-         return remote.push(["refs/heads/master:refs/heads/master"],
-            {
-               callbacks: {
-                  credentials: function(url, username) {
-                     return nodegit.Cred.sshKeyFromAgent(username);
-                  }
-               }
-            });
-         }));
+    (function (iIndex) {
+      promises.push(info.gitRepo.getRemote(remoteName).then(function(remote) {
+        // TODO Does the refs String below need to change?
+           return remote.push(["refs/heads/master:refs/heads/master"],
+              {
+                 callbacks: {
+                    credentials: function(url, u) {
+                       return nodegit.Cred.sshKeyFromAgent(userName);
+                    }
+                 }
+              }).then(function (status) {
+                pushStatusMap[proxies[iIndex].item.id] = status;
+              });
+           }));
+    })(i);
   }
   
-  return Promise.all(promises);
+  return Promise.all(promises).then(function () {
+    return pushStatusMap;
+  });
 }
 module.exports.push = push;
 
@@ -304,9 +311,21 @@ module.exports.diff = diff;
 //////////////////////////////////////////////////////////////////////////
 function addRemote(proxy, remoteName, remoteUrl) {
   var info = repoRelativePathOf(proxy);
-  return nodegit.Remote.create(info.gitRepo, remoteName, remoteUrl);
+  return nodegit.Remote.create(info.gitRepo, remoteName, remoteUrl)
+    .then(function (remote) {
+      return remote.name();
+  });
 }
 module.exports.addRemote = addRemote;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function getRemotes(proxy) {
+  var info = repoRelativePathOf(proxy);
+  return nodegit.Remote.list(info.gitRepo);
+}
+module.exports.getRemotes = getRemotes;
 
 //////////////////////////////////////////////////////////////////////////
 //
