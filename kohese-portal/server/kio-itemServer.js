@@ -241,7 +241,7 @@ kio.server.on('connection', function (socket) {
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
     
-    kdb.kdbRepo.push(proxies, requst.remoteName, request.username).then(function (pushStatusMap) {
+    kdb.kdbRepo.push(proxies, request.remoteName, request.username).then(function (pushStatusMap) {
       sendResponse(pushStatusMap);
     }).catch(function (err) {
       sendResponse({
