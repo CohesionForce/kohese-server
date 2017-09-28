@@ -113,7 +113,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     });
 
     $scope.$on('userLoaded', function () {
-        ctrl.userName = UserService.getCurrentUsername();
+        detailsCtrl.userName = UserService.getCurrentUsername();
       });
 
     $scope.$on('tabSelected', function () {
