@@ -29,53 +29,10 @@ function openRepo(proxy) {
           var changes = [];
           for (var i = 0; i < commits.length; i++) {
             (function (iIndex) {
-              commitPromise.push(commits[i].getDiff().then(function (diffs) {
-                var diffOpts = {
-                    flags: nodegit.Diff.FIND.RENAMES
-                };
-                var diffPromise = [];
-                var f = [];
-                for (var j = 0; j < diffs.length; j++) {
-                  (function (jIndex, files) {
-                    diffPromise.push(diffs[jIndex].findSimilar(diffOpts).then(function (result) {
-                      var fileStructure = {
-                          names: [],
-                          paths: [],
-                          statuses: []
-                      };
-                      
-                      for (var k = 0; k < diffs[jIndex].numDeltas(); k++) {
-                        var d = diffs[jIndex].getDelta(k);
-                        var np = d.newFile().path();
-                        var op = d.oldFile().path();
-                        var stat = d.status();
-                        
-                        if (-1 == fileStructure.paths.indexOf(np)) {
-                          fileStructure.paths.push(np);
-                          /* Get the UUID of the file, as that should be mostly
-                          unchanging */
-                          fileStructure.names.push(np.substring(np.lastIndexOf("/") + 1, np.lastIndexOf(".json")));
-                        }
-                        
-                        if (-1 == fileStructure.paths.indexOf(op)) {
-                          fileStructure.paths.push(op);
-                        }
-                        
-                        if (-1 == fileStructure.statuses.indexOf(stat)) {
-                          fileStructure.statuses.push(stat);
-                        }
-                      }
-                      
-                      files.push(fileStructure);
-                    }));
-                  })(j, f);
-                }
-                
-                return Promise.all(diffPromise).then(function () {
-                  changes.push({
-                    commit: commits[iIndex],
-                    files: f
-                  });
+              commitPromise.push(getCommitFilesChanged(commits[iIndex]).then(function (filesChanged) {
+                changes.push({
+                  commit: commits[iIndex],
+                  files: filesChanged
                 });
               }));
             })(i);
@@ -93,16 +50,65 @@ function openRepo(proxy) {
 }
 module.exports.openRepo = openRepo;
 
+function getCommitFilesChanged(commit) {
+  return commit.getDiff().then(function (diffs) {
+    var diffOpts = {
+        flags: nodegit.Diff.FIND.RENAMES
+    };
+    var diffPromise = [];
+    var f = [];
+    for (var j = 0; j < diffs.length; j++) {
+      (function (jIndex, files) {
+        diffPromise.push(diffs[jIndex].findSimilar(diffOpts).then(function (result) {
+          var fileStructure = {
+              names: [],
+              paths: [],
+              statuses: []
+          };
+          
+          for (var k = 0; k < diffs[jIndex].numDeltas(); k++) {
+            var d = diffs[jIndex].getDelta(k);
+            var np = d.newFile().path();
+            var op = d.oldFile().path();
+            var stat = d.status();
+            
+            if (-1 === fileStructure.paths.indexOf(np)) {
+              fileStructure.paths.push(np);
+              /* Get the UUID of the file, as that should be mostly
+              unchanging */
+              fileStructure.names.push(np.substring(np.lastIndexOf("/") + 1, np.lastIndexOf(".json")));
+            }
+            
+            if (-1 === fileStructure.paths.indexOf(op)) {
+              fileStructure.paths.push(op);
+            }
+            
+            if (-1 === fileStructure.statuses.indexOf(stat)) {
+              fileStructure.statuses.push(stat);
+            }
+          }
+          
+          files.push(fileStructure);
+        }));
+      })(j, f);
+    }
+    
+    return Promise.all(diffPromise).then(function () {
+      return f;
+    });
+  });
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
 function initializeRepository(repoProxy, path) {
-	return nodegit.Repository.init(path, 0).then(function (r) {
-	  repoList[repoProxy.item.id] = {
-	      repo: r,
-	      history: []
-	  };
-	});
+  return nodegit.Repository.init(path, 0).then(function (r) {
+    repoList[repoProxy.item.id] = {
+        repo: r,
+        history: []
+    };
+  });
 }
 module.exports.initializeRepository = initializeRepository;
 
@@ -169,6 +175,14 @@ function commit(proxies, userName, eMail, message) {
           var p = repo.createCommit("HEAD", signature, signature, message,
               stageMap[repo], [commit]).then(function (commitId) {
             commitIdMap[proxies[iIndex].item.id] = commitId;
+            repo.getCommit(commitId).then(function (c) {
+              getCommitFilesChanged(c).then(function (filesChanged) {
+                repoList[info.repoProxy.item.id].history.push({
+                  commit: c,
+                  files: filesChanged
+                });
+              });
+            });
           });
           delete stageMap[repo];
           return p;
@@ -186,24 +200,31 @@ module.exports.commit = commit;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function push(proxies, remoteName) {
+function push(proxies, remoteName, userName) {
+  var pushStatusMap = {};
   var promises = [];
   for (var i = 0; i < proxies.length; i++) {
     var info = repoRelativePathOf(proxies[i]);
-    promises.push(info.gitRepo.getRemote(remoteName).then(function(remote) {
-      // TODO Does the refs String below need to change?
-         return remote.push(["refs/heads/master:refs/heads/master"],
-            {
-               callbacks: {
-                  credentials: function(url, username) {
-                     return nodegit.Cred.sshKeyFromAgent(username);
-                  }
-               }
-            });
-         }));
+    (function (iIndex) {
+      promises.push(info.gitRepo.getRemote(remoteName).then(function(remote) {
+        // TODO Does the refs String below need to change?
+           return remote.push(["refs/heads/master:refs/heads/master"],
+              {
+                 callbacks: {
+                    credentials: function(url, u) {
+                       return nodegit.Cred.sshKeyFromAgent(userName);
+                    }
+                 }
+              }).then(function (status) {
+                pushStatusMap[proxies[iIndex].item.id] = status;
+              });
+           }));
+    })(i);
   }
   
-  return Promise.all(promises);
+  return Promise.all(promises).then(function () {
+    return pushStatusMap;
+  });
 }
 module.exports.push = push;
 
@@ -216,7 +237,7 @@ function checkout(proxies, pointOfReference, force) {
     var add = true;
     var info = repoRelativePathOf(proxies[i]);
     for (var j = 0; j < repoMap.length; j++) {
-      if (repoMap[j].repo == info.gitRepo) {
+      if (repoMap[j].repo === info.gitRepo) {
         repoMap[j].paths.push(info.relativeFilePath);
         add = false;
         break;
@@ -304,9 +325,21 @@ module.exports.diff = diff;
 //////////////////////////////////////////////////////////////////////////
 function addRemote(proxy, remoteName, remoteUrl) {
   var info = repoRelativePathOf(proxy);
-  return nodegit.Remote.create(info.gitRepo, remoteName, remoteUrl);
+  return nodegit.Remote.create(info.gitRepo, remoteName, remoteUrl)
+    .then(function (remote) {
+      return remote.name();
+  });
 }
 module.exports.addRemote = addRemote;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function getRemotes(proxy) {
+  var info = repoRelativePathOf(proxy);
+  return nodegit.Remote.list(info.gitRepo);
+}
+module.exports.getRemotes = getRemotes;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -414,17 +447,17 @@ module.exports.getStatus = getStatus;
 //
 //////////////////////////////////////////////////////////////////////////
 function getItemStatus(proxy) {
-	var info = repoRelativePathOf(proxy);
+  var info = repoRelativePathOf(proxy);
   var status = [];
-	var statNum = nodegit.Status.file(info.gitRepo, info.relativeFilePath);
-	
-	for (var statusKey in nodegit.Status.STATUS) {
-		if ((statNum & nodegit.Status.STATUS[statusKey]) != 0) {
-			status.push(statusKey);
-		}
-	}
-	
-	return status;
+  var statNum = nodegit.Status.file(info.gitRepo, info.relativeFilePath);
+  
+  for (var statusKey in nodegit.Status.STATUS) {
+    if ((statNum & nodegit.Status.STATUS[statusKey]) !== 0) {
+      status.push(statusKey);
+    }
+  }
+  
+  return status;
 }
 module.exports.getItemStatus = getItemStatus;
 
@@ -472,7 +505,7 @@ function collectHistory(repo, path) {
   var relatedCommits = [];
   var name = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".json"));
   for (var r in repoList) {
-    if (repoList[r].repo == repo) {
+    if (repoList[r].repo === repo) {
       var history = repoList[r].history;
       for (var j = 0; j < history.length; j++) {
         var files = history[j].files;
