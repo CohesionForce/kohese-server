@@ -1,68 +1,61 @@
-/* Created by Josh */
+/* Created by Josh 
+    This service manages version control messaging between the client and server
+
+*/
 
 function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepository, toastr)
 {
     const service = this;
-    service.versionStatusMap = {
-        "STATUS.CURRENT"  : [],	
-        "INDEX_NEW"	      : [], 
-        "INDEX_MODIFIED"  : [],
-        "INDEX_DELETED"	  : [],
-        "INDEX_RENAMED"	  : [],
-        "INDEX_TYPECHANGE": [],
-        "WT_NEW"	      : [],
-        "WT_MODIFIED"    :  [],
-        "WT_DELETED"      : [],
-        "WT_TYPECHANGE"	  : [],
-        "WT_RENAMED"      : [],
-        "WT_UNREADABLE"   : [],
-        "IGNORED"         : [],
-        "CONFLICTED"      : []
-    }
-    service.gitStatusMap = {};
+    service.indexedProxies = {};
 
-    $rootScope.$on('ItemRepositoryReady', 
-        function () {
-            InitializeService();
-            });
-
-    $rootScope.$on('Version Control Status Updated', 
-        function (gitStatusMap)
-            {
-            UpdateVersionStatusMap(gitStatusMap);
-            });
-
-    $rootScope.$on('Version Control Node Updated', function(notification)
-    {
-        
-        service.versionStatusMap[notification.status].push(notification.id)
-    });
     
-    service.stageItems = function(proxyIds) {
-        console.log (proxyIds);
-        var data = {proxyIds: Array.from(proxyIds)}
+    service.setIndexedProxy = function(proxy) {
+        service.indexedProxies[proxy.item.id] = proxy;
+        console.log(service.indexedProxies);
+    }
+
+    service.getIndexedProxies = function() {
+        return service.indexedProxies;
+    }
+    
+    service.stageItems = function(proxyList) {
+        console.log (proxyList);
+        var proxyList = Array.from(proxyList)
+        var data = { proxyIds : []}
+        for (var i= 0; i < proxyList.length; i++)
+        {
+            data.proxyIds.push(proxyList[i].item.id);
+        }
         console.log("StageItems");
         console.log(data);
         KoheseIO.socket.emit('VersionControl/add', data, function (results) {
-            if (results.error)
-            toastr.error('Stage Failed', 'Version Control');
-            else {
-            toastr.success('Stage Succeeded!', 'Version Control');
-            }
             console.log("::: Stage results:");
             console.log(results);
+            if (results.error)
+                toastr.error('Stage Failed', 'Version Control');
+            else {
+                toastr.success('Stage Succeeded!', 'Version Control');
+
+            }
+
           });
     }
 
-    service.commitItems = function (proxyIds, commitMessage) {
-        var data = {};
-        data.proxyIds = Array.from(proxyIds);
+    service.commitItems = function (proxyList, commitMessage) {
+        var data = { proxyIds : []}
+        var proxyList = Array.from(proxyList);
+        for (var i= 0; i < proxyList.length; i++)
+        {
+            data.proxyIds.push(proxyList[i].item.id);
+        }
         data.username = UserService.getCurrentUsername();
         data.email = UserService.getCurrentUserEmail();
         data.message = commitMessage;
         console.log("Commit Data");
         console.log(data);
         KoheseIO.socket.emit('VersionControl/commit', data, function (results) {
+            console.log("Commit Results");
+            console.log(results);
             if (results.error)
                 toastr.error('Commit Failed', 'Version Control');
             else {
@@ -70,46 +63,50 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
                 }
             console.log("::: Commit results:");
             console.log (results);
+            
         });
     }
 
-    function InitializeService() 
-        {   
-        var root = ItemRepository.getRootProxy()
-        // If Repository isn't loaded, cancel the init
-        if (!root)
-            return;
-            
-        console.log("Initial Load : VCS");
-        KoheseIO.socket.emit('Item/getStatus', {repoId: root.item.id}, 
-            function (gitStatusMap) 
-            {
-                UpdateVersionStatusMap(gitStatusMap);
-            });
-        }; 
+    service.push = function(proxyIds, remoteName) {
+        var data = {};
+        data.proxyIds = proxyIds,
+        data.remoteName = remoteName;
+        data.userName = UserService.getCurrentUsername();
+        console.log("Push send data");
+        console.log(data)
 
-    function UpdateVersionStatusMap(gitStatusMap)
-        {
-        
-        console.log("VCS GitStatus Update");
-        console.log(gitStatusMap);
-
-        for (var i = 0; i < gitStatusMap.length; i++) {
-            var currentNode = gitStatusMap[i];
-            for (var statusI = 0; statusI < currentNode.status.length; statusI++)
-                {
-                var key = currentNode.status[statusI];
-                service.versionStatusMap[key].push(currentNode.id);
-                }
-            }
-
-        console.log("UpdateVersionStatusMap Complete");
-        console.log(service.versionStatusMap);
-        }
-        
-    // Execution 
-    InitializeService();
+        KoheseIO.socket.emit('VersionControl/push', data, function(results){
+            console.log("::: Push results:");
+            console.log (results);
+        } )
     }
+
+    service.addRemote = function(proxyId, remoteName, url) {
+        var data = {};
+        data.proxyId = proxyId;
+        data.remoteName = remoteName;
+        data.url = url;
+        console.log("Add Remote Send");
+        console.log(data);
+        KoheseIO.socket.emit('VersionControl/addRemote', data, function(results) {
+            console.log(results);
+            console.log("Add Remote rcvd");
+        });
+    }
+
+    service.getRemotes = function(proxyId) {
+        var data = {};
+        data.proxyId = proxyId;
+        console.log ("Get Remote Send");
+        console.log(data);
+        KoheseIO.socket.emit('VersionControl/getRemotes', data, function(results) {
+            console.log("Get Remote rcvd")
+            console.log(results);
+        })
+    }
+
+
+}
 
 export default () => {
 

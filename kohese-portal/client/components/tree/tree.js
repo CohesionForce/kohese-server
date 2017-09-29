@@ -3,7 +3,8 @@
  */
 
 function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
-                        $scope, $location, $stateParams, SearchService, tabService, VersionControlService) {
+                        $scope, $location, $stateParams, SearchService, tabService, VersionControlService,
+                        Popeye) {
 
     var treeCtrl = this,
         syncListener;
@@ -30,6 +31,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
         treeCtrl.selectedItemProxy = {};
         treeCtrl.versionControlEnabled = false; 
+        treeCtrl.stagedItems = [];
 
         // NEW View Control
         treeCtrl.viewList = ["Default","Advanced Filter","Version Control"]; // TO-DO : Probably want to get this from somewhere else so 
@@ -305,6 +307,8 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
       }
     };
 
+
+/******** List expansion functions */
     treeCtrl.expandAll = function () {
         treeCtrl.allExpanded = true;
         for (var key in treeCtrl.collapsed) {
@@ -351,6 +355,8 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
           }
       }
     };
+
+    /****** End list expansion functions */
 
     treeCtrl.navigate = function (state, type, id) {
       treeCtrl.tab.state = state;
@@ -410,13 +416,16 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
                 switch (status)
                 {
                     case ("WT_MODIFIED"):
-                        proxy.statusFlags.modified = true;
+                        proxy.statusFlags.WTModified= true;
                         break;
                     case ("WT_NEW"):
                         proxy.statusFlags.newItem = true;
                         break;
                     case ("INDEX_MODIFIED"):
                         proxy.statusFlags.IndexModified = true;
+                        break;
+                    case ("INDEX_NEW"):
+                        proxy.statusFlags.IndexNew = true;
                         break;
                     default:
                         console.log ("VC Status uncaught")
@@ -432,25 +441,66 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         console.log("Version Control Stage Change");
         if (proxy.selected)
         {
-            treeCtrl.selectedVersionControlNodes.add(proxy.item.id);
+            treeCtrl.selectedVersionControlNodes.add(proxy);
         } else {
-            treeCtrl.selectedVersionControlNodes.delete(proxy.item.id);
+            treeCtrl.selectedVersionControlNodes.delete(proxy);
         }
 
         console.log(treeCtrl.selectedVersionControlNodes)
     }
 
     treeCtrl.stageItems = function()
-        {
+        { 
         VersionControlService.stageItems(treeCtrl.selectedVersionControlNodes);
         console.log("Stage Items");
         }
+
+    // treeCtrl.openCommitModal = function()
+    //     {
+    //         Popeye.openModal({
+    //             templateUrl: "components/tree/modals/commitmodal.html",
+    //             controller: "CommitModalControl as modalCtrl",            
+    //         })
+    //     }
     
-    treeCtrl.commitItems = function()
+    treeCtrl.commit = function()
         {
+        if (!treeCtrl.commitMessage)
+            treeCtrl.commitMessage = "No Message Entered"
+
+            console.log(treeCtrl.selectedVersionControlNodes);
+
+        // Need to grab all of the indexed nodes
         VersionControlService.commitItems(treeCtrl.selectedVersionControlNodes,
-                                          "Hello, I'm a commit");
+                                          treeCtrl.commitMessage);
         }
+
+    // treeCtrl.openPushModal = function()
+    // {
+    //     Popeye.openModal({
+    //         templateUrl: "components/tree/modals/pushmodal.html",
+    //         controller: "PushModalControl as modalCtrl",
+    //     })
+    // }
+
+    treeCtrl.addRemote = function(){
+        VersionControlService.addRemote([treeCtrl.treeRoot.children[0].item.id], "test-repo", 
+        "git@matrix:home/jephillips/kohese-server/kohese-portal");
+    }
+
+    treeCtrl.getRemotes = function(){
+        VersionControlService.getRemotes(treeCtrl.treeRoot.children[0].item.id);
+    }
+
+    treeCtrl.push = function() 
+    {
+        var proxyIds = []
+        proxyIds.push(treeCtrl.treeRoot.children[0].item.id)
+        VersionControlService.push(proxyIds, "test-kdb");
+    }
+
+    /****** End Version Control View Functions */
+
 }
 
 export default () => {

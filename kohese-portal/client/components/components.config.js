@@ -6,6 +6,7 @@
 
 export default () => {
     //Component Modules
+    require('./tree/modals/modalcontrollers')();
     require('./tree/tree')();
     require('./detailsview/detailsview')();
     require('./contentcontainer/contentcontainer')();

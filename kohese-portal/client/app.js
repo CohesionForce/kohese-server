@@ -6,6 +6,7 @@ const appModule = angular.module('app', [
     'app.contentcontainer',
     'app.detailsview',
     'app.tree',
+    'app.tree.modalcontrollers',
     'app.admin',
     'app.login',
     'app.navigationmenu',
@@ -40,7 +41,8 @@ const appModule = angular.module('app', [
     'ui.tree',
     'monospaced.elastic',
     'shagstrom.angular-split-pane',
-    'simplemde'
+    'simplemde',
+    "pathgather.popeye"
 ]);
 
 
