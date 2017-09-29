@@ -251,7 +251,8 @@ kio.server.on('connection', function (socket) {
   });
   
   socket.on("VersionControl/addRemote", function (request, sendResponse) {
-    kdb.kdbRepo.addRemote(request.proxyId, request.remoteName, request.url).then(function (remoteName) {
+    kdb.kdbRepo.addRemote(kdb.ItemProxy.getProxyFor(request.proxyId),
+        request.remoteName, request.url).then(function (remoteName) {
       sendResponse(remoteName);
     }).catch(function (err) {
       sendResponse({
@@ -261,7 +262,8 @@ kio.server.on('connection', function (socket) {
   });
   
   socket.on("VersionControl/getRemotes", function (request, sendResponse) {
-    kdb.kdbRepo.getRemotes(request.proxyId).then(function (remoteNames) {
+    kdb.kdbRepo.getRemotes(kdb.ItemProxy.getProxyFor(request.proxyId))
+        .then(function (remoteNames) {
       sendResponse(remoteNames);
     }).catch(function (err) {
       sendResponse({
