@@ -5,10 +5,6 @@
 <<<<<<< HEAD
 function AdminController(tabService, $state, $scope, UserService, ItemRepository, 
                          SessionService, $rootScope, VersionControlService, $window) {
-=======
-function AdminController(tabService, $state, $scope, UserService, ItemRepository,
-                        SessionService) {
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
     var ctrl = this;
     var tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(tab.id, 'adminCtrl', this);
@@ -19,12 +15,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
         ctrl.editUserForm = false;
         ctrl.users = [];
         ctrl.sessions = SessionService.sessions;
-<<<<<<< HEAD
 
-    }
-
-=======
-        ctrl.repositoryList = ItemRepository.getRepositories();
     }
 
 >>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
@@ -154,7 +145,6 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
             fetchUsers();
         });
     };
-<<<<<<< HEAD
 
     /* Version Control Functions */
 
@@ -182,9 +172,6 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
         {
         if (ctrl.commitMessageInput === "")
             treeCtrl.commitMessageInput = "No Message Entered"
-=======
-}
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
 
         // Need to grab all of the indexed nodes
         VersionControlService.commitItems(treeRoot.children[0],
