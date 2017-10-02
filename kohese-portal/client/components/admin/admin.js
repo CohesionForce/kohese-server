@@ -14,6 +14,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
         ctrl.editUserForm = false;
         ctrl.users = [];
         ctrl.sessions = SessionService.sessions;
+        ctrl.repositoryList = ItemRepository.getRepositories();
 
     }
 
