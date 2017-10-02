@@ -3,12 +3,8 @@
  */
 
 function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
-<<<<<<< HEAD
                         $scope, $location, $stateParams, SearchService, tabService, VersionControlService,
                         Popeye) {
-=======
-                        $scope, $location, $stateParams, SearchService, tabService) {
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
 
     var treeCtrl = this,
         syncListener;
@@ -34,7 +30,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         treeCtrl.treeRoot = ItemRepository.getRootProxy();
         treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
         treeCtrl.selectedItemProxy = {};
-<<<<<<< HEAD
         treeCtrl.versionControlEnabled = false; 
         treeCtrl.stagedItems = [];
 
@@ -43,8 +38,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
                                                                               // view types can be pulled based on version of Kohese
         treeCtrl.viewType = "Default";
         
-=======
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
     } else {
         console.log("Root Check!");
         console.log(treeCtrl);
@@ -375,7 +368,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     treeCtrl.createChildOfSelectedItem = function () {
       $state.go('kohese.explore.create', {parentId: treeCtrl.selectedItemProxy.item.id})
     };
-<<<<<<< HEAD
 
     /****** Version Control View Functions */
 
@@ -511,11 +503,9 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 
     /****** End Version Control View Functions */
 
-=======
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
 }
 
 export default () => {
-    angular.module('app.tree', ['app.services.tabservice'])
+    angular.module('app.tree', ['app.services.tabservice', 'app.services.versioncontrolservice'])
         .controller('KTreeController', KTreeController);
 }

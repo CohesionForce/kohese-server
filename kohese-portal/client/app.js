@@ -25,11 +25,8 @@ const appModule = angular.module('app', [
     'app.services.analysisservice',
     'app.services.searchservice',
     'app.services.navigationservice',
-<<<<<<< HEAD
     'app.services.versioncontrolservice',
     'app.factories.koheseio',
-=======
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
     'app.directives.navigation',
     'app.directives.treerow',
     require('angular-ui-router'),

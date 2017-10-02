@@ -2,7 +2,6 @@
  * Created by josh on 9/22/15.
  */
 
-<<<<<<< HEAD
 function AdminController(tabService, $state, $scope, UserService, ItemRepository, 
                          SessionService, $rootScope, VersionControlService, $window) {
     var ctrl = this;
@@ -18,7 +17,6 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
 
     }
 
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
     $scope.$on('$viewContentLoaded', function () {
         tab.setTitle('Admin');
         tab.type = 'singleview';
@@ -64,11 +62,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     ctrl.editUser = function (userProxy) {
         ctrl.usernameInput = userProxy.item.name;
         ctrl.descriptionInput = userProxy.item.description;
-<<<<<<< HEAD
         ctrl.emailInput = userProxy.item.email;
-=======
-        ctrl.emailInput = userProxy.item.email
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
         ctrl.editUserForm = true;
         ctrl.currentForm = 'Edit User';
         ctrl.selectedUserProxy = userProxy;
@@ -98,7 +92,6 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
         ctrl.emailInput = '';
         ctrl.passwordInput = '';
         ctrl.confirmPasswordInput = '';
-        
     };
 
     // Will need another pass on this for security eventually for passwords
@@ -108,32 +101,19 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
         userProxy.item.email = ctrl.emailInput;
 
         // Test to see if the password has been changed and matches
-<<<<<<< HEAD
         if (ctrl.passwordInput != '' && ctrl.passwordInput === ctrl.confirmPasswordInput) {
             userProxy.item.password = ctrl.passwordInput;
         } // TO-DO Add error handling for invalid passwords and whatnot
-=======
-        if (ctrl.passwordInput != '' && ctrl.passwordInput === ctrl.confirmPasswordInput) 
-            {
-            userProxy.item.password = ctrl.passwordInput;
-            } // TO-DO Add error handling for invalid passwords and whatnot
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
     }
 
     ctrl.upsertUser = function () {
         if (ctrl.passwordInput == ctrl.confirmPasswordInput) {
             updateUserObject(ctrl.selectedUserProxy);
-<<<<<<< HEAD
             console.log(ctrl.selectedUserProxy);
             ItemRepository.upsertItem(ctrl.selectedUserProxy).then(function (results) {
                 fetchUsers();
                 $rootScope.$broadcast('UserUpdated', ctrl.selectedUserProxy)
             });
-=======
-            ItemRepository.upsertItem(ctrl.selectedUserProxy).then(function (results) {
-                    fetchUsers();
-                });
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
             ctrl.cancelForm();
         } else {
             alert('Passwords do not match');

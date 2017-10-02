@@ -16,22 +16,25 @@
 			 ng-class="{ 'btn-green': treeCtrl.locationSynced}"
 			 class="btn btn-default btn-sm fa fa-exchange"> 
 		</i> 
-    <span>Showing
-      {{treeCtrl.getItemMatchedCount()}} of
-      {{treeCtrl.treeRoot.descendantCount}}
-    </span>
-  </div>
-  <div>
-	  <span> 
-			<span class="control-group">
-				<label class="control-label" for="Kind"> Kind </label> <span
-				class="controls"> <select id="Kind"
-					ng-model="treeCtrl.filter.kind">
-						<option></option>
-						<option ng-repeat="kind in treeCtrl.kindList">{{kind}}</option>
-				</select>
+    	<span>Showing
+      		{{treeCtrl.getItemMatchedCount()}} of
+      		{{treeCtrl.treeRoot.descendantCount}}
+    	</span>
+    
+		<div>
+			<!-- Start View Control -->
+			<span class="control-group"> 
+				<label class="control-label" for="View"> View </label>
+				<span
+					class="controls"> 
+					<select id="View" 
+							ng-model="treeCtrl.viewType"
+							ng-change="treeCtrl.onViewTypeChanged()">
+							<option></option>
+							<option ng-repeat="kind in treeCtrl.viewList">{{kind}}</option>
+					</select> 
+				</span>
 			</span>
-<<<<<<< HEAD
 			<!-- Start View Forking -->
 			<span ng-switch on="treeCtrl.viewType">
 				<!-- Start Default Toolbar -->
@@ -106,40 +109,8 @@
 				</span>		
 			</span> <!-- End Switch on View Type -->
 		</div>
-=======
-		</span>
-		<span ng-if="treeCtrl.filter.kind === 'Action'" class="control-group">
-				<label class="control-label" for="ActionState"> State </label> <span
-				class="controls"> <select id="actionState"
-					ng-model="treeCtrl.filter.actionState">
-						<option></option>
-						<option ng-repeat="state in treeCtrl.actionStates">{{state.item.name}}</option>
-				</select>
-			</span>
-		</span> <span ng-if="treeCtrl.filter.kind === 'Action'" class="control-group">
-				<label class="control-label" for="Assignee"> Assignee </label> <span
-				class="controls"> <select id="actionAssignee"
-					ng-model="treeCtrl.filter.actionAssignee">
-						<option></option>
-						<option ng-repeat="user in treeCtrl.userList">{{user.item.name}}</option>
-				</select>
-			</span>
-		</span> 
-    <span class="control-group"> <label class="control-label"
-        for="Modified"> Modified </label> <input type="checkbox"
-        ng-model="treeCtrl.filter.status" />
-    </span>
-    <span class="control-group"> <label class="control-label"
-        for="Dirty"> Dirty </label> <input type="checkbox"
-        ng-model="treeCtrl.filter.dirty" />
-    </span>
-		<input class="input-sm" type="text" ng-model="treeCtrl.filter.text"
-			ng-style="treeCtrl.filter.invalidRegex && {'background-color':'pink'}"
-			placeholder="Filter" style="margin: 5px" />
-		</span>
->>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
 	</div>
-
+	<!-- Begin Knowledge Tree -->
 	<div class="knowledge-tree-panel" style="overflow:hidden">
 		<div id="theKT" class="knowledge-tree" style="overflow:hidden">
 			<div class="kt-head">
@@ -150,10 +121,10 @@
 						ng-click="treeCtrl.updateTab('create')"></i>
 				</div>
 			</div>
-			<div class="kt-body" style="overflow:auto">
+			<div class="kt-body" style="overflow:auto; height: 100%">
 				<tree-row tree-ctrl="treeCtrl"
 					proxy-collection="treeCtrl.treeRoot.children"></tree-row>
 			</div>
 		</div>
-	</div>
+	</div> <!-- End Knowledge Tree -->
 </div>
