@@ -12,6 +12,14 @@
                     'kti-filtered': !treeCtrl.matchesFilter(itemProxy) && !treeCtrl.childMatchesFilter(itemProxy),
                     'kti-filterMatchedExact': treeCtrl.matchesFilter(itemProxy, true),
                     'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
+        <!-- Checkbox if item has a version control status -->
+        <span ng-if="treeCtrl.versionControlEnabled && itemProxy.statusFlags">
+        <input type="checkbox" 
+               class="align-middle"
+               ng-model="itemProxy.selected"
+               ng-change="treeCtrl.onVersionControlStageChange(itemProxy)">
+        </span>
+        <!-- End conditional Checkbox for Version control -->
         <div class="kti-name"
                 ng-style="{'font-weight': 'bold'}">
             <a style=""> <i
@@ -23,11 +31,31 @@
                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0),
                            'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}">
             </i>
-            </a> <span ng-if="itemProxy.dirty">*</span>&lt;{{itemProxy.kind}}&gt; <span class="kt-label"
+            </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
                                                   ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
                                                   ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id)"></span>
                 <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
-                <span ng-if="itemProxy.status"> {{itemProxy.status}}</span>
+                <!-- Conditional Icons for Item status -->
+                <span ng-if="itemProxy.dirty"> **
+                        <img src="resources/icons/versioncontrol/dirty.ico"
+                             title = "Dirty item" />
+                </span>
+                <span ng-if="treeCtrl.versionControlEnabled"
+                      ng-init="treeCtrl.applyVersionControlTags(itemProxy)"> 
+                        <img    ng-if="itemProxy.statusFlags.WTModified"
+                                src="resources/icons/versioncontrol/unstaged.ico"
+                                title="Unstaged Modified">
+                        <img    ng-if="itemProxy.statusFlags.IndexModified"
+                                src="resources/icons/versioncontrol/index-mod.ico"
+                                title="Staged Modified">
+                        <img    ng-if="itemProxy.statusFlags.newItem"
+                                src="resources/icons/versioncontrol/unstaged.ico"
+                                title="Unstaged New">
+                        <img    ng-if="itemProxy.statusFlags.IndexNew"
+                                src="resources/icons/versioncontrol/index-mod.ico"
+                                title="Staged New">
+                </span>
+                {{itemProxy.status}}
         </div>
         <div class="kti-cell kti-actions pull-right"> 
             <i class="fa fa-anchor"
