@@ -3,6 +3,7 @@ var kdb = require("./kdb.js");
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
+const importer = require("./directory-ingest.js");
 
 
 console.log("::: Initializing KIO Item Server");
@@ -271,6 +272,14 @@ kio.server.on('connection', function (socket) {
       });
     });
   });
+  
+  socket.on("ImportDocuments", function (request, sendResponse) {
+    new Promise(function (resolve, reject) {
+      importer.importFiles(request.files, request.parentItem, request.intermediateDirectories);
+      resolve(sendResponse());
+    });
+  });
+
 });
 
 function sendStatusUpdates(proxies) {
