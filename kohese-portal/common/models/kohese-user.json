@@ -7,6 +7,10 @@
     "password"
   ],
   "properties": {
+    "email" : {
+      "type": "string",
+      "required" : false
+    },
     "password": {
       "type": "string",
       "required": true

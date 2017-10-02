@@ -17,6 +17,9 @@ export default() => {
     require('./user-services/session-service')();
     require('./navigation-services/navigation-service')();
     require('./search-service')();
+<<<<<<< HEAD
     require('./versionControlService')();
     require('./kohese-io')();
+=======
+>>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
 }

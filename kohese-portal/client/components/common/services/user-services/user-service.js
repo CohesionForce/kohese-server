@@ -6,8 +6,13 @@
  *      Contains information related to the authentication status
  */
 
+<<<<<<< HEAD
 function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, 
                      KoheseIO, $state, SessionService) {
+=======
+function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, $state
+                    , SessionService) {
+>>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
 
     const service = this;
     var users = {};
@@ -15,8 +20,12 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
     var userLoggedIn = false;
 
     service.getAllUsers = getAllUsers;
+<<<<<<< HEAD
     service.getCurrentUsername = getCurrentUsername;
     service.getCurrentUserEmail = getCurrentUserEmail;
+=======
+    service.getCurrentUser = getCurrentUser;
+>>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
     service.authToken = {};
     service.getUsersItemId = getUsersItemId;
 
@@ -46,6 +55,7 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
     function setCurrentUser() {
         service.authToken = AuthTokenFactory.getToken();
         if (service.authToken) {
+<<<<<<< HEAD
             var decodedToken = jwtHelper.decodeToken(service.authToken);
             var root = ItemRepository.getRootProxy();
             var users = root.getChildByName('Users');
@@ -56,6 +66,10 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
             currentUser = users.getChildByName(decodedToken.username);
             SessionService.registerSessions();
             }
+=======
+            currentUser = jwtHelper.decodeToken(service.authToken);
+            SessionService.registerSessions();
+>>>>>>> 424f9a301b745e31c0dc0d61b42bb686ef4d19a9
         } else {
             $state.go('login');
         }
@@ -84,7 +98,6 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
         });
 
     setCurrentUser();
-    console.log(currentUser);
 }
 
 export default () => {
