@@ -1,4 +1,4 @@
-function CommitModalControl($scope, Popeye){
+function CommitModalControl($scope){
 
     const ctrl = this;
 
@@ -9,7 +9,6 @@ function CommitModalControl($scope, Popeye){
     ctrl.commit = function(){
         console.log("yo");
         console.log($scope)
-        console.log(Popeye)
     }
     
 }

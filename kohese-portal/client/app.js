@@ -41,8 +41,7 @@ const appModule = angular.module('app', [
     'ui.tree',
     'monospaced.elastic',
     'shagstrom.angular-split-pane',
-    'simplemde',
-    "pathgather.popeye"
+    'simplemde'
 ]);
 
 

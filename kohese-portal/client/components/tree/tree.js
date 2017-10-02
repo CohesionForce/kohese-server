@@ -3,8 +3,7 @@
  */
 
 function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
-                        $scope, $location, $stateParams, SearchService, tabService, VersionControlService,
-                        Popeye) {
+                        $scope, $location, $stateParams, SearchService, tabService, VersionControlService) {
 
     var treeCtrl = this,
         syncListener;
@@ -455,15 +454,15 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         console.log("Stage Items");
         }
 
-    treeCtrl.openCommitModal = function()
-        {
-            Popeye.openModal({
-                templateUrl: "components/tree/modals/commitmodal.html",
-                $scope: {
-                    treeCtrl: "="
-                }            
-            })
-        }
+    // treeCtrl.openCommitModal = function()
+    //     {
+    //         Popeye.openModal({
+    //             templateUrl: "components/tree/modals/commitmodal.html",
+    //             $scope: {
+    //                 treeCtrl: "="
+    //             }            
+    //         })
+    //     }
     
     treeCtrl.commit = function()
         {
