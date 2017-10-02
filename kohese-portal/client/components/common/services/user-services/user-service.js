@@ -6,59 +6,56 @@
  *      Contains information related to the authentication status
  */
 
-function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, KoheseIO, $state) {
+function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, 
+                     KoheseIO, $state, SessionService) {
 
     const service = this;
     var users = {};
-    var currentUser = "";
+    var currentUser = {};
     var userLoggedIn = false;
 
     service.getAllUsers = getAllUsers;
-    service.getCurrentUser = getCurrentUser;
-    service.sessions = {};
+    service.getCurrentUsername = getCurrentUsername;
+    service.getCurrentUserEmail = getCurrentUserEmail;
     service.authToken = {};
+    service.getUsersItemId = getUsersItemId;
 
-    function registerSessions() {
-        KoheseIO.socket.on('session/add', function (session) {
-            service.sessions[session.sessionId] = session;
-            console.log("::: Added session %s for %s at %s", session.sessionId, session.username, session.address);
-        });
-
-        KoheseIO.socket.on('session/remove', function (session) {
-            console.log("::: Removed session %s for %s at %s", session.sessionId, session.username, session.address);
-            delete service.sessions[session.sessionId];
-        });
-
-        KoheseIO.socket.on('session/list', function (sessionList) {
-            // Remove existing sessions
-            for (var key in service.sessions) {
-                console.log("... Removing session" + key);
-                delete service.sessions[key];
-            }
-
-            for (var sessionIdx in sessionList) {
-                var session = sessionList[sessionIdx];
-                console.log("::: Existing session %s for %s at %s", session.sessionId, session.username, session.address);
-                service.sessions[session.sessionId] = session;
-            }
-        });
-
-    }
-
+    function getUsersItemId() {
+      return users.item.id;
+  }
 
     function getAllUsers() {
-        return users.children;
-    }
+      return users.children;
+  }
 
-    function getCurrentUser() {
-        return currentUser.username;
+    function getCurrentUsername() {
+        return (currentUser.item) ? 
+            currentUser.item.name : "Loading";
+     }
+
+    function getCurrentUserEmail() {
+        if (currentUser.item)
+        {
+            return (currentUser.item.email) ? 
+                currentUser.item.email : "No email specified";
+        }
+        else 
+            return "Loading";
     }
 
     function setCurrentUser() {
         service.authToken = AuthTokenFactory.getToken();
         if (service.authToken) {
-            currentUser = jwtHelper.decodeToken(service.authToken);
-            registerSessions();
+            var decodedToken = jwtHelper.decodeToken(service.authToken);
+            var root = ItemRepository.getRootProxy();
+            var users = root.getChildByName('Users');
+            /* If the users object isn't around we probably are waiting for load
+               We will call this function again when the repo is loaded. */
+            if (users) 
+            {
+            currentUser = users.getChildByName(decodedToken.username);
+            SessionService.registerSessions();
+            }
         } else {
             $state.go('login');
         }
@@ -67,6 +64,8 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, Ko
     $rootScope.$on('itemRepositoryReady', function () {
         var root = ItemRepository.getRootProxy();
         users = root.getChildByName('Users');
+        setCurrentUser();
+        $rootScope.$broadcast('userLoaded');
     });
 
     $rootScope.$on('userLoggedIn', function onUserLogin() {
@@ -78,6 +77,11 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, Ko
     $rootScope.$on('userLoggedOut', function onUserLogout() {
         userLoggedIn = false;
     });
+
+    $rootScope.$on('UserUpdated', function onUserUpdated(event, data) {
+        currentUser = data;
+        console.log(currentUser);
+        });
 
     setCurrentUser();
     console.log(currentUser);

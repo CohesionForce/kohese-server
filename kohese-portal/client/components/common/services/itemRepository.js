@@ -30,6 +30,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
                 } else {
                 	proxy = new ItemProxy(notification.kind, notification.item);
                 }
+
                 proxy.status = notification.status;
                 proxy.dirty = false;
             });
@@ -42,16 +43,24 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
                 } else {
                 	proxy = new ItemProxy(notification.kind, notification.item);
                 }
+
                 proxy.status = notification.status;
                 proxy.dirty = false;
             });
-
+            
             KoheseIO.socket.on(modelName + '/delete', function (notification) {
                 console.log("::: Received notification of " + notification.kind + " Deleted:  " + notification.id);
                 var proxy = ItemProxy.getProxyFor(notification.id);
                 proxy.deleteItem();
             });
         }
+        
+        KoheseIO.socket.on("VersionControl/statusUpdated", function (gitStatusMap) {
+          for (var id in gitStatusMap) {
+            var proxy = ItemProxy.getProxyFor(id);
+            proxy.status = gitStatusMap[id];
+          }
+        });
 
         KoheseIO.socket.on('connect_error', function () {
             console.log("::: IR: Socket IO Connection Error");
@@ -193,9 +202,14 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
               reject(response.error);
             } else {
               console.log(response);
-              proxy.updateItem(response.kind, response.item);
+              if(!proxy.updateItem){
+                proxy.item = response.item;
+                proxy = new ItemProxy(response.kind, response.item);
+              } else {
+                proxy.updateItem(response.kind, response.item);
+              }
               proxy.dirty = false;
-              resolve(response);              
+              resolve(proxy);              
             }
           });         
         });

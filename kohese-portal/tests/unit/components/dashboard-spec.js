@@ -60,7 +60,7 @@ describe("DashboardController Test", function()
     // Test filters
     it("Test Filter User", function()
     {
-        user = mockUserService.getCurrentUser();
+        user = mockUserService.getCurrentUsername();
         expect(controller.acceptedFilter.item.assignedTo).toBe(user);
         expect(controller.assignedFilter.item.assignedTo).toBe(user);
         expect(controller.inWorkFilter.item.assignedTo).toBe(user);

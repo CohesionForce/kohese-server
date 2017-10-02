@@ -64,7 +64,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.issueStates = IssueService.getIssueStates();
         detailsCtrl.categoryTags = CategoryService.getTags();
         detailsCtrl.userList = UserService.getAllUsers();
-        detailsCtrl.currentUser = UserService.getCurrentUser();
+        detailsCtrl.currentUser = UserService.getCurrentUsername();
         detailsCtrl.proxyList = ItemRepository.getShortFormItemList();
         detailsCtrl.analysisFilterPOS = analysisService.filterPOS;
         detailsCtrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
@@ -110,9 +110,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             }
         }
         $scope.$emit('newItemSelected', $stateParams.id);
-
-
     });
+
+    $scope.$on('userLoaded', function () {
+        detailsCtrl.userName = UserService.getCurrentUsername();
+      });
 
     $scope.$on('tabSelected', function () {
         tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
@@ -296,8 +298,12 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
 
     detailsCtrl.createItem = function (navigationType) {
         ItemRepository.upsertItem(detailsCtrl.itemProxy)
-            .then(function (updatedItem) {
+            .then(function (updatedItemProxy) {
 
+                if (!detailsCtrl.itemProxy.updateItem){
+                  // This was a create, so replace the itemProxy
+                  detailsCtrl.itemProxy = updatedItemProxy;
+                }
                 // clear the state of the form
                 detailsCtrl.itemForm.$setPristine();
                 if (detailsCtrl.decisionForm) {
@@ -309,9 +315,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
                 detailsCtrl.enableEdit = false;
 
                 if (navigationType === 'parent') {
-                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItem.parentId})
+                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItemProxy.item.parentId})
                 } else if (navigationType === 'child') {
-                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItem.id})
+                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItemProxy.item.id})
                 }
             });
     };
@@ -442,7 +448,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
 
     detailsCtrl.upsertItem = function () {
         ItemRepository.upsertItem(detailsCtrl.itemProxy)
-            .then(function (updatedItem) {
+            .then(function (updatedItemProxy) {
 
                 // clear the state of the form
                 detailsCtrl.itemForm.$setPristine();

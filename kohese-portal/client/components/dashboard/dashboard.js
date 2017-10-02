@@ -9,7 +9,7 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
 
     if (!controllerRestored) {
         ctrl.itemList = ItemRepository.getAllItemProxies();
-        ctrl.currentUser = UserService.getCurrentUser();
+        ctrl.currentUser = UserService.getCurrentUsername();
         ctrl.acceptedFilter = {
             item: {
                 actionState: 'Accepted',
@@ -87,6 +87,10 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
     $scope.$on('tabSelected', function () {
         tabService.bundleController(ctrl, 'dashboardCtrl', currentTab.id)
     });
+
+    $scope.$on('userLoaded', function () {
+        ctrl.currentUser = UserService.getCurrentUsername();
+      });
 
 
 }
