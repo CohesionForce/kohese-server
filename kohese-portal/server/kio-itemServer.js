@@ -203,7 +203,7 @@ kio.server.on('connection', function (socket) {
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
     
     kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
