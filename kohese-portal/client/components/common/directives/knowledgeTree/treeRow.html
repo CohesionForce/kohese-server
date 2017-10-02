@@ -44,12 +44,18 @@
                       ng-init="treeCtrl.applyVersionControlTags(itemProxy)"> 
                         <img    ng-if="itemProxy.statusFlags.WTModified"
                                 src="resources/icons/versioncontrol/unstaged.ico"
-                                title="Unstaged Item">
+                                title="Unstaged Modified">
                         <img    ng-if="itemProxy.statusFlags.IndexModified"
                                 src="resources/icons/versioncontrol/index-mod.ico"
-                                title="Index Modified">
-                        
+                                title="Staged Modified">
+                        <img    ng-if="itemProxy.statusFlags.newItem"
+                                src="resources/icons/versioncontrol/unstaged.ico"
+                                title="Unstaged New">
+                        <img    ng-if="itemProxy.statusFlags.IndexNew"
+                                src="resources/icons/versioncontrol/index-mod.ico"
+                                title="Staged New">
                 </span>
+                {{itemProxy.status}}
         </div>
         <div class="kti-cell kti-actions pull-right"> 
             <i class="fa fa-anchor"
