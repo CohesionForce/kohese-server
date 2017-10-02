@@ -3,17 +3,18 @@
  */
 
 function AdminController(tabService, $state, $scope, UserService, ItemRepository, 
-                         SessionService, $rootScope) {
+                         SessionService, $rootScope, VersionControlService, $window) {
     var ctrl = this;
     var tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(tab.id, 'adminCtrl', this);
+    var treeRoot = ItemRepository.getRootProxy()
 
     if (!controllerRestored) {
         ctrl.addUserForm = false;
         ctrl.editUserForm = false;
         ctrl.users = [];
         ctrl.sessions = SessionService.sessions;
-        ctrl.repositoryList = ItemRepository.getRepositories();
+
     }
 
     $scope.$on('$viewContentLoaded', function () {
@@ -24,7 +25,9 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     /* This handles if the user is coming to the screen for the first time */
     $scope.$on('itemRepositoryReady', function () {
         ctrl.repositoryList = ItemRepository.getRepositories();
+        ctrl.treeRoot = ItemRepository.getRootProxy();
         fetchUsers();
+
     });
 
     $scope.$on('tabSelected', function () {
@@ -122,10 +125,53 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
             fetchUsers();
         });
     };
+
+    /* Version Control Functions */
+
+    ctrl.addRemote = function(){
+        if(ctrl.remoteNameInput != "" && ctrl.remoteUrlInput != "")
+        {
+        VersionControlService.addRemote([treeRoot.children[0].item.id], 
+            ctrl.remoteNameInput, ctrl.remoteUrlInput);
+        } else {
+            $window.alert("Please enter a name and url");
+        }
+    }
+
+    ctrl.getRemotes = function(){
+        console.log(treeRoot.children[0]);  
+        VersionControlService.getRemotes(treeRoot.children[0].item.id, 
+            function(remoteList) {
+            ctrl.remotesList = remoteList;
+            });
+
+        console.log(ctrl.remotesList);
+    }
+
+    ctrl.commit = function()
+        {
+        if (ctrl.commitMessageInput === "")
+            treeCtrl.commitMessageInput = "No Message Entered"
+
+        // Need to grab all of the indexed nodes
+        VersionControlService.commitItems(treeRoot.children[0],
+                                        ctrl.commitMessageInput);
+        }
+
+    ctrl.push = function() 
+    {
+        // Using the root nodes repo for now while that system gets worked out.
+        var proxyIds = []
+        proxyIds.push(treeRoot.children[0].item.id);
+        VersionControlService.push(proxyIds, ctrl.pushRemoteNameInput);
+    }
+        
 }
 
 export default () =>
 {
-    angular.module('app.admin', ['app.services.tabservice', 'app.services.sessionservice'])
+    angular.module('app.admin', ['app.services.tabservice', 
+                                 'app.services.sessionservice',
+                                 'app.services.versioncontrolservice'])
            .controller('AdminController', AdminController);
 }

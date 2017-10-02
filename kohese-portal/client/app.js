@@ -6,7 +6,7 @@ const appModule = angular.module('app', [
     'app.contentcontainer',
     'app.detailsview',
     'app.tree',
-    'app.tree.modalcontrollers',
+    //'app.tree.modalcontrollers', offline while we figure out modals
     'app.admin',
     'app.login',
     'app.navigationmenu',

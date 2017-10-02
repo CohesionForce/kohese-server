@@ -76,6 +76,11 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
         console.log(data)
 
         KoheseIO.socket.emit('VersionControl/push', data, function(results){
+        if (results.error)
+            toastr.error('Push Failed', 'Version Control');
+        else {
+            toastr.success('Push Succeeded!', 'Version Control');
+            }
             console.log("::: Push results:");
             console.log (results);
         } )
@@ -89,22 +94,32 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
         console.log("Add Remote Send");
         console.log(data);
         KoheseIO.socket.emit('VersionControl/addRemote', data, function(results) {
-            console.log(results);
-            console.log("Add Remote rcvd");
+            if (results.error)
+            toastr.error('Add Remote Failed', 'Version Control');
+        else {
+            toastr.success('Add Remote Succeeded!', 'Version Control');
+            }
+        console.log(results);
         });
     }
 
-    service.getRemotes = function(proxyId) {
+    service.getRemotes = function(proxyId, callback) {
         var data = {};
         data.proxyId = proxyId;
         console.log ("Get Remote Send");
         console.log(data);
         KoheseIO.socket.emit('VersionControl/getRemotes', data, function(results) {
-            console.log("Get Remote rcvd")
+        if (results.error)
+            toastr.error('Get Remotes Failed', 'Version Control');
+        else {
+            toastr.success('Get Remotes Succeeded!', 'Version Control');
+            callback(results);
+            }
             console.log(results);
         })
-    }
 
+
+    }
 
 }
 

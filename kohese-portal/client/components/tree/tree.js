@@ -455,13 +455,15 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         console.log("Stage Items");
         }
 
-    // treeCtrl.openCommitModal = function()
-    //     {
-    //         Popeye.openModal({
-    //             templateUrl: "components/tree/modals/commitmodal.html",
-    //             controller: "CommitModalControl as modalCtrl",            
-    //         })
-    //     }
+    treeCtrl.openCommitModal = function()
+        {
+            Popeye.openModal({
+                templateUrl: "components/tree/modals/commitmodal.html",
+                $scope: {
+                    treeCtrl: "="
+                }            
+            })
+        }
     
     treeCtrl.commit = function()
         {
