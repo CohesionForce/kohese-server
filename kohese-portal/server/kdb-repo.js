@@ -46,6 +46,8 @@ function openRepo(proxy) {
           });
         });
       });
+    }).catch(function (err) {
+      console.log("Error opening repository at " + path + ". " + err);
     });
 }
 module.exports.openRepo = openRepo;
