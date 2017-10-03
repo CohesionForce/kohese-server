@@ -15,6 +15,7 @@ export default () => {
     require('./search/search')();
     require('./admin/admin')();
     require('./dashboard/dashboard')();
+    require('./create/createWizard')();
 
     //Common
 
