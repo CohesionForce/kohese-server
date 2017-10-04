@@ -24,11 +24,16 @@ function Server(httpServer, options){
         console.log('>>>> session %s is user %s', socket.id, socket.koheseUser.username);
         socket.emit('authenticated');
         socket.emit('session/list', kio.sessions);
+        
         kio.sessions[socket.id] = {
             sessionId: socket.id,
             address: socket.handshake.address,
             username: socket.koheseUser.username
           };
+
+        // Provide notification to socket listeners that the user has authenticated
+        global.app.emit('newSession', socket);
+        
         kio.server.emit('session/add',kio.sessions[socket.id]);
       });
       socket.on('disconnect', function () {

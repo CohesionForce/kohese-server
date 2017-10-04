@@ -44,6 +44,8 @@ boot(app, __dirname, function (err) {
           var kio = require('./koheseIO.js');
           var kioServer = kio.Server(appServer);
           var itemServer = require('./kio-itemServer.js');
+          var fileServer = require('./kio-fileServer.js');
+          
           console.log("::: KoheseIO Started");
           app.emit('koheseIO-started');
 
