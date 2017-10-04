@@ -43,7 +43,8 @@ const appModule = angular.module('app', [
     'ui.tree',
     'monospaced.elastic',
     'shagstrom.angular-split-pane',
-    'simplemde'
+    'simplemde',
+    'ngFileUpload'
 ]);
 
 
@@ -103,7 +104,8 @@ appModule
                 url: 'import/{parentId}',
                 views: {
                     'right@kohese': {
-                        templateUrl: '/components/create/import/import.html'
+                        templateUrl: '/components/create/import/import.html',
+                        controller: "ImportItemController as importCtrl"
                     }
                 }
 
@@ -129,7 +131,7 @@ appModule
             })
             .state('/kohese.new', {
                 url: 'new/{parentId}',
-                templateUrl: '/components/detailsview/subviews.createitem.html',
+                templateUrl: '/components/detailsview/subviews/createitem.html',
                 controller: "DetailsViewController as detailsCtrl"
             })
             .state('kohese.search', {
