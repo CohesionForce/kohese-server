@@ -1,6 +1,8 @@
-function CreateWizardController($state, tabService) {
+function CreateWizardController($state, tabService, $stateParams) {
 
     const ctrl = this;
+
+    ctrl.tab = tabService.getCurrentTab();
 
     var controllerRestored = tabService.restoreControllerData(ctrl.tab.id, 'createWizardCtrl', this);
     
@@ -11,9 +13,10 @@ function CreateWizardController($state, tabService) {
             
         }
 
-    ctrl.navigate = function(destination) {
-        $state.go('kohese.explore.create.' + destination);
-        console.log('kohese.explore.create.' + destination)
+    ctrl.navigate = function(state, params) {
+        console.log($stateParams)
+        ctrl.tab.setState(state, params)
+        $state.go(state);
     }
 }
 

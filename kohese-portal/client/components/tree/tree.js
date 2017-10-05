@@ -355,11 +355,9 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 
     /****** End list expansion functions */
 
-    treeCtrl.navigate = function (state, type, id) {
-      treeCtrl.tab.state = state;
-      treeCtrl.tab.type = type || 'dualview';
-      treeCtrl.tab.params.id = id;
-      $state.go(state, {id: id})
+    treeCtrl.navigate = function (state, params) {
+      treeCtrl.tab.setState(state, params);
+      $state.go(state, params)
     };
 
     treeCtrl.createChildOfSelectedItem = function () {

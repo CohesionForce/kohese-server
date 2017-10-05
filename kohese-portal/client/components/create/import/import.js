@@ -1,5 +1,6 @@
 function ImportItemController(Upload, tabService) {
     const ctrl = this;
+    ctrl.tab = tabService.getCurrentTab();
 
     var controllerRestored = tabService.restoreControllerData(ctrl.tab.id, 'importCtrl', this);
 
