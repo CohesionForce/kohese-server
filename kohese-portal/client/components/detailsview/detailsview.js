@@ -308,9 +308,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
                 detailsCtrl.enableEdit = false;
 
                 if (navigationType === 'parent') {
-                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItemProxy.item.parentId})
+                    detailsCtrl.updateTab("kohese.explore.edit", updatedItemProxy.item.parentId);
                 } else if (navigationType === 'child') {
-                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItemProxy.item.id})
+                    detailsCtrl.updateTab("kohese.explore.edit", {id: updatedItemProxy.item.id})
                 }
             });
     };
@@ -320,8 +320,10 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     // Currently this won't handle navigation with parentId it seems
     detailsCtrl.updateTab = function (state, id) {
         var data = (id) ? {id:id} : {};
+        console.log(state);
+        console.log(id);
         detailsCtrl.tab.setState(state, data);
-        detailsCtrl.navigate(state, id)
+        detailsCtrl.navigate(state, {id:id})
     };
 
     detailsCtrl.navigateToCreateForm = function () {

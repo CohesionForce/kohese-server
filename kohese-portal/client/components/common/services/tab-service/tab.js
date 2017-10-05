@@ -4,7 +4,7 @@ function Tab(state, params, id) {
     tab.title = state.title;
     tab.type = state.type;
     tab.params = (state.params) ? params : {};
-    tab.state = state.state
+    tab.state = state.state;
     tab.scope = {};
     tab.content = {};
     tab.id = id;
