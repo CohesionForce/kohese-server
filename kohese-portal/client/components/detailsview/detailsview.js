@@ -35,7 +35,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         }
         detailsCtrl.updateParentProxy();
         detailsCtrl.tab = tabService.getCurrentTab();
-        detailsCtrl.tab.route = $stateParams.id;
+        detailsCtrl.tab.route = $stateParams.id; // Likely duplicated logic, can probably refactor this to use tab param object
         detailsCtrl.filterString = "";
         detailsCtrl.filterTextTimeout;
 
@@ -71,7 +71,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
         detailsCtrl.analysisPOSFilterName = "Standard";
         detailsCtrl.NavigationService = NavigationService;
-        if (detailsCtrl.tab.state === 'kohese.explore.create') {
+        if (detailsCtrl.tab.state === 'kohese.explore.create.new') {
             detailsCtrl.enableEdit = true;
         }
     }
@@ -258,13 +258,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         }
     };
 
-    if (detailsCtrl.tab.state === 'kohese.investigate') {
-        detailsCtrl.tab.setTitle('Investigate');
-        detailsCtrl.tab.params = {
-            id: $stateParams.id
-        };
-    }
-
     function updateParentProxy() {
         if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId) {
             detailsCtrl.parentProxy = ItemRepository.getProxyFor(detailsCtrl.itemProxy.item.parentId);
@@ -315,46 +308,48 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
                 detailsCtrl.enableEdit = false;
 
                 if (navigationType === 'parent') {
-                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItemProxy.item.parentId})
+                    detailsCtrl.updateTab("kohese.explore.edit", updatedItemProxy.item.parentId);
                 } else if (navigationType === 'child') {
-                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItemProxy.item.id})
-                }
-            });
+                    detailsCtrl.updateTab("kohese.explore.edit", updatedItemProxy.item.id);
+            }});
     };
 
-    detailsCtrl.updateTab = function (state, id, view) {
-        detailsCtrl.tab.setState(state);
-        detailsCtrl.tab.params.id = id;
-        if (view) {
-            detailsCtrl.tab.toggleType();
-            detailsCtrl.tab.setType = view;
-        }
-        detailsCtrl.navigate(state, id)
+    // This pipeline for navigating should possibly be modified to be more in 
+    // line with the other views. This updateTab is unique to detailsView.
+    // Currently this won't handle navigation with parentId it seems
+    detailsCtrl.updateTab = function (state, id) {
+        var data = (id) ? {id:id} : {};
+        console.log(state);
+        console.log(id);
+        detailsCtrl.tab.setState(state, data);
+        detailsCtrl.navigate(state, {id:id})
     };
 
     detailsCtrl.navigateToCreateForm = function () {
+        var data = {
+            parentId: detailsCtrl.itemProxy.item.id
+        }
         if (detailsCtrl.tab.type === 'singleview') {
-            detailsCtrl.tab.setState('kohese.create');
-            detailsCtrl.tab.params.parentId = detailsCtrl.itemProxy.item.id;
-            $state.go('kohese.create', {parentId: detailsCtrl.itemProxy.item.parentId})
-        } else {
+            detailsCtrl.tab.setState('kohese.create', data);
+            $state.go('kohese.create', data)
+        } 
+        else {
             if ($state.current.name === 'kohese.explore.edit' || $state.current.name === 'kohese.explore') {
-                detailsCtrl.tab.setState('kohese.explore.create');
-                detailsCtrl.tab.params.parentId = detailsCtrl.itemProxy.item.id;
-                $state.go('kohese.explore.create', {parentId: detailsCtrl.itemProxy.item.id})
-            } else if ($state.current.name === 'kohese.search' || $state.current.name === 'kohese.search.edit') {
-                detailsCtrl.tab.setState('kohese.search.create');
-                detailsCtrl.tab.params.parentId = detailsCtrl.itemProxy.item.id;
-                $state.go('kohese.search.create', {parentId: detailsCtrl.itemProxy.item.id})
+                detailsCtrl.tab.setState('kohese.explore.create', data);
+                $state.go('kohese.explore.create', data)
+            } 
+            else if ($state.current.name === 'kohese.search' || $state.current.name === 'kohese.search.edit') {
+                detailsCtrl.tab.setState('kohese.search.create', data);
+                $state.go('kohese.search.create', data)
             }
         }
     };
 
-    detailsCtrl.navigate = function (state, id) {
+    detailsCtrl.navigate = function (state, params) {
         if (state) {
-            $state.go(state, {id: id})
+            $state.go(state, params)
         } else {
-            $state.go('kohese.explore.edit', {id: id})
+            $state.go('kohese.explore.edit', params)
         }
     };
 
@@ -421,11 +416,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     detailsCtrl.deleteItemInput = function (type, row) {
         var index = detailsCtrl.itemProxy.item[type].indexOf(row);
         detailsCtrl.itemProxy.item[type].splice(index, 1);
-    };
-
-    detailsCtrl.toggleView = function (state) {
-        detailsCtrl.tab.toggleType();
-        detailsCtrl.tab.setState(state);
     };
 
     detailsCtrl.fetchAnalysis = function () {

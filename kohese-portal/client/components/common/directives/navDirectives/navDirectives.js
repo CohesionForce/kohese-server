@@ -8,12 +8,11 @@ function AppBarController($rootScope, UserService, LoginService, $state, jwtHelp
     checkAuthentication();
     ctrl.userName = UserService.getCurrentUsername();
 
-    ctrl.navigate = function (state, params, type) {
+    ctrl.navigate = function (state, params) {
         $rootScope.$broadcast('navigationEvent',
             {
                 state: state,
-                params: params,
-                type: type
+                params: params
             });
     };
 
