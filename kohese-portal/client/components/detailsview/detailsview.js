@@ -308,17 +308,21 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
                 detailsCtrl.enableEdit = false;
 
                 if (navigationType === 'parent') {
-                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItemProxy.item.parentId})
+                    detailsCtrl.updateTab("kohese.explore.edit", updatedItemProxy.item.parentId);
                 } else if (navigationType === 'child') {
-                    $state.go(NavigationService.getLastState(detailsCtrl.tab.id), {id: updatedItemProxy.item.id})
-                }
-            });
+                    detailsCtrl.updateTab("kohese.explore.edit", updatedItemProxy.item.id);
+            }});
     };
 
-    detailsCtrl.updateTab = function (state, id, view) {
-        (id) ? detailsCtrl.tab.setState(state, {id: id}) : 
-               detailsCtrl.tab.setState(state, {});
-        detailsCtrl.navigate(state, id)
+    // This pipeline for navigating should possibly be modified to be more in 
+    // line with the other views. This updateTab is unique to detailsView.
+    // Currently this won't handle navigation with parentId it seems
+    detailsCtrl.updateTab = function (state, id) {
+        var data = (id) ? {id:id} : {};
+        console.log(state);
+        console.log(id);
+        detailsCtrl.tab.setState(state, data);
+        detailsCtrl.navigate(state, {id:id})
     };
 
     detailsCtrl.navigateToCreateForm = function () {
@@ -341,11 +345,11 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         }
     };
 
-    detailsCtrl.navigate = function (state, id) {
+    detailsCtrl.navigate = function (state, params) {
         if (state) {
-            $state.go(state, {id: id})
+            $state.go(state, params)
         } else {
-            $state.go('kohese.explore.edit', {id: id})
+            $state.go('kohese.explore.edit', params)
         }
     };
 

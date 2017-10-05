@@ -36,7 +36,7 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     };
 
     function createTab(state, params) {
-        var newTab = tabService.createTab(state, params)
+        var newTab = tabService.createTab(state, params);
         console.log(newTab);
         newTab.position = containerCtrl.tabs.length;
         tabService.setCurrentTab(newTab);
@@ -55,6 +55,34 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     };
 
     containerCtrl.deleteTab = function (tab) {
+        // If tab is currently selected select the previous tab, 
+        // If it is the first tab get the next one
+        // If it is the only tab, recreate the base tab
+
+        if (tab.id === tabService.getCurrentTab().id)
+        {
+            if (tab.position === 0)
+            {
+                if (containerCtrl.tabs.length === 1) 
+                    {
+                    containerCtrl.addTab();
+                    } 
+                else 
+                    {
+                    containerCtrl.setTab(containerCtrl.tabs[1]);
+                    }   
+            } 
+            else if (tab.position === containerCtrl.tabs.length)
+                {
+                containerCtrl.setTab(containerCtrl.tabs[tab.position - 1]);
+                }
+            else 
+                {
+                containerCtrl.setTab(containerCtrl.tabs[tab.position + 1]);
+                }
+            
+        }
+
         containerCtrl.tabs.splice(tab.position, 1);
         updatePositions();
     };

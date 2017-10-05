@@ -26,7 +26,7 @@
     <tr ui-tree-node ng-repeat="proxy in filteredItems = (detailsCtrl.itemProxy.children  | filter:{item: {$: detailsCtrl.filterString}}) | orderBy:itemSortField">
         <td><i ui-tree-handle class="fa fa-th" aria-hidden="true" ng-if="detailsCtrl.itemProxy.childrenAreManuallyOrdered()")></i></td>
         <td>{{proxy.kind}}</td>
-        <td ng-click="detailsCtrl.updateTab(detailsCtrl.NavigationService.getCurrentState(detailsCtrl.tab.id), proxy.item.id)"
+        <td ng-click="detailsCtrl.updateTab('kohese.explore.edit', proxy.item.id)"
             class="tree-label"
             ng-bind-html="proxy.item.name | highlight:detailsCtrl.filterString"></td>
         <td>
