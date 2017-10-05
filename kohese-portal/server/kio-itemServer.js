@@ -8,9 +8,9 @@ const importer = require("./directory-ingest.js");
 
 console.log("::: Initializing KIO Item Server");
 
-kio.server.on('connection', function (socket) {
+global.app.on('newSession', function (socket) {
 
-  console.log('>>> KIO Item Server: session %s connected from %s', socket.id, socket.handshake.address);
+  console.log('>>> KIO Item Server: session %s connected from %s for %s', socket.id, socket.handshake.address, socket.koheseUser.username);
   
   //////////////////////////////////////////////////////////////////////////
   //
