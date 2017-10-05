@@ -2,12 +2,17 @@
  * Created by josh on 8/14/15.
  */
 
+import Tab from "./tab-service/tab.js"
+
 function TabService($state, $rootScope) {
     var tService = this;
     var _ = require('underscore');
 
     tService.tabCount = 0;
     tService.currentTab = {};
+
+    tService.stateDefinitions = require('./tab-service/tab-state-info.json');
+    console.log(tService.stateDefinitions);
 
     //
     // Tab Book-keeping
@@ -29,6 +34,21 @@ function TabService($state, $rootScope) {
     tService.getCurrentTab = function () {
         return tService.currentTab;
     };
+
+    tService.createTab = function (state, params) {
+        var state = tService.stateDefinitions[state];
+        var id = tService.tabCount;
+        tService.tabCount++
+
+        console.log(state);
+        console.log(params);
+        console.log(id);
+
+        var tab = Tab(state,params, id);
+        console.log(tab);
+        return tab;
+    }
+
 
     //
     // Bundler Service

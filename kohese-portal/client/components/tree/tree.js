@@ -224,8 +224,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         return (treeCtrl.matchesFilter(proxy) || treeCtrl.childMatchesFilter(proxy));
     }
 
-    treeCtrl.tab.setTitle('Explore');
-
     $scope.$on('tabSelected', function () {
         tabService.bundleController(treeCtrl, 'treeCtrl', treeCtrl.tab.id)
     });
