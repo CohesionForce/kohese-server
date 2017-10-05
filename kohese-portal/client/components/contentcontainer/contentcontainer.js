@@ -72,9 +72,13 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
                     containerCtrl.setTab(containerCtrl.tabs[1]);
                     }   
             } 
-            else 
+            else if (tab.position === containerCtrl.tabs.length)
                 {
                 containerCtrl.setTab(containerCtrl.tabs[tab.position - 1]);
+                }
+            else 
+                {
+                containerCtrl.setTab(containerCtrl.tabs[tab.position + 1]);
                 }
             
         }
