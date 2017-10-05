@@ -310,9 +310,8 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
                 if (navigationType === 'parent') {
                     detailsCtrl.updateTab("kohese.explore.edit", updatedItemProxy.item.parentId);
                 } else if (navigationType === 'child') {
-                    detailsCtrl.updateTab("kohese.explore.edit", {id: updatedItemProxy.item.id})
-                }
-            });
+                    detailsCtrl.updateTab("kohese.explore.edit", updatedItemProxy.item.id);
+            }});
     };
 
     // This pipeline for navigating should possibly be modified to be more in 

@@ -36,7 +36,7 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     };
 
     function createTab(state, params) {
-        var newTab = tabService.createTab(state, params)
+        var newTab = tabService.createTab(state, params);
         console.log(newTab);
         newTab.position = containerCtrl.tabs.length;
         tabService.setCurrentTab(newTab);

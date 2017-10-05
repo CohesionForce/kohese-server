@@ -38,7 +38,7 @@ function TabService($state, $rootScope) {
     tService.createTab = function (state, params) {
         var state = tService.stateDefinitions[state];
         var id = tService.tabCount;
-        tService.tabCount++
+        tService.tabCount++;
 
         console.log(state);
         console.log(params);
