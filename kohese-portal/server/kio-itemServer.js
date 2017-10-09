@@ -3,6 +3,7 @@ var kdb = require("./kdb.js");
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
+const Path = require("path");
 const importer = require("./directory-ingest.js");
 
 
@@ -275,7 +276,12 @@ global.app.on('newSession', function (socket) {
   
   socket.on("ImportDocuments", function (request, sendResponse) {
     new Promise(function (resolve, reject) {
-      importer.importFiles(request.files, request.parentItem, request.intermediateDirectories);
+      var absolutes = [];
+      var root = Path.dirname(fs.realpathSync(__dirname));
+      for (var i = 0; i < request.files.length; i++) {
+        absolutes.push(Path.join(root, request.files[i]));
+      }
+      importer.importFiles(absolutes, request.parentItem, request.intermediateDirectories);
       resolve(sendResponse());
     });
   });
