@@ -112,7 +112,7 @@ appModule
 
             })
             .state('kohese.explore.create.new', {
-                url: 'new/{parentId}',
+                url: 'new/{type}{parentId}',
                 views: {
                     'right@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',
@@ -131,7 +131,7 @@ appModule
                 controller: 'ImportController as importCtrl'
             })
             .state('/kohese.new', {
-                url: 'new/{parentId}',
+                url: 'new/{type}{parentId}',
                 templateUrl: '/components/detailsview/subviews/createitem.html',
                 controller: "DetailsViewController as detailsCtrl"
             })
