@@ -319,8 +319,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     // Currently this won't handle navigation with parentId it seems
     detailsCtrl.updateTab = function (state, id) {
         var data = (id) ? {id:id} : {};
-        console.log(state);
-        console.log(id);
         detailsCtrl.tab.setState(state, data);
         detailsCtrl.navigate(state, {id:id})
     };

@@ -15,12 +15,8 @@ function Tab(state, params, id) {
     tab.setScope = function (scope) {
         tab.scope = scope;
         bundleListener = tab.scope.$on('tabSelected', function (event, data) {
-            console.log(data);
-            console.log(tab);
             if (data === tab.id) {
                 console.log('Tab Selected :: Bundle Listener');
-                console.log(tab);
-                console.log(data);
                 tab.scope.$broadcast('bundleReady');
                 bundleListener();
             }

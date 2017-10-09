@@ -1,4 +1,4 @@
-function ImportItemController(Upload, tabService) {
+function ImportItemController(Upload, tabService, ImportService, $stateParams) {
     const ctrl = this;
     ctrl.tab = tabService.getCurrentTab();
 
@@ -20,6 +20,7 @@ function ImportItemController(Upload, tabService) {
 
 export default () => {
     angular.module('app.create.import', ['ngFileUpload',
-                                         'app.services.tabservice'])
+                                         'app.services.tabservice',
+                                         'app.services.importservice'])
         .controller('ImportItemController', ImportItemController);
 }

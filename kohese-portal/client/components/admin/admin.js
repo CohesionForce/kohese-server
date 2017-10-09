@@ -93,7 +93,6 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     ctrl.upsertUser = function () {
         if (ctrl.passwordInput == ctrl.confirmPasswordInput) {
             updateUserObject(ctrl.selectedUserProxy);
-            console.log(ctrl.selectedUserProxy);
             ItemRepository.upsertItem(ctrl.selectedUserProxy).then(function (results) {
                 fetchUsers();
                 $rootScope.$broadcast('UserUpdated', ctrl.selectedUserProxy)
