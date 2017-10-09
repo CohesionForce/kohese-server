@@ -122,13 +122,10 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     }
 
     ctrl.getRemotes = function(){
-        console.log(treeRoot.children[0]);  
         VersionControlService.getRemotes(treeRoot.children[0].item.id, 
             function(remoteList) {
             ctrl.remotesList = remoteList;
             });
-
-        console.log(ctrl.remotesList);
     }
 
     ctrl.commit = function()
