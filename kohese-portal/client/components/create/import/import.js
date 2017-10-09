@@ -14,6 +14,7 @@ function ImportItemController(Upload, tabService, ImportService, $stateParams) {
     ctrl.submit = function () {
         console.log(this);
         console.log(this.file);
+        ImportService.importFile(this.file);
     }
 
 }

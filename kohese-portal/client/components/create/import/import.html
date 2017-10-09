@@ -8,8 +8,10 @@
                  ngf-select ng-model="importCtrl.file"
                  name="file" 
                  ngf-pattern=".doc,.docx,.odt'"
-                 ngf-max-size="100MB"> Select</div>
-            <div>File selected : {{importCtrl.file.$ngfName}}</div>
+                 ngf-max-size="100MB"> 
+                 Select
+            </div>
+            <div>File selected : {{importCtrl.file.name}}</div>
             <br/>
             <label for="name-input">Item name: </label>
             <input type="text" id="name-input" ng-model="importCtrl.nameInput"/>
