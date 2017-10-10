@@ -277,7 +277,7 @@ global.app.on('newSession', function (socket) {
   socket.on("ImportDocuments", function (request, sendResponse) {
     new Promise(function (resolve, reject) {
       var absolutes = [];
-      var root = Path.dirname(fs.realpathSync(__dirname));
+      var root = Path.dirname(fs.realpathSync(__dirname), "data_import", socket.koheseUser.username);
       for (var i = 0; i < request.files.length; i++) {
         absolutes.push(Path.join(root, request.files[i]));
       }

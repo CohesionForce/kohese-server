@@ -28,7 +28,7 @@ function ImportService(KoheseIO) {
     uploader.on('complete', function(fileInfo) {
         console.log('Upload Complete', fileInfo);
         KoheseIO.socket.emit('ImportDocuments', {
-          files: [Path.join(fileInfo.uploadDir, fileInfo.name)],
+          files: [fileInfo.name],
           parentItem: parent,
           intermediateDirectories: intermediate
         }, function () {

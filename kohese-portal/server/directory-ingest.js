@@ -12,7 +12,6 @@ var mdToKohese = require('./md-to-kohese.js');
 
 var rootId;
 var basePath;
-var tempDir = '/tmp-' + Math.floor((Math.random() * 10000) + 1);
 var tempDirPath;
 
 function importFiles(files, parent, rootName) {
@@ -21,6 +20,7 @@ function importFiles(files, parent, rootName) {
   }
   
   basePath = Path.parse(files[0]).dir;
+  var tempDir = "tmp-" + Math.floor((Math.random() * 10000) + 1);
   tempDirPath = Path.join(basePath,tempDir);
   
   if (!rootName) {
@@ -70,7 +70,7 @@ function processToMarkdown(filePath, basePath) {
   case '.doc':
     // doc processing
     console.log('::: Processing doc to odt to md');
-    var soffice = child.spawnSync('soffice', ['--headless', '--convert-to', 'odt', pathDirBase, '--outdir', Path.join(basePath, tempDir, path.dir) ], { cwd: basePath, encoding : 'utf8' });
+    var soffice = child.spawnSync('soffice', ['--headless', '--convert-to', 'odt', pathDirBase, '--outdir', Path.join(tempDirPath, path.dir) ], { cwd: basePath, encoding : 'utf8' });
     if(soffice.stdout) {
       console.log(soffice.stdout);
     }
@@ -124,7 +124,7 @@ function processToMarkdown(filePath, basePath) {
 
 function process(file, parent) {
   var fileStat = fs.lstatSync(file);
-  var tmpPath = tempDirPath + '/' + splitPath(file, basePath);
+  var tmpPath = tempDirPath + Path.sep + splitPath(file, basePath);
   
   if (fileStat.isDirectory()) {
     fs.mkdirSync(tmpPath);
