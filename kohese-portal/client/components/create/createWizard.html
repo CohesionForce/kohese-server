@@ -2,11 +2,16 @@
         <div class="panel-heading">
             <span>Create Wizard</span>
         </div>
-    <div class="panel-body"style="margin: auto;">   
-        <button ng-click="createCtrl.navigate('kohese.explore.create.new');"
-                class="btn btn-success">New Item</button>
+    <div class="panel-body"style="margin: auto;"
+         ng-repeat="type in createCtrl.types">   
+        <button 
+                ng-click="createCtrl.navigate('kohese.explore.create.new', {type:type});"
+                class="btn btn-success">New {{type}}</button>
         <br/>
-        <button ng-click="createCtrl.navigate('kohese.explore.create.import')"
-                class="btn btn-primary">Import Item</button>
     </div> 
+    <div class="panel-body">
+        <button ng-click="createCtrl.navigate('kohese.explore.create.import', {})"
+                class="btn btn-primary">Import Item</button>
+    </div>
+
 </div>

@@ -1,8 +1,15 @@
-function CreateWizardController($state, tabService, $stateParams) {
+function CreateWizardController($state, tabService, $stateParams, ItemRepository) {
 
     const ctrl = this;
 
     ctrl.tab = tabService.getCurrentTab();
+    ctrl.types = []
+
+    for (const key of Object.keys(ItemRepository.getModelTypes())) {
+        ctrl.types.push(key)
+    }
+
+    console.log(ctrl.types);
 
     var controllerRestored = tabService.restoreControllerData(ctrl.tab.id, 'createWizardCtrl', this);
     
@@ -14,14 +21,17 @@ function CreateWizardController($state, tabService, $stateParams) {
         }
 
     ctrl.navigate = function(state, params) {
-        console.log($stateParams)
+        console.log($stateParams);
+        if ($stateParams.parentId) {
+            params.parentId = $stateParams.parentId
+        }
         ctrl.tab.setState(state, params)
-        $state.go(state);
+        $state.go(state, params);
     }
 }
 
 export default () => {
-    angular.module('app.create', [])
+    angular.module('app.create', ['app.services.itemservice'])
            .controller('CreateWizardController', CreateWizardController);
 
     // Load sub-controllers 
