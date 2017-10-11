@@ -14,7 +14,7 @@ var rootId;
 var basePath;
 var tempDirPath;
 
-function importFiles(files, parent, rootName) {
+function importFiles(files, parentId) {
   if (0 === files.length) {
     return;
   }
@@ -22,10 +22,6 @@ function importFiles(files, parent, rootName) {
   basePath = Path.parse(files[0]).dir;
   var tempDir = "tmp-" + Math.floor((Math.random() * 10000) + 1);
   tempDirPath = Path.join(basePath,tempDir);
-  
-  if (!rootName) {
-    rootName = basePath;
-  }
 
   try {
     fs.mkdirSync(tempDirPath);
@@ -34,15 +30,8 @@ function importFiles(files, parent, rootName) {
     console.log(err);
   }
 
-  var dirCount = 0;
-  var dir = global.app.models["Item"].upsert({
-      name: rootName,
-      parentId: parent
-    }, {}, function () {
-  });
-  
   for (var i = 0; i < files.length; i++) {
-    process(files[i], dir);
+    process(files[i], parentId);
   }
 
   console.log('All operations are completed. Now cleaning up...');
@@ -130,7 +119,7 @@ function process(file, parent) {
     fs.mkdirSync(tmpPath);
     var fileObj = global.app.models["Item"].upsert({
       name: Path.basename(tmpPath),
-      parentId: parent.id
+      parentId: parent
       }, {}, function () {
     });
     var files = fs.readdirSync(file);
@@ -141,7 +130,11 @@ function process(file, parent) {
     var processedFile = processToMarkdown(file, basePath);
     if (processedFile.wasProcessed && fs.existsSync(processedFile.outputPath)) {
       console.log("Processing " + processedFile.outputPath + "...");
-      var mdRoot = {name: Path.basename(processedFile.outputPath), parentId: parent.id, itemIds: []};
+      var mdRoot = {
+        name: Path.basename(processedFile.outputPath),
+        parentId: parent,
+        itemIds: []
+      };
       mdToKohese(processedFile.outputPath, mdRoot);
     }
   } else {
