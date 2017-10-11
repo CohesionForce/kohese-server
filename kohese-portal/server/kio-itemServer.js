@@ -275,15 +275,23 @@ global.app.on('newSession', function (socket) {
   });
   
   socket.on("ImportDocuments", function (request, sendResponse) {
+    console.log("!!!!!!!!!!!!!IMPORTDOC");
+    console.log(request);
     new Promise(function (resolve, reject) {
       var absolutes = [];
-      var root = Path.dirname(fs.realpathSync(__dirname), "data_import", socket.koheseUser.username);
-      for (var i = 0; i < request.files.length; i++) {
-        absolutes.push(Path.join(root, request.files[i]));
-      }
-      importer.importFiles(absolutes, request.parentItem, request.intermediateDirectories);
-      resolve(sendResponse());
-    });
+      console.log("Promise");
+      var root = Path.dirname(fs.realpathSync(__dirname));
+      root = Path.join(root, "data_import", socket.koheseUser.username)
+      absolutes.push(Path.join(root, request.file));
+      console.log(absolutes);
+      var results = importer.importFiles(absolutes, request.parentItem);
+      console.log(results);
+      return results;
+    }).then(function (results) {
+      sendResponse(results);
+    }).catch(function (err){
+      sendResponse({err:err});
+    }) 
   });
 
 });

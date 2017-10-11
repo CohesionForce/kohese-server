@@ -1,6 +1,7 @@
 function ImportItemController(Upload, tabService, ImportService, $stateParams) {
     const ctrl = this;
     ctrl.tab = tabService.getCurrentTab();
+    ctrl.files = []
 
     var controllerRestored = tabService.restoreControllerData(ctrl.tab.id, 'importCtrl', this);
 
@@ -8,13 +9,14 @@ function ImportItemController(Upload, tabService, ImportService, $stateParams) {
     {
         ctrl.tab = tabService.getCurrentTab();
         ctrl.tab.route = $stateParams.id;
+        ctrl.parentId = $stateParams.parentId
         
     }
 
     ctrl.submit = function () {
         console.log(this);
-        console.log(this.file);
-        ImportService.importFile(this.file);
+        console.log(this.files);
+        ImportService.importFile(ctrl.files, ctrl.parentId);
     }
 
 }
