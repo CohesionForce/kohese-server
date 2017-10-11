@@ -30,13 +30,16 @@ function importFiles(files, parentId) {
     console.log(err);
   }
 
+  var addedIds = [];
   for (var i = 0; i < files.length; i++) {
-    process(files[i], parentId);
+    process(files[i], parentId, addedIds);
   }
 
   console.log('All operations are completed. Now cleaning up...');
   deleteFile(tempDirPath);
   console.log('Clean up done!');
+  
+  return addedIds;
 }
 module.exports.importFiles = importFiles;
 
@@ -111,7 +114,7 @@ function processToMarkdown(filePath, basePath) {
   };
 }
 
-function process(file, parent) {
+function process(file, parent, addedIds) {
   var fileStat = fs.lstatSync(file);
   var tmpPath = tempDirPath + Path.sep + splitPath(file, basePath);
   
@@ -122,9 +125,10 @@ function process(file, parent) {
       parentId: parent
       }, {}, function () {
     });
+    addedIds.push(fileObj.id);
     var files = fs.readdirSync(file);
     for (var i = 0; i < files.length; i++) {
-      process(Path.join(file, files[i]), fileObj);
+      process(Path.join(file, files[i]), fileObj.id, addedIds);
     }
   } else if (fileStat.isFile()) {
     var processedFile = processToMarkdown(file, basePath);
@@ -135,7 +139,10 @@ function process(file, parent) {
         parentId: parent,
         itemIds: []
       };
-      mdToKohese(processedFile.outputPath, mdRoot);
+      var added = mdToKohese(processedFile.outputPath, mdRoot);
+      for (var j = 0; j < added.length; j++) {
+        addedIds.push(added[j]);
+      }
     }
   } else {
     console.log('!!! Warning: ' + file + ' is not a file or directory.');

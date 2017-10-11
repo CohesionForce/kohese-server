@@ -25,6 +25,7 @@ function mdToKohese(filePath, rootItem) {
   var walker = parsed.walker();
 
   var item = global.app.models["Item"].upsert(rootItem, {}, function () {});
+  var addedIds = [item.id];
   var lineage = [item.id];
   
   var tmpIdCounter = 0;
@@ -59,6 +60,7 @@ function mdToKohese(filePath, rootItem) {
             delete koheseItem.tmpId;
             item = global.app.models["Item"].upsert(koheseItem, {},
                 function () {});
+            addedIds.push(item.id);
             lineage[i] = item.id;
             readyToUpsert = false;
             break;
@@ -107,6 +109,7 @@ function mdToKohese(filePath, rootItem) {
             delete koheseItem.tmpId;
             item = global.app.models["Item"].upsert(koheseItem, {},
                 function () {});
+            addedIds.push(item.id);
             lineage[i] = item.id;
             readyToUpsert = false;
             break;
@@ -119,5 +122,7 @@ function mdToKohese(filePath, rootItem) {
           + ' - Entering: ' + event.entering);
     }
   }
+  
+  return addedIds;
 }
 module.exports = mdToKohese;
