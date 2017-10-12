@@ -66,9 +66,12 @@ function processToMarkdown(filePath, basePath) {
     if(soffice.stdout) {
       console.log(soffice.stdout);
     }
-    var pandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', "commonmark", '--atx-headers', Path.join(basePath, tempPathDirName, '.odt'), '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    var pandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', "commonmark", '--atx-headers', (tempPathDirName + '.odt'), '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
     if(pandoc.stdout) {
       console.log(pandoc.stdout);
+    }
+    if(pandoc.stderr) {
+      console.log(pandoc.stderr);
     }
     break;
   case '.odt':

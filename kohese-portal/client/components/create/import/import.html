@@ -5,18 +5,30 @@
     <div class="panel-body">
         <form name="form">
             <div class="btn btn-default" 
-                 ngf-select ng-model="importCtrl.file"
+                 ngf-select ng-model="importCtrl.files"
                  name="file" 
+                 ngf-drop
                  ngf-pattern=".doc,.docx,.odt'"
-                 ngf-max-size="100MB"> 
+                 ngf-max-size="100MB"
+                 ngf-include-dir="true"
+                 multiple="true"> 
                  Select
             </div>
-            <div>File selected : {{importCtrl.file.name}}</div>
+            <div>Files selected : File
+                <div ng-repeat="file in importCtrl.files">
+                   - {{file.name}}</div>
             <br/>
-            <label for="name-input">Item name: </label>
-            <input type="text" id="name-input" ng-model="importCtrl.nameInput"/>
+            <label for="name-input">Parent Id: </label>
+            <input type="text" id="name-input" ng-model="importCtrl.parentId"/>
             <br/>
             <button type="submit" class="btn btn-primary" ng-click="importCtrl.submit()">Submit</button>
         </form>
+        <div ng-if="importCtrl.importComplete">
+            <h4>Imported items</h4>
+            <div ng-repeat="item in importCtrl.importedItems">
+                {{item}} : <button ng-click="importCtrl.navigate
+                            ('kohese.explore.edit', {id : item})"> Go </button>
+            </div>
+        </div>
     </div>
 </div>
