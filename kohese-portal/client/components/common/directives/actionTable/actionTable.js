@@ -14,6 +14,8 @@ function ActionTableController($scope)
     {      
         ////////////////// TEMPORARY ////////////////////////////////////
         // Set up base field object - temporary /////////////////////////
+        // When we get the generic types from the servr this will be pulled from
+        // that service.
         this.fields = [
             {title: 'Name', key: 'name', onProxy: false, primary: true},
             {title: 'State', key: 'actionState', onProxy: false},
