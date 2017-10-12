@@ -286,8 +286,11 @@ global.app.on('newSession', function (socket) {
       console.log(absolutes);
       var results = importer.importFiles(absolutes, request.parentItem);
       console.log(results);
-      return results;
+
+      resolve(results);
     }).then(function (results) {
+      console.log("Callback");
+      console.log(results);
       sendResponse(results);
     }).catch(function (err){
       sendResponse({err:err});

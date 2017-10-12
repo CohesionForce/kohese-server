@@ -4,22 +4,21 @@
 import SocketIOFileClient from 'socket.io-file-client';
 const Path = require("path");
 
-function ImportService(KoheseIO, toastr) {  
+function ImportService(KoheseIO, toastr, $rootScope) {  
 
     const ctrl = this;
 
     var uploader = new SocketIOFileClient(KoheseIO.socket);
     var parent;
-    var intermediate;
     var uploadListLength = 0;
     var importedItems = [];
 
-    ctrl.importFile = function(fileInfo, parentItem, intermediateDirectories) {
+    ctrl.importFile = function(fileInfo, parentItem) {
         console.log(fileInfo);
+        importedItems = []
         // Save length of list so we can track when the import is complete
         uploadListLength = fileInfo.length;
         parent = parentItem;
-        intermediate = intermediateDirectories;
         uploader.upload(fileInfo);
     }
 
@@ -33,25 +32,25 @@ function ImportService(KoheseIO, toastr) {
         {
         var data =  {         
             file: fileInfo.name,
-            parentItem: parent,
-            intermediateDirectories: intermediate
+            parentItem: parent
             }
         console.log('Upload Complete', fileInfo);
         KoheseIO.socket.emit('ImportDocuments', data,   
             function (results) {
                 
                 if (results.error) {
-                    toastr.error('Import Failed.', 'Document Import');            
+                    toastr.error('Import Failed.', results.error);            
                 } 
                 else 
                     {
-                    console.log(fileInfo);
-                    importedItems.push(fileInfo);
-                    if (importedItems.length === uploadListLength) 
+                    console.log(results);
+                    for (var i = 0; i < results.length; i++)
+                        importedItems.push(results[i]);
+                    if (importedItems.length >= uploadListLength) 
                         {
-                        console.log("::: Success importing " + fileInfo.name + ".");
+                        console.log("::: Success importing " + results + ".");
                         console.log(importedItems);
-                        importedItems = [];
+                        $rootScope.$broadcast('Import Complete', importedItems)
                         }
                 }
             });
