@@ -17,7 +17,6 @@ function ImportItemController(Upload, tabService, ImportService, $stateParams,
     }
 
     $scope.$on("Import Complete", function(event, data) {
-        console.log(data);
         ctrl.importedItems = data;
         ctrl.importComplete = true;
         
@@ -31,8 +30,6 @@ function ImportItemController(Upload, tabService, ImportService, $stateParams,
     };
 
     ctrl.submit = function () {
-        console.log(this);
-        console.log(this.files);
         ctrl.importComplete = false;
         ImportService.importFile(ctrl.files, ctrl.parentId);
     }

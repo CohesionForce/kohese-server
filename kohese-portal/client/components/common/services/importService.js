@@ -14,7 +14,6 @@ function ImportService(KoheseIO, toastr, $rootScope) {
     var importedItems = [];
 
     ctrl.importFile = function(fileInfo, parentItem) {
-        console.log(fileInfo);
         importedItems = []
         // Save length of list so we can track when the import is complete
         uploadListLength = fileInfo.length;
@@ -34,7 +33,6 @@ function ImportService(KoheseIO, toastr, $rootScope) {
             file: fileInfo.name,
             parentItem: parent
             }
-        console.log('Upload Complete', fileInfo);
         KoheseIO.socket.emit('ImportDocuments', data,   
             function (results) {
                 
@@ -48,8 +46,8 @@ function ImportService(KoheseIO, toastr, $rootScope) {
                         importedItems.push(results[i]);
                     if (importedItems.length >= uploadListLength) 
                         {
+                        toastr.success('Import Succeeded', "Document Import")
                         console.log("::: Success importing " + results + ".");
-                        console.log(importedItems);
                         $rootScope.$broadcast('Import Complete', importedItems)
                         }
                 }
@@ -64,6 +62,6 @@ function ImportService(KoheseIO, toastr, $rootScope) {
 }
 
 export default () => {
-    angular.module('app.services.importservice', [])
+    angular.module('app.services.importservice', ['app.factories.koheseio'])
         .service("ImportService", ImportService);
 }

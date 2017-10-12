@@ -128,8 +128,6 @@ function process(file, parent, addedIds) {
       parentId: parent
       }, {}, function () {
     });
-    console.log("Pushing item");
-    console.log(fileobj);
     addedIds.push(fileObj.id);
     var files = fs.readdirSync(file);
     for (var i = 0; i < files.length; i++) {
@@ -145,11 +143,7 @@ function process(file, parent, addedIds) {
         itemIds: []
       };
       var added = mdToKohese(processedFile.outputPath, mdRoot);
-      console.log("Added");
-      console.log(added);
       for (var j = 0; j < added.length; j++) {
-        console.log("Pushing item");
-        console.log(added[j]);
         addedIds.push(added[j]);
       }
     }

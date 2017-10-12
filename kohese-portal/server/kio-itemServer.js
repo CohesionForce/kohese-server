@@ -275,22 +275,14 @@ global.app.on('newSession', function (socket) {
   });
   
   socket.on("ImportDocuments", function (request, sendResponse) {
-    console.log("!!!!!!!!!!!!!IMPORTDOC");
-    console.log(request);
     new Promise(function (resolve, reject) {
       var absolutes = [];
-      console.log("Promise");
       var root = Path.dirname(fs.realpathSync(__dirname));
       root = Path.join(root, "data_import", socket.koheseUser.username)
       absolutes.push(Path.join(root, request.file));
-      console.log(absolutes);
       var results = importer.importFiles(absolutes, request.parentItem);
-      console.log(results);
-
       resolve(results);
     }).then(function (results) {
-      console.log("Callback");
-      console.log(results);
       sendResponse(results);
     }).catch(function (err){
       sendResponse({err:err});
