@@ -1,14 +1,15 @@
 <div class="panel">
     <div class="panel-heading">Create Item
         <span class="pull-right item-actions">
-        <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
-           ui-sref="kohese.explore.edit({id:detailsCtrl.itemProxy.item.id})"
-           ng-click="detailsCtrl.updateTab('edit', itemProxy.item.id, 'dualview')">
-        </i>
-        <i class="fa fa-lg fa-arrows-alt" ng-if="detailsCtrl.tab.type === 'dualview'"
-           ui-sref="kohese.investigate({id:detailsCtrl.itemProxy.item.id})"
-           ng-click="detailsCtrl.updateTab('investigate', itemProxy.item.id, 'singleview')"></i>
-            </span>
+            <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
+            ng-click="detailsCtrl.navigate('kohese.explore.edit', 
+                                            {id: detailsCtrl.itemProxy.item.id})">
+            </i>
+            <i class="fa fa-lg fa-arrows-alt" ng-if="detailsCtrl.tab.type === 'dualview'"
+            ng-click="detailsCtrl.navigate('kohese.investigate', 
+                                            {id: detailsCtrl.itemProxy.item.id})">
+            </i>
+        </span>
     </div>
     <tabset>
         <tab>
@@ -47,7 +48,7 @@
             <ng-include src="'components/common/templates/task-form.html'"></ng-include>
         </tab>
     </tabset>
-    <div class="form-actions">
+    <div class="form-actions create-controls">
         <button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit"
                 class="btn btn-primary">
             Edit

@@ -5,11 +5,11 @@
 function DashboardController(UserService, $scope, $rootScope, tabService, ItemRepository) {
     const ctrl = this;
     var currentTab = tabService.getCurrentTab();
-    var controllerRestored = tabService.restoreControllerData(currentTab, 'dashboardCtrl', this);
+    var controllerRestored = tabService.restoreControllerData(currentTab.id, 'dashboardCtrl', this);
 
     if (!controllerRestored) {
         ctrl.itemList = ItemRepository.getAllItemProxies();
-        ctrl.currentUser = UserService.getCurrentUser();
+        ctrl.currentUser = UserService.getCurrentUsername();
         ctrl.acceptedFilter = {
             item: {
                 actionState: 'Accepted',
@@ -70,12 +70,13 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
     }
 
 
-    ctrl.navigate = function (state, params, type) {
+    ctrl.navigate = function (state, params) {
+        console.log(state);
+        console.log(params);
         $rootScope.$broadcast('navigationEvent',
             {
                 state: state,
-                params: params,
-                type: type
+                params: params
             });
     };
 
@@ -87,6 +88,10 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
     $scope.$on('tabSelected', function () {
         tabService.bundleController(ctrl, 'dashboardCtrl', currentTab.id)
     });
+
+    $scope.$on('userLoaded', function () {
+        ctrl.currentUser = UserService.getCurrentUsername();
+      });
 
 
 }

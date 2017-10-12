@@ -3,7 +3,7 @@
  */
 
 function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
-                        $scope, $location, $stateParams, SearchService, tabService) {
+                        $scope, $location, $stateParams, SearchService, tabService, VersionControlService) {
 
     var treeCtrl = this,
         syncListener;
@@ -29,6 +29,14 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         treeCtrl.treeRoot = ItemRepository.getRootProxy();
         treeCtrl.absoluteRoot = ItemRepository.getRootProxy();
         treeCtrl.selectedItemProxy = {};
+        treeCtrl.versionControlEnabled = false; 
+        treeCtrl.stagedItems = [];
+
+        // NEW View Control
+        treeCtrl.viewList = ["Default","Advanced Filter","Version Control"]; // TO-DO : Probably want to get this from somewhere else so 
+                                                                              // view types can be pulled based on version of Kohese
+        treeCtrl.viewType = "Default";
+        
     } else {
         console.log("Root Check!");
         console.log(treeCtrl);
@@ -216,8 +224,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         return (treeCtrl.matchesFilter(proxy) || treeCtrl.childMatchesFilter(proxy));
     }
 
-    treeCtrl.tab.setTitle('Explore');
-
     $scope.$on('tabSelected', function () {
         tabService.bundleController(treeCtrl, 'treeCtrl', treeCtrl.tab.id)
     });
@@ -298,6 +304,8 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
       }
     };
 
+
+/******** List expansion functions */
     treeCtrl.expandAll = function () {
         treeCtrl.allExpanded = true;
         for (var key in treeCtrl.collapsed) {
@@ -345,19 +353,154 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
       }
     };
 
-    treeCtrl.navigate = function (state, type, id) {
-      treeCtrl.tab.state = state;
-      treeCtrl.tab.type = type || 'dualview';
-      treeCtrl.tab.params.id = id;
-      $state.go(state, {id: id})
+    /****** End list expansion functions */
+
+    treeCtrl.navigate = function (state, params) {
+      treeCtrl.tab.setState(state, params);
+      $state.go(state, params)
     };
 
     treeCtrl.createChildOfSelectedItem = function () {
       $state.go('kohese.explore.create', {parentId: treeCtrl.selectedItemProxy.item.id})
     };
+
+    /****** Version Control View Functions */
+
+    /* Called when the user changes views of the tree */
+    treeCtrl.onViewTypeChanged = function()
+    {
+        console.log(treeCtrl.viewType);
+        switch (treeCtrl.viewType)
+            {
+            case "Version Control":
+                treeCtrl.filter.status = true;
+                treeCtrl.filter.dirty = false;
+                treeCtrl.versionControlEnabled = true;
+                treeCtrl.selectedVersionControlNodes = new Set();
+                treeCtrl.expandFiltered()
+                console.log(treeCtrl.filter);
+                break;
+            default : 
+                treeCtrl.filter.status = false;
+                treeCtrl.filter.dirty = false;
+                treeCtrl.versionControlEnabled = false;
+                console.log(treeCtrl.filter);
+            }
+            
+    }
+
+    // Called when the version control view is selected
+    treeCtrl.applyVersionControlTags = function (proxy)
+    {
+        if (proxy.status)
+        {
+            console.log(proxy.item.id);
+            console.log(proxy.status);
+            // Define the statusflags object on the proxy
+            proxy.statusFlags = 
+            {
+                WTModified: false,
+                NewItem: false,
+                IndexModified: false
+            }
+
+            // Set flags for the returned statuses
+            for (var i = 0; i < proxy.status.length; i++ )
+            {
+                status = proxy.status[i];
+                switch (status)
+                {
+                    case ("WT_MODIFIED"):
+                        proxy.statusFlags.WTModified= true;
+                        break;
+                    case ("WT_NEW"):
+                        proxy.statusFlags.newItem = true;
+                        break;
+                    case ("INDEX_MODIFIED"):
+                        proxy.statusFlags.IndexModified = true;
+                        break;
+                    case ("INDEX_NEW"):
+                        proxy.statusFlags.IndexNew = true;
+                        break;
+                    default:
+                        console.log ("VC Status uncaught")
+                        console.log (status);
+                }      
+            }
+        }
+    }
+
+    treeCtrl.onVersionControlStageChange = function(proxy)
+    {
+        
+        console.log("Version Control Stage Change");
+        if (proxy.selected)
+        {
+            treeCtrl.selectedVersionControlNodes.add(proxy);
+        } else {
+            treeCtrl.selectedVersionControlNodes.delete(proxy);
+        }
+
+        console.log(treeCtrl.selectedVersionControlNodes)
+    }
+
+    treeCtrl.stageItems = function()
+        { 
+        VersionControlService.stageItems(treeCtrl.selectedVersionControlNodes);
+        console.log("Stage Items");
+        }
+
+    // treeCtrl.openCommitModal = function()
+    //     {
+    //         Popeye.openModal({
+    //             templateUrl: "components/tree/modals/commitmodal.html",
+    //             $scope: {
+    //                 treeCtrl: "="
+    //             }            
+    //         })
+    //     }
+    
+    treeCtrl.commit = function()
+        {
+        if (!treeCtrl.commitMessage)
+            treeCtrl.commitMessage = "No Message Entered"
+
+            console.log(treeCtrl.selectedVersionControlNodes);
+
+        // Need to grab all of the indexed nodes
+        VersionControlService.commitItems(treeCtrl.selectedVersionControlNodes,
+                                          treeCtrl.commitMessage);
+        }
+
+    // treeCtrl.openPushModal = function()
+    // {
+    //     Popeye.openModal({
+    //         templateUrl: "components/tree/modals/pushmodal.html",
+    //         controller: "PushModalControl as modalCtrl",
+    //     })
+    // }
+
+    treeCtrl.addRemote = function(){
+        VersionControlService.addRemote([treeCtrl.treeRoot.children[0].item.id], "test-repo", 
+        "git@matrix:home/jephillips/kohese-server/kohese-portal");
+    }
+
+    treeCtrl.getRemotes = function(){
+        VersionControlService.getRemotes(treeCtrl.treeRoot.children[0].item.id);
+    }
+
+    treeCtrl.push = function() 
+    {
+        var proxyIds = []
+        proxyIds.push(treeCtrl.treeRoot.children[0].item.id)
+        VersionControlService.push(proxyIds, "test-kdb");
+    }
+
+    /****** End Version Control View Functions */
+
 }
 
 export default () => {
-    angular.module('app.tree', ['app.services.tabservice'])
+    angular.module('app.tree', ['app.services.tabservice', 'app.services.versioncontrolservice'])
         .controller('KTreeController', KTreeController);
 }

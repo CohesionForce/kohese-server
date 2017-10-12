@@ -3,13 +3,14 @@ var kdb = require("./kdb.js");
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
+const importer = require("./directory-ingest.js");
 
 
 console.log("::: Initializing KIO Item Server");
 
-kio.server.on('connection', function (socket) {
+global.app.on('newSession', function (socket) {
 
-  console.log('>>> KIO Item Server: session %s connected from %s', socket.id, socket.handshake.address);
+  console.log('>>> KIO Item Server: session %s connected from %s for %s', socket.id, socket.handshake.address, socket.koheseUser.username);
   
   //////////////////////////////////////////////////////////////////////////
   //
@@ -203,25 +204,12 @@ kio.server.on('connection', function (socket) {
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
-    kdb.kdbRepo.add(proxies).then(function (results) {
-      var promises = [];
-      for (var i = 0; i < proxies.length; i++) {
-        promises.push(kdb.kdbRepo.getItemStatus(proxies[i]));
-      }
-      
-      Promise.all(promises).then(function (statuses) {
-        var idStatusMap = [];
-        for (var i = 0; i < results.length; i++) {
-          idStatusMap[idsArray[i]] = {
-              addStatus: results[i],
-              status: statuses[i]
-          };
-        }
-        
-        sendResponse(idStatusMap);
-      });
+    
+    kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
+      sendResponse(addStatusMap);
+      sendStatusUpdates(proxies);
     }).catch(function (err) {
       sendResponse({
         error: err
@@ -233,17 +221,79 @@ kio.server.on('connection', function (socket) {
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
-//    kdb.kdbRepo.commit(proxies, userName, eMail, message);
+    
+    kdb.kdbRepo.commit(proxies, request.username, request.email, 
+      request.message).then(function (commitIdMap) {
+        sendResponse(commitIdMap);
+        sendStatusUpdates(proxies);
+    }).catch(function (err) {
+      sendResponse({
+        error: err
+      });
+    });
   });
 
   socket.on("VersionControl/push", function (request, sendResponse) {
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      proxies.push(ItemProxy.getProxyFor(idsArray[i]));
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
-//    kdb.kdbRepo.push(proxies, remoteName, userName);
+    
+    kdb.kdbRepo.push(proxies, request.remoteName, request.username).then(function (pushStatusMap) {
+      sendResponse(pushStatusMap);
+    }).catch(function (err) {
+      sendResponse({
+        error: err
+      });
+    });
   });
+  
+  socket.on("VersionControl/addRemote", function (request, sendResponse) {
+    kdb.kdbRepo.addRemote(kdb.ItemProxy.getProxyFor(request.proxyId),
+        request.remoteName, request.url).then(function (remoteName) {
+      sendResponse(remoteName);
+    }).catch(function (err) {
+      sendResponse({
+        error: err
+      });
+    });
+  });
+  
+  socket.on("VersionControl/getRemotes", function (request, sendResponse) {
+    kdb.kdbRepo.getRemotes(kdb.ItemProxy.getProxyFor(request.proxyId))
+        .then(function (remoteNames) {
+      sendResponse(remoteNames);
+    }).catch(function (err) {
+      sendResponse({
+        error: err
+      });
+    });
+  });
+  
+  socket.on("ImportDocuments", function (request, sendResponse) {
+    new Promise(function (resolve, reject) {
+      importer.importFiles(request.files, request.parentItem, request.intermediateDirectories);
+      resolve(sendResponse());
+    });
+  });
+
 });
+
+function sendStatusUpdates(proxies) {
+  var promises = [];
+  for (var i = 0; i < proxies.length; i++) {
+    promises.push(kdb.kdbRepo.getItemStatus(proxies[i]));
+  }
+  
+  Promise.all(promises).then(function (statuses) {
+    var statusMap = {};
+    for (var i = 0; i < statuses.length; i++) {
+      statusMap[proxies[i].item.id] = statuses[i];
+    }
+    
+    kio.server.emit("VersionControl/statusUpdated", statusMap);
+  });
+}

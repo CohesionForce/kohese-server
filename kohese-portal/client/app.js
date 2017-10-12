@@ -6,11 +6,14 @@ const appModule = angular.module('app', [
     'app.contentcontainer',
     'app.detailsview',
     'app.tree',
+    //'app.tree.modalcontrollers', offline while we figure out modals
     'app.admin',
     'app.login',
     'app.navigationmenu',
     'app.search',
     'app.dashboard',
+    'app.create',
+    'app.create.import',
     'app.services.itemservice',
     'app.services.decisionservice',
     'app.services.actionservice',
@@ -18,11 +21,14 @@ const appModule = angular.module('app', [
     'app.services.issueservice',
     'app.services.observationservice',
     'app.services.userservice',
+    'app.services.sessionservice',
     'app.services.tabservice',
     'app.services.authentication',
     'app.services.analysisservice',
     'app.services.searchservice',
     'app.services.navigationservice',
+    'app.services.versioncontrolservice',
+    'app.factories.koheseio',
     'app.directives.navigation',
     'app.directives.treerow',
     require('angular-ui-router'),
@@ -37,7 +43,8 @@ const appModule = angular.module('app', [
     'ui.tree',
     'monospaced.elastic',
     'shagstrom.angular-split-pane',
-    'simplemde'
+    'simplemde',
+    'ngFileUpload'
 ]);
 
 
@@ -88,6 +95,25 @@ appModule
                 url: '/create/{parentId}',
                 views: {
                     'right@kohese': {
+                        templateUrl: '/components/create/createWizard.html',
+                        controller: 'CreateWizardController as createCtrl'
+                    }
+                }
+            })
+            .state('kohese.explore.create.import', {
+                url: 'import/{parentId}',
+                views: {
+                    'right@kohese': {
+                        templateUrl: '/components/create/import/import.html',
+                        controller: "ImportItemController as importCtrl"
+                    }
+                }
+
+            })
+            .state('kohese.explore.create.new', {
+                url: 'new/{parentId}',
+                views: {
+                    'right@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -95,8 +121,18 @@ appModule
             })
             .state('kohese.create', {
                 url: '/create/{parentId}',
+                templateUrl: '/components/create/createWizard.html',
+                controller: 'CreateWizardController as createCtrl'
+            })
+            .state('/kohese.import', {
+                url: 'import/{parentId}',
+                templateUrl: '/components/create/import/import.html',
+                controller: 'ImportController as importCtrl'
+            })
+            .state('/kohese.new', {
+                url: 'new/{parentId}',
                 templateUrl: '/components/detailsview/subviews/createitem.html',
-                controller: 'DetailsViewController as detailsCtrl'
+                controller: "DetailsViewController as detailsCtrl"
             })
             .state('kohese.search', {
                 url: '/search/{filter}',
@@ -124,8 +160,8 @@ appModule
                 url:'/create/{parentId}',
                 views: {
                     'right@kohese': {
-                        templateUrl: '/components/detailsview/subviews/createitem.html',
-                        controller: 'DetailsViewController as detailsCtrl'
+                        templateUrl: '/components/create/createwizard.html',
+                        controller: 'CreateWizardController as createCtrl'
                     }
                 }
             })
@@ -191,72 +227,3 @@ appModule
             }
         }
     })
-    .factory('KoheseIO', function ($rootScope, socketFactory, AuthTokenFactory) {
-
-      var socket, ioSocket, isAuthenticated,
-      self = {
-          isInitialized: isInitialized,
-          isAuthenticated: isAuthenticated
-      };
-      
-      var isInitialized = false;
-      
-      // by default the socket property is null and is not authenticated
-      self.socket = socket;
-      
-      // initializer function to connect the socket for the first time after logging in to the app
-      self.initialize = function(){
-        console.log("+++ Initializing KoheseIO");
-
-        isAuthenticated = false;
-        isInitialized = true;
-
-        //call btford angular-socket-io library factory to connect to server at this point
-        self.socket = socket = socketFactory({
-          ioSocket: ioSocket
-        });
-
-        //---------------------
-        //these listeners will only be applied once when socket.initialize is called
-        //they will be triggered each time the socket connects/re-connects (e.g. when logging out and logging in again)
-        //----------------------
-        socket.on('authenticated', function () {
-          isAuthenticated = true;
-          console.log('::: KoheseIO is authenticated');
-          $rootScope.$broadcast('KoheseIOAuthenticated');
-        });
-        //---------------------
-        socket.on('connect', function () {
-          //send the jwt
-          console.log('::: KoheseIO is connected')
-          socket.emit('authenticate', {token: AuthTokenFactory.getToken()});
-        });
-        socket.on('disconnect', function () {
-          console.log('::: KoheseIO is disconnected')
-          isAuthenticated = false;
-        });
-      };
-      
-      self.connect = function() {
-        if (isInitialized){
-          console.log("+++ Connecting KoheseIO");
-          self.socket.connect();
-        } else {
-          self.initialize();
-        }
-      };
-      
-      self.disconnect = function() {
-        console.log("--- Disconnecting KoheseIO");
-        if (isInitialized){
-          self.socket.disconnect();
-          isAuthenticated = false;
-        }        
-      };
-      
-      if (AuthTokenFactory.getToken()){
-        self.initialize();
-      }
-
-      return self;
-    });

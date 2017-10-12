@@ -4,16 +4,15 @@
 
 function AppBarController($rootScope, UserService, LoginService, $state, jwtHelper, AuthTokenFactory) {
     var ctrl = this;
-    ctrl.userName = {};
+    ctrl.userName = "";
     checkAuthentication();
-    ctrl.userName = UserService.getCurrentUser();
+    ctrl.userName = UserService.getCurrentUsername();
 
-    ctrl.navigate = function (state, params, type) {
+    ctrl.navigate = function (state, params) {
         $rootScope.$broadcast('navigationEvent',
             {
                 state: state,
-                params: params,
-                type: type
+                params: params
             });
     };
 
@@ -26,6 +25,12 @@ function AppBarController($rootScope, UserService, LoginService, $state, jwtHelp
     $rootScope.$on('userLoggedIn', function() {
       checkAuthentication();
     });
+
+    $rootScope.$on('userLoaded', function () {
+      ctrl.userName = UserService.getCurrentUsername();
+    });
+
+    
 
     function checkAuthentication() {
         ctrl.userLoggedIn = LoginService.checkLoginStatus();

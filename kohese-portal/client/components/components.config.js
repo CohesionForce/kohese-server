@@ -6,6 +6,7 @@
 
 export default () => {
     //Component Modules
+    //require('./tree/modals/modalcontrollers')(); offline for now
     require('./tree/tree')();
     require('./detailsview/detailsview')();
     require('./contentcontainer/contentcontainer')();
@@ -14,6 +15,7 @@ export default () => {
     require('./search/search')();
     require('./admin/admin')();
     require('./dashboard/dashboard')();
+    require('./create/createWizard')();
 
     //Common
 
