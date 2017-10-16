@@ -8,7 +8,6 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
 
     $scope.$on('navigationEvent', function onNavigationEvent(event, data) {
         let newTab = createTab(data.state, data.params);
-        console.log(newTab);
         containerCtrl.setTab(newTab);
         $state.go(newTab.state, newTab.params);
     });
@@ -37,7 +36,6 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
 
     function createTab(state, params) {
         var newTab = tabService.createTab(state, params);
-        console.log(newTab);
         newTab.position = containerCtrl.tabs.length;
         tabService.setCurrentTab(newTab);
         containerCtrl.tabs.push(newTab);

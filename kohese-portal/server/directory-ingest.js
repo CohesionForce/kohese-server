@@ -12,20 +12,16 @@ var mdToKohese = require('./md-to-kohese.js');
 
 var rootId;
 var basePath;
-var tempDir = '/tmp-' + Math.floor((Math.random() * 10000) + 1);
 var tempDirPath;
 
-function importFiles(files, parent, rootName) {
+function importFiles(files, parentId) {
   if (0 === files.length) {
     return;
   }
   
   basePath = Path.parse(files[0]).dir;
+  var tempDir = "tmp-" + Math.floor((Math.random() * 10000) + 1);
   tempDirPath = Path.join(basePath,tempDir);
-  
-  if (!rootName) {
-    rootName = basePath;
-  }
 
   try {
     fs.mkdirSync(tempDirPath);
@@ -34,20 +30,16 @@ function importFiles(files, parent, rootName) {
     console.log(err);
   }
 
-  var dirCount = 0;
-  var dir = global.app.models["Item"].upsert({
-      name: rootName,
-      parentId: parent
-    }, {}, function () {
-  });
-  
+  var addedIds = [];
   for (var i = 0; i < files.length; i++) {
-    process(files[i], dir);
+    process(files[i], parentId, addedIds);
   }
 
   console.log('All operations are completed. Now cleaning up...');
   deleteFile(tempDirPath);
   console.log('Clean up done!');
+  
+  return addedIds;
 }
 module.exports.importFiles = importFiles;
 
@@ -70,13 +62,16 @@ function processToMarkdown(filePath, basePath) {
   case '.doc':
     // doc processing
     console.log('::: Processing doc to odt to md');
-    var soffice = child.spawnSync('soffice', ['--headless', '--convert-to', 'odt', pathDirBase, '--outdir', Path.join(basePath, tempDir, path.dir) ], { cwd: basePath, encoding : 'utf8' });
+    var soffice = child.spawnSync('soffice', ['--headless', '--convert-to', 'odt', pathDirBase, '--outdir', Path.join(tempDirPath, path.dir) ], { cwd: basePath, encoding : 'utf8' });
     if(soffice.stdout) {
       console.log(soffice.stdout);
     }
-    var pandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', "commonmark", '--atx-headers', Path.join(basePath, tempPathDirName, '.odt'), '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    var pandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', "commonmark", '--atx-headers', (tempPathDirName + '.odt'), '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
     if(pandoc.stdout) {
       console.log(pandoc.stdout);
+    }
+    if(pandoc.stderr) {
+      console.log(pandoc.stderr);
     }
     break;
   case '.odt':
@@ -122,27 +117,35 @@ function processToMarkdown(filePath, basePath) {
   };
 }
 
-function process(file, parent) {
+function process(file, parent, addedIds) {
   var fileStat = fs.lstatSync(file);
-  var tmpPath = tempDirPath + '/' + splitPath(file, basePath);
+  var tmpPath = tempDirPath + Path.sep + splitPath(file, basePath);
   
   if (fileStat.isDirectory()) {
     fs.mkdirSync(tmpPath);
     var fileObj = global.app.models["Item"].upsert({
       name: Path.basename(tmpPath),
-      parentId: parent.id
+      parentId: parent
       }, {}, function () {
     });
+    addedIds.push(fileObj.id);
     var files = fs.readdirSync(file);
     for (var i = 0; i < files.length; i++) {
-      process(Path.join(file, files[i]), fileObj);
+      process(Path.join(file, files[i]), fileObj.id, addedIds);
     }
   } else if (fileStat.isFile()) {
     var processedFile = processToMarkdown(file, basePath);
     if (processedFile.wasProcessed && fs.existsSync(processedFile.outputPath)) {
       console.log("Processing " + processedFile.outputPath + "...");
-      var mdRoot = {name: Path.basename(processedFile.outputPath), parentId: parent.id, itemIds: []};
-      mdToKohese(processedFile.outputPath, mdRoot);
+      var mdRoot = {
+        name: Path.basename(processedFile.outputPath),
+        parentId: parent,
+        itemIds: []
+      };
+      var added = mdToKohese(processedFile.outputPath, mdRoot);
+      for (var j = 0; j < added.length; j++) {
+        addedIds.push(added[j]);
+      }
     }
   } else {
     console.log('!!! Warning: ' + file + ' is not a file or directory.');

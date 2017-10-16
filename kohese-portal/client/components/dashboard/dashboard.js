@@ -71,8 +71,6 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
 
 
     ctrl.navigate = function (state, params) {
-        console.log(state);
-        console.log(params);
         $rootScope.$broadcast('navigationEvent',
             {
                 state: state,

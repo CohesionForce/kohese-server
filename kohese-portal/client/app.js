@@ -28,6 +28,7 @@ const appModule = angular.module('app', [
     'app.services.searchservice',
     'app.services.navigationservice',
     'app.services.versioncontrolservice',
+    'app.services.importservice',
     'app.factories.koheseio',
     'app.directives.navigation',
     'app.directives.treerow',
@@ -112,7 +113,7 @@ appModule
 
             })
             .state('kohese.explore.create.new', {
-                url: 'new/{parentId}',
+                url: 'new/{type}/{parentId}',
                 views: {
                     'right@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',
@@ -131,7 +132,7 @@ appModule
                 controller: 'ImportController as importCtrl'
             })
             .state('/kohese.new', {
-                url: 'new/{parentId}',
+                url: 'new/{type}{parentId}',
                 templateUrl: '/components/detailsview/subviews/createitem.html',
                 controller: "DetailsViewController as detailsCtrl"
             })

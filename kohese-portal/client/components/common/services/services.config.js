@@ -19,4 +19,5 @@ export default() => {
     require('./search-service')();
     require('./versionControlService')();
     require('./kohese-io')();
+    require('./importService')();
 }

@@ -33,6 +33,10 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             detailsCtrl.itemProxy.item = {};
             detailsCtrl.itemProxy.kind = "Item";
         }
+        if (angular.isDefined($stateParams.type)) {
+            detailsCtrl.itemProxy.kind = $stateParams.type;
+            initializeItemStates(detailsCtrl.itemProxy.kind);
+        }
         detailsCtrl.updateParentProxy();
         detailsCtrl.tab = tabService.getCurrentTab();
         detailsCtrl.tab.route = $stateParams.id; // Likely duplicated logic, can probably refactor this to use tab param object
@@ -319,8 +323,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
     // Currently this won't handle navigation with parentId it seems
     detailsCtrl.updateTab = function (state, id) {
         var data = (id) ? {id:id} : {};
-        console.log(state);
-        console.log(id);
         detailsCtrl.tab.setState(state, data);
         detailsCtrl.navigate(state, {id:id})
     };

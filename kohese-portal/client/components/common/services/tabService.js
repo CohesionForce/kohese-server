@@ -12,7 +12,6 @@ function TabService($state, $rootScope) {
     tService.currentTab = {};
 
     tService.stateDefinitions = require('./tab-service/tab-state-info.json');
-    console.log(tService.stateDefinitions);
 
     //
     // Tab Book-keeping
@@ -27,7 +26,6 @@ function TabService($state, $rootScope) {
     };
 
     tService.setCurrentTab = function (tab) {
-        //console.log("Tab set");
         tService.currentTab = tab;
     };
 
@@ -40,12 +38,7 @@ function TabService($state, $rootScope) {
         var id = tService.tabCount;
         tService.tabCount++;
 
-        console.log(state);
-        console.log(params);
-        console.log(id);
-
         var tab = Tab(state,params, id);
-        console.log(tab);
         return tab;
     }
 
@@ -102,7 +95,6 @@ function TabService($state, $rootScope) {
         }
         currentBundle.currentState = $state.current.name;
         tService.bundler[tService.getCurrentTab().id] = currentBundle;
-        console.log(tService.bundler);
     });
 
     function Bundle() {
