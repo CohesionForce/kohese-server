@@ -25,7 +25,8 @@ function mdToKohese(filePath, rootItem) {
   var walker = parsed.walker();
 
   var item = global.app.models["Item"].upsert(rootItem, {}, function () {});
-  var addedIds = [item.id];
+  var addedIds = [{id:item.id,
+                   name: item.name}];
   var lineage = [item.id];
   
   var tmpIdCounter = 0;
@@ -57,7 +58,8 @@ function mdToKohese(filePath, rootItem) {
         if (!koheseItem.tmpId) {
           item = global.app.models["Item"].upsert(koheseItem, {},
               function () {});
-          addedIds.push(item.id);
+          addedIds.push({id:item.id,
+                         name: item.name});
           readyToUpsert = false;
         } else {
           for (var i = 0; i < lineage.length; i++) {
@@ -65,7 +67,8 @@ function mdToKohese(filePath, rootItem) {
               delete koheseItem.tmpId;
               item = global.app.models["Item"].upsert(koheseItem, {},
                   function () {});
-              addedIds.push(item.id);
+              addedIds.push({id:item.id,
+                             name: item.name});
               lineage[i] = item.id;
               readyToUpsert = false;
               break;
@@ -114,7 +117,8 @@ function mdToKohese(filePath, rootItem) {
         if (!koheseItem.tmpId) {
           item = global.app.models["Item"].upsert(koheseItem, {},
               function () {});
-          addedIds.push(item.id);
+          addedIds.push({id:item.id,
+                         name: item.name});
           readyToUpsert = false;
         } else {
           for (var i = 0; i < lineage.length; i++) {
@@ -122,7 +126,8 @@ function mdToKohese(filePath, rootItem) {
               delete koheseItem.tmpId;
               item = global.app.models["Item"].upsert(koheseItem, {},
                   function () {});
-              addedIds.push(item.id);
+              addedIds.push({id:item.id,
+                             name: item.name});
               lineage[i] = item.id;
               readyToUpsert = false;
               break;
