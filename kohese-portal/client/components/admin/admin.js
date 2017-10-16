@@ -62,9 +62,9 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
         ctrl.addUserForm = true;
 
         // TODO This will need to move to new KoheseUser in the future
-        ctrl.selectedUser = {};
-        ctrl.selectedUser.item = { parentId: UserService.getUsersItemId() };
-        ctrl.selectedUser.kind = "KoheseUser";
+        ctrl.selectedUserProxy = {};
+        ctrl.selectedUserProxy.item = { parentId: UserService.getUsersItemId() };
+        ctrl.selectedUserProxy.kind = "KoheseUser";
     };
 
     ctrl.cancelForm = function () {
