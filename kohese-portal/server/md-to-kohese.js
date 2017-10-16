@@ -31,6 +31,8 @@ function mdToKohese(filePath, rootItem) {
   var tmpIdCounter = 0;
   var koheseItem;
   var readyToUpsert = false;
+  var itemMap = {};
+  itemMap[item.id] = item;
 
   var render = renderFunc();
   var event;
@@ -53,27 +55,9 @@ function mdToKohese(filePath, rootItem) {
     if(event.entering && event.node.type === 'heading') {
       // Entering a new header, check if an item is ready to be pushed
       if(readyToUpsert) {
-        koheseItem.description = render.getBuffer();
-        if (!koheseItem.tmpId) {
-          item = global.app.models["Item"].upsert(koheseItem, {},
-              function () {});
-          addedIds.push(item.id);
-          readyToUpsert = false;
-        } else {
-          for (var i = 0; i < lineage.length; i++) {
-            if (lineage[i] === koheseItem.tmpId) {
-              delete koheseItem.tmpId;
-              item = global.app.models["Item"].upsert(koheseItem, {},
-                  function () {});
-              addedIds.push(item.id);
-              lineage[i] = item.id;
-              readyToUpsert = false;
-              break;
-            }
-          }
-        }
+        upsert(koheseItem, render, addedIds, lineage, itemMap);
+        readyToUpsert = false;
       }
-
       
       // Handle increasing jumps in level that are greater than one
       var parent = undefined;
@@ -110,25 +94,8 @@ function mdToKohese(filePath, rootItem) {
     } else if(!event.entering && event.node.type === 'document') {
       // Push a straggling kohese item
       if(readyToUpsert) {
-        koheseItem.description = render.getBuffer();
-        if (!koheseItem.tmpId) {
-          item = global.app.models["Item"].upsert(koheseItem, {},
-              function () {});
-          addedIds.push(item.id);
-          readyToUpsert = false;
-        } else {
-          for (var i = 0; i < lineage.length; i++) {
-            if (lineage[i] === koheseItem.tmpId) {
-              delete koheseItem.tmpId;
-              item = global.app.models["Item"].upsert(koheseItem, {},
-                  function () {});
-              addedIds.push(item.id);
-              lineage[i] = item.id;
-              readyToUpsert = false;
-              break;
-            }
-          }
-        }
+        upsert(koheseItem, render, addedIds, lineage, itemMap);
+        readyToUpsert = false;
       }
     } else if(event.node.type !== 'document' && event.node.type !== 'heading') {
       // Already handling document and heading events
@@ -137,6 +104,44 @@ function mdToKohese(filePath, rootItem) {
     }
   }
   
+  for (var id in itemMap) {
+    if (itemMap[id].itemIds.length > 0) {
+      global.app.models["Item"].upsert(itemMap[id], {}, function () {});
+    }
+  }
+  
   return addedIds;
 }
 module.exports = mdToKohese;
+
+function upsert(koheseItem, render, idList, lineageMap, itemMap) {
+  koheseItem.description = render.getBuffer();
+  var item;
+  if (!koheseItem.tmpId) {
+    item = global.app.models["Item"].upsert(koheseItem, {},
+        function () {});
+    idList.push(item.id);
+    itemMap[item.parentId].itemIds.push(item.id);
+  } else {
+    for (var i = 0; i < lineageMap.length; i++) {
+      if (lineageMap[i] === koheseItem.tmpId) {
+        delete koheseItem.tmpId;
+        item = global.app.models["Item"].upsert(koheseItem, {},
+            function () {});
+        idList.push(item.id);
+        lineageMap[i] = item.id;
+        
+        for (var id in itemMap) {
+          if (JSON.stringify(id) === JSON.stringify(koheseItem.parentId)) {
+            itemMap[id].itemIds.push(item.id);
+            break;
+          }
+        }
+        
+        itemMap[item.id] = item;
+        
+        break;
+      }
+    }
+  }
+}
