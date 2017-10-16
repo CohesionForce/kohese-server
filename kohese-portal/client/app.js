@@ -174,7 +174,8 @@ appModule
             .state('kohese.admin', {
                 url: '/admin',
                 templateUrl: '/components/admin/admin.html',
-                controller: 'AdminController as adminCtrl'
+                controller: 'AdminController as adminCtrl',
+                abstract: true
             })
             .state('kohese.admin.groups', {
                 url: '/groups',
