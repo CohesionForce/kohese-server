@@ -13,15 +13,11 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     });
 
 
-    function createBaseTab() {
-        var currentState = $state.current.name;
-
+    containerCtrl.createBaseTab = function() {
         containerCtrl.baseTab = createTab($state.current.name, $stateParams);
-
     }
 
-
-    createBaseTab();
+    containerCtrl.createBaseTab();
 
 
 //Will need refactoring to account for refreshing the page at some point

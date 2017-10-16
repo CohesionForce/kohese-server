@@ -62,13 +62,21 @@ describe("ContentContainerController Test", function()
         });
     }));
 
+    it("Creates a base tab with starting params", ()=> {
+        controller.tabs.pop()
+        controller.createBaseTab()
+        var tab = controller.tabs[0];
+        expect(tab.params.id).toBe('testID')
+        expect(tab.state).toBe('kohese.explore.edit');
+    })
+
     // Test Container Constructor
     it("Test Construction", function()
     {
         tab = mockTabService.getCurrentTab();
         expect(tab).not.toBeUndefined();
         expect(tab).not.toBeNull();
-        expect(tab.title).toBe('Kohese');
+        expect(tab.title).toBe('Explore');
         expect(tab.state).toBe('kohese.explore.edit');
         expect(tab.params).not.toBeUndefined();
         expect(tab.params).not.toBeNull();
