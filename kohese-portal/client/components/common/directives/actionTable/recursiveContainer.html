@@ -1,0 +1,9 @@
+<span ng-controller="RecursiveContainerController as containerCtrl">
+    Hi I'm a container
+    <actionRow ng-repeat="proxy in containerCtrl.proxies"
+               ng-if="containerCtrl.indention <= 3"
+               proxy="proxy"
+               indention="containerCtrl.indention"
+               fields="containerCtrl.fields">
+</span>
+        

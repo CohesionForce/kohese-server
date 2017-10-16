@@ -256,6 +256,11 @@
 
                 <p><b>This tab is under construction.</b></p>
             </tab>
+            <tab heading="Action Table"
+                 ng-if="detailsCtrl.itemProxy.children">
+
+              <action-table item-proxy="detailsCtrl.itemProxy">
+            </tab>
         </tabset>
     </div>
     <!-- /.panel -->

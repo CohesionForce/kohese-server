@@ -32,6 +32,7 @@ const appModule = angular.module('app', [
     'app.factories.koheseio',
     'app.directives.navigation',
     'app.directives.treerow',
+    'app.directives.actiontable',
     require('angular-ui-router'),
     'angular-jwt',
     'ui.bootstrap',
