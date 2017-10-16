@@ -17,10 +17,10 @@ if(process.argv[2]){
 
 console.log("::: Begin test-kgit for " + forItemId);
 
-function testGetItemStatus(repoInfo){
+function testGetItemStatus(proxy){
   console.log("::: Get Item Status");
 
-  var itemStatus = KDB.kdbRepo.getItemStatus(repoInfo.gitRepo, repoInfo.relativeFilePath);
+  var itemStatus = KDB.kdbRepo.getItemStatus(proxy);
   console.log(itemStatus);  
 }
 
@@ -33,13 +33,6 @@ function testHistory(proxy) {
 }
 
 var proxy = KDB.ItemProxy.getProxyFor(forItemId);
-
-var repoInfo = KDB.kdbRepo.repoRelativePathOf(proxy);
-if(repoInfo){
-  testGetItemStatus(repoInfo);  
-} else {
-  console.log("*** Did not find gitRepo")
-}
 
 var kgitPrompt = {properties: {kgitAns: {
   description: 'Ready to kgit? (Y/N): ',
@@ -57,8 +50,7 @@ prompt.get(kgitPrompt, function(err, result) {
   } else if (result.kgitAns === 'y' || result.kgitAns === 'Y') {
 
     console.log("::: Waiting for prompts");
-    repoInfo = KDB.kdbRepo.repoRelativePathOf(proxy);
-    testGetItemStatus(repoInfo);
+    testGetItemStatus(proxy);
     testHistory(proxy);
   }
 });
