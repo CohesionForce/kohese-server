@@ -32,6 +32,7 @@ const appModule = angular.module('app', [
     'app.factories.koheseio',
     'app.directives.navigation',
     'app.directives.treerow',
+    'app.directives.actiontable',
     require('angular-ui-router'),
     'angular-jwt',
     'ui.bootstrap',
@@ -112,7 +113,7 @@ appModule
 
             })
             .state('kohese.explore.create.new', {
-                url: 'new/{type}{parentId}',
+                url: 'new/{type}/{parentId}',
                 views: {
                     'right@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',

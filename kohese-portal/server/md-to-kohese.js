@@ -25,7 +25,10 @@ function mdToKohese(filePath, rootItem) {
   var walker = parsed.walker();
 
   var item = global.app.models["Item"].upsert(rootItem, {}, function () {});
-  var addedIds = [item.id];
+  var addedIds = [{
+    id: item.id,
+    name: item.name
+  }];
   var lineage = [item.id];
   
   var tmpIdCounter = 0;
@@ -128,7 +131,10 @@ function upsert(koheseItem, render, idList, lineageMap, itemMap) {
         delete koheseItem.tmpId;
         item = global.app.models["Item"].upsert(koheseItem, {},
             function () {});
-        idList.push(item.id);
+        idList.push({
+          id: item.id,
+          name: item.name
+        });
         lineageMap[i] = item.id;
         
         for (var id in itemMap) {
