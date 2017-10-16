@@ -1,0 +1,20 @@
+<div id="import-panel" class="panel">
+    <div class="panel-heading">
+        <span>Import Item</span>
+    </div>
+    <div class="panel-body">
+        <form name="form">
+            <div class="btn btn-default" 
+                 ngf-select ng-model="importCtrl.file"
+                 name="file" 
+                 ngf-pattern=".doc,.docx,.odt'"
+                 ngf-max-size="100MB"> Select</div>
+            <div>File selected : {{importCtrl.file.$ngfName}}</div>
+            <br/>
+            <label for="name-input">Item name: </label>
+            <input type="text" id="name-input" ng-model="importCtrl.nameInput"/>
+            <br/>
+            <button type="submit" class="btn btn-primary" ng-click="importCtrl.submit()">Submit</button>
+        </form>
+    </div>
+</div>

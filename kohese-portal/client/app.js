@@ -12,6 +12,8 @@ const appModule = angular.module('app', [
     'app.navigationmenu',
     'app.search',
     'app.dashboard',
+    'app.create',
+    'app.create.import',
     'app.services.itemservice',
     'app.services.decisionservice',
     'app.services.actionservice',
@@ -29,6 +31,7 @@ const appModule = angular.module('app', [
     'app.factories.koheseio',
     'app.directives.navigation',
     'app.directives.treerow',
+    'app.directives.actiontable',
     require('angular-ui-router'),
     'angular-jwt',
     'ui.bootstrap',
@@ -41,7 +44,8 @@ const appModule = angular.module('app', [
     'ui.tree',
     'monospaced.elastic',
     'shagstrom.angular-split-pane',
-    'simplemde'
+    'simplemde',
+    'ngFileUpload'
 ]);
 
 
@@ -92,6 +96,25 @@ appModule
                 url: '/create/{parentId}',
                 views: {
                     'right@kohese': {
+                        templateUrl: '/components/create/createWizard.html',
+                        controller: 'CreateWizardController as createCtrl'
+                    }
+                }
+            })
+            .state('kohese.explore.create.import', {
+                url: 'import/{parentId}',
+                views: {
+                    'right@kohese': {
+                        templateUrl: '/components/create/import/import.html',
+                        controller: "ImportItemController as importCtrl"
+                    }
+                }
+
+            })
+            .state('kohese.explore.create.new', {
+                url: 'new/{parentId}',
+                views: {
+                    'right@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',
                         controller: 'DetailsViewController as detailsCtrl'
                     }
@@ -99,8 +122,18 @@ appModule
             })
             .state('kohese.create', {
                 url: '/create/{parentId}',
+                templateUrl: '/components/create/createWizard.html',
+                controller: 'CreateWizardController as createCtrl'
+            })
+            .state('/kohese.import', {
+                url: 'import/{parentId}',
+                templateUrl: '/components/create/import/import.html',
+                controller: 'ImportController as importCtrl'
+            })
+            .state('/kohese.new', {
+                url: 'new/{parentId}',
                 templateUrl: '/components/detailsview/subviews/createitem.html',
-                controller: 'DetailsViewController as detailsCtrl'
+                controller: "DetailsViewController as detailsCtrl"
             })
             .state('kohese.search', {
                 url: '/search/{filter}',
@@ -128,8 +161,8 @@ appModule
                 url:'/create/{parentId}',
                 views: {
                     'right@kohese': {
-                        templateUrl: '/components/detailsview/subviews/createitem.html',
-                        controller: 'DetailsViewController as detailsCtrl'
+                        templateUrl: '/components/create/createwizard.html',
+                        controller: 'CreateWizardController as createCtrl'
                     }
                 }
             })

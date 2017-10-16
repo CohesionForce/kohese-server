@@ -27,11 +27,11 @@
                title=" Save"
                     ></i>
             <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
-               ng-click="detailsCtrl.updateTab(detailsCtrl.NavigationService.getLastState(detailsCtrl.tab.id), detailsCtrl.itemProxy.item.id, 'dualview')"
+               ng-click="detailsCtrl.updateTab('kohese.explore.edit', detailsCtrl.itemProxy.item.id)"
                title="Split Screen">
             </i>
             <i class="fa fa-lg fa-arrows-alt" ng-if="detailsCtrl.tab.type === 'dualview'"
-               ng-click="detailsCtrl.updateTab('kohese.investigate', detailsCtrl.itemProxy.item.id, 'singleview')"
+               ng-click="detailsCtrl.updateTab('kohese.investigate', detailsCtrl.itemProxy.item.id)"
                title="Fullscreen"></i>
         </span>
     </div>
@@ -255,6 +255,11 @@
                 <h4>Journal Tab</h4>
 
                 <p><b>This tab is under construction.</b></p>
+            </tab>
+            <tab heading="Action Table"
+                 ng-if="detailsCtrl.itemProxy.children">
+
+              <action-table item-proxy="detailsCtrl.itemProxy">
             </tab>
         </tabset>
     </div>

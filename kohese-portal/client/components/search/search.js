@@ -54,12 +54,6 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
         };
     }
 
-    if (ctrl.searchString !== '') {
-        tab.setTitle('Search - ' + ctrl.searchString);
-    } else {
-        tab.setTitle('Search - All')
-    }
-
     if ($stateParams.id) {
         ctrl.currentItem = $stateParams.id;
     }

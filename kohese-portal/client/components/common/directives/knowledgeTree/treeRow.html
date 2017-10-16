@@ -33,7 +33,8 @@
             </i>
             </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
                                                   ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
-                                                  ng-click="treeCtrl.navigate('kohese.explore.edit', 'dualview', itemProxy.item.id)"></span>
+                                                  ng-click="treeCtrl.navigate('kohese.explore.edit', 
+                                                            {id: itemProxy.item.id})"></span>
                 <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
                 <!-- Conditional Icons for Item status -->
                 <span ng-if="itemProxy.dirty"> **
@@ -81,7 +82,8 @@
             </li>
             <li class="pointer context-item"
                 role="menuitem"
-                ui-sref="kohese.explore.create({parentId: itemProxy.item.id})">
+                ng-click="treeCtrl.navigate('kohese.explore.create',
+                                            {parentId: itemProxy.item.id})">
                 <a>
                     Create child
                 </a>

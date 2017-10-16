@@ -4,96 +4,11 @@
 
 function ContainerController(tabService, $scope, $state, $stateParams) {
     var containerCtrl = this;
-
-    containerCtrl.tabService = tabService;
-
-    var Tab = function (state, params, type) {
-        var tab = this;
-        var bundleListener;
-        tab.title = 'Kohese';
-        tab.scope = {};
-        tab.content = {};
-        tab.id = tabService.getTabId();
-
-
-        if (params) {
-            tab.params = params;
-        } else {
-            tab.params = {}
-        }
-
-        if (state) {
-            tab.state = state;
-        } else {
-            tab.state = 'kohese.dashboard';
-        }
-
-        if (type) {
-            tab.type = type;
-        } else {
-            tab.type = 'singleview';
-        }
-
-        tab.setType = function (type) {
-            tab.type = type;
-        };
-        tab.toggleType = function () {
-            if (tab.type == 'dualview') {
-                tab.type = 'singleview';
-            } else {
-                tab.type = 'dualview';
-            }
-        };
-        tab.setScope = function (scope) {
-            tab.scope = scope;
-            bundleListener = tab.scope.$on('tabSelected', function (event, data) {
-                console.log(data);
-                console.log(tab);
-                if (data === tab.id) {
-                    console.log('Tab Selected :: Bundle Listener');
-                    console.log(tab);
-                    console.log(data);
-                    tab.scope.$broadcast('bundleReady');
-                    bundleListener();
-                }
-            })
-        };
-
-        tab.setTitle = function (title) {
-            tab.title = title;
-        };
-
-        tab.setState = function (state) {
-            if (state === 'investigate') {
-                tab.state = 'kohese.investigate'
-            } else if (state === 'explore') {
-                tab.state = 'kohese.explore'
-            } else if (state === 'search') {
-                tab.state = 'kohese.search'
-            } else if (state === 'search') {
-                tab.state = 'kohese.search.edit'
-            } else if (state === 'edit') {
-                // Will remove once references are gone
-                tab.state = 'kohese.explore.edit'
-            } else if (state === 'explore.edit') {
-                tab.state = 'kohese.explore.edit'
-            } else if (state === 'create') {
-                tab.state = 'kohese.explore.create'
-            } else {
-                tab.state = state;
-            }
-        };
-        tab.updateFilter = function (string) {
-            tab.scope.$broadcast('newFilterString', string);
-        };
-
-        tab.toggleBundle = function () {
-            bundleListener();
-        };
-    };
+    containerCtrl.tabs = []
 
     $scope.$on('navigationEvent', function onNavigationEvent(event, data) {
-        let newTab = createTab(data.state, data.params, data.type);
+        let newTab = createTab(data.state, data.params);
+        console.log(newTab);
         containerCtrl.setTab(newTab);
         $state.go(newTab.state, newTab.params);
     });
@@ -102,21 +17,7 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     function createBaseTab() {
         var currentState = $state.current.name;
 
-        if (currentState === 'kohese.explore') {
-            containerCtrl.baseTab = new Tab('kohese.explore', {}, 'dualview');
-        } else if (currentState === 'kohese.explore.edit') {
-            containerCtrl.baseTab = new Tab('kohese.explore.edit', {id: $stateParams.id}, 'dualview')
-        } else if (currentState === 'kohese.explore.create') {
-            containerCtrl.baseTab = new Tab('kohese.explore.create', {parentId: $stateParams.parentId}, 'dualview')
-        } else if (currentState === 'kohese.search') {
-            containerCtrl.baseTab = new Tab('kohese.search', {id: $stateParams.id}, 'dualview')
-        } else if (currentState === 'kohese.search.edit') {
-            containerCtrl.baseTab = new Tab('kohese.search.edit', {id: $stateParams.id}, 'dualview')
-        } else if (currentState === 'kohese.search.create') {
-            containerCtrl.baseTab = new Tab('kohese.search.create', {parentId: $stateParams.parentId}, 'dualview')
-        } else {
-            containerCtrl.baseTab = new Tab('kohese.dashboard', {}, 'singleview')
-        }
+        containerCtrl.baseTab = createTab($state.current.name, $stateParams);
 
     }
 
@@ -127,16 +28,16 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
 //Will need refactoring to account for refreshing the page at some point
 
     containerCtrl.tabs = [containerCtrl.baseTab];
-    containerCtrl.tabService.setCurrentTab(containerCtrl.tabs[0]);
+    tabService.setCurrentTab(containerCtrl.tabs[0]);
 
-    containerCtrl.addTab = function (state, params) {
-        var tab = createTab(state, params);
+    containerCtrl.addTab = function () {
+        var tab = createTab('kohese.dashboard', false);
         containerCtrl.setTab(tab);
     };
 
-    function createTab(state, params, type) {
-        tabService.incrementTabs();
-        var newTab = new Tab(state, params, type);
+    function createTab(state, params) {
+        var newTab = tabService.createTab(state, params);
+        console.log(newTab);
         newTab.position = containerCtrl.tabs.length;
         tabService.setCurrentTab(newTab);
         containerCtrl.tabs.push(newTab);
@@ -149,11 +50,39 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     containerCtrl.setTab = function (tab) {
         $scope.$broadcast('tabSelected', tab.id);
         tab.active = true;
-        containerCtrl.tabService.setCurrentTab(tab);
+        tabService.setCurrentTab(tab);
         $state.go(tab.state, tab.params);
     };
 
     containerCtrl.deleteTab = function (tab) {
+        // If tab is currently selected select the previous tab, 
+        // If it is the first tab get the next one
+        // If it is the only tab, recreate the base tab
+
+        if (tab.id === tabService.getCurrentTab().id)
+        {
+            if (tab.position === 0)
+            {
+                if (containerCtrl.tabs.length === 1) 
+                    {
+                    containerCtrl.addTab();
+                    } 
+                else 
+                    {
+                    containerCtrl.setTab(containerCtrl.tabs[1]);
+                    }   
+            } 
+            else if (tab.position === containerCtrl.tabs.length)
+                {
+                containerCtrl.setTab(containerCtrl.tabs[tab.position - 1]);
+                }
+            else 
+                {
+                containerCtrl.setTab(containerCtrl.tabs[tab.position + 1]);
+                }
+            
+        }
+
         containerCtrl.tabs.splice(tab.position, 1);
         updatePositions();
     };

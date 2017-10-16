@@ -18,11 +18,6 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
 
     }
 
-    $scope.$on('$viewContentLoaded', function () {
-        tab.setTitle('Admin');
-        tab.type = 'singleview';
-    });
-
     /* This handles if the user is coming to the screen for the first time */
     $scope.$on('itemRepositoryReady', function () {
         ctrl.repositoryList = ItemRepository.getRepositories();
@@ -41,24 +36,12 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
 
     fetchUsers();
 
-    ctrl.navigate = function (state, type, id) {
+    ctrl.navigate = function (state) {
         if (state) {
-            updateTab(state, type, { id: id });
-            $state.go(state, { id: id });
+            tab.setState(state);
+            $state.go(state);
         }
     };
-
-    function updateTab(state, type, params) {
-        if (state) {
-            tab.state = state;
-        }
-        if (type) {
-            tab.type = type;
-        }
-        if (params) {
-            tab.params = params;
-        }
-    }
 
     ctrl.editUser = function (userProxy) {
         ctrl.usernameInput = userProxy.item.name;
