@@ -112,7 +112,7 @@ appModule
 
             })
             .state('kohese.explore.create.new', {
-                url: 'new/{type}{parentId}',
+                url: 'new/{type}/{parentId}',
                 views: {
                     'right@kohese': {
                         templateUrl: '/components/detailsview/subviews/createitem.html',
