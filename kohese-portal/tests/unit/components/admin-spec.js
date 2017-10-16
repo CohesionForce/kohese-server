@@ -6,6 +6,7 @@ var MockTabService = require('../mock/MockTabService');
 var MockUserService = require('../mock/MockUserService');
 var MockState = require('../mock/MockState');
 var MockItemRepository = require('../mock/MockItemRepository');
+var MockVersionControlService = require('../mock/MockVersionControlService');
 
 describe(
 		"AdminController Test",
@@ -19,6 +20,7 @@ describe(
 			var mockUserService = new MockUserService();
 			var mockState = new MockState();
 			var mockItemRepository = new MockItemRepository();
+			var mockVersionControlService = new MockVersionControlService();
 			
 			function KoheseUser() {
 				this.name = '';
@@ -83,23 +85,27 @@ describe(
 					$scope : mockScope,
 					KoheseUser : KoheseUser,
 					UserService : mockUserService,
-					ItemRepository : mockItemRepository
+					ItemRepository : mockItemRepository,
+					VersionControlService : mockVersionControlService
 				});
 			}));
 
 			// Test Edit User
 			it("Test Edit User", function() {
-				var user = {
-						name : 'UserName',
-						description : 'User Description',
-						password : 'User Password'};
-				adminController.editUser(user);
+				var userProxy = {
+						item : {
+							name : 'UserName',
+							description : 'User Description',
+							password : 'User Password'
+							}
+						};
+				adminController.editUser(userProxy);
 				expect(adminController.usernameInput).toBe('UserName');
 				expect(adminController.descriptionInput).toBe('User Description');
 				expect(adminController.editUserForm).toBe(true);
 				expect(adminController.passwordInput).toBe(undefined);
                 expect(adminController.confirmPasswordInput).toBe(undefined);
-				expect(adminController.selectedUser).toBe(user);
+				expect(adminController.selectedUser).toBe(userProxy);
 			});
 			
 			// Test Clear form

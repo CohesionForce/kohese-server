@@ -36,6 +36,10 @@ function MockTabService() {
     this.restoreControllerData = function(one, two, three) {
         return false;
     };
+
+    this.createTab = function() {
+        return {};
+    }
 }
 
 module.exports = MockTabService;
