@@ -13,6 +13,7 @@ module.exports = function (app) {
 
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
+    app.use('/socket.io-file-client', loopback.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
     
     app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
     app.use('/reports', loopback.static(path.resolve(__dirname, '../../tmp_reports')));

@@ -80,11 +80,9 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
 
     $rootScope.$on('UserUpdated', function onUserUpdated(event, data) {
         currentUser = data;
-        console.log(currentUser);
         });
 
     setCurrentUser();
-    console.log(currentUser);
 }
 
 export default () => {
