@@ -70,7 +70,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     ctrl.cancelForm = function () {
         ctrl.addUserForm = false;
         ctrl.editUserForm = false;
-        ctrl.selectedUser = null;
+        ctrl.selectedUserProxy = null;
         ctrl.usernameInput = '';
         ctrl.descriptionInput = '';
         ctrl.emailInput = '';
