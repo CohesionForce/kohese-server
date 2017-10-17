@@ -16,9 +16,27 @@ module.exports = function(config) {
 				'bower_components/angular-mocks/angular-mocks.js',
 				'bower_components/angular-resource/angular-resource.js',
 				'bower_components/jquery/dist/jquery.js',
+				'bower_components/',
 				'client/bundle.js',
 				'tests/unit/mock/Mock*.js',
-				'tests/unit/components/*-spec.js'],
+				'tests/unit/components/*-spec.js',
+				"bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
+				"bower_components/angular-animate/angular-animate.js",
+				"bower_components/socket.io-client/socket.io.js",
+				"bower_components/angular-socket-io/socket.js",
+				"bower_components/angular-jwt/dist/angular-jwt.js",
+				"bower_components/angular-recursion/angular-recursion.js",
+				"bower_components/angucomplete-alt/angucomplete-alt.js",
+				"bower_components/angular-toastr/dist/angular-toastr.tpls.js",
+				"bower_components/ng-context-menu/dist/ng-context-menu.js",
+				"bower_components/angular-elastic/elastic.js",
+				"bower_components/commonmark/dist/commonmark.js",
+				"bower_components/angular-ui-tree/dist/angular-ui-tree.js",
+				"bower_components/simplemde/dist/simplemde.min.js",
+				"bower_components/simplemde-angular/dist/simplemde-angular.min.js",
+				"bower_components/split-pane/split-pane.js",
+				"bower_components/angular-split-pane/angular-split-pane.js",
+				"bower_components/ng-file-upload/ng-file-upload.js"],
 
 		// list of files to exclude
 		exclude : [],
@@ -81,10 +99,10 @@ module.exports = function(config) {
 		// start these browsers
 		// available browser launchers:
 		// https://npmjs.org/browse/keyword/karma-launcher
-		browsers : [ 'PhantomJS' ],
+		browsers : [ 'Chrome' ],
 
 		// Continuous Integration mode
 		// if true, Karma captures browsers, runs the tests and exits
-		singleRun : true
+		singleRun : false
 	})
 }

@@ -39,6 +39,10 @@ function MockLoginService() {
     this.getUsername = function() {
         return username;
     }
+
+    this.logout = function () {
+        
+    }
 }
 
 module.exports = MockLoginService;
