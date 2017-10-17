@@ -7,30 +7,22 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     containerCtrl.tabs = []
 
     $scope.$on('navigationEvent', function onNavigationEvent(event, data) {
-        let newTab = createTab(data.state, data.params);
+        let newTab = containerCtrl.createTab(data.state, data.params);
         containerCtrl.setTab(newTab);
         $state.go(newTab.state, newTab.params);
     });
 
 
     containerCtrl.createBaseTab = function() {
-        containerCtrl.baseTab = createTab($state.current.name, $stateParams);
+        containerCtrl.baseTab = containerCtrl.createTab($state.current.name, $stateParams);
     }
 
-    containerCtrl.createBaseTab();
-
-
-//Will need refactoring to account for refreshing the page at some point
-
-    containerCtrl.tabs = [containerCtrl.baseTab];
-    tabService.setCurrentTab(containerCtrl.tabs[0]);
-
     containerCtrl.addTab = function () {
-        var tab = createTab('kohese.dashboard', false);
+        var tab = containerCtrl.createTab('kohese.dashboard', false);
         containerCtrl.setTab(tab);
     };
 
-    function createTab(state, params) {
+    containerCtrl.createTab = function(state, params) {
         var newTab = tabService.createTab(state, params);
         newTab.position = containerCtrl.tabs.length;
         tabService.setCurrentTab(newTab);
@@ -55,6 +47,8 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
 
         if (tab.id === tabService.getCurrentTab().id)
         {
+            console.log(tab.position);
+            console.log(containerCtrl.tabs.length);
             if (tab.position === 0)
             {
                 if (containerCtrl.tabs.length === 1) 
@@ -66,12 +60,14 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
                     containerCtrl.setTab(containerCtrl.tabs[1]);
                     }   
             } 
-            else if (tab.position === containerCtrl.tabs.length)
+            else if (tab.position === containerCtrl.tabs.length -1)
                 {
+                console.log("-1")
                 containerCtrl.setTab(containerCtrl.tabs[tab.position - 1]);
                 }
             else 
                 {
+                console.log("+1")
                 containerCtrl.setTab(containerCtrl.tabs[tab.position + 1]);
                 }
             
@@ -87,6 +83,12 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
         }
     }
 
+    // Initialization Block
+    containerCtrl.createBaseTab();  
+    //Will need refactoring to account for refreshing the page at some point
+
+    containerCtrl.tabs = [containerCtrl.baseTab];
+    tabService.setCurrentTab(containerCtrl.tabs[0]);
 }
 
 var ContentContainer = function () {
