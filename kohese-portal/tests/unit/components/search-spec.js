@@ -18,7 +18,8 @@ describe("Search Controller Test", function() {
     var mockDecisionService = new MockDecisionService();
     var mockActionService = new MockActionService();
     var mockSearchService = new MockSearchService();
-    
+	var filter = angular.injector(['ng']).get('$filter'); 
+	
 	beforeEach(angular.mock.module('app.search'));
 
 	beforeEach(function() {
@@ -40,13 +41,7 @@ describe("Search Controller Test", function() {
 		    $on : function(name, func) {
 		        
 		    }
-		};
-		
-		filter = function(name) {
-		    return function(something) {
-		        
-		    };
-		};
+		};	    
 	});
 
 	beforeEach(inject(function($controller) {
@@ -60,7 +55,8 @@ describe("Search Controller Test", function() {
 			$state : state,
 			$scope : scope,
 			$stateParams : stateParams,
-			$filter: filter });
+			$filter: filter 
+		})
 	}));
 
 	it("Check Tree Navigation", function() {
@@ -68,23 +64,7 @@ describe("Search Controller Test", function() {
 	    expect(mockTabService.tab.state).toBe('explore.edit');
 	    expect(state.callData).toBe('kohese.explore.edit');
 	    expect(state.id).toBe(stateParams.id);
-	}),
-	
-	it("Check Tree Navigate", function() {
-	    console.log('Create Test for tree navigate');
-	    expect(true).toBe(true);
-	}),
-	
-	it("Check Tree Assigned to Filter", function() {
-        console.log('Create Test for tree navigate');
-        expect(true).toBe(true);
-	}),
-	
-	it("Check Tree Search String Filter", function() {
-        console.log('Create Test Search String Filter');
-        expect(true).toBe(true);
-	});
-
+	})
 });
 
 describe("suite name", function() {
