@@ -4,7 +4,7 @@
     "*-spec.js"
   ],
   "helpers": [
-    "tests/server/helpers/reporter.js"
+    "helpers/reporter.js"
   ],
   
   "stopSpecOnExpectationFailure": false,
