@@ -63,6 +63,8 @@
     "grunt-sass": "^1.2.1",
     "grunt-webpack": "^1.0.14",
     "jasmine": "^2.5.2",
+    "jasmine-node": "^1.14.5",
+    "jasmine-spec-reporter": "^4.2.1",
     "jshint": "^2.5.6",
     "karma": "^1.1.2",
     "karma-browserify": "^4.4.0",
