@@ -199,7 +199,7 @@ module.exports = function(grunt) {
     var client = ['sass', 'webpack'];
 	// Run node server related testing
 	var testServer = ['jshint:server', 'run:jasmineServer', 'run:server', 'run:jasmineRest'];
-	var testUnitServer = ['run:jasmineServer']
+	var testUnitServer = ['run:jasmineServer', 'babel']
 	// Run client based tests
 	var testClient = ['browserify', 'jasmine'];
 	var test = [].concat(testServer, testClient);
