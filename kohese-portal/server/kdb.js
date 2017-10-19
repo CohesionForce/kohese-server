@@ -24,20 +24,14 @@ var kdbStore = {
 var modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
 var mountList = {};
 var kdbDirPath = "kdb";
-//Paths may be provided via arguments when starting via -kdb=PATH
-var baseRepoPath = 'kohese-kdb';
-for (var i = 2; i < process.argv.length; i++) {
-    var arg = process.argv[i].split('=');
-    if(arg[0] === '-kdb' && arg[1] !=='') {
-        baseRepoPath = arg[1];
-        break;
-    }
-}
 
-var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
-var mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
+var koheseKDBDirPath;
+var mountFilePath;
 
-function initialize() {
+function initialize(koheseKdbPath) {
+  koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
+  mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
+  
   // Ignore the loopback _meta
   if (modelConfig._meta) {
     delete modelConfig._meta;
