@@ -6,121 +6,74 @@ global.app = new EventEmitter();
 
 
 describe("Test KIO", ()=> {
-    it("Tests KIO Running", ()=> {
-        expect(true).toBeTruthy();
-    });
-    
-    it("Waits for KDB to Load", (done)=> {
+    it("Wait for KDB to Load", (done)=> {
       console.log("::: Waiting on KDB to load");
       kdb.initialize().then(()=>{
         done();
       });
     });
 
-    it("Tests Launching Server", () => {
+    it("Demo KIO Server Test", (done) => {
       var kio = require("../../../server/koheseIO.js");
       console.log("KIO Started");
-      console.log(kio.Server);
 
-      kio.server = new SocketMock();
-      console.log(kio.server);
+      // Mock initialization by setting kio.server to mock interface
+      kio.server = new EventEmitter;
       
-            
-    });
-
-    it("Tests Launching Server Again", (done) => {
-      var kio = require("../../../server/koheseIO.js");
-      console.log("KIO Started Again");
-      console.log(kio.server);
-
+      // Mock the client socket
+      var socket = new EventEmitter();
+      
       // Initialize additional socket parameters
-      var socket = kio.server.socketClient;
       
       socket.id = "Session-01";
-      
-      socket.handshake = {};
-      socket.handshake.address = "1.2.3.4";
-      
-      socket.koheseUser = {};
-      socket.koheseUser.username = "TestUser";
+      socket.handshake = {address: "1.2.3.4"};
+      socket.koheseUser = {username: "TestUser"};
 
       // Initialize KIO Item Server
+      console.log("::: Initialize kio Item Server");
       var itemServer = require("../../../server/kio-itemServer.js");
       global.app.emit("newSession", socket);
-      
+            
       // Request items be staged
-      var request = ["1","2","3"];
+      var itemId = "87a2bf30-9a96-11e5-a88b-13b67c50fa38";
+      var request = {
+          proxyIds: [itemId]
+      };
+      
+      var eventOrder = [];
+      
+      function receivedEvent (event) {
+        console.log("--- Received event: " + event);
+        eventOrder.push(event);
+        if (eventOrder.length == 2){
+          console.log("::: Checking order");
+          expect(eventOrder).toBe(['statusUpdated', 'response']);
+          done();          
+        }
+      };
 
-      kio.server.onEmit('VersionControl/statusUpdated', (statusMap)=>{
+      var expectedStatusMap = {};
+      expectedStatusMap[itemId] = ['INDEX_MODIFIED'];
+      
+      var expectedResponse = {};
+      expectedResponse[itemId] = true;
+
+      // Register for notification that would be sent to all connected clients
+      kio.server.on('VersionControl/statusUpdated', (statusMap)=>{
         console.log("::: Received statusUpdated");
         console.log(statusMap);
-        done();
+        expect(statusMap).toEqual(expectedStatusMap);
+        receivedEvent('statusUpdated');
       });
 
-      console.log("::: First try");
-      kio.server.socketClient.emit('VersionControl/add', request);
-
-      console.log("::: Second try");
-      kio.server.emitEvent('VersionControl/add', request);
-      
-      console.log("::: Third try");
-      kio.server.socketClient.emit('VersionControl/add', request, (results)=> {
+      console.log("::: Invoke add");
+      socket.emit('VersionControl/add', request, (response) => {
         console.log("::: Add Results");
-        console.log(results);
+        console.log(response);
+        expect(response).toEqual(expectedResponse);
+        receivedEvent('response');
       });
 
     });
-
-    it("Should indicate unmodified item can not be staged", (done) => {
-      console.log("::: Trying to call the kdbRepo.add with an item that is not modified");
-      var proxies = [];
-      var itemId = "87a2bf30-9a96-11e5-a88b-13b67c50fa38";
-      var proxy = kdb.ItemProxy.getProxyFor(itemId);
-      proxies.push(proxy);
-
-      kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
-        console.log('::: Added proxy');
-        //sendResponse(addStatusMap);
-        //sendStatusUpdates(proxies);
-        console.log(addStatusMap);
-        expect(addStatusMap[itemId]).toBe(false);
-        
-        done();
-      }).catch(function (err) {
-        console.log("*** Received expected error");
-        console.log(err);
-//        sendResponse({
-//          error: err
-//        });
-        done();
-      });
-    });
-
-    it("Should detect invalid id", (done) => {
-      console.log("::: Trying to call the kdbRepo.add with an item that is not modified");
-      var proxies = [];
-      var itemId = "invalid-id";
-      var proxy = kdb.ItemProxy.getProxyFor(itemId);
-      proxies.push(proxy);
-
-      kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
-        console.log('::: Added proxy');
-        //sendResponse(addStatusMap);
-        //sendStatusUpdates(proxies);
-        console.log(addStatusMap);
-        expect(addStatusMap[itemId]).toBe(false);
-        
-        done();
-      }).catch(function (err) {
-        console.log("*** Received expected error");
-        console.log(err);
-//        sendResponse({
-//          error: err
-//        });
-        done();
-      });
-    });
-
-    
 
 });

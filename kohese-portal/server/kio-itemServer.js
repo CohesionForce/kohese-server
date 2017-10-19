@@ -211,7 +211,7 @@ global.app.on('newSession', function (socket) {
     }
     
     kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
-      console.log('::: session %s: Sending response for VersionControl/add for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+      console.log('::: session %s: Sending response for VersionControl/add for user %s at %s', socket.id, socket.koheseUser.username, socket.handshake.address);
       sendResponse(addStatusMap);
       sendStatusUpdates(proxies);
     }).catch(function (err) {
