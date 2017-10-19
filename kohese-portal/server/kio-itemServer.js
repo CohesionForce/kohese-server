@@ -9,8 +9,11 @@ const importer = require("./directory-ingest.js");
 
 console.log("::: Initializing KIO Item Server");
 
-global.app.on('newSession', KIOItemServer) 
-
+if(global.app)
+  {
+  global.app.on('newSession', KIOItemServer) 
+  }
+  
 function KIOItemServer(socket){
 
   console.log('>>> KIO Item Server: session %s connected from %s for %s', socket.id, socket.handshake.address, socket.koheseUser.username);
@@ -312,4 +315,4 @@ function sendStatusUpdates(proxies) {
   });
 }
 
-module.exports = KIOItemServer;
+module.exports.KIOItemServer = KIOItemServer;
