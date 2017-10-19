@@ -8,7 +8,7 @@ global.app = new EventEmitter();
 describe("Test KIO", ()=> {
     it("Tests KIO Running", ()=> {
         expect(true).toBeTruthy();
-    })
+    });
     
     it("Waits for KDB to Load", (done)=> {
       console.log("::: Waiting on KDB to load");
@@ -26,7 +26,7 @@ describe("Test KIO", ()=> {
       console.log(kio.server);
       
             
-    })
+    });
 
     it("Tests Launching Server Again", (done) => {
       var kio = require("../../../server/koheseIO.js");
@@ -69,7 +69,58 @@ describe("Test KIO", ()=> {
         console.log(results);
       });
 
-      
-    })
+    });
 
-})
+    it("Should indicate unmodified item can not be staged", (done) => {
+      console.log("::: Trying to call the kdbRepo.add with an item that is not modified");
+      var proxies = [];
+      var itemId = "87a2bf30-9a96-11e5-a88b-13b67c50fa38";
+      var proxy = kdb.ItemProxy.getProxyFor(itemId);
+      proxies.push(proxy);
+
+      kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
+        console.log('::: Added proxy');
+        //sendResponse(addStatusMap);
+        //sendStatusUpdates(proxies);
+        console.log(addStatusMap);
+        expect(addStatusMap[itemId]).toBe(false);
+        
+        done();
+      }).catch(function (err) {
+        console.log("*** Received expected error");
+        console.log(err);
+//        sendResponse({
+//          error: err
+//        });
+        done();
+      });
+    });
+
+    it("Should detect invalid id", (done) => {
+      console.log("::: Trying to call the kdbRepo.add with an item that is not modified");
+      var proxies = [];
+      var itemId = "invalid-id";
+      var proxy = kdb.ItemProxy.getProxyFor(itemId);
+      proxies.push(proxy);
+
+      kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
+        console.log('::: Added proxy');
+        //sendResponse(addStatusMap);
+        //sendStatusUpdates(proxies);
+        console.log(addStatusMap);
+        expect(addStatusMap[itemId]).toBe(false);
+        
+        done();
+      }).catch(function (err) {
+        console.log("*** Received expected error");
+        console.log(err);
+//        sendResponse({
+//          error: err
+//        });
+        done();
+      });
+    });
+
+    
+
+});
