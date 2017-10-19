@@ -202,13 +202,16 @@ global.app.on('newSession', function (socket) {
   });
   
   socket.on("VersionControl/add", function (request, sendResponse) {
+    console.log('::: session %s: Received VersionControl/add for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
+      console.log("--- Adding proxy for: " + idsArray[i]);
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
     
     kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
+      console.log('::: session %s: Sending response for VersionControl/add for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
       sendResponse(addStatusMap);
       sendStatusUpdates(proxies);
     }).catch(function (err) {
