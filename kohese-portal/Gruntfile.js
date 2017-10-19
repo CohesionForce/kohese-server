@@ -159,7 +159,7 @@ module.exports = function(grunt) {
 					// quiet: true
 				},
 				cmd: 'node',
-				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=tests/jasmine.json']
+				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=server/tests/jasmine.json']
 			},
 			
 			jasmineRest: {
@@ -199,7 +199,7 @@ module.exports = function(grunt) {
     var client = ['sass', 'webpack'];
 	// Run node server related testing
 	var testServer = ['jshint:server', 'run:jasmineServer', 'run:server', 'run:jasmineRest'];
-	var testUnitServer = ['run:jasmineServer', 'babel']
+	var testUnitServer = ['babel', 'run:jasmineServer']
 	// Run client based tests
 	var testClient = ['browserify', 'jasmine'];
 	var test = [].concat(testServer, testClient);
