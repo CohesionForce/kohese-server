@@ -561,3 +561,13 @@ function openRepositories() {
 	
 	return Promise.all(promises);
 }
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function index(proxy) {
+  return kdbRepo.generateCommitHistoryIndices(proxy).then(function () {
+    console.log("::: Indexing of " + proxy.item.name + " complete.");
+  });
+}
+module.exports.index = index;

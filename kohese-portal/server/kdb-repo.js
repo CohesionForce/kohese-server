@@ -5,6 +5,7 @@
 
 var nodegit = require('nodegit');
 var path = require("path");
+const fs = require("fs");
 
 var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
@@ -18,34 +19,7 @@ function openRepo(proxy) {
   var path = proxy.getRepositoryProxy().repoPath.split('Root.json')[0];
     console.log("::: Opening git repo " + path);
     return nodegit.Repository.open(path).then(function (r) {
-      return r.getMasterCommit().then(function (mc) {
-        var rw = nodegit.Revwalk.create(r);
-        rw.sorting(nodegit.Revwalk.SORT.TIME);
-        rw.push(mc.id());
-        return rw.getCommitsUntil(function (c) {
-          return true;
-        }).then(function (commits) {
-          var commitPromise = [];
-          var changes = [];
-          for (var i = 0; i < commits.length; i++) {
-            (function (iIndex) {
-              commitPromise.push(getCommitFilesChanged(commits[iIndex]).then(function (filesChanged) {
-                changes.push({
-                  commit: commits[iIndex],
-                  files: filesChanged
-                });
-              }));
-            })(i);
-          }
-          
-          return Promise.all(commitPromise).then(function () {
-            repoList[proxy.item.id] = {
-                repo: r,
-                history : changes
-            };
-          });
-        });
-      });
+      repoList[proxy.item.id] = r;
     }).catch(function (err) {
       console.log("Error opening repository at " + path + ". " + err);
     });
@@ -58,45 +32,22 @@ function getCommitFilesChanged(commit) {
         flags: nodegit.Diff.FIND.RENAMES
     };
     var diffPromise = [];
-    var f = [];
+    var paths = [];
     for (var j = 0; j < diffs.length; j++) {
-      (function (jIndex, files) {
+      (function (jIndex) {
         diffPromise.push(diffs[jIndex].findSimilar(diffOpts).then(function (result) {
-          var fileStructure = {
-              names: [],
-              paths: [],
-              statuses: []
-          };
-          
           for (var k = 0; k < diffs[jIndex].numDeltas(); k++) {
-            var d = diffs[jIndex].getDelta(k);
-            var np = d.newFile().path();
-            var op = d.oldFile().path();
-            var stat = d.status();
-            
-            if (-1 === fileStructure.paths.indexOf(np)) {
-              fileStructure.paths.push(np);
-              /* Get the UUID of the file, as that should be mostly
-              unchanging */
-              fileStructure.names.push(np.substring(np.lastIndexOf("/") + 1, np.lastIndexOf(".json")));
-            }
-            
-            if (-1 === fileStructure.paths.indexOf(op)) {
-              fileStructure.paths.push(op);
-            }
-            
-            if (-1 === fileStructure.statuses.indexOf(stat)) {
-              fileStructure.statuses.push(stat);
+            var p = diffs[jIndex].getDelta(k).newFile().path();
+            if (-1 === paths.indexOf(p)) {
+              paths.push(p);
             }
           }
-          
-          files.push(fileStructure);
         }));
-      })(j, f);
+      })(j);
     }
     
     return Promise.all(diffPromise).then(function () {
-      return f;
+      return paths;
     });
   });
 }
@@ -104,12 +55,98 @@ function getCommitFilesChanged(commit) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function generateCommitHistoryIndices(proxy) {
+  var p = proxy.getRepositoryProxy().repoPath.split('Root.json')[0];
+  return nodegit.Repository.open(p).then(function (r) {
+    return r.getMasterCommit().then(function (mc) {
+      var rw = nodegit.Revwalk.create(r);
+      rw.sorting(nodegit.Revwalk.SORT.TIME);
+      rw.push(mc.id());
+      return rw.getCommitsUntil(function (c) {
+        return true;
+      }).then(function (commits) {
+        var indexPromises = [];
+        for (var j = 0; j < commits.length; j++) {
+          indexPromises.push(indexCommit(commits[j]));
+        }
+        
+        return Promise.all(indexPromises);
+      });
+    });
+  });
+}
+module.exports.generateCommitHistoryIndices = generateCommitHistoryIndices;
+
+function indexCommit(commit) {
+  return getCommitFilesChanged(commit).then(function (paths) {
+    return commit.getTree().then(function (tree) {
+      return getIndexEntries(tree, paths);
+    });
+  }).then(function (entryMap) {
+    entryMap["time"] = commit.time();
+    entryMap["author"] = commit.author().toString();
+    entryMap["message"] = commit.message();
+    entryMap["parents"] = [];
+    for (var j = 0; j < commit.parentcount(); j++) {
+      entryMap["parents"].push(commit.parentId(j).toString());
+    }
+    
+    return fs.writeFile(path.join("kdb", "index", commit.id() + ".json"),
+      JSON.stringify(entryMap));
+  }).catch(function (err) {
+    console.log(err.stack);
+  });
+}
+
+function getIndexEntries(tree, paths) {
+  var entryPromises = [];
+  for (var j = 0; j < paths.length; j++) {
+    (function (jIndex) {
+      var p = paths[jIndex];
+      entryPromises.push(tree.entryByPath(p).then(function (entry) {
+        if (entry) {
+          return {
+            uuid: p.substring(p.lastIndexOf(path.sep) + 1, p.lastIndexOf(".json")),
+            oid: entry.sha(),
+            kind: path.basename(path.dirname(p))
+          };
+        }
+      }));
+    })(j);
+  }
+  
+  return Promise.all(entryPromises).then(function (entries) {
+    var entryMap = {};
+    for (var j = 0; j < entries.length; j++) {
+      entryMap[entries[j].uuid] = {
+        oid: entries[j].oid,
+        kind: entries[j].kind
+      };
+    }
+    
+    return entryMap;
+  });
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function getContents(repositoryProxy, oid) {
+  return nodegit.Blob.lookup(repoList[repositoryProxy.item.id], nodegit.Oid
+    .fromString(oid)).then(function (o) {
+    return JSON.parse(o.toString());
+  }).catch(function (err) {
+    console.log(err.stack);
+  });
+}
+module.exports.getContents = getContents;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function initializeRepository(repoProxy, path) {
   return nodegit.Repository.init(path, 0).then(function (r) {
-    repoList[repoProxy.item.id] = {
-        repo: r,
-        history: []
-    };
+    repoList[repoProxy.item.id] = r;
   });
 }
 module.exports.initializeRepository = initializeRepository;
@@ -177,14 +214,6 @@ function commit(proxies, userName, eMail, message) {
           var p = repo.createCommit("HEAD", signature, signature, message,
               stageMap[repo], [commit]).then(function (commitId) {
             commitIdMap[proxies[iIndex].item.id] = commitId;
-            repo.getCommit(commitId).then(function (c) {
-              getCommitFilesChanged(c).then(function (filesChanged) {
-                repoList[info.repoProxy.item.id].history.push({
-                  commit: c,
-                  files: filesChanged
-                });
-              });
-            });
           });
           delete stageMap[repo];
           return p;
@@ -410,7 +439,7 @@ function repoRelativePathOf(proxy){
 
   return {
     repoProxy: repoProxy,
-    gitRepo: r.repo,
+    gitRepo: r,
     pathToRepo: pathToRepo,
     relativeFilePath: relativeFilePath
   };
@@ -506,6 +535,7 @@ module.exports.walkHistoryForFile = walkHistoryForFile;
 function collectHistory(repo, path) {
   var relatedCommits = [];
   var name = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".json"));
+  // TODO Fix this based on changes
   for (var r in repoList) {
     if (repoList[r].repo === repo) {
       var history = repoList[r].history;
