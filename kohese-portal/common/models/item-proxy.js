@@ -4,9 +4,13 @@
 
 "use strict"; //Required for use of 'class'
 var _ = require('underscore');
+var jsSHA = require('jssha');
+
 
 var tree = {};
 tree.proxyMap = {};
+tree.repoMap = {};
+tree.proxyTreeHashes = {};
 
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
@@ -32,6 +36,10 @@ class ItemProxy {
     proxy.kind = kind;
     proxy.item = forItem;
 
+    if (kind === "Repository") {
+      tree.repoMap[itemId] = proxy;
+    }
+    
     if (kind === "Internal") {
       // Don't continue
       return proxy;
@@ -51,6 +59,8 @@ class ItemProxy {
     if (proxy.children){
       proxy.sortChildren();
     }
+
+    this.calculateTreeHash();
 
     return proxy;
   }
@@ -87,6 +97,141 @@ class ItemProxy {
 
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getFormattedString() {
+    return JSON.stringify(this.item, null, '  ');
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  calculateOID() {
+    var shaObj = new jsSHA("SHA-1", "TEXT");
+    var formattedItem = this.getFormattedString();
+    try {
+      var length = formattedItem.length;
+      shaObj.update('blob ' + length + '\0' + formattedItem);
+      
+      this.oid = shaObj.getHash("HEX");
+    }
+    catch(err){
+      console.log("*** Error");
+      console.log(err);
+      console.log("===");
+      console.log(this);
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  calculateTreeHash(deferred) {
+
+    // Don't calculateTreeHash for placeholder nodes that have not been populated yet
+    if (!this.item){
+      return;
+    }
+    
+    // Should only have to do this when content is updated
+    this.calculateOID();
+
+    var treeHashEntry = {
+        kind: this.kind,
+        oid: this.oid,
+        childTreeHashes: {}
+    };    
+
+    for (var childIdx in this.children){
+      var childProxy = this.children[childIdx];
+      if(childProxy.kind === "Repository"){
+        treeHashEntry.childTreeHashes[childProxy.item.id] = "Repository-Mount";
+      } else {
+        treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;        
+      }
+    }
+
+    var shaObj = new jsSHA("SHA-1", "TEXT");
+    shaObj.update(JSON.stringify(treeHashEntry));
+    this.treeHash =  shaObj.getHash("HEX");
+
+    treeHashEntry.treeHash = this.treeHash;
+
+    // Add the parentId to the treeHash entry
+    if (this.item.parentId){
+      treeHashEntry.parentId = this.item.parentId;
+    }
+    
+    tree.proxyTreeHashes[this.item.id] = treeHashEntry;
+    this.treeHashEntry = treeHashEntry;
+    
+    // Propagate changes up the tree
+    if (!deferred){
+      if (this.parentProxy){
+        this.parentProxy.calculateTreeHash();
+      }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static calculateAllTreeHashes() {
+    var stack = [];
+    tree.proxyTreeHashes = {};
+    console.log("::: Calc AL THs");
+
+    const deferred = true;
+    
+    function calculateAndPropogate(proxy){
+      var parentId = proxy.item.parentId;
+      if(proxy.parentProxy && (tree.proxyTreeHashes[parentId] !== "Deferred")){
+        tree.proxyTreeHashes[parentId] = "Deferred";
+        stack.push(proxy.parentProxy);
+      }              
+      proxy.calculateTreeHash(deferred);      
+    }
+    
+    // Need to calculate from the bottom up
+    for(var id in tree.proxyMap){
+      var proxy = tree.proxyMap[id];
+
+      if (!proxy.children || (proxy.children.length === 0)){
+        // Only process the leaf items
+        calculateAndPropogate(proxy);
+      }
+    }
+    
+    while (stack.length >0){
+      var proxy = stack.pop();
+      calculateAndPropogate(proxy);
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getAllTreeHashes() {
+    return tree.proxyTreeHashes;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getRepoTreeHashes() {
+    var repoTreeHashes = {};
+    console.log("::: Getting repo tree hashes");
+    
+    for(var repoIdx in tree.repoMap){
+      console.log(repoIdx);
+      var repoProxy = tree.repoMap[repoIdx];
+      console.log("::: Repo Idx: " + repoIdx);
+      repoTreeHashes[repoIdx] = repoProxy.treeHashEntry;
+    }
+    return repoTreeHashes;
+  }
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -363,6 +508,7 @@ class ItemProxy {
       this.deleteItem();
     }
 
+    this.calculateTreeHash();
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -430,6 +576,7 @@ class ItemProxy {
     if (!this.childrenAreManuallyOrdered()){
       this.item.itemIds = this.getOrderedChildIds();
       this.sortChildren();
+      this.calculateTreeHash();
     }
   }
   
@@ -450,6 +597,7 @@ class ItemProxy {
     if (this.childrenAreManuallyOrdered()){
       this.item.itemIds = [];
       this.sortChildren();
+      this.calculateTreeHash();
     }
   }
   
@@ -518,6 +666,8 @@ class ItemProxy {
       newParentProxy.addChild(this);
     }
     
+    this.calculateTreeHash();
+    
     if (this.analysis) {
         // delete the analysis in case some of the requisite data was updated
         delete this.analysis;
@@ -555,12 +705,14 @@ tree.root = new ItemProxy("Internal", {
   id: "ROOT",
   name : "Root of Knowledge Tree"
 });
+tree.repoMap["ROOT"] = tree.root;
 
 tree.lostAndFound = new ItemProxy("Internal", {
   id : "LOST+FOUND",
   name : "Lost-And-Found",
   description : "Collection of node(s) that are no longer connected."
 });
+tree.repoMap["LOST+FOUND"] = tree.lostAndFound;
 
 
 //////////////////////////////////////////////////////////////////////////

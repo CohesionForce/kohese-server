@@ -40,6 +40,8 @@
         <tabset id="details-tabs">
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active" heading="Document">
                 <h4>Document Tab</h4>
+                <h5>OID: {{detailsCtrl.itemProxy.oid}}</h5>
+                <h5>Tree Hash: {{detailsCtrl.itemProxy.treeHash}}</h5>
                 <button ng-click="detailsCtrl.generateHTMLReport()" class="btn btn-primary">
                    Generate HTML Report
                </button>
