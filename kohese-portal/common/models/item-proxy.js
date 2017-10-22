@@ -100,7 +100,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getFormattedString() {
+  document() {
     return JSON.stringify(this.item, null, '  ');
   }
   
@@ -109,19 +109,10 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   calculateOID() {
     var shaObj = new jsSHA("SHA-1", "TEXT");
-    var formattedItem = this.getFormattedString();
-    try {
-      var length = formattedItem.length;
-      shaObj.update('blob ' + length + '\0' + formattedItem);
-      
-      this.oid = shaObj.getHash("HEX");
-    }
-    catch(err){
-      console.log("*** Error");
-      console.log(err);
-      console.log("===");
-      console.log(this);
-    }
+    var doc = this.document();
+    shaObj.update('blob ' + doc.length + '\0' + doc);
+    
+    this.oid = shaObj.getHash("HEX");
   }
   
   //////////////////////////////////////////////////////////////////////////

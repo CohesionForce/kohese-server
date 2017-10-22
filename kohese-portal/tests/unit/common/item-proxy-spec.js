@@ -6,21 +6,52 @@ describe("ItemProxy Test", function() {
   var a, aa, newAAItem, bb, b, ab;
   // console.log(__dirname);
   // console.log("::: Starting Item Proxy Test");
+  var dumpEnabled = false;
 
-  dump = function(message) {
-//    if (message) {
-//      // console.log(">>> " + message);
-//    }
-//
-//    ItemProxy.dumpAllProxies();
-//    // console.log("");
-//    root.dumpProxy();
-//    // console.log("Root Descendants: " + root.descendantCount);
-//    // console.log("");
-//    lostAndFound.dumpProxy();
-//    // console.log("-----------------------------------------");
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  function dump(message) {
+    if (dumpEnabled){
+      if (message) {
+         console.log(">>> " + message);
+      }
+
+      ItemProxy.dumpAllProxies();
+      // console.log("");
+      root.dumpProxy();
+      // console.log("Root Descendants: " + root.descendantCount);
+      // console.log("");
+      lostAndFound.dumpProxy();
+      console.log("-----------------------------------------");      
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  function dumpHashFor(proxy, message) {
+    if (dumpEnabled){
+      console.log("::: Hash for " + proxy.item.name)
+      if (message) {
+         console.log(">>> " + message);
+      }
+
+      console.log(proxy.treeHashEntry);
+      console.log("-----------------------------------------");      
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  function getCopyOfItem (proxy){
+    return JSON.parse(JSON.stringify(proxy.item));
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Add Node Without Parent", function() {
     dump('--- Beginning state');
     expect(root).toBeDefined();
@@ -37,6 +68,9 @@ describe("ItemProxy Test", function() {
     dump("Added node without parent");
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Add Parent", function() {
     // console.log("::: Adding parent");
     a = new ItemProxy("Test", {
@@ -60,6 +94,9 @@ describe("ItemProxy Test", function() {
     dump("Added parent");
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Add Bs", function() {
     // console.log("::: Adding b, bbb");
     b = new ItemProxy("Test", {
@@ -88,6 +125,9 @@ describe("ItemProxy Test", function() {
     dump("Added b's");
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Adding bb", function() {
     // console.log("::: Adding bb");
     bb = new ItemProxy("Test", {
@@ -113,6 +153,9 @@ describe("ItemProxy Test", function() {
     expect(root.children[0].item.id).toBe('b');
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Changing parent of aa", function() {
     // console.log("::: Changing parent of aa");
     // console.log(aa.item);
@@ -133,6 +176,9 @@ describe("ItemProxy Test", function() {
     expect(aa.item.id).toBe(temp);
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Deleting description for aa", function() {
     // console.log("::: Deleting description for aa");
 
@@ -147,6 +193,9 @@ describe("ItemProxy Test", function() {
     expect(aa.item.id).toBe(temp);
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Changing parent of bb to ROOT", function() {
     // console.log("::: Changing parent of bb to ROOT");
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
@@ -159,6 +208,9 @@ describe("ItemProxy Test", function() {
     expect(root.getChildByName('BB')).toBe(bb);
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Changing parent of bb to c", function() {
     // console.log("::: Changing parent of bb to c");
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
@@ -172,6 +224,9 @@ describe("ItemProxy Test", function() {
     expect(c.getChildByName('BB')).toBe(bb);
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Morph b into a NewTest", function() {
     // console.log("::: Morph b into a NewTest");
     var newBItem = JSON.parse(JSON.stringify(b.item));
@@ -181,6 +236,9 @@ describe("ItemProxy Test", function() {
     expect(b.kind).toBe('NewTest');
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Renaming an item", function() {
     // console.log("::: Preparing to rename an item");
     var ab = new ItemProxy("Test", {
@@ -242,6 +300,9 @@ describe("ItemProxy Test", function() {
     expect(getChildIds(b)).toBe(expectArray);
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Renaming an ordered item", function() {
     // console.log("::: Preparing to rename an ordered item");
     // console.log("::: Adding d - de");
@@ -410,6 +471,9 @@ describe("ItemProxy Test", function() {
 
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it("Get Ancestors", function() {
     // console.log("::: Getting AB ancestors");
     var ab = ItemProxy.getProxyFor('ab');
@@ -420,7 +484,167 @@ describe("ItemProxy Test", function() {
       // console.log(ancestor.item.id + " - " + ancestor.item.name);
 
       expect(ancestor.item.id).toBe(expected[ancestorIdx]);
-    }
+    }    
+  });
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  xit("Should Remove All Items From Repository", ()=> {
+    
+  });
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  xit("Displays Tree Hash Map", ()=> {
+    var treeHashMap = ItemProxy.getAllTreeHashes();
+    console.log(treeHashMap);  
+  });
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  it("Hash Before Item Loaded Creates Tree Hash On Internal Node", ()=> {
+
+    var item = {
+      id:"test-item-id",
+      name: "TestItem ",
+      parentId: "Not_A_Valid_Parent_Id"
+    };
+    var proxy = new ItemProxy("Test", item);
+
+    dumpHashFor(proxy.parentProxy);
+    dumpHashFor(proxy);
+
+    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual("61a57146a9fa2422b0940680c7449a42db3b71ab");
+    expect(proxy.parentProxy.treeHashEntry.childTreeHashes["test-item-id"]).toEqual("53688a4a9207203c25da692d634bd58305ae1313");
+    expect(proxy.treeHashEntry.treeHash).toEqual("53688a4a9207203c25da692d634bd58305ae1313");
+  });
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  it("Calculates OID and TreeHash For a Leaf Node", ()=> {
+    
+    var thProxy = new ItemProxy("Test", {
+      id : "TH-Node-A",
+      name : "Node A",
+      parentId : ""
+    });
+    console.log("::: Node A");
+    console.log(thProxy.treeHashEntry);
+    expect(thProxy.treeHashEntry.treeHash).toBe("c821eb4089f0a835ab941c9b0db64f2ad32b44c7");
+    
+    console.log("::: Update Node");
+    var copyOfItem = getCopyOfItem(thProxy);
+    var itemToModify = getCopyOfItem(thProxy);
+    
+    itemToModify.name = "Node A Updated";
+    thProxy.updateItem("Test", itemToModify);
+    console.log(thProxy.treeHashEntry);
+    expect(thProxy.treeHashEntry.treeHash).toBe("2719d45fee33b0f3dbd72135fb57283b87bb321b");
+
+    
+    console.log("::: Putting back to same item");
+    thProxy.updateItem("Test", copyOfItem);
+    console.log(thProxy.treeHashEntry);
+    expect(thProxy.treeHashEntry.treeHash).toBe("c821eb4089f0a835ab941c9b0db64f2ad32b44c7");
+    
+    console.log("===");
+    console.log(thProxy.document());
+    console.log("===");
+    
+    expect(thProxy.treeHashEntry.oid).toBe("96f356b031940440afda4aab888a66753a3dcf47");
+    expect(thProxy.treeHashEntry.treeHash).toBe("c821eb4089f0a835ab941c9b0db64f2ad32b44c7");
 
   });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  it("Isolates Repositories in Tree Hash", ()=> {
+    var repoA = new ItemProxy("Repository", {
+      name: "Repository A",
+      id: "AAAA-AAAA"
+    });
+    
+    var a1 = new ItemProxy("Test", {
+      name: "Item A1",
+      id: "AAAA-1111",
+      parentId: "AAAA-AAAA"      
+    });
+    
+    var repoB = new ItemProxy("Repository", {
+      name: "Repository B",
+      id: "BBBB-BBBB",
+      parentId: "AAAA-AAAA"
+    });
+    
+    const expectedRepoAChildHashes = {
+        'AAAA-1111': '32e9a0cf54ff2a87304865fe3b99723dac910278',
+        'BBBB-BBBB': 'Repository-Mount'
+    };
+
+    const expectedInitialRepoBChildHashes = {};
+
+    const expectedFinalRepoBChildHashes = {
+        'BBBB-1111' : '7b1715172e8c5491ef5265adf78695d7ef9cb9ad'
+    };
+    
+    dumpHashFor(repoA, "Isolated Nested Repositories");
+    dumpHashFor(a1);
+    dumpHashFor(repoB);
+    expect(repoA.treeHashEntry.childTreeHashes).toEqual(expectedRepoAChildHashes);
+    expect(repoA.treeHashEntry.treeHash).toEqual("f8730b5510c1d47c3082836728336cd4a68f34d5");
+    expect(repoB.treeHashEntry.childTreeHashes).toEqual(expectedInitialRepoBChildHashes);
+    
+    var b1 = new ItemProxy("Test", {
+      name: "Item B1",
+      id: "BBBB-1111",
+      parentId: "BBBB-BBBB"      
+    });
+
+    dumpHashFor(repoA, "Added Item in Repo B, should not affect Repo A");
+    dumpHashFor(a1);
+    dumpHashFor(repoB);
+    // Only Repo B should have been affected
+    expect(repoA.treeHashEntry.childTreeHashes).toEqual(expectedRepoAChildHashes);
+    expect(repoA.treeHashEntry.treeHash).toEqual("f8730b5510c1d47c3082836728336cd4a68f34d5");
+    expect(repoB.treeHashEntry.childTreeHashes).toEqual(expectedFinalRepoBChildHashes);
+    
+  });
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  xit("Writes a File", ()=>{
+    var jsonObject = {
+      name: "Some Content",
+      id: "Some File"
+    }
+    var fs = require('fs');
+    
+    console.log("::: Writing the file")
+    fs.writeFileSync("w.out", JSON.stringify(jsonObject, null, '  '), {encoding: 'utf8', flag: 'w'});      
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  iit("Should Ensure Fields Are In Consistent Order", ()=>{
+    var object1a = {
+        name: "Some Content",
+        id: "id-1a1a1a"        
+    };
+    var object1b = {
+        id: "id_1a1a1a",
+        name: "Some Content"
+    };
+    
+    expect("Test").toBe("Written");
+    
+    expect(object1a).toEqual(object1b);
+  });
+  
 });
