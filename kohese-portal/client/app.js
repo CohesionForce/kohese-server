@@ -29,6 +29,7 @@ const appModule = angular.module('app', [
     'app.services.navigationservice',
     'app.services.versioncontrolservice',
     'app.services.importservice',
+    'app.services.modalservice',
     'app.factories.koheseio',
     'app.directives.navigation',
     'app.directives.treerow',
