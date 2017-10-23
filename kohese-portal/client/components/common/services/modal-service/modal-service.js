@@ -1,5 +1,13 @@
+/* Service that allows ui components to create modals with custom messages and 
+   controllers. Uses the ui-bootstrap modal components. More info on options for
+   modals can be found at :
+
+   https://github.com/angular-ui/bootstrap/tree/master/src/modal
+*/
+
 function ModalService($modal) {
     const service = this;
+    console.log('hello')
 
     var modalDefaults = {
         backdrop: true,

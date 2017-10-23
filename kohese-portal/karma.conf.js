@@ -18,8 +18,8 @@ module.exports = function(config) {
 				'bower_components/jquery/dist/jquery.js',
 				'bower_components/',
 				'client/bundle.js',
-				'tests/unit/mock/Mock*.js',
-				'tests/unit/components/*-spec.js',
+				'client/tests/unit/mock/Mock*.js',
+				'client/tests/unit/components/*-spec.js',
 				"bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
 				"bower_components/angular-animate/angular-animate.js",
 				"bower_components/socket.io-client/socket.io.js",
@@ -49,14 +49,32 @@ module.exports = function(config) {
 		      // do not include tests or libraries
 		      // (these files will be instrumented by Istanbul)
 		      'client/bundle.js': ['coverage'],
-	          'tests/unit/components/*.js': ['browserify'],
-	          'tests/unit/mock/*.js': ['browserify']
-		    },
+	          'client/tests/unit/components/*.js': ['browserify'],
+	          'client/tests/unit/mock/*.js': ['browserify']
+			},
+		
+		plugins: [	'karma-browserify', 
+					'karma-jasmine', 
+					'karma-coverage',
+					'karma-super-dots-reporter',
+					'karma-junit-reporter',
+					'karma-chrome-launcher',
+					'karma-html-reporter'],
 
 		    // test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters : ['dots', 'junit', 'coverage'],
+		reporters : ['super-dots', 'junit', 'coverage', 'html'],
+
+		htmlReporter: {
+			outputDir: 'karma_html', // where to put the reports  
+			templatePath: null, // set if you moved jasmine_template.html 
+			focusOnFailures: true, // reports show failures on start 
+			namedFiles: true, // name files instead of creating sub-directories 
+			pageTitle: null, // page title for reports; browser info by default 
+			urlFriendlyName: true, // simply replaces spaces with _ for files/dirs 
+			reportName: 'report-summary-filename', // report summary filename; browser info by default
+		},
 		
 		junitReporter : {
 			outputDir: '',
@@ -103,6 +121,6 @@ module.exports = function(config) {
 
 		// Continuous Integration mode
 		// if true, Karma captures browsers, runs the tests and exits
-		singleRun : false
+		singleRun : true
 	})
 }
