@@ -632,7 +632,7 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  iit("Should Ensure Fields Are In Consistent Order", ()=>{
+  it("Should Ensure Fields Are In Consistent Order", ()=>{
     var object1a = {
         name: "Some Content",
         id: "id-1a1a1a"        
@@ -642,6 +642,9 @@ describe("ItemProxy Test", function() {
         name: "Some Content"
     };
     
+    console.log("1A Keys: " + Object.keys(object1a));
+    console.log("1B Keys: " + Object.keys(object1b));
+
     expect("Test").toBe("Written");
     
     expect(object1a).toEqual(object1b);
