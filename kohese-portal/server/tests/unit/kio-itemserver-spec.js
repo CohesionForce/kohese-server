@@ -24,8 +24,8 @@ describe("Test the Item Server", ()=> {
         describe("Test the Add Message", ()=>{
             it("should add an updated item to the index", (done)=>{
 
-                
-                var req = {proxyIds: ["1","2","3"]};
+
+                var req = {proxyIds: ["748b7880-b509-11e7-ba1e-cbd891de1f92"]};
                 var expectedStatusMap = {"1":["INDEX_ADD"]}//2:INDEX_ADD,3:INDEX_ADD}
                 var expectedResults = {"1": true, "2": true,"3":true}
 

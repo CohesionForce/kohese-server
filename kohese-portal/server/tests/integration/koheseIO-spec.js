@@ -35,7 +35,7 @@ describe("Test KIO", ()=> {
       global.app.emit("newSession", socket);
             
       // Request items be staged
-      var itemId = "87a2bf30-9a96-11e5-a88b-13b67c50fa38";
+      var itemId = "748b7880-b509-11e7-ba1e-cbd891de1f92";
       var request = {
           proxyIds: undefined
       };
