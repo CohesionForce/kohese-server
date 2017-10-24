@@ -18,6 +18,29 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
         Category: "Category",
         KoheseUser: "KoheseUser"
     };
+    
+    var VCStateLookup = {
+        CURRENT: {state: "Current", substate: ""},
+        INDEX_NEW: {state: "Staged", substate: "New"},
+        INDEX_MODIFIED: {state: "Staged", substate: "Modified"},
+        INDEX_DELETED: {state: "Staged", substate: "Deleted"},
+        INDEX_RENAMED: {state: "Staged", substate: "Renamed"},
+        INDEX_TYPECHANGE: {state: "Staged", substate: "TypeChange"}, // Shouldn't happen
+        WT_NEW: {state: "Unstaged", substate: "New"},
+        WT_MODIFIED: {state: "Unstaged", substate: "Modified"},
+        WT_DELETED: {state: "Unstaged", substate: "Deleted"},
+        WT_TYPECHANGE: {state: "Unstaged", substate: "TypeChange"}, // Shouldn't happen
+        WT_RENAMED: {state: "Unstaged", substate: "Renamed"},
+        WT_UNREADABLE: {state: "Unstaged", substate: "Unreadable"}, // Shouldn't happen
+        IGNORED: {state: "Ignored", substate: ""},
+        CONFLICTED: {state: "Conflict", substate: ""}
+    };
+
+    var repoStagingStatus = {
+        Unstaged: {},
+        Staged: {},
+        Conflicted: {}
+    };
 
     function registerKoheseIOListeners() {
         // Register the listeners for the Item kinds that are being tracked
@@ -31,7 +54,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
                 	proxy = new ItemProxy(notification.kind, notification.item);
                 }
 
-                proxy.status = notification.status;
+                updateVCState(proxy, notification.status);
                 proxy.dirty = false;
             });
 
@@ -44,7 +67,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
                 	proxy = new ItemProxy(notification.kind, notification.item);
                 }
 
-                proxy.status = notification.status;
+                updateVCState(proxy, notification.status);
                 proxy.dirty = false;
             });
             
@@ -58,7 +81,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
         KoheseIO.socket.on("VersionControl/statusUpdated", function (gitStatusMap) {
           for (var id in gitStatusMap) {
             var proxy = ItemProxy.getProxyFor(id);
-            proxy.status = gitStatusMap[id];
+            updateVCState(proxy, gitStatusMap[id]);
           }
         });
 
@@ -83,7 +106,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
             }
         });
 
-    }
+    };
 
     if (KoheseIO.isAuthenticated) {
         console.log("::: IR: KoheseIO already connected");
@@ -115,9 +138,48 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
         generateDOCXReportFor: generateDOCXReportFor,
         getHistoryFor: getHistoryFor,
         getStatusFor: getStatusFor,
-        performAnalysis: performAnalysis
+        performAnalysis: performAnalysis,
+        getRepoStagingStatus: getRepoStagingStatus
     };
-
+    
+    function updateVCState(proxy, newStatus) {
+      var oldStatus = proxy.status;
+      var oldVCState = proxy.vcState;
+      var newVCState = {};
+      var itemId = proxy.item.id;
+      
+      for (var idx in newStatus){
+        var s = newStatus[idx];
+        var vc = VCStateLookup[newStatus[idx]];
+        newVCState[vc.state] = vc.substate;
+      }
+      
+      if(oldVCState && oldVCState.Unstaged && !(newVCState && newVCState.Unstaged)){
+        // Item removed from working tree
+        delete repoStagingStatus.Unstaged[itemId];
+      }
+      if(oldVCState && oldVCState.Staged && !(newVCState && newVCState.Staged)){
+        // Item removed from index
+        delete repoStagingStatus.Staged[itemId];
+      }
+      if(newVCState && newVCState.Unstaged && !(oldVCState && oldVCState.Unstaged)){
+        // Item added to working tree
+        repoStagingStatus.Unstaged[itemId] = proxy;
+      }
+      if(newVCState && newVCState.Staged && !(oldVCState && oldVCState.Staged)){
+        // Item add to index
+        repoStagingStatus.Staged[itemId] = proxy;
+      }
+      
+      
+      proxy.status = newStatus;
+      proxy.vcState = newVCState;
+    };
+    
+    function getRepoStagingStatus() {
+        return repoStagingStatus;
+    };
+    
     function fetchItems() {
       KoheseIO.socket.emit('Item/getAll', {}, function (response) {
         console.log("::: Response for getAll");
@@ -278,7 +340,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
 
             var proxy = ItemProxy.getProxyFor(entry.id);
             if (proxy) {
-              proxy.status = entry.status              
+              updateVCState(proxy, entry.status);              
             } else {
               console.log("!!! Item not found for entry: " + rIdx + " - " + entry.id + " - " + entry.status );              
             }
