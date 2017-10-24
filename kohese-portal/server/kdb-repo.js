@@ -9,7 +9,6 @@ var path = require("path");
 var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
 var repoList = {};
-var stageMap = {};
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -145,12 +144,7 @@ function add(proxies) {
   return Promise.all(promises).then(function () {
     var promises = [];
     for (var repo in repoIndexMap) {
-      var index = repoIndexMap[repo];
-      promises.push(index.write().then(function (returnVal) {
-        return index.writeTree();
-      }).then(function (writeId) {
-        stageMap[repo] = writeId;
-      }));
+      promises.push(repoIndexMap[repo].write());
     }
     
     return Promise.all(promises);
@@ -173,9 +167,11 @@ function commit(proxies, userName, eMail, message) {
     var repo = info.gitRepo;
     (function (iIndex) {
       promises.push(repo.getHeadCommit().then(function (commit) {
-        if (stageMap[repo]) {  
-          var p = repo.createCommit("HEAD", signature, signature, message,
-              stageMap[repo], [commit]).then(function (commitId) {
+        return repo.refreshIndex().then(function (index) {
+          return index.writeTree();
+        }).then(function (treeId) {
+          return repo.createCommit("HEAD", signature, signature, message,
+              treeId, [commit]).then(function (commitId) {
             commitIdMap[proxies[iIndex].item.id] = commitId;
             repo.getCommit(commitId).then(function (c) {
               getCommitFilesChanged(c).then(function (filesChanged) {
@@ -186,9 +182,7 @@ function commit(proxies, userName, eMail, message) {
               });
             });
           });
-          delete stageMap[repo];
-          return p;
-        }
+        });
       }));
     })(i);
   }
