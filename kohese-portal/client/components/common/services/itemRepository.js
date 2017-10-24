@@ -138,7 +138,8 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
         generateDOCXReportFor: generateDOCXReportFor,
         getHistoryFor: getHistoryFor,
         getStatusFor: getStatusFor,
-        performAnalysis: performAnalysis
+        performAnalysis: performAnalysis,
+        getRepoStagingStatus: getRepoStagingStatus
     };
     
     function updateVCState(proxy, newStatus) {
