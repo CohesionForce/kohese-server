@@ -122,7 +122,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     }
 
     ctrl.getRemotes = function(){
-        VersionControlService.getRemotes(treeRoot.children[0].item.id, 
+        VersionControlService.getRemotes(treeRoot.item.id, 
             function(remoteList) {
             ctrl.remotesList = remoteList;
             });
@@ -130,11 +130,12 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
 
     ctrl.commit = function()
         {
-        if (ctrl.commitMessageInput === "")
-            treeCtrl.commitMessageInput = "No Message Entered"
+        if (ctrl.commitMessageInput === "" || !ctrl.commitMessageInput)
+            ctrl.commitMessageInput = "No Message Entered"
 
         // Need to grab all of the indexed nodes
-        VersionControlService.commitItems(treeRoot.children[0],
+        // Hack while repo split is WIP
+        VersionControlService.commitItems([treeRoot],
                                         ctrl.commitMessageInput);
         }
 
@@ -142,7 +143,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     {
         // Using the root nodes repo for now while that system gets worked out.
         var proxyIds = []
-        proxyIds.push(treeRoot.children[0].item.id);
+        proxyIds.push(treeRoot.item.id);
         VersionControlService.push(proxyIds, ctrl.pushRemoteNameInput);
     }
         
