@@ -20,4 +20,5 @@ export default() => {
     require('./versionControlService')();
     require('./kohese-io')();
     require('./importService')();
+    require('./modal-service/modal-service')();
 }

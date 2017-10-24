@@ -3,7 +3,8 @@
  */
 
 function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
-                        $scope, $location, $stateParams, SearchService, tabService, VersionControlService) {
+                        $scope, $location, $stateParams, SearchService, tabService, VersionControlService,
+                        ModalService) {
 
     var treeCtrl = this,
         syncListener;
@@ -253,11 +254,21 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 
     treeCtrl.removeItem = function (proxy) {
         var itemId = proxy.item.id;
-        ItemRepository
-            .deleteItem(proxy)
-            .then(function () {
+        var modalOptions = {
+            closeButtonText : 'Cancel',
+            actionButtonText : 'Delete',
+            headerText: 'Delete "' + proxy.item.name + '"?',
+            bodyText: 'Are you sure you want to delete this item?'
+        }
+
+        ModalService.showModal({}, modalOptions).then((result)=>
+            {
+            ItemRepository
+            .deleteItem(proxy).then(function () 
+                {
                 console.log("::: Item has been deleted: " + itemId);
-            });
+                });
+        })
     };
 
     treeCtrl.initCollapsed = function (itemId){
@@ -501,6 +512,8 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 }
 
 export default () => {
-    angular.module('app.tree', ['app.services.tabservice', 'app.services.versioncontrolservice'])
+    angular.module('app.tree', ['app.services.tabservice', 
+                                'app.services.versioncontrolservice',
+                                'app.services.modalservice'])
         .controller('KTreeController', KTreeController);
 }

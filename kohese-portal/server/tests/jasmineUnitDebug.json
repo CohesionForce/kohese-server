@@ -1,10 +1,9 @@
 {
-  "spec_dir": "tests/server/unit",
+  "spec_dir": "server/tests/unit",
   "spec_files": [
     "*-spec.js"
   ],
   "helpers": [
-    "helpers/reporter.js"
   ],
   
   "stopSpecOnExpectationFailure": false,
