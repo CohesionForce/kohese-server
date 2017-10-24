@@ -265,12 +265,17 @@ module.exports.checkout = checkout;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function reset(proxies, paths) {
+function reset(repoProxies, proxiesToReset) {
   var promises = [];
-  for (var i = 0; i < proxies.length; i++) {
-    var info = repoRelativePathOf(proxies[i]);
+  var resetPaths = [];
+  for (var j = 0; j < proxiesToReset.length; j++) {
+    resetPaths.push(repoRelativePathOf(proxiesToReset[j]).relativeFilePath);
+  }
+  
+  for (var i = 0; i < repoProxies.length; i++) {
+    var info = repoRelativePathOf(repoProxies[i]);
     promises.push(info.gitRepo.getHeadCommit().then(function (commit) {
-      return nodegit.Reset.default(info.gitRepo, commit, paths);
+      return nodegit.Reset.default(info.gitRepo, commit, resetPaths);
     }));
   }
   

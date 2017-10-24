@@ -11,7 +11,7 @@ console.log("::: Initializing KIO Item Server");
 
 if(global.app)
   {
-  global.app.on('newSession', KIOItemServer) 
+  global.app.on('newSession', KIOItemServer);
   }
   
 function KIOItemServer(socket){
@@ -282,11 +282,33 @@ function KIOItemServer(socket){
     });
   });
   
+  socket.on("VersionControl/unstage", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray.length; i++) {
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
+    }
+    
+    kdb.kdbRepo.reset([kdb.ItemProxy.getProxyFor(request.repo)], proxies).then(
+        function (statuses) {
+          sendStatusUpdates(proxies);
+          sendResponse(statuses);
+        }).catch(function (err) {
+          sendResponse({
+            error: err
+          });
+        });
+  });
+  
+  socket.on("VersionControl/checkout", function (request, sendResponse) {
+// TODO    kdb.kdbRepo.checkout();
+  });
+  
   socket.on("ImportDocuments", function (request, sendResponse) {
     new Promise(function (resolve, reject) {
       var absolutes = [];
       var root = Path.dirname(fs.realpathSync(__dirname));
-      root = Path.join(root, "data_import", socket.koheseUser.username)
+      root = Path.join(root, "data_import", socket.koheseUser.username);
       absolutes.push(Path.join(root, request.file));
       var results = importer.importFiles(absolutes, request.parentItem);
       resolve(results);
@@ -294,10 +316,10 @@ function KIOItemServer(socket){
       sendResponse(results);
     }).catch(function (err){
       sendResponse({err:err});
-    }) 
+    });
   });
 
-};
+}
 
 function sendStatusUpdates(proxies) {
   var promises = [];
