@@ -153,13 +153,26 @@ module.exports = function(grunt) {
 				args: ['.']
 			},
 			
-			jasmineServer: {
+			jasmineUnit: {
 				options: {
 					// This test logs a bunch of garbage
-					quiet: true
+					// quiet: true
 				},
 				cmd: 'node',
-				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=tests/jasmine.json']
+				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=server/tests/jasmineUnit.json']
+			},
+
+			jasmineUnitDebug: {
+				cmd: 'node',
+				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=server/tests/jasmineUnitDebug.json']
+			},
+			jasmineIntegration : {
+				cmd: 'node',
+				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=server/tests/jasmineIntegration.json']
+			},
+			jasmineIntegrationDebug: {
+				cmd: 'node',
+				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=server/tests/jasmineIntegrationDebug.json']
 			},
 			
 			jasmineRest: {
@@ -199,6 +212,10 @@ module.exports = function(grunt) {
     var client = ['sass', 'webpack'];
 	// Run node server related testing
 	var testServer = ['jshint:server', 'run:jasmineServer', 'run:server', 'run:jasmineRest'];
+	var testUnitServer = ['babel', 'run:jasmineUnit'];
+	var testUnitServerDebug = ['babel', 'run:jasmineUnitDebug'];
+	var testIntegrationServer = ['babel', 'run:jasmineIntegration'];
+	var testIntegrationServerDebug = ['babel', 'run:jasmineIntegrationDebug']
 	// Run client based tests
 	var testClient = ['browserify', 'jasmine'];
 	var test = [].concat(testServer, testClient);
@@ -212,6 +229,13 @@ module.exports = function(grunt) {
 	grunt.registerTask('server', ['babel', 'uglify','copy:server']);
 	grunt.registerTask('test:server', 'Run server related testing.', testServer);
 	grunt.registerTask('test:client', 'Run client related testing.', testClient);
+	grunt.registerTask('sunit', 'Run unit tests on the server', testUnitServer);
+	grunt.registerTask('sunit:d', 'Run server unit tests with stacktrace', 
+							testUnitServerDebug);
+	grunt.registerTask('sinte', 'Run integration tests on the server', 
+							testIntegrationServer);
+	grunt.registerTask('sinte:d', 'Run server integration test with stacktrace',
+							testIntegrationServerDebug)
 	grunt.registerTask('test', 'Run server and client tests.', test);
 	grunt.registerTask('dist', 'Prepare Kohese for distribution.', dist);
 	grunt.registerTask('build', 'Run all testing and dist related tasks.', build);
