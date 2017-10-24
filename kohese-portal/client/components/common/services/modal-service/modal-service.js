@@ -7,7 +7,6 @@
 
 function ModalService($modal) {
     const service = this;
-    console.log('hello')
 
     var modalDefaults = {
         backdrop: true,

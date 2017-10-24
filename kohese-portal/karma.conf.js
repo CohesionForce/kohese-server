@@ -20,6 +20,7 @@ module.exports = function(config) {
 				'client/bundle.js',
 				'client/tests/unit/mock/Mock*.js',
 				'client/tests/unit/components/*-spec.js',
+				'client/tests/unit/services/*-spec.js',
 				"bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
 				"bower_components/angular-animate/angular-animate.js",
 				"bower_components/socket.io-client/socket.io.js",
@@ -48,7 +49,6 @@ module.exports = function(config) {
 		      // source files, that you wanna generate coverage for
 		      // do not include tests or libraries
 		      // (these files will be instrumented by Istanbul)
-		      'client/bundle.js': ['coverage'],
 	          'client/tests/unit/components/*.js': ['browserify'],
 	          'client/tests/unit/mock/*.js': ['browserify']
 			},
@@ -121,6 +121,6 @@ module.exports = function(config) {
 
 		// Continuous Integration mode
 		// if true, Karma captures browsers, runs the tests and exits
-		singleRun : true
+		singleRun : false
 	})
 }
