@@ -41,6 +41,28 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
           });
     }
 
+    service.unstageItem = function(proxyList, repo) {
+        var data = {
+            proxyIds : [],
+            repo : repo.item.id
+        }
+        for (var i = 0; i < proxyList.length; i++)
+        {
+            data.proxyIds.push(proxyList[i].item.id);
+        }
+        Kohese.socket.emit('VersionControl/unstage', function (results) {
+            console("::: Unstage results:");
+            console.log(results);
+            if (results.error)
+                toastr.error("Unstage failed", results.error);
+            else {
+                toastr.success('Unstage Succeeded!', 'Version Control');
+            }
+        });
+    };
+
+    service.revertItem = 
+
     service.commitItems = function (proxyList, commitMessage) {
         var data = { proxyIds : []}
         var proxyList = Array.from(proxyList);
@@ -71,7 +93,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
         var data = {};
         data.proxyIds = proxyIds,
         data.remoteName = remoteName;
-        data.userName = UserService.getCurrentUsername();
+        data.username = UserService.getCurrentUsername();
         console.log("Push send data");
         console.log(data)
 

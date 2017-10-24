@@ -213,7 +213,10 @@ function push(proxies, remoteName, userName) {
                  }
               }).then(function (status) {
                 pushStatusMap[proxies[iIndex].item.id] = status;
-              });
+              })
+                .catch(function(err){
+                 console.log(err); 
+                });
            }));
     })(i);
   }
