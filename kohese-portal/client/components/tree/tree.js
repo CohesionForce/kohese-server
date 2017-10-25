@@ -408,10 +408,62 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         VersionControlService.unstageItems([itemProxy]);
         }
 
-    treeCtrl.revertItem = function (itemProxy) {
-        VersionControlService.revertItems([itemProxy]);
-    }
     
+    function showDiscardModal(itemProxy, options){
+        var modalOptions = {
+            closeButtonText : 'Cancel',
+            actionButtonText : 'Discard Item',
+            headerText: '"' + itemProxy.item.name + '" is a new item. ',
+            bodyText: 'Reverting this to the last checkpoint will delete it permanently. Are you sure you want to discard this item?'
+        }    
+
+        ModalService.showModal({}, modalOptions).then((result)=>
+            {
+            ItemRepository
+            .deleteItem(itemProxy).then(function () 
+                {
+                console.log("::: Item has been deleted: " + itemId);
+                });
+            })
+        };
+
+    treeCtrl.revertItem = function (itemProxy) {
+
+        if (itemProxy.vcState.Staged)
+            {
+            if (itemProxy.vcState.Staged === "New")
+                {
+                showDiscardModal(itemProxy);
+                return;
+                }
+            }
+        if (itemProxy.vcState.Unstaged)
+            {
+            if (itemProxy.vcState.Unstaged ==="New")
+                {
+                showDiscardModal(itemProxy);
+                return;
+                }
+            }
+
+        var modalOptions = {
+            closeButtonText : 'Cancel',
+            actionButtonText : 'Discard Changes',
+            headerText: 'Discard Changes',
+            bodyText: 'Reverting this to the last checkpoint will delete any new changes. Are you sure?'
+        }    
+
+        ModalService.showModal({}, modalOptions).then((result)=>
+            {
+                VersionControlService.revertItems([itemProxy]);
+            })
+         
+        
+        
+    };
+        
+
+
     treeCtrl.commit = function()
         {
         if (!treeCtrl.commitMessage)

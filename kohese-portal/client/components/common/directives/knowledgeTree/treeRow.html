@@ -58,7 +58,6 @@
                     title="Staged"/>
                 <!-- Actions -->
                 <i  class="fa fa-undo"
-                    ng-if="!(itemProxy.vcState.Staged && itemProxy.vcState.Unstaged)"
                     ng-click="treeCtrl.revertItem(itemProxy)"/>
                 <i  class="fa fa-plus"
                     ng-if="itemProxy.vcState.Unstaged"
