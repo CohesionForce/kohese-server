@@ -22,10 +22,9 @@
                     ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]"
                     ng-init="treeCtrl.initCollapsed(itemProxy.item.id)"
                     class="kt-icon"
-                    ng-class="{'glyphicon fa icon-minus glyphicon-minus fa-minus': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
-                           'glyphicon fa icon-plus glyphicon-plus fa-plus': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
-                           'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0),
-                           'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}">
+                    ng-class="{'glyphicon fa icon-minus glyphicon-minus fa-caret-down': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
+                           'glyphicon fa icon-plus glyphicon-plus fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
+                           'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
             </i>
             </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
                                                   ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"

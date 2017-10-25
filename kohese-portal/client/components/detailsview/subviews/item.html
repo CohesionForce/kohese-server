@@ -19,8 +19,12 @@
     <th><a href="" ng-click="itemSortField = 'item.assignedTo'">Assigned To</a></th>
     <th><a href="" ng-click="itemSortField = 'item.tags'">Tags</a></th>
     <th><a href="" ng-click="itemSortField = 'item.description'">Description</a></th>
-    <th><i class="glyphicon glyphicon-plus pull-right"
-           ng-click="detailsCtrl.navigateToCreateForm()"></i></th>
+    <th>					
+        <span 	
+            class="create-button pull-right"
+            ng-click="detailsCtrl.navigateToCreateForm()">
+            Create Child
+        </span>
     </thead>
     <tbody ui-tree-nodes ng-model="detailsCtrl.itemProxy.children">
     <tr ui-tree-node ng-repeat="proxy in filteredItems = (detailsCtrl.itemProxy.children  | filter:{item: {$: detailsCtrl.filterString}}) | orderBy:itemSortField">
