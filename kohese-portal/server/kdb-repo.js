@@ -255,7 +255,8 @@ function checkout(proxies, force) {
   for (var j = 0; j < repoMap.length; j++) {
     var options = new nodegit.CheckoutOptions();
     options.paths = repoMap[j].paths;
-    options.checkoutStrategy = (force ? nodegit.Checkout.STRATEGY.FORCE : nodegit.Checkout.STRATEGY.SAFE);
+    options.checkoutStrategy = (force ? (nodegit.Checkout.STRATEGY.FORCE
+        | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : nodegit.Checkout.STRATEGY.SAFE);
     (function (jIndex) {
       promises.push(repoMap[jIndex].repo.getHeadCommit().then(function (commit) {
         return nodegit.Checkout.tree(repoMap[jIndex].repo, commit, options);
