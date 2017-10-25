@@ -389,87 +389,28 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
                 treeCtrl.versionControlEnabled = true;
                 treeCtrl.selectedVersionControlNodes = new Set();
                 treeCtrl.expandFiltered()
-                console.log(treeCtrl.filter);
                 break;
             default : 
                 treeCtrl.filter.status = false;
                 treeCtrl.filter.dirty = false;
                 treeCtrl.versionControlEnabled = false;
-                console.log(treeCtrl.filter);
             }
             
     }
 
-    // Called when the version control view is selected
-    treeCtrl.applyVersionControlTags = function (proxy)
-    {
-        if (proxy.status)
-        {
-            console.log(proxy.item.id);
-            console.log(proxy.status);
-            // Define the statusflags object on the proxy
-            proxy.statusFlags = 
-            {
-                WTModified: false,
-                NewItem: false,
-                IndexModified: false
-            }
-
-            // Set flags for the returned statuses
-            for (var i = 0; i < proxy.status.length; i++ )
-            {
-                status = proxy.status[i];
-                switch (status)
-                {
-                    case ("WT_MODIFIED"):
-                        proxy.statusFlags.WTModified= true;
-                        break;
-                    case ("WT_NEW"):
-                        proxy.statusFlags.newItem = true;
-                        break;
-                    case ("INDEX_MODIFIED"):
-                        proxy.statusFlags.IndexModified = true;
-                        break;
-                    case ("INDEX_NEW"):
-                        proxy.statusFlags.IndexNew = true;
-                        break;
-                    default:
-                        console.log ("VC Status uncaught")
-                        console.log (status);
-                }      
-            }
-        }
-    }
-
-    treeCtrl.onVersionControlStageChange = function(proxy)
-    {
-        
-        console.log("Version Control Stage Change");
-        if (proxy.selected)
-        {
-            treeCtrl.selectedVersionControlNodes.add(proxy);
-        } else {
-            treeCtrl.selectedVersionControlNodes.delete(proxy);
-        }
-
-        console.log(treeCtrl.selectedVersionControlNodes)
-    }
-
-    treeCtrl.stageItems = function()
+    treeCtrl.stageItem = function(itemProxy)
         { 
-        VersionControlService.stageItems(treeCtrl.selectedVersionControlNodes);
-        console.log("Stage Items");
+        VersionControlService.stageItems([itemProxy]);
         }
 
-    // treeCtrl.openCommitModal = function()
-    //     {
-    //         Popeye.openModal({
-    //             templateUrl: "components/tree/modals/commitmodal.html",
-    //             $scope: {
-    //                 treeCtrl: "="
-    //             }            
-    //         })
-    //     }
+    treeCtrl.unstageItem = function (itemProxy) 
+        {
+        VersionControlService.unstageItems([itemProxy]);
+        }
+
+    treeCtrl.revertItem = function (itemProxy) {
+        VersionControlService.revertItems([itemProxy]);
+    }
     
     treeCtrl.commit = function()
         {
@@ -482,30 +423,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         VersionControlService.commitItems(treeCtrl.selectedVersionControlNodes,
                                           treeCtrl.commitMessage);
         }
-
-    // treeCtrl.openPushModal = function()
-    // {
-    //     Popeye.openModal({
-    //         templateUrl: "components/tree/modals/pushmodal.html",
-    //         controller: "PushModalControl as modalCtrl",
-    //     })
-    // }
-
-    treeCtrl.addRemote = function(){
-        VersionControlService.addRemote([treeCtrl.treeRoot.children[0].item.id], "test-repo", 
-        "git@matrix:home/jephillips/kohese-server/kohese-portal");
-    }
-
-    treeCtrl.getRemotes = function(){
-        VersionControlService.getRemotes(treeCtrl.treeRoot.children[0].item.id);
-    }
-
-    treeCtrl.push = function() 
-    {
-        var proxyIds = []
-        proxyIds.push(treeCtrl.treeRoot.children[0].item.id)
-        VersionControlService.push(proxyIds, "test-kdb");
-    }
 
     /****** End Version Control View Functions */
 

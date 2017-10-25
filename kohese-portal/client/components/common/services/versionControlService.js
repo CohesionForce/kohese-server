@@ -6,18 +6,7 @@
 function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepository, toastr)
 {
     const service = this;
-    service.indexedProxies = {};
 
-    
-    service.setIndexedProxy = function(proxy) {
-        service.indexedProxies[proxy.item.id] = proxy;
-        console.log(service.indexedProxies);
-    }
-
-    service.getIndexedProxies = function() {
-        return service.indexedProxies;
-    }
-    
     service.stageItems = function(proxyList) {
         console.log (proxyList);
         var proxyList = Array.from(proxyList)
@@ -35,13 +24,11 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
                 toastr.error('Stage Failed', 'Version Control');
             else {
                 toastr.success('Stage Succeeded!', 'Version Control');
-
             }
-
           });
-    }
+    };
 
-    service.unstageItem = function(proxyList) {
+    service.unstageItems = function(proxyList) {
         var data = {
             proxyIds : []
         }
@@ -49,7 +36,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
         {
             data.proxyIds.push(proxyList[i].item.id);
         }
-        Kohese.socket.emit('VersionControl/reset', function (results) {
+        KoheseIO.socket.emit('VersionControl/reset', data, function (results) {
             console("::: Unstage results:");
             console.log(results);
             if (results.error)
@@ -60,14 +47,14 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
         });
     };
 
-    service.revertItem = function(proxyList) {
+    service.revertItems = function(proxyList) {
         var data = {
             proxyIds: []
         }
         for (var i= 0; i< proxyList.length; i++) {
             data.proxyIds.push(proxyList[i].item.id);
         }
-        Kohese.socket.emit('VersionControl/checkout', function (results){
+        KoheseIO.socket.emit('VersionControl/checkout', data, function (results){
             console.log("::: Revert results");
             console.log(results);
             if (results.error)
@@ -76,6 +63,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
                 toastr.success('Revert Succeeded!', 'Version Control');
             } 
         }) 
+    };
     
 
     service.commitItems = function (proxyList, commitMessage) {
@@ -102,7 +90,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
             console.log (results);
             
         });
-    }
+    };
 
     service.push = function(proxyIds, remoteName) {
         var data = {};
@@ -120,7 +108,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
             console.log("::: Push results:");
             console.log (results);
         } )
-    }
+    };
 
     service.addRemote = function(proxyId, remoteName, url) {
         var data = {};
@@ -137,7 +125,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
             }
         console.log(results);
         });
-    }
+    };
 
     service.getRemotes = function(proxyId, callback) {
         var data = {};
@@ -153,9 +141,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
             }
             console.log(results);
         })
-
-
-    }
+    };
 
 }
 
