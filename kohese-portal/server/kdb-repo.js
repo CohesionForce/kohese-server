@@ -196,7 +196,7 @@ module.exports.commit = commit;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function push(proxies, remoteName, userName) {
+function push(proxies, remoteName) {
   var pushStatusMap = {};
   var promises = [];
   for (var i = 0; i < proxies.length; i++) {
@@ -208,7 +208,7 @@ function push(proxies, remoteName, userName) {
               {
                  callbacks: {
                     credentials: function(url, u) {
-                       return nodegit.Cred.sshKeyFromAgent(userName);
+                       return nodegit.Cred.sshKeyFromAgent(remote.url().split("@")[0]);
                     }
                  }
               }).then(function (status) {
@@ -230,25 +230,27 @@ module.exports.push = push;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function checkout(proxies, pointOfReference, force) {
+function checkout(proxies, force) {
   var repoMap = [];
   for (var i = 0; i < proxies.length; i++) {
     var add = true;
     var info = repoRelativePathOf(proxies[i]);
+    var entry = {
+        id: proxies[i].item.id,
+        path: info.relativeFilePath
+    };
     for (var j = 0; j < repoMap.length; j++) {
       if (repoMap[j].repo === info.gitRepo) {
-        repoMap[j].paths.push(info.relativeFilePath);
+        repoMap[j].idPathPairs.push(entry);
         add = false;
         break;
       }
     }
     
     if (add) {
-      var p = [];
-      p.push(info.relativeFilePath);
       repoMap.push({
         repo: info.gitRepo,
-        paths: p
+        idPathPairs: [entry]
       });
     }
   }
@@ -256,9 +258,19 @@ function checkout(proxies, pointOfReference, force) {
   var promises = [];
   for (var j = 0; j < repoMap.length; j++) {
     var options = new nodegit.CheckoutOptions();
-    options.paths = repoMap[j].paths;
+    var paths = [];
+    for (var k = 0; k < repoMap[j].idPathPairs.length; k++) {
+      paths.push(repoMap[j].idPathPairs[k]);
+    }
+    options.paths = paths;
     options.checkoutStrategy = (force ? nodegit.Checkout.STRATEGY.FORCE : nodegit.Checkout.STRATEGY.SAFE);
-    promises.push(nodegit.Checkout.tree(repoMap[j].repo, pointOfReference, options));
+    (function (jIndex) {
+      promises.push(repoMap[jIndex].repo.getHeadCommit().then(function (commit) {
+        return nodegit.Checkout.tree(repoMap[jIndex].repo, commit, options).then(function () {
+          return repoMap[jIndex].idPathPairs;
+        });
+      }));
+    })(j);
   }
   
   return Promise.all(promises);
@@ -268,18 +280,34 @@ module.exports.checkout = checkout;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function reset(repoProxies, proxiesToReset) {
+function reset(proxiesToReset) {
   var promises = [];
-  var resetPaths = [];
+  var repoMap = [];
   for (var j = 0; j < proxiesToReset.length; j++) {
-    resetPaths.push(repoRelativePathOf(proxiesToReset[j]).relativeFilePath);
+    var info = repoRelativePathOf(proxiesToReset[j]);
+    var found = false;
+    for (var k = 0; k < repoMap.length; k++) {
+      if (repoMap[k].repo === info.gitRepo) {
+        found = true;
+        repoMap[k].resetPaths.push(info.relativeFilePath);
+        break;
+      }
+    }
+    
+    if (!found) {
+      repoMap.push({
+          repo: info.gitRepo,
+          resetPaths: [info.relativeFilePath]
+      });
+    }
   }
   
-  for (var i = 0; i < repoProxies.length; i++) {
-    var info = repoRelativePathOf(repoProxies[i]);
-    promises.push(info.gitRepo.getHeadCommit().then(function (commit) {
-      return nodegit.Reset.default(info.gitRepo, commit, resetPaths);
-    }));
+  for (var i = 0; i < repoMap.length; i++) {
+    (function (iIndex) {
+      promises.push(repoMap[iIndex].repo.getHeadCommit().then(function (commit) {
+        return nodegit.Reset.default(repoMap[iIndex].repo, commit, repoMap[iIndex].resetPaths);
+      }));
+    })(i);
   }
   
   return Promise.all(promises);
