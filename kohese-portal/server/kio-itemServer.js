@@ -308,18 +308,16 @@ function KIOItemServer(socket){
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
     
-    kdb.kdbRepo.checkout(proxies, true).then(function (idPathPairs) {
+    kdb.kdbRepo.checkout(proxies, true).then(function () {
       // Update content based on reverted files
-      for (var j = 0; j < idPathPairs.length; j++) {
-        for (var k = 0; k < idPathPairs[j].length; k++) {
-          var proxy = kdb.ItemProxy.getProxyFor(idPathPairs[j][k].id);
-          proxy.item = kdbFs.loadJSONDoc(idPathPairs[j][k].path);
-          global.app.models[proxy.kind].upsert(proxy.item, {}, function () {});
-        }
+      for (var j = 0; j < proxies.length; j++) {
+        var proxy = proxies[j];
+        proxy.item = kdbFs.loadJSONDoc(proxy.repoPath);
+        global.app.models[proxy.kind].upsert(proxy.item, {}, function () {});
       }
       
       sendStatusUpdates(proxies);
-      sendResponse();
+      sendResponse({});
     }).catch(function (err) {
       sendResponse({
         error: err

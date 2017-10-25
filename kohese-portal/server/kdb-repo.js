@@ -235,13 +235,9 @@ function checkout(proxies, force) {
   for (var i = 0; i < proxies.length; i++) {
     var add = true;
     var info = repoRelativePathOf(proxies[i]);
-    var entry = {
-        id: proxies[i].item.id,
-        path: info.relativeFilePath
-    };
     for (var j = 0; j < repoMap.length; j++) {
       if (repoMap[j].repo === info.gitRepo) {
-        repoMap[j].idPathPairs.push(entry);
+        repoMap[j].paths.push(info.relativeFilePath);
         add = false;
         break;
       }
@@ -250,7 +246,7 @@ function checkout(proxies, force) {
     if (add) {
       repoMap.push({
         repo: info.gitRepo,
-        idPathPairs: [entry]
+        paths: [info.relativeFilePath]
       });
     }
   }
@@ -258,17 +254,11 @@ function checkout(proxies, force) {
   var promises = [];
   for (var j = 0; j < repoMap.length; j++) {
     var options = new nodegit.CheckoutOptions();
-    var paths = [];
-    for (var k = 0; k < repoMap[j].idPathPairs.length; k++) {
-      paths.push(repoMap[j].idPathPairs[k]);
-    }
-    options.paths = paths;
+    options.paths = repoMap[j].paths;
     options.checkoutStrategy = (force ? nodegit.Checkout.STRATEGY.FORCE : nodegit.Checkout.STRATEGY.SAFE);
     (function (jIndex) {
       promises.push(repoMap[jIndex].repo.getHeadCommit().then(function (commit) {
-        return nodegit.Checkout.tree(repoMap[jIndex].repo, commit, options).then(function () {
-          return repoMap[jIndex].idPathPairs;
-        });
+        return nodegit.Checkout.tree(repoMap[jIndex].repo, commit, options);
       }));
     })(j);
   }
