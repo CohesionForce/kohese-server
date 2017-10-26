@@ -414,7 +414,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
             closeButtonText : 'Cancel',
             actionButtonText : 'Discard Item',
             headerText: '"' + itemProxy.item.name + '" is a new item. ',
-            bodyText: 'Reverting this to the last checkpoint will delete it permanently. Are you sure you want to discard this item?'
+            bodyText: 'Reverting this to the last commit will delete it permanently. Are you sure you want to discard this item?'
         }    
 
         ModalService.showModal({}, modalOptions).then((result)=>
@@ -450,7 +450,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
             closeButtonText : 'Cancel',
             actionButtonText : 'Discard Changes',
             headerText: 'Discard Changes',
-            bodyText: 'Reverting this to the last checkpoint will delete any new changes. Are you sure?'
+            bodyText: 'Reverting this to the last commit will delete any new changes. Are you sure?'
         }    
 
         ModalService.showModal({}, modalOptions).then((result)=>
