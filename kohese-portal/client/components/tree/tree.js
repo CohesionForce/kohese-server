@@ -481,7 +481,11 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 }
 
 export default () => {
-    angular.module('app.tree', ['app.services.tabservice', 
+    angular.module('app.tree', ['app.services.itemservice',
+                                'app.services.actionservice',
+                                'app.services.userservice',
+                                'app.services.searchservice',
+                                'app.services.tabservice', 
                                 'app.services.versioncontrolservice',
                                 'app.services.modalservice'])
         .controller('KTreeController', KTreeController);

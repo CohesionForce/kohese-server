@@ -13,6 +13,7 @@ module.exports = function(config) {
 		frameworks : [ 'jasmine', 'browserify' ],
 
 		files : [ 'node_modules/angular/angular.js',
+				  'node_modules/angular-ui-router/release/angular-ui-router.js',
 				'bower_components/angular-mocks/angular-mocks.js',
 				'bower_components/angular-resource/angular-resource.js',
 				'bower_components/jquery/dist/jquery.js',
