@@ -12,11 +12,7 @@ describe("ItemRepository", function () {
     };
 
     beforeEach(function () {
-        angular.mock.module('itemServices');
-
-        angular.mock.module(function($provide) {
-            $provide.service('_itemRepository_')
-        })
+        angular.mock.module('app.services.itemservice');
 
         inject(function ($injector) {
             service = $injector.get('ItemRepository');

@@ -89,6 +89,7 @@ export default () => {
 
     angular.module('app.services.userservice', [
         'app.services.itemservice',
-        'app.services.authentication'])
+        'app.services.authentication',
+        'app.factories.koheseio'])
         .service('UserService', UserService);
 }
