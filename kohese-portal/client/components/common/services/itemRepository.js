@@ -121,6 +121,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     function fetchItems() {
       KoheseIO.socket.emit('Item/getAll', {}, function (response) {
         console.log("::: Response for getAll");
+        ItemProxy.loadModelDefinitions(response.modelDef);
         for(var kind in response.cache){
           console.log("--- Processing " + kind);
           var kindList = response.cache[kind];

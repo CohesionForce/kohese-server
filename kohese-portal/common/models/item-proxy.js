@@ -11,6 +11,11 @@ var tree = {};
 tree.proxyMap = {};
 tree.repoMap = {};
 tree.proxyTreeHashes = {};
+tree.modelMap = {
+    "Internal": {},
+    "Internal-Lost": {},
+    "Internal-Model": {}
+};
 
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
@@ -35,6 +40,11 @@ class ItemProxy {
 
     proxy.kind = kind;
     proxy.item = forItem;
+    
+    if(!tree.modelMap[kind]){
+      tree.modelMap[kind] = createMissingProxy(kind);
+    }
+    proxy.model = tree.modelMap[kind];
 
     if (kind === "Repository") {
       tree.repoMap[itemId] = proxy;
@@ -100,7 +110,31 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  checkPropertyOrder(){
+    if (this.model && this.model.item && this.model.item.orderedProperties) {
+      var newItem = {};
+      var oldKeys = Object.keys(this.item);
+      for (var keyIdx in this.model.item.orderedProperties){
+        var key = this.model.item.orderedProperties[keyIdx];
+        if (this.item[key]){
+          newItem[key] = this.item[key];
+        }
+      }
+      if (this.item.itemIds){
+        newItem.itemIds = this.item.itemIds;
+      }
+      var newKeys = Object.keys(newItem);
+      if (!_.isEqual(oldKeys, newKeys)){
+        this.item = newItem;
+      }
+    } 
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   document() {
+    this.checkPropertyOrder();
     return JSON.stringify(this.item, null, '  ');
   }
   
@@ -687,6 +721,52 @@ class ItemProxy {
 
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getModelDefinitions(){
+    var rootModelProxy = ItemProxy.getProxyFor("Model-Definitions");
+    return rootModelProxy.modelDefMap;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static loadModelDefinitions(modelDefMap) {
+    var rootModelDef = {
+        id: "Model-Definitions",
+        name: "Model Definitions"
+    }
+    var rootModelProxy = new ItemProxy("Internal-Model", rootModelDef);
+    rootModelProxy.modelDefMap = modelDefMap;
+    
+    for(var modelKey in modelDefMap){
+      console.log(modelKey);
+      var model = modelDefMap[modelKey];
+      model.id = modelKey;
+      if (model.base === "PersistedModel"){
+        delete model.base;
+      }
+      if (model.base){
+        model.parentId = model.base;
+      } else {
+        model.parentId = rootModelDef.id;
+      }
+      var proxy = new ItemProxy("Internal-Model", model);
+      tree.modelMap[modelKey] = proxy;
+    }
+    
+    // Create the key ordering for descendant models
+    var models = rootModelProxy.getDescendants();
+        
+    for(var index in models){
+      var model = models[index];
+      console.log("::: Loading Model " + model.item.name);
+      // TODO this might eventually need to be moved to proxy
+      var properties = model.parentProxy.item.orderedProperties || [];
+      model.item.orderedProperties = Object.keys(model.item.properties).concat(properties);
+    }
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////

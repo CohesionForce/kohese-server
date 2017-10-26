@@ -633,21 +633,69 @@ describe("ItemProxy Test", function() {
   //
   //////////////////////////////////////////////////////////////////////////
   it("Should Ensure Fields Are In Consistent Order", ()=>{
+
+    var modelDefMap = {
+        Test: {
+          "name": "Test",
+          "base": "PersistedModel",
+          "strict": "validate",
+          "idInjection": true,
+          "trackChanges": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "id": true,
+              "defaultFn": "guid"
+            },
+            "name": {
+              "type": "string",
+              "required": true
+            },
+            "parentId": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          "validations": [],
+          "relations": {},
+          "acls": [],
+          "methods": []
+      }        
+    }
+    
+    ItemProxy.loadModelDefinitions(modelDefMap);
+
     var object1a = {
         name: "Some Content",
         id: "id-1a1a1a"        
     };
+    
     var object1b = {
         id: "id_1a1a1a",
         name: "Some Content"
     };
     
-    console.log("1A Keys: " + Object.keys(object1a));
-    console.log("1B Keys: " + Object.keys(object1b));
+    var obj1a = new ItemProxy("Test", object1a);
 
-    expect("Test").toBe("Written");
+    expect(Object.keys(obj1a.item)).toEqual([ 'id', 'name' ]);
     
-    expect(object1a).toEqual(object1b);
   });
   
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  iit("Should Load Class Model Definitions", ()=>{
+    var fs = require('fs');
+    var modelDefData = fs.readFileSync("./kdb/modelDef.json", {encoding: 'utf8', flag: 'r'});
+    var modelDefMap = JSON.parse(modelDefData);
+   
+    ItemProxy.loadModelDefinitions(modelDefMap);
+    
+//    dumpEnabled = true;
+    dump();
+    
+    var modelDef = ItemProxy.getModelDefinitions();
+
+    });
+
 });

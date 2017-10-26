@@ -38,8 +38,12 @@ global.app.on('newSession', function (socket) {
     console.log('::: session %s: Received getAll for user %s at %s', socket.id, username, socket.handshake.address);
     console.log(request);
     var kdbStore = kdb.retrieveDataForMemoryConnector();
+    
+    var modelDef = kdb.ItemProxy.getModelDefinitions();
+    
     console.log("::: Sending getAll response");
     sendResponse({
+      modelDef: modelDef,
       cache: kdbStore.cache
     });
     console.log("::: Sent getAll response");
@@ -108,7 +112,7 @@ global.app.on('newSession', function (socket) {
         kind: request.kind,
         item: responseHeaders
       });
-      console.log("::: Sent Item/upsert response");      
+      console.log("::: Sent Item/upsert response");
     }, function (httpResponse){
       sendResponse({error: httpResponse});
       console.log("::: Sent Item/upsert error");      

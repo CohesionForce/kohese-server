@@ -38,6 +38,11 @@ var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
 var mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
 function initialize() {
+
+  var kdbModel = require('./kdb-model.js');
+  ItemProxy.loadModelDefinitions(kdbModel.modelDef);
+  kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
+  
   // Ignore the loopback _meta
   if (modelConfig._meta) {
     delete modelConfig._meta;
@@ -553,9 +558,6 @@ function openRepositories() {
 	  var childProxy = rootProxy.children[childIdx];
 	  console.log("--- Child descendant count of " + childProxy.item.name + ": " + childProxy.descendantCount);  
 	}
-
-	var kdbModel = require('./kdb-model.js');
-	kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
 
 	console.log("::: End KDB File Load");
 	
