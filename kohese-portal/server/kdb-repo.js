@@ -208,7 +208,7 @@ function push(proxies, remoteName) {
               {
                  callbacks: {
                     credentials: function(url, u) {
-                       return nodegit.Cred.sshKeyFromAgent(remote.url().split("@")[0]);
+                       return nodegit.Cred.sshKeyFromAgent(new require("url").URL(url).username);
                     }
                  }
               }).then(function (status) {

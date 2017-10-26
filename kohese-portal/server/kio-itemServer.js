@@ -308,7 +308,7 @@ function KIOItemServer(socket){
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
     
-    kdb.kdbRepo.checkout(proxies, true).then(function () {
+    kdb.kdbRepo.checkout(proxies, false).then(function () {
       // Update content based on reverted files
       for (var j = 0; j < proxies.length; j++) {
         var proxy = proxies[j];
