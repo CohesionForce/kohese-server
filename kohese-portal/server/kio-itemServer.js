@@ -9,7 +9,12 @@ const importer = require("./directory-ingest.js");
 
 console.log("::: Initializing KIO Item Server");
 
-global.app.on('newSession', function (socket) {
+if(global.app)
+  {
+  global.app.on('newSession', KIOItemServer) 
+  }
+  
+function KIOItemServer(socket){
 
   console.log('>>> KIO Item Server: session %s connected from %s for %s', socket.id, socket.handshake.address, socket.koheseUser.username);
   
@@ -206,13 +211,16 @@ global.app.on('newSession', function (socket) {
   });
   
   socket.on("VersionControl/add", function (request, sendResponse) {
+    console.log('::: session %s: Received VersionControl/add for %s for user %s at %s', socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
+      console.log("--- Adding proxy for: " + idsArray[i]);
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
     
     kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
+      console.log('::: session %s: Sending response for VersionControl/add for user %s at %s', socket.id, socket.koheseUser.username, socket.handshake.address);
       sendResponse(addStatusMap);
       sendStatusUpdates(proxies);
     }).catch(function (err) {
@@ -293,7 +301,7 @@ global.app.on('newSession', function (socket) {
     }) 
   });
 
-});
+};
 
 function sendStatusUpdates(proxies) {
   var promises = [];
@@ -310,3 +318,5 @@ function sendStatusUpdates(proxies) {
     kio.server.emit("VersionControl/statusUpdated", statusMap);
   });
 }
+
+module.exports.KIOItemServer = KIOItemServer;

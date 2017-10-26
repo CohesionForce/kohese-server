@@ -43,18 +43,12 @@
                 </span>
                 <span ng-if="treeCtrl.versionControlEnabled"
                       ng-init="treeCtrl.applyVersionControlTags(itemProxy)"> 
-                        <img    ng-if="itemProxy.statusFlags.WTModified"
+                        <img    ng-if="itemProxy.vcState.Unstaged"
                                 src="resources/icons/versioncontrol/unstaged.ico"
-                                title="Unstaged Modified">
-                        <img    ng-if="itemProxy.statusFlags.IndexModified"
+                                title="Unstaged">
+                        <img    ng-if="itemProxy.vcState.Staged"
                                 src="resources/icons/versioncontrol/index-mod.ico"
-                                title="Staged Modified">
-                        <img    ng-if="itemProxy.statusFlags.newItem"
-                                src="resources/icons/versioncontrol/unstaged.ico"
-                                title="Unstaged New">
-                        <img    ng-if="itemProxy.statusFlags.IndexNew"
-                                src="resources/icons/versioncontrol/index-mod.ico"
-                                title="Staged New">
+                                title="Staged">
                 </span>
                 {{itemProxy.status}}
         </div>
