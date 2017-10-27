@@ -69,7 +69,9 @@ function AuthInterceptor(AuthTokenFactory) {
 }
 
 export default () => {
-    angular.module('app.services.authentication', ['app.factories.koheseio'])
+    angular.module('app.services.authentication', 
+    ['app.factories.koheseio',
+    'app.constants.endpoints'])
         .service('LoginService', LoginService)
         .factory('AuthTokenFactory', AuthTokenFactory)
         .factory('AuthInterceptor', AuthInterceptor);
