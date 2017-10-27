@@ -34,6 +34,7 @@ const appModule = angular.module('app', [
     'app.directives.navigation',
     'app.directives.treerow',
     'app.directives.actiontable',
+    'app.constants.endpoints',
     require('angular-ui-router'),
     'angular-jwt',
     'ui.bootstrap',
@@ -52,7 +53,6 @@ const appModule = angular.module('app', [
 
 
 appModule
-    .constant('API_URL', '')
     .config(function ($httpProvider, $stateProvider, $urlRouterProvider) {
         $httpProvider.interceptors.push('AuthInterceptor');
         $stateProvider

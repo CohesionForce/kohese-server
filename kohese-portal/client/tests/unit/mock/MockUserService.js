@@ -20,7 +20,8 @@ function MockUserService() {
             currentUser,
             { item: {
                 name: "User 2",
-                id  : "9"
+                id  : "9",
+                email: "email@email.com"
                 }
             }]
     }
@@ -35,6 +36,10 @@ function MockUserService() {
     
     service.getCurrentUsername = function() {
         return currentUser.item.name;
+    }
+
+    service.getCurrentUserEmail = function() {
+        return currentUser.item.email
     }
 }
 

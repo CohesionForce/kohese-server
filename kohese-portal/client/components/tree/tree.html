@@ -85,9 +85,6 @@
 				</span>	<!-- End Default Controls -->	
 				<!-- Start Version Control View -->
 				<span ng-switch-when="Version Control">
-					<button class="btn btn-default"
-							ng-click="treeCtrl.stageItems()"
-							ng-disabled="treeCtrl.selectedVersionControlNodes.size === 0">Stage Items</button>
 					<!-- Commented out while we figure out the modal situation -->
 					<!-- <button class="btn btn-default"
 							ng-click="treeCtrl.commit()"
@@ -112,12 +109,15 @@
 	</div>
 	<!-- Begin Knowledge Tree -->
 	<div class="knowledge-tree-panel" style="overflow:hidden">
-		<div id="theKT" class="knowledge-tree" style="overflow:hidden">
+		<div id="theKT" class="knowledge-tree">
 			<div class="kt-head">
 				<div class="kth-cell kti-name">Name</div>
 				<div class="kth-cell pull-right">
-					<i class="glyphicon glyphicon-plus pull-right"
-						ng-click="treeCtrl.navigate('kohese.explore.create', {})"></i>
+					<span 	
+						class="create-button"
+						ng-click="treeCtrl.navigate('kohese.explore.create', {})">
+						Create Item
+					</span>
 				</div>
 			</div>
 			<div class="kt-body" style="overflow:auto; height: 100%">

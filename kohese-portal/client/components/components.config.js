@@ -22,5 +22,6 @@ export default () => {
     require('./common/services/services.config')();
     require('./common/directives/directives.config')();
     require('./common/sb-admin-2')();
+    require('./common/constants/constants.config')();
 
 }
