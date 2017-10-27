@@ -196,7 +196,7 @@ module.exports.commit = commit;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function push(proxies, remoteName) {
+function push(proxies, remoteName, defaultUser) {
   var pushStatusMap = {};
   var promises = [];
   for (var i = 0; i < proxies.length; i++) {
@@ -208,7 +208,9 @@ function push(proxies, remoteName) {
               {
                  callbacks: {
                     credentials: function(url, u) {
-                       return nodegit.Cred.sshKeyFromAgent(new require("url").URL(url).username);
+                      // TODO Get the username from the given URL once we have
+                      // upgraded our version of node.js
+                      return nodegit.Cred.sshKeyFromAgent(defaultUser);
                     }
                  }
               }).then(function (status) {
@@ -256,12 +258,15 @@ function checkout(proxies, force) {
     var options = new nodegit.CheckoutOptions();
     options.paths = repoMap[j].paths;
     options.checkoutStrategy = (force ? (nodegit.Checkout.STRATEGY.FORCE
-        | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : nodegit.Checkout.STRATEGY.SAFE);
-    (function (jIndex) {
-      promises.push(repoMap[jIndex].repo.getHeadCommit().then(function (commit) {
-        return nodegit.Checkout.tree(repoMap[jIndex].repo, commit, options);
-      }));
-    })(j);
+        | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : (nodegit.Checkout.STRATEGY.SAFE
+        | nodegit.Checkout.STRATEGY.ALLOW_CONFLICTS));
+    //options.notifyFlags = nodegit.Checkout.NOTIFY.ALL;
+    //options.notifyCb = function (why, path, baseline, target, workdir, payload) {
+      // Return zero to proceed
+    //  return 0;
+    //};
+    // Passing null uses HEAD for the checkout
+    promises.push(nodegit.Checkout.tree(repoMap[j].repo, null, options));
   }
   
   return Promise.all(promises);
