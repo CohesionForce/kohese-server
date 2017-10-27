@@ -14,8 +14,10 @@ tree.proxyTreeHashes = {};
 tree.modelMap = {
     "Internal": {},
     "Internal-Lost": {},
-    "Internal-Model": {}
+    "Internal-Model": {},
+    "Internal-State": {}
 };
+tree.loading = true;
 
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
@@ -86,6 +88,14 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static loadingComplete() {
+    tree.loading = false;
+    ItemProxy.calculateAllTreeHashes();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static getAllItemProxies() {
     var itemProxyList = [];
     for ( var key in tree.proxyMap) {
@@ -142,6 +152,11 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   calculateOID() {
+    // Skip placeholder nodes that haven't been loaded yet
+    if (!this.item){
+      return;
+    }
+
     var shaObj = new jsSHA("SHA-1", "TEXT");
     var doc = this.document();
     shaObj.update('blob ' + doc.length + '\0' + doc);
@@ -154,14 +169,17 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   calculateTreeHash(deferred) {
 
-    // Don't calculateTreeHash for placeholder nodes that have not been populated yet
-    if (!this.item){
+    // TODO: Should only have to do this when content is updated
+    this.calculateOID();
+
+    // Don't calculateTreeHash during initial load
+    if (!this.item || tree.loading){
       return;
     }
     
-    // Should only have to do this when content is updated
-    this.calculateOID();
-
+//    console.log("Deferred: " + deferred);
+//    console.log("))) Calculating hash for " + this.item.id + " - " + this.item.name);
+    
     var treeHashEntry = {
         kind: this.kind,
         oid: this.oid,
@@ -193,6 +211,7 @@ class ItemProxy {
     
     // Propagate changes up the tree
     if (!deferred){
+      console.log("!!! Not deferred");
       if (this.parentProxy){
         this.parentProxy.calculateTreeHash();
       }
@@ -205,7 +224,7 @@ class ItemProxy {
   static calculateAllTreeHashes() {
     var stack = [];
     tree.proxyTreeHashes = {};
-    console.log("::: Calc AL THs");
+    console.log("::: Calculate All Treehashes");
 
     const deferred = true;
     
@@ -224,12 +243,12 @@ class ItemProxy {
 
       if (!proxy.children || (proxy.children.length === 0)){
         // Only process the leaf items
-        calculateAndPropogate(proxy);
+        stack.push(proxy);
       }
     }
     
     while (stack.length >0){
-      var proxy = stack.pop();
+      var proxy = stack.shift();
       calculateAndPropogate(proxy);
     }
   }
@@ -246,12 +265,9 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   static getRepoTreeHashes() {
     var repoTreeHashes = {};
-    console.log("::: Getting repo tree hashes");
     
     for(var repoIdx in tree.repoMap){
-      console.log(repoIdx);
       var repoProxy = tree.repoMap[repoIdx];
-      console.log("::: Repo Idx: " + repoIdx);
       repoTreeHashes[repoIdx] = repoProxy.treeHashEntry;
     }
     return repoTreeHashes;
@@ -580,7 +596,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   childrenAreManuallyOrdered() {
-    return (this.item.itemIds.length > 0);
+    return (this.item.itemIds && this.item.itemIds.length > 0);
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -741,7 +757,6 @@ class ItemProxy {
     rootModelProxy.modelDefMap = modelDefMap;
     
     for(var modelKey in modelDefMap){
-      console.log(modelKey);
       var model = modelDefMap[modelKey];
       model.id = modelKey;
       if (model.base === "PersistedModel"){
@@ -761,7 +776,7 @@ class ItemProxy {
         
     for(var index in models){
       var model = models[index];
-      console.log("::: Loading Model " + model.item.name);
+//      console.log("::: Loading Model " + model.item.name);
       // TODO this might eventually need to be moved to proxy
       var properties = model.parentProxy.item.orderedProperties || [];
       model.item.orderedProperties = Object.keys(model.item.properties).concat(properties);

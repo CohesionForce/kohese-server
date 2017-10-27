@@ -180,17 +180,72 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
         return repoStagingStatus;
     };
     
+    function compareRepoTreeHashes(fromTree, toTree){
+      console.log("::: Compare Tree Hashes");
+      if(!fromTree){
+        console.log("--- From Tree is undefined");
+        return;
+      }
+      for (var key in fromTree){
+        console.log("--- Comparing " + key);
+        if (!_.isEqual(fromTree[key], toTree[key])){
+          console.log("*** Found unmatched tree: " + key);
+          console.log(fromTree[key]);
+          console.log(toTree[key]);
+          compareTreeEntries(fromTree[key], toTree[key]);
+        }
+      }          
+    }
+    
+    function compareTreeEntries(fromEntry, toEntry){
+      
+      if (!fromEntry){
+        console.log("--- From Entry is undefined");
+        return;
+      }
+      for (var childId in fromEntry.childTreeHashes){
+        if (!_.isEqual(fromEntry.childTreeHashes[childId], toEntry.childTreeHashes[childId])){
+          console.log("*** Found unmatched child: " + childId);
+          console.log(fromEntry.childTreeHashes[childId]);
+          console.log(toEntry.childTreeHashes[childId]);
+        }
+      }
+    }
+    
     function fetchItems() {
-      KoheseIO.socket.emit('Item/getAll', {}, function (response) {
+      var origRepoTreeHashes = ItemProxy.getRepoTreeHashes();
+      KoheseIO.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
         console.log("::: Response for getAll");
-        ItemProxy.loadModelDefinitions(response.modelDef);
-        for(var kind in response.cache){
-          console.log("--- Processing " + kind);
-          var kindList = response.cache[kind];
-          for (var index in kindList){
-            var item = JSON.parse(kindList[index]);
-            var iProxy = new ItemProxy(kind, item);
+        if(response.kdbMatches){
+          console.log("::: KDB is already in sync")
+        } else {
+          ItemProxy.loadModelDefinitions(response.modelDef);
+          console.log("::: Repo Tree Hashes");
+          console.log(origRepoTreeHashes);
+          console.log(response.repoTreeHashes);
+          compareRepoTreeHashes(origRepoTreeHashes, response.repoTreeHashes);
+          for(var kind in response.cache){
+            console.log("--- Processing " + kind);
+            var kindList = response.cache[kind];
+            for (var index in kindList){
+              var item = JSON.parse(kindList[index]);
+              var iProxy = new ItemProxy(kind, item);
+            }
           }
+          console.log(new Date());
+          ItemProxy.loadingComplete();
+          console.log(new Date());
+          console.log("::: Client Repo Tree Hashes");
+          var repoTreeHashes = ItemProxy.getRepoTreeHashes();
+          console.log(repoTreeHashes);
+          
+          if(!_.isEqual(response.repoTreeHashes, repoTreeHashes)){
+            console.log("*** Tree hashes do not match");
+          } else {
+            console.log("--- Tree hashes match");
+          }
+          compareRepoTreeHashes(response.TreeHashes, repoTreeHashes);
+          
         }
 
         $rootScope.$broadcast('itemRepositoryReady');

@@ -516,6 +516,7 @@ describe("ItemProxy Test", function() {
 
     dumpHashFor(proxy.parentProxy);
     dumpHashFor(proxy);
+    ItemProxy.loadingComplete();
 
     expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual("61a57146a9fa2422b0940680c7449a42db3b71ab");
     expect(proxy.parentProxy.treeHashEntry.childTreeHashes["test-item-id"]).toEqual("53688a4a9207203c25da692d634bd58305ae1313");
@@ -684,18 +685,26 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  iit("Should Load Class Model Definitions", ()=>{
+  it("Should Load Class Model Definitions", ()=>{
     var fs = require('fs');
     var modelDefData = fs.readFileSync("./kdb/modelDef.json", {encoding: 'utf8', flag: 'r'});
     var modelDefMap = JSON.parse(modelDefData);
    
     ItemProxy.loadModelDefinitions(modelDefMap);
+    ItemProxy.loadingComplete();
     
-//    dumpEnabled = true;
-    dump();
+    var modelDefProxy = ItemProxy.getProxyFor("Model-Definitions");
+
+    dumpEnabled = true;
+    dumpHashFor(modelDefProxy, "First Load");
     
     var modelDef = ItemProxy.getModelDefinitions();
 
-    });
+    ItemProxy.loadModelDefinitions(modelDef);
+    ItemProxy.loadingComplete();
+    dumpHashFor(modelDefProxy, "Second Load");
+
+    
+  });
 
 });

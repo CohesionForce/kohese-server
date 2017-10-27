@@ -5,6 +5,8 @@ var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
 const Path = require("path");
 const importer = require("./directory-ingest.js");
+var _ = require('underscore');
+
 
 
 console.log("::: Initializing KIO Item Server");
@@ -41,16 +43,29 @@ function KIOItemServer(socket){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getAll for user %s at %s', socket.id, username, socket.handshake.address);
-    console.log(request);
-    var kdbStore = kdb.retrieveDataForMemoryConnector();
     
+    var repoTreeHashes = kdb.ItemProxy.getRepoTreeHashes();
+
+    var response = {};
     var modelDef = kdb.ItemProxy.getModelDefinitions();
+
+    if(!_.isEqual(request.repoTreeHashes, repoTreeHashes)){
+      console.log("--- KDB Does Not Match: Full response will be sent");
+      var kdbStore = kdb.retrieveDataForMemoryConnector();
+      var cache = kdbStore.cache;
+      response = {
+          modelDef: modelDef,
+          repoTreeHashes: repoTreeHashes,
+          cache: cache
+        };
+    } else {
+      console.log("--- KDB Matches: Minimal response will be sent");
+      response.kdbMatches = true;
+      response.modelDef = modelDef;
+    }
     
     console.log("::: Sending getAll response");
-    sendResponse({
-      modelDef: modelDef,
-      cache: kdbStore.cache
-    });
+    sendResponse(response);
     console.log("::: Sent getAll response");
   });
 
