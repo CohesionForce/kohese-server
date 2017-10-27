@@ -11,6 +11,8 @@ var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
 var repoList = {};
 var stageMap = {};
+const INDEX_DIRECTORY = path.join("kdb", "index");
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -55,7 +57,7 @@ function getCommitFilesChanged(commit) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function generateCommitHistoryIndices(proxy) {
+function generateCommitHistoryIndices(proxy, overwrite) {
   var p = proxy.getRepositoryProxy().repoPath.split('Root.json')[0];
   return nodegit.Repository.open(p).then(function (r) {
     return r.getMasterCommit().then(function (mc) {
@@ -65,12 +67,19 @@ function generateCommitHistoryIndices(proxy) {
       return rw.getCommitsUntil(function (c) {
         return true;
       }).then(function (commits) {
-        var indexPromises = [];
-        for (var j = 0; j < commits.length; j++) {
-          indexPromises.push(indexCommit(commits[j]));
+        if (!fs.existsSync(INDEX_DIRECTORY)) {
+          fs.mkdirSync(INDEX_DIRECTORY);
         }
         
-        return Promise.all(indexPromises);
+        var promises = [];
+        for (var j = 0; j < commits.length; j++) {
+          if (overwrite || !fs.existsSync(path.join(INDEX_DIRECTORY,
+              commits[j].id() + ".json"))) {
+            promises.push(indexCommit(commits[j]));
+          }
+        }
+        
+        return Promise.all(promises);
       });
     });
   });
@@ -78,53 +87,105 @@ function generateCommitHistoryIndices(proxy) {
 module.exports.generateCommitHistoryIndices = generateCommitHistoryIndices;
 
 function indexCommit(commit) {
-  return getCommitFilesChanged(commit).then(function (paths) {
-    return commit.getTree().then(function (tree) {
-      return getIndexEntries(tree, paths);
-    });
+  return commit.getTree().then(function (tree) {
+    return getIndexEntries(tree, []);
   }).then(function (entryMap) {
-    entryMap["time"] = commit.time();
-    entryMap["author"] = commit.author().toString();
-    entryMap["message"] = commit.message();
-    entryMap["parents"] = [];
+    entryMap.meta.time = commit.time();
+    entryMap.meta.author = commit.author().toString();
+    entryMap.meta.message = commit.message();
+    entryMap.meta.parents = [];
     for (var j = 0; j < commit.parentcount(); j++) {
-      entryMap["parents"].push(commit.parentId(j).toString());
+      entryMap.meta.parents.push(commit.parentId(j).toString());
     }
     
-    return fs.writeFile(path.join("kdb", "index", commit.id() + ".json"),
-      JSON.stringify(entryMap));
+    fs.writeFileSync(path.join(INDEX_DIRECTORY, commit.id() + ".json"),
+      JSON.stringify(entryMap, null, "  "), {encoding: 'utf8', flag: 'w'});
+    return Promise.resolve(true);
   }).catch(function (err) {
     console.log(err.stack);
   });
 }
 
 function getIndexEntries(tree, paths) {
-  var entryPromises = [];
-  for (var j = 0; j < paths.length; j++) {
-    (function (jIndex) {
-      var p = paths[jIndex];
-      entryPromises.push(tree.entryByPath(p).then(function (entry) {
-        if (entry) {
-          return {
-            uuid: p.substring(p.lastIndexOf(path.sep) + 1, p.lastIndexOf(".json")),
-            oid: entry.sha(),
-            kind: path.basename(path.dirname(p))
-          };
-        }
-      }));
-    })(j);
+  var p;
+  if (paths.length > 0) {
+    var entryPromises = [];
+    for (var j = 0; j < paths.length; j++) {
+      (function (jIndex) {
+        var p = paths[jIndex];
+        entryPromises.push(tree.entryByPath(p).then(function (entry) {
+          if (entry) {
+            return {
+              uuid: p.substring(p.lastIndexOf(path.sep) + 1,
+                  p.lastIndexOf(".json")),
+              oid: entry.sha(),
+              kind: path.basename(path.dirname(p))
+            };
+          }
+        }));
+      })(j);
+    }
+    
+    p = Promise.all(entryPromises);
+  } else {
+    p = parseTree(tree);
   }
   
-  return Promise.all(entryPromises).then(function (entries) {
-    var entryMap = {};
+  return p.then(function (entries) {
+    var entryMap = {
+      meta: {},
+      objects: {}
+    };
+    
+    entries.sort(function (e1, e2) {
+      return (e1.uuid > e2.uuid ? 1 : (e1.uuid < e2.uuid ? -1 : 0));
+    });
+    
     for (var j = 0; j < entries.length; j++) {
-      entryMap[entries[j].uuid] = {
-        oid: entries[j].oid,
-        kind: entries[j].kind
-      };
+      entryMap.objects[entries[j].uuid] = {
+          oid: entries[j].oid,
+          kind: entries[j].kind
+        };
     }
     
     return entryMap;
+  });
+}
+
+function parseTree(tree) {
+  var promises = [];
+  for (var j = 0; j < tree.entryCount(); j++) {
+    var entry = tree.entryByIndex(j);
+    if (entry.isTree()) {
+      promises.push(entry.getTree().then(function (t) {
+        return parseTree(t);
+      }));
+    } else {
+      var p = entry.path();
+      var id = p.substring(p.lastIndexOf(path.sep) + 1, p.lastIndexOf(".json"));
+      if (UUID_REGEX.test(id)) {
+        promises.push(Promise.resolve({
+          uuid: id,
+          oid: entry.sha(),
+          kind: path.basename(path.dirname(p))
+        }));
+      }
+    }
+  }
+  
+  return Promise.all(promises).then(function (results) {
+    var objects = [];
+    for (var j = 0; j < results.length; j++) {
+      if (Array.isArray(results[j])) {
+        for (var k = 0; k < results[j].length; k++) {
+          objects.push(results[j][k]);
+        }
+      } else {
+        objects.push(results[j]);
+      }
+    }
+    
+    return Promise.resolve(objects);
   });
 }
 
@@ -214,6 +275,9 @@ function commit(proxies, userName, eMail, message) {
           var p = repo.createCommit("HEAD", signature, signature, message,
               stageMap[repo], [commit]).then(function (commitId) {
             commitIdMap[proxies[iIndex].item.id] = commitId;
+            return repo.getCommit(commitId).then(function (c) {
+              return indexCommit(c);
+            });
           });
           delete stageMap[repo];
           return p;
@@ -497,64 +561,49 @@ module.exports.getItemStatus = getItemStatus;
 //////////////////////////////////////////////////////////////////////////
 function walkHistoryForFile(proxy, callback){
   var repoInfo = repoRelativePathOf(proxy);
-  var relatedCommits = collectHistory(repoInfo.gitRepo, repoInfo.relativeFilePath);
+  var itemId = repoInfo.relativeFilePath.substring(repoInfo.relativeFilePath.lastIndexOf(path.sep) + 1,
+      repoInfo.relativeFilePath.lastIndexOf(".json"));
+  if (!UUID_REGEX.test(itemId)) {
+    // The ID was not a valid UUID, so assume that the Item is a Repository.
+    // TODO Fix this case. All (or almost all) commits are being displayed.
+    itemId = path.basename(path.dirname(repoInfo.relativeFilePath));
+  }
+  var commitFiles = fs.readdirSync(INDEX_DIRECTORY);
+  var relatedCommits = [];
+  for (var j = 0; j < commitFiles.length; j++) {
+    var content = JSON.parse(fs.readFileSync(path.join(INDEX_DIRECTORY, commitFiles[j])));
+    var entry = content.objects[itemId];
+    if (entry) {
+      relatedCommits.push({
+        commit: commitFiles[j].substring(0, commitFiles[j].lastIndexOf(".json")),
+        message: content.meta.message,
+        author: content.meta.author,
+        date: content.meta.time,
+        indexEntry: entry
+      });
+    }
+  }
   
-  var fileParts = repoInfo.relativeFilePath.match(itemFileRegEx);
-  var itemId;
-  if(fileParts === null) {
-      // Match failed, likely repoInfo.relativeFilePath is Root.json
-      fileParts = repoInfo.relativeFilePath;
-      itemId = fileParts;
-  } else {
-      itemId = fileParts[1];
+  relatedCommits.sort(function (c1, c2) {
+    return c2.date - c1.date;
+  });
+  
+  var j = relatedCommits.length - 1;
+  var lastEntry = relatedCommits[j].indexEntry;
+  while (j--) {
+    var entry = relatedCommits[j].indexEntry;
+    if (entry === lastEntry) {
+      relatedCommits.splice(j, 1);
+    } else {
+      lastEntry = entry;
+    }
   }
   
   var historyResponse = {
       id: itemId,
-      history: []
+      history: relatedCommits
   };
-  for (var i = 0; i < relatedCommits.length; i++) {
-    var commit = relatedCommits[i];
-
-      historyResponse.history.push({
-        commit: commit.sha(),
-        message: commit.message(),
-        author: commit.author().name(),
-        date: commit.date().getTime()
-      });
-  }
-  
-  historyResponse.history.sort(function (c1, c2) {
-    return c2.date - c1.date;
-  });
   
   callback(historyResponse);
 }
 module.exports.walkHistoryForFile = walkHistoryForFile;
-
-function collectHistory(repo, path) {
-  var relatedCommits = [];
-  var name = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".json"));
-  // TODO Fix this based on changes
-  for (var r in repoList) {
-    if (repoList[r].repo === repo) {
-      var history = repoList[r].history;
-      for (var j = 0; j < history.length; j++) {
-        var files = history[j].files;
-        fileLoop: for (var k = 0; k < files.length; k++) {
-          var names = files[k].names;
-          for (var l = 0; l < names.length; l++) {
-            if (-1 != names.indexOf(name)) {
-              relatedCommits.push(history[j].commit);
-              break fileLoop;
-            }
-          }
-        }
-      }
-      
-      break;
-    }
-  }
-  
-  return relatedCommits;
-}

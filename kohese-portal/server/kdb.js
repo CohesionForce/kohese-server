@@ -538,11 +538,14 @@ function openRepositories() {
 	//Load corresponding git repositories
 	var promises = [];
 	promises.push(kdbRepo.openRepo(ItemProxy.getRootProxy()));
+	index(ItemProxy.getRootProxy(), false);
 
 	// Initialize nodegit repo-open promises
 	for(var id in mountList) {
 	    if(mountList[id].mounted && mountList[id].repoStoragePath) {
 	        promises.push(kdbRepo.openRepo(ItemProxy.getProxyFor(id)));
+	        // TODO Once Repositories are version controlled separately,
+	        // index them here.
 	    }
 	}
 	
@@ -565,8 +568,8 @@ function openRepositories() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function index(proxy) {
-  return kdbRepo.generateCommitHistoryIndices(proxy).then(function () {
+function index(proxy, overwrite) {
+  return kdbRepo.generateCommitHistoryIndices(proxy, overwrite).then(function () {
     console.log("::: Indexing of " + proxy.item.name + " complete.");
   });
 }
