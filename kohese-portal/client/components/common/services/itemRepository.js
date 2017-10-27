@@ -425,7 +425,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
 
 export default () => {
 
-    angular.module("app.services.itemservice", [])
+    angular.module("app.services.itemservice", ['app.factories.koheseio', 'toastr'])
         .service("ItemRepository", ItemRepository);
 
 }

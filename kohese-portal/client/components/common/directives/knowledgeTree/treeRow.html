@@ -14,10 +14,6 @@
                     'kti-filterMatched': treeCtrl.matchesFilter(itemProxy)}">
         <!-- Checkbox if item has a version control status -->
         <span ng-if="treeCtrl.versionControlEnabled && itemProxy.statusFlags">
-        <input type="checkbox" 
-               class="align-middle"
-               ng-model="itemProxy.selected"
-               ng-change="treeCtrl.onVersionControlStageChange(itemProxy)">
         </span>
         <!-- End conditional Checkbox for Version control -->
         <div class="kti-name"
@@ -26,10 +22,9 @@
                     ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]"
                     ng-init="treeCtrl.initCollapsed(itemProxy.item.id)"
                     class="kt-icon"
-                    ng-class="{'glyphicon fa icon-minus glyphicon-minus fa-minus': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
-                           'glyphicon fa icon-plus glyphicon-plus fa-plus': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
-                           'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0),
-                           'glyphicon glyphicon-th-list': (itemProxy.children.length > 0)}">
+                    ng-class="{'glyphicon fa icon-minus glyphicon-minus fa-caret-down': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
+                           'glyphicon fa icon-plus glyphicon-plus fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
+                           'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
             </i>
             </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
                                                   ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
@@ -37,26 +32,43 @@
                                                             {id: itemProxy.item.id})"></span>
                 <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
                 <!-- Conditional Icons for Item status -->
-                <span ng-if="itemProxy.dirty"> **
+                <span ng-if="itemProxy.dirty">
                         <img src="resources/icons/versioncontrol/dirty.ico"
                              title = "Dirty item" />
                 </span>
-                <span ng-if="treeCtrl.versionControlEnabled"
-                      ng-init="treeCtrl.applyVersionControlTags(itemProxy)"> 
-                        <img    ng-if="itemProxy.vcState.Unstaged"
-                                src="resources/icons/versioncontrol/unstaged.ico"
-                                title="Unstaged">
-                        <img    ng-if="itemProxy.vcState.Staged"
-                                src="resources/icons/versioncontrol/index-mod.ico"
-                                title="Staged">
-                </span>
+
                 {{itemProxy.status}}
         </div>
         <div class="kti-cell kti-actions pull-right"> 
-            <i class="fa fa-anchor"
-               ng-click="treeCtrl.updateRoot(itemProxy)"></i>
-            <i class="glyphicon glyphicon-remove  pull-right"
-               ng-click="treeCtrl.removeItem(itemProxy)"> </i>
+            <!-- Default row actions -->
+            <span ng-if="!treeCtrl.versionControlEnabled">
+                <i class="fa fa-anchor"
+                ng-click="treeCtrl.updateRoot(itemProxy)"></i>
+                <i class="glyphicon glyphicon-remove  pull-right"
+                ng-click="treeCtrl.removeItem(itemProxy)"> </i>
+            </span>
+            <!-- Version Control row actions -->
+            <span ng-if="treeCtrl.versionControlEnabled && itemProxy.vcState">
+                <!-- VC Status Icons -->
+                <img ng-if="itemProxy.vcState.Unstaged"
+                    src="resources/icons/versioncontrol/unstaged.ico"
+                    title="Unstaged"/>
+                <img ng-if="itemProxy.vcState.Staged"
+                    src="resources/icons/versioncontrol/index-mod.ico"
+                    title="Staged"/>
+                <!-- Actions -->
+                <i  class="fa fa-undo"
+                    ng-click="treeCtrl.revertItem(itemProxy)"/>
+                <i  class="fa fa-plus"
+                    ng-if="itemProxy.vcState.Unstaged"
+                    ng-click="treeCtrl.stageItem(itemProxy)"/>
+                <i  class="fa fa-minus"
+                    ng-if="itemProxy.vcState.Staged"
+                    ng-click="treeCtrl.unstageItem(itemProxy)"/>
+
+
+            </span>
+
         </div>
     </div>
 

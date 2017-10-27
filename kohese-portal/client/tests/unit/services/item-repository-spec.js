@@ -12,23 +12,11 @@ describe("ItemRepository", function () {
     };
 
     beforeEach(function () {
-        angular.mock.module('itemServices');
-
-        angular.mock.module(function($provide) {
-            $provide.service('_itemRepository_')
-        })
+        angular.mock.module('app.services.itemservice');
 
         inject(function ($injector) {
             service = $injector.get('ItemRepository');
         });
 
     });
-
-    describe("Lost and Found", function () {
-        it("Should attach the item to the lost and found node", function () {
-            service.attachToLostAndFound(testItem);
-            expect(service.tree.proxyMap["LOST+FOUND"].children["Test+ID"].title).toBe("Test title");
-        });
-    })
-
 });

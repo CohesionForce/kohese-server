@@ -24,6 +24,7 @@ function LoginController(LoginService, KoheseIO, AuthTokenFactory, $state){
 }
 
 export default () => {
-    angular.module('app.login', ['app.services.authentication'])
+    angular.module('app.login', ['app.services.authentication',
+                                 'app.factories.koheseio'])
         .controller('LoginController', LoginController);
 }

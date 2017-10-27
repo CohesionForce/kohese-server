@@ -62,6 +62,8 @@ function ImportService(KoheseIO, toastr, $rootScope) {
 }
 
 export default () => {
-    angular.module('app.services.importservice', ['app.factories.koheseio'])
+    angular.module('app.services.importservice', 
+        ['app.factories.koheseio',
+        'toastr'])
         .service("ImportService", ImportService);
 }
