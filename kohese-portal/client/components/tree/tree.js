@@ -420,9 +420,9 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         ModalService.showModal({}, modalOptions).then((result)=>
             {
             ItemRepository
-            .deleteItem(itemProxy).then(function () 
+            .deleteItem(itemProxy).then((result)=> 
                 {
-                console.log("::: Item has been deleted: " + itemId);
+                console.log("::: Item has been deleted: " + result.itemId);
                 });
             })
         };

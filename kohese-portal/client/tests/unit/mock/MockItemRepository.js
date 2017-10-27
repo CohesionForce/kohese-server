@@ -5,6 +5,9 @@ function MockItemRepository() {
         item : {
             name : "Root",
             id   : "0"
+        },
+        getChildByName: ()=>{
+            return; 
         }
     }
  
@@ -24,12 +27,11 @@ function MockItemRepository() {
     };
 
     this.getRootProxy = function() {
-        return {item: {},
-                kind: 'Repository'}
+        return this.rootProxy;
     }
 
     this.deleteItem = function() {
-        return promiseMock;
+        return Promise.resolve({itemId:"01"});
     }
 
     this.upsertItem = function(proxy) {

@@ -1,22 +1,20 @@
 function MockVersionControlService() {
     const service = this;
-    service.indexedProxies = {};
-
-    
-    service.setIndexedProxy = function(proxy) {
-
-    }
-
-    service.getIndexedProxies = function() {
-
-    }
     
     service.stageItems = function(proxyList) {
 
     }
 
+    service.unstageItems = function(proxyList) {
+
+    }
+
     service.commitItems = function (proxyList, commitMessage) {
 
+    }
+
+    service.revertItems = function(proxyList) {
+        
     }
 
     service.push = function(proxyIds, remoteName) {
@@ -28,7 +26,7 @@ function MockVersionControlService() {
     }
 
     service.getRemotes = function(proxyId, callback) {
-
+        callback(['test-remote', 'master'])
     }
 }
 

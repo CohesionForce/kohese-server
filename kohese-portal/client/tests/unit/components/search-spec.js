@@ -59,7 +59,7 @@ describe("Search Controller Test", function() {
 		})
 	}));
 
-	it("Check Tree Navigation", function() {
+	xit("Check Tree Navigation", function() {
 	    searchController.navigateToTree();
 	    expect(mockTabService.tab.state).toBe('explore.edit');
 	    expect(state.callData).toBe('kohese.explore.edit');

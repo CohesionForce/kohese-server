@@ -19,12 +19,4 @@ describe("ItemRepository", function () {
         });
 
     });
-
-    describe("Lost and Found", function () {
-        it("Should attach the item to the lost and found node", function () {
-            service.attachToLostAndFound(testItem);
-            expect(service.tree.proxyMap["LOST+FOUND"].children["Test+ID"].title).toBe("Test title");
-        });
-    })
-
 });
