@@ -65,13 +65,24 @@ describe("KDB Test", function() {
       
       console.log("------------");
 
-//      ItemProxy.loadingComplete();
+      ItemProxy.loadingComplete();
 //      dump();
     
 //      var modelDef = ItemProxy.getModelDefinitions();
       
-      var repoTreeHashes = ItemProxy.getRepoTreeHashes();
-      console.log(repoTreeHashes);
+      var repoTreeHashes = kdb.ItemProxy.getRepoTreeHashes();
+//      console.log(repoTreeHashes);
+      
+      console.log("===> Begin Get");
+      var timeBefore = new Date();
+      var treeHashMap = kdb.ItemProxy.getAllTreeHashes();
+      var timeAfter = new Date();
+      console.log("===> After Get");
+      var deltaTime = timeAfter - timeBefore;
+      console.log("Time to getAllTH: " + deltaTime);
+      console.log(timeBefore);
+      console.log(timeAfter);
+
       done();
     });
   });

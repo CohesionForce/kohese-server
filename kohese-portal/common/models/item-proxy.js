@@ -174,11 +174,9 @@ class ItemProxy {
 
     // Don't calculateTreeHash during initial load
     if (!this.item || tree.loading){
+      this.deferTreeHash = true;
       return;
     }
-    
-//    console.log("Deferred: " + deferred);
-//    console.log("))) Calculating hash for " + this.item.id + " - " + this.item.name);
     
     var treeHashEntry = {
         kind: this.kind,
@@ -191,6 +189,10 @@ class ItemProxy {
       if(childProxy.kind === "Repository"){
         treeHashEntry.childTreeHashes[childProxy.item.id] = "Repository-Mount";
       } else {
+        if(childProxy.deferTreeHash){
+          this.deferTreeHash = true;
+          return;
+        }
         treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;        
       }
     }
@@ -200,6 +202,9 @@ class ItemProxy {
     this.treeHash =  shaObj.getHash("HEX");
 
     treeHashEntry.treeHash = this.treeHash;
+    if(this.deferTreeHash){
+      delete this.deferTreeHash;
+    }
 
     // Add the parentId to the treeHash entry
     if (this.item.parentId){
@@ -211,7 +216,6 @@ class ItemProxy {
     
     // Propagate changes up the tree
     if (!deferred){
-      console.log("!!! Not deferred");
       if (this.parentProxy){
         this.parentProxy.calculateTreeHash();
       }
@@ -222,42 +226,86 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static calculateAllTreeHashes() {
-    var stack = [];
     tree.proxyTreeHashes = {};
-    console.log("::: Calculate All Treehashes");
-
+    
     const deferred = true;
-    
-    function calculateAndPropogate(proxy){
-      var parentId = proxy.item.parentId;
-      if(proxy.parentProxy && (tree.proxyTreeHashes[parentId] !== "Deferred")){
-        tree.proxyTreeHashes[parentId] = "Deferred";
-        stack.push(proxy.parentProxy);
-      }              
-      proxy.calculateTreeHash(deferred);      
-    }
-    
-    // Need to calculate from the bottom up
-    for(var id in tree.proxyMap){
-      var proxy = tree.proxyMap[id];
-
-      if (!proxy.children || (proxy.children.length === 0)){
-        // Only process the leaf items
-        stack.push(proxy);
-      }
-    }
-    
-    while (stack.length >0){
-      var proxy = stack.shift();
-      calculateAndPropogate(proxy);
-    }
+    tree.root.visitTree(null, null, (proxy) => {
+      proxy.calculateTreeHash(deferred);
+    });
   }
   
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static compareTreeHashMap(fromTHMap, toTHMap){
+    
+    var fromKeys = Object.keys(fromTHMap).sort();
+    var toKeys = Object.keys(toTHMap).sort();
+    var allKeys = _.union(fromKeys, toKeys);
+    var commonKeys = _.intersection(fromKeys, toKeys);
+    
+    if(!fromTHMap){
+      console.log("*** From is undefined");
+    }
+    
+    var thmCompare = {
+      match: _.isEqual(fromTHMap, toTHMap),
+      addedItems: _.difference(toKeys, fromKeys),
+      changedItems: [],
+      deletedItems: _.difference(fromKeys, toKeys),
+      addedChildren: [],
+      changedChildren: [],
+      deletedChildren: [],
+      undefinedFromItems: [],
+      undefinedToItems: []
+    };
+        
+    commonKeys.forEach((key) => {
+      var fromNode = fromTHMap[key];
+      var toNode = toTHMap[key];
+      if (!fromNode || !toNode){
+        if (!fromNode){
+          thmCompare.undefinedFromItems.push(key);
+        }
+        if (!toNode){
+          thmCompare.undefinedToItems.push(key);          
+        }
+        return;
+      }
+      if (!_.isEqual(fromNode.treeHash, toNode.treeHash)) {
+        
+        if (fromNode.oid !== toNode.oid){
+          thmCompare.changedItems.push(key);
+        }
+//        if (!_.isEqual(fromNode.childTreeHashes, toNode.childTreeHashes)){
+//          console.log("::> " + key + ": Different Children");
+//          fromChildren = fromNode.childTreeHashes;
+//          toChildren = toNode.childTreeHashes;
+//          fromChildKeys = Object.keys(fromNode.childTreeHashes).sort();
+//          toChildKeys = Object.keys(toNode.childTreeHashes).sort();
+//          allChildKeys = _.union(fromKeys, toKeys);
+//          commonChildKeys = _.intersection(fromKeys, toKeys);
+//          
+//          console.log(fromChildren);
+//          console.log(toChildren);
+//          
+//        }
+      }
+      
+    });
+    return thmCompare;
+
+  }
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static getAllTreeHashes() {
-    return tree.proxyTreeHashes;
+    var proxyTreeHashes = {};
+    tree.root.visitTree(null,(proxy) => {
+      proxyTreeHashes[proxy.item.id] = proxy.treeHashEntry;
+    });
+  
+    return proxyTreeHashes;
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -321,6 +369,11 @@ class ItemProxy {
     return repoList;
   }
   
+//  static getRepositories2(){
+//    var repoList = [tree.rootProxy];
+//    tree.rootProxy.visit(null, );
+//  }
+//  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -370,7 +423,71 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  /*
+   * Flags -
+   *   {
+   *     includeOrigin - defaults to true
+   *     excludeKind - Kind followed by boolean
+   *   }
+   *
+   * Depth First - only supply before function
+   * 
+   * Breadth First - Visits Top Nodes First
+   * 
+   * Include Origin - Operate on the parent node
+   * 
+   */
+  visitTree(flags, doBefore, doAfter){
+    
+    var includeOrigin = (flags && flags.hasOwnProperty("includeOrigin")) ? flags.includeOrigin : true; 
+    var excludeKind = (flags && flags.hasOwnProperty("excludeKind")) ? flags.excludeKind : [];
+    var before = doBefore ? doBefore : () => {};
+    var after = doAfter ? doAfter : () => {};
+    
+    var excludeChildKind = {};
+    excludeKind.forEach((kind)=>{excludeChildKind[kind] = true});
+
+    function visitChild(proxy){
+      if (!excludeChildKind[proxy.kind]){
+        before(proxy);
+        proxy.children.forEach(visitChild);
+        after(proxy);
+      }
+    }
+    
+    // Before Origin
+    if (includeOrigin){
+      before(this);
+    }
+    
+    this.children.forEach(visitChild);
+    
+    // After for Origin
+    if (includeOrigin){
+      after(this);
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  /*
+   * Calls visit with flags.includeOrigin = false.
+   * 
+   */
+  visitChildren(flags, doBefore, doAfter){
+
+    var childFlags = flags || {};
+    childFlags.includeOrigin = false;
+        
+    this.visitTree(childFlags, doBefore, doAfter);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   visitDescendants(performAction) {
+    // Visit Breadth First
     var proxyStack = [];
     
     proxyStack.push(this);
@@ -718,21 +835,46 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  deleteItem() {
+  deleteItem(deleteDescendants) {
     var byId = this.item.id;
 
     console.log("::: Deleting proxy for " + byId);
+    
+    var attemptToDeleteRestrictedNode = (
+        (this.item.id === tree.lostAndFound.item.id) || 
+        (this.item.id === tree.root.item.id));
 
-    if (this.parentProxy) {
+    // Unlink from parent
+    if (this.parentProxy && !attemptToDeleteRestrictedNode) {
       this.parentProxy.removeChild(this);
     }
-
-    if (this.children.length !== 0) {
-      console.log("::: -> Node still has children");
-      createMissingProxy(byId);
+    
+    if (deleteDescendants){
+      // Delete children depth first (after visit)
+      this.visitChildren(null, null, (childProxy) => {
+        childProxy.deleteItem(deleteDescendants);
+      });
+      if (attemptToDeleteRestrictedNode){
+        console.log("::: -> Not removing " + this.item.name);        
+      } else {
+        console.log("::: -> Removing all references");
+        delete tree.proxyMap[byId];
+      }
     } else {
-      console.log("::: -> Removing all references");
-      delete tree.proxyMap[byId];
+      // Remove this item and leave any children under Lost+Found
+      if (this.children.length !== 0) {
+        if (!attemptToDeleteRestrictedNode){
+          console.log("::: -> Node still has children");
+          createMissingProxy(byId);          
+        }
+      } else {
+        if (attemptToDeleteRestrictedNode){
+          console.log("::: -> Not removing " + this.item.name);                  
+        } else {
+          console.log("::: -> Removing all references");
+          delete tree.proxyMap[byId];
+        }
+      }      
     }
 
   }

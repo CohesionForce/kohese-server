@@ -213,17 +213,13 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     }
     
     function fetchItems() {
-      var origRepoTreeHashes = ItemProxy.getRepoTreeHashes();
+      var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
       KoheseIO.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
         console.log("::: Response for getAll");
         if(response.kdbMatches){
           console.log("::: KDB is already in sync")
         } else {
-          ItemProxy.loadModelDefinitions(response.modelDef);
-          console.log("::: Repo Tree Hashes");
-          console.log(origRepoTreeHashes);
-          console.log(response.repoTreeHashes);
-          compareRepoTreeHashes(origRepoTreeHashes, response.repoTreeHashes);
+        
           for(var kind in response.cache){
             console.log("--- Processing " + kind);
             var kindList = response.cache[kind];
@@ -232,19 +228,41 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
               var iProxy = new ItemProxy(kind, item);
             }
           }
-          console.log(new Date());
-          ItemProxy.loadingComplete();
-          console.log(new Date());
-          console.log("::: Client Repo Tree Hashes");
-          var repoTreeHashes = ItemProxy.getRepoTreeHashes();
-          console.log(repoTreeHashes);
           
-          if(!_.isEqual(response.repoTreeHashes, repoTreeHashes)){
-            console.log("*** Tree hashes do not match");
-          } else {
-            console.log("--- Tree hashes match");
+          if(response.addItems){
+            response.addItems.forEach((addedItem) => {
+              var iProxy = new ItemProxy(addedItem.kind, addedItem.item);
+            });
           }
-          compareRepoTreeHashes(response.TreeHashes, repoTreeHashes);
+          
+          if(response.changeItems){
+            response.changeItems.forEach((changededItem) => {
+              var iProxy = new ItemProxy(changededItem.kind, changededItem.item);
+            });
+          }
+          
+          if(response.deleteItems){
+            response.deleteItems.forEach((deletedItemId) => {
+              var proxy = ItemProxy.getProxyFor(deletedItemId);
+              proxy.deleteItem();
+            });
+          }
+
+          if(response.sentAll){
+            ItemProxy.loadingComplete();            
+          }
+
+          console.log("::: Compare Repo Tree Hashes After Update");
+          var updatedTreeHashes = ItemProxy.getAllTreeHashes();
+          var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
+          console.log(compareAfterRTH);
+          
+          if(!compareAfterRTH.match){
+            console.log("*** Checking hashes again");
+            var recheckTreeHashes = ItemProxy.getAllTreeHashes();
+            var compareAgain = ItemProxy.compareTreeHashMap(recheckTreeHashes, response.repoTreeHashes);
+            console.log(compareAgain);
+          }
           
         }
 
