@@ -270,6 +270,10 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 
         ModalService.showModal(modalDefaults, modalOptions).then((result)=>
             {
+            if (!result.deleteChildren) {
+                result.deleteChildren = false;
+            }
+                                      
             ItemRepository
             .deleteItem(proxy, result.deleteChildren).then(function () 
                 {
