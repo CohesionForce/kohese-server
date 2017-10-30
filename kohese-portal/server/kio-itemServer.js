@@ -1,5 +1,6 @@
 var kio = require("./koheseIO.js");
 var kdb = require("./kdb.js");
+const kdbFs = require("./kdb-fs.js");
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
@@ -11,7 +12,7 @@ console.log("::: Initializing KIO Item Server");
 
 if(global.app)
   {
-  global.app.on('newSession', KIOItemServer) 
+  global.app.on('newSession', KIOItemServer);
   }
   
 function KIOItemServer(socket){
@@ -217,8 +218,8 @@ function KIOItemServer(socket){
     
     kdb.kdbRepo.add(proxies).then(function (addStatusMap) {
       console.log('::: session %s: Sending response for VersionControl/add for user %s at %s', socket.id, socket.koheseUser.username, socket.handshake.address);
-      sendResponse(addStatusMap);
       sendStatusUpdates(proxies);
+      sendResponse(addStatusMap);
     }).catch(function (err) {
       sendResponse({
         error: err
@@ -235,8 +236,8 @@ function KIOItemServer(socket){
     
     kdb.kdbRepo.commit(proxies, request.username, request.email, 
       request.message).then(function (commitIdMap) {
-        sendResponse(commitIdMap);
         sendStatusUpdates(proxies);
+        sendResponse(commitIdMap);
     }).catch(function (err) {
       sendResponse({
         error: err
@@ -251,7 +252,7 @@ function KIOItemServer(socket){
       proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
     }
     
-    kdb.kdbRepo.push(proxies, request.remoteName, request.username).then(function (pushStatusMap) {
+    kdb.kdbRepo.push(proxies, request.remoteName, socket.koheseUser.username).then(function (pushStatusMap) {
       sendResponse(pushStatusMap);
     }).catch(function (err) {
       sendResponse({
@@ -282,11 +283,53 @@ function KIOItemServer(socket){
     });
   });
   
+  socket.on("VersionControl/reset", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray.length; i++) {
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
+    }
+    
+    kdb.kdbRepo.reset(proxies).then(
+        function (statuses) {
+          sendStatusUpdates(proxies);
+          sendResponse(statuses);
+        }).catch(function (err) {
+          sendResponse({
+            error: err
+          });
+        });
+  });
+  
+  socket.on("VersionControl/checkout", function (request, sendResponse) {
+    var proxies = [];
+    var idsArray = Array.from(request.proxyIds);
+    for (var i = 0; i < idsArray.length; i++) {
+      proxies.push(kdb.ItemProxy.getProxyFor(idsArray[i]));
+    }
+    
+    kdb.kdbRepo.checkout(proxies, true).then(function () {
+      // Update content based on reverted files
+      for (var j = 0; j < proxies.length; j++) {
+        var proxy = proxies[j];
+        proxy.item = kdbFs.loadJSONDoc(proxy.repoPath);
+        global.app.models[proxy.kind].upsert(proxy.item, {}, function () {});
+      }
+      
+      sendStatusUpdates(proxies);
+      sendResponse({});
+    }).catch(function (err) {
+      sendResponse({
+        error: err
+      });
+    });
+  });
+  
   socket.on("ImportDocuments", function (request, sendResponse) {
     new Promise(function (resolve, reject) {
       var absolutes = [];
       var root = Path.dirname(fs.realpathSync(__dirname));
-      root = Path.join(root, "data_import", socket.koheseUser.username)
+      root = Path.join(root, "data_import", socket.koheseUser.username);
       absolutes.push(Path.join(root, request.file));
       var results = importer.importFiles(absolutes, request.parentItem);
       resolve(results);
@@ -294,10 +337,10 @@ function KIOItemServer(socket){
       sendResponse(results);
     }).catch(function (err){
       sendResponse({err:err});
-    }) 
+    });
   });
 
-};
+}
 
 function sendStatusUpdates(proxies) {
   var promises = [];

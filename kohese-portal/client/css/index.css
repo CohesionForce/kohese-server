@@ -606,6 +606,20 @@ tab div {
   overflow: hidden;
 }
 
+.create-button {
+  border: 1px black solid;
+  border-radius: 10px;
+  display: inline-block;
+  padding: 0px 10px;
+  background-color: green;
+  color: white;
+  margin-right: 5px;
+}
+
+.create-button:hover {
+  cursor: pointer;
+}
+
 .sidebar {
   color: whitesmoke;
   position: relative;

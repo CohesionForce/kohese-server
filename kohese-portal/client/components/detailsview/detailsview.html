@@ -59,7 +59,11 @@
                
             </tab>
             <tab >
-                 <tab-heading>Overview <span ng-show="detailsCtrl.itemForm.$dirty">(*)</span></tab-heading>
+                 <tab-heading>Overview 
+                   <span ng-show="detailsCtrl.itemForm.$dirty">
+                      <img src="resources/icons/versioncontrol/dirty.ico"
+                      title = "Dirty item" />   
+                  </span></tab-heading>
                 <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Action'">
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>

@@ -243,12 +243,7 @@ function add(proxies) {
   return Promise.all(promises).then(function () {
     var promises = [];
     for (var repo in repoIndexMap) {
-      var index = repoIndexMap[repo];
-      promises.push(index.write().then(function (returnVal) {
-        return index.writeTree();
-      }).then(function (writeId) {
-        stageMap[repo] = writeId;
-      }));
+      promises.push(repoIndexMap[repo].write());
     }
     
     return Promise.all(promises);
@@ -271,17 +266,17 @@ function commit(proxies, userName, eMail, message) {
     var repo = info.gitRepo;
     (function (iIndex) {
       promises.push(repo.getHeadCommit().then(function (commit) {
-        if (stageMap[repo]) {  
-          var p = repo.createCommit("HEAD", signature, signature, message,
-              stageMap[repo], [commit]).then(function (commitId) {
+        return repo.refreshIndex().then(function (index) {
+          return index.writeTree();
+        }).then(function (treeId) {
+          return repo.createCommit("HEAD", signature, signature, message,
+              treeId, [commit]).then(function (commitId) {
             commitIdMap[proxies[iIndex].item.id] = commitId;
             return repo.getCommit(commitId).then(function (c) {
               return indexCommit(c);
             });
           });
-          delete stageMap[repo];
-          return p;
-        }
+        });
       }));
     })(i);
   }
@@ -295,7 +290,7 @@ module.exports.commit = commit;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function push(proxies, remoteName, userName) {
+function push(proxies, remoteName, defaultUser) {
   var pushStatusMap = {};
   var promises = [];
   for (var i = 0; i < proxies.length; i++) {
@@ -307,12 +302,17 @@ function push(proxies, remoteName, userName) {
               {
                  callbacks: {
                     credentials: function(url, u) {
-                       return nodegit.Cred.sshKeyFromAgent(userName);
+                      // TODO Get the username from the given URL once we have
+                      // upgraded our version of node.js
+                      return nodegit.Cred.sshKeyFromAgent(defaultUser);
                     }
                  }
               }).then(function (status) {
                 pushStatusMap[proxies[iIndex].item.id] = status;
-              });
+              })
+                .catch(function(err){
+                 console.log(err); 
+                });
            }));
     })(i);
   }
@@ -326,7 +326,7 @@ module.exports.push = push;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function checkout(proxies, pointOfReference, force) {
+function checkout(proxies, force) {
   var repoMap = [];
   for (var i = 0; i < proxies.length; i++) {
     var add = true;
@@ -340,11 +340,9 @@ function checkout(proxies, pointOfReference, force) {
     }
     
     if (add) {
-      var p = [];
-      p.push(info.relativeFilePath);
       repoMap.push({
         repo: info.gitRepo,
-        paths: p
+        paths: [info.relativeFilePath]
       });
     }
   }
@@ -353,8 +351,16 @@ function checkout(proxies, pointOfReference, force) {
   for (var j = 0; j < repoMap.length; j++) {
     var options = new nodegit.CheckoutOptions();
     options.paths = repoMap[j].paths;
-    options.checkoutStrategy = (force ? nodegit.Checkout.STRATEGY.FORCE : nodegit.Checkout.STRATEGY.SAFE);
-    promises.push(nodegit.Checkout.tree(repoMap[j].repo, pointOfReference, options));
+    options.checkoutStrategy = (force ? (nodegit.Checkout.STRATEGY.FORCE
+        | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : (nodegit.Checkout.STRATEGY.SAFE
+        | nodegit.Checkout.STRATEGY.ALLOW_CONFLICTS));
+    //options.notifyFlags = nodegit.Checkout.NOTIFY.ALL;
+    //options.notifyCb = function (why, path, baseline, target, workdir, payload) {
+      // Return zero to proceed
+    //  return 0;
+    //};
+    // Passing null uses HEAD for the checkout
+    promises.push(nodegit.Checkout.tree(repoMap[j].repo, null, options));
   }
   
   return Promise.all(promises);
@@ -364,13 +370,34 @@ module.exports.checkout = checkout;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function reset(proxies, paths) {
+function reset(proxiesToReset) {
   var promises = [];
-  for (var i = 0; i < proxies.length; i++) {
-    var info = repoRelativePathOf(proxies[i]);
-    promises.push(info.gitRepo.getHeadCommit().then(function (commit) {
-      return nodegit.Reset.default(info.gitRepo, commit, paths);
-    }));
+  var repoMap = [];
+  for (var j = 0; j < proxiesToReset.length; j++) {
+    var info = repoRelativePathOf(proxiesToReset[j]);
+    var found = false;
+    for (var k = 0; k < repoMap.length; k++) {
+      if (repoMap[k].repo === info.gitRepo) {
+        found = true;
+        repoMap[k].resetPaths.push(info.relativeFilePath);
+        break;
+      }
+    }
+    
+    if (!found) {
+      repoMap.push({
+          repo: info.gitRepo,
+          resetPaths: [info.relativeFilePath]
+      });
+    }
+  }
+  
+  for (var i = 0; i < repoMap.length; i++) {
+    (function (iIndex) {
+      promises.push(repoMap[iIndex].repo.getHeadCommit().then(function (commit) {
+        return nodegit.Reset.default(repoMap[iIndex].repo, commit, repoMap[iIndex].resetPaths);
+      }));
+    })(i);
   }
   
   return Promise.all(promises);
