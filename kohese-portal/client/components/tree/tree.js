@@ -4,7 +4,7 @@
 
 function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
                         $scope, $location, $stateParams, SearchService, tabService, VersionControlService,
-                        ModalService) {
+                        ModalService, DeleteTemplate) {
 
     var treeCtrl = this,
         syncListener;
@@ -258,7 +258,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 
         if (proxy.children.length > 0)
         {
-            modalDefaults.templateUrl = 'components/common/services/modal-service/deleteModal.html'
+            modalDefaults.templateUrl = DeleteTemplate;
         }
 
         var modalOptions = {

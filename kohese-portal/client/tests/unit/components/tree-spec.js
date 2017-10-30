@@ -7,6 +7,26 @@ describe("Tree View",()=>{
     var treeCtrl;
     var VersionControlService;
     var $rootScope;
+    var DeleteTemplate;
+    var testProxy = {
+        item: {
+            id: "01",
+            name: "Childless Proxy"
+        },
+        children: []
+    }
+    var testParentProxy = {
+        item: {
+            id: "02",
+            name: "Parent Proxy"
+        },
+        children: [{
+            item: {
+                id: "03",
+                name: "Child Proxy"
+            }
+        }]
+    }
 
         beforeEach(()=>{
             angular.mock.module(require('angular-ui-router'));
@@ -36,6 +56,7 @@ describe("Tree View",()=>{
                 VersionControlService = $injector.get('VersionControlService')
                 ItemRepository = $injector.get("ItemRepository");
                 ModalService = $injector.get("ModalService");
+                DeleteTemplate = $injector.get("DeleteTemplate");
             })
             });
 
@@ -43,6 +64,64 @@ describe("Tree View",()=>{
             console.log("Test");
             console.log(treeCtrl);
             console.log(VersionControlService);
+        })
+
+        describe("Delete Item", ()=>{
+            var deferred1;
+            var deferred2;
+            var defaultParentModalOptions = {
+                closeButtonText : 'Cancel',
+                actionButtonText : 'Delete',
+                headerText: 'Delete "' + testParentProxy.item.name + '"?',
+                bodyText: 'Are you sure you want to delete this item?'
+            }
+            var defaultSingleModalOptions = {
+                closeButtonText : 'Cancel',
+                actionButtonText : 'Delete',
+                headerText: 'Delete "' + testProxy.item.name + '"?',
+                bodyText: 'Are you sure you want to delete this item?'
+            }
+
+            beforeEach(()=>{         
+                inject((_$q_)=>{
+                    deferred1 = _$q_.defer();
+                    deferred2 = _$q_.defer();
+                    spyOn(ModalService, "showModal")
+                        .and.callFake(()=>{
+                            return deferred1.promise;
+                        });
+                    spyOn(ItemRepository, 'deleteItem')
+                        .and.callFake(()=>{
+                            return deferred2.promise;
+                        });
+                });
+            });
+
+            it("shows a modal asking the user to confirm deletion of one item", 
+                (done)=>{
+                treeCtrl.removeItem(testProxy);
+                deferred1.resolve({});
+                $rootScope.$digest();
+                expect(ModalService.showModal)
+                    .toHaveBeenCalledWith({}, defaultSingleModalOptions)
+                deferred2.resolve({id: "01"});
+                $rootScope.$digest();
+                expect(ItemRepository.deleteItem).toHaveBeenCalled();
+                done();
+            })
+            it("shows a modal with options for recursive delete of item and children", 
+                (done)=>{
+                treeCtrl.removeItem(testParentProxy);
+                deferred1.resolve({deleteChildren:true});
+                $rootScope.$digest();
+                expect(ModalService.showModal)
+                    .toHaveBeenCalledWith({templateUrl: DeleteTemplate},
+                                            defaultParentModalOptions);
+                deferred2.resolve({id: "02"});
+                $rootScope.$digest();
+                expect(ItemRepository.deleteItem).toHaveBeenCalledWith(testParentProxy, true);
+                done();
+            })
         })
 
         describe("Version Control", ()=>{
