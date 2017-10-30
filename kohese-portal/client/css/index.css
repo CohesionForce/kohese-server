@@ -360,7 +360,7 @@ table td .glyphicon-remove:hover {
 }
 
 .knowledge-tree {
-  height: 100%;
+  height: calc(100% - 32px);
 }
 
 .knowledge-tree .kt-icon, .knowledge-tree .kt-label {

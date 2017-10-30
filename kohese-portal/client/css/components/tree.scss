@@ -10,7 +10,7 @@
 }
 
 .knowledge-tree {
-  height: 100%;
+  height: calc(100% - 32px);
     
   .kt-icon, .kt-label {
     cursor: pointer;
