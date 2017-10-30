@@ -40,6 +40,12 @@ class ItemProxy {
       tree.proxyMap[itemId] = proxy;
     }
 
+    if (proxy.item && (proxy.kind !== "Internal-Lost") && (proxy.kind !== "Internal-Model")){
+      // Item already exists, so update it instead
+      proxy.updateItem(kind, forItem);
+      return proxy;
+    }
+    
     proxy.kind = kind;
     proxy.item = forItem;
     
@@ -50,6 +56,10 @@ class ItemProxy {
 
     if (kind === "Repository") {
       tree.repoMap[itemId] = proxy;
+    }
+    
+    if (kind === "Internal-Model") {
+      tree.modelMap[itemId] = proxy;
     }
     
     if (kind === "Internal") {
@@ -72,7 +82,7 @@ class ItemProxy {
       proxy.sortChildren();
     }
 
-    this.calculateTreeHash();
+    proxy.calculateTreeHash();
 
     return proxy;
   }

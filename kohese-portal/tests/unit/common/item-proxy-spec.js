@@ -739,6 +739,8 @@ describe("ItemProxy Test", function() {
 
     var rootProxy = ItemProxy.getRootProxy();
     var modelDefProxy = ItemProxy.getProxyFor("Model-Definitions");
+    console.log(rootProxy.treeHashEntry.childTreeHashes["Model-Definitions"]);
+    console.log(modelDefProxy.treeHashEntry.treeHash);
     
     expect(rootProxy.treeHashEntry.childTreeHashes["Model-Definitions"]).toEqual(modelDefProxy.treeHashEntry.treeHash);    
   });
@@ -992,6 +994,47 @@ describe("ItemProxy Test", function() {
 
     lostAndFound.deleteItem(true);
     expect(lfProxyAfter.descendantCount).toEqual(0);    
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  it("Update Tree Hash When Creating Already Existing Item", ()=> {
+
+    resetItemRepository();
+    defineTestModel();
+    
+    var a = new ItemProxy("Test", {
+      id: "A",
+      name: "A Item"
+    });
+    var aa = new ItemProxy("Test", {
+      id: "AA",
+      name: "AA Item",
+      parentId: "A"
+    });
+    var ab = new ItemProxy("Test", {
+      id: "AB",
+      name: "AA Item",
+      parentId: "A"
+    });
+    
+    var newAA = new ItemProxy("Test", {
+      id: "AA",
+      name: "Updated AA Item",
+      parentId: "A"
+    });
+    
+    var expectedATreeHashEntry = {
+        kind: 'Test',
+        oid: '167cc8efd041e787a28a392144edaea329ddc8ca',
+        childTreeHashes: 
+         { AB: '90f7ce824ded7365abe31d7ab084837d205a4ff0',
+           AA: 'b19335d15534a0f103ee74de78ad6d9be9189eeb' },
+        treeHash: '377eb414c090b204428ab610f75ebbc99bae7d20'
+    }
+    
+    expect(a.treeHashEntry).toEqual(expectedATreeHashEntry);
   });
 
 });

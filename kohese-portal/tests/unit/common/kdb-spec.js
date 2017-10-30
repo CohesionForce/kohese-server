@@ -51,19 +51,10 @@ describe("KDB Test", function() {
     kdb.initialize('kohese-kdb').then(() => {
 
       console.log("::: KDB is initialized");
-      try {
-        var rootProxy = kdb.ItemProxy.getRootProxy();
-        console.log(rootProxy.item);
+
+      var rootProxy = kdb.ItemProxy.getRootProxy();
+      console.log(rootProxy.item);
     
-      }
-      catch (error){
-        console.log("::: Error ")
-        console.log(error);
-        console.log(error.stack);
-        
-      }
-      
-      console.log("------------");
 
       ItemProxy.loadingComplete();
 //      dump();
@@ -73,15 +64,17 @@ describe("KDB Test", function() {
       var repoTreeHashes = kdb.ItemProxy.getRepoTreeHashes();
 //      console.log(repoTreeHashes);
       
-      console.log("===> Begin Get");
       var timeBefore = new Date();
       var treeHashMap = kdb.ItemProxy.getAllTreeHashes();
       var timeAfter = new Date();
-      console.log("===> After Get");
       var deltaTime = timeAfter - timeBefore;
       console.log("Time to getAllTH: " + deltaTime);
-      console.log(timeBefore);
-      console.log(timeAfter);
+      
+      var fs = require('fs');
+      
+      console.log("::: Writing the file")
+      fs.writeFileSync("thm.out", JSON.stringify(treeHashMap, null, '  '), {encoding: 'utf8', flag: 'w'});      
+
 
       done();
     });
