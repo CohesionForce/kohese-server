@@ -321,11 +321,11 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
         return promise;
     }
 
-    function deleteItem(proxy) {
+    function deleteItem(proxy, recursive) {
         console.log("::: Preparing to deleteById " + proxy.kind);
         
         var promise = new Promise((resolve, reject) => {
-          KoheseIO.socket.emit('Item/deleteById', {kind: proxy.kind, id: proxy.item.id}, function (response) {
+          KoheseIO.socket.emit('Item/deleteById', {kind: proxy.kind, id: proxy.item.id, recursive: recursive}, function (response) {
             if (response.error){
               reject(response.error);
             } else {

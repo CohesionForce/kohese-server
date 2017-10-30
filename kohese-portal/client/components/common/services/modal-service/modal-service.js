@@ -63,4 +63,6 @@ function ModalService($modal) {
 export default () => {
     angular.module('app.services.modalservice', ['ui.bootstrap'])
         .service('ModalService', ModalService)
+        .constant('DeleteTemplate', 'components/common/services/modal-service/deleteModal.html')
+        .constant('DefaultTemplate', 'components/common/services/modal-service/modal.html')
 }
