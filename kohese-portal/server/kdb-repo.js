@@ -90,7 +90,7 @@ function indexCommit(commit) {
   return commit.getTree().then(function (tree) {
     return getIndexEntries(tree, []);
   }).then(function (entryMap) {
-    entryMap.meta.time = commit.time();
+    entryMap.meta.time = commit.timeMs();
     entryMap.meta.author = commit.author().toString();
     entryMap.meta.message = commit.message();
     entryMap.meta.parents = [];
@@ -619,7 +619,7 @@ function walkHistoryForFile(proxy, callback){
   var lastEntry = relatedCommits[j].indexEntry;
   while (j--) {
     var entry = relatedCommits[j].indexEntry;
-    if (entry === lastEntry) {
+    if ((entry.oid === lastEntry.oid) && (entry.kind === lastEntry.kind)) {
       relatedCommits.splice(j, 1);
     } else {
       lastEntry = entry;
