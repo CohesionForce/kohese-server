@@ -23,6 +23,7 @@
     "jquery": "^2.1.4",
     "json-loader": "^0.5.4",
     "jsonwebtoken": "^5.0.5",
+    "jssha": "^2.3.1",
     "loopback": "^2.14.0",
     "loopback-boot": "^2.6.5",
     "loopback-connector-mongodb": "^1.8.0",
