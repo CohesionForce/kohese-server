@@ -14,6 +14,7 @@ module.exports.kdbRepo = kdbRepo;
 var jsonExt = /\.json$/;
 
 var ItemProxy = require('../common/models/item-proxy.js');
+var CreateStates = require('../common/models/createStates.js');
 module.exports.ItemProxy = ItemProxy;
 
 var kdbStore = {
@@ -36,8 +37,14 @@ for (var i = 2; i < process.argv.length; i++) {
 
 var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
 var mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
+var cachePath = path.join(kdbDirPath, 'cache');
 
 function initialize() {
+
+  var kdbModel = require('./kdb-model.js');
+  ItemProxy.loadModelDefinitions(kdbModel.modelDef);
+  kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
+  
   // Ignore the loopback _meta
   if (modelConfig._meta) {
     delete modelConfig._meta;
@@ -56,6 +63,7 @@ function initialize() {
     kdbStore.models[modelKind] = {};
   }
 
+  checkAndCreateDir(cachePath);  
   checkAndCreateDir(kdbDirPath);
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
   //TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
@@ -554,10 +562,10 @@ function openRepositories() {
 	  console.log("--- Child descendant count of " + childProxy.item.name + ": " + childProxy.descendantCount);  
 	}
 
-	var kdbModel = require('./kdb-model.js');
-	kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
-
 	console.log("::: End KDB File Load");
+	console.log(new Date());
+  ItemProxy.loadingComplete();
+  console.log(new Date());
 	
 	return Promise.all(promises);
 }

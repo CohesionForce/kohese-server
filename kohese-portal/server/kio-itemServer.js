@@ -6,6 +6,8 @@ var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
 const Path = require("path");
 const importer = require("./directory-ingest.js");
+var _ = require('underscore');
+
 
 
 console.log("::: Initializing KIO Item Server");
@@ -42,12 +44,63 @@ function KIOItemServer(socket){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getAll for user %s at %s', socket.id, username, socket.handshake.address);
-    console.log(request);
-    var kdbStore = kdb.retrieveDataForMemoryConnector();
+    
+    var repoTreeHashes = kdb.ItemProxy.getAllTreeHashes();
+    
+    var response = {};
+    if(!_.isEqual(request.repoTreeHashes, repoTreeHashes)){
+      if (_.size(request.repoTreeHashes) === 0){
+        console.log("--- KDB Does Not Match: Full response will be sent");
+        
+        response = {
+            repoTreeHashes: repoTreeHashes,
+            cache: {},
+            sentAll: true
+          };
+        
+        var rootProxy = kdb.ItemProxy.getRootProxy();
+        rootProxy.visitChildren(null, (proxy) => {
+          if (!response.cache[proxy.kind]){
+            response.cache[proxy.kind] = {};
+          }
+          var kindCache = response.cache[proxy.kind];
+          kindCache[proxy.item.id] = JSON.stringify(proxy.item);
+        });
+        
+      } else {
+        // Send deltas to client
+        console.log("--- KDB Does Not Match: Delta response will be sent");
+
+        var thmCompare = kdb.ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+//        console.log(thmCompare);
+        
+        var response = {
+            repoTreeHashes: repoTreeHashes,
+            addItems: [],
+            changeItems: [],
+            deleteItems: thmCompare.deletedItems
+        };
+        
+        thmCompare.addedItems.forEach((itemId) => {
+          var proxy = kdb.ItemProxy.getProxyFor(itemId);
+          response.addItems.push({kind: proxy.kind, item: proxy.item});
+//          console.log(proxy.item);
+        });
+        
+        thmCompare.changedItems.forEach((itemId) => {
+          var proxy = kdb.ItemProxy.getProxyFor(itemId);
+          response.changeItems.push({kind: proxy.kind, item: proxy.item})
+//          console.log(proxy.item);
+        });
+      }
+
+    } else {
+      console.log("--- KDB Matches: No changes will be sent");
+      response.kdbMatches = true;
+    }
+    
     console.log("::: Sending getAll response");
-    sendResponse({
-      cache: kdbStore.cache
-    });
+    sendResponse(response);
     console.log("::: Sent getAll response");
   });
 
@@ -114,7 +167,7 @@ function KIOItemServer(socket){
         kind: request.kind,
         item: responseHeaders
       });
-      console.log("::: Sent Item/upsert response");      
+      console.log("::: Sent Item/upsert response");
     }, function (httpResponse){
       sendResponse({error: httpResponse});
       console.log("::: Sent Item/upsert error");      

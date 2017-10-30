@@ -39,7 +39,6 @@
         <!-- Nav tabs -->
         <tabset id="details-tabs">
             <tab id="defaultTab" active="detailsCtrl.defaultTab.active" heading="Document">
-                <h4>Document Tab</h4>
                 <button ng-click="detailsCtrl.generateHTMLReport()" class="btn btn-primary">
                    Generate HTML Report
                </button>
@@ -264,6 +263,14 @@
                  ng-if="detailsCtrl.itemProxy.children">
 
               <action-table item-proxy="detailsCtrl.itemProxy">
+            </tab>
+            <tab heading="Raw Data">
+                <h4>Document Tab</h4>
+                <h5>Id: {{detailsCtrl.itemProxy.item.id}}</h5>
+                <h5>OID: {{detailsCtrl.itemProxy.oid}}</h5>
+                <h5>Tree Hash: {{detailsCtrl.itemProxy.treeHash}}</h5>
+                <pre>{{detailsCtrl.itemProxy.document()}}</pre>
+                <pre>{{detailsCtrl.itemProxy.treeHashEntry | json}}</pre>
             </tab>
         </tabset>
     </div>

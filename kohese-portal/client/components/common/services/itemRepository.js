@@ -181,15 +181,57 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     };
     
     function fetchItems() {
-      KoheseIO.socket.emit('Item/getAll', {}, function (response) {
+      var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
+      KoheseIO.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
         console.log("::: Response for getAll");
-        for(var kind in response.cache){
-          console.log("--- Processing " + kind);
-          var kindList = response.cache[kind];
-          for (var index in kindList){
-            var item = JSON.parse(kindList[index]);
-            var iProxy = new ItemProxy(kind, item);
+        if(response.kdbMatches){
+          console.log("::: KDB is already in sync")
+        } else {
+        
+          for(var kind in response.cache){
+            console.log("--- Processing " + kind);
+            var kindList = response.cache[kind];
+            for (var index in kindList){
+              var item = JSON.parse(kindList[index]);
+              var iProxy = new ItemProxy(kind, item);
+            }
           }
+          
+          if(response.addItems){
+            response.addItems.forEach((addedItem) => {
+              var iProxy = new ItemProxy(addedItem.kind, addedItem.item);
+            });
+          }
+          
+          if(response.changeItems){
+            response.changeItems.forEach((changededItem) => {
+              var iProxy = new ItemProxy(changededItem.kind, changededItem.item);
+            });
+          }
+          
+          if(response.deleteItems){
+            response.deleteItems.forEach((deletedItemId) => {
+              var proxy = ItemProxy.getProxyFor(deletedItemId);
+              proxy.deleteItem();
+            });
+          }
+
+          if(response.sentAll){
+            ItemProxy.loadingComplete();            
+          }
+
+          console.log("::: Compare Repo Tree Hashes After Update");
+          var updatedTreeHashes = ItemProxy.getAllTreeHashes();
+          var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
+          console.log(compareAfterRTH);
+          
+          if(!compareAfterRTH.match){
+            console.log("*** Checking hashes again");
+            var recheckTreeHashes = ItemProxy.getAllTreeHashes();
+            var compareAgain = ItemProxy.compareTreeHashMap(recheckTreeHashes, response.repoTreeHashes);
+            console.log(compareAgain);
+          }
+          
         }
 
         $rootScope.$broadcast('itemRepositoryReady');
