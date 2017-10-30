@@ -180,38 +180,6 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
         return repoStagingStatus;
     };
     
-    function compareRepoTreeHashes(fromTree, toTree){
-      console.log("::: Compare Tree Hashes");
-      if(!fromTree){
-        console.log("--- From Tree is undefined");
-        return;
-      }
-      for (var key in fromTree){
-        console.log("--- Comparing " + key);
-        if (!_.isEqual(fromTree[key], toTree[key])){
-          console.log("*** Found unmatched tree: " + key);
-          console.log(fromTree[key]);
-          console.log(toTree[key]);
-          compareTreeEntries(fromTree[key], toTree[key]);
-        }
-      }          
-    }
-    
-    function compareTreeEntries(fromEntry, toEntry){
-      
-      if (!fromEntry){
-        console.log("--- From Entry is undefined");
-        return;
-      }
-      for (var childId in fromEntry.childTreeHashes){
-        if (!_.isEqual(fromEntry.childTreeHashes[childId], toEntry.childTreeHashes[childId])){
-          console.log("*** Found unmatched child: " + childId);
-          console.log(fromEntry.childTreeHashes[childId]);
-          console.log(toEntry.childTreeHashes[childId]);
-        }
-      }
-    }
-    
     function fetchItems() {
       var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
       KoheseIO.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
