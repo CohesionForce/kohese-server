@@ -254,6 +254,13 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 
     treeCtrl.removeItem = function (proxy) {
         var itemId = proxy.item.id;
+        var modalDefaults = {};
+
+        if (proxy.children.length > 0)
+        {
+            modalDefaults.templateUrl = 'components/common/services/modal-service/deleteModal.html'
+        }
+
         var modalOptions = {
             closeButtonText : 'Cancel',
             actionButtonText : 'Delete',
@@ -261,10 +268,10 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
             bodyText: 'Are you sure you want to delete this item?'
         }
 
-        ModalService.showModal({}, modalOptions).then((result)=>
+        ModalService.showModal(modalDefaults, modalOptions).then((result)=>
             {
             ItemRepository
-            .deleteItem(proxy).then(function () 
+            .deleteItem(proxy, result.deleteChildren).then(function () 
                 {
                 console.log("::: Item has been deleted: " + itemId);
                 });
