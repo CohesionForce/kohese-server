@@ -347,6 +347,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         }
     };
 
+    // This needs to go away. I don't like us having manual state transitions in
+    // controllers. We need to centralize how we navigate to get the bundle and
+    // tab situation in a maintable situation -- TO-DO JEP
     detailsCtrl.navigate = function (state, params) {
         if (state) {
             $state.go(state, params)
@@ -354,6 +357,10 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             $state.go('kohese.explore.edit', params)
         }
     };
+
+    detailsCtrl.newTab = function(state, params) {
+        NavigationService.navigate(state, params);
+    }
 
     /*
      *

@@ -11,8 +11,7 @@ function NavigationService($state, tabService, $rootScope){
     service.updateState = updateState;
     service.getLastState = getLastState;
     service.getCurrentState = getCurrentState;
-
-
+    service.navigate = navigate;
 
     function updateState(newState){
         lastState = currentState;
@@ -31,6 +30,10 @@ function NavigationService($state, tabService, $rootScope){
         lastState[tabService.getCurrentTab().id] = currentState[tabService.getCurrentTab().id];
         currentState[tabService.getCurrentTab().id] = $state.current.name;
     })
+
+    function navigate(state, params) {
+        $rootScope.$broadcast('navigationEvent',{state: state, params: params});
+    }
 }
 
 

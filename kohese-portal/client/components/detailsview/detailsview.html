@@ -45,6 +45,12 @@
                 <button ng-click="detailsCtrl.generateDOCXReport()" class="btn btn-primary">
                    Generate Word Document
                </button>
+               <button 
+                      class= "btn btn-primary"
+                      ng-click="detailsCtrl.newTab('kohese.analysis', 
+                                {id: detailsCtrl.itemProxy.item.id})">
+                      Analyze                
+              </button>
 
 		           <div ng-if="detailsCtrl.itemProxy.children.length">
                   <label class="control-label" for="showChildren"> Show Children </label> <input
