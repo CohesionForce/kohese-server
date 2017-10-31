@@ -40,7 +40,7 @@ class ItemProxy {
       tree.proxyMap[itemId] = proxy;
     }
 
-    if (proxy.item && (proxy.kind !== "Internal-Lost") && (proxy.kind !== "Internal-Model")){
+    if (proxy.item && (proxy.kind !== "Internal") && (proxy.kind !== "Internal-Lost") && (proxy.kind !== "Internal-Model")){
       // Item already exists, so update it instead
       proxy.updateItem(kind, forItem);
       return proxy;
