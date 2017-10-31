@@ -8,6 +8,7 @@ describe("ItemProxy Test", function() {
   // console.log(__dirname);
   // console.log("::: Starting Item Proxy Test");
   var dumpEnabled = false;
+  var _ = require("underscore");
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -1035,6 +1036,27 @@ describe("ItemProxy Test", function() {
     }
     
     expect(a.treeHashEntry).toEqual(expectedATreeHashEntry);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  it("Prevent Recursion on Updating Lost+Found", ()=> {
+
+    resetItemRepository();
+    defineTestModel();
+    
+    var a = new ItemProxy("Test", {
+      id: "A",
+      name: "A Item",
+      parentId: "MISSING"
+    });
+    
+    var lfContent = _.clone(lostAndFound.item);
+    
+    var lf = new ItemProxy("Internal", lfContent);
+    
+    expect(lostAndFound.descendantCount).toEqual(2);
   });
 
 });
