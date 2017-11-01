@@ -9,8 +9,8 @@ function DocumentController($scope, $sce, $stateParams, tabService){
     var controllerRestored = tabService.restoreControllerData(currentTab.id, 'DocumentController', this); 
     //Exposed 
 
+    //Init block
     if (!controllerRestored){
-        //Init block
         docCtrl.itemProxy = $scope.itemProxy;
     }
   

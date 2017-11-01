@@ -1,4 +1,4 @@
-function TermViewController($scope, tabService){
+function TermViewController($scope, $timeout, tabService, analysisService){
     const ctrl = this;
     var currentTab = tabService.getCurrentTab();
     
@@ -7,11 +7,95 @@ function TermViewController($scope, tabService){
     
     if(!controllerRestored) {
         // Initialization Block
+        ctrl.itemProxy = $scope.itemProxy;
+
+        ctrl.analysisSummarySortField = ['-count', 'text'];
+        ctrl.analysisTokenLimit = 100;
+
+        ctrl.analysisFilterPOS = analysisService.filterPOS;
+        ctrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
+        ctrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
+        ctrl.analysisPOSFilterName = "Standard";
+
+        ctrl.filterString = "";
+        ctrl.filterTextTimeout;
+        ctrl.filterList = []
+
+        ctrl.analysisFilterString = "";
+        ctrl.analysisFilterRegex = null;
+
+        // Event Listeners 
+        $scope.$on('tabSelected', function () {
+            tabService.bundleController(ctrl, 'ChunkViewController', currentTab.id);
+        });
+
+        $scope.$watch('ctrl.analysisFilterString', onFilterChange);
+    }
+    ctrl.fetchAnalysis = function () {
+        analysisService.fetchAnalysis(ctrl.itemProxy).then(function (results){
+          $scope.$apply();
+        });
+      };
+
+    ctrl.submitStringFilter = function() {
+        ctrl.filterList.push(ctrl.analysisFilterString);
+        ctrl.analysisFilterString = ctrl.analysisFilterInput;
+        console.log(ctrl.analysisFilterInput);
     }
 
-    $scope.$on('tabSelected', function () {
-        tabService.bundleController(ctrl, 'ChunkViewController', currentTab.id);
-    });
+    ctrl.submitClickFilter = function(term) {
+        ctrl.analysisFilterInput = term;
+        ctrl.submitStringFilter();
+    }
+
+
+    ctrl.filterTokens = function(summary) {
+        var POSFilterReturn = ctrl.analysisFilterPOS(summary,
+                ctrl.analysisPOSFilterCriteria[ctrl.analysisPOSFilterName])
+        var RegexFilterReturn = ((ctrl.analysisFilterRegex === null) ||
+                                ctrl.analysisFilterRegex.test(summary.text));
+        return (POSFilterReturn && RegexFilterReturn)
+               
+        // return ctrl.analysisFilterPOS(summary,ctrl.analysisPOSFilterCriteria[ctrl.analysisPOSFilterName]) && 
+        // ((ctrl.analysisFilterRegex === null) || ctrl.analysisFilterRegex.test(summary.text));
+      };
+
+    function onFilterChange()
+        {
+            console.log(">>> Filter string changed to: " + ctrl.analysisFilterString);
+            if (ctrl.filterTextTimeout) {
+              $timeout.cancel(ctrl.filterTextTimeout);
+            }
+            
+            ctrl.filterTextTimeout = $timeout(function() {
+              var regexFilter = /^\/(.*)\/([gimy]*)$/;
+              var filterIsRegex = ctrl.analysisFilterString.match(regexFilter);
+      
+              if (filterIsRegex) {
+                try {
+                  ctrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
+                  ctrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
+                  ctrl.invalidAnalysisFilterRegex = false;              
+                } catch (e) {
+                  ctrl.invalidAnalysisFilterRegex = true;
+                }
+              } else 
+                    {
+                    let cleanedPhrase = ctrl.analysisFilterString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                    if(ctrl.analysisFilterString !== ""){
+                        ctrl.analysisFilterRegex = new RegExp(cleanedPhrase,"i");
+                        ctrl.analysisFilterRegexHighlight = new RegExp('(' + cleanedPhrase + ')',"gi");
+                        ctrl.invalidAnalysisFilterRegex = false;
+                    } else {
+                        ctrl.analysisFilterRegex = null;
+                        ctrl.analysisFilterRegexHighlight = null;
+                        ctrl.invalidAnalysisFilterRegex = false;
+                    }
+                }
+            });
+        }
+
+    ctrl.fetchAnalysis();
 }
  
 function TermViewDirective(){
@@ -26,7 +110,8 @@ function TermViewDirective(){
 }
 
 export default ()=> {
-    angular.module('app.directives.termview', ['app.services.tabservice'])
+    angular.module('app.directives.termview', ['app.services.tabservice',
+                                              'app.services.analysisservice'])
         .directive('termView', TermViewDirective)
         .controller('TermViewController', TermViewController)
 }
