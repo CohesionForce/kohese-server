@@ -1,14 +1,26 @@
-function AnalysisController($stateParams, ItemRepository, tabService) {
+function AnalysisController($scope, $stateParams, ItemRepository, tabService) {
     const ctrl = this;
 
-    var tab = tabService.getCurrentTab();
-    var controllerRestored = tabService.restoreControllerData(tab.id, 'AnalysisController', this);
+    var currentTab = tabService.getCurrentTab();
     ctrl.showChildren= true;
+
+    var controllerRestored = tabService.restoreControllerData(currentTab.id, 'AnalysisController', this);
 
     if(!controllerRestored) {
         ctrl.itemProxy =  ItemRepository.getProxyFor($stateParams.id);
     }
     this.msg = ctrl.itemProxy.item.name;
+
+    $scope.$on('tabSelected', function () {
+        tabService.bundleController(ctrl, 'AnalysisController', currentTab.id);
+    });
+
+    $scope.$on('itemRepositoryReady', function () {
+        if (angular.isDefined($stateParams.id)) {
+           ctrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
+        }
+    })
+
 }
 
 export default ()=> {

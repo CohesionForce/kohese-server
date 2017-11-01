@@ -23,11 +23,7 @@ function DocumentDirective(){
             itemProxy: '=',
             showChildren: '='
         },
-        templateUrl: 'components/common/directives/document-view/document-view.html',
-        link: (scope, element, attrs)=>{
-            console.log('link');
-            console.log(scope);
-        }
+        templateUrl: 'components/common/directives/document-view/document-view.html'
     }
 }
 

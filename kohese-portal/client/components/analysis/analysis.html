@@ -1,7 +1,19 @@
 <div id="analysis-view">
-    {{aCtrl.msg}}
+
+    <chunk-view     id="chunk-view"
+                    class="col"
+                    item-proxy="aCtrl.itemProxy"></chunk-view>
+
+    <term-view      id="term-view"
+                    class="col"
+                    item-proxy="aCtrl.itemProxy"></term-view>
+
+    <sentence-view  id="sentence-view"
+                    class="col"
+                    item-proxy="aCtrl.itemProxy"></sentence-view>
+
     <document-view  id="document-view"
                     class="col align-self-end"
                     item-proxy="aCtrl.itemProxy"
-                    show-children="aCtrl.showChildren"/>
+                    show-children="aCtrl.showChildren"></document-view>
 </div>

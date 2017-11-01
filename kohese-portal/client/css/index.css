@@ -622,6 +622,7 @@ tab div {
 
 #analysis-view {
   height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -631,12 +632,68 @@ tab div {
 
 #analysis-view #document-view .panel {
   height: 50%;
-  float: right;
+  position: absolute;
+  top: 42px;
+  right: 0px;
   width: 50%;
 }
 
 #analysis-view #document-view .panel .panel-body {
   overflow: auto;
+  height: 100%;
+}
+
+#analysis-view #term-view {
+  height: inherit;
+  width: inherit;
+}
+
+#analysis-view #term-view .panel {
+  height: 50%;
+  width: 50%;
+  position: absolute;
+  top: 42px;
+  left: 0px;
+}
+
+#analysis-view #term-view .panel .panel-body {
+  overflow: auto;
+  height: 100%;
+}
+
+#analysis-view #chunk-view {
+  height: inherit;
+  width: inherit;
+}
+
+#analysis-view #chunk-view .panel {
+  height: 40%;
+  width: 50%;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+}
+
+#analysis-view #chunk-view .panel .panel-body {
+  overflow: auto;
+  height: 100%;
+}
+
+#analysis-view #sentence-view {
+  height: inherit;
+}
+
+#analysis-view #sentence-view .panel {
+  height: 40%;
+  width: 50%;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+
+#analysis-view #sentence-view .panel .panel-body {
+  overflow: auto;
+  height: 100%;
 }
 
 .sidebar {

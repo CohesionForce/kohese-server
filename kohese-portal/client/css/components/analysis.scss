@@ -1,14 +1,62 @@
 #analysis-view{
     height: 100%;
+    width: 100%;
     overflow: hidden;
     #document-view{
         height: inherit;
         .panel{
             height: 50%;
-            float: right;
+            position: absolute;
+            top: 42px;
+            right: 0px;
             width: 50%;
             .panel-body{
                 overflow:auto;
+                height: 100%;
+            }
+        }
+    }
+    #term-view{
+        height: inherit;
+        width: inherit;
+        .panel{
+            height: 50%; 
+            width: 50%;
+            position: absolute;
+            top: 42px;
+            left: 0px;
+            .panel-body {
+                overflow: auto;
+                height:100%;
+            }
+        }
+    }
+    #chunk-view{
+        height: inherit;
+        width: inherit;
+        .panel{
+            height: 40%;
+            width:  50%;
+            position: absolute;
+            left: 0px;
+            bottom: 0px;
+            .panel-body {
+                overflow: auto;
+                height:100%;
+            }
+        }
+    }
+    #sentence-view{
+        height: inherit;
+        .panel{
+            height: 40%;
+            width: 50%;
+            position: absolute;
+            right: 0px;
+            bottom: 0px;
+            .panel-body {
+                overflow: auto;
+                height:100%;
             }
         }
     }
