@@ -17,7 +17,7 @@ global.app.on('newSession', function (socket) {
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/msword',
       'application/pdf'],
-    maxFileSize: 4194304,
+    maxFileSize: 20000000,
     chunkSize: 10240,
     transmissionDelay: 0,
     overwrite: true
