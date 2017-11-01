@@ -1,0 +1,4 @@
+eclipse.preferences.version=1
+excluded=//*.min.js\:bower_components//*\:dist//*\:node_modules//*
+included=//*.js
+projectSpecificOptions=true
