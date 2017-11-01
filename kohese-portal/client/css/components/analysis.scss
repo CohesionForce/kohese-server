@@ -1,0 +1,15 @@
+#analysis-view{
+    height: 100%;
+    overflow: hidden;
+    #document-view{
+        height: inherit;
+        .panel{
+            height: 50%;
+            float: right;
+            width: 50%;
+            .panel-body{
+                overflow:auto;
+            }
+        }
+    }
+}

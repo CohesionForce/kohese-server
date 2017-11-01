@@ -61,6 +61,9 @@
 
                 <ng-bind-html ng-if="!detailsCtrl.docShowChildren" style="height:100%" ng-bind-html="detailsCtrl.itemDescriptionRendered"></ng-bind-html>
                 <ng-bind-html ng-if="detailsCtrl.docShowChildren" style="height:100%" ng-bind-html="detailsCtrl.docRendered"></ng-bind-html>
+                <document-view itemProxy="detailsCtrl.itemProxy"
+                               showChildren="detailsCtrl.docShowChildren" />
+
                
             </tab>
             <tab >

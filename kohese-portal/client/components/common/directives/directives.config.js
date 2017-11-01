@@ -10,4 +10,5 @@ export default () => {
     require('./navDirectives/navDirectives')();
     require('./knowledgeTree/treeRow')();
     require('./actionTable/actionTable')();
+    require('./document-view/document-view')();
 }

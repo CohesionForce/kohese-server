@@ -3,6 +3,7 @@ function AnalysisController($stateParams, ItemRepository, tabService) {
 
     var tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(tab.id, 'AnalysisController', this);
+    ctrl.showChildren= true;
 
     if(!controllerRestored) {
         ctrl.itemProxy =  ItemRepository.getProxyFor($stateParams.id);

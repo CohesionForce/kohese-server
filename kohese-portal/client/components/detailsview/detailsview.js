@@ -191,54 +191,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         
       }      
     });
-    
-    $scope.$watch('detailsCtrl.docShowChildren', function () {
-      if(detailsCtrl.docShowChildren){
-        var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
-        detailsCtrl.docRendered = docWriter.render(docParsed);
-        detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);
-      } else {
-        detailsCtrl.docRendered = null;
-      }
-    });
-    
-    $scope.$watch('detailsCtrl.analysisFilterString', function () {
-      console.log(">>> Filter string changed to: " + detailsCtrl.analysisFilterString);
-      if (detailsCtrl.filterTextTimeout) {
-        $timeout.cancel(detailsCtrl.filterTextTimeout);
-      }
-      
-      detailsCtrl.filterTextTimeout = $timeout(function() {
-        var regexFilter = /^\/(.*)\/([gimy]*)$/;
-        var filterIsRegex = detailsCtrl.analysisFilterString.match(regexFilter);
-
-        if (filterIsRegex) {
-          try {
-            detailsCtrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
-            detailsCtrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
-            detailsCtrl.invalidAnalysisFilterRegex = false;              
-          } catch (e) {
-            detailsCtrl.invalidAnalysisFilterRegex = true;
-          }
-        } else {
-          let cleanedPhrase = detailsCtrl.analysisFilterString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-          if(detailsCtrl.analysisFilterString !== ""){
-            detailsCtrl.analysisFilterRegex = new RegExp(cleanedPhrase,"i");
-            detailsCtrl.analysisFilterRegexHighlight = new RegExp('(' + cleanedPhrase + ')',"gi");
-            detailsCtrl.invalidAnalysisFilterRegex = false;
-          } else {
-            detailsCtrl.analysisFilterRegex = null;
-            detailsCtrl.analysisFilterRegexHighlight = null;
-            detailsCtrl.invalidAnalysisFilterRegex = false;
-          }
-        }
-
-        postDigest(function () {
-            // Force one more update cycle to get the match count to display
-            $scope.$apply();
-        });
-      }, 1000); // delay 1000 ms
-    });
 
     detailsCtrl.uiTreeOptions = {
         dropped : function (event) {
@@ -427,12 +379,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.itemProxy.item[type].splice(index, 1);
     };
 
-    detailsCtrl.fetchAnalysis = function () {
-      analysisService.fetchAnalysis(detailsCtrl.itemProxy).then(function (results){
-        $scope.$apply();
-      });
-    };
-
     detailsCtrl.generateHTMLReport = function () {
       ItemRepository.generateHTMLReportFor(detailsCtrl.itemProxy);
     };
@@ -461,6 +407,58 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
 
             });
     };
+
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    /* ANALYSIS FUNCTIONS - MOVE TBD */
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    $scope.$watch('detailsCtrl.analysisFilterString', function () {
+        console.log(">>> Filter string changed to: " + detailsCtrl.analysisFilterString);
+        if (detailsCtrl.filterTextTimeout) {
+          $timeout.cancel(detailsCtrl.filterTextTimeout);
+        }
+        
+        detailsCtrl.filterTextTimeout = $timeout(function() {
+          var regexFilter = /^\/(.*)\/([gimy]*)$/;
+          var filterIsRegex = detailsCtrl.analysisFilterString.match(regexFilter);
+  
+          if (filterIsRegex) {
+            try {
+              detailsCtrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
+              detailsCtrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
+              detailsCtrl.invalidAnalysisFilterRegex = false;              
+            } catch (e) {
+              detailsCtrl.invalidAnalysisFilterRegex = true;
+            }
+          } else {
+            let cleanedPhrase = detailsCtrl.analysisFilterString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            if(detailsCtrl.analysisFilterString !== ""){
+              detailsCtrl.analysisFilterRegex = new RegExp(cleanedPhrase,"i");
+              detailsCtrl.analysisFilterRegexHighlight = new RegExp('(' + cleanedPhrase + ')',"gi");
+              detailsCtrl.invalidAnalysisFilterRegex = false;
+            } else {
+              detailsCtrl.analysisFilterRegex = null;
+              detailsCtrl.analysisFilterRegexHighlight = null;
+              detailsCtrl.invalidAnalysisFilterRegex = false;
+            }
+          }
+  
+          postDigest(function () {
+              // Force one more update cycle to get the match count to display
+              $scope.$apply();
+          });
+        }, 1000); // delay 1000 ms
+      });
+
+
+    detailsCtrl.fetchAnalysis = function () {
+        analysisService.fetchAnalysis(detailsCtrl.itemProxy).then(function (results){
+          $scope.$apply();
+        });
+      };
 
     detailsCtrl.getLastFilter = function () {
         detailsCtrl.analysisFilterString = detailsCtrl.filterList.pop();
@@ -542,7 +540,34 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
           $scope.$apply();
       });
     });
-    
+
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    /* ANALYSIS FUNCTIONS END - TBD */
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    /* DOC FUNCTION - TBD */
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    $scope.$watch('detailsCtrl.docShowChildren', function () {
+        if(detailsCtrl.docShowChildren){
+          var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
+          detailsCtrl.docRendered = docWriter.render(docParsed);
+          detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);
+        } else {
+          detailsCtrl.docRendered = null;
+        }
+      });
+
     $scope.$watch('detailsCtrl.itemProxy.item.description', function () {
       if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.description){
         var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
@@ -555,6 +580,16 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         }
       }
     });
+
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    /* DOC FUNCTION END - TBD */
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
+    /****************************************************************** */
 
     function postDigest(callback) {
       var unregister = $scope.$watch(function () {

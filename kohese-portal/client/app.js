@@ -35,6 +35,7 @@ const appModule = angular.module('app', [
     'app.directives.navigation',
     'app.directives.treerow',
     'app.directives.actiontable',
+    'app.directives.documentview',
     'app.constants.endpoints',
     require('angular-ui-router'),
     'angular-jwt',

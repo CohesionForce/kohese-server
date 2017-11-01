@@ -620,6 +620,25 @@ tab div {
   cursor: pointer;
 }
 
+#analysis-view {
+  height: 100%;
+  overflow: hidden;
+}
+
+#analysis-view #document-view {
+  height: inherit;
+}
+
+#analysis-view #document-view .panel {
+  height: 50%;
+  float: right;
+  width: 50%;
+}
+
+#analysis-view #document-view .panel .panel-body {
+  overflow: auto;
+}
+
 .sidebar {
   color: whitesmoke;
   position: relative;
