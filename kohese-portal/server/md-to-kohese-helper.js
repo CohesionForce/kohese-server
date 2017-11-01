@@ -122,7 +122,7 @@ var Render = function() {
                
                paragraph: function(node, entering) {
                        var grandparent = node.parent.parent;
-                       if(grandparent !== null && grandparent.type == 'list') {
+                       if(grandparent !== null && grandparent.type === 'list') {
                                if(!entering) {
                                        this.buffer += '\n';
                                }
@@ -139,7 +139,7 @@ var Render = function() {
                softbreak: function(node, entering) {
                        this.buffer += '\n'; // space or \n may be valid
                        var grandparent = node.parent.parent;
-                       if(grandparent !== null && grandparent.type == 'item') {
+                       if(grandparent !== null && grandparent.type === 'item') {
                                this.addListTabs();
                        }
                },
