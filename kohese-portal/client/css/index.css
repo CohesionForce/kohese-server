@@ -635,7 +635,7 @@ tab div {
   position: absolute;
   top: 42px;
   right: 0px;
-  width: 50%;
+  width: 70%;
 }
 
 #analysis-view #document-view .panel .panel-body {
@@ -650,7 +650,7 @@ tab div {
 
 #analysis-view #term-view .panel {
   height: 50%;
-  width: 50%;
+  width: 30%;
   position: absolute;
   top: 42px;
   left: 0px;
@@ -668,7 +668,7 @@ tab div {
 
 #analysis-view #chunk-view .panel {
   height: 40%;
-  width: 50%;
+  width: 40%;
   position: absolute;
   left: 0px;
   bottom: 0px;
@@ -685,7 +685,7 @@ tab div {
 
 #analysis-view #sentence-view .panel {
   height: 40%;
-  width: 50%;
+  width: 60%;
   position: absolute;
   right: 0px;
   bottom: 0px;

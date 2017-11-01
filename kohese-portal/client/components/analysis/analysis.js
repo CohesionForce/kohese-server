@@ -9,7 +9,6 @@ function AnalysisController($scope, $stateParams, ItemRepository, tabService) {
     if(!controllerRestored) {
         ctrl.itemProxy =  ItemRepository.getProxyFor($stateParams.id);
     }
-    this.msg = ctrl.itemProxy.item.name;
 
     $scope.$on('tabSelected', function () {
         tabService.bundleController(ctrl, 'AnalysisController', currentTab.id);

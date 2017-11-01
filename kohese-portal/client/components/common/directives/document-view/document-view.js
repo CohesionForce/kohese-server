@@ -1,18 +1,33 @@
-function DocumentController($scope, $sce){
+function DocumentController($scope, $sce, $stateParams, tabService){
     var docCtrl = this;
+
     var reader = new commonmark.Parser();
     var writer = new commonmark.HtmlRenderer();
     var docReader = new commonmark.Parser();
     var docWriter = new commonmark.HtmlRenderer();
+    var currentTab = tabService.getCurrentTab();
+    var controllerRestored = tabService.restoreControllerData(currentTab.id, 'DocumentController', this); 
+    //Exposed 
 
-    console.log($scope);
+    if (!controllerRestored){
+        //Init block
+        docCtrl.itemProxy = $scope.itemProxy;
+    }
+  
 
-    if($scope.showChildren){
-        var docParsed = docReader.parse($scope.itemProxy.getDocument());
+    $scope.$on('tabSelected', function () {
+        tabService.bundleController(docCtrl, 'DocumentController', currentTab.id);
+    });
+
+    if($scope.showChildren && $scope.itemProxy){
+        generateDoc();     
+      }
+
+    function generateDoc(){
+        var docParsed = docReader.parse(docCtrl.itemProxy.getDocument());
         docCtrl.docRendered = docWriter.render(docParsed);
         docCtrl.docRendered = $sce.trustAsHtml(docCtrl.docRendered);
-        console.log(docCtrl);                
-      }
+    }
 }
 
 function DocumentDirective(){
