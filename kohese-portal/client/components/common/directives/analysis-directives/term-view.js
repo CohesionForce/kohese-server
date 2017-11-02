@@ -40,8 +40,7 @@ function TermViewController($scope, $timeout, tabService, analysisService){
     ctrl.submitStringFilter = function() {
         ctrl.filterList.push(ctrl.analysisFilterString);
         ctrl.analysisFilterString = ctrl.analysisFilterInput;
-        console.log('Analysis Filter String: ' + ctrl.analysisFilterInput);
-        
+        $scope.$emit('newTermFilter', ctrl.analysisFilterString)
         // TODO Mimic watch firing
         onFilterChange();
     }

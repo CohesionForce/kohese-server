@@ -29,6 +29,11 @@ function SentenceViewController($scope, $timeout, tabService, analysisService){
         tabService.bundleController(ctrl, 'SentenceViewController', currentTab.id);
     });
 
+    $scope.$on('newAnalysisFilter', (event, filter)=>{
+        ctrl.analysisFilterString = filter;
+        onFilterChange();
+    })
+
     ctrl.filterDetails = function(listItem) {
         return ((listItem.displayLevel == 1) && 
                 ((ctrl.analysisFilterRegex === null) || 
@@ -44,6 +49,40 @@ function SentenceViewController($scope, $timeout, tabService, analysisService){
     ctrl.getDetailsItemCount = function () {
         return $('#theDetailsBody').find("tr").length;
       };
+
+    function onFilterChange() {
+        console.log(">>> Filter string changed to: " + ctrl.analysisFilterString);
+        if (ctrl.filterTextTimeout) {
+          $timeout.cancel(ctrl.filterTextTimeout);
+        }
+        
+        ctrl.filterTextTimeout = $timeout(function() {
+          var regexFilter = /^\/(.*)\/([gimy]*)$/;
+          var filterIsRegex = ctrl.analysisFilterString.match(regexFilter);
+  
+          if (filterIsRegex) {
+            try {
+              ctrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
+              ctrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
+              ctrl.invalidAnalysisFilterRegex = false;              
+            } catch (e) {
+              ctrl.invalidAnalysisFilterRegex = true;
+            }
+          } else 
+                {
+                let cleanedPhrase = ctrl.analysisFilterString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                if(ctrl.analysisFilterString !== ""){
+                    ctrl.analysisFilterRegex = new RegExp(cleanedPhrase,"i");
+                    ctrl.analysisFilterRegexHighlight = new RegExp('(' + cleanedPhrase + ')',"gi");
+                    ctrl.invalidAnalysisFilterRegex = false;
+                } else {
+                    ctrl.analysisFilterRegex = null;
+                    ctrl.analysisFilterRegexHighlight = null;
+                    ctrl.invalidAnalysisFilterRegex = false;
+                }
+            }
+        });
+}
 }
 
 function SentenceViewDirective(){

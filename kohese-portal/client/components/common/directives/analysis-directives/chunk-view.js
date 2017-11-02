@@ -10,7 +10,7 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
         ctrl.itemProxy = $scope.itemProxy;
     
         ctrl.analysisChunkLimit = 100;
-        ctrl.analysisSumarrySortField = ['text', '-count'];
+        ctrl.analysisSummarySortField = ['text', '-count'];
 
         ctrl.analysisFilterPOS = analysisService.filterPOS;
         ctrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
@@ -28,6 +28,11 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
     $scope.$on('tabSelected', function () {
         tabService.bundleController(ctrl, 'ChunkViewController', currentTab.id);
     });
+
+    $scope.$on('newAnalysisFilter', (event, filter)=>{
+        ctrl.analysisFilterString = filter;
+        onFilterChange();
+    })
 
     ctrl.fetchAnalysis = function () {
         analysisService.fetchAnalysis(ctrl.itemProxy).then(function (results){
@@ -56,6 +61,40 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
     ctrl.getChunkCount = function () {
         return $('#theChunksBody').find("tr").length;
       };
+
+    function onFilterChange() {
+        console.log(">>> Filter string changed to: " + ctrl.analysisFilterString);
+        if (ctrl.filterTextTimeout) {
+          $timeout.cancel(ctrl.filterTextTimeout);
+        }
+        
+        ctrl.filterTextTimeout = $timeout(function() {
+          var regexFilter = /^\/(.*)\/([gimy]*)$/;
+          var filterIsRegex = ctrl.analysisFilterString.match(regexFilter);
+  
+          if (filterIsRegex) {
+            try {
+              ctrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
+              ctrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
+              ctrl.invalidAnalysisFilterRegex = false;              
+            } catch (e) {
+              ctrl.invalidAnalysisFilterRegex = true;
+            }
+          } else 
+                {
+                let cleanedPhrase = ctrl.analysisFilterString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                if(ctrl.analysisFilterString !== ""){
+                    ctrl.analysisFilterRegex = new RegExp(cleanedPhrase,"i");
+                    ctrl.analysisFilterRegexHighlight = new RegExp('(' + cleanedPhrase + ')',"gi");
+                    ctrl.invalidAnalysisFilterRegex = false;
+                } else {
+                    ctrl.analysisFilterRegex = null;
+                    ctrl.analysisFilterRegexHighlight = null;
+                    ctrl.invalidAnalysisFilterRegex = false;
+                }
+            }
+        });
+}
 
     ctrl.fetchAnalysis();
 }
