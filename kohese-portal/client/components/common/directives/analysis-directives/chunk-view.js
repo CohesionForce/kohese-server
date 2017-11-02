@@ -55,7 +55,7 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
     };
 
     ctrl.submitSummaryFilter = function(text){
-        console.log(ctrl.itemProxy);
+        $scope.$emit('newChunkFilter', text);
     }
 
     ctrl.getChunkCount = function () {
