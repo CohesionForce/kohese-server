@@ -53,9 +53,9 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
         console.log(ctrl.itemProxy);
     }
 
-    ctrl.getChunkCount = function() {
-        return 5;
-    }
+    ctrl.getChunkCount = function () {
+        return $('#theChunksBody').find("tr").length;
+      };
 
     ctrl.fetchAnalysis();
 }

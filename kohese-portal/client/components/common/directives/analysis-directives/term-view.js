@@ -55,6 +55,10 @@ function TermViewController($scope, $timeout, tabService, analysisService){
         ctrl.submitStringFilter();
     }
 
+    ctrl.getTokenCount = function () {
+        return $('#theTokensBody').find("tr").length;
+      };
+
 
     ctrl.filterTokens = function(summary) {
         var POSFilterReturn = ctrl.analysisFilterPOS(summary,
