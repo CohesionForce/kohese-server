@@ -6,9 +6,6 @@
         height: inherit;
         .panel{
             height: calc(100% - 28.89px);
-            position: absolute;
-            top: 0px;
-            right: 0px;
             width: 100%;
             .panel-body{
                 overflow:auto;
@@ -22,12 +19,15 @@
         .panel{
             height: calc(100% - 28.89px); 
             width: 100%;
-            position: absolute;
-            top: 0px;
-            left: 0px;
+            overflow: hidden;
             .panel-body {
-                overflow: auto;
-                height:100%;
+                height: inherit;
+                padding-right: 0px;
+                #term-div {
+                    height: 85%;
+                    width: 100%;
+                    overflow: auto;
+                }
             }
         }
     }
@@ -38,12 +38,14 @@
             height: calc(100% - 28.89px);
             width:  100%;
             overflow: hidden;
-            position: absolute;
-            left: 0px;
-            bottom: 0px;
             .panel-body {
-                overflow: auto;
-                height: 100%;
+                height: inherit;
+                padding-right: 0px;
+                #chunk-div{
+                    height: 95%;
+                    width: 100%;
+                    overflow: auto;
+                }
             }
         }
     }
@@ -53,12 +55,14 @@
             height: calc(100% - 28.89px);
             width: 100%;
             overflow: hidden;
-            position: absolute;
-            right: 0px;
-            bottom: 0px;
             .panel-body {
-                overflow: auto;
-                height: 100%;
+                height: inherit;
+                padding-right: 0px;
+                #sentence-div {
+                    height: 100%;
+                    width: 100%;
+                    overflow: auto;
+                }
             }
         }
     }
