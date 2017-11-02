@@ -1,21 +1,35 @@
-<div id="analysis-view">
+<div id="analysis-view" split-pane>
 
-    <chunk-view     id="chunk-view"
-                    class="col"
-                    item-proxy="aCtrl.itemProxy"></chunk-view>
+	<div split-pane-component height="50%">
+    <div split-pane>
+      <div split-pane-component width="30%">
+        <term-view id="term-view" ng-if="aCtrl.itemProxy" class="col"
+          item-proxy="aCtrl.itemProxy"></term-view>
+      </div>
+      <div split-pane-divider width="5px"></div>
+      <div split-pane-component>
+        <document-view id="document-view" ng-if="aCtrl.itemProxy"
+          class="col align-self-end" item-proxy="aCtrl.itemProxy"
+          show-children="aCtrl.showChildren"></document-view>
+      </div>
+    </div>
+	</div>
 
-    <term-view      id="term-view"
-                    ng-if="aCtrl.itemProxy"
-                    class="col"
-                    item-proxy="aCtrl.itemProxy"></term-view>
+	<div split-pane-divider height="5px"></div>
 
-    <sentence-view  id="sentence-view"
-                    class="col"
-                    item-proxy="aCtrl.itemProxy"></sentence-view>
+	<div split-pane-component>
+	  <div split-pane>
+	    <div split-pane-component width="40%">
+        <chunk-view id="chunk-view" class="col" item-proxy="aCtrl.itemProxy"></chunk-view>
+      </div>
 
-    <document-view  id="document-view"
-                    ng-if="aCtrl.itemProxy"
-                    class="col align-self-end"
-                    item-proxy="aCtrl.itemProxy"
-                    show-children="aCtrl.showChildren"></document-view>
+      <div split-pane-divider width="5px"></div>
+
+      <div split-pane-component>
+        <sentence-view id="sentence-view" class="col"
+             item-proxy="aCtrl.itemProxy"></sentence-view>
+      </div>
+    </div>
+	</div>
+
 </div>

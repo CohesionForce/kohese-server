@@ -28,7 +28,7 @@ function TermViewController($scope, $timeout, tabService, analysisService){
         $scope.$on('tabSelected', function () {
             tabService.bundleController(ctrl, 'ChunkViewController', currentTab.id);
         });
-
+        
         $scope.$watch('ctrl.analysisFilterString', onFilterChange);
     }
     ctrl.fetchAnalysis = function () {
@@ -40,8 +40,15 @@ function TermViewController($scope, $timeout, tabService, analysisService){
     ctrl.submitStringFilter = function() {
         ctrl.filterList.push(ctrl.analysisFilterString);
         ctrl.analysisFilterString = ctrl.analysisFilterInput;
-        console.log(ctrl.analysisFilterInput);
+        console.log('Analysis Filter String: ' + ctrl.analysisFilterInput);
+        
+        // TODO Mimic watch firing
+        onFilterChange();
     }
+    
+    $scope.$watch('ctrl.analysisFilterInput', () => {
+      console.log('aFI: ' + ctrl.analysisFilterInput);
+    });
 
     ctrl.submitClickFilter = function(term) {
         ctrl.analysisFilterInput = term;
@@ -60,8 +67,7 @@ function TermViewController($scope, $timeout, tabService, analysisService){
         // ((ctrl.analysisFilterRegex === null) || ctrl.analysisFilterRegex.test(summary.text));
       };
 
-    function onFilterChange()
-        {
+    function onFilterChange() {
             console.log(">>> Filter string changed to: " + ctrl.analysisFilterString);
             if (ctrl.filterTextTimeout) {
               $timeout.cancel(ctrl.filterTextTimeout);
@@ -93,7 +99,7 @@ function TermViewController($scope, $timeout, tabService, analysisService){
                     }
                 }
             });
-        }
+    }
 
     ctrl.fetchAnalysis();
 }
