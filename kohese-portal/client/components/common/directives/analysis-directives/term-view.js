@@ -22,6 +22,7 @@ function TermViewController($scope, $timeout, tabService, analysisService){
         ctrl.filterList = []
 
         ctrl.analysisFilterString = "";
+        ctrl.analysisFilterInput = "";
         ctrl.analysisFilterRegex = null;
 
         // Event Listeners 
@@ -45,8 +46,10 @@ function TermViewController($scope, $timeout, tabService, analysisService){
         onFilterChange();
     }
     
-    $scope.$watch('ctrl.analysisFilterInput', () => {
-      console.log('aFI: ' + ctrl.analysisFilterInput);
+    $scope.$watch(angular.bind(this, ()=>{return ctrl.analysisFilterInput}), () => {
+      ctrl.analysisFilterString = ctrl.analysisFilterInput;
+      console.log(ctrl.analysisFilterInput);
+      onFilterChange();
     });
 
     ctrl.submitClickFilter = function(term) {
