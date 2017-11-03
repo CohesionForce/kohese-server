@@ -24,7 +24,7 @@ function mdToKohese(filePath, rootItem) {
   var parsed = new commonmark.Parser().parse(text);
   var walker = parsed.walker();
 
-  var item = global.app.models["Item"].upsert(rootItem, {}, function () {});
+  var item = global.app.models['Item'].upsert(rootItem, {}, function () {});
   var addedIds = [{
     id: item.id,
     name: item.name
@@ -46,8 +46,8 @@ function mdToKohese(filePath, rootItem) {
       // Check if document begins with heading. If not, make an item.
       if(!(event.entering && event.node.type === 'heading')) {
         koheseItem = {
-            name: "Preamble",
-            description: "",
+            name: 'Preamble',
+            description: '',
             parentId: lineage[0],
             itemIds: []
         };
@@ -69,8 +69,8 @@ function mdToKohese(filePath, rootItem) {
       }
       
       koheseItem = {
-          name: "",
-          description: "",
+          name: '',
+          description: '',
           parentId: parent,
           itemIds: [],
           tmpId: ++tmpIdCounter
@@ -89,7 +89,7 @@ function mdToKohese(filePath, rootItem) {
         event = walker.next();
       }
       
-      if(koheseItem.name === "") {
+      if(koheseItem.name === '') {
         koheseItem.name = 'No Heading Title Found';
       }
     } else if(render[event.node.type]) {
@@ -102,14 +102,14 @@ function mdToKohese(filePath, rootItem) {
       }
     } else if(event.node.type !== 'document' && event.node.type !== 'heading') {
       // Already handling document and heading events
-      console.log('!!! Unknown/Unhandled event: ' + event.node.type
-          + ' - Entering: ' + event.entering);
+      console.log('!!! Unknown/Unhandled event: ' + event.node.type +
+          ' - Entering: ' + event.entering);
     }
   }
   
   for (var id in itemMap) {
     if (itemMap[id].itemIds.length > 0) {
-      global.app.models["Item"].upsert(itemMap[id], {}, function () {});
+      global.app.models['Item'].upsert(itemMap[id], {}, function () {});
     }
   }
   
@@ -121,7 +121,7 @@ function upsert(koheseItem, render, idList, lineageMap, itemMap) {
   koheseItem.description = render.getBuffer();
   var item;
   if (!koheseItem.tmpId) {
-    item = global.app.models["Item"].upsert(koheseItem, {},
+    item = global.app.models['Item'].upsert(koheseItem, {},
         function () {});
     idList.push(item.id);
     itemMap[item.parentId].itemIds.push(item.id);
@@ -129,7 +129,7 @@ function upsert(koheseItem, render, idList, lineageMap, itemMap) {
     for (var i = 0; i < lineageMap.length; i++) {
       if (lineageMap[i] === koheseItem.tmpId) {
         delete koheseItem.tmpId;
-        item = global.app.models["Item"].upsert(koheseItem, {},
+        item = global.app.models['Item'].upsert(koheseItem, {},
             function () {});
         idList.push({
           id: item.id,

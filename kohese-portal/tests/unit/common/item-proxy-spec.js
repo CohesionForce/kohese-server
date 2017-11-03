@@ -1,14 +1,14 @@
-describe("ItemProxy Test", function() {
+describe('ItemProxy Test', function() {
 
   var ItemProxy = require('../../../common/models/item-proxy.js');
 
   var root = ItemProxy.getRootProxy();
-  var lostAndFound = ItemProxy.getProxyFor("LOST+FOUND");
+  var lostAndFound = ItemProxy.getProxyFor('LOST+FOUND');
   var a, aa, newAAItem, bb, b, ab;
   // console.log(__dirname);
-  // console.log("::: Starting Item Proxy Test");
+  // console.log('::: Starting Item Proxy Test');
   var dumpEnabled = false;
-  var _ = require("underscore");
+  var _ = require('underscore');
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -22,7 +22,7 @@ describe("ItemProxy Test", function() {
     
     ItemProxy.loadingComplete();
     
-    expect(rootProxy.treeHashEntry.treeHash).toEqual("4061d87643bd1c197979c24f2f7fdc013d2b71b3");
+    expect(rootProxy.treeHashEntry.treeHash).toEqual('4061d87643bd1c197979c24f2f7fdc013d2b71b3');
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -31,16 +31,16 @@ describe("ItemProxy Test", function() {
   function dump(message) {
     if (dumpEnabled){
       if (message) {
-         console.log(">>> " + message);
+         console.log('>>> ' + message);
       }
 
       ItemProxy.dumpAllProxies();
-      // console.log("");
+      // console.log('');
       root.dumpProxy();
-      // console.log("Root Descendants: " + root.descendantCount);
-      // console.log("");
+      // console.log('Root Descendants: ' + root.descendantCount);
+      // console.log('');
       lostAndFound.dumpProxy();
-      console.log("-----------------------------------------");      
+      console.log('-----------------------------------------');      
     }
   }
   
@@ -49,13 +49,13 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   function dumpHashFor(proxy, message) {
     if (dumpEnabled){
-      console.log("::: Hash for " + proxy.item.name)
+      console.log('::: Hash for ' + proxy.item.name);
       if (message) {
-         console.log(">>> " + message);
+         console.log('>>> ' + message);
       }
 
       console.log(proxy.treeHashEntry);
-      console.log("-----------------------------------------");      
+      console.log('-----------------------------------------');      
     }
   }
   
@@ -65,59 +65,59 @@ describe("ItemProxy Test", function() {
   function defineTestModel() {
     var modelDefMap = {
         Test: {
-          "name": "Test",
-          "base": "PersistedModel",
-          "strict": "validate",
-          "idInjection": true,
-          "trackChanges": false,
-          "properties": {
-            "id": {
-              "type": "string",
-              "id": true,
-              "defaultFn": "guid"
+          'name': 'Test',
+          'base': 'PersistedModel',
+          'strict': 'validate',
+          'idInjection': true,
+          'trackChanges': false,
+          'properties': {
+            'id': {
+              'type': 'string',
+              'id': true,
+              'defaultFn': 'guid'
             },
-            "name": {
-              "type": "string",
-              "required": true
+            'name': {
+              'type': 'string',
+              'required': true
             },
-            "parentId": {
-              "type": "string",
-              "default": ""
+            'parentId': {
+              'type': 'string',
+              'default': ''
             }
           },
-          "validations": [],
-          "relations": {},
-          "acls": [],
-          "methods": []
+          'validations': [],
+          'relations': {},
+          'acls': [],
+          'methods': []
       },
-      "Test-Exclude": {
-        "name": "Test",
-        "base": "PersistedModel",
-        "strict": "validate",
-        "idInjection": true,
-        "trackChanges": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "id": true,
-            "defaultFn": "guid"
+      'Test-Exclude': {
+        'name': 'Test',
+        'base': 'PersistedModel',
+        'strict': 'validate',
+        'idInjection': true,
+        'trackChanges': false,
+        'properties': {
+          'id': {
+            'type': 'string',
+            'id': true,
+            'defaultFn': 'guid'
           },
-          "name": {
-            "type": "string",
-            "required": true
+          'name': {
+            'type': 'string',
+            'required': true
           },
-          "parentId": {
-            "type": "string",
-            "default": ""
+          'parentId': {
+            'type': 'string',
+            'default': ''
           }
         },
-        "validations": [],
-        "relations": {},
-        "acls": [],
-        "methods": []
-    }        
+        'validations': [],
+        'relations': {},
+        'acls': [],
+        'methods': []
+      }        
 
-    }
+    };
     
     ItemProxy.loadModelDefinitions(modelDefMap);
   }
@@ -132,35 +132,35 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Add Node Without Parent", function() {
+  it('Add Node Without Parent', function() {
     dump('--- Beginning state');
     expect(root).toBeDefined();
-    // console.log("::: Adding node without parent");
-    aa = new ItemProxy("Test", {
-      id : "aa",
-      name : "AA",
-      parentId : "a",
-      uniq : "unique"
+    // console.log('::: Adding node without parent');
+    aa = new ItemProxy('Test', {
+      id : 'aa',
+      name : 'AA',
+      parentId : 'a',
+      uniq : 'unique'
     });
     expect(aa).toBeDefined();
     expect(aa).not.toBeNull();
 
-    dump("Added node without parent");
+    dump('Added node without parent');
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Add Parent", function() {
-    // console.log("::: Adding parent");
-    a = new ItemProxy("Test", {
-      id : "a",
-      name : "A",
-      parentId : ""
+  it('Add Parent', function() {
+    // console.log('::: Adding parent');
+    a = new ItemProxy('Test', {
+      id : 'a',
+      name : 'A',
+      parentId : ''
     });
     expect(a).toBeDefined();
     expect(a).not.toBeNull();
-    child = root.getChildByName('A');
+    var child = root.getChildByName('A');
     expect(child).toBeDefined();
     expect(child).not.toBeNull();
     expect(child).toBe(a);
@@ -171,64 +171,64 @@ describe("ItemProxy Test", function() {
     expect(child).not.toBeNull();
     expect(child).toBe(aa);
 
-    dump("Added parent");
+    dump('Added parent');
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Add Bs", function() {
-    // console.log("::: Adding b, bbb");
-    b = new ItemProxy("Test", {
-      id : "b",
-      name : "B",
-      parentId : ""
+  it('Add Bs', function() {
+    // console.log('::: Adding b, bbb');
+    b = new ItemProxy('Test', {
+      id : 'b',
+      name : 'B',
+      parentId : ''
     });
 
     expect(b).toBeDefined();
     expect(b).not.toBeNull();
-    child = root.getChildByName('B');
+    var child = root.getChildByName('B');
     expect(child).toBeDefined();
     expect(child).not.toBeNull();
     expect(child).toBe(b);
 
-    var bbb = new ItemProxy("Test", {
-      id : "bbb",
-      name : "BBB",
-      parentId : "bb"
+    var bbb = new ItemProxy('Test', {
+      id : 'bbb',
+      name : 'BBB',
+      parentId : 'bb'
     });
 
     var autobb = ItemProxy.getProxyFor('bb');
 
     expect(autobb.item.parentId).toBe('LOST+FOUND');
 
-    dump("Added b's");
+    dump('Added b\'s');
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Adding bb", function() {
-    // console.log("::: Adding bb");
-    bb = new ItemProxy("Test", {
-      id : "bb",
-      name : "BB",
-      parentId : "b"
+  it('Adding bb', function() {
+    // console.log('::: Adding bb');
+    bb = new ItemProxy('Test', {
+      id : 'bb',
+      name : 'BB',
+      parentId : 'b'
     });
-    dump("Added bb");
+    dump('Added bb');
 
     expect(b.children[0].item.id).toBe('bb');
     expect(b.item.id).toBe(bb.parentProxy.item.id);
 
   });
 
-  it("Delete a", function() {
-    // console.log("::: Deleting a");
+  it('Delete a', function() {
+    // console.log('::: Deleting a');
 
     expect(root.children[0].item.id).toBe('a');
 
     a.deleteItem();
-    dump("Deleted a");
+    dump('Deleted a');
 
     expect(root.children[0].item.id).toBe('b');
   });
@@ -236,20 +236,20 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Changing parent of aa", function() {
-    // console.log("::: Changing parent of aa");
+  it('Changing parent of aa', function() {
+    // console.log('::: Changing parent of aa');
     // console.log(aa.item);
     newAAItem = JSON.parse(JSON.stringify(aa.item));
-    newAAItem.parentId = "b";
-    newAAItem.description = "b with changes";
+    newAAItem.parentId = 'b';
+    newAAItem.description = 'b with changes';
     delete newAAItem.uniq;
     // console.log(newAAItem);
 
     var temp = aa.item.id;
 
-    aa.updateItem("Test", newAAItem);
+    aa.updateItem('Test', newAAItem);
     // console.log(aa.item);
-    dump("Changed aa parent");
+    dump('Changed aa parent');
 
     expect(aa.item.parentId).toBe('b');
     expect(aa.item.description).toBe('b with changes');
@@ -259,15 +259,15 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Deleting description for aa", function() {
-    // console.log("::: Deleting description for aa");
+  it('Deleting description for aa', function() {
+    // console.log('::: Deleting description for aa');
 
     var temp = aa.item.id;
 
     delete newAAItem.description;
-    aa.updateItem("Test", newAAItem);
+    aa.updateItem('Test', newAAItem);
     // console.log(aa.item);
-    dump("Deleted aa description");
+    dump('Deleted aa description');
 
     expect(aa.item.description).toBe(undefined);
     expect(aa.item.id).toBe(temp);
@@ -276,12 +276,12 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Changing parent of bb to ROOT", function() {
-    // console.log("::: Changing parent of bb to ROOT");
+  it('Changing parent of bb to ROOT', function() {
+    // console.log('::: Changing parent of bb to ROOT');
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
-    newBBItem.parentId = "";
-    bb.updateItem("Test", newBBItem);
-    dump("Changed bb parent to ROOT");
+    newBBItem.parentId = '';
+    bb.updateItem('Test', newBBItem);
+    dump('Changed bb parent to ROOT');
 
     expect(bb.item.parentId).toBe('');
     expect(bb.parentProxy).toBe(root);
@@ -291,12 +291,12 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Changing parent of bb to c", function() {
-    // console.log("::: Changing parent of bb to c");
+  it('Changing parent of bb to c', function() {
+    // console.log('::: Changing parent of bb to c');
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
-    newBBItem.parentId = "c";
-    bb.updateItem("Test", newBBItem);
-    dump("Changed bb parent to c");
+    newBBItem.parentId = 'c';
+    bb.updateItem('Test', newBBItem);
+    dump('Changed bb parent to c');
 
     var c = ItemProxy.getProxyFor('c');
     expect(bb.item.parentId).toBe('c');
@@ -307,11 +307,11 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Morph b into a NewTest", function() {
-    // console.log("::: Morph b into a NewTest");
+  it('Morph b into a NewTest', function() {
+    // console.log('::: Morph b into a NewTest');
     var newBItem = JSON.parse(JSON.stringify(b.item));
-    b.updateItem("NewTest", newBItem);
-    dump("Change b to a NewTest kind");
+    b.updateItem('NewTest', newBItem);
+    dump('Change b to a NewTest kind');
 
     expect(b.kind).toBe('NewTest');
   });
@@ -319,29 +319,29 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Renaming an item", function() {
-    // console.log("::: Preparing to rename an item");
-    var ab = new ItemProxy("Test", {
-      id : "ab",
-      name : "AB",
-      parentId : "b"
+  it('Renaming an item', function() {
+    // console.log('::: Preparing to rename an item');
+    var ab = new ItemProxy('Test', {
+      id : 'ab',
+      name : 'AB',
+      parentId : 'b'
     });
-    var ac = new ItemProxy("Test", {
-      id : "ac",
-      name : "AC",
-      parentId : "b"
+    var ac = new ItemProxy('Test', {
+      id : 'ac',
+      name : 'AC',
+      parentId : 'b'
     });
-    var ad = new ItemProxy("Test", {
-      id : "ad",
-      name : "AD",
-      parentId : "b"
+    var ad = new ItemProxy('Test', {
+      id : 'ad',
+      name : 'AD',
+      parentId : 'b'
     });
-    var ae = new ItemProxy("Test", {
-      id : "ae",
-      name : "AE",
-      parentId : "b"
+    var ae = new ItemProxy('Test', {
+      id : 'ae',
+      name : 'AE',
+      parentId : 'b'
     });
-    dump("Created AB - AE");
+    dump('Created AB - AE');
 
     var expectArray = JSON.stringify([ 'aa', 'ab', 'ac', 'ad', 'ae' ]);
     function getChildIds(item) {
@@ -351,30 +351,29 @@ describe("ItemProxy Test", function() {
       }
       return JSON.stringify(temp);
     }
-    ;
 
     expect(getChildIds(b)).toBe(expectArray);
 
     var newAEItem = JSON.parse(JSON.stringify(ae.item));
-    newAEItem.name = "A - New Name - AE";
-    ae.updateItem("Item", newAEItem);
-    dump("AE Name Updated")
+    newAEItem.name = 'A - New Name - AE';
+    ae.updateItem('Item', newAEItem);
+    dump('AE Name Updated');
 
     expectArray = JSON.stringify([ 'ae', 'aa', 'ab', 'ac', 'ad' ]);
     expect(getChildIds(b)).toBe(expectArray);
 
     var newABItem = JSON.parse(JSON.stringify(ab.item));
-    newABItem.name = "New Name - AB";
-    ab.updateItem("Item", newABItem);
-    dump("AB Name Updated")
+    newABItem.name = 'New Name - AB';
+    ab.updateItem('Item', newABItem);
+    dump('AB Name Updated');
 
     expectArray = JSON.stringify([ 'ae', 'aa', 'ac', 'ad', 'ab' ]);
     expect(getChildIds(b)).toBe(expectArray);
 
     var newAAItem = JSON.parse(JSON.stringify(aa.item));
-    newAAItem.name = "B - New Name - AA";
-    aa.updateItem("Item", newAAItem);
-    dump("AA Name Updated")
+    newAAItem.name = 'B - New Name - AA';
+    aa.updateItem('Item', newAAItem);
+    dump('AA Name Updated');
 
     expectArray = JSON.stringify([ 'ae', 'ac', 'ad', 'aa', 'ab' ]);
     expect(getChildIds(b)).toBe(expectArray);
@@ -383,168 +382,168 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Renaming an ordered item", function() {
-    // console.log("::: Preparing to rename an ordered item");
-    // console.log("::: Adding d - de");
-    d = new ItemProxy("Test", {
-      id : "d",
-      name : "D",
-      parentId : "",
+  it('Renaming an ordered item', function() {
+    // console.log('::: Preparing to rename an ordered item');
+    // console.log('::: Adding d - de');
+    var d = new ItemProxy('Test', {
+      id : 'd',
+      name : 'D',
+      parentId : '',
       itemIds : [ 'da', 'db', 'dc', 'dd', 'de' ]
     });
-    var dab = new ItemProxy("Test", {
-      id : "dab",
-      name : "DAB",
-      parentId : "d"
+    var dab = new ItemProxy('Test', {
+      id : 'dab',
+      name : 'DAB',
+      parentId : 'd'
     });
-    var da = new ItemProxy("Test", {
-      id : "da",
-      name : "DA",
-      parentId : "d"
+    var da = new ItemProxy('Test', {
+      id : 'da',
+      name : 'DA',
+      parentId : 'd'
     });
-    var db = new ItemProxy("Test", {
-      id : "db",
-      name : "DB",
-      parentId : "d"
+    var db = new ItemProxy('Test', {
+      id : 'db',
+      name : 'DB',
+      parentId : 'd'
     });
-    var dc = new ItemProxy("Test", {
-      id : "dc",
-      name : "DC",
-      parentId : "d"
+    var dc = new ItemProxy('Test', {
+      id : 'dc',
+      name : 'DC',
+      parentId : 'd'
     });
-    var dd = new ItemProxy("Test", {
-      id : "dd",
-      name : "DD",
-      parentId : "d"
+    var dd = new ItemProxy('Test', {
+      id : 'dd',
+      name : 'DD',
+      parentId : 'd'
     });
-    var de = new ItemProxy("Test", {
-      id : "de",
-      name : "DE",
-      parentId : "d"
+    var de = new ItemProxy('Test', {
+      id : 'de',
+      name : 'DE',
+      parentId : 'd'
     });
-    dump("Created D - DE");
+    dump('Created D - DE');
 
     var expectArray = JSON.stringify([ 'da', 'db', 'dc', 'dd', 'de', 'dab' ]);
     
     function getChildIds(proxy) {
       return JSON.stringify(proxy.getOrderedChildIds());
-    };
+    }
 
     expect(getChildIds(d)).toBe(expectArray);
 
     var newDEItem = JSON.parse(JSON.stringify(de.item));
-    newDEItem.name = "A - New Name - DE";
-    de.updateItem("Test", newDEItem);
-    dump("DE Name Updated")
+    newDEItem.name = 'A - New Name - DE';
+    de.updateItem('Test', newDEItem);
+    dump('DE Name Updated');
     expect(getChildIds(d)).toBe(expectArray);
 
     var newDBItem = JSON.parse(JSON.stringify(db.item));
-    newDBItem.name = "New Name - DB";
-    db.updateItem("Test", newDBItem);
-    dump("DB Name Updated")
+    newDBItem.name = 'New Name - DB';
+    db.updateItem('Test', newDBItem);
+    dump('DB Name Updated');
     expect(getChildIds(d)).toBe(expectArray);
 
     var newDAItem = JSON.parse(JSON.stringify(da.item));
-    newDAItem.name = "B - New Name - DA";
-    da.updateItem("Test", newDAItem);
-    dump("DA Name Updated")
+    newDAItem.name = 'B - New Name - DA';
+    da.updateItem('Test', newDAItem);
+    dump('DA Name Updated');
     expect(getChildIds(d)).toBe(expectArray);
 
     expectArray = JSON.stringify([ 'da', 'db', 'dd', 'de', 'dab' ]);
     dc.deleteItem();
-    dump("Deleted dc");
+    dump('Deleted dc');
     expect(getChildIds(d)).toBe(expectArray);
 
     expectArray = JSON.stringify([ 'da', 'db', 'dd', 'de', 'daa', 'dab', 'dac' ]);
-    dump("Adding daa and dac");
-    var dac = new ItemProxy("Test", {
-      id : "dac",
-      name : "DAC",
-      parentId : "d"
+    dump('Adding daa and dac');
+    var dac = new ItemProxy('Test', {
+      id : 'dac',
+      name : 'DAC',
+      parentId : 'd'
     });
-    var daa = new ItemProxy("Test", {
-      id : "daa",
-      name : "DAA",
-      parentId : "d"
+    var daa = new ItemProxy('Test', {
+      id : 'daa',
+      name : 'DAA',
+      parentId : 'd'
     });
     expect(getChildIds(d)).toBe(expectArray);
 
     expectArray = JSON.stringify([ 'da', 'dd', 'db', 'de', 'daa', 'dab', 'dac' ]);
     var newDItem = JSON.parse(JSON.stringify(d.item));
     newDItem.itemIds = [ 'da', 'dd', 'db', 'de' ];
-    d.updateItem("Test", newDItem);
-    dump("Moved db and dd");
+    d.updateItem('Test', newDItem);
+    dump('Moved db and dd');
     expect(getChildIds(d)).toBe(expectArray);
     
     expectArray = JSON.stringify([ 'dab', 'de', 'dd', 'db', 'da', 'daa', 'dac' ]);
     d.deleteItem();
-    d = new ItemProxy("Test", {
-      id : "d",
-      name : "D",
-      parentId : "",
+    d = new ItemProxy('Test', {
+      id : 'd',
+      name : 'D',
+      parentId : '',
       itemIds : [ 'dab', 'de', 'dd', 'db', 'da' ]
     });
-    dump("Added d");
+    dump('Added d');
     expect(getChildIds(d)).toBe(expectArray);
     
     expectArray = JSON.stringify([ 'dab', 'de', 'dd', 'db', 'da', 'da1', 'daa', 'dac', 'dz1', 'dz2', 'dz3' ]);
-    var da1 = new ItemProxy("Test", {
-      id : "da1",
-      name : "DA1",
-      parentId : "d"
+    var da1 = new ItemProxy('Test', {
+      id : 'da1',
+      name : 'DA1',
+      parentId : 'd'
     });
-    var dz1 = new ItemProxy("Test", {
-      id : "dz1",
-      name : "DZ1",
-      parentId : "d"
+    var dz1 = new ItemProxy('Test', {
+      id : 'dz1',
+      name : 'DZ1',
+      parentId : 'd'
     });
-    var dz2 = new ItemProxy("Test", {
-      id : "dz2",
-      name : "DZ2",
-      parentId : "d"
+    var dz2 = new ItemProxy('Test', {
+      id : 'dz2',
+      name : 'DZ2',
+      parentId : 'd'
     });
-    var dz3 = new ItemProxy("Test", {
-      id : "dz3",
-      name : "DZ3",
-      parentId : "d"
+    var dz3 = new ItemProxy('Test', {
+      id : 'dz3',
+      name : 'DZ3',
+      parentId : 'd'
     });
-    dump("Added da1, dz1-dz2");
+    dump('Added da1, dz1-dz2');
     expect(getChildIds(d)).toBe(expectArray);
 
     expectArray = JSON.stringify([ 'de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dz1', 'dz2', 'dz3', 'db' ]);
     newDItem = JSON.parse(JSON.stringify(d.item));
     newDItem.itemIds = [];
-    d.updateItem("Test", newDItem);
-    dump("Removed itemIds");
+    d.updateItem('Test', newDItem);
+    dump('Removed itemIds');
     expect(getChildIds(d)).toBe(expectArray);
     
     expectArray = JSON.stringify([ 'dac', 'da', 'daa', 'dab', 'de', 'dd', 'dz1', 'dz2', 'db', 'da1', 'dz3' ]);
     newDItem = JSON.parse(JSON.stringify(d.item));
     newDItem.itemIds = [ 'dac', 'da', 'daa', 'dab', 'de', 'dd', 'dz1', 'dz2', 'db' ];
-    d.updateItem("Test", newDItem);
-    dump("Added itemIds");
+    d.updateItem('Test', newDItem);
+    dump('Added itemIds');
     expect(getChildIds(d)).toBe(expectArray);
 
     expectArray = JSON.stringify(['de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dz1', 'dz2', 'dz3', 'db']);
     d.makeChildrenAutoOrdered();
-    dump("Auto Ordered");
+    dump('Auto Ordered');
     expect(getChildIds(d)).toBe(expectArray);
     expect(d.item.itemIds.length).toBe(0);
 
 
     expectArray = JSON.stringify(['de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dn', 'dz1', 'dz2', 'dz3', 'db']);
-    var dn = new ItemProxy("Test", {
-      id : "dn",
-      name : "DN",
-      parentId : "d"
+    var dn = new ItemProxy('Test', {
+      id : 'dn',
+      name : 'DN',
+      parentId : 'd'
     });
-    dump("Added DN to Auto List");
+    dump('Added DN to Auto List');
     expect(getChildIds(d)).toBe(expectArray);
 
 
 
     d.makeChildrenManualOrdered();
-    dump("Manual Ordered");
+    dump('Manual Ordered');
     expect(getChildIds(d)).toBe(expectArray);
     expect(d.item.itemIds.length).toBe(12);
 
@@ -554,14 +553,14 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Get Ancestors", function() {
-    // console.log("::: Getting AB ancestors");
+  it('Get Ancestors', function() {
+    // console.log('::: Getting AB ancestors');
     var ab = ItemProxy.getProxyFor('ab');
     var abAncestors = ab.getAncestorProxies();
     var expected = [ 'b', 'ROOT' ];
     for ( var ancestorIdx in abAncestors) {
-      var ancestor = abAncestors[ancestorIdx]
-      // console.log(ancestor.item.id + " - " + ancestor.item.name);
+      var ancestor = abAncestors[ancestorIdx];
+      // console.log(ancestor.item.id + ' - ' + ancestor.item.name);
 
       expect(ancestor.item.id).toBe(expected[ancestorIdx]);
     }    
@@ -570,88 +569,111 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  xit("Should Remove All Items From Repository", ()=> {
+  it('Get Descendants', function() {
+    // console.log('::: Getting B Descendants');
+    var b = ItemProxy.getProxyFor('b');
+    var ac1 = new ItemProxy('Test', {
+      id: 'ac1',
+      name: 'AC1',
+      parentId: 'ac'
+    });
+    var bDescendants = b.getDescendants();
+    var expectedIds =  [ 'ae', 'ac', 'ac1', 'ad', 'aa', 'ab' ];
+    
+    var bDescendantIds = [];
+    bDescendants.forEach((proxy) => {
+      bDescendantIds.push(proxy.item.id);
+    });
+    
+    expect(bDescendantIds).toEqual(expectedIds);
+  });
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  xit('Should Remove All Items From Repository', ()=> {
     
   });
   
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Hash Before Item Loaded Creates Tree Hash On Internal Node", ()=> {
+  it('Hash Before Item Loaded Creates Tree Hash On Internal Node', ()=> {
 
     var item = {
-      id:"test-item-id",
-      name: "TestItem ",
-      parentId: "Not_A_Valid_Parent_Id"
+      id:'test-item-id',
+      name: 'TestItem ',
+      parentId: 'Not_A_Valid_Parent_Id'
     };
-    var proxy = new ItemProxy("Test", item);
+    var proxy = new ItemProxy('Test', item);
 
     dumpHashFor(proxy.parentProxy);
     dumpHashFor(proxy);
     ItemProxy.loadingComplete();
 
-    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual("61a57146a9fa2422b0940680c7449a42db3b71ab");
-    expect(proxy.parentProxy.treeHashEntry.childTreeHashes["test-item-id"]).toEqual("53688a4a9207203c25da692d634bd58305ae1313");
-    expect(proxy.treeHashEntry.treeHash).toEqual("53688a4a9207203c25da692d634bd58305ae1313");
+    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('61a57146a9fa2422b0940680c7449a42db3b71ab');
+    expect(proxy.parentProxy.treeHashEntry.childTreeHashes['test-item-id'])
+      .toEqual('53688a4a9207203c25da692d634bd58305ae1313');
+    expect(proxy.treeHashEntry.treeHash).toEqual('53688a4a9207203c25da692d634bd58305ae1313');
   });
   
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Calculates OID and TreeHash For a Leaf Node", ()=> {
+  it('Calculates OID and TreeHash For a Leaf Node', ()=> {
     
-    var thProxy = new ItemProxy("Test", {
-      id : "TH-Node-A",
-      name : "Node A",
-      parentId : ""
+    var thProxy = new ItemProxy('Test', {
+      id : 'TH-Node-A',
+      name : 'Node A',
+      parentId : ''
     });
-    console.log("::: Node A");
+    console.log('::: Node A');
     console.log(thProxy.treeHashEntry);
-    expect(thProxy.treeHashEntry.treeHash).toBe("c821eb4089f0a835ab941c9b0db64f2ad32b44c7");
+    expect(thProxy.treeHashEntry.treeHash).toBe('c821eb4089f0a835ab941c9b0db64f2ad32b44c7');
     
-    console.log("::: Update Node");
+    console.log('::: Update Node');
     var copyOfItem = getCopyOfItem(thProxy);
     var itemToModify = getCopyOfItem(thProxy);
     
-    itemToModify.name = "Node A Updated";
-    thProxy.updateItem("Test", itemToModify);
+    itemToModify.name = 'Node A Updated';
+    thProxy.updateItem('Test', itemToModify);
     console.log(thProxy.treeHashEntry);
-    expect(thProxy.treeHashEntry.treeHash).toBe("2719d45fee33b0f3dbd72135fb57283b87bb321b");
+    expect(thProxy.treeHashEntry.treeHash).toBe('2719d45fee33b0f3dbd72135fb57283b87bb321b');
 
     
-    console.log("::: Putting back to same item");
-    thProxy.updateItem("Test", copyOfItem);
+    console.log('::: Putting back to same item');
+    thProxy.updateItem('Test', copyOfItem);
     console.log(thProxy.treeHashEntry);
-    expect(thProxy.treeHashEntry.treeHash).toBe("c821eb4089f0a835ab941c9b0db64f2ad32b44c7");
+    expect(thProxy.treeHashEntry.treeHash).toBe('c821eb4089f0a835ab941c9b0db64f2ad32b44c7');
     
-    console.log("===");
+    console.log('===');
     console.log(thProxy.document());
-    console.log("===");
+    console.log('===');
     
-    expect(thProxy.treeHashEntry.oid).toBe("96f356b031940440afda4aab888a66753a3dcf47");
-    expect(thProxy.treeHashEntry.treeHash).toBe("c821eb4089f0a835ab941c9b0db64f2ad32b44c7");
+    expect(thProxy.treeHashEntry.oid).toBe('96f356b031940440afda4aab888a66753a3dcf47');
+    expect(thProxy.treeHashEntry.treeHash).toBe('c821eb4089f0a835ab941c9b0db64f2ad32b44c7');
 
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Isolates Repositories in Tree Hash", ()=> {
-    var repoA = new ItemProxy("Repository", {
-      name: "Repository A",
-      id: "AAAA-AAAA"
+  it('Isolates Repositories in Tree Hash', ()=> {
+    var repoA = new ItemProxy('Repository', {
+      name: 'Repository A',
+      id: 'AAAA-AAAA'
     });
     
-    var a1 = new ItemProxy("Test", {
-      name: "Item A1",
-      id: "AAAA-1111",
-      parentId: "AAAA-AAAA"      
+    var a1 = new ItemProxy('Test', {
+      name: 'Item A1',
+      id: 'AAAA-1111',
+      parentId: 'AAAA-AAAA'      
     });
     
-    var repoB = new ItemProxy("Repository", {
-      name: "Repository B",
-      id: "BBBB-BBBB",
-      parentId: "AAAA-AAAA"
+    var repoB = new ItemProxy('Repository', {
+      name: 'Repository B',
+      id: 'BBBB-BBBB',
+      parentId: 'AAAA-AAAA'
     });
     
     const expectedRepoAChildHashes = {
@@ -665,25 +687,25 @@ describe("ItemProxy Test", function() {
         'BBBB-1111' : '7b1715172e8c5491ef5265adf78695d7ef9cb9ad'
     };
     
-    dumpHashFor(repoA, "Isolated Nested Repositories");
+    dumpHashFor(repoA, 'Isolated Nested Repositories');
     dumpHashFor(a1);
     dumpHashFor(repoB);
     expect(repoA.treeHashEntry.childTreeHashes).toEqual(expectedRepoAChildHashes);
-    expect(repoA.treeHashEntry.treeHash).toEqual("f8730b5510c1d47c3082836728336cd4a68f34d5");
+    expect(repoA.treeHashEntry.treeHash).toEqual('f8730b5510c1d47c3082836728336cd4a68f34d5');
     expect(repoB.treeHashEntry.childTreeHashes).toEqual(expectedInitialRepoBChildHashes);
     
-    var b1 = new ItemProxy("Test", {
-      name: "Item B1",
-      id: "BBBB-1111",
-      parentId: "BBBB-BBBB"      
+    var b1 = new ItemProxy('Test', {
+      name: 'Item B1',
+      id: 'BBBB-1111',
+      parentId: 'BBBB-BBBB'      
     });
 
-    dumpHashFor(repoA, "Added Item in Repo B, should not affect Repo A");
+    dumpHashFor(repoA, 'Added Item in Repo B, should not affect Repo A');
     dumpHashFor(a1);
     dumpHashFor(repoB);
     // Only Repo B should have been affected
     expect(repoA.treeHashEntry.childTreeHashes).toEqual(expectedRepoAChildHashes);
-    expect(repoA.treeHashEntry.treeHash).toEqual("f8730b5510c1d47c3082836728336cd4a68f34d5");
+    expect(repoA.treeHashEntry.treeHash).toEqual('f8730b5510c1d47c3082836728336cd4a68f34d5');
     expect(repoB.treeHashEntry.childTreeHashes).toEqual(expectedFinalRepoBChildHashes);
     
   });
@@ -691,35 +713,35 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  xit("Writes a File", ()=>{
+  xit('Writes a File', ()=>{
     var jsonObject = {
-      name: "Some Content",
-      id: "Some File"
-    }
+      name: 'Some Content',
+      id: 'Some File'
+    };
     var fs = require('fs');
     
-    console.log("::: Writing the file")
-    fs.writeFileSync("w.out", JSON.stringify(jsonObject, null, '  '), {encoding: 'utf8', flag: 'w'});      
+    console.log('::: Writing the file');
+    fs.writeFileSync('w.out', JSON.stringify(jsonObject, null, '  '), {encoding: 'utf8', flag: 'w'});      
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Should Ensure Fields Are In Consistent Order", ()=>{
+  it('Should Ensure Fields Are In Consistent Order', ()=>{
 
     defineTestModel();
     
     var object1a = {
-        name: "Some Content",
-        id: "id-1a1a1a"        
+        name: 'Some Content',
+        id: 'id-1a1a1a'        
     };
     
     var object1b = {
-        id: "id_1a1a1a",
-        name: "Some Content"
+        id: 'id_1a1a1a',
+        name: 'Some Content'
     };
     
-    var obj1a = new ItemProxy("Test", object1a);
+    var obj1a = new ItemProxy('Test', object1a);
 
     expect(Object.keys(obj1a.item)).toEqual([ 'id', 'name' ]);
     
@@ -728,97 +750,108 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Should Load Class Model Definitions", ()=>{
+  it('Should Load Class Model Definitions', ()=>{
     var fs = require('fs');
-    var modelDefData = fs.readFileSync("./kdb/modelDef.json", {encoding: 'utf8', flag: 'r'});
+    var modelDefData = fs.readFileSync('./kdb/modelDef.json', {encoding: 'utf8', flag: 'r'});
     var modelDefMap = JSON.parse(modelDefData);
    
     ItemProxy.loadModelDefinitions(modelDefMap);
     ItemProxy.loadingComplete();
     
-    var modelDefProxy = ItemProxy.getProxyFor("Model-Definitions");
-
     var rootProxy = ItemProxy.getRootProxy();
-    var modelDefProxy = ItemProxy.getProxyFor("Model-Definitions");
-    console.log(rootProxy.treeHashEntry.childTreeHashes["Model-Definitions"]);
+    var modelDefProxy = ItemProxy.getProxyFor('Model-Definitions');
+    console.log(rootProxy.treeHashEntry.childTreeHashes['Model-Definitions']);
     console.log(modelDefProxy.treeHashEntry.treeHash);
     
-    expect(rootProxy.treeHashEntry.childTreeHashes["Model-Definitions"]).toEqual(modelDefProxy.treeHashEntry.treeHash);    
+    expect(rootProxy.treeHashEntry.childTreeHashes['Model-Definitions'])
+      .toEqual(modelDefProxy.treeHashEntry.treeHash);    
   });
   
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("should do depth first visit", () =>{
+  it('should do depth first visit', () =>{
 
     resetItemRepository();
     
     defineTestModel();
     
     function createNV(nodeId, parentId, kind){
-      var kind = kind || "Test";
-      var proxy = new ItemProxy(kind,{
+      var createKind = kind || 'Test';
+      var proxy = new ItemProxy(createKind,{
         id: nodeId,
-        name: "Node Visitor " + nodeId,
+        name: 'Node Visitor ' + nodeId,
         parentId: parentId
       });
     }
       
-    var topProxy = new ItemProxy("Test", {
-      id : "NV-TOP",
-      name: "NV Top"
+    var topProxy = new ItemProxy('Test', {
+      id : 'NV-TOP',
+      name: 'NV Top'
     });
 
-    createNV("A", "NV-TOP");
-    createNV("AA", "A");
-    createNV("AB", "A", "Test-Exclude");
-    createNV("ABA", "AB");
-    createNV("ABB", "AB");
-    createNV("AC", "A");
-    createNV("B", "NV-TOP");
-    createNV("C", "NV-TOP");
+    createNV('A', 'NV-TOP');
+    createNV('AA', 'A');
+    createNV('AB', 'A', 'Test-Exclude');
+    createNV('ABA', 'AB');
+    createNV('ABB', 'AB');
+    createNV('AC', 'A');
+    createNV('B', 'NV-TOP');
+    createNV('C', 'NV-TOP');
 
     var order = [];
     
     function before(proxy){
-      order.push("Before " + proxy.item.id);
+      order.push('Before ' + proxy.item.id);
     }
     
     function after(proxy){
-      order.push("After " + proxy.item.id);
+      order.push('After ' + proxy.item.id);
     }
     
     // Breadth First (Top Down)
     order = [];
     topProxy.visitTree(null, before, null);
-    expect(order).toEqual([ 'Before NV-TOP', 'Before A', 'Before AA', 'Before AB', 'Before ABA', 'Before ABB', 'Before AC', 'Before B', 'Before C' ]);
+    expect(order).toEqual(
+        [ 'Before NV-TOP', 'Before A', 'Before AA', 'Before AB', 'Before ABA', 'Before ABB',
+          'Before AC', 'Before B', 'Before C' ]);
 
     // Depth First (Bottom Up)
     order = [];
     topProxy.visitTree(null, null, after);
-    expect(order).toEqual([ 'After AA', 'After ABA', 'After ABB', 'After AB', 'After AC', 'After A', 'After B', 'After C', 'After NV-TOP' ]);
+    expect(order).toEqual(
+        [ 'After AA', 'After ABA', 'After ABB', 'After AB', 'After AC', 'After A', 'After B',
+          'After C', 'After NV-TOP' ]);
     
     // Wrap Visit (Before and After)
     order = [];
     topProxy.visitTree(null, before, after);
-    expect(order).toEqual( [ 'Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AB', 'Before ABA', 'After ABA', 'Before ABB', 'After ABB', 'After AB', 'Before AC', 'After AC', 'After A', 'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP' ]);
+    expect(order).toEqual(
+        [ 'Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AB', 'Before ABA',
+          'After ABA', 'Before ABB', 'After ABB', 'After AB', 'Before AC', 'After AC', 'After A',
+          'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP' ]);
     
     // Wrap Children
     order = [];
     topProxy.visitChildren(null, before, after);
-    expect(order).toEqual([ 'Before A', 'Before AA', 'After AA', 'Before AB', 'Before ABA', 'After ABA', 'Before ABB', 'After ABB', 'After AB', 'Before AC', 'After AC', 'After A', 'Before B', 'After B', 'Before C', 'After C' ]);
+    expect(order).toEqual(
+        [ 'Before A', 'Before AA', 'After AA', 'Before AB', 'Before ABA', 'After ABA', 'Before ABB',
+          'After ABB', 'After AB', 'Before AC', 'After AC', 'After A', 'Before B', 'After B', 'Before C',
+          'After C' ]);
     
     // Exclude Sub-Tree
     order = [];
-    topProxy.visitTree({excludeKind: ["Test-Exclude"]}, before, after);
-    expect(order).toEqual([ 'Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AC', 'After AC', 'After A', 'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP' ]);
+    topProxy.visitTree({excludeKind: ['Test-Exclude']}, before, after);
+    expect(order).toEqual(
+        [ 'Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AC', 'After AC', 'After A',
+          'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP' ]);
     
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Retrieve Tree Hash Map", ()=> {
+  it('Retrieve Tree Hash Map', ()=> {
 
     var treeHashMap = ItemProxy.getAllTreeHashes();
     var expectedTreeHashMap = { 
@@ -913,9 +946,9 @@ describe("ItemProxy Test", function() {
     
     var thmCompare = ItemProxy.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
     if (!thmCompare.match){
-      console.log("Tree Map")
+      console.log('Tree Map');
       console.log(treeHashMap);
-      console.log("Tree Hash Map Compare")
+      console.log('Tree Hash Map Compare');
       console.log(thmCompare);
     }
     
@@ -925,25 +958,25 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Retrieve Delta Tree Hash Map", ()=> {
+  it('Retrieve Delta Tree Hash Map', ()=> {
 
     var treeHashMapBefore = ItemProxy.getAllTreeHashes();
 
     // Delete B
-    var b = ItemProxy.getProxyFor("B");
+    var b = ItemProxy.getProxyFor('B');
     b.deleteItem();
     
     // Update C
-    var c = ItemProxy.getProxyFor("C");
+    var c = ItemProxy.getProxyFor('C');
     var newCItem = JSON.parse(JSON.stringify(c.item));
-    newCItem.name = "Updated C";
+    newCItem.name = 'Updated C';
     c.updateItem(c.kind, newCItem);
    
     // Add D
-    var d = new ItemProxy("Test", {
-      id: "D",
-      name: "Node Visitor D",
-      parentId: "NV-TOP"
+    var d = new ItemProxy('Test', {
+      id: 'D',
+      name: 'Node Visitor D',
+      parentId: 'NV-TOP'
     });
     
     var expectedDeltaMap = {
@@ -968,28 +1001,28 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Should Not Hang When Deleting Lost+Found With Children", ()=> {
+  it('Should Not Hang When Deleting Lost+Found With Children', ()=> {
 
     resetItemRepository();
     defineTestModel();
     
-    var a = new ItemProxy("Test", {
-      id: "A",
-      name: "A Item"
+    var a = new ItemProxy('Test', {
+      id: 'A',
+      name: 'A Item'
     });
     
-    var bb = new ItemProxy("Test", {
-      id: "BB",
-      name: "BB Item",
-      parentId: "B"
+    var bb = new ItemProxy('Test', {
+      id: 'BB',
+      name: 'BB Item',
+      parentId: 'B'
     });
 
     // Try to delete item only
-    var lfProxy = ItemProxy.getProxyFor("LOST+FOUND");
+    var lfProxy = ItemProxy.getProxyFor('LOST+FOUND');
     lfProxy.deleteItem();
  
     // Try to delete item and descendants
-    var lfProxyAfter = ItemProxy.getProxyFor("LOST+FOUND");
+    var lfProxyAfter = ItemProxy.getProxyFor('LOST+FOUND');
     expect(lfProxyAfter).toEqual(lostAndFound);
     expect(lfProxyAfter.descendantCount).toEqual(2);
 
@@ -1000,30 +1033,30 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Update Tree Hash When Creating Already Existing Item", ()=> {
+  it('Update Tree Hash When Creating Already Existing Item', ()=> {
 
     resetItemRepository();
     defineTestModel();
     
-    var a = new ItemProxy("Test", {
-      id: "A",
-      name: "A Item"
+    var a = new ItemProxy('Test', {
+      id: 'A',
+      name: 'A Item'
     });
-    var aa = new ItemProxy("Test", {
-      id: "AA",
-      name: "AA Item",
-      parentId: "A"
+    var aa = new ItemProxy('Test', {
+      id: 'AA',
+      name: 'AA Item',
+      parentId: 'A'
     });
-    var ab = new ItemProxy("Test", {
-      id: "AB",
-      name: "AA Item",
-      parentId: "A"
+    var ab = new ItemProxy('Test', {
+      id: 'AB',
+      name: 'AA Item',
+      parentId: 'A'
     });
     
-    var newAA = new ItemProxy("Test", {
-      id: "AA",
-      name: "Updated AA Item",
-      parentId: "A"
+    var newAA = new ItemProxy('Test', {
+      id: 'AA',
+      name: 'Updated AA Item',
+      parentId: 'A'
     });
     
     var expectedATreeHashEntry = {
@@ -1033,7 +1066,7 @@ describe("ItemProxy Test", function() {
          { AB: '90f7ce824ded7365abe31d7ab084837d205a4ff0',
            AA: 'b19335d15534a0f103ee74de78ad6d9be9189eeb' },
         treeHash: '377eb414c090b204428ab610f75ebbc99bae7d20'
-    }
+    };
     
     expect(a.treeHashEntry).toEqual(expectedATreeHashEntry);
   });
@@ -1041,20 +1074,20 @@ describe("ItemProxy Test", function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it("Prevent Recursion on Updating Lost+Found", ()=> {
+  it('Prevent Recursion on Updating Lost+Found', ()=> {
 
     resetItemRepository();
     defineTestModel();
     
-    var a = new ItemProxy("Test", {
-      id: "A",
-      name: "A Item",
-      parentId: "MISSING"
+    var a = new ItemProxy('Test', {
+      id: 'A',
+      name: 'A Item',
+      parentId: 'MISSING'
     });
     
     var lfContent = _.clone(lostAndFound.item);
     
-    var lf = new ItemProxy("Internal", lfContent);
+    var lf = new ItemProxy('Internal', lfContent);
     
     expect(lostAndFound.descendantCount).toEqual(2);
   });

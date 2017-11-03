@@ -203,5 +203,5 @@ var internalStates = [
 
 for (var idx in internalStates) {
   var item = internalStates[idx];
-  var proxy = new ItemProxy("Internal-State", item);
-};
+  var proxy = new ItemProxy('Internal-State', item);
+}

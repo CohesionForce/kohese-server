@@ -9,7 +9,7 @@ var fs = require('fs');
 //////////////////////////////////////////////////////////////////////////
 function loadJSONDoc(filePath) {
 
-//  console.log("::: Loading " + filePath);
+//  console.log('::: Loading ' + filePath);
 
   var fileData = fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
   var jsonObject = JSON.parse(fileData);
@@ -24,7 +24,7 @@ module.exports.loadJSONDoc = loadJSONDoc;
 //////////////////////////////////////////////////////////////////////////
 function storeJSONDoc(filePath, doc) {
 
-  console.log("::: Storing " + filePath);
+  console.log('::: Storing ' + filePath);
 
   fs.writeFileSync(filePath, JSON.stringify(doc, null, '  '), {encoding: 'utf8', flag: 'w'});  
 }
@@ -36,8 +36,8 @@ module.exports.storeJSONDoc = storeJSONDoc;
 //////////////////////////////////////////////////////////////////////////
 function createEmptyFileIfMissing(filePath) {
   if (!fs.existsSync(filePath)) {
-    console.log("::: Creating " + filePath);
-    storeJSONDoc(filePath, "");
+    console.log('::: Creating ' + filePath);
+    storeJSONDoc(filePath, '');
   }
 }
 
@@ -48,8 +48,8 @@ module.exports.createEmptyFileIfMissing = createEmptyFileIfMissing;
 //////////////////////////////////////////////////////////////////////////
 function createGITIgnoreJSONIfMissing(filePath) {
   if (!fs.existsSync(filePath)) {
-    console.log("::: Creating .gitignore for *.json " + filePath);
-    fs.writeFileSync(filePath, "*.json", {encoding: 'utf8', flag: 'w'});
+    console.log('::: Creating .gitignore for *.json ' + filePath);
+    fs.writeFileSync(filePath, '*.json', {encoding: 'utf8', flag: 'w'});
   }
 }
 
@@ -60,7 +60,7 @@ module.exports.createGITIgnoreJSONIfMissing = createGITIgnoreJSONIfMissing;
 //////////////////////////////////////////////////////////////////////////
 function createDirIfMissing(dirName) {
   if (!fs.existsSync(dirName)) {
-    console.log("::: Creating " + dirName);
+    console.log('::: Creating ' + dirName);
     fs.mkdirSync(dirName);
   }
 }
@@ -75,7 +75,7 @@ function deleteFolderRecursive(dirPath) {
   if( fs.existsSync(dirPath) ) {
       files = fs.readdirSync(dirPath);
       files.forEach(function(file,index){
-          var curPath = dirPath + "/" + file;
+          var curPath = dirPath + '/' + file;
           if(fs.lstatSync(curPath).isDirectory()) { // recurse
               deleteFolderRecursive(curPath);
           } else { // delete file
@@ -93,7 +93,7 @@ module.exports.deleteFolderRecursive = deleteFolderRecursive;
 //////////////////////////////////////////////////////////////////////////
 function removeFile(filePath) {
 
-  console.log("::: Removing " + filePath);
+  console.log('::: Removing ' + filePath);
   fs.unlinkSync(filePath);
 
 }

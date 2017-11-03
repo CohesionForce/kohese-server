@@ -5,7 +5,7 @@ var boot = require('loopback-boot');
 var app = module.exports = loopback();
 global.app = app;
 
-app.use(morgan("short"));
+app.use(morgan('short'));
 
 app.start = function () {
     // start the web server
@@ -37,16 +37,16 @@ boot(app, __dirname, function (err) {
           var enableAuth = require('./server-enableAuth');
           enableAuth(app);
       
-          console.log("::: Starting Express Services");
+          console.log('::: Starting Express Services');
           var appServer = app.start();
           
-          console.log("::: Starting Kohese IO");
+          console.log('::: Starting Kohese IO');
           var kio = require('./koheseIO.js');
           var kioServer = kio.Server(appServer);
           var itemServer = require('./kio-itemServer.js');
           var fileServer = require('./kio-fileServer.js');
           
-          console.log("::: KoheseIO Started");
+          console.log('::: KoheseIO Started');
           app.emit('koheseIO-started');
 
           

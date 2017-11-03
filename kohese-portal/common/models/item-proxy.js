@@ -2,9 +2,9 @@
  * 
  */
 
-"use strict"; //Required for use of 'class'
+'use strict'; //Required for use of 'class'
 var _ = require('underscore');
-var jsSHA = require('jssha');
+var SHA = require('jssha');
 
 
 var tree = {};
@@ -12,10 +12,10 @@ tree.proxyMap = {};
 tree.repoMap = {};
 tree.proxyTreeHashes = {};
 tree.modelMap = {
-    "Internal": {},
-    "Internal-Lost": {},
-    "Internal-Model": {},
-    "Internal-State": {}
+    'Internal': {},
+    'Internal-Lost': {},
+    'Internal-Model': {},
+    'Internal-State': {}
 };
 tree.loading = true;
 
@@ -33,14 +33,17 @@ class ItemProxy {
 
     var proxy = tree.proxyMap[itemId];
     if (!proxy) {
-//      console.log("::: IP: Creating " + forItem.id + " - " + forItem.name + " - " + kind);
+//      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
       proxy = this;
       proxy.children = [];
       proxy.descendantCount = 0;
       tree.proxyMap[itemId] = proxy;
     }
 
-    if (proxy.item && (proxy.kind !== "Internal") && (proxy.kind !== "Internal-Lost") && (proxy.kind !== "Internal-Model")){
+    if (proxy.item && 
+        (proxy.kind !== 'Internal') && 
+        (proxy.kind !== 'Internal-Lost') && 
+        (proxy.kind !== 'Internal-Model')){
       // Item already exists, so update it instead
       proxy.updateItem(kind, forItem);
       return proxy;
@@ -54,20 +57,20 @@ class ItemProxy {
     }
     proxy.model = tree.modelMap[kind];
 
-    if (kind === "Repository") {
+    if (kind === 'Repository') {
       tree.repoMap[itemId] = proxy;
     }
     
-    if (kind === "Internal-Model") {
+    if (kind === 'Internal-Model') {
       tree.modelMap[itemId] = proxy;
     }
     
-    if (kind === "Internal") {
+    if (kind === 'Internal') {
       // Don't continue
       return proxy;
     }
 
-    var parentId = proxy.item.parentId || "ROOT";
+    var parentId = proxy.item.parentId || 'ROOT';
 
     var parent = tree.proxyMap[parentId];
 
@@ -91,7 +94,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static getRootProxy() {
-    // console.log("::: IP: Getting Root Proxy");
+    // console.log('::: IP: Getting Root Proxy');
     return tree.root;
   }
 
@@ -119,7 +122,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   static getProxyFor(id) {
 
-    // console.log("::: IP: Getting proxy for " + id);
+    // console.log('::: IP: Getting proxy for ' + id);
 	if(id === '') {
 		return tree.root;
 	}
@@ -167,11 +170,11 @@ class ItemProxy {
       return;
     }
 
-    var shaObj = new jsSHA("SHA-1", "TEXT");
+    var shaObj = new SHA('SHA-1', 'TEXT');
     var doc = this.document();
     shaObj.update('blob ' + doc.length + '\0' + doc);
     
-    this.oid = shaObj.getHash("HEX");
+    this.oid = shaObj.getHash('HEX');
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -196,8 +199,8 @@ class ItemProxy {
 
     for (var childIdx in this.children){
       var childProxy = this.children[childIdx];
-      if(childProxy.kind === "Repository"){
-        treeHashEntry.childTreeHashes[childProxy.item.id] = "Repository-Mount";
+      if(childProxy.kind === 'Repository'){
+        treeHashEntry.childTreeHashes[childProxy.item.id] = 'Repository-Mount';
       } else {
         if(childProxy.deferTreeHash){
           this.deferTreeHash = true;
@@ -207,9 +210,9 @@ class ItemProxy {
       }
     }
 
-    var shaObj = new jsSHA("SHA-1", "TEXT");
+    var shaObj = new SHA('SHA-1', 'TEXT');
     shaObj.update(JSON.stringify(treeHashEntry));
-    this.treeHash =  shaObj.getHash("HEX");
+    this.treeHash =  shaObj.getHash('HEX');
 
     treeHashEntry.treeHash = this.treeHash;
     if(this.deferTreeHash){
@@ -255,7 +258,7 @@ class ItemProxy {
     var commonKeys = _.intersection(fromKeys, toKeys);
     
     if(!fromTHMap){
-      console.log("*** From is undefined");
+      console.log('*** From is undefined');
     }
     
     var thmCompare = {
@@ -288,7 +291,7 @@ class ItemProxy {
           thmCompare.changedItems.push(key);
         }
 //        if (!_.isEqual(fromNode.childTreeHashes, toNode.childTreeHashes)){
-//          console.log("::> " + key + ": Different Children");
+//          console.log('::> ' + key + ': Different Children');
 //          fromChildren = fromNode.childTreeHashes;
 //          toChildren = toNode.childTreeHashes;
 //          fromChildKeys = Object.keys(fromNode.childTreeHashes).sort();
@@ -372,7 +375,7 @@ class ItemProxy {
     var repoList = [];
     for(var id in tree.proxyMap){
       var proxy = tree.proxyMap[id];
-      if (proxy.kind === "Repository"){
+      if (proxy.kind === 'Repository'){
         repoList.push(proxy);
       }
     }
@@ -390,7 +393,7 @@ class ItemProxy {
   getRepositoryProxy() {
     var proxy = this;
     
-    while (proxy && proxy.kind !== "Repository" && proxy.item.id !== 'ROOT'){
+    while (proxy && proxy.kind !== 'Repository' && proxy.item.id !== 'ROOT'){
       proxy = proxy.parentProxy;
     }
     return proxy;
@@ -413,20 +416,12 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   getDescendants() {
-    var proxyStack = [];
-    for (var childIdx = this.children.length - 1; childIdx > -1; childIdx--) {
-      proxyStack.push(this.children[childIdx]);
-    }
-
     var descendantList = [];
-    var descendant = proxyStack.pop();
-    while (descendant) {
-      descendantList.push(descendant);
-      for (var childIdx = descendant.children.length - 1; childIdx > -1; childIdx--) {
-        proxyStack.push(descendant.children[childIdx]);
-      }
-      descendant = proxyStack.pop();
-    }
+    
+    this.visitChildren(null, (childProxy) => {
+      descendantList.push(childProxy);
+    });
+ 
     return descendantList;
   }
 
@@ -449,13 +444,15 @@ class ItemProxy {
    */
   visitTree(flags, doBefore, doAfter){
     
-    var includeOrigin = (flags && flags.hasOwnProperty("includeOrigin")) ? flags.includeOrigin : true; 
-    var excludeKind = (flags && flags.hasOwnProperty("excludeKind")) ? flags.excludeKind : [];
+    var includeOrigin = (flags && flags.hasOwnProperty('includeOrigin')) ? flags.includeOrigin : true; 
+    var excludeKind = (flags && flags.hasOwnProperty('excludeKind')) ? flags.excludeKind : [];
     var before = doBefore ? doBefore : () => {};
     var after = doAfter ? doAfter : () => {};
     
     var excludeChildKind = {};
-    excludeKind.forEach((kind)=>{excludeChildKind[kind] = true});
+    excludeKind.forEach((kind)=>{
+      excludeChildKind[kind] = true;
+      });
 
     function visitChild(proxy){
       if (!excludeChildKind[proxy.kind]){
@@ -518,8 +515,8 @@ class ItemProxy {
   static dumpAllProxies() {
     for ( var proxyId in tree.proxyMap) {
       var proxy = tree.proxyMap[proxyId];
-      console.log("::: Dumping " + proxy.item.id + " - " + proxy.item.name
-          + " - " + proxy.kind);
+      console.log('::: Dumping ' + proxy.item.id + ' - ' + proxy.item.name +
+          ' - ' + proxy.kind);
     }
   }
 
@@ -527,15 +524,15 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   dumpProxy(indent) {
-    var thisIndent = "";
-    var childIndent = "|-";
+    var thisIndent = '';
+    var childIndent = '|-';
     if (indent) {
       thisIndent = indent;
-      childIndent = "| " + thisIndent;
+      childIndent = '| ' + thisIndent;
     }
 
-    console.log("=== " + thisIndent + this.item.id + " - " + this.item.name
-        + " - " + this.kind);
+    console.log('=== ' + thisIndent + this.item.id + ' - ' + this.item.name +
+        ' - ' + this.kind);
 
     for ( var childIdx in this.children) {
       var childProxy = this.children[childIdx];
@@ -561,31 +558,31 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   getDocument(showUndefined) {
     
-    var outputBuffer = "";
+    var outputBuffer = '';
     var document = this;
 
     var displayItem = function(proxy){
 
       var depth = proxy.getDepthFromAncestor(document);
-      var hdr = "";
+      var hdr = '';
 
       for(var idx = 0; idx < depth; idx++){
-        hdr += "#";
+        hdr += '#';
       }
       
       if (depth === 0){
         // Top Node
         if (proxy.item.description || showUndefined) {
-          outputBuffer += "**" + proxy.item.name + "**  \n" + proxy.item.description + "\n\n";
+          outputBuffer += '**' + proxy.item.name + '**  \n' + proxy.item.description + '\n\n';
         } else {
-          outputBuffer += "**" + proxy.item.name + "**\n\n";
+          outputBuffer += '**' + proxy.item.name + '**\n\n';
         }
       } else {
         //Child Node
         if (proxy.item.description || showUndefined) {
-          outputBuffer += hdr + " " + proxy.item.name + "\n" + proxy.item.description + "\n\n";
+          outputBuffer += hdr + ' ' + proxy.item.name + '\n' + proxy.item.description + '\n\n';
         } else {
-          outputBuffer += hdr + " " + proxy.item.name + "\n\n";
+          outputBuffer += hdr + ' ' + proxy.item.name + '\n\n';
         }        
       }
 
@@ -601,11 +598,11 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   addChild(childProxy) {
-    if (childProxy.parentProxy == this) {
-//      console.log("::: IP: Child " + childProxy.item.name + " already associated with " + this.item.name);
+    if (childProxy.parentProxy === this) {
+//      console.log('::: IP: Child ' + childProxy.item.name + ' already associated with ' + this.item.name);
       return;
     }
-//    console.log("::: IP: Adding child " + childProxy.item.name + " to " + this.item.name);
+//    console.log('::: IP: Adding child ' + childProxy.item.name + ' to ' + this.item.name);
      
     // Determine if this node is already attached to another parent
     if (childProxy.parentProxy) {
@@ -640,7 +637,7 @@ class ItemProxy {
     }
     
     // update display of lostAndFound node
-    if (this == tree.lostAndFound && tree.lostAndFound.children.length === 1) {
+    if (this === tree.lostAndFound && tree.lostAndFound.children.length === 1) {
       tree.root.addChild(tree.lostAndFound);
     }
   }
@@ -649,7 +646,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   removeChild(childProxy) {
-    // console.log("::: IP: Removing child " + proxy.item.name + " from " +
+    // console.log('::: IP: Removing child ' + proxy.item.name + ' from ' +
     // this.item.name);
     this.children = _.reject(this.children, function(proxy) {
       return childProxy.item.id === proxy.item.id;
@@ -668,11 +665,11 @@ class ItemProxy {
     }
     
     // update display of lostAndFound node
-    if (this == tree.lostAndFound && tree.lostAndFound.children.length === 0) {
+    if (this === tree.lostAndFound && tree.lostAndFound.children.length === 0) {
       tree.root.removeChild(tree.lostAndFound);
     }
 
-    if (this.kind === "Internal-Lost" && this.children.length === 0) {
+    if (this.kind === 'Internal-Lost' && this.children.length === 0) {
       this.deleteItem();
     }
 
@@ -753,7 +750,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   updateChildrenManualOrder() {
     if (this.childrenAreManuallyOrdered()){
-      console.log("::: Updating child order");
+      console.log('::: Updating child order');
       this.item.itemIds = this.getOrderedChildIds();
     }
   }
@@ -784,13 +781,13 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
-    console.log("!!! Updating " + modelKind + " - " + this.item.id);
+    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
 
     // Determine if item kind changed
     var newKind = modelKind;
 
     if (newKind !== this.kind) {
-      console.log("::: Proxy kind changed from " + this.kind + " to " + newKind);
+      console.log('::: Proxy kind changed from ' + this.kind + ' to ' + newKind);
       this.kind = newKind;
     }
 
@@ -809,19 +806,19 @@ class ItemProxy {
     }
 
     // Determine if the parent changed
-    var oldParentId = "";
+    var oldParentId = '';
     if (this.parentProxy) {
       oldParentId = this.parentProxy.item.id;
     }
 
     var newParentId = withItem.parentId;
-    console.log("::: Eval Parent Id old: " + oldParentId + " new: " + newParentId);
+    console.log('::: Eval Parent Id old: ' + oldParentId + ' new: ' + newParentId);
     if (oldParentId !== newParentId) {
-      console.log("::: Parent Id changed from " + oldParentId + " to "
-          + newParentId);
+      console.log('::: Parent Id changed from ' + oldParentId + ' to ' +
+          newParentId);
 
       var newParentProxy;
-      if (newParentId === "") {
+      if (newParentId === '') {
         newParentProxy = tree.root;
       } else {
         newParentProxy = tree.proxyMap[newParentId];
@@ -848,7 +845,7 @@ class ItemProxy {
   deleteItem(deleteDescendants) {
     var byId = this.item.id;
 
-    console.log("::: Deleting proxy for " + byId);
+    console.log('::: Deleting proxy for ' + byId);
     
     var attemptToDeleteRestrictedNode = (
         (this.item.id === tree.lostAndFound.item.id) || 
@@ -865,23 +862,23 @@ class ItemProxy {
         childProxy.deleteItem(deleteDescendants);
       });
       if (attemptToDeleteRestrictedNode){
-        console.log("::: -> Not removing " + this.item.name);        
+        console.log('::: -> Not removing ' + this.item.name);        
       } else {
-        console.log("::: -> Removing all references");
+        console.log('::: -> Removing all references');
         delete tree.proxyMap[byId];
       }
     } else {
       // Remove this item and leave any children under Lost+Found
       if (this.children.length !== 0) {
         if (!attemptToDeleteRestrictedNode){
-          console.log("::: -> Node still has children");
+          console.log('::: -> Node still has children');
           createMissingProxy(byId);          
         }
       } else {
         if (attemptToDeleteRestrictedNode){
-          console.log("::: -> Not removing " + this.item.name);                  
+          console.log('::: -> Not removing ' + this.item.name);                  
         } else {
-          console.log("::: -> Removing all references");
+          console.log('::: -> Removing all references');
           delete tree.proxyMap[byId];
         }
       }      
@@ -893,7 +890,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static getModelDefinitions(){
-    var rootModelProxy = ItemProxy.getProxyFor("Model-Definitions");
+    var rootModelProxy = ItemProxy.getProxyFor('Model-Definitions');
     return rootModelProxy.modelDefMap;
   }
   
@@ -902,16 +899,16 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   static loadModelDefinitions(modelDefMap) {
     var rootModelDef = {
-        id: "Model-Definitions",
-        name: "Model Definitions"
-    }
-    var rootModelProxy = new ItemProxy("Internal-Model", rootModelDef);
+        id: 'Model-Definitions',
+        name: 'Model Definitions'
+    };
+    var rootModelProxy = new ItemProxy('Internal-Model', rootModelDef);
     rootModelProxy.modelDefMap = modelDefMap;
     
     for(var modelKey in modelDefMap){
       var model = modelDefMap[modelKey];
       model.id = modelKey;
-      if (model.base === "PersistedModel"){
+      if (model.base === 'PersistedModel'){
         delete model.base;
       }
       if (model.base){
@@ -919,7 +916,7 @@ class ItemProxy {
       } else {
         model.parentId = rootModelDef.id;
       }
-      var proxy = new ItemProxy("Internal-Model", model);
+      var proxy = new ItemProxy('Internal-Model', model);
       tree.modelMap[modelKey] = proxy;
     }
     
@@ -927,11 +924,11 @@ class ItemProxy {
     var models = rootModelProxy.getDescendants();
         
     for(var index in models){
-      var model = models[index];
-//      console.log("::: Loading Model " + model.item.name);
+      var modelProxy = models[index];
+//      console.log('::: Loading Model ' + model.item.name);
       // TODO this might eventually need to be moved to proxy
-      var properties = model.parentProxy.item.orderedProperties || [];
-      model.item.orderedProperties = Object.keys(model.item.properties).concat(properties);
+      var properties = modelProxy.parentProxy.item.orderedProperties || [];
+      modelProxy.item.orderedProperties = Object.keys(modelProxy.item.properties).concat(properties);
     }
   }
 }
@@ -939,29 +936,29 @@ class ItemProxy {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-tree.root = new ItemProxy("Internal", {
-  id: "ROOT",
-  name : "Root of Knowledge Tree"
+tree.root = new ItemProxy('Internal', {
+  id: 'ROOT',
+  name : 'Root of Knowledge Tree'
 });
-tree.repoMap["ROOT"] = tree.root;
+tree.repoMap['ROOT'] = tree.root;
 
-tree.lostAndFound = new ItemProxy("Internal", {
-  id : "LOST+FOUND",
-  name : "Lost-And-Found",
-  description : "Collection of node(s) that are no longer connected."
+tree.lostAndFound = new ItemProxy('Internal', {
+  id : 'LOST+FOUND',
+  name : 'Lost-And-Found',
+  description : 'Collection of node(s) that are no longer connected.'
 });
-tree.repoMap["LOST+FOUND"] = tree.lostAndFound;
+tree.repoMap['LOST+FOUND'] = tree.lostAndFound;
 
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
 function createMissingProxy(forId) {
-  var lostProxy = new ItemProxy("Internal-Lost", {
+  var lostProxy = new ItemProxy('Internal-Lost', {
     id : forId,
-    name : "Lost Item: " + forId,
-    description : "Found children nodes referencing this node as a parent.",
-    parentId : "LOST+FOUND"
+    name : 'Lost Item: ' + forId,
+    description : 'Found children nodes referencing this node as a parent.',
+    parentId : 'LOST+FOUND'
   });
 
   return lostProxy;
@@ -973,23 +970,23 @@ function createMissingProxy(forId) {
 function copyAttributes(fromItem, toItem) {
 
   // Copy attributes proxy
-  for ( var key in fromItem) {
-    if (fromItem.hasOwnProperty(key) && (key.charAt(0) !== '$')
-        && !_.isEqual(fromItem[key], toItem[key])) {
-      console.log("!!! Updating " + key);
-      toItem[key] = fromItem[key];
+  for ( var fromKey in fromItem) {
+    if (fromItem.hasOwnProperty(fromKey) && (fromKey.charAt(0) !== '$') &&
+        !_.isEqual(fromItem[fromKey], toItem[fromKey])) {
+      console.log('!!! Updating ' + fromKey);
+      toItem[fromKey] = fromItem[fromKey];
     }
   }
   // Check for unexpected values
-  for ( var key in toItem) {
-    if (key !== "__deletedProperty" && toItem.hasOwnProperty(key)
-        && (key.charAt(0) !== '$') && !fromItem.hasOwnProperty(key)) {
-      console.log("!!! Deleted Property: " + key);
+  for ( var toKey in toItem) {
+    if (toKey !== '__deletedProperty' && toItem.hasOwnProperty(toKey) &&
+        (toKey.charAt(0) !== '$') && !fromItem.hasOwnProperty(toKey)) {
+      console.log('!!! Deleted Property: ' + toKey);
       if (!toItem.__deletedProperty) {
         toItem.__deletedProperty = {};
       }
-      toItem.__deletedProperty[key] = toItem[key];
-      delete toItem[key];
+      toItem.__deletedProperty[toKey] = toItem[toKey];
+      delete toItem[toKey];
     }
   }
 }
