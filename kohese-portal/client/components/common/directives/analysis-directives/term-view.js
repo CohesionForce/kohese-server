@@ -69,7 +69,7 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
         onFilterChange();
     });
 
-    ctrl.getTokenCount = function () {
+    ctrl.getTermCount = function () {
         return $('#theTokensBody').find("tr").length;
     };
 

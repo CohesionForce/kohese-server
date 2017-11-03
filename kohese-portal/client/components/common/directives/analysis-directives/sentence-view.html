@@ -1,8 +1,8 @@
 <div class="panel">
-        <div class="panel-heading">Sentence View</div>
+        <div class="panel-heading">Sentence View - ({{svCtrl.getDetailsItemCount()}}) Sentences</div>
         <div class="panel-body"> 
         <div>
-          <span><b>Analysis Details</b>  ({{svCtrl.getDetailsItemCount()}})</span>
+          <span><b>Analysis Details</b> </span>
                 <span class="col-xs-4 pull-right"> 
                         <b>Limit</b>
                         <input class="input-sm col-xs-6 pull-right" type="number" ng-model="svCtrl.loadLimit"
@@ -10,7 +10,7 @@
                 </span>
                 </div>
                 <input type="checkbox" ng-model="svCtrl.showSentencesInDetails"
-                        ng-init="svCtrl.showSentencesInDetails=true" name="showSentencesInDetailsInput"
+                        ng-init="svCtrl.showSentencesInDetails=false" name="showSentencesInDetailsInput"
                         style="margin: 5px"/> Show Sentences in Details
                 <input type="checkbox" ng-model="svCtrl.showChunksInDetails"
                         ng-init="svCtrl.showChunksInDetails=false" name="showChunksInDetailsInput"
@@ -31,7 +31,7 @@
                         class="tree-grid-row" id="{{listItem.displayId}}"
                         ng-repeat="listItem in svCtrl.itemProxy.analysis.extendedList 
                                 | filter:svCtrl.filterDetails 
-                                | orderBy:svCtrl.analysisDetailsSortField 
+                                | orderBy:svCtrl.analysisDetailsSortField:svCtrl.reverse 
                                 | limitTo:svCtrl.loadLimit">
                         <td class="indented">{{listItem.displayType}}</td>
                         <td ng-bind-html="listItem.text | highlightRegex:svCtrl.analysisFilterRegexHighlight"></td>

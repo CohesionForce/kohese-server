@@ -10,7 +10,7 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
         ctrl.itemProxy = $scope.itemProxy;
     
         ctrl.loadLimit = 100;
-        ctrl.analysisSummarySortField = ['text', '-count'];
+        ctrl.analysisSummarySortField = ['-count', "text"];
 
         ctrl.analysisFilterPOS = analysisService.filterPOS;
         ctrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;

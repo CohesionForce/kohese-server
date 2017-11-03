@@ -10,6 +10,7 @@ function SentenceViewController($scope, $timeout, tabService, analysisService){
         ctrl.itemProxy = $scope.itemProxy;
 
         ctrl.analysisSummarySortField = ['-count', 'text'];
+        ctrl.reverseSort = false;
         ctrl.loadLimit = 100;
 
         ctrl.analysisFilterPOS = analysisService.filterPOS;
