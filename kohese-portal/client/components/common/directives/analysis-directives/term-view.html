@@ -9,6 +9,14 @@
                      <option ng-repeat="filterCriteria in tvCtrl.analysisPOSFilterCriteriaList">{{filterCriteria}}</option>
               </select>
             </label>
+            <span>
+                  <input type="checkbox" ng-model="tvCtrl.filterExactMatch"
+                              name="summaryFilterExactMatchInput"
+                              style="margin: 5px"/> Exact Match
+                  <input type="checkbox" ng-model="tvCtrl.filterIgnoreCase"
+                              name="summaryFilterIgnoreCaseInput"
+                              style="margin: 5px"/> Ignore Case
+            </span>
             <br/> 
             <input class="input-sm" type="text" ng-model="tvCtrl.analysisFilterInput"
                    placeholder="Filter" style="margin: 5px"/>
