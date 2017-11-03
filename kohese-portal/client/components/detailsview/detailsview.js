@@ -386,47 +386,14 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueServ
             });
     };
 
-    /****************************************************************** */
-    /****************************************************************** */
-    /****************************************************************** */
-    /****************************************************************** */
-    /* DOC FUNCTION - TBD */
-    /****************************************************************** */
-    /****************************************************************** */
-    /****************************************************************** */
-    /****************************************************************** */
-    $scope.$watch('detailsCtrl.docShowChildren', function () {
-        if(detailsCtrl.docShowChildren){
-          var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
-          detailsCtrl.docRendered = docWriter.render(docParsed);
-          detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);
-        } else {
-          detailsCtrl.docRendered = null;
-        }
-      });
+    detailsCtrl.showChildrenToggled = function() {
+        detailsCtrl.docShowChildren = !detailsCtrl.docShowChildren;
+        $scope.$broadcast('Show Children Toggled', detailsCtrl.docShowChildren);
+    }
 
     $scope.$watch('detailsCtrl.itemProxy.item.description', function () {
-      if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.description){
-        var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
-        detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
-        detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
-        if(detailsCtrl.docShowChildren){
-          var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
-          detailsCtrl.docRendered = docWriter.render(docParsed);
-          detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);                
-        }
-      }
-    });
-
-    /****************************************************************** */
-    /****************************************************************** */
-    /****************************************************************** */
-    /****************************************************************** */
-    /* DOC FUNCTION END - TBD */
-    /****************************************************************** */
-    /****************************************************************** */
-    /****************************************************************** */
-    /****************************************************************** */
+      $scope.$broadcast('Proxy Description Updated', detailsCtrl.itemProxy);              
+        });
 
     function postDigest(callback) {
       var unregister = $scope.$watch(function () {

@@ -54,15 +54,12 @@
 
 		           <div ng-if="detailsCtrl.itemProxy.children.length">
                   <label class="control-label" for="showChildren"> Show Children </label> <input
-                         type="checkbox" ng-checked="detailsCtrl.docShowChildren;detailsCtrl.updatedDoc()"
-                         ng-click="detailsCtrl.docShowChildren=!detailsCtrl.docShowChildren" />
+                         type="checkbox" ng-checked="detailsCtrl.docShowChildren;"
+                         ng-click="detailsCtrl.showChildrenToggled()" />
                 </div>
-		            
-
-                <ng-bind-html ng-if="!detailsCtrl.docShowChildren" style="height:100%" ng-bind-html="detailsCtrl.itemDescriptionRendered"></ng-bind-html>
-                <ng-bind-html ng-if="detailsCtrl.docShowChildren" style="height:100%" ng-bind-html="detailsCtrl.docRendered"></ng-bind-html>
-                <document-view itemProxy="detailsCtrl.itemProxy"
-                               showChildren="detailsCtrl.docShowChildren" />
+                <document-view item-proxy="detailsCtrl.itemProxy"
+                               ng-if="detailsCtrl.itemProxy"
+                               show-children="detailsCtrl.docShowChildren" />
 
                
             </tab>
