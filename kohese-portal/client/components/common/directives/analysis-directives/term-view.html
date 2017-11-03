@@ -53,7 +53,17 @@
                      </span>
                   </span>
                </th>
-               <th>POS Count</th>
+               <th ng-if="tvCtrl.showPOS">POS Count</th>
+               <span class="dropdown pull-right">
+                        <a class="dropdown-toggle" data-toggle="dropdown" >
+                            <span>Options</span> 
+                        <i class="fa fa-angle-double-down"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li ng-click="tvCtrl.showPOS = !tvCtrl.showPOS">
+                                <a><i ng-if="tvCtrl.showPOS" 
+                                    class="fa fa-check-"></i>Show POS</a></li>
+                        </ul>
             </thead>
             <tbody id="theTokensBody">
                <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
@@ -65,7 +75,7 @@
                      class="tree-label"
                      ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight"></td>
                <td>{{summary.count}}</td>
-               <td>{{summary.posCount}}</td>
+               <td ng-if="tvCtrl.showPOS">{{summary.posCount}}</td>
                </tr>
             </tbody>
          </table>

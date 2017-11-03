@@ -13,6 +13,8 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
         ctrl.reverse = false;
         ctrl.loadLimit = 100;
 
+        ctrl.showPOS = false;
+
         ctrl.analysisFilterPOS = analysisService.filterPOS;
         ctrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
         ctrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
