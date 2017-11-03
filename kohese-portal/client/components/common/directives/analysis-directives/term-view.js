@@ -41,7 +41,11 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
     };
 
     ctrl.submitStringFilter = function (term) {
-        if (ctrl.filterExactMatch) {
+        if(!term) {
+            term = "" // If an empty search has been entered
+        }
+
+        if (ctrl.filterExactMatch && term != "") {
             ctrl.analysisFilterInput = "/\\b" + term + "\\b/";
             if (ctrl.filterIgnoreCase) {
                 ctrl.analysisFilterInput += "i";
@@ -49,6 +53,7 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
         } else {
             ctrl.analysisFilterInput = term;
         }
+
         ctrl.analysisFilterString = ctrl.analysisFilterInput;
         ctrl.filterList.push(ctrl.analysisFilterString);
         $scope.$emit('newTermFilter', ctrl.analysisFilterString)
@@ -61,12 +66,6 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
         console.log(ctrl.analysisFilterInput);
         onFilterChange();
     });
-
-    ctrl.submitClickFilter = function (term) {
-        (term) ? ctrl.analysisFilterInput = term 
-               : ctrl.analysisFilterInput = ""; 
-        ctrl.submitStringFilter(term);
-    }
 
     ctrl.getTokenCount = function () {
         return $('#theTokensBody').find("tr").length;

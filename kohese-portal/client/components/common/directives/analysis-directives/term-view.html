@@ -53,7 +53,7 @@
                         | filter:tvCtrl.filterTokens 
                         | orderBy:tvCtrl.analysisSummarySortField 
                         | limitTo:tvCtrl.analysisTokenLimit">
-               <td ng-click="tvCtrl.submitClickFilter(summary.text)"
+               <td ng-click="tvCtrl.submitStringFilter(summary.text)"
                      class="tree-label"
                      ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight"></td>
                <td>{{summary.count}}</td>
