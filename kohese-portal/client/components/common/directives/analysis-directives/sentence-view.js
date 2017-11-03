@@ -108,7 +108,8 @@ function SentenceViewDirective(){
 }
 
 export default () =>{
-    angular.module('app.directives.sentenceview', ['app.services.tabservice'])
+    angular.module('app.directives.sentenceview', ['app.services.tabservice',
+    'app.services.analysisservice'])
         .directive('sentenceView', SentenceViewDirective)
         .controller('SentenceViewController', SentenceViewController);
 }

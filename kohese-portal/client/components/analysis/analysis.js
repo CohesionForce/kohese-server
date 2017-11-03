@@ -8,17 +8,18 @@ function AnalysisController($scope, $stateParams, ItemRepository, tabService) {
 
     if(!controllerRestored) {
         ctrl.itemProxy =  ItemRepository.getProxyFor($stateParams.id);
-    }
+    };
 
     $scope.$on('tabSelected', function () {
         tabService.bundleController(ctrl, 'AnalysisController', currentTab.id);
+        currentTab.params = $stateParams;
     });
 
     $scope.$on('itemRepositoryReady', function () {
         if (angular.isDefined($stateParams.id)) {
            ctrl.itemProxy = ItemRepository.getProxyFor($stateParams.id);
         }
-    })
+    });
 
     $scope.$on('newTermFilter', newAnalysisFilter);
 
@@ -27,7 +28,7 @@ function AnalysisController($scope, $stateParams, ItemRepository, tabService) {
     function newAnalysisFilter(event, string) {
         event.stopPropagation();
         $scope.$broadcast('newAnalysisFilter', string);
-    }
+    };
 }
 
 export default ()=> {

@@ -121,7 +121,8 @@ function PhraseViewDirective(){
 }
 
 export default () =>{
-    angular.module('app.directives.phraseview', ['app.services.tabservice'])
+    angular.module('app.directives.phraseview', ['app.services.tabservice',
+    'app.services.analysisservice'])
         .directive('phraseView', PhraseViewDirective)
         .controller('PhraseViewController', PhraseViewController);
 }
