@@ -9,8 +9,8 @@ function SentenceViewController($scope, $timeout, tabService, analysisService){
         // Initialization Block
         ctrl.itemProxy = $scope.itemProxy;
 
-        ctrl.analysisSummarySortField = ['-count', 'text'];
-        ctrl.reverseSort = false;
+        ctrl.sortField = ['-count','-text'];
+        ctrl.reverse = false;
         ctrl.loadLimit = 100;
 
         ctrl.analysisFilterPOS = analysisService.filterPOS;
@@ -83,7 +83,17 @@ function SentenceViewController($scope, $timeout, tabService, analysisService){
                 }
             }
         });
-}
+    }
+
+    ctrl.newSort = function (term) {
+        if (ctrl.sortField === term) {
+            ctrl.reverse = !ctrl.reverse;
+        } else {
+            ctrl.sortField = term;
+            ctrl.reverse = false;
+        }
+    }
+
 }
 
 function SentenceViewDirective(){

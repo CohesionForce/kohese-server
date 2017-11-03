@@ -10,7 +10,7 @@
                 </span>
                 </div>
                 <input type="checkbox" ng-model="svCtrl.showSentencesInDetails"
-                        ng-init="svCtrl.showSentencesInDetails=false" name="showSentencesInDetailsInput"
+                        ng-init="svCtrl.showSentencesInDetails=true" name="showSentencesInDetailsInput"
                         style="margin: 5px"/> Show Sentences in Details
                 <input type="checkbox" ng-model="svCtrl.showChunksInDetails"
                         ng-init="svCtrl.showChunksInDetails=false" name="showChunksInDetailsInput"
@@ -23,7 +23,13 @@
                         class="table tree-grid table-striped table-condensed table-hover">
                 <thead>
                         <th style="width:20%">Type</th>
-                        <th><a href="" ng-click="svCtrl.analysisDetailsSortField = 'text'">Text</a></th>
+                        <th><span ng-click="svCtrl.newSort('-text')">
+                                Text
+                                <span ng-if="svCtrl.sortField === '-text'">
+                                <i ng-if="svCtrl.reverse" class="fa fa-chevron-up"></i>
+                                <i ng-if="!svCtrl.reverse" class="fa fa-chevron-down"></i>
+                                </span>
+                        </span></th>
                 </thead>
                
                 <tbody id="theDetailsBody">

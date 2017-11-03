@@ -9,7 +9,8 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
         // Initialization Block
         ctrl.itemProxy = $scope.itemProxy;
 
-        ctrl.analysisSummarySortField = ['-count', 'text'];
+        ctrl.sortField = ['-count', '-text'];
+        ctrl.reverse = false;
         ctrl.loadLimit = 100;
 
         ctrl.analysisFilterPOS = analysisService.filterPOS;
@@ -72,6 +73,15 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
     ctrl.getTermCount = function () {
         return $('#theTokensBody').find("tr").length;
     };
+
+    ctrl.newSort = function (term) {
+        if (ctrl.sortField === term) {
+            ctrl.reverse = !ctrl.reverse;
+        } else {
+            ctrl.sortField = term;
+            ctrl.reverse = false;
+        }
+    }
 
 
     ctrl.filterTokens = function (summary) {

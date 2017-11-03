@@ -10,7 +10,8 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
         ctrl.itemProxy = $scope.itemProxy;
     
         ctrl.loadLimit = 100;
-        ctrl.analysisSummarySortField = ['-count', "text"];
+        ctrl.sortField = ['-count', '-text'];
+        ctrl.reverse = false;
 
         ctrl.analysisFilterPOS = analysisService.filterPOS;
         ctrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
@@ -94,7 +95,16 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
                 }
             }
         });
-}
+    }
+
+    ctrl.newSort = function (term) {
+        if (ctrl.sortField === term) {
+            ctrl.reverse = !ctrl.reverse;
+        } else {
+            ctrl.sortField = term;
+            ctrl.reverse = false;
+        }
+    }
 
     ctrl.fetchAnalysis();
 }

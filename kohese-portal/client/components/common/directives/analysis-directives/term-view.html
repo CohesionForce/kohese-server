@@ -36,13 +36,21 @@
                 class="table tree-grid table-striped table-condensed table-hover">
             <thead>
                <th>
-                  <span ng-click="tvCtrl.analysisSummarySortField = 'text'">
-                     Text
+                  <span ng-click="tvCtrl.newSort('-text')">
+                     Text 
+                     <span ng-if="tvCtrl.sortField === '-text'">
+                     <i ng-if="tvCtrl.reverse" class="fa fa-chevron-up"></i>
+                     <i ng-if="!tvCtrl.reverse" class="fa fa-chevron-down"></i>
+                     </span>
                   </span>
                </th>
                <th>
-                  <span ng-click="tvCtrl.analysisSummarySortField = '-count'">
+                  <span ng-click="tvCtrl.newSort('-count')">
                      Count
+                     <span ng-if="tvCtrl.sortField === '-count'">
+                     <i ng-if="tvCtrl.reverse" class="fa fa-chevron-up"></i>
+                     <i ng-if="!tvCtrl.reverse" class="fa fa-chevron-down"></i>
+                     </span>
                   </span>
                </th>
                <th>POS Count</th>
@@ -51,7 +59,7 @@
                <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
                ng-repeat="summary in tvCtrl.itemProxy.analysis.extendedTokenSummaryList 
                         | filter:tvCtrl.filterTokens 
-                        | orderBy:tvCtrl.analysisSummarySortField 
+                        | orderBy:tvCtrl.sortField:tvCtrl.reverse
                         | limitTo:tvCtrl.loadLimit">
                <td ng-click="tvCtrl.submitStringFilter(summary.text)"
                      class="tree-label"
