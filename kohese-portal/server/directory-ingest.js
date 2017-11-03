@@ -20,7 +20,7 @@ function importFiles(files, parentId) {
   }
   
   basePath = Path.parse(files[0]).dir;
-  var tempDir = "tmp-" + Math.floor((Math.random() * 10000) + 1);
+  var tempDir = 'tmp-' + Math.floor((Math.random() * 10000) + 1);
   tempDirPath = Path.join(basePath,tempDir);
 
   try {
@@ -62,41 +62,51 @@ function processToMarkdown(filePath, basePath) {
   case '.doc':
     // doc processing
     console.log('::: Processing doc to odt to md');
-    var soffice = child.spawnSync('soffice', ['--headless', '--convert-to', 'odt', pathDirBase, '--outdir', Path.join(tempDirPath, path.dir) ], { cwd: basePath, encoding : 'utf8' });
+    var soffice = child.spawnSync('soffice', 
+        ['--headless', '--convert-to', 'odt', pathDirBase, 
+          '--outdir', Path.join(tempDirPath, path.dir) ], { cwd: basePath, encoding : 'utf8' });
     if(soffice.stdout) {
       console.log(soffice.stdout);
     }
-    var pandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', "commonmark", '--atx-headers', (tempPathDirName + '.odt'), '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
-    if(pandoc.stdout) {
-      console.log(pandoc.stdout);
+    var docPandoc = child.spawnSync('pandoc', 
+        ['-f', 'odt', '-t', 'commonmark', '--atx-headers', (tempPathDirName + '.odt'), 
+          '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    if(docPandoc.stdout) {
+      console.log(docPandoc.stdout);
     }
-    if(pandoc.stderr) {
-      console.log(pandoc.stderr);
+    if(docPandoc.stderr) {
+      console.log(docPandoc.stderr);
     }
     break;
   case '.odt':
     // odt processing
     console.log('::: Processing odt to md');
-    var pandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', "commonmark", '--atx-headers', pathDirBase, '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
-    if(pandoc.stdout) {
-      console.log(pandoc.stdout);
+    var odtPandoc = child.spawnSync('pandoc', 
+        ['-f', 'odt', '-t', 'commonmark', '--atx-headers', pathDirBase, '-o', mdOutPath], 
+        { cwd: basePath, encoding : 'utf8' });
+    if(odtPandoc.stdout) {
+      console.log(odtPandoc.stdout);
     }
     break;
   case '.docx':
     // docx processing
     console.log('::: Processing docx to md');
-    var pandoc = child.spawnSync('pandoc', ['-f', 'docx', '-t', "commonmark", '--atx-headers', pathDirBase, '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
-    if(pandoc.stdout) {
-      console.log(pandoc.stdout);
+    var docxPandoc = child.spawnSync('pandoc', 
+        ['-f', 'docx', '-t', 'commonmark', '--atx-headers', pathDirBase,
+          '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    if(docxPandoc.stdout) {
+      console.log(docxPandoc.stdout);
     }
     break;
   case '.htm':
   case '.html':
     // html processing
     console.log('::: Processing html to md');
-    var pandoc = child.spawnSync('pandoc', ['-f', 'html', '-t', "commonmark", '--atx-headers', pathDirBase, '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
-    if(pandoc.stdout) {
-      console.log(pandoc.stdout);
+    var htmlPandoc = child.spawnSync('pandoc', 
+        ['-f', 'html', '-t', 'commonmark', '--atx-headers', pathDirBase, 
+          '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    if(htmlPandoc.stdout) {
+      console.log(htmlPandoc.stdout);
     }
     break;
   case '.md':
@@ -123,7 +133,7 @@ function process(file, parent, addedIds) {
   
   if (fileStat.isDirectory()) {
     fs.mkdirSync(tmpPath);
-    var fileObj = global.app.models["Item"].upsert({
+    var fileObj = global.app.models['Item'].upsert({
       name: Path.basename(tmpPath),
       parentId: parent
       }, {}, function () {
@@ -136,7 +146,7 @@ function process(file, parent, addedIds) {
   } else if (fileStat.isFile()) {
     var processedFile = processToMarkdown(file, basePath);
     if (processedFile.wasProcessed && fs.existsSync(processedFile.outputPath)) {
-      console.log("Processing " + processedFile.outputPath + "...");
+      console.log('Processing ' + processedFile.outputPath + '...');
       var mdRoot = {
         name: Path.basename(processedFile.outputPath),
         parentId: parent,

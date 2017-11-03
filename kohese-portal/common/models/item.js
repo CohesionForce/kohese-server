@@ -56,11 +56,11 @@ module.exports = function (Item) {
         if (ctx.instance) {
         	global.koheseKDB.storeModelInstance(ctx.Model.modelName, ctx.instance.toObject()).then(function (status) {
         	  console.log('Saved %s #%s#%s#', ctx.Model.modelName, ctx.instance.id, ctx.instance.name);
-            var notification = new Object();
+            var notification = {};
             notification.kind = ctx.Model.modelName;
             notification.item = ctx.instance;
             notification.status = status;
-            console.log("Change Instance:" + JSON.stringify(notification));
+            console.log('Change Instance:' + JSON.stringify(notification));
             if (ctx.isNewInstance) {
                 notification.type = 'create';
                 kio.server.emit(ctx.Model.modelName +'/create', notification);
@@ -75,7 +75,7 @@ module.exports = function (Item) {
             console.log('*** Updated %s matching %j',
                 ctx.Model.pluralModelName,
                 ctx.where);
-            var notification = new Object();
+            var notification = {};
             notification.kind = ctx.Model.pluralModelName;
             notification.id = ctx.where.id;
             notification.ctx = ctx;
@@ -87,14 +87,14 @@ module.exports = function (Item) {
                 notification.type = 'update';
                 kio.server.emit(ctx.Model.modelName +'/update', notification);
             }
-            console.log("*** Change Multiple: " + JSON.stringify(notification));
+            console.log('*** Change Multiple: ' + JSON.stringify(notification));
             
             next();
         }
         
-        if(ctx.Model.modelName === "Item"){
+        if(ctx.Model.modelName === 'Item'){
           //var Analysis = app.models.Analysis;
-          console.log("::: Need to call Analysis update logic");
+          console.log('::: Need to call Analysis update logic');
         }
     };
     
@@ -103,7 +103,7 @@ module.exports = function (Item) {
     //////////////////////////////////////////////////////////////////////////
     Item.afterDeleteKohese = function (ctx, next) {
         console.log('::: After delete - ' + ctx.Model.modelName);
-        var notification = new Object();
+        var notification = {};
         if (ctx.instance) {
             console.log('Deleted %s #%s#', ctx.Model.modelName, ctx);
             notification.type = 'delete';
@@ -114,7 +114,7 @@ module.exports = function (Item) {
             notification.type = 'delete';
             notification.kind = ctx.Model.modelName;
             notification.id = ctx.where.id;
-            console.log("Change: " + JSON.stringify(notification));
+            console.log('Change: ' + JSON.stringify(notification));
             kio.server.emit(ctx.Model.modelName +'/delete', notification);
             global.koheseKDB.removeModelInstance(ctx.Model.modelName, notification.id);
         }
@@ -126,17 +126,17 @@ module.exports = function (Item) {
     //
     //////////////////////////////////////////////////////////////////////////
     Item.getHistory = function(req, onId, cb) {
-      //console.log("::: Getting history for " + onId);
+      //console.log('::: Getting history for ' + onId);
 
       var proxy = global.koheseKDB.ItemProxy.getProxyFor(onId);
-      console.log("::: Getting history for " + proxy.repoPath);
+      console.log('::: Getting history for ' + proxy.repoPath);
       
       global.koheseKDB.kdbRepo.walkHistoryForFile(proxy, function(history){
         
         if (history) {
           cb(null, history);
         } else {
-          cb({error: "history error"}, null);
+          cb({error: 'history error'}, null);
         }        
       });
 
@@ -162,23 +162,25 @@ module.exports = function (Item) {
     });
 
     Item.afterRemoteError('getHistory', function(ctx, next) {
+      // jshint -W106
       ctx.res.status(ctx.error.http_code).end(ctx.error.message);
+      // jshint +W106
     });
     
     //////////////////////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////////////////////
     Item.getStatus = function(req, onId, cb) {
-      console.log("::: Getting status for " + onId);
+      console.log('::: Getting status for ' + onId);
       //var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
       global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.ItemProxy.getProxyFor(onId), function(status){
         
         if (status) {
           cb(null, status);
         } else {
-          console.log("*** Error (Returned from getStatus)");
+          console.log('*** Error (Returned from getStatus)');
           console.log(status);
-          cb({error: "status error"}, null);
+          cb({error: 'status error'}, null);
         }        
       });
 
@@ -203,9 +205,12 @@ module.exports = function (Item) {
     });
 
     Item.afterRemoteError('getStatus', function(ctx, next) {
-      console.log("*** Error (After Remote)");
+      console.log('*** Error (After Remote)');
       console.log(ctx.error);
+      // jshint -W106
       ctx.res.status(ctx.error.http_code).end(ctx.error.message);
+      // jshint +W106
+
     });
     
     //////////////////////////////////////////////////////////////////////////
@@ -219,26 +224,27 @@ module.exports = function (Item) {
       var result = {};
 
       if (!proxy){
-        console.log("*** Could not find proxy for: " + forItemId);        
-        cb({error: "Item not found: " + forItemId}, null);
+        console.log('*** Could not find proxy for: ' + forItemId);        
+        cb({error: 'Item not found: ' + forItemId}, null);
         return;
       }
 
-      console.log("::: Found proxy for: " + forItemId + " - " + proxy.item.name);        
+      console.log('::: Found proxy for: ' + forItemId + ' - ' + proxy.item.name);        
 
       var reportTime = new Date();
 
-      var outputBuffer = "::: Dump of " + forItemId + ": " + proxy.item.name + " at " + reportTime.toDateString() + " " + reportTime.toTimeString() + "\n\n";
+      var outputBuffer = '::: Dump of ' + forItemId + ': ' + proxy.item.name + ' at ' +
+          reportTime.toDateString() + ' ' + reportTime.toTimeString() + '\n\n';
 
       outputBuffer += proxy.getDocument(showUndefined);
 
-      var itemName = proxy.item.name.replace(/[:\/]/g, " ");
-      var fileBasename ="dump." + forItemId + "." + itemName;
-      var dumpFile= "tmp_reports/" + fileBasename + ".md";
-      console.log("::: Creating: " + dumpFile);
+      var itemName = proxy.item.name.replace(/[:\/]/g, ' ');
+      var fileBasename ='dump.' + forItemId + '.' + itemName;
+      var dumpFile= 'tmp_reports/' + fileBasename + '.md';
+      console.log('::: Creating: ' + dumpFile);
       
       fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});
-      result.markdown = "reports/" + fileBasename + ".md";
+      result.markdown = 'reports/' + fileBasename + '.md';
       
       if (outFormat) {
         console.log('::: Now spawning pandoc...');
@@ -248,7 +254,7 @@ module.exports = function (Item) {
         if(pandoc.stdout) {
           console.log(pandoc.stdout);
         }
-        result[outFormat] = "reports/" + fileBasename + '.' + outFormat;
+        result[outFormat] = 'reports/' + fileBasename + '.' + outFormat;
         console.log('Pandoc done!');
       }
       
@@ -260,7 +266,7 @@ module.exports = function (Item) {
     //
     //////////////////////////////////////////////////////////////////////////
     Item.generateHTMLReport = function(req, onId, cb) {
-      console.log("::: Generating HTML Report for " + onId);
+      console.log('::: Generating HTML Report for ' + onId);
 
       Item.generateReport(req, onId, 'html', cb);
       
@@ -284,14 +290,16 @@ module.exports = function (Item) {
     });
 
     Item.afterRemoteError('generateHTMLReport', function(ctx, next) {
+      // jshint -W106
       ctx.res.status(ctx.error.http_code).end(ctx.error.message);
+      // jshint +W106
     });
     
     //////////////////////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////////////////////
     Item.generateDOCXReport = function(req, onId, cb) {
-      console.log("::: Generating DOCX Report for " + onId);
+      console.log('::: Generating DOCX Report for ' + onId);
 
 
       Item.generateReport(req, onId, 'docx', cb);
@@ -316,7 +324,9 @@ module.exports = function (Item) {
     });
 
     Item.afterRemoteError('generateDOCXReport', function(ctx, next) {
+      // jshint -W106
       ctx.res.status(ctx.error.http_code).end(ctx.error.message);
+      // jshint +W106
     });
     
     //////////////////////////////////////////////////////////////////////////

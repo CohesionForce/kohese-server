@@ -4,8 +4,69 @@
   var _und = require('underscore');
   var request = require('request');
 
+  var lookup = {
+      CC: 'Coordinating Conjuction',
+      LS: 'List Item',
+      PRPS: 'Possessive Pronoun',
+      VBD: 'Past Tense Verb',
+      CD: 'Cardinal Number',
+      MD: 'Modal',
+      RB: 'Adverb',
+      VBG: 'Present Participle Verb',
+      DT: 'Determiner',
+      NN: 'Noun',
+      RBR: 'Comparative Adverb',
+      VBN: 'Past Participle Verb',
+      EX: 'Existential There',
+      NNS: 'Plural Noun',
+      RBS: 'Superlative Adverb',
+      VBP: 'Non-3rd Present Verb',
+      FW: 'Foreign Word',
+      NNP: 'Proper Noun',
+      RP: 'Particle',
+      VBZ: '3rd Person Present Verb',
+      IN: 'Preposition',
+      NNPS: 'Plural Proper Noun',
+      SYM: 'Symbol',
+      WDT: 'WH Determiner',
+      JJ: 'Adjective',
+      PDT: 'Predeterminer',
+      TO: 'To',
+      WP: 'WH Pronoun',
+      JJR: 'Comparative Adjective',
+      POS: 'Possessive Ending',
+      UH: 'Interjection',
+      WPS: 'Possessive WH Pronoun',
+      JJS: 'Superlative Adjective',
+      PRP: 'Personal Pronoun',
+      VB: 'Verb',
+      WRB: 'WH Adverb',
+      ADJP: 'Adjective',
+      NP: 'Noun Phrase',
+      UCP: 'Unlike Coordinated Phrase',
+      ADVP: 'Adverb',
+      NX: 'Head Noun',
+      VP: 'Verb Phrase',
+      CONJP: 'Conjunction',
+      PP: 'Prepositional',
+      WHADJP: 'WH Adjective',
+      FRAG: 'Fragment',
+      PRN: 'Parenthetical',
+      WHAVP: 'WH Adverb',
+      INTJ: 'Interjection',
+      PRT: 'Particle',
+      WHNP: 'WH Noun',
+      LST: 'List',
+      QP: 'Quantifier',
+      WHPP: 'WH Prepositional',
+      NAC: 'Not A Constituent',
+      RRC: 'Reduced Relative Clause',
+      X: 'Unknown',
+      XKPC: 'Pseudo Chunk'
+  };
+
   function requestAnalysisJSON(forModelKind, onId, cb) {
-    console.log('::: ANALYZING: ' + forModelKind + " - " + onId);
+    console.log('::: ANALYZING: ' + forModelKind + ' - ' + onId);
 
     var instance = global.koheseKDB.retrieveModelInstance(forModelKind, onId);
 
@@ -14,7 +75,7 @@
     analysis.id = onId;
     analysis.raw = {};
     analysis.forModelKind = forModelKind;
-    analysis.name = "Analysis for: " + instance.name;
+    analysis.name = 'Analysis for: ' + instance.name;
 
     if (instance.name) {
       requestData.name = instance.name;
@@ -27,7 +88,7 @@
     }
 
     var options = {
-      uri : "http://localhost:9091/services/analysis",
+      uri : 'http://localhost:9091/services/analysis',
       method : 'POST',
       json : true,
       body : requestData
@@ -39,45 +100,48 @@
       if (analysisError) {
         var error = new Error(
             '*** Failure while communicating with Analysis server');
+        
+        // jshint -W106
         error.http_code = 504;
+        // jshint +W106 
+        
         error.code = analysisError.code;
         error.syscall = analysisError.syscall;
         console.log(error);
         cb({error: error});
 
-        console.log("*** Error:");
+        console.log('*** Error:');
         console.log(error);
       } else {
-        // console.log("--- Body:");
+        // console.log('--- Body:');
         // console.log(analysisBody);
 
         try {
-          var analysisBody;
           for ( var key in analysisBody) {
             analysis.raw[key] = JSON.parse(analysisBody[key]);
           }
           consolidateAnalysis(analysis);
           // delete the raw data
           delete analysis.__data.raw;
-          global.koheseKDB.storeModelInstance("Analysis", analysis).then(function (status) {
+          global.koheseKDB.storeModelInstance('Analysis', analysis).then(function (status) {
             console.log('::: ANALYSIS Completed: ' + onId);
 
             cb(analysis);
           });
         } catch (err) {
-          console.log("*** Error parsing result for: " + forModelKind + "- "
-              + onId + " - " + analysis.name);
-          console.log("Analysis response body:  >>>");
+          console.log('*** Error parsing result for: ' + forModelKind + ' - ' +
+              onId + ' - ' + analysis.name);
+          console.log('Analysis response body:  >>>');
           console.log(analysisBody);
-          console.log("<<<");
+          console.log('<<<');
           console.log(err);
           console.log(err.stack);
           
-          var error = new Error(
+          var parseError = new Error(
           '*** Failure while parsing analysis');
-          error.onId = onId;
-          console.log(error);
-          cb({error: error});
+          parseError.onId = onId;
+          console.log(parseError);
+          cb({error: parseError});
 
         }
 
@@ -87,9 +151,9 @@
 
   function performAnalysis (forModelKind, onId, cb){
     
-    console.log("::: Preparing to analyze " + forModelKind + " " + onId);
+    console.log('::: Preparing to analyze ' + forModelKind + ' ' + onId);
 
-    var analysis = global.koheseKDB.retrieveModelInstance("Analysis", onId);
+    var analysis = global.koheseKDB.retrieveModelInstance('Analysis', onId);
     if (analysis) {
       cb(analysis);
     } else {
@@ -101,17 +165,17 @@
   function addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken){
     // Create a pseudo chunk to associate this token with
     var pseudoChunk = JSON.parse(JSON.stringify(nextToken));
-    pseudoChunk.chunkType = "XKPC";
+    pseudoChunk.chunkType = 'XKPC';
     delete pseudoChunk.pos;
     
-    addChunkToSummary(onAnalysis, key, "Pseudo-" + tokenIndex, pseudoChunk);
+    addChunkToSummary(onAnalysis, key, 'Pseudo-' + tokenIndex, pseudoChunk);
     addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);    
   }
 
   function addChunkToSummary(onAnalysis, key, chunkIndex, nextChunk) {
-    nextChunk.displayType = lookup[nextChunk.chunkType] + " ("
-        + nextChunk.chunkType + ")";
-    nextChunk.displayId = key + "-Chunk-" + chunkIndex;
+    nextChunk.displayType = lookup[nextChunk.chunkType] + ' (' +
+        nextChunk.chunkType + ')';
+    nextChunk.displayId = key + '-Chunk-' + chunkIndex;
     nextChunk.displayLevel = 3;
     onAnalysis.list.push(nextChunk);
 
@@ -121,7 +185,7 @@
       var chunkSummary = {};
       chunkSummary.text = nextChunk.text;
       chunkSummary.count = 1;
-      chunkSummary.displayType = "Chunk";
+      chunkSummary.displayType = 'Chunk';
       chunkSummary.posCount = {};
       onAnalysis.chunkSummary[nextChunk.text] = chunkSummary;
     }
@@ -134,8 +198,8 @@
   }
 
   function addTokenToSummary(onAnalysis, key, tokenIndex, nextToken) {
-    nextToken.displayType = lookup[nextToken.pos] + " (" + nextToken.pos + ")";
-    nextToken.displayId = key + "-Token-" + tokenIndex;
+    nextToken.displayType = lookup[nextToken.pos] + ' (' + nextToken.pos + ')';
+    nextToken.displayId = key + '-Token-' + tokenIndex;
     nextToken.displayLevel = 4;
     onAnalysis.list.push(nextToken);
 
@@ -145,7 +209,7 @@
       var tokenSummary = {};
       tokenSummary.text = nextToken.text;
       tokenSummary.count = 1;
-      tokenSummary.displayType = "Token";
+      tokenSummary.displayType = 'Token';
       tokenSummary.posCount = {};
       onAnalysis.tokenSummary[nextToken.text] = tokenSummary;
     }
@@ -189,8 +253,8 @@
 
         for (var sentenceIndex = 0; sentenceIndex < sentenceCount; sentenceIndex++) {
           var sentence = view.Sentence[sentenceIndex];
-          sentence.displayType = "Sentence";
-          sentence.displayId = key + "-Sentence-" + sentenceIndex;
+          sentence.displayType = 'Sentence';
+          sentence.displayId = key + '-Sentence-' + sentenceIndex;
           sentence.displayLevel = 2;
           onAnalysis.list.push(sentence);
 
@@ -215,8 +279,8 @@
             if (tokenIndex < tokenCount) {
               nextToken = view.Token[tokenIndex];
             }
-            while ((tokenIndex < tokenCount)
-                && (nextToken.end <= nextChunk.end)) {
+            while ((tokenIndex < tokenCount) &&
+                (nextToken.end <= nextChunk.end)) {
 
               addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);
               
@@ -236,8 +300,8 @@
           if (tokenIndex < tokenCount) {
             nextToken = view.Token[tokenIndex];
           }
-          while ((tokenIndex < tokenCount)
-              && (nextToken.end <= sentence.end)) {
+          while ((tokenIndex < tokenCount) &&
+              (nextToken.end <= sentence.end)) {
 
             addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken);
             
@@ -252,66 +316,4 @@
 
     onAnalysis.summaryList = _und.union(_und.values(onAnalysis.chunkSummary),
         _und.values(onAnalysis.tokenSummary));
-  };
-
-  var lookup = {};
-  lookup.CC = "Coordinating Conjuction";
-  lookup.LS = "List Item";
-  lookup.PRPS = "Possessive Pronoun";
-  lookup.VBD = "Past Tense Verb";
-  lookup.CD = "Cardinal Number";
-  lookup.MD = "Modal";
-  lookup.RB = "Adverb";
-  lookup.VBG = "Present Participle Verb";
-  lookup.DT = "Determiner";
-  lookup.NN = "Noun";
-  lookup.RBR = "Comparative Adverb";
-  lookup.VBN = "Past Participle Verb";
-  lookup.EX = "Existential There";
-  lookup.NNS = "Plural Noun";
-  lookup.RBS = "Superlative Adverb";
-  lookup.VBP = "Non-3rd Present Verb";
-  lookup.FW = "Foreign Word";
-  lookup.NNP = "Proper Noun";
-  lookup.RP = "Particle";
-  lookup.VBZ = "3rd Person Present Verb";
-  lookup.IN = "Preposition";
-  lookup.NNPS = "Plural Proper Noun";
-  lookup.SYM = "Symbol";
-  lookup.WDT = "WH Determiner";
-  lookup.JJ = "Adjective";
-  lookup.PDT = "Predeterminer";
-  lookup.TO = "To";
-  lookup.WP = "WH Pronoun";
-  lookup.JJR = "Comparative Adjective";
-  lookup.POS = "Possessive Ending";
-  lookup.UH = "Interjection";
-  lookup.WPS = "Possessive WH Pronoun";
-  lookup.JJS = "Superlative Adjective";
-  lookup.PRP = "Personal Pronoun";
-  lookup.VB = "Verb";
-  lookup.WRB = "WH Adverb";
-  lookup.ADJP = "Adjective";
-  lookup.NP = "Noun Phrase";
-  lookup.UCP = "Unlike Coordinated Phrase";
-  lookup.ADVP = "Adverb";
-  lookup.NX = "Head Noun";
-  lookup.VP = "Verb Phrase";
-  lookup.CONJP = "Conjunction";
-  lookup.PP = "Prepositional";
-  lookup.WHADJP = "WH Adjective";
-  lookup.FRAG = "Fragment";
-  lookup.PRN = "Parenthetical";
-  lookup.WHAVP = "WH Adverb";
-  lookup.INTJ = "Interjection";
-  lookup.PRT = "Particle";
-  lookup.WHNP = "WH Noun";
-  lookup.LST = "List";
-  lookup.QP = "Quantifier";
-  lookup.WHPP = "WH Prepositional";
-  lookup.NAC = "Not A Constituent";
-  lookup.RRC = "Reduced Relative Clause";
-
-  // Does this (X) really exist?
-  lookup.X = "Unknown";
-  lookup.XKPC = "Pseudo Chunk";
+  }

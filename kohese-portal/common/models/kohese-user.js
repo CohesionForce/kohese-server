@@ -36,7 +36,7 @@ module.exports = function(KoheseUser) {
 	      }
 	    }, function(err, principal) {
 	      if(principal.length === 0){
-	        console.log("::: Creating Users Item");
+	        console.log('::: Creating Users Item');
 	        var now = Date.now();
 	        Item.create({
 	           name: 'Users',
@@ -46,15 +46,15 @@ module.exports = function(KoheseUser) {
 	           modifiedBy: 'admin',
 	           modifiedOn: now
 	          }, function(err, item){
-	            console.log(">>> " + err);
-	            console.log("::: Created Users Item");
-	            console.log(JSON.stringify(item,null,"  "));
+	            console.log('>>> ' + err);
+	            console.log('::: Created Users Item');
+	            console.log(JSON.stringify(item,null,'  '));
 	            usersItem = item;
 	            checkAndCreateAdminAccount();
 	          });
 	        } else {
-	          console.log("::: Users Item already exists");
-	          console.log(JSON.stringify(principal[0],null,"  "));
+	          console.log('::: Users Item already exists');
+	          console.log(JSON.stringify(principal[0],null,'  '));
 	          usersItem = principal[0];
 	          checkAndCreateAdminAccount();
 	        }
@@ -69,7 +69,7 @@ module.exports = function(KoheseUser) {
 	      }
 	    }, function(err, principal) {
 	      if(principal.length === 0){
-	        console.log("::: Creating admin account");
+	        console.log('::: Creating admin account');
 	        var now = Date.now();
 	        KoheseUser.create({
 	           name: 'admin',
@@ -81,10 +81,10 @@ module.exports = function(KoheseUser) {
 	           modifiedBy: 'admin',
 	           modifiedOn: now
 	          }, function(err, principal){
-	            console.log("::: Created admin account");
+	            console.log('::: Created admin account');
 	          });
 	        } else {
-	          console.log("::: Admin account already exists");
+	          console.log('::: Admin account already exists');
 	        }
 	    });    
 	  }
@@ -139,7 +139,7 @@ module.exports = function(KoheseUser) {
   // This function is an adaptation of the Loopback User.login function
   // cb (err, user)
   KoheseUser.login = function (username, password, cb){
-    console.log("::: Preparing to evaluate credentials");
+    console.log('::: Preparing to evaluate credentials');
 
     this.findOne({where: {name: username}}, function(err, user) {
       if (err) {
@@ -154,12 +154,12 @@ module.exports = function(KoheseUser) {
             cb(null, user);
           } else {
             console.log('*** The password is invalid for user %s', username);
-            cb("Invalid password", null);
+            cb('Invalid password', null);
           }
         });
       } else {
         console.log('*** No matching record is found for user %s', username);
-        cb("No such user", null);
+        cb('No such user', null);
       }
     });
   };

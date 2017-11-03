@@ -9,7 +9,7 @@ var net = require('net');
 var util = require('util');
 var kio = require('./koheseIO.js');
 
-console.log("::: Starting Remote REPL Interface");
+console.log('::: Starting Remote REPL Interface');
 var replServer = net.createServer(function(socket) {
 
     socket.on('error', function(err) {
@@ -24,8 +24,8 @@ var replServer = net.createServer(function(socket) {
         output: socket
     });
 
-    replConsole.outputStream.write("\nType '.help' for commands. \n");
-    replConsole.outputStream.write("Note: All commands must be prefaced with '.'\n");
+    replConsole.outputStream.write('\nType \'.help\' for commands. \n');
+    replConsole.outputStream.write('Note: All commands must be prefaced with \'.\'\n');
     replConsole.displayPrompt();
 
     replConsole.on('exit', function() {
@@ -81,7 +81,9 @@ function defineCommands(replConsole) {
             var kdbPath = global.koheseKDB.ItemProxy.getRootProxy().repoPath;
             kdbPath = kdbPath.replace(/\/Root.json$/,'');
             kdbPath = kdbPath.replace(/^kdb\//, '');
-            child.spawn('gnome-terminal', ['-e', 'node . -kdb=' + kdbPath + ' repl', '--title', 'Kohese Server : ' + kdbPath], {detached: true});
+            child.spawn('gnome-terminal', 
+                ['-e', 'node . -kdb=' + kdbPath + ' repl', '--title', 'Kohese Server : ' + kdbPath], 
+                {detached: true});
             process.exit();
             // If the current process exits before spawning a new one may need to do:
             // setTimeout(function() {process.exit()} , 100)

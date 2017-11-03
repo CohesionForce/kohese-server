@@ -1,6 +1,6 @@
 {
   "node": true,
-  "esnext": true,
+  "esversion": 6,
   "bitwise": true,
   "camelcase": true,
   "eqeqeq": true,
@@ -17,5 +17,6 @@
   "unused": false,
   "trailing": true,
   "sub": true,
-  "maxlen": 80
+  "maxlen": 120,
+  "jasmine": true
 }

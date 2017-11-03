@@ -2,12 +2,13 @@
  * 
  */
 
-var kio = require("./koheseIO.js");
+var kio = require('./koheseIO.js');
 var SocketIOFile = require('socket.io-file');
 
 global.app.on('newSession', function (socket) {
 
-  console.log('>>> KIO File Server: session %s connected from %s for %s', socket.id, socket.handshake.address, socket.koheseUser.username);
+  console.log('>>> KIO File Server: session %s connected from %s for %s',
+      socket.id, socket.handshake.address, socket.koheseUser.username);
 
   var uploader = new SocketIOFile(socket, {
     uploadDir: 'data_import/' + socket.koheseUser.username,
@@ -23,7 +24,8 @@ global.app.on('newSession', function (socket) {
   });
   
   uploader.on('start', (fileInfo) => {
-    console.log('::: session %s: Received File/Upload for %s for user %s at %s', socket.id, fileInfo.name, socket.koheseUser.username, socket.handshake.address);
+    console.log('::: session %s: Received File/Upload for %s for user %s at %s',
+        socket.id, fileInfo.name, socket.koheseUser.username, socket.handshake.address);
     console.log('::: File: Start uploading');
     console.log(fileInfo);
   });
