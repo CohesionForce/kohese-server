@@ -20,12 +20,12 @@
             <br/> 
             <input class="input-sm" type="text" ng-model="tvCtrl.analysisFilterInput"
                    placeholder="Filter" style="margin: 5px"/>
-            <button ng-click="tvCtrl.submitStringFilter()" 
+            <button ng-click="tvCtrl.submitStringFilter(tvCtrl.analysisFilterInput)" 
                     class=" btn btn-default fa fa-search"> Submit
             </button>
             <label for="term-limit">Limit
                   <input type="text" 
-                        ng-model="tvCtrl.analysisTokenLimit"/>
+                        ng-model="tvCtrl.loadLimit"/>
             </label>
             <!-- <button ng-click="tvCtrl.getLastFilter()" 
                     class="btn btn-default fa fa-chevron-left"> Last Filter
@@ -52,7 +52,7 @@
                ng-repeat="summary in tvCtrl.itemProxy.analysis.extendedTokenSummaryList 
                         | filter:tvCtrl.filterTokens 
                         | orderBy:tvCtrl.analysisSummarySortField 
-                        | limitTo:tvCtrl.analysisTokenLimit">
+                        | limitTo:tvCtrl.loadLimit">
                <td ng-click="tvCtrl.submitStringFilter(summary.text)"
                      class="tree-label"
                      ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight"></td>

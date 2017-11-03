@@ -4,7 +4,7 @@
                 <span><b>Chunk Summary</b>  ({{cvCtrl.getChunkCount()}})</span>
                 <span class="col-xs-4 pull-right"> 
                 <b>Limit</b>
-                <input class="input-sm col-xs-6 pull-right" type="number" ng-model="cvCtrl.analysisChunkLimit"
+                <input class="input-sm col-xs-6 pull-right" type="number" ng-model="cvCtrl.loadLimit"
                 placeholder="Chunk Limit"/>
                 </span>
           </div>
@@ -21,7 +21,7 @@
                         ng-repeat="summary in cvCtrl.itemProxy.analysis.extendedChunkSummaryList 
                                 | filter:cvCtrl.filterChunks 
                                 | orderBy:cvCtrl.analysisSummarySortField 
-                                | limitTo:cvCtrl.analysisChunkLimit">
+                                | limitTo:cvCtrl.loadLimit">
                 <td ng-click="cvCtrl.submitSummaryFilter(summary.text)"
                         class="tree-label"
                         ng-bind-html="summary.text | highlightRegex:cvCtrl.analysisFilterRegexHighlight"></td>

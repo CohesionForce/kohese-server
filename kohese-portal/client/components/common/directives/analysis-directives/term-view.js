@@ -10,7 +10,7 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
         ctrl.itemProxy = $scope.itemProxy;
 
         ctrl.analysisSummarySortField = ['-count', 'text'];
-        ctrl.analysisTokenLimit = 100;
+        ctrl.loadLimit = 100;
 
         ctrl.analysisFilterPOS = analysisService.filterPOS;
         ctrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
@@ -28,12 +28,14 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
         ctrl.analysisFilterRegex = null;
 
         // Event Listeners 
-        $scope.$on('tabSelected', function () {
-            tabService.bundleController(ctrl, 'ChunkViewController', currentTab.id);
-        });
 
         $scope.$watch('ctrl.analysisFilterString', onFilterChange);
     }
+
+    $scope.$on('tabSelected', function () {
+        tabService.bundleController(ctrl, 'TermViewController', currentTab.id);
+    });
+
     ctrl.fetchAnalysis = function () {
         analysisService.fetchAnalysis(ctrl.itemProxy).then(function (results) {
             $scope.$apply();

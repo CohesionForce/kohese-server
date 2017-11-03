@@ -5,7 +5,7 @@
           <span><b>Analysis Details</b>  ({{svCtrl.getDetailsItemCount()}})</span>
                 <span class="col-xs-4 pull-right"> 
                         <b>Limit</b>
-                        <input class="input-sm col-xs-6 pull-right" type="number" ng-model="svCtrl.analysisDetailsItemLimit"
+                        <input class="input-sm col-xs-6 pull-right" type="number" ng-model="svCtrl.loadLimit"
                         placeholder="Details Limit"/>
                 </span>
                 </div>
@@ -32,7 +32,7 @@
                         ng-repeat="listItem in svCtrl.itemProxy.analysis.extendedList 
                                 | filter:svCtrl.filterDetails 
                                 | orderBy:svCtrl.analysisDetailsSortField 
-                                | limitTo:svCtrl.analysisDetailsItemLimit">
+                                | limitTo:svCtrl.loadLimit">
                         <td class="indented">{{listItem.displayType}}</td>
                         <td ng-bind-html="listItem.text | highlightRegex:svCtrl.analysisFilterRegexHighlight"></td>
                         </tr>
