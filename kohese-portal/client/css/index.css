@@ -662,23 +662,23 @@ tab div {
   overflow: auto;
 }
 
-#analysis-view #chunk-view {
+#analysis-view #phrase-view {
   height: inherit;
   width: inherit;
 }
 
-#analysis-view #chunk-view .panel {
+#analysis-view #phrase-view .panel {
   height: calc(100% - 28.89px);
   width: 100%;
   overflow: hidden;
 }
 
-#analysis-view #chunk-view .panel .panel-body {
+#analysis-view #phrase-view .panel .panel-body {
   height: inherit;
   padding-right: 0px;
 }
 
-#analysis-view #chunk-view .panel .panel-body #chunk-div {
+#analysis-view #phrase-view .panel .panel-body #phrase-div {
   height: 95%;
   width: 100%;
   overflow: auto;

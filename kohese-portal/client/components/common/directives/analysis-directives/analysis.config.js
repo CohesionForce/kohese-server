@@ -3,7 +3,7 @@
 */
 
 export default ()=> {
-    require('./chunk-view')();
+    require('./phrase-view')();
     require('./sentence-view')();
     require('./term-view')();
 }

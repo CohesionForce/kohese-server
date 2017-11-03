@@ -1,9 +1,9 @@
-function ChunkViewController($scope, $timeout, tabService, analysisService){
+function PhraseViewController($scope, $timeout, tabService, analysisService){
     const ctrl = this;
     var currentTab = tabService.getCurrentTab();
 
     // Bundler Logic 
-    var controllerRestored = tabService.restoreControllerData(currentTab.id, 'ChunkViewController', this);
+    var controllerRestored = tabService.restoreControllerData(currentTab.id, 'PhraseViewController', this);
     
     if(!controllerRestored) {
         // Initialization Block
@@ -27,7 +27,7 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
     }
 
     $scope.$on('tabSelected', function () {
-        tabService.bundleController(ctrl, 'ChunkViewController', currentTab.id);
+        tabService.bundleController(ctrl, 'PhraseViewController', currentTab.id);
     });
 
     $scope.$on('newAnalysisFilter', (event, filter)=>{
@@ -42,7 +42,7 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
         });
       };
 
-    ctrl.filterChunks = function(summary) {
+    ctrl.filterPhrases = function(summary) {
     var MatchesStringFilter;
     var MatchesPOS = ctrl.analysisFilterPOS(summary,
             ctrl.analysisPOSFilterCriteria[ctrl.analysisPOSFilterName]) 
@@ -56,11 +56,11 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
     };
 
     ctrl.submitSummaryFilter = function(text){
-        $scope.$emit('newChunkFilter', text);
+        $scope.$emit('newPhraseFilter', text);
     }
 
-    ctrl.getChunkCount = function () {
-        return $('#theChunksBody').find("tr").length;
+    ctrl.getPhraseCount = function () {
+        return $('#thePhrasesBody').find("tr").length;
       };
 
     function onFilterChange() {
@@ -109,19 +109,19 @@ function ChunkViewController($scope, $timeout, tabService, analysisService){
     ctrl.fetchAnalysis();
 }
 
-function ChunkViewDirective(){
+function PhraseViewDirective(){
     return {
         restrict: 'E',
-        controller: 'ChunkViewController as cvCtrl',
+        controller: 'PhraseViewController as pvCtrl',
         scope: {
             itemProxy: '='
         },
-        templateUrl: 'components/common/directives/analysis-directives/chunk-view.html'
+        templateUrl: 'components/common/directives/analysis-directives/phrase-view.html'
     }
 }
 
 export default () =>{
-    angular.module('app.directives.chunkview', ['app.services.tabservice'])
-        .directive('chunkView', ChunkViewDirective)
-        .controller('ChunkViewController', ChunkViewController);
+    angular.module('app.directives.phraseview', ['app.services.tabservice'])
+        .directive('phraseView', PhraseViewDirective)
+        .controller('PhraseViewController', PhraseViewController);
 }

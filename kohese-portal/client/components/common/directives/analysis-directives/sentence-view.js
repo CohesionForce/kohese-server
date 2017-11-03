@@ -41,7 +41,7 @@ function SentenceViewController($scope, $timeout, tabService, analysisService){
                  (ctrl.analysisFilterRegex.test(listItem.item.name)) || 
                  (ctrl.analysisFilterRegex.test(listItem.item.description)))) || 
                (((listItem.displayLevel == 2) && ctrl.showSentencesInDetails) || 
-                ((listItem.displayLevel == 3) && ctrl.showChunksInDetails) || 
+                ((listItem.displayLevel == 3) && ctrl.showPhrasesInDetails) || 
                 ((listItem.displayLevel == 4) && ctrl.showTokensInDetails)
                 ) &&
                 ((ctrl.analysisFilterRegex === null) || ctrl.analysisFilterRegex.test(listItem.text));

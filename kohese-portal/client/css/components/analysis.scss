@@ -31,7 +31,7 @@
             }
         }
     }
-    #chunk-view{
+    #phrase-view{
         height: inherit;
         width: inherit;
         .panel{
@@ -41,7 +41,7 @@
             .panel-body {
                 height: inherit;
                 padding-right: 0px;
-                #chunk-div{
+                #phrase-div{
                     height: 95%;
                     width: 100%;
                     overflow: auto;

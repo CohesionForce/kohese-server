@@ -22,7 +22,7 @@ function AnalysisController($scope, $stateParams, ItemRepository, tabService) {
 
     $scope.$on('newTermFilter', newAnalysisFilter);
 
-    $scope.$on('newChunkFilter', newAnalysisFilter);
+    $scope.$on('newPhraseFilter', newAnalysisFilter);
 
     function newAnalysisFilter(event, string) {
         event.stopPropagation();

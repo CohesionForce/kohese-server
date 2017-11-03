@@ -38,7 +38,7 @@ const appModule = angular.module('app', [
     'app.directives.documentview',
     'app.directives.termview',
     'app.directives.sentenceview',
-    'app.directives.chunkview',
+    'app.directives.phraseview',
     'app.constants.endpoints',
     require('angular-ui-router'),
     'angular-jwt',

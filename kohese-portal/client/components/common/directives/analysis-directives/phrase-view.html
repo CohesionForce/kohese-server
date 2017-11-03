@@ -1,0 +1,47 @@
+<div class="panel">
+        <div class="panel-heading">Phrase View - ({{pvCtrl.getPhraseCount()}}) Phrases</div>
+        <div class="panel-body">                <div>
+                <span class="col-xs-4 pull-right"> 
+                <b>Limit</b>
+                <input class="input-sm col-xs-6 pull-right" type="number" ng-model="pvCtrl.loadLimit"
+                placeholder="Phrase Limit"/>
+                </span>
+          </div>
+          <div   id="phrase-div">
+            <table id="thePhrasesSummary"
+                class="table tree-grid table-striped table-condensed table-hover">
+                <thead>
+                <th><span ng-click="pvCtrl.newSort('-text')">
+                        Text
+                        <span ng-if="pvCtrl.sortField === '-text'">
+                        <i ng-if="pvCtrl.reverse" class="fa fa-chevron-up"></i>
+                        <i ng-if="!pvCtrl.reverse" class="fa fa-chevron-down"></i>
+                        </span>
+                </span></th>
+                <th ng-click="pvCtrl.newSort('-count')">
+                        <span>Count
+                        <span ng-if="pvCtrl.sortField === '-count'">
+                        <i ng-if="tvCtrl.reverse" class="fa fa-chevron-up"></i>
+                        <i ng-if="!tvCtrl.reverse" class="fa fa-chevron-down"></i>
+                        </span>
+                        </span>
+                        </th>
+                <th>POS Count</th>
+                </thead>
+                <tbody id="thePhrasesBody">
+                <tr class="tree-grid-row" id="Phrase:{{summary.text}}"
+                        ng-repeat="summary in pvCtrl.itemProxy.analysis.extendedChunkSummaryList 
+                                | filter:pvCtrl.filterPhrases 
+                                | orderBy:pvCtrl.sortField:pvCtrl.reverse 
+                                | limitTo:pvCtrl.loadLimit">
+                <td ng-click="pvCtrl.submitSummaryFilter(summary.text)"
+                        class="tree-label"
+                        ng-bind-html="summary.text | highlightRegex:pvCtrl.analysisFilterRegexHighlight"></td>
+                <td>{{summary.count}}</td>
+                <td>{{summary.posCount}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
