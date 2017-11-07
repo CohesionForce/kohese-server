@@ -91,10 +91,8 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
             ctrl.analysisPOSFilterCriteria[ctrl.analysisPOSFilterName])
         var RegexFilterReturn = ((ctrl.analysisFilterRegex === null) ||
             ctrl.analysisFilterRegex.test(summary.text));
-        return (POSFilterReturn && RegexFilterReturn)
+        return (POSFilterReturn && RegexFilterReturn);
 
-        // return ctrl.analysisFilterPOS(summary,ctrl.analysisPOSFilterCriteria[ctrl.analysisPOSFilterName]) && 
-        // ((ctrl.analysisFilterRegex === null) || ctrl.analysisFilterRegex.test(summary.text));
     };
 
     function onFilterChange() {
