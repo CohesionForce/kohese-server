@@ -5,12 +5,13 @@
 'use strict'; //Required for use of 'class'
 var _ = require('underscore');
 var SHA = require('jssha');
+var uuidV1 = require('uuid/v1');
+
 
 
 var tree = {};
 tree.proxyMap = {};
 tree.repoMap = {};
-tree.proxyTreeHashes = {};
 tree.modelMap = {
     'Internal': {},
     'Internal-Lost': {},
@@ -30,6 +31,11 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   constructor(kind, forItem) {
     var itemId = forItem.id;
+    
+    if (!itemId){
+      itemId = forItem.id = uuidV1();
+      console.log('::: Allocating new id: ' + itemId);
+    }
 
     var proxy = tree.proxyMap[itemId];
     if (!proxy) {
@@ -224,7 +230,6 @@ class ItemProxy {
       treeHashEntry.parentId = this.item.parentId;
     }
     
-    tree.proxyTreeHashes[this.item.id] = treeHashEntry;
     this.treeHashEntry = treeHashEntry;
     
     // Propagate changes up the tree
@@ -239,8 +244,6 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static calculateAllTreeHashes() {
-    tree.proxyTreeHashes = {};
-    
     const deferred = true;
     tree.root.visitTree(null, null, (proxy) => {
       proxy.calculateTreeHash(deferred);
@@ -324,12 +327,23 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getTreeHashMap() {
+    var treeHashMap = {};
+    this.visitTree({excludeKind : ['Repository']}, (proxy) => {
+      treeHashMap [proxy.item.id] = proxy.treeHashEntry;
+    });
+    return treeHashMap;    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static getRepoTreeHashes() {
     var repoTreeHashes = {};
     
     for(var repoIdx in tree.repoMap){
       var repoProxy = tree.repoMap[repoIdx];
-      repoTreeHashes[repoIdx] = repoProxy.treeHashEntry;
+      repoTreeHashes[repoIdx] = repoProxy.getTreeHashMap();
     }
     return repoTreeHashes;
   }

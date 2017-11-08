@@ -75,6 +75,9 @@ describe('KDB Test', function() {
       console.log('::: Writing the file');
       fs.writeFileSync('thm.out', JSON.stringify(treeHashMap, null, '  '), {encoding: 'utf8', flag: 'w'});      
 
+      var repoTreeHashMap = kdb.ItemProxy.getRepoTreeHashes();
+      fs.writeFileSync('rthm.out', JSON.stringify(repoTreeHashMap, null, '  '), {encoding: 'utf8', flag: 'w'});      
+      
 
       done();
     });
