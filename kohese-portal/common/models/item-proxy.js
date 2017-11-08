@@ -164,7 +164,6 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   validateItem(){
     
-    var missingProperties = [];
     var validationResult = {
       valid: true,
       missingProperties: []
