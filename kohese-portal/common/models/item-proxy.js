@@ -162,6 +162,29 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  validateItem(){
+    
+    var missingProperties = [];
+    var validationResult = {
+      valid: true,
+      missingProperties: []
+    };
+    
+    if (this.model && this.model.item && this.model.item.requiredProperties) {
+      this.model.item.requiredProperties.forEach((property) => {
+        if (!this.item.hasOwnProperty(property)) {
+          validationResult.valid = false;
+          validationResult.missingProperties.push(property);
+        }
+      });
+    }
+    
+    return validationResult;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   document() {
     this.checkPropertyOrder();
     return JSON.stringify(this.item, null, '  ');
@@ -943,6 +966,15 @@ class ItemProxy {
       // TODO this might eventually need to be moved to proxy
       var properties = modelProxy.parentProxy.item.orderedProperties || [];
       modelProxy.item.orderedProperties = Object.keys(modelProxy.item.properties).concat(properties);
+      
+      modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
+
+      for (var property in modelProxy.item.properties){
+        var propertySettings = modelProxy.item.properties[property];
+        if (propertySettings.required){
+          modelProxy.item.requiredProperties.push(property);
+        }
+      }
     }
   }
 }
