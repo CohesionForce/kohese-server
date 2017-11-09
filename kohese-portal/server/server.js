@@ -24,10 +24,10 @@ boot(app, __dirname, function (err) {
     if (require.main === module) {
       
       //Paths may be provided via arguments when starting via -kdb=PATH
-      var baseRepoPath = "kohese-kdb";
+      var baseRepoPath = 'kohese-kdb';
       for (var i = 2; i < process.argv.length; i++) {
-        var arg = process.argv[i].split("=");
-        if((arg[0] === "-kdb") && (arg[1] !== "")) {
+        var arg = process.argv[i].split('=');
+        if((arg[0] === '-kdb') && (arg[1] !== '')) {
           baseRepoPath = arg[1];
           break;
         }
