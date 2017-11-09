@@ -1,6 +1,5 @@
 
 function KoheseIO($rootScope, socketFactory, AuthTokenFactory) {
-
     var socket, ioSocket, isAuthenticated,
     self = {
         isInitialized: isInitialized,
@@ -13,9 +12,8 @@ function KoheseIO($rootScope, socketFactory, AuthTokenFactory) {
     self.socket = socket;
     
     // initializer function to connect the socket for the first time after logging in to the app
-    self.initialize = function()
-    {
-        console.log("+++ Initializing KoheseIO");
+    self.initialize = function() {
+        console.log('+++ Initializing KoheseIO');
 
         isAuthenticated = false;
         isInitialized = true;
@@ -47,29 +45,29 @@ function KoheseIO($rootScope, socketFactory, AuthTokenFactory) {
     }; /* End KoheseIO.initialize */
     
     self.connect = function() {
-        if (isInitialized){
-            console.log("+++ Connecting KoheseIO");
+        if (isInitialized) {
+            console.log('+++ Connecting KoheseIO');
             self.socket.connect();
-        } else {
+        }
+        else {
             self.initialize();
         }
     };
     
     self.disconnect = function() {
-        console.log("--- Disconnecting KoheseIO");
-        if (isInitialized)
-            {
+        console.log('--- Disconnecting KoheseIO');
+        if (isInitialized) {
             self.socket.disconnect();
             isAuthenticated = false;
             }        
         };
     
-    if (AuthTokenFactory.getToken()){
+    if (AuthTokenFactory.getToken()) {
         self.initialize();
     }
 
     return self;
-};
+}
 
 export default () => {
     angular.module('app.factories.koheseio',['app.services.authentication','btford.socket-io'])

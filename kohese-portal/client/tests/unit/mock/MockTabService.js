@@ -5,7 +5,7 @@ function MockTabService() {
     service.currentTab = {}
 
     this.getTabId = function() {
-        return "TabID";
+        return 'TabID';
     };
     
     this.getCurrentTab = function() {
@@ -40,7 +40,7 @@ function MockTabService() {
         var bundleListener;
         tab.title = state.title;
         tab.type = state.type;
-        tab.params = (state.params) ? params : {};
+        tab.params = state.params ? params : {};
         tab.state = state.state;
         tab.scope = {};
         tab.content = {};
@@ -58,7 +58,7 @@ function MockTabService() {
     
             tab.title = stateDefinition.title;
             tab.type = stateDefinition.type;
-            tab.params = (stateDefinition.params) ? params : {};
+            tab.params = stateDefinition.params ? params : {};
             tab.paramKeys = stateDefinition.params;
             tab.state = state;
         };
@@ -72,20 +72,20 @@ function MockTabService() {
         };
     
         return tab;
-    };
+    }
 
     service.stateDefinitions = {
-        "kohese.dashboard" : {
-            "type" : "singleview",
-            "title": "Dashboard",
-            "params": false,
-            "state" : "kohese.dashboard"
+        'kohese.dashboard' : {
+            'type' : 'singleview',
+            'title': 'Dashboard',
+            'params': false,
+            'state' : 'kohese.dashboard'
         },
-        "kohese.explore.edit" : {
-            "type" : "dualview",
-            "title": "Explore",
-            "params" : ["id"],
-            "state" : "kohese.explore.edit"
+        'kohese.explore.edit' : {
+            'type' : 'dualview',
+            'title': 'Explore',
+            'params' : ['id'],
+            'state' : 'kohese.explore.edit'
         }
     }
 }

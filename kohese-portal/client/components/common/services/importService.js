@@ -2,10 +2,9 @@
    imported into Kohese */
 
 import SocketIOFileClient from 'socket.io-file-client';
-const Path = require("path");
+const Path = require('path');
 
-function ImportService(KoheseIO, toastr, $rootScope) {  
-
+function ImportService(KoheseIO, toastr, $rootScope) {
     const ctrl = this;
 
     var uploader = new SocketIOFileClient(KoheseIO.socket);
@@ -27,27 +26,23 @@ function ImportService(KoheseIO, toastr, $rootScope) {
     uploader.on('stream', function(fileInfo) {
         console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
     });
-    uploader.on('complete', function(fileInfo) 
-        {
+    uploader.on('complete', function(fileInfo) {
         var data =  {         
             file: fileInfo.name,
             parentItem: parent
             }
         KoheseIO.socket.emit('ImportDocuments', data,   
             function (results) {
-                
                 if (results.error) {
                     toastr.error('Import Failed.', results.error);            
                 } 
-                else 
-                    {
+                else {
                     console.log(results);
                     for (var i = 0; i < results.length; i++)
                         importedItems.push(results[i]);
-                    if (importedItems.length >= uploadListLength) 
-                        {
-                        toastr.success('Import Succeeded', "Document Import")
-                        console.log("::: Success importing " + results + ".");
+                    if (importedItems.length >= uploadListLength) {
+                        toastr.success('Import Succeeded', 'Document Import')
+                        console.log('::: Success importing ' + results + '.');
                         $rootScope.$broadcast('Import Complete', importedItems)
                         }
                 }
@@ -65,5 +60,5 @@ export default () => {
     angular.module('app.services.importservice', 
         ['app.factories.koheseio',
         'toastr'])
-        .service("ImportService", ImportService);
+        .service('ImportService', ImportService);
 }

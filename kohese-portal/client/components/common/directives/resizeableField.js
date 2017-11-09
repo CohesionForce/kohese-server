@@ -4,9 +4,7 @@
 
 function ResizeableField() {
     return function ($scope, $element, $attrs) {
-
         $($element).autoResize();
-
     };
 }
 

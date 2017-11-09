@@ -89,13 +89,10 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
     ctrl.updateSearchStringFilter = function () {
         ctrl.customFilter.item.$ = ctrl.searchString;
     };
-
-
 }
 
 
 export default () => {
-
     angular.module('app.search', [
         'app.services.itemservice',
         'app.services.tabservice',

@@ -12,10 +12,6 @@ function ActionRowController ($scope) {
     ctrl.proxy = $scope.proxy;
     ctrl.fields = $scope.fields;
     ctrl.indention = $scope.indention;
-
-    console.log("Row")
-    console.log(ctrl.proxy.item.name);
-    console.log(ctrl);
 }
 
 function ActionRow($compile, RecursionHelper) {
@@ -24,7 +20,7 @@ function ActionRow($compile, RecursionHelper) {
         scope: {
             proxy: '=',
             fields: '=',
-            indention: "="
+            indention: '='
         },
         templateUrl: 'components/common/directives/actionTable/actionRow.html',
         controller: ActionRowController    
@@ -49,5 +45,5 @@ function ActionRow($compile, RecursionHelper) {
 export default () => {
   angular.module('app.directives.actionrow', [])
   .directive('actionRow', ActionRow)
-  .controller("ActionRowController", ActionRowController);
+  .controller('ActionRowController', ActionRowController);
 }

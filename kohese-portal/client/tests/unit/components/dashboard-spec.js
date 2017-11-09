@@ -6,8 +6,7 @@ var MockTabService = require('../mock/MockTabService');
 var MockUserService = require('../mock/MockUserService');
 var MockItemRepository = require('../mock/MockItemRepository');
 
-describe("DashboardController Test", function()
-{
+describe('DashboardController Test', function() {
     var controller;
     var mockScope;
     var mockRootScope;
@@ -19,27 +18,21 @@ describe("DashboardController Test", function()
     
     beforeEach(angular.mock.module('app.dashboard'));
 
-    beforeEach(inject(function($q)
-    {
-
+    beforeEach(inject(function($q) {
         mockUserList = [ 'user1', 'user2', 'user3' ];
 
         mockScope = {
-            $on : function(name, func)
-            {
+            $on : function(name, func) {
             },
             
-            $broadcast : function(data)
-            {
+            $broadcast : function(data) {
                 broadcast = data;
             }
         
         };
-
     }));
 
-    beforeEach(inject(function($controller)
-    {
+    beforeEach(inject(function($controller) {
         controller = $controller('DashboardController', {
             UserService : mockUserService,
             $scope : mockScope,
@@ -50,16 +43,14 @@ describe("DashboardController Test", function()
     }));
 
     // Test Container Constructor
-    it("Test Construction", function()
-    {
+    it('Test Construction', function() {
         expect(controller).toBeDefined();
         expect(controller).not.toBeNull();
         tab = mockTabService.getCurrentTab();
     });
 
     // Test filters
-    it("Test Filter User", function()
-    {
+    it('Test Filter User', function() {
         user = mockUserService.getCurrentUsername();
         expect(controller.acceptedFilter.item.assignedTo).toBe(user);
         expect(controller.assignedFilter.item.assignedTo).toBe(user);
@@ -71,6 +62,5 @@ describe("DashboardController Test", function()
     });
 });
 
-describe("suite name", function()
-{
+describe('suite name', function() {
 });

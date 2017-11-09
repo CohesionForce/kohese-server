@@ -2,25 +2,24 @@
  * Created by josh on 9/8/15.
  */
 
-function LoginController(LoginService, KoheseIO, AuthTokenFactory, $state){
+function LoginController(LoginService, KoheseIO, AuthTokenFactory, $state) {
     var ctrl = this;
 
-    ctrl.login = function(username, password){
+    ctrl.login = function(username, password) {
         console.log('Login');
-        LoginService.login(username, password).then(function success(response){
+        LoginService.login(username, password).then(function success(response) {
             AuthTokenFactory.setToken(response.data);
             KoheseIO.connect();
             $state.go('kohese.explore');
-        }, function handleError(response){
+        }, function handleError(response) {
             alert('Error: ' + response.data);
         })
     };
 
-    ctrl.logout = function(){
+    ctrl.logout = function() {
         ctrl.testNote = null;
         LoginService.logout();
     }
-    
 }
 
 export default () => {

@@ -43,7 +43,8 @@ function AuthTokenFactory($window, $rootScope) {
         if (token) {
             store.setItem(key, token);
             $rootScope.$broadcast('userLoggedIn');
-        } else {
+        }
+ else {
             store.removeItem(key);
             $rootScope.$broadcast('userLoggedOut');
         }

@@ -11,7 +11,7 @@ function MockLoginService() {
 
     // login function called by the controller
     this.login = function(name, password) {
-        console.log("mockLoginService.login called with " + name + ":"
+        console.log('mockLoginService.login called with ' + name + ':'
                 + password);
         this.username = name;
         this.password = password;
@@ -21,11 +21,12 @@ function MockLoginService() {
             then : function(passFunction, failFunction) {
                 if (service.pass) {
                     passFunction({
-                        data : "SomeData"
+                        data : 'SomeData'
                     });
-                } else {
+                }
+ else {
                     failFunction({
-                        data : "Failed"
+                        data : 'Failed'
                     });
                 }
             }

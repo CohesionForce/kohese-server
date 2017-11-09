@@ -8,7 +8,6 @@
 
 function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, 
                      KoheseIO, $state, SessionService) {
-
     const service = this;
     var users = {};
     var currentUser = {};
@@ -29,18 +28,17 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
   }
 
     function getCurrentUsername() {
-        return (currentUser.item) ? 
-            currentUser.item.name : "Loading";
+        return currentUser.item ? 
+            currentUser.item.name : 'Loading';
      }
 
     function getCurrentUserEmail() {
-        if (currentUser.item)
-        {
-            return (currentUser.item.email) ? 
-                currentUser.item.email : "No email specified";
+        if (currentUser.item) {
+            return currentUser.item.email ? 
+                currentUser.item.email : 'No email specified';
         }
         else 
-            return "Loading";
+            return 'Loading';
     }
 
     function setCurrentUser() {
@@ -51,12 +49,12 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
             var users = root.getChildByName('Users');
             /* If the users object isn't around we probably are waiting for load
                We will call this function again when the repo is loaded. */
-            if (users) 
-            {
+            if (users) {
             currentUser = users.getChildByName(decodedToken.username);
             SessionService.registerSessions();
             }
-        } else {
+        }
+ else {
             $state.go('login');
         }
     }
@@ -86,7 +84,6 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
 }
 
 export default () => {
-
     angular.module('app.services.userservice', [
         'app.services.itemservice',
         'app.services.authentication',

@@ -1,7 +1,7 @@
 /**
  * Created by josh on 11/4/15.
  */
-function NavigationService($state, tabService, $rootScope){
+function NavigationService($state, tabService, $rootScope) {
     var service = this;
 
     var currentState = [];
@@ -14,20 +14,20 @@ function NavigationService($state, tabService, $rootScope){
 
 
 
-    function updateState(newState){
+    function updateState(newState) {
         lastState = currentState;
         currentState[tabService.getCurrentTab().id] = newState;
     }
 
-    function getLastState(tabId){
+    function getLastState(tabId) {
         return lastState[tabId];
     }
 
-    function getCurrentState(tabId){
+    function getCurrentState(tabId) {
         return currentState[tabId];
     }
 
-    $rootScope.$on('$stateChangeSuccess', function(){
+    $rootScope.$on('$stateChangeSuccess', function() {
         lastState[tabService.getCurrentTab().id] = currentState[tabService.getCurrentTab().id];
         currentState[tabService.getCurrentTab().id] = $state.current.name;
     })

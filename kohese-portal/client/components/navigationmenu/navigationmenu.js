@@ -8,7 +8,7 @@ function NavigationController($rootScope, $scope, AuthTokenFactory, tabService) 
 
     ctrl.searchInput = '';
 
-    ctrl.search = function(searchString){
+    ctrl.search = function(searchString) {
         $rootScope.$broadcast('navigationEvent', {
             state: 'kohese.search',
             params: {
@@ -19,18 +19,17 @@ function NavigationController($rootScope, $scope, AuthTokenFactory, tabService) 
         ctrl.toggleSideBar();
     };
 
-    ctrl.toggleSideBar = function(){
+    ctrl.toggleSideBar = function() {
         $('.side-pane').toggleClass('open')
     };
 
-    $scope.$on('userLoggedIn', function onUserLogin(){
+    $scope.$on('userLoggedIn', function onUserLogin() {
         ctrl.userLoggedIn = true;
     });
 
-    $scope.$on('userLoggedOut', function onUserLogout(){
+    $scope.$on('userLoggedOut', function onUserLogout() {
         ctrl.userLoggedIn = false;
     })
-
 }
 var sideNavDirective = function () {
     return {

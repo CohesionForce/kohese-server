@@ -1,4 +1,4 @@
-describe("Modal service", ()=>{
+describe('Modal service', ()=>{
     var service;
     var $modal;
 
@@ -36,7 +36,7 @@ describe("Modal service", ()=>{
         });
     });
 
-    it("can launch a modal", (done)=>{
+    it('can launch a modal', (done)=>{
        spyOn($modal, 'open').and.returnValue(modalInstance);
        service.show({},{})
        expect($modal.open).toHaveBeenCalled();

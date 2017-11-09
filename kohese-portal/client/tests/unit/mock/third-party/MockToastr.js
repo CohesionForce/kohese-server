@@ -1,4 +1,4 @@
-function MockToastr(){
+function MockToastr() {
     this.success = () =>{
 
     }

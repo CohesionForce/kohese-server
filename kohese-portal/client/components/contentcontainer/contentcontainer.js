@@ -45,32 +45,21 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
         // If it is the first tab get the next one
         // If it is the only tab, recreate the base tab
 
-        if (tab.id === tabService.getCurrentTab().id)
-        {
-            console.log(tab.position);
-            console.log(containerCtrl.tabs.length);
-            if (tab.position === 0)
-            {
-                if (containerCtrl.tabs.length === 1) 
-                    {
+        if (tab.id === tabService.getCurrentTab().id) {
+            if (tab.position === 0) {
+                if (containerCtrl.tabs.length === 1) {
                     containerCtrl.addTab();
                     } 
-                else 
-                    {
+                else {
                     containerCtrl.setTab(containerCtrl.tabs[1]);
                     }   
             } 
-            else if (tab.position === containerCtrl.tabs.length -1)
-                {
-                console.log("-1")
+            else if (tab.position === containerCtrl.tabs.length -1) {
                 containerCtrl.setTab(containerCtrl.tabs[tab.position - 1]);
                 }
-            else 
-                {
-                console.log("+1")
+            else {
                 containerCtrl.setTab(containerCtrl.tabs[tab.position + 1]);
                 }
-            
         }
 
         containerCtrl.tabs.splice(tab.position, 1);
@@ -101,7 +90,6 @@ var ContentContainer = function () {
 
 
 export default () => {
-
     var containerModule = angular.module('app.contentcontainer', [
         'app.services.tabservice'])
         .controller('ContainerController', ContainerController)
@@ -109,7 +97,6 @@ export default () => {
 
     require('./subviews/dualview/dualview')(containerModule);
     require('./subviews/singleview/singleview')(containerModule);
-
 }
 
 

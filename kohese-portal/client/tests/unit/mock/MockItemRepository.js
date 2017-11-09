@@ -1,10 +1,12 @@
 function MockItemRepository() {
     const service = this;
-    var promiseMock = {then : function(fn) { fn()}}
+    var promiseMock = {then : function(fn) {
+ fn()
+}}
     this.rootProxy = {
         item : {
-            name : "Root",
-            id   : "0"
+            name : 'Root',
+            id   : '0'
         },
         getChildByName: ()=>{
             return; 
@@ -31,7 +33,7 @@ function MockItemRepository() {
     }
 
     this.deleteItem = function() {
-        return Promise.resolve({itemId:"01"});
+        return Promise.resolve({itemId:'01'});
     }
 
     this.upsertItem = function(proxy) {

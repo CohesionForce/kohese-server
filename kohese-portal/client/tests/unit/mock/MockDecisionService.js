@@ -1,5 +1,4 @@
 function MockDecisionService() {
-    
     this.getDecisionStates = function() {
         return [];
     };

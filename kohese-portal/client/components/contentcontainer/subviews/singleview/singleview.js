@@ -6,11 +6,10 @@
 
 
 export default containerModule => {
-
    containerModule
         .directive('singleView', function () {
             return {
-                restrict: "A",
+                restrict: 'A',
                 templateUrl: 'components/contentcontainer/subviews/singleview/singleview.html',
                 replace: true,
                 link: function (scope, element, attribute) {

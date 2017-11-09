@@ -9,8 +9,7 @@ var MockDecisionService = require('../mock/MockDecisionService');
 var MockActionService = require('../mock/MockActionService');
 var MockSearchService = require('../mock/MockSearchService');
 
-describe("Search Controller Test", function() {
-
+describe('Search Controller Test', function() {
 	var searchController;
     var mockTabService = new MockTabService();
     var mockItemRepository = new MockItemRepository();
@@ -23,7 +22,6 @@ describe("Search Controller Test", function() {
 	beforeEach(angular.mock.module('app.search'));
 
 	beforeEach(function() {
-
 		state = {
 		    callData : undefined,
 		    id : undefined,
@@ -34,7 +32,7 @@ describe("Search Controller Test", function() {
 		};
 
 		stateParams = {
-		    id : "stateParams.id"
+		    id : 'stateParams.id'
 		};
 
 		scope = {
@@ -59,7 +57,7 @@ describe("Search Controller Test", function() {
 		})
 	}));
 
-	xit("Check Tree Navigation", function() {
+	xit('Check Tree Navigation', function() {
 	    searchController.navigateToTree();
 	    expect(mockTabService.tab.state).toBe('explore.edit');
 	    expect(state.callData).toBe('kohese.explore.edit');
@@ -67,5 +65,5 @@ describe("Search Controller Test", function() {
 	})
 });
 
-describe("suite name", function() {
+describe('suite name', function() {
 });

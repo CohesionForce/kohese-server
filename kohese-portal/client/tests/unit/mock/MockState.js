@@ -1,5 +1,4 @@
 function MockState() {
- 
     this.getActionStates = function() {
         return [];
     };

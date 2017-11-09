@@ -3,7 +3,6 @@
  */
 
 function DecisionService(ItemRepository, $rootScope) {
-
     var service = this;
     var states = [{item: {name: ''}}];
 
@@ -19,7 +18,7 @@ function DecisionService(ItemRepository, $rootScope) {
 
     var root = ItemRepository.getRootProxy();
     var stateProxy = root.getChildByName('State');
-    if (stateProxy){
+    if (stateProxy) {
         var decisionProxy = stateProxy.getChildByName('Decision State');
         Array.prototype.push.apply(states, decisionProxy.getDescendants());
     }
@@ -27,12 +26,9 @@ function DecisionService(ItemRepository, $rootScope) {
     function getDecisionStates() {
         return states;
     }
-
-
 }
 
 export default () => {
-
     angular.module('app.services.decisionservice', ['app.services.itemservice'])
         .service('DecisionService', DecisionService);
 }

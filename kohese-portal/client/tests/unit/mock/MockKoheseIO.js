@@ -6,7 +6,7 @@ function MockKoheseIO() {
 
     this.resolveCallbacks = (type) => {
         for (var i=0; i < callbackStack.length;i++) {
-            (type === "err") ? callbackStack[i](errorResults) : 
+            type === 'err' ? callbackStack[i](errorResults) : 
                                callbackStack[i](successResults); 
         }
     }
@@ -24,9 +24,9 @@ function MockKoheseIO() {
         emit: (event,data,callback) =>{
             callbackStack.push(callback);
         },
-        id: "Session-01",
+        id: 'Session-01',
         handshake: {address: '1.2.3.4'},
-        koheseUser : {username: "Test user"}
+        koheseUser : {username: 'Test user'}
         }
 }
 

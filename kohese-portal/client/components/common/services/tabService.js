@@ -2,7 +2,7 @@
  * Created by josh on 8/14/15.
  */
 
-import Tab from "./tab-service/tab.js"
+import Tab from './tab-service/tab.js'
 
 function TabService($state, $rootScope) {
     var tService = this;
@@ -60,7 +60,7 @@ function TabService($state, $rootScope) {
             var fromController = bundlerPosition.controllers[type];
             if (fromController) {
                 for (var key in fromController) {
-                    if (fromController.hasOwnProperty(key) && (key.charAt(0) !== '$')
+                    if (fromController.hasOwnProperty(key) && key.charAt(0) !== '$'
                         && !_.isEqual(fromController[key], toController[key])) {
                         toController[key] = fromController[key];
                     }
@@ -83,14 +83,14 @@ function TabService($state, $rootScope) {
 
     tService.getCurrentState = function (tabId) {
         return tService.bundler[tabId].lastState;
-
     };
 
     $rootScope.$on('$stateChangeSuccess', function () {
         var currentBundle = tService.bundler[tService.getCurrentTab().id];
         if (currentBundle) {
             currentBundle.lastState = currentBundle.currentState;
-        } else {
+        }
+ else {
             currentBundle = new Bundle();
         }
         currentBundle.currentState = $state.current.name;
@@ -101,7 +101,6 @@ function TabService($state, $rootScope) {
         var bundle = this;
         bundle.controllers = {};
     }
-
 }
 
 export default () => {

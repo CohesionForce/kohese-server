@@ -58,13 +58,13 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
         ctrl.emailInput = '';
         ctrl.passwordInput = '';
         ctrl.confirmPasswordInput = '';
-        ctrl.currentForm = "Add User";
+        ctrl.currentForm = 'Add User';
         ctrl.addUserForm = true;
 
         // TODO This will need to move to new KoheseUser in the future
         ctrl.selectedUserProxy = {};
         ctrl.selectedUserProxy.item = { parentId: UserService.getUsersItemId() };
-        ctrl.selectedUserProxy.kind = "KoheseUser";
+        ctrl.selectedUserProxy.kind = 'KoheseUser';
     };
 
     ctrl.cancelForm = function () {
@@ -98,7 +98,8 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
                 $rootScope.$broadcast('UserUpdated', ctrl.selectedUserProxy)
             });
             ctrl.cancelForm();
-        } else {
+        } 
+        else {
             alert('Passwords do not match');
         }
     };
@@ -111,27 +112,26 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
 
     /* Version Control Functions */
 
-    ctrl.addRemote = function(){
-        if(ctrl.remoteNameInput != "" && ctrl.remoteUrlInput != "")
-        {
+    ctrl.addRemote = function() {
+        if(ctrl.remoteNameInput != '' && ctrl.remoteUrlInput != '') {
         VersionControlService.addRemote([treeRoot.children[0].item.id], 
             ctrl.remoteNameInput, ctrl.remoteUrlInput);
-        } else {
-            $window.alert("Please enter a name and url");
+        } 
+        else {
+            $window.alert('Please enter a name and url');
         }
     }
 
-    ctrl.getRemotes = function(){
+    ctrl.getRemotes = function() {
         VersionControlService.getRemotes(treeRoot.item.id, 
             function(remoteList) {
             ctrl.remotesList = remoteList;
             });
     }
 
-    ctrl.commit = function()
-        {
-        if (ctrl.commitMessageInput === "" || !ctrl.commitMessageInput)
-            ctrl.commitMessageInput = "No Message Entered"
+    ctrl.commit = function() {
+        if (ctrl.commitMessageInput === '' || !ctrl.commitMessageInput)
+            ctrl.commitMessageInput = 'No Message Entered'
 
         // Need to grab all of the indexed nodes
         // Hack while repo split is WIP
@@ -139,18 +139,15 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
                                         ctrl.commitMessageInput);
         }
 
-    ctrl.push = function() 
-    {
+    ctrl.push = function() {
         // Using the root nodes repo for now while that system gets worked out.
         var proxyIds = []
         proxyIds.push(treeRoot.item.id);
         VersionControlService.push(proxyIds, ctrl.pushRemoteNameInput);
-    }
-        
+    }      
 }
 
-export default () =>
-{
+export default () => {
     angular.module('app.admin', ['app.services.tabservice', 
                                  'app.services.sessionservice',
                                  'app.services.versioncontrolservice'])

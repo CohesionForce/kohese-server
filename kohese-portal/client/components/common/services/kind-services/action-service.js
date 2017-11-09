@@ -2,7 +2,6 @@
  * Created by josh on 10/7/15.
  */
 function ActionService(ItemRepository, $rootScope) {
-
     var service = this;
     var states = [{item: {name: ''}}];
 
@@ -27,12 +26,9 @@ function ActionService(ItemRepository, $rootScope) {
     function getActionStates() {
         return states;
     }
-
-
 }
 
 export default () => {
-
     angular.module('app.services.actionservice', ['app.services.itemservice'])
         .service('ActionService', ActionService);
 }

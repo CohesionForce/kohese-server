@@ -1,5 +1,6 @@
-function RecursiveContainerController($scope)
-{
+/* Recursive container for a nested action table */
+
+function RecursiveContainerController($scope) {
     var ctrl = this;
 
     // Copy scope variables for better formatting in html
@@ -16,7 +17,7 @@ function RecursiveContainer() {
         scope: {
             proxies: '=',
             fields: '=',
-            indention: "="
+            indention: '='
         },
         templateUrl: 'components/common/directives/actionTable/actionRow.html',
         controller: RecursiveContainerController

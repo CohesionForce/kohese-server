@@ -5,7 +5,6 @@
 function KTreeController(ItemRepository, ActionService, UserService, $timeout, $anchorScroll, $state,
                         $scope, $location, $stateParams, SearchService, tabService, VersionControlService,
                         ModalService, DeleteTemplate) {
-
     var treeCtrl = this,
         syncListener;
     treeCtrl.tab = tabService.getCurrentTab();
@@ -34,12 +33,12 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         treeCtrl.stagedItems = [];
 
         // NEW View Control
-        treeCtrl.viewList = ["Default","Advanced Filter","Version Control"]; // TO-DO : Probably want to get this from somewhere else so 
+        treeCtrl.viewList = ['Default','Advanced Filter','Version Control']; // TO-DO : Probably want to get this from somewhere else so 
                                                                               // view types can be pulled based on version of Kohese
-        treeCtrl.viewType = "Default";
-        
-    } else {
-        console.log("Root Check!");
+        treeCtrl.viewType = 'Default';
+    }
+    else {
+        console.log('Root Check!');
         console.log(treeCtrl);
     }
 
@@ -68,16 +67,19 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
               treeCtrl.filter.textRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
               treeCtrl.filter.textRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
               treeCtrl.filter.invalidRegex = false;              
-            } catch (e) {
+            }
+ catch (e) {
               treeCtrl.filter.invalidRegex = true;
             }
-          } else {
-            let cleanedPhrase = treeCtrl.filter.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-            if(treeCtrl.filter.text !== ""){
-              treeCtrl.filter.textRegex = new RegExp(cleanedPhrase,"i");
-              treeCtrl.filter.textRegexHighlight = new RegExp('(' + cleanedPhrase + ')',"gi");
+          }
+          else {
+            let cleanedPhrase = treeCtrl.filter.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            if(treeCtrl.filter.text !== '') {
+              treeCtrl.filter.textRegex = new RegExp(cleanedPhrase,'i');
+              treeCtrl.filter.textRegexHighlight = new RegExp('(' + cleanedPhrase + ')','gi');
               treeCtrl.filter.invalidRegex = false;
-            } else {
+            }
+            else {
               treeCtrl.filter.textRegex = null;
               treeCtrl.filter.textRegexHighlight = null;
               treeCtrl.filter.invalidRegex = false;
@@ -89,7 +91,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
               $scope.$apply();
           });
         }, 1000); // delay 1000 ms
-
     });
 
     $scope.$watch('treeCtrl.filter.kind', function () {
@@ -120,10 +121,10 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 
     if (!treeCtrl.filter) {
         treeCtrl.filter = {
-            text: "",
-            kind: "",
-            actionState: "",
-            actionAssignee: "",
+            text: '',
+            kind: '',
+            actionState: '',
+            actionAssignee: '',
             status: false,
             dirty: false
         };
@@ -139,7 +140,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
             treeCtrl.lazyLimitIncreasePending = true;
             postDigest(function () {
                 treeCtrl.currentLazyLimit = treeCtrl.currentLazyItemIdx + treeCtrl.lazyLimitIncrement;
-//                console.log("::: Increased lazy limit to " + treeCtrl.currentLazyLimit);
                 treeCtrl.lazyLimitIncreasePending = false;
                 $scope.$apply();
             });
@@ -150,7 +150,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
 
     function postDigest(callback) {
         var unregister = $scope.$watch(function () {
-//            console.log("::: postDigest at " + treeCtrl.currentLazyItemIdx);
             unregister();
             $timeout(function () {
                 callback();
@@ -159,26 +158,27 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     }
 
     treeCtrl.getItemCount = function () {
-        return $('#theKT').find(".kt-item").length;
+        return $('#theKT').find('.kt-item').length;
     };
 
     treeCtrl.getItemMatchedCount = function () {
-        return $('#theKT').find(".kti-filterMatched").length;
+        return $('#theKT').find('.kti-filterMatched').length;
     };
 
     function getTypeForFilter(val) {
-        return (val === null) ? 'null' : typeof val;
+        return val === null ? 'null' : typeof val;
     }
 
     treeCtrl.matchesFilter = function (proxy, exact) {
-        if (exact === undefined){
+        if (exact === undefined) {
             exact = false;
         }
 
-        if ((treeCtrl.filter.textRegex === null) && !treeCtrl.filter.kind && !treeCtrl.filter.status && !treeCtrl.filter.dirty) {
+        if (treeCtrl.filter.textRegex === null && !treeCtrl.filter.kind && !treeCtrl.filter.status && !treeCtrl.filter.dirty) {
             return !exact;
-        } else {
-            if (treeCtrl.filter.status && (!proxy.status || (proxy.status && proxy.status.length === 0))) {
+        }
+        else {
+            if (treeCtrl.filter.status && (!proxy.status || proxy.status && proxy.status.length === 0)) {
                 return false;
             }
             if (treeCtrl.filter.dirty && !proxy.dirty) {
@@ -201,7 +201,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
             }
 
             for (var key in proxy.item) {
-                if ((key.charAt(0) !== '$') && getTypeForFilter(proxy.item[key]) === 'string' && proxy.item[key].match(treeCtrl.filter.textRegex)) {
+                if (key.charAt(0) !== '$' && getTypeForFilter(proxy.item[key]) === 'string' && proxy.item[key].match(treeCtrl.filter.textRegex)) {
                     return true;
                 }
             }
@@ -222,7 +222,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     };
     
     treeCtrl.proxyOrChildMatchesFilter = function (proxy) {
-        return (treeCtrl.matchesFilter(proxy) || treeCtrl.childMatchesFilter(proxy));
+        return treeCtrl.matchesFilter(proxy) || treeCtrl.childMatchesFilter(proxy);
     }
 
     $scope.$on('tabSelected', function () {
@@ -235,10 +235,10 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     };
 
     treeCtrl.upLevel = function () {
-      if (!treeCtrl.isRootDefault){
+      if (!treeCtrl.isRootDefault) {
         treeCtrl.treeRoot = treeCtrl.treeRoot.parentProxy;
-        treeCtrl.isRootDefault = (treeCtrl.treeRoot === treeCtrl.absoluteRoot);        
-        console.log("::: Setting root to " + treeCtrl.treeRoot.item.name);
+        treeCtrl.isRootDefault = treeCtrl.treeRoot === treeCtrl.absoluteRoot;        
+        console.log('::: Setting root to ' + treeCtrl.treeRoot.item.name);
       }
     };
 
@@ -256,8 +256,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         var itemId = proxy.item.id;
         var modalDefaults = {};
 
-        if (proxy.children.length > 0)
-        {
+        if (proxy.children.length > 0) {
             modalDefaults.templateUrl = DeleteTemplate;
         }
 
@@ -268,32 +267,29 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
             bodyText: 'Are you sure you want to delete this item?'
         }
 
-        ModalService.showModal(modalDefaults, modalOptions).then((result)=>
-            {
+        ModalService.showModal(modalDefaults, modalOptions).then((result)=> {
             if (!result.deleteChildren) {
                 result.deleteChildren = false;
             }
                                       
             ItemRepository
-            .deleteItem(proxy, result.deleteChildren).then(function () 
-                {
-                console.log("::: Item has been deleted: " + itemId);
+            .deleteItem(proxy, result.deleteChildren).then(function () {
+                console.log('::: Item has been deleted: ' + itemId);
                 });
         })
     };
 
-    treeCtrl.initCollapsed = function (itemId){
-      if (treeCtrl.collapsed[itemId] === undefined){
+    treeCtrl.initCollapsed = function (itemId) {
+      if (treeCtrl.collapsed[itemId] === undefined) {
         treeCtrl.collapsed[itemId] = !treeCtrl.allExpanded;
       }
     }
     
     function expandSyncedNodes() {
-      
-      if (treeCtrl.selectedItemProxy){
+      if (treeCtrl.selectedItemProxy) {
         var ancestorProxy = treeCtrl.selectedItemProxy.parentProxy;
-        while(ancestorProxy && ancestorProxy !== treeCtrl.treeRoot){
-          if(treeCtrl.collapsed[ancestorProxy.item.id] === undefined || treeCtrl.collapsed[ancestorProxy.item.id]){
+        while(ancestorProxy && ancestorProxy !== treeCtrl.treeRoot) {
+          if(treeCtrl.collapsed[ancestorProxy.item.id] === undefined || treeCtrl.collapsed[ancestorProxy.item.id]) {
             treeCtrl.collapsed[ancestorProxy.item.id] = false;
           }
           ancestorProxy = ancestorProxy.parentProxy;          
@@ -310,18 +306,17 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     }
     
     syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler(event, data) {
-
-      console.log("::: Sync Item:" + data);
+      console.log('::: Sync Item:' + data);
       treeCtrl.selectedItemProxy = ItemRepository.getProxyFor(data);
       
-      if (treeCtrl.locationSynced){
+      if (treeCtrl.locationSynced) {
         expandSyncedNodes();        
       }
     });
     
     treeCtrl.syncLocation = function () {
       treeCtrl.locationSynced = !treeCtrl.locationSynced;
-      if(treeCtrl.locationSynced){
+      if(treeCtrl.locationSynced) {
         expandSyncedNodes();
       }
     };
@@ -369,7 +364,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
       treeCtrl.collapsed[itemProxy.item.id] = false;
       for (var i = 0; i < childrenList.length; i++) {
           var proxy = childrenList[i];
-          if (treeCtrl.proxyOrChildMatchesFilter(proxy)){
+          if (treeCtrl.proxyOrChildMatchesFilter(proxy)) {
             treeCtrl.expandMatchingChildren(proxy);
           }
       }
@@ -389,12 +384,10 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     /****** Version Control View Functions */
 
     /* Called when the user changes views of the tree */
-    treeCtrl.onViewTypeChanged = function()
-    {
+    treeCtrl.onViewTypeChanged = function() {
         console.log(treeCtrl.viewType);
-        switch (treeCtrl.viewType)
-            {
-            case "Version Control":
+        switch (treeCtrl.viewType) {
+            case 'Version Control':
                 treeCtrl.filter.status = true;
                 treeCtrl.filter.dirty = false;
                 treeCtrl.versionControlEnabled = true;
@@ -406,21 +399,18 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
                 treeCtrl.filter.dirty = false;
                 treeCtrl.versionControlEnabled = false;
             }
-            
     }
 
-    treeCtrl.stageItem = function(itemProxy)
-        { 
+    treeCtrl.stageItem = function(itemProxy) { 
         VersionControlService.stageItems([itemProxy]);
         }
 
-    treeCtrl.unstageItem = function (itemProxy) 
-        {
+    treeCtrl.unstageItem = function (itemProxy) {
         VersionControlService.unstageItems([itemProxy]);
         }
 
     
-    function showDiscardModal(itemProxy, options){
+    function showDiscardModal(itemProxy, options) {
         var modalOptions = {
             closeButtonText : 'Cancel',
             actionButtonText : 'Discard Item',
@@ -428,30 +418,23 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
             bodyText: 'Reverting this to the last commit will delete it permanently. Are you sure you want to discard this item?'
         }    
 
-        ModalService.showModal({}, modalOptions).then((result)=>
-            {
+        ModalService.showModal({}, modalOptions).then((result)=> {
             ItemRepository
-            .deleteItem(itemProxy).then((result)=> 
-                {
-                console.log("::: Item has been deleted: " + result.itemId);
+            .deleteItem(itemProxy).then((result)=> {
+                console.log('::: Item has been deleted: ' + result.itemId);
                 });
             })
-        };
+        }
 
     treeCtrl.revertItem = function (itemProxy) {
-
-        if (itemProxy.vcState.Staged)
-            {
-            if (itemProxy.vcState.Staged === "New")
-                {
+        if (itemProxy.vcState.Staged) {
+            if (itemProxy.vcState.Staged === 'New') {
                 showDiscardModal(itemProxy);
                 return;
                 }
             }
-        if (itemProxy.vcState.Unstaged)
-            {
-            if (itemProxy.vcState.Unstaged ==="New")
-                {
+        if (itemProxy.vcState.Unstaged) {
+            if (itemProxy.vcState.Unstaged ==='New') {
                 showDiscardModal(itemProxy);
                 return;
                 }
@@ -464,21 +447,16 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
             bodyText: 'Reverting this to the last commit will delete any new changes. Are you sure?'
         }    
 
-        ModalService.showModal({}, modalOptions).then((result)=>
-            {
+        ModalService.showModal({}, modalOptions).then((result)=> {
                 VersionControlService.revertItems([itemProxy]);
             })
-         
-        
-        
     };
         
 
 
-    treeCtrl.commit = function()
-        {
+    treeCtrl.commit = function() {
         if (!treeCtrl.commitMessage)
-            treeCtrl.commitMessage = "No Message Entered"
+            treeCtrl.commitMessage = 'No Message Entered'
 
             console.log(treeCtrl.selectedVersionControlNodes);
 
@@ -488,7 +466,6 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
         }
 
     /****** End Version Control View Functions */
-
 }
 
 export default () => {

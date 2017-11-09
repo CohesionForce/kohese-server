@@ -16,10 +16,10 @@ function ModalService($modal) {
     };
 
     var modalOptions = {
-        closeButtonText : "Close",
-        actionButtonText : "Ok",
-        headerText : "Proceed",
-        bodyText: "Perform this action"
+        closeButtonText : 'Close',
+        actionButtonText : 'Ok',
+        headerText : 'Proceed',
+        bodyText: 'Perform this action'
     };
 
     service.showModal = function(customModalDefaults, customModalOptions) {
@@ -43,10 +43,10 @@ function ModalService($modal) {
 
         /* If a more complex controller hasn't been passed in, create a generic
            open / close function */
-        if (!tempModalDefaults.controller){
+        if (!tempModalDefaults.controller) {
             tempModalDefaults.controller = function($scope, $modalInstance) {
                 $scope.modalOptions = tempModalOptions;
-                $scope.modalOptions.ok = function(result){
+                $scope.modalOptions.ok = function(result) {
                     $modalInstance.close(result);
                 }
                 $scope.modalOptions.close = function(result) {
@@ -56,7 +56,6 @@ function ModalService($modal) {
         }
 
         return $modal.open(tempModalDefaults).result;
-
     }
 }
 

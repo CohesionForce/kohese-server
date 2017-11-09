@@ -1,5 +1,4 @@
 function MockSearchService() {
-
     this.getFilterObject = function(id) {
         return null;
     }
@@ -7,7 +6,6 @@ function MockSearchService() {
     this.setFilterObject = function(filter, id) {
         
     }
-
 }
 
 module.exports = MockSearchService;

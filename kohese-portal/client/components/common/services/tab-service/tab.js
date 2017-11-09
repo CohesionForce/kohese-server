@@ -3,7 +3,7 @@ function Tab(state, params, id) {
     var bundleListener;
     tab.title = state.title;
     tab.type = state.type;
-    tab.params = (state.params) ? params : {};
+    tab.params = state.params ? params : {};
     tab.state = state.state;
     tab.scope = {};
     tab.content = {};
@@ -28,7 +28,7 @@ function Tab(state, params, id) {
 
         tab.title = stateDefinition.title;
         tab.type = stateDefinition.type;
-        tab.params = (stateDefinition.params) ? params : {};
+        tab.params = stateDefinition.params ? params : {};
         tab.paramKeys = stateDefinition.params;
         tab.state = state;
     };
@@ -42,6 +42,6 @@ function Tab(state, params, id) {
     };
 
     return tab;
-};
+}
 
 export default Tab;

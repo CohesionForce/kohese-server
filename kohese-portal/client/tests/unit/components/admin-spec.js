@@ -9,9 +9,8 @@ var MockItemRepository = require('../mock/MockItemRepository');
 var MockVersionControlService = require('../mock/MockVersionControlService');
 
 describe(
-		"AdminController Test",
+		'AdminController Test',
 		function() {
-
 			var adminController;
 			var mockScope;
 			var mockKoheseUser;
@@ -26,7 +25,7 @@ describe(
 				this.name = '';
 				this.description = '';
 				this.password = '';
-			};
+			}
 			
 			KoheseUser.find = function() {
 				console.log('KoheseUser.find()');
@@ -67,7 +66,6 @@ describe(
 			beforeEach(angular.mock.module('app.admin'));
 
 			beforeEach(inject(function($q) {
-
 				mockUserList = [ 'user1', 'user2', 'user3' ];
 
 				mockScope = {
@@ -75,7 +73,6 @@ describe(
 
 					}
 				};
-
 			}));
 
 			beforeEach(inject(function($controller) {
@@ -96,10 +93,9 @@ describe(
 				}
 			})
 			
-			describe ("User Actions", ()=>{
-
+			describe ('User Actions', ()=>{
 				// Test Edit User
-				it("Edit User", function() {
+				it('Edit User', function() {
 					var userProxy = {
 							item : {
 								name : 'UserName',
@@ -117,9 +113,9 @@ describe(
 				});
 				
 				// Test Clear form
-				it("Clears User Form", function() {
+				it('Clears User Form', function() {
 					adminController.addUserForm = true;
-					adminController.selectedUserProxy.item.name = "Mock User"
+					adminController.selectedUserProxy.item.name = 'Mock User'
 					adminController.cancelForm();
 					expect(adminController.selectedUserProxy).toBe(null);
 					expect(adminController.addUserForm).toBe(false);
@@ -127,7 +123,7 @@ describe(
 				});
 				
 				// Test Add User
-				it("Adda a User", function() {
+				it('Adda a User', function() {
 					expect(adminController.addUserForm).toBe(false);
 					console.log('Calling AdminController.addUser');
 					adminController.addUser();
@@ -135,13 +131,13 @@ describe(
 					expect(adminController.descriptionInput).toBe('');
 					expect(adminController.passwordInput).toBe('');
 					expect(adminController.confirmPasswordInput).toBe('');
-					expect(adminController.currentForm).toBe("Add User");
+					expect(adminController.currentForm).toBe('Add User');
 					expect(adminController.addUserForm).toBe(true);
 					expect(adminController.editUserForm).toBe(false);
 				});
 				
 				// Test Upsert User
-				it("Upserts a User", function() {
+				it('Upserts a User', function() {
 					adminController.usernameInput = 'New User';
 					adminController.descriptionInput = 'New User Description';
 					adminController.passwordInput = 'password';
@@ -159,7 +155,7 @@ describe(
 				});
 				
 				// Test Upsert User
-				it("Rejects a Bad Password", function() {
+				it('Rejects a Bad Password', function() {
 					KoheseUser.lastUser = null;
 					adminController.usernameInput = 'New User';
 					adminController.descriptionInput = 'New User Description';
@@ -173,18 +169,16 @@ describe(
 				});
 
 				// Test Delete User
-				it("Deletes User", function() {
+				it('Deletes User', function() {
 					user = adminController.users[0]
 					adminController.deleteUser(user);
 					// This test is currently unverifiable due to the way our code
 				    // works. But this will catch any erros on the send side.
 				});
-				
 			});
-		describe("Version Control Actions", ()=> {
+		describe('Version Control Actions', ()=> {
 
 		})
-
 		})
 	
 

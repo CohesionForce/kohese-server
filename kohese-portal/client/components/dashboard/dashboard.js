@@ -90,18 +90,13 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
     $scope.$on('userLoaded', function () {
         ctrl.currentUser = UserService.getCurrentUsername();
       });
-
-
 }
 
 
 export default () => {
-
     angular.module('app.dashboard', [
         'app.services.userservice',
         'app.services.tabservice',
         'app.services.itemservice'])
         .controller('DashboardController', DashboardController);
-
-
 }

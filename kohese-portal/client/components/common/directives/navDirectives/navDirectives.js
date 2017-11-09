@@ -4,7 +4,7 @@
 
 function AppBarController($rootScope, UserService, LoginService, $state, jwtHelper, AuthTokenFactory) {
     var ctrl = this;
-    ctrl.userName = "";
+    ctrl.userName = '';
     checkAuthentication();
     ctrl.userName = UserService.getCurrentUsername();
 
@@ -30,14 +30,13 @@ function AppBarController($rootScope, UserService, LoginService, $state, jwtHelp
       ctrl.userName = UserService.getCurrentUsername();
     });
 
-    
-
     function checkAuthentication() {
         ctrl.userLoggedIn = LoginService.checkLoginStatus();
         if (!ctrl.userLoggedIn) {
             $state.go('login');
             ctrl.onLoginScreen = true;
-        } else {
+        }
+        else {
             ctrl.onLoginScreen = false;
             ctrl.userName = jwtHelper.decodeToken(AuthTokenFactory.getToken()).username;
         }
@@ -53,7 +52,6 @@ function AppBar() {
 }
 
 export default () => {
-
     var app = angular.module('app.directives.navigation', [
         'app.services.authentication',
         'app.services.userservice',
@@ -63,5 +61,4 @@ export default () => {
     app
         .directive('appBar', AppBar)
         .controller('AppBarController', AppBarController);
-
 };

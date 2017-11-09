@@ -4,9 +4,7 @@
 
 var MockTabService = require('../mock/MockTabService');
 
-describe("ContentContainerController Test", function()
-{
-
+describe('ContentContainerController Test', function() {
     var controller;
     var mockScope;
     var callData;
@@ -31,29 +29,23 @@ describe("ContentContainerController Test", function()
 
     beforeEach(angular.mock.module('app.contentcontainer'));
 
-    beforeEach(inject(function($q)
-    {
-
+    beforeEach(inject(function($q) {
         mockUserList = [ 'user1', 'user2', 'user3' ];
 
         mockScope = {
-            $on : function(name, func)
-            {
+            $on : function(name, func) {
                 on.name = name;
                 on.func = func;
             },
             
-            $broadcast : function(data)
-            {
+            $broadcast : function(data) {
                 broadcast = data;
             }
         
         };
-
     }));
 
-    beforeEach(inject(function($controller)
-    {
+    beforeEach(inject(function($controller) {
         controller = $controller('ContainerController', {
             tabService : mockTabService,
             $scope : mockScope,
@@ -62,7 +54,7 @@ describe("ContentContainerController Test", function()
         });
     }));
 
-    it("Creates a base tab with starting params", ()=> {
+    it('Creates a base tab with starting params', ()=> {
         controller.tabs.pop()
         controller.createBaseTab()
         var tab = controller.tabs[0];
@@ -71,8 +63,7 @@ describe("ContentContainerController Test", function()
     })
 
     // Test Container Constructor
-    it("starts with the desired tabs", function()
-    {
+    it('starts with the desired tabs', function() {
         tab = mockTabService.getCurrentTab();
         expect(tab).not.toBeUndefined();
         expect(tab).not.toBeNull();
@@ -85,8 +76,7 @@ describe("ContentContainerController Test", function()
     });
 
     // Test set tabs method
-    it("creates a tab", function()
-    {
+    it('creates a tab', function() {
         tab = mockTabService.getCurrentTab();
         controller.addTab(mockState,mockStateParams);
         newtab = mockTabService.getCurrentTab();
@@ -95,7 +85,7 @@ describe("ContentContainerController Test", function()
         expect(tab).not.toBe(newtab);
     });
 
-    it("creates a new dashboard when the only tab is deleted", ()=>{
+    it('creates a new dashboard when the only tab is deleted', ()=>{
         controller.deleteTab(controller.tabs[0]);
         tab = mockTabService.getCurrentTab();
         expect(tab).not.toBeUndefined();
@@ -105,12 +95,11 @@ describe("ContentContainerController Test", function()
     })
 
     describe('Delete Tab Functionality', ()=>{
-
         beforeEach(() => {
-            controller.createTab('kohese.explore.edit', {id:"Tab[1]"});
+            controller.createTab('kohese.explore.edit', {id:'Tab[1]'});
         })
 
-        it("selects the tab to the right when the first tab is deleted", () => {
+        it('selects the tab to the right when the first tab is deleted', () => {
             controller.deleteTab(controller.tabs[0]);
             tab = mockTabService.getCurrentTab();
             expect(tab).not.toBeUndefined();
@@ -118,13 +107,12 @@ describe("ContentContainerController Test", function()
             expect(tab.params.id).toBe('Tab[1]');
         });
 
-        it("selects the tab to the left when final tab is deleted", ()=>{
+        it('selects the tab to the left when final tab is deleted', ()=>{
             controller.setTab(controller.tabs[1]);
             controller.deleteTab(controller.tabs[1]);
             tab = mockTabService.getCurrentTab();
             expect(tab).not.toBeUndefined();
             expect(tab.params.id).toBe('Tab[0]');
         })
-
     });
 })

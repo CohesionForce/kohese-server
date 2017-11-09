@@ -108,7 +108,7 @@ appModule
                 views: {
                     'right@kohese': {
                         templateUrl: '/components/create/import/import.html',
-                        controller: "ImportItemController as importCtrl"
+                        controller: 'ImportItemController as importCtrl'
                     }
                 }
 
@@ -135,7 +135,7 @@ appModule
             .state('/kohese.new', {
                 url: 'new/{type}{parentId}',
                 templateUrl: '/components/detailsview/subviews/createitem.html',
-                controller: "DetailsViewController as detailsCtrl"
+                controller: 'DetailsViewController as detailsCtrl'
             })
             .state('kohese.search', {
                 url: '/search/{filter}',
@@ -199,8 +199,8 @@ appModule
     })
     .filter('highlight', function ($sce) {
         return function (text, phrase) {
-            if (text && angular.isDefined(phrase) && phrase !== "") {
-                let cleanedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            if (text && angular.isDefined(phrase) && phrase !== '') {
+                let cleanedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 if (cleanedPhrase) text = text.replace(new RegExp('(' + cleanedPhrase + ')', 'gi'),
                     '<span class="highlighted">$1</span>');
             }

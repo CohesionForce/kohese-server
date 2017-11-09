@@ -8,18 +8,15 @@ function ImportItemController(Upload, tabService, ImportService, $stateParams,
 
     var controllerRestored = tabService.restoreControllerData(tab.id, 'importCtrl', this);
 
-    if (!controllerRestored)
-    {
+    if (!controllerRestored) {
         tab = tabService.getCurrentTab();
         tab.route = $stateParams.id;
         ctrl.parentId = $stateParams.parentId
-        
     }
 
-    $scope.$on("Import Complete", function(event, data) {
+    $scope.$on('Import Complete', function(event, data) {
         ctrl.importedItems = data;
         ctrl.importComplete = true;
-        
     })
 
     ctrl.navigate = function (state, params) {
@@ -33,9 +30,6 @@ function ImportItemController(Upload, tabService, ImportService, $stateParams,
         ctrl.importComplete = false;
         ImportService.importFile(ctrl.files, ctrl.parentId);
     }
-
-    
-
 }
 
 export default () => {

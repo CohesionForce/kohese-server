@@ -3,27 +3,27 @@ var MockActionService = require('../mock/MockActionService');
 var MockUserService = require('../mock/MockUserService');
 var MockVersionControlService = require('../mock/MockVersionControlService');
 
-describe("Tree View",()=>{
+describe('Tree View',()=>{
     var treeCtrl;
     var VersionControlService;
     var $rootScope;
     var DeleteTemplate;
     var testProxy = {
         item: {
-            id: "01",
-            name: "Childless Proxy"
+            id: '01',
+            name: 'Childless Proxy'
         },
         children: []
     }
     var testParentProxy = {
         item: {
-            id: "02",
-            name: "Parent Proxy"
+            id: '02',
+            name: 'Parent Proxy'
         },
         children: [{
             item: {
-                id: "03",
-                name: "Child Proxy"
+                id: '03',
+                name: 'Child Proxy'
             }
         }]
     }
@@ -54,19 +54,19 @@ describe("Tree View",()=>{
                 })
 
                 VersionControlService = $injector.get('VersionControlService')
-                ItemRepository = $injector.get("ItemRepository");
-                ModalService = $injector.get("ModalService");
-                DeleteTemplate = $injector.get("DeleteTemplate");
+                ItemRepository = $injector.get('ItemRepository');
+                ModalService = $injector.get('ModalService');
+                DeleteTemplate = $injector.get('DeleteTemplate');
             })
             });
 
-        it("tests the tree spec",()=>{
-            console.log("Test");
+        it('tests the tree spec',()=>{
+            console.log('Test');
             console.log(treeCtrl);
             console.log(VersionControlService);
         })
 
-        describe("Delete Item", ()=>{
+        describe('Delete Item', ()=>{
             var deferred1;
             var deferred2;
             var defaultParentModalOptions = {
@@ -86,7 +86,7 @@ describe("Tree View",()=>{
                 inject((_$q_)=>{
                     deferred1 = _$q_.defer();
                     deferred2 = _$q_.defer();
-                    spyOn(ModalService, "showModal")
+                    spyOn(ModalService, 'showModal')
                         .and.callFake(()=>{
                             return deferred1.promise;
                         });
@@ -97,19 +97,19 @@ describe("Tree View",()=>{
                 });
             });
 
-            it("shows a modal asking the user to confirm deletion of one item", 
+            it('shows a modal asking the user to confirm deletion of one item', 
                 (done)=>{
                 treeCtrl.removeItem(testProxy);
                 deferred1.resolve({});
                 $rootScope.$digest();
                 expect(ModalService.showModal)
                     .toHaveBeenCalledWith({}, defaultSingleModalOptions)
-                deferred2.resolve({id: "01"});
+                deferred2.resolve({id: '01'});
                 $rootScope.$digest();
                 expect(ItemRepository.deleteItem).toHaveBeenCalled();
                 done();
             })
-            it("shows a modal with options for recursive delete of item and children", 
+            it('shows a modal with options for recursive delete of item and children', 
                 (done)=>{
                 treeCtrl.removeItem(testParentProxy);
                 deferred1.resolve({deleteChildren:true});
@@ -117,14 +117,14 @@ describe("Tree View",()=>{
                 expect(ModalService.showModal)
                     .toHaveBeenCalledWith({templateUrl: DeleteTemplate},
                                             defaultParentModalOptions);
-                deferred2.resolve({id: "02"});
+                deferred2.resolve({id: '02'});
                 $rootScope.$digest();
                 expect(ItemRepository.deleteItem).toHaveBeenCalledWith(testParentProxy, true);
                 done();
             })
         })
 
-        describe("Version Control", ()=>{
+        describe('Version Control', ()=>{
             var newStagedItemProxy;
             var newUnstagedItemProxy;
             var modifiedStagedItemProxy;
@@ -134,50 +134,50 @@ describe("Tree View",()=>{
             beforeEach(()=>{
                 newStagedItemProxy = {
                     item: {
-                        id: "02",
-                        name: "New Proxy"
+                        id: '02',
+                        name: 'New Proxy'
                     },
                     vcState: {
-                        Staged: "New"
+                        Staged: 'New'
                     }
                 }
                 newUnstagedItemProxy = {
                     item: {
-                        id: "03",
-                        name: "New Unstaged Item Proxy"
+                        id: '03',
+                        name: 'New Unstaged Item Proxy'
                     },
                     vcState: {
-                        Unstaged: "New"
+                        Unstaged: 'New'
                     }
                 }
                 modifiedStagedItemProxy = {
                     item: {
-                        id: "04",
-                        name: "Modified Staged Item Proxy"
+                        id: '04',
+                        name: 'Modified Staged Item Proxy'
                     },
                     vcState: {
-                        Staged: "Modified"
+                        Staged: 'Modified'
                     }
                 }
                 modifiedUnstagedItemProxy = {
                     item: {
-                        id: "05",
-                        name: "Modified Unstaged Item Proxy"
+                        id: '05',
+                        name: 'Modified Unstaged Item Proxy'
                     },
                     vcState: {
-                        Unstaged: "Modified"
+                        Unstaged: 'Modified'
                     }
                 }
             })
 
-            it("signals the server to stage an item", (done) => {
+            it('signals the server to stage an item', (done) => {
                 spyOn(VersionControlService, 'stageItems');
                 treeCtrl.stageItem(newUnstagedItemProxy);
                 expect(VersionControlService.stageItems)
                     .toHaveBeenCalledWith([newUnstagedItemProxy]);
                 done();
             })
-            it("signals the server to unstage an item", (done) => {
+            it('signals the server to unstage an item', (done) => {
                 spyOn(VersionControlService, 'unstageItems');
                 treeCtrl.unstageItem(newUnstagedItemProxy);
                 expect(VersionControlService.unstageItems)
@@ -185,7 +185,7 @@ describe("Tree View",()=>{
                 done();
             })
 
-            describe("revert",()=>{
+            describe('revert',()=>{
                 var deferred1;
                 var deferred2;
 
@@ -193,7 +193,7 @@ describe("Tree View",()=>{
                     inject((_$q_)=>{
                         deferred1 = _$q_.defer();
                         deferred2 = _$q_.defer();
-                        spyOn(ModalService, "showModal")
+                        spyOn(ModalService, 'showModal')
                             .and.callFake(()=>{
                                 return deferred1.promise;
                             });
@@ -206,9 +206,9 @@ describe("Tree View",()=>{
            
                 it('deletes a new unstaged item when revert is called on it', (done)=>{
                     treeCtrl.revertItem(newUnstagedItemProxy);
-                    deferred1.resolve({itemId: "01"});
+                    deferred1.resolve({itemId: '01'});
                     $rootScope.$digest();
-                    deferred2.resolve({itemId:"01"});
+                    deferred2.resolve({itemId:'01'});
                     $rootScope.$digest();
                     
                     expect(ItemRepository.deleteItem)
@@ -218,9 +218,9 @@ describe("Tree View",()=>{
 
                 it('deletes a new staged item when revert is called on it', (done)=>{
                     treeCtrl.revertItem(newStagedItemProxy);
-                    deferred1.resolve({itemId: "01"});
+                    deferred1.resolve({itemId: '01'});
                     $rootScope.$digest();
-                    deferred2.resolve({itemId:"01"});
+                    deferred2.resolve({itemId:'01'});
                     $rootScope.$digest();
                     
                     expect(ItemRepository.deleteItem)
@@ -228,7 +228,7 @@ describe("Tree View",()=>{
                     done();  
                 })
 
-                it("signals the server to revert a modified staged item", (done)=>{
+                it('signals the server to revert a modified staged item', (done)=>{
                     spyOn(VersionControlService, 'revertItems');
                     treeCtrl.revertItem(modifiedStagedItemProxy);
                     deferred1.resolve({});
@@ -238,7 +238,7 @@ describe("Tree View",()=>{
                         .toHaveBeenCalledWith([modifiedStagedItemProxy]);
                     done();
                 })
-                it("signals the server to revert an modified unstaged item", (done)=>{
+                it('signals the server to revert an modified unstaged item', (done)=>{
                     spyOn(VersionControlService, 'revertItems');
                     treeCtrl.revertItem(modifiedUnstagedItemProxy);
                     deferred1.resolve({});
@@ -250,6 +250,4 @@ describe("Tree View",()=>{
                 })
             })
         })
-
-        
 });

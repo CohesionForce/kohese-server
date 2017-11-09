@@ -1,5 +1,6 @@
-function CreateWizardController($state, tabService, $stateParams, ItemRepository) {
+/* Controller for the Create Screen Wizard  */
 
+function CreateWizardController($state, tabService, $stateParams, ItemRepository) {
     const ctrl = this;
 
     ctrl.tab = tabService.getCurrentTab();
@@ -13,11 +14,9 @@ function CreateWizardController($state, tabService, $stateParams, ItemRepository
 
     var controllerRestored = tabService.restoreControllerData(ctrl.tab.id, 'createWizardCtrl', this);
     
-        if (!controllerRestored)
-        {
+        if (!controllerRestored) {
             ctrl.tab = tabService.getCurrentTab();
             ctrl.tab.route = $stateParams.id;
-            
         }
 
     ctrl.navigate = function(state, params) {

@@ -1,27 +1,26 @@
 function MockUserService() {
-
     const service = this;
 
     var currentUser = {
         item : { 
-            name: "Mock user",
-            id  : "0",
-            description: "Mock User"
+            name: 'Mock user',
+            id  : '0',
+            description: 'Mock User'
         }
     }
 
     service.users = {
         item : {
-            name : "Users",
-            id : "999"
+            name : 'Users',
+            id : '999'
 
         },
         children : [
             currentUser,
             { item: {
-                name: "User 2",
-                id  : "9",
-                email: "email@email.com"
+                name: 'User 2',
+                id  : '9',
+                email: 'email@email.com'
                 }
             }]
     }
