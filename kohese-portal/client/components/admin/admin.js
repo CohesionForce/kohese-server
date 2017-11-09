@@ -7,7 +7,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     var ctrl = this;
     var tab = tabService.getCurrentTab();
     var controllerRestored = tabService.restoreControllerData(tab.id, 'adminCtrl', this);
-    var treeRoot = ItemRepository.getRootProxy()
+    var treeRoot = ItemRepository.getRootProxy();
 
     if (!controllerRestored) {
         ctrl.addUserForm = false;

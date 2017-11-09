@@ -16,6 +16,7 @@ export default () => {
     require('./admin/admin')();
     require('./dashboard/dashboard')();
     require('./create/createWizard')();
+    require('./analysis/analysis')();
 
     //Common
 

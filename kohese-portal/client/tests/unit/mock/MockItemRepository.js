@@ -16,6 +16,18 @@ function MockItemRepository() {
     this.getAllItemProxies = function() {
         return [];
     };
+
+    this.getProxyFor = function(id) {
+        return {
+            item: {
+                id: id,
+                name: "Mock Proxy"
+            },
+            children: [
+
+            ]
+        }
+    }
     
     this.modelTypes = [];
 

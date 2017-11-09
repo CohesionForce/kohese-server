@@ -751,6 +751,8 @@ describe('ItemProxy Test', function() {
   //
   //////////////////////////////////////////////////////////////////////////
   it('Should Load Class Model Definitions', ()=>{
+    resetItemRepository();
+
     var fs = require('fs');
     var modelDefData = fs.readFileSync('./kdb/modelDef.json', {encoding: 'utf8', flag: 'r'});
     var modelDefMap = JSON.parse(modelDefData);
@@ -760,11 +762,46 @@ describe('ItemProxy Test', function() {
     
     var rootProxy = ItemProxy.getRootProxy();
     var modelDefProxy = ItemProxy.getProxyFor('Model-Definitions');
-    console.log(rootProxy.treeHashEntry.childTreeHashes['Model-Definitions']);
-    console.log(modelDefProxy.treeHashEntry.treeHash);
     
     expect(rootProxy.treeHashEntry.childTreeHashes['Model-Definitions'])
-      .toEqual(modelDefProxy.treeHashEntry.treeHash);    
+      .toEqual(modelDefProxy.treeHashEntry.treeHash);
+    
+    var requiredFields = {};
+    modelDefProxy.visitChildren(null, (proxy) => {
+      requiredFields[proxy.item.name] = proxy.item.requiredProperties;
+    });
+    
+    var expectedRequiredFields = { 
+        Analysis : [ 'id' ],
+        Item : [ 'name' ],
+        Category : [ 'name' ],
+        Decision : [ 'name', 'decisionState' ],
+        Action : [ 'name', 'decisionState', 'actionState' ],
+        KoheseModel : [ 'name', 'idInjection', 'properties', 'validations', 'relations', 'acls', 'methods' ],
+        KoheseUser : [ 'name', 'password' ],
+        Observation : [ 'name', 'observedBy', 'observedOn', 'context' ],
+        Issue : [ 'name', 'observedBy', 'observedOn', 'context', 'issueState' ],
+        Repository : [ 'name' ],
+        Task : [ 'name', 'taskState' ] };
+
+    expect(requiredFields).toEqual(expectedRequiredFields);
+    
+    
+    var newItem = new ItemProxy('Item', {
+      id: 'new-item',
+      description: 'Missing Name'
+    });
+    
+    var itemValidation = newItem.validateItem();
+    expect(itemValidation).toEqual({
+      valid: false,
+      missingProperties: [ 'name']
+    });
+    
+    newItem.item.name = "Test";
+    itemValidation = newItem.validateItem();
+    expect(itemValidation.valid).toEqual(true);
+    
   });
   
   //////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
  */
 
 
-function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisService, IssueService, NavigationService,
+function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueService, NavigationService,
                                DecisionService, ActionService, CategoryService, UserService, tabService,
                                $scope, $stateParams) {
     var detailsCtrl = this;
@@ -41,28 +41,10 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.updateParentProxy();
         detailsCtrl.tab = tabService.getCurrentTab();
         detailsCtrl.tab.route = $stateParams.id; // Likely duplicated logic, can probably refactor this to use tab param object
-        detailsCtrl.filterString = '';
-        detailsCtrl.filterTextTimeout;
 
-        detailsCtrl.analysisFilterString = '';
-        detailsCtrl.analysisFilterRegex = null;
-        detailsCtrl.invalidAnalysisFilterRegex = false;
-        detailsCtrl.summaryFilterExactMatch = true;
-        detailsCtrl.summaryFilterIgnoreCase = true;
 
-        detailsCtrl.analysisSummarySortField = ['-count', 'text'];
-        detailsCtrl.analysisDetailsSortField = '';
         detailsCtrl.enableEdit = false;
         detailsCtrl.defaultTab = {active: true};
-        detailsCtrl.showChunksInAnalysis = true;
-        detailsCtrl.showTokensInAnalysis = true;
-        detailsCtrl.showSentencesInDetails = true;
-        detailsCtrl.showChunksInDetails = false;
-        detailsCtrl.showTokensInDetails = false;
-        detailsCtrl.analysisTokenLimit = 100;
-        detailsCtrl.analysisChunkLimit = 100;
-        detailsCtrl.analysisDetailsItemLimit = 1000;
-        detailsCtrl.filterList = [];
         detailsCtrl.kindList = ItemRepository.getModelTypes();
         detailsCtrl.decisionStates = DecisionService.getDecisionStates();
         detailsCtrl.actionStates = ActionService.getActionStates();
@@ -71,10 +53,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.userList = UserService.getAllUsers();
         detailsCtrl.currentUser = UserService.getCurrentUsername();
         detailsCtrl.proxyList = ItemRepository.getShortFormItemList();
-        detailsCtrl.analysisFilterPOS = analysisService.filterPOS;
-        detailsCtrl.analysisPOSFilterCriteria = analysisService.posFilterCriteria;
-        detailsCtrl.analysisPOSFilterCriteriaList = Object.keys(analysisService.posFilterCriteria);
-        detailsCtrl.analysisPOSFilterName = 'Standard';
         detailsCtrl.NavigationService = NavigationService;
         if (detailsCtrl.tab.state === 'kohese.explore.create.new') {
             detailsCtrl.enableEdit = true;
@@ -182,58 +160,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
           detailsCtrl.itemForm.$dirty = detailsCtrl.issueForm.$dirty;
         }
       }      
-    });
-    
-    $scope.$watch('detailsCtrl.docShowChildren', function () {
-      if(detailsCtrl.docShowChildren) {
-        var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
-        detailsCtrl.docRendered = docWriter.render(docParsed);
-        detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);
-      }
-      else {
-        detailsCtrl.docRendered = null;
-      }
-    });
-    
-    $scope.$watch('detailsCtrl.analysisFilterString', function () {
-      console.log('>>> Filter string changed to: ' + detailsCtrl.analysisFilterString);
-      if (detailsCtrl.filterTextTimeout) {
-        $timeout.cancel(detailsCtrl.filterTextTimeout);
-      }
-      
-      detailsCtrl.filterTextTimeout = $timeout(function() {
-        var regexFilter = /^\/(.*)\/([gimy]*)$/;
-        var filterIsRegex = detailsCtrl.analysisFilterString.match(regexFilter);
-
-        if (filterIsRegex) {
-          try {
-            detailsCtrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
-            detailsCtrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
-            detailsCtrl.invalidAnalysisFilterRegex = false;              
-          }
-          catch (e) {
-            detailsCtrl.invalidAnalysisFilterRegex = true;
-          }
-        }
-        else {
-          let cleanedPhrase = detailsCtrl.analysisFilterString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          if(detailsCtrl.analysisFilterString !== '') {
-            detailsCtrl.analysisFilterRegex = new RegExp(cleanedPhrase,'i');
-            detailsCtrl.analysisFilterRegexHighlight = new RegExp('(' + cleanedPhrase + ')','gi');
-            detailsCtrl.invalidAnalysisFilterRegex = false;
-          }
-          else {
-            detailsCtrl.analysisFilterRegex = null;
-            detailsCtrl.analysisFilterRegexHighlight = null;
-            detailsCtrl.invalidAnalysisFilterRegex = false;
-          }
-        }
-
-        postDigest(function () {
-            // Force one more update cycle to get the match count to display
-            $scope.$apply();
-        });
-      }, 1000); // delay 1000 ms
     });
 
     detailsCtrl.uiTreeOptions = {
@@ -348,6 +274,9 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         }
     };
 
+    // This needs to go away. I don't like us having manual state transitions in
+    // controllers. We need to centralize how we navigate to get the bundle and
+    // tab situation in a maintable situation -- TO-DO JEP
     detailsCtrl.navigate = function (state, params) {
         if (state) {
             $state.go(state, params)
@@ -356,6 +285,10 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             $state.go('kohese.explore.edit', params)
         }
     };
+
+    detailsCtrl.newTab = function(state, params) {
+        NavigationService.navigate(state, params);
+    }
 
     /*
      *
@@ -424,12 +357,6 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
         detailsCtrl.itemProxy.item[type].splice(index, 1);
     };
 
-    detailsCtrl.fetchAnalysis = function () {
-      analysisService.fetchAnalysis(detailsCtrl.itemProxy).then(function (results) {
-        $scope.$apply();
-      });
-    };
-
     detailsCtrl.generateHTMLReport = function () {
       ItemRepository.generateHTMLReportFor(detailsCtrl.itemProxy);
     };
@@ -457,98 +384,14 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             });
     };
 
-    detailsCtrl.getLastFilter = function () {
-        detailsCtrl.analysisFilterString = detailsCtrl.filterList.pop();
-        detailsCtrl.analysisFilterInput = detailsCtrl.analysisFilterString;
-    };
+    detailsCtrl.showChildrenToggled = function() {
+        detailsCtrl.docShowChildren = !detailsCtrl.docShowChildren;
+        $scope.$broadcast('Show Children Toggled', detailsCtrl.docShowChildren);
+    }
 
-    detailsCtrl.submitFilter = function () {
-        detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
-        detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
-    };
-    
-    detailsCtrl.submitSummaryFilter = function (onText) {
-      if (detailsCtrl.summaryFilterExactMatch) {
-        detailsCtrl.analysisFilterInput = '/\\b' + onText + '\\b/';
-        if (detailsCtrl.summaryFilterIgnoreCase) {
-          detailsCtrl.analysisFilterInput += 'i';
-        }
-      }
-      else {
-        detailsCtrl.analysisFilterInput = onText;
-      }
-      
-      detailsCtrl.filterList.push(detailsCtrl.analysisFilterString);
-      detailsCtrl.analysisFilterString = detailsCtrl.analysisFilterInput;
-    };
-  
-    detailsCtrl.filterTokens = function(summary) {
-      return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
-             (detailsCtrl.analysisFilterRegex === null || detailsCtrl.analysisFilterRegex.test(summary.text));
-    };
-
-    detailsCtrl.filterChunks = function(summary) {
-      return detailsCtrl.analysisFilterPOS(summary,detailsCtrl.analysisPOSFilterCriteria[detailsCtrl.analysisPOSFilterName]) && 
-             (detailsCtrl.analysisFilterRegex === null || detailsCtrl.analysisFilterRegex.test(summary.text));
-    };
-
-    detailsCtrl.filterDetails = function(listItem) {
-        return (listItem.displayLevel == 1) && 
-                ((detailsCtrl.analysisFilterRegex === null) || 
-                 (detailsCtrl.analysisFilterRegex.test(listItem.item.name)) || 
-                 (detailsCtrl.analysisFilterRegex.test(listItem.item.description))) || 
-               ((listItem.displayLevel == 2) && detailsCtrl.showSentencesInDetails || 
-                (listItem.displayLevel == 3) && detailsCtrl.showChunksInDetails || 
-                (listItem.displayLevel == 4) && detailsCtrl.showTokensInDetails
-                ) &&
-                (detailsCtrl.analysisFilterRegex === null || detailsCtrl.analysisFilterRegex.test(listItem.text));
-    };
-
-    detailsCtrl.getTokenCount = function () {
-      return $('#theTokensBody').find('tr').length;
-    };
-
-    detailsCtrl.getChunkCount = function () {
-      return $('#theChunksBody').find('tr').length;
-    };
-
-    detailsCtrl.getDetailsItemCount = function () {
-      return $('#theDetailsBody').find('tr').length;
-    };
-    
-    $scope.$watch('detailsCtrl.analysisSummaryItemLimit', function () {
-      postDigest(function () {
-          // Force one more update cycle to get the match count to display
-          $scope.$apply();
-      });
-    });
-
-    $scope.$watch('detailsCtrl.analysisFilterString', function () {
-      postDigest(function () {
-          // Force one more update cycle to get the match count to display
-          $scope.$apply();
-      });
-    });
-
-    $scope.$watch('detailsCtrl.analysisDetailsItemLimit', function () {
-      postDigest(function () {
-          // Force one more update cycle to get the match count to display
-          $scope.$apply();
-      });
-    });
-    
     $scope.$watch('detailsCtrl.itemProxy.item.description', function () {
-      if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.description) {
-        var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
-        detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
-        detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
-        if(detailsCtrl.docShowChildren) {
-          var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
-          detailsCtrl.docRendered = docWriter.render(docParsed);
-          detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);                
-        }
-      }
-    });
+      $scope.$broadcast('Proxy Description Updated', detailsCtrl.itemProxy);              
+        });
 
     function postDigest(callback) {
       var unregister = $scope.$watch(function () {
@@ -606,7 +449,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, analysisS
             // shame.js - I need to refactor this magic number
             detailsCtrl.itemProxy.item[type] = date.valueOf() + 86399;
         }
- else {
+        else {
             detailsCtrl.itemProxy.item[type] = date.valueOf();
         }
     };

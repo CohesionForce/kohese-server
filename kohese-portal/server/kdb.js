@@ -25,21 +25,14 @@ var kdbStore = {
 var modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
 var mountList = {};
 var kdbDirPath = "kdb";
-//Paths may be provided via arguments when starting via -kdb=PATH
-var baseRepoPath = 'kohese-kdb';
-for (var i = 2; i < process.argv.length; i++) {
-    var arg = process.argv[i].split('=');
-    if(arg[0] === '-kdb' && arg[1] !=='') {
-        baseRepoPath = arg[1];
-        break;
-    }
-}
 
-var koheseKDBDirPath = path.join(kdbDirPath, baseRepoPath);
-var mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
-var cachePath = path.join(kdbDirPath, 'cache');
+var koheseKDBDirPath;
+var mountFilePath;
 
-function initialize() {
+function initialize(koheseKdbPath) {
+  koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
+  mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
+
 
   var kdbModel = require('./kdb-model.js');
   ItemProxy.loadModelDefinitions(kdbModel.modelDef);
@@ -63,7 +56,6 @@ function initialize() {
     kdbStore.models[modelKind] = {};
   }
 
-  checkAndCreateDir(cachePath);  
   checkAndCreateDir(kdbDirPath);
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
   //TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.

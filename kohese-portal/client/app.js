@@ -14,6 +14,7 @@ const appModule = angular.module('app', [
     'app.dashboard',
     'app.create',
     'app.create.import',
+    'app.components.analysis',
     'app.services.itemservice',
     'app.services.decisionservice',
     'app.services.actionservice',
@@ -34,6 +35,10 @@ const appModule = angular.module('app', [
     'app.directives.navigation',
     'app.directives.treerow',
     'app.directives.actiontable',
+    'app.directives.documentview',
+    'app.directives.termview',
+    'app.directives.sentenceview',
+    'app.directives.phraseview',
     'app.constants.endpoints',
     require('angular-ui-router'),
     'angular-jwt',
@@ -193,6 +198,11 @@ appModule
                 url: '/users',
                 templateUrl: 'components/admin/subviews/users.html',
                 controller: 'AdminController as adminCtrl'
+            })
+            .state('kohese.analysis', {
+                url: '/analysis/{id}',
+                templateUrl: 'components/analysis/analysis.html',
+                controller: 'AnalysisController as aCtrl'
             });
 
         $urlRouterProvider.otherwise('/dashboard')

@@ -23,6 +23,7 @@ module.exports = function(config) {
 				'client/tests/unit/components/*-spec.js',
 				'client/tests/unit/services/*-spec.js',
 				'client/tests/unit/mock/third-party/Mock*.js',
+				'client/tests/unit/directives/analysis/*-spec.js',
 				"bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
 				"bower_components/angular-animate/angular-animate.js",
 				"bower_components/socket.io-client/socket.io.js",
@@ -54,7 +55,8 @@ module.exports = function(config) {
 	          'client/tests/unit/components/*.js': ['browserify'],
 			  'client/tests/unit/mock/*.js': ['browserify'],
 			  'client/tests/unit/mock/third-party/*.js' : ['browserify'],
-			  'client/tests/unit/services/*.js' : ['browserify']
+			  'client/tests/unit/services/*.js' : ['browserify'],
+			  'client/tests/unit/directives/analysis/*.js' : ['browserify']
 			},
 		
 		plugins: [	'karma-browserify', 

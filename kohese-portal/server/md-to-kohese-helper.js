@@ -5,6 +5,9 @@
  */
  
 var Render = function() {
+  
+       // Need to ignore underscores in identifiers
+       // jshint -W106
        
        return {
                buffer: '',
@@ -156,6 +159,8 @@ var Render = function() {
                        this.buffer += '___'; //Need line break?
                }
        };
+       
+       // jshint +W106
 };
 
 module.exports = Render;
