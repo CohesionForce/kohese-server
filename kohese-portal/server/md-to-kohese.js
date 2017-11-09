@@ -38,8 +38,8 @@ function mdToKohese(filePath, rootItem) {
   itemMap[item.id] = item;
 
   var render = renderFunc();
-  var event;
-  while(event = walker.next()) {
+  var event = walker.next();
+  while(event) {
     // console.log('Event: ' + event.node.type + ' Entering: ' + event.entering);
     if(event.entering && event.node.type === 'document') {
       event = walker.next();
@@ -105,6 +105,8 @@ function mdToKohese(filePath, rootItem) {
       console.log('!!! Unknown/Unhandled event: ' + event.node.type +
           ' - Entering: ' + event.entering);
     }
+    
+    event = walker.next();
   }
   
   for (var id in itemMap) {
