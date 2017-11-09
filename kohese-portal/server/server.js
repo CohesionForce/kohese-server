@@ -22,11 +22,21 @@ boot(app, __dirname, function (err) {
 
     // start the server if `$ node server.js`
     if (require.main === module) {
+      
+      //Paths may be provided via arguments when starting via -kdb=PATH
+      var baseRepoPath = "kohese-kdb";
+      for (var i = 2; i < process.argv.length; i++) {
+        var arg = process.argv[i].split("=");
+        if((arg[0] === "-kdb") && (arg[1] !== "")) {
+          baseRepoPath = arg[1];
+          break;
+        }
+      }
 
         // Load the KDB
         var kdb = require('./kdb.js');
         global.koheseKDB = kdb;
-        kdb.initialize().then(function () {
+        kdb.initialize(baseRepoPath).then(function () {
           // Initialize the in-memory loopback data connector
           var lbMemInitData = kdb.retrieveDataForMemoryConnector();
           var memConnector = app.dataSources.db.connector;
