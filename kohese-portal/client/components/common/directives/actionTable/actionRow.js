@@ -7,47 +7,43 @@
 */
 
 function ActionRowController ($scope) {
-    // Copy the scope variables
-    var ctrl = this;
-    ctrl.proxy = $scope.proxy;
-    ctrl.fields = $scope.fields;
-    ctrl.indention = $scope.indention;
-
-    console.log("Row")
-    console.log(ctrl.proxy.item.name);
-    console.log(ctrl);
+  // Copy the scope variables
+  var ctrl = this;
+  ctrl.proxy = $scope.proxy;
+  ctrl.fields = $scope.fields;
+  ctrl.indention = $scope.indention;
 }
 
 function ActionRow($compile, RecursionHelper) {
-    return {
-        restrict: 'EA',
-        scope: {
-            proxy: '=',
-            fields: '=',
-            indention: "="
-        },
-        templateUrl: 'components/common/directives/actionTable/actionRow.html',
-        controller: ActionRowController    
-        // compile: function(tElement, tAttr) {
-        //   var contents = tElement.contents().remove();
-        //   var compiledContents;
-        //   return function(scope, iElement, iAttr) {
-        //       if(!compiledContents) {
-        //           compiledContents = $compile(contents);
-        //       }
-        //       iElement.append(
-        //           compiledContents(scope, 
-        //                            function(clone) {
-        //                                return clone; }));
-        //       };
-        }
-    }
+  return {
+    restrict: 'EA',
+    scope: {
+      proxy: '=',
+      fields: '=',
+      indention: '='
+    },
+    templateUrl: 'components/common/directives/actionTable/actionRow.html',
+    controller: ActionRowController    
+    // compile: function(tElement, tAttr) {
+    //   var contents = tElement.contents().remove();
+    //   var compiledContents;
+    //   return function(scope, iElement, iAttr) {
+    //       if(!compiledContents) {
+    //           compiledContents = $compile(contents);
+    //       }
+    //       iElement.append(
+    //           compiledContents(scope, 
+    //                            function(clone) {
+    //                                return clone; }));
+    //       };
+  }
+}
 
 
 
 
 export default () => {
   angular.module('app.directives.actionrow', [])
-  .directive('actionRow', ActionRow)
-  .controller("ActionRowController", ActionRowController);
+    .directive('actionRow', ActionRow)
+    .controller('ActionRowController', ActionRowController);
 }

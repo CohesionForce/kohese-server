@@ -1,11 +1,11 @@
-function MockToastr(){
-    this.success = () =>{
+function MockToastr() {
+  this.success = () =>{
 
-    }
+  }
 
-    this.error = () =>{
+  this.error = () =>{
 
-    }
+  }
 }
 
 module.exports = MockToastr;

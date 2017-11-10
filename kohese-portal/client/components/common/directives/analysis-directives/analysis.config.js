@@ -3,7 +3,7 @@
 */
 
 export default ()=> {
-    require('./phrase-view')();
-    require('./sentence-view')();
-    require('./term-view')();
+  require('./phrase-view')();
+  require('./sentence-view')();
+  require('./term-view')();
 }

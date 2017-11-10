@@ -1,33 +1,33 @@
 function MockVersionControlService() {
-    const service = this;
+  const service = this;
     
-    service.stageItems = function(proxyList) {
+  service.stageItems = function(proxyList) {
 
-    }
+  }
 
-    service.unstageItems = function(proxyList) {
+  service.unstageItems = function(proxyList) {
 
-    }
+  }
 
-    service.commitItems = function (proxyList, commitMessage) {
+  service.commitItems = function (proxyList, commitMessage) {
 
-    }
+  }
 
-    service.revertItems = function(proxyList) {
+  service.revertItems = function(proxyList) {
         
-    }
+  }
 
-    service.push = function(proxyIds, remoteName) {
+  service.push = function(proxyIds, remoteName) {
         
-    }
+  }
 
-    service.addRemote = function(proxyId, remoteName, url) {
+  service.addRemote = function(proxyId, remoteName, url) {
 
-    }
+  }
 
-    service.getRemotes = function(proxyId, callback) {
-        callback(['test-remote', 'master'])
-    }
+  service.getRemotes = function(proxyId, callback) {
+    callback(['test-remote', 'master'])
+  }
 }
 
 module.exports = MockVersionControlService;
