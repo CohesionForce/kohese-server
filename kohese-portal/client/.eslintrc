@@ -33,7 +33,7 @@
     "no-constant-condition" : 1,
     "no-irregular-whitespace": 1,
     "padded-blocks": [1, "never"],
-    "space-after-function-name": [1, "never"],
+    "space-before-function-paren": 2,
     "space-before-blocks": [1, "always"]
    }
 }
