@@ -3,34 +3,34 @@
  */
 
 function CategoryService(ItemRepository, $rootScope) {
-    const service = this;
-    var users = [];
+  const service = this;
+  var users = [];
 
-    service.getTags = getTags;
-    service.getTagNames = getTagNames;
+  service.getTags = getTags;
+  service.getTagNames = getTagNames;
 
-    $rootScope.$on('itemRepositoryReady', function () {
-        var root = ItemRepository.getRootProxy();
-        //TBD:  Why is this getting Users?
-        users = root.getChildByName('Users').children;
-    });
+  $rootScope.$on('itemRepositoryReady', function () {
+    var root = ItemRepository.getRootProxy();
+    //TBD:  Why is this getting Users?
+    users = root.getChildByName('Users').children;
+  });
 
-    function getTags() {
-        return users;
+  function getTags() {
+    return users;
+  }
+
+  function getTagNames() {
+    var tagNames = [];
+    for (var x = 0; x < users.length; x++) {
+      tagNames.push(users[x].item.name);
     }
-
-    function getTagNames() {
-        var tagNames = [];
-        for (var x = 0; x < users.length; x++) {
-            tagNames.push(users[x].item.name);
-        }
-        return tagNames;
-    }
+    return tagNames;
+  }
 }
 
 export default () => {
-    angular.module('app.services.categoryservice', [
-        'app.services.itemservice'
-    ])
-        .service('CategoryService', CategoryService)
+  angular.module('app.services.categoryservice', [
+    'app.services.itemservice'
+  ])
+    .service('CategoryService', CategoryService)
 }

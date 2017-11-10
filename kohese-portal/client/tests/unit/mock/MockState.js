@@ -1,7 +1,7 @@
 function MockState() {
-    this.getActionStates = function() {
-        return [];
-    };
+  this.getActionStates = function() {
+    return [];
+  };
 }
 
 module.exports = MockState;

@@ -13,13 +13,17 @@
      "exampleGlobalVariable": true,
      "angular": true,  // ng
      "inject" : true, //ng injector
-     "$" : true //jquery
+     "$" : true, //jquery
+     "$scope" : true
+
    },
    "plugins": ["angular"],
    "rules": {
     "quotes": [2, "single", "avoid-escape"],
     "eqeqeq": 0,
-    "brace-style": [1, "stroustrup"],
+    "curly" : 1,
+    "brace-style": [1, "1tbs"],
+    "indent" : ["error", 2],
     "eol-last": 0,
     "for-direction": 1,
     "no-nested-ternary": 1,

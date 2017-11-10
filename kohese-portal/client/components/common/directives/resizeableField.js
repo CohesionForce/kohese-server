@@ -3,12 +3,12 @@
  */
 
 function ResizeableField() {
-    return function ($scope, $element, $attrs) {
-        $($element).autoResize();
-    };
+  return function ($scope, $element, $attrs) {
+    $($element).autoResize();
+  };
 }
 
 export default () => {
-    angular.module('app.directives.resizeablefield', [])
-        .directive('resizeableField', ResizeableField)
+  angular.module('app.directives.resizeablefield', [])
+    .directive('resizeableField', ResizeableField)
 }
