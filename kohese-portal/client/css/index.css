@@ -806,6 +806,16 @@ tab div {
   background-color: #7dd7ae;
 }
 
+.navbar .navbar-disconnected {
+  color: white;
+  cursor: pointer;
+  background-color: red;
+}
+
+.navbar .navbar-syncing {
+  background-color: yellow;
+}
+
 .navbar .navbar-top-links {
   margin-right: 0;
 }

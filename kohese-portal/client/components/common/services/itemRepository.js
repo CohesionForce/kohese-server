@@ -2,7 +2,7 @@
  *
  */
 
-function ItemRepository(KoheseIO, $rootScope, toastr) {
+function ItemRepository (KoheseIO, $rootScope, toastr) {
   var _ = require('underscore');
   var ItemProxy = require('../../../../common/models/item-proxy');
   var createStates = require('../../../../common/models/createStates');
@@ -42,7 +42,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     Conflicted: {}
   };
 
-  function registerKoheseIOListeners() {
+  function registerKoheseIOListeners () {
     // Register the listeners for the Item kinds that are being tracked
     for (var modelName in modelTypes) {
       KoheseIO.socket.on(modelName + '/create', function (notification) {
@@ -87,7 +87,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
 
     KoheseIO.socket.on('connect_error', function () {
       console.log('::: IR: Socket IO Connection Error');
-      toastr.error('Disconnected from server', 'Connection Error');
+      $rootScope.$broadcast('serverDisconnected', {})
     });
 
     KoheseIO.socket.on('reconnect', function () {
@@ -141,7 +141,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     getRepoStagingStatus: getRepoStagingStatus
   };
     
-  function updateVCState(proxy, newStatus) {
+  function updateVCState (proxy, newStatus) {
     var oldStatus = proxy.status;
     var oldVCState = proxy.vcState;
     var newVCState = {};
@@ -175,12 +175,13 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     proxy.vcState = newVCState;
   }
     
-  function getRepoStagingStatus() {
+  function getRepoStagingStatus () {
     return repoStagingStatus;
   }
     
-  function fetchItems() {
+  function fetchItems () {
     var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
+    $rootScope.$broadcast('syncingRepository');
     KoheseIO.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
       console.log('::: Response for getAll');
       if(response.kdbMatches) {
@@ -227,6 +228,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
           console.log('*** Checking hashes again');
           var recheckTreeHashes = ItemProxy.getAllTreeHashes();
           var compareAgain = ItemProxy.compareTreeHashMap(recheckTreeHashes, response.repoTreeHashes);
+          $rootScope.$broadcast('syncRepositoryFailed');
           console.log(compareAgain);
         }
       }
@@ -237,11 +239,11 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     });         
   }
 
-  function getModelTypes() {
+  function getModelTypes () {
     return modelTypes;
   }
 
-  function createShortFormItemList() {
+  function createShortFormItemList () {
     var proxies = ItemProxy.getAllItemProxies();
     shortProxyList=[];
     for (var i = 0; i < proxies.length; i++ ) {
@@ -252,12 +254,12 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     }
   }
 
-  function getShortFormItemList() {
+  function getShortFormItemList () {
     createShortFormItemList();
     return shortProxyList;
   }
 
-  function copyAttributes(fromItem, toItem) {
+  function copyAttributes (fromItem, toItem) {
     // TBD: Need to remove
     console.log('### Deprecated call to copyAttributes');
 
@@ -269,7 +271,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     }
   }
 
-  function updateItemProxy(withResults) {
+  function updateItemProxy (withResults) {
     var proxy = ItemProxy.getProxyFor(withResults.id);
 
     if (proxy) {
@@ -280,7 +282,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     proxy.dirty = false;
   }
 
-  function fetchItem(proxy) {
+  function fetchItem (proxy) {
     var promise = new Promise((resolve, reject) => {
       KoheseIO.socket.emit('Item/findById', {id: proxy.item.id}, function (response) {
         proxy.updateItem(response.kind, response.item);
@@ -292,7 +294,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     return promise;
   }
 
-  function upsertItem(proxy) {
+  function upsertItem (proxy) {
     console.log('::: Preparing to upsert ' + proxy.kind);
         
     var promise = new Promise((resolve, reject) => {
@@ -316,7 +318,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     return promise;
   }
 
-  function deleteItem(proxy, recursive) {
+  function deleteItem (proxy, recursive) {
     console.log('::: Preparing to deleteById ' + proxy.kind);
         
     var promise = new Promise((resolve, reject) => {
@@ -332,19 +334,19 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     return promise;
   }
 
-  function generateHTMLReportFor(proxy) {
+  function generateHTMLReportFor (proxy) {
     KoheseIO.socket.emit('Item/generateReport', {onId: proxy.item.id, format: 'html'}, function (results) {
       console.log('::: Report results: ' + results.html);
     });
   }
 
-  function generateDOCXReportFor(proxy) {
+  function generateDOCXReportFor (proxy) {
     KoheseIO.socket.emit('Item/generateReport', {onId: proxy.item.id, format: 'docx'}, function (results) {
       console.log('::: Report results: ' + results.docx);
     });
   }
 
-  function getHistoryFor(proxy) {
+  function getHistoryFor (proxy) {
     KoheseIO.socket.emit('Item/getHistory', {onId: proxy.item.id}, function (results) {
       if (!proxy.history) {
         proxy.history = {};
@@ -355,7 +357,7 @@ function ItemRepository(KoheseIO, $rootScope, toastr) {
     });
   }
 
-  function getStatusFor(repo) {
+  function getStatusFor (repo) {
     KoheseIO.socket.emit('Item/getStatus', {repoId: repo.item.id}, function (results) {
       if (!repo.repoStatus) {
         repo.repoStatus = {};

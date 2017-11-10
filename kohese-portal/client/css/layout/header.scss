@@ -21,6 +21,14 @@
 
     }
   }
+  .navbar-disconnected {
+    color: white;
+    cursor: pointer;
+    background-color: red;
+  }
+  .navbar-syncing {
+    background-color: yellow;
+  }
 
   .navbar-top-links {
     margin-right: 0;

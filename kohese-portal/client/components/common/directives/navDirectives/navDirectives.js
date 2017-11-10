@@ -2,9 +2,10 @@
  * Created by josh on 6/17/15.
  */
 
-function AppBarController($rootScope, UserService, LoginService, $state, jwtHelper, AuthTokenFactory) {
+function AppBarController ($rootScope, UserService, LoginService, $state, jwtHelper, AuthTokenFactory) {
   var ctrl = this;
   ctrl.userName = '';
+  ctrl.repositorySynced = false;
   checkAuthentication();
   ctrl.userName = UserService.getCurrentUsername();
 
@@ -22,7 +23,7 @@ function AppBarController($rootScope, UserService, LoginService, $state, jwtHelp
     ctrl.userLoggedIn = null;
   };
     
-  $rootScope.$on('userLoggedIn', function() {
+  $rootScope.$on('userLoggedIn', function () {
     checkAuthentication();
   });
 
@@ -30,7 +31,25 @@ function AppBarController($rootScope, UserService, LoginService, $state, jwtHelp
     ctrl.userName = UserService.getCurrentUsername();
   });
 
-  function checkAuthentication() {
+  $rootScope.$on('syncingRepository', function () {
+    ctrl.repositorySyncing = true;
+  });
+
+  $rootScope.$on('syncRepositoryFailed', function () {
+    ctrl.repositorySyncing = false;
+    ctrl.repositorySynced = false;
+  })
+
+  $rootScope.$on('itemRepositoryReady', function () {
+    ctrl.repositorySyncing = false;
+    ctrl.repositorySynced = true;
+  });
+
+  $rootScope.$on('serverDisconnected', function () { 
+    ctrl.repositorySynced = false;
+  });
+
+  function checkAuthentication () {
     ctrl.userLoggedIn = LoginService.checkLoginStatus();
     if (!ctrl.userLoggedIn) {
       $state.go('login');
@@ -42,7 +61,7 @@ function AppBarController($rootScope, UserService, LoginService, $state, jwtHelp
   }
 }
 
-function AppBar() {
+function AppBar () {
   return {
     restrict: 'EA',
     templateUrl: 'components/common/directives/navDirectives/appBar.html',
