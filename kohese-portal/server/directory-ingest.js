@@ -58,7 +58,10 @@ function processToMarkdown(filePath, basePath) {
   var mdOutPath = tempPathDirName + '.md';
   var processed = true;
   
-  switch (path.ext) {
+  // Need to convert doc extension to lower case for comparison
+  var docType = path.ext.toLowerCase();
+  
+  switch (docType) {
   case '.doc':
     // doc processing
     console.log('::: Processing doc to odt to md');
