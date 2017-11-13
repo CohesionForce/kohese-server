@@ -1,4 +1,4 @@
-function DocumentController($scope, $sce, $stateParams, tabService) {
+function DocumentController ($scope, $sce, $stateParams, tabService) {
   var docCtrl = this;
 
   var reader = new commonmark.Parser();
@@ -41,12 +41,12 @@ function DocumentController($scope, $sce, $stateParams, tabService) {
     }
   })
 
-  function generateDoc() {
+  function generateDoc () {
     if (docCtrl.showChildren) {
       var docParsed = docReader.parse(docCtrl.itemProxy.getDocument());
       docCtrl.docRendered = docWriter.render(docParsed);
       docCtrl.docRendered = $sce.trustAsHtml(docCtrl.docRendered);
-    } else {
+    } else if (docCtrl.itemProxy.item.description) {
       var parsed = reader.parse(docCtrl.itemProxy.item.description); // parsed is a 'Node' tree   
       docCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
       docCtrl.itemDescriptionRendered = $sce.trustAsHtml(docCtrl.itemDescriptionRendered);
@@ -54,7 +54,7 @@ function DocumentController($scope, $sce, $stateParams, tabService) {
   }
 }
 
-function DocumentDirective() {
+function DocumentDirective () {
   return {
     restrict: 'E',
     controller: 'DocumentController as docCtrl',
