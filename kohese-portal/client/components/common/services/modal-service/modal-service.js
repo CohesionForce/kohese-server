@@ -5,14 +5,17 @@
    https://github.com/angular-ui/bootstrap/tree/master/src/modal
 */
 
-function ModalService($modal) {
+function ModalService ($modal) {
   const service = this;
+  this.DEFAULT_TEMPLATE = 'components/common/services/modal-service/modal.html'
+  this.ONE_LIST_TEMPLATE = 'components/common/services/modal-service/oneListModal.html'
+  this.DELETE_TEMPLATE = 'components/common/services/modal-service/deleteModal.html'
 
   var modalDefaults = {
     backdrop: true,
     keyboard: true,
     modalFade: true,
-    templateUrl: 'components/common/services/modal-service/modal.html'
+    templateUrl: this.DEFAULT_TEMPLATE
   };
 
   var modalOptions = {
@@ -22,7 +25,7 @@ function ModalService($modal) {
     bodyText: 'Perform this action'
   };
 
-  service.showModal = function(customModalDefaults, customModalOptions) {
+  service.showModal = function (customModalDefaults, customModalOptions) {
     if (!customModalDefaults) {
       customModalDefaults = {}
     }
@@ -31,7 +34,7 @@ function ModalService($modal) {
     return service.show(customModalDefaults, customModalOptions);
   }
 
-  service.show = function(customModalDefaults, customModalOptions) {
+  service.show = function (customModalDefaults, customModalOptions) {
     var tempModalDefaults = {};
     var tempModalOptions = {};
 
@@ -44,12 +47,12 @@ function ModalService($modal) {
     /* If a more complex controller hasn't been passed in, create a generic
            open / close function */
     if (!tempModalDefaults.controller) {
-      tempModalDefaults.controller = function($scope, $modalInstance) {
+      tempModalDefaults.controller = function ($scope, $modalInstance) {
         $scope.modalOptions = tempModalOptions;
-        $scope.modalOptions.ok = function(result) {
+        $scope.modalOptions.ok = function (result) {
           $modalInstance.close(result);
         }
-        $scope.modalOptions.close = function(result) {
+        $scope.modalOptions.close = function (result) {
           $modalInstance.dismiss('cancel');
         };
       }
@@ -64,4 +67,5 @@ export default () => {
     .service('ModalService', ModalService)
     .constant('DeleteTemplate', 'components/common/services/modal-service/deleteModal.html')
     .constant('DefaultTemplate', 'components/common/services/modal-service/modal.html')
+    
 }

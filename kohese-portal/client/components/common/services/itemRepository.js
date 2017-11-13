@@ -2,7 +2,7 @@
  *
  */
 
-function ItemRepository (KoheseIO, $rootScope, toastr) {
+function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
   var _ = require('underscore');
   var ItemProxy = require('../../../../common/models/item-proxy');
   var createStates = require('../../../../common/models/createStates');
@@ -296,25 +296,54 @@ function ItemRepository (KoheseIO, $rootScope, toastr) {
 
   function upsertItem (proxy) {
     console.log('::: Preparing to upsert ' + proxy.kind);
-        
-    var promise = new Promise((resolve, reject) => {
-      KoheseIO.socket.emit('Item/upsert', {kind: proxy.kind, item:proxy.item}, function (response) {
-        if (response.error) {
-          reject(response.error);
-        } else {
-          console.log(response);
-          if(!proxy.updateItem) {
-            proxy.item = response.item;
-            proxy = new ItemProxy(response.kind, response.item);
+    var promise; 
+    var requiredProperties = true;
+
+    for (var i = 0; i < proxy.model.item.requiredProperties.length; i++) {
+      var fieldName = proxy.model.item.requiredProperties[i];
+      if (!proxy.item[fieldName]) {
+        requiredProperties = false;
+        break;
+      }
+    }
+    
+    if(requiredProperties) {
+      promise = new Promise((resolve, reject) => {
+        KoheseIO.socket.emit('Item/upsert', {kind: proxy.kind, item:proxy.item}, function (response) {
+          if (response.error) {
+            reject(response.error);
           } else {
-            proxy.updateItem(response.kind, response.item);
+            console.log(response);
+            if(!proxy.updateItem) {
+              proxy.item = response.item;
+              proxy = new ItemProxy(response.kind, response.item);
+            } else {
+              proxy.updateItem(response.kind, response.item);
+            }
+            proxy.dirty = false;
+            resolve(proxy);              
           }
-          proxy.dirty = false;
-          resolve(proxy);              
+        });         
+      });
+    } else {
+      promise = new Promise((resolve, reject) => {
+        var modalOptions = {
+          actionButtonText : 'Ok',
+          closeButtonText : null,
+          headerText: 'Invalid field',
+          bodyText: 'Please fill out all required fields : ',
+          list: proxy.model.item.requiredProperties
+        }    
+
+        var modalDefaults = {
+          templateUrl : ModalService.ONE_LIST_TEMPLATE
         }
-      });         
-    });
-        
+      
+        ModalService.showModal(modalDefaults, modalOptions);
+        reject({error: 'User must fill out required fields'})
+      })
+    }
+
     return promise;
   }
 
@@ -397,6 +426,9 @@ function ItemRepository (KoheseIO, $rootScope, toastr) {
 }
 
 export default () => {
-  angular.module('app.services.itemservice', ['app.factories.koheseio', 'toastr'])
+  angular.module('app.services.itemservice', 
+    ['app.factories.koheseio', 
+      'toastr',
+      'app.services.modalservice'])
     .service('ItemRepository', ItemRepository);
 }
