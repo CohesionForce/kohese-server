@@ -3,7 +3,7 @@
  */
 
 
-function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueService, NavigationService,
+function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueService, NavigationService,
   DecisionService, ActionService, CategoryService, UserService, tabService,
   $scope, $stateParams) {
   var detailsCtrl = this;
@@ -181,7 +181,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueServ
     }
   };
 
-  function updateParentProxy() {
+  function updateParentProxy () {
     if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.parentId) {
       detailsCtrl.parentProxy = ItemRepository.getProxyFor(detailsCtrl.itemProxy.item.parentId);
     } else {
@@ -189,7 +189,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueServ
     }
   }
 
-  function initializeItemStates(type) {
+  function initializeItemStates (type) {
     if (type === 'Action') {
       if (!detailsCtrl.itemProxy.item.hasOwnProperty('actionState')) {
         detailsCtrl.itemProxy.item.actionState = 'Proposed';
@@ -213,6 +213,8 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueServ
   }
 
   detailsCtrl.createItem = function (navigationType) {
+    detailsCtrl.itemProxy.model = ItemRepository
+      .getProxyFor(detailsCtrl.itemProxy.kind);
     ItemRepository.upsertItem(detailsCtrl.itemProxy)
       .then(function (updatedItemProxy) {
         if (!detailsCtrl.itemProxy.updateItem) {
@@ -275,7 +277,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueServ
     }
   };
 
-  detailsCtrl.newTab = function(state, params) {
+  detailsCtrl.newTab = function (state, params) {
     NavigationService.navigate(state, params);
   }
 
@@ -371,7 +373,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueServ
       });
   };
 
-  detailsCtrl.showChildrenToggled = function() {
+  detailsCtrl.showChildrenToggled = function () {
     detailsCtrl.docShowChildren = !detailsCtrl.docShowChildren;
     $scope.$broadcast('Show Children Toggled', detailsCtrl.docShowChildren);
   }
@@ -380,7 +382,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueServ
     $scope.$broadcast('Proxy Description Updated', detailsCtrl.itemProxy);              
   });
 
-  function postDigest(callback) {
+  function postDigest (callback) {
     var unregister = $scope.$watch(function () {
       unregister();
       $timeout(function () {
@@ -467,7 +469,7 @@ function DetailsViewController($state, $sce, $timeout, ItemRepository, IssueServ
     detailsCtrl.upsertItem();
   };
 
-  function configureState() {
+  function configureState () {
     detailsCtrl.accordion = {};
     if (detailsCtrl.itemProxy.item.actionState === 'Proposed'
             && detailsCtrl.itemProxy.item.decisionState != 'Proposed') {
