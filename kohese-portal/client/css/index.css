@@ -365,6 +365,7 @@ table td .glyphicon-remove:hover {
 
 .knowledge-tree .kt-icon, .knowledge-tree .kt-label {
   cursor: pointer;
+  padding: 3px 5px 3px 5px;
 }
 
 .kt-collection .kt-collection {
