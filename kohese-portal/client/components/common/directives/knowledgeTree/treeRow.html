@@ -16,29 +16,30 @@
         <span ng-if="treeCtrl.versionControlEnabled && itemProxy.statusFlags">
         </span>
         <!-- End conditional Checkbox for Version control -->
-        <div class="kti-name"
-                ng-style="{'font-weight': 'bold'}">
-            <a style=""> <i
-                    ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]"
-                    ng-init="treeCtrl.initCollapsed(itemProxy.item.id)"
-                    class="kt-icon"
-                    ng-class="{'fa fa-caret-down': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
-                           'fa fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
-                           'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
-            </i>
-            </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
-                                                  ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
-                                                  ng-click="treeCtrl.navigate('kohese.explore.edit', 
-                                                            {id: itemProxy.item.id})"></span>
-                <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
-                <!-- Conditional Icons for Item status -->
-                <span ng-if="itemProxy.dirty">
-                        <img src="resources/icons/versioncontrol/dirty.ico"
-                             title = "Dirty item" />
-                </span>
+            <div class="kti-name"
+                    ng-style="{'font-weight': 'bold'}"
+                    ng-click="treeCtrl.navigate('kohese.explore.edit', 
+                    {id: itemProxy.item.id})">
+                <a style=""> <i
+                        ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]; $event.stopPropagation()"
+                        ng-init="treeCtrl.initCollapsed(itemProxy.item.id)"
+                        class="kt-icon"
+                        ng-class="{'fa fa-caret-down': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
+                            'fa fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
+                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
+                </i>
+                </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
+                                                    ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
+                                                    ></span>
+                    <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
+                    <!-- Conditional Icons for Item status -->
+                    <span ng-if="itemProxy.dirty">
+                            <img src="resources/icons/versioncontrol/dirty.ico"
+                                title = "Dirty item" />
+                    </span>
 
-                {{itemProxy.status}}
-        </div>
+                    {{itemProxy.status}}
+            </div>
         <div class="kti-cell kti-actions pull-right"> 
             <!-- Default row actions -->
             <span ng-if="!treeCtrl.versionControlEnabled">
