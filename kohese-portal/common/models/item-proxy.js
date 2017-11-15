@@ -99,6 +99,21 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static resetItemRepository() {
+    
+    console.log('::: Resetting Item Repository');
+    var rootProxy = ItemProxy.getRootProxy();
+
+    tree.loading = true;
+
+    rootProxy.visitChildren(null, null, (childProxy) => {
+      childProxy.deleteItem();
+    });
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static getRootProxy() {
     // console.log('::: IP: Getting Root Proxy');
     return tree.root;
@@ -190,6 +205,30 @@ class ItemProxy {
   }
   
   //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static gitDocumentOID(forDoc) {
+    var shaObj = new SHA('SHA-1', 'TEXT');
+    
+    var forText = JSON.stringify(forDoc, null, '  ');
+        
+    var length = forText.length;
+//    console.log(forText);
+//    console.log('\n');
+    shaObj.update('blob ' + forText.length + '\0' + forText);
+    
+    var oid = shaObj.getHash('HEX');
+    
+//    for(var l = length - 5; l < length +5; l++){
+//      shaObj.update('blob ' + l + '\0' + forText);
+//      var newOid = shaObj.getHash('HEX');
+//      console.log('>>> ' + l + ' - ' + newOid);
+//    }
+    
+    return oid;
+  }
+  
+ //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   calculateOID() {
@@ -881,7 +920,7 @@ class ItemProxy {
   deleteItem(deleteDescendants) {
     var byId = this.item.id;
 
-    console.log('::: Deleting proxy for ' + byId);
+//    console.log('::: Deleting proxy for ' + byId);
     
     var attemptToDeleteRestrictedNode = (
         (this.item.id === tree.lostAndFound.item.id) || 
@@ -898,23 +937,23 @@ class ItemProxy {
         childProxy.deleteItem(deleteDescendants);
       });
       if (attemptToDeleteRestrictedNode){
-        console.log('::: -> Not removing ' + this.item.name);        
+//        console.log('::: -> Not removing ' + this.item.name);        
       } else {
-        console.log('::: -> Removing all references');
+//        console.log('::: -> Removing all references');
         delete tree.proxyMap[byId];
       }
     } else {
       // Remove this item and leave any children under Lost+Found
       if (this.children.length !== 0) {
         if (!attemptToDeleteRestrictedNode){
-          console.log('::: -> Node still has children');
+//          console.log('::: -> Node still has children');
           createMissingProxy(byId);          
         }
       } else {
         if (attemptToDeleteRestrictedNode){
-          console.log('::: -> Not removing ' + this.item.name);                  
+//          console.log('::: -> Not removing ' + this.item.name);                  
         } else {
-          console.log('::: -> Removing all references');
+//          console.log('::: -> Removing all references');
           delete tree.proxyMap[byId];
         }
       }      
