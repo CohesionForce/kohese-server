@@ -13,7 +13,6 @@ const COMMIT_DIRECTORY = path.join(OBJECT_DIRECTORY, 'commit');
 const BLOB_DIRECTORY = path.join(OBJECT_DIRECTORY, 'blob');
 const TREE_DIRECTORY = path.join(OBJECT_DIRECTORY, 'tree');
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const repositoryPath = process.argv[2];
 
 // TODO Remove or Replace Index Dir with Cache Dir
@@ -25,8 +24,11 @@ kdbFS.createDirIfMissing(COMMIT_DIRECTORY);
 kdbFS.createDirIfMissing(BLOB_DIRECTORY);
 kdbFS.createDirIfMissing(TREE_DIRECTORY);
 
-var cachedOIDs = [];
-var repoBlobs = {};
+var repoObjects = {
+  blob: {},
+  tree: {},
+  commit: {}
+};
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -38,25 +40,30 @@ function loadCachedObjects(repoBlobs) {
   oidFiles.forEach((oidFile) => {
     var oid = oidFile.replace(/\.json$/, '');
     var object = kdbFS.loadJSONDoc(BLOB_DIRECTORY + '/' + oidFile);
-    repoBlobs[oid]=object;
+    repoObjects.blob[oid] = object;
   });
   
-  cachedOIDs = Object.keys(repoBlobs).sort();
+  oidFiles = kdbFS.getRepositoryFileList(TREE_DIRECTORY, /\.json$/);
+  oidFiles.forEach((oidFile) => {
+    var oid = oidFile.replace(/\.json$/, '');
+    var object = kdbFS.loadJSONDoc(TREE_DIRECTORY + '/' + oidFile);
+    repoObjects.tree[oid] = object;
+  });
+  
+  oidFiles = kdbFS.getRepositoryFileList(COMMIT_DIRECTORY, /\.json$/);
+  oidFiles.forEach((oidFile) => {
+    var oid = oidFile.replace(/\.json$/, '');
+    var object = kdbFS.loadJSONDoc(COMMIT_DIRECTORY + '/' + oidFile);
+    repoObjects.commit[oid] = object;
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function storeCachedObjects() {
-  var updatedOIDs = Object.keys(repoBlobs).sort();
-  var newOIDs = _.difference(updatedOIDs, cachedOIDs);
-  console.log('New Objects Found: ' + newOIDs.length);
-  
-  newOIDs.forEach((oid) => {
-    kdbFS.storeJSONDoc(BLOB_DIRECTORY + '/' + oid + '.json', repoBlobs[oid]);
-  });  
-  
-  cachedOIDs = updatedOIDs;
+function addCachedObject(type, oid, object) {
+  repoObjects[type][oid] = object;
+  kdbFS.storeJSONDoc(OBJECT_DIRECTORY + '/' + type + path.sep + oid + '.json', object);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -65,7 +72,7 @@ function storeCachedObjects() {
 
 // Load Cached Objects From Prior Runs
 var beforeTime = Date.now();
-loadCachedObjects(repoBlobs);
+loadCachedObjects(repoObjects);
 var afterTime = Date.now();
 var deltaTime = afterTime-beforeTime;
 console.log('--- Load Cached Objects Time: ' + deltaTime/1000);
@@ -83,7 +90,7 @@ commitFileList.forEach((commitFile) => {
 
 generateCommitHistoryIndices(repositoryPath, false).then(() => {
   console.log('::: Finished Indexing');
-  storeCachedObjects();
+  addCachedObject();
 });
 
 //////////////////////////////////////////////////////////////////////////
@@ -129,16 +136,20 @@ function indexCommit(repository, commits) {
     var beforeCommitTime = Date.now();
 
     return commit.getTree().then(function (tree) {
+      var co = {
+        treeId: tree.id().toString(),
+        time: commit.timeMs(),
+        author: commit.author().toString(),
+        message: commit.message(),
+        parents: []
+      };
+      for (var j = 0; j < commit.parentcount(); j++) {
+        co.parents.push(commit.parentId(j).toString());
+      }
+      addCachedObject("commit", commit.id(), co);
+      
       return getIndexEntries(tree, []);
     }).then(function (entryMap) {
-      entryMap.meta.time = commit.timeMs();
-      entryMap.meta.author = commit.author().toString();
-      entryMap.meta.message = commit.message();
-      entryMap.meta.parents = [];
-      for (var j = 0; j < commit.parentcount(); j++) {
-        entryMap.meta.parents.push(commit.parentId(j).toString());
-      }
-
       var beforeTime = Date.now();
       ItemProxy.resetItemRepository();
       var afterTime = Date.now();
@@ -146,18 +157,15 @@ function indexCommit(repository, commits) {
       console.log('--- Reset Time: ' + deltaTime/1000);
       
       var promises = [];
-      for (var id in entryMap.objects) {
-        (function (idKey) {
-          var oid = entryMap.objects[idKey].oid;
-          if (repoBlobs[oid]){
-            var proxy = new ItemProxy(entryMap.objects[idKey].kind, repoBlobs[oid]);
-          } else {
-            promises.push(getContents(repository, entryMap.objects[idKey].oid).then(function (contents) {
-              repoBlobs[oid] = contents;
-              var proxy = new ItemProxy(entryMap.objects[idKey].kind, repoBlobs[oid]);
+      for (var j = 0; j < entryMap.length; j++) {
+        (function (jIndex) {
+          var oid = entryMap[j].oid;
+          if (!repoObjects.blob[oid]){
+            promises.push(getContents(repository, entryMap[j].oid).then(function (contents) {
+              addCachedObject("blob", oid, contents);
             }));          
           }
-        })(id);
+        })(j);
       }
       
       return Promise.all(promises).then(function () {
@@ -165,23 +173,6 @@ function indexCommit(repository, commits) {
         var afterCommitTime = Date.now();
         var deltaCommitTime = afterCommitTime-beforeCommitTime;
         console.log('--- Commit Read Time: ' + deltaCommitTime/1000);
-        
-        var beforeCompleteTime = Date.now();
-        ItemProxy.loadingComplete();
-        var afterCompleteTime = Date.now();
-        var deltaCompleteTime = afterCompleteTime-beforeCompleteTime;
-        console.log('--- Load Complete Time: ' + deltaCompleteTime/1000);
-
-        var beforeGATHTime = Date.now();
-        entryMap.treeHash = ItemProxy.getAllTreeHashes();
-        var afterGATHTime = Date.now();
-        var deltaGATHTime = afterGATHTime-beforeGATHTime;
-        console.log('--- GATH Time: ' + deltaGATHTime/1000);
-
-        fs.writeFileSync(path.join(INDEX_DIRECTORY, commit.id() + '.json'),
-            JSON.stringify(entryMap, null, '  '), {encoding: 'utf8', flag: 'w'});
-
-        storeCachedObjects();
         
         return indexCommit(repository, commits);
       });      
@@ -219,25 +210,7 @@ function getIndexEntries(tree, paths) {
     p = parseTree(tree);
   }
   
-  return p.then(function (entries) {
-    var entryMap = {
-      meta: {},
-      objects: {}
-    };
-    
-    entries.sort(function (e1, e2) {
-      return (e1.uuid > e2.uuid ? 1 : (e1.uuid < e2.uuid ? -1 : 0));
-    });
-    
-    for (var j = 0; j < entries.length; j++) {
-      entryMap.objects[entries[j].uuid] = {
-          oid: entries[j].oid,
-          kind: entries[j].kind
-        };
-    }
-    
-    return entryMap;
-  });
+  return p;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -245,27 +218,30 @@ function getIndexEntries(tree, paths) {
 //////////////////////////////////////////////////////////////////////////
 function parseTree(tree) {
   var promises = [];
+  var entries = [];
   for (var j = 0; j < tree.entryCount(); j++) {
     var entry = tree.entryByIndex(j);
+    
+    var e = {
+      type: (entry.isTree() ? "tree" : "blob"),
+      oid: entry.sha(),
+      name: entry.name()
+    };
+    entries.push(e);
+    
     if (entry.isTree()) {
       promises.push(entry.getTree().then(function (t) {
         return parseTree(t);
       }));
     } else {
-      var p = entry.path();
-      var k = path.basename(path.dirname(p));
-      if ('Analysis' !== k) {
-        var id = path.basename(p, '.json');
-        if (UUID_REGEX.test(id)) {
-          promises.push(Promise.resolve({
-            uuid: id,
-            oid: entry.sha(),
-            kind: k
-          }));
-        }
-      }
+      promises.push(Promise.resolve({
+        oid: entry.sha(),
+        name: entry.name()
+      }));
     }
   }
+  
+  addCachedObject("tree", tree.id(), entries);
   
   return Promise.all(promises).then(function (results) {
     var objects = [];
