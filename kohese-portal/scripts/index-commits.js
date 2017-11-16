@@ -125,6 +125,8 @@ function indexCommit(repository, commits) {
     return indexCommit(repository, commits);      
   } else {
     console.log('::: Processing commit ' + commit.id());
+    
+    var beforeCommitTime = Date.now();
 
     return commit.getTree().then(function (tree) {
       return getIndexEntries(tree, []);
@@ -137,18 +139,22 @@ function indexCommit(repository, commits) {
         entryMap.meta.parents.push(commit.parentId(j).toString());
       }
 
+      var beforeTime = Date.now();
       ItemProxy.resetItemRepository();
+      var afterTime = Date.now();
+      var deltaTime = afterTime-beforeTime;
+      console.log('--- Reset Time: ' + deltaTime/1000);
       
       var promises = [];
       for (var id in entryMap.objects) {
         (function (idKey) {
           var oid = entryMap.objects[idKey].oid;
           if (repoBlobs[oid]){
-            new ItemProxy(entryMap.objects[idKey].kind, repoBlobs[oid]);
+            var proxy = new ItemProxy(entryMap.objects[idKey].kind, repoBlobs[oid]);
           } else {
             promises.push(getContents(repository, entryMap.objects[idKey].oid).then(function (contents) {
               repoBlobs[oid] = contents;
-              new ItemProxy(entryMap.objects[idKey].kind, repoBlobs[oid]);
+              var proxy = new ItemProxy(entryMap.objects[idKey].kind, repoBlobs[oid]);
             }));          
           }
         })(id);
@@ -156,8 +162,21 @@ function indexCommit(repository, commits) {
       
       return Promise.all(promises).then(function () {
         console.log('::: Loaded commit ' + commit.id());
+        var afterCommitTime = Date.now();
+        var deltaCommitTime = afterCommitTime-beforeCommitTime;
+        console.log('--- Commit Read Time: ' + deltaCommitTime/1000);
+        
+        var beforeCompleteTime = Date.now();
         ItemProxy.loadingComplete();
+        var afterCompleteTime = Date.now();
+        var deltaCompleteTime = afterCompleteTime-beforeCompleteTime;
+        console.log('--- Load Complete Time: ' + deltaCompleteTime/1000);
+
+        var beforeGATHTime = Date.now();
         entryMap.treeHash = ItemProxy.getAllTreeHashes();
+        var afterGATHTime = Date.now();
+        var deltaGATHTime = afterGATHTime-beforeGATHTime;
+        console.log('--- GATH Time: ' + deltaGATHTime/1000);
 
         fs.writeFileSync(path.join(INDEX_DIRECTORY, commit.id() + '.json'),
             JSON.stringify(entryMap, null, '  '), {encoding: 'utf8', flag: 'w'});
