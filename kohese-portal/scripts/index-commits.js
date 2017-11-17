@@ -38,9 +38,14 @@ function loadCachedObjects(repoBlobs) {
   var oidFiles = kdbFS.getRepositoryFileList(BLOB_DIRECTORY, /\.json$/);
 
   oidFiles.forEach((oidFile) => {
-    var oid = oidFile.replace(/\.json$/, '');
-    var object = kdbFS.loadJSONDoc(BLOB_DIRECTORY + '/' + oidFile);
-    repoObjects.blob[oid] = object;
+    try {
+      var oid = oidFile.replace(/\.json$/, '');
+      var object = kdbFS.loadJSONDoc(BLOB_DIRECTORY + '/' + oidFile);
+      repoObjects.blob[oid] = object;
+    } catch (err) {
+      console.log("*** Could not load cached blob:  " + oid);
+      console.log(err);
+    }
   });
   
   oidFiles = kdbFS.getRepositoryFileList(TREE_DIRECTORY, /\.json$/);
@@ -150,11 +155,6 @@ function indexCommit(repository, commits) {
       
       return getIndexEntries(tree, []);
     }).then(function (entryMap) {
-      var beforeTime = Date.now();
-      ItemProxy.resetItemRepository();
-      var afterTime = Date.now();
-      var deltaTime = afterTime-beforeTime;
-      console.log('--- Reset Time: ' + deltaTime/1000);
       
       var promises = [];
       for (var j = 0; j < entryMap.length; j++) {
@@ -264,9 +264,10 @@ function parseTree(tree) {
 //////////////////////////////////////////////////////////////////////////
 function getContents(repository, oid) {
   return nodegit.Blob.lookup(repository, nodegit.Oid
-    .fromString(oid)).then(function (o) {
+    .fromString(oid)).then(function (o) {      
     return JSON.parse(o.toString());
   }).catch(function (err) {
+    console.log('*** Error parsing: ' + oid);
     console.log(err.stack);
   });
 }
