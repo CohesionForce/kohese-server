@@ -228,7 +228,30 @@ class ItemProxy {
     return oid;
   }
   
- //////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static gitFileOID(forFile) {
+    var shaObj = new SHA('SHA-1', 'TEXT');
+    
+        
+    var length = forFile.length;
+//    console.log(forText);
+//    console.log('\n');
+    shaObj.update('blob ' + length + '\0' + forFile);
+    
+    var oid = shaObj.getHash('HEX');
+    
+//    for(var l = length - 5; l < length +5; l++){
+//      shaObj.update('blob ' + l + '\0' + forText);
+//      var newOid = shaObj.getHash('HEX');
+//      console.log('>>> ' + l + ' - ' + newOid);
+//    }
+    
+    return oid;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   calculateOID() {

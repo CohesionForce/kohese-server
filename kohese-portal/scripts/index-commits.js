@@ -5,18 +5,13 @@ const ItemProxy = require('../common/models/item-proxy.js');
 var kdbFS = require('../server/kdb-fs.js');
 var _ = require('underscore');
 
-const INDEX_DIRECTORY = path.join('kdb', 'index');
+const repositoryPath = process.argv[2];
 
 const CACHE_DIRECTORY = path.join('kdb', 'cache');
 const OBJECT_DIRECTORY = path.join(CACHE_DIRECTORY, 'git-object');
 const COMMIT_DIRECTORY = path.join(OBJECT_DIRECTORY, 'commit');
 const BLOB_DIRECTORY = path.join(OBJECT_DIRECTORY, 'blob');
 const TREE_DIRECTORY = path.join(OBJECT_DIRECTORY, 'tree');
-
-const repositoryPath = process.argv[2];
-
-// TODO Remove or Replace Index Dir with Cache Dir
-kdbFS.createDirIfMissing(INDEX_DIRECTORY);
 
 kdbFS.createDirIfMissing(CACHE_DIRECTORY);
 kdbFS.createDirIfMissing(OBJECT_DIRECTORY);
@@ -30,23 +25,31 @@ var repoObjects = {
   commit: {}
 };
 
+var repoBlob = repoObjects.blob;
+var repoTree = repoObjects.tree;
+var repoCommit = repoObjects.commit;
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
 function loadCachedObjects(repoBlobs) {
   console.log('::: Loading cached objects');
-  var oidFiles = kdbFS.getRepositoryFileList(BLOB_DIRECTORY, /\.json$/);
+  var oidFiles = kdbFS.getRepositoryFileList(BLOB_DIRECTORY);
 
-  oidFiles.forEach((oidFile) => {
+  oidFiles.forEach((oid) => {
     try {
-      var oid = oidFile.replace(/\.json$/, '');
-      var object = kdbFS.loadJSONDoc(BLOB_DIRECTORY + '/' + oidFile);
+      var object = kdbFS.loadBinaryFile(BLOB_DIRECTORY + '/' + oid);
+      var koid = ItemProxy.gitFileOID(object);
+      if (oid !== koid){
+        console.log('Mismatch for ' + oid + ' - ' + koid);        
+      }
       repoObjects.blob[oid] = object;
     } catch (err) {
-      console.log("*** Could not load cached blob:  " + oid);
+      console.log('*** Could not load cached blob:  ' + oid);
       console.log(err);
     }
   });
+  console.log('::: Found ' + _.size(repoObjects.blob) + ' blobs');
   
   oidFiles = kdbFS.getRepositoryFileList(TREE_DIRECTORY, /\.json$/);
   oidFiles.forEach((oidFile) => {
@@ -54,6 +57,7 @@ function loadCachedObjects(repoBlobs) {
     var object = kdbFS.loadJSONDoc(TREE_DIRECTORY + '/' + oidFile);
     repoObjects.tree[oid] = object;
   });
+  console.log('::: Found ' + _.size(repoObjects.tree) + ' trees');
   
   oidFiles = kdbFS.getRepositoryFileList(COMMIT_DIRECTORY, /\.json$/);
   oidFiles.forEach((oidFile) => {
@@ -61,6 +65,7 @@ function loadCachedObjects(repoBlobs) {
     var object = kdbFS.loadJSONDoc(COMMIT_DIRECTORY + '/' + oidFile);
     repoObjects.commit[oid] = object;
   });
+  console.log('::: Found ' + _.size(repoObjects.commit) + ' commits');
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -68,7 +73,12 @@ function loadCachedObjects(repoBlobs) {
 //////////////////////////////////////////////////////////////////////////
 function addCachedObject(type, oid, object) {
   repoObjects[type][oid] = object;
-  kdbFS.storeJSONDoc(OBJECT_DIRECTORY + '/' + type + path.sep + oid + '.json', object);
+
+  if(type === 'blob'){
+    kdbFS.storeBinaryFile(OBJECT_DIRECTORY + '/' + type + path.sep + oid, object);
+  } else {
+    kdbFS.storeJSONDoc(OBJECT_DIRECTORY + '/' + type + path.sep + oid + '.json', object);    
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -82,16 +92,6 @@ var afterTime = Date.now();
 var deltaTime = afterTime-beforeTime;
 console.log('--- Load Cached Objects Time: ' + deltaTime/1000);
 
-
-// Determine what has already been indexed
-var commitFileList = kdbFS.getRepositoryFileList(INDEX_DIRECTORY, /\.json$/);
-
-var commitIndexed = {};
-
-commitFileList.forEach((commitFile) => {
-  var commitId = commitFile.replace(/\.json$/,'');
-  commitIndexed[commitId] = true;
-});
 
 generateCommitHistoryIndices(repositoryPath, false).then(() => {
   console.log('::: Finished Indexing');
@@ -111,10 +111,6 @@ function generateCommitHistoryIndices(p, overwrite) {
       return rw.getCommitsUntil(function (c) {
         return true;
       }).then(function (commits) {
-        if (!fs.existsSync(INDEX_DIRECTORY)) {
-          fs.mkdirSync(INDEX_DIRECTORY);
-        }
-        
         return indexCommit(r, commits);
       });
     });
@@ -132,7 +128,7 @@ function indexCommit(repository, commits) {
     return;
   }
   
-  if (commitIndexed[commit.id()]){
+  if (repoCommit[commit.id()]){
     console.log('::: Already indexed commit ' + commit.id());
     return indexCommit(repository, commits);      
   } else {
@@ -151,31 +147,17 @@ function indexCommit(repository, commits) {
       for (var j = 0; j < commit.parentcount(); j++) {
         co.parents.push(commit.parentId(j).toString());
       }
-      addCachedObject("commit", commit.id(), co);
+      addCachedObject('commit', commit.id(), co);
       
-      return getIndexEntries(tree, []);
+      return parseTree(repository, tree);
     }).then(function (entryMap) {
       
-      var promises = [];
-      for (var j = 0; j < entryMap.length; j++) {
-        (function (jIndex) {
-          var oid = entryMap[j].oid;
-          if (!repoObjects.blob[oid]){
-            promises.push(getContents(repository, entryMap[j].oid).then(function (contents) {
-              addCachedObject("blob", oid, contents);
-            }));          
-          }
-        })(j);
-      }
+      console.log('::: Loaded commit ' + commit.id());
+      var afterCommitTime = Date.now();
+      var deltaCommitTime = afterCommitTime-beforeCommitTime;
+      console.log('--- Commit Read Time: ' + deltaCommitTime/1000);
       
-      return Promise.all(promises).then(function () {
-        console.log('::: Loaded commit ' + commit.id());
-        var afterCommitTime = Date.now();
-        var deltaCommitTime = afterCommitTime-beforeCommitTime;
-        console.log('--- Commit Read Time: ' + deltaCommitTime/1000);
-        
-        return indexCommit(repository, commits);
-      });      
+      return indexCommit(repository, commits);
     }).catch(function (err) {
       console.log(err.stack);
     });
@@ -185,78 +167,38 @@ function indexCommit(repository, commits) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getIndexEntries(tree, paths) {
-  var p;
-  if (paths.length > 0) {
-    var entryPromises = [];
-    for (var j = 0; j < paths.length; j++) {
-      (function (jIndex) {
-        var p = paths[jIndex];
-        entryPromises.push(tree.entryByPath(p).then(function (entry) {
-          if (entry) {
-            return {
-              uuid: p.substring(p.lastIndexOf(path.sep) + 1,
-                  p.lastIndexOf('.json')),
-              oid: entry.sha(),
-              kind: path.basename(path.dirname(p))
-            };
-          }
-        }));
-      })(j);
-    }
-    
-    p = Promise.all(entryPromises);
-  } else {
-    p = parseTree(tree);
-  }
-  
-  return p;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function parseTree(tree) {
+function parseTree(repository, tree) {
   var promises = [];
   var entries = [];
   for (var j = 0; j < tree.entryCount(); j++) {
     var entry = tree.entryByIndex(j);
     
     var e = {
-      type: (entry.isTree() ? "tree" : "blob"),
+      type: (entry.isTree() ? 'tree' : 'blob'),
       oid: entry.sha(),
       name: entry.name()
     };
     entries.push(e);
     
     if (entry.isTree()) {
-      promises.push(entry.getTree().then(function (t) {
-        return parseTree(t);
-      }));
+      // Retrieve subtree if it is not already cached
+      if (!repoObjects.tree[entry.sha()]){
+        promises.push(entry.getTree().then(function (t) {
+          return parseTree(repository, t);
+        }));
+      }
     } else {
-      promises.push(Promise.resolve({
-        oid: entry.sha(),
-        name: entry.name()
-      }));
+      // Retrieve Blob if it is not already cached
+      var oid = entry.sha();
+      if (!repoObjects.blob[oid]){
+        promises.push(getContents(repository, oid));       
+      }
     }
   }
   
-  addCachedObject("tree", tree.id(), entries);
+  addCachedObject('tree', tree.id(), entries);
   
-  return Promise.all(promises).then(function (results) {
-    var objects = [];
-    for (var j = 0; j < results.length; j++) {
-      if (Array.isArray(results[j])) {
-        for (var k = 0; k < results[j].length; k++) {
-          objects.push(results[j][k]);
-        }
-      } else {
-        objects.push(results[j]);
-      }
-    }
-    
-    return Promise.resolve(objects);
-  });
+  return Promise.all(promises);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -264,10 +206,11 @@ function parseTree(tree) {
 //////////////////////////////////////////////////////////////////////////
 function getContents(repository, oid) {
   return nodegit.Blob.lookup(repository, nodegit.Oid
-    .fromString(oid)).then(function (o) {      
-    return JSON.parse(o.toString());
+    .fromString(oid)).then(function (blob) {
+      addCachedObject('blob', oid, blob.content());
+      return Promise.resolve(oid);
   }).catch(function (err) {
-    console.log('*** Error parsing: ' + oid);
+    console.log('*** Error retreiving: ' + oid);
     console.log(err.stack);
   });
 }
