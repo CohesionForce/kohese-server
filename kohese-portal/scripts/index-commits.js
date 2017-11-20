@@ -64,11 +64,11 @@ function indexCommit(repository, commits) {
 
     return commit.getTree().then(function (tree) {
       var co = {
-        treeId: tree.id().toString(),
         time: commit.timeMs(),
         author: commit.author().toString(),
         message: commit.message(),
-        parents: []
+        parents: [],
+        treeId: tree.id().toString()
       };
       for (var j = 0; j < commit.parentcount(); j++) {
         co.parents.push(commit.parentId(j).toString());
