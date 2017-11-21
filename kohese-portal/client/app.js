@@ -31,6 +31,7 @@ const appModule = angular.module('app', [
   'app.services.versioncontrolservice',
   'app.services.importservice',
   'app.services.modalservice',
+  'app.services.highlightservice',
   'app.factories.koheseio',
   'app.directives.navigation',
   'app.directives.treerow',
@@ -40,6 +41,8 @@ const appModule = angular.module('app', [
   'app.directives.sentenceview',
   'app.directives.phraseview',
   'app.constants.endpoints',
+  'app.filters.htmlfilters',
+  'app.filters.highlight',
   require('angular-ui-router'),
   'angular-jwt',
   'ui.bootstrap',
@@ -206,31 +209,6 @@ appModule
       });
 
     $urlRouterProvider.otherwise('/dashboard')
-  })
-  .filter('highlight', function ($sce) {
-    return function (text, phrase) {
-      if (text && angular.isDefined(phrase) && phrase !== '') {
-        let cleanedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        if (cleanedPhrase) {
-          text = text.replace(new RegExp('(' + cleanedPhrase + ')', 'gi'),
-            '<span class="highlighted">$1</span>');
-        }
-      }
-
-      return $sce.trustAsHtml(text);
-    }
-  })
-  .filter('highlightRegex', function ($sce) {
-    return function (text, phrase) {
-      if (text && angular.isDefined(phrase)) {
-        if (phrase) {
-          text = text.replace(phrase,
-            '<span class="highlighted">$1</span>');
-        }
-      }
-
-      return $sce.trustAsHtml(text);
-    }
   })
   .filter('categories', function () {
     return function (input) {

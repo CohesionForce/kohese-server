@@ -1,4 +1,4 @@
-function DocumentController ($scope, $sce, $stateParams, tabService) {
+function DocumentController ($scope, $stateParams, tabService, $filter, HighlightService) {
   var docCtrl = this;
 
   var reader = new commonmark.Parser();
@@ -20,6 +20,11 @@ function DocumentController ($scope, $sce, $stateParams, tabService) {
   $scope.$on('tabSelected', function () {
     tabService.bundleController(docCtrl, 'DocumentController', currentTab.id);
   });
+
+  $scope.$on('newAnalysisFilter', (event, filter)=>{
+    docCtrl.analysisFilterString = filter;
+    onFilterChange();
+  })
 
   if ($scope.itemProxy) {
     generateDoc();
@@ -43,13 +48,39 @@ function DocumentController ($scope, $sce, $stateParams, tabService) {
 
   function generateDoc () {
     if (docCtrl.showChildren) {
-      var docParsed = docReader.parse(docCtrl.itemProxy.getDocument());
+      var docParsed = docReader.parse(docCtrl.itemProxy.getDocument(), {sourcepos: true});
       docCtrl.docRendered = docWriter.render(docParsed);
-      docCtrl.docRendered = $sce.trustAsHtml(docCtrl.docRendered);
     } else if (docCtrl.itemProxy.item.description) {
       var parsed = reader.parse(docCtrl.itemProxy.item.description); // parsed is a 'Node' tree   
       docCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
-      docCtrl.itemDescriptionRendered = $sce.trustAsHtml(docCtrl.itemDescriptionRendered);
+    }
+  }
+
+  function onFilterChange () {
+    console.log('>>> Filter string changed to: ' + docCtrl.analysisFilterString);
+
+    var regexFilter = /^\/(.*)\/([gimy]*)$/;
+    var filterIsRegex = docCtrl.analysisFilterString.match(regexFilter);
+
+    if (filterIsRegex) {
+      try {
+        docCtrl.analysisFilterRegex = new RegExp(filterIsRegex[1], filterIsRegex[2]);
+        docCtrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')', 'g' + filterIsRegex[2]);
+        docCtrl.invalidAnalysisFilterRegex = false;
+      } catch (e) {
+        docCtrl.invalidAnalysisFilterRegex = true;
+      }
+    } else {
+      let cleanedPhrase = docCtrl.analysisFilterString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (docCtrl.analysisFilterString !== '') {
+        docCtrl.analysisFilterRegex = new RegExp(cleanedPhrase, 'i');
+        docCtrl.analysisFilterRegexHighlight = new RegExp('(' + cleanedPhrase + ')', 'gi');
+        docCtrl.invalidAnalysisFilterRegex = false;
+      } else {
+        docCtrl.analysisFilterRegex = null;
+        docCtrl.analysisFilterRegexHighlight = null;
+        docCtrl.invalidAnalysisFilterRegex = false;
+      }
     }
   }
 }

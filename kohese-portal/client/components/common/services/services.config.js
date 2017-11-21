@@ -21,4 +21,5 @@ export default() => {
   require('./kohese-io')();
   require('./importService')();
   require('./modal-service/modal-service')();
+  require('./highlight-service')();
 }

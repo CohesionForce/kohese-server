@@ -29,7 +29,7 @@
                             'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
                 </i>
                 </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
-                                                    ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
+                                                    ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight | trustAsHTML)"
                                                     ></span>
                     <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
                     <!-- Conditional Icons for Item status -->

@@ -73,7 +73,7 @@
                         | limitTo:tvCtrl.loadLimit">
                <td ng-click="tvCtrl.submitStringFilter(summary.text)"
                      class="tree-label"
-                     ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight"></td>
+                     ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight | trustAsHTML"></td>
                <td>{{summary.count}}</td>
                <td ng-if="tvCtrl.showPOS">{{summary.posCount}}</td>
                </tr>
