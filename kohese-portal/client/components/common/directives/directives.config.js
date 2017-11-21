@@ -11,6 +11,7 @@ export default () => {
   require('./knowledgeTree/treeRow')();
   require('./actionTable/actionTable')();
   require('./document-view/document-view')();
+  require('./kind-icon/kind-icon')();
 
   // Sub-directive folders
   require('./analysis-directives/analysis.config')();

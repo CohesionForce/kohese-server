@@ -39,6 +39,7 @@ const appModule = angular.module('app', [
   'app.directives.termview',
   'app.directives.sentenceview',
   'app.directives.phraseview',
+  'app.directives.kindicon',
   'app.constants.endpoints',
   require('angular-ui-router'),
   'angular-jwt',
