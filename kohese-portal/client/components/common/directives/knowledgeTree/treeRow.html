@@ -25,11 +25,10 @@
                         ng-init="treeCtrl.initCollapsed(itemProxy.item.id)"
                         class="kt-icon"
                         ng-class="{'fa fa-caret-down': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
-                            'fa fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
-                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
-                </i>
+                        'fa fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
+                        'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">  
+                                  </i>
                 </a> 
-                    <kind-icon kind='itemProxy.kind'></kind-icon>
                     <span class="kt-label"
                         ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)">
                     </span>
@@ -39,8 +38,11 @@
                             <img src="resources/icons/versioncontrol/dirty.ico"
                                 title = "Dirty item" />
                     </span>
+                    <kind-icon kind='itemProxy.kind'></kind-icon>
 
-                    {{itemProxy.status}}
+                    <span ng-if="treeCtrl.versionControlEnabled">
+                        {{itemProxy.status}}
+                    </span>
             </div>
         <div class="kti-cell kti-actions pull-right"> 
             <!-- Default row actions -->
