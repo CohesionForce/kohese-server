@@ -3,12 +3,8 @@
 function HighlightRegex () {
   return function (text, phrase, html5) {
     // TO-DO add additional branch for nested tags
-    console.log(html5);
     if (text && angular.isDefined(phrase)) {
       if (phrase) {
-        console.log('Highlight')
-        console.log(phrase);
-        console.log(text);
         text = text.replace(phrase,
           '<span class="highlighted">$1</span>');
       }
