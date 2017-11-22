@@ -10,7 +10,7 @@ function HighlightRegex () {
       }
     }
     return text;
-  }
+  };
 }
 
 function Highlight () {
@@ -30,4 +30,4 @@ export default () => {
   angular.module('app.filters.highlight', [])
     .filter('highlightRegex', HighlightRegex)
     .filter('highlight', Highlight);
-}
+};
