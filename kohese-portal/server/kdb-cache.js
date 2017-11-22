@@ -20,7 +20,6 @@ const BLOB_DIRECTORY = path.join(OBJECT_DIRECTORY, 'blob');
 const BLOB_MISMATCH_DIRECTORY = path.join(OBJECT_DIRECTORY, 'mismatch_blob');
 const TREE_DIRECTORY = path.join(OBJECT_DIRECTORY, 'tree');
 
-
 var repoObjects = {
     blob: {},
     tree: {},
@@ -179,21 +178,21 @@ class KDBCache {
     
     var contents = treeData.contents;
     
-    treeEntry.forEach((entry) => {
+    for(var entryName in treeEntry){
+      var entry = treeEntry[entryName];
       switch (entry.type) {
         case 'blob':
-          contents[entry.name] = {
+          contents[entryName] = {
             oid: entry.oid
           };
           break;
         case 'tree':
-          contents[entry.name] = this.expandTree(entry.oid);
+          contents[entryName] = this.expandTree(entry.oid);
           break;
         default:
           console.log('*** Error: Unexpected Kind ' + entry.kind + ' in tree: ' + treeId);
       }
-    });
-
+    }
     
     return treeData;
   }

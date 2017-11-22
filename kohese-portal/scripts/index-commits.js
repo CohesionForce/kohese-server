@@ -102,16 +102,14 @@ function indexCommit(repository, commits) {
 //////////////////////////////////////////////////////////////////////////
 function parseTree(repository, tree) {
   var promises = [];
-  var entries = [];
+  var entries = {};
   for (var j = 0; j < tree.entryCount(); j++) {
     var entry = tree.entryByIndex(j);
     
-    var e = {
-      type: (entry.isTree() ? 'tree' : 'blob'),
-      oid: entry.sha(),
-      name: entry.name()
+    entries[entry.name()] = {
+        type: (entry.isTree() ? 'tree' : 'blob'),
+        oid: entry.sha()
     };
-    entries.push(e);
     
     if (entry.isTree()) {
       // Retrieve subtree if it is not already cached
