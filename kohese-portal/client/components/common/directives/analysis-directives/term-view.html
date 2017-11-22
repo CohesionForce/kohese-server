@@ -19,7 +19,9 @@
             </span>
             <br/> 
             <input class="input-sm" type="text" ng-model="tvCtrl.analysisFilterInput"
-                   placeholder="Filter" style="margin: 5px"/>
+                   placeholder="Filter" style="margin: 5px"
+                   ng-style="tvCtrl.invalidAnalysisFilterRegex && {'background-color':'pink'}"/>
+
             <button ng-click="tvCtrl.submitStringFilter(tvCtrl.analysisFilterInput)" 
                     class=" btn btn-default fa fa-search"> Submit
             </button>
@@ -73,7 +75,7 @@
                         | limitTo:tvCtrl.loadLimit">
                <td ng-click="tvCtrl.submitStringFilter(summary.text)"
                      class="tree-label"
-                     ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight"></td>
+                     ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight:true | trustAsHTML"></td>
                <td>{{summary.count}}</td>
                <td ng-if="tvCtrl.showPOS">{{summary.posCount}}</td>
                </tr>

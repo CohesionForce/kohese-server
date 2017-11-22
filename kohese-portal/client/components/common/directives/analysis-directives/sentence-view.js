@@ -1,4 +1,4 @@
-function SentenceViewController($scope, $timeout, tabService, analysisService) {
+function SentenceViewController ($scope, $timeout, tabService, analysisService) {
   const ctrl = this;
   var currentTab = tabService.getCurrentTab();
 
@@ -35,7 +35,7 @@ function SentenceViewController($scope, $timeout, tabService, analysisService) {
     onFilterChange();
   })
 
-  ctrl.filterDetails = function(listItem) {
+  ctrl.filterDetails = function (listItem) {
     return listItem.displayLevel == 1 && 
                 (ctrl.analysisFilterRegex === null || 
                  ctrl.analysisFilterRegex.test(listItem.item.name) || 
@@ -51,13 +51,13 @@ function SentenceViewController($scope, $timeout, tabService, analysisService) {
     return $('#theDetailsBody').find('tr').length;
   };
 
-  function onFilterChange() {
+  function onFilterChange () {
     console.log('>>> Filter string changed to: ' + ctrl.analysisFilterString);
     if (ctrl.filterTextTimeout) {
       $timeout.cancel(ctrl.filterTextTimeout);
     }
         
-    ctrl.filterTextTimeout = $timeout(function() {
+    ctrl.filterTextTimeout = $timeout(function () {
       var regexFilter = /^\/(.*)\/([gimy]*)$/;
       var filterIsRegex = ctrl.analysisFilterString.match(regexFilter);
   
@@ -94,7 +94,7 @@ function SentenceViewController($scope, $timeout, tabService, analysisService) {
   }
 }
 
-function SentenceViewDirective() {
+function SentenceViewDirective () {
   return {
     restrict: 'E',
     controller: 'SentenceViewController as svCtrl',

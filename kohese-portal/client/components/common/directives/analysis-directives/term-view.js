@@ -1,4 +1,4 @@
-function TermViewController($scope, $timeout, tabService, analysisService) {
+function TermViewController ($scope, $timeout, tabService, analysisService) {
   const ctrl = this;
   var currentTab = tabService.getCurrentTab();
 
@@ -96,7 +96,7 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
     return POSFilterReturn && RegexFilterReturn;
   };
 
-  function onFilterChange() {
+  function onFilterChange () {
     console.log('>>> Filter string changed to: ' + ctrl.analysisFilterString);
     if (ctrl.filterTextTimeout) {
       $timeout.cancel(ctrl.filterTextTimeout);
@@ -132,7 +132,7 @@ function TermViewController($scope, $timeout, tabService, analysisService) {
   ctrl.fetchAnalysis();
 }
 
-function TermViewDirective() {
+function TermViewDirective () {
   return {
     restrict: 'E',
     controller: 'TermViewController as tvCtrl',
