@@ -172,6 +172,10 @@ class KDBCache {
     };
     
     var treeEntry = this.cachedTree(treeId);
+
+    if (!treeEntry){
+      console.log('*** Can\'t find cached tree: ' + treeId);
+    }
     
     var contents = treeData.contents;
     

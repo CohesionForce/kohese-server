@@ -73,15 +73,22 @@ function indexCommit(repository, commits) {
       for (var j = 0; j < commit.parentcount(); j++) {
         co.parents.push(commit.parentId(j).toString());
       }
-      kdbCache.addCachedObject('commit', commit.id(), co);
       
-      return parseTree(repository, tree);
-    }).then(function (entryMap) {
+      var commitDataPromise = new Promise((resolve, reject) => {
+        parseTree(repository, tree).then(() => {
+          resolve(co);
+        });        
+      });
+      
+      return commitDataPromise;
+    }).then(function (co) {
       
       console.log('::: Loaded commit ' + commit.id());
       var afterCommitTime = Date.now();
       var deltaCommitTime = afterCommitTime-beforeCommitTime;
       console.log('--- Commit Read Time: ' + deltaCommitTime/1000);
+
+      kdbCache.addCachedObject('commit', commit.id(), co);
       
       return indexCommit(repository, commits);
     }).catch(function (err) {
