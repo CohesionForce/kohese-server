@@ -20,17 +20,19 @@
                     ng-style="{'font-weight': 'bold'}"
                     ng-click="treeCtrl.navigate('kohese.explore.edit', 
                     {id: itemProxy.item.id})">
-                <a style=""> <i
+                 <i
                         ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]; $event.stopPropagation()"
                         ng-init="treeCtrl.initCollapsed(itemProxy.item.id)"
                         class="kt-icon"
                         ng-class="{'fa fa-caret-down': (itemProxy.children.length > 0) && !treeCtrl.collapsed[itemProxy.item.id],
-                            'fa fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
-                            'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
-                </i>
-                </a> &lt;{{itemProxy.kind}}&gt; <span class="kt-label"
-                                                    ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight)"
-                                                    ></span>
+                        'fa fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
+                        'no-icon': !(itemProxy.children.length > 0)}">  
+                                  </i>
+
+                    <kind-icon kind='itemProxy.kind'></kind-icon>
+                    <span class="kt-label"
+                        ng-bind-html="(itemProxy.item.name | highlightRegex:treeCtrl.filter.textRegexHighlight | trustAsHTML)">
+                    </span>
                     <span ng-if="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
                     <!-- Conditional Icons for Item status -->
                     <span ng-if="itemProxy.dirty">
@@ -38,7 +40,9 @@
                                 title = "Dirty item" />
                     </span>
 
-                    {{itemProxy.status}}
+                    <span ng-if="treeCtrl.versionControlEnabled">
+                        {{itemProxy.status}}
+                    </span>
             </div>
         <div class="kti-cell kti-actions pull-right"> 
             <!-- Default row actions -->

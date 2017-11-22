@@ -1,5 +1,17 @@
 <div class="panel">
-      <div class="panel-heading">Term View - ({{tvCtrl.getTermCount()}}) Terms</div>
+      <div class="panel-heading">Term View - ({{tvCtrl.getTermCount()}}) Terms
+      <span class="dropdown pull-right">
+                  <a class="dropdown-toggle" data-toggle="dropdown" >
+                        <span>Options</span> 
+                  <i class="fa fa-gear"></i>
+                  </a>
+                  <ul class="dropdown-menu dropdown-user">
+                        <li ng-click="tvCtrl.showPOS = !tvCtrl.showPOS">
+                              <a><i ng-if="tvCtrl.showPOS" 
+                              class="fa fa-check-"></i>Show POS</a></li>
+                  </ul>
+      </span>
+      </div>
       <div class="panel-body"> 
       <div>
             <label class="control-label" for="posFilter">
@@ -19,7 +31,9 @@
             </span>
             <br/> 
             <input class="input-sm" type="text" ng-model="tvCtrl.analysisFilterInput"
-                   placeholder="Filter" style="margin: 5px"/>
+                   placeholder="Filter" style="margin: 5px"
+                   ng-style="tvCtrl.invalidAnalysisFilterRegex && {'background-color':'pink'}"/>
+
             <button ng-click="tvCtrl.submitStringFilter(tvCtrl.analysisFilterInput)" 
                     class=" btn btn-default fa fa-search"> Submit
             </button>
@@ -54,16 +68,6 @@
                   </span>
                </th>
                <th ng-if="tvCtrl.showPOS">POS Count</th>
-               <span class="dropdown pull-right">
-                        <a class="dropdown-toggle" data-toggle="dropdown" >
-                            <span>Options</span> 
-                        <i class="fa fa-angle-double-down"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li ng-click="tvCtrl.showPOS = !tvCtrl.showPOS">
-                                <a><i ng-if="tvCtrl.showPOS" 
-                                    class="fa fa-check-"></i>Show POS</a></li>
-                        </ul>
             </thead>
             <tbody id="theTokensBody">
                <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
@@ -73,7 +77,7 @@
                         | limitTo:tvCtrl.loadLimit">
                <td ng-click="tvCtrl.submitStringFilter(summary.text)"
                      class="tree-label"
-                     ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight"></td>
+                     ng-bind-html="summary.text | highlightRegex:tvCtrl.analysisFilterRegexHighlight:true | trustAsHTML"></td>
                <td>{{summary.count}}</td>
                <td ng-if="tvCtrl.showPOS">{{summary.posCount}}</td>
                </tr>
