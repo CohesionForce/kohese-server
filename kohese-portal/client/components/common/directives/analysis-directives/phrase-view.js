@@ -1,4 +1,4 @@
-function PhraseViewController($scope, $timeout, tabService, analysisService) {
+function PhraseViewController ($scope, $timeout, tabService, analysisService) {
   const ctrl = this;
   var currentTab = tabService.getCurrentTab();
 
@@ -42,7 +42,7 @@ function PhraseViewController($scope, $timeout, tabService, analysisService) {
     });
   };
 
-  ctrl.filterPhrases = function(summary) {
+  ctrl.filterPhrases = function (summary) {
     var MatchesStringFilter;
     var MatchesPOS = ctrl.analysisFilterPOS(summary,
       ctrl.analysisPOSFilterCriteria[ctrl.analysisPOSFilterName]) 
@@ -55,7 +55,7 @@ function PhraseViewController($scope, $timeout, tabService, analysisService) {
     return MatchesPOS && MatchesStringFilter
   };
 
-  ctrl.submitSummaryFilter = function(text) {
+  ctrl.submitSummaryFilter = function (text) {
     $scope.$emit('newPhraseFilter', text);
   }
 
@@ -63,13 +63,13 @@ function PhraseViewController($scope, $timeout, tabService, analysisService) {
     return $('#thePhrasesBody').find('tr').length;
   };
 
-  function onFilterChange() {
+  function onFilterChange () {
     console.log('>>> Filter string changed to: ' + ctrl.analysisFilterString);
     if (ctrl.filterTextTimeout) {
       $timeout.cancel(ctrl.filterTextTimeout);
     }
         
-    ctrl.filterTextTimeout = $timeout(function() {
+    ctrl.filterTextTimeout = $timeout(function () {
       var regexFilter = /^\/(.*)\/([gimy]*)$/;
       var filterIsRegex = ctrl.analysisFilterString.match(regexFilter);
   
@@ -108,7 +108,7 @@ function PhraseViewController($scope, $timeout, tabService, analysisService) {
   ctrl.fetchAnalysis();
 }
 
-function PhraseViewDirective() {
+function PhraseViewDirective () {
   return {
     restrict: 'E',
     controller: 'PhraseViewController as pvCtrl',

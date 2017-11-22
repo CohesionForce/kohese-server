@@ -36,7 +36,7 @@
                                 | limitTo:pvCtrl.loadLimit">
                 <td ng-click="pvCtrl.submitSummaryFilter(summary.text)"
                         class="tree-label"
-                        ng-bind-html="summary.text | highlightRegex:pvCtrl.analysisFilterRegexHighlight"></td>
+                        ng-bind-html="summary.text | highlightRegex:pvCtrl.analysisFilterRegexHighlight:true | trustAsHTML"></td>
                 <td>{{summary.count}}</td>
                 <td>{{summary.posCount}}</td>
                 </tr>

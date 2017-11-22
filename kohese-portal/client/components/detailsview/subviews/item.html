@@ -32,7 +32,7 @@
         <td>{{proxy.kind}}</td>
         <td ng-click="detailsCtrl.updateTab('kohese.explore.edit', proxy.item.id)"
             class="tree-label"
-            ng-bind-html="proxy.item.name | highlight:detailsCtrl.filterString"></td>
+            ng-bind-html="proxy.item.name | highlight:detailsCtrl.filterString | trustAsHTML"></td>
         <td>
             <span ng-if="proxy.kind==='Decision'">{{proxy.item.decisionState}}</span>
             <span ng-if="proxy.kind==='Action'">{{proxy.item.decisionState}}/{{proxy.item.actionState}}</span>
@@ -43,7 +43,7 @@
         <td>{{proxy.item.tags}}</td>
         <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
             ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false"
-            ng-bind-html="proxy.item.description | highlight:detailsCtrl.filterString"></td>
+            ng-bind-html="proxy.item.description | highlight:detailsCtrl.filterString | trustAsHTML"></td>
         <td class="pull-right">
             <i class="glyphicon glyphicon-remove" ng-click="detailsCtrl.removeItem(proxy)"></i>
         </td>
