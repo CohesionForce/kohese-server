@@ -20,7 +20,7 @@
                     ng-style="{'font-weight': 'bold'}"
                     ng-click="treeCtrl.navigate('kohese.explore.edit', 
                     {id: itemProxy.item.id})">
-                <a> <i
+                 <i
                         ng-click="treeCtrl.collapsed[itemProxy.item.id] = !treeCtrl.collapsed[itemProxy.item.id]; $event.stopPropagation()"
                         ng-init="treeCtrl.initCollapsed(itemProxy.item.id)"
                         class="kt-icon"
@@ -28,7 +28,6 @@
                         'fa fa-caret-right': (itemProxy.children.length > 0) && treeCtrl.collapsed[itemProxy.item.id],
                         'no-icon': !(itemProxy.children.length > 0)}">  
                                   </i>
-                </a> 
 
                     <kind-icon kind='itemProxy.kind'></kind-icon>
                     <span class="kt-label"

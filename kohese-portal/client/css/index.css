@@ -454,7 +454,7 @@ table td .glyphicon-remove:hover {
 }
 
 .no-icon {
-  padding-left: 14px;
+  padding-left: 12.5px !important;
 }
 
 .trim-info {
