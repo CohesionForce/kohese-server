@@ -1,7 +1,9 @@
 
 
 function HighlightRegex () {
-  return function (text, phrase) {
+  return function (text, phrase, html5) {
+    // TO-DO add additional branch for nested tags
+    console.log(html5);
     if (text && angular.isDefined(phrase)) {
       if (phrase) {
         console.log('Highlight')

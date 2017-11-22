@@ -40,7 +40,7 @@
                                 | orderBy:svCtrl.analysisDetailsSortField:svCtrl.reverse 
                                 | limitTo:svCtrl.loadLimit">
                         <td class="indented">{{listItem.displayType}}</td>
-                        <td ng-bind-html="listItem.text | highlightRegex:svCtrl.analysisFilterRegexHighlight | trustAsHTML"></td>
+                        <td ng-bind-html="listItem.text | highlightRegex:svCtrl.analysisFilterRegexHighlight:true | trustAsHTML"></td>
                         </tr>
                 </tbody>
                 </table>
