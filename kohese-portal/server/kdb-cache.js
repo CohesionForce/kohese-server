@@ -20,6 +20,8 @@ const BLOB_DIRECTORY = path.join(OBJECT_DIRECTORY, 'blob');
 const BLOB_MISMATCH_DIRECTORY = path.join(OBJECT_DIRECTORY, 'mismatch_blob');
 const TREE_DIRECTORY = path.join(OBJECT_DIRECTORY, 'tree');
 
+var jsonExt = /\.json$/;
+
 var repoObjects = {
     blob: {},
     tree: {},
@@ -197,6 +199,101 @@ class KDBCache {
     return treeData;
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static loadCommit(commitId){
+    var commit = this.expandCommit(commitId);
+    this.loadRepo(commit.tree);
+    ItemProxy.loadingComplete();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static loadRepo(treeData){
+    var contents = treeData.contents;
+
+    if(contents.hasOwnProperty('store')) {
+      console.log('::: Found store dir for ' + treeData.oid);
+    }
+    
+    if (contents.hasOwnProperty('export')) {
+      console.log('::: Found early legacy dir (v0.1) for ' + treeData.oid);
+      this.loadRepo(contents['export']);
+      return;
+    }
+    
+    if (contents.hasOwnProperty('Item')){
+      console.log('::: Found legacy dir (v0.2) for ' + treeData.oid);
+      
+      for(var kind in contents){
+        switch (kind) {
+          case '.gitignore':
+          case '.project':
+          case 'Analysis':
+            console.log('--- Skipping ' + kind);
+            break;
+          case 'Repository':
+            this.loadRepoContents(contents.Repository.contents);
+            break;
+          default:
+            this.loadKindContents(kind, contents[kind].contents);
+        }
+        
+      }
+      
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static loadRepoContents(repoDir){
+    console.log('::: Processing Repositories');
+    
+    for(var repoFile in repoDir){
+      
+      if (!jsonExt.test(repoFile)){
+        console.log('>>> Skipping repo file ' + repoFile);
+        continue;
+      }
+
+      console.log('+++ Found Repository ' + repoFile);
+      
+      var oid = repoDir[repoFile].oid;
+
+      var item = JSON.parse(this.cachedBlob(oid));
+      var proxy = new ItemProxy('Repository', item);
+      
+      // TODO Need to handle mount files
+      
+      var repoSubdir = repoDir[item.id];
+      this.loadRepo(repoSubdir);
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static loadKindContents(kind, kindDir){
+    console.log('::: Processing ' + kind);
+    for(var kindFile in kindDir){
+      
+      if (!jsonExt.test(kindFile)){
+        continue;
+      }
+      
+      var oid = kindDir[kindFile].oid;
+
+      var item = JSON.parse(this.cachedBlob(oid));
+      var proxy = new ItemProxy(kind, item);
+      
+    }
+    
+  }
+  
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
