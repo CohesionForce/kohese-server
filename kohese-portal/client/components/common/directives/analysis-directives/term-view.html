@@ -19,7 +19,9 @@
             </span>
             <br/> 
             <input class="input-sm" type="text" ng-model="tvCtrl.analysisFilterInput"
-                   placeholder="Filter" style="margin: 5px"/>
+                   placeholder="Filter" style="margin: 5px"
+                   ng-style="tvCtrl.invalidAnalysisFilterRegex && {'background-color':'pink'}"/>
+
             <button ng-click="tvCtrl.submitStringFilter(tvCtrl.analysisFilterInput)" 
                     class=" btn btn-default fa fa-search"> Submit
             </button>
