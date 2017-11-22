@@ -1,5 +1,17 @@
 <div class="panel">
-      <div class="panel-heading">Term View - ({{tvCtrl.getTermCount()}}) Terms</div>
+      <div class="panel-heading">Term View - ({{tvCtrl.getTermCount()}}) Terms
+      <span class="dropdown pull-right">
+                  <a class="dropdown-toggle" data-toggle="dropdown" >
+                        <span>Options</span> 
+                  <i class="fa fa-gear"></i>
+                  </a>
+                  <ul class="dropdown-menu dropdown-user">
+                        <li ng-click="tvCtrl.showPOS = !tvCtrl.showPOS">
+                              <a><i ng-if="tvCtrl.showPOS" 
+                              class="fa fa-check-"></i>Show POS</a></li>
+                  </ul>
+      </span>
+      </div>
       <div class="panel-body"> 
       <div>
             <label class="control-label" for="posFilter">
@@ -56,16 +68,6 @@
                   </span>
                </th>
                <th ng-if="tvCtrl.showPOS">POS Count</th>
-               <span class="dropdown pull-right">
-                        <a class="dropdown-toggle" data-toggle="dropdown" >
-                            <span>Options</span> 
-                        <i class="fa fa-angle-double-down"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li ng-click="tvCtrl.showPOS = !tvCtrl.showPOS">
-                                <a><i ng-if="tvCtrl.showPOS" 
-                                    class="fa fa-check-"></i>Show POS</a></li>
-                        </ul>
             </thead>
             <tbody id="theTokensBody">
                <tr class="tree-grid-row" id="Chunk:{{summary.text}}"

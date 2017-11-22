@@ -1,5 +1,17 @@
 <div class="panel">
-        <div class="panel-heading">Phrase View - ({{pvCtrl.getPhraseCount()}}) Phrases</div>
+        <div class="panel-heading">Phrase View - ({{pvCtrl.getPhraseCount()}}) Phrases
+        <span class="dropdown pull-right">
+                <a class="dropdown-toggle" data-toggle="dropdown" >
+                        <span>Options</span> 
+                <i class="fa fa-gear"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                        <li ng-click="pvCtrl.showPOS = !pvCtrl.showPOS">
+                        <a><i ng-if="pvCtrl.showPOS" 
+                                class="fa fa-check-"></i>Show POS</a></li>
+                </ul>
+        </span>
+        </div>
         <div class="panel-body">                <div>
                 <span class="col-xs-4 pull-right"> 
                 <b>Limit</b>
@@ -26,7 +38,7 @@
                         </span>
                         </span>
                         </th>
-                <th>POS Count</th>
+                <th ng-if="pvCtrl.showPOS">POS Count</th>
                 </thead>
                 <tbody id="thePhrasesBody">
                 <tr class="tree-grid-row" id="Phrase:{{summary.text}}"
@@ -38,7 +50,7 @@
                         class="tree-label"
                         ng-bind-html="summary.text | highlightRegex:pvCtrl.analysisFilterRegexHighlight:true | trustAsHTML"></td>
                 <td>{{summary.count}}</td>
-                <td>{{summary.posCount}}</td>
+                <td ng-if="pvCtrl.showPOS">{{summary.posCount}}</td>
                 </tr>
                 </tbody>
             </table>
