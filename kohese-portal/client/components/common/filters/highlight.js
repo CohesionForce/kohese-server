@@ -1,6 +1,6 @@
 
 
-function Highlight () {
+function HighlightRegex () {
   return function (text, phrase) {
     if (text && angular.isDefined(phrase)) {
       if (phrase) {
@@ -15,7 +15,21 @@ function Highlight () {
   }
 }
 
+function Highlight () {
+  return function (text, phrase) {
+    if (text && angular.isDefined(phrase) && phrase !== '') {
+      let cleanedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (cleanedPhrase) {
+        text = text.replace(new RegExp('(' + cleanedPhrase + ')', 'gi'),
+          '<span class="highlighted">$1</span>');
+      }
+    }
+    return text;
+  }
+}
+
 export default () => {
   angular.module('app.filters.highlight', [])
-    .filter('highlightRegex', Highlight)
+    .filter('highlightRegex', HighlightRegex)
+    .filter('highlight', Highlight);
 }
