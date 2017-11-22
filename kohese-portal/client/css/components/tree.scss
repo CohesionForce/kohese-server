@@ -5,7 +5,7 @@
   position: relative;
   height: calc(100% - 120px);
   width: calc(100% - 20px);
-  margin: 0px 0px 0px 20px;
+  padding-left : 20px;
   overflow: hidden;
 }
 
@@ -116,6 +116,10 @@
   }
 }
 
+.no-icon {
+  padding-left : 12.5px !important;
+}
+
 .trim-info {
   max-width: 25em;
   overflow: hidden;
@@ -128,4 +132,17 @@
   max-width: 25em;
   white-space: pre-wrap;
   position: relative;
+}
+
+kind-icon {
+  padding-left: 3px;
+}
+
+.tooltip {
+  position: absolute;
+  .tooltiptext {
+    z-index : 0;
+    top: -5px;
+    left: 105%;
+  }
 }

@@ -40,6 +40,7 @@ const appModule = angular.module('app', [
   'app.directives.termview',
   'app.directives.sentenceview',
   'app.directives.phraseview',
+  'app.directives.kindicon',
   'app.constants.endpoints',
   'app.filters.htmlfilters',
   'app.filters.highlight',
