@@ -40,21 +40,66 @@ class KDBCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  constructor() {
-    kdbFS.createDirIfMissing(CACHE_DIRECTORY);
-    kdbFS.createDirIfMissing(OBJECT_DIRECTORY);
-    kdbFS.createDirIfMissing(COMMIT_DIRECTORY);
-    kdbFS.createDirIfMissing(EXPAND_COMMIT_DIRECTORY);
-    kdbFS.createDirIfMissing(BLOB_DIRECTORY);
-    kdbFS.createDirIfMissing(BLOB_MISMATCH_DIRECTORY);
-    kdbFS.createDirIfMissing(TREE_DIRECTORY);
+  constructor(repoPath) {
+    this.repoPath = repoPath;
+    
+    this.loadCachedObjects();
+    
+    // Then check index for new commits
+    
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static getCommits(){
+    return repoCommit;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static cachedCommit(oid){
+    return repoCommit[oid];
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static cachedTree(oid){
+    return repoTree[oid];
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static cachedBlob(oid){
+    return repoBlob[oid];
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static convertBlob(object) {
+    var blobObject;
+    
+    try {
+      // Try to convert the blob to a JSON object
+      blobObject = JSON.parse(object);
+    } catch (err) {
+      // If error, then it must be a binary file
+      blobObject = {
+          binary: object
+      };
+    }
+    return blobObject;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static loadCachedObjects() {
-    // TODO This should only be done in constructor
+
     kdbFS.createDirIfMissing(CACHE_DIRECTORY);
     kdbFS.createDirIfMissing(OBJECT_DIRECTORY);
     kdbFS.createDirIfMissing(COMMIT_DIRECTORY);
@@ -125,24 +170,6 @@ class KDBCache {
     console.log('::: Found ' + _.size(repoObjects.commit) + ' commits');
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static convertBlob(object) {
-    var blobObject;
-    
-    try {
-      // Try to convert the blob to a JSON object
-      blobObject = JSON.parse(object);
-    } catch (err) {
-      // If error, then it must be a binary file
-      blobObject = {
-          binary: object
-      };
-    }
-    return blobObject;
-  }
-  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -236,16 +263,16 @@ class KDBCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static loadCommit(commitId){
+  static loadProxiesForCommit(commitId){
     var commit = this.expandCommit(commitId);
-    this.loadRepo(commit.tree);
+    this.loadProxiesForRepo(commit.tree);
     ItemProxy.loadingComplete();
   }
   
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static loadRepo(treeData){
+  static loadProxiesForRepo(treeData){
     var contents = treeData.contents;
 
     if(contents.hasOwnProperty('store')) {
@@ -254,7 +281,7 @@ class KDBCache {
     
     if (contents.hasOwnProperty('export')) {
       console.log('::: Found early legacy dir (v0.1) for ' + treeData.oid);
-      this.loadRepo(contents['export']);
+      this.loadProxiesForRepo(contents['export']);
       return;
     }
     
@@ -269,10 +296,10 @@ class KDBCache {
             console.log('--- Skipping ' + kind);
             break;
           case 'Repository':
-            this.loadRepoContents(contents.Repository.contents);
+            this.loadProxiesForRepoContents(contents.Repository.contents);
             break;
           default:
-            this.loadKindContents(kind, contents[kind].contents);
+            this.loadProxiesForKindContents(kind, contents[kind].contents);
         }
         
       }
@@ -283,7 +310,7 @@ class KDBCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static loadRepoContents(repoDir){
+  static loadProxiesForRepoContents(repoDir){
     console.log('::: Processing Repositories');
     
     for(var repoFile in repoDir){
@@ -303,14 +330,14 @@ class KDBCache {
       // TODO Need to handle mount files
       
       var repoSubdir = repoDir[item.id];
-      this.loadRepo(repoSubdir);
+      this.loadProxiesForRepo(repoSubdir);
     }
   }
   
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static loadKindContents(kind, kindDir){
+  static loadProxiesForKindContents(kind, kindDir){
     console.log('::: Processing ' + kind);
     for(var kindFile in kindDir){
       
@@ -327,35 +354,6 @@ class KDBCache {
     
   }
   
-  
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getCommits(){
-    return repoCommit;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static cachedCommit(oid){
-    return repoCommit[oid];
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static cachedTree(oid){
-    return repoTree[oid];
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static cachedBlob(oid){
-    return repoBlob[oid];
-  }
-
 }
 
 module.exports = KDBCache;
