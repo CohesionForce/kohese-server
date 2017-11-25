@@ -67,9 +67,13 @@ class KDBCache {
     var oidFiles = kdbFS.getRepositoryFileList(BLOB_DIRECTORY);
 
     var parseMismatch = 0;
-    oidFiles.forEach((oid) => {
+    oidFiles.forEach((oidFile) => {
+      var oid = oidFile.replace(/\.json$/, '');
       try {
-        var object = kdbFS.loadBinaryFile(BLOB_DIRECTORY + '/' + oid);
+        var object = kdbFS.loadBinaryFile(BLOB_DIRECTORY + '/' + oidFile);
+        var blob = this.convertBlob(object);
+        Object.freeze(blob);
+
         if (compareOIDs){
           var koid = ItemProxy.gitFileOID(object);
           if (oid !== koid){
@@ -91,7 +95,7 @@ class KDBCache {
             }
           }         
         }
-        repoObjects.blob[oid] = object;
+        repoObjects.blob[oid] = blob;
       } catch (err) {
         console.log('*** Could not load cached blob:  ' + oid);
         console.log(err);
@@ -106,6 +110,7 @@ class KDBCache {
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(/\.json$/, '');
       var object = kdbFS.loadJSONDoc(TREE_DIRECTORY + '/' + oidFile);
+      Object.freeze(object);
       repoObjects.tree[oid] = object;
     });
     console.log('::: Found ' + _.size(repoObjects.tree) + ' trees');
@@ -114,6 +119,7 @@ class KDBCache {
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(/\.json$/, '');
       var object = kdbFS.loadJSONDoc(COMMIT_DIRECTORY + '/' + oidFile);
+      Object.freeze(object);
       repoObjects.commit[oid] = object;
     });
     console.log('::: Found ' + _.size(repoObjects.commit) + ' commits');
@@ -122,7 +128,31 @@ class KDBCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static convertBlob(object) {
+    var blobObject;
+    
+    try {
+      // Try to convert the blob to a JSON object
+      blobObject = JSON.parse(object);
+    } catch (err) {
+      // If error, then it must be a binary file
+      blobObject = {
+          binary: object
+      };
+    }
+    return blobObject;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static addCachedObject(type, oid, object) {
+    
+    if (type === 'blob'){
+      object = this.convertBlob(object);
+    }
+
+    Object.freeze(object);
     repoObjects[type][oid] = object;
     
     switch (type) {
@@ -138,7 +168,11 @@ class KDBCache {
         kdbFS.storeJSONDoc(TREE_DIRECTORY + path.sep + oid + '.json', object);    
         break;
       case 'blob':
-        kdbFS.storeBinaryFile(BLOB_DIRECTORY + path.sep + oid, object);
+        if (object.binary) {
+          kdbFS.storeBinaryFile(BLOB_DIRECTORY + path.sep + oid, object.binary);          
+        } else {
+          kdbFS.storeJSONDoc(BLOB_DIRECTORY + path.sep + oid + '.json', object);
+        }
         break;
       default:
         console.log('*** Unexpected type (' + type + ') for ' + oid);
@@ -263,7 +297,7 @@ class KDBCache {
       
       var oid = repoDir[repoFile].oid;
 
-      var item = JSON.parse(this.cachedBlob(oid));
+      var item = this.cachedBlob(oid);
       var proxy = new ItemProxy('Repository', item);
       
       // TODO Need to handle mount files
@@ -286,7 +320,7 @@ class KDBCache {
       
       var oid = kindDir[kindFile].oid;
 
-      var item = JSON.parse(this.cachedBlob(oid));
+      var item = this.cachedBlob(oid);
       var proxy = new ItemProxy(kind, item);
       
     }
