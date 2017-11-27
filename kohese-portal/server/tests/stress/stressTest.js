@@ -17,7 +17,7 @@ if(process.argv[4] && !isNaN(Number(process.argv[4]))) {
     delayInMS = Number(process.argv[4]);
     
 } else {
-    console.log('Usage: node tests/stressTest.js <itemId> <numberOfReqs> <delayInMS>');
+    console.log('Usage: node server/tests/stress/stressTest.js <itemId> <numberOfReqs> <delayInMS>');
     process.exit();
 }
 

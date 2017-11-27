@@ -174,11 +174,18 @@ module.exports = function(grunt) {
 				cmd: 'node',
 				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=server/tests/jasmineIntegrationDebug.json']
 			},
-			
+			jasmineCommon : {
+        cmd: 'node',
+        args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=common/tests/jasmineCommon.json']
+      },
+      jasmineCommonDebug : {
+        cmd: 'node',
+        args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=server/tests/jasmineCommonDebug.json']
+      },
 			jasmineRest: {
 				cmd: 'node',
 				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=tests/jasmineRest.json']
-			},
+			}
 			
 		},
 		
@@ -216,6 +223,8 @@ module.exports = function(grunt) {
 	var testUnitServerDebug = ['babel', 'run:jasmineUnitDebug'];
 	var testIntegrationServer = ['babel', 'run:jasmineIntegration'];
 	var testIntegrationServerDebug = ['babel', 'run:jasmineIntegrationDebug']
+	var testUnitCommon = ['babel', 'run:jasmineCommon'];
+	var testUnitCommonDebug = ['babel', 'run:jasmineCommonDebug'];
 	// Run client based tests
 	var testClient = ['browserify', 'jasmine'];
 	var test = [].concat(testServer, testClient);
@@ -235,7 +244,11 @@ module.exports = function(grunt) {
 	grunt.registerTask('sinte', 'Run integration tests on the server', 
 							testIntegrationServer);
 	grunt.registerTask('sinte:d', 'Run server integration test with stacktrace',
-							testIntegrationServerDebug)
+							testIntegrationServerDebug);
+	grunt.registerTask('cunit', 'Run common unit tests',
+	            testUnitCommon);
+	grunt.registerTask('cunit:d', 'Run common unit tests with stacktrace',
+	            testUnitCommonDebug);
 	grunt.registerTask('test', 'Run server and client tests.', test);
 	grunt.registerTask('dist', 'Prepare Kohese for distribution.', dist);
 	grunt.registerTask('build', 'Run all testing and dist related tasks.', build);
