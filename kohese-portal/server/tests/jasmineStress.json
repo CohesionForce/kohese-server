@@ -1,0 +1,13 @@
+{
+    "spec_dir": "server/tests/stress",
+    "spec_files": [
+      "*-spec.js"
+    ],
+    "helpers": [
+        "../helpers/reporter.js"     
+    ],
+    
+    "stopSpecOnExpectationFailure": false,
+    "random": false
+  }
+  

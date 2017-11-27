@@ -1,9 +1,10 @@
 {
-  "spec_dir": "tests/http",
+  "spec_dir": "common/tests/unit",
   "spec_files": [
     "*-spec.js"
   ],
-  "helpers": [],
+  "helpers": [
+  ],
   
   "stopSpecOnExpectationFailure": false,
   "random": false
