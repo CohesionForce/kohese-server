@@ -19,7 +19,7 @@ var repoCommit = repoObjects.commit;
 
 var jsonExt = /\.json$/;
 
-const disableObjectFreeze = true;  // TODO set back to false
+const disableObjectFreeze = false;  // TODO set back to false and/or remove disable check below
 
 class ItemCache {
   constructor() {
