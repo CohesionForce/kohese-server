@@ -10,7 +10,8 @@ var kdbFS = require('./kdb-fs.js');
 
 var nodegit = require('nodegit');
 
-const ItemProxy = require('../common/models/item-proxy.js');
+var ItemProxy = require('../common/models/item-proxy.js');
+var ItemCache = require('../common/models/item-cache.js');
 
 const CACHE_DIRECTORY = path.join('kdb', 'cache');
 const OBJECT_DIRECTORY = path.join(CACHE_DIRECTORY, 'git-object');
@@ -21,24 +22,11 @@ const BLOB_MISMATCH_DIRECTORY = path.join(OBJECT_DIRECTORY, 'mismatch_blob');
 const TREE_DIRECTORY = path.join(OBJECT_DIRECTORY, 'tree');
 const HASHMAP_DIRECTORY = path.join(OBJECT_DIRECTORY, 'hashmap');
 
-var jsonExt = /\.json$/;
-
-var repoObjects = {
-    blob: {},
-    tree: {},
-    commit: {}
-  };
-
-var repoBlob = repoObjects.blob;
-var repoTree = repoObjects.tree;
-var repoCommit = repoObjects.commit;
-
 const compareOIDs = false;
 const expandCommits = true;
 const createHashMaps = true;
-const disableObjectFreeze = false;
 
-class KDBCache {
+class KDBCache extends ItemCache {
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -50,34 +38,6 @@ class KDBCache {
     
     // Then check index for new commits
     
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getCommits(){
-    return repoCommit;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static cachedCommit(oid){
-    return repoCommit[oid];
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static cachedTree(oid){
-    return repoTree[oid];
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static cachedBlob(oid){
-    return repoBlob[oid];
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -122,10 +82,6 @@ class KDBCache {
         var object = kdbFS.loadBinaryFile(BLOB_DIRECTORY + '/' + oidFile);
         var blob = this.convertBlob(object);
 
-        if(!disableObjectFreeze){
-          Object.freeze(blob);
-        }          
-
         if (compareOIDs){
           var koid = ItemProxy.gitFileOID(object);
           if (oid !== koid){
@@ -147,13 +103,13 @@ class KDBCache {
             }
           }         
         }
-        repoObjects.blob[oid] = blob;
+        this.cacheBlob(oid, blob);
       } catch (err) {
         console.log('*** Could not load cached blob:  ' + oid);
         console.log(err);
       }
     });
-    console.log('::: Found ' + _.size(repoObjects.blob) + ' blobs');
+    console.log('::: Found ' + this.numberOfBlobs() + ' blobs');
     if(parseMismatch){
       console.log('::: Found ' + parseMismatch + ' parse mismatches');      
     }
@@ -162,19 +118,17 @@ class KDBCache {
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(/\.json$/, '');
       var object = kdbFS.loadJSONDoc(TREE_DIRECTORY + '/' + oidFile);
-      Object.freeze(object);
-      repoObjects.tree[oid] = object;
+      this.cacheTree(oid, object);
     });
-    console.log('::: Found ' + _.size(repoObjects.tree) + ' trees');
+    console.log('::: Found ' + this.numberOfTrees() + ' trees');
     
     oidFiles = kdbFS.getRepositoryFileList(COMMIT_DIRECTORY, /\.json$/);
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(/\.json$/, '');
       var object = kdbFS.loadJSONDoc(COMMIT_DIRECTORY + '/' + oidFile);
-      Object.freeze(object);
-      repoObjects.commit[oid] = object;
+      this.cacheCommit(oid, object);
     });
-    console.log('::: Found ' + _.size(repoObjects.commit) + ' commits');
+    console.log('::: Found ' + this.numberOfCommits() + ' commits');
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -182,17 +136,9 @@ class KDBCache {
   //////////////////////////////////////////////////////////////////////////
   static addCachedObject(type, oid, object) {
     
-    if (type === 'blob'){
-      object = this.convertBlob(object);
-    }
-
-    if(!disableObjectFreeze){
-      Object.freeze(object);      
-    }
-    repoObjects[type][oid] = object;
-    
     switch (type) {
       case 'commit':
+        this.cacheCommit(oid, object);
         kdbFS.storeJSONDoc(COMMIT_DIRECTORY + path.sep + oid + '.json', object);
         
         if (expandCommits){
@@ -208,9 +154,12 @@ class KDBCache {
         }
         break;
       case 'tree':
+        this.cacheTree(oid, object);
         kdbFS.storeJSONDoc(TREE_DIRECTORY + path.sep + oid + '.json', object);    
         break;
       case 'blob':
+        object = this.convertBlob(object);
+        this.cacheBlob(oid, object);
         if (object.binary) {
           kdbFS.storeBinaryFile(BLOB_DIRECTORY + path.sep + oid, object.binary);          
         } else {
@@ -223,59 +172,6 @@ class KDBCache {
 
   }
   
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static expandCommit(oid){
-    var commitData = repoCommit[oid];
-
-    var newCommitData = {
-        meta: _.clone(commitData),
-        tree: {}
-    };
-    
-    delete newCommitData.meta.treeId;
-    newCommitData.tree = this.expandTree(commitData.treeId);
-
-    return newCommitData;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static expandTree(treeId) {
-    var treeData = {
-        oid: treeId,
-        contents: {}
-    };
-    
-    var treeEntry = this.cachedTree(treeId);
-
-    if (!treeEntry){
-      console.log('*** Can\'t find cached tree: ' + treeId);
-    }
-    
-    var contents = treeData.contents;
-    
-    for(var entryName in treeEntry){
-      var entry = treeEntry[entryName];
-      switch (entry.type) {
-        case 'blob':
-          contents[entryName] = {
-            oid: entry.oid
-          };
-          break;
-        case 'tree':
-          contents[entryName] = this.expandTree(entry.oid);
-          break;
-        default:
-          console.log('*** Error: Unexpected Kind ' + entry.kind + ' in tree: ' + treeId);
-      }
-    }
-    
-    return treeData;
-  }
-
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////
   //// Generate index files
@@ -402,109 +298,6 @@ class KDBCache {
     });
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////
-  //// Proxy loading methods
-  //////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////
-
-  
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static loadProxiesForCommit(commitId){
-    var commit = this.expandCommit(commitId);
-    this.loadProxiesForRepo(commit.tree);
-    ItemProxy.loadingComplete();
-  }
-  
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static loadProxiesForRepo(treeData){
-    var contents = treeData.contents;
-
-    if(contents.hasOwnProperty('store')) {
-      console.log('::: Found store dir for ' + treeData.oid);
-    }
-    
-    if (contents.hasOwnProperty('export')) {
-      console.log('::: Found early legacy dir (v0.1) for ' + treeData.oid);
-      this.loadProxiesForRepo(contents['export']);
-      return;
-    }
-    
-    if (contents.hasOwnProperty('Item')){
-      console.log('::: Found legacy dir (v0.2) for ' + treeData.oid);
-      
-      for(var kind in contents){
-        switch (kind) {
-          case '.gitignore':
-          case '.project':
-          case 'Analysis':
-            console.log('--- Skipping ' + kind);
-            break;
-          case 'Repository':
-            this.loadProxiesForRepoContents(contents.Repository.contents);
-            break;
-          default:
-            this.loadProxiesForKindContents(kind, contents[kind].contents);
-        }
-        
-      }
-      
-    }
-  }
-  
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static loadProxiesForRepoContents(repoDir){
-    console.log('::: Processing Repositories');
-    
-    for(var repoFile in repoDir){
-      
-      if (!jsonExt.test(repoFile)){
-        console.log('>>> Skipping repo file ' + repoFile);
-        continue;
-      }
-
-      console.log('+++ Found Repository ' + repoFile);
-      
-      var oid = repoDir[repoFile].oid;
-
-      var item = this.cachedBlob(oid);
-      var proxy = new ItemProxy('Repository', item);
-      
-      // TODO Need to handle mount files
-      
-      var repoSubdir = repoDir[item.id];
-      if(repoSubdir){
-        this.loadProxiesForRepo(repoSubdir);        
-      }
-    }
-  }
-  
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static loadProxiesForKindContents(kind, kindDir){
-    console.log('::: Processing ' + kind);
-    for(var kindFile in kindDir){
-      
-      if (!jsonExt.test(kindFile)){
-        continue;
-      }
-      
-      var oid = kindDir[kindFile].oid;
-
-      var item = this.cachedBlob(oid);
-      var proxy = new ItemProxy(kind, item);
-      
-    }
-    
-  }
-  
 }
 
 module.exports = KDBCache;
