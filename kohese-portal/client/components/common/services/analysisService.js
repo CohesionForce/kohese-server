@@ -3,7 +3,7 @@
  */
 
 
-function AnalysisService(ItemRepository) {
+function AnalysisService (ItemRepository) {
   var _ = require('underscore');
   var service = this;
     
@@ -37,7 +37,7 @@ function AnalysisService(ItemRepository) {
 
       if (!forProxy.analysis) {
         console.log('::: Retrieving analysis for ' + forProxy.item.id + ' - ' + forProxy.item.name);
-        performAnalysis(forProxy).then(function(results) {
+        performAnalysis(forProxy).then(function (results) {
           resolve(results);
         });
       }
@@ -46,7 +46,7 @@ function AnalysisService(ItemRepository) {
     return analysisComplete;
   }
 
-  function performAnalysis(proxy) {
+  function performAnalysis (proxy) {
     var analysis = ItemRepository.performAnalysis(proxy)
         
     analysis.then(function (results) {
@@ -61,12 +61,12 @@ function AnalysisService(ItemRepository) {
     return analysis;
   }
 
-  function consolidateAnalysis(proxy) {
+  function consolidateAnalysis (proxy) {
     proxy.analysis.extendedSummaryList = proxy.analysis.data.summaryList;
     rollUpAnalysis(proxy);
   }
 
-  function rollUpAnalysis(proxy) {
+  function rollUpAnalysis (proxy) {
     if (!proxy.analysis.data) {
       return;
     }

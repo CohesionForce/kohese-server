@@ -10,6 +10,7 @@ function ModalService ($modal) {
   this.DEFAULT_TEMPLATE = 'components/common/services/modal-service/modal.html'
   this.ONE_LIST_TEMPLATE = 'components/common/services/modal-service/oneListModal.html'
   this.DELETE_TEMPLATE = 'components/common/services/modal-service/deleteModal.html'
+  this.LOADING_TEMPLATE = 'components/common/services/modal-service/loadingModal.html'
 
   var modalDefaults = {
     backdrop: true,
