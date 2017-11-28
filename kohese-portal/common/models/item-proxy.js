@@ -36,7 +36,25 @@ class ItemProxy {
       itemId = forItem.id = uuidV1();
       console.log('::: Allocating new id: ' + itemId);
     }
-
+    
+    var validation = ItemProxy.validateProposedItemUpdate(kind, forItem);
+    
+    if (!validation.valid){
+      // TODO Need to remove this bypass logic which is needed to load some existing data
+      if(tree.loading){
+        console.log('*** Error: Invalid data item');
+        console.log('Kind: ' + kind);
+        console.log(forItem);
+        console.log(validation);        
+      } else {
+        throw ({
+          error: 'Not-Valid',
+          validation: validation
+        });
+        
+      }
+    }
+    
     var proxy = tree.proxyMap[itemId];
     if (!proxy) {
 //      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
@@ -187,6 +205,30 @@ class ItemProxy {
     if (this.model && this.model.item && this.model.item.requiredProperties) {
       this.model.item.requiredProperties.forEach((property) => {
         if (!this.item.hasOwnProperty(property)) {
+          validationResult.valid = false;
+          validationResult.missingProperties.push(property);
+        }
+      });
+    }
+    
+    return validationResult;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static validateProposedItemUpdate(kind, itemUpdate){
+    
+    var model = tree.modelMap[kind];
+    
+    var validationResult = {
+      valid: true,
+      missingProperties: []
+    };
+    
+    if (model && model.item && model.item.requiredProperties) {
+      model.item.requiredProperties.forEach((property) => {
+        if (!itemUpdate.hasOwnProperty(property)) {
           validationResult.valid = false;
           validationResult.missingProperties.push(property);
         }
@@ -880,6 +922,15 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
     console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
+    
+    var validation = ItemProxy.validateProposedItemUpdate(modelKind, withItem);
+    
+    if (!validation.valid){
+      throw ({
+        error: 'Not-Valid',
+        validation: validation
+      });
+    }
 
     // Determine if item kind changed
     var newKind = modelKind;
