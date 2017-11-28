@@ -32,9 +32,12 @@ class KDBCache extends ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   constructor(repoPath) {
-    this.repoPath = repoPath;
     
-    this.loadCachedObjects();
+    super();
+    
+    KDBCache.repoPath = repoPath;
+    
+    KDBCache.loadCachedObjects();
     
     // Then check index for new commits
     
