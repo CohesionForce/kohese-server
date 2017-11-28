@@ -4,11 +4,10 @@ const kdbFs = require('./kdb-fs.js');
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
+var ItemProxy = require('../common/models/item-proxy.js');
 const Path = require('path');
 const importer = require('./directory-ingest.js');
 var _ = require('underscore');
-
-
 
 console.log('::: Initializing KIO Item Server');
 
@@ -161,21 +160,51 @@ function KIOItemServer(socket){
       request.item.createdOn = request.item.modifiedOn;
     }
 
+    try {
+      
+      var proxy;
+      var isNewInstance = false;
+      
+      if (request.item.id){
+        proxy = ItemProxy.getProxyFor(request.item.id);
+        proxy.updateItem(request.kind, request.item);
+      } else {
+        isNewInstance = true;
+        proxy = new ItemProxy(request.kind, request.item);      
+      }
+      
 
-    global.app.models[request.kind].upsert(request.item, {}, function (value, responseHeaders){
       console.log('::: Upsert ' + request.id);
-      console.log(value);
-      console.log(responseHeaders);
-      sendResponse({
-        kind: request.kind,
-        item: responseHeaders
+      
+      global.koheseKDB.storeModelInstance(proxy.kind, proxy.item, isNewInstance).then(function (status) {
+        console.log('Saved %s #%s#%s#', proxy.kind, proxy.item.id, proxy.item.name);
+        var notification = {};
+        notification.kind = proxy.kind;
+        notification.item = proxy.item;
+        notification.status = status;
+        console.log('Change Instance:' + JSON.stringify(notification));
+        if (isNewInstance) {
+            notification.type = 'create';
+            kio.server.emit(proxy.kind +'/create', notification);
+        } else {
+            notification.type = 'update';
+            kio.server.emit(proxy.kind +'/update', notification);
+        }
+      
+        // TODO need to add user password processing
+      
+        sendResponse({
+          kind: request.kind,
+          item: proxy.item
+        });
+        console.log('::: Sent Item/upsert response');
       });
-      console.log('::: Sent Item/upsert response');
-    }, function (httpResponse){
-      sendResponse({error: httpResponse});
-      console.log('::: Sent Item/upsert error');      
-    });
-
+    } catch (err){
+      console.log('*** Error: ' + err);
+      console.log(err.stack);
+      sendResponse({error: err});
+      console.log('::: Sent Item/upsert error');            
+    }
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -185,19 +214,17 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received deleteById for %s for user %s at %s',
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
-
-    global.app.models[request.kind].deleteById(request.id, {}, function (value, responseHeaders){
-      console.log('::: Deleted ' + request.id);
-      sendResponse({
-        success: value,
-        headers: responseHeaders
-      });
-      console.log('::: Sent Item/deleteById response');      
-    }, function (httpResponse){
-      sendResponse({error: httpResponse});
-      console.log('::: Sent Item/deleteById error');      
-    });
-
+    
+    var proxy = ItemProxy.getProxyFor(request.id);
+    
+    console.log('Deleted %s #%s#', request.kind, request.id);
+    var notification = {};
+    notification.type = 'delete';
+    notification.kind = request.kind;
+    notification.id = request.id;
+    console.log('Change: ' + JSON.stringify(notification));
+    kio.server.emit(request.kind +'/delete', notification);
+    global.koheseKDB.removeModelInstance(request.kind, notification.id);
   });
   
   //////////////////////////////////////////////////////////////////////////
@@ -374,7 +401,11 @@ function KIOItemServer(socket){
       for (var j = 0; j < proxies.length; j++) {
         var proxy = proxies[j];
         proxy.item = kdbFs.loadJSONDoc(proxy.repoPath);
-        global.app.models[proxy.kind].upsert(proxy.item, {}, function () {});
+        proxy.updateItem(proxy.kind, proxy.item);
+        var notification = {};
+        notification.kind = proxy.kind;
+        notification.item = proxy.item;
+        kio.server.emit(proxy.kind +'/update', notification);
       }
       
       sendStatusUpdates(proxies);

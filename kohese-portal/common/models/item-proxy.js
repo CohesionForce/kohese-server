@@ -37,7 +37,7 @@ class ItemProxy {
       console.log('::: Allocating new id: ' + itemId);
     }
     
-    var validation = ItemProxy.validateProposedItemUpdate(kind, forItem);
+    var validation = ItemProxy.validateItemContent(kind, forItem);
     
     if (!validation.valid){
       // TODO Need to remove this bypass logic which is needed to load some existing data
@@ -197,27 +197,14 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   validateItem(){
     
-    var validationResult = {
-      valid: true,
-      missingProperties: []
-    };
+    return ItemProxy.validateItemContent(this.kind, this.item);
     
-    if (this.model && this.model.item && this.model.item.requiredProperties) {
-      this.model.item.requiredProperties.forEach((property) => {
-        if (!this.item.hasOwnProperty(property)) {
-          validationResult.valid = false;
-          validationResult.missingProperties.push(property);
-        }
-      });
-    }
-    
-    return validationResult;
   }
   
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static validateProposedItemUpdate(kind, itemUpdate){
+  static validateItemContent(kind, itemContent){
     
     var model = tree.modelMap[kind];
     
@@ -228,7 +215,7 @@ class ItemProxy {
     
     if (model && model.item && model.item.requiredProperties) {
       model.item.requiredProperties.forEach((property) => {
-        if (!itemUpdate.hasOwnProperty(property)) {
+        if (!itemContent.hasOwnProperty(property)) {
           validationResult.valid = false;
           validationResult.missingProperties.push(property);
         }
@@ -923,13 +910,21 @@ class ItemProxy {
   updateItem(modelKind, withItem) {
     console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
     
-    var validation = ItemProxy.validateProposedItemUpdate(modelKind, withItem);
+    var validation = ItemProxy.validateItemContent(modelKind, withItem);
     
     if (!validation.valid){
-      throw ({
-        error: 'Not-Valid',
-        validation: validation
-      });
+      // TODO Need to remove this bypass logic which is needed to load some existing data
+      if(tree.loading){
+        console.log('*** Error: Invalid data item');
+        console.log('Kind: ' + modelKind);
+        console.log(withItem);
+        console.log(validation);        
+      } else {
+        throw ({
+          error: 'Not-Valid',
+          validation: validation
+        });
+      }
     }
 
     // Determine if item kind changed
