@@ -591,13 +591,6 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  xit('Should Remove All Items From Repository', ()=> {
-    
-  });
-  
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   it('Hash Before Item Loaded Creates Tree Hash On Internal Node', ()=> {
 
     var item = {
@@ -713,20 +706,6 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  xit('Writes a File', ()=>{
-    var jsonObject = {
-      name: 'Some Content',
-      id: 'Some File'
-    };
-    var fs = require('fs');
-    
-    console.log('::: Writing the file');
-    fs.writeFileSync('w.out', JSON.stringify(jsonObject, null, '  '), {encoding: 'utf8', flag: 'w'});      
-  });
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   it('Should Ensure Fields Are In Consistent Order', ()=>{
 
     defineTestModel();
@@ -786,20 +765,30 @@ describe('ItemProxy Test', function() {
 
     expect(requiredFields).toEqual(expectedRequiredFields);
     
+    var item = {
+        id: 'new-item',
+        description: 'Missing Name'
+      };
+
+    var newItem;
+    try {
+      newItem = new ItemProxy('Item', item);      
+    } catch (err){
+      expect(err).toEqual({ 
+        error : 'Not-Valid', 
+        validation : { 
+          valid : false, 
+          missingProperties : [ 'name' ] 
+        } 
+      });
+    }
     
-    var newItem = new ItemProxy('Item', {
-      id: 'new-item',
-      description: 'Missing Name'
-    });
+    // Add the missing field
+    item.name = 'Test';
+    
+    newItem = new ItemProxy('Item', item);
     
     var itemValidation = newItem.validateItem();
-    expect(itemValidation).toEqual({
-      valid: false,
-      missingProperties: [ 'name']
-    });
-    
-    newItem.item.name = "Test";
-    itemValidation = newItem.validateItem();
     expect(itemValidation.valid).toEqual(true);
     
   });
