@@ -83,11 +83,6 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
         var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
         detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
         detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
-        if(detailsCtrl.docShowChildren) {
-          var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
-          detailsCtrl.docRendered = docWriter.render(docParsed);
-          detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);                
-        }
       }
     }
     $scope.$emit('newItemSelected', $stateParams.id);
@@ -385,11 +380,6 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
       var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
       detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
       detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
-      if(detailsCtrl.docShowChildren){
-        var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
-        detailsCtrl.docRendered = docWriter.render(docParsed);
-        detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);                
-      }
     }
   });
 
