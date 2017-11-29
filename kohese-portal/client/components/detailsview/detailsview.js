@@ -379,7 +379,18 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
   }
 
   $scope.$watch('detailsCtrl.itemProxy.item.description', function () {
-    $scope.$broadcast('Proxy Description Updated', detailsCtrl.itemProxy);              
+    $scope.$broadcast('Proxy Description Updated', detailsCtrl.itemProxy);
+    
+    if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.description){
+      var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
+      detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
+      detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
+      if(detailsCtrl.docShowChildren){
+        var docParsed = docReader.parse(detailsCtrl.itemProxy.getDocument());
+        detailsCtrl.docRendered = docWriter.render(docParsed);
+        detailsCtrl.docRendered = $sce.trustAsHtml(detailsCtrl.docRendered);                
+      }
+    }
   });
 
   function postDigest (callback) {
