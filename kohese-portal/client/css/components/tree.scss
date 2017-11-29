@@ -94,6 +94,9 @@
   vertical-align: top;
   padding: 5px 0px 5px;
   width: 80%;
+  &:hover {
+    cursor : pointer;
+  }
 }
 
 .knowledge-tree {
