@@ -437,6 +437,10 @@ table td .glyphicon-remove:hover {
   width: 80%;
 }
 
+.kti-name:hover {
+  cursor: pointer;
+}
+
 .knowledge-tree .kt-head .glyphicon-plus {
   color: green;
 }
