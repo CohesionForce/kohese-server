@@ -6,7 +6,7 @@
  *      Contains information related to the authentication status
  */
 
-function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, 
+function UserService (ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, 
   KoheseIO, $state, SessionService) {
   const service = this;
   var users = {};
@@ -19,20 +19,20 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
   service.authToken = {};
   service.getUsersItemId = getUsersItemId;
 
-  function getUsersItemId() {
+  function getUsersItemId () {
     return users.item.id;
   }
 
-  function getAllUsers() {
+  function getAllUsers () {
     return users.children;
   }
 
-  function getCurrentUsername() {
+  function getCurrentUsername () {
     return currentUser.item ? 
       currentUser.item.name : 'Loading';
   }
 
-  function getCurrentUserEmail() {
+  function getCurrentUserEmail () {
     if (currentUser.item) {
       return currentUser.item.email ? 
         currentUser.item.email : 'No email specified';
@@ -41,7 +41,7 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
     }
   }
 
-  function setCurrentUser() {
+  function setCurrentUser () {
     service.authToken = AuthTokenFactory.getToken();
     if (service.authToken) {
       var decodedToken = jwtHelper.decodeToken(service.authToken);
@@ -51,7 +51,6 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
                We will call this function again when the repo is loaded. */
       if (users) {
         currentUser = users.getChildByName(decodedToken.username);
-        SessionService.registerSessions();
       }
     } else {
       $state.go('login');
@@ -65,17 +64,17 @@ function UserService(ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
     $rootScope.$broadcast('userLoaded');
   });
 
-  $rootScope.$on('userLoggedIn', function onUserLogin() {
+  $rootScope.$on('userLoggedIn', function onUserLogin () {
     userLoggedIn = true;
     setCurrentUser();
     console.log('::: Logged in as ' + currentUser.username);
   });
 
-  $rootScope.$on('userLoggedOut', function onUserLogout() {
+  $rootScope.$on('userLoggedOut', function onUserLogout () {
     userLoggedIn = false;
   });
 
-  $rootScope.$on('UserUpdated', function onUserUpdated(event, data) {
+  $rootScope.$on('UserUpdated', function onUserUpdated (event, data) {
     currentUser = data;
   });
 
