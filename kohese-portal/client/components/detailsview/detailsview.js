@@ -365,6 +365,7 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
           detailsCtrl.actionForm.$setPristine();
         }
         detailsCtrl.enableEdit = false;
+        $scope.$apply();
       });
   };
 
