@@ -10,6 +10,14 @@
   
 }
 
+.details-form {
+  height: calc(100% - 44px);
+  .form-container {
+    height : 700px;
+    overflow : auto;
+  }
+}
+
 #details-tabs {
   height: calc(100% - 30px);
   

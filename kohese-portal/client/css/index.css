@@ -509,6 +509,15 @@ kind-icon {
   height: calc(100% - 30px);
 }
 
+.details-form {
+  height: calc(100% - 44px);
+}
+
+.details-form .form-container {
+  height: 700px;
+  overflow: auto;
+}
+
 #details-tabs {
   height: calc(100% - 30px);
 }
