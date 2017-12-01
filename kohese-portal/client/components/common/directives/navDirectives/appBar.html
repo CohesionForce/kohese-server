@@ -6,12 +6,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" 
+        <a class="navbar-brand"
            ng-class="{'navbar-syncing': appBarCtrl.repositorySyncing,
                       'navbar-disconnected': !appBarCtrl.repositorySynced}"
            ng-click="appBarCtrl.navigate('kohese.explore',{}, 'dualview')">
-             Kohese Portal <i class="fa fa-exclamation-triangle" 
+             Kohese Portal <i class="fa fa-exclamation-triangle"
                               ng-hide="appBarCtrl.repositorySynced"> - Disconnected</i> </a>
+                           <i class="fa fa-exclamation-triangle"
+                              ng-if="!appBarCtrl.repositorySynced && !appBarCtrl.repositorySyncing"> - Failed Connection</i>
         <a class="navbar-brand" ng-click="appBarCtrl.navigate('kohese.dashboard',{}, 'singleview')">Dashboard</a>
     </div>
     <!-- /.navbar-header -->
