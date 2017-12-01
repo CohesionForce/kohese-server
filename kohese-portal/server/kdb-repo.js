@@ -336,19 +336,23 @@ function checkout(repositoryId, filePaths, force) {
       checkoutPaths.push(filePaths[j]);
     }
   }
-  
-  var options = new nodegit.CheckoutOptions();
-  options.paths = checkoutPaths;
-  options.checkoutStrategy = (force ? (nodegit.Checkout.STRATEGY.FORCE
-      | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : (nodegit.Checkout.STRATEGY.SAFE
-      | nodegit.Checkout.STRATEGY.ALLOW_CONFLICTS));
-  //options.notifyFlags = nodegit.Checkout.NOTIFY.ALL;
-  //options.notifyCb = function (why, path, baseline, target, workdir, payload) {
-  //  // Return zero to proceed
-  //  return 0;
-  //};
-  // Passing null uses HEAD for the checkout
-  return nodegit.Checkout.tree(repository, null, options);
+
+  if (checkoutPaths.length > 0) {
+    var options = new nodegit.CheckoutOptions();
+    options.paths = checkoutPaths;
+    options.checkoutStrategy = (force ? (nodegit.Checkout.STRATEGY.FORCE
+        | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : (nodegit.Checkout.STRATEGY.SAFE
+        | nodegit.Checkout.STRATEGY.ALLOW_CONFLICTS));
+    //options.notifyFlags = nodegit.Checkout.NOTIFY.ALL;
+    //options.notifyCb = function (why, path, baseline, target, workdir, payload) {
+    //  // Return zero to proceed
+    //  return 0;
+    //};
+    // Passing null uses HEAD for the checkout
+    return nodegit.Checkout.tree(repository, null, options);
+  } else {
+    return Promise.resolve(true);
+  }
 }
 module.exports.checkout = checkout;
 
