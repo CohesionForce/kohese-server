@@ -21,7 +21,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     });
   };
 
-  service.unstageItems = function(proxyList) {
+  service.unstageItems = function(proxyList, callback) {
     var data = {
       proxyIds : []
     }
@@ -33,6 +33,10 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
         toastr.error('Unstage failed', results.error);
       } else {
         toastr.success('Unstage Succeeded!', 'Version Control');
+      }
+      
+      if (callback) {
+        callback(!results.error);
       }
     });
   };

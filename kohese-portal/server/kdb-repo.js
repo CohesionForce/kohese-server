@@ -17,14 +17,13 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function openRepo(proxy) {
-  var path = proxy.getRepositoryProxy().repoPath.split('Root.json')[0];
-    console.log("::: Opening git repo " + path);
-    return nodegit.Repository.open(path).then(function (r) {
-      repoList[proxy.item.id] = r;
-    }).catch(function (err) {
-      console.log("Error opening repository at " + path + ". " + err);
-    });
+function openRepo(repositoryId, repositoryPath) {
+  console.log("::: Opening git repo " + repositoryPath);
+  return nodegit.Repository.open(repositoryPath).then(function (r) {
+    repoList[repositoryId] = r;
+  }).catch(function (err) {
+    console.log("Error opening repository at " + repositoryPath + ". " + err);
+  });
 }
 module.exports.openRepo = openRepo;
 
@@ -57,9 +56,8 @@ function getCommitFilesChanged(commit) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function generateCommitHistoryIndices(proxy, overwrite) {
-  var p = proxy.getRepositoryProxy().repoPath.split('Root.json')[0];
-  return nodegit.Repository.open(p).then(function (r) {
+function generateCommitHistoryIndices(repositoryPath, overwrite) {
+  return nodegit.Repository.open(repositoryPath).then(function (r) {
     return r.getMasterCommit().then(function (mc) {
       var rw = nodegit.Revwalk.create(r);
       rw.sorting(nodegit.Revwalk.SORT.TIME);
@@ -192,8 +190,8 @@ function parseTree(tree) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getContents(repositoryProxy, oid) {
-  return nodegit.Blob.lookup(repoList[repositoryProxy.item.id], nodegit.Oid
+function getContents(repositoryId, oid) {
+  return nodegit.Blob.lookup(repoList[repositoryId], nodegit.Oid
     .fromString(oid)).then(function (o) {
     return JSON.parse(o.toString());
   }).catch(function (err) {
@@ -205,9 +203,9 @@ module.exports.getContents = getContents;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function initializeRepository(repoProxy, path) {
+function initializeRepository(repositoryId, path) {
   return nodegit.Repository.init(path, 0).then(function (r) {
-    repoList[repoProxy.item.id] = r;
+    repoList[repositoryId] = r;
   });
 }
 module.exports.initializeRepository = initializeRepository;
@@ -215,40 +213,20 @@ module.exports.initializeRepository = initializeRepository;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function add(proxies) {
-  var addStatusMap = {};
-  var repoIndexMap = {};
-  var promises = [];
-  for (var i = 0; i < proxies.length; i++) {
-    (function (iIndex) {
-      var info = repoRelativePathOf(proxies[iIndex]);
-      promises.push(info.gitRepo.refreshIndex().then(function(index) {
-         return index.addByPath(info.relativeFilePath).then(function(result) {
-           repoIndexMap[info.gitRepo] = index;
-           var added = false;
-           var indexEntries = index.entries();
-           for (var j = 0; j < indexEntries.length; j++) {
-             if (indexEntries[j].path === info.relativeFilePath) {
-               added = true;
-               break;
-             }
-           }
-           
-           addStatusMap[proxies[iIndex].item.id] = added;
-         });
-      }));
-    })(i);
-  }
-  
-  return Promise.all(promises).then(function () {
-    var promises = [];
-    for (var repo in repoIndexMap) {
-      promises.push(repoIndexMap[repo].write());
-    }
-    
-    return Promise.all(promises);
-  }).then(function () {
-    return addStatusMap;
+function add(repositoryId, filePath) {
+  return repoList[repositoryId].refreshIndex().then(function (index) {
+    return index.addByPath(filePath).then(function () {
+      return index.write();
+    }).then(function () {
+      var status = getItemStatus(repositoryId, filePath);
+      for (var j = 0; j < status.length; j++) {
+        if (status[j].startsWith("INDEX_")) {
+          return true;
+        }
+      }
+      
+      return false;
+    });
   });
 }
 module.exports.add = add;
@@ -256,26 +234,44 @@ module.exports.add = add;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function commit(proxies, userName, eMail, message) {
+function commit(repositoryIds, userName, eMail, message) {
   // TODO Does "HEAD" need to be a variable?
   var commitIdMap = {};
   var signature = nodegit.Signature.now(userName, eMail);
   var promises = [];
-  for (var i = 0; i < proxies.length; i++) {
-    var info = repoRelativePathOf(proxies[i]);
-    var repo = info.gitRepo;
+  for (var i = 0; i < repositoryIds.length; i++) {
+    var repo = repoList[repositoryIds[i]];
     (function (iIndex) {
       promises.push(repo.getHeadCommit().then(function (commit) {
         return repo.refreshIndex().then(function (index) {
-          return index.writeTree();
-        }).then(function (treeId) {
-          return repo.createCommit("HEAD", signature, signature, message,
-              treeId, [commit]).then(function (commitId) {
-            commitIdMap[proxies[iIndex].item.id] = commitId;
-            return repo.getCommit(commitId).then(function (c) {
-              return indexCommit(c);
+          return index.writeTree().then(function (treeId) {
+            var parentCommits = [];
+            if (commit) {
+              parentCommits.push(commit);
+            }
+            return repo.getStatusExt().then(function (statuses) {
+              var filePaths = [];
+              for (var j = 0; j < statuses.length; j++) {
+                var status = statuses[j];
+                if (status.inIndex()) {
+                  filePaths.push(status.path());
+                }
+              }
+              
+              return repo.createCommit("HEAD", signature, signature, message,
+                  treeId, parentCommits).then(function (commitId) {
+                commitIdMap[repositoryIds[iIndex]] = {
+                  commitId: commitId,
+                  filesCommitted: filePaths
+                };
+                return repo.getCommit(commitId).then(function (c) {
+                  return indexCommit(c);
+                });
+              });
             });
           });
+        }).catch(function (err) {
+          console.log(err.stack);
         });
       }));
     })(i);
@@ -290,30 +286,27 @@ module.exports.commit = commit;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function push(proxies, remoteName, defaultUser) {
+function push(repositoryIds, remoteName, defaultUser) {
   var pushStatusMap = {};
   var promises = [];
-  for (var i = 0; i < proxies.length; i++) {
-    var info = repoRelativePathOf(proxies[i]);
+  for (var i = 0; i < repositoryIds.length; i++) {
     (function (iIndex) {
-      promises.push(info.gitRepo.getRemote(remoteName).then(function(remote) {
+      promises.push(repoList[repositoryIds[iIndex]].getRemote(remoteName).then(function(remote) {
         // TODO Does the refs String below need to change?
-           return remote.push(["refs/heads/master:refs/heads/master"],
-              {
-                 callbacks: {
-                    credentials: function(url, u) {
-                      // TODO Get the username from the given URL once we have
-                      // upgraded our version of node.js
-                      return nodegit.Cred.sshKeyFromAgent(defaultUser);
-                    }
-                 }
-              }).then(function (status) {
-                pushStatusMap[proxies[iIndex].item.id] = status;
-              })
-                .catch(function(err){
-                 console.log(err); 
-                });
-           }));
+        return remote.push(["refs/heads/master:refs/heads/master"], {
+            callbacks: {
+              credentials: function(url, u) {
+                // TODO Get the username from the given URL once we have
+                // upgraded our version of node.js
+                return nodegit.Cred.sshKeyFromAgent(defaultUser);
+              }
+            }
+        }).then(function (status) {
+          pushStatusMap[repositoryIds[iIndex]] = status;
+        }).catch(function(err){
+          console.log(err); 
+        });
+      }));
     })(i);
   }
   
@@ -326,92 +319,58 @@ module.exports.push = push;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function checkout(proxies, force) {
-  var repoMap = [];
-  for (var i = 0; i < proxies.length; i++) {
-    var add = true;
-    var info = repoRelativePathOf(proxies[i]);
-    for (var j = 0; j < repoMap.length; j++) {
-      if (repoMap[j].repo === info.gitRepo) {
-        repoMap[j].paths.push(info.relativeFilePath);
-        add = false;
+function checkout(repositoryId, filePaths, force) {
+  var repository = repoList[repositoryId];
+  var checkoutPaths = [];
+  for (var j = 0; j < filePaths.length; j++) {
+    var status = getItemStatus(repositoryId, filePaths[j]);
+    var inIndex = false;
+    for (var k = 0; k < status.length; k++) {
+      if (status[k].startsWith("INDEX_")) {
+        inIndex = true;
         break;
       }
     }
     
-    if (add) {
-      repoMap.push({
-        repo: info.gitRepo,
-        paths: [info.relativeFilePath]
-      });
+    if (!inIndex) {
+      checkoutPaths.push(filePaths[j]);
     }
   }
   
-  var promises = [];
-  for (var j = 0; j < repoMap.length; j++) {
-    var options = new nodegit.CheckoutOptions();
-    options.paths = repoMap[j].paths;
-    options.checkoutStrategy = (force ? (nodegit.Checkout.STRATEGY.FORCE
-        | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : (nodegit.Checkout.STRATEGY.SAFE
-        | nodegit.Checkout.STRATEGY.ALLOW_CONFLICTS));
-    //options.notifyFlags = nodegit.Checkout.NOTIFY.ALL;
-    //options.notifyCb = function (why, path, baseline, target, workdir, payload) {
-      // Return zero to proceed
-    //  return 0;
-    //};
-    // Passing null uses HEAD for the checkout
-    promises.push(nodegit.Checkout.tree(repoMap[j].repo, null, options));
-  }
-  
-  return Promise.all(promises);
+  var options = new nodegit.CheckoutOptions();
+  options.paths = checkoutPaths;
+  options.checkoutStrategy = (force ? (nodegit.Checkout.STRATEGY.FORCE
+      | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : (nodegit.Checkout.STRATEGY.SAFE
+      | nodegit.Checkout.STRATEGY.ALLOW_CONFLICTS));
+  //options.notifyFlags = nodegit.Checkout.NOTIFY.ALL;
+  //options.notifyCb = function (why, path, baseline, target, workdir, payload) {
+  //  // Return zero to proceed
+  //  return 0;
+  //};
+  // Passing null uses HEAD for the checkout
+  return nodegit.Checkout.tree(repository, null, options);
 }
 module.exports.checkout = checkout;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function reset(proxiesToReset) {
-  var promises = [];
-  var repoMap = [];
-  for (var j = 0; j < proxiesToReset.length; j++) {
-    var info = repoRelativePathOf(proxiesToReset[j]);
-    var found = false;
-    for (var k = 0; k < repoMap.length; k++) {
-      if (repoMap[k].repo === info.gitRepo) {
-        found = true;
-        repoMap[k].resetPaths.push(info.relativeFilePath);
-        break;
-      }
-    }
-    
-    if (!found) {
-      repoMap.push({
-          repo: info.gitRepo,
-          resetPaths: [info.relativeFilePath]
-      });
-    }
-  }
-  
-  for (var i = 0; i < repoMap.length; i++) {
-    (function (iIndex) {
-      promises.push(repoMap[iIndex].repo.getHeadCommit().then(function (commit) {
-        return nodegit.Reset.default(repoMap[iIndex].repo, commit, repoMap[iIndex].resetPaths);
-      }));
-    })(i);
-  }
-  
-  return Promise.all(promises);
+function reset(repositoryId, filePaths) {
+  var repository = repoList[repositoryId];
+  return repository.getHeadCommit().then(function (commit) {
+    return nodegit.Reset.default(repository, commit, filePaths);
+  });
 }
 module.exports.reset = reset;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function diff(proxy) {
-  var info = repoRelativePathOf(proxy);
-  return info.gitRepo.getHeadCommit().then(function (commit) {
+function diff(repositoryId) {
+  var repository = repoList[repositoryId];
+  return repository.getHeadCommit().then(function (commit) {
     return commit.getTree().then(function (tree) {
-       return nodegit.Diff.treeToWorkdirWithIndex(info.gitRepo, tree, null);
+       return nodegit.Diff.treeToWorkdirWithIndex(repository, tree, null);
     });
   }).then(function (diff) {
     var diffContent = [];
@@ -445,9 +404,8 @@ module.exports.diff = diff;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function addRemote(proxy, remoteName, remoteUrl) {
-  var info = repoRelativePathOf(proxy);
-  return nodegit.Remote.create(info.gitRepo, remoteName, remoteUrl)
+function addRemote(repositoryId, remoteName, remoteUrl) {
+  return nodegit.Remote.create(repoList[repositoryId], remoteName, remoteUrl)
     .then(function (remote) {
       return remote.name();
   });
@@ -457,18 +415,16 @@ module.exports.addRemote = addRemote;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getRemotes(proxy) {
-  var info = repoRelativePathOf(proxy);
-  return nodegit.Remote.list(info.gitRepo);
+function getRemotes(repositoryId) {
+  return nodegit.Remote.list(repoList[repositoryId]);
 }
 module.exports.getRemotes = getRemotes;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function fetch(proxy, remoteName) {
-  var info = repoRelativePathOf(proxy);
-  return info.gitRepo.fetch(remoteName, {
+function fetch(repositoryId, remoteName) {
+  return repoList[repositoryId].fetch(remoteName, {
     callbacks: {
       credentials: function (url, username) {
         return nodegit.Cred.sshKeyFromAgent(username);
@@ -481,16 +437,16 @@ module.exports.fetch = fetch;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function merge(proxy, signature) {
-  var info = repoRelativePathOf(proxy);
-  return Promise.join(info.gitRepo.getHeadCommit(), info.gitRepo.getMasterCommit(), function (hc, mc) {
-    var index = nodegit.Merge.commits(info.gitRepo, hc, mc, null);
+function merge(repositoryId, signature) {
+  var repository = repoList[repositoryId];
+  return Promise.join(repository.getHeadCommit(), repository.getMasterCommit(), function (hc, mc) {
+    var index = nodegit.Merge.commits(repository, hc, mc, null);
     if (index.hasConflicts()) {
       // TODO Handle conflicts
     }
     
-    return index.writeTreeTo(info.gitRepo).then(function (treeId) {
-      return info.gitRepo.createCommit("HEAD", signature, signature, "Merge from master to HEAD.", treeId, [hc, mc]);
+    return index.writeTreeTo(repository).then(function (treeId) {
+      return repository.createCommit("HEAD", signature, signature, "Merge from master to HEAD.", treeId, [hc, mc]);
     });
   });
 }
@@ -499,10 +455,10 @@ module.exports.merge = merge;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function pull(proxy, remoteName, signature) {
-  var info = repoRelativePathOf(proxy);
-  return fetch(info.gitRepo, remoteName).then(function () {
-    return merge(info.gitRepo, signature);
+function pull(repositoryId, remoteName, signature) {
+  var repository = repoList[repositoryId];
+  return fetch(repository, remoteName).then(function () {
+    return merge(repository, signature);
   });
 }
 module.exports.pull = pull;
@@ -510,54 +466,31 @@ module.exports.pull = pull;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function repoRelativePathOf(proxy){
-  var filePath = proxy.repoPath;
-  var repoProxy = proxy.getRepositoryProxy();
-  var r = repoList[repoProxy.item.id];
-
-  while(!r) {
-      if(!repoProxy.parentProxy){
-          console.log('!!! Cannot find a git repo containing ' + filePath);
-          return;
-      }
-      
-      repoProxy = repoProxy.parentProxy.getRepositoryProxy();
-      r = repoList[repoProxy.item.id];
-  }
-  
-  var pathToRepo = repoProxy.repoPath.split('Root.json')[0];
-  var relativeFilePath = filePath.split(pathToRepo)[1];
-
-  return {
-    repoProxy: repoProxy,
-    gitRepo: r,
-    pathToRepo: pathToRepo,
-    relativeFilePath: relativeFilePath
-  };
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function getStatus (proxy, callback){
+function getStatus (repositoryId, callback){
   //This code gets working directory changes similar to git status
-  var info = repoRelativePathOf(proxy);
-  info.gitRepo.getStatusExt().then(function(statuses) {
+  repoList[repositoryId].getStatusExt().then(function(statuses) {
     
     var repoStatus = [];
     
     statuses.forEach(function(file) {
       var fileString = file.path();
-      var fileParts = fileString.match(itemFileRegEx);
-
-      if (fileParts) {
-        var itemId = fileParts[1];
-        repoStatus.push({
-          id: itemId,
-          status: file.status()
-        });
+      if (fileString.endsWith('.json')) {
+        var id = path.basename(fileString, '.json');
+        var foundId = true;
+        if (!UUID_REGEX.test(id)) {
+          id = path.basename(path.dirname(fileString));
+          if (!UUID_REGEX.test(id)) {
+            foundId = false;
+          }
+        }
+        
+        if (foundId) {
+          repoStatus.push({
+            id: id,
+            status: file.status()
+          });
+        }
       }
-
     });
 
     callback(repoStatus);
@@ -568,10 +501,9 @@ module.exports.getStatus = getStatus;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getItemStatus(proxy) {
-  var info = repoRelativePathOf(proxy);
+function getItemStatus(repositoryId, filePath) {
   var status = [];
-  var statNum = nodegit.Status.file(info.gitRepo, info.relativeFilePath);
+  var statNum = nodegit.Status.file(repoList[repositoryId], filePath);
   
   for (var statusKey in nodegit.Status.STATUS) {
     if ((statNum & nodegit.Status.STATUS[statusKey]) !== 0) {
@@ -586,14 +518,13 @@ module.exports.getItemStatus = getItemStatus;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function walkHistoryForFile(proxy, callback){
-  var repoInfo = repoRelativePathOf(proxy);
-  var itemId = repoInfo.relativeFilePath.substring(repoInfo.relativeFilePath.lastIndexOf(path.sep) + 1,
-      repoInfo.relativeFilePath.lastIndexOf(".json"));
+function walkHistoryForFile(filePath, callback){
+  var itemId = filePath.substring(filePath.lastIndexOf(path.sep) + 1,
+      filePath.lastIndexOf(".json"));
   if (!UUID_REGEX.test(itemId)) {
     // The ID was not a valid UUID, so assume that the Item is a Repository.
     // TODO Fix this case. All (or almost all) commits are being displayed.
-    itemId = path.basename(path.dirname(repoInfo.relativeFilePath));
+    itemId = path.basename(path.dirname(filePath));
   }
   var commitFiles = fs.readdirSync(INDEX_DIRECTORY);
   var relatedCommits = [];

@@ -142,7 +142,6 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
   };
     
   function updateVCState (proxy, newStatus) {
-    var oldStatus = proxy.status;
     var oldVCState = proxy.vcState;
     var newVCState = {};
     var itemId = proxy.item.id;
@@ -170,9 +169,13 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
       repoStagingStatus.Staged[itemId] = proxy;
     }
       
-      
-    proxy.status = newStatus;
-    proxy.vcState = newVCState;
+    if (newStatus.length > 0) {
+      proxy.status = newStatus;
+      proxy.vcState = newVCState;
+    } else {
+      delete proxy.status;
+      delete proxy.vcState;
+    }
   }
     
   function getRepoStagingStatus () {

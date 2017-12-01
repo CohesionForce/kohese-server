@@ -131,7 +131,7 @@ module.exports = function (Item) {
       var proxy = global.koheseKDB.ItemProxy.getProxyFor(onId);
       console.log('::: Getting history for ' + proxy.repoPath);
       
-      global.koheseKDB.kdbRepo.walkHistoryForFile(proxy, function(history){
+      global.koheseKDB.kdbRepo.walkHistoryForFile(proxy.repoPath, function(history){
         
         if (history) {
           cb(null, history);
@@ -173,7 +173,7 @@ module.exports = function (Item) {
     Item.getStatus = function(req, onId, cb) {
       console.log('::: Getting status for ' + onId);
       //var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
-      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.ItemProxy.getProxyFor(onId), function(status){
+      global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.ItemProxy.getRootProxy().item.id, function(status){
         
         if (status) {
           cb(null, status);

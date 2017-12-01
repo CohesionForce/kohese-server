@@ -414,25 +414,28 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     }    
 
     ModalService.showModal({}, modalOptions).then((result)=> {
-      ItemRepository
-        .deleteItem(itemProxy).then((result)=> {
+      if ('New' === itemProxy.vcState.Staged) {
+        VersionControlService.unstageItems([itemProxy], function (success) {
+          if (success) {
+            ItemRepository
+            .deleteItem(itemProxy).then((result)=> {
+              console.log('::: Item has been deleted: ' + result.itemId);
+            });
+          }
+        });
+      } else {
+        ItemRepository.deleteItem(itemProxy).then((result)=> {
           console.log('::: Item has been deleted: ' + result.itemId);
         });
-    })
+      }
+    });
   }
 
   treeCtrl.revertItem = function (itemProxy) {
-    if (itemProxy.vcState.Staged) {
-      if (itemProxy.vcState.Staged === 'New') {
-        showDiscardModal(itemProxy);
-        return;
-      }
-    }
-    if (itemProxy.vcState.Unstaged) {
-      if (itemProxy.vcState.Unstaged ==='New') {
-        showDiscardModal(itemProxy);
-        return;
-      }
+    if (((itemProxy.vcState.Staged) && (itemProxy.vcState.Staged === 'New')) ||
+        ((itemProxy.vcState.Unstaged) && (itemProxy.vcState.Unstaged === 'New'))) {
+      showDiscardModal(itemProxy);
+      return;
     }
 
     var modalOptions = {
