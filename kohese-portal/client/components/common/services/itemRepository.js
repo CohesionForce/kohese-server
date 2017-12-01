@@ -184,8 +184,10 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
     $rootScope.$broadcast('syncingRepository');
     KoheseIO.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
       console.log('::: Response for getAll');
+      var syncSucceeded = false;
       if(response.kdbMatches) {
-        console.log('::: KDB is already in sync')
+        console.log('::: KDB is already in sync');
+        syncSucceeded = true;
       } else {
         for(var kind in response.cache) {
           console.log('--- Processing ' + kind);
@@ -222,18 +224,18 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         console.log('::: Compare Repo Tree Hashes After Update');
         var updatedTreeHashes = ItemProxy.getAllTreeHashes();
         var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
-        console.log(compareAfterRTH);
           
         if(!compareAfterRTH.match) {
-          console.log('*** Checking hashes again');
-          var recheckTreeHashes = ItemProxy.getAllTreeHashes();
-          var compareAgain = ItemProxy.compareTreeHashMap(recheckTreeHashes, response.repoTreeHashes);
+          console.log('*** Repository sync failed');
+          console.log(compareAfterRTH);
           $rootScope.$broadcast('syncRepositoryFailed');
-          console.log(compareAgain);
+          syncSucceeded = false;
         }
       }
 
-      $rootScope.$broadcast('itemRepositoryReady');
+      if(syncSucceeded){
+        $rootScope.$broadcast('itemRepositoryReady');        
+      }
       var rootProxy = ItemProxy.getRootProxy();
       getStatusFor(rootProxy);
     });         

@@ -11,7 +11,13 @@
                       'navbar-disconnected': !appBarCtrl.repositorySynced}"
            ng-click="appBarCtrl.navigate('kohese.explore',{}, 'dualview')">
              Kohese Portal <i class="fa fa-exclamation-triangle" 
-                              ng-hide="appBarCtrl.repositorySynced"> - Disconnected</i> </a>
+                              ng-if="!appBarCtrl.repositorySynced && !appBarCtrl.repositorySyncing && !appBarCtrl.repositorySyncFailed"> - Disconnected</i> 
+                           <i class="fa fa-exclamation-triangle" 
+                              ng-if="appBarCtrl.repositorySyncing"> - Syncing</i> 
+                           <i class="fa fa-exclamation-triangle"
+                              ng-if="appBarCtrl.repositorySyncFailed"> - Failed Synchronization</i>
+
+        </a>
         <a class="navbar-brand" ng-click="appBarCtrl.navigate('kohese.dashboard',{}, 'singleview')">Dashboard</a>
     </div>
     <!-- /.navbar-header -->
