@@ -738,6 +738,10 @@ class ItemProxy {
       this.children.sort(function(a, b){
         if (a.item.name > b.item.name) return 1;
         if (a.item.name < b.item.name) return -1;
+        if (a.item.name === b.item.name) {
+          if (a.item.id > b.item.id) return 1;
+          if (a.item.id < b.item.id) return -1;
+        }
         return 0;
       });    	
     } else {
@@ -835,8 +839,6 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
-    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
-
     // Determine if item kind changed
     var newKind = modelKind;
 
@@ -866,7 +868,6 @@ class ItemProxy {
     }
 
     var newParentId = withItem.parentId;
-    console.log('::: Eval Parent Id old: ' + oldParentId + ' new: ' + newParentId);
     if (oldParentId !== newParentId) {
       console.log('::: Parent Id changed from ' + oldParentId + ' to ' +
           newParentId);

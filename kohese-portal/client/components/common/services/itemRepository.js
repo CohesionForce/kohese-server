@@ -224,12 +224,13 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         console.log('::: Compare Repo Tree Hashes After Update');
         var updatedTreeHashes = ItemProxy.getAllTreeHashes();
         var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
-          
+        
+        syncSucceeded = compareAfterRTH.match;
+
         if(!compareAfterRTH.match) {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
           $rootScope.$broadcast('syncRepositoryFailed');
-          syncSucceeded = false;
         }
       }
 
@@ -395,7 +396,6 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
       }
       repo.repoStatus = results;
       console.log('::: Status retrieved for: ' + repo.item.id + ' - ' + repo.item.name);
-      console.log(repo.repoStatus);
       for(var rIdx in repo.repoStatus) {
         var entry = repo.repoStatus[rIdx];
         console.log('+++ ' + rIdx + ' - ' + entry.id + ' - ' + entry.status );
