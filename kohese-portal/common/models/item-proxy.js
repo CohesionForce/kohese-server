@@ -7,8 +7,6 @@ var _ = require('underscore');
 var SHA = require('jssha');
 var uuidV1 = require('uuid/v1');
 
-
-
 var tree = {};
 tree.proxyMap = {};
 tree.repoMap = {};
@@ -277,10 +275,10 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   static compareTreeHashMap(fromTHMap, toTHMap){
     
-    var fromKeys = Object.keys(fromTHMap).sort();
-    var toKeys = Object.keys(toTHMap).sort();
-    var allKeys = _.union(fromKeys, toKeys);
-    var commonKeys = _.intersection(fromKeys, toKeys);
+    var fromIds = Object.keys(fromTHMap).sort();
+    var toIds = Object.keys(toTHMap).sort();
+    var allIds = _.union(fromIds, toIds);
+    var commonIds = _.intersection(fromIds, toIds);
     
     if(!fromTHMap){
       console.log('*** From is undefined');
@@ -288,49 +286,69 @@ class ItemProxy {
     
     var thmCompare = {
       match: _.isEqual(fromTHMap, toTHMap),
-      addedItems: _.difference(toKeys, fromKeys),
+      addedItems: _.difference(toIds, fromIds),
       changedItems: [],
-      deletedItems: _.difference(fromKeys, toKeys),
-      addedChildren: [],
-      changedChildren: [],
-      deletedChildren: [],
-      undefinedFromItems: [],
-      undefinedToItems: []
-    };
+      deletedItems: _.difference(fromIds, toIds),
+      childMismatch: {}
+  };
         
-    commonKeys.forEach((key) => {
+    commonIds.forEach((key) => {
       var fromNode = fromTHMap[key];
       var toNode = toTHMap[key];
-      if (!fromNode || !toNode){
-        if (!fromNode){
-          thmCompare.undefinedFromItems.push(key);
-        }
-        if (!toNode){
-          thmCompare.undefinedToItems.push(key);          
-        }
-        return;
-      }
+ 
       if (!_.isEqual(fromNode.treeHash, toNode.treeHash)) {
         
         if (fromNode.oid !== toNode.oid){
           thmCompare.changedItems.push(key);
+        } else {
+          // Found structural difference at child level
+          var fromChildren = fromNode.childTreeHashes;
+          var toChildren = toNode.childTreeHashes;
+          var fromChildIds = Object.keys(fromChildren);
+          var toChildIds = Object.keys(toChildren);
+          var fromChildIdsSorted = Object.keys(fromChildren).sort();
+          var toChildIdsSorted = Object.keys(toChildren).sort();
+          var allChildIds = _.union(fromChildIdsSorted, toChildIdsSorted);
+          var commonChildIds = _.intersection(fromChildIdsSorted, toChildIdsSorted);
+
+          var childMismatch = {};
+          childMismatch.addedChildren = _.difference(toChildIdsSorted, fromChildIdsSorted);
+          childMismatch.deletedChildren = _.difference(fromChildIdsSorted, toChildIdsSorted);
+
+          
+          // Check for different tree hashes
+          var changedChildren = {};
+          commonChildIds.forEach((childId) => {
+            var fromOID = fromChildren[childId];
+            var toOID = toChildren[childId];
+            
+            if (fromOID !== toOID){
+              changedChildren[childId] ={
+                  from: fromOID,
+                  to: toOID
+              };
+       }
+          });
+          childMismatch.changedChildren = changedChildren;
+          
+          // Check for different order
+          var reorderedChildren = {};
+          for (var idx = 0; idx < fromChildIds.length; idx++){
+            if(fromChildIds[idx] !== toChildIds[idx]){
+              reorderedChildren[idx] = {
+                  from: fromChildIds[idx],
+                  to: toChildIds[idx]
+              };
+            }
+          }
+          childMismatch.reorderedChildren = reorderedChildren;
+          
+          thmCompare.childMismatch[key] = childMismatch;
         }
-//        if (!_.isEqual(fromNode.childTreeHashes, toNode.childTreeHashes)){
-//          console.log('::> ' + key + ': Different Children');
-//          fromChildren = fromNode.childTreeHashes;
-//          toChildren = toNode.childTreeHashes;
-//          fromChildKeys = Object.keys(fromNode.childTreeHashes).sort();
-//          toChildKeys = Object.keys(toNode.childTreeHashes).sort();
-//          allChildKeys = _.union(fromKeys, toKeys);
-//          commonChildKeys = _.intersection(fromKeys, toKeys);
-//          
-//          console.log(fromChildren);
-//          console.log(toChildren);
-//          
-//        }
       }
       
     });
+
     return thmCompare;
 
   }
@@ -720,6 +738,10 @@ class ItemProxy {
       this.children.sort(function(a, b){
         if (a.item.name > b.item.name) return 1;
         if (a.item.name < b.item.name) return -1;
+        if (a.item.name === b.item.name) {
+          if (a.item.id > b.item.id) return 1;
+          if (a.item.id < b.item.id) return -1;
+        }
         return 0;
       });    	
     } else {
@@ -817,8 +839,6 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
-    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
-
     // Determine if item kind changed
     var newKind = modelKind;
 
@@ -848,7 +868,6 @@ class ItemProxy {
     }
 
     var newParentId = withItem.parentId;
-    console.log('::: Eval Parent Id old: ' + oldParentId + ' new: ' + newParentId);
     if (oldParentId !== newParentId) {
       console.log('::: Parent Id changed from ' + oldParentId + ' to ' +
           newParentId);
