@@ -1,19 +1,21 @@
 /**
  * Created by josh on 7/28/15.
  */
+import { DualViewModule } from './subviews/dualview/dualview';
+import { SingleViewModule } from './subviews/singleview/singleview';
 
-function ContainerController(tabService, $scope, $state, $stateParams) {
+function ContainerController (tabService, $scope, $state, $stateParams) {
   var containerCtrl = this;
   containerCtrl.tabs = []
 
-  $scope.$on('navigationEvent', function onNavigationEvent(event, data) {
+  $scope.$on('navigationEvent', function onNavigationEvent (event, data) {
     let newTab = containerCtrl.createTab(data.state, data.params);
     containerCtrl.setTab(newTab);
     $state.go(newTab.state, newTab.params);
   });
 
 
-  containerCtrl.createBaseTab = function() {
+  containerCtrl.createBaseTab = function () {
     containerCtrl.baseTab = containerCtrl.createTab($state.current.name, $stateParams);
   }
 
@@ -22,7 +24,7 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     containerCtrl.setTab(tab);
   };
 
-  containerCtrl.createTab = function(state, params) {
+  containerCtrl.createTab = function (state, params) {
     var newTab = tabService.createTab(state, params);
     newTab.position = containerCtrl.tabs.length;
     tabService.setCurrentTab(newTab);
@@ -41,7 +43,7 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
   };
 
   containerCtrl.deleteTab = function (tab) {
-    // If tab is currently selected select the previous tab, 
+    // If tab is currently selected select the previous tab,
     // If it is the first tab get the next one
     // If it is the only tab, recreate the base tab
 
@@ -51,7 +53,7 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
           containerCtrl.addTab();
         } else {
           containerCtrl.setTab(containerCtrl.tabs[1]);
-        }   
+        }
       } else if (tab.position === containerCtrl.tabs.length -1) {
         containerCtrl.setTab(containerCtrl.tabs[tab.position - 1]);
       } else {
@@ -63,14 +65,14 @@ function ContainerController(tabService, $scope, $state, $stateParams) {
     updatePositions();
   };
 
-  function updatePositions() {
+  function updatePositions () {
     for (var i = 0; i < containerCtrl.tabs.length; i++) {
       containerCtrl.tabs[i].position = i;
     }
   }
 
   // Initialization Block
-  containerCtrl.createBaseTab();  
+  containerCtrl.createBaseTab();
   //Will need refactoring to account for refreshing the page at some point
 
   containerCtrl.tabs = [containerCtrl.baseTab];
@@ -86,14 +88,18 @@ var ContentContainer = function () {
 };
 
 
-export default () => {
-  var containerModule = angular.module('app.contentcontainer', [
-    'app.services.tabservice'])
-    .controller('ContainerController', ContainerController)
-    .directive('contentContainer', ContentContainer);
+export const ContentContainerModule = {
 
-  require('./subviews/dualview/dualview')(containerModule);
-  require('./subviews/singleview/singleview')(containerModule);
+  init: function () {
+    var container =
+      angular.module('app.contentcontainer', [
+        'app.services.tabservice'])
+        .controller('ContainerController', ContainerController)
+        .directive('contentContainer', ContentContainer);
+
+    DualViewModule.init(container);
+    SingleViewModule.init(container);
+  }
 }
 
 

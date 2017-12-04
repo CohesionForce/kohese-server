@@ -1,4 +1,4 @@
-function AnalysisController($scope, $stateParams, ItemRepository, tabService) {
+function AnalysisController ($scope, $stateParams, ItemRepository, tabService) {
   const ctrl = this;
 
   var currentTab = tabService.getCurrentTab();
@@ -25,15 +25,17 @@ function AnalysisController($scope, $stateParams, ItemRepository, tabService) {
 
   $scope.$on('newPhraseFilter', newAnalysisFilter);
 
-  function newAnalysisFilter(event, string) {
+  function newAnalysisFilter (event, string) {
     event.stopPropagation();
     $scope.$broadcast('newAnalysisFilter', string);
   }
 }
 
-export default ()=> {
-  angular.module('app.components.analysis', 
-    ['app.services.itemservice',
-      'app.services.tabservice'])
-    .controller('AnalysisController', AnalysisController)
+export const AnalysisModule ={
+  init: function () {
+    angular.module('app.components.analysis',
+      ['app.services.itemservice',
+        'app.services.tabservice'])
+      .controller('AnalysisController', AnalysisController)
+  }
 }

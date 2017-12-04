@@ -1,6 +1,7 @@
 /* Controller for the Create Screen Wizard  */
+import { ImportModule } from './import/import';
 
-function CreateWizardController($state, tabService, $stateParams, ItemRepository) {
+function CreateWizardController ($state, tabService, $stateParams, ItemRepository) {
   const ctrl = this;
 
   ctrl.tab = tabService.getCurrentTab();
@@ -13,13 +14,13 @@ function CreateWizardController($state, tabService, $stateParams, ItemRepository
   console.log(ctrl.types);
 
   var controllerRestored = tabService.restoreControllerData(ctrl.tab.id, 'createWizardCtrl', this);
-    
+
   if (!controllerRestored) {
     ctrl.tab = tabService.getCurrentTab();
     ctrl.tab.route = $stateParams.id;
   }
 
-  ctrl.navigate = function(state, params) {
+  ctrl.navigate = function (state, params) {
     console.log($stateParams);
     if ($stateParams.parentId) {
       params.parentId = $stateParams.parentId
@@ -29,10 +30,12 @@ function CreateWizardController($state, tabService, $stateParams, ItemRepository
   }
 }
 
-export default () => {
-  angular.module('app.create', ['app.services.itemservice'])
-    .controller('CreateWizardController', CreateWizardController);
+export const CreateWizardModule = {
+  init: function () {
+    angular.module('app.create', ['app.services.itemservice'])
+      .controller('CreateWizardController', CreateWizardController);
 
-  // Load sub-controllers 
-  require('./import/import.js')();
+    // Load sub-controllers
+    ImportModule.init();
+  }
 }

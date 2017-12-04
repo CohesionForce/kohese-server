@@ -4,13 +4,13 @@
  * Component specific directive
  */
 
-function SingleViewController($scope, tabService) {
+function SingleViewController ($scope, tabService) {
   var ctrl = this;
   var tab = tabService.getCurrentTab();
   tab.setScope($scope);
 }
 
-function SingleViewDirective() {
+function SingleViewDirective () {
   return {
     restrict: 'A',
     controller: 'SingleViewController as ctrl',
@@ -23,10 +23,12 @@ function SingleViewDirective() {
 }
 
 
-export default containerModule => {
-  containerModule
-    .directive('singleView', SingleViewDirective)
-    .controller('SingleViewController', SingleViewController)
+export const SingleViewModule = {
+  init : function (container) {
+    container
+      .directive('singleView', SingleViewDirective)
+      .controller('SingleViewController', SingleViewController)
+  }
 };
 
 

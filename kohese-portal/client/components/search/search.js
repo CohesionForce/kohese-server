@@ -2,7 +2,7 @@
  * Created by josh on 9/16/15.
  */
 
-function SearchController(ItemRepository, UserService, DecisionService, ActionService, tabService, SearchService, $state, $scope, $stateParams, $filter) {
+function SearchController (ItemRepository, UserService, DecisionService, ActionService, tabService, SearchService, $state, $scope, $stateParams, $filter) {
   var ctrl = this;
   var tab = tabService.getCurrentTab();
   var controllerRestored = tabService.restoreControllerData(tab.id, 'searchCtrl', this);
@@ -92,13 +92,15 @@ function SearchController(ItemRepository, UserService, DecisionService, ActionSe
 }
 
 
-export default () => {
-  angular.module('app.search', [
-    'app.services.itemservice',
-    'app.services.tabservice',
-    'app.services.userservice',
-    'app.services.actionservice',
-    'app.services.decisionservice',
-    'app.services.searchservice'])
-    .controller('SearchController', SearchController)
+export const SearchModule = {
+  init : function () {
+    angular.module('app.search', [
+      'app.services.itemservice',
+      'app.services.tabservice',
+      'app.services.userservice',
+      'app.services.actionservice',
+      'app.services.decisionservice',
+      'app.services.searchservice'])
+      .controller('SearchController', SearchController)
+  }
 }

@@ -1,4 +1,4 @@
-function ImportItemController(Upload, tabService, ImportService, $stateParams,
+function ImportItemController (Upload, tabService, ImportService, $stateParams,
   $scope, $state) {
   const ctrl = this;
   var tab = tabService.getCurrentTab();
@@ -14,7 +14,7 @@ function ImportItemController(Upload, tabService, ImportService, $stateParams,
     ctrl.parentId = $stateParams.parentId
   }
 
-  $scope.$on('Import Complete', function(event, data) {
+  $scope.$on('Import Complete', function (event, data) {
     ctrl.importedItems = data;
     ctrl.importComplete = true;
   })
@@ -32,9 +32,11 @@ function ImportItemController(Upload, tabService, ImportService, $stateParams,
   }
 }
 
-export default () => {
-  angular.module('app.create.import', ['ngFileUpload',
-    'app.services.tabservice',
-    'app.services.importservice'])
-    .controller('ImportItemController', ImportItemController);
+export const ImportModule = {
+  init: function () {
+    angular.module('app.create.import', ['ngFileUpload',
+      'app.services.tabservice',
+      'app.services.importservice'])
+      .controller('ImportItemController', ImportItemController);
+  }
 }

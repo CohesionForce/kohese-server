@@ -3,26 +3,48 @@
  *
  * Webpack dependency file. Will register components with the bundler.
  */
+import  { TreeModule } from './tree/tree';
+import  { DetailsModule } from './detailsview/detailsview';
+import  { ContentContainerModule } from './contentcontainer/contentcontainer';
+import  { NavigationMenuModule } from './navigationmenu/navigationmenu';
+import  { LoginModule } from './login/login';
+import  { SearchModule } from './search/search';
+import  { AdminModule } from './admin/admin';
+import  { DashboardModule } from './dashboard/dashboard';
+import  { CreateWizardModule } from './create/createWizard';
+import  { AnalysisModule } from './analysis/analysis';
 
-export default () => {
+//Common
+
+import  { ServicesModule } from './common/services/services.config';
+import  { DirectivesModule } from './common/directives/directives.config';
+import  { SBAdminModule } from './common/sb-admin-2';
+import  { ConstantsModule } from './common/constants/constants.config';
+import  { FiltersModule } from './common/filters/filters.config';
+
+console.log(ContentContainerModule);
+
+export const Components = {
   //Component Modules
-  //require('./tree/modals/modalcontrollers')(); offline for now
-  require('./tree/tree')();
-  require('./detailsview/detailsview')();
-  require('./contentcontainer/contentcontainer')();
-  require('./navigationmenu/navigationmenu')();
-  require('./login/login')();
-  require('./search/search')();
-  require('./admin/admin')();
-  require('./dashboard/dashboard')();
-  require('./create/createWizard')();
-  require('./analysis/analysis')();
+  init : function () {
+    console.log(ContentContainerModule);
+    ContentContainerModule.init();
+    TreeModule.init();
+    DetailsModule.init();
+    NavigationMenuModule.init();
+    LoginModule.init();
+    SearchModule.init();
+    AdminModule.init();
+    DashboardModule.init();
+    CreateWizardModule.init();
+    AnalysisModule.init();
 
-  //Common
-
-  require('./common/services/services.config')();
-  require('./common/directives/directives.config')();
-  require('./common/sb-admin-2')();
-  require('./common/constants/constants.config')();
-  require('./common/filters/filters.config')();
+    ServicesModule.init();
+    DirectivesModule.init();
+    SBAdminModule.init();
+    ConstantsModule.init();
+    FiltersModule.init();
+  }
 }
+
+console.log(Components);

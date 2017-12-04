@@ -1,8 +1,13 @@
 'use strict';
 
-require('./components/components.config')();
+import { Components } from './components/components.config';
 
-const Ng1AppModule = angular.module('app', [
+Components.init();
+console.log(Components);
+
+// Temporary Scaffolding for ng2 upgrade
+
+export const Ng1AppModule = angular.module('app', [
   'app.contentcontainer',
   'app.detailsview',
   'app.tree',
@@ -225,4 +230,3 @@ Ng1AppModule
     }
   })
 
-module.exports = Ng1AppModule;

@@ -2,7 +2,7 @@
  * Created by josh on 9/22/15.
  */
 
-function AdminController(tabService, $state, $scope, UserService, ItemRepository, 
+function AdminController (tabService, $state, $scope, UserService, ItemRepository,
   SessionService, $rootScope, VersionControlService, $window) {
   var ctrl = this;
   var tab = tabService.getCurrentTab();
@@ -28,7 +28,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
     tabService.bundleController(ctrl, 'adminCtrl', tab.id);
   });
 
-  function fetchUsers() {
+  function fetchUsers () {
     ctrl.users = UserService.getAllUsers();
   }
 
@@ -77,7 +77,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
   };
 
   // Will need another pass on this for security eventually for passwords
-  function updateUserObject(userProxy) {
+  function updateUserObject (userProxy) {
     userProxy.item.name = ctrl.usernameInput;
     userProxy.item.description = ctrl.descriptionInput;
     userProxy.item.email = ctrl.emailInput;
@@ -109,23 +109,23 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
 
   /* Version Control Functions */
 
-  ctrl.addRemote = function() {
+  ctrl.addRemote = function () {
     if(ctrl.remoteNameInput != '' && ctrl.remoteUrlInput != '') {
-      VersionControlService.addRemote([treeRoot.children[0].item.id], 
+      VersionControlService.addRemote([treeRoot.children[0].item.id],
         ctrl.remoteNameInput, ctrl.remoteUrlInput);
     } else {
       $window.alert('Please enter a name and url');
     }
   }
 
-  ctrl.getRemotes = function() {
-    VersionControlService.getRemotes(treeRoot.item.id, 
-      function(remoteList) {
+  ctrl.getRemotes = function () {
+    VersionControlService.getRemotes(treeRoot.item.id,
+      function (remoteList) {
         ctrl.remotesList = remoteList;
       });
   }
 
-  ctrl.commit = function() {
+  ctrl.commit = function () {
     if (ctrl.commitMessageInput === '' || !ctrl.commitMessageInput) {
       ctrl.commitMessageInput = 'No Message Entered'
     }
@@ -136,17 +136,19 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
       ctrl.commitMessageInput);
   }
 
-  ctrl.push = function() {
+  ctrl.push = function () {
     // Using the root nodes repo for now while that system gets worked out.
     var proxyIds = []
     proxyIds.push(treeRoot.item.id);
     VersionControlService.push(proxyIds, ctrl.pushRemoteNameInput);
-  }      
+  }
 }
 
-export default () => {
-  angular.module('app.admin', ['app.services.tabservice', 
-    'app.services.sessionservice',
-    'app.services.versioncontrolservice'])
-    .controller('AdminController', AdminController);
+export const AdminModule =  {
+  init : function () {
+    angular.module('app.admin', ['app.services.tabservice',
+      'app.services.sessionservice',
+      'app.services.versioncontrolservice'])
+      .controller('AdminController', AdminController);
+  }
 }

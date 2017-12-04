@@ -2,7 +2,7 @@
  * Created by josh on 10/27/15.
  */
 
-function DashboardController(UserService, $scope, $rootScope, tabService, ItemRepository) {
+function DashboardController (UserService, $scope, $rootScope, tabService, ItemRepository) {
   const ctrl = this;
   var currentTab = tabService.getCurrentTab();
   var controllerRestored = tabService.restoreControllerData(currentTab.id, 'dashboardCtrl', this);
@@ -93,10 +93,12 @@ function DashboardController(UserService, $scope, $rootScope, tabService, ItemRe
 }
 
 
-export default () => {
-  angular.module('app.dashboard', [
-    'app.services.userservice',
-    'app.services.tabservice',
-    'app.services.itemservice'])
-    .controller('DashboardController', DashboardController);
+export const DashboardModule = {
+  init: function () {
+    angular.module('app.dashboard', [
+      'app.services.userservice',
+      'app.services.tabservice',
+      'app.services.itemservice'])
+      .controller('DashboardController', DashboardController);
+  }
 }

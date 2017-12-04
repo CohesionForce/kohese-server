@@ -13,7 +13,7 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
   var docReader = new commonmark.Parser();
   var docWriter = new commonmark.HtmlRenderer();
   detailsCtrl.docShowChildren=false;
-    
+
   detailsCtrl.tab = tabService.getCurrentTab();
   var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
 
@@ -80,8 +80,8 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
     if (detailsCtrl.itemProxy) {
       configureState();
       if (detailsCtrl.itemProxy.item.description) {
-        var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
-        detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
+        var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree
+        detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String
         detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
       }
     }
@@ -95,7 +95,7 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
   $scope.$on('tabSelected', function () {
     tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
   });
-  
+
   $scope.$watch('detailsCtrl.itemProxy.dirty', function () {
     if (detailsCtrl.itemProxy && detailsCtrl.itemForm) {
       if(detailsCtrl.itemForm.$dirty !== detailsCtrl.itemProxy.dirty) {
@@ -111,48 +111,48 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
       if (detailsCtrl.itemForm.$dirty) {
         detailsCtrl.itemProxy.dirty = detailsCtrl.itemForm.$dirty;
       }
-        
+
       // Detect if existing proxy is already dirty
       if (!detailsCtrl.itemForm.$dirty && detailsCtrl.itemProxy.dirty) {
         detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
       }
     }
   });
-    
+
   $scope.$watch('detailsCtrl.decisionForm.$dirty', function () {
     if (detailsCtrl.itemProxy && detailsCtrl.decisionForm) {
       // Detect if decisionForm has been changed
       if (detailsCtrl.decisionForm.$dirty) {
         detailsCtrl.itemForm.$dirty = detailsCtrl.decisionForm.$dirty;
       }
-    }      
+    }
   });
-    
+
   $scope.$watch('detailsCtrl.actionForm.$dirty', function () {
     if (detailsCtrl.itemProxy && detailsCtrl.actionForm) {
       // Detect if actionForm has been changed
       if (detailsCtrl.actionForm.$dirty) {
         detailsCtrl.itemForm.$dirty = detailsCtrl.actionForm.$dirty;
       }
-    }      
+    }
   });
-    
+
   $scope.$watch('detailsCtrl.observationForm.$dirty', function () {
     if (detailsCtrl.itemProxy && detailsCtrl.observationForm) {
       // Detect if observationForm has been changed
       if (detailsCtrl.observationForm.$dirty) {
         detailsCtrl.itemForm.$dirty = detailsCtrl.observationForm.$dirty;
       }
-    }      
+    }
   });
-    
+
   $scope.$watch('detailsCtrl.issueForm.$dirty', function () {
     if (detailsCtrl.itemProxy && detailsCtrl.issueForm) {
       // Detect if actionForm has been changed
       if (detailsCtrl.issueForm.$dirty) {
         detailsCtrl.itemForm.$dirty = detailsCtrl.issueForm.$dirty;
       }
-    }      
+    }
   });
 
   detailsCtrl.uiTreeOptions = {
@@ -234,7 +234,7 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
       });
   };
 
-  // This pipeline for navigating should possibly be modified to be more in 
+  // This pipeline for navigating should possibly be modified to be more in
   // line with the other views. This updateTab is unique to detailsView.
   // Currently this won't handle navigation with parentId it seems
   detailsCtrl.updateTab = function (state, id) {
@@ -326,14 +326,14 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
     if(!detailsCtrl.itemProxy.item[type]) {
       detailsCtrl.itemProxy.item[type] = [];
     }
-      
+
     if (type === 'context') {
       detailsCtrl.itemProxy.item[type].push({id: detailsCtrl.contextInput.description.id});
     } else if (type === 'resolutionActions') {
       detailsCtrl.itemProxy.item[type].push({id: detailsCtrl.resolutionActionsInput.description.id});
     } else {
       detailsCtrl.itemProxy.item[type].push({name: ''});
-    }   
+    }
   };
 
   detailsCtrl.deleteItemInput = function (type, row) {
@@ -376,10 +376,10 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
 
   $scope.$watch('detailsCtrl.itemProxy.item.description', function () {
     $scope.$broadcast('Proxy Description Updated', detailsCtrl.itemProxy);
-    
-    if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.description){
-      var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree 
-      detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
+
+    if (detailsCtrl.itemProxy && detailsCtrl.itemProxy.item.description) {
+      var parsed = reader.parse(detailsCtrl.itemProxy.item.description); // parsed is a 'Node' tree
+      detailsCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String
       detailsCtrl.itemDescriptionRendered = $sce.trustAsHtml(detailsCtrl.itemDescriptionRendered);
     }
   });
@@ -392,7 +392,7 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
       }, 0, false);
     });
   }
-      
+
   detailsCtrl.cancel = function () {
     if (this.itemProxy.dirty) {
       ItemRepository.fetchItem(detailsCtrl.itemProxy)
@@ -509,14 +509,16 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
   }
 }
 
-export default () => {
-  angular.module('app.detailsview', [
-    'app.services.tabservice',
-    'app.services.decisionservice',
-    'app.services.actionservice',
-    'app.services.categoryservice',
-    'app.services.userservice',
-    'app.services.issueservice',
-    'app.services.observationservice'])
-    .controller('DetailsViewController', DetailsViewController);
+export const DetailsModule = {
+  init : function () {
+    angular.module('app.detailsview', [
+      'app.services.tabservice',
+      'app.services.decisionservice',
+      'app.services.actionservice',
+      'app.services.categoryservice',
+      'app.services.userservice',
+      'app.services.issueservice',
+      'app.services.observationservice'])
+      .controller('DetailsViewController', DetailsViewController);
+  }
 }
