@@ -33,16 +33,19 @@ function AppBarController ($rootScope, UserService, LoginService, $state, jwtHel
 
   $rootScope.$on('syncingRepository', function () {
     ctrl.repositorySyncing = true;
+    ctrl.repositorySyncFailed = false;
   });
 
   $rootScope.$on('syncRepositoryFailed', function () {
     ctrl.repositorySyncing = false;
     ctrl.repositorySynced = false;
+    ctrl.repositorySyncFailed = true;
   })
 
   $rootScope.$on('itemRepositoryReady', function () {
     ctrl.repositorySyncing = false;
     ctrl.repositorySynced = true;
+    ctrl.repositorySyncFailed = false;
   });
 
   $rootScope.$on('serverDisconnected', function () { 
