@@ -184,8 +184,10 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
     $rootScope.$broadcast('syncingRepository');
     KoheseIO.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
       console.log('::: Response for getAll');
+      var syncSucceeded = false;
       if(response.kdbMatches) {
-        console.log('::: KDB is already in sync')
+        console.log('::: KDB is already in sync');
+        syncSucceeded = true;
       } else {
         for(var kind in response.cache) {
           console.log('--- Processing ' + kind);
@@ -222,18 +224,19 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         console.log('::: Compare Repo Tree Hashes After Update');
         var updatedTreeHashes = ItemProxy.getAllTreeHashes();
         var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
-        console.log(compareAfterRTH);
-          
+        
+        syncSucceeded = compareAfterRTH.match;
+
         if(!compareAfterRTH.match) {
-          console.log('*** Checking hashes again');
-          var recheckTreeHashes = ItemProxy.getAllTreeHashes();
-          var compareAgain = ItemProxy.compareTreeHashMap(recheckTreeHashes, response.repoTreeHashes);
+          console.log('*** Repository sync failed');
+          console.log(compareAfterRTH);
           $rootScope.$broadcast('syncRepositoryFailed');
-          console.log(compareAgain);
         }
       }
 
-      $rootScope.$broadcast('itemRepositoryReady');
+      if(syncSucceeded){
+        $rootScope.$broadcast('itemRepositoryReady');        
+      }
       var rootProxy = ItemProxy.getRootProxy();
       getStatusFor(rootProxy);
     });         
@@ -393,7 +396,6 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
       }
       repo.repoStatus = results;
       console.log('::: Status retrieved for: ' + repo.item.id + ' - ' + repo.item.name);
-      console.log(repo.repoStatus);
       for(var rIdx in repo.repoStatus) {
         var entry = repo.repoStatus[rIdx];
         console.log('+++ ' + rIdx + ' - ' + entry.id + ' - ' + entry.status );
