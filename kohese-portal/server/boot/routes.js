@@ -13,12 +13,12 @@ module.exports = function (app) {
 
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
-    app.use('/socket.io-file-client', 
+    app.use('/socket.io-file-client',
             loopback.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
-    
+
     app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
     app.use('/reports', loopback.static(path.resolve(__dirname, '../../tmp_reports')));
-    
+
     app.use(bodyParser.json());
 
     app.post('/login', authenticate);
@@ -26,7 +26,7 @@ module.exports = function (app) {
     function authenticate(req, res, next) {
         var body = req.body;
         console.log('::: Checking: ' + body.username);
-        
+
         if (!body.username) {
           res.status(400).end('Must provide username');
           return;
@@ -40,15 +40,15 @@ module.exports = function (app) {
         app.models.KoheseUser.login(body.username, body.password, function processCallback(err, user) {
           if (err){
             res.status(401).end('Login failed: ' + err);
-            return;            
+            return;
           }
-          
+
           console.log('::: Authenticated: ' + user.name + ' - ' + user.description);
           var token = jwt.sign({
             username: req.body.username
           }, jwtSecret);
           res.send(token);
-        });        
+        });
     }
 
     app.use(function(req,res,next){
@@ -58,7 +58,7 @@ module.exports = function (app) {
       console.log('Query:   ' + util.inspect(req.query,false,null));
 //      console.log('Headers:  ');
 //      console.log(req.headers);
-      
+
       // check to see if the authorization header is missing, but an auth_token was provided
 
       // jshint -W106
@@ -67,17 +67,17 @@ module.exports = function (app) {
         req.headers.authorization = 'Bearer ' + req.query.access_token;
       }
       // jshint +W106
-      next();  
+      next();
     });
-    
-    app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
+
+    //app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
 
     function decodeAuthToken(authToken){
       var decodedToken = jwt.verify(authToken, jwtSecret);
       return decodedToken;
     }
     module.exports.decodeAuthToken = decodeAuthToken;
-    
+
     app.use(function (req, res, next){
       var authHeader = (req.headers.authorization);
       var header = authHeader.replace('Bearer ', '');
@@ -86,7 +86,7 @@ module.exports = function (app) {
       next();
     });
 
-    
+
 //    var requestRegex = /\/api\/([^\/]*)\/([^\/]*)/;
     var requestRegex = /^\/([^\/]*)\/([^\/]*)/;
     function kdbGet(req, res, next) {
@@ -108,10 +108,10 @@ module.exports = function (app) {
     }
 
     var restApiRoot = app.get('restApiRoot');
-    
+
     // Using Item Proxy
     app.use(restApiRoot, kdbGet);
-    
+
     // Using Loopback
     app.use(restApiRoot, app.loopback.rest());
 

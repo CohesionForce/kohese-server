@@ -2,7 +2,7 @@
 
 require('./components/components.config')();
 
-const appModule = angular.module('app', [
+const Ng1AppModule = angular.module('app', [
   'app.contentcontainer',
   'app.detailsview',
   'app.tree',
@@ -61,7 +61,7 @@ const appModule = angular.module('app', [
 ]);
 
 
-appModule
+Ng1AppModule
   .config(function ($httpProvider, $stateProvider, $urlRouterProvider) {
     $httpProvider.interceptors.push('AuthInterceptor');
     $stateProvider
@@ -224,3 +224,5 @@ appModule
       }
     }
   })
+
+module.exports = Ng1AppModule;
