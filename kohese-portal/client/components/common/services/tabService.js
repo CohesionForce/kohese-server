@@ -2,8 +2,8 @@
  * Created by josh on 8/14/15.
  */
 
-import Tab from './tab-service/tab.js';
-import { stateDefinitions } from './tab-service/tab-state-info.json';
+import { Tab } from './tab-service/tab.js';
+import * as stateDefinitions from './tab-service/tab-state-info.json';
 
 function TabService ($state, $rootScope) {
   var tService = this;

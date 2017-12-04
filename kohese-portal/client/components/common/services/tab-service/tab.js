@@ -1,4 +1,4 @@
-import { stateDefinitions } from './tab-state-info.json';
+import * as stateDefinitions from './tab-state-info.json';
 
 export function Tab (state, params, id) {
   var tab = {};
