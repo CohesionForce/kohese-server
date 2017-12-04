@@ -321,67 +321,16 @@ module.exports.push = push;
 //////////////////////////////////////////////////////////////////////////
 function checkout(repositoryId, filePaths, force) {
   var repository = repoList[repositoryId];
-  var checkoutPaths = [];
-  var checkoutPathsFromTree = [];
-  var checkoutPathsFromIndex = [];
-  for (var j = 0; j < filePaths.length; j++) {
-    var status = getItemStatus(repositoryId, filePaths[j]);
-    var inIndex = false;
-    for (var k = 0; k < status.length; k++) {
-      if (status[k].startsWith("INDEX_")) {
-        inIndex = true;
-        break;
-      }
-    }
 
-    // TODO Need to simplify the logic associated with tree/index detection
-    if (!inIndex) {
-      checkoutPathsFromTree.push(filePaths[j]);
-    } else {
-      checkoutPathsFromIndex.push(filePaths[j]);
-    }
-    checkoutPaths.push(filePaths[j]);
-  }
-
-  if (checkoutPaths.length > 0) {
+  if (filePaths.length > 0) {
     var options = new nodegit.CheckoutOptions();
-    options.paths = checkoutPaths;
+    options.paths = filePaths;
     options.checkoutStrategy = (force ? (nodegit.Checkout.STRATEGY.FORCE
         | nodegit.Checkout.STRATEGY.REMOVE_UNTRACKED) : (nodegit.Checkout.STRATEGY.SAFE
         | nodegit.Checkout.STRATEGY.ALLOW_CONFLICTS));
-    //options.notifyFlags = nodegit.Checkout.NOTIFY.ALL;
-    //options.notifyCb = function (why, path, baseline, target, workdir, payload) {
-    //  // Return zero to proceed
-    //  return 0;
-    //};
-    // Passing null uses HEAD for the checkout
-
-    // TODO Need to simplify the logic associated with tree/index processing
-    // TODO Need to handle case when there are changes in both tree and index
-    var checkoutResult = new Promise(function(resolve, reject){
-
-      if (checkoutPathsFromIndex.length === 0){
-        // Checkout from tree
-        nodegit.Checkout.tree(repository, null, options)
-        .then(function() {
-          resolve(true);
-        });      
-      } else {
-        // Checkout from index
-        repository.refreshIndex()
-        .then(function(index){
-          nodegit.Checkout.index(repository, index, options)
-          .then(function() {
-            resolve(true);
-          });          
-        })
-        .catch((error) => {
-          reject(error);
-        });
-      }
+    return repository.refreshIndex().then(function (index) {
+      return nodegit.Checkout.index(repository, index, options);
     });
-    
-    return checkoutResult;
   } else {
     return Promise.resolve(true);
   }
@@ -509,24 +458,10 @@ function getStatus (repositoryId, callback){
     var repoStatus = [];
     
     statuses.forEach(function(file) {
-      var fileString = file.path();
-      if (fileString.endsWith('.json')) {
-        var id = path.basename(fileString, '.json');
-        var foundId = true;
-        if (!UUID_REGEX.test(id)) {
-          id = path.basename(path.dirname(fileString));
-          if (!UUID_REGEX.test(id)) {
-            foundId = false;
-          }
-        }
-        
-        if (foundId) {
-          repoStatus.push({
-            id: id,
-            status: file.status()
-          });
-        }
-      }
+      repoStatus.push({
+        path: file.path(),
+        status: file.status()
+      });
     });
 
     callback(repoStatus);
@@ -554,7 +489,7 @@ module.exports.getItemStatus = getItemStatus;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function walkHistoryForFile(filePath, callback){
+function walkHistoryForFile(itemId, callback){
   var itemId = filePath.substring(filePath.lastIndexOf(path.sep) + 1,
       filePath.lastIndexOf(".json"));
   if (!UUID_REGEX.test(itemId)) {
@@ -578,18 +513,20 @@ function walkHistoryForFile(filePath, callback){
     }
   }
   
-  relatedCommits.sort(function (c1, c2) {
-    return c2.date - c1.date;
-  });
-  
-  var j = relatedCommits.length - 1;
-  var lastEntry = relatedCommits[j].indexEntry;
-  while (j--) {
-    var entry = relatedCommits[j].indexEntry;
-    if ((entry.oid === lastEntry.oid) && (entry.kind === lastEntry.kind)) {
-      relatedCommits.splice(j, 1);
-    } else {
-      lastEntry = entry;
+  if (relatedCommits.length > 0) {
+    relatedCommits.sort(function (c1, c2) {
+      return c2.date - c1.date;
+    });
+    
+    var j = relatedCommits.length - 1;
+    var lastEntry = relatedCommits[j].indexEntry;
+    while (j--) {
+      var entry = relatedCommits[j].indexEntry;
+      if ((entry.oid === lastEntry.oid) && (entry.kind === lastEntry.kind)) {
+        relatedCommits.splice(j, 1);
+      } else {
+        lastEntry = entry;
+      }
     }
   }
   

@@ -5,6 +5,7 @@ module.exports = function (Item) {
     var child = require('child_process');
     var ItemProxy = require('./item-proxy.js');
     var kio = require('../../server/koheseIO.js');
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     
     //////////////////////////////////////////////////////////////////////////
     //
@@ -127,11 +128,7 @@ module.exports = function (Item) {
     //////////////////////////////////////////////////////////////////////////
     Item.getHistory = function(req, onId, cb) {
       //console.log('::: Getting history for ' + onId);
-
-      var proxy = global.koheseKDB.ItemProxy.getProxyFor(onId);
-      console.log('::: Getting history for ' + proxy.repoPath);
-      
-      global.koheseKDB.kdbRepo.walkHistoryForFile(proxy.repoPath, function(history){
+      global.koheseKDB.kdbRepo.walkHistoryForFile(onId, function(history){
         
         if (history) {
           cb(null, history);
@@ -174,9 +171,30 @@ module.exports = function (Item) {
       console.log('::: Getting status for ' + onId);
       //var instance = global.koheseKDB.ItemProxy.getProxyFor(repoId);
       global.koheseKDB.kdbRepo.getStatus(global.koheseKDB.ItemProxy.getRootProxy().item.id, function(status){
-        
         if (status) {
-          cb(null, status);
+          var idStatusArray = [];
+          for (var j = 0; j < status.length; j++) {
+            var fileString = status[j].path;
+            if (fileString.endsWith('.json')) {
+              var id = Path.basename(fileString, '.json');
+              var foundId = true;
+              if (!UUID_REGEX.test(id)) {
+                id = Path.basename(Path.dirname(fileString));
+                if (!UUID_REGEX.test(id)) {
+                  foundId = false;
+                }
+              }
+              
+              if (foundId) {
+                idStatusArray.push({
+                  id: id,
+                  status: file.status()
+                });
+              }
+            }
+          }
+          
+          cb(null, idStatusArray);
         } else {
           console.log('*** Error (Returned from getStatus)');
           console.log(status);

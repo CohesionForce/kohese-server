@@ -113,7 +113,29 @@ function KIOItemServer(socket){
   socket.on('Item/getStatus', function(request, sendResponse){
     global.koheseKDB.kdbRepo.getStatus(request.repoId, function(status){    
       if (status) {
-        sendResponse(status);
+        var idStatusArray = [];
+        for (var j = 0; j < status.length; j++) {
+          var fileString = status[j].path;
+          if (fileString.endsWith('.json')) {
+            var id = Path.basename(fileString, '.json');
+            var foundId = true;
+            if (!UUID_REGEX.test(id)) {
+              id = Path.basename(Path.dirname(fileString));
+              if (!UUID_REGEX.test(id)) {
+                foundId = false;
+              }
+            }
+            
+            if (foundId) {
+              idStatusArray.push({
+                id: id,
+                status: file.status()
+              });
+            }
+          }
+        }
+        
+        sendResponse(idStatusArray);
       } else {
         console.log('*** Error (Returned from getStatus)');
         console.log(status);
@@ -126,11 +148,7 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getHistory', function(request, sendResponse){
-  
-    console.log('::: Getting history for ' + request.onId);
-    var proxy = global.koheseKDB.ItemProxy.getProxyFor(request.onId);
-      
-    global.koheseKDB.kdbRepo.walkHistoryForFile(proxy.repoPath, function(history){
+    global.koheseKDB.kdbRepo.walkHistoryForFile(request.onId, function(history){
       
       if (history) {
         sendResponse(history);
@@ -263,8 +281,8 @@ function KIOItemServer(socket){
 
   });
   
-  socket.on('VersionControl/add', function (request, sendResponse) {
-    console.log('::: session %s: Received VersionControl/add for %s for user %s at %s',
+  socket.on('VersionControl/stage', function (request, sendResponse) {
+    console.log('::: session %s: Received VersionControl/stage for %s for user %s at %s',
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     var idsArray = Array.from(request.proxyIds);
     var proxies = [];
@@ -282,7 +300,7 @@ function KIOItemServer(socket){
     }
       
     Promise.all(promises).then(function () {
-      console.log('::: session %s: Sending response for VersionControl/add for user %s at %s',
+      console.log('::: session %s: Sending response for VersionControl/stage for user %s at %s',
         socket.id, socket.koheseUser.username, socket.handshake.address);
       sendStatusUpdates(proxies);
       sendResponse(addStatusMap);
@@ -370,7 +388,7 @@ function KIOItemServer(socket){
     });
   });
   
-  socket.on('VersionControl/reset', function (request, sendResponse) {
+  socket.on('VersionControl/unstage', function (request, sendResponse) {
     var proxies = [];
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
@@ -399,7 +417,8 @@ function KIOItemServer(socket){
     }
   });
   
-  socket.on('VersionControl/checkout', function (request, sendResponse) {
+  socket.on('VersionControl/revert', function (request, sendResponse) {
+    var unstageIfIndexOnly = true;
     var proxies = [];
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
@@ -408,10 +427,37 @@ function KIOItemServer(socket){
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
-      if (!repositoryPathMap[repositoryId]) {
-        repositoryPathMap[repositoryId] = [];
+      var status = kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath);
+      if (unstageIfIndexOnly) {
+        var unstage = true;
+        for (var j = 0; j < status.length; j++) {
+          if (status[j].startsWith('WT_')) {
+            unstage = false;
+            break;
+          }
+        }
+        
+        if (unstage) {
+          kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]);
+        }
       }
-      repositoryPathMap[repositoryId].push(repositoryInformation.relativeFilePath);
+      
+      var deleteFile = false;
+      for (var j = 0; j < status.length; j++) {
+        if (status[j].endsWith('_NEW')) {
+          deleteFile = true;
+          break;
+        }
+      }
+      
+      if (deleteFile) {
+        global.app.models[proxy.kind].deleteById(idsArray[i], {}, function () {});
+      } else {
+        if (!repositoryPathMap[repositoryId]) {
+          repositoryPathMap[repositoryId] = [];
+        }
+        repositoryPathMap[repositoryId].push(repositoryInformation.relativeFilePath);
+      }
     }
     
     for (var repositoryId in repositoryPathMap) {

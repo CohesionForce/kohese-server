@@ -12,7 +12,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     for (var i= 0; i < proxyList.length; i++) {
       data.proxyIds.push(proxyList[i].item.id);
     }
-    KoheseIO.socket.emit('VersionControl/add', data, function (results) {
+    KoheseIO.socket.emit('VersionControl/stage', data, function (results) {
       if (results.error) {    
         toastr.error('Stage Failed', 'Version Control');
       } else {
@@ -28,7 +28,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     for (var i = 0; i < proxyList.length; i++) {
       data.proxyIds.push(proxyList[i].item.id);
     }
-    KoheseIO.socket.emit('VersionControl/reset', data, function (results) {
+    KoheseIO.socket.emit('VersionControl/unstage', data, function (results) {
       if (results.error) {
         toastr.error('Unstage failed', results.error);
       } else {
@@ -48,7 +48,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     for (var i= 0; i< proxyList.length; i++) {
       data.proxyIds.push(proxyList[i].item.id);
     }
-    KoheseIO.socket.emit('VersionControl/checkout', data, function (results) {
+    KoheseIO.socket.emit('VersionControl/revert', data, function (results) {
       if (results.error) {
         toastr.error('Revert failed', results.error);
       } else {

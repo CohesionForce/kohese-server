@@ -98,7 +98,7 @@ describe('Test Repository functionality', function () {
     });
   });
 
-  it('performs a checkout of a commited file with modifications', function (done) {
+  it('reverts an unstaged committed file with modifications', function (done) {
     Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent +
       additionalContent);
     KdbRepo.checkout(repositoryId, [testFile], true).then(function () {
@@ -141,7 +141,7 @@ describe('Test Repository functionality', function () {
       }
     });
   });
-
+  
   it('reverts an indexed and further modified file to the indexed state', function (done) {
     var originalContent = Fs.readFileSync(repositoryPath + Path.sep + testFile,
         {encoding: 'utf8', flag: 'r'});
@@ -164,7 +164,10 @@ describe('Test Repository functionality', function () {
 
   it('retrieves Repository status', function (done) {
     KdbRepo.getStatus(repositoryId, function (repoStatus) {
-      expect(repoStatus).toEqual([{ id : testUUID, status : ['INDEX_MODIFIED']}]);
+      expect(repoStatus).toEqual([{
+        path: testFile,
+        status : ['INDEX_MODIFIED']
+      }]);
       done();
     });
   });
@@ -180,6 +183,17 @@ describe('Test Repository functionality', function () {
     }).catch(function (err) {
       fail();
       console.log(err.stack);
+    });
+  });
+  
+  it('does not delete an untracked file when it is reverted', function (done) {
+    var matthew = repositoryPath + Path.sep + 'Matthew.txt';
+    Fs.writeFileSync(matthew, 'Mark');
+    var status = KdbRepo.getItemStatus(repositoryId, 'Matthew.txt');
+    expect(status).toEqual(['WT_NEW']);
+    KdbRepo.checkout(repositoryId, [matthew], true).then(function () {
+      expect(Fs.existsSync(matthew)).toEqual(true);
+      done();
     });
   });
 });
