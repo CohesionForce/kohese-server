@@ -8,7 +8,9 @@ function KindIconDirective () {
   }
 }
 
-export default () => {
-  angular.module('app.directives.kindicon', [])
-    .directive('kindIcon', KindIconDirective);
+export const KindIconModule = {
+  init: function () {
+    angular.module('app.directives.kindicon', [])
+      .directive('kindIcon', KindIconDirective);
+  }
 }

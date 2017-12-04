@@ -22,7 +22,7 @@ function AppBarController ($rootScope, UserService, LoginService, $state, jwtHel
     ctrl.onLoginScreen = true;
     ctrl.userLoggedIn = null;
   };
-    
+
   $rootScope.$on('userLoggedIn', function () {
     checkAuthentication();
   });
@@ -48,7 +48,7 @@ function AppBarController ($rootScope, UserService, LoginService, $state, jwtHel
     ctrl.repositorySyncFailed = false;
   });
 
-  $rootScope.$on('serverDisconnected', function () { 
+  $rootScope.$on('serverDisconnected', function () {
     ctrl.repositorySynced = false;
   });
 
@@ -72,14 +72,16 @@ function AppBar () {
   }
 }
 
-export default () => {
-  var app = angular.module('app.directives.navigation', [
-    'app.services.authentication',
-    'app.services.userservice',
-    'app.services.tabservice',
-    'angular-jwt']);
+export const NavDirectivesModule = {
+  init: function () {
+    var app = angular.module('app.directives.navigation', [
+      'app.services.authentication',
+      'app.services.userservice',
+      'app.services.tabservice',
+      'angular-jwt']);
 
-  app
-    .directive('appBar', AppBar)
-    .controller('AppBarController', AppBarController);
-};
+    app
+      .directive('appBar', AppBar)
+      .controller('AppBarController', AppBarController);
+  }
+}

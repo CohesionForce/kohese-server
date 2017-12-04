@@ -517,8 +517,7 @@ export const DetailsModule = {
       'app.services.actionservice',
       'app.services.categoryservice',
       'app.services.userservice',
-      'app.services.issueservice',
-      'app.services.observationservice'])
+      'app.services.issueservice'])
       .controller('DetailsViewController', DetailsViewController);
   }
 }

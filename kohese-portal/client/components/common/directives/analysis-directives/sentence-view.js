@@ -2,9 +2,9 @@ function SentenceViewController ($scope, $timeout, tabService, analysisService) 
   const ctrl = this;
   var currentTab = tabService.getCurrentTab();
 
-  // Bundler Logic 
+  // Bundler Logic
   var controllerRestored = tabService.restoreControllerData(currentTab.id, 'SentenceViewController', this);
-    
+
   if(!controllerRestored) {
     // Initialization Block
     ctrl.itemProxy = $scope.itemProxy;
@@ -36,12 +36,12 @@ function SentenceViewController ($scope, $timeout, tabService, analysisService) 
   })
 
   ctrl.filterDetails = function (listItem) {
-    return listItem.displayLevel == 1 && 
-                (ctrl.analysisFilterRegex === null || 
-                 ctrl.analysisFilterRegex.test(listItem.item.name) || 
-                 ctrl.analysisFilterRegex.test(listItem.item.description)) || 
-               (listItem.displayLevel == 2 && ctrl.showSentencesInDetails || 
-                listItem.displayLevel == 3 && ctrl.showPhrasesInDetails || 
+    return listItem.displayLevel == 1 &&
+                (ctrl.analysisFilterRegex === null ||
+                 ctrl.analysisFilterRegex.test(listItem.item.name) ||
+                 ctrl.analysisFilterRegex.test(listItem.item.description)) ||
+               (listItem.displayLevel == 2 && ctrl.showSentencesInDetails ||
+                listItem.displayLevel == 3 && ctrl.showPhrasesInDetails ||
                 listItem.displayLevel == 4 && ctrl.showTokensInDetails
                ) &&
                 (ctrl.analysisFilterRegex === null || ctrl.analysisFilterRegex.test(listItem.text));
@@ -56,16 +56,16 @@ function SentenceViewController ($scope, $timeout, tabService, analysisService) 
     if (ctrl.filterTextTimeout) {
       $timeout.cancel(ctrl.filterTextTimeout);
     }
-        
+
     ctrl.filterTextTimeout = $timeout(function () {
       var regexFilter = /^\/(.*)\/([gimy]*)$/;
       var filterIsRegex = ctrl.analysisFilterString.match(regexFilter);
-  
+
       if (filterIsRegex) {
         try {
           ctrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
           ctrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
-          ctrl.invalidAnalysisFilterRegex = false;              
+          ctrl.invalidAnalysisFilterRegex = false;
         } catch (e) {
           ctrl.invalidAnalysisFilterRegex = true;
         }
@@ -105,9 +105,11 @@ function SentenceViewDirective () {
   }
 }
 
-export default () =>{
-  angular.module('app.directives.sentenceview', ['app.services.tabservice',
-    'app.services.analysisservice'])
-    .directive('sentenceView', SentenceViewDirective)
-    .controller('SentenceViewController', SentenceViewController);
+export const SentenceViewModule = {
+  init: function () {
+    angular.module('app.directives.sentenceview', ['app.services.tabservice',
+      'app.services.analysisservice'])
+      .directive('sentenceView', SentenceViewDirective)
+      .controller('SentenceViewController', SentenceViewController);
+  }
 }

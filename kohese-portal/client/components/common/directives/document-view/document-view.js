@@ -7,7 +7,7 @@ function DocumentController ($scope, $stateParams, tabService, $filter, Highligh
   var docWriter = new commonmark.HtmlRenderer();
   var currentTab = tabService.getCurrentTab();
   var controllerRestored = tabService.restoreControllerData(currentTab.id, 'DocumentController', this);
-  //Exposed 
+  //Exposed
 
   //Init block
   if (!controllerRestored) {
@@ -51,8 +51,8 @@ function DocumentController ($scope, $stateParams, tabService, $filter, Highligh
       var docParsed = docReader.parse(docCtrl.itemProxy.getDocument(), {sourcepos: true});
       docCtrl.docRendered = docWriter.render(docParsed);
     } else if (docCtrl.itemProxy.item.description) {
-      var parsed = reader.parse(docCtrl.itemProxy.item.description); // parsed is a 'Node' tree   
-      docCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String 
+      var parsed = reader.parse(docCtrl.itemProxy.item.description); // parsed is a 'Node' tree
+      docCtrl.itemDescriptionRendered = writer.render(parsed); // result is a String
     }
   }
 
@@ -97,8 +97,10 @@ function DocumentDirective () {
   }
 }
 
-export default () => {
-  angular.module('app.directives.documentview', [])
-    .controller('DocumentController', DocumentController)
-    .directive('documentView', DocumentDirective);
+export const DocumentViewModule = {
+  init: function () {
+    angular.module('app.directives.documentview', [])
+      .controller('DocumentController', DocumentController)
+      .directive('documentView', DocumentDirective);
+  }
 }

@@ -2,13 +2,13 @@ function PhraseViewController ($scope, $timeout, tabService, analysisService) {
   const ctrl = this;
   var currentTab = tabService.getCurrentTab();
 
-  // Bundler Logic 
+  // Bundler Logic
   var controllerRestored = tabService.restoreControllerData(currentTab.id, 'PhraseViewController', this);
-    
+
   if(!controllerRestored) {
     // Initialization Block
     ctrl.itemProxy = $scope.itemProxy;
-    
+
     ctrl.loadLimit = 100;
     ctrl.sortField = ['-count', '-text'];
     ctrl.reverse = false;
@@ -45,13 +45,13 @@ function PhraseViewController ($scope, $timeout, tabService, analysisService) {
   ctrl.filterPhrases = function (summary) {
     var MatchesStringFilter;
     var MatchesPOS = ctrl.analysisFilterPOS(summary,
-      ctrl.analysisPOSFilterCriteria[ctrl.analysisPOSFilterName]) 
+      ctrl.analysisPOSFilterCriteria[ctrl.analysisPOSFilterName])
     if (MatchesPOS) {
-      MatchesStringFilter = 
-            ctrl.analysisFilterRegex === null 
+      MatchesStringFilter =
+            ctrl.analysisFilterRegex === null
             || ctrl.analysisFilterRegex.test(summary.text);
     }
-    
+
     return MatchesPOS && MatchesStringFilter
   };
 
@@ -68,16 +68,16 @@ function PhraseViewController ($scope, $timeout, tabService, analysisService) {
     if (ctrl.filterTextTimeout) {
       $timeout.cancel(ctrl.filterTextTimeout);
     }
-        
+
     ctrl.filterTextTimeout = $timeout(function () {
       var regexFilter = /^\/(.*)\/([gimy]*)$/;
       var filterIsRegex = ctrl.analysisFilterString.match(regexFilter);
-  
+
       if (filterIsRegex) {
         try {
           ctrl.analysisFilterRegex = new RegExp(filterIsRegex[1],filterIsRegex[2]);
           ctrl.analysisFilterRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')','g' + filterIsRegex[2]);
-          ctrl.invalidAnalysisFilterRegex = false;              
+          ctrl.invalidAnalysisFilterRegex = false;
         } catch (e) {
           ctrl.invalidAnalysisFilterRegex = true;
         }
@@ -119,9 +119,11 @@ function PhraseViewDirective () {
   }
 }
 
-export default () =>{
-  angular.module('app.directives.phraseview', ['app.services.tabservice',
-    'app.services.analysisservice'])
-    .directive('phraseView', PhraseViewDirective)
-    .controller('PhraseViewController', PhraseViewController);
+export const PhraseViewModule = {
+  init: function () {
+    angular.module('app.directives.phraseview', ['app.services.tabservice',
+      'app.services.analysisservice'])
+      .directive('phraseView', PhraseViewDirective)
+      .controller('PhraseViewController', PhraseViewController);
+  }
 }

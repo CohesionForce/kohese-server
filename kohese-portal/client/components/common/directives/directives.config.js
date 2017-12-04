@@ -3,16 +3,25 @@
  *
  * Webpack depdendency file.
  */
+import { ResizeableModule } from  './resizeableField';
+import { NavDirectivesModule } from  './navDirectives/navDirectives';
+import { KnowledgeTreeModule } from  './knowledgeTree/treeRow';
+import { ActionTableModule } from  './actionTable/actionTable';
+import { DocumentViewModule } from  './document-view/document-view';
+import { KindIconModule } from  './kind-icon/kind-icon';
 
+// Sub-directive folders
+import { AnalysisDirectivesModule } from  './analysis-directives/analysis.config';
 
-export default () => {
-  require('./resizeableField')();
-  require('./navDirectives/navDirectives')();
-  require('./knowledgeTree/treeRow')();
-  require('./actionTable/actionTable')();
-  require('./document-view/document-view')();
-  require('./kind-icon/kind-icon')();
+export const DirectivesModule =  {
+  init : function () {
+    ResizeableModule.init();
+    NavDirectivesModule.init();
+    KnowledgeTreeModule.init();
+    ActionTableModule.init();
+    DocumentViewModule.init();
+    KindIconModule.init();
 
-  // Sub-directive folders
-  require('./analysis-directives/analysis.config')();
+    AnalysisDirectivesModule.init();
+  }
 }

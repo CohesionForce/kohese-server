@@ -2,7 +2,7 @@ function TermViewController ($scope, $timeout, tabService, analysisService) {
   const ctrl = this;
   var currentTab = tabService.getCurrentTab();
 
-  // Bundler Logic 
+  // Bundler Logic
   var controllerRestored = tabService.restoreControllerData(currentTab.id, 'TermViewController', this);
 
   if (!controllerRestored) {
@@ -30,7 +30,7 @@ function TermViewController ($scope, $timeout, tabService, analysisService) {
     ctrl.analysisFilterInput = '';
     ctrl.analysisFilterRegex = null;
 
-    // Event Listeners 
+    // Event Listeners
 
     $scope.$watch('ctrl.analysisFilterString', onFilterChange);
   }
@@ -67,7 +67,7 @@ function TermViewController ($scope, $timeout, tabService, analysisService) {
   }
 
   $scope.$watch(angular.bind(this, () => {
-    return ctrl.analysisFilterInput 
+    return ctrl.analysisFilterInput
   }), () => {
     ctrl.analysisFilterString = ctrl.analysisFilterInput;
     console.log(ctrl.analysisFilterInput);
@@ -143,9 +143,11 @@ function TermViewDirective () {
   }
 }
 
-export default () => {
-  angular.module('app.directives.termview', ['app.services.tabservice',
-    'app.services.analysisservice'])
-    .directive('termView', TermViewDirective)
-    .controller('TermViewController', TermViewController)
+export const TermViewModule = {
+  init: function () {
+    angular.module('app.directives.termview', ['app.services.tabservice',
+      'app.services.analysisservice'])
+      .directive('termView', TermViewDirective)
+      .controller('TermViewController', TermViewController)
+  }
 }

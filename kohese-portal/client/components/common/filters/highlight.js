@@ -26,8 +26,10 @@ function Highlight () {
   }
 }
 
-export default () => {
-  angular.module('app.filters.highlight', [])
-    .filter('highlightRegex', HighlightRegex)
-    .filter('highlight', Highlight);
-};
+export const HighlightFilterModule = {
+  init: function () {
+    angular.module('app.filters.highlight', [])
+      .filter('highlightRegex', HighlightRegex)
+      .filter('highlight', Highlight);
+  }
+}

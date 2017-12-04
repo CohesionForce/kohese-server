@@ -1,16 +1,16 @@
 /*
-    Directive used to represent an item's children in the manner of a burndown chart. 
+    Directive used to represent an item's children in the manner of a burndown chart.
     Receives a proxy as input and requires nothing view-specific in order to be instantiated
 
     Pass in the proxy with the item-proxy attribute from the enclosing html layer
 
-    Created by Josh Phillips 
+    Created by Josh Phillips
 */
 
 const ASCENDING_SORT = 1;
 const DESCENDING_SORT = 2;
 
-function ActionTableController($scope) {      
+function ActionTableController ($scope) {
   ////////////////// TEMPORARY ////////////////////////////////////
   // Set up base field object - temporary /////////////////////////
   // When we get the generic types from the servr this will be pulled from
@@ -37,33 +37,33 @@ function ActionTableController($scope) {
   this.sortable = true;
   console.log(this.itemProxy);
 
-    
 
-    
-  // Filter items down to relevant kinds, may need update to use 
+
+
+  // Filter items down to relevant kinds, may need update to use
   // generic kind definitions in the future
   this.proxyCollection = this.itemProxy
     .getDescendants()
-    .filter(function(proxy) {
+    .filter(function (proxy) {
       if (proxy.kind == 'Action' || proxy.kind == 'Task') {
         return proxy;
       }
     });
-    
+
   // Array does not exist, is not an array, or is empty
   if (!Array.isArray(this.proxyCollection) || !this.proxyCollection.length) {
     this.actionsFound = false;
   } else {
     this.actionsFound = true;
   }
-    
+
   //Logging, remove before commit
   console.log(this.proxyCollection);
 
-    
+
   /////////////////////////// Function Definitions /////////////////////////////
 
-  this.sortTable = function(array,sortKey) {
+  this.sortTable = function (array,sortKey) {
     // If a new sort field has been selected
     if(sortKey != this.sortedFieldKey) {
       this.sortedFieldKey = sortKey;
@@ -78,25 +78,25 @@ function ActionTableController($scope) {
   }
 
   // SORTING SERVICE FUNCTIONS - WILL MOVE
-  function sort(array, sortKey, direction) {
+  function sort (array, sortKey, direction) {
     var sortedArray = array.slice(0)
       .sort(alphabeticalComparison(sortKey))
-        
+
     if (direction == DESCENDING_SORT) {
       return sortedArray.reverse();
     }
-        
+
     return sortedArray;
   }
 
   // Generates a comparison function for the entered sort key
   // move to lower case TBD
   function alphabeticalComparison (sortKey) {
-    return function(a,b) { 
+    return function (a,b) {
       if(a.item[sortKey]) {
         var nameA = a.item[sortKey].toLowerCase(); // ignore upper and lowercase
       }
-        
+
       if(b.item[sortKey]) {
         var nameB = b.item[sortKey].toLowerCase(); // ignore upper and lowercase
       }
@@ -105,7 +105,7 @@ function ActionTableController($scope) {
       if (!nameA && nameB) {
         return  1;
       }
-            
+
       if (nameA && !nameB) {
         return -1;
       }
@@ -122,9 +122,9 @@ function ActionTableController($scope) {
     }
   }
 }
-        
 
-function ActionTable() {
+
+function ActionTable () {
   return {
     restrict: 'EA',
     scope: {
@@ -135,8 +135,10 @@ function ActionTable() {
   }
 }
 
-export default () => {
-  angular.module('app.directives.actiontable', [])
-    .directive('actionTable', ActionTable)
-    .controller('ActionTableController', ['$scope', ActionTableController]);
+export const ActionTableModule = {
+  init: function () {
+    angular.module('app.directives.actiontable', [])
+      .directive('actionTable', ActionTable)
+      .controller('ActionTableController', ['$scope', ActionTableController]);
+  }
 }
