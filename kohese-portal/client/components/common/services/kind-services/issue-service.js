@@ -1,7 +1,7 @@
 /**
  * Created by josh on 10/16/15.
  */
-function IssueService(ItemRepository, $rootScope) {
+function IssueService (ItemRepository, $rootScope) {
   var service = this;
   var states = [{item: {name: ''}}];
 
@@ -22,12 +22,14 @@ function IssueService(ItemRepository, $rootScope) {
     Array.prototype.push.apply(states, issueProxy.getDescendants());
   }
 
-  function getIssueStates() {
+  function getIssueStates () {
     return states;
   }
 }
 
-export default () => {
-  angular.module('app.services.issueservice', ['app.services.itemservice'])
-    .service('IssueService', IssueService);
+export const IssueServiceModule = {
+  init: function () {
+    angular.module('app.services.issueservice', ['app.services.itemservice'])
+      .service('IssueService', IssueService);
+  }
 }

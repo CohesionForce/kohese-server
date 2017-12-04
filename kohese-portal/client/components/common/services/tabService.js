@@ -2,16 +2,17 @@
  * Created by josh on 8/14/15.
  */
 
-import Tab from './tab-service/tab.js'
+import Tab from './tab-service/tab.js';
+import { stateDefinitions } from './tab-service/tab-state-info.json';
 
-function TabService($state, $rootScope) {
+function TabService ($state, $rootScope) {
   var tService = this;
   var _ = require('underscore');
 
   tService.tabCount = 0;
   tService.currentTab = {};
 
-  tService.stateDefinitions = require('./tab-service/tab-state-info.json');
+  tService.stateDefinitions = stateDefinitions;
 
   //
   // Tab Book-keeping
@@ -96,13 +97,15 @@ function TabService($state, $rootScope) {
     tService.bundler[tService.getCurrentTab().id] = currentBundle;
   });
 
-  function Bundle() {
+  function Bundle () {
     var bundle = this;
     bundle.controllers = {};
   }
 }
 
-export default () => {
-  angular.module('app.services.tabservice', [])
-    .service('tabService', TabService);
+export const TabServiceModule = {
+  init: function () {
+    angular.module('app.services.tabservice', [])
+      .service('tabService', TabService);
+  }
 }

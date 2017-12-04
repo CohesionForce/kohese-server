@@ -2,7 +2,7 @@
  * Created by josh on 10/7/15.
  */
 
-function CategoryService(ItemRepository, $rootScope) {
+function CategoryService (ItemRepository, $rootScope) {
   const service = this;
   var users = [];
 
@@ -15,11 +15,11 @@ function CategoryService(ItemRepository, $rootScope) {
     users = root.getChildByName('Users').children;
   });
 
-  function getTags() {
+  function getTags () {
     return users;
   }
 
-  function getTagNames() {
+  function getTagNames () {
     var tagNames = [];
     for (var x = 0; x < users.length; x++) {
       tagNames.push(users[x].item.name);
@@ -28,9 +28,11 @@ function CategoryService(ItemRepository, $rootScope) {
   }
 }
 
-export default () => {
-  angular.module('app.services.categoryservice', [
-    'app.services.itemservice'
-  ])
-    .service('CategoryService', CategoryService)
+export const CategoryServiceModule = {
+  init: function () {
+    angular.module('app.services.categoryservice', [
+      'app.services.itemservice'
+    ])
+      .service('CategoryService', CategoryService)
+  }
 }

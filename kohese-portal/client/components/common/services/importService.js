@@ -4,7 +4,7 @@
 import SocketIOFileClient from 'socket.io-file-client';
 const Path = require('path');
 
-function ImportService(KoheseIO, toastr, $rootScope) {
+function ImportService (KoheseIO, toastr, $rootScope) {
   const ctrl = this;
 
   var uploader = new SocketIOFileClient(KoheseIO.socket);
@@ -12,7 +12,7 @@ function ImportService(KoheseIO, toastr, $rootScope) {
   var uploadListLength = 0;
   var importedItems = [];
 
-  ctrl.importFile = function(fileInfo, parentItem) {
+  ctrl.importFile = function (fileInfo, parentItem) {
     importedItems = []
     // Save length of list so we can track when the import is complete
     uploadListLength = fileInfo.length;
@@ -20,21 +20,21 @@ function ImportService(KoheseIO, toastr, $rootScope) {
     uploader.upload(fileInfo);
   }
 
-  uploader.on('start', function(fileInfo) {
+  uploader.on('start', function (fileInfo) {
     console.log('Start uploading', fileInfo);
   });
-  uploader.on('stream', function(fileInfo) {
+  uploader.on('stream', function (fileInfo) {
     console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
   });
-  uploader.on('complete', function(fileInfo) {
-    var data =  {         
+  uploader.on('complete', function (fileInfo) {
+    var data =  {
       file: fileInfo.name,
       parentItem: parent
     }
-    KoheseIO.socket.emit('ImportDocuments', data,   
+    KoheseIO.socket.emit('ImportDocuments', data,
       function (results) {
         if (results.error) {
-          toastr.error('Import Failed.', results.error);            
+          toastr.error('Import Failed.', results.error);
         } else {
           console.log(results);
           for (var i = 0; i < results.length; i++) {
@@ -48,17 +48,19 @@ function ImportService(KoheseIO, toastr, $rootScope) {
         }
       });
   });
-  uploader.on('error', function(err) {
+  uploader.on('error', function (err) {
     console.log('Error!', err);
   });
-  uploader.on('abort', function(fileInfo) {
+  uploader.on('abort', function (fileInfo) {
     console.log('Aborted: ', fileInfo);
   });
 }
 
-export default () => {
-  angular.module('app.services.importservice', 
-    ['app.factories.koheseio',
-      'toastr'])
-    .service('ImportService', ImportService);
+export const ImportServiceModule = {
+  init: function () {
+    angular.module('app.services.importservice',
+      ['app.factories.koheseio',
+        'toastr'])
+      .service('ImportService', ImportService);
+  }
 }

@@ -11,7 +11,6 @@ export const Ng1AppModule = angular.module('app', [
   'app.contentcontainer',
   'app.detailsview',
   'app.tree',
-  //'app.tree.modalcontrollers', offline while we figure out modals
   'app.admin',
   'app.login',
   'app.navigationmenu',
@@ -25,7 +24,6 @@ export const Ng1AppModule = angular.module('app', [
   'app.services.actionservice',
   'app.services.categoryservice',
   'app.services.issueservice',
-  'app.services.observationservice',
   'app.services.userservice',
   'app.services.sessionservice',
   'app.services.tabservice',

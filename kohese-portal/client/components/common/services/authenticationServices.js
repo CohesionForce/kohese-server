@@ -6,7 +6,7 @@
 
 
 /* Service used by views to log in and out of the kohese portal */
-function LoginService($http, API_URL, AuthTokenFactory, KoheseIO) {
+function LoginService ($http, API_URL, AuthTokenFactory, KoheseIO) {
   var service = this;
 
   service.login = function (username, password) {
@@ -17,15 +17,15 @@ function LoginService($http, API_URL, AuthTokenFactory, KoheseIO) {
   }
   service.logout = function () {
     AuthTokenFactory.setToken();
-    KoheseIO.disconnect();   
+    KoheseIO.disconnect();
   }
-  service.checkLoginStatus = function() {
+  service.checkLoginStatus = function () {
     return AuthTokenFactory.getToken() !== null;
   }
 }
 
 /* Factory used to interact with the authentication token stored in local storage */
-function AuthTokenFactory($window, $rootScope) {
+function AuthTokenFactory ($window, $rootScope) {
   'use strict';
   var store = $window.localStorage;
   var key = 'auth-token';
@@ -35,11 +35,11 @@ function AuthTokenFactory($window, $rootScope) {
     setToken: setToken
   };
 
-  function getToken() {
+  function getToken () {
     return store.getItem(key);
   }
 
-  function setToken(token) {
+  function setToken (token) {
     if (token) {
       store.setItem(key, token);
       $rootScope.$broadcast('userLoggedIn');
@@ -51,13 +51,13 @@ function AuthTokenFactory($window, $rootScope) {
 }
 
 /* Interceptor used by router to confirm user is authenticated for the request */
-function AuthInterceptor(AuthTokenFactory) {
+function AuthInterceptor (AuthTokenFactory) {
   'use strict';
   return {
     request: addToken
   };
 
-  function addToken(config) {
+  function addToken (config) {
     var token = AuthTokenFactory.getToken();
     if (token) {
       config.headers = config.headers || {};
@@ -68,11 +68,13 @@ function AuthInterceptor(AuthTokenFactory) {
   }
 }
 
-export default () => {
-  angular.module('app.services.authentication', 
-    ['app.factories.koheseio',
-      'app.constants.endpoints'])
-    .service('LoginService', LoginService)
-    .factory('AuthTokenFactory', AuthTokenFactory)
-    .factory('AuthInterceptor', AuthInterceptor);
+export const AuthenticationServiceModule = {
+  init: function () {
+    angular.module('app.services.authentication',
+      ['app.factories.koheseio',
+        'app.constants.endpoints'])
+      .service('LoginService', LoginService)
+      .factory('AuthTokenFactory', AuthTokenFactory)
+      .factory('AuthInterceptor', AuthInterceptor);
+  }
 }

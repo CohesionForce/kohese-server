@@ -1,12 +1,12 @@
 /**
  * Created by josh on 10/8/15.
- * 
- *      Service that manages the status of the currently logged in User. 
- * 
+ *
+ *      Service that manages the status of the currently logged in User.
+ *
  *      Contains information related to the authentication status
  */
 
-function UserService (ItemRepository, $rootScope, jwtHelper, AuthTokenFactory, 
+function UserService (ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
   KoheseIO, $state, SessionService) {
   const service = this;
   var users = {};
@@ -28,13 +28,13 @@ function UserService (ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
   }
 
   function getCurrentUsername () {
-    return currentUser.item ? 
+    return currentUser.item ?
       currentUser.item.name : 'Loading';
   }
 
   function getCurrentUserEmail () {
     if (currentUser.item) {
-      return currentUser.item.email ? 
+      return currentUser.item.email ?
         currentUser.item.email : 'No email specified';
     } else {
       return 'Loading';
@@ -81,12 +81,14 @@ function UserService (ItemRepository, $rootScope, jwtHelper, AuthTokenFactory,
   setCurrentUser();
 }
 
-export default () => {
-  angular.module('app.services.userservice', [
-    'app.services.itemservice',
-    'app.services.authentication',
-    'app.factories.koheseio',
-    'angular-jwt',
-    'app.services.sessionservice'])
-    .service('UserService', UserService);
+export const UserServiceModule = {
+  init: function () {
+    angular.module('app.services.userservice', [
+      'app.services.itemservice',
+      'app.services.authentication',
+      'app.factories.koheseio',
+      'angular-jwt',
+      'app.services.sessionservice'])
+      .service('UserService', UserService);
+  }
 }

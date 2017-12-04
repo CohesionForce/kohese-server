@@ -3,10 +3,10 @@
  */
 
 
-function AnalysisService(ItemRepository) {
+function AnalysisService (ItemRepository) {
   var _ = require('underscore');
   var service = this;
-    
+
   service.posFilterCriteria = {
     'Standard': ['RRC','X','NAC','WHPP','QP','LST','WHNP','PRT','INTJ','WHAVP','PRN','FRAG','WHADJP','PP','CONJP','VP','NX','ADVP','UCP','NP','ADJP','WRB','VB','PRP','JJS','WPS','UH','POS','JJR','WP','PDT','JJ','WDT','SYM','NNPS','VBZ','RP','NNP','FW','VBP','RBS','NNS','EX','VBN','RBR','NN','VBG','RB','MD','CD','VBD','PRPS','LS'],
     'Modal': ['MD'],
@@ -26,7 +26,7 @@ function AnalysisService(ItemRepository) {
     }
     return false;
   }
-    
+
   service.fetchAnalysis = function (forProxy) {
     var analysisComplete = new Promise((resolve, reject) => {
       // Note:  This logic does a depth first retrieval to decrease the amount of rework associated with roll-up
@@ -37,7 +37,7 @@ function AnalysisService(ItemRepository) {
 
       if (!forProxy.analysis) {
         console.log('::: Retrieving analysis for ' + forProxy.item.id + ' - ' + forProxy.item.name);
-        performAnalysis(forProxy).then(function(results) {
+        performAnalysis(forProxy).then(function (results) {
           resolve(results);
         });
       }
@@ -46,9 +46,9 @@ function AnalysisService(ItemRepository) {
     return analysisComplete;
   }
 
-  function performAnalysis(proxy) {
+  function performAnalysis (proxy) {
     var analysis = ItemRepository.performAnalysis(proxy)
-        
+
     analysis.then(function (results) {
       if (!proxy.analysis) {
         proxy.analysis = {};
@@ -57,16 +57,16 @@ function AnalysisService(ItemRepository) {
       console.log('::: Analysis performed for: ' + proxy.item.id + ' - ' + proxy.item.name);
       consolidateAnalysis(proxy);
     });
-        
+
     return analysis;
   }
 
-  function consolidateAnalysis(proxy) {
+  function consolidateAnalysis (proxy) {
     proxy.analysis.extendedSummaryList = proxy.analysis.data.summaryList;
     rollUpAnalysis(proxy);
   }
 
-  function rollUpAnalysis(proxy) {
+  function rollUpAnalysis (proxy) {
     if (!proxy.analysis.data) {
       return;
     }
@@ -82,7 +82,7 @@ function AnalysisService(ItemRepository) {
       chunkSummary.count = chunk.count;
       chunkSummary.posCount = {};
       for (var pos in chunk.posCount) {
-        chunkSummary.posCount[pos] = chunk.posCount[pos]; 
+        chunkSummary.posCount[pos] = chunk.posCount[pos];
       }
       proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
     }
@@ -97,7 +97,7 @@ function AnalysisService(ItemRepository) {
       tokenSummary.count = token.count;
       tokenSummary.posCount = {};
       for (var pos in token.posCount) {
-        tokenSummary.posCount[pos] = token.posCount[pos]; 
+        tokenSummary.posCount[pos] = token.posCount[pos];
       }
       proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
     }
@@ -139,7 +139,7 @@ function AnalysisService(ItemRepository) {
               chunkSummary.count = chunk.count;
               chunkSummary.posCount = {};
               for (var pos in chunk.posCount) {
-                chunkSummary.posCount[pos] = chunk.posCount[pos]; 
+                chunkSummary.posCount[pos] = chunk.posCount[pos];
               }
               proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;
             }
@@ -162,7 +162,7 @@ function AnalysisService(ItemRepository) {
               tokenSummary.count = token.count;
               tokenSummary.posCount = {};
               for (var pos in token.posCount) {
-                tokenSummary.posCount[pos] = token.posCount[pos]; 
+                tokenSummary.posCount[pos] = token.posCount[pos];
               }
               proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;
             }
@@ -185,7 +185,9 @@ function AnalysisService(ItemRepository) {
   }
 }
 
-export default () => {
-  angular.module('app.services.analysisservice', ['app.services.itemservice'])
-    .service('analysisService', AnalysisService)
+export const AnalysisServiceModule = {
+  init: function () {
+    angular.module('app.services.analysisservice', ['app.services.itemservice'])
+      .service('analysisService', AnalysisService)
+  }
 }

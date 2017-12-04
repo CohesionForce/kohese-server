@@ -1,19 +1,19 @@
-/* Created by Josh 
+/* Created by Josh
     This service manages version control messaging between the client and server
 
 */
 
-function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepository, toastr) {
+function VersionControlService (KoheseIO, UserService , $rootScope, ItemRepository, toastr) {
   const service = this;
 
-  service.stageItems = function(proxyList) {
+  service.stageItems = function (proxyList) {
     var proxyList = Array.from(proxyList)
     var data = { proxyIds : []}
     for (var i= 0; i < proxyList.length; i++) {
       data.proxyIds.push(proxyList[i].item.id);
     }
     KoheseIO.socket.emit('VersionControl/add', data, function (results) {
-      if (results.error) {    
+      if (results.error) {
         toastr.error('Stage Failed', 'Version Control');
       } else {
         toastr.success('Stage Succeeded!', 'Version Control');
@@ -21,7 +21,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     });
   };
 
-  service.unstageItems = function(proxyList) {
+  service.unstageItems = function (proxyList) {
     var data = {
       proxyIds : []
     }
@@ -37,7 +37,7 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     });
   };
 
-  service.revertItems = function(proxyList) {
+  service.revertItems = function (proxyList) {
     var data = {
       proxyIds: []
     }
@@ -49,10 +49,10 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
         toastr.error('Revert failed', results.error);
       } else {
         toastr.success('Revert Succeeded!', 'Version Control');
-      } 
-    }) 
+      }
+    })
   };
-    
+
 
   service.commitItems = function (proxyList, commitMessage) {
     var data = { proxyIds : []}
@@ -72,12 +72,12 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     });
   };
 
-  service.push = function(proxyIds, remoteName) {
+  service.push = function (proxyIds, remoteName) {
     var data = {};
     data.proxyIds = proxyIds,
     data.remoteName = remoteName;
 
-    KoheseIO.socket.emit('VersionControl/push', data, function(results) {
+    KoheseIO.socket.emit('VersionControl/push', data, function (results) {
       if (results.error) {
         toastr.error('Push Failed', 'Version Control');
       } else {
@@ -86,12 +86,12 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     } )
   };
 
-  service.addRemote = function(proxyId, remoteName, url) {
+  service.addRemote = function (proxyId, remoteName, url) {
     var data = {};
     data.proxyId = proxyId;
     data.remoteName = remoteName;
     data.url = url;
-    KoheseIO.socket.emit('VersionControl/addRemote', data, function(results) {
+    KoheseIO.socket.emit('VersionControl/addRemote', data, function (results) {
       if (results.error) {
         toastr.error('Add Remote Failed', 'Version Control');
       } else {
@@ -100,10 +100,10 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
     });
   };
 
-  service.getRemotes = function(proxyId, callback) {
+  service.getRemotes = function (proxyId, callback) {
     var data = {};
     data.proxyId = proxyId;
-    KoheseIO.socket.emit('VersionControl/getRemotes', data, function(results) {
+    KoheseIO.socket.emit('VersionControl/getRemotes', data, function (results) {
       if (results.error) {
         toastr.error('Get Remotes Failed', 'Version Control');
       } else {
@@ -114,11 +114,13 @@ function VersionControlService(KoheseIO, UserService , $rootScope, ItemRepositor
   };
 }
 
-export default () => {
-  angular.module('app.services.versioncontrolservice',
-    [  'app.factories.koheseio', 
-      'toastr',
-      'app.services.userservice',
-      'app.services.itemservice'])
-    .service('VersionControlService', VersionControlService);
+export const VersionControlServiceModule = {
+  init: function () {
+    angular.module('app.services.versioncontrolservice',
+      [  'app.factories.koheseio',
+        'toastr',
+        'app.services.userservice',
+        'app.services.itemservice'])
+      .service('VersionControlService', VersionControlService);
+  }
 }

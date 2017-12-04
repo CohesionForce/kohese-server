@@ -13,7 +13,9 @@ function HighlightService () {
   }
 }
 
-export default () => {
-  angular.module('app.services.highlightservice', [])
-    .service('HighlightService', HighlightService)
+export const HighlightServiceModule = {
+  init: function () {
+    angular.module('app.services.highlightservice', [])
+      .service('HighlightService', HighlightService)
+  }
 }

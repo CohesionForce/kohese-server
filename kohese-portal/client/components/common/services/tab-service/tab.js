@@ -1,4 +1,6 @@
-function Tab(state, params, id) {
+import { stateDefinitions } from './tab-state-info.json';
+
+export function Tab (state, params, id) {
   var tab = {};
   var bundleListener;
   tab.title = state.title;
@@ -9,7 +11,6 @@ function Tab(state, params, id) {
   tab.content = {};
   tab.id = id;
 
-  var stateDefinitions = require('./tab-state-info.json');
   tab.paramKeys = stateDefinitions[tab.state].params;
 
   tab.setScope = function (scope) {
@@ -44,4 +45,3 @@ function Tab(state, params, id) {
   return tab;
 }
 
-export default Tab;

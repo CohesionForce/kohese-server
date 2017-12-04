@@ -2,7 +2,7 @@
  * Created by josh on 10/7/15.
  */
 
-function DecisionService(ItemRepository, $rootScope) {
+function DecisionService (ItemRepository, $rootScope) {
   var service = this;
   var states = [{item: {name: ''}}];
 
@@ -23,12 +23,14 @@ function DecisionService(ItemRepository, $rootScope) {
     Array.prototype.push.apply(states, decisionProxy.getDescendants());
   }
 
-  function getDecisionStates() {
+  function getDecisionStates () {
     return states;
   }
 }
 
-export default () => {
-  angular.module('app.services.decisionservice', ['app.services.itemservice'])
-    .service('DecisionService', DecisionService);
+export const DecisionServiceModule = {
+  init: function () {
+    angular.module('app.services.decisionservice', ['app.services.itemservice'])
+      .service('DecisionService', DecisionService);
+  }
 }

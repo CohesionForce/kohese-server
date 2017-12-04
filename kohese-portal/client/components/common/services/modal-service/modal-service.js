@@ -1,4 +1,4 @@
-/* Service that allows ui components to create modals with custom messages and 
+/* Service that allows ui components to create modals with custom messages and
    controllers. Uses the ui-bootstrap modal components. More info on options for
    modals can be found at :
 
@@ -38,9 +38,9 @@ function ModalService ($modal) {
     var tempModalDefaults = {};
     var tempModalOptions = {};
 
-    /* Map angular-ui modal custom defaults to modal defaults defined 
+    /* Map angular-ui modal custom defaults to modal defaults defined
            in service */
-    angular.extend(tempModalDefaults, modalDefaults, customModalDefaults); 
+    angular.extend(tempModalDefaults, modalDefaults, customModalDefaults);
 
     angular.extend(tempModalOptions, modalOptions, customModalOptions);
 
@@ -62,10 +62,11 @@ function ModalService ($modal) {
   }
 }
 
-export default () => {
-  angular.module('app.services.modalservice', ['ui.bootstrap'])
-    .service('ModalService', ModalService)
-    .constant('DeleteTemplate', 'components/common/services/modal-service/deleteModal.html')
-    .constant('DefaultTemplate', 'components/common/services/modal-service/modal.html')
-    
+export const ModalServiceModule = {
+  init: function () {
+    angular.module('app.services.modalservice', ['ui.bootstrap'])
+      .service('ModalService', ModalService)
+      .constant('DeleteTemplate', 'components/common/services/modal-service/deleteModal.html')
+      .constant('DefaultTemplate', 'components/common/services/modal-service/modal.html')
+  }
 }

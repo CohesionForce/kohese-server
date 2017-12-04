@@ -1,5 +1,5 @@
 /* Created by Josh. 09/25/17
-	    This service keeps track of changes to the session list while the client 
+	    This service keeps track of changes to the session list while the client
 	    is running. Information needed by the client in regards to session should
 	    be pulled from here
 	*/
@@ -8,7 +8,7 @@ function SessionService (KoheseIO) {
 
   service.sessions = {};
 
-  /* Listeners to provide updates to the session list as they come in from 
+  /* Listeners to provide updates to the session list as they come in from
             the server */
   KoheseIO.socket.on('session/add', function (session) {
     service.sessions[session.sessionId] = session;
@@ -36,8 +36,9 @@ function SessionService (KoheseIO) {
   /* End Register Sessions */
 }
 
-export default () => {
-  angular.module('app.services.sessionservice', ['app.factories.koheseio'])
-    .service('SessionService', SessionService);
+export const SessionServiceModule = {
+  init: function () {
+    angular.module('app.services.sessionservice', ['app.factories.koheseio'])
+      .service('SessionService', SessionService);
+  }
 }
-    
