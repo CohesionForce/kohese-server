@@ -4,9 +4,11 @@ const Path = require('path');
 
 var repositoryId = 'repository';
 var repositoryPath = repositoryId;
-var testFile = '77777777-7777-1777-a777-777777777777.json';
-var baseContent = 'first';
-var additionalContent = 'second';
+var testUUID = '77777777-7777-1777-a777-777777777777';
+var testFile = testUUID + '.json';
+var baseContent = 'base';
+var additionalContent = '-additonal';
+var furtherContent = '-further';
 
 describe('Test Repository functionality', function () {
   if (Fs.existsSync(repositoryPath)) {
@@ -33,8 +35,14 @@ describe('Test Repository functionality', function () {
     });
   });
 
+  it('retrieves status for a new file added to the working tree', function () {
+    Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent);
+    var status = KdbRepo.getItemStatus(repositoryId, testFile);
+    expect(status).toEqual(['WT_NEW']);
+  });
+  
   it('adds to the index', function (done) {
-    addToIndex(testFile, baseContent).then(function (addStatus) {
+    KdbRepo.add(repositoryId, testFile).then(function (addStatus) {
       expect(addStatus).toBeTruthy();
       done();
     }).catch(function (err) {
@@ -43,8 +51,14 @@ describe('Test Repository functionality', function () {
     });
   });
 
+  it('retrieves status for a new file added to the index', function () {
+    var status = KdbRepo.getItemStatus(repositoryId, testFile);
+    expect(status).toEqual(['INDEX_NEW']);
+  });
+  
   it('commits', function (done) {
     KdbRepo.commit([repositoryId], 'name', 'e-mail', 'message').then(function (commitIdMap) {
+      expect(commitIdMap.repository.filesCommitted).toEqual([testFile]);
       expect(commitIdMap[repositoryId]).toBeDefined();
       done();
     }).catch(function (err) {
@@ -66,7 +80,7 @@ describe('Test Repository functionality', function () {
 
   it('lists remotes', function (done) {
     KdbRepo.getRemotes(repositoryId).then(function (remotes) {
-      expect(remotes.length).toEqual(1);
+      expect(remotes).toEqual([ 'name' ]);
       done();
     }).catch(function (err) {
       fail();
@@ -84,12 +98,12 @@ describe('Test Repository functionality', function () {
     });
   });
 
-  it('performs a checkout', function (done) {
+  it('performs a checkout of a commited file with modifications', function (done) {
     Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent +
       additionalContent);
     KdbRepo.checkout(repositoryId, [testFile], true).then(function () {
       var status = KdbRepo.getItemStatus(repositoryId, testFile);
-      expect(status.length).toEqual(0);
+      expect(status).toEqual([]);
       done();
     }).catch(function (err) {
       fail();
@@ -118,6 +132,8 @@ describe('Test Repository functionality', function () {
         KdbRepo.checkout(repositoryId, [testFile], true).then(function () {
           expect(Fs.readFileSync(repositoryPath + Path.sep + testFile,
             {encoding: 'utf8', flag: 'r'})).toEqual(baseContent + additionalContent);
+          var status = KdbRepo.getItemStatus(repositoryId, testFile);
+          expect(status).toEqual(['INDEX_MODIFIED']);
           done();
         });
       } else {
@@ -125,12 +141,21 @@ describe('Test Repository functionality', function () {
       }
     });
   });
-  
+
   it('reverts an indexed and further modified file to the indexed state', function (done) {
     var originalContent = Fs.readFileSync(repositoryPath + Path.sep + testFile,
         {encoding: 'utf8', flag: 'r'});
-    Fs.writeFileSync(repositoryPath + Path.sep + testFile, originalContent + 'further');
+
+    var status = KdbRepo.getItemStatus(repositoryId, testFile);
+    expect(status).toEqual(['INDEX_MODIFIED']);
+    
+    Fs.writeFileSync(repositoryPath + Path.sep + testFile, originalContent + furtherContent);
+    status = KdbRepo.getItemStatus(repositoryId, testFile);
+    expect(status).toEqual(['INDEX_MODIFIED', 'WT_MODIFIED']);
+
     KdbRepo.checkout(repositoryId, [testFile], true).then(function () {
+      status = KdbRepo.getItemStatus(repositoryId, testFile);
+      expect(status).toEqual(['INDEX_MODIFIED']);
       expect(Fs.readFileSync(repositoryPath + Path.sep + testFile,
           {encoding: 'utf8', flag: 'r'})).toEqual(originalContent);
       done();
@@ -139,23 +164,18 @@ describe('Test Repository functionality', function () {
 
   it('retrieves Repository status', function (done) {
     KdbRepo.getStatus(repositoryId, function (repoStatus) {
-      expect(repoStatus.length).not.toEqual(0);
+      expect(repoStatus).toEqual([{ id : testUUID, status : ['INDEX_MODIFIED']}]);
       done();
     });
   });
 
-  it('retrieves status for a file added to the index', function () {
-    var status = KdbRepo.getItemStatus(repositoryId, testFile);
-    expect(status.length).not.toEqual(0);
-  });
-  
   it('retrieves status for a working tree change', function (done) {
     KdbRepo.commit([repositoryId], 'name', 'e-mail', 'message').then(function (commitIdMap) {
       Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent +
           additionalContent +
           'third');
       var status = KdbRepo.getItemStatus(repositoryId, testFile);
-      expect(status.length).not.toEqual(0);
+      expect(status).toEqual(['WT_MODIFIED']);
       done();
     }).catch(function (err) {
       fail();
@@ -163,14 +183,6 @@ describe('Test Repository functionality', function () {
     });
   });
 });
-
-function addToIndex(pathFromRepository, content) {
-  if (!Fs.existsSync(repositoryPath + Path.sep + pathFromRepository)) {
-    Fs.writeFileSync(repositoryPath + Path.sep + pathFromRepository, content);
-  }
-  
-  return KdbRepo.add(repositoryId, pathFromRepository);
-}
 
 function descend(location, callback) {
   var stat = Fs.statSync(location);

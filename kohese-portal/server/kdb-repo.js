@@ -322,6 +322,8 @@ module.exports.push = push;
 function checkout(repositoryId, filePaths, force) {
   var repository = repoList[repositoryId];
   var checkoutPaths = [];
+  var checkoutPathsFromTree = [];
+  var checkoutPathsFromIndex = [];
   for (var j = 0; j < filePaths.length; j++) {
     var status = getItemStatus(repositoryId, filePaths[j]);
     var inIndex = false;
@@ -331,10 +333,14 @@ function checkout(repositoryId, filePaths, force) {
         break;
       }
     }
-    
+
+    // TODO Need to simplify the logic associated with tree/index detection
     if (!inIndex) {
-      checkoutPaths.push(filePaths[j]);
+      checkoutPathsFromTree.push(filePaths[j]);
+    } else {
+      checkoutPathsFromIndex.push(filePaths[j]);
     }
+    checkoutPaths.push(filePaths[j]);
   }
 
   if (checkoutPaths.length > 0) {
@@ -349,7 +355,33 @@ function checkout(repositoryId, filePaths, force) {
     //  return 0;
     //};
     // Passing null uses HEAD for the checkout
-    return nodegit.Checkout.tree(repository, null, options);
+
+    // TODO Need to simplify the logic associated with tree/index processing
+    // TODO Need to handle case when there are changes in both tree and index
+    var checkoutResult = new Promise(function(resolve, reject){
+
+      if (checkoutPathsFromIndex.length === 0){
+        // Checkout from tree
+        nodegit.Checkout.tree(repository, null, options)
+        .then(function() {
+          resolve(true);
+        });      
+      } else {
+        // Checkout from index
+        repository.refreshIndex()
+        .then(function(index){
+          nodegit.Checkout.index(repository, index, options)
+          .then(function() {
+            resolve(true);
+          });          
+        })
+        .catch((error) => {
+          reject(error);
+        });
+      }
+    });
+    
+    return checkoutResult;
   } else {
     return Promise.resolve(true);
   }
