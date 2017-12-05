@@ -111,8 +111,15 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getStatus', function(request, sendResponse){
+
+    var repoProxy = global.koheseKDB.ItemProxy.getProxyFor(request.repoId);    
+    console.log('::: Getting status for repo: ' + repoProxy.item.name);
+
     global.koheseKDB.kdbRepo.getStatus(request.repoId, function(status){    
       if (status) {
+        console.log('Status =>');
+        console.log(status);
+        
         var idStatusArray = [];
         for (var j = 0; j < status.length; j++) {
           var fileString = status[j].path;
@@ -129,12 +136,14 @@ function KIOItemServer(socket){
             if (foundId) {
               idStatusArray.push({
                 id: id,
-                status: file.status()
+                status: status[j].status
               });
             }
           }
         }
         
+        console.log('::: Status Array');
+        console.log(idStatusArray);
         sendResponse(idStatusArray);
       } else {
         console.log('*** Error (Returned from getStatus)');
