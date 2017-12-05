@@ -62,12 +62,12 @@
                     src="resources/icons/versioncontrol/index-mod.ico"
                     title="Staged"/>
                 <!-- Actions -->
-                <i  class="fa fa-undo"
+                <i  class="fa fa-undo kt-icon"
                     ng-click="treeCtrl.revertItem(itemProxy)"/>
-                <i  class="fa fa-plus"
+                <i  class="fa fa-plus kt-icon"
                     ng-if="itemProxy.vcState.Unstaged"
                     ng-click="treeCtrl.stageItem(itemProxy)"/>
-                <i  class="fa fa-minus"
+                <i  class="fa fa-minus kt-icon"
                     ng-if="itemProxy.vcState.Staged"
                     ng-click="treeCtrl.unstageItem(itemProxy)"/>
 

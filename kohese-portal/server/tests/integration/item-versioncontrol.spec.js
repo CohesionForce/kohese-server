@@ -20,7 +20,7 @@ describe('Version Control', ()=>{
             var expectedResults = {'1': true, '2': true,'3':true};
 
                         
-            socket.socketClient.emit('VersionControl/add',req, (results)=> {
+            socket.socketClient.emit('VersionControl/stage',req, (results)=> {
                 expect(rcvdStatusMap).toBe(expectedStatusMap);
                 expect(results).toBe(expectedResults);
                 done();

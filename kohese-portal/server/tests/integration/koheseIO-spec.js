@@ -67,7 +67,7 @@ describe('Test KIO', ()=> {
       });
 
       console.log('::: Invoke add');
-      socket.emit('VersionControl/add', request, (response) => {
+      socket.emit('VersionControl/stage', request, (response) => {
         console.log('::: Add Results');
         console.log(response);
         expect(response).toEqual(expectedResponse);
