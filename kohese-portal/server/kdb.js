@@ -217,6 +217,7 @@ function storeModelInstance(modelName, modelInstance){
   console.log(">>> Repo storage: " + repoStoragePath);
   var filePath = repoStoragePath + "/" + modelName + "/" + modelInstance.id + ".json";
 
+  var promise = Promise.resolve(true);
   if (modelName === "Repository"){
     var parentRepo = proxy.parentProxy.getRepositoryProxy();
     var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
@@ -241,46 +242,40 @@ function storeModelInstance(modelName, modelInstance){
     delete repoRootData.parentId;
     delete repoRootData.repoStoragePath;
     delete repoRootData.mounted;
+    modelInstance = repoRootData;
     
-    return createRepoStructure(repoStoragePath).then(function (repo) {
-      kdbFS.storeJSONDoc(filePath, repoRootData);
-      
-      if (isNewItem){
-          // Need to call create repo structure once that has been removed form validate
-          mountRepository({id: modelInstance.id, parentId: modelInstance.parentId, 'repoStoragePath': repoStoragePath});
-      }
-      
-      return postStore(modelName, modelInstance);
-    });
-    } else {
-
-      if(modelName !== "Analysis" && filePath !== proxy.repoPath){
-        console.log("}}} Old: " + proxy.repoPath);
-        if (proxy.repoPath){
-          kdbFS.removeFile(proxy.repoPath);      
-        }
-        console.log("}}} New: " + filePath);
-        proxy.repoPath = filePath;
-      }
-      
-      kdbFS.storeJSONDoc(filePath, modelInstance);
-      
-      return postStore(modelName, modelInstance);
+    if (isNewItem) {
+      promise = createRepoStructure(repoStoragePath).then(function (repo) {
+        // Need to call create repo structure once that has been removed form validate
+      });
     }
-}
-
-module.exports.storeModelInstance = storeModelInstance;
-
-function postStore(modelName, modelInstance) {
-  return new Promise(function(resolve, reject) {
-    var status = kdbRepo.getItemStatus(ItemProxy.getProxyFor(modelInstance.id));
+  } else {
+    if(modelName !== "Analysis" && filePath !== proxy.repoPath){
+      console.log("}}} Old: " + proxy.repoPath);
+      if (proxy.repoPath){
+        kdbFS.removeFile(proxy.repoPath);      
+      }
+      console.log("}}} New: " + filePath);
+      proxy.repoPath = filePath;
+    }
+  }
+  
+  return promise.then(function () {
+    kdbFS.storeJSONDoc(filePath, modelInstance);
+    if (isNewItem && (modelName === 'Repository')) {
+      mountRepository({id: modelInstance.id, parentId: modelInstance.parentId, 'repoStoragePath': repoStoragePath});
+    }
     
     var modelStore = kdbStore.models[modelName];
     modelStore[modelInstance.id] = JSON.stringify(modelInstance);
-    
-    resolve(status);
+    var repositoryPath = ItemProxy.getRootProxy().repoPath.split('Root.json')[0];
+    repositoryPath = ItemProxy.getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
+    return kdbRepo.getItemStatus(ItemProxy.getRootProxy().item.id,
+        repositoryPath);
   });
 }
+
+module.exports.storeModelInstance = storeModelInstance;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -429,7 +424,7 @@ function createRepoStructure(repoDirPath) {
       checkAndCreateDir(modelDirPath, ignoreJSONFiles);
     }
     
-    return kdbRepo.initializeRepository(ItemProxy.getRootProxy(), repoDirPath);
+    return kdbRepo.initializeRepository(ItemProxy.getRootProxy().item.id, repoDirPath);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -537,13 +532,14 @@ function openRepositories() {
 
 	//Load corresponding git repositories
 	var promises = [];
-	promises.push(kdbRepo.openRepo(ItemProxy.getRootProxy()));
+	promises.push(kdbRepo.openRepo(ItemProxy.getRootProxy().item.id, koheseKDBDirPath));
 	index(ItemProxy.getRootProxy(), false);
 
 	// Initialize nodegit repo-open promises
 	for(var id in mountList) {
 	    if(mountList[id].mounted && mountList[id].repoStoragePath) {
-	        promises.push(kdbRepo.openRepo(ItemProxy.getProxyFor(id)));
+	      var proxy = ItemProxy.getProxyFor(id);
+	        //promises.push(kdbRepo.openRepo(ItemProxy.getRootProxy().item.id, proxy.repoPath));
 	        // TODO Once Repositories are version controlled separately,
 	        // index them here.
 	    }
@@ -569,7 +565,9 @@ function openRepositories() {
 //
 //////////////////////////////////////////////////////////////////////////
 function index(proxy, overwrite) {
-  return kdbRepo.generateCommitHistoryIndices(proxy, overwrite).then(function () {
+  var repositoryPath = proxy.repoPath;
+  return kdbRepo.generateCommitHistoryIndices((repositoryPath.endsWith('Root.json') ?
+      path.dirname(repositoryPath) : repositoryPath), overwrite).then(function () {
     console.log("::: Indexing of " + proxy.item.name + " complete.");
   });
 }

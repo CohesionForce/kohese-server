@@ -111,7 +111,7 @@ function AdminController(tabService, $state, $scope, UserService, ItemRepository
 
   ctrl.addRemote = function() {
     if(ctrl.remoteNameInput != '' && ctrl.remoteUrlInput != '') {
-      VersionControlService.addRemote([treeRoot.children[0].item.id], 
+      VersionControlService.addRemote([treeRoot.item.id], 
         ctrl.remoteNameInput, ctrl.remoteUrlInput);
     } else {
       $window.alert('Please enter a name and url');
