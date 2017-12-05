@@ -2,15 +2,18 @@ const KdbRepo = require('./../../kdb-repo.js');
 const Fs = require('fs');
 const Path = require('path');
 
-var repositoryId = 'repository';
-var repositoryPath = repositoryId;
-var testUUID = '77777777-7777-1777-a777-777777777777';
+var repositoryId = 'kdb-repo-unit-test-repository';
+var repositoryPath = 'kdb' + Path.sep + repositoryId;
+var testUUID = '77777777-7777-1777-a777-777777777771';
 var testFile = testUUID + '.json';
+var testUUID2 = '77777777-7777-1777-a777-777777777772';
+var testFile2 = testUUID2 + '.json';
+
 var baseContent = 'base';
 var additionalContent = '-additonal';
 var furtherContent = '-further';
 
-describe('Test Repository functionality', function () {
+describe('Test KDB Repository: ', function () {
   if (Fs.existsSync(repositoryPath)) {
     descend(repositoryPath, function (location, isDirectory) {
       if (isDirectory) {
@@ -30,8 +33,8 @@ describe('Test Repository functionality', function () {
       expect(Fs.readdirSync(repositoryPath).indexOf('.git')).not.toEqual(-1);
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
 
@@ -46,8 +49,8 @@ describe('Test Repository functionality', function () {
       expect(addStatus).toBeTruthy();
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
 
@@ -57,13 +60,13 @@ describe('Test Repository functionality', function () {
   });
   
   it('commits', function (done) {
-    KdbRepo.commit([repositoryId], 'name', 'e-mail', 'message').then(function (commitIdMap) {
-      expect(commitIdMap.repository.filesCommitted).toEqual([testFile]);
+    KdbRepo.commit([repositoryId], 'name', 'e-mail', 'initial commit').then(function (commitIdMap) {
+      expect(commitIdMap[repositoryId].filesCommitted).toEqual([testFile]);
       expect(commitIdMap[repositoryId]).toBeDefined();
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
 
@@ -73,8 +76,8 @@ describe('Test Repository functionality', function () {
       expect(name).toEqual(remoteName);
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
 
@@ -83,8 +86,8 @@ describe('Test Repository functionality', function () {
       expect(remotes).toEqual([ 'name' ]);
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
 
@@ -93,8 +96,8 @@ describe('Test Repository functionality', function () {
       expect(pushStatusMap[repositoryId]).toBeDefined();
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
 
@@ -106,8 +109,8 @@ describe('Test Repository functionality', function () {
       expect(status).toEqual([]);
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
   
@@ -121,8 +124,8 @@ describe('Test Repository functionality', function () {
       expect(s).toContain('WT_MODIFIED');
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
   
@@ -137,6 +140,7 @@ describe('Test Repository functionality', function () {
           done();
         });
       } else {
+        console.log('*** Error: Add to index failed');
         fail();
       }
     });
@@ -173,7 +177,7 @@ describe('Test Repository functionality', function () {
   });
 
   it('retrieves status for a working tree change', function (done) {
-    KdbRepo.commit([repositoryId], 'name', 'e-mail', 'message').then(function (commitIdMap) {
+    KdbRepo.commit([repositoryId], 'name', 'e-mail', 'commited changes').then(function (commitIdMap) {
       Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent +
           additionalContent +
           'third');
@@ -181,18 +185,19 @@ describe('Test Repository functionality', function () {
       expect(status).toEqual(['WT_MODIFIED']);
       done();
     }).catch(function (err) {
-      fail();
       console.log(err.stack);
+      fail();
     });
   });
   
-  it('does not delete an untracked file when it is reverted', function (done) {
-    var matthew = repositoryPath + Path.sep + 'Matthew.txt';
-    Fs.writeFileSync(matthew, 'Mark');
-    var status = KdbRepo.getItemStatus(repositoryId, 'Matthew.txt');
+  it('deletes an untracked file when it is reverted', function (done) {
+    Fs.writeFileSync(repositoryPath + Path.sep + testFile2, baseContent);
+    var status = KdbRepo.getItemStatus(repositoryId, testFile2);
     expect(status).toEqual(['WT_NEW']);
-    KdbRepo.checkout(repositoryId, [matthew], true).then(function () {
-      expect(Fs.existsSync(matthew)).toEqual(true);
+    KdbRepo.checkout(repositoryId, [testFile2], true).then(function () {
+      expect(Fs.existsSync(repositoryPath + Path.sep + testFile2)).toEqual(false);
+      var statusAfterCheckout = KdbRepo.getItemStatus(repositoryId, testFile2);
+      expect(statusAfterCheckout).toEqual([]);
       done();
     });
   });
