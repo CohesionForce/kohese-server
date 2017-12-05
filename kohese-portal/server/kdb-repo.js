@@ -4,25 +4,25 @@
 
 
 var nodegit = require('nodegit');
-var path = require("path");
-const fs = require("fs");
+var path = require('path');
+const fs = require('fs');
 
 var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
 var repoList = {};
 var stageMap = {};
-const INDEX_DIRECTORY = path.join("kdb", "index");
+const INDEX_DIRECTORY = path.join('kdb', 'index');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
 function openRepo(repositoryId, repositoryPath) {
-  console.log("::: Opening git repo " + repositoryPath);
+  console.log('::: Opening git repo ' + repositoryPath);
   return nodegit.Repository.open(repositoryPath).then(function (r) {
     repoList[repositoryId] = r;
   }).catch(function (err) {
-    console.log("Error opening repository at " + repositoryPath + ". " + err);
+    console.log('Error opening repository at ' + repositoryPath + '. ' + err);
   });
 }
 module.exports.openRepo = openRepo;
@@ -72,7 +72,7 @@ function generateCommitHistoryIndices(repositoryPath, overwrite) {
         var promises = [];
         for (var j = 0; j < commits.length; j++) {
           if (overwrite || !fs.existsSync(path.join(INDEX_DIRECTORY,
-              commits[j].id() + ".json"))) {
+              commits[j].id() + '.json'))) {
             promises.push(indexCommit(commits[j]));
           }
         }
@@ -96,8 +96,8 @@ function indexCommit(commit) {
       entryMap.meta.parents.push(commit.parentId(j).toString());
     }
     
-    fs.writeFileSync(path.join(INDEX_DIRECTORY, commit.id() + ".json"),
-      JSON.stringify(entryMap, null, "  "), {encoding: 'utf8', flag: 'w'});
+    fs.writeFileSync(path.join(INDEX_DIRECTORY, commit.id() + '.json'),
+      JSON.stringify(entryMap, null, '  '), {encoding: 'utf8', flag: 'w'});
     return Promise.resolve(true);
   }).catch(function (err) {
     console.log(err.stack);
@@ -115,7 +115,7 @@ function getIndexEntries(tree, paths) {
           if (entry) {
             return {
               uuid: p.substring(p.lastIndexOf(path.sep) + 1,
-                  p.lastIndexOf(".json")),
+                  p.lastIndexOf('.json')),
               oid: entry.sha(),
               kind: path.basename(path.dirname(p))
             };
@@ -160,7 +160,7 @@ function parseTree(tree) {
       }));
     } else {
       var p = entry.path();
-      var id = p.substring(p.lastIndexOf(path.sep) + 1, p.lastIndexOf(".json"));
+      var id = p.substring(p.lastIndexOf(path.sep) + 1, p.lastIndexOf('.json'));
       if (UUID_REGEX.test(id)) {
         promises.push(Promise.resolve({
           uuid: id,
@@ -220,7 +220,7 @@ function add(repositoryId, filePath) {
     }).then(function () {
       var status = getItemStatus(repositoryId, filePath);
       for (var j = 0; j < status.length; j++) {
-        if (status[j].startsWith("INDEX_")) {
+        if (status[j].startsWith('INDEX_')) {
           return true;
         }
       }
@@ -235,7 +235,7 @@ module.exports.add = add;
 //
 //////////////////////////////////////////////////////////////////////////
 function commit(repositoryIds, userName, eMail, message) {
-  // TODO Does "HEAD" need to be a variable?
+  // TODO Does 'HEAD' need to be a variable?
   var commitIdMap = {};
   var signature = nodegit.Signature.now(userName, eMail);
   var promises = [];
@@ -258,7 +258,7 @@ function commit(repositoryIds, userName, eMail, message) {
                 }
               }
               
-              return repo.createCommit("HEAD", signature, signature, message,
+              return repo.createCommit('HEAD', signature, signature, message,
                   treeId, parentCommits).then(function (commitId) {
                 commitIdMap[repositoryIds[iIndex]] = {
                   commitId: commitId,
@@ -293,7 +293,7 @@ function push(repositoryIds, remoteName, defaultUser) {
     (function (iIndex) {
       promises.push(repoList[repositoryIds[iIndex]].getRemote(remoteName).then(function(remote) {
         // TODO Does the refs String below need to change?
-        return remote.push(["refs/heads/master:refs/heads/master"], {
+        return remote.push(['refs/heads/master:refs/heads/master'], {
             callbacks: {
               credentials: function(url, u) {
                 // TODO Get the username from the given URL once we have
@@ -366,7 +366,7 @@ function diff(repositoryId) {
           var pHunks = [];
           hunks.forEach(function (h) {
             pHunks.push(h.lines().then(function (lines) {
-              diffContent.push("diff " + p.oldFile().path() + " " + p.newFile().path());
+              diffContent.push('diff ' + p.oldFile().path() + ' ' + p.newFile().path());
               diffContent.push(h.header().trim());
               lines.forEach(function (l) {
                 diffContent.push(String.fromCharCode(l.origin()) + l.content().trim());
@@ -431,7 +431,7 @@ function merge(repositoryId, signature) {
     }
     
     return index.writeTreeTo(repository).then(function (treeId) {
-      return repository.createCommit("HEAD", signature, signature, "Merge from master to HEAD.", treeId, [hc, mc]);
+      return repository.createCommit('HEAD', signature, signature, 'Merge from master to HEAD.', treeId, [hc, mc]);
     });
   });
 }
@@ -491,7 +491,7 @@ module.exports.getItemStatus = getItemStatus;
 //////////////////////////////////////////////////////////////////////////
 function walkHistoryForFile(itemId, callback){
   var itemId = filePath.substring(filePath.lastIndexOf(path.sep) + 1,
-      filePath.lastIndexOf(".json"));
+      filePath.lastIndexOf('.json'));
   if (!UUID_REGEX.test(itemId)) {
     // The ID was not a valid UUID, so assume that the Item is a Repository.
     // TODO Fix this case. All (or almost all) commits are being displayed.
@@ -504,7 +504,7 @@ function walkHistoryForFile(itemId, callback){
     var entry = content.objects[itemId];
     if (entry) {
       relatedCommits.push({
-        commit: commitFiles[j].substring(0, commitFiles[j].lastIndexOf(".json")),
+        commit: commitFiles[j].substring(0, commitFiles[j].lastIndexOf('.json')),
         message: content.meta.message,
         author: content.meta.author,
         date: content.meta.time,
