@@ -15,6 +15,7 @@
     "@angular/core": "^5.0.3",
     "@angular/platform-browser": "^5.0.3",
     "@angular/platform-browser-dynamic": "^5.0.3",
+    "@angular/router": "^5.0.5",
     "@angular/upgrade": "^5.0.3",
     "@types/core-js": "^0.9.43",
     "angular": "^1.4.4",
@@ -56,6 +57,9 @@
     "loopback-explorer": "^1.1.0"
   },
   "devDependencies": {
+    "@angular/cli": "^1.5.5",
+    "@angular/compiler-cli": "^5.0.5",
+    "@angular/language-service": "^5.0.5",
     "@types/node": "^8.0.53",
     "@types/webpack": "^3.8.1",
     "babel-core": "^6.26.0",

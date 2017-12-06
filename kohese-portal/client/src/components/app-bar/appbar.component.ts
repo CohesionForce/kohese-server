@@ -1,0 +1,41 @@
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-bar',
+  templateUrl: './appbar.component.html'
+})
+
+export class AppBarComponent implements OnInit {
+  userLoggedIn : boolean;
+  userName : string;
+  onLoginScreen : boolean;
+
+  repositorySyncing: boolean;
+  repositorySynced: boolean;
+  repositorySyncFailed: boolean;
+
+  constructor() { }
+
+  ngOnInit() {
+    this.userLoggedIn = true;
+    this.userName = 'admin';
+    this.onLoginScreen = true;
+
+    this.repositorySynced = true;
+    this.repositorySyncing = false;
+    this.repositorySyncFailed = false;
+  }
+
+  navigate(state: string, params: object, type: string) {
+    console.log(state)
+    console.log(params);
+    console.log(type);
+    console.log(this);
+
+  }
+
+  logout() {
+    console.log('Logout Called - Not Implemented');
+    console.log(this);
+  }
+}

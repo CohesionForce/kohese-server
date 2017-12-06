@@ -15,7 +15,7 @@ module.exports = {
     resolve: {
         alias: {}, // Use this to more easily resolve common modules
         modules: ['node_modules', 'bower_components'],
-        extensions: ['.ts', 'tsx','.js']
+        extensions: ['.ts', 'tsx','.js', '.css']
     },
     devtool: 'inline-source-map',
     plugins: [],
@@ -25,6 +25,10 @@ module.exports = {
               test: /\.tsx?$/,
               use: 'ts-loader',
               exclude: /node_modules/
+            },
+            {
+              test: /\.css$/,
+              use: 'style-loader!css-loader'
             }
           ]
     }

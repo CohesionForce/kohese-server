@@ -1,0 +1,176 @@
+
+
+<div id="details-panel" class="panel">
+    <div class="panel-heading ">
+        <span ng-if="detailsCtrl.itemProxy.kind">{{detailsCtrl.itemProxy.kind}} Information: {{detailsCtrl.itemProxy.item.name}} </span>
+        <span ng-if="!detailsCtrl.itemProxy.kind">No Item Selected</span>
+        <span class="pull-right item-actions">
+            <i class="fa fa-lg fa-level-up"
+                    ng-if="detailsCtrl.itemProxy.item.parentId"
+                    ng-click="detailsCtrl.updateTab(detailsCtrl.NavigationService.getCurrentState(detailsCtrl.tab.id), detailsCtrl.itemProxy.item.parentId)"
+                    title="Go to Parent"></i>
+            <i class="fa fa-lg fa-edit"
+               ng-if="!detailsCtrl.enableEdit"
+               ng-click="detailsCtrl.enableEdit=true"
+               title="Edit"></i>
+            <span ng-if="detailsCtrl.enableEdit"
+                  class="fa fa-stack">
+                <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
+                   ng-click="detailsCtrl.enableEdit = false"
+                   title="Cancel Edit"></i>
+                <i class="fa fa-stack-1x fa-times stacked-child"
+                   ng-click="detailsCtrl.enableEdit = false; detailsCtrl.cancel();"
+                   title="Cancel Edit"></i>
+            </span>
+            <i class="fa fa-lg fa-save"
+               ng-click="detailsCtrl.upsertItem()"
+               title=" Save"
+                    ></i>
+            <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
+               ng-click="detailsCtrl.updateTab('kohese.explore.edit', detailsCtrl.itemProxy.item.id)"
+               title="Split Screen">
+            </i>
+            <i class="fa fa-lg fa-arrows-alt" ng-if="detailsCtrl.tab.type === 'dualview'"
+               ng-click="detailsCtrl.updateTab('kohese.investigate', detailsCtrl.itemProxy.item.id)"
+               title="Fullscreen"></i>
+        </span>
+    </div>
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <tabset id="details-tabs">
+            <tab id="defaultTab" active="detailsCtrl.defaultTab.active" heading="Document">
+                <button ng-click="detailsCtrl.generateHTMLReport()" class="btn btn-primary">
+                   Generate HTML Report
+               </button>
+                <button ng-click="detailsCtrl.generateDOCXReport()" class="btn btn-primary">
+                   Generate Word Document
+               </button>
+               <button 
+                      class= "btn btn-primary"
+                      ng-click="detailsCtrl.newTab('kohese.analysis', 
+                                {id: detailsCtrl.itemProxy.item.id})">
+                      Analyze                
+              </button>
+
+		           <div ng-if="detailsCtrl.itemProxy.children.length">
+                  <label class="control-label" for="showChildren"> Show Children </label> <input
+                         type="checkbox" ng-checked="detailsCtrl.docShowChildren;"
+                         ng-click="detailsCtrl.showChildrenToggled()" />
+                </div>
+                <document-view item-proxy="detailsCtrl.itemProxy"
+                               ng-if="detailsCtrl.itemProxy"
+                               show-children="detailsCtrl.docShowChildren" />
+
+               
+            </tab>
+            <tab >
+                 <tab-heading>Overview 
+                   <span ng-show="detailsCtrl.itemForm.$dirty">
+                      <img src="resources/icons/versioncontrol/dirty.ico"
+                      title = "Dirty item" />   
+                  </span></tab-heading>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Action'">
+                    <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
+                </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind != 'Action' &&
+                detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Task'
+                && detailsCtrl.itemProxy.kind != 'Repository'">
+                    <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+                </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Task'">
+                    <ng-include src="'components/common/templates/task-form.html'"></ng-include>
+                </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Decision'">
+                    <accordion>
+                        <ng-include src="'components/common/templates/decision-form.new.html'"></ng-include>
+                    </accordion>
+                </div>
+                <div class="details-tab" ng-if="detailsCtrl.itemProxy.kind ==='Repository'">
+                    <ng-include src="'components/common/templates/repository-form.html'"></ng-include>
+                </div>
+
+            </tab>
+            <tab ng-if="detailsCtrl.itemProxy.kind === 'Observation'">
+                <tab-heading>Observation</tab-heading>
+                <ng-include src="'components/common/templates/observation-form.html'"></ng-include>
+            </tab>
+            <tab ng-if="detailsCtrl.itemProxy.kind === 'Issue'">
+                <tab-heading>Issue</tab-heading>
+                <ng-include src="'components/common/templates/issue-form.html'"></ng-include>
+            </tab>
+            <tab heading="Children ({{detailsCtrl.itemProxy.children.length}})">
+                <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
+            </tab>
+            <tab heading="Relations">
+                <h4>Relations Tab</h4>
+
+                <p><b>This tab is under construction.</b></p>
+            </tab>
+            <tab heading="History" select="detailsCtrl.getHistory()">
+                <h4>History Tab</h4>
+
+                <div style="width:20%; overflow:auto; display:inline-block;">
+                  <label>Created by: {{detailsCtrl.itemProxy.item.createdBy}}</label>
+                  <label>Created on: {{detailsCtrl.itemProxy.item.createdOn | date:'medium'}}</label>
+                  <label>Modified by: {{detailsCtrl.itemProxy.item.modifiedBy}}</label>
+                  <label>Modified on: {{detailsCtrl.itemProxy.item.modifiedOn | date:'medium'}}</label>
+                </div>
+                <div class="pull-right" style="width:78%; vertical-align: top; display:inline-block; overflow:auto">                
+                  <table>
+                      <thead>
+                        <th style="width:30%">Commit</th>
+                        <th style="width:45%">Message</th>
+                        <th style="width:10%">Author</th>
+                        <th style="width:14%">Date</th>
+                      </thead>
+                      <tbody id="theDetailsBody">
+                        <tr ng-repeat="record in detailsCtrl.itemProxy.history" style="vertical-align: top;">
+                          <td>{{record.commit}}</td>
+                          <td>{{record.message}}</td>
+                          <td>{{record.author}}</td>
+                          <td>{{record.date | date:'medium'}}</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                  <label >{{record}}</label>
+                </div>  
+
+            </tab>
+            <tab heading="Journal">
+                <h4>Journal Tab</h4>
+
+                <p><b>This tab is under construction.</b></p>
+            </tab>
+            <tab heading="Action Table"
+                 ng-if="detailsCtrl.itemProxy.children">
+
+              <action-table item-proxy="detailsCtrl.itemProxy">
+            </tab>
+            <tab heading="Raw Data">
+                <h4>Document Tab</h4>
+                <h5>Id: {{detailsCtrl.itemProxy.item.id}}</h5>
+                <h5>OID: {{detailsCtrl.itemProxy.oid}}</h5>
+                <h5>Tree Hash: {{detailsCtrl.itemProxy.treeHash}}</h5>
+                <pre>{{detailsCtrl.itemProxy.document()}}</pre>
+                <pre>{{detailsCtrl.itemProxy.treeHashEntry | json}}</pre>
+            </tab>
+        </tabset>
+    </div>
+    <!-- /.panel -->
+    <!--<span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'"-->
+    <!--class="form-actions">-->
+    <!--<button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">-->
+    <!--Edit-->
+    <!--</button>-->
+    <!--<button ng-click="detailsCtrl.upsertItem()"-->
+    <!--ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine-->
+    <!--&& detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">-->
+    <!--Update-->
+    <!--</button>-->
+    <!--<button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"-->
+    <!--class="btn btn-danger">-->
+    <!--Cancel-->
+    <!--</button>-->
+    <!-- /.panel-body -->
+    </span>
+</div>

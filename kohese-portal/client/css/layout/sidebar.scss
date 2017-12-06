@@ -14,10 +14,11 @@
     height: calc(100% - #{$topNavHeight});
     width: $leftNavWidth;
     z-index: 7;
-    background-image: -webkit-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
-    background-image: -moz-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
-    background-image: -ms-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
-    background-image: -o-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    // background-image: -webkit-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    // background-image: -moz-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    // background-image: -ms-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    // background-image: -o-linear-gradient(bottom, $secondaryColor + 100, $secondaryColor);
+    background-color: $secondaryColor;
     i {
       padding: 10px;
     }

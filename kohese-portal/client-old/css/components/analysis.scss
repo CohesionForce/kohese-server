@@ -1,0 +1,69 @@
+#analysis-view{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    #document-view{
+        height: inherit;
+        .panel{
+            height: calc(100% - 28.89px);
+            width: 100%;
+            .panel-body{
+                overflow:auto;
+                height: 100%;
+            }
+        }
+    }
+    #term-view{
+        height: inherit;
+        width: inherit;
+        .panel{
+            height: calc(100% - 28.89px); 
+            width: 100%;
+            overflow: hidden;
+            .panel-body {
+                height: inherit;
+                padding-right: 0px;
+                #term-div {
+                    height: 85%;
+                    width: 100%;
+                    overflow: auto;
+                }
+            }
+        }
+    }
+    #phrase-view{
+        height: inherit;
+        width: inherit;
+        .panel{
+            height: calc(100% - 28.89px);
+            width:  100%;
+            overflow: hidden;
+            .panel-body {
+                height: inherit;
+                padding-right: 0px;
+                #phrase-div{
+                    height: 95%;
+                    width: 100%;
+                    overflow: auto;
+                }
+            }
+        }
+    }
+    #sentence-view{
+        height: inherit;
+        .panel{
+            height: calc(100% - 28.89px);
+            width: 100%;
+            overflow: hidden;
+            .panel-body {
+                height: inherit;
+                padding-right: 0px;
+                #sentence-div {
+                    height: 100%;
+                    width: 100%;
+                    overflow: auto;
+                }
+            }
+        }
+    }
+}

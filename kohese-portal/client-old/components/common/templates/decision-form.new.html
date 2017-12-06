@@ -1,0 +1,169 @@
+<form name="detailsCtrl.decisionForm">
+    <h4>Overview:</h4>
+    <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+    <h4 ng-if="detailsCtrl.itemProxy.kind === 'Decision'">State: {{detailsCtrl.itemProxy.item.decisionState}}</h4>
+    <h4 ng-if="detailsCtrl.itemProxy.kind === 'Action'">
+        State: {{detailsCtrl.currentState}}
+    </h4>
+    <accordion-group heading="Proposed"
+                     is-open="detailsCtrl.accordion.Proposed">
+
+        <label class=control-label" for="Rationale">
+            <div class="top-align">
+                Rationale:
+            </div>
+                <textarea
+                        rows="1" msd-elastic
+                        id="Rationale"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-model="detailsCtrl.itemProxy.item.rationale"></textarea>
+        </label>
+        <br>
+        <label>
+            Alternatives:
+            <div ng-repeat="alternative in detailsCtrl.itemProxy.item.alternatives track by $index">
+                <label class="top-align">
+                    <div>
+                        Name:
+                    </div>
+                    <input class="alternative-field"
+                           type="text"
+                           ng-disabled="!detailsCtrl.enableEdit"
+                           ng-model="alternative.name">
+                </label>
+                <label class="top-align">
+                    <div>
+                        Description:
+                    </div>
+                    <textarea
+                            rows="1" msd-elastic
+                            class="alternative-field"
+                            type="text"
+                            ng-disabled="!detailsCtrl.enableEdit"
+                            ng-model="alternative.description"></textarea>
+                </label>
+                <i ng-click="detailsCtrl.deleteItemInput('alternatives', alternative)"
+                   class="glyphicon glyphicon-remove"></i>
+            </div>
+            <button ng-click="detailsCtrl.incrementItemInput('alternatives')"
+                    ng-show="detailsCtrl.enableEdit"
+                    class="btn btn-primary">Add
+            </button>
+        </label>
+        <br>
+        <button ng-click="detailsCtrl.updateState('In Analysis', 'Decision')"
+                class="btn btn-primary">Request Analysis
+        </button>
+    </accordion-group>
+    <accordion-group heading="In Analysis"
+                     is-open="detailsCtrl.accordion.InAnalysis">
+        <div>
+            <label class="control-label three-columns">
+                Estimated Start:
+            <span class="input-group ">
+                <input type="text"
+                       class="form-control"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.estimatedStart"
+                       ng-change="detailsCtrl.convertDate('estimatedStart')"
+                       is-open="detailsCtrl.estimatedStart"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-click="detailsCtrl.openDatePicker($event, 'estimatedStart')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+              </span>
+            </span>
+            </label>
+            <label class="three-columns control-label">
+                Estimated Completion:
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.estimatedCompletion"
+                       ng-change="detailsCtrl.convertDate('estimatedCompletion', true)"
+                       is-open="detailsCtrl.estimatedCompletion"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-click="detailsCtrl.openDatePicker($event, 'estimatedCompletion')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+              </span>
+            </span>
+            </label>
+            <label class="control-label three-columns top-align">
+                Estimated Hours:
+                <br/>
+                <input class=""
+                       ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort"
+                       ng-disabled="!detailsCtrl.enableEdit">
+            </label>
+            <br>
+        </div>
+        <button ng-click="detailsCtrl.updateState('In Review','Decision')"
+                class="btn btn-primary">Request Review
+        </button>
+    </accordion-group>
+    <accordion-group heading="In Review"
+                     is-open="detailsCtrl.accordion.InReview">
+        <label class="control-label three-columns">
+            Approved By:
+            <angucomplete-alt id="ApprovedBy"
+                              disable-input="!detailsCtrl.enableEdit"
+                              placeholder="{{detailsCtrl.itemProxy.item.approvedBy}}"
+                              selected-object="detailsCtrl.decisionApproved"
+                              search-fields="item.name,item.description"
+                              title-field="item.name"
+                              description-field="item.description"
+                              pause="100"
+                              local-data="detailsCtrl.userList"
+                              minlength="1"
+                              match-class="highlight"
+                    ></angucomplete-alt>
+        </label>
+        <br/>
+        <label class="control-label three-columns">
+            Approved On:
+            <div class="controls">
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.approvedOn"
+                       ng-change="detailsCtrl.convertDate('approvedOn', true)"
+                       is-open="detailsCtrl.approvedOn"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-click="detailsCtrl.openDatePicker($event, 'approvedOn')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+                  </span>
+                </span>
+            </div>
+        </label>
+        <br/>
+        <button ng-click="detailsCtrl.updateState('Approved', 'Decision')"
+                class="btn btn-primary">Approve
+        </button>
+        <button ng-click="detailsCtrl.updateState('Disapproved', 'Decision')"
+                class="btn btn-danger">Disapprove
+        </button>
+        <button ng-click="detailsCtrl.updateState('Deferred', 'Decision')"
+                class="btn btn-default">Defer
+        </button>
+        </button>
+    </accordion-group>
+</form>

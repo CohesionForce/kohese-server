@@ -752,10 +752,7 @@ tab div {
   height: calc(100% - 50px);
   width: 50px;
   z-index: 7;
-  background-image: -webkit-linear-gradient(bottom, #ca6464, #660000);
-  background-image: -moz-linear-gradient(bottom, #ca6464, #660000);
-  background-image: -ms-linear-gradient(bottom, #ca6464, #660000);
-  background-image: -o-linear-gradient(bottom, #ca6464, #660000);
+  background-color: #660000;
 }
 
 .sidebar .static-side-panel i {

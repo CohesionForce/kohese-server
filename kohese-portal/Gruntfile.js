@@ -10,7 +10,7 @@ module.exports = function(grunt) {
 		// For example, watch the clients and only do webpack if needed
 		watch: {
 			server: {
-				files: [ 'common/**/*.js', 
+				files: [ 'common/**/*.js',
 				         'server/**/*.js',],
 				tasks: ['jshint:server']
 			},
@@ -48,7 +48,7 @@ module.exports = function(grunt) {
 				},
 				files: [{
 					expand: true,
-					src: ['common/**/*.js', 
+					src: ['common/**/*.js',
 					      'server/**/*.js'],
 					      dest: 'tmp/babel/',
 					      ext: '.babel.js',
@@ -63,7 +63,7 @@ module.exports = function(grunt) {
 				banner: '/* Kohese Server */',
 			},
 			dist: {
-				files: [{ 
+				files: [{
 					cwd: 'tmp/babel/',
 					expand: true,
 					src: ['**/*.js'],  // source files mask
@@ -82,7 +82,7 @@ module.exports = function(grunt) {
 				files: [{expand: true,
 					src: ['client/index.html',
 					      'client/bundle.js',
-					      'client/css/index.css', 
+					      'client/css/index.css',
 					      'client/components/**/*.html',
 					      'bower_components/**/*',
 					      ],
@@ -92,7 +92,7 @@ module.exports = function(grunt) {
 			},
 		},
 
-		webpack: { 
+		webpack: {
 			dist: {
 				context: 'client/',
 				entry: './app.js',
@@ -120,12 +120,12 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		
+
 		// Used to preprocess the files for the PhantomJS jasmine tests
 		browserify: {
 			'tmp/browserify/test-spec.js' : ['tests/unit/components/*.js', 'tests/unit/mock/*.js']
 		},
-		
+
 		jasmine: {
 			 src: ['node_modules/angular/angular.js',
 				   'bower_components/angular-mocks/angular-mocks.js',
@@ -138,7 +138,7 @@ module.exports = function(grunt) {
 		        specs: ['tmp/browserify/test-spec.js'],
 		      }
 		},
-		
+
 		run: {
 			server: {
 				options: {
@@ -152,7 +152,7 @@ module.exports = function(grunt) {
 				cmd: 'node',
 				args: ['.']
 			},
-			
+
 			jasmineUnit: {
 				options: {
 					// This test logs a bunch of garbage
@@ -186,21 +186,21 @@ module.exports = function(grunt) {
 				cmd: 'node',
 				args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=tests/jasmineRest.json']
 			}
-			
+
 		},
-		
+
 		sass: {
 		    options: {
 		        sourceMap: false
 		    },
 		    dist: {
 		        files: {
-	                'client/css/index.css': ['client/css/index.scss']
-	            } 
+	                'client/styles.css': ['client/css/index.scss']
+	            }
 		    }
-		    
+
 		}
-		
+
 
 	});
 
@@ -214,7 +214,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-run');
 	grunt.loadNpmTasks('grunt-sass');
-	
+
     //Run web related build commands
     var client = ['sass', 'webpack'];
 	// Run node server related testing
@@ -231,17 +231,17 @@ module.exports = function(grunt) {
 	//Prepare the distribution
 	var dist = ['sass', 'webpack', 'babel', 'uglify', 'copy'];
 	var build = [].concat(client, test, ['babel', 'uglify', 'copy']);
-	
-	
+
+
 
 	//grunt.registerTask('default', ['watch:server', 'watch:client']);
 	grunt.registerTask('server', ['babel', 'uglify','copy:server']);
 	grunt.registerTask('test:server', 'Run server related testing.', testServer);
 	grunt.registerTask('test:client', 'Run client related testing.', testClient);
 	grunt.registerTask('sunit', 'Run unit tests on the server', testUnitServer);
-	grunt.registerTask('sunit:d', 'Run server unit tests with stacktrace', 
+	grunt.registerTask('sunit:d', 'Run server unit tests with stacktrace',
 							testUnitServerDebug);
-	grunt.registerTask('sinte', 'Run integration tests on the server', 
+	grunt.registerTask('sinte', 'Run integration tests on the server',
 							testIntegrationServer);
 	grunt.registerTask('sinte:d', 'Run server integration test with stacktrace',
 							testIntegrationServerDebug);
@@ -253,11 +253,11 @@ module.exports = function(grunt) {
 	grunt.registerTask('dist', 'Prepare Kohese for distribution.', dist);
 	grunt.registerTask('build', 'Run all testing and dist related tasks.', build);
 	grunt.registerTask('client', 'Run client/web related build tools.', client);
-	
+
 	grunt.registerTask('default', 'Default task', function() {
 		grunt.log.writeln("Use 'grunt --help' to display available tasks.");
 	});
-	
-	
+
+
 
 };

@@ -1,0 +1,41 @@
+@import '../utils/variables';
+
+$filterWizardWidth: 350px;
+
+.results-list {
+  width: calc(90% - #{$filterWizardWidth});
+  float: left;
+  .search-result {
+    margin: 15px;
+  }
+  .panel {
+    .panel-title {
+      overflow: auto;
+      background-color: $primaryColor + 100;
+      padding: 7px;
+      color: whitesmoke;
+    }
+  }
+}
+
+.filter-wizard {
+  width: $filterWizardWidth;
+  float: right;
+  height: 100%;
+  overflow: auto;
+  padding-bottom: 20px;
+
+
+  .panel-title {
+    overflow: auto;
+    background-color: $secondaryColor;
+    padding: 7px;
+    color: whitesmoke;
+  }
+
+  .panel-body {
+    padding: 5px;
+  }
+}
+
+

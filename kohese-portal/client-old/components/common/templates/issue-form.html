@@ -1,0 +1,136 @@
+<form name="detailsCtrl.issueForm">
+    <div>
+        <label class="control-label" for="IssueState">
+            State:
+            <br/>
+            <select id="IssueState"
+                    ng-disabled="!detailsCtrl.enableEdit"
+                    ng-model="detailsCtrl.itemProxy.item.issueState">
+                <option ng-repeat="state in detailsCtrl.issueStates">{{state.item.name}}</option>
+            </select>
+        </label>
+        <label class="control-label top-align three-columns">
+            Observed On:
+            <div class="controls">
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-model="detailsCtrl.itemProxy.item.observedOn"
+                       ng-change="detailsCtrl.convertDate('observedOn', true)"
+                       is-open="detailsCtrl.observedOn"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-click="detailsCtrl.openDatePicker($event, 'observedOn')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+                  </span>
+                </span>
+            </div>
+        </label>
+        <label class="control-label top-align three-columns">
+            Observed By:
+            <angucomplete-alt id="ObservedBy"
+                              disable-input="!detailsCtrl.enableEdit"
+                              placeholder="{{detailsCtrl.itemProxy.item.observedBy}}"
+                              selected-object="detailsCtrl.somethingObserved"
+                              search-fields="item.name,item.description"
+                              title-field="item.name"
+                              description-field="item.description"
+                              pause="100"
+                              local-data="detailsCtrl.userList"
+                              minlength="1"
+                              match-class="highlight"
+                    ></angucomplete-alt>
+        </label>
+    </div>
+    <label class="control-label two-columns">
+        Analysis Action
+        <angucomplete-alt id="Parent"
+                          disable-input="!detailsCtrl.enableEdit"
+                          selected-object="detailsCtrl.analysisActionSelected"
+                          placeholder="{{detailsCtrl.itemProxy.item.analysisAction.name}}"
+                          search-fields="name"
+                          title-field="name"
+                          pause="100"
+                          local-data="detailsCtrl.proxyList"
+                          minlength="1"
+                          match-class="highlight"
+                          style="width: 200px;"
+                ></angucomplete-alt>
+    </label>
+
+    <div>
+    </div>
+    <div>
+        <div class="three-columns top-align inline-block">
+            <label>
+                Context:
+                <angucomplete-alt id="Parent"
+                                  disable-input="!detailsCtrl.enableEdit"
+                                  selected-object="detailsCtrl.contextInput"
+                                  placeholder="{{action.item.name}}"
+                                  search-fields="name"
+                                  title-field="name"
+                                  pause="100"
+                                  local-data="detailsCtrl.proxyList"
+                                  minlength="1"
+                                  match-class="highlight"
+                                  style="width: 200px;"
+                        ></angucomplete-alt>
+            </label>
+            <button ng-click="detailsCtrl.incrementItemInput('context')"
+                    ng-show="detailsCtrl.enableEdit"
+                    class="btn btn-primary">Add
+            </button>
+            <div ng-repeat="context in detailsCtrl.itemProxy.item.context track by $index" ng-init="contextProxy=detailsCtrl.getProxyFor(context.id)">
+            <span ng-click="detailsCtrl.navigate(detailsCtrl.NavigationService.getCurrentState(), context.id)">
+            {{ contextProxy.item.name }}
+                </span>
+                <i ng-click="detailsCtrl.deleteItemInput('context', context)"
+                   class="glyphicon glyphicon-remove"></i>
+            </div>
+
+        </div>
+        <div class="three-columns top align inline-block">
+            <label>
+                Resolution Actions:
+                <angucomplete-alt id="Parent"
+                                  disable-input="!detailsCtrl.enableEdit"
+                                  selected-object="detailsCtrl.resolutionActionsInput"
+                                  placeholder="{{action.item.name}}"
+                                  search-fields="name"
+                                  title-field="name"
+                                  pause="100"
+                                  local-data="detailsCtrl.proxyList"
+                                  minlength="1"
+                                  match-class="highlight"
+                                  style="width: 200px;"
+                        ></angucomplete-alt>
+            </label>
+            <button ng-click="detailsCtrl.incrementItemInput('resolutionActions')"
+                    ng-show="detailsCtrl.enableEdit"
+                    class="btn btn-primary">Add
+            </button>
+            <div ng-repeat="action in detailsCtrl.itemProxy.item.resolutionActions track by $index" ng-init="actionProxy=detailsCtrl.getProxyFor(action.id)">
+            <span ng-click="detailsCtrl.navigate(detailsCtrl.NavigationService.getCurrentState(), action.id)">
+            {{actionProxy.item.name}}
+            </span>
+                <i ng-click="detailsCtrl.deleteItemInput('resolutionActions', action)"
+                   class="glyphicon glyphicon-remove"></i>
+            </div>
+        </div>
+    </div>
+    <label class="control-label two-columns" for="Response">
+        Response:
+            <textarea id="Response"
+                      rows="1" msd-elastic
+                      class="one-column"
+                      ng-disabled="!detailsCtrl.enableEdit"
+                      ng-model="detailsCtrl.itemProxy.item.response"></textarea>
+    </label>
+    <br>
+</form>

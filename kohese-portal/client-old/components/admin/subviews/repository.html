@@ -1,0 +1,69 @@
+<div>
+    <div class="version-control-admin">
+        <h4>
+            Version Control:
+        </h4>
+            <div>
+                <h5>Repository List:</h5>
+                <button ng-click="adminCtrl.getRemotes()"
+                        class="btn btn-primary">Refresh Repositories</button>
+                <div ng-repeat="repo in adminCtrl.remotesList">
+                    {{repo}}
+                </div>
+            </div>
+        <div>
+            <label for="add-remote-input">Remote Name: </label>
+            <input id="add-remote-input" type="text" ng-model="adminCtrl.remoteNameInput"/>
+            <label for="push-remote-url">Push url :</label>
+            <input id="add-remote-url" type="text" 
+                    ng-model="adminCtrl.remoteUrlInput">
+            <button ng-click="adminCtrl.addRemote()" 
+                    class="btn btn-primary">Add Remote</button>
+        </div>
+
+        <div>
+            <h4>Commit/Push Item Changes</h4>
+            <label for="commit-message-input">Commit Message: </label>
+            <input id="commit-message-input" type="text" ng-model="adminCtrl.commitMessageInput" />
+            <button ng-click="adminCtrl.commit()"
+                    class="btn btn-primary">Commit Staged Items</button>
+            <br/>
+            <label for="push-remote-name">Push to :</label>
+            <input id="push-remote-name" type="text" 
+                   ng-model="adminCtrl.pushRemoteNameInput">
+            <button ng-click="adminCtrl.push()"
+                    class="btn btn-primary">Push</button>
+        </div>
+    </div>
+    
+    <hr/>
+    <h4>
+        Repositories:
+    </h4>
+    <hr/>
+    <div class="panel repository-panel"
+         ng-repeat="repository in adminCtrl.repositoryList"
+            >
+        <div class="panel-title">
+            {{repository.item.name}}
+        </div>
+        <div class="panel-body">
+            <h5>
+                <b>Description:</b>
+            </h5>
+            {{repository.item.description}}
+            <br/>
+            <h5>
+                <b>Items:</b>
+            </h5>
+            {{repository.descendantCount}}
+        </div>
+        <div class="panel-footer">
+            <button class="btn btn-default"
+                    ng-click="adminCtrl.navigate('kohese.explore.edit', repository.item.id)">
+                Go <i class="fa fa-chevron-right"></i>
+            </button>
+        </div>
+
+    </div>
+</div>

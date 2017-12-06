@@ -1,0 +1,183 @@
+<div>
+    <h4>Overview:</h4>
+
+    <div class="text-center" ng-if="detailsCtrl.itemProxy.item.taskState === 'Assigned'
+                                    && detailsCtrl.currentUser === detailsCtrl.itemProxy.item.assignedTo">
+        Do you you accept this task?
+        <br>
+        <button ng-click="detailsCtrl.updateState('Accepted', 'Task')"
+                class="btn btn-primary">Yes
+        </button>
+        <button ng-click="detailsCtrl.updateState('Pending Reassign', 'Task')" class="btn btn-danger">No
+        </button>
+    </div>
+    <div ng-if="detailsCtrl.itemProxy.item.taskState === 'Pending Reassign'"
+         class="text-center">
+        Task requires assignment:
+        <label class=control-label">
+            Assign To:
+            <angucomplete-alt id="AssignedTo"
+                              disable-input="!detailsCtrl.enableEdit"
+                              placeholder="{{detailsCtrl.itemProxy.item.assignedTo}}"
+                              selected-object="detailsCtrl.taskAssigned"
+                              search-fields="item.name,item.description"
+                              title-field="item.name"
+                              description-field="item.description"
+                              pause="100"
+                              local-data="detailsCtrl.userList"
+                              minlength="1"
+                              match-class="highlight"
+                    ></angucomplete-alt>
+            <button ng-click="detailsCtrl.updateState('Assigned', 'Task')"
+                    class="btn btn-primary">Assign
+            </button>
+            </button>
+
+        </label>
+    </div>
+    <div ng-include="'components/common/templates/itemform.html'"></div>
+
+    <h4>State: {{detailsCtrl.itemProxy.item.taskState}}</h4>
+    <accordion>
+        <accordion-group heading="Proposed">
+            <label class=control-label">
+                Assigned To:
+                <angucomplete-alt id="AssignedTo"
+                                  disable-input="!detailsCtrl.enableEdit"
+                                  placeholder="{{detailsCtrl.itemProxy.item.assignedTo}}"
+                                  selected-object="detailsCtrl.taskAssigned"
+                                  search-fields="item.name,item.description"
+                                  title-field="item.name"
+                                  description-field="item.description"
+                                  pause="100"
+                                  local-data="detailsCtrl.userList"
+                                  minlength="1"
+                                  match-class="highlight"
+                        ></angucomplete-alt>
+            </label>
+            <button ng-click="detailsCtrl.updateState('Assigned', 'Task')"
+                    class="btn btn-primary">Assign
+            </button>
+        </accordion-group>
+        <accordion-group heading="Accepted"
+                         is-open="detailsCtrl.accordion.Accepted">
+            <div>
+                <label class="control-label three-columns">
+                    Estimated Start:
+            <span class="input-group ">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       ng-model="detailsCtrl.itemProxy.item.estimatedStart"
+                       ng-change="detailsCtrl.convertDate('estimatedStart')"
+                       is-open="detailsCtrl.estimatedStart"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-click="detailsCtrl.openDatePicker($event, 'estimatedStart')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+              </span>
+            </span>
+                </label>
+                <label class="three-columns control-label">
+                    Estimated Completion:
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       ng-model="detailsCtrl.itemProxy.item.estimatedCompletion"
+                       ng-change="detailsCtrl.convertDate('estimatedCompletion', true)"
+                       is-open="detailsCtrl.estimatedCompletion"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-click="detailsCtrl.openDatePicker($event, 'estimatedCompletion')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+              </span>
+            </span>
+                </label>
+                <label class="control-label three-columns top-align" for="EstimatedHours">
+                    Estimated Hours:
+                    <br/>
+                    <input class=""
+                           ng-model="detailsCtrl.itemProxy.item.estimatedHoursEffort"
+                           ng-disabled="!detailsCtrl.enableEdit"
+                           id="EstimatedHours">
+                </label>
+                <br>
+                <button ng-click="detailsCtrl.updateState('In Work', 'Task')"
+                        class="btn btn-primary">Begin Work
+                </button>
+                <button ng-click="detailsCtrl.updateState('Pending Reassign','Task')"
+                        class="btn btn-danger"> Reassign
+                </button>
+            </div>
+        </accordion-group>
+        <accordion-group heading="In Work"
+                         is-open="detailsCtrl.accordion.InWork">
+            <label class="three-columns control-label">
+                Actual Start:
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       ng-model="detailsCtrl.itemProxy.item.actualStart"
+                       ng-change="detailsCtrl.convertDate('actualStart')"
+                       is-open="detailsCtrl.actualStart"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-click="detailsCtrl.openDatePicker($event, 'actualStart')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+                  </span>
+                </span>
+            </label>
+            <label class="three-columns control-label">
+                Actual Completion:
+                <div class="controls">
+            <span class="input-group">
+                <input type="text"
+                       class="form-control"
+                       datepicker-popup="dd-MMMM-yyyy"
+                       ng-disabled="!detailsCtrl.enableEdit"
+                       ng-model="detailsCtrl.itemProxy.item.actualCompletion"
+                       ng-change="detailsCtrl.convertDate('actualCompletion', true)"
+                       is-open="detailsCtrl.actualCompletion"
+                       datepicker-options="detailsCtrl.dateOptions"
+                       close-text="Close"/>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"
+                        ng-disabled="!detailsCtrl.enableEdit"
+                        ng-click="detailsCtrl.openDatePicker($event, 'actualCompletion')">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </button>
+                  </span>
+                </span>
+                </div>
+            </label>
+            <label class="control-label top-align three-columns" for="ActualHours">
+                Actual Hours:
+                <div class="controls">
+                    <input ng-model="detailsCtrl.itemProxy.item.actualHoursEffort"
+                           ng-disabled="!detailsCtrl.enableEdit"
+                           id="ActualHours">
+                </div>
+            </label>
+            <br>
+            <button ng-click="detailsCtrl.updateState('Completed', 'Task')"
+                    class="btn btn-primary">Task Completed
+            </button>
+        </accordion-group>
+</div>

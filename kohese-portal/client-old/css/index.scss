@@ -1,0 +1,21 @@
+@charset "utf-8";
+
+/*
+Required Load Order:
+
+utils/
+vendors/
+base/
+layout/
+components/
+pages/
+themes/
+*/
+
+@import 'utils/utils.config';
+@import 'vendors/vendors.config';
+@import 'vendor-override/vendor-override.config';
+@import 'base/base.config';
+@import 'components/components.config';
+@import 'layout/layout.config';
+@import 'pages/pages.config';
