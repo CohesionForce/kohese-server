@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-bar',
@@ -14,11 +15,11 @@ export class AppBarComponent implements OnInit {
   repositorySynced: boolean;
   repositorySyncFailed: boolean;
 
-  constructor() { }
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
     this.userLoggedIn = true;
-    this.userName = 'admin';
+    this.userName = this.userService.getCurrentUsername();
     this.onLoginScreen = true;
 
     this.repositorySynced = true;

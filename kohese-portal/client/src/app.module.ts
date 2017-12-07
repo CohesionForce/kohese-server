@@ -9,6 +9,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { AppBarComponent} from './components/app-bar/appbar.component';
 import { SideBarComponent} from './components/side-bar/sidebar.component';
+import { UserService } from './services/user.service';
 
 
 @NgModule({
@@ -23,7 +24,7 @@ import { SideBarComponent} from './components/side-bar/sidebar.component';
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [UserService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

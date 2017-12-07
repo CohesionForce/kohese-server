@@ -4,7 +4,7 @@
   <div class="navbar-header">
   <a class="navbar-brand"
       [ngClass]="{'navbar-syncing': repositorySyncing,
-                'navbar-disconnected': repositorySynced}"
+                'navbar-disconnected': !repositorySynced}"
       (click)="navigate('kohese.explore',{}, 'dualview')">
         Kohese Portal <i class="fa fa-exclamation-triangle"
                         *ngIf="!repositorySynced && !repositorySyncing && !repositorySyncFailed"> - Disconnected</i>
