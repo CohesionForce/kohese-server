@@ -116,9 +116,6 @@ function KIOItemServer(socket){
 
     global.koheseKDB.kdbRepo.getStatus(request.repoId, function(status){    
       if (status) {
-        console.log('Status =>');
-        console.log(status);
-        
         var idStatusArray = [];
         for (var j = 0; j < status.length; j++) {
           var fileString = status[j].path;
@@ -141,8 +138,6 @@ function KIOItemServer(socket){
           }
         }
         
-        console.log('::: Status Array');
-        console.log(idStatusArray);
         sendResponse(idStatusArray);
       } else {
         console.log('*** Error (Returned from getStatus)');
@@ -170,32 +165,8 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  function upsertAndNotify(koheseUserName, kind, item){
-    item.modifiedBy = koheseUserName;
-    item.modifiedOn = Date.now();
-    
-    if(!item.createdBy){
-      console.log('::: Updating created fields (instance) - ' + kind);
-      item.createdBy = item.modifiedBy;
-      item.createdOn = item.modifiedOn;
-    }
-
-    var proxy;
-    var isNewInstance = false;
-    
-    if (item.id){
-      proxy = ItemProxy.getProxyFor(item.id);
-
-      // TODO need to add user password processing
-
-      proxy.updateItem(kind, item);
-    } else {
-      isNewInstance = true;
-      proxy = new ItemProxy(kind, item);      
-    }
-    
-
-    console.log('::: Upsert ' + item.id);
+  function storeAndNotify(proxy, isNewInstance){
+    console.log('::: Storing ' + proxy.item.id);
     
     var promise = new Promise(function(resolve, reject) {
       global.koheseKDB.storeModelInstance(proxy.kind, proxy.item, isNewInstance)
@@ -205,7 +176,6 @@ function KIOItemServer(socket){
         notification.kind = proxy.kind;
         notification.item = proxy.item;
         notification.status = status;
-        console.log('Change Instance:' + JSON.stringify(notification));
         if (isNewInstance) {
             notification.type = 'create';
             kio.server.emit(proxy.kind +'/create', notification);
@@ -234,8 +204,35 @@ function KIOItemServer(socket){
         socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     
+    var koheseUserName = socket.koheseUser.username;
+    var item = request.item;
+    var kind = request.kind;
+    
     try {
-      upsertAndNotify(socket.koheseUser.username, request.kind, request.item)
+      item.modifiedBy = koheseUserName;
+      item.modifiedOn = Date.now();
+      
+      if(!item.createdBy){
+        console.log('::: Updating created fields (instance) - ' + kind);
+        item.createdBy = item.modifiedBy;
+        item.createdOn = item.modifiedOn;
+      }
+
+      var proxy;
+      var isNewInstance = false;
+      
+      if (item.id){
+        proxy = ItemProxy.getProxyFor(item.id);
+
+        // TODO need to add user password processing
+
+        proxy.updateItem(kind, item);
+      } else {
+        isNewInstance = true;
+        proxy = new ItemProxy(kind, item);      
+      }
+      
+      storeAndNotify(proxy, isNewInstance)
       .then(function(proxy){
         sendResponse({
           kind: request.kind,
@@ -549,16 +546,30 @@ function KIOItemServer(socket){
   });
   
   socket.on('ImportDocuments', function (request, sendResponse) {
+    console.log('::: session %s: Received ImportDocuments for %s for user %s at %s',
+        socket.id, socket.koheseUser.username, socket.handshake.address);
+
     new Promise(function (resolve, reject) {
       var absolutes = [];
       var root = Path.dirname(fs.realpathSync(__dirname));
       root = Path.join(root, 'data_import', socket.koheseUser.username);
       absolutes.push(Path.join(root, request.file));
       var results = importer.importFiles(socket.koheseUser.username, absolutes, request.parentItem);
-      resolve(results);
+      var promises = [];
+      for(var resultIdx in results){
+        var result = results[resultIdx];
+        var proxy = ItemProxy.getProxyFor(result.id);
+        promises.push(storeAndNotify(proxy, true));
+      }
+      
+      Promise.all(promises).then(function (){
+        resolve(results);        
+      });
     }).then(function (results) {
       sendResponse(results);
     }).catch(function (err){
+      console.log(err);
+      console.log(err.stack);
       sendResponse({err:err});
     });
   });
