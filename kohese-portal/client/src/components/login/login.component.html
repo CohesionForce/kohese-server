@@ -1,0 +1,30 @@
+<div id="login-form">
+    <h1>Kohese</h1>
+    <form (ngSubmit)="login()">
+        <label for="username"> Username: </label>
+          <input id="username"
+                 type="text"
+                 name="username"
+                 ngModel
+                 #username="ngModel"
+                 class="form-control"
+                 required/>
+          <div class="alert alert-danger"
+               *ngIf="!username.valid && loginSubmitted">Username is required</div>
+        <br/>
+        <label for="password">Password: </label>
+          <input  id="password"
+                  type="password"
+                  name="password"
+                  #password="ngModel"
+                  class="form-control"
+                  ngModel
+                  required/>
+          <div class="alert alert-danger"
+               *ngIf="!password.valid && loginSubmitted">Password is required</div>
+        <br/>
+        <button type="submit"
+                class="btn btn-primary">
+        Log In</button>
+    </form>
+</div>
