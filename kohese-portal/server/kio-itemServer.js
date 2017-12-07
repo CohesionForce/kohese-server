@@ -146,37 +146,36 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/upsert', function(request, sendResponse){
-    console.log('::: session %s: Received upsert for %s for user %s at %s',
-        socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
-    console.log(request);
+  function upsertAndNotify(koheseUserName, kind, item){
+    item.modifiedBy = koheseUserName;
+    item.modifiedOn = Date.now();
     
-    request.item.modifiedBy = socket.koheseUser.username;
-    request.item.modifiedOn = Date.now();
-    
-    if(!request.item.createdBy){
-      console.log('::: Updating created fields (instance) - ' + request.kind);
-      request.item.createdBy = request.item.modifiedBy;
-      request.item.createdOn = request.item.modifiedOn;
+    if(!item.createdBy){
+      console.log('::: Updating created fields (instance) - ' + kind);
+      item.createdBy = item.modifiedBy;
+      item.createdOn = item.modifiedOn;
     }
 
-    try {
-      
-      var proxy;
-      var isNewInstance = false;
-      
-      if (request.item.id){
-        proxy = ItemProxy.getProxyFor(request.item.id);
-        proxy.updateItem(request.kind, request.item);
-      } else {
-        isNewInstance = true;
-        proxy = new ItemProxy(request.kind, request.item);      
-      }
-      
+    var proxy;
+    var isNewInstance = false;
+    
+    if (item.id){
+      proxy = ItemProxy.getProxyFor(item.id);
 
-      console.log('::: Upsert ' + request.id);
-      
-      global.koheseKDB.storeModelInstance(proxy.kind, proxy.item, isNewInstance).then(function (status) {
+      // TODO need to add user password processing
+
+      proxy.updateItem(kind, item);
+    } else {
+      isNewInstance = true;
+      proxy = new ItemProxy(kind, item);      
+    }
+    
+
+    console.log('::: Upsert ' + item.id);
+    
+    var promise = new Promise(function(resolve, reject) {
+      global.koheseKDB.storeModelInstance(proxy.kind, proxy.item, isNewInstance)
+      .then(function (status) {
         console.log('Saved %s #%s#%s#', proxy.kind, proxy.item.id, proxy.item.name);
         var notification = {};
         notification.kind = proxy.kind;
@@ -191,14 +190,43 @@ function KIOItemServer(socket){
             kio.server.emit(proxy.kind +'/update', notification);
         }
       
-        // TODO need to add user password processing
+        resolve(proxy);
+      })
+      .catch(function (error){
+        reject(error);  
+      });
       
+    });
+    
+    return promise;
+    
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Item/upsert', function(request, sendResponse){
+    console.log('::: session %s: Received upsert for %s for user %s at %s',
+        socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
+    console.log(request);
+    
+    try {
+      upsertAndNotify(socket.koheseUser.username, request.kind, request.item)
+      .then(function(proxy){
         sendResponse({
           kind: request.kind,
           item: proxy.item
         });
-        console.log('::: Sent Item/upsert response');
+        
+        console.log('::: Sent Item/upsert response');        
+      })
+      .catch(function(err){
+        console.log('*** Error: ' + err);
+        console.log(err.stack);
+        sendResponse({error: err});
+        console.log('::: Sent Item/upsert error');                    
       });
+
     } catch (err){
       console.log('*** Error: ' + err);
       console.log(err.stack);
@@ -423,7 +451,7 @@ function KIOItemServer(socket){
       var root = Path.dirname(fs.realpathSync(__dirname));
       root = Path.join(root, 'data_import', socket.koheseUser.username);
       absolutes.push(Path.join(root, request.file));
-      var results = importer.importFiles(absolutes, request.parentItem);
+      var results = importer.importFiles(socket.koheseUser.username, absolutes, request.parentItem);
       resolve(results);
     }).then(function (results) {
       sendResponse(results);

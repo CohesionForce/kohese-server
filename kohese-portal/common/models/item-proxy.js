@@ -7,8 +7,6 @@ var _ = require('underscore');
 var SHA = require('jssha');
 var uuidV1 = require('uuid/v1');
 
-
-
 var tree = {};
 tree.proxyMap = {};
 tree.repoMap = {};
@@ -94,6 +92,10 @@ class ItemProxy {
       return proxy;
     }
 
+    if (proxy.item.parentId && proxy.item.parentId === '') {
+      delete proxy.item.parentId;
+    }
+    
     var parentId = proxy.item.parentId || 'ROOT';
 
     var parent = tree.proxyMap[parentId];
@@ -955,7 +957,7 @@ class ItemProxy {
       oldParentId = this.parentProxy.item.id;
     }
 
-    var newParentId = withItem.parentId;
+    var newParentId = withItem.parentId || 'ROOT';
     console.log('::: Eval Parent Id old: ' + oldParentId + ' new: ' + newParentId);
     if (oldParentId !== newParentId) {
       console.log('::: Parent Id changed from ' + oldParentId + ' to ' +
