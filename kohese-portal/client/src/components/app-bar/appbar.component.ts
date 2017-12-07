@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../services/user.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-bar',
@@ -19,7 +20,7 @@ export class AppBarComponent implements OnInit {
 
   ngOnInit() {
     this.userLoggedIn = true;
-    this.userName = this.userService.getCurrentUsername();
+    this.userName = this.userService.getCurrentUsername().value;
     this.onLoginScreen = true;
 
     this.repositorySynced = true;

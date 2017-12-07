@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core'
 import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { Observable } from 'rxjs/Observable';
+import { ScalarObservable } from 'rxjs/observable/ScalarObservable';
+import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class UserService implements OnInit {
@@ -19,12 +22,12 @@ export class UserService implements OnInit {
 
   }
 
-  getCurrentUsername () {
-    return 'admin';
+  getCurrentUsername (): ScalarObservable<string> {
+    return new ScalarObservable('admin');
   }
 
-  getCurrentUserEmail () {
-
+  getCurrentUserEmail (): ScalarObservable<string> {
+    return new ScalarObservable('admin@admin.com');
   }
 
   setCurrentUser () {
