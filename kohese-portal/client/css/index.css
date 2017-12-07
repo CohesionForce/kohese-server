@@ -437,6 +437,10 @@ table td .glyphicon-remove:hover {
   width: 80%;
 }
 
+.kti-name:hover {
+  cursor: pointer;
+}
+
 .knowledge-tree .kt-head .glyphicon-plus {
   color: green;
 }
@@ -507,6 +511,15 @@ kind-icon {
 
 #details-panel > .panel-body {
   height: calc(100% - 30px);
+}
+
+.details-form {
+  height: calc(100% - 44px);
+}
+
+.details-form .form-container {
+  height: 700px;
+  overflow: auto;
 }
 
 #details-tabs {

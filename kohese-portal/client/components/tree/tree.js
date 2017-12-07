@@ -404,37 +404,7 @@ function KTreeController(ItemRepository, ActionService, UserService, $timeout, $
     VersionControlService.unstageItems([itemProxy]);
   }
 
-    
-  function showDiscardModal(itemProxy, options) {
-    var modalOptions = {
-      closeButtonText : 'Cancel',
-      actionButtonText : 'Discard Item',
-      headerText: '"' + itemProxy.item.name + '" is a new item. ',
-      bodyText: 'Reverting this to the last commit will delete it permanently. Are you sure you want to discard this item?'
-    }    
-
-    ModalService.showModal({}, modalOptions).then((result)=> {
-      ItemRepository
-        .deleteItem(itemProxy).then((result)=> {
-          console.log('::: Item has been deleted: ' + result.itemId);
-        });
-    })
-  }
-
   treeCtrl.revertItem = function (itemProxy) {
-    if (itemProxy.vcState.Staged) {
-      if (itemProxy.vcState.Staged === 'New') {
-        showDiscardModal(itemProxy);
-        return;
-      }
-    }
-    if (itemProxy.vcState.Unstaged) {
-      if (itemProxy.vcState.Unstaged ==='New') {
-        showDiscardModal(itemProxy);
-        return;
-      }
-    }
-
     var modalOptions = {
       closeButtonText : 'Cancel',
       actionButtonText : 'Discard Changes',

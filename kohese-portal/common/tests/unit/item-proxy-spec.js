@@ -1009,12 +1009,25 @@ describe('ItemProxy Test', function() {
         match : false, 
         addedItems : [ 'D' ], 
         changedItems : [ 'C' ], 
-        deletedItems : [ 'B' ], 
-        addedChildren : [  ],
-        changedChildren : [  ],
-        deletedChildren : [  ],
-        undefinedFromItems : [  ],
-        undefinedToItems : [  ]
+        deletedItems : [ 'B' ],
+        childMismatch : { 
+          'NV-TOP' : { 
+            addedChildren : [ 'D' ], 
+            deletedChildren : [ 'B' ], 
+            changedChildren : { 
+              C : { 
+                from : 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e', 
+                to : '51f07bc8e0eb82b241784709669f186aee2c3989' } }, 
+            reorderedChildren : { 1 : { from : 'B', to : 'D' } } }, 
+          ROOT : { 
+            addedChildren : [  ], 
+            deletedChildren : [  ], 
+            changedChildren : { 
+              'NV-TOP' : { 
+                from : 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8', 
+                to : '9b63f5728719510e9e8a24eff75fae92a7b4b758' } }, 
+            reorderedChildren : {  } } 
+        } 
     };
 
     var treeHashMapAfter = ItemProxy.getAllTreeHashes();
