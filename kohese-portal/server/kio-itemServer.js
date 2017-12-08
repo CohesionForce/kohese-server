@@ -512,7 +512,13 @@ function KIOItemServer(socket){
       }
       
       if (deleteFile) {
-        global.app.models[proxy.kind].deleteById(idsArray[i], {}, function () {});
+        var notification = {};
+        notification.type = 'delete';
+        notification.kind = proxy.kind;
+        notification.id = proxy.item.id;
+
+        kio.server.emit(proxy.kind +'/delete', notification);
+        global.koheseKDB.removeModelInstance(proxy.kind, proxy.item.id);
       } else {
         if (!repositoryPathMap[repositoryId]) {
           repositoryPathMap[repositoryId] = [];
@@ -531,7 +537,8 @@ function KIOItemServer(socket){
           if (proxy.kind === 'Repository') {
             item.parentId = proxy.item.parentId;
           }
-          global.app.models[proxy.kind].replaceById(proxy.item.id, item, {}, function () {});
+          proxy.updateItem(proxy.kind, item);
+          storeAndNotify(proxy, false);
         }
         
         sendStatusUpdates(proxies);
