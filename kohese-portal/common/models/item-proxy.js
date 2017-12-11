@@ -7,6 +7,8 @@ var _ = require('underscore');
 var SHA = require('jssha');
 var uuidV1 = require('uuid/v1');
 
+var Rx = require('rxjs/Rx');
+
 var tree = {};
 tree.proxyMap = {};
 tree.repoMap = {};
@@ -17,6 +19,8 @@ tree.modelMap = {
     'Internal-State': {}
 };
 tree.loading = true;
+
+tree.changeSubject = new Rx.Subject();
 
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
@@ -137,6 +141,13 @@ class ItemProxy {
   static getRootProxy() {
     // console.log('::: IP: Getting Root Proxy');
     return tree.root;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getChangeSubject() {
+    return tree.changeSubject;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1035,6 +1046,12 @@ class ItemProxy {
 //        console.log('::: -> Not removing ' + this.item.name);        
       } else {
 //        console.log('::: -> Removing all references');
+        tree.changeSubject.next({
+          type: 'delete',
+          kind: this.kind,
+          id: this.item.id,
+          proxy: this
+        });
         delete tree.proxyMap[byId];
       }
     } else {
@@ -1042,6 +1059,12 @@ class ItemProxy {
       if (this.children.length !== 0) {
         if (!attemptToDeleteRestrictedNode){
 //          console.log('::: -> Node still has children');
+          tree.changeSubject.next({
+            type: 'delete',
+            kind: this.kind,
+            id: this.item.id,
+            proxy: this
+          });
           createMissingProxy(byId);          
         }
       } else {
@@ -1049,6 +1072,12 @@ class ItemProxy {
 //          console.log('::: -> Not removing ' + this.item.name);                  
         } else {
 //          console.log('::: -> Removing all references');
+          tree.changeSubject.next({
+            type: 'delete',
+            kind: this.kind,
+            id: this.item.id,
+            proxy: this
+          });
           delete tree.proxyMap[byId];
         }
       }      

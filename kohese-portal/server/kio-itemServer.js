@@ -12,11 +12,45 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-
 
 console.log('::: Initializing KIO Item Server');
 
-if(global.app)
-  {
+if(global.app){
   global.app.on('newSession', KIOItemServer);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+ItemProxy.getChangeSubject().subscribe(change => {
+  console.log('+++ Received notification of change: ' + change.type);
+  console.log(change.kind);
+  console.log(change.proxy.item);
+
+  var notification = {
+    type: change.type,
+    kind: change.kind,
+    id: change.proxy.item.id
+  };
+
+  var sendChangeNotification = true;
+  
+  switch (change.type){
+    case 'delete':
+      global.koheseKDB.removeModelInstance(change.proxy);
+      break;
+    default:
+      console.log('!!! Not processing change notification: ' + change.type);
+      sendChangeNotification = false;
+    }
+  
+  if(sendChangeNotification){
+    console.log('::: Change: ' + JSON.stringify(notification));
+    kio.server.emit(change.kind +'/' + change.type, notification);    
   }
   
+});
+  
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function KIOItemServer(socket){
 
   console.log('>>> KIO Item Server: session %s connected from %s for %s', 
@@ -254,15 +288,16 @@ function KIOItemServer(socket){
     console.log(request);
     
     var proxy = ItemProxy.getProxyFor(request.id);
+    proxy.deleteItem(request.recursive);
     
     console.log('Deleted %s #%s#', request.kind, request.id);
-    var notification = {};
-    notification.type = 'delete';
-    notification.kind = request.kind;
-    notification.id = request.id;
-    console.log('Change: ' + JSON.stringify(notification));
-    kio.server.emit(request.kind +'/delete', notification);
-    global.koheseKDB.removeModelInstance(request.kind, notification.id);
+
+    sendResponse({
+      deleted: 'true',
+      kind: request.kind,
+      id: request.id
+    });
+
   });
   
   //////////////////////////////////////////////////////////////////////////
@@ -359,7 +394,7 @@ function KIOItemServer(socket){
       sendResponse({
         error: err
       });
-    })
+    });
   });
   
   socket.on('VersionControl/commit', function (request, sendResponse) {
@@ -468,57 +503,74 @@ function KIOItemServer(socket){
   });
   
   socket.on('VersionControl/revert', function (request, sendResponse) {
-    var unstageIfIndexOnly = true;
     var proxies = [];
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
+    var pendingUnstagePromises = [];
     for (var i = 0; i < idsArray.length; i++) {
       var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
-      proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
       var status = kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath);
-      if (unstageIfIndexOnly) {
-        var unstage = true;
+      
+      var isNewFile = false;
+      var isStaged = false;
+      var hasUnstagedChanges = false;
+      
+      for (var j = 0; j < status.length; j++) {
+        if (status[j].startsWith('WT_')) {
+          hasUnstagedChanges = true;
+        }
+        if (status[j].startsWith('INDEX_')) {
+          isStaged = true;
+        }
+      }
+      
+      // Unstage if the item is staged without additional changes
+      if(isStaged && !hasUnstagedChanges){
+        pendingUnstagePromises.push(kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]));
+      }
+            
+    }
+    
+    // Wait for any pending unstage requests to complete
+    Promise.all(pendingUnstagePromises).then(function(){
+      // Determine if items need to be checked out or deleted
+      for (var i = 0; i < idsArray.length; i++) {
+        var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
+        var repositoryInformation = getRepositoryInformation(proxy);
+        var repositoryId = repositoryInformation.repositoryProxy.item.id;
+        var status = kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath);
+
+        var isNewUnstagedFile = false;
+        
         for (var j = 0; j < status.length; j++) {
-          if (status[j].startsWith('WT_')) {
-            unstage = false;
-            break;
+          if (status[j].endsWith('WT_NEW')) {
+            isNewUnstagedFile = true;
           }
         }
         
-        if (unstage) {
-          kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]);
+        if (isNewUnstagedFile) {
+          proxy.deleteItem();
+        } else {
+          if (!repositoryPathMap[repositoryId]) {
+            repositoryPathMap[repositoryId] = [];
+          }
+          repositoryPathMap[repositoryId].push(repositoryInformation.relativeFilePath);
+          proxies.push(proxy);
         }
+        
       }
-      
-      var deleteFile = false;
-      for (var j = 0; j < status.length; j++) {
-        if (status[j].endsWith('_NEW')) {
-          deleteFile = true;
-          break;
-        }
-      }
-      
-      if (deleteFile) {
-        var notification = {};
-        notification.type = 'delete';
-        notification.kind = proxy.kind;
-        notification.id = proxy.item.id;
-
-        kio.server.emit(proxy.kind +'/delete', notification);
-        global.koheseKDB.removeModelInstance(proxy.kind, proxy.item.id);
-      } else {
-        if (!repositoryPathMap[repositoryId]) {
-          repositoryPathMap[repositoryId] = [];
-        }
-        repositoryPathMap[repositoryId].push(repositoryInformation.relativeFilePath);
-      }
-    }
     
-    for (var repositoryId in repositoryPathMap) {
-      kdb.kdbRepo.checkout(repositoryId, repositoryPathMap[repositoryId], true).
-        then(function () {
+      // Checkout any remaining files
+      var pendingCheckoutProxies = [];
+      for (var repositoryId in repositoryPathMap) {
+        pendingCheckoutProxies.push(kdb.kdbRepo.checkout(repositoryId, repositoryPathMap[repositoryId], true));
+      }
+      
+      // Send response
+      Promise.all(pendingCheckoutProxies)
+      .then(function () {
         // Update content based on reverted files
         for (var j = 0; j < proxies.length; j++) {
           var proxy = proxies[j];
@@ -538,7 +590,9 @@ function KIOItemServer(socket){
           error: err
         });
       });
-    }
+
+    });
+
   });
   
   socket.on('ImportDocuments', function (request, sendResponse) {

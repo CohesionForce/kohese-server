@@ -272,8 +272,9 @@ module.exports.storeModelInstance = storeModelInstance;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function removeModelInstance(modelName, instanceId){
-  var proxy = ItemProxy.getProxyFor(instanceId);
+function removeModelInstance(proxy){
+  var modelName = proxy.kind;
+  var instanceId = proxy.item.id;
 
   if(modelName === "Analysis"){
     var repo = proxy.getRepositoryProxy();    
@@ -294,7 +295,6 @@ function removeModelInstance(modelName, instanceId){
           
           kdbFS.removeFile(path.join(parentRepoPath, 'Repository', proxy.item.id + '.json.mount'));
           delete mountList[proxy.item.id];
-          proxy.deleteItem();
           updateMountFile();
           
           // Should remove the proxies and modelStore instances of all the children, but not delete from disk.
@@ -304,7 +304,6 @@ function removeModelInstance(modelName, instanceId){
           // In that case, remove it from the mount and remove the proxy.
           
           delete mountList[proxy.item.id];
-          proxy.deleteItem();
           updateMountFile();
       }
   } else {
@@ -314,12 +313,16 @@ function removeModelInstance(modelName, instanceId){
       removeModelInstance("Analysis", instanceId);
     }
 
-    kdbFS.removeFile(proxy.repoPath);
-    proxy.deleteItem();
+    if (proxy.repoPath){
+      kdbFS.removeFile(proxy.repoPath);
+      delete proxy.repoPath;
+    }
   }
   
   var modelStore = kdbStore.models[modelName];
-  delete modelStore[instanceId];
+  if(modelStore && modelStore[instanceId]){
+    delete modelStore[instanceId];    
+  }
 }
 
 module.exports.removeModelInstance = removeModelInstance;
