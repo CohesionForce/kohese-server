@@ -34,7 +34,25 @@ class ItemProxy {
       itemId = forItem.id = uuidV1();
       console.log('::: Allocating new id: ' + itemId);
     }
-
+    
+    var validation = ItemProxy.validateItemContent(kind, forItem);
+    
+    if (!validation.valid){
+      // TODO Need to remove this bypass logic which is needed to load some existing data
+      if(tree.loading){
+        console.log('*** Error: Invalid data item');
+        console.log('Kind: ' + kind);
+        console.log(forItem);
+        console.log(validation);        
+      } else {
+        throw ({
+          error: 'Not-Valid',
+          validation: validation
+        });
+        
+      }
+    }
+    
     var proxy = tree.proxyMap[itemId];
     if (!proxy) {
 //      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
@@ -74,6 +92,10 @@ class ItemProxy {
       return proxy;
     }
 
+    if (proxy.item.parentId && proxy.item.parentId === '') {
+      delete proxy.item.parentId;
+    }
+    
     var parentId = proxy.item.parentId || 'ROOT';
 
     var parent = tree.proxyMap[parentId];
@@ -94,6 +116,21 @@ class ItemProxy {
     return proxy;
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static resetItemRepository() {
+    
+    console.log('::: Resetting Item Repository');
+    var rootProxy = ItemProxy.getRootProxy();
+
+    tree.loading = true;
+
+    rootProxy.visitChildren(null, null, (childProxy) => {
+      childProxy.deleteItem();
+    });
+  }
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -162,14 +199,25 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   validateItem(){
     
+    return ItemProxy.validateItemContent(this.kind, this.item);
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static validateItemContent(kind, itemContent){
+    
+    var model = tree.modelMap[kind];
+    
     var validationResult = {
       valid: true,
       missingProperties: []
     };
     
-    if (this.model && this.model.item && this.model.item.requiredProperties) {
-      this.model.item.requiredProperties.forEach((property) => {
-        if (!this.item.hasOwnProperty(property)) {
+    if (model && model.item && model.item.requiredProperties) {
+      model.item.requiredProperties.forEach((property) => {
+        if (!itemContent.hasOwnProperty(property)) {
           validationResult.valid = false;
           validationResult.missingProperties.push(property);
         }
@@ -185,6 +233,53 @@ class ItemProxy {
   document() {
     this.checkPropertyOrder();
     return JSON.stringify(this.item, null, '  ');
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static gitDocumentOID(forDoc) {
+    var shaObj = new SHA('SHA-1', 'TEXT');
+    
+    var forText = JSON.stringify(forDoc, null, '  ');
+        
+    var length = forText.length;
+//    console.log(forText);
+//    console.log('\n');
+    shaObj.update('blob ' + forText.length + '\0' + forText);
+    
+    var oid = shaObj.getHash('HEX');
+    
+//    for(var l = length - 5; l < length +5; l++){
+//      shaObj.update('blob ' + l + '\0' + forText);
+//      var newOid = shaObj.getHash('HEX');
+//      console.log('>>> ' + l + ' - ' + newOid);
+//    }
+    
+    return oid;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static gitFileOID(forFile) {
+    var shaObj = new SHA('SHA-1', 'TEXT');
+    
+        
+    var length = forFile.length;
+//    console.log(forText);
+//    console.log('\n');
+    shaObj.update('blob ' + length + '\0' + forFile);
+    
+    var oid = shaObj.getHash('HEX');
+    
+//    for(var l = length - 5; l < length +5; l++){
+//      shaObj.update('blob ' + l + '\0' + forText);
+//      var newOid = shaObj.getHash('HEX');
+//      console.log('>>> ' + l + ' - ' + newOid);
+//    }
+    
+    return oid;
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -839,6 +934,25 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
+    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
+    
+    var validation = ItemProxy.validateItemContent(modelKind, withItem);
+    
+    if (!validation.valid){
+      // TODO Need to remove this bypass logic which is needed to load some existing data
+      if(tree.loading){
+        console.log('*** Error: Invalid data item');
+        console.log('Kind: ' + modelKind);
+        console.log(withItem);
+        console.log(validation);        
+      } else {
+        throw ({
+          error: 'Not-Valid',
+          validation: validation
+        });
+      }
+    }
+
     // Determine if item kind changed
     var newKind = modelKind;
 
@@ -867,7 +981,8 @@ class ItemProxy {
       oldParentId = this.parentProxy.item.id;
     }
 
-    var newParentId = withItem.parentId;
+    var newParentId = withItem.parentId || 'ROOT';
+
     if (oldParentId !== newParentId) {
       console.log('::: Parent Id changed from ' + oldParentId + ' to ' +
           newParentId);
@@ -900,7 +1015,7 @@ class ItemProxy {
   deleteItem(deleteDescendants) {
     var byId = this.item.id;
 
-    console.log('::: Deleting proxy for ' + byId);
+//    console.log('::: Deleting proxy for ' + byId);
     
     var attemptToDeleteRestrictedNode = (
         (this.item.id === tree.lostAndFound.item.id) || 
@@ -917,23 +1032,23 @@ class ItemProxy {
         childProxy.deleteItem(deleteDescendants);
       });
       if (attemptToDeleteRestrictedNode){
-        console.log('::: -> Not removing ' + this.item.name);        
+//        console.log('::: -> Not removing ' + this.item.name);        
       } else {
-        console.log('::: -> Removing all references');
+//        console.log('::: -> Removing all references');
         delete tree.proxyMap[byId];
       }
     } else {
       // Remove this item and leave any children under Lost+Found
       if (this.children.length !== 0) {
         if (!attemptToDeleteRestrictedNode){
-          console.log('::: -> Node still has children');
+//          console.log('::: -> Node still has children');
           createMissingProxy(byId);          
         }
       } else {
         if (attemptToDeleteRestrictedNode){
-          console.log('::: -> Not removing ' + this.item.name);                  
+//          console.log('::: -> Not removing ' + this.item.name);                  
         } else {
-          console.log('::: -> Removing all references');
+//          console.log('::: -> Removing all references');
           delete tree.proxyMap[byId];
         }
       }      

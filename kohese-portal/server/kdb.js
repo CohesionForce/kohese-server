@@ -190,20 +190,12 @@ module.exports.retrieveModelInstance = retrieveModelInstance;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function storeModelInstance(modelName, modelInstance){
+function storeModelInstance(modelName, modelInstance, isNewItem){
+
 
   var proxy = ItemProxy.getProxyFor(modelInstance.id);
-  var isNewItem = false;
   
   if(modelName !== "Analysis"){
-    var strippedInstance = JSON.parse(JSON.stringify(modelInstance));
-    if (proxy){
-      proxy.updateItem(modelName, strippedInstance);
-    } else {
-      proxy = new ItemProxy(modelName, strippedInstance);
-      isNewItem = true;
-    }
-    
     // Delete any associated analysis
     var analysisStore = kdbStore.models["Analysis"];
     if(analysisStore[modelInstance.id]){

@@ -24,12 +24,38 @@ module.exports.loadJSONDoc = loadJSONDoc;
 //////////////////////////////////////////////////////////////////////////
 function storeJSONDoc(filePath, doc) {
 
-  console.log('::: Storing ' + filePath);
+//  console.log('::: Storing ' + filePath);
 
   fs.writeFileSync(filePath, JSON.stringify(doc, null, '  '), {encoding: 'utf8', flag: 'w'});  
 }
 
 module.exports.storeJSONDoc = storeJSONDoc;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function loadBinaryFile(filePath) {
+
+//  console.log('::: Loading ' + filePath);
+
+  var fileData = fs.readFileSync(filePath);
+
+  return fileData;
+}
+
+module.exports.loadBinaryFile = loadBinaryFile;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function storeBinaryFile(filePath, binFile) {
+
+//  console.log('::: Storing ' + filePath);
+
+  fs.writeFileSync(filePath, binFile);  
+}
+
+module.exports.storeBinaryFile = storeBinaryFile;
 
 //////////////////////////////////////////////////////////////////////////
 //

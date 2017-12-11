@@ -4,12 +4,11 @@ const kdbFs = require('./kdb-fs.js');
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
+var ItemProxy = require('../common/models/item-proxy.js');
 const Path = require('path');
 const importer = require('./directory-ingest.js');
 var _ = require('underscore');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-
 
 console.log('::: Initializing KIO Item Server');
 
@@ -117,9 +116,6 @@ function KIOItemServer(socket){
 
     global.koheseKDB.kdbRepo.getStatus(request.repoId, function(status){    
       if (status) {
-        console.log('Status =>');
-        console.log(status);
-        
         var idStatusArray = [];
         for (var j = 0; j < status.length; j++) {
           var fileString = status[j].path;
@@ -142,8 +138,6 @@ function KIOItemServer(socket){
           }
         }
         
-        console.log('::: Status Array');
-        console.log(idStatusArray);
         sendResponse(idStatusArray);
       } else {
         console.log('*** Error (Returned from getStatus)');
@@ -171,35 +165,84 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  function storeAndNotify(proxy, isNewInstance){
+    console.log('::: Storing ' + proxy.item.id);
+    
+    return global.koheseKDB.storeModelInstance(proxy.kind, proxy.item, isNewInstance)
+      .then(function (status) {
+        console.log('Saved %s #%s#%s#', proxy.kind, proxy.item.id, proxy.item.name);
+        var notification = {};
+        notification.kind = proxy.kind;
+        notification.item = proxy.item;
+        notification.status = status;
+        if (isNewInstance) {
+            notification.type = 'create';
+            kio.server.emit(proxy.kind +'/create', notification);
+        } else {
+            notification.type = 'update';
+            kio.server.emit(proxy.kind +'/update', notification);
+        }
+      });    
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('Item/upsert', function(request, sendResponse){
     console.log('::: session %s: Received upsert for %s for user %s at %s',
         socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     
-    request.item.modifiedBy = socket.koheseUser.username;
-    request.item.modifiedOn = Date.now();
+    var koheseUserName = socket.koheseUser.username;
+    var item = request.item;
+    var kind = request.kind;
     
-    if(!request.item.createdBy){
-      console.log('::: Updating created fields (instance) - ' + request.kind);
-      request.item.createdBy = request.item.modifiedBy;
-      request.item.createdOn = request.item.modifiedOn;
-    }
+    try {
+      item.modifiedBy = koheseUserName;
+      item.modifiedOn = Date.now();
+      
+      if(!item.createdBy){
+        console.log('::: Updating created fields (instance) - ' + kind);
+        item.createdBy = item.modifiedBy;
+        item.createdOn = item.modifiedOn;
+      }
 
+      var proxy;
+      var isNewInstance = false;
+      
+      if (item.id){
+        proxy = ItemProxy.getProxyFor(item.id);
 
-    global.app.models[request.kind].upsert(request.item, {}, function (value, responseHeaders){
-      console.log('::: Upsert ' + request.id);
-      console.log(value);
-      console.log(responseHeaders);
-      sendResponse({
-        kind: request.kind,
-        item: responseHeaders
+        // TODO need to add user password processing
+
+        proxy.updateItem(kind, item);
+      } else {
+        isNewInstance = true;
+        proxy = new ItemProxy(kind, item);      
+      }
+      
+      storeAndNotify(proxy, isNewInstance)
+      .then(function(){
+        sendResponse({
+          kind: request.kind,
+          item: proxy.item
+        });
+        
+        console.log('::: Sent Item/upsert response');        
+      })
+      .catch(function(err){
+        console.log('*** Error: ' + err);
+        console.log(err.stack);
+        sendResponse({error: err});
+        console.log('::: Sent Item/upsert error');                    
       });
-      console.log('::: Sent Item/upsert response');
-    }, function (httpResponse){
-      sendResponse({error: httpResponse});
-      console.log('::: Sent Item/upsert error');      
-    });
 
+    } catch (err){
+      console.log('*** Error: ' + err);
+      console.log(err.stack);
+      sendResponse({error: err});
+      console.log('::: Sent Item/upsert error');            
+    }
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -209,19 +252,17 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received deleteById for %s for user %s at %s',
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
-
-    global.app.models[request.kind].deleteById(request.id, {}, function (value, responseHeaders){
-      console.log('::: Deleted ' + request.id);
-      sendResponse({
-        success: value,
-        headers: responseHeaders
-      });
-      console.log('::: Sent Item/deleteById response');      
-    }, function (httpResponse){
-      sendResponse({error: httpResponse});
-      console.log('::: Sent Item/deleteById error');      
-    });
-
+    
+    var proxy = ItemProxy.getProxyFor(request.id);
+    
+    console.log('Deleted %s #%s#', request.kind, request.id);
+    var notification = {};
+    notification.type = 'delete';
+    notification.kind = request.kind;
+    notification.id = request.id;
+    console.log('Change: ' + JSON.stringify(notification));
+    kio.server.emit(request.kind +'/delete', notification);
+    global.koheseKDB.removeModelInstance(request.kind, notification.id);
   });
   
   //////////////////////////////////////////////////////////////////////////
@@ -460,7 +501,13 @@ function KIOItemServer(socket){
       }
       
       if (deleteFile) {
-        global.app.models[proxy.kind].deleteById(idsArray[i], {}, function () {});
+        var notification = {};
+        notification.type = 'delete';
+        notification.kind = proxy.kind;
+        notification.id = proxy.item.id;
+
+        kio.server.emit(proxy.kind +'/delete', notification);
+        global.koheseKDB.removeModelInstance(proxy.kind, proxy.item.id);
       } else {
         if (!repositoryPathMap[repositoryId]) {
           repositoryPathMap[repositoryId] = [];
@@ -479,7 +526,8 @@ function KIOItemServer(socket){
           if (proxy.kind === 'Repository') {
             item.parentId = proxy.item.parentId;
           }
-          global.app.models[proxy.kind].replaceById(proxy.item.id, item, {}, function () {});
+          proxy.updateItem(proxy.kind, item);
+          storeAndNotify(proxy, /* isNewInstance */ false);
         }
         
         sendStatusUpdates(proxies);
@@ -494,16 +542,30 @@ function KIOItemServer(socket){
   });
   
   socket.on('ImportDocuments', function (request, sendResponse) {
+    console.log('::: session %s: Received ImportDocuments for user %s at %s',
+        socket.id, socket.koheseUser.username, socket.handshake.address);
+
     new Promise(function (resolve, reject) {
       var absolutes = [];
       var root = Path.dirname(fs.realpathSync(__dirname));
       root = Path.join(root, 'data_import', socket.koheseUser.username);
       absolutes.push(Path.join(root, request.file));
-      var results = importer.importFiles(absolutes, request.parentItem);
-      resolve(results);
+      var results = importer.importFiles(socket.koheseUser.username, absolutes, request.parentItem);
+      var promises = [];
+      for(var resultIdx in results){
+        var result = results[resultIdx];
+        var proxy = ItemProxy.getProxyFor(result.id);
+        promises.push(storeAndNotify(proxy, /* isNewInstance */ true));
+      }
+      
+      Promise.all(promises).then(function (){
+        resolve(results);        
+      });
     }).then(function (results) {
       sendResponse(results);
     }).catch(function (err){
+      console.log(err);
+      console.log(err.stack);
       sendResponse({err:err});
     });
   });

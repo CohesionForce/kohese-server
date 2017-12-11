@@ -8,10 +8,11 @@ var util = require('util');
 var commonmark = require('commonmark');
 var http = require('http');
 var renderFunc = require('./md-to-kohese-helper.js');
+var ItemProxy = require('../common/models/item-proxy.js');
 
 var accessToken;
 
-function mdToKohese(filePath, rootItem) {
+function mdToKohese(koheseUserName, filePath, rootItem) {
   var text;
 
   try {
@@ -24,7 +25,8 @@ function mdToKohese(filePath, rootItem) {
   var parsed = new commonmark.Parser().parse(text);
   var walker = parsed.walker();
 
-  var item = global.app.models['Item'].upsert(rootItem, {}, function () {});
+  var item = new ItemProxy('Item',rootItem).item;
+  
   var addedIds = [{
     id: item.id,
     name: item.name
@@ -111,7 +113,8 @@ function mdToKohese(filePath, rootItem) {
   
   for (var id in itemMap) {
     if (itemMap[id].itemIds.length > 0) {
-      global.app.models['Item'].upsert(itemMap[id], {}, function () {});
+      var proxy = ItemProxy.getProxyFor(id);
+      proxy.updateItem(proxy.kind, itemMap[id]);
     }
   }
   
@@ -123,16 +126,14 @@ function upsert(koheseItem, render, idList, lineageMap, itemMap) {
   koheseItem.description = render.getBuffer();
   var item;
   if (!koheseItem.tmpId) {
-    item = global.app.models['Item'].upsert(koheseItem, {},
-        function () {});
+    item = new ItemProxy('Item', koheseItem).item;
     idList.push(item.id);
     itemMap[item.parentId].itemIds.push(item.id);
   } else {
     for (var i = 0; i < lineageMap.length; i++) {
       if (lineageMap[i] === koheseItem.tmpId) {
         delete koheseItem.tmpId;
-        item = global.app.models['Item'].upsert(koheseItem, {},
-            function () {});
+        item = new ItemProxy('Item', koheseItem).item;
         idList.push({
           id: item.id,
           name: item.name

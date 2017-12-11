@@ -180,7 +180,7 @@ module.exports = function(grunt) {
       },
       jasmineCommonDebug : {
         cmd: 'node',
-        args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=server/tests/jasmineCommonDebug.json']
+        args: ['node_modules/jasmine/bin/jasmine.js', 'JASMINE_CONFIG_PATH=common/tests/jasmineCommonDebug.json']
       },
 			jasmineRest: {
 				cmd: 'node',
