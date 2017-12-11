@@ -1,0 +1,25 @@
+<div id="content-container">
+    <div id="tab-bar">
+
+        <ngb-tabset>
+          <div *ngFor="let tab of tabs">
+            <ngb-tab (click)="setTab(tab)" active="tab.active"
+            class=" navnav-tabs">
+                <ng-template ngbTabTitle>
+                    {{tab.title}}
+                    <i (click)=deleteTab(tab) class="delete-tab-button glyphicon glyphicon-remove"></i>
+                </ng-template>
+                <ng-template ngbTabContent
+                             class="tab-body"
+                             style="height:inherit">
+                  <router-outlet></router-outlet>
+                </ng-template>
+            </ngb-tab>
+          </div>
+        </ngb-tabset>
+        <button id="add-tab-button" (click)="addTab()">
+            <i class="glyphicon glyphicon-plus"></i>
+        </button>
+    </div>
+
+</div>

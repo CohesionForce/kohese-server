@@ -12,11 +12,16 @@ import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 
 import { UserService } from './services/user.service';
+import { TabService } from './services/tab-service/tab.service';
+import { BundleService } from './services/bundle-service/bundle.service';
+import { ContentContainerComponent } from './components/content-container/content-container.component';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
     AppComponent,
+    ContentContainerComponent,
     AppBarComponent,
     SideBarComponent,
     DashboardComponent,
@@ -26,9 +31,10 @@ import { UserService } from './services/user.service';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    NgbModule.forRoot()
   ],
-  providers: [UserService],
+  providers: [UserService, TabService, BundleService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
