@@ -19,7 +19,23 @@ var repoCommit = repoObjects.commit;
 
 var jsonExt = /\.json$/;
 
-const disableObjectFreeze = false;  // TODO set back to false and/or remove disable check below
+// TODO set back to false and/or remove disable check below
+const disableObjectFreeze = false;
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//
+// The ItemCache is the super class that will support cache management on both the server and the client.
+// The ItemCache will support retrieval of all historical data as well as the current working tree and
+// staged content.
+//
+// ItemCache uses the Object.freeze capability to restrict the modification of any cached
+// information.  Any attempt to modify cached data will result in an exception.  As the item
+// class management capability is rolled out, there will be a way to perform a copy of the data
+// prior to modification.
+//
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 class ItemCache {
   constructor() {

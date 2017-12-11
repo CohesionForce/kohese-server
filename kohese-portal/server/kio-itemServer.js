@@ -168,8 +168,7 @@ function KIOItemServer(socket){
   function storeAndNotify(proxy, isNewInstance){
     console.log('::: Storing ' + proxy.item.id);
     
-    var promise = new Promise(function(resolve, reject) {
-      global.koheseKDB.storeModelInstance(proxy.kind, proxy.item, isNewInstance)
+    return global.koheseKDB.storeModelInstance(proxy.kind, proxy.item, isNewInstance)
       .then(function (status) {
         console.log('Saved %s #%s#%s#', proxy.kind, proxy.item.id, proxy.item.name);
         var notification = {};
@@ -183,17 +182,7 @@ function KIOItemServer(socket){
             notification.type = 'update';
             kio.server.emit(proxy.kind +'/update', notification);
         }
-      
-        resolve(proxy);
-      })
-      .catch(function (error){
-        reject(error);  
-      });
-      
-    });
-    
-    return promise;
-    
+      });    
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -233,7 +222,7 @@ function KIOItemServer(socket){
       }
       
       storeAndNotify(proxy, isNewInstance)
-      .then(function(proxy){
+      .then(function(){
         sendResponse({
           kind: request.kind,
           item: proxy.item
@@ -538,7 +527,7 @@ function KIOItemServer(socket){
             item.parentId = proxy.item.parentId;
           }
           proxy.updateItem(proxy.kind, item);
-          storeAndNotify(proxy, false);
+          storeAndNotify(proxy, /* isNewInstance */ false);
         }
         
         sendStatusUpdates(proxies);
@@ -553,7 +542,7 @@ function KIOItemServer(socket){
   });
   
   socket.on('ImportDocuments', function (request, sendResponse) {
-    console.log('::: session %s: Received ImportDocuments for %s for user %s at %s',
+    console.log('::: session %s: Received ImportDocuments for user %s at %s',
         socket.id, socket.koheseUser.username, socket.handshake.address);
 
     new Promise(function (resolve, reject) {
@@ -566,7 +555,7 @@ function KIOItemServer(socket){
       for(var resultIdx in results){
         var result = results[resultIdx];
         var proxy = ItemProxy.getProxyFor(result.id);
-        promises.push(storeAndNotify(proxy, true));
+        promises.push(storeAndNotify(proxy, /* isNewInstance */ true));
       }
       
       Promise.all(promises).then(function (){
