@@ -4,7 +4,7 @@ export class Tab {
   id: number;
   params: Object;
 
-  constructor (title: string, params: Object, id: number) {
+  constructor (title: string, route: string, params: Object, id: number) {
     this.title = title;
     this.params = params;
     this.id = id;

@@ -1,22 +1,44 @@
-import { Tab } from '../tab-service/Tab.class';
-import { Injectable, OnInit } from '@angular/core';
 import * as _ from 'underscore';
+import { Injectable } from '@angular/core';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+
+import { TabService } from '../tab-service/tab.service';
+import { Tab } from '../tab-service/Tab.class';
+import { Bundle } from './bundle.class';
+import 'rxjs/add/operator/filter';
+
 
 @Injectable()
-export class BundleService implements OnInit {
+export class BundleService {
   bundler: Array<any>;
 
-  constructor () {
-
+  constructor (private tabService: TabService,
+               private router: Router,
+               private activatedRouter: ActivatedRoute) {
+    this.onInit();
+    this.bundler = [];
   }
 
-  ngOnInit () {
-
+  onInit () {
+    console.log('Bundle.service init')
+    this.router.events
+      .filter((event) => event instanceof NavigationEnd)
+      .subscribe((event) => this.updateBundle())
   }
 
   bundleComponent (component: any, type: string, tabId: number): void {
     let bundle = this.bundler[tabId];
     bundle.components[type] = component;
+  }
+
+  updateBundle (): void {
+    console.log('Update Bundle');
+    let currentBundle = this.bundler[0]; // TODO - Update to new currenttab logic
+    if (currentBundle) {
+      currentBundle.lastState = currentBundle.currentState;
+    } else {
+      currentBundle = new Bundle();
+    }
   }
 
   restoreComponentData(tabId: number, type: string, toComponent): boolean {

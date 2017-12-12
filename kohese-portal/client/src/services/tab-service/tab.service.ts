@@ -1,16 +1,22 @@
 import { Tab } from './Tab.class';
 import { Injectable } from '@angular/core';
-import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
+
+import { Subject } from 'rxjs/Subject'
 
 import * as _ from 'underscore';
 
 @Injectable()
-export class TabService implements OnInit {
+export class TabService {
   tabCount : number;
-  currentTab: Tab;
+  tabs: Array<Tab>;
+  currentTab: Subject<Tab>;
+
 
   constructor () {
-
+    this.tabCount = 0;
+    this.currentTab = new Subject();
+    let baseTab = this.createTab('Dashboard', '/dashboard', {});
+    this.tabs = [baseTab];
   }
 
   ngOnInit (): void {
@@ -26,16 +32,20 @@ export class TabService implements OnInit {
   }
 
   setCurrentTab (tab: Tab): void {
-    this.currentTab = tab;
+    console.log(this);
+    if (tab)
+      this.currentTab.next(tab);
   }
 
-  getCurrentTab (): Tab {
+  getCurrentTab (): Subject<Tab> {
+    console.log(this);
     return this.currentTab;
   }
 
-  createTab (state, params): Tab {
-    var tab = new Tab(state, params, this.tabCount);
+  createTab (state, route, params): Tab {
+    var tab = new Tab(state, route, params, this.tabCount);
     this.incrementTabs();
+    this.setCurrentTab(tab);
 
     return tab;
   }

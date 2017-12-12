@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core'
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/mergeMap';
+import { TabService } from '../../services/tab-service/tab.service';
+import { BundleService } from '../../services/bundle-service/bundle.service';
+import { Tab } from '../../services/tab-service/Tab.class';
+import { Subject } from 'rxjs/Subject';
 
 
 
@@ -10,29 +14,32 @@ import 'rxjs/add/operator/mergeMap';
   templateUrl: './content-container.component.html'
 })
 export class ContentContainerComponent implements OnInit {
-  tabs;
+  tabs: Array<Tab>
 
-  constructor() {
+  constructor(private tabService: TabService,
+              private bundleService: BundleService) {
 
+      this.tabs = [];
   }
 
   ngOnInit(): void {
-    this.tabs = [{title: 'Base tab'}, {title: 'second tab'}];
-    console.log(this.tabs);
-    const source = of('Hello');
-    source.mergeMap(val => of(`${val} World!`));
+    this.tabService.getCurrentTab()
+      .subscribe( x=> console.log(`Subscriber test ${x}`))
   }
 
-  setTab(): void {
-    console.log('Set tab');
+  setTab(tab): void {
+    this.tabService.setCurrentTab(tab)
   }
 
   deleteTab(tab): void {
 
   }
 
-  addTab(): void {
-    this.tabs.push({title:'new tab'});
+  addTab(title: string, route: string, params: Object): void {
+    let newTab = this.tabService.createTab(title, route, params)
+    this.tabs.push(newTab);
+    this.setTab(newTab);
+
     console.log(this.tabs)
 
   }
