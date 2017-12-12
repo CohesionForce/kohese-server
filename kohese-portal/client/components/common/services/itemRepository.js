@@ -42,6 +42,23 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
     Conflicted: {}
   };
 
+  ItemProxy.getChangeSubject().subscribe(change => {
+    console.log('+++ Received notification of change: ' + change.type);
+    if(change.proxy){
+      console.log(change.kind);
+      console.log(change.proxy.item);      
+    }
+    
+    switch (change.type){
+      case 'loaded':
+        console.log('::: ItemProxy is loaded');
+        break;
+      case 'loading':
+        console.log('::: ItemProxy is loading');
+        break;
+    }
+  });
+  
   function registerKoheseIOListeners () {
     // Register the listeners for the Item kinds that are being tracked
     for (var modelName in modelTypes) {
@@ -125,6 +142,7 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
     getModelTypes: getModelTypes,
     modelTypes: modelTypes,
     getRootProxy: ItemProxy.getRootProxy,
+    getChangeSubject: ItemProxy.getChangeSubject,
     getProxyFor: ItemProxy.getProxyFor,
     getAllItemProxies: ItemProxy.getAllItemProxies,
     getRepositories: ItemProxy.getRepositories,

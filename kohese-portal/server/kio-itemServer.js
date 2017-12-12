@@ -21,30 +21,38 @@ if(global.app){
 //////////////////////////////////////////////////////////////////////////
 ItemProxy.getChangeSubject().subscribe(change => {
   console.log('+++ Received notification of change: ' + change.type);
-  console.log(change.kind);
-  console.log(change.proxy.item);
+  if(change.proxy){
+    console.log(change.kind);
+    console.log(change.proxy.item);    
+  }
 
-  var notification = {
-    type: change.type,
-    kind: change.kind,
-    id: change.proxy.item.id
-  };
-
-  var sendChangeNotification = true;
-  
   switch (change.type){
+    case 'create':
+    case 'update':
+      global.koheseKDB.storeModelInstance(change.proxy, change.type === 'create')
+      .then(function (status) {
+        var notification = {
+            type: change.type,
+            kind: change.kind,
+            id: change.proxy.item.id,
+            item: change.proxy.item,
+            status: status
+        };
+        kio.server.emit(change.kind +'/' + change.type, notification);    
+      });
+      break;
     case 'delete':
+      var notification = {
+        type: change.type,
+        kind: change.kind,
+        id: change.proxy.item.id
+      };
       global.koheseKDB.removeModelInstance(change.proxy);
+      kio.server.emit(change.kind +'/' + change.type, notification);    
       break;
     default:
-      console.log('!!! Not processing change notification: ' + change.type);
-      sendChangeNotification = false;
+      console.log('*** Not processing change notification: ' + change.type);
     }
-  
-  if(sendChangeNotification){
-    console.log('::: Change: ' + JSON.stringify(notification));
-    kio.server.emit(change.kind +'/' + change.type, notification);    
-  }
   
 });
   
@@ -199,29 +207,6 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  function storeAndNotify(proxy, isNewInstance){
-    console.log('::: Storing ' + proxy.item.id);
-    
-    return global.koheseKDB.storeModelInstance(proxy.kind, proxy.item, isNewInstance)
-      .then(function (status) {
-        console.log('Saved %s #%s#%s#', proxy.kind, proxy.item.id, proxy.item.name);
-        var notification = {};
-        notification.kind = proxy.kind;
-        notification.item = proxy.item;
-        notification.status = status;
-        if (isNewInstance) {
-            notification.type = 'create';
-            kio.server.emit(proxy.kind +'/create', notification);
-        } else {
-            notification.type = 'update';
-            kio.server.emit(proxy.kind +'/update', notification);
-        }
-      });    
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   socket.on('Item/upsert', function(request, sendResponse){
     console.log('::: session %s: Received upsert for %s for user %s at %s',
         socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
@@ -255,21 +240,12 @@ function KIOItemServer(socket){
         proxy = new ItemProxy(kind, item);      
       }
       
-      storeAndNotify(proxy, isNewInstance)
-      .then(function(){
-        sendResponse({
-          kind: request.kind,
-          item: proxy.item
-        });
-        
-        console.log('::: Sent Item/upsert response');        
-      })
-      .catch(function(err){
-        console.log('*** Error: ' + err);
-        console.log(err.stack);
-        sendResponse({error: err});
-        console.log('::: Sent Item/upsert error');                    
+      sendResponse({
+        kind: request.kind,
+        item: proxy.item
       });
+      
+      console.log('::: Sent Item/upsert response');        
 
     } catch (err){
       console.log('*** Error: ' + err);
@@ -579,7 +555,6 @@ function KIOItemServer(socket){
             item.parentId = proxy.item.parentId;
           }
           proxy.updateItem(proxy.kind, item);
-          storeAndNotify(proxy, /* isNewInstance */ false);
         }
         
         sendStatusUpdates(proxies);
@@ -599,29 +574,20 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received ImportDocuments for user %s at %s',
         socket.id, socket.koheseUser.username, socket.handshake.address);
 
-    new Promise(function (resolve, reject) {
+    try {
       var absolutes = [];
       var root = Path.dirname(fs.realpathSync(__dirname));
       root = Path.join(root, 'data_import', socket.koheseUser.username);
       absolutes.push(Path.join(root, request.file));
+
       var results = importer.importFiles(socket.koheseUser.username, absolutes, request.parentItem);
-      var promises = [];
-      for(var resultIdx in results){
-        var result = results[resultIdx];
-        var proxy = ItemProxy.getProxyFor(result.id);
-        promises.push(storeAndNotify(proxy, /* isNewInstance */ true));
-      }
-      
-      Promise.all(promises).then(function (){
-        resolve(results);        
-      });
-    }).then(function (results) {
       sendResponse(results);
-    }).catch(function (err){
+      
+    } catch (err) {
       console.log(err);
       console.log(err.stack);
       sendResponse({err:err});
-    });
+    }
   });
 
 }

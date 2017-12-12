@@ -190,10 +190,10 @@ module.exports.retrieveModelInstance = retrieveModelInstance;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function storeModelInstance(modelName, modelInstance, isNewItem){
+function storeModelInstance(proxy, isNewItem){
 
-
-  var proxy = ItemProxy.getProxyFor(modelInstance.id);
+  var modelName = proxy.kind;
+  var modelInstance = proxy.item;
   
   if(modelName !== "Analysis"){
     // Delete any associated analysis
