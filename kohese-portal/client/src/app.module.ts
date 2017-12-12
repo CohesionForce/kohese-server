@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 
@@ -12,6 +14,10 @@ import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 
 import { UserService } from './services/user.service';
+import { AuthTokenFactory } from './services/authentication-services/auth-token.factory';
+import { LoginService } from './services/authentication-services/login.service';
+import { AuthInterceptor } from './services/authentication-services/auth-interceptor.factory';
+import { KoheseIoService } from './services/kohese-io.service';
 
 
 @NgModule({
@@ -26,9 +32,14 @@ import { UserService } from './services/user.service';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
-  providers: [UserService],
+  providers: [UserService, AuthTokenFactory, LoginService, {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true,
+  }, KoheseIoService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
