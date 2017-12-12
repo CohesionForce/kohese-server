@@ -1,6 +1,7 @@
 export class Tab {
   title: string;
   type: string;
+  route: string;
   id: number;
   params: Object;
 
@@ -8,6 +9,7 @@ export class Tab {
     this.title = title;
     this.params = params;
     this.id = id;
+    this.route = route;
   }
 
 

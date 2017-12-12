@@ -3,11 +3,13 @@
 
         <ngb-tabset>
           <div *ngFor="let tab of tabs">
-            <ngb-tab (click)="setTab(tab)" active="tab.active"
-            class=" navnav-tabs">
+            <ngb-tab active="tab.active"
+            class=" nav nav-tabs">
                 <ng-template ngbTabTitle>
+                  <span (click)="setTab(tab)">
                     {{tab.title}}
-                    <i (click)=deleteTab(tab) class="delete-tab-button glyphicon glyphicon-remove"></i>
+                    <i (click)="deleteTab(tab)" class="delete-tab-button glyphicon glyphicon-remove"></i>
+                  </span>
                 </ng-template>
                 <ng-template ngbTabContent
                              class="tab-body"

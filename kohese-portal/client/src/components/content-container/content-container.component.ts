@@ -24,7 +24,9 @@ export class ContentContainerComponent implements OnInit {
 
   ngOnInit(): void {
     this.tabService.getCurrentTab()
-      .subscribe( x=> console.log(`Subscriber test ${x}`))
+      .subscribe( x=> console.log(`Subscriber test ${x}`));
+    this.tabService.getTabList()
+      .subscribe( tabList=> this.tabs = tabList);
   }
 
   setTab(tab): void {
@@ -36,11 +38,6 @@ export class ContentContainerComponent implements OnInit {
   }
 
   addTab(title: string, route: string, params: Object): void {
-    let newTab = this.tabService.createTab(title, route, params)
-    this.tabs.push(newTab);
-    this.setTab(newTab);
-
-    console.log(this.tabs)
-
+    this.tabService.createTab(title, route, params)
   }
 }
