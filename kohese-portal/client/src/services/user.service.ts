@@ -5,6 +5,9 @@ import { Router } from '@angular/router';
 import { ItemProxy } from '../../../common/models/item-proxy';
 import { AuthTokenFactory } from './authentication-services/auth-token.factory';
 import { JwtHelper } from 'angular2-jwt';
+import { Observable } from 'rxjs/Observable';
+import { ScalarObservable } from 'rxjs/observable/ScalarObservable';
+import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class UserService implements OnInit {
@@ -35,12 +38,12 @@ export class UserService implements OnInit {
   getAllUsers() {
   }
 
-  getCurrentUsername(): string {
-    return (this.currentUser ? this.currentUser.item.name : 'Loading');
+  getCurrentUsername (): ScalarObservable<string> {
+    return new ScalarObservable((this.currentUser ? this.currentUser.item.name : 'Loading'));
   }
 
-  getCurrentUserEmail(): string {
-    return (this.currentUser ? (this.currentUser.item.email ? this.currentUser.item.email :
-      'No e-mail address specified') : 'Loading');
+  getCurrentUserEmail (): ScalarObservable<string> {
+    return new ScalarObservable((this.currentUser ? (this.currentUser.item.email ? this.currentUser.item.email :
+      'No e-mail address specified') : 'Loading'));
   }
 }

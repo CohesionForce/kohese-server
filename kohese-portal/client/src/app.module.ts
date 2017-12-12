@@ -18,11 +18,16 @@ import { AuthTokenFactory } from './services/authentication-services/auth-token.
 import { LoginService } from './services/authentication-services/login.service';
 import { AuthInterceptor } from './services/authentication-services/auth-interceptor.factory';
 import { KoheseIoService } from './services/kohese-io.service';
+import { TabService } from './services/tab-service/tab.service';
+import { BundleService } from './services/bundle-service/bundle.service';
+import { ContentContainerComponent } from './components/content-container/content-container.component';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
     AppComponent,
+    ContentContainerComponent,
     AppBarComponent,
     SideBarComponent,
     DashboardComponent,
@@ -33,13 +38,14 @@ import { KoheseIoService } from './services/kohese-io.service';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbModule.forRoot()
   ],
   providers: [UserService, AuthTokenFactory, LoginService, {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true,
-  }, KoheseIoService],
+  }, KoheseIoService, TabService, BundleService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

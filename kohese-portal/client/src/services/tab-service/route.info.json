@@ -1,0 +1,122 @@
+{
+  "login" : {
+      "type" : "standalone",
+      "title" : "Login",
+      "params" : false,
+      "state" : "login"
+  },
+  "kohese" : {
+      "type" : "abstract",
+      "title" : "Kohese",
+      "params" : false,
+      "state" : "kohese"
+  },
+  "kohese.dashboard" : {
+      "type" : "singleview",
+      "title": "Dashboard",
+      "params": false,
+      "state" : "kohese.dashboard"
+  },
+  "kohese.explore"   : {
+      "type" : "dualview",
+      "title": "Explore",
+      "params": false,
+      "state" : "kohese.explore"
+  },
+  "kohese.explore.edit" : {
+      "type" : "dualview",
+      "title": "Explore",
+      "params" : ["id"],
+      "state" : "kohese.explore.edit"
+  },
+  "kohese.explore.create" : {
+      "type" : "dualview",
+      "title": "Create Wizard",
+      "params": ["parentId"],
+      "state" : "kohese.explore.create"
+  },
+  "kohese.explore.create.import" :  {
+      "type" : "dualview",
+      "title": "Import",
+      "params": ["parentId"],
+      "state" : "kohese.explore.create.import"
+  },
+  "kohese.explore.create.new" : {
+      "type" : "dualview",
+      "title": "New Item",
+      "params": ["parentId"],
+      "state" : "kohese.explore.create.new"
+  },
+  "kohese.create" :  {
+      "type" : "singleview",
+      "title": "Create Wizard",
+      "params": ["parentId"],
+      "state" : "kohese.create"
+  },
+  "kohese.import" : {
+      "type" : "singleview",
+      "title": "Import",
+      "params": ["parentId"],
+      "state" : "kohese.import"
+  },
+  "kohese.new" : {
+      "type" : "singleview",
+      "title": "New Item",
+      "params": ["parentId"],
+      "state" : "kohese.new"
+  },
+  "kohese.search" : {
+      "type" : "dualview",
+      "title": "Search",
+      "params": ["filter"],
+      "state" : "kohese.search"
+  },
+  "kohese.search.edit" :  {
+      "type" : "dualview",
+      "title": "Search",
+      "params": ["filter", "id"],
+      "state" : "kohese.search.edit"
+  },
+  "kohese.search.create" :  {
+      "type" : "dualview",
+      "title": "Create Wizard",
+      "params": ["filter", "id"],
+      "state" : "kohese.search.create"
+  },
+  "kohese.investigate" : {
+      "type" : "singleview",
+      "title": "Investigate",
+      "params": ["id"],
+      "state" : "kohese.investigate"
+  },
+  "kohese.admin" : {
+      "type" : "singleview",
+      "title": "Admin",
+      "params" : false,
+      "state" : "kohese.admin"
+  },
+  "kohese.admin.groups" : {
+      "type" : "singleview",
+      "title": "Group Admin",
+      "params" : false,
+      "state" : "kohese.admin.groups"
+  },
+  "kohese.admin.repository" : {
+      "type" : "singleview",
+      "title": "Repository Admin",
+      "params" : false,
+      "state" : "kohese.admin.repository"
+  },
+  "kohese.admin.users" : {
+      "type" : "singleview",
+      "title": "User Admin",
+      "params" : false,
+      "state" : "kohese.admin.users"
+  },
+  "kohese.analysis" : {
+      "type" : "singleview",
+      "title": "Analysis",
+      "params" : ["id"],
+      "state" : "kohese.analysis"
+  }
+}
