@@ -45,7 +45,7 @@
     "loopback-datasource-juggler": "^2.19.0",
     "morgan": "^1.7.0",
     "node-uuid": "^1.4.7",
-    "nodegit": "^0.14.1",
+    "nodegit": "^0.20.3",
     "prompt": "^1.0.0",
     "request": "^2.65.0",
     "rxjs": "^5.5.2",
