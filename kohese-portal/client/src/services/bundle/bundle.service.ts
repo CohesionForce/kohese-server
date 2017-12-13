@@ -2,8 +2,8 @@ import * as _ from 'underscore';
 import { Injectable } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 
-import { TabService } from '../tab-service/tab.service';
-import { Tab } from '../tab-service/Tab.class';
+import { TabService } from '../tab/tab.service';
+import { Tab } from '../tab/Tab.class';
 import { Bundle } from './bundle.class';
 import 'rxjs/add/operator/filter';
 

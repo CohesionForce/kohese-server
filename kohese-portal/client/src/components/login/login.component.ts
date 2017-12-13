@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { LoginService } from '../../services/authentication-services/login.service';
+import { LoginService } from '../../services/authentication/login.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'login',
@@ -11,7 +12,7 @@ export class LoginComponent implements OnInit {
   password : string;
   loginSubmitted : boolean;
 
-  constructor(private loginService: LoginService) {
+  constructor(private loginService: LoginService, private router: Router) {
   }
 
   login () {
@@ -22,6 +23,7 @@ export class LoginComponent implements OnInit {
       username: this.username,
       password: this.password
     }).subscribe(function (next) {
+      this.router.navigate(['dashboard']);
     });
   }
 

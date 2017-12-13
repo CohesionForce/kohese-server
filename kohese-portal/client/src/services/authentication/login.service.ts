@@ -3,16 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { AuthTokenFactory } from './auth-token.factory';
+import { SocketService } from '../socket/socket.service';
 
 @Injectable()
 export class LoginService {
-  private readonly LOGIN_URL: string = '';
-
-  constructor(private httpClient: HttpClient, private authTokenFactory: AuthTokenFactory) {
+  constructor(private httpClient: HttpClient, private authTokenFactory: AuthTokenFactory,
+    private socketService: SocketService) {
   }
   
   login(credentials: any) : Observable<any> {
-    return this.httpClient.post(this.LOGIN_URL + '/login', {
+    return this.httpClient.post('/login', {
       username: credentials.username,
       password: credentials.password
     });
@@ -20,6 +20,7 @@ export class LoginService {
   
   logout() {
     this.authTokenFactory.setToken(undefined);
+    this.socketService.disconnect();
   }
   
   checkLoginStatus(): Observable<boolean> {

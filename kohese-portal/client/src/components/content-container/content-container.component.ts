@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core'
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/mergeMap';
-import { TabService } from '../../services/tab-service/tab.service';
-import { BundleService } from '../../services/bundle-service/bundle.service';
-import { Tab } from '../../services/tab-service/Tab.class';
+import { TabService } from '../../services/tab/tab.service';
+import { BundleService } from '../../services/bundle/bundle.service';
+import { Tab } from '../../services/tab/Tab.class';
 import { Subject } from 'rxjs/Subject';
 
 

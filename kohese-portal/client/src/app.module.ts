@@ -13,13 +13,14 @@ import { AppBarComponent} from './components/app-bar/appbar.component';
 import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 
-import { UserService } from './services/user.service';
-import { AuthTokenFactory } from './services/authentication-services/auth-token.factory';
-import { LoginService } from './services/authentication-services/login.service';
-import { AuthInterceptor } from './services/authentication-services/auth-interceptor.factory';
-import { KoheseIoService } from './services/kohese-io.service';
-import { TabService } from './services/tab-service/tab.service';
-import { BundleService } from './services/bundle-service/bundle.service';
+import { UserService } from './services/user/user.service';
+import { AuthTokenFactory } from './services/authentication/auth-token.factory';
+import { LoginService } from './services/authentication/login.service';
+import { AuthInterceptor } from './services/authentication/auth-interceptor.factory';
+import { SocketService } from './services/socket/socket.service';
+import { TabService } from './services/tab/tab.service';
+import { BundleService } from './services/bundle/bundle.service';
+import { SessionService } from './services/user/session.service';
 import { ContentContainerComponent } from './components/content-container/content-container.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -45,7 +46,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true,
-  }, KoheseIoService, TabService, BundleService],
+  }, SocketService, TabService, BundleService, SessionService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

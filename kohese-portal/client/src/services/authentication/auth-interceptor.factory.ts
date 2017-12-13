@@ -11,7 +11,12 @@ export class AuthInterceptor implements HttpInterceptor {
   
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return this.authTokenFactory.getToken().mergeMap((token) => {
-      return next.handle(req.clone({setHeaders: {Authorization: 'Bearer ' + token}}));
+      let request: HttpRequest<any> = req;
+      if (token) {
+        request = req.clone({setHeaders: {Authorization: 'Bearer ' + token}});
+      }
+      
+      return next.handle(request);
     });
   }
 }

@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core'
 import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
 import { Router } from '@angular/router';
 
-import { ItemProxy } from '../../../common/models/item-proxy';
-import { AuthTokenFactory } from './authentication-services/auth-token.factory';
+import { ItemProxy } from '../../../../common/models/item-proxy';
+import { AuthTokenFactory } from '../authentication/auth-token.factory';
 import { JwtHelper } from 'angular2-jwt';
 import { Observable } from 'rxjs/Observable';
 import { ScalarObservable } from 'rxjs/observable/ScalarObservable';

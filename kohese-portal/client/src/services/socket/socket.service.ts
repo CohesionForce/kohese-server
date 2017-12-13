@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { AuthTokenFactory } from './authentication-services/auth-token.factory';
+import { AuthTokenFactory } from '../authentication/auth-token.factory';
 import { Observable } from 'rxjs/Observable';
-import io from 'socket.io-client';
+import * as SocketIoClient from 'socket.io-client';
 
 @Injectable()
-export class KoheseIoService {
-  private socket: any;
+export class SocketService {
+  private socket: SocketIOClient.Socket;
   private initialized: boolean = false;
   private authenticated: boolean = false;
   
@@ -64,7 +64,7 @@ export class KoheseIoService {
     return this.authenticated;
   }
   
-  getSocket(): any {
+  getSocket(): SocketIOClient.Socket {
     return this.socket;
   }
 }

@@ -21,6 +21,8 @@
     "@angular/upgrade": "^5.0.3",
     "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.7",
     "@types/core-js": "^0.9.43",
+    "@types/socket.io": "^1.4.31",
+    "@types/socket.io-client": "^1.4.32",
     "angular": "^1.4.4",
     "angular-ui-router": "^0.3.2",
     "angular2-jwt": "^0.2.3",
