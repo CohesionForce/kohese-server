@@ -6,15 +6,17 @@ import { TabService } from '../../services/tab-service/tab.service';
 import { BundleService } from '../../services/bundle-service/bundle.service';
 import { Tab } from '../../services/tab-service/Tab.class';
 import { Subject } from 'rxjs/Subject';
-
-
+import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'content-container',
   templateUrl: './content-container.component.html'
 })
-export class ContentContainerComponent implements OnInit {
+export class ContentContainerComponent implements OnInit, OnDestroy {
   tabs: Array<Tab>
+  currentTabListener : BehaviorSubject<Tab>;
+  tabListListener : BehaviorSubject<Array<Tab>>;
 
   constructor(private tabService: TabService,
               private bundleService: BundleService) {
@@ -23,10 +25,17 @@ export class ContentContainerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.tabService.getCurrentTab()
+    this.currentTabListener = this.tabService.getCurrentTab();
+    this.currentTabListener
       .subscribe( x=> console.log(`Subscriber test ${x}`));
-    this.tabService.getTabList()
+    this.tabListListener = this.tabService.getTabList();
+    this.tabListListener
       .subscribe( tabList=> this.tabs = tabList);
+  }
+
+  ngOnDestroy(): void {
+    this.currentTabListener.unsubscribe();
+    this.tabListListener.unsubscribe();
   }
 
   setTab(tab): void {
