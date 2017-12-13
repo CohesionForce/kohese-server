@@ -359,7 +359,8 @@ function removeModelAnalysis(proxy) {
   var repo = proxy.getRepositoryProxy();
   var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
   
-  kdbFS.removeFileIfExists(analysisPath);
+  const ignoreNonExistent = true;
+  kdbFS.removeFile(analysisPath, ignoreNonExistent);
   
 }
 module.exports.removeModelAnalysis = removeModelAnalysis;
