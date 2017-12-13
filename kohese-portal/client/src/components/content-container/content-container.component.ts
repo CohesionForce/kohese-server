@@ -33,8 +33,8 @@ export class ContentContainerComponent implements OnInit {
     this.tabService.setCurrentTab(tab)
   }
 
-  deleteTab(tab): void {
-
+  removeTab(tab): void {
+    this.tabService.removeTab(tab);
   }
 
   addTab(title: string, route: string, params: Object): void {

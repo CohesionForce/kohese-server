@@ -9,11 +9,10 @@ import { Router } from '@angular/router';
 @Injectable()
 export class TabService {
   private tabCount : number;
+  private currentTab : Tab;
   private tabList: Array<Tab>;
   currentTabSubject: BehaviorSubject<Tab>;
   currentTabListSubject: BehaviorSubject<Array<Tab>>;
-
-
 
   constructor (private router: Router) {
     this.tabCount = 0;
@@ -21,9 +20,12 @@ export class TabService {
   }
 
   initService() : void {
-    let baseTab = new Tab('Dashboard', '/dashboard', {}, this.tabCount)
+    // Setting up the base tab
+    let baseTab = new Tab('Dashboard', '/dashboard', {}, this.tabCount, 0)
     this.incrementTabs();
     this.currentTabSubject = new BehaviorSubject(baseTab);
+    this.currentTab = baseTab;
+    // Setting up the starting tab list
     this.tabList = [baseTab];
     this.currentTabListSubject = new BehaviorSubject(this.tabList);
   }
@@ -54,7 +56,7 @@ export class TabService {
   }
 
   createTab (state, route, params): void {
-    var tab = new Tab(state, route, params, this.tabCount);
+    var tab = new Tab(state, route, params, this.tabCount, this.tabList.length);
     this.incrementTabs();
     this.tabList.push(tab);
     this.setCurrentTab(tab);
@@ -62,8 +64,34 @@ export class TabService {
 
   }
 
-  removeTab(tab): void {
+  removeTab(tab: Tab): void {
+    // If tab is currently selected select the previous tab,
+    // If it is the first tab get the next one
+    // If it is the only tab, recreate the base tab
 
+    if (tab.id === this.currentTab.id) {
+      if (tab.position === 0) {
+        if (this.tabList.length === 1) {
+          this.createTab('Dashboard', '/dashboard', {});
+        } else {
+          this.setCurrentTab(this.tabList[1]);
+        }
+      } else if (tab.position === this.tabList.length -1) {
+        this.setCurrentTab(this.tabList[tab.position - 1]);
+      } else {
+        this.setCurrentTab(this.tabList[tab.position + 1]);
+      }
+    }
+
+    this.tabList.splice(tab.position, 1);
+    this.updatePositions();
+    this.currentTabListSubject.next(this.tabList);
+  }
+
+  updatePositions () {
+    for (var i = 0; i < this.tabList.length; i++) {
+      this.tabList[i].position = i;
+    }
   }
 
   //
