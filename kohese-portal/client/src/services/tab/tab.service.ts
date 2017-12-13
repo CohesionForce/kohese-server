@@ -5,6 +5,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 
 import * as _ from 'underscore';
 import { Router } from '@angular/router';
+import { NavigationService } from '../navigation/navigation.service';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class TabService {
@@ -14,14 +16,16 @@ export class TabService {
   currentTabSubject: BehaviorSubject<Tab>;
   currentTabListSubject: BehaviorSubject<Array<Tab>>;
 
-  constructor (private router: Router) {
+  constructor (private router: Router,
+               private NavigationService : NavigationService) {
     this.tabCount = 0;
     this.initService();
   }
 
   initService() : void {
     // Setting up the base tab
-    let baseTab = new Tab('Dashboard', '/dashboard', {}, this.tabCount, 0)
+    let baseTab = new Tab('Dashboard', '/dashboard', {}, this.tabCount, 0,
+                            this.NavigationService.getNavUpdates())
     this.incrementTabs();
     this.currentTabSubject = new BehaviorSubject(baseTab);
     this.currentTab = baseTab;
@@ -56,7 +60,8 @@ export class TabService {
   }
 
   createTab (state, route, params): void {
-    var tab = new Tab(state, route, params, this.tabCount, this.tabList.length);
+    var tab = new Tab(state, route, params, this.tabCount, this.tabList.length,
+                      this.NavigationService.getNavUpdates());
     this.incrementTabs();
     this.tabList.push(tab);
     this.setCurrentTab(tab);
@@ -83,6 +88,7 @@ export class TabService {
       }
     }
 
+    tab.destroy();
     this.tabList.splice(tab.position, 1);
     this.updatePositions();
     this.currentTabListSubject.next(this.tabList);

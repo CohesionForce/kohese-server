@@ -12,6 +12,7 @@ import { AdminComponent } from './components/admin/admin.component';
 import { AppBarComponent} from './components/app-bar/appbar.component';
 import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
+import { ContentContainerComponent } from './components/content-container/content-container.component';
 
 import { UserService } from './services/user/user.service';
 import { AuthTokenFactory } from './services/authentication/auth-token.factory';
@@ -21,7 +22,8 @@ import { SocketService } from './services/socket/socket.service';
 import { TabService } from './services/tab/tab.service';
 import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
-import { ContentContainerComponent } from './components/content-container/content-container.component';
+import { NavigationService } from './services/navigation/navigation.service';
+
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -46,7 +48,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true,
-  }, SocketService, TabService, BundleService, SessionService],
+  }, SocketService, TabService, BundleService, SessionService, NavigationService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
