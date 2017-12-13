@@ -197,10 +197,7 @@ function storeModelInstance(proxy, isNewItem){
   
   if(modelName !== "Analysis"){
     // Delete any associated analysis
-    var analysisStore = kdbStore.models["Analysis"];
-    if(analysisStore[modelInstance.id]){
-      removeModelInstance("Analysis", modelInstance.id);
-    }
+    removeModelAnalysis(proxy);
   }
 
   var repo = proxy.getRepositoryProxy();    
@@ -272,6 +269,32 @@ module.exports.storeModelInstance = storeModelInstance;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function storeModelAnalysis(analysisInstance){
+  var modelName = 'Analysis';
+  var modelInstanceId = analysisInstance.id;
+  console.log(analysisInstance);
+  
+  var proxy = ItemProxy.getProxyFor(modelInstanceId);
+  
+  if (proxy) {
+    var repo = proxy.getRepositoryProxy();
+    var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
+    
+    var modelStore = kdbStore.models[modelName];
+    modelStore[modelInstanceId] = JSON.stringify(analysisInstance);
+    
+    kdbFS.storeJSONDoc(analysisPath, analysisInstance);
+
+    
+  } else {
+    console.log('*** No item found for analysis instance: ' + modelInstanceId);
+  }
+}
+module.exports.storeModelAnalysis = storeModelAnalysis;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function removeModelInstance(proxy){
   var modelName = proxy.kind;
   var instanceId = proxy.item.id;
@@ -284,11 +307,8 @@ function removeModelInstance(proxy){
     kdbFS.removeFile(filePath); 
   } else if (modelName === 'Repository') {
       if(mountList[proxy.item.id].mounted) {
-       // Delete any associated analysis
-          var analysisStore = kdbStore.models["Analysis"];
-          if(analysisStore[instanceId]){
-            removeModelInstance("Analysis", instanceId);
-          }
+          // Delete any associated analysis
+          removeModelAnalysis(proxy);
           
           var parentRepo = proxy.parentProxy.getRepositoryProxy();
           var parentRepoPath = mountList[parentRepo.item.id].repoStoragePath;
@@ -308,10 +328,7 @@ function removeModelInstance(proxy){
       }
   } else {
     // Delete any associated analysis
-    var analysisStore = kdbStore.models["Analysis"];
-    if(analysisStore[instanceId]){
-      removeModelInstance("Analysis", instanceId);
-    }
+    removeModelAnalysis(proxy);
 
     if (proxy.repoPath){
       kdbFS.removeFile(proxy.repoPath);
@@ -326,6 +343,26 @@ function removeModelInstance(proxy){
 }
 
 module.exports.removeModelInstance = removeModelInstance;
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function removeModelAnalysis(proxy) {
+  var modelInstanceId = proxy.item.id;
+  
+  var analysisStore = kdbStore.models["Analysis"];
+  if(analysisStore[modelInstanceId]){
+    delete analysisStore[modelInstanceId];
+  }
+
+  var repo = proxy.getRepositoryProxy();
+  var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
+  
+  kdbFS.removeFileIfExists(analysisPath);
+  
+}
+module.exports.removeModelAnalysis = removeModelAnalysis;
 
 //////////////////////////////////////////////////////////////////////////
 //

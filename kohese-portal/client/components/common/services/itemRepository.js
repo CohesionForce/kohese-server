@@ -5,7 +5,6 @@
 function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
   var _ = require('underscore');
   var ItemProxy = require('../../../../common/models/item-proxy');
-  var createStates = require('../../../../common/models/createStates');
   var shortProxyList = [];
   var modelTypes = {
     Repository: 'Repository',

@@ -123,11 +123,9 @@
           consolidateAnalysis(analysis);
           // delete the raw data
           delete analysis.__data.raw;
-          global.koheseKDB.storeModelInstance('Analysis', analysis).then(function (status) {
-            console.log('::: ANALYSIS Completed: ' + onId);
-
-            cb(analysis);
-          });
+          global.koheseKDB.storeModelAnalysis(analysis);
+          console.log('::: ANALYSIS Completed: ' + onId);
+          cb(analysis);
         } catch (err) {
           console.log('*** Error parsing result for: ' + forModelKind + ' - ' +
               onId + ' - ' + analysis.name);

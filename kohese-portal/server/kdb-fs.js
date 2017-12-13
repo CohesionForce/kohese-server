@@ -119,12 +119,26 @@ module.exports.deleteFolderRecursive = deleteFolderRecursive;
 //////////////////////////////////////////////////////////////////////////
 function removeFile(filePath) {
 
-  console.log('::: Removing ' + filePath);
+  console.log('::: Removing: ' + filePath);
   fs.unlinkSync(filePath);
 
 }
 
 module.exports.removeFile = removeFile;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function removeFileIfExists(filePath) {
+
+  if (fs.existsSync(filePath)){
+    console.log('::: Removing existing file: ' + filePath);
+    fs.unlinkSync(filePath);
+  }
+
+}
+
+module.exports.removeFileIfExists = removeFileIfExists;
 
 //////////////////////////////////////////////////////////////////////////
 //

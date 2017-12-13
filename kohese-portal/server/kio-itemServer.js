@@ -483,6 +483,9 @@ function KIOItemServer(socket){
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
     var pendingUnstagePromises = [];
+    
+    // TODO Determine if these two loops can safely be consolidated into a single iteration
+    
     for (var i = 0; i < idsArray.length; i++) {
       var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
       var repositoryInformation = getRepositoryInformation(proxy);
@@ -523,6 +526,7 @@ function KIOItemServer(socket){
         for (var j = 0; j < status.length; j++) {
           if (status[j].endsWith('WT_NEW')) {
             isNewUnstagedFile = true;
+            break;
           }
         }
         
