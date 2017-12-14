@@ -49,8 +49,4 @@ export class ContentContainerComponent extends NavigatableComponent
   removeTab(tab): void {
     this.tabService.removeTab(tab);
   }
-
-  addTab(location: string, params: Object): void {
-    this.tabService.createTab(location, params)
-  }
 }

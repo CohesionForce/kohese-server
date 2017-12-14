@@ -22,4 +22,8 @@ export class NavigatableComponent {
   navigate (location : string, params: object) {
     this.NavigationService.navigate(location, params, this.tab.id);
   }
+
+  addTab(location: string, params: Object): void {
+    this.TabService.createTab(location, params)
+  }
 }
