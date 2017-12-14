@@ -24,7 +24,6 @@ import { TabService } from './services/tab/tab.service';
 import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
-import { ContentContainerComponent } from './components/content-container/content-container.component';
 import { NavigationService } from './services/navigation/navigation.service';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
