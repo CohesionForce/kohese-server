@@ -931,7 +931,7 @@ tab div {
   margin-right: 15px;
 }
 
-/* 
+/*
 Stylesheet for the content container element and the configurations for the dual view and single view children e
 elements
 
@@ -946,6 +946,8 @@ Created by Josh P
   position: fixed;
   top: 50px;
   left: 50px;
+  height: 100%;
+  width: 100%;
 }
 
 #page-wrapper > div {

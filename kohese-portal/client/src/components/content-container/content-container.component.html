@@ -1,6 +1,8 @@
 <div id="content-container">
     <div id="tab-bar">
-
+      <button id="add-tab-button" (click)="addTab('Dashboard', '/dashboard', {})">
+        <i class="glyphicon glyphicon-plus"></i>
+    </button>
         <ngb-tabset>
           <div *ngFor="let tab of tabs">
             <ngb-tab active="tab.active"
@@ -18,10 +20,9 @@
                 </ng-template>
             </ngb-tab>
           </div>
+
         </ngb-tabset>
-        <button id="add-tab-button" (click)="addTab('Dashboard', '/dashboard', {})">
-            <i class="glyphicon glyphicon-plus"></i>
-        </button>
+
     </div>
 
 </div>
