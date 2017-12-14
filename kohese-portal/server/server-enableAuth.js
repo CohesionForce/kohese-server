@@ -6,7 +6,7 @@ const ItemProxy = require('../common/models/item-proxy.js');
 
 var usersProxy;
 
-var SALT_WORK_FACTOR = 10;
+const SALT_WORK_FACTOR = 10;
 var usersItem;
 
 var bcrypt;
@@ -31,7 +31,6 @@ server.enableAuth();
 //
 //////////////////////////////////////////////////////////////////////////
 server.once('started', function(baseUrl) {
-  var KoheseUser = server.models.KoheseUser;
   console.log('$$$ Calling checkAndCreateUsersItem');
   checkAndCreateUsersItem();
 });
@@ -104,7 +103,7 @@ function setPassword(item, password) {
   if (password.indexOf('$2a$') === 0 && password.length === 60) {
     // The password is already hashed. It can be the case
     // when the instance is loaded from DB
-    item.$password = password;
+    item.password = password;
   } else {
     item.password = hashPassword(password);
   }
@@ -158,7 +157,7 @@ function login(username, password, cb){
     hasPassword(userProxy, password, function(err, isMatch) {
       if (err) {
         console.log('*** An error is reported from KoheseUser.hasPassword: %j', err);
-        cb(err,null);
+        cb(err, null);
       } else if (isMatch) {
         cb(null, userProxy.item);
       } else {
