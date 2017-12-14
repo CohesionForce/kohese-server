@@ -5,6 +5,7 @@ var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('../common/models/analysis.js');
 var ItemProxy = require('../common/models/item-proxy.js');
+var serverAuthentication = require('./server-enableAuth.js');
 const Path = require('path');
 const importer = require('./directory-ingest.js');
 var _ = require('underscore');
@@ -232,7 +233,16 @@ function KIOItemServer(socket){
       if (item.id){
         proxy = ItemProxy.getProxyFor(item.id);
 
-        // TODO need to add user password processing
+        // TODO need to move user password processing based on model definition
+        if (proxy.kind === 'KoheseUser'){
+          if (item.password){
+            // Request has a password
+            serverAuthentication.setPassword(item, item.password);
+          } else {
+            // Password was not supplied, so use the old value
+            item.password = proxy.item.password;
+          }
+        }
 
         proxy.updateItem(kind, item);
       } else {

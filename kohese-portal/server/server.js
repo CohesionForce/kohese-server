@@ -37,6 +37,9 @@ boot(app, __dirname, function (err) {
         var kdb = require('./kdb.js');
         global.koheseKDB = kdb;
         kdb.initialize(baseRepoPath).then(function () {
+          
+          // TODO need to remove memConnector logic
+          
           // Initialize the in-memory loopback data connector
           var lbMemInitData = kdb.retrieveDataForMemoryConnector();
           var memConnector = app.dataSources.db.connector;
@@ -45,7 +48,6 @@ boot(app, __dirname, function (err) {
      
           // Setup the KoheseUser relations 
           var enableAuth = require('./server-enableAuth');
-          enableAuth(app);
       
           console.log('::: Starting Express Services');
           var appServer = app.start();

@@ -10,6 +10,8 @@ module.exports = function (app) {
     var bodyParser = require('body-parser');
     var util = require('util');
     var serveIndex = require('serve-index');
+    
+    var serverAuthentication = require('../server-enableAuth.js');
 
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
@@ -22,8 +24,12 @@ module.exports = function (app) {
     app.use(bodyParser.json());
 
     app.post('/login', authenticate);
-
+    
+    console.log('$$$ Loading routes');
+    
     function authenticate(req, res, next) {
+        console.log('$$$ Authenticate');
+        
         var body = req.body;
         console.log('::: Checking: ' + body.username);
         
@@ -37,7 +43,7 @@ module.exports = function (app) {
           return;
         }
 
-        app.models.KoheseUser.login(body.username, body.password, function processCallback(err, user) {
+        serverAuthentication.login(body.username, body.password, function processCallback(err, user) {
           if (err){
             res.status(401).end('Login failed: ' + err);
             return;            
@@ -63,9 +69,11 @@ module.exports = function (app) {
 
       // jshint -W106
       if(!req.headers.authorization && req.query.access_token){
+        console.log('$$$ Auth Token: ' + req.query.access_token);
         console.log('::: Creating authorization header from access_token');
         req.headers.authorization = 'Bearer ' + req.query.access_token;
       }
+      console.log('$$$ Authorization: ' + req.headers.authorization);
       // jshint +W106
       next();  
     });
@@ -82,6 +90,7 @@ module.exports = function (app) {
       var authHeader = (req.headers.authorization);
       var header = authHeader.replace('Bearer ', '');
       req.headers.koheseUser = jwt.verify(header, jwtSecret);
+      console.log('$$$ User: ' + req.headers.koheseUser);
       console.log('User:    ' + util.inspect(req.headers.koheseUser,false,null));
       next();
     });
