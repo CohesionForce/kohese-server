@@ -22,8 +22,12 @@ module.exports = function (app) {
     app.use(bodyParser.json());
 
     app.post('/login', authenticate);
-
+    
+    console.log('$$$ Loading routes');
+    
     function authenticate(req, res, next) {
+        console.log('$$$ Authenticate');
+        
         var body = req.body;
         console.log('::: Checking: ' + body.username);
         
@@ -63,9 +67,11 @@ module.exports = function (app) {
 
       // jshint -W106
       if(!req.headers.authorization && req.query.access_token){
+        console.log('$$$ Auth Token: ' + req.query.access_token);
         console.log('::: Creating authorization header from access_token');
         req.headers.authorization = 'Bearer ' + req.query.access_token;
       }
+      console.log('$$$ Authorization: ' + req.headers.authorization);
       // jshint +W106
       next();  
     });
@@ -82,6 +88,7 @@ module.exports = function (app) {
       var authHeader = (req.headers.authorization);
       var header = authHeader.replace('Bearer ', '');
       req.headers.koheseUser = jwt.verify(header, jwtSecret);
+      console.log('$$$ User: ' + req.headers.koheseUser);
       console.log('User:    ' + util.inspect(req.headers.koheseUser,false,null));
       next();
     });
