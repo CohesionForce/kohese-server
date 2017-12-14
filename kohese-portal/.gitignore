@@ -18,6 +18,7 @@ npm-debug.log
 /db.json
 client/bundle.js
 client/bundle.js.map
+client/bundle/
 bower_components
 /.sass-cache/
 /db.json.*

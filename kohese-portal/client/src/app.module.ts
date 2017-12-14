@@ -13,6 +13,7 @@ import { AppBarComponent} from './components/app-bar/appbar.component';
 import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ContentContainerComponent } from './components/content-container/content-container.component';
 
 import { UserService } from './services/user/user.service';
 import { AuthTokenFactory } from './services/authentication/auth-token.factory';
@@ -24,6 +25,7 @@ import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { ContentContainerComponent } from './components/content-container/content-container.component';
+import { NavigationService } from './services/navigation/navigation.service';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
@@ -52,7 +54,7 @@ import { ToastrModule } from 'ngx-toastr';
       useClass: AuthInterceptor,
       multi: true,
     }, SocketService, TabService, BundleService, SessionService,
-    VersionControlService],
+    VersionControlService, NavigationService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
