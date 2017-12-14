@@ -99,16 +99,17 @@ function checkAndCreateAdminAccount() {
 //    }
 //    next();
 //};
-//
-//  KoheseUser.setter.password = function(password) {
-//    if (password.indexOf('$2a$') === 0 && password.length === 60) {
-//      // The password is already hashed. It can be the case
-//      // when the instance is loaded from DB
-//      this.$password = password;
-//    } else {
-//      this.$password = this.constructor.hashPassword(password);
-//    }
-//  };
+
+function setPassword(item, password) {
+  if (password.indexOf('$2a$') === 0 && password.length === 60) {
+    // The password is already hashed. It can be the case
+    // when the instance is loaded from DB
+    item.$password = password;
+  } else {
+    item.password = hashPassword(password);
+  }
+}
+module.exports.setPassword = setPassword;
 
 /**
  * Compare the given `password` with the users hashed password.
