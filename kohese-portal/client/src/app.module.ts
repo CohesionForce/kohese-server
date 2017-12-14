@@ -12,6 +12,7 @@ import { AdminComponent } from './components/admin/admin.component';
 import { AppBarComponent} from './components/app-bar/appbar.component';
 import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { UserService } from './services/user/user.service';
 import { AuthTokenFactory } from './services/authentication/auth-token.factory';
@@ -21,9 +22,11 @@ import { SocketService } from './services/socket/socket.service';
 import { TabService } from './services/tab/tab.service';
 import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
+import { VersionControlService } from './services/version-control/version-control.service';
 import { ContentContainerComponent } from './components/content-container/content-container.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -40,13 +43,16 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    NgbModule.forRoot()
+    NgbModule.forRoot(),
+    BrowserAnimationsModule,
+    ToastrModule.forRoot()
   ],
   providers: [UserService, AuthTokenFactory, LoginService, {
-    provide: HTTP_INTERCEPTORS,
-    useClass: AuthInterceptor,
-    multi: true,
-  }, SocketService, TabService, BundleService, SessionService],
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    }, SocketService, TabService, BundleService, SessionService,
+    VersionControlService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
