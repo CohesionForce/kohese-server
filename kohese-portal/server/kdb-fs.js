@@ -117,11 +117,17 @@ module.exports.deleteFolderRecursive = deleteFolderRecursive;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function removeFile(filePath) {
+function removeFile(filePath, ignoreNonExistent) {
 
-  console.log('::: Removing ' + filePath);
-  fs.unlinkSync(filePath);
-
+  if (fs.existsSync(filePath)){
+    console.log('::: Removing existing file: ' + filePath);
+    fs.unlinkSync(filePath);
+  } else {
+    if(!ignoreNonExistent){
+      // TODO need to convert this to a exception in the future
+      console.log('*** Attempt to remove non-existent file:  ' + filePath);
+    }
+  }
 }
 
 module.exports.removeFile = removeFile;

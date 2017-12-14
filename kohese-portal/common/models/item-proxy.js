@@ -7,6 +7,8 @@ var _ = require('underscore');
 var SHA = require('jssha');
 var uuidV1 = require('uuid/v1');
 
+var Rx = require('rxjs/Rx');
+
 var tree = {};
 tree.proxyMap = {};
 tree.repoMap = {};
@@ -17,6 +19,8 @@ tree.modelMap = {
     'Internal-State': {}
 };
 tree.loading = true;
+
+tree.changeSubject = new Rx.Subject();
 
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
@@ -113,6 +117,15 @@ class ItemProxy {
 
     proxy.calculateTreeHash();
 
+    if(!tree.loading){
+      tree.changeSubject.next({
+        type: 'create',
+        kind: proxy.kind,
+        id: proxy.item.id,
+        proxy: proxy
+      });
+    }
+
     return proxy;
   }
 
@@ -126,9 +139,14 @@ class ItemProxy {
 
     tree.loading = true;
 
+    tree.changeSubject.next({
+      type: 'loading'
+    });
+
     rootProxy.visitChildren(null, null, (childProxy) => {
       childProxy.deleteItem();
     });
+    
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -142,9 +160,19 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static getChangeSubject() {
+    return tree.changeSubject;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static loadingComplete() {
     tree.loading = false;
     ItemProxy.calculateAllTreeHashes();
+    tree.changeSubject.next({
+      type: 'loaded'
+    });
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -934,7 +962,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
-    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
+//    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
     
     var validation = ItemProxy.validateItemContent(modelKind, withItem);
     
@@ -1007,6 +1035,16 @@ class ItemProxy {
         // delete the analysis in case some of the requisite data was updated
         delete this.analysis;
     }
+    
+    if(!tree.loading){
+      tree.changeSubject.next({
+        type: 'update',
+        kind: this.kind,
+        id: this.item.id,
+        proxy: this
+      });
+    }
+
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1035,6 +1073,14 @@ class ItemProxy {
 //        console.log('::: -> Not removing ' + this.item.name);        
       } else {
 //        console.log('::: -> Removing all references');
+        if(!tree.loading){
+          tree.changeSubject.next({
+            type: 'delete',
+            kind: this.kind,
+            id: this.item.id,
+            proxy: this
+          });          
+        }
         delete tree.proxyMap[byId];
       }
     } else {
@@ -1042,6 +1088,14 @@ class ItemProxy {
       if (this.children.length !== 0) {
         if (!attemptToDeleteRestrictedNode){
 //          console.log('::: -> Node still has children');
+          if(!tree.loading){
+            tree.changeSubject.next({
+              type: 'delete',
+              kind: this.kind,
+              id: this.item.id,
+              proxy: this
+            });
+          }
           createMissingProxy(byId);          
         }
       } else {
@@ -1049,6 +1103,14 @@ class ItemProxy {
 //          console.log('::: -> Not removing ' + this.item.name);                  
         } else {
 //          console.log('::: -> Removing all references');
+          if(!tree.loading){
+            tree.changeSubject.next({
+              type: 'delete',
+              kind: this.kind,
+              id: this.item.id,
+              proxy: this
+            });
+          }
           delete tree.proxyMap[byId];
         }
       }      
