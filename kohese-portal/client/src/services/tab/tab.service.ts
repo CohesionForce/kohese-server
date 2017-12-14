@@ -24,7 +24,7 @@ export class TabService {
 
   initService() : void {
     // Setting up the base tab
-    let baseTab = new Tab('Dashboard', '/dashboard', {}, this.tabCount, 0,
+    let baseTab = new Tab('Dashboard', {}, this.tabCount, 0,
                             this.NavigationService.getNavUpdates())
     this.incrementTabs();
     this.currentTabSubject = new BehaviorSubject(baseTab);
@@ -59,8 +59,8 @@ export class TabService {
     return this.currentTabListSubject;
   }
 
-  createTab (state, route, params): void {
-    var tab = new Tab(state, route, params, this.tabCount, this.tabList.length,
+  createTab (location, params): void {
+    var tab = new Tab(location, params, this.tabCount, this.tabList.length,
                       this.NavigationService.getNavUpdates());
     this.incrementTabs();
     this.tabList.push(tab);
@@ -77,7 +77,7 @@ export class TabService {
     if (tab.id === this.currentTab.id) {
       if (tab.position === 0) {
         if (this.tabList.length === 1) {
-          this.createTab('Dashboard', '/dashboard', {});
+          this.createTab('Dashboard', {});
         } else {
           this.setCurrentTab(this.tabList[1]);
         }

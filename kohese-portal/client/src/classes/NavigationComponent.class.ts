@@ -19,7 +19,7 @@ export class NavigatableComponent {
 
   }
 
-  navigate (route : string, params: object) {
-    this.NavigationService.navigate(route, params, this.tab.id);
+  navigate (location : string, params: object) {
+    this.NavigationService.navigate(location, params, this.tab.id);
   }
 }
