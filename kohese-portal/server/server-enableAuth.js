@@ -109,24 +109,24 @@ function checkAndCreateAdminAccount() {
 //      this.$password = this.constructor.hashPassword(password);
 //    }
 //  };
-//
-//  /**
-//   * Compare the given `password` with the users hashed password.
-//   *
-//   * @param {String} password The plain text password
-//   * @returns {Boolean}
-//   */
-//
-//  KoheseUser.prototype.hasPassword = function(plainPassword, fn) {
-//    if (this.password && plainPassword) {
-//      bcrypt.compare(plainPassword, this.password, function(err, isMatch) {
-//        if (err) return fn(err);
-//        fn(null, isMatch);
-//      });
-//    } else {
-//      fn(null, false);
-//    }
-//  };
+
+/**
+ * Compare the given `password` with the users hashed password.
+ *
+ * @param {String} password The plain text password
+ * @returns {Boolean}
+ */
+
+function hasPassword(proxy, plainPassword, fn) {
+  if (proxy.item.password && plainPassword) {
+    bcrypt.compare(plainPassword, proxy.item.password, function(err, isMatch) {
+      if (err) return fn(err);
+      fn(null, isMatch);
+    });
+  } else {
+    fn(null, false);
+  }
+}
 
 /*!
  * Hash the plain password
@@ -135,7 +135,7 @@ function hashPassword(plainPassword) {
   validatePassword(plainPassword);
   var salt = bcrypt.genSaltSync(SALT_WORK_FACTOR);
   return bcrypt.hashSync(plainPassword, salt);
-};
+}
 module.exports.hashPassword = hashPassword;
 
 function validatePassword(plainPassword) {
@@ -147,32 +147,30 @@ function validatePassword(plainPassword) {
   throw err;
 }
 
-//  // This function is an adaptation of the Loopback User.login function
-//  // cb (err, user)
-//  KoheseUser.login = function (username, password, cb){
-//    console.log('::: Preparing to evaluate credentials');
-//
-//    this.findOne({where: {name: username}}, function(err, user) {
-//      if (err) {
-//        console.log('*** An error is reported from KoheseUser.findOne: %j', err);
-//        cb(err, null);
-//      } else if (user) {
-//        user.hasPassword(password, function(err, isMatch) {
-//          if (err) {
-//            console.log('*** An error is reported from KoheseUser.hasPassword: %j', err);
-//            cb(err,null);
-//          } else if (isMatch) {
-//            cb(null, user);
-//          } else {
-//            console.log('*** The password is invalid for user %s', username);
-//            cb('Invalid password', null);
-//          }
-//        });
-//      } else {
-//        console.log('*** No matching record is found for user %s', username);
-//        cb('No such user', null);
-//      }
-//    });
-//  };
+// This function is an adaptation of the Loopback User.login function
+function login(username, password, cb){
+  console.log('::: Preparing to evaluate credentials');
+
+  var userProxy = usersProxy.getChildByName(username);
+  
+  if (userProxy){
+    hasPassword(userProxy, password, function(err, isMatch) {
+      if (err) {
+        console.log('*** An error is reported from KoheseUser.hasPassword: %j', err);
+        cb(err,null);
+      } else if (isMatch) {
+        cb(null, userProxy.item);
+      } else {
+        console.log('*** The password is invalid for user %s', username);
+        cb('Invalid password', null);
+      }
+    });
+  } else {
+    console.log('*** No matching record is found for user %s', username);
+    cb('No such user', null);
+  }
+  
+}
+module.exports.login = login;
 
 console.log('$$$ Finished Loading Enable Authentication');

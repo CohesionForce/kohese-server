@@ -10,6 +10,8 @@ module.exports = function (app) {
     var bodyParser = require('body-parser');
     var util = require('util');
     var serveIndex = require('serve-index');
+    
+    var serverAuthentication = require('../server-enableAuth.js');
 
     app.use(loopback.static(path.resolve(__dirname, '../../client')));
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
@@ -41,7 +43,7 @@ module.exports = function (app) {
           return;
         }
 
-        app.models.KoheseUser.login(body.username, body.password, function processCallback(err, user) {
+        serverAuthentication.login(body.username, body.password, function processCallback(err, user) {
           if (err){
             res.status(401).end('Login failed: ' + err);
             return;            
