@@ -1,8 +1,118 @@
-<h3>Dashboard</h3>
-<div class="grid grid-pad">
-  <a
-    (click)="navigate('Admin', {})">Admin</a>
-  <a
-    (click)="navigate('Login', {})">Login</a>
+<div>
+  <div class="text-center">
+      <h2>
+          Hello {{currentUser}}
+      </h2>
+  </div>
+  <div class="dashboard-navigation">
+      <button routerLink="/login">Explore
+      </button>
+      <br>
+      <button (click)="navigate('Admin', {})"
+              class="btn btn-primary">Admin
+      </button>
 
+  </div>
+
+  <div class="assignment-accordion">
+    <pre>
+    {{currentUser}}
+  </pre>
+
+      <h4>Actions:</h4>
+      <ngb-accordion #acc="ngbAccordion" activeIds="ngb-panel-0">
+          <ngb-panel title="Assigned">
+            <ng-template ngbPanelContent>
+              <div class="assignment"
+                   *ngFor="let itemProxy of assignedItems">
+                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                          >
+                      {{itemProxy.item.name}} </span>
+              </div>
+            </ng-template>
+          </ngb-panel>
+          <ngb-panel title="Accepted">
+              <div class="assignment"
+                   *ngFor="let itemProxy of acceptedItems">
+                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                          >
+                      {{itemProxy.item.name}} </span>
+              </div>
+          </ngb-panel>
+          <ngb-panel title="In Work">
+              <div class="assignment"
+                   *ngFor="let itemProxy of inWorkItems">
+                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                          >
+                      {{itemProxy.item.name}} </span>
+              </div>
+          </ngb-panel>
+          <ngb-panel title="In Verification">
+              <div class="assignment"
+                   *ngFor="let itemProxy of inVerificationItems">
+                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                          >
+                      {{itemProxy.item.name}} </span>
+              </div>
+          </ngb-panel>
+      </ngb-accordion>
+
+      <br>
+      <h4> Issues:</h4>
+      <ngb-accordion>
+          <ngb-panel title="Observed">
+              <div class="assignment"
+                   *ngFor="let itemProxy of observedIssuesItems">
+                  <span (click)="navigate('Explore', {id: itemProxy.item.id})">
+                      {{itemProxy.item.name}}
+                  </span>
+              </div>
+          </ngb-panel>
+          <ngb-panel title="In Analysis">
+              <div class="assignment"
+                   *ngFor="let itemProxy of inAnalysisIssueItems">
+                  <span (click)="navigate('Explore', {id: itemProxy.item.id})">
+                      {{itemProxy.item.name}}
+                  </span>
+              </div>
+          </ngb-panel>
+          <ngb-panel title="Requires Action">
+              <div class="assignment"
+                   *ngFor="let itemProxy of requiresActionItems">
+                  <span (click)="navigate('Explore', {id: itemProxy.item.id})">
+                      {{itemProxy.item.name}}
+                  </span>
+              </div>
+          </ngb-panel>
+      </ngb-accordion>
+
+      <h4>Tasks:</h4>
+      <ngb-accordion>
+          <ngb-panel title="Assigned">
+              <div class="assignment"
+                   *ngFor="let itemProxy of assignedTasks">
+                  <span (click)="navigate('Explore', {id: itemProxy.item.id})">
+                      {{itemProxy.item.name}}
+                  </span>
+              </div>
+          </ngb-panel>
+          <ngb-panel title="Accepted">
+              <div class="assignment"
+                   *ngFor="let itemProxy of acceptedTasks">
+                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                          >
+                      {{itemProxy.item.name}} </span>
+              </div>
+          </ngb-panel>
+          <ngb-panel title="In Work">
+              <div class="assignment"
+                   *ngFor="let itemProxy of inWorkTasks">
+                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                          >
+                      {{itemProxy.item.name}} </span>
+              </div>
+          </ngb-panel>
+      </ngb-accordion>
+  </div>
 </div>
+
