@@ -29,6 +29,8 @@ import { NavigationService } from './services/navigation/navigation.service';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 
+import { MaterialModule } from './material.module';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -46,7 +48,8 @@ import { ToastrModule } from 'ngx-toastr';
     HttpClientModule,
     NgbModule.forRoot(),
     BrowserAnimationsModule,
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    MaterialModule
   ],
   providers: [UserService, AuthTokenFactory, LoginService, {
       provide: HTTP_INTERCEPTORS,
