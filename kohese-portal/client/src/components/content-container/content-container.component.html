@@ -3,9 +3,9 @@
       <button id="add-tab-button" (click)="addTab('Dashboard', '/dashboard', {})">
         <i class="glyphicon glyphicon-plus"></i>
     </button>
-        <ngb-tabset>
+        <mat-tab-group>
           <div *ngFor="let tab of tabs">
-            <ngb-tab active="tab.active"
+            <mat-tab label="tab.active"
             class=" nav nav-tabs">
                 <ng-template ngbTabTitle>
                   <span (click)="setTab(tab)">

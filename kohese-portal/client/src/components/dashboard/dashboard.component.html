@@ -15,156 +15,158 @@
   </div>
 
   <div class="assignment-accordion">
-      <h4>Actions:</h4>
-      <mat-accordion>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                Assignment
-              </mat-panel-title>
+      <mat-tab-group>
+        <mat-tab label="Actions">
+          <mat-accordion>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Assignment
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                  <mat-panel-description>
+                    <div class="assignment"
+                        *ngFor="let itemProxy of assignedItems">
+                        <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                                >
+                            {{itemProxy.item.name}} </span>
+                    </div>
+                  </mat-panel-description>
+            </mat-expansion-panel>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  Accepted
+                </mat-panel-title>
             </mat-expansion-panel-header>
-              <mat-panel-description>
+            <mat-panel-description>
+              <div class="assignment"
+                  *ngFor="let itemProxy of acceptedItems">
+                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                          >
+                      {{itemProxy.item.name}} </span>
+              </div>
+            </mat-panel-description>
+            </mat-expansion-panel>
+            <mat-expansion-panel >
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  Assignment
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+                <mat-panel-description>
                 <div class="assignment"
-                    *ngFor="let itemProxy of assignedItems">
+                    *ngFor="let itemProxy of inWorkItems">
                     <span (click)="navigate('Explore', { id: itemProxy.item.id})"
                             >
                         {{itemProxy.item.name}} </span>
                 </div>
               </mat-panel-description>
-        </mat-expansion-panel>
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Accepted
-            </mat-panel-title>
-        </mat-expansion-panel-header>
-          <mat-panel-description>
-            <div class="assignment"
-                *ngFor="let itemProxy of acceptedItems">
-                <span (click)="navigate('Explore', { id: itemProxy.item.id})"
-                        >
-                    {{itemProxy.item.name}} </span>
-            </div>
-          </mat-panel-description>
-        </mat-expansion-panel>
-        <mat-expansion-panel >
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Assignment
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-            <mat-panel-description>
-            <div class="assignment"
-                *ngFor="let itemProxy of inWorkItems">
-                <span (click)="navigate('Explore', { id: itemProxy.item.id})"
-                        >
-                    {{itemProxy.item.name}} </span>
-            </div>
-          </mat-panel-description>
-        </mat-expansion-panel>
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              In Verification
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-panel-description>
-            <div class="assignment"
-                *ngFor="let itemProxy of inVerificationItems">
-                <span (click)="navigate('Explore', { id: itemProxy.item.id})"
-                        >
-                    {{itemProxy.item.name}} </span>
-            </div>
-          </mat-panel-description>
-        </mat-expansion-panel>
-      </mat-accordion>
-
-      <br>
-      <h4> Issues:</h4>
-      <mat-accordion>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
+            </mat-expansion-panel>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
                 <mat-panel-title>
-                  Observed
+                  In Verification
                 </mat-panel-title>
               </mat-expansion-panel-header>
-              <div class="assignment"
-                   *ngFor="let itemProxy of observedIssuesItems">
-                  <span (click)="navigate('Explore', {id: itemProxy.item.id})">
-                      {{itemProxy.item.name}}
-                  </span>
-              </div>
-          </mat-expansion-panel>
-          <mat-expansion-panel >
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                  In Analysis
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <div class="assignment"
-                   *ngFor="let itemProxy of inAnalysisIssueItems">
-                  <span (click)="navigate('Explore', {id: itemProxy.item.id})">
-                      {{itemProxy.item.name}}
-                  </span>
-              </div>
-          </mat-expansion-panel>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                  Requires Action
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <div class="assignment"
-                   *ngFor="let itemProxy of requiresActionItems">
-                  <span (click)="navigate('Explore', {id: itemProxy.item.id})">
-                      {{itemProxy.item.name}}
-                  </span>
-              </div>
-          </mat-expansion-panel>
-      </mat-accordion>
-
-      <h4>Tasks:</h4>
-      <mat-accordion>
-          <mat-expansion-panel >
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                  Assigned
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-              <div class="assignment"
-                   *ngFor="let itemProxy of assignedTasks">
-                  <span (click)="navigate('Explore', {id: itemProxy.item.id})">
-                      {{itemProxy.item.name}}
-                  </span>
-              </div>
-          </mat-expansion-panel>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                  Accepted
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-              <div class="assignment"
-                   *ngFor="let itemProxy of acceptedTasks">
-                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
-                          >
-                      {{itemProxy.item.name}} </span>
-              </div>
-          </mat-expansion-panel>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                  In Work
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-              <div class="assignment"
-                   *ngFor="let itemProxy of inWorkTasks">
-                  <span (click)="navigate('Explore', { id: itemProxy.item.id})"
-                          >
-                      {{itemProxy.item.name}} </span>
-              </div>
-          </mat-expansion-panel>
-      </mat-accordion>
+              <mat-panel-description>
+                <div class="assignment"
+                    *ngFor="let itemProxy of inVerificationItems">
+                    <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                            >
+                        {{itemProxy.item.name}} </span>
+                </div>
+              </mat-panel-description>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </mat-tab>
+        <mat-tab label="Issues">
+          <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      Observed
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div class="assignment"
+                      *ngFor="let itemProxy of observedIssuesItems">
+                      <span (click)="navigate('Explore', {id: itemProxy.item.id})">
+                          {{itemProxy.item.name}}
+                      </span>
+                  </div>
+              </mat-expansion-panel>
+              <mat-expansion-panel >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      In Analysis
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div class="assignment"
+                      *ngFor="let itemProxy of inAnalysisIssueItems">
+                      <span (click)="navigate('Explore', {id: itemProxy.item.id})">
+                          {{itemProxy.item.name}}
+                      </span>
+                  </div>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      Requires Action
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div class="assignment"
+                      *ngFor="let itemProxy of requiresActionItems">
+                      <span (click)="navigate('Explore', {id: itemProxy.item.id})">
+                          {{itemProxy.item.name}}
+                      </span>
+                  </div>
+              </mat-expansion-panel>
+          </mat-accordion>
+        </mat-tab>
+        <mat-tab label="Tasks">
+          <mat-accordion>
+              <mat-expansion-panel >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      Assigned
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                  <div class="assignment"
+                      *ngFor="let itemProxy of assignedTasks">
+                      <span (click)="navigate('Explore', {id: itemProxy.item.id})">
+                          {{itemProxy.item.name}}
+                      </span>
+                  </div>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      Accepted
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                  <div class="assignment"
+                      *ngFor="let itemProxy of acceptedTasks">
+                      <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                              >
+                          {{itemProxy.item.name}} </span>
+                  </div>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      In Work
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                  <div class="assignment"
+                      *ngFor="let itemProxy of inWorkTasks">
+                      <span (click)="navigate('Explore', { id: itemProxy.item.id})"
+                              >
+                          {{itemProxy.item.name}} </span>
+                  </div>
+              </mat-expansion-panel>
+          </mat-accordion>
+        </mat-tab>
+      </mat-tab-group>
   </div>
 </div>
 
