@@ -12,9 +12,12 @@ export class LoginService {
   }
   
   login(credentials: any) : Observable<any> {
-    return this.httpClient.post('/login', {
+    return this.httpClient.post('/authenticate', {
       username: credentials.username,
       password: credentials.password
+    }, {
+      observe: 'response',
+      responseType: 'text'
     });
   }
   

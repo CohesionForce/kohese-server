@@ -4,8 +4,6 @@ import { ItemProxy } from '../../../../common/models/item-proxy';
 import { SocketService } from '../socket/socket.service';
 import { UserService } from '../user/user.service';
 import { ToastrService } from 'ngx-toastr';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/forkJoin';
 
 @Injectable()
 export class VersionControlService {
@@ -78,31 +76,29 @@ export class VersionControlService {
   }
   
   commitItems(proxies: ItemProxy[], commitMessage: string) {
-    Observable.forkJoin([this.userService.getCurrentUsername(),
-      this.userService.getCurrentUserEmail()]).subscribe((results) => {
-      let data: {
-        proxyIds: string[];
-        username: string;
-        email: string;
-        message: string;
-      } = {
-        proxyIds: [],
-        username: results[0],
-        email: results[1],
-        message: commitMessage
-      };
-      for (let j = 0; j < proxies.length; j++) {
-        data.proxyIds.push(proxies[j].id);
+    let proxy: ItemProxy = this.userService.getCurrentUser().getValue();
+    let data: {
+      proxyIds: string[];
+      username: string;
+      email: string;
+      message: string;
+    } = {
+      proxyIds: [],
+      username: proxy.item.name,
+      email: proxy.item.email,
+      message: commitMessage
+    };
+    for (let j = 0; j < proxies.length; j++) {
+      data.proxyIds.push(proxies[j].id);
+    }
+  
+    this.socketService.getSocket().emit('VersionControl/commit', data,
+      function (results) {
+      if (results.error) {
+        this.toastrService.error('Commit Failed', results.error);
+      } else {
+        this.toastrService.success('Commit Succeeded', 'Version Control');
       }
-    
-      this.socketService.getSocket().emit('VersionControl/commit', data,
-        function (results) {
-        if (results.error) {
-          this.toastrService.error('Commit Failed', results.error);
-        } else {
-          this.toastrService.success('Commit Succeeded', 'Version Control');
-        }
-      });
     });
   }
   

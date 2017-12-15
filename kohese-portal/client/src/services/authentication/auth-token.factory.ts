@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class AuthTokenFactory {
-  private token: string;
+  private token: BehaviorSubject<string> = new BehaviorSubject('');
   
   constructor() {
   }
   
-  getToken(): Observable<string> {
-    return Observable.of(this.token);
+  getToken(): BehaviorSubject<string> {
+    return this.token;
   }
   
   setToken(t: string) {
-    this.token = t;
+    this.token.next(t);
   }
 }

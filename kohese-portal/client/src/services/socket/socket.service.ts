@@ -1,48 +1,46 @@
 import { Injectable } from '@angular/core';
 
 import { AuthTokenFactory } from '../authentication/auth-token.factory';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as SocketIoClient from 'socket.io-client';
 
 @Injectable()
 export class SocketService {
   private socket: SocketIOClient.Socket;
-  private initialized: boolean = false;
-  private authenticated: boolean = false;
+  private initialized: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private authenticated: BehaviorSubject<boolean> = new BehaviorSubject(false);
   
   constructor(private authTokenFactory: AuthTokenFactory) {
-  }
-  
-  ngOnInit() {
-    this.authTokenFactory.getToken().subscribe((token) => {
-      if (token) {
-        this.initialize();
-      }
-    });
+    let token: string = this.authTokenFactory.getToken().getValue();
+    if (token) {
+      this.initialize();
+    }
   }
   
   initialize() {
-    this.initialized = true;
-    this.socket = io();
+    this.initialized.next(true);
+    this.socket = SocketIoClient();
     
     this.socket.on('authenticated', () => {
-      this.authenticated = true;
+      this.authenticated.next(true);
     });
     
     this.socket.on('connect', () => {
-      let token: {token: Observable<string>} = {
-        token: this.authTokenFactory.getToken()
+      let token: {
+        token: string
+      } = {
+        token: this.authTokenFactory.getToken().getValue()
       };
       this.socket.emit('authenticate', token);
     });
     
     this.socket.on('disconnect', () => {
-      this.authenticated = false;
+      this.authenticated.next(false);
     });
   }
   
   connect() {
-    if (this.initialized) {
+    if (this.initialized.getValue()) {
       this.socket.connect();
     } else {
       this.initialize();
@@ -50,17 +48,17 @@ export class SocketService {
   }
   
   disconnect() {
-    if (this.initialized) {
+    if (this.initialized.getValue()) {
       this.socket.disconnect();
-      this.authenticated = false;
+      this.authenticated.next(false);
     }
   }
   
-  isInitialized(): boolean {
+  isInitialized(): BehaviorSubject<boolean> {
     return this.initialized;
   }
   
-  isAuthenticated(): boolean {
+  isAuthenticated(): BehaviorSubject<boolean> {
     return this.authenticated;
   }
   
