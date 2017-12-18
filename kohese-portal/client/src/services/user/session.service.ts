@@ -7,9 +7,6 @@ export class SessionService {
   private sessions: SessionMap = {};
 
   constructor(private socketService: SocketService) {
-  }
-  
-  ngOnInit() {
     this.socketService.getSocket().on('session/add', (session) => {
       this.sessions[session.sessionId] = session;
     });

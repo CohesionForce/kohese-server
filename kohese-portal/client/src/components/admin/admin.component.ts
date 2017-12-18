@@ -1,8 +1,8 @@
-import { Component } from '@angular/core'
-import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { Component, OnInit } from '@angular/core'
 
 import { ItemProxy } from '../../../../common/models/item-proxy';
 import { UserService } from '../../services/user/user.service';
+import { VersionControlService } from '../../services/version-control/version-control.service';
 
 @Component({
   selector: 'app-admin',
@@ -23,7 +23,7 @@ export class AdminComponent implements OnInit {
   private remotes: any[] = [];
   private commitMessageInput: string;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private versionControlService: VersionControlService) {
   }
 
   ngOnInit() {
@@ -87,7 +87,8 @@ export class AdminComponent implements OnInit {
   
   addRemote() {
     if ((this.remoteNameInput !== '') && (this.remoteUrlInput !== '')) {
-      // TODO Add remote through VersionControlService
+      this.versionControlService.addRemote(ItemProxy.getRootProxy().item.id,
+        this.remoteNameInput, this.remoteUrlInput);
     } else {
       alert('Please specify both a remote name and URL.');
     }
