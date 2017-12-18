@@ -86,7 +86,6 @@ export class ItemRepository {
       }
     });
 
-    // TODO - Figure this out when more brain
     this.socketService.isAuthenticated()
       .subscribe(authenticationStatus => {
         console.log('Auth IR');
