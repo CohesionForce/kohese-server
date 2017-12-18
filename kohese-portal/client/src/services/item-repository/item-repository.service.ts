@@ -98,9 +98,28 @@ export class ItemRepository {
       })
   }
 
-  getRootProxy () {
-    return ItemProxy.getRootProxy();
+  // Item Proxy Wrapper Methods
+  getRootProxy () : Function {
+    return ItemProxy.getRootProxy;
   }
+
+  getChangeSubject () : Function {
+    return ItemProxy.getChangeSubject;
+  }
+
+  getProxyFor () : Function {
+    return ItemProxy.getProxyFor;
+  }
+
+  getAllItemProxies () : Function {
+    return ItemProxy.getAllItemProxies;
+  }
+
+  getRepositories () : Function {
+    return ItemProxy.getRepositories
+  }
+
+  // End Item Proxy Wrapper
 
   getRepoStatusSubject () : BehaviorSubject<any> {
     return this.repositoryStatus;
