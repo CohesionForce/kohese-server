@@ -30,6 +30,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 
 import { MaterialModule } from './material.module';
+import { ItemRepository } from './services/item-repository/item-repository.service';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,7 @@ import { MaterialModule } from './material.module';
     ToastrModule.forRoot(),
     MaterialModule
   ],
-  providers: [UserService, AuthTokenFactory, LoginService, {
+  providers: [ItemRepository ,UserService, AuthTokenFactory, LoginService, {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true,
