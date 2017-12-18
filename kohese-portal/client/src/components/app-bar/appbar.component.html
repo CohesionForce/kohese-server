@@ -5,7 +5,7 @@
   <a class="navbar-brand"
       [ngClass]="{'navbar-syncing': repositorySyncing,
                 'navbar-disconnected': !repositorySynced}"
-      (click)="navigate('kohese.explore',{}, 'dualview')">
+      (click)="navigate('Explore', {})">
         Kohese Portal <i class="fa fa-exclamation-triangle"
                         *ngIf="!repositorySynced && !repositorySyncing && !repositorySyncFailed"> - Disconnected</i>
                       <i class="fa fa-exclamation-triangle"
@@ -14,11 +14,11 @@
                         *ngIf="repositorySyncFailed"> - Failed Synchronization</i>
 
   </a>
-  <a class="navbar-brand" routerLink="/dashboard">Dashboard</a>
+  <a class="navbar-brand" (click)="addTab('Dashboard',{})">Dashboard</a>
 </div>
   <!-- /.navbar-header -->
 
-<a routerLink="/admin">Admin</a>
+<a (click)="addTab('Admin',{})">Admin</a>
 
 <ul [hidden]="!userLoggedIn" class="nav navbar-top-links navbar-right">
 

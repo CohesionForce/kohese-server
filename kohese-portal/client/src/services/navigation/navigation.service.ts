@@ -4,6 +4,8 @@ import { NavigationUpdate } from './NavigationUpdate.class';
 import { Subject } from 'rxjs/Subject';
 import { Router } from '@angular/router';
 
+import { LocationMap } from '../../constants/LocationMap.data'
+
 @Injectable()
 
 export class NavigationService {
@@ -18,9 +20,11 @@ export class NavigationService {
     return this.navUpdates;
   }
 
-  navigate(route : string, params: object, id : number ) {
-    let newNavUpdate = new NavigationUpdate(route, params, id);
+  navigate(location : string, params: object, id : number ) {
+    let newNavUpdate = new NavigationUpdate(location, params, id);
     this.navUpdates.next(newNavUpdate);
+    console.log(LocationMap[location]);
+    this.router.navigate([LocationMap[location].route])
 
   }
 }

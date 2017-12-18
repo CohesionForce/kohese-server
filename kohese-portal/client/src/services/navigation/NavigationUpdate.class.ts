@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class NavigationUpdate {
-  route : string;
+  location : string;
   params : object;
   tabID : number
 
-  constructor (route : string,
+  constructor (location : string,
                params : object,
                tabID : number ) {
-    this.route = route;
+    this.location = location;
     this.params = params;
     this.tabID = tabID;
   }

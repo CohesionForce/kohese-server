@@ -10,11 +10,14 @@
     "wp": "webpack-dev-server --inline --progress --port 8000"
   },
   "dependencies": {
+    "@angular/animations": "^5.1.1",
+    "@angular/cdk": "^5.0.1",
     "@angular/common": "^5.0.3",
     "@angular/compiler": "^5.0.3",
     "@angular/core": "^5.0.3",
     "@angular/forms": "^5.1.0",
     "@angular/http": "^5.1.0",
+    "@angular/material": "^5.0.1",
     "@angular/platform-browser": "^5.0.3",
     "@angular/platform-browser-dynamic": "^5.0.3",
     "@angular/router": "^5.0.5",
@@ -44,6 +47,7 @@
     "loopback-connector-mongodb": "^1.8.0",
     "loopback-datasource-juggler": "^2.19.0",
     "morgan": "^1.7.0",
+    "ngx-toastr": "^8.0.0",
     "node-uuid": "^1.4.7",
     "nodegit": "^0.20.3",
     "prompt": "^1.0.0",

@@ -11,7 +11,20 @@ module.exports = function (app) {
     var util = require('util');
     var serveIndex = require('serve-index');
 
-    app.use(loopback.static(path.resolve(__dirname, '../../client/bundle')));
+    var clientBundlePath = path.resolve(__dirname, '../../client/bundle'); 
+
+    app.use(loopback.static(clientBundlePath));
+
+    var ngRoutes = [
+      '/admin',
+      '/dashboard',
+      '/login'
+    ];
+ 
+    app.use(ngRoutes, function (req, res) {
+      res.sendFile(path.resolve(clientBundlePath, 'index.html'));
+    });
+    
     app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
     app.use('/socket.io-file-client', 
             loopback.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
@@ -21,7 +34,7 @@ module.exports = function (app) {
     
     app.use(bodyParser.json());
 
-    app.post('/login', authenticate);
+    app.post('/authenticate', authenticate);
     
     console.log('$$$ Loading routes');
 
@@ -82,8 +95,8 @@ module.exports = function (app) {
       // jshint +W106
       next();  
     });
-    
-    app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
+
+    app.use(expressJwt({secret: jwtSecret}).unless({path: ngRoutes})); 
 
     function decodeAuthToken(authToken){
       var decodedToken = jwt.verify(authToken, jwtSecret);
@@ -93,14 +106,19 @@ module.exports = function (app) {
     
     app.use(function (req, res, next){
       var authHeader = (req.headers.authorization);
-      var header = authHeader.replace('Bearer ', '');
-      req.headers.koheseUser = jwt.verify(header, jwtSecret);
+
+      if (authHeader) {
+        var header = authHeader.replace('Bearer ', '');
+        req.headers.koheseUser = jwt.verify(header, jwtSecret);
+      } else {
+        console.log('*** Authorization header is missing');
+      }
+
       console.log('$$$ User: ' + req.headers.koheseUser);
       console.log('User:    ' + util.inspect(req.headers.koheseUser,false,null));
       next();
     });
 
-    
 //    var requestRegex = /\/api\/([^\/]*)\/([^\/]*)/;
     var requestRegex = /^\/([^\/]*)\/([^\/]*)/;
     function kdbGet(req, res, next) {
@@ -128,5 +146,4 @@ module.exports = function (app) {
     
     // Using Loopback
     app.use(restApiRoot, app.loopback.rest());
-
 };

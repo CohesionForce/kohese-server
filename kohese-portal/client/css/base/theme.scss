@@ -1,0 +1,11 @@
+// Define 3 theme colors
+
+$kohese-theme-primary: mat-palette($mat-green, 700, 300, 900);
+$kohese-theme-accent: mat-palette($mat-red);
+$kohese-them-warn: mat-palette($mat-deep-orange);
+
+$kohese-theme: mat-light-theme(
+  $kohese-theme-primary,
+  $kohese-theme-accent,
+  $kohese-theme-warn
+)

@@ -1,1 +1,9 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
 @import 'base';
+@import 'theme';
+
+.kohese-theme {
+  @include angular-material-theme($kohese-theme);
+}
