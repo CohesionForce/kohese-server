@@ -14,6 +14,9 @@ import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ContentContainerComponent } from './components/content-container/content-container.component';
+import { TreeComponent } from './components/tree/tree.component';
+import { DetailsComponent } from './components/details/details.component';
+import { ExploreComponent } from './components/explore/explore.component';
 
 import { UserService } from './services/user/user.service';
 import { AuthTokenFactory } from './services/authentication/auth-token.factory';
@@ -40,7 +43,10 @@ import { ItemRepository } from './services/item-repository/item-repository.servi
     SideBarComponent,
     DashboardComponent,
     AdminComponent,
-    LoginComponent
+    LoginComponent,
+    TreeComponent,
+    DetailsComponent,
+    ExploreComponent
   ],
   imports: [
     BrowserModule,
