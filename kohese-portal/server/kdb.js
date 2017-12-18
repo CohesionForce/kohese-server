@@ -29,22 +29,20 @@ var kdbDirPath = "kdb";
 var koheseKDBDirPath;
 var mountFilePath;
 
+// TODO need to remove kdbStore since it is no longer needed
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function initialize(koheseKdbPath) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
-
 
   var kdbModel = require('./kdb-model.js');
   ItemProxy.loadModelDefinitions(kdbModel.modelDef);
   kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
   
-  // Ignore the loopback _meta
-  if (modelConfig._meta) {
-    delete modelConfig._meta;
-  }
-
-  console.log(modelConfig);
-
   var modelKinds = Object.keys(modelConfig);
   modelKinds.sort();
   console.log("::: ModelKinds: " + modelKinds);
@@ -97,31 +95,6 @@ function initialize(koheseKdbPath) {
   }
 }
 module.exports.initialize = initialize;
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function retrieveDataForMemoryConnector(){
-
-  var lbMemConnectorData = {
-      ids: JSON.parse(JSON.stringify(kdbStore.ids)),
-      cache: {}
-  };
- 
-  for(var model in kdbStore.models) {
-    if (model !== "Analysis") {
-      lbMemConnectorData.cache[model] = JSON.parse(JSON.stringify(kdbStore.models[model]));
-    }
-  } 
-
-  // Since we do not store the Analysis artifacts in loopback, remove them
-  lbMemConnectorData.ids.Analysis=0;
-  lbMemConnectorData.cache.Analysis = {};
-  
-  return lbMemConnectorData;
-}
-
-module.exports.retrieveDataForMemoryConnector = retrieveDataForMemoryConnector; 
 
 //////////////////////////////////////////////////////////////////////////
 //

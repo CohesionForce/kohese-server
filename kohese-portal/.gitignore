@@ -23,7 +23,6 @@ bower_components
 /db.json.*
 tmp/
 /dist/
-!index.css
 *.css
 *.ccs.map
 
