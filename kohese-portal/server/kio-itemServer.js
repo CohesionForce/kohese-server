@@ -492,44 +492,54 @@ function KIOItemServer(socket){
     var proxies = [];
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
-    var pendingUnstagePromises = [];
-    
-    // TODO Determine if these two loops can safely be consolidated into a single iteration
+    var pendingEvaluationPromises = [];
     
     for (var i = 0; i < idsArray.length; i++) {
       var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
-      var status = kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath);
       
-      var isNewFile = false;
-      var isStaged = false;
-      var hasUnstagedChanges = false;
-      
-      for (var j = 0; j < status.length; j++) {
-        if (status[j].startsWith('WT_')) {
-          hasUnstagedChanges = true;
-        }
-        if (status[j].startsWith('INDEX_')) {
-          isStaged = true;
-        }
-      }
-      
-      // Unstage if the item is staged without additional changes
-      if(isStaged && !hasUnstagedChanges){
-        pendingUnstagePromises.push(kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]));
-      }
-            
+      var evaluationPromise = new Promise((resolve, reject) => {
+        kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).then((status) => {
+
+          var isNewFile = false;
+          var isStaged = false;
+          var hasUnstagedChanges = false;
+          
+          for (var j = 0; j < status.length; j++) {
+            if (status[j].startsWith('WT_')) {
+              hasUnstagedChanges = true;
+            }
+            if (status[j].startsWith('INDEX_')) {
+              isStaged = true;
+            }
+          }
+          
+          // Unstage if the item is staged without additional changes
+          if(isStaged && !hasUnstagedChanges){
+            // Item is staged, but does not have changes, so it needs to be unstaged to revert it
+            kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]).then(() => {
+              // file has been unstaged, need to retrieve updated status
+              kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).then((statusAfterUnstage) => {
+                resolve(statusAfterUnstage);                              
+              });
+            });
+          } else {
+            resolve(status);
+          }
+        });
+      });
+      pendingEvaluationPromises.push(evaluationPromise);
     }
     
     // Wait for any pending unstage requests to complete
-    Promise.all(pendingUnstagePromises).then(function(){
+    Promise.all(pendingEvaluationPromises).then(function(statusArray){
       // Determine if items need to be checked out or deleted
       for (var i = 0; i < idsArray.length; i++) {
         var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
         var repositoryInformation = getRepositoryInformation(proxy);
         var repositoryId = repositoryInformation.repositoryProxy.item.id;
-        var status = kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath);
+        var status = statusArray[i];
 
         var isNewUnstagedFile = false;
         
@@ -608,14 +618,21 @@ function KIOItemServer(socket){
 
 function sendStatusUpdates(proxies) {
   var statusMap = {};
+  var promises = [];
   for (var i = 0; i < proxies.length; i++) {
     var repositoryInformation = getRepositoryInformation(proxies[i]);
-    var status = kdb.kdbRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
+    let promise = kdb.kdbRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
         repositoryInformation.relativeFilePath);
-    statusMap[proxies[i].item.id] = status;
+    promises.push(promise);
   }
-  
-  kio.server.emit('VersionControl/statusUpdated', statusMap);
+
+  Promise.all(promises).then((statusArray) => {
+    for (var i = 0; i < proxies.length; i++) {
+      statusMap[proxies[i].item.id] = statusArray[i];
+    }
+
+    kio.server.emit('VersionControl/statusUpdated', statusMap);
+  });
 }
 
 function getRepositoryInformation(proxy) {
