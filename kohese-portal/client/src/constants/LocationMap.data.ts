@@ -31,5 +31,11 @@ export var LocationMap = {
     'title': 'Admin',
     'params': {},
     'route': '/admin'
+  },
+  'Repositories': {
+    'type': 'external',
+    'title': 'Repositories',
+    'params': {},
+    'route': '/repositories'
   }
 }

@@ -4,7 +4,8 @@ import { Observable } from 'rxjs/Observable';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TabService } from '../../services/tab/tab.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { LoginService } from '../../services/authentication/login.service';
+import * as ItemProxy from '../../../../common/models/item-proxy';
 
 @Component({
   selector: 'app-bar',
@@ -22,7 +23,8 @@ export class AppBarComponent extends NavigatableComponent implements OnInit {
 
   constructor(private userService: UserService,
               protected TabService: TabService,
-              protected NavigationService: NavigationService) {
+              protected NavigationService: NavigationService,
+              private loginService: LoginService) {
                 super(NavigationService, TabService);
                }
 
@@ -44,7 +46,8 @@ export class AppBarComponent extends NavigatableComponent implements OnInit {
   }
 
   logout() {
-    console.log('Logout Called - Not Implemented');
-    console.log(this);
+    this.loginService.logout();
+    this.onLoginScreen = true;
+    this.userLoggedIn = null;
   }
 }

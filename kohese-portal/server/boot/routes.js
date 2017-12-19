@@ -18,7 +18,8 @@ module.exports = function (app) {
     var ngRoutes = [
       '/admin',
       '/dashboard',
-      '/login'
+      '/login',
+      '/repositories'
     ];
  
     app.use(ngRoutes, function (req, res) {

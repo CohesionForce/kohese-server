@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/models/item-proxy';
 import { SocketService } from '../socket/socket.service';
 import { UserService } from '../user/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/bindCallback';
+import 'rxjs/add/operator/do';
 
 @Injectable()
 export class VersionControlService {
@@ -142,19 +145,20 @@ export class VersionControlService {
     });
   }
   
-  getRemotes(id: string, callback: Function) {
+  getRemotes(id: string): Observable<any> {
     let data: {
       proxyId: string;
     } = {
       proxyId: id
     };
-    this.socketService.getSocket().emit('VersionControl/getRemotes', data,
-      function (results) {
+    
+    let emit: (message: string, data: { proxyId: string; }) => Observable<any> =
+      Observable.bindCallback(this.socketService.getSocket().emit);
+    return emit('VersionControl/getRemotes', data).do((results) => {
       if (results.error) {
         this.toastrService.error('Remote Retrieval Failed', results.error);
       } else {
         this.toastrService.success('Remote Retrieval Succeeded', 'Version Control');
-        callback(results);
       }
     });
   }

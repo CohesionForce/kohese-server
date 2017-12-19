@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core'
 
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/models/item-proxy';
 import { UserService } from '../../services/user/user.service';
 import { VersionControlService } from '../../services/version-control/version-control.service';
+import { SessionService } from '../../services/user/session.service';
 
 @Component({
   selector: 'app-admin',
@@ -18,18 +19,11 @@ export class AdminComponent implements OnInit {
   private editUserForm: boolean = false;
   private currentForm: string;
   private selectedUserProxy: ItemProxy;
-  private remoteNameInput: string;
-  private remoteUrlInput: string;
-  private remotes: any[] = [];
-  private commitMessageInput: string;
 
-  constructor(private userService: UserService, private versionControlService: VersionControlService) {
+  constructor(private userService: UserService, private sessionService: SessionService) {
   }
 
   ngOnInit() {
-  }
-  
-  navigate(state) {
   }
   
   addUser() {
@@ -83,31 +77,5 @@ export class AdminComponent implements OnInit {
   
   deleteUser(userProxy) {
     // TODO Delete user on the server
-  }
-  
-  addRemote() {
-    if ((this.remoteNameInput !== '') && (this.remoteUrlInput !== '')) {
-      this.versionControlService.addRemote(ItemProxy.getRootProxy().item.id,
-        this.remoteNameInput, this.remoteUrlInput);
-    } else {
-      alert('Please specify both a remote name and URL.');
-    }
-  }
-  
-  getRemotes(): any[] {
-    // TODO Get remotes from VersionControlService
-    return [];
-  }
-  
-  commit() {
-    if (this.commitMessageInput === '') {
-      this.commitMessageInput = '<No message supplied>';
-    }
-    
-    // TODO Commit through VersionControlService
-  }
-  
-  push() {
-    // TODO Push through VersionControlService
   }
 }

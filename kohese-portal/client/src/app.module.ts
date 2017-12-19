@@ -14,6 +14,7 @@ import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ContentContainerComponent } from './components/content-container/content-container.component';
+import { RepositoriesComponent } from './components/admin/repositories.component';
 
 import { UserService } from './services/user/user.service';
 import { AuthTokenFactory } from './services/authentication/auth-token.factory';
@@ -25,6 +26,7 @@ import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
+import { MapKeyPipe } from './map-key.pipe';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
@@ -39,7 +41,9 @@ import { MaterialModule } from './material.module';
     SideBarComponent,
     DashboardComponent,
     AdminComponent,
-    LoginComponent
+    LoginComponent,
+    MapKeyPipe,
+    RepositoriesComponent
   ],
   imports: [
     BrowserModule,
