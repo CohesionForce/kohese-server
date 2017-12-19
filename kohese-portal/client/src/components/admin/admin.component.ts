@@ -28,10 +28,10 @@ export class AdminComponent implements OnInit {
 
   ngOnInit() {
   }
-  
+
   navigate(state) {
   }
-  
+
   addUser() {
     this.usernameInput = '';
     this.descriptionInput = '';
@@ -44,7 +44,7 @@ export class AdminComponent implements OnInit {
       parentId: this.userService.getUsersItemId()
     });
   }
-  
+
   editUser(userProxy: ItemProxy) {
     this.usernameInput = userProxy.item.name;
     this.descriptionInput = userProxy.item.description;
@@ -53,7 +53,7 @@ export class AdminComponent implements OnInit {
     this.currentForm = 'Edit User';
     this.selectedUserProxy = userProxy;
   }
-  
+
   cancelForm() {
     this.addUserForm = false;
     this.editUserForm = false;
@@ -64,7 +64,7 @@ export class AdminComponent implements OnInit {
     this.passwordInput = '';
     this.confirmPasswordInput = '';
   }
-  
+
   updateUser() {
     if (this.passwordInput === this.confirmPasswordInput) {
       this.selectedUserProxy.item.name = this.usernameInput;
@@ -73,18 +73,18 @@ export class AdminComponent implements OnInit {
       if (this.passwordInput !== '') {
         this.selectedUserProxy.item.password = this.passwordInput;
       }
-      
+
       // TODO Update the user on the server
       this.cancelForm();
     } else {
       alert('Confirmation password does not match password.');
     }
   }
-  
+
   deleteUser(userProxy) {
     // TODO Delete user on the server
   }
-  
+
   addRemote() {
     if ((this.remoteNameInput !== '') && (this.remoteUrlInput !== '')) {
       this.versionControlService.addRemote(ItemProxy.getRootProxy().item.id,
@@ -93,20 +93,20 @@ export class AdminComponent implements OnInit {
       alert('Please specify both a remote name and URL.');
     }
   }
-  
+
   getRemotes(): any[] {
     // TODO Get remotes from VersionControlService
     return [];
   }
-  
+
   commit() {
     if (this.commitMessageInput === '') {
       this.commitMessageInput = '<No message supplied>';
     }
-    
+
     // TODO Commit through VersionControlService
   }
-  
+
   push() {
     // TODO Push through VersionControlService
   }

@@ -14,6 +14,9 @@ import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ContentContainerComponent } from './components/content-container/content-container.component';
+import { TreeComponent } from './components/tree/tree.component';
+import { DetailsComponent } from './components/details/details.component';
+import { ExploreComponent } from './components/explore/explore.component';
 
 import { UserService } from './services/user/user.service';
 import { AuthTokenFactory } from './services/authentication/auth-token.factory';
@@ -30,6 +33,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 
 import { MaterialModule } from './material.module';
+import { ItemRepository } from './services/item-repository/item-repository.service';
 
 @NgModule({
   declarations: [
@@ -39,7 +43,10 @@ import { MaterialModule } from './material.module';
     SideBarComponent,
     DashboardComponent,
     AdminComponent,
-    LoginComponent
+    LoginComponent,
+    TreeComponent,
+    DetailsComponent,
+    ExploreComponent
   ],
   imports: [
     BrowserModule,
@@ -51,7 +58,7 @@ import { MaterialModule } from './material.module';
     ToastrModule.forRoot(),
     MaterialModule
   ],
-  providers: [UserService, AuthTokenFactory, LoginService, {
+  providers: [ItemRepository ,UserService, AuthTokenFactory, LoginService, {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true,
