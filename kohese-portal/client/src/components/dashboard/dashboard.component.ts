@@ -4,6 +4,8 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TabService } from '../../services/tab/tab.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,13 +34,14 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
   acceptedTasksFilter : Object;
   inWorkTasks : Array<any>;
   inWorkTasksFilter : Object;
-  thisGuy;
+  repoStatusSubject : BehaviorSubject<any>;
 
 
 
   constructor(private bundleService: BundleService,
               protected NavigationService : NavigationService,
-              protected TabService : TabService) {
+              protected TabService : TabService,
+              private ItemRepository : ItemRepository) {
     super(NavigationService, TabService);
                }
 
@@ -63,8 +66,12 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     this.acceptedTasksFilter = {};
     this.inWorkTasks = this.testProxies();
     this.inWorkTasksFilter = {};
-    this.thisGuy = this;
-    console.log(this);
+    this.repoStatusSubject = this.ItemRepository.getRepoStatusSubject();
+    this.repoStatusSubject.subscribe(update => {
+      if (update.connected) {
+        console.log(this.ItemRepository.getRootProxy());
+      }
+    })
   }
 
   testProxies () : Array<object> {

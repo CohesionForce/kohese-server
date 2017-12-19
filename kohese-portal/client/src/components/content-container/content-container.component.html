@@ -5,7 +5,7 @@
     </button>
         <ngb-tabset>
           <div *ngFor="let tab of tabs">
-            <ngb-tab active="tab.active"
+            <ngb-tab label="tab.active"
             class=" nav nav-tabs">
                 <ng-template ngbTabTitle>
                   <span (click)="setTab(tab)">

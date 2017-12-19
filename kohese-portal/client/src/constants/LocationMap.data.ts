@@ -37,5 +37,11 @@ export var LocationMap = {
     'title': 'Repositories',
     'params': {},
     'route': '/repositories'
+  },
+  'Explore' : {
+    'type' : 'dual',
+    'title' : 'Explore',
+    'params' : {},
+    'route' : '/explore'
   }
 }
