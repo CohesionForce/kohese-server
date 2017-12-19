@@ -69,7 +69,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     this.repoStatusSubject = this.ItemRepository.getRepoStatusSubject();
     this.repoStatusSubject.subscribe(update => {
       if (update.connected) {
-        console.log(this.ItemRepository.getRootProxy())
+        console.log(this.ItemRepository.getRootProxy());
       }
     })
   }

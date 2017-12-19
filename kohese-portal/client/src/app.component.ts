@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { OnInit } from '@angular/core';
 import { ItemRepository } from './services/item-repository/item-repository.service';
 import { SocketService } from './services/socket/socket.service';
 

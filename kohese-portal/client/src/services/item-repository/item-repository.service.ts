@@ -21,7 +21,8 @@ export class ItemRepository {
     Unstaged,
     Staged,
     Conflicted
-  }
+  };
+
   repositoryStatus : BehaviorSubject<any>;
 
   constructor (private socketService: SocketService,
