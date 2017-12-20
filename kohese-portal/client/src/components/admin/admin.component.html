@@ -7,13 +7,13 @@
         <div>
             <h2>Sessions:</h2>
             <div class="session-container" *ngFor="let session of sessionService.getSessions() | mapKey">
-              <div>{{session.getSessions()[session].username}} - {{session.getSessions()[session].address}} - {{session.getSessions()[session].sessionId}}</div>
+              <div>{{sessionService.getSessions()[session].username}} - {{sessionService.getSessions()[session].address}} - {{sessionService.getSessions()[session].sessionId}}</div>
             </div>
         </div>
         <div id="admin-user-list">
             <h2>Users:</h2>
 
-            <div class="card-container" *ngFor="let userProxy of userService.getAllUsers()">
+            <div class="card-container" *ngFor="let userProxy of sessionService.getUsers()">
                 <div class="card">
                     <div class="front">
                         <div class="title">

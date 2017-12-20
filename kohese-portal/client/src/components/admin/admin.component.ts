@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 
 import * as ItemProxy from '../../../../common/models/item-proxy';
-import { UserService } from '../../services/user/user.service';
 import { VersionControlService } from '../../services/version-control/version-control.service';
 import { SessionService } from '../../services/user/session.service';
 
@@ -20,7 +19,7 @@ export class AdminComponent implements OnInit {
   private currentForm: string;
   private selectedUserProxy: ItemProxy;
 
-  constructor(private userService: UserService, private sessionService: SessionService) {
+  constructor(private sessionService: SessionService) {
   }
 
   ngOnInit() {
@@ -35,7 +34,7 @@ export class AdminComponent implements OnInit {
     this.currentForm = 'Add User';
     this.addUserForm = true;
     this.selectedUserProxy = new ItemProxy('KoheseUser', {
-      parentId: this.userService.getUsersItemId()
+      parentId: this.sessionService.getSessionUser().getValue().item.parentId
     });
   }
 

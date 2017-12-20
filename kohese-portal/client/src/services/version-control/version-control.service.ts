@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 
 import * as ItemProxy from '../../../../common/models/item-proxy';
 import { SocketService } from '../socket/socket.service';
-import { UserService } from '../user/user.service';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs/Observable';
+import { SessionService } from '../user/session.service';
 import 'rxjs/add/observable/bindCallback';
 import 'rxjs/add/operator/do';
 
 @Injectable()
 export class VersionControlService {
-  constructor(private socketService: SocketService, private userService: UserService,
+  constructor(private socketService: SocketService, private sessionService: SessionService,
     private toastrService: ToastrService) {
   }
   
@@ -25,9 +25,9 @@ export class VersionControlService {
     }
     
     this.socketService.getSocket().emit('VersionControl/stage', data,
-      function (results) {
+      (results) => {
       if (results.error) {
-        this.toastrService.error('Stage Failed', results.error);
+        this.toastrService.error('Stage Failed', 'Version Control');
       } else {
         this.toastrService.success('Stage Succeeded', 'Version Control');
       }
@@ -45,9 +45,9 @@ export class VersionControlService {
     }
     
     this.socketService.getSocket().emit('VersionControl/unstage', data,
-      function (results) {
+      (results) => {
       if (results.error) {
-        this.toastrService.error('Unstage Failed', results.error);
+        this.toastrService.error('Unstage Failed', 'Version Control');
       } else {
         this.toastrService.success('Unstage Succeeded', 'Version Control');
       }
@@ -69,9 +69,9 @@ export class VersionControlService {
     }
     
     this.socketService.getSocket().emit('VersionControl/revert', data,
-      function (results) {
+      (results) => {
       if (results.error) {
-        this.toastrService.error('Revert Failed', results.error);
+        this.toastrService.error('Revert Failed', 'Version Control');
       } else {
         this.toastrService.success('Revert Succeeded', 'Version Control');
       }
@@ -79,7 +79,7 @@ export class VersionControlService {
   }
   
   commitItems(proxies: ItemProxy[], commitMessage: string) {
-    let proxy: ItemProxy = this.userService.getCurrentUser().getValue();
+    let proxy: ItemProxy = this.sessionService.getSessionUser().getValue();
     let data: {
       proxyIds: string[];
       username: string;
@@ -96,9 +96,9 @@ export class VersionControlService {
     }
   
     this.socketService.getSocket().emit('VersionControl/commit', data,
-      function (results) {
+      (results) => {
       if (results.error) {
-        this.toastrService.error('Commit Failed', results.error);
+        this.toastrService.error('Commit Failed', 'Version Control');
       } else {
         this.toastrService.success('Commit Succeeded', 'Version Control');
       }
@@ -115,9 +115,9 @@ export class VersionControlService {
     };
     
     this.socketService.getSocket().emit('VersionControl/push', data,
-      function (results) {
+      (results) => {
       if (results.error) {
-        this.toastrService.error('Push Failed', results.error);
+        this.toastrService.error('Push Failed', 'Version Control');
       } else {
         this.toastrService.success('Push Succeeded', 'Version Control');
       }
@@ -136,9 +136,9 @@ export class VersionControlService {
     };
     
     this.socketService.getSocket().emit('VersionControl/addRemote', data,
-      function (results) {
+      (results) => {
       if (results.error) {
-        this.toastrService.error('Add Remote Failed', results.error);
+        this.toastrService.error('Add Remote Failed', 'Version Control');
       } else {
         this.toastrService.success('Add Remote Succeeded', 'Version Control');
       }
@@ -156,7 +156,7 @@ export class VersionControlService {
       Observable.bindCallback(this.socketService.getSocket().emit);
     return emit('VersionControl/getRemotes', data).do((results) => {
       if (results.error) {
-        this.toastrService.error('Remote Retrieval Failed', results.error);
+        this.toastrService.error('Remote Retrieval Failed', 'Version Control');
       } else {
         this.toastrService.success('Remote Retrieval Succeeded', 'Version Control');
       }

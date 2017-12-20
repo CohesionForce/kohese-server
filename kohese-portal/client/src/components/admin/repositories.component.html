@@ -7,14 +7,14 @@
                 <h5>Repository List:</h5>
                 <button (click)="getRemotes()"
                         class="btn btn-primary">Refresh Repositories</button>
-                <div *ngFor="let repo of remotesList">
+                <div *ngFor="let repo of remotes">
                     {{repo}}
                 </div>
             </div>
         <div>
             <label for="add-remote-input">Remote Name: </label>
             <input id="add-remote-input" type="text" [(ngModel)]="remoteNameInput"/>
-            <label for="push-remote-url">Push url :</label>
+            <label for="push-remote-url">Push URL:</label>
             <input id="add-remote-url" type="text" 
                     [(ngModel)]="remoteUrlInput">
             <button (click)="addRemote()" 

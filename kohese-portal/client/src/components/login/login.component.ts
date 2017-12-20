@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LoginService } from '../../services/authentication/login.service';
-import { AuthTokenFactory } from '../../services/authentication/auth-token.factory';
+import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { SocketService } from '../../services/socket/socket.service';
 import { Router } from '@angular/router';
 
@@ -14,8 +13,8 @@ export class LoginComponent {
   private password : string = '';
   private loginSubmitted : boolean = false;
 
-  constructor(private loginService: LoginService, private router: Router,
-    private authTokenFactory: AuthTokenFactory, private socketService: SocketService) {
+  constructor(private authenticationService: AuthenticationService, private router: Router,
+    private socketService: SocketService) {
   }
   
   ngOnInit() {
@@ -24,12 +23,10 @@ export class LoginComponent {
   login() {
     this.loginSubmitted = true;
     console.log ('Login Submitted');
-    this.loginService.login({
+    this.authenticationService.login({
       username: this.username,
       password: this.password
-    }).subscribe((httpResponse) => {
-      this.authTokenFactory.setToken(httpResponse.body);
-      this.socketService.connect();
+    }).subscribe((decodedToken) => {
       this.router.navigate(['/dashboard']);
       this.loginSubmitted = false;
     }, (err) => {
