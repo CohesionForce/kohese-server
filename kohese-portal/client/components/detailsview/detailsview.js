@@ -96,69 +96,52 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
     tabService.bundleController(detailsCtrl, 'detailsCtrl', detailsCtrl.tab.id)
   });
   
-  $scope.$watch('detailsCtrl.itemProxy.dirty', function () {
-    if (detailsCtrl.itemProxy && detailsCtrl.itemForm) {
-      if(detailsCtrl.itemForm.$dirty !== detailsCtrl.itemProxy.dirty) {
-        // itemProxy has changed
-        detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
-      }
-    }
-  });
-
   $scope.$watch('detailsCtrl.itemForm.$dirty', function () {
-    if (detailsCtrl.itemProxy && detailsCtrl.itemForm) {
-      // Detect if itemForm has been changed
-      if (detailsCtrl.itemForm.$dirty) {
-        detailsCtrl.itemProxy.dirty = detailsCtrl.itemForm.$dirty;
-      }
-        
-      // Detect if existing proxy is already dirty
-      if (!detailsCtrl.itemForm.$dirty && detailsCtrl.itemProxy.dirty) {
-        detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
-      }
+    if (detailsCtrl.itemProxy && detailsCtrl.itemForm && detailsCtrl.itemForm.$dirty) {
+      detailsCtrl.itemProxy.dirty = true;
     }
   });
     
   $scope.$watch('detailsCtrl.decisionForm.$dirty', function () {
-    if (detailsCtrl.itemProxy && detailsCtrl.decisionForm) {
-      // Detect if decisionForm has been changed
-      if (detailsCtrl.decisionForm.$dirty) {
-        detailsCtrl.itemForm.$dirty = detailsCtrl.decisionForm.$dirty;
-      }
+    if (detailsCtrl.itemProxy && detailsCtrl.decisionForm && detailsCtrl.decisionForm.$dirty) {
+      detailsCtrl.itemProxy.dirty = true;
     }      
   });
     
   $scope.$watch('detailsCtrl.actionForm.$dirty', function () {
-    if (detailsCtrl.itemProxy && detailsCtrl.actionForm) {
-      // Detect if actionForm has been changed
-      if (detailsCtrl.actionForm.$dirty) {
-        detailsCtrl.itemForm.$dirty = detailsCtrl.actionForm.$dirty;
-      }
+    if (detailsCtrl.itemProxy && detailsCtrl.actionForm && detailsCtrl.actionForm.$dirty) {
+      detailsCtrl.itemProxy.dirty = true;
+    }      
+  });
+    
+  $scope.$watch('detailsCtrl.taskForm.$dirty', function () {
+    if (detailsCtrl.itemProxy && detailsCtrl.taskForm && detailsCtrl.taskForm.$dirty) {
+      detailsCtrl.itemProxy.dirty = true;
     }      
   });
     
   $scope.$watch('detailsCtrl.observationForm.$dirty', function () {
-    if (detailsCtrl.itemProxy && detailsCtrl.observationForm) {
-      // Detect if observationForm has been changed
-      if (detailsCtrl.observationForm.$dirty) {
-        detailsCtrl.itemForm.$dirty = detailsCtrl.observationForm.$dirty;
-      }
+    if (detailsCtrl.itemProxy && detailsCtrl.observationForm && detailsCtrl.observationForm.$dirty) {
+      detailsCtrl.itemProxy.dirty = true;
     }      
   });
     
   $scope.$watch('detailsCtrl.issueForm.$dirty', function () {
-    if (detailsCtrl.itemProxy && detailsCtrl.issueForm) {
-      // Detect if actionForm has been changed
-      if (detailsCtrl.issueForm.$dirty) {
-        detailsCtrl.itemForm.$dirty = detailsCtrl.issueForm.$dirty;
-      }
+    if (detailsCtrl.itemProxy && detailsCtrl.issueForm && detailsCtrl.issueForm.$dirty) {
+      detailsCtrl.itemProxy.dirty = true;
+    }      
+  });
+
+  $scope.$watch('detailsCtrl.repositoryForm.$dirty', function () {
+    if (detailsCtrl.itemProxy && detailsCtrl.repositoryForm && detailsCtrl.repositoryForm.$dirty) {
+      detailsCtrl.itemProxy.dirty = true;
     }      
   });
 
   detailsCtrl.uiTreeOptions = {
     dropped : function (event) {
       if (event.source.index != event.dest.index) {
-        detailsCtrl.itemForm.$dirty = true;
+        detailsCtrl.itemProxy.dirty = true;
         detailsCtrl.itemProxy.updateChildrenManualOrder();
         console.log('))) Source:    ' + event.source);
         console.log('))) Source id: ' + event.source.nodeScope.proxy.item.id);
@@ -217,13 +200,7 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
           detailsCtrl.itemProxy = updatedItemProxy;
         }
         // clear the state of the form
-        detailsCtrl.itemForm.$setPristine();
-        if (detailsCtrl.decisionForm) {
-          detailsCtrl.decisionForm.$setPristine();
-        }
-        if (detailsCtrl.actionForm) {
-          detailsCtrl.actionForm.$setPristine();
-        }
+        detailsCtrl.setFormsPristine();
         detailsCtrl.enableEdit = false;
 
         if (navigationType === 'parent') {
@@ -357,13 +334,7 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
     ItemRepository.upsertItem(detailsCtrl.itemProxy)
       .then(function (updatedItemProxy) {
         // clear the state of the form
-        detailsCtrl.itemForm.$setPristine();
-        if (detailsCtrl.decisionForm) {
-          detailsCtrl.decisionForm.$setPristine();
-        }
-        if (detailsCtrl.actionForm) {
-          detailsCtrl.actionForm.$setPristine();
-        }
+        detailsCtrl.setFormsPristine();
         detailsCtrl.enableEdit = false;
         $scope.$apply();
       });
@@ -392,18 +363,36 @@ function DetailsViewController ($state, $sce, $timeout, ItemRepository, IssueSer
       }, 0, false);
     });
   }
-      
+     
+  detailsCtrl.setFormsPristine = function () {
+    if (this.itemForm) {
+      this.itemForm.$setPristine();
+    }
+    if (this.decisionForm) {
+      this.decisionForm.$setPristine();
+    }
+    if (this.actionForm) {
+      this.actionForm.$setPristine();
+    }
+    if (this.taskForm) {
+      this.taskForm.$setPristine();
+    }          
+    if (this.observationForm) {
+      this.observationForm.$setPristine();
+    }
+    if (this.issueForm) {
+      this.issueForm.$setPristine();
+    }
+    if (this.repositoryForm) {
+      this.repositoryForm.$setPristine();
+    }              
+  }
+  
   detailsCtrl.cancel = function () {
     if (this.itemProxy.dirty) {
       ItemRepository.fetchItem(detailsCtrl.itemProxy)
         .then((fetchResults) => {
-          this.itemForm.$setPristine();
-          if (this.decisionForm) {
-            this.decisionForm.$setPristine();
-          }
-          if (this.actionForm) {
-            this.actionForm.$setPristine();
-          }
+          this.setFormsPristine();
           $scope.$apply();
         });
     }
