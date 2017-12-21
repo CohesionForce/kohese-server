@@ -9,7 +9,7 @@ import { ItemRepository } from '../item-repository/item-repository.service';
 @Injectable()
 export class UserService {
   private currentUser: BehaviorSubject<ItemProxy> = new BehaviorSubject(undefined);
-  
+
   constructor(private authenticationService: AuthenticationService,
     private itemRepository: ItemRepository, private router: Router) {
     this.authenticationService.getAuthenticationInformation().subscribe((decodedToken) => {
@@ -28,7 +28,18 @@ export class UserService {
   getUsersItemId() {
   }
 
-  getAllUsers() {
+  getAllUsers() : Array<any> {
+    return [
+      {
+      item: {
+        name: 'admin'
+      }
+    },
+    {
+      item: {
+        name: 'test-user'
+      }
+    }]
   }
 
   getCurrentUser(): BehaviorSubject<ItemProxy> {

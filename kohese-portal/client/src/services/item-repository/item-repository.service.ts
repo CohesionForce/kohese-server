@@ -320,6 +320,10 @@ export class ItemRepository {
     return this.modelTypes;
   }
 
+  getModelList () : Array<String> {
+    return Object.keys(this.modelTypes);
+  }
+
   createShortFormItemList () {
     var proxies = ItemProxy.getAllItemProxies();
     this.shortProxyList=[];
