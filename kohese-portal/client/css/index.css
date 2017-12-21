@@ -9,6 +9,7 @@ components/
 pages/
 themes/
 */
+@import '../../node_modules/@angular/material/prebuilt-themes/indigo-pink.css';
 .btn-outline {
   color: inherit;
   background-color: transparent;

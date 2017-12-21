@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 
 import * as _ from 'underscore';
 
-import { SocketService } from "../socket/socket.service";
+import { SocketService } from '../socket/socket.service';
+import { AuthenticationService } from '../authentication/authentication.service';
 import { ToastrService } from "ngx-toastr";
 
 import * as ItemProxy from '../../../../common/models/item-proxy';
+import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 /**
@@ -26,6 +28,7 @@ export class ItemRepository {
   repositoryStatus : BehaviorSubject<any>;
 
   constructor (private socketService: SocketService,
+               private authenticationService: AuthenticationService,
                private toastrService : ToastrService) {
               this.initialize();
               }
@@ -87,10 +90,10 @@ export class ItemRepository {
       }
     });
 
-    this.socketService.isAuthenticated()
-      .subscribe(authenticationStatus => {
+    this.authenticationService.getAuthenticationInformation()
+      .subscribe((decodedToken) => {
         console.log('Auth IR');
-        if (authenticationStatus === true) {
+        if (decodedToken) {
           console.log('::: IR: this.socketService already connected');
           this.registerKoheseIOListeners();
           this.fetchItems();
@@ -99,24 +102,24 @@ export class ItemRepository {
   }
 
   // Item Proxy Wrapper Methods
-  getRootProxy () : Function {
-    return ItemProxy.getRootProxy;
+  getRootProxy(): ItemProxy {
+    return ItemProxy.getRootProxy();
   }
 
-  getChangeSubject () : Function {
-    return ItemProxy.getChangeSubject;
+  getChangeSubject(): Subject<any> {
+    return ItemProxy.getChangeSubject();
   }
 
-  getProxyFor () : Function {
-    return ItemProxy.getProxyFor;
+  getProxyFor(id: string): ItemProxy {
+    return ItemProxy.getProxyFor(id);
   }
 
-  getAllItemProxies () : Function {
-    return ItemProxy.getAllItemProxies;
+  getAllItemProxies(): Array<ItemProxy> {
+    return ItemProxy.getAllItemProxies();
   }
 
-  getRepositories () : Function {
-    return ItemProxy.getRepositories
+  getRepositories(): Array<ItemProxy> {
+    return ItemProxy.getRepositories();
   }
 
   // End Item Proxy Wrapper
@@ -177,15 +180,15 @@ export class ItemRepository {
       });
 
       this.socketService.socket.on('reconnect', function () {
-        if (this.socketService.isAuthenticated) {
-          console.log('::: IR: this.socketService already authenticated');
+        if (this.authenticationService.getAuthenticationInformation().getValue()) {
+          console.log('::: IR: this.authenticationService already authenticated');
           this.fetchItems();
           this.toastrService.success('Reconnected!', 'Server Connection!');
         } else {
-          console.log('::: IR: Listening for this.socketService authentication');
-          var deregister = this.socketService.isAuthenticated()
-            .subscribe(notification => {
-              if(notification === true) {
+          console.log('::: IR: Listening for this.authenticationService authentication');
+          var deregister = this.authenticationService.getAuthenticationInformation()
+            .subscribe((decodedToken) => {
+              if(decodedToken) {
                 console.log('::: IR: Socket Authenticated');
                 this.fetchItems();
                 this.toastrService.success('Reconnected!', 'Server Connection!');
