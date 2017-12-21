@@ -218,14 +218,16 @@ function add(repositoryId, filePath) {
     return index.addByPath(filePath).then(function () {
       return index.write();
     }).then(function () {
-      var status = getItemStatus(repositoryId, filePath);
-      for (var j = 0; j < status.length; j++) {
-        if (status[j].startsWith('INDEX_')) {
-          return true;
+      var statusPromise = getItemStatus(repositoryId, filePath);
+      return statusPromise.then((status) => {
+        for (var j = 0; j < status.length; j++) {
+          if (status[j].startsWith('INDEX_')) {
+            return true;
+          }
         }
-      }
-      
-      return false;
+        
+        return false;
+      });
     });
   });
 }
@@ -474,15 +476,18 @@ module.exports.getStatus = getStatus;
 //////////////////////////////////////////////////////////////////////////
 function getItemStatus(repositoryId, filePath) {
   var status = [];
-  var statNum = nodegit.Status.file(repoList[repositoryId], filePath);
-  
-  for (var statusKey in nodegit.Status.STATUS) {
-    if ((statNum & nodegit.Status.STATUS[statusKey]) !== 0) {
-      status.push(statusKey);
+  var statPromise = nodegit.Status.file(repoList[repositoryId], filePath);
+
+  return statPromise.then((statNum) => {
+    for (var statusKey in nodegit.Status.STATUS) {
+      if ((statNum & nodegit.Status.STATUS[statusKey]) !== 0) {
+        status.push(statusKey);
+      }
     }
-  }
+    
+    return status;
+  });
   
-  return status;
 }
 module.exports.getItemStatus = getItemStatus;
 

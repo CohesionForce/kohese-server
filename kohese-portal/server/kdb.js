@@ -234,6 +234,8 @@ function storeModelInstance(proxy, isNewItem){
     repositoryPath = ItemProxy.getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
     return kdbRepo.getItemStatus(ItemProxy.getRootProxy().item.id,
         repositoryPath);
+  }).then((status) => {
+    return status;
   });
 }
 

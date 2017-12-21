@@ -1,5 +1,3 @@
-console.log('$$$ Begin Loading Enable Authentication');
-
 const server = global.app;
 
 const ItemProxy = require('../common/models/item-proxy.js');
@@ -169,5 +167,3 @@ module.exports.login = login;
 //////////////////////////////////////////////////////////////////////////
 console.log('::: Checking if users and admin account exist');
 checkAndCreateUsersItem();
-
-console.log('$$$ Finished Loading Enable Authentication');

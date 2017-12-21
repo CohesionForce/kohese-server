@@ -10,6 +10,8 @@ module.exports = function (app) {
     var bodyParser = require('body-parser');
     var util = require('util');
     var serveIndex = require('serve-index');
+    var serveFavicon = require('serve-favicon');
+
     
     var serverAuthentication = require('../server-enableAuth.js');
 
@@ -18,6 +20,8 @@ module.exports = function (app) {
     app.use('/socket.io-file-client', 
             express.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
     
+    app.use(serveFavicon(path.resolve(__dirname, '../../client/resources/icons/favicon.ico')));
+
     app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
     app.use('/reports', express.static(path.resolve(__dirname, '../../tmp_reports')));
     

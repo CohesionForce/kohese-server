@@ -38,10 +38,13 @@ describe('Test KDB Repository: ', function () {
     });
   });
 
-  it('retrieves status for a new file added to the working tree', function () {
+  it('retrieves status for a new file added to the working tree', function (done) {
     Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent);
-    var status = KdbRepo.getItemStatus(repositoryId, testFile);
-    expect(status).toEqual(['WT_NEW']);
+    var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+    statusPromise.then((status) => {
+      expect(status).toEqual(['WT_NEW']);
+      done();
+    });
   });
   
   it('adds to the index', function (done) {
@@ -54,9 +57,12 @@ describe('Test KDB Repository: ', function () {
     });
   });
 
-  it('retrieves status for a new file added to the index', function () {
-    var status = KdbRepo.getItemStatus(repositoryId, testFile);
-    expect(status).toEqual(['INDEX_NEW']);
+  it('retrieves status for a new file added to the index', function (done) {
+    var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+    statusPromise.then((status) => {
+      expect(status).toEqual(['INDEX_NEW']);
+      done();      
+    });
   });
   
   it('commits', function (done) {
@@ -105,9 +111,11 @@ describe('Test KDB Repository: ', function () {
     Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent +
       additionalContent);
     KdbRepo.checkout(repositoryId, [testFile], true).then(function () {
-      var status = KdbRepo.getItemStatus(repositoryId, testFile);
-      expect(status).toEqual([]);
-      done();
+      var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+      statusPromise.then((status) => {
+        expect(status).toEqual([]);
+        done();
+      });
     }).catch(function (err) {
       console.log(err.stack);
       fail();
@@ -120,9 +128,11 @@ describe('Test KDB Repository: ', function () {
     KdbRepo.add(repositoryId, testFile).then(function () {
       return KdbRepo.reset(repositoryId, [testFile]);
     }).then(function () {
-      var s = KdbRepo.getItemStatus(repositoryId, testFile);
-      expect(s).toContain('WT_MODIFIED');
-      done();
+      var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+      statusPromise.then((status) => {
+        expect(status).toContain('WT_MODIFIED');
+        done();
+      });
     }).catch(function (err) {
       console.log(err.stack);
       fail();
@@ -135,9 +145,11 @@ describe('Test KDB Repository: ', function () {
         KdbRepo.checkout(repositoryId, [testFile], true).then(function () {
           expect(Fs.readFileSync(repositoryPath + Path.sep + testFile,
             {encoding: 'utf8', flag: 'r'})).toEqual(baseContent + additionalContent);
-          var status = KdbRepo.getItemStatus(repositoryId, testFile);
-          expect(status).toEqual(['INDEX_MODIFIED']);
-          done();
+          var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+          statusPromise.then((status) => {
+            expect(status).toEqual(['INDEX_MODIFIED']);
+            done();
+          });
         });
       } else {
         console.log('*** Error: Add to index failed');
@@ -150,19 +162,25 @@ describe('Test KDB Repository: ', function () {
     var originalContent = Fs.readFileSync(repositoryPath + Path.sep + testFile,
         {encoding: 'utf8', flag: 'r'});
 
-    var status = KdbRepo.getItemStatus(repositoryId, testFile);
-    expect(status).toEqual(['INDEX_MODIFIED']);
-    
-    Fs.writeFileSync(repositoryPath + Path.sep + testFile, originalContent + furtherContent);
-    status = KdbRepo.getItemStatus(repositoryId, testFile);
-    expect(status).toEqual(['INDEX_MODIFIED', 'WT_MODIFIED']);
-
-    KdbRepo.checkout(repositoryId, [testFile], true).then(function () {
-      status = KdbRepo.getItemStatus(repositoryId, testFile);
+    var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+    statusPromise.then((status) => {
       expect(status).toEqual(['INDEX_MODIFIED']);
-      expect(Fs.readFileSync(repositoryPath + Path.sep + testFile,
-          {encoding: 'utf8', flag: 'r'})).toEqual(originalContent);
-      done();
+      
+      Fs.writeFileSync(repositoryPath + Path.sep + testFile, originalContent + furtherContent);
+      statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+      statusPromise.then((status) => {
+        expect(status).toEqual(['INDEX_MODIFIED', 'WT_MODIFIED']);
+
+        KdbRepo.checkout(repositoryId, [testFile], true).then(function () {
+          statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+          statusPromise.then((status) => {
+            expect(status).toEqual(['INDEX_MODIFIED']);
+            expect(Fs.readFileSync(repositoryPath + Path.sep + testFile,
+                {encoding: 'utf8', flag: 'r'})).toEqual(originalContent);
+            done();
+          });
+        });
+      });
     });
   });
 
@@ -181,9 +199,11 @@ describe('Test KDB Repository: ', function () {
       Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent +
           additionalContent +
           'third');
-      var status = KdbRepo.getItemStatus(repositoryId, testFile);
-      expect(status).toEqual(['WT_MODIFIED']);
-      done();
+      var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
+      statusPromise.then((status) => {
+        expect(status).toEqual(['WT_MODIFIED']);
+        done();
+      });
     }).catch(function (err) {
       console.log(err.stack);
       fail();
@@ -192,13 +212,17 @@ describe('Test KDB Repository: ', function () {
   
   it('deletes an untracked file when it is reverted', function (done) {
     Fs.writeFileSync(repositoryPath + Path.sep + testFile2, baseContent);
-    var status = KdbRepo.getItemStatus(repositoryId, testFile2);
-    expect(status).toEqual(['WT_NEW']);
-    KdbRepo.checkout(repositoryId, [testFile2], true).then(function () {
-      expect(Fs.existsSync(repositoryPath + Path.sep + testFile2)).toEqual(false);
-      var statusAfterCheckout = KdbRepo.getItemStatus(repositoryId, testFile2);
-      expect(statusAfterCheckout).toEqual([]);
-      done();
+    var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile2);
+    statusPromise.then((status) => {
+      expect(status).toEqual(['WT_NEW']);
+      KdbRepo.checkout(repositoryId, [testFile2], true).then(function () {
+        expect(Fs.existsSync(repositoryPath + Path.sep + testFile2)).toEqual(false);
+        statusPromise = KdbRepo.getItemStatus(repositoryId, testFile2);
+        statusPromise.then((status) => {
+          expect(status).toEqual([]);
+          done();
+        });
+      });
     });
   });
 });
