@@ -10,6 +10,7 @@ import { Tab } from '../../services/tab/Tab.class';
 import { TabService } from '../../services/tab/tab.service';
 import { BundleService } from '../../services/bundle/bundle.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'content-container',
@@ -18,8 +19,8 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 export class ContentContainerComponent extends NavigatableComponent
                                        implements OnInit, OnDestroy {
   tabs: Array<Tab>
-  currentTabListener : BehaviorSubject<Tab>;
-  tabListListener : BehaviorSubject<Array<Tab>>;
+  currentTabSub : Subscription;
+  tabListSub : Subscription;
 
   constructor(private tabService: TabService,
               private bundleService: BundleService,
@@ -29,17 +30,15 @@ export class ContentContainerComponent extends NavigatableComponent
   }
 
   ngOnInit(): void {
-    this.currentTabListener = this.tabService.getCurrentTab();
-    this.currentTabListener
+    this.currentTabSub = this.tabService.getCurrentTab()
       .subscribe( x=> console.log(`Subscriber test ${x}`));
-    this.tabListListener = this.tabService.getTabList();
-    this.tabListListener
+    this.tabListSub = this.tabService.getTabList()
       .subscribe( tabList=> this.tabs = tabList);
   }
 
   ngOnDestroy(): void {
-    this.currentTabListener.unsubscribe();
-    this.tabListListener.unsubscribe();
+    this.currentTabSub.unsubscribe();
+    this.tabListSub.unsubscribe();
   }
 
   setTab(tab): void {

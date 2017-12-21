@@ -10,7 +10,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 export class UserService {
   private currentUser: BehaviorSubject<ItemProxy> = new BehaviorSubject(undefined);
   private jwtHelper: JwtHelper = new JwtHelper();
-  
+
   constructor(private authTokenFactory: AuthTokenFactory, private router: Router) {
     this.authTokenFactory.getToken().subscribe((token) => {
       if (token) {
@@ -29,7 +29,18 @@ export class UserService {
   getUsersItemId() {
   }
 
-  getAllUsers() {
+  getAllUsers() : Array<any> {
+    return [
+      {
+      item: {
+        name: 'admin'
+      }
+    },
+    {
+      item: {
+        name: 'test-user'
+      }
+    }]
   }
 
   getCurrentUser(): BehaviorSubject<ItemProxy> {
