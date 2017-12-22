@@ -5,25 +5,36 @@ module.exports = function (app) {
     var jwt = require('jsonwebtoken');
     var jwtSecret = 'ij2ijo32iro2i3jrod111223';
     var expressJwt = require('express-jwt');
-    var loopback = require('loopback');
+    var express = require('express');
     var path = require('path');
     var bodyParser = require('body-parser');
     var util = require('util');
     var serveIndex = require('serve-index');
+    var serveFavicon = require('serve-favicon');
 
-    app.use(loopback.static(path.resolve(__dirname, '../../client')));
-    app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
-    app.use('/socket.io-file-client', 
-            loopback.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
     
+    var serverAuthentication = require('../server-enableAuth.js');
+
+    app.use(express.static(path.resolve(__dirname, '../../client-ng1')));
+    app.use(serveFavicon(path.resolve(__dirname, '../../client-ng1/resources/icons/favicon.ico')));
+
+    app.use(express.static(path.resolve(__dirname, '../../bower_components')));
+    app.use('/socket.io-file-client', 
+            express.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
+    
+
     app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
-    app.use('/reports', loopback.static(path.resolve(__dirname, '../../tmp_reports')));
+    app.use('/reports', express.static(path.resolve(__dirname, '../../tmp_reports')));
     
     app.use(bodyParser.json());
 
     app.post('/login', authenticate);
-
+    
+    console.log('$$$ Loading routes');
+    
     function authenticate(req, res, next) {
+        console.log('$$$ Authenticate');
+        
         var body = req.body;
         console.log('::: Checking: ' + body.username);
         
@@ -37,7 +48,7 @@ module.exports = function (app) {
           return;
         }
 
-        app.models.KoheseUser.login(body.username, body.password, function processCallback(err, user) {
+        serverAuthentication.login(body.username, body.password, function processCallback(err, user) {
           if (err){
             res.status(401).end('Login failed: ' + err);
             return;            
@@ -63,9 +74,11 @@ module.exports = function (app) {
 
       // jshint -W106
       if(!req.headers.authorization && req.query.access_token){
+        console.log('$$$ Auth Token: ' + req.query.access_token);
         console.log('::: Creating authorization header from access_token');
         req.headers.authorization = 'Bearer ' + req.query.access_token;
       }
+      console.log('$$$ Authorization: ' + req.headers.authorization);
       // jshint +W106
       next();  
     });
@@ -82,37 +95,9 @@ module.exports = function (app) {
       var authHeader = (req.headers.authorization);
       var header = authHeader.replace('Bearer ', '');
       req.headers.koheseUser = jwt.verify(header, jwtSecret);
+      console.log('$$$ User: ' + req.headers.koheseUser);
       console.log('User:    ' + util.inspect(req.headers.koheseUser,false,null));
       next();
     });
-
-    
-//    var requestRegex = /\/api\/([^\/]*)\/([^\/]*)/;
-    var requestRegex = /^\/([^\/]*)\/([^\/]*)/;
-    function kdbGet(req, res, next) {
-       var reqParts = req.url.match(requestRegex);
-       if (req.method === 'GET' && reqParts && reqParts[2]){
-         console.log('::: processing GET request - ' + req.method + ' - ' + req.url );
-//         console.log('+++ decoding request');
-//         console.log(reqParts);
-         var proxy = global.koheseKDB.ItemProxy.getProxyFor(reqParts[2]);
-         if (proxy){
-//           console.log(proxy.item);
-           res.send(proxy.item);
-         } else {
-           res.status(404).end();
-         }
-       } else {
-         next();
-       }
-    }
-
-    var restApiRoot = app.get('restApiRoot');
-    
-    // Using Item Proxy
-    app.use(restApiRoot, kdbGet);
-    
-    // Using Loopback
-    app.use(restApiRoot, app.loopback.rest());
 
 };

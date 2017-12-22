@@ -7,7 +7,7 @@ var _ = require('underscore');
 var SHA = require('jssha');
 var uuidV1 = require('uuid/v1');
 
-
+var Rx = require('rxjs/Rx');
 
 var tree = {};
 tree.proxyMap = {};
@@ -19,6 +19,8 @@ tree.modelMap = {
     'Internal-State': {}
 };
 tree.loading = true;
+
+tree.changeSubject = new Rx.Subject();
 
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
@@ -36,7 +38,25 @@ class ItemProxy {
       itemId = forItem.id = uuidV1();
       console.log('::: Allocating new id: ' + itemId);
     }
-
+    
+    var validation = ItemProxy.validateItemContent(kind, forItem);
+    
+    if (!validation.valid){
+      // TODO Need to remove this bypass logic which is needed to load some existing data
+      if(tree.loading){
+        console.log('*** Error: Invalid data item');
+        console.log('Kind: ' + kind);
+        console.log(forItem);
+        console.log(validation);        
+      } else {
+        throw ({
+          error: 'Not-Valid',
+          validation: validation
+        });
+        
+      }
+    }
+    
     var proxy = tree.proxyMap[itemId];
     if (!proxy) {
 //      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
@@ -76,6 +96,10 @@ class ItemProxy {
       return proxy;
     }
 
+    if (proxy.item.parentId && proxy.item.parentId === '') {
+      delete proxy.item.parentId;
+    }
+    
     var parentId = proxy.item.parentId || 'ROOT';
 
     var parent = tree.proxyMap[parentId];
@@ -93,9 +117,38 @@ class ItemProxy {
 
     proxy.calculateTreeHash();
 
+    if(!tree.loading){
+      tree.changeSubject.next({
+        type: 'create',
+        kind: proxy.kind,
+        id: proxy.item.id,
+        proxy: proxy
+      });
+    }
+
     return proxy;
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static resetItemRepository() {
+    
+    console.log('::: Resetting Item Repository');
+    var rootProxy = ItemProxy.getRootProxy();
+
+    tree.loading = true;
+
+    tree.changeSubject.next({
+      type: 'loading'
+    });
+
+    rootProxy.visitChildren(null, null, (childProxy) => {
+      childProxy.deleteItem();
+    });
+    
+  }
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -107,9 +160,19 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static getChangeSubject() {
+    return tree.changeSubject;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static loadingComplete() {
     tree.loading = false;
     ItemProxy.calculateAllTreeHashes();
+    tree.changeSubject.next({
+      type: 'loaded'
+    });
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -164,14 +227,25 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   validateItem(){
     
+    return ItemProxy.validateItemContent(this.kind, this.item);
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static validateItemContent(kind, itemContent){
+    
+    var model = tree.modelMap[kind];
+    
     var validationResult = {
       valid: true,
       missingProperties: []
     };
     
-    if (this.model && this.model.item && this.model.item.requiredProperties) {
-      this.model.item.requiredProperties.forEach((property) => {
-        if (!this.item.hasOwnProperty(property)) {
+    if (model && model.item && model.item.requiredProperties) {
+      model.item.requiredProperties.forEach((property) => {
+        if (!itemContent.hasOwnProperty(property)) {
           validationResult.valid = false;
           validationResult.missingProperties.push(property);
         }
@@ -187,6 +261,53 @@ class ItemProxy {
   document() {
     this.checkPropertyOrder();
     return JSON.stringify(this.item, null, '  ');
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static gitDocumentOID(forDoc) {
+    var shaObj = new SHA('SHA-1', 'TEXT');
+    
+    var forText = JSON.stringify(forDoc, null, '  ');
+        
+    var length = forText.length;
+//    console.log(forText);
+//    console.log('\n');
+    shaObj.update('blob ' + forText.length + '\0' + forText);
+    
+    var oid = shaObj.getHash('HEX');
+    
+//    for(var l = length - 5; l < length +5; l++){
+//      shaObj.update('blob ' + l + '\0' + forText);
+//      var newOid = shaObj.getHash('HEX');
+//      console.log('>>> ' + l + ' - ' + newOid);
+//    }
+    
+    return oid;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static gitFileOID(forFile) {
+    var shaObj = new SHA('SHA-1', 'TEXT');
+    
+        
+    var length = forFile.length;
+//    console.log(forText);
+//    console.log('\n');
+    shaObj.update('blob ' + length + '\0' + forFile);
+    
+    var oid = shaObj.getHash('HEX');
+    
+//    for(var l = length - 5; l < length +5; l++){
+//      shaObj.update('blob ' + l + '\0' + forText);
+//      var newOid = shaObj.getHash('HEX');
+//      console.log('>>> ' + l + ' - ' + newOid);
+//    }
+    
+    return oid;
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -277,10 +398,10 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   static compareTreeHashMap(fromTHMap, toTHMap){
     
-    var fromKeys = Object.keys(fromTHMap).sort();
-    var toKeys = Object.keys(toTHMap).sort();
-    var allKeys = _.union(fromKeys, toKeys);
-    var commonKeys = _.intersection(fromKeys, toKeys);
+    var fromIds = Object.keys(fromTHMap).sort();
+    var toIds = Object.keys(toTHMap).sort();
+    var allIds = _.union(fromIds, toIds);
+    var commonIds = _.intersection(fromIds, toIds);
     
     if(!fromTHMap){
       console.log('*** From is undefined');
@@ -288,49 +409,69 @@ class ItemProxy {
     
     var thmCompare = {
       match: _.isEqual(fromTHMap, toTHMap),
-      addedItems: _.difference(toKeys, fromKeys),
+      addedItems: _.difference(toIds, fromIds),
       changedItems: [],
-      deletedItems: _.difference(fromKeys, toKeys),
-      addedChildren: [],
-      changedChildren: [],
-      deletedChildren: [],
-      undefinedFromItems: [],
-      undefinedToItems: []
-    };
+      deletedItems: _.difference(fromIds, toIds),
+      childMismatch: {}
+  };
         
-    commonKeys.forEach((key) => {
+    commonIds.forEach((key) => {
       var fromNode = fromTHMap[key];
       var toNode = toTHMap[key];
-      if (!fromNode || !toNode){
-        if (!fromNode){
-          thmCompare.undefinedFromItems.push(key);
-        }
-        if (!toNode){
-          thmCompare.undefinedToItems.push(key);          
-        }
-        return;
-      }
+ 
       if (!_.isEqual(fromNode.treeHash, toNode.treeHash)) {
         
         if (fromNode.oid !== toNode.oid){
           thmCompare.changedItems.push(key);
+        } else {
+          // Found structural difference at child level
+          var fromChildren = fromNode.childTreeHashes;
+          var toChildren = toNode.childTreeHashes;
+          var fromChildIds = Object.keys(fromChildren);
+          var toChildIds = Object.keys(toChildren);
+          var fromChildIdsSorted = Object.keys(fromChildren).sort();
+          var toChildIdsSorted = Object.keys(toChildren).sort();
+          var allChildIds = _.union(fromChildIdsSorted, toChildIdsSorted);
+          var commonChildIds = _.intersection(fromChildIdsSorted, toChildIdsSorted);
+
+          var childMismatch = {};
+          childMismatch.addedChildren = _.difference(toChildIdsSorted, fromChildIdsSorted);
+          childMismatch.deletedChildren = _.difference(fromChildIdsSorted, toChildIdsSorted);
+
+          
+          // Check for different tree hashes
+          var changedChildren = {};
+          commonChildIds.forEach((childId) => {
+            var fromOID = fromChildren[childId];
+            var toOID = toChildren[childId];
+            
+            if (fromOID !== toOID){
+              changedChildren[childId] ={
+                  from: fromOID,
+                  to: toOID
+              };
+       }
+          });
+          childMismatch.changedChildren = changedChildren;
+          
+          // Check for different order
+          var reorderedChildren = {};
+          for (var idx = 0; idx < fromChildIds.length; idx++){
+            if(fromChildIds[idx] !== toChildIds[idx]){
+              reorderedChildren[idx] = {
+                  from: fromChildIds[idx],
+                  to: toChildIds[idx]
+              };
+            }
+          }
+          childMismatch.reorderedChildren = reorderedChildren;
+          
+          thmCompare.childMismatch[key] = childMismatch;
         }
-//        if (!_.isEqual(fromNode.childTreeHashes, toNode.childTreeHashes)){
-//          console.log('::> ' + key + ': Different Children');
-//          fromChildren = fromNode.childTreeHashes;
-//          toChildren = toNode.childTreeHashes;
-//          fromChildKeys = Object.keys(fromNode.childTreeHashes).sort();
-//          toChildKeys = Object.keys(toNode.childTreeHashes).sort();
-//          allChildKeys = _.union(fromKeys, toKeys);
-//          commonChildKeys = _.intersection(fromKeys, toKeys);
-//          
-//          console.log(fromChildren);
-//          console.log(toChildren);
-//          
-//        }
       }
       
     });
+
     return thmCompare;
 
   }
@@ -720,6 +861,10 @@ class ItemProxy {
       this.children.sort(function(a, b){
         if (a.item.name > b.item.name) return 1;
         if (a.item.name < b.item.name) return -1;
+        if (a.item.name === b.item.name) {
+          if (a.item.id > b.item.id) return 1;
+          if (a.item.id < b.item.id) return -1;
+        }
         return 0;
       });    	
     } else {
@@ -817,7 +962,24 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
-    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
+//    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
+    
+    var validation = ItemProxy.validateItemContent(modelKind, withItem);
+    
+    if (!validation.valid){
+      // TODO Need to remove this bypass logic which is needed to load some existing data
+      if(tree.loading){
+        console.log('*** Error: Invalid data item');
+        console.log('Kind: ' + modelKind);
+        console.log(withItem);
+        console.log(validation);        
+      } else {
+        throw ({
+          error: 'Not-Valid',
+          validation: validation
+        });
+      }
+    }
 
     // Determine if item kind changed
     var newKind = modelKind;
@@ -847,8 +1009,8 @@ class ItemProxy {
       oldParentId = this.parentProxy.item.id;
     }
 
-    var newParentId = withItem.parentId;
-    console.log('::: Eval Parent Id old: ' + oldParentId + ' new: ' + newParentId);
+    var newParentId = withItem.parentId || 'ROOT';
+
     if (oldParentId !== newParentId) {
       console.log('::: Parent Id changed from ' + oldParentId + ' to ' +
           newParentId);
@@ -873,6 +1035,16 @@ class ItemProxy {
         // delete the analysis in case some of the requisite data was updated
         delete this.analysis;
     }
+    
+    if(!tree.loading){
+      tree.changeSubject.next({
+        type: 'update',
+        kind: this.kind,
+        id: this.item.id,
+        proxy: this
+      });
+    }
+
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -881,7 +1053,7 @@ class ItemProxy {
   deleteItem(deleteDescendants) {
     var byId = this.item.id;
 
-    console.log('::: Deleting proxy for ' + byId);
+//    console.log('::: Deleting proxy for ' + byId);
     
     var attemptToDeleteRestrictedNode = (
         (this.item.id === tree.lostAndFound.item.id) || 
@@ -898,23 +1070,47 @@ class ItemProxy {
         childProxy.deleteItem(deleteDescendants);
       });
       if (attemptToDeleteRestrictedNode){
-        console.log('::: -> Not removing ' + this.item.name);        
+//        console.log('::: -> Not removing ' + this.item.name);        
       } else {
-        console.log('::: -> Removing all references');
+//        console.log('::: -> Removing all references');
+        if(!tree.loading){
+          tree.changeSubject.next({
+            type: 'delete',
+            kind: this.kind,
+            id: this.item.id,
+            proxy: this
+          });          
+        }
         delete tree.proxyMap[byId];
       }
     } else {
       // Remove this item and leave any children under Lost+Found
       if (this.children.length !== 0) {
         if (!attemptToDeleteRestrictedNode){
-          console.log('::: -> Node still has children');
+//          console.log('::: -> Node still has children');
+          if(!tree.loading){
+            tree.changeSubject.next({
+              type: 'delete',
+              kind: this.kind,
+              id: this.item.id,
+              proxy: this
+            });
+          }
           createMissingProxy(byId);          
         }
       } else {
         if (attemptToDeleteRestrictedNode){
-          console.log('::: -> Not removing ' + this.item.name);                  
+//          console.log('::: -> Not removing ' + this.item.name);                  
         } else {
-          console.log('::: -> Removing all references');
+//          console.log('::: -> Removing all references');
+          if(!tree.loading){
+            tree.changeSubject.next({
+              type: 'delete',
+              kind: this.kind,
+              id: this.item.id,
+              proxy: this
+            });
+          }
           delete tree.proxyMap[byId];
         }
       }      
