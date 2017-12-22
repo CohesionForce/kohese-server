@@ -15,12 +15,13 @@ module.exports = function (app) {
     
     var serverAuthentication = require('../server-enableAuth.js');
 
-    app.use(express.static(path.resolve(__dirname, '../../client')));
+    app.use(express.static(path.resolve(__dirname, '../../client-ng1')));
+    app.use(serveFavicon(path.resolve(__dirname, '../../client-ng1/resources/icons/favicon.ico')));
+
     app.use(express.static(path.resolve(__dirname, '../../bower_components')));
     app.use('/socket.io-file-client', 
             express.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
     
-    app.use(serveFavicon(path.resolve(__dirname, '../../client/resources/icons/favicon.ico')));
 
     app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
     app.use('/reports', express.static(path.resolve(__dirname, '../../tmp_reports')));
