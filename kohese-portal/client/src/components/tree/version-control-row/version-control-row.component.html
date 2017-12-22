@@ -1,0 +1,62 @@
+<div
+class="kt-collection" ng-repeat="itemProxy in proxyCollection"
+[ngClass]="{'kt-hidden' : itemProxy.parentProxy.item.id && collapsed[itemProxy.parentProxy.item.id]}"
+context-menu>
+
+<div class="kt-item"
+    id="{{itemProxy.item.id}}"
+    [ngClass]="{'kti-selected-item' : itemProxy.item.id === selectedItemProxy.item.id,
+            'kti-filtered': !matchesFilter(itemProxy) && !childMatchesFilter(itemProxy),
+            'kti-filterMatchedExact': matchesFilter(itemProxy, true),
+            'kti-filterMatched': matchesFilter(itemProxy)}">
+    <div class="kti-name"
+            [ngStyle]="{'font-weight': 'bold'}"
+            (click)="navigate('kohese.explore.edit',
+            {id: itemProxy.item.id})">
+        <a> <i
+                (click)="collapsed[itemProxy.item.id] = !collapsed[itemProxy.item.id]; $event.stopPropagation()"
+                class="kt-icon"
+                [ngClass]="{'fa fa-caret-down': (itemProxy.children.length > 0) && !collapsed[itemProxy.item.id],
+                    'fa fa-caret-right': (itemProxy.children.length > 0) && collapsed[itemProxy.item.id],
+                    'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
+        </i>
+        </a> <span class="kt-label">
+        {{(itemProxy.item.name | highlightRegex )}}
+                                            ></span>
+            <span *ngIf="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
+            <!-- Conditional Icons for Item status -->
+            <span *ngIf="itemProxy.dirty">
+                    <img src="resources/icons/versioncontrol/dirty.ico"
+                        title = "Dirty item" />
+            </span>
+
+            {{itemProxy.status}}
+    </div>
+<div class="kti-cell kti-actions pull-right">
+    <!-- Default row actions -->
+    <span *ngIf="itemProxy.vcState">
+        <!-- VC Status Icons -->
+        <i *ngIf="itemProxy.vcState.Unstaged"
+            src="resources/icons/versioncontrol/unstaged.ico"
+            title="Unstaged"></i>
+        <i *ngIf="itemProxy.vcState.Staged"
+            src="resources/icons/versioncontrol/index-mod.ico"
+            title="Staged"></i>
+        <!-- Actions -->
+        <i  class="fa fa-undo"
+            (click)="revertItem(itemProxy)"></i>
+        <i  class="fa fa-plus"
+            *ngIf="itemProxy.vcState.Unstaged"
+            (click)="stageItem(itemProxy)"></i>
+        <i  class="fa fa-minus"
+            *ngIf="itemProxy.vcState.Staged"
+            (click)="unstageItem(itemProxy)"></i>
+    </span>
+</div>
+</div>
+<div *ngIf="itemProxy.children && (!collapsed[itemProxy.item.id] || previouslyExpanded[itemProxy.item.id] || allExpanded )">
+    <version-control-row proxy-collection="itemProxy.children"
+                        collapsed="true"
+                        filter="filter"></version-control-row>
+</div>
+</div>

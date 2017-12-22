@@ -1,24 +1,23 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router';
 
-import { ItemProxy } from '../../../../common/models/item-proxy';
-import { AuthTokenFactory } from '../authentication/auth-token.factory';
-import { JwtHelper } from 'angular2-jwt';
+import * as ItemProxy from '../../../../common/models/item-proxy';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { AuthenticationService } from '../authentication/authentication.service';
+import { ItemRepository } from '../item-repository/item-repository.service';
 
 @Injectable()
 export class UserService {
   private currentUser: BehaviorSubject<ItemProxy> = new BehaviorSubject(undefined);
-  private jwtHelper: JwtHelper = new JwtHelper();
-  
-  constructor(private authTokenFactory: AuthTokenFactory, private router: Router) {
-    this.authTokenFactory.getToken().subscribe((token) => {
-      if (token) {
-        let decodedToken: any = this.jwtHelper.decodeToken(token);
-        //let usersProxy: ItemProxy = ItemProxy.getRootProxy().getChildByName('users');
-        //if (usersProxy) {
-        //  this.currentUser.next(usersProxy.getChildByName(decodedToken.username));
-        //}
+
+  constructor(private authenticationService: AuthenticationService,
+    private itemRepository: ItemRepository, private router: Router) {
+    this.authenticationService.getAuthenticationInformation().subscribe((decodedToken) => {
+      if (decodedToken) {
+        let usersProxy: ItemProxy = itemRepository.getRootProxy().getChildByName('users');
+        if (usersProxy) {
+          this.currentUser.next(usersProxy.getChildByName(decodedToken.username));
+        }
       } else {
         this.router.navigate(['login']);
       }
@@ -29,7 +28,18 @@ export class UserService {
   getUsersItemId() {
   }
 
-  getAllUsers() {
+  getAllUsers() : Array<any> {
+    return [
+      {
+      item: {
+        name: 'admin'
+      }
+    },
+    {
+      item: {
+        name: 'test-user'
+      }
+    }]
   }
 
   getCurrentUser(): BehaviorSubject<ItemProxy> {

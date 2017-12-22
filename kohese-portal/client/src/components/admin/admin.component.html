@@ -2,6 +2,75 @@
     <div class="panel" id="adminPanel" style="height:inherit">
         <div class="panel-heading">Admin</div>
         <div id="admin-view-wrapper" style="height:inherit">
+          <div class="users-screen">
+    <div class="panel-body">
+        <div>
+            <h2>Sessions:</h2>
+            <div class="session-container" *ngFor="let session of sessionService.getSessions() | mapKey">
+              <div>{{sessionService.getSessions()[session].username}} - {{sessionService.getSessions()[session].address}} - {{sessionService.getSessions()[session].sessionId}}</div>
+            </div>
+        </div>
+        <div id="admin-user-list">
+            <h2>Users:</h2>
+
+            <div class="card-container" *ngFor="let userProxy of sessionService.getUsers()">
+                <div class="card">
+                    <div class="front">
+                        <div class="title">
+                            {{userProxy.item.name}}
+                        </div>
+                        <div class="body">
+                            {{userProxy.item.description}}
+                        </div>
+                        <div class="footer">
+                            Modified on {{userProxy.item.modifiedOn | date }} by {{userProxy.item.modifiedBy}}
+
+                        </div>
+                    </div>
+                    <div class="back">
+                        <button class="btn btn-primary"
+                                (click)="deleteUser(userProxy)">
+                            <i class="fa fa-3x fa-trash"></i>
+                            Delete
+                        </button>
+                        <br/>
+                        <button class="btn btn-primary"
+                                (click)="editUser(userProxy)">
+                            <i class="fa fa-3x fa-edit"></i>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="admin-user-form">
+        <button class="btn btn-default"
+                (click)="addUser()"
+                *ngIf="!addUserForm && !editUserForm">Add User
+        </button>
+
+        <div *ngIf="addUserForm || editUserForm">
+
+            <h3>{{currentForm}}</h3>
+
+            <form>
+                <label>Username<input [(ngModel)]="usernameInput" name="usernameInput" type="text"/></label>
+                <br/>
+                <label>Description<input [(ngModel)]="descriptionInput" name="descriptionInput" type="text"/></label>
+                <br/>
+                <label>Email<input [(ngModel)]="emailInput" name="emailInput" type="email"/></label>
+                <label>Password<input [(ngModel)]="passwordInput" name="passwordInput" type="password"/></label>
+                <br/>
+                <label>Confirm Password<input [(ngModel)]="confirmPasswordInput" name="confirmPasswordInput" type="password"/></label>
+                <br/>
+            </form>
+            <button class="btn btn-primary" (click)="updateUser()">Submit</button>
+            <button class="btn btn-danger" (click)="cancelForm()">Cancel</button>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>

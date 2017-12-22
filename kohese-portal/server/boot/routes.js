@@ -19,6 +19,7 @@ module.exports = function (app) {
       '/admin',
       '/dashboard',
       '/login',
+      '/repositories',
       '/explore'
     ];
 

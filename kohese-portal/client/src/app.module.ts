@@ -14,26 +14,36 @@ import { SideBarComponent} from './components/side-bar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ContentContainerComponent } from './components/content-container/content-container.component';
+import { RepositoriesComponent } from './components/admin/repositories.component';
 import { TreeComponent } from './components/tree/tree.component';
 import { DetailsComponent } from './components/details/details.component';
 import { ExploreComponent } from './components/explore/explore.component';
+import { TreeRowComponent } from './components/tree/tree-row/tree-row.component';
+import { VersionControlRowComponent } from './components/tree/version-control-row/version-control-row.component';
+import { KindIconComponent } from './components/kind-icon/kind-icon.component';
 
-import { UserService } from './services/user/user.service';
-import { AuthTokenFactory } from './services/authentication/auth-token.factory';
-import { LoginService } from './services/authentication/login.service';
-import { AuthInterceptor } from './services/authentication/auth-interceptor.factory';
+import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
+import { AuthenticationService } from './services/authentication/authentication.service';
 import { SocketService } from './services/socket/socket.service';
 import { TabService } from './services/tab/tab.service';
 import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
+import { MapKeyPipe } from './map-key.pipe';
+import { HighlightRegexPipe } from './pipes/Highlight.pipe';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
+
+const AUTHENTICATION_INTERCEPTOR = {
+  provide: HTTP_INTERCEPTORS,
+  useClass: AuthenticationInterceptor,
+  multi: true
+};
 
 @NgModule({
   declarations: [
@@ -44,9 +54,16 @@ import { ItemRepository } from './services/item-repository/item-repository.servi
     DashboardComponent,
     AdminComponent,
     LoginComponent,
+    MapKeyPipe,
+    HighlightRegexPipe,
+    RepositoriesComponent,
     TreeComponent,
     DetailsComponent,
-    ExploreComponent
+    ExploreComponent,
+    TreeRowComponent,
+    VersionControlRowComponent,
+    KindIconComponent
+
   ],
   imports: [
     BrowserModule,
@@ -58,12 +75,10 @@ import { ItemRepository } from './services/item-repository/item-repository.servi
     ToastrModule.forRoot(),
     MaterialModule
   ],
-  providers: [ItemRepository ,UserService, AuthTokenFactory, LoginService, {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true,
-    }, SocketService, TabService, BundleService, SessionService,
-    VersionControlService, NavigationService],
+  providers: [ItemRepository, AuthenticationService,
+    AUTHENTICATION_INTERCEPTOR, SocketService, TabService,
+    BundleService, SessionService, VersionControlService,
+    NavigationService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

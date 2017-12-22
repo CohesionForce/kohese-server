@@ -1,0 +1,92 @@
+<div
+  class="kt-collection" *ngFor="let itemProxy of proxyCollection"
+  [ngClass]="{'kt-hidden' : itemProxy.item.parentId && collapsed[itemProxy.item.parentId]}" >
+
+<div class="kt-item"
+    id="{{itemProxy.item.id}}"
+    [ngClass]="{'kti-selected-item' : itemProxy.item.id === selectedItemProxy.item.id,
+               'kti-filtered': !matchesFilter(itemProxy) && !childMatchesFilter(itemProxy),
+               'kti-filterMatchedExact': matchesFilter(itemProxy, true),
+               'kti-filterMatched': matchesFilter(itemProxy)}">
+   <!-- End conditional Checkbox for Version control -->
+       <div class="kti-name"
+               [style]="{'font-weight': 'bold'}"
+               (click)="navigate('kohese.explore.edit',
+               {id: itemProxy.item.id})">
+            <i
+                   (click)="collapsed[itemProxy.item.id] = !collapsed[itemProxy.item.id]; $event.stopPropagation()"
+                   class="kt-icon"
+                   [ngClass]="{'fa fa-caret-down': (itemProxy.children.length > 0) && !collapsed[itemProxy.item.id],
+                   'fa fa-caret-right': (itemProxy.children.length > 0) && collapsed[itemProxy.item.id],
+                   'no-icon': !(itemProxy.children.length > 0)}">
+                             </i>
+
+               <kind-icon kind='itemProxy.kind'></kind-icon>
+               <span class="kt-label">
+                   {{(itemProxy.item.name | highlightRegex )}}
+               </span>
+               <span *ngIf="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
+               <!-- Conditional Icons for Item status -->
+               <span *ngIf="itemProxy.dirty">
+                       <img src="resources/icons/versioncontrol/dirty.ico"
+                           title = "Dirty item" />
+               </span>
+       </div>
+   <div class="kti-cell kti-actions pull-right">
+       <!-- Default row actions -->
+       <span>
+           <i class="fa fa-anchor"
+           (click)="updateRoot(itemProxy)"></i>
+           <i class="glyphicon glyphicon-remove  pull-right"
+           (click)="removeItem(itemProxy)"> </i>
+       </span>
+   </div>
+</div>
+
+<div *ngIf="itemProxy.children && (!collapsed[itemProxy.item.id]) || previouslyExpanded[itemProxy.item.id] || allExpanded">
+   <tree-row filterSubject="filterSubject" proxy-collection="itemProxy.children"
+             exactFilter="exactFilter"></tree-row>
+</div>
+<!-- Dropdown menu-->
+<div class="dropdown position-fixed" id="tree-menu-{{itemProxy.item.id}}">
+   <ul class="dropdown-menu" role="menu">
+       <li class="pointer context-item"
+           role="menuitem"
+           (click)="updateRoot(itemProxy)">
+           <a>
+               Set as root
+           </a>
+       </li>
+       <li class="pointer context-item"
+           role="menuitem"
+           (click)="navigate('kohese.explore.create',
+                                       {parentId: itemProxy.item.id})">
+           <a>
+               Create child
+           </a>
+       </li>
+       <li class="pointer context-item"
+           role="menuitem"
+           (click)="collapseChildren(itemProxy)">
+           <a>
+               Collapse children
+           </a>
+       </li>
+       <li class="pointer context-item"
+           role="menuitem"
+           (click)="expandChildren(itemProxy)">
+           <a>
+               Expand Children
+           </a>
+       </li>
+       <li class="pointer context-item"
+           role="menuitem"
+           (click)="expandMatchingChildren(itemProxy)">
+           <a>
+               Expand Matching Children
+           </a>
+       </li>
+   </ul>
+</div>
+</div>
+
