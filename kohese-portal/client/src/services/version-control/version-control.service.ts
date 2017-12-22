@@ -153,7 +153,7 @@ export class VersionControlService {
     };
     
     let emit: (message: string, data: { proxyId: string; }) => Observable<any> =
-      Observable.bindCallback(this.socketService.getSocket().emit);
+      Observable.bindCallback(this.socketService.getSocket().emit.bind(this.socketService.getSocket()));
     return emit('VersionControl/getRemotes', data).do((results) => {
       if (results.error) {
         this.toastrService.error('Remote Retrieval Failed', 'Version Control');

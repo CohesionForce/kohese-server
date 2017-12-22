@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 
 import * as ItemProxy from '../../../../common/models/item-proxy';
-import { VersionControlService } from '../../services/version-control/version-control.service';
 import { SessionService } from '../../services/user/session.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 @Component({
   selector: 'app-admin',
@@ -19,7 +19,7 @@ export class AdminComponent implements OnInit {
   private currentForm: string;
   private selectedUserProxy: ItemProxy;
 
-  constructor(private sessionService: SessionService) {
+  constructor(private sessionService: SessionService, private itemRepository: ItemRepository) {
   }
 
   ngOnInit() {
@@ -33,9 +33,6 @@ export class AdminComponent implements OnInit {
     this.confirmPasswordInput = '';
     this.currentForm = 'Add User';
     this.addUserForm = true;
-    this.selectedUserProxy = new ItemProxy('KoheseUser', {
-      parentId: this.sessionService.getSessionUser().getValue().item.parentId
-    });
   }
 
   editUser(userProxy: ItemProxy) {
@@ -60,14 +57,28 @@ export class AdminComponent implements OnInit {
 
   updateUser() {
     if (this.passwordInput === this.confirmPasswordInput) {
-      this.selectedUserProxy.item.name = this.usernameInput;
-      this.selectedUserProxy.item.description = this.descriptionInput;
-      this.selectedUserProxy.item.email = this.emailInput;
-      if (this.passwordInput !== '') {
-        this.selectedUserProxy.item.password = this.passwordInput;
+      if (this.selectedUserProxy) {
+        this.selectedUserProxy.item.name = this.usernameInput;
+        this.selectedUserProxy.item.description = this.descriptionInput;
+        this.selectedUserProxy.item.email = this.emailInput;
+        if (this.passwordInput !== '') {
+          this.selectedUserProxy.item.password = this.passwordInput;
+        }
+      } else {
+        // TODO
+        let item: any = {
+          parentId: this.sessionService.getSessionUser().getValue().item.parentId,
+          name: this.usernameInput,
+          description: this.descriptionInput,
+          email: this.emailInput,
+        };
+        if (this.passwordInput !== '') {
+          item.password = this.passwordInput;
+        }
+        this.selectedUserProxy = new ItemProxy('KoheseUser', item);
       }
 
-      // TODO Update the user on the server
+      this.itemRepository.upsertItem(this.selectedUserProxy);
       this.cancelForm();
     } else {
       alert('Confirmation password does not match password.');
@@ -75,6 +86,6 @@ export class AdminComponent implements OnInit {
   }
 
   deleteUser(userProxy) {
-    // TODO Delete user on the server
+    this.itemRepository.deleteItem(userProxy, false);
   }
 }

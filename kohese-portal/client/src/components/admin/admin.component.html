@@ -56,17 +56,17 @@
             <h3>{{currentForm}}</h3>
 
             <form>
-                <label>Username<input [(ngModel)]="usernameInput" type="text"></label>
+                <label>Username<input [(ngModel)]="usernameInput" name="usernameInput" type="text"/></label>
                 <br/>
-                <label>Description<input [(ngModel)]="descriptionInput" type="text"></label>
+                <label>Description<input [(ngModel)]="descriptionInput" name="descriptionInput" type="text"/></label>
                 <br/>
-                <label>Email<input [(ngModel)]="emailInput" type="email"></label>
-                <label>Password<input [(ngModel)]="passwordInput" type="password"></label>
+                <label>Email<input [(ngModel)]="emailInput" name="emailInput" type="email"/></label>
+                <label>Password<input [(ngModel)]="passwordInput" name="passwordInput" type="password"/></label>
                 <br/>
-                <label>Confirm Password<input [(ngModel)]="confirmPasswordInput" type="password"></label>
+                <label>Confirm Password<input [(ngModel)]="confirmPasswordInput" name="confirmPasswordInput" type="password"/></label>
                 <br/>
             </form>
-            <button class="btn btn-primary" (click)="upsertUser()">Submit</button>
+            <button class="btn btn-primary" (click)="updateUser()">Submit</button>
             <button class="btn btn-danger" (click)="cancelForm()">Cancel</button>
         </div>
     </div>
