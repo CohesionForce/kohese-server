@@ -24,6 +24,7 @@
             </span>
             <i class="fa fa-lg fa-save"
                ng-click="detailsCtrl.upsertItem()"
+               ng-if="detailsCtrl.itemProxy.dirty"
                title=" Save"
                     ></i>
             <i ng-if="detailsCtrl.tab.type === 'singleview'" class="fa fa-clone pull-right"
@@ -65,7 +66,7 @@
             </tab>
             <tab >
                  <tab-heading>Overview 
-                   <span ng-show="detailsCtrl.itemForm.$dirty">
+                   <span ng-show="detailsCtrl.itemProxy.dirty">
                       <img src="resources/icons/versioncontrol/dirty.ico"
                       title = "Dirty item" />   
                   </span></tab-heading>
@@ -155,22 +156,5 @@
                 <pre>{{detailsCtrl.itemProxy.treeHashEntry | json}}</pre>
             </tab>
         </tabset>
-    </div>
-    <!-- /.panel -->
-    <!--<span ng-if="detailsCtrl.itemProxy.kind != 'Decision' && detailsCtrl.itemProxy.kind != 'Action'"-->
-    <!--class="form-actions">-->
-    <!--<button ng-click="detailsCtrl.enableEdit=true" ng-disabled="detailsCtrl.enableEdit" class="btn btn-primary">-->
-    <!--Edit-->
-    <!--</button>-->
-    <!--<button ng-click="detailsCtrl.upsertItem()"-->
-    <!--ng-disabled="!detailsCtrl.enableEdit || detailsCtrl.itemForm.$pristine-->
-    <!--&& detailsCtrl.actionForm.$pristine && detailsCtrl.decisionForm.$pristine" class="btn btn-primary">-->
-    <!--Update-->
-    <!--</button>-->
-    <!--<button ng-click="detailsCtrl.enableEdit=false; detailsCtrl.cancel()" ng-disabled="!detailsCtrl.enableEdit"-->
-    <!--class="btn btn-danger">-->
-    <!--Cancel-->
-    <!--</button>-->
-    <!-- /.panel-body -->
-    </span>
+	</div>
 </div>

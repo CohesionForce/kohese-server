@@ -2,7 +2,7 @@
 <span class="control-group">
   <label class="control-label" for="Ordered"> Ordered </label>
   <input type="checkbox" ng-disabled="!(detailsCtrl.enableEdit)"
-         ng-checked="detailsCtrl.itemProxy.childrenAreManuallyOrdered()" ng-click="detailsCtrl.itemProxy.toggleChildrenAreManuallyOrdered();detailsCtrl.itemForm.$dirty=true" />
+         ng-checked="detailsCtrl.itemProxy.childrenAreManuallyOrdered()" ng-click="detailsCtrl.itemProxy.toggleChildrenAreManuallyOrdered();detailsCtrl.itemProxy.dirty=true" />
 </span>
 
 <span class="pull-right">
