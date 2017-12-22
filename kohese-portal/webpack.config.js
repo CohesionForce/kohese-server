@@ -6,30 +6,29 @@ var BowerWebpackPlugin = require("bower-webpack-plugin");
 var webpack = require("webpack");
 
 module.exports = {
-    //context: __dirname + '/client',
-    entry: './client/bootstrap.ts',
+    context: __dirname + '/client-ng1',
+    entry: './app.js',
     output: {
-        path: __dirname + '/client',
+        path: __dirname + '/client-ng1',
         filename: 'bundle.js'
     },
     resolve: {
-        alias: {}, // Use this to more easily resolve common modules
-        modules: ['node_modules', 'bower_components'],
-        extensions: ['.ts', 'tsx','.js', '.css']
+        modulesDirectories: ['node_modules', 'bower_components']
     },
-    devtool: 'inline-source-map',
-    plugins: [],
+    devtool: 'source-map',
+    plugins: [new BowerWebpackPlugin({
+        modulesDirectories: ['bower_components'],
+        manifestFiles: 'bower.json',
+        includes: /.*/,
+        excludes: [],
+        searchResolveModulesDirectories: true
+    })],
     module: {
-          rules: [
-            {
-              test: /\.tsx?$/,
-              use: 'ts-loader',
-              exclude: /node_modules/
-            },
-            {
-              test: /\.css$/,
-              use: 'style-loader!css-loader'
-            }
-          ]
+        loaders: [
+            {test: /\.js$/, loader: 'babel'},
+            {test: /\.json$/, loader: 'json-loader'},
+            {test: /\.css$/, loader: "style-loader!css-loader"},
+            {test: /\.less$/, loader: "style!css!less"}
+        ]
     }
 };
