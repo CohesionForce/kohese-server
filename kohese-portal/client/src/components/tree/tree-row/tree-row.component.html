@@ -1,9 +1,6 @@
 <div
-  class="kt-collection" ng-repeat="itemProxy in proxyCollection"
-  [ngClass]="{'kt-hidden' : itemProxy.item.parentId && collapsed[itemProxy.item.parentId]}"
-  data-target="tree-menu-{{itemProxy.item.id}}"
-  context-menu
-   >
+  class="kt-collection" *ngFor="let itemProxy of proxyCollection"
+  [ngClass]="{'kt-hidden' : itemProxy.item.parentId && collapsed[itemProxy.item.parentId]}" >
 
 <div class="kt-item"
     id="{{itemProxy.item.id}}"
@@ -13,7 +10,7 @@
                'kti-filterMatched': matchesFilter(itemProxy)}">
    <!-- End conditional Checkbox for Version control -->
        <div class="kti-name"
-               ng-style="{'font-weight': 'bold'}"
+               [style]="{'font-weight': 'bold'}"
                (click)="navigate('kohese.explore.edit',
                {id: itemProxy.item.id})">
             <i
@@ -25,8 +22,8 @@
                              </i>
 
                <kind-icon kind='itemProxy.kind'></kind-icon>
-               <span class="kt-label"
-                   [inner-html]="(itemProxy.item.name | highlightRegex:filter.textRegexHighlight | trustAsHTML)">
+               <span class="kt-label">
+                   {{(itemProxy.item.name | highlightRegex )}}
                </span>
                <span *ngIf="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
                <!-- Conditional Icons for Item status -->
@@ -46,7 +43,7 @@
    </div>
 </div>
 
-<div *ngIf="itemProxy.children && (!collapsed[itemProxy.item.id] || previouslyExpanded[itemProxy.item.id] || allExpanded">
+<div *ngIf="itemProxy.children && (!collapsed[itemProxy.item.id]) || previouslyExpanded[itemProxy.item.id] || allExpanded">
    <tree-row filterSubject="filterSubject" proxy-collection="itemProxy.children"
              exactFilter="exactFilter"></tree-row>
 </div>

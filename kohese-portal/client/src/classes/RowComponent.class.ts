@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { NavigatableComponent } from './NavigationComponent.class';
 import { NavigationService } from '../services/navigation/navigation.service';
 import { TabService } from '../services/tab/tab.service';
-import { Input } from '@angular/core/src/metadata/directives';
+import { Input } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { ProxyFilter } from './ProxyFilter.class';

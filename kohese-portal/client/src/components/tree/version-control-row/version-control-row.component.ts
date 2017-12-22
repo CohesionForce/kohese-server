@@ -7,7 +7,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 
-Component({
+@Component({
   selector: 'version-control-row',
   templateUrl : './version-control-row.component.html'
 })

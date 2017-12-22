@@ -72,6 +72,7 @@ export class TreeComponent extends NavigatableComponent
     this.selectedItemProxy = {};
     this.versionControlEnabled = false;
     this.filter = new ProxyFilter();
+    this.filterSubject = new BehaviorSubject(this.filter);
 
     // NEW View Control
     this.viewList = ['Default','Version Control']; // TODO : Probably want to get this from somewhere else so

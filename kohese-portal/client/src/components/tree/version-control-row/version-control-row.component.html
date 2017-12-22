@@ -1,7 +1,6 @@
 <div
 class="kt-collection" ng-repeat="itemProxy in proxyCollection"
 [ngClass]="{'kt-hidden' : itemProxy.parentProxy.item.id && collapsed[itemProxy.parentProxy.item.id]}"
-data-target="tree-menu-{{itemProxy.item.id}}"
 context-menu>
 
 <div class="kt-item"
@@ -21,8 +20,8 @@ context-menu>
                     'fa fa-caret-right': (itemProxy.children.length > 0) && collapsed[itemProxy.item.id],
                     'glyphicon glyphicon-list-alt': !(itemProxy.children.length > 0)}">
         </i>
-        </a> <span class="kt-label"
-                [innerHtml]="(itemProxy.item.name | highlightRegex:filter.textRegexHighlight | trustAsHTML)"
+        </a> <span class="kt-label">
+        {{(itemProxy.item.name | highlightRegex )}}
                                             ></span>
             <span *ngIf="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
             <!-- Conditional Icons for Item status -->
@@ -37,27 +36,27 @@ context-menu>
     <!-- Default row actions -->
     <span *ngIf="itemProxy.vcState">
         <!-- VC Status Icons -->
-        <img *ngIf="itemProxy.vcState.Unstaged"
+        <i *ngIf="itemProxy.vcState.Unstaged"
             src="resources/icons/versioncontrol/unstaged.ico"
-            title="Unstaged"/>
-        <img *ngIf="itemProxy.vcState.Staged"
+            title="Unstaged"></i>
+        <i *ngIf="itemProxy.vcState.Staged"
             src="resources/icons/versioncontrol/index-mod.ico"
-            title="Staged"/>
+            title="Staged"></i>
         <!-- Actions -->
         <i  class="fa fa-undo"
-            (click)="revertItem(itemProxy)"/>
+            (click)="revertItem(itemProxy)"></i>
         <i  class="fa fa-plus"
             *ngIf="itemProxy.vcState.Unstaged"
-            (click)="stageItem(itemProxy)"/>
+            (click)="stageItem(itemProxy)"></i>
         <i  class="fa fa-minus"
             *ngIf="itemProxy.vcState.Staged"
-            (click)="unstageItem(itemProxy)"/>
+            (click)="unstageItem(itemProxy)"></i>
     </span>
 </div>
 </div>
 <div *ngIf="itemProxy.children && (!collapsed[itemProxy.item.id] || previouslyExpanded[itemProxy.item.id] || allExpanded )">
     <version-control-row proxy-collection="itemProxy.children"
                         collapsed="true"
-                        filter="filter"></tree-row>
+                        filter="filter"></version-control-row>
 </div>
 </div>
