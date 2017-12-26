@@ -194,11 +194,17 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getHistory', function(request, sendResponse){
+    console.log("::: Getting history for " + request.onId);
+    
+    // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
     global.koheseKDB.kdbRepo.walkHistoryForFile(request.onId, function(history){
       
       if (history) {
+        console.log('+++ History for ' + request.onId);
+        console.log(history);
         sendResponse(history);
       } else {
+        console.log('*** History error for ' + request.onId);
         sendResponse({error: 'history error'});
       }        
     });
