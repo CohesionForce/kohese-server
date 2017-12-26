@@ -1,47 +1,47 @@
-<span ng-switch="kind">
-  <i ng-switch-when="Action"
+<span [ngSwitch]="kind">
+  <i *ngSwitchCase="Action"
     class ="fa fa-paper-plane"
     tooltip="Action"></i>
 
-  <i ng-switch-when="Decision"
+  <i *ngSwitchCase="Decision"
     class ="fa fa-gavel"
     tooltip="Decision"></i>
 
-  <i ng-switch-when="Task"
+  <i *ngSwitchCase="Task"
     class ="fa fa-tasks"
     tooltip="Task"></i>
 
-  <i ng-switch-when="Item"
+  <i *ngSwitchCase="Item"
     class ="fa fa-sticky-note"
     tooltip="Item"></i>
 
-  <i ng-switch-when="Issue"
+  <i *ngSwitchCase="Issue"
     class ="fa fa-exclamation-circle"
     tooltip="Issue"></i>
 
-  <i ng-switch-when="Observation"
+  <i *ngSwitchCase="Observation"
     class ="fa fa-comment"
     tooltip="Observation"></i>
 
-  <i ng-switch-when="KoheseUser"
+  <i *ngSwitchCase="KoheseUser"
     class ="fa fa-user"
     tooltip="User"></i>
 
-  <i ng-switch-when="Repository"
+  <i *ngSwitchCase="Repository"
     class ="fa fa-database"
     tooltip="Repository"></i>
 
-  <i ng-switch-when="Internal-Model"
+  <i *ngSwitchCase="Internal-Model"
     class ="fa fa-sitemap"
     tooltip="Models"></i>
 
-  <i ng-switch-when="Internal"
+  <i *ngSwitchCase="Internal"
     class ="fa fa-database"
     tooltip="Internal"></i>
 
-  <i ng-switch-when="Internal-Lost"
+  <i *ngSwitchCase="Internal-Lost"
     class ="fa fa-trash"
     tooltip="Repository"></i>
 
-  <i ng-switch-default class ="fa fa-sticky-note"></i>
+  <i *ngSwitchDefault class ="fa fa-sticky-note"></i>
 </span>
