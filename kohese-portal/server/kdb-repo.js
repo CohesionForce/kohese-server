@@ -495,13 +495,9 @@ module.exports.getItemStatus = getItemStatus;
 //
 //////////////////////////////////////////////////////////////////////////
 function walkHistoryForFile(itemId, callback){
-  var itemId = filePath.substring(filePath.lastIndexOf(path.sep) + 1,
-      filePath.lastIndexOf('.json'));
-  if (!UUID_REGEX.test(itemId)) {
-    // The ID was not a valid UUID, so assume that the Item is a Repository.
-    // TODO Fix this case. All (or almost all) commits are being displayed.
-    itemId = path.basename(path.dirname(filePath));
-  }
+  
+  // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
+
   var commitFiles = fs.readdirSync(INDEX_DIRECTORY);
   var relatedCommits = [];
   for (var j = 0; j < commitFiles.length; j++) {
