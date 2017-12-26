@@ -12,6 +12,10 @@ Created by Josh P
   height: 100%;
 }
 
+.tab-content {
+  height: 100%;
+}
+
 #page-wrapper {
 
   position: fixed;
@@ -20,38 +24,32 @@ Created by Josh P
   height: 100%;
   width: 100%;
 
-  >div {
+  div {
     height:100%;
   }
 
+  content-container {
   #content-container {
     height: 100%;
     z-index: 2;
 
-    > #tab-bar {
+    #tab-bar {
       height: 100%;
-
-      > div {
-        height: 100%;
-
-        > .tab-content {
-          height: calc(100% - #{$tabBarHeight});
-
-          > .tab-pane {
-            height: 100%;
-            overflow:hidden;
-
-            > .tab-body {
+         ngb-tabset {
+          .tab-content {
+            .tab-pane {
               height: 100%;
-
-              > .singleview {
+              overflow:hidden;
+              .tab-body {
                 height: 100%;
-
-                >div {
+                .singleview {
                   height: 100%;
-                  >div {
+                  div {
                     height: 100%;
-                  }
+                    div {
+                      height: 100%;
+                    }
+                }
                 }
               }
             }
@@ -59,6 +57,8 @@ Created by Josh P
         }
       }
     }
+
+
 
     border-radius: $baseBorderRadius;
     .delete-tab-button {
@@ -107,7 +107,7 @@ Created by Josh P
       }
     }
   }
-}
+
 
 .left-content {
   height: inherit;

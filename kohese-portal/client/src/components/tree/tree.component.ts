@@ -5,7 +5,7 @@ import { TabService } from '../../services/tab/tab.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { VersionControlService } from '../../services/version-control/version-control.service';
-import { UserService } from '../../services/user/user.service';
+import { SessionService } from '../../services/user/session.service';
 import { Tab } from '../../services/tab/Tab.class';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -46,7 +46,7 @@ export class TreeComponent extends NavigatableComponent
                protected TabService : TabService,
                private ItemRepository : ItemRepository,
                private VersionControlService : VersionControlService,
-               private UserService : UserService) {
+               private SessionService : SessionService) {
     super(NavigationService, TabService);
     }
 
@@ -63,7 +63,7 @@ export class TreeComponent extends NavigatableComponent
       })
     this.kindList = this.ItemRepository.getModelList();
     this.actionStates = ['Pending Review', 'In Verification', 'Assigned'];
-    this.userList = this.UserService.getAllUsers();
+    this.userList = this.SessionService.getUsers();
     this.collapsed = {};
     this.previouslyExpanded = {};
     this.allExpanded = false;

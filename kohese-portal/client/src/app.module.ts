@@ -30,11 +30,12 @@ import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
-import { MapKeyPipe } from './map-key.pipe';
+import { MapKeyPipe } from './pipes/map-key.pipe';
 import { HighlightRegexPipe } from './pipes/Highlight.pipe';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
+import { SplitPaneModule } from 'ng2-split-pane/lib/ng2-split-pane';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
@@ -73,7 +74,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     NgbModule.forRoot(),
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
-    MaterialModule
+    MaterialModule,
+    SplitPaneModule
   ],
   providers: [ItemRepository, AuthenticationService,
     AUTHENTICATION_INTERCEPTOR, SocketService, TabService,
