@@ -11,6 +11,8 @@ import { ItemProxy } from '../../../common/models/item-proxy.js';
 
 export class RowComponent extends NavigatableComponent {
   @Input()
+  proxyCollection : Array<ItemProxy>
+  @Input()
   exactFilter : boolean // TODO - Implement exact Passing
   @Input()
   filterSubject : BehaviorSubject<ProxyFilter>
@@ -26,6 +28,7 @@ export class RowComponent extends NavigatableComponent {
 
   initialize () {
     this.filterSubject.subscribe(filter => { this.filter = filter })
+    console.log(this);
   }
 
   rowSelected ( ) {

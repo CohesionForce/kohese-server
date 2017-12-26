@@ -14,6 +14,8 @@ import { RowComponent } from '../../../classes/RowComponent.class';
 
 export class TreeRowComponent extends RowComponent
                               implements OnInit, OnDestroy {
+  @Input()
+  proxyCollection : Array<ItemProxy>
 
   constructor (NavigationService : NavigationService,
                TabService : TabService) {
@@ -22,7 +24,8 @@ export class TreeRowComponent extends RowComponent
   }
 
   ngOnInit () {
-
+    console.log('Init Row');
+    console.log(this);
   }
 
   ngOnDestroy () {

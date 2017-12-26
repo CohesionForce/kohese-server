@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { ItemProxy } from '../../../../common/models/item-proxy.js';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 
-declare var $: any;
+import * as $ from 'jquery';
 
 @Component({
   selector : 'tree-view',
