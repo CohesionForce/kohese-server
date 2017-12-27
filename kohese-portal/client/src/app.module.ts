@@ -21,6 +21,7 @@ import { ExploreComponent } from './components/explore/explore.component';
 import { TreeRowComponent } from './components/tree/tree-row/tree-row.component';
 import { VersionControlRowComponent } from './components/tree/version-control-row/version-control-row.component';
 import { KindIconComponent } from './components/kind-icon/kind-icon.component';
+import { DocumentViewComponent } from './components/document-view/document-view.component';
 
 import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
 import { AuthenticationService } from './services/authentication/authentication.service';
@@ -63,7 +64,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     ExploreComponent,
     TreeRowComponent,
     VersionControlRowComponent,
-    KindIconComponent
+    KindIconComponent,
+    DocumentViewComponent
 
   ],
   imports: [

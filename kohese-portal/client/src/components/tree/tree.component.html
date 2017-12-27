@@ -1,4 +1,4 @@
-<div style="height:inherit">
+<div style="height:inherit" *ngIf="treeRoot">
     <div id="top-action-bar">
       <button (click)="expandAll()" class="btn btn-default btn-sm"
         style="margin: 5px">Expand All</button>
@@ -107,9 +107,9 @@
         </div>
         <div class="kt-body" style="overflow:auto; height: 100%">
   <tree-row [proxyCollection]="treeRoot.children" [filterSubject]="filterSubject"
-            [collapsed]="true"></tree-row>
+            [collapsed]="true" *ngIf=""></tree-row>
       </div>
     </div>
   </div> <!-- End Knowledge Tree -->
 </div>
-
+<div *ngIf="!treeRoot">Loading . . .</div>

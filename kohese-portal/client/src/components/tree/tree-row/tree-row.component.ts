@@ -14,12 +14,11 @@ import { RowComponent } from '../../../classes/RowComponent.class';
 
 export class TreeRowComponent extends RowComponent
                               implements OnInit, OnDestroy {
-  @Input()
-  proxyCollection : Array<ItemProxy>
 
   constructor (NavigationService : NavigationService,
                TabService : TabService) {
     super(NavigationService, TabService);
+    console.log(this);
 
   }
 

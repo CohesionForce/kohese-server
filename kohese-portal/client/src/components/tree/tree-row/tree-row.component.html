@@ -1,3 +1,6 @@
+<pre>
+  {{proxyCollection}}
+</pre>
 <div
   class="kt-collection" *ngFor="let itemProxy of proxyCollection"
   [ngClass]="{'kt-hidden' : itemProxy.item.parentId && collapsed[itemProxy.item.parentId]}" >
@@ -41,52 +44,50 @@
             (click)="removeItem(itemProxy)"> </i>
         </span>
     </div>
-</div>
-
-<div *ngIf="itemProxy.children && (!collapsed[itemProxy.item.id]) || previouslyExpanded[itemProxy.item.id] || allExpanded">
-   <tree-row filterSubject="filterSubject" proxy-collection="itemProxy.children"
-             exactFilter="exactFilter"></tree-row>
+  </div>
+  <div *ngIf="itemProxy.children && (!collapsed[itemProxy.item.id]) || previouslyExpanded[itemProxy.item.id] || allExpanded">
+      <tree-row [filterSubject]="filterSubject" [proxyCollection]="itemProxy.children"
+                [exactFilter]="exactFilter"></tree-row>
+   </div>
+   <div class="dropdown position-fixed" id="tree-menu-{{itemProxy.item.id}}">
+      <ul class="dropdown-menu" role="menu">
+          <li class="pointer context-item"
+              role="menuitem"
+              (click)="updateRoot(itemProxy)">
+              <a>
+                  Set as root
+              </a>
+          </li>
+          <li class="pointer context-item"
+              role="menuitem"
+              (click)="navigate('kohese.explore.create',
+                                          {parentId: itemProxy.item.id})">
+              <a>
+                  Create child
+              </a>
+          </li>
+          <li class="pointer context-item"
+              role="menuitem"
+              (click)="collapseChildren(itemProxy)">
+              <a>
+                  Collapse children
+              </a>
+          </li>
+          <li class="pointer context-item"
+              role="menuitem"
+              (click)="expandChildren(itemProxy)">
+              <a>
+                  Expand Children
+              </a>
+          </li>
+          <li class="pointer context-item"
+              role="menuitem"
+              (click)="expandMatchingChildren(itemProxy)">
+              <a>
+                  Expand Matching Children
+              </a>
+          </li>
+      </ul>
+   </div>
 </div>
 <!-- Dropdown menu-->
-<div class="dropdown position-fixed" id="tree-menu-{{itemProxy.item.id}}">
-   <ul class="dropdown-menu" role="menu">
-       <li class="pointer context-item"
-           role="menuitem"
-           (click)="updateRoot(itemProxy)">
-           <a>
-               Set as root
-           </a>
-       </li>
-       <li class="pointer context-item"
-           role="menuitem"
-           (click)="navigate('kohese.explore.create',
-                                       {parentId: itemProxy.item.id})">
-           <a>
-               Create child
-           </a>
-       </li>
-       <li class="pointer context-item"
-           role="menuitem"
-           (click)="collapseChildren(itemProxy)">
-           <a>
-               Collapse children
-           </a>
-       </li>
-       <li class="pointer context-item"
-           role="menuitem"
-           (click)="expandChildren(itemProxy)">
-           <a>
-               Expand Children
-           </a>
-       </li>
-       <li class="pointer context-item"
-           role="menuitem"
-           (click)="expandMatchingChildren(itemProxy)">
-           <a>
-               Expand Matching Children
-           </a>
-       </li>
-   </ul>
-</div>
-</div>
-
