@@ -6,6 +6,7 @@ import { AdminComponent } from './components/admin/admin.component';
 import { LoginComponent } from './components/login/login.component';
 import { RepositoriesComponent } from './components/admin/repositories.component';
 import { ExploreComponent } from './components/explore/explore.component';
+import { AnalysisComponent } from './components/analysis/analysis.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -13,7 +14,8 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent},
   { path: 'login', component: LoginComponent},
   { path: 'repositories', component: RepositoriesComponent },
-  { path: 'explore', component: ExploreComponent }
+  { path: 'explore', component: ExploreComponent},
+  { path: 'analysis', component: AnalysisComponent }
 ]
 
 @NgModule({

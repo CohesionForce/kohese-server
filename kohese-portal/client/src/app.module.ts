@@ -6,6 +6,8 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 
+import { AnalysisModule } from './components/analysis/analysis.module';
+
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
@@ -77,7 +79,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
     MaterialModule,
-    SplitPaneModule
+    SplitPaneModule,
+    AnalysisModule
   ],
   providers: [ItemRepository, AuthenticationService,
     AUTHENTICATION_INTERCEPTOR, SocketService, TabService,
