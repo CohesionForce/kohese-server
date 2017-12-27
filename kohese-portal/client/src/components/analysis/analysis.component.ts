@@ -35,4 +35,4 @@ export class AnalysisComponent extends NavigatableComponent
   }
 }
 
-                               }
+
