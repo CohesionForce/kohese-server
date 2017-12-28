@@ -252,7 +252,8 @@ function storeModelAnalysis(analysisInstance){
   
   if (proxy) {
     console.log('::: Storing analysis for ' + proxy.item.id + ' - ' + proxy.item.name);
-    
+
+    var repo = proxy.getRepositoryProxy();
     var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
     
     var modelStore = kdbStore.models[modelName];
