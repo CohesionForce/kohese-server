@@ -3,7 +3,7 @@ var kdb = require('./kdb.js');
 const kdbFs = require('./kdb-fs.js');
 var fs = require('fs');
 var child = require('child_process');
-var itemAnalysis = require('../common/models/analysis.js');
+var itemAnalysis = require('./analysis.js');
 var ItemProxy = require('../common/models/item-proxy.js');
 var serverAuthentication = require('./server-enableAuth.js');
 const Path = require('path');
@@ -30,7 +30,7 @@ ItemProxy.getChangeSubject().subscribe(change => {
   switch (change.type){
     case 'create':
     case 'update':
-      global.koheseKDB.storeModelInstance(change.proxy, change.type === 'create')
+      kdb.storeModelInstance(change.proxy, change.type === 'create')
       .then(function (status) {
         var notification = {
             type: change.type,
@@ -48,7 +48,7 @@ ItemProxy.getChangeSubject().subscribe(change => {
         kind: change.kind,
         id: change.proxy.item.id
       };
-      global.koheseKDB.removeModelInstance(change.proxy);
+      kdb.removeModelInstance(change.proxy);
       kio.server.emit(change.kind +'/' + change.type, notification);    
       break;
     default:
@@ -72,7 +72,7 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received findById for %s for user %s at %s',
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
-    var proxy = kdb.ItemProxy.getProxyFor(request.id);
+    var proxy = ItemProxy.getProxyFor(request.id);
     sendResponse({
       kind: proxy.kind,
       item: proxy.item
@@ -90,7 +90,7 @@ function KIOItemServer(socket){
     }
     console.log('::: session %s: Received getAll for user %s at %s', socket.id, username, socket.handshake.address);
     
-    var repoTreeHashes = kdb.ItemProxy.getAllTreeHashes();
+    var repoTreeHashes = ItemProxy.getAllTreeHashes();
     
     var response = {};
     if(!_.isEqual(request.repoTreeHashes, repoTreeHashes)){
@@ -103,7 +103,7 @@ function KIOItemServer(socket){
             sentAll: true
           };
         
-        var rootProxy = kdb.ItemProxy.getRootProxy();
+        var rootProxy = ItemProxy.getRootProxy();
         rootProxy.visitChildren(null, (proxy) => {
           if (!response.cache[proxy.kind]){
             response.cache[proxy.kind] = {};
@@ -116,7 +116,7 @@ function KIOItemServer(socket){
         // Send deltas to client
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
-        var thmCompare = kdb.ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+        var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 //        console.log(thmCompare);
         
         response = {
@@ -127,13 +127,13 @@ function KIOItemServer(socket){
         };
         
         thmCompare.addedItems.forEach((itemId) => {
-          var proxy = kdb.ItemProxy.getProxyFor(itemId);
+          var proxy = ItemProxy.getProxyFor(itemId);
           response.addItems.push({kind: proxy.kind, item: proxy.item});
 //          console.log(proxy.item);
         });
         
         thmCompare.changedItems.forEach((itemId) => {
-          var proxy = kdb.ItemProxy.getProxyFor(itemId);
+          var proxy = ItemProxy.getProxyFor(itemId);
           response.changeItems.push({kind: proxy.kind, item: proxy.item});
 //          console.log(proxy.item);
         });
@@ -154,10 +154,10 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getStatus', function(request, sendResponse){
 
-    var repoProxy = global.koheseKDB.ItemProxy.getProxyFor(request.repoId);    
+    var repoProxy = ItemProxy.getProxyFor(request.repoId);    
     console.log('::: Getting status for repo: ' + repoProxy.item.name);
 
-    global.koheseKDB.kdbRepo.getStatus(request.repoId, function(status){    
+    kdb.kdbRepo.getStatus(request.repoId, function(status){    
       if (status) {
         var idStatusArray = [];
         for (var j = 0; j < status.length; j++) {
@@ -194,11 +194,17 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getHistory', function(request, sendResponse){
-    global.koheseKDB.kdbRepo.walkHistoryForFile(request.onId, function(history){
+    console.log("::: Getting history for " + request.onId);
+    
+    // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
+    kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
       
       if (history) {
+        console.log('+++ History for ' + request.onId);
+        console.log(history);
         sendResponse(history);
       } else {
+        console.log('*** History error for ' + request.onId);
         sendResponse({error: 'history error'});
       }        
     });
@@ -310,7 +316,7 @@ function KIOItemServer(socket){
       
     console.log('::: Generating ' + outFormat + ' Report for ' + forItemId);
 
-    var proxy = global.koheseKDB.ItemProxy.getProxyFor(forItemId);
+    var proxy = ItemProxy.getProxyFor(forItemId);
     var result = {};
 
     if (!proxy){
@@ -361,7 +367,7 @@ function KIOItemServer(socket){
     var addStatusMap = {};
     for (var i = 0; i < idsArray.length; i++) {
       console.log('--- Adding proxy for: ' + idsArray[i]);
-      var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
+      var proxy = ItemProxy.getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
       promises.push(kdb.kdbRepo.add(repositoryInformation.repositoryProxy.item.id,
@@ -406,7 +412,7 @@ function KIOItemServer(socket){
               }
               
               if (foundId) {
-                proxies.push(kdb.ItemProxy.getProxyFor(fileName));
+                proxies.push(ItemProxy.getProxyFor(fileName));
               }
             }
           }
@@ -464,7 +470,7 @@ function KIOItemServer(socket){
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
+      var proxy = ItemProxy.getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
@@ -495,7 +501,7 @@ function KIOItemServer(socket){
     var pendingEvaluationPromises = [];
     
     for (var i = 0; i < idsArray.length; i++) {
-      var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
+      var proxy = ItemProxy.getProxyFor(idsArray[i]);
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
       
@@ -536,7 +542,7 @@ function KIOItemServer(socket){
     Promise.all(pendingEvaluationPromises).then(function(statusArray){
       // Determine if items need to be checked out or deleted
       for (var i = 0; i < idsArray.length; i++) {
-        var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
+        var proxy = ItemProxy.getProxyFor(idsArray[i]);
         var repositoryInformation = getRepositoryInformation(proxy);
         var repositoryId = repositoryInformation.repositoryProxy.item.id;
         var status = statusArray[i];

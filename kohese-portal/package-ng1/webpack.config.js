@@ -6,10 +6,10 @@ var BowerWebpackPlugin = require("bower-webpack-plugin");
 var webpack = require("webpack");
 
 module.exports = {
-    context: __dirname + '/client-ng1',
+    context: __dirname + '/../client-ng1',
     entry: './app.js',
     output: {
-        path: __dirname + '/client-ng1',
+        path: __dirname + '/../client-ng1',
         filename: 'bundle.js'
     },
     resolve: {
