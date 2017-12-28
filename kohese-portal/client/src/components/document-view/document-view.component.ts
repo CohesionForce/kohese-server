@@ -1,4 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+
+import { ItemProxy } from '../../../../common/models/item-proxy.js';
 
 @Component({
   selector: 'document-view',
@@ -6,6 +8,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 })
 
 export class DocumentViewComponent implements OnInit, OnDestroy {
+  @Input()
+  itemProxy : ItemProxy;
+  @Input()
+  showChildren : boolean;
+
   constructor () {
 
   }

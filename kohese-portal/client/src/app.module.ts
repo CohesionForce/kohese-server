@@ -6,7 +6,11 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 
+/* Custom Modules */
 import { AnalysisModule } from './components/analysis/analysis.module';
+import { DetailsModule } from './components/details/details.module';
+import { DocumentViewModule } from './components/document-view/document-view.module';
+import { ActionTableModule } from './components/action-table/action-table.module'
 
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -18,12 +22,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ContentContainerComponent } from './components/content-container/content-container.component';
 import { RepositoriesComponent } from './components/admin/repositories.component';
 import { TreeComponent } from './components/tree/tree.component';
-import { DetailsComponent } from './components/details/details.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { TreeRowComponent } from './components/tree/tree-row/tree-row.component';
 import { VersionControlRowComponent } from './components/tree/version-control-row/version-control-row.component';
 import { KindIconComponent } from './components/kind-icon/kind-icon.component';
-import { DocumentViewComponent } from './components/document-view/document-view.component';
+import { ActionTableComponent } from './components/action-table/action-table.component';
 
 import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
 import { AuthenticationService } from './services/authentication/authentication.service';
@@ -62,12 +65,10 @@ const AUTHENTICATION_INTERCEPTOR = {
     HighlightRegexPipe,
     RepositoriesComponent,
     TreeComponent,
-    DetailsComponent,
     ExploreComponent,
     TreeRowComponent,
     VersionControlRowComponent,
-    KindIconComponent,
-    DocumentViewComponent
+    KindIconComponent
 
   ],
   imports: [
@@ -80,7 +81,10 @@ const AUTHENTICATION_INTERCEPTOR = {
     ToastrModule.forRoot(),
     MaterialModule,
     SplitPaneModule,
-    AnalysisModule
+    AnalysisModule,
+    DetailsModule,
+    DocumentViewModule,
+    ActionTableModule
   ],
   providers: [ItemRepository, AuthenticationService,
     AUTHENTICATION_INTERCEPTOR, SocketService, TabService,

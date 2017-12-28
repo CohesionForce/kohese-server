@@ -4,10 +4,10 @@ import { ActivatedRoute } from '@angular/router';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TabService } from '../../services/tab/tab.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ItemRepository } from 'client/src/services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 import { ItemProxy } from '../../../../common/models/item-proxy.js';
-import { SessionService } from 'client/src/services/user/session.service';
+import { SessionService } from '../../services/user/session.service';
 
 import * as commonmark from 'commonmark';
 import { HtmlRenderer, Parser } from 'commonmark';

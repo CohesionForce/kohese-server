@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router/src/router_state';
+import { ActivatedRoute } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service'
 import { TabService } from '../../services/tab/tab.service';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 @Component({
   selector: 'analysis-view',
@@ -21,7 +22,7 @@ export class AnalysisComponent extends NavigatableComponent
   constructor(protected NavigationService : NavigationService,
               protected TabService : TabService,
               private router : ActivatedRoute,
-              private ItemRepository) {
+              private ItemRepository : ItemRepository) {
     super(NavigationService, TabService)
 
   }

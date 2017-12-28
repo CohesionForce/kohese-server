@@ -27,18 +27,18 @@
                title=" Save"
                     ></i>
             <i *ngIf="tab.type === 'singleview'" class="fa fa-clone pull-right"
-               (click)="updateTab('kohese.explore.edit', itemProxy.item.id)"
+               (click)="navigate('Explore', {id: itemProxy.item.id})"
                title="Split Screen">
             </i>
             <i class="fa fa-lg fa-arrows-alt" *ngIf="tab.type === 'dualview'"
-               (click)="updateTab('kohese.investigate', itemProxy.item.id)"
+               (click)="navigate('Investigate', {id: itemProxy.item.id})"
                title="Fullscreen"></i>
         </span>
     </div>
     <div class="panel-body">
         <!-- Nav tabs -->
-        <tabset id="details-tabs">
-            <tab id="defaultTab" active="defaultTab.active" heading="Document">
+        <mat-tab-group id="details-tabs">
+            <mat-tab id="defaultTab" active="defaultTab.active" label="Document">
                 <button (click)="generateHTMLReport()" class="btn btn-primary">
                    Generate HTML Report
                </button>
@@ -47,29 +47,33 @@
                </button>
                <button
                       class= "btn btn-primary"
-                      (click)="newTab('kohese.analysis',
+                      (click)="addTab('Analysis',
                                 {id: itemProxy.item.id})">
                       Analyze
               </button>
 
 		           <div *ngIf="itemProxy.children.length">
-                  <label class="control-label" for="showChildren"> Show Children </label> <input
-                         type="checkbox" ng-checked="docShowChildren;"
+                  <label class="control-label" for="showChildren"> Show Children </label>
+                  <input
+                         type="checkbox" [checked]="showChildren"
                          (click)="showChildrenToggled()" />
                 </div>
-                <document-view item-proxy="itemProxy"
+                <document-view itemProxy="itemProxy"
                                *ngIf="itemProxy"
-                               show-children="docShowChildren" />
+                               showChildren="showChildren"></document-view>
 
 
-            </tab>
-            <tab >
-                 <tab-heading>Overview
-                   <span ng-show="itemForm.$dirty">
-                      <img src="resources/icons/versioncontrol/dirty.ico"
+            </mat-tab>
+            <mat-tab label="Overview">
+                <ng-template mat-tab-label>
+                   Overview
+                   <span *ngIf="itemForm.$dirty">
+                      <img src="../../../assets/icons/versioncontrol/dirty.ico"
                       title = "Dirty item" />
-                  </span></tab-heading>
-                <div class="details-tab" *ngIf="itemProxy.kind ==='Action'">
+                  </span>
+                </ng-template>
+                TBD - User Defined Types
+                <!-- <div class="details-tab" *ngIf="itemProxy.kind ==='Action'">
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>
                 <div class="details-tab" *ngIf="itemProxy.kind != 'Action' &&
@@ -87,74 +91,49 @@
                 </div>
                 <div class="details-tab" *ngIf="itemProxy.kind ==='Repository'">
                     <ng-include src="'components/common/templates/repository-form.html'"></ng-include>
-                </div>
+                </div> -->
 
-            </tab>
-            <tab *ngIf="itemProxy.kind === 'Observation'">
-                <tab-heading>Observation</tab-heading>
+            </mat-tab>
+            <!-- <mat-tab *ngIf="itemProxy.kind === 'Observation'">
+                <tab-label>Observation</tab-label>
                 <ng-include src="'components/common/templates/observation-form.html'"></ng-include>
-            </tab>
+            </mat-tab>
             <tab *ngIf="itemProxy.kind === 'Issue'">
-                <tab-heading>Issue</tab-heading>
+                <tab-label>Issue</tab-label>
                 <ng-include src="'components/common/templates/issue-form.html'"></ng-include>
-            </tab>
-            <tab heading="Children ({{itemProxy.children.length}})">
-                <ng-include src="'components/detailsview/subviews/item.html'"></ng-include>
-            </tab>
-            <tab heading="Relations">
+            </tab> -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                  Children ({{itemProxy.children.length}})
+              </ng-template>
+              <children-tab itemProxy="itemProxy"></children-tab>
+            </mat-tab>
+            <mat-tab label="Relations">
                 <h4>Relations Tab</h4>
 
                 <p><b>This tab is under construction.</b></p>
-            </tab>
-            <tab heading="History" select="getHistory()">
-                <h4>History Tab</h4>
-
-                <div style="width:20%; overflow:auto; display:inline-block;">
-                  <label>Created by: {{itemProxy.item.createdBy}}</label>
-                  <label>Created on: {{itemProxy.item.createdOn | date:'medium'}}</label>
-                  <label>Modified by: {{itemProxy.item.modifiedBy}}</label>
-                  <label>Modified on: {{itemProxy.item.modifiedOn | date:'medium'}}</label>
-                </div>
-                <div class="pull-right" style="width:78%; vertical-align: top; display:inline-block; overflow:auto">
-                  <table>
-                      <thead>
-                        <th style="width:30%">Commit</th>
-                        <th style="width:45%">Message</th>
-                        <th style="width:10%">Author</th>
-                        <th style="width:14%">Date</th>
-                      </thead>
-                      <tbody id="theDetailsBody">
-                        <tr ng-repeat="record in itemProxy.history" style="vertical-align: top;">
-                          <td>{{record.commit}}</td>
-                          <td>{{record.message}}</td>
-                          <td>{{record.author}}</td>
-                          <td>{{record.date | date:'medium'}}</td>
-                        </tr>
-                      </tbody>
-                  </table>
-                  <label >{{record}}</label>
-                </div>
-
-            </tab>
-            <tab heading="Journal">
+            </mat-tab>
+            <mat-tab label="History" select="getHistory()">
+                <history-tab itemProxy="itemProxy"></history-tab>
+            </mat-tab>
+            <mat-tab label="Journal">
                 <h4>Journal Tab</h4>
 
                 <p><b>This tab is under construction.</b></p>
-            </tab>
-            <tab heading="Action Table"
+            </mat-tab>
+            <mat-tab label="Action Table"
                  *ngIf="itemProxy.children">
 
-              <action-table item-proxy="itemProxy">
-            </tab>
-            <tab heading="Raw Data">
+              <action-table itemProxy="itemProxy"></action-table>
+            </mat-tab>
+            <mat-tab label="Raw Data">
                 <h4>Document Tab</h4>
                 <h5>Id: {{itemProxy.item.id}}</h5>
                 <h5>OID: {{itemProxy.oid}}</h5>
                 <h5>Tree Hash: {{itemProxy.treeHash}}</h5>
                 <pre>{{itemProxy.document()}}</pre>
                 <pre>{{itemProxy.treeHashEntry | json}}</pre>
-            </tab>
-        </tabset>
+            </mat-tab>
+        </mat-tab-group>
     </div>
-    </span>
 </div>

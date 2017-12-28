@@ -43,5 +43,11 @@ export var LocationMap = {
     'title' : 'Explore',
     'params' : {},
     'route' : '/explore'
+  },
+  'Analysis' : {
+    'type' : 'single',
+    'title': 'Analysis',
+    'params' : {},
+    'route' : '/analysis'
   }
 }

@@ -1,8 +1,11 @@
-import { NgModule } from "@angular/core/src/metadata/ng_module";
+import { NgModule } from "@angular/core/";
 import { AnalysisComponent } from "./analysis.component";
 import { PhraseViewComponent } from "./phrase-view/phrase-view.component";
 import { SentenceViewComponent } from "./sentence-view/sentence-view.component";
 import { TermViewComponent } from "./term-view/term-view.component";
+
+import { SplitPaneModule } from "ng2-split-pane/lib/ng2-split-pane";
+import { DocumentViewModule } from '../document-view/document-view.module';
 
 
 @NgModule({
@@ -13,7 +16,8 @@ import { TermViewComponent } from "./term-view/term-view.component";
     TermViewComponent
   ],
   imports : [
-
+    SplitPaneModule,
+    DocumentViewModule
   ],
   exports : [
     AnalysisComponent,
