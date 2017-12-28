@@ -3,11 +3,11 @@
 </pre>
 <div
   class="kt-collection" *ngFor="let itemProxy of proxyCollection"
-  [ngClass]="{'kt-hidden' : itemProxy.item.parentId && collapsed[itemProxy.item.parentId]}" >
+  [ngClass]="{'kt-hidden' : itemProxy.item.parentId && collapsed}" >
 
   <div class="kt-item"
       id="{{itemProxy.item.id}}"
-      [ngClass]="{'kti-selected-item' : itemProxy.item.id === selectedItemProxy.item.id,
+      [ngClass]="{'kti-selected-item' : itemProxy.item.id === 1,
                 'kti-filtered': !matchesFilter(itemProxy) && !childMatchesFilter(itemProxy),
                 'kti-filterMatchedExact': matchesFilter(itemProxy, true),
                 'kti-filterMatched': matchesFilter(itemProxy)}">

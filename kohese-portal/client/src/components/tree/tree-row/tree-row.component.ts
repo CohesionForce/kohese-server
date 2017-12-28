@@ -6,6 +6,10 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { TabService } from '../../../services/tab/tab.service';
 
 import { RowComponent } from '../../../classes/RowComponent.class';
+import { ProxyFilter } from '../../../classes/ProxyFilter.class';
+
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'tree-row',
@@ -14,6 +18,14 @@ import { RowComponent } from '../../../classes/RowComponent.class';
 
 export class TreeRowComponent extends RowComponent
                               implements OnInit, OnDestroy {
+  @Input()
+  proxyCollection : Array<ItemProxy>;
+  @Input()
+  filterSubject : BehaviorSubject<ProxyFilter>
+  @Input()
+  collapsed : boolean;
+
+  filterSubscription : Subscription;
 
   constructor (NavigationService : NavigationService,
                TabService : TabService) {
@@ -25,10 +37,13 @@ export class TreeRowComponent extends RowComponent
   ngOnInit () {
     console.log('Init Row');
     console.log(this);
+    this.filterSubscription = this.filterSubject.subscribe(newFilter => {
+      this.filter = newFilter;
+    })
   }
 
   ngOnDestroy () {
-
+    this.filterSubscription.unsubscribe();
   }
 
   removeItem (proxy : ItemProxy) {
