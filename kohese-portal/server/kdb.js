@@ -247,12 +247,12 @@ module.exports.storeModelInstance = storeModelInstance;
 function storeModelAnalysis(analysisInstance){
   var modelName = 'Analysis';
   var modelInstanceId = analysisInstance.id;
-  console.log(analysisInstance);
   
   var proxy = ItemProxy.getProxyFor(modelInstanceId);
   
   if (proxy) {
-    var repo = proxy.getRepositoryProxy();
+    console.log('::: Storing analysis for ' + proxy.item.id + ' - ' + proxy.item.name);
+    
     var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
     
     var modelStore = kdbStore.models[modelName];
