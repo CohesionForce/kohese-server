@@ -247,11 +247,12 @@ module.exports.storeModelInstance = storeModelInstance;
 function storeModelAnalysis(analysisInstance){
   var modelName = 'Analysis';
   var modelInstanceId = analysisInstance.id;
-  console.log(analysisInstance);
   
   var proxy = ItemProxy.getProxyFor(modelInstanceId);
   
   if (proxy) {
+    console.log('::: Storing analysis for ' + proxy.item.id + ' - ' + proxy.item.name);
+
     var repo = proxy.getRepositoryProxy();
     var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
     

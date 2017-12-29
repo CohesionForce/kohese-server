@@ -3,7 +3,7 @@
  */
 
 
-function AnalysisService(ItemRepository) {
+function AnalysisService (ItemRepository) {
   var _ = require('underscore');
   var service = this;
     
@@ -27,26 +27,30 @@ function AnalysisService(ItemRepository) {
     return false;
   }
     
-  service.fetchAnalysis = function (forProxy) {
+  service.fetchAnalysis = function (forProxy, promiseList) {
+    
     var analysisComplete = new Promise((resolve, reject) => {
       // Note:  This logic does a depth first retrieval to decrease the amount of rework associated with roll-up
       // Fetch children
       for (var childIdx = 0; childIdx < forProxy.children.length; childIdx++) {
-        service.fetchAnalysis(forProxy.children[childIdx]);
+        service.fetchAnalysis(forProxy.children[childIdx], promiseList);
       }
 
       if (!forProxy.analysis) {
         console.log('::: Retrieving analysis for ' + forProxy.item.id + ' - ' + forProxy.item.name);
-        performAnalysis(forProxy).then(function(results) {
+        performAnalysis(forProxy).then(function (results) {
           resolve(results);
+        }).catch(function(error){
+          reject(error);
         });
+      } else {
+        resolve('Analysis already loaded');
       }
     });
-
-    return analysisComplete;
+    promiseList.push(analysisComplete);
   }
 
-  function performAnalysis(proxy) {
+  function performAnalysis (proxy) {
     var analysis = ItemRepository.performAnalysis(proxy)
         
     analysis.then(function (results) {
@@ -56,17 +60,20 @@ function AnalysisService(ItemRepository) {
       proxy.analysis.data = results;
       console.log('::: Analysis performed for: ' + proxy.item.id + ' - ' + proxy.item.name);
       consolidateAnalysis(proxy);
+    }).catch(function(error) {
+      console.log('::: Analysis failed for: ' + proxy.item.id + ' - ' + proxy.item.name);
+      console.log(error);
     });
         
     return analysis;
   }
 
-  function consolidateAnalysis(proxy) {
+  function consolidateAnalysis (proxy) {
     proxy.analysis.extendedSummaryList = proxy.analysis.data.summaryList;
     rollUpAnalysis(proxy);
   }
 
-  function rollUpAnalysis(proxy) {
+  function rollUpAnalysis (proxy) {
     if (!proxy.analysis.data) {
       return;
     }

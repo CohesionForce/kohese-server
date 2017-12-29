@@ -35,13 +35,6 @@ function PhraseViewController ($scope, $timeout, tabService, analysisService) {
     onFilterChange();
   })
 
-  ctrl.fetchAnalysis = function () {
-    analysisService.fetchAnalysis(ctrl.itemProxy).then(function (results) {
-      $scope.$apply();
-      console.log(ctrl.itemProxy);
-    });
-  };
-
   ctrl.filterPhrases = function (summary) {
     var MatchesStringFilter;
     var MatchesPOS = ctrl.analysisFilterPOS(summary,
@@ -105,7 +98,6 @@ function PhraseViewController ($scope, $timeout, tabService, analysisService) {
     }
   }
 
-  ctrl.fetchAnalysis();
 }
 
 function PhraseViewDirective () {
