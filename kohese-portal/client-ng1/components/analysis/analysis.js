@@ -32,27 +32,48 @@ function AnalysisController ($scope, $stateParams, ItemRepository, tabService,
       templateUrl : ModalService.LOADING_TEMPLATE,
       controller : ($scope, $modalInstance) => {
         $scope.modalOptions = {
+          promiseList : [],
+          completed : undefined,
+          numberToComplete : undefined,
+          errorCount : 0,
           ok : (result) => {
             $modalInstance.close(result);
           },
           close : (result) => {
             $modalInstance.dismiss('cancel');
           },
+          incrementCompleted : (results) => {
+            console.log('$$$ Got results for ');
+            console.log(results);
+            $scope.modalOptions.completed++;
+            if($scope.modalOptions.completed === $scope.modalOptions.numberToComplete){
+              if(!$scope.modalOptions.errorCount){
+                $scope.modalOptions.ok(results);                
+              }
+            }
+            $scope.$apply();
+          },
           init : () => {
-            analysisService.fetchAnalysis($scope.modalOptions.itemProxy)
-              .then( (results) => {
-                // TODO - Error handling 
-                // if (results.err) {
-                //   $scope.modalOptions.bodyText = err
-                // }
-                $scope.modalOptions.ok(results);
+            analysisService.fetchAnalysis($scope.modalOptions.itemProxy, $scope.modalOptions.promiseList);
+            console.log('$$$ PromiseList:');
+            console.log($scope.modalOptions.promiseList);
+            $scope.modalOptions.completed = 0;
+            $scope.modalOptions.numberToComplete = $scope.modalOptions.promiseList.length;
+            
+            for(var idx in $scope.modalOptions.promiseList){
+              $scope.modalOptions.promiseList[idx].then((results) => {
+                $scope.modalOptions.incrementCompleted(results);
+              }).catch((error) => {
+                $scope.modalOptions.errorCount++;
+                $scope.modalOptions.incrementCompleted(error);
               });
+            }
           },
           itemProxy : ctrl.itemProxy,
           headerText: 'Loading Analysis'
-        }
+        };
       }
-    }
+    };
 
     console.log('Testing analysis modal');
     console.log(ctrl.itemProxy);
@@ -62,7 +83,7 @@ function AnalysisController ($scope, $stateParams, ItemRepository, tabService,
       if (!$scope.$$phase) {
         $scope.$apply();
       }
-    })
+    });
   }
 
   function newAnalysisFilter (event, string) {
@@ -80,5 +101,5 @@ export default ()=> {
   angular.module('app.components.analysis', 
     ['app.services.itemservice',
       'app.services.tabservice'])
-    .controller('AnalysisController', AnalysisController)
-}
+    .controller('AnalysisController', AnalysisController);
+};
