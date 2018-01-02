@@ -10,7 +10,8 @@ import { AppComponent } from './app.component';
 import { AnalysisModule } from './components/analysis/analysis.module';
 import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
-import { ActionTableModule } from './components/action-table/action-table.module'
+import { ActionTableModule } from './components/action-table/action-table.module';
+import { CreateItemModule } from './components/create-item/create-item.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -84,7 +85,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     AnalysisModule,
     DetailsModule,
     DocumentViewModule,
-    ActionTableModule
+    ActionTableModule,
+    CreateItemModule
   ],
   providers: [ItemRepository, AuthenticationService,
     AUTHENTICATION_INTERCEPTOR, SocketService, TabService,

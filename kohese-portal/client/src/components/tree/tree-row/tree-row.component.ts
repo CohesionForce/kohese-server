@@ -18,13 +18,19 @@ import { Subscription } from 'rxjs/Subscription';
 
 export class TreeRowComponent extends RowComponent
                               implements OnInit, OnDestroy {
-  @Input()
-  proxyCollection : Array<ItemProxy>;
-  @Input()
-  filterSubject : BehaviorSubject<ProxyFilter>
-  @Input()
-  collapsed : boolean;
 
+
+  /* UI Triggers
+     RowComponent : exactFilter
+                    collapsed */
+
+  /* Data
+     RowComponent : proxyCollection */
+
+  /* Observables
+     RowComponent : filterSubject */
+
+  /* Subscriptions */
   filterSubscription : Subscription;
 
   constructor (NavigationService : NavigationService,
@@ -36,10 +42,14 @@ export class TreeRowComponent extends RowComponent
 
   ngOnInit () {
     console.log('Init Row');
-    console.log(this);
     this.filterSubscription = this.filterSubject.subscribe(newFilter => {
       this.filter = newFilter;
     })
+    // Initialize rows to collapsed status
+    this.collapsed = {}
+    for (let itemProxy of this.proxyCollection) {
+      this.collapsed[itemProxy.id] = false;
+    }
   }
 
   ngOnDestroy () {

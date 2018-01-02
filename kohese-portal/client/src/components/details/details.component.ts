@@ -80,25 +80,26 @@ export class DetailsComponent extends NavigatableComponent
       // TODO Before we were doing an additional check for parent id to determine
       // if this was a create case. Decided to not port this over in favor of another solution
       // Assess if this is correct and remove TODO
+      this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
+      .subscribe(update => {
+        if (update.connected) {
+          this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+          if (!this.itemProxy) {
+            // TODO : Throw error modal to the UI
+          }
+          this.proxyList = this.ItemRepository.getShortFormItemList();
+          this.userList = this.SessionService.getUsers();
+          this.updateParentProxy();
+          this.configureState();
+          if (this.itemProxy.item.description) {
+            let parsed = this.reader.parse(this.itemProxy.item.description);
+            this.itemDescriptionRendered = this.writer.render(parsed);
+            // TODO Determine if we need to run this through something like $sce
+          }
+        }
+      })
     });
-    this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
-    .subscribe(update => {
-      if (update.connected) {
-        this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
-        if (!this.itemProxy) {
-          // TODO : Throw error modal to the UI
-        }
-        this.proxyList = this.ItemRepository.getShortFormItemList();
-        this.userList = this.SessionService.getUsers();
-        this.updateParentProxy();
-        this.configureState();
-        if (this.itemProxy.item.description) {
-          let parsed = this.reader.parse(this.itemProxy.item.description);
-          this.itemDescriptionRendered = this.writer.render(parsed);
-          // TODO Determine if we need to run this through something like $sce
-        }
-      }
-    })
+
 
     // TODO - Add subscription to the description field of the proxy form and
     // call the document render logic on it

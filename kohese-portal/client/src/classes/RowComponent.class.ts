@@ -16,9 +16,8 @@ export class RowComponent extends NavigatableComponent {
   exactFilter : boolean // TODO - Implement exact Passing
   @Input()
   filterSubject : BehaviorSubject<ProxyFilter>
-  @Input()
-  collapsed : boolean
 
+  collapsed : object;
   filter : ProxyFilter;
 
   constructor (protected NavigationService : NavigationService,

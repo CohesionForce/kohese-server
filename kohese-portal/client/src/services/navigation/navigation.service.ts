@@ -24,7 +24,7 @@ export class NavigationService {
     let newNavUpdate = new NavigationUpdate(location, params, id);
     this.navUpdates.next(newNavUpdate);
     console.log(LocationMap[location]);
-    this.router.navigate([LocationMap[location].route])
+    this.router.navigate([LocationMap[location].route], params)
 
   }
 }
