@@ -36,7 +36,6 @@ export class TreeRowComponent extends RowComponent
   constructor (NavigationService : NavigationService,
                TabService : TabService) {
     super(NavigationService, TabService);
-    console.log(this);
 
   }
 

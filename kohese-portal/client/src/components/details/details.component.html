@@ -1,11 +1,11 @@
 
 
-<div id="details-panel" class="panel">
+<div id="details-panel" class="panel" style="margin-right: 30px"> <!--  This inline style needs to go ASAP-->
     <div class="panel-heading ">
         <span *ngIf="itemProxy.kind">{{itemProxy.kind}} Information: {{itemProxy.item.name}} </span>
         <span *ngIf="!itemProxy.kind">No Item Selected</span>
         <span class="pull-right item-actions">
-            <i class="fa fa-lg fa-level-up"
+            <i class="fa fa-level-up"
                     *ngIf="itemProxy.item.parentId"
                     (click)="navigate('Explore', {id :itemProxy.item.parentId})"
                     title="Go to Parent"></i>
@@ -19,7 +19,7 @@
                    (click)="enableEdit = false"
                    title="Cancel Edit"></i>
                 <i class="fa fa-stack-1x fa-times stacked-child"
-                   (click)="enableEdit = false; cancel();"
+                   (click)="enableEdit = false;"
                    title="Cancel Edit"></i>
             </span>
             <i class="fa fa-lg fa-save"
@@ -67,7 +67,8 @@
             <mat-tab label="Overview">
                 <ng-template mat-tab-label>
                    Overview
-                   <span *ngIf="itemForm.$dirty">
+                   <!-- TODO ngIf form is dirty -->
+                   <span *ngIf="itemForm">
                       <img src="../../../assets/icons/versioncontrol/dirty.ico"
                       title = "Dirty item" />
                   </span>
@@ -106,7 +107,7 @@
               <ng-template mat-tab-label>
                   Children ({{itemProxy.children.length}})
               </ng-template>
-              <children-tab itemProxy="itemProxy"></children-tab>
+              <children-tab [itemProxy]="itemProxy"></children-tab>
             </mat-tab>
             <mat-tab label="Relations">
                 <h4>Relations Tab</h4>
@@ -114,7 +115,7 @@
                 <p><b>This tab is under construction.</b></p>
             </mat-tab>
             <mat-tab label="History" select="getHistory()">
-                <history-tab itemProxy="itemProxy"></history-tab>
+                <history-tab [itemProxy]="itemProxy"></history-tab>
             </mat-tab>
             <mat-tab label="Journal">
                 <h4>Journal Tab</h4>
