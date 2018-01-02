@@ -47,8 +47,8 @@ export class TreeRowComponent extends RowComponent
     })
     // Initialize rows to collapsed status
     this.collapsed = {}
-    for (let itemProxy of this.proxyCollection) {
-      this.collapsed[itemProxy.id] = false;
+    for (let itemProxy of this.itemProxy.children) {
+      this.collapsed[itemProxy.item.id] = false;
     }
   }
 

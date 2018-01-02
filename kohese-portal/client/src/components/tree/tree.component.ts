@@ -39,7 +39,6 @@ export class TreeComponent extends NavigatableComponent
     kindList : Array<String>;
     actionStates : Array<String>;
     userList : Array<any>; // This will eventually be of type KoheseUser
-    previouslyExpanded ; // TODO Assess if this is needed
     viewList : Array<String>;
     viewType : String;
 
@@ -72,7 +71,7 @@ export class TreeComponent extends NavigatableComponent
           this.absoluteRoot = this.treeRoot;
           this.collapsed = {};
           for (let itemProxy of this.treeRoot.children) {
-            this.collapsed[itemProxy.id] = false;
+            this.collapsed[itemProxy.item.id] = false;
           }
 
         }
@@ -84,7 +83,6 @@ export class TreeComponent extends NavigatableComponent
     this.kindList = this.ItemRepository.getModelList();
     this.actionStates = ['Pending Review', 'In Verification', 'Assigned'];
     this.userList = this.SessionService.getUsers();
-    this.previouslyExpanded = {};
     this.allExpanded = false;
     this.locationSynced = false;
     this.isRootDefault = true;

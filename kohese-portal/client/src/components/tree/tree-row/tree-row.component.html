@@ -1,5 +1,5 @@
 <div
-  class="kt-collection" *ngFor="let itemProxy of proxyCollection"
+  class="kt-collection"
   [ngClass]="{'kt-hidden' : itemProxy.item.parentId && collapsed}" >
 
   <div class="kt-item"
@@ -15,9 +15,9 @@
                 {id: itemProxy.item.id})">
               <i
                     (click)="collapsed[itemProxy.item.id] = !collapsed[itemProxy.item.id]; $event.stopPropagation()"
-                    class="kt-icon"
-                    [ngClass]="{'fa fa-caret-down': (itemProxy.children.length > 0) && !collapsed[itemProxy.item.id],
-                    'fa fa-caret-right': (itemProxy.children.length > 0) && collapsed[itemProxy.item.id],
+                    class="kt-icon fa"
+                    [ngClass]="{'fa-caret-down': (itemProxy.children.length > 0) && !collapsed[itemProxy.item.id],
+                    'fa-caret-right': (itemProxy.children.length > 0) && collapsed[itemProxy.item.id],
                     'no-icon': !(itemProxy.children.length > 0)}">
                               </i>
 
@@ -42,10 +42,9 @@
         </span>
     </div>
   </div>
-  <div *ngIf="itemProxy.children && (!collapsed[itemProxy.item.id]) || previouslyExpanded[itemProxy.item.id] || allExpanded">
-      <tree-row [filterSubject]="filterSubject" [proxyCollection]="itemProxy.children"
+      <tree-row *ngFor="let childProxy of itemProxy.children"
+                [filterSubject]="filterSubject" [itemProxy]="childProxy"
                 [exactFilter]="exactFilter"></tree-row>
-   </div>
    <div class="dropdown position-fixed" id="tree-menu-{{itemProxy.item.id}}">
       <ul class="dropdown-menu" role="menu">
           <li class="pointer context-item"

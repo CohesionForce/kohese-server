@@ -106,8 +106,8 @@
           </div>
         </div>
         <div class="kt-body" style="overflow:auto; height: 100%">
-  <tree-row [proxyCollection]="treeRoot.children" [filterSubject]="filterSubject"
-            *ngIf="treeRoot"></tree-row>
+  <tree-row *ngFor="let childProxy of treeRoot.children"
+            [itemProxy]="childProxy" [filterSubject]="filterSubject"></tree-row>
       </div>
     </div>
   </div> <!-- End Knowledge Tree -->
