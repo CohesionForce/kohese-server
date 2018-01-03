@@ -40,7 +40,6 @@ export class TreeRowComponent extends RowComponent
   }
 
   ngOnInit () {
-    console.log('Init Row');
     this.filterSubscription = this.filterSubject.subscribe(newFilter => {
       this.filter = newFilter;
     })

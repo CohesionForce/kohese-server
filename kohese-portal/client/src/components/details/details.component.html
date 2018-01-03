@@ -54,13 +54,11 @@
 
 		           <div *ngIf="itemProxy.children.length">
                   <label class="control-label" for="showChildren"> Show Children </label>
-                  <input
-                         type="checkbox" [checked]="showChildren"
-                         (click)="showChildrenToggled()" />
+                  <mat-checkbox [(ngModel)]="showChildren" (change)="showChildrenToggled()"
+                         type="checkbox"></mat-checkbox>
                 </div>
-                <document-view itemProxy="itemProxy"
-                               *ngIf="itemProxy"
-                               showChildren="showChildren"></document-view>
+                <document-view [itemProxy]="itemProxy"
+                               [showChildrenSubject]="showChildrenSubject"></document-view>
 
 
             </mat-tab>
