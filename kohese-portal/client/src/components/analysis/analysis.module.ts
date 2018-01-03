@@ -6,7 +6,7 @@ import { TermViewComponent } from "./term-view/term-view.component";
 
 import { SplitPaneModule } from "ng2-split-pane/lib/ng2-split-pane";
 import { DocumentViewModule } from '../document-view/document-view.module';
-
+import { CommonModule } from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -17,7 +17,8 @@ import { DocumentViewModule } from '../document-view/document-view.module';
   ],
   imports : [
     SplitPaneModule,
-    DocumentViewModule
+    DocumentViewModule,
+    CommonModule
   ],
   exports : [
     AnalysisComponent,
