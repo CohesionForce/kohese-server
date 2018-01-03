@@ -37,6 +37,8 @@ import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
+import { AnalysisService } from './services/analysis/analysis.service';
+
 import { MapKeyPipe } from './pipes/map-key.pipe';
 import { HighlightRegexPipe } from './pipes/Highlight.pipe';
 
@@ -88,10 +90,16 @@ const AUTHENTICATION_INTERCEPTOR = {
     ActionTableModule,
     CreateItemModule
   ],
-  providers: [ItemRepository, AuthenticationService,
-    AUTHENTICATION_INTERCEPTOR, SocketService, TabService,
-    BundleService, SessionService, VersionControlService,
-    NavigationService],
+  providers: [
+    ItemRepository,
+    AuthenticationService,
+    AUTHENTICATION_INTERCEPTOR,
+    SocketService, TabService,
+    BundleService,
+    SessionService,
+    VersionControlService,
+    NavigationService,
+    AnalysisService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
