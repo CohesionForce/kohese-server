@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'filter'
 })
 export class FilterPipe implements PipeTransform {
-  transform(items: any, filter: any, isAnd: bool): any {
+  transform(items: any, filter: any, isAnd: boolean): any {
     if (filter && Array.isArray(items)) {
       let filterKeys = Object.keys(filter);
       if (isAnd) {

@@ -4,6 +4,7 @@ import { AnalysisViewComponent } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { TabService } from '../../../services/tab/tab.service';
+import { AnalysisService } from '../../../services/analysis/analysis.service';
 
 
 @Component({
@@ -13,8 +14,9 @@ import { TabService } from '../../../services/tab/tab.service';
 export class TermViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
   constructor(NavigationService : NavigationService,
-              TabService : TabService) {
-    super(NavigationService, TabService);
+              TabService : TabService,
+              AnalysisService : AnalysisService) {
+    super(NavigationService, TabService, AnalysisService);
 
   }
 
