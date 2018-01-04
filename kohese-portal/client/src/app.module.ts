@@ -12,6 +12,7 @@ import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
 import { ActionTableModule } from './components/action-table/action-table.module';
 import { CreateItemModule } from './components/create-item/create-item.module';
+import { PipesModule } from './pipes/pipes.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -39,10 +40,6 @@ import { VersionControlService } from './services/version-control/version-contro
 import { NavigationService } from './services/navigation/navigation.service';
 import { AnalysisService } from './services/analysis/analysis.service';
 
-import { MapKeyPipe } from './pipes/map-key.pipe';
-import { HighlightRegexPipe } from './pipes/highlight.pipe';
-import { OrderByPipe } from './pipes/orderBy.pipe';
-
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { SplitPaneModule } from 'ng2-split-pane/lib/ng2-split-pane';
@@ -65,9 +62,6 @@ const AUTHENTICATION_INTERCEPTOR = {
     DashboardComponent,
     AdminComponent,
     LoginComponent,
-    MapKeyPipe,
-    HighlightRegexPipe,
-    OrderByPipe,
     RepositoriesComponent,
     TreeComponent,
     ExploreComponent,
@@ -84,6 +78,7 @@ const AUTHENTICATION_INTERCEPTOR = {
     NgbModule.forRoot(),
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
+    PipesModule,
     MaterialModule,
     SplitPaneModule,
     AnalysisModule,
