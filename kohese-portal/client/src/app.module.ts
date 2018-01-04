@@ -40,7 +40,8 @@ import { NavigationService } from './services/navigation/navigation.service';
 import { AnalysisService } from './services/analysis/analysis.service';
 
 import { MapKeyPipe } from './pipes/map-key.pipe';
-import { HighlightRegexPipe } from './pipes/Highlight.pipe';
+import { HighlightRegexPipe } from './pipes/highlight.pipe';
+import { OrderByPipe } from './pipes/orderBy.pipe';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
@@ -66,6 +67,7 @@ const AUTHENTICATION_INTERCEPTOR = {
     LoginComponent,
     MapKeyPipe,
     HighlightRegexPipe,
+    OrderByPipe,
     RepositoriesComponent,
     TreeComponent,
     ExploreComponent,
