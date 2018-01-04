@@ -1,0 +1,55 @@
+@import '../utils/variables';
+
+body {
+  font-family: FontAwesome, arial, sans-serif;
+  height: 100%; 
+  overflow: hidden;
+  
+  .one-column {
+    width:100%;
+  }
+
+  .two-columns {
+    width: 50%;
+  }
+
+  .three-columns {
+    width: 30%
+  }
+
+  .position-fixed {
+    position: fixed;
+  }
+
+  .inline-block {
+    display: inline-block;
+  }
+
+  .top-align {
+    vertical-align: top;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }
+}
+
+table {
+  th {
+    .glyphicon-plus {
+      color: green;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  td {
+    .glyphicon-remove {
+      color: $secondaryColor + 100;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}

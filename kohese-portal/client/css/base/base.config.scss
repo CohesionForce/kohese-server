@@ -1,0 +1,8 @@
+
+@include mat-core();
+
+@import 'base';
+
+.kohese-theme {
+  @include angular-material-theme($kohese-theme);
+}
