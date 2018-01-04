@@ -218,14 +218,16 @@ function add(repositoryId, filePath) {
     return index.addByPath(filePath).then(function () {
       return index.write();
     }).then(function () {
-      var status = getItemStatus(repositoryId, filePath);
-      for (var j = 0; j < status.length; j++) {
-        if (status[j].startsWith('INDEX_')) {
-          return true;
+      var statusPromise = getItemStatus(repositoryId, filePath);
+      return statusPromise.then((status) => {
+        for (var j = 0; j < status.length; j++) {
+          if (status[j].startsWith('INDEX_')) {
+            return true;
+          }
         }
-      }
-      
-      return false;
+        
+        return false;
+      });
     });
   });
 }
@@ -474,15 +476,18 @@ module.exports.getStatus = getStatus;
 //////////////////////////////////////////////////////////////////////////
 function getItemStatus(repositoryId, filePath) {
   var status = [];
-  var statNum = nodegit.Status.file(repoList[repositoryId], filePath);
-  
-  for (var statusKey in nodegit.Status.STATUS) {
-    if ((statNum & nodegit.Status.STATUS[statusKey]) !== 0) {
-      status.push(statusKey);
+  var statPromise = nodegit.Status.file(repoList[repositoryId], filePath);
+
+  return statPromise.then((statNum) => {
+    for (var statusKey in nodegit.Status.STATUS) {
+      if ((statNum & nodegit.Status.STATUS[statusKey]) !== 0) {
+        status.push(statusKey);
+      }
     }
-  }
+    
+    return status;
+  });
   
-  return status;
 }
 module.exports.getItemStatus = getItemStatus;
 
@@ -490,13 +495,9 @@ module.exports.getItemStatus = getItemStatus;
 //
 //////////////////////////////////////////////////////////////////////////
 function walkHistoryForFile(itemId, callback){
-  var itemId = filePath.substring(filePath.lastIndexOf(path.sep) + 1,
-      filePath.lastIndexOf('.json'));
-  if (!UUID_REGEX.test(itemId)) {
-    // The ID was not a valid UUID, so assume that the Item is a Repository.
-    // TODO Fix this case. All (or almost all) commits are being displayed.
-    itemId = path.basename(path.dirname(filePath));
-  }
+  
+  // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
+
   var commitFiles = fs.readdirSync(INDEX_DIRECTORY);
   var relatedCommits = [];
   for (var j = 0; j < commitFiles.length; j++) {

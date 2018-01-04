@@ -5,46 +5,72 @@ module.exports = function (app) {
     var jwt = require('jsonwebtoken');
     var jwtSecret = 'ij2ijo32iro2i3jrod111223';
     var expressJwt = require('express-jwt');
-    var loopback = require('loopback');
+    var express = require('express');
     var path = require('path');
     var bodyParser = require('body-parser');
     var util = require('util');
     var serveIndex = require('serve-index');
+    var serveFavicon = require('serve-favicon');
+    var fs = require('fs');
 
-    var clientBundlePath = path.resolve(__dirname, '../../client/bundle');
+    var serverAuthentication = require('../server-enableAuth.js');
 
-    app.use(loopback.static(clientBundlePath));
+    var usingNG1 = false;
+    
+    try {
+        console.log('::: Checking for configuration');
+        var packageConfig = fs.readlinkSync('./package');
+        console.log('::: Found ' + packageConfig);
+        usingNG1 = (packageConfig.match(/^package-ng1/) !== null);
+        console.log('!!! Using NG1:  ' + usingNG1);
+    } catch (err) {
+        console.log('*** Error: ' + err);
+        console.log(err.stack);
+        process.exit(1);
+    }
 
-    var ngRoutes = [
-      '/admin',
-      '/dashboard',
-      '/login',
-      '/repositories',
-      '/explore'
-    ];
 
-    app.use(ngRoutes, function (req, res) {
-      res.sendFile(path.resolve(clientBundlePath, 'index.html'));
-    });
+    if (usingNG1) {
+      app.use(express.static(path.resolve(__dirname, '../../client-ng1')));
 
-    app.use(loopback.static(path.resolve(__dirname, '../../bower_components')));
+    } else {
+      var clientBundlePath = path.resolve(__dirname, '../../client/bundle');
+
+      app.use(express.static(clientBundlePath));
+
+      var ngRoutes = [
+        '/admin',
+        '/dashboard',
+        '/login',
+        '/repositories',
+        '/explore'
+      ];
+
+      app.use(ngRoutes, function (req, res) {
+        res.sendFile(path.resolve(clientBundlePath, 'index.html'));
+      });
+
+    }    
+
+    //TODO Need to move this to the client-ng2 directory too
+    app.use(serveFavicon(path.resolve(__dirname, '../../client-ng1/resources/icons/favicon.ico')));
+
+
+    app.use(express.static(path.resolve(__dirname, '../../bower_components')));
     app.use('/socket.io-file-client',
-            loopback.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
-
+            express.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
+    
     app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
-    app.use('/reports', loopback.static(path.resolve(__dirname, '../../tmp_reports')));
+    app.use('/reports', express.static(path.resolve(__dirname, '../../tmp_reports')));
 
     app.use(bodyParser.json());
 
-    app.post('/authenticate', authenticate);
+    if (usingNG1) {
+      app.post('/login', authenticate);
+    } else {
+      app.post('/authenticate', authenticate);
+    }
 
-    console.log('$$$ Loading routes');
-
-    app.get('/hello', (req,res) => {
-      console.log('$$$ Help');
-      console.log(req.headers);
-      res.send('hello world');
-    });
 
     function authenticate(req, res, next) {
         console.log('$$$ Authenticate');
@@ -62,7 +88,7 @@ module.exports = function (app) {
           return;
         }
 
-        app.models.KoheseUser.login(body.username, body.password, function processCallback(err, user) {
+        serverAuthentication.login(body.username, body.password, function processCallback(err, user) {
           if (err){
             res.status(401).end('Login failed: ' + err);
             return;
@@ -81,24 +107,27 @@ module.exports = function (app) {
       console.log('Request: ' + req.url);
       console.log('Method:  ' + req.method);
       console.log('Query:   ' + util.inspect(req.query,false,null));
-      console.log('Headers:  ');
-      console.log(req.headers);
+//      console.log('Headers:  ');
+//      console.log(req.headers);
 
       // check to see if the authorization header is missing, but an auth_token was provided
 
-      console.log('$$$ Authorization: ' + req.headers.authorization);
-      console.log('$$$ Auth Token: ' + req.query.access_token);
-
       // jshint -W106
       if(!req.headers.authorization && req.query.access_token){
+        console.log('$$$ Auth Token: ' + req.query.access_token);
         console.log('::: Creating authorization header from access_token');
         req.headers.authorization = 'Bearer ' + req.query.access_token;
       }
+      console.log('$$$ Authorization: ' + req.headers.authorization);
       // jshint +W106
       next();
     });
 
-    app.use(expressJwt({secret: jwtSecret}).unless({path: ngRoutes}));
+    if(usingNG1){
+      app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
+    } else {
+      app.use(expressJwt({secret: jwtSecret}).unless({path: ngRoutes}));
+    }
 
     function decodeAuthToken(authToken){
       var decodedToken = jwt.verify(authToken, jwtSecret);
@@ -121,31 +150,4 @@ module.exports = function (app) {
       next();
     });
 
-//    var requestRegex = /\/api\/([^\/]*)\/([^\/]*)/;
-    var requestRegex = /^\/([^\/]*)\/([^\/]*)/;
-    function kdbGet(req, res, next) {
-       var reqParts = req.url.match(requestRegex);
-       if (req.method === 'GET' && reqParts && reqParts[2]){
-         console.log('::: processing GET request - ' + req.method + ' - ' + req.url );
-//         console.log('+++ decoding request');
-//         console.log(reqParts);
-         var proxy = global.koheseKDB.ItemProxy.getProxyFor(reqParts[2]);
-         if (proxy){
-//           console.log(proxy.item);
-           res.send(proxy.item);
-         } else {
-           res.status(404).end();
-         }
-       } else {
-         next();
-       }
-    }
-
-    var restApiRoot = app.get('restApiRoot');
-
-    // Using Item Proxy
-    app.use(restApiRoot, kdbGet);
-
-    // Using Loopback
-    app.use(restApiRoot, app.loopback.rest());
 };

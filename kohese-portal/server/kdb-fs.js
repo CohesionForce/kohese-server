@@ -24,12 +24,38 @@ module.exports.loadJSONDoc = loadJSONDoc;
 //////////////////////////////////////////////////////////////////////////
 function storeJSONDoc(filePath, doc) {
 
-  console.log('::: Storing ' + filePath);
+//  console.log('::: Storing ' + filePath);
 
   fs.writeFileSync(filePath, JSON.stringify(doc, null, '  '), {encoding: 'utf8', flag: 'w'});  
 }
 
 module.exports.storeJSONDoc = storeJSONDoc;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function loadBinaryFile(filePath) {
+
+//  console.log('::: Loading ' + filePath);
+
+  var fileData = fs.readFileSync(filePath);
+
+  return fileData;
+}
+
+module.exports.loadBinaryFile = loadBinaryFile;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function storeBinaryFile(filePath, binFile) {
+
+//  console.log('::: Storing ' + filePath);
+
+  fs.writeFileSync(filePath, binFile);  
+}
+
+module.exports.storeBinaryFile = storeBinaryFile;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -91,11 +117,17 @@ module.exports.deleteFolderRecursive = deleteFolderRecursive;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function removeFile(filePath) {
+function removeFile(filePath, ignoreNonExistent) {
 
-  console.log('::: Removing ' + filePath);
-  fs.unlinkSync(filePath);
-
+  if (fs.existsSync(filePath)){
+    console.log('::: Removing existing file: ' + filePath);
+    fs.unlinkSync(filePath);
+  } else {
+    if(!ignoreNonExistent){
+      // TODO need to convert this to a exception in the future
+      console.log('*** Attempt to remove non-existent file:  ' + filePath);
+    }
+  }
 }
 
 module.exports.removeFile = removeFile;

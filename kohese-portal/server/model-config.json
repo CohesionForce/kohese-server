@@ -1,12 +1,4 @@
 {
-  "_meta": {
-    "sources": [
-      "loopback/common/models",
-      "loopback/server/models",
-      "../common/models",
-      "./models"
-    ]
-  },
   "User": {
     "dataSource": "db",
     "public": false
