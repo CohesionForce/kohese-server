@@ -39,11 +39,11 @@ module.exports = function (app) {
       app.use(express.static(clientBundlePath));
 
       var ngRoutes = [
-        '/admin',
-        '/dashboard',
-        '/login',
-        '/repositories',
-        '/explore'
+        /^\/admin.*/,
+        /^\/dashboard.*/,
+        /^\/login/,
+        /^\/repositories.*/,
+        /^\/explore.*/
       ];
 
       app.use(ngRoutes, function (req, res) {
