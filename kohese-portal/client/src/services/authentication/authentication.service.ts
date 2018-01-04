@@ -9,17 +9,26 @@ import { JwtHelper } from 'angular2-jwt';
 @Injectable()
 export class AuthenticationService {
   private readonly TOKEN_KEY: string = 'auth-token';
+  private readonly UNDEFINED_LOCAL_STORAGE_VALUE = 'undefined';
   private token: BehaviorSubject<string> = new BehaviorSubject(localStorage.getItem(this.TOKEN_KEY));
   private jwtHelper: JwtHelper = new JwtHelper();
   private authenticationInformation: BehaviorSubject<any> =
-    new BehaviorSubject(this.jwtHelper.decodeToken(this.token.getValue()));
+    new BehaviorSubject(UNDEFINED_LOCAL_STORAGE_VALUE);
   
   constructor(private httpClient: HttpClient,
     private socketService: SocketService) {
+    let t: any = this.token.getValue();
+    if (!((this.UNDEFINED_LOCAL_STORAGE_VALUE === t) || (null == t))) {
+      this.authenticationInformation.next(this.jwtHelper.decodeToken(t));
+    }
+    
     this.socketService.getSocket().on('connect', () => {
-      this.socketService.getSocket().emit('authenticate', {
-        token: this.token.getValue()
-      });
+      let t: any = this.token.getValue();
+      if (!((this.UNDEFINED_LOCAL_STORAGE_VALUE === t) || (null == t))) {
+        this.socketService.getSocket().emit('authenticate', {
+          token: t
+        });
+      }
     });
   }
   
@@ -31,9 +40,9 @@ export class AuthenticationService {
       observe: 'response',
       responseType: 'text'
     }).mergeMap((httpResponse) => {
+      this.socketService.connect();
       localStorage.setItem(this.TOKEN_KEY, httpResponse.body);
       this.token.next(httpResponse.body);
-      this.socketService.connect();
       this.authenticationInformation.next(this.jwtHelper.decodeToken(httpResponse.body));
       return this.authenticationInformation;
     }) as BehaviorSubject<any>;
@@ -41,7 +50,7 @@ export class AuthenticationService {
   
   logout(): void {
     this.token.next('');
-    localStorage.setItem(this.TOKEN_KEY, undefined);
+    localStorage.removeItem(this.TOKEN_KEY);
     this.authenticationInformation.next(undefined);
     this.socketService.disconnect();
   }

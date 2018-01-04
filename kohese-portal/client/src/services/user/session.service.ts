@@ -15,15 +15,18 @@ export class SessionService {
   constructor(private socketService: SocketService,
     private authenticationService: AuthenticationService,
     private itemRepository: ItemRepository, private router: Router) {
-    this.itemRepository.getRepoStatusSubject().subscribe((status) => {
-      if (status.connected) {
-        let decodedToken: any = this.authenticationService.getAuthenticationInformation().getValue();
-        if (decodedToken) {
-          let usersProxy: ItemProxy = this.itemRepository.getRootProxy().getChildByName('Users');
-          this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
-        } else {
-          this.router.navigate(['login']);
-        }
+    this.authenticationService.getAuthenticationInformation().subscribe((decodedToken) => {
+      if (decodedToken) {
+        this.itemRepository.getRepoStatusSubject().subscribe((status) => {
+          if (status.connected) {
+            let usersProxy: ItemProxy = this.itemRepository.getRootProxy().getChildByName('Users');
+            this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
+          } else {
+            this.sessionUser.next(undefined);
+          }
+        });
+      } else {
+        this.router.navigate(['login']);
       }
     });
     

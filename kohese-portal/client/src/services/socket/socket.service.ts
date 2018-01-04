@@ -18,11 +18,7 @@ export class SocketService {
   }
 
   connect(): void {
-    if (this.initialized.getValue()) {
-      this.socket.connect();
-    } else {
-      this.initialize();
-    }
+    this.socket.connect();
   }
 
   disconnect(): void {

@@ -195,7 +195,7 @@ module.exports = function(grunt) {
 		    },
 		    dist: {
 		        files: {
-	                'client/styles.css': ['client/css/index.scss']
+	                'client/css/index.css': ['client/css/index.scss']
 	            }
 		    }
 
