@@ -1,0 +1,7 @@
+<div class="panel right-zone">
+  <div class="panel-heading">Document View</div>
+  <div class="panel-body">
+      <div *ngIf="!showChildren" [innerHTML]="itemDescriptionRendered"></div>
+      <div *ngIf="showChildren" [innerHTML]="docRendered"></div>
+  </div>
+</div>

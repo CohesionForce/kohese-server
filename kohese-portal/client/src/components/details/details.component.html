@@ -1,0 +1,138 @@
+
+
+<div id="details-panel" class="panel" style="margin-right: 30px"> <!--  This inline style needs to go ASAP-->
+    <div class="panel-heading ">
+        <span *ngIf="itemProxy.kind">{{itemProxy.kind}} Information: {{itemProxy.item.name}} </span>
+        <span *ngIf="!itemProxy.kind">No Item Selected</span>
+        <span class="pull-right item-actions">
+            <i class="fa fa-level-up"
+                    *ngIf="itemProxy.item.parentId"
+                    (click)="navigate('Explore', {id :itemProxy.item.parentId})"
+                    title="Go to Parent"></i>
+            <i class="fa fa-lg fa-edit"
+               *ngIf="!enableEdit"
+               (click)="enableEdit=true"
+               title="Edit"></i>
+            <span *ngIf="enableEdit"
+                  class="fa fa-stack">
+                <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
+                   (click)="enableEdit = false"
+                   title="Cancel Edit"></i>
+                <i class="fa fa-stack-1x fa-times stacked-child"
+                   (click)="enableEdit = false;"
+                   title="Cancel Edit"></i>
+            </span>
+            <i class="fa fa-lg fa-save"
+               (click)="upsertItem()"
+               title=" Save"
+                    ></i>
+            <i *ngIf="tab.type === 'singleview'" class="fa fa-clone pull-right"
+               (click)="navigate('Explore', {id: itemProxy.item.id})"
+               title="Split Screen">
+            </i>
+            <i class="fa fa-lg fa-arrows-alt" *ngIf="tab.type === 'dualview'"
+               (click)="navigate('Investigate', {id: itemProxy.item.id})"
+               title="Fullscreen"></i>
+        </span>
+    </div>
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <mat-tab-group id="details-tabs">
+            <mat-tab id="defaultTab" active="defaultTab.active" label="Document">
+                <button (click)="generateHTMLReport()" class="btn btn-primary">
+                   Generate HTML Report
+               </button>
+                <button (click)="generateDOCXReport()" class="btn btn-primary">
+                   Generate Word Document
+               </button>
+               <button
+                      class= "btn btn-primary"
+                      (click)="addTab('Analysis',
+                                {id: itemProxy.item.id})">
+                      Analyze
+              </button>
+
+		           <div *ngIf="itemProxy.children.length">
+                  <label class="control-label" for="showChildren"> Show Children </label>
+                  <mat-checkbox [(ngModel)]="showChildren" (change)="showChildrenToggled()"
+                         type="checkbox"></mat-checkbox>
+                </div>
+                <document-view [itemProxy]="itemProxy"
+                               [showChildrenSubject]="showChildrenSubject"></document-view>
+
+
+            </mat-tab>
+            <mat-tab label="Overview">
+                <ng-template mat-tab-label>
+                   Overview
+                   <!-- TODO ngIf form is dirty -->
+                   <span *ngIf="itemForm">
+                      <img src="../../../assets/icons/versioncontrol/dirty.ico"
+                      title = "Dirty item" />
+                  </span>
+                </ng-template>
+                TBD - User Defined Types
+                <!-- <div class="details-tab" *ngIf="itemProxy.kind ==='Action'">
+                    <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
+                </div>
+                <div class="details-tab" *ngIf="itemProxy.kind != 'Action' &&
+                itemProxy.kind != 'Decision' && itemProxy.kind != 'Task'
+                && itemProxy.kind != 'Repository'">
+                    <ng-include src="'components/common/templates/itemform.html'"></ng-include>
+                </div>
+                <div class="details-tab" *ngIf="itemProxy.kind ==='Task'">
+                    <ng-include src="'components/common/templates/task-form.html'"></ng-include>
+                </div>
+                <div class="details-tab" *ngIf="itemProxy.kind ==='Decision'">
+                    <accordion>
+                        <ng-include src="'components/common/templates/decision-form.new.html'"></ng-include>
+                    </accordion>
+                </div>
+                <div class="details-tab" *ngIf="itemProxy.kind ==='Repository'">
+                    <ng-include src="'components/common/templates/repository-form.html'"></ng-include>
+                </div> -->
+
+            </mat-tab>
+            <!-- <mat-tab *ngIf="itemProxy.kind === 'Observation'">
+                <tab-label>Observation</tab-label>
+                <ng-include src="'components/common/templates/observation-form.html'"></ng-include>
+            </mat-tab>
+            <tab *ngIf="itemProxy.kind === 'Issue'">
+                <tab-label>Issue</tab-label>
+                <ng-include src="'components/common/templates/issue-form.html'"></ng-include>
+            </tab> -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                  Children ({{itemProxy.children.length}})
+              </ng-template>
+              <children-tab [itemProxy]="itemProxy"></children-tab>
+            </mat-tab>
+            <mat-tab label="Relations">
+                <h4>Relations Tab</h4>
+
+                <p><b>This tab is under construction.</b></p>
+            </mat-tab>
+            <mat-tab label="History" select="getHistory()">
+                <history-tab [itemProxy]="itemProxy"></history-tab>
+            </mat-tab>
+            <mat-tab label="Journal">
+                <h4>Journal Tab</h4>
+
+                <p><b>This tab is under construction.</b></p>
+            </mat-tab>
+            <mat-tab label="Action Table"
+                 *ngIf="itemProxy.children">
+
+              <action-table itemProxy="itemProxy"></action-table>
+            </mat-tab>
+            <mat-tab label="Raw Data">
+                <h4>Document Tab</h4>
+                <h5>Id: {{itemProxy.item.id}}</h5>
+                <h5>OID: {{itemProxy.oid}}</h5>
+                <h5>Tree Hash: {{itemProxy.treeHash}}</h5>
+                <pre>{{itemProxy.document()}}</pre>
+                <pre>{{itemProxy.treeHashEntry | json}}</pre>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</div>

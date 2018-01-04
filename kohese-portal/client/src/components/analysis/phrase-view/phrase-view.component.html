@@ -1,0 +1,59 @@
+<div class="panel">
+  <div class="panel-heading">Phrase View - ({{getPhraseCount()}}) Phrases
+  <span class="dropdown pull-right">
+          <a class="dropdown-toggle" data-toggle="dropdown" >
+                  <span>Options</span>
+          <i class="fa fa-gear"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-user">
+                  <li (click)="showPOS = !showPOS">
+                  <a><i *ngIf="showPOS"
+                          class="fa fa-check-"></i>Show POS</a></li>
+          </ul>
+  </span>
+  </div>
+  <div class="panel-body">                <div>
+          <span class="col-xs-4 pull-right">
+          <b>Limit</b>
+          <input class="input-sm col-xs-6 pull-right" type="number" [(ngModel)]="loadLimit"
+          placeholder="Phrase Limit"/>
+          </span>
+    </div>
+    <div   id="phrase-div">
+      <table id="thePhrasesSummary"
+          class="table tree-grid table-striped table-condensed table-hover">
+          <thead>
+          <th><span (click)="newSort('-text')">
+                  Text
+                  <span *ngIf="sortField === '-text'">
+                  <i *ngIf="reverse" class="fa fa-chevron-up"></i>
+                  <i *ngIf="!reverse" class="fa fa-chevron-down"></i>
+                  </span>
+          </span></th>
+          <th (click)="newSort('-count')">
+                  <span>Count
+                  <span *ngIf="sortField === '-count'">
+                  <i *ngIf="tvCtrl.reverse" class="fa fa-chevron-up"></i>
+                  <i *ngIf="!tvCtrl.reverse" class="fa fa-chevron-down"></i>
+                  </span>
+                  </span>
+                  </th>
+          <th *ngIf="showPOS">POS Count</th>
+          </thead>
+          <tbody id="thePhrasesBody">
+          <tr class="tree-grid-row" id="Phrase:{{summary.text}}"
+                  *ngFor="let summary of itemProxy.analysis.extendedChunkSummaryList
+                          | filter:filterPhrases
+                          | orderBy:sortField:reverse
+                          | slice:loadLimit">
+          <td (click)="submitSummaryFilter(summary.text)"
+                  class="tree-label"
+                  [innerHTML]="summary.text | highlightRegex:filterRegexHighlight:true"></td>
+          <td>{{summary.count}}</td>
+          <td *ngIf="showPOS">{{summary.posCount}}</td>
+          </tr>
+          </tbody>
+      </table>
+  </div>
+  </div>
+</div>

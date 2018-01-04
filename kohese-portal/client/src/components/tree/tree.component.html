@@ -1,0 +1,115 @@
+<div style="height:inherit" *ngIf="treeRoot">
+    <div id="top-action-bar">
+      <button (click)="expandAll()" class="btn btn-default btn-sm"
+        style="margin: 5px">Expand All</button>
+      <button (click)="expandFiltered()"
+        class="btn btn-default btn-sm" style="margin: 5px">Expand
+        Filtered</button>
+      <button (click)="collapseAll()"
+        class="btn btn-default btn-sm" style="margin: 5px">Collapse
+        All</button>
+      <button class="btn btn-default btn-sm" (click)="upLevel()"
+        [disabled]="isRootDefault">Up Level</button>
+      <button class="btn btn-default btn-sm" (click)="resetRoot()"
+        [disabled]="isRootDefault">Reset Root</button>
+      <i (click)="syncLocation()"
+         [ngClass]="{ 'btn-green': locationSynced}"
+         class="btn btn-default btn-sm fa fa-exchange">
+      </i>
+        <span>Showing
+            {{getItemMatchedCount()}} of
+            {{treeRoot.descendantCount}}
+        </span>
+
+      <div>
+        <!-- Start View Control -->
+        <span class="control-group">
+          <label class="control-label" for="View"> View </label>
+          <span
+            class="controls">
+            <select id="View"
+                [(ngModel)]="viewType"
+                (change)="onViewTypeChanged()">
+                <option></option>
+                <option *ngFor="let kind of viewList">{{kind}}</option>
+            </select>
+          </span>
+        </span>
+        <!-- Start View Forking -->
+        <span [ngSwitch]="viewType">
+          <!-- Start Default Toolbar -->
+          <span *ngSwitchCase="Default">
+            <span class="control-group">
+              <!-- Kind Selection -->
+              <label class="control-label" for="Kind"> Kind </label>
+              <span class="controls">
+                <select id="Kind" [(ngModel)]="filter.kind">
+                  <option *ngFor="let kind of kindList">{{kind}}</option>
+                </select>
+              </span>
+            </span>
+            <!-- Version Control Filtering -->
+            <span class="control-group">
+              <label class="control-label" for="Modified"> Modified </label>
+              <input type="checkbox" [(ngModel)]="filter.status" />
+            </span>
+            <span class="control-group">
+              <label class="control-label" for="Dirty"> Dirty </label>
+              <input type="checkbox" [(ngModel)]="filter.dirty" />
+            </span>
+            <!-- End Version Control Filtering -->
+            <!-- String Filtering -->
+            <input class="input-sm" type="text" [(ngModel)]="filter.text"
+              [ngStyle]="filter.invalidRegex && {'background-color':'pink'}"
+              placeholder="Filter" style="margin: 5px" />
+            <!-- Action Filtering -->
+            <div *ngIf="filter.kind === 'Action'" class="control-group">
+              <label class="control-label" for="ActionState"> State </label>
+              <span class="controls">
+                  <select id="actionState" [(ngModel)]="filter.actionState">
+                  <option></option>
+                  <option *ngFor="let state of actionStates">{{state.item.name}}</option>
+                </select>
+              </span>
+              <span *ngIf="filter.kind === 'Action'" class="control-group">
+                <label class="control-label" for="Assignee"> Assignee </label>
+                <span class="controls">
+                  <select id="actionAssignee" [(ngModel)]="filter.actionAssignee">
+                    <option></option>
+                    <option *ngFor="let user of userList">{{user.item.name}}</option>
+                  </select>
+                </span>
+              </span>
+            </div> <!-- End Action Filtering -->
+          </span>	<!-- End Default Controls -->
+          <!-- Start Version Control View -->
+          <span *ngSwitchCase="Version Control">
+          </span>
+          <!-- Start Placeholder View -->
+          <span *ngSwitchDefault>
+            {{viewType}} - Not Implemented
+          </span>
+        </span> <!-- End Switch on View Type -->
+      </div>
+    </div>
+    <!-- Begin Knowledge Tree -->
+    <div class="knowledge-tree-panel" style="overflow:hidden">
+      <div id="theKT" class="knowledge-tree">
+        <div class="kt-head">
+          <div class="kth-cell kti-name">Name</div>
+          <div class="kth-cell pull-right">
+            <span
+              class="create-button"
+              (click)="navigate('Create', {})">
+              Create Item
+            </span>
+          </div>
+        </div>
+        <div class="kt-body" style="overflow:auto; height: 100%">
+  <tree-row *ngFor="let childProxy of treeRoot.children"
+            [itemProxy]="childProxy" [filterSubject]="filterSubject"></tree-row>
+      </div>
+    </div>
+  </div> <!-- End Knowledge Tree -->
+</div>
+<div *ngIf="!treeRoot">Loading . . .</div>
