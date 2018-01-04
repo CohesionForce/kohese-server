@@ -39,12 +39,6 @@ function TermViewController ($scope, $timeout, tabService, analysisService) {
     tabService.bundleController(ctrl, 'TermViewController', currentTab.id);
   });
 
-  ctrl.fetchAnalysis = function () {
-    analysisService.fetchAnalysis(ctrl.itemProxy).then(function (results) {
-      $scope.$apply();
-    });
-  };
-
   ctrl.submitStringFilter = function (term) {
     if(!term) {
       term = '' // If an empty search has been entered
@@ -128,8 +122,6 @@ function TermViewController ($scope, $timeout, tabService, analysisService) {
       }
     });
   }
-
-  ctrl.fetchAnalysis();
 }
 
 function TermViewDirective () {

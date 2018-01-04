@@ -3,6 +3,7 @@
   var util = require('util');
   var _und = require('underscore');
   var request = require('request');
+  var kdb = require('./kdb.js');
 
   var lookup = {
       CC: 'Coordinating Conjuction',
@@ -68,10 +69,10 @@
   function requestAnalysisJSON(forModelKind, onId, cb) {
     console.log('::: ANALYZING: ' + forModelKind + ' - ' + onId);
 
-    var instance = global.koheseKDB.retrieveModelInstance(forModelKind, onId);
+    var instance = kdb.retrieveModelInstance(forModelKind, onId);
 
     var requestData = {};
-    var analysis = new global.app.models.Analysis();
+    var analysis = {};
     analysis.id = onId;
     analysis.raw = {};
     analysis.forModelKind = forModelKind;
@@ -122,12 +123,10 @@
           }
           consolidateAnalysis(analysis);
           // delete the raw data
-          delete analysis.__data.raw;
-          global.koheseKDB.storeModelInstance('Analysis', analysis).then(function (status) {
-            console.log('::: ANALYSIS Completed: ' + onId);
-
-            cb(analysis);
-          });
+          delete analysis.raw;
+          kdb.storeModelAnalysis(analysis);
+          console.log('::: ANALYSIS Completed: ' + onId);
+          cb(analysis);
         } catch (err) {
           console.log('*** Error parsing result for: ' + forModelKind + ' - ' +
               onId + ' - ' + analysis.name);
@@ -153,7 +152,7 @@
     
     console.log('::: Preparing to analyze ' + forModelKind + ' ' + onId);
 
-    var analysis = global.koheseKDB.retrieveModelInstance('Analysis', onId);
+    var analysis = kdb.retrieveModelInstance('Analysis', onId);
     if (analysis) {
       cb(analysis);
     } else {
