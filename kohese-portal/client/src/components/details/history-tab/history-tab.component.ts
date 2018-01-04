@@ -20,7 +20,7 @@ export class HistoryTabComponent extends NavigatableComponent
   }
 
   ngOnInit() {
-
+    console.log(this.itemProxy);
   }
 
   ngOnDestroy () {

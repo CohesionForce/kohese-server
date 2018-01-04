@@ -5,7 +5,7 @@
   <a class="navbar-brand"
       [ngClass]="{'navbar-syncing': repositorySyncing,
                 'navbar-disconnected': !repositorySynced}"
-      (click)="addTab('Explore', {})">
+      (click)="addTab('Explore', {id : ''})">
         Kohese Portal <i class="fa fa-exclamation-triangle"
                         *ngIf="!repositorySynced && !repositorySyncing && !repositorySyncFailed"> - Disconnected</i>
                       <i class="fa fa-exclamation-triangle"

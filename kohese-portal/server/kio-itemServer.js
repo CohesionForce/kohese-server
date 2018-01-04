@@ -3,21 +3,63 @@ var kdb = require('./kdb.js');
 const kdbFs = require('./kdb-fs.js');
 var fs = require('fs');
 var child = require('child_process');
-var itemAnalysis = require('../common/models/analysis.js');
+var itemAnalysis = require('./analysis.js');
+var ItemProxy = require('../common/models/item-proxy.js');
+var serverAuthentication = require('./server-enableAuth.js');
 const Path = require('path');
 const importer = require('./directory-ingest.js');
 var _ = require('underscore');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-
-
 console.log('::: Initializing KIO Item Server');
 
-if(global.app)
-  {
+if(global.app){
   global.app.on('newSession', KIOItemServer);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+ItemProxy.getChangeSubject().subscribe(change => {
+  console.log('+++ Received notification of change: ' + change.type);
+  if(change.proxy){
+    console.log(change.kind);
+    console.log(change.proxy.item);    
   }
+
+  switch (change.type){
+    case 'create':
+    case 'update':
+      kdb.storeModelInstance(change.proxy, change.type === 'create')
+      .then(function (status) {
+        var notification = {
+            type: change.type,
+            kind: change.kind,
+            id: change.proxy.item.id,
+            item: change.proxy.item,
+            status: status
+        };
+        kio.server.emit(change.kind +'/' + change.type, notification);    
+      });
+      break;
+    case 'delete':
+      var notification = {
+        type: change.type,
+        kind: change.kind,
+        id: change.proxy.item.id
+      };
+      kdb.removeModelInstance(change.proxy);
+      kio.server.emit(change.kind +'/' + change.type, notification);    
+      break;
+    default:
+      console.log('*** Not processing change notification: ' + change.type);
+    }
   
+});
+  
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function KIOItemServer(socket){
 
   console.log('>>> KIO Item Server: session %s connected from %s for %s', 
@@ -30,7 +72,7 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received findById for %s for user %s at %s',
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
-    var proxy = kdb.ItemProxy.getProxyFor(request.id);
+    var proxy = ItemProxy.getProxyFor(request.id);
     sendResponse({
       kind: proxy.kind,
       item: proxy.item
@@ -48,7 +90,7 @@ function KIOItemServer(socket){
     }
     console.log('::: session %s: Received getAll for user %s at %s', socket.id, username, socket.handshake.address);
     
-    var repoTreeHashes = kdb.ItemProxy.getAllTreeHashes();
+    var repoTreeHashes = ItemProxy.getAllTreeHashes();
     
     var response = {};
     if(!_.isEqual(request.repoTreeHashes, repoTreeHashes)){
@@ -61,7 +103,7 @@ function KIOItemServer(socket){
             sentAll: true
           };
         
-        var rootProxy = kdb.ItemProxy.getRootProxy();
+        var rootProxy = ItemProxy.getRootProxy();
         rootProxy.visitChildren(null, (proxy) => {
           if (!response.cache[proxy.kind]){
             response.cache[proxy.kind] = {};
@@ -74,7 +116,7 @@ function KIOItemServer(socket){
         // Send deltas to client
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
-        var thmCompare = kdb.ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+        var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 //        console.log(thmCompare);
         
         response = {
@@ -85,13 +127,13 @@ function KIOItemServer(socket){
         };
         
         thmCompare.addedItems.forEach((itemId) => {
-          var proxy = kdb.ItemProxy.getProxyFor(itemId);
+          var proxy = ItemProxy.getProxyFor(itemId);
           response.addItems.push({kind: proxy.kind, item: proxy.item});
 //          console.log(proxy.item);
         });
         
         thmCompare.changedItems.forEach((itemId) => {
-          var proxy = kdb.ItemProxy.getProxyFor(itemId);
+          var proxy = ItemProxy.getProxyFor(itemId);
           response.changeItems.push({kind: proxy.kind, item: proxy.item});
 //          console.log(proxy.item);
         });
@@ -111,7 +153,11 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getStatus', function(request, sendResponse){
-    global.koheseKDB.kdbRepo.getStatus(request.repoId, function(status){    
+
+    var repoProxy = ItemProxy.getProxyFor(request.repoId);    
+    console.log('::: Getting status for repo: ' + repoProxy.item.name);
+
+    kdb.kdbRepo.getStatus(request.repoId, function(status){    
       if (status) {
         var idStatusArray = [];
         for (var j = 0; j < status.length; j++) {
@@ -129,7 +175,7 @@ function KIOItemServer(socket){
             if (foundId) {
               idStatusArray.push({
                 id: id,
-                status: file.status()
+                status: status[j].status
               });
             }
           }
@@ -148,11 +194,17 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getHistory', function(request, sendResponse){
-    global.koheseKDB.kdbRepo.walkHistoryForFile(request.onId, function(history){
+    console.log("::: Getting history for " + request.onId);
+    
+    // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
+    kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
       
       if (history) {
+        console.log('+++ History for ' + request.onId);
+        console.log(history);
         sendResponse(history);
       } else {
+        console.log('*** History error for ' + request.onId);
         sendResponse({error: 'history error'});
       }        
     });
@@ -167,30 +219,56 @@ function KIOItemServer(socket){
         socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     
-    request.item.modifiedBy = socket.koheseUser.username;
-    request.item.modifiedOn = Date.now();
+    var koheseUserName = socket.koheseUser.username;
+    var item = request.item;
+    var kind = request.kind;
     
-    if(!request.item.createdBy){
-      console.log('::: Updating created fields (instance) - ' + request.kind);
-      request.item.createdBy = request.item.modifiedBy;
-      request.item.createdOn = request.item.modifiedOn;
-    }
+    try {
+      item.modifiedBy = koheseUserName;
+      item.modifiedOn = Date.now();
+      
+      if(!item.createdBy){
+        console.log('::: Updating created fields (instance) - ' + kind);
+        item.createdBy = item.modifiedBy;
+        item.createdOn = item.modifiedOn;
+      }
 
+      var proxy;
+      var isNewInstance = false;
+      
+      if (item.id){
+        proxy = ItemProxy.getProxyFor(item.id);
 
-    global.app.models[request.kind].upsert(request.item, {}, function (value, responseHeaders){
-      console.log('::: Upsert ' + request.id);
-      console.log(value);
-      console.log(responseHeaders);
+        // TODO need to move user password processing based on model definition
+        if (proxy.kind === 'KoheseUser'){
+          if (item.password){
+            // Request has a password
+            serverAuthentication.setPassword(item, item.password);
+          } else {
+            // Password was not supplied, so use the old value
+            item.password = proxy.item.password;
+          }
+        }
+
+        proxy.updateItem(kind, item);
+      } else {
+        isNewInstance = true;
+        proxy = new ItemProxy(kind, item);      
+      }
+      
       sendResponse({
         kind: request.kind,
-        item: responseHeaders
+        item: proxy.item
       });
-      console.log('::: Sent Item/upsert response');
-    }, function (httpResponse){
-      sendResponse({error: httpResponse});
-      console.log('::: Sent Item/upsert error');      
-    });
+      
+      console.log('::: Sent Item/upsert response');        
 
+    } catch (err){
+      console.log('*** Error: ' + err);
+      console.log(err.stack);
+      sendResponse({error: err});
+      console.log('::: Sent Item/upsert error');            
+    }
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -200,17 +278,16 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received deleteById for %s for user %s at %s',
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
+    
+    var proxy = ItemProxy.getProxyFor(request.id);
+    proxy.deleteItem(request.recursive);
+    
+    console.log('Deleted %s #%s#', request.kind, request.id);
 
-    global.app.models[request.kind].deleteById(request.id, {}, function (value, responseHeaders){
-      console.log('::: Deleted ' + request.id);
-      sendResponse({
-        success: value,
-        headers: responseHeaders
-      });
-      console.log('::: Sent Item/deleteById response');      
-    }, function (httpResponse){
-      sendResponse({error: httpResponse});
-      console.log('::: Sent Item/deleteById error');      
+    sendResponse({
+      deleted: 'true',
+      kind: request.kind,
+      id: request.id
     });
 
   });
@@ -239,7 +316,7 @@ function KIOItemServer(socket){
       
     console.log('::: Generating ' + outFormat + ' Report for ' + forItemId);
 
-    var proxy = global.koheseKDB.ItemProxy.getProxyFor(forItemId);
+    var proxy = ItemProxy.getProxyFor(forItemId);
     var result = {};
 
     if (!proxy){
@@ -290,7 +367,7 @@ function KIOItemServer(socket){
     var addStatusMap = {};
     for (var i = 0; i < idsArray.length; i++) {
       console.log('--- Adding proxy for: ' + idsArray[i]);
-      var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
+      var proxy = ItemProxy.getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
       promises.push(kdb.kdbRepo.add(repositoryInformation.repositoryProxy.item.id,
@@ -309,7 +386,7 @@ function KIOItemServer(socket){
       sendResponse({
         error: err
       });
-    })
+    });
   });
   
   socket.on('VersionControl/commit', function (request, sendResponse) {
@@ -335,7 +412,7 @@ function KIOItemServer(socket){
               }
               
               if (foundId) {
-                proxies.push(kdb.ItemProxy.getProxyFor(fileName));
+                proxies.push(ItemProxy.getProxyFor(fileName));
               }
             }
           }
@@ -393,7 +470,7 @@ function KIOItemServer(socket){
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
+      var proxy = ItemProxy.getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
@@ -418,51 +495,88 @@ function KIOItemServer(socket){
   });
   
   socket.on('VersionControl/revert', function (request, sendResponse) {
-    var unstageIfIndexOnly = true;
     var proxies = [];
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
+    var pendingEvaluationPromises = [];
+    
     for (var i = 0; i < idsArray.length; i++) {
-      var proxy = kdb.ItemProxy.getProxyFor(idsArray[i]);
-      proxies.push(proxy);
+      var proxy = ItemProxy.getProxyFor(idsArray[i]);
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
-      var status = kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath);
-      if (unstageIfIndexOnly) {
-        var unstage = true;
+      
+      var evaluationPromise = new Promise((resolve, reject) => {
+        kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).then((status) => {
+
+          var isNewFile = false;
+          var isStaged = false;
+          var hasUnstagedChanges = false;
+          
+          for (var j = 0; j < status.length; j++) {
+            if (status[j].startsWith('WT_')) {
+              hasUnstagedChanges = true;
+            }
+            if (status[j].startsWith('INDEX_')) {
+              isStaged = true;
+            }
+          }
+          
+          // Unstage if the item is staged without additional changes
+          if(isStaged && !hasUnstagedChanges){
+            // Item is staged, but does not have changes, so it needs to be unstaged to revert it
+            kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]).then(() => {
+              // file has been unstaged, need to retrieve updated status
+              kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).then((statusAfterUnstage) => {
+                resolve(statusAfterUnstage);                              
+              });
+            });
+          } else {
+            resolve(status);
+          }
+        });
+      });
+      pendingEvaluationPromises.push(evaluationPromise);
+    }
+    
+    // Wait for any pending unstage requests to complete
+    Promise.all(pendingEvaluationPromises).then(function(statusArray){
+      // Determine if items need to be checked out or deleted
+      for (var i = 0; i < idsArray.length; i++) {
+        var proxy = ItemProxy.getProxyFor(idsArray[i]);
+        var repositoryInformation = getRepositoryInformation(proxy);
+        var repositoryId = repositoryInformation.repositoryProxy.item.id;
+        var status = statusArray[i];
+
+        var isNewUnstagedFile = false;
+        
         for (var j = 0; j < status.length; j++) {
-          if (status[j].startsWith('WT_')) {
-            unstage = false;
+          if (status[j].endsWith('WT_NEW')) {
+            isNewUnstagedFile = true;
             break;
           }
         }
         
-        if (unstage) {
-          kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]);
+        if (isNewUnstagedFile) {
+          proxy.deleteItem();
+        } else {
+          if (!repositoryPathMap[repositoryId]) {
+            repositoryPathMap[repositoryId] = [];
+          }
+          repositoryPathMap[repositoryId].push(repositoryInformation.relativeFilePath);
+          proxies.push(proxy);
         }
+        
       }
-      
-      var deleteFile = false;
-      for (var j = 0; j < status.length; j++) {
-        if (status[j].endsWith('_NEW')) {
-          deleteFile = true;
-          break;
-        }
-      }
-      
-      if (deleteFile) {
-        global.app.models[proxy.kind].deleteById(idsArray[i], {}, function () {});
-      } else {
-        if (!repositoryPathMap[repositoryId]) {
-          repositoryPathMap[repositoryId] = [];
-        }
-        repositoryPathMap[repositoryId].push(repositoryInformation.relativeFilePath);
-      }
-    }
     
-    for (var repositoryId in repositoryPathMap) {
-      kdb.kdbRepo.checkout(repositoryId, repositoryPathMap[repositoryId], true).
-        then(function () {
+      // Checkout any remaining files
+      var pendingCheckoutProxies = [];
+      for (var repositoryId in repositoryPathMap) {
+        pendingCheckoutProxies.push(kdb.kdbRepo.checkout(repositoryId, repositoryPathMap[repositoryId], true));
+      }
+      
+      // Send response
+      Promise.all(pendingCheckoutProxies)
+      .then(function () {
         // Update content based on reverted files
         for (var j = 0; j < proxies.length; j++) {
           var proxy = proxies[j];
@@ -470,7 +584,7 @@ function KIOItemServer(socket){
           if (proxy.kind === 'Repository') {
             item.parentId = proxy.item.parentId;
           }
-          global.app.models[proxy.kind].replaceById(proxy.item.id, item, {}, function () {});
+          proxy.updateItem(proxy.kind, item);
         }
         
         sendStatusUpdates(proxies);
@@ -481,36 +595,50 @@ function KIOItemServer(socket){
           error: err
         });
       });
-    }
+
+    });
+
   });
   
   socket.on('ImportDocuments', function (request, sendResponse) {
-    new Promise(function (resolve, reject) {
+    console.log('::: session %s: Received ImportDocuments for user %s at %s',
+        socket.id, socket.koheseUser.username, socket.handshake.address);
+
+    try {
       var absolutes = [];
       var root = Path.dirname(fs.realpathSync(__dirname));
       root = Path.join(root, 'data_import', socket.koheseUser.username);
       absolutes.push(Path.join(root, request.file));
-      var results = importer.importFiles(absolutes, request.parentItem);
-      resolve(results);
-    }).then(function (results) {
+
+      var results = importer.importFiles(socket.koheseUser.username, absolutes, request.parentItem);
       sendResponse(results);
-    }).catch(function (err){
+      
+    } catch (err) {
+      console.log(err);
+      console.log(err.stack);
       sendResponse({err:err});
-    });
+    }
   });
 
 }
 
 function sendStatusUpdates(proxies) {
   var statusMap = {};
+  var promises = [];
   for (var i = 0; i < proxies.length; i++) {
     var repositoryInformation = getRepositoryInformation(proxies[i]);
-    var status = kdb.kdbRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
+    let promise = kdb.kdbRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
         repositoryInformation.relativeFilePath);
-    statusMap[proxies[i].item.id] = status;
+    promises.push(promise);
   }
-  
-  kio.server.emit('VersionControl/statusUpdated', statusMap);
+
+  Promise.all(promises).then((statusArray) => {
+    for (var i = 0; i < proxies.length; i++) {
+      statusMap[proxies[i].item.id] = statusArray[i];
+    }
+
+    kio.server.emit('VersionControl/statusUpdated', statusMap);
+  });
 }
 
 function getRepositoryInformation(proxy) {

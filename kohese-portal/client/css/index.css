@@ -9,7 +9,6 @@ components/
 pages/
 themes/
 */
-@import url(~@angular/material/prebuilt-themes/deeppurple-amber.css);
 .btn-outline {
   color: inherit;
   background-color: transparent;
@@ -396,7 +395,7 @@ kind-icon {
   border: double 1px black; }
 
 #details-panel {
-  margin-bottom: 0px;
+  margin-right: 30px;
   height: 100%; }
   #details-panel > .panel-body {
     height: calc(100% - 30px); }

@@ -12,6 +12,7 @@ import { SessionService } from '../../services/user/session.service';
 import * as commonmark from 'commonmark';
 import { HtmlRenderer, Parser } from 'commonmark';
 import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector : 'details-view',
@@ -27,7 +28,9 @@ export class DetailsComponent extends NavigatableComponent
   /* Commonmark items */
   reader : Parser;
   writer : HtmlRenderer;
-  showChildren : boolean;
+
+  /* Observables */
+  showChildrenSubject : BehaviorSubject<boolean>
 
   /* Subscriptions */
   routeSub : Subscription;
@@ -37,6 +40,7 @@ export class DetailsComponent extends NavigatableComponent
   enableEdit : boolean;
   defaultTab : object;
   uiTreeOptions : object;
+  showChildren : boolean;
 
   /* UI Components */
   contextInput;
@@ -67,6 +71,7 @@ export class DetailsComponent extends NavigatableComponent
     this.reader = new commonmark.Parser();
     this.writer = new commonmark.HtmlRenderer();
     this.showChildren = true;
+    this.showChildrenSubject = new BehaviorSubject(this.showChildren);
 
     // TODO Implement controller restored?
     //   var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
@@ -80,25 +85,26 @@ export class DetailsComponent extends NavigatableComponent
       // TODO Before we were doing an additional check for parent id to determine
       // if this was a create case. Decided to not port this over in favor of another solution
       // Assess if this is correct and remove TODO
+      this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
+      .subscribe(update => {
+        if (update.connected) {
+          this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+          if (!this.itemProxy) {
+            // TODO : Throw error modal to the UI
+          }
+          this.proxyList = this.ItemRepository.getShortFormItemList();
+          this.userList = this.SessionService.getUsers();
+          this.updateParentProxy();
+          this.configureState();
+          if (this.itemProxy.item.description) {
+            let parsed = this.reader.parse(this.itemProxy.item.description);
+            this.itemDescriptionRendered = this.writer.render(parsed);
+            // TODO Determine if we need to run this through something like $sce
+          }
+        }
+      })
     });
-    this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
-    .subscribe(update => {
-      if (update.connected) {
-        this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
-        if (!this.itemProxy) {
-          // TODO : Throw error modal to the UI
-        }
-        this.proxyList = this.ItemRepository.getShortFormItemList();
-        this.userList = this.SessionService.getUsers();
-        this.updateParentProxy();
-        this.configureState();
-        if (this.itemProxy.item.description) {
-          let parsed = this.reader.parse(this.itemProxy.item.description);
-          this.itemDescriptionRendered = this.writer.render(parsed);
-          // TODO Determine if we need to run this through something like $sce
-        }
-      }
-    })
+
 
     // TODO - Add subscription to the description field of the proxy form and
     // call the document render logic on it
@@ -134,103 +140,102 @@ export class DetailsComponent extends NavigatableComponent
     // TODO - implement bundle logic here
   }
 
-updateParentProxy () : void {
-      if (this.itemProxy && this.itemProxy.item.parentId) {
-        this.parentProxy = this.ItemRepository.getProxyFor(this.itemProxy.item.parentId);
-      } else {
-        this.parentProxy = {};
-      }
-    };
+  updateParentProxy () : void {
+        if (this.itemProxy && this.itemProxy.item.parentId) {
+          this.parentProxy = this.ItemRepository.getProxyFor(this.itemProxy.item.parentId);
+        } else {
+          this.parentProxy = {};
+        }
+      };
 
-getProxyFor(id) : any {
-    return this.ItemRepository.getProxyFor(id);
-  }
-
-initializeItemStates (type : string) : void {
-    // TODO - Don't know how I feel about this implementation
-    // Revisit after initial port
-    if (type === 'Action') {
-      if (!this.itemProxy.item.hasOwnProperty('actionState')) {
-        this.itemProxy.item.actionState = 'Proposed';
-      }
-      if (!this.itemProxy.item.hasOwnProperty('decisionState')) {
-        this.itemProxy.item.decisionState = 'Proposed';
-      }
-    } else if (type === 'Decision') {
-      if (!this.itemProxy.item.hasOwnProperty('decisionState')) {
-        this.itemProxy.item.decisionState = 'Proposed';
-      }
-    } else if (type === 'Task') {
-      if (!this.itemProxy.item.hasOwnProperty('taskState')) {
-        this.itemProxy.item.taskState = 'Proposed';
-      }
-    } else if (type === 'Issue') {
-      if (!this.itemProxy.item.hasOwnProperty('issueState')) {
-        this.itemProxy.item.issueState = 'Observed';
-      }
-    }
-  }
-
-incrementItemInput (type) : void {
-    if(!this.itemProxy.item[type]) {
-      this.itemProxy.item[type] = [];
+  getProxyFor(id) : any {
+      return this.ItemRepository.getProxyFor(id);
     }
 
-      // TODO - This needs to be assessed
-      if (type === 'context') {
-        this.itemProxy.item[type].push({id: this.contextInput.description.id});
-      } else if (type === 'resolutionActions') {
-        this.itemProxy.item[type].push({id: this.resolutionActionsInput.description.id});
-      } else {
-        this.itemProxy.item[type].push({name: ''});
+  initializeItemStates (type : string) : void {
+      // TODO - Don't know how I feel about this implementation
+      // Revisit after initial port
+      if (type === 'Action') {
+        if (!this.itemProxy.item.hasOwnProperty('actionState')) {
+          this.itemProxy.item.actionState = 'Proposed';
+        }
+        if (!this.itemProxy.item.hasOwnProperty('decisionState')) {
+          this.itemProxy.item.decisionState = 'Proposed';
+        }
+      } else if (type === 'Decision') {
+        if (!this.itemProxy.item.hasOwnProperty('decisionState')) {
+          this.itemProxy.item.decisionState = 'Proposed';
+        }
+      } else if (type === 'Task') {
+        if (!this.itemProxy.item.hasOwnProperty('taskState')) {
+          this.itemProxy.item.taskState = 'Proposed';
+        }
+      } else if (type === 'Issue') {
+        if (!this.itemProxy.item.hasOwnProperty('issueState')) {
+          this.itemProxy.item.issueState = 'Observed';
+        }
       }
-  }
+    }
 
-deleteItemInput (type : string, row : number): void {
-      var index = this.itemProxy.item[type].indexOf(row);
-      this.itemProxy.item[type].splice(index, 1);
-  }
+  incrementItemInput (type) : void {
+      if(!this.itemProxy.item[type]) {
+        this.itemProxy.item[type] = [];
+      }
 
-generateHTMLReport () : void {
-      this.ItemRepository.generateHTMLReportFor(this.itemProxy);
-    };
+        // TODO - This needs to be assessed
+        if (type === 'context') {
+          this.itemProxy.item[type].push({id: this.contextInput.description.id});
+        } else if (type === 'resolutionActions') {
+          this.itemProxy.item[type].push({id: this.resolutionActionsInput.description.id});
+        } else {
+          this.itemProxy.item[type].push({name: ''});
+        }
+    }
 
-generateDOCXReport () : void {
-      this.ItemRepository.generateDOCXReportFor(this.itemProxy);
-    };
+  deleteItemInput (type : string, row : number): void {
+        var index = this.itemProxy.item[type].indexOf(row);
+        this.itemProxy.item[type].splice(index, 1);
+    }
 
-getHistory = function () : void {
-      this.ItemRepository.getHistoryFor(this.itemProxy);
-    };
+  generateHTMLReport () : void {
+        this.ItemRepository.generateHTMLReportFor(this.itemProxy);
+      };
 
-upsertItem = function () : void {
-      this.ItemRepository.upsertItem(this.itemProxy)
-        .then(function (updatedItemProxy) {
-          // clear the state of the form
+  generateDOCXReport () : void {
+        this.ItemRepository.generateDOCXReportFor(this.itemProxy);
+      };
+
+  getHistory = function () : void {
+        this.ItemRepository.getHistoryFor(this.itemProxy);
+      };
+
+  upsertItem = function () : void {
+        this.ItemRepository.upsertItem(this.itemProxy)
+          .then(function (updatedItemProxy) {
+            // clear the state of the form
+            // TODO - Get form and set pristine
+          });
+      };
+
+  showChildrenToggled () : void {
+      this.showChildrenSubject.next(this.showChildren);
+    }
+
+  cancel () : void {
+    if (this.itemProxy.dirty) {
+      this.ItemRepository.fetchItem(this.itemProxy)
+        .then((fetchResults) => {
           // TODO - Get form and set pristine
         });
-    };
-
-showChildrenToggled () : void {
-      this.showChildren = !this.showChildren;
-      // TODO - implement toggle transfer to child doc comp
     }
+  };
 
-cancel () : void {
-  if (this.itemProxy.dirty) {
-    this.ItemRepository.fetchItem(this.itemProxy)
-      .then((fetchResults) => {
-        // TODO - Get form and set pristine
+  removeItem (proxy : ItemProxy) : void {
+    this.ItemRepository.deleteItem(proxy, false)
+      .then(function () {
+        // TBD:  May need to do something special if the delete fails
       });
-  }
-};
-
-removeItem (proxy : ItemProxy) : void {
-  this.ItemRepository.deleteItem(proxy, false)
-    .then(function () {
-      // TBD:  May need to do something special if the delete fails
-    });
-};
+  };
   updateState = function (state : string, type : string) {
     // TODO - This functionality is trash and needs to be updated,
     //        The general flow will update with user defined types, so deferring

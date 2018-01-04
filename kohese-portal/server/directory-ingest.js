@@ -7,6 +7,7 @@ var fs = require('fs');
 var Path = require('path');
 var child = require('child_process');
 var http = require('http');
+var ItemProxy = require('../common/models/item-proxy.js');
 
 var mdToKohese = require('./md-to-kohese.js');
 
@@ -14,7 +15,7 @@ var rootId;
 var basePath;
 var tempDirPath;
 
-function importFiles(files, parentId) {
+function importFiles(koheseUserName, files, parentId) {
   if (0 === files.length) {
     return;
   }
@@ -32,7 +33,7 @@ function importFiles(files, parentId) {
 
   var addedIds = [];
   for (var i = 0; i < files.length; i++) {
-    process(files[i], parentId, addedIds);
+    process(koheseUserName, files[i], parentId, addedIds);
   }
 
   console.log('All operations are completed. Now cleaning up...');
@@ -130,21 +131,25 @@ function processToMarkdown(filePath, basePath) {
   };
 }
 
-function process(file, parent, addedIds) {
+function process(koheseUserName, file, parent, addedIds) {
   var fileStat = fs.lstatSync(file);
   var tmpPath = tempDirPath + Path.sep + splitPath(file, basePath);
   
   if (fileStat.isDirectory()) {
     fs.mkdirSync(tmpPath);
-    var fileObj = global.app.models['Item'].upsert({
+    var createTime = Date.now();
+    var fileObj = new ItemProxy('Item', {
       name: Path.basename(tmpPath),
-      parentId: parent
-      }, {}, function () {
-    });
+      parentId: parent,
+      createdBy: koheseUserName,
+      createdOn: createTime,
+      modifiedBy: koheseUserName,
+      modifiedOn: createTime
+      }).item;
     addedIds.push(fileObj.id);
     var files = fs.readdirSync(file);
     for (var i = 0; i < files.length; i++) {
-      process(Path.join(file, files[i]), fileObj.id, addedIds);
+      process(koheseUserName, Path.join(file, files[i]), fileObj.id, addedIds);
     }
   } else if (fileStat.isFile()) {
     var processedFile = processToMarkdown(file, basePath);
@@ -155,7 +160,7 @@ function process(file, parent, addedIds) {
         parentId: parent,
         itemIds: []
       };
-      var added = mdToKohese(processedFile.outputPath, mdRoot);
+      var added = mdToKohese(koheseUserName, processedFile.outputPath, mdRoot);
       for (var j = 0; j < added.length; j++) {
         addedIds.push(added[j]);
       }

@@ -26,14 +26,15 @@ export var LocationMap = {
     'params': {},
     'route' : '/dashboard'
   },
+  // We should rename this component to be called Users
   'Admin': {
-    'type': 'external',
+    'type': 'single',
     'title': 'Admin',
     'params': {},
     'route': '/admin'
   },
   'Repositories': {
-    'type': 'external',
+    'type': 'single',
     'title': 'Repositories',
     'params': {},
     'route': '/repositories'
@@ -41,7 +42,7 @@ export var LocationMap = {
   'Explore' : {
     'type' : 'dual',
     'title' : 'Explore',
-    'params' : {},
+    'params' : ['id'],
     'route' : '/explore'
   },
   'Analysis' : {
@@ -49,5 +50,11 @@ export var LocationMap = {
     'title': 'Analysis',
     'params' : {},
     'route' : '/analysis'
+  },
+  'Create' : {
+    'type' : 'dual',
+    'title' : 'Create Item',
+    'params' : ['parentId'],
   }
 }
+

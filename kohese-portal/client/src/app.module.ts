@@ -10,7 +10,9 @@ import { AppComponent } from './app.component';
 import { AnalysisModule } from './components/analysis/analysis.module';
 import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
-import { ActionTableModule } from './components/action-table/action-table.module'
+import { ActionTableModule } from './components/action-table/action-table.module';
+import { CreateItemModule } from './components/create-item/create-item.module';
+import { PipesModule } from './pipes/pipes.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -36,8 +38,7 @@ import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
-import { MapKeyPipe } from './pipes/map-key.pipe';
-import { HighlightRegexPipe } from './pipes/Highlight.pipe';
+import { AnalysisService } from './services/analysis/analysis.service';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
@@ -61,8 +62,6 @@ const AUTHENTICATION_INTERCEPTOR = {
     DashboardComponent,
     AdminComponent,
     LoginComponent,
-    MapKeyPipe,
-    HighlightRegexPipe,
     RepositoriesComponent,
     TreeComponent,
     ExploreComponent,
@@ -79,17 +78,25 @@ const AUTHENTICATION_INTERCEPTOR = {
     NgbModule.forRoot(),
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
+    PipesModule,
     MaterialModule,
     SplitPaneModule,
     AnalysisModule,
     DetailsModule,
     DocumentViewModule,
-    ActionTableModule
+    ActionTableModule,
+    CreateItemModule
   ],
-  providers: [ItemRepository, AuthenticationService,
-    AUTHENTICATION_INTERCEPTOR, SocketService, TabService,
-    BundleService, SessionService, VersionControlService,
-    NavigationService],
+  providers: [
+    ItemRepository,
+    AuthenticationService,
+    AUTHENTICATION_INTERCEPTOR,
+    SocketService, TabService,
+    BundleService,
+    SessionService,
+    VersionControlService,
+    NavigationService,
+    AnalysisService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

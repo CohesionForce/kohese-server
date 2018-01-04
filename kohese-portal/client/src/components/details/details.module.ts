@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { MaterialModule } from "../../material.module";
 import { DocumentViewModule } from "../document-view/document-view.module";
 import { ActionTableModule } from "../action-table/action-table.module";
+import { FormsModule } from "@angular/forms";
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { ActionTableModule } from "../action-table/action-table.module";
     CommonModule,
     MaterialModule,
     DocumentViewModule,
-    ActionTableModule
+    ActionTableModule,
+    FormsModule
   ],
   exports : [
     DetailsComponent,

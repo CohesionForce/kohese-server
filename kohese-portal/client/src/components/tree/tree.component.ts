@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TabService } from '../../services/tab/tab.service';
@@ -22,50 +23,66 @@ import * as $ from 'jquery';
 
 export class TreeComponent extends NavigatableComponent
                               implements OnInit, OnDestroy {
-    tab : Tab;
-    currentTabSubscription : Subscription;
-    repoStatusSubscription : Subscription;
-    kindList : Array<String>;
-    actionStates : Array<String>;
-    userList : Array<any>; // This will eventually be of type KoheseUser
-    collapsed; // TODO Assess if this is needed
-    previouslyExpanded ; // TODO Assess if this is needed
+    /* UI Toggles */
     allExpanded : boolean;
     locationSynced : boolean;
     isRootDefault : boolean;
+    versionControlEnabled : boolean;
+    collapsed : Object;
+
+    /* Data */
     treeRoot : ItemProxy;
     absoluteRoot : ItemProxy;
+    filter : ProxyFilter; // TODO get definition for Filter
     selectedItemProxy : ItemProxy;
-    versionControlEnabled : boolean;
+    itemProxyId : string;
+    kindList : Array<String>;
+    actionStates : Array<String>;
+    userList : Array<any>; // This will eventually be of type KoheseUser
     viewList : Array<String>;
     viewType : String;
+
+    /* Observables */
     filterSubject : BehaviorSubject<ProxyFilter>;
-    filter : ProxyFilter; // TODO get definition for Filter
+
+
+    /* Subscriptions */
+    currentTabSub : Subscription;
+    repoStatusSub : Subscription;
+    routeSub : Subscription;
 
   constructor (protected NavigationService : NavigationService,
                protected TabService : TabService,
                private ItemRepository : ItemRepository,
                private VersionControlService : VersionControlService,
-               private SessionService : SessionService) {
+               private SessionService : SessionService,
+               private route : ActivatedRoute) {
     super(NavigationService, TabService);
     }
 
   ngOnInit () {
     // TODO - Test component restoration logic
-    this.currentTabSubscription = this.TabService.getCurrentTab()
+    this.currentTabSub = this.TabService.getCurrentTab()
       .subscribe(currentTab => this.tab = currentTab);
-    this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
+    this.repoStatusSub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
         if (update.connected) {
           this.treeRoot = this.ItemRepository.getRootProxy();
           this.absoluteRoot = this.treeRoot;
+          this.collapsed = {};
+          for (let itemProxy of this.treeRoot.children) {
+            this.collapsed[itemProxy.item.id] = false;
+          }
+
         }
       })
+    this.routeSub = this.route.params.subscribe(params => {
+      this.itemProxyId = params['id'];
+    })
+
     this.kindList = this.ItemRepository.getModelList();
     this.actionStates = ['Pending Review', 'In Verification', 'Assigned'];
     this.userList = this.SessionService.getUsers();
-    this.collapsed = {};
-    this.previouslyExpanded = {};
     this.allExpanded = false;
     this.locationSynced = false;
     this.isRootDefault = true;
@@ -79,14 +96,16 @@ export class TreeComponent extends NavigatableComponent
     // view types can be pulled based on version of Kohese
     this.viewType = 'Default';
 
+
+
     // TODO set up @output/@input listeners for selectedItemProxy and row objects
 
     // TODO set up sync listener functionality
   }
 
   ngOnDestroy () {
-    this.currentTabSubscription.unsubscribe();
-    this.repoStatusSubscription.unsubscribe();
+    this.currentTabSub.unsubscribe();
+    this.repoStatusSub.unsubscribe();
   }
 
 

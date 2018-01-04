@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 
 'use strict'; //Required for use of 'class'
@@ -33,30 +33,30 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   constructor(kind, forItem) {
     var itemId = forItem.id;
-
+    
     if (!itemId){
       itemId = forItem.id = uuidV1();
       console.log('::: Allocating new id: ' + itemId);
     }
-
+    
     var validation = ItemProxy.validateItemContent(kind, forItem);
-
+    
     if (!validation.valid){
       // TODO Need to remove this bypass logic which is needed to load some existing data
       if(tree.loading){
         console.log('*** Error: Invalid data item');
         console.log('Kind: ' + kind);
         console.log(forItem);
-        console.log(validation);
+        console.log(validation);        
       } else {
         throw ({
           error: 'Not-Valid',
           validation: validation
         });
-
+        
       }
     }
-
+    
     var proxy = tree.proxyMap[itemId];
     if (!proxy) {
 //      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
@@ -66,18 +66,18 @@ class ItemProxy {
       tree.proxyMap[itemId] = proxy;
     }
 
-    if (proxy.item &&
-        (proxy.kind !== 'Internal') &&
-        (proxy.kind !== 'Internal-Lost') &&
+    if (proxy.item && 
+        (proxy.kind !== 'Internal') && 
+        (proxy.kind !== 'Internal-Lost') && 
         (proxy.kind !== 'Internal-Model')){
       // Item already exists, so update it instead
       proxy.updateItem(kind, forItem);
       return proxy;
     }
-
+    
     proxy.kind = kind;
     proxy.item = forItem;
-
+    
     if(!tree.modelMap[kind]){
       tree.modelMap[kind] = createMissingProxy(kind);
     }
@@ -86,11 +86,11 @@ class ItemProxy {
     if (kind === 'Repository') {
       tree.repoMap[itemId] = proxy;
     }
-
+    
     if (kind === 'Internal-Model') {
       tree.modelMap[itemId] = proxy;
     }
-
+    
     if (kind === 'Internal') {
       // Don't continue
       return proxy;
@@ -99,7 +99,7 @@ class ItemProxy {
     if (proxy.item.parentId && proxy.item.parentId === '') {
       delete proxy.item.parentId;
     }
-
+    
     var parentId = proxy.item.parentId || 'ROOT';
 
     var parent = tree.proxyMap[parentId];
@@ -110,7 +110,7 @@ class ItemProxy {
     }
 
     parent.addChild(proxy);
-
+    
     if (proxy.children){
       proxy.sortChildren();
     }
@@ -133,7 +133,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static resetItemRepository() {
-
+    
     console.log('::: Resetting Item Repository');
     var rootProxy = ItemProxy.getRootProxy();
 
@@ -146,9 +146,9 @@ class ItemProxy {
     rootProxy.visitChildren(null, null, (childProxy) => {
       childProxy.deleteItem();
     });
-
+    
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -174,7 +174,7 @@ class ItemProxy {
       type: 'loaded'
     });
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -219,30 +219,30 @@ class ItemProxy {
       if (!_.isEqual(oldKeys, newKeys)){
         this.item = newItem;
       }
-    }
+    } 
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   validateItem(){
-
+    
     return ItemProxy.validateItemContent(this.kind, this.item);
-
+    
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static validateItemContent(kind, itemContent){
-
+    
     var model = tree.modelMap[kind];
-
+    
     var validationResult = {
       valid: true,
       missingProperties: []
     };
-
+    
     if (model && model.item && model.item.requiredProperties) {
       model.item.requiredProperties.forEach((property) => {
         if (!itemContent.hasOwnProperty(property)) {
@@ -251,10 +251,10 @@ class ItemProxy {
         }
       });
     }
-
+    
     return validationResult;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -262,54 +262,54 @@ class ItemProxy {
     this.checkPropertyOrder();
     return JSON.stringify(this.item, null, '  ');
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static gitDocumentOID(forDoc) {
     var shaObj = new SHA('SHA-1', 'TEXT');
-
+    
     var forText = JSON.stringify(forDoc, null, '  ');
-
+        
     var length = forText.length;
 //    console.log(forText);
 //    console.log('\n');
     shaObj.update('blob ' + forText.length + '\0' + forText);
-
+    
     var oid = shaObj.getHash('HEX');
-
+    
 //    for(var l = length - 5; l < length +5; l++){
 //      shaObj.update('blob ' + l + '\0' + forText);
 //      var newOid = shaObj.getHash('HEX');
 //      console.log('>>> ' + l + ' - ' + newOid);
 //    }
-
+    
     return oid;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static gitFileOID(forFile) {
     var shaObj = new SHA('SHA-1', 'TEXT');
-
-
+    
+        
     var length = forFile.length;
 //    console.log(forText);
 //    console.log('\n');
     shaObj.update('blob ' + length + '\0' + forFile);
-
+    
     var oid = shaObj.getHash('HEX');
-
+    
 //    for(var l = length - 5; l < length +5; l++){
 //      shaObj.update('blob ' + l + '\0' + forText);
 //      var newOid = shaObj.getHash('HEX');
 //      console.log('>>> ' + l + ' - ' + newOid);
 //    }
-
+    
     return oid;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -322,10 +322,10 @@ class ItemProxy {
     var shaObj = new SHA('SHA-1', 'TEXT');
     var doc = this.document();
     shaObj.update('blob ' + doc.length + '\0' + doc);
-
+    
     this.oid = shaObj.getHash('HEX');
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -339,12 +339,12 @@ class ItemProxy {
       this.deferTreeHash = true;
       return;
     }
-
+    
     var treeHashEntry = {
         kind: this.kind,
         oid: this.oid,
         childTreeHashes: {}
-    };
+    };    
 
     for (var childIdx in this.children){
       var childProxy = this.children[childIdx];
@@ -355,7 +355,7 @@ class ItemProxy {
           this.deferTreeHash = true;
           return;
         }
-        treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;
+        treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;        
       }
     }
 
@@ -372,9 +372,9 @@ class ItemProxy {
     if (this.item.parentId){
       treeHashEntry.parentId = this.item.parentId;
     }
-
+    
     this.treeHashEntry = treeHashEntry;
-
+    
     // Propagate changes up the tree
     if (!deferred){
       if (this.parentProxy){
@@ -392,21 +392,21 @@ class ItemProxy {
       proxy.calculateTreeHash(deferred);
     });
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static compareTreeHashMap(fromTHMap, toTHMap){
-
+    
     var fromIds = Object.keys(fromTHMap).sort();
     var toIds = Object.keys(toTHMap).sort();
     var allIds = _.union(fromIds, toIds);
     var commonIds = _.intersection(fromIds, toIds);
-
+    
     if(!fromTHMap){
       console.log('*** From is undefined');
     }
-
+    
     var thmCompare = {
       match: _.isEqual(fromTHMap, toTHMap),
       addedItems: _.difference(toIds, fromIds),
@@ -414,13 +414,13 @@ class ItemProxy {
       deletedItems: _.difference(fromIds, toIds),
       childMismatch: {}
   };
-
+        
     commonIds.forEach((key) => {
       var fromNode = fromTHMap[key];
       var toNode = toTHMap[key];
-
+ 
       if (!_.isEqual(fromNode.treeHash, toNode.treeHash)) {
-
+        
         if (fromNode.oid !== toNode.oid){
           thmCompare.changedItems.push(key);
         } else {
@@ -438,13 +438,13 @@ class ItemProxy {
           childMismatch.addedChildren = _.difference(toChildIdsSorted, fromChildIdsSorted);
           childMismatch.deletedChildren = _.difference(fromChildIdsSorted, toChildIdsSorted);
 
-
+          
           // Check for different tree hashes
           var changedChildren = {};
           commonChildIds.forEach((childId) => {
             var fromOID = fromChildren[childId];
             var toOID = toChildren[childId];
-
+            
             if (fromOID !== toOID){
               changedChildren[childId] ={
                   from: fromOID,
@@ -453,7 +453,7 @@ class ItemProxy {
        }
           });
           childMismatch.changedChildren = changedChildren;
-
+          
           // Check for different order
           var reorderedChildren = {};
           for (var idx = 0; idx < fromChildIds.length; idx++){
@@ -465,11 +465,11 @@ class ItemProxy {
             }
           }
           childMismatch.reorderedChildren = reorderedChildren;
-
+          
           thmCompare.childMismatch[key] = childMismatch;
         }
       }
-
+      
     });
 
     return thmCompare;
@@ -483,10 +483,10 @@ class ItemProxy {
     tree.root.visitTree(null,(proxy) => {
       proxyTreeHashes[proxy.item.id] = proxy.treeHashEntry;
     });
-
+  
     return proxyTreeHashes;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -495,22 +495,22 @@ class ItemProxy {
     this.visitTree({excludeKind : ['Repository']}, (proxy) => {
       treeHashMap [proxy.item.id] = proxy.treeHashEntry;
     });
-    return treeHashMap;
+    return treeHashMap;    
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static getRepoTreeHashes() {
     var repoTreeHashes = {};
-
+    
     for(var repoIdx in tree.repoMap){
       var repoProxy = tree.repoMap[repoIdx];
       repoTreeHashes[repoIdx] = repoProxy.getTreeHashMap();
     }
     return repoTreeHashes;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -530,11 +530,11 @@ class ItemProxy {
   getDepthFromAncestor(theAncestor) {
     var ancestorProxy = this.parentProxy;
     var depth = 1;
-
+    
     if (this === theAncestor){
       return 0;
     }
-
+    
     while (ancestorProxy){
       if (ancestorProxy === theAncestor){
         return depth;
@@ -544,7 +544,7 @@ class ItemProxy {
     }
     return depth;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -558,24 +558,24 @@ class ItemProxy {
     }
     return repoList;
   }
-
+  
 //  static getRepositories2(){
 //    var repoList = [tree.rootProxy];
 //    tree.rootProxy.visit(null, );
 //  }
-//
+//  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   getRepositoryProxy() {
     var proxy = this;
-
+    
     while (proxy && proxy.kind !== 'Repository' && proxy.item.id !== 'ROOT'){
       proxy = proxy.parentProxy;
     }
     return proxy;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -594,11 +594,11 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   getDescendants() {
     var descendantList = [];
-
+    
     this.visitChildren(null, (childProxy) => {
       descendantList.push(childProxy);
     });
-
+ 
     return descendantList;
   }
 
@@ -613,19 +613,19 @@ class ItemProxy {
    *   }
    *
    * Depth First - only supply before function
-   *
+   * 
    * Breadth First - Visits Top Nodes First
-   *
+   * 
    * Include Origin - Operate on the parent node
-   *
+   * 
    */
   visitTree(flags, doBefore, doAfter){
-
-    var includeOrigin = (flags && flags.hasOwnProperty('includeOrigin')) ? flags.includeOrigin : true;
+    
+    var includeOrigin = (flags && flags.hasOwnProperty('includeOrigin')) ? flags.includeOrigin : true; 
     var excludeKind = (flags && flags.hasOwnProperty('excludeKind')) ? flags.excludeKind : [];
     var before = doBefore ? doBefore : () => {};
     var after = doAfter ? doAfter : () => {};
-
+    
     var excludeChildKind = {};
     excludeKind.forEach((kind)=>{
       excludeChildKind[kind] = true;
@@ -638,14 +638,14 @@ class ItemProxy {
         after(proxy);
       }
     }
-
+    
     // Before Origin
     if (includeOrigin){
       before(this);
     }
-
+    
     this.children.forEach(visitChild);
-
+    
     // After for Origin
     if (includeOrigin){
       after(this);
@@ -657,13 +657,13 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   /*
    * Calls visit with flags.includeOrigin = false.
-   *
+   * 
    */
   visitChildren(flags, doBefore, doAfter){
 
     var childFlags = flags || {};
     childFlags.includeOrigin = false;
-
+        
     this.visitTree(childFlags, doBefore, doAfter);
   }
 
@@ -673,7 +673,7 @@ class ItemProxy {
   visitDescendants(performAction) {
     // Visit Breadth First
     var proxyStack = [];
-
+    
     proxyStack.push(this);
 
     var descendant = proxyStack.pop();
@@ -734,7 +734,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   getDocument(showUndefined) {
-
+    
     var outputBuffer = '';
     var document = this;
 
@@ -746,7 +746,7 @@ class ItemProxy {
       for(var idx = 0; idx < depth; idx++){
         hdr += '#';
       }
-
+      
       if (depth === 0){
         // Top Node
         if (proxy.item.description || showUndefined) {
@@ -760,17 +760,17 @@ class ItemProxy {
           outputBuffer += hdr + ' ' + proxy.item.name + '\n' + proxy.item.description + '\n\n';
         } else {
           outputBuffer += hdr + ' ' + proxy.item.name + '\n\n';
-        }
+        }        
       }
 
     };
 
     this.visitDescendants(displayItem);
-
+    
     return outputBuffer;
-
+    
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -780,14 +780,14 @@ class ItemProxy {
       return;
     }
 //    console.log('::: IP: Adding child ' + childProxy.item.name + ' to ' + this.item.name);
-
+     
     // Determine if this node is already attached to another parent
     if (childProxy.parentProxy) {
       childProxy.parentProxy.removeChild(childProxy);
     }
 
     // Determine where to insert the new child
-    var insertAt = this.children.length;
+    var insertAt = this.children.length;  
     if (!this.item.itemIds){
         for (var childIdx in this.children){
             if (childProxy.item.name < this.children[childIdx].item.name){
@@ -797,7 +797,7 @@ class ItemProxy {
           }
 
           this.children.splice(insertAt, 0, childProxy);
-          childProxy.parentProxy = this;
+          childProxy.parentProxy = this;    	
     } else {
         this.children.push(childProxy);
         childProxy.parentProxy = this;
@@ -812,7 +812,7 @@ class ItemProxy {
       ancestorProxy.descendantCount += deltaCount;
       ancestorProxy = ancestorProxy.parentProxy;
     }
-
+    
     // update display of lostAndFound node
     if (this === tree.lostAndFound && tree.lostAndFound.children.length === 1) {
       tree.root.addChild(tree.lostAndFound);
@@ -840,7 +840,7 @@ class ItemProxy {
       ancestorProxy.descendantCount -= deltaCount;
       ancestorProxy = ancestorProxy.parentProxy;
     }
-
+    
     // update display of lostAndFound node
     if (this === tree.lostAndFound && tree.lostAndFound.children.length === 0) {
       tree.root.removeChild(tree.lostAndFound);
@@ -866,7 +866,7 @@ class ItemProxy {
           if (a.item.id < b.item.id) return -1;
         }
         return 0;
-      });
+      });    	
     } else {
     	// Sort by itemIds list if it is present
     	var itemIds = this.item.itemIds;
@@ -875,20 +875,20 @@ class ItemProxy {
     		var aIndex = itemIds.indexOf(a.item.id);
     		var bIndex = itemIds.indexOf(b.item.id);
     		if (aIndex < 0) {
-          aIndex = itemIds.length;
+          aIndex = itemIds.length; 
     		}
         if (bIndex < 0) {
           bIndex = itemIds.length;
           // Detect when both items are not in the list
           if (aIndex === bIndex) {
             if (a.item.name > b.item.name){
-              aIndex++;
+              aIndex++; 
             } else if (a.item.name < b.item.name) {
               bIndex++;
             }
           }
         }
-
+        
         if (aIndex > bIndex) return 1;
         if (aIndex < bIndex) return -1;
         return 0;
@@ -903,7 +903,7 @@ class ItemProxy {
   childrenAreManuallyOrdered() {
     return (this.item.itemIds && this.item.itemIds.length > 0);
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -914,7 +914,7 @@ class ItemProxy {
       this.makeChildrenManualOrdered();
     }
 }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -925,7 +925,7 @@ class ItemProxy {
       this.calculateTreeHash();
     }
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -935,7 +935,7 @@ class ItemProxy {
       this.item.itemIds = this.getOrderedChildIds();
     }
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -946,7 +946,7 @@ class ItemProxy {
       this.calculateTreeHash();
     }
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -957,22 +957,22 @@ class ItemProxy {
     }
     return childIds;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
 //    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
-
+    
     var validation = ItemProxy.validateItemContent(modelKind, withItem);
-
+    
     if (!validation.valid){
       // TODO Need to remove this bypass logic which is needed to load some existing data
       if(tree.loading){
         console.log('*** Error: Invalid data item');
         console.log('Kind: ' + modelKind);
         console.log(withItem);
-        console.log(validation);
+        console.log(validation);        
       } else {
         throw ({
           error: 'Not-Valid',
@@ -1028,14 +1028,14 @@ class ItemProxy {
 
       newParentProxy.addChild(this);
     }
-
+    
     this.calculateTreeHash();
-
+    
     if (this.analysis) {
         // delete the analysis in case some of the requisite data was updated
         delete this.analysis;
     }
-
+    
     if(!tree.loading){
       tree.changeSubject.next({
         type: 'update',
@@ -1054,23 +1054,23 @@ class ItemProxy {
     var byId = this.item.id;
 
 //    console.log('::: Deleting proxy for ' + byId);
-
+    
     var attemptToDeleteRestrictedNode = (
-        (this.item.id === tree.lostAndFound.item.id) ||
+        (this.item.id === tree.lostAndFound.item.id) || 
         (this.item.id === tree.root.item.id));
 
     // Unlink from parent
     if (this.parentProxy && !attemptToDeleteRestrictedNode) {
       this.parentProxy.removeChild(this);
     }
-
+    
     if (deleteDescendants){
       // Delete children depth first (after visit)
       this.visitChildren(null, null, (childProxy) => {
         childProxy.deleteItem(deleteDescendants);
       });
       if (attemptToDeleteRestrictedNode){
-//        console.log('::: -> Not removing ' + this.item.name);
+//        console.log('::: -> Not removing ' + this.item.name);        
       } else {
 //        console.log('::: -> Removing all references');
         if(!tree.loading){
@@ -1079,7 +1079,7 @@ class ItemProxy {
             kind: this.kind,
             id: this.item.id,
             proxy: this
-          });
+          });          
         }
         delete tree.proxyMap[byId];
       }
@@ -1096,11 +1096,11 @@ class ItemProxy {
               proxy: this
             });
           }
-          createMissingProxy(byId);
+          createMissingProxy(byId);          
         }
       } else {
         if (attemptToDeleteRestrictedNode){
-//          console.log('::: -> Not removing ' + this.item.name);
+//          console.log('::: -> Not removing ' + this.item.name);                  
         } else {
 //          console.log('::: -> Removing all references');
           if(!tree.loading){
@@ -1113,7 +1113,7 @@ class ItemProxy {
           }
           delete tree.proxyMap[byId];
         }
-      }
+      }      
     }
 
   }
@@ -1125,7 +1125,7 @@ class ItemProxy {
     var rootModelProxy = ItemProxy.getProxyFor('Model-Definitions');
     return rootModelProxy.modelDefMap;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -1136,7 +1136,7 @@ class ItemProxy {
     };
     var rootModelProxy = new ItemProxy('Internal-Model', rootModelDef);
     rootModelProxy.modelDefMap = modelDefMap;
-
+    
     for(var modelKey in modelDefMap){
       var model = modelDefMap[modelKey];
       model.id = modelKey;
@@ -1151,17 +1151,17 @@ class ItemProxy {
       var proxy = new ItemProxy('Internal-Model', model);
       tree.modelMap[modelKey] = proxy;
     }
-
+    
     // Create the key ordering for descendant models
     var models = rootModelProxy.getDescendants();
-
+        
     for(var index in models){
       var modelProxy = models[index];
 //      console.log('::: Loading Model ' + model.item.name);
       // TODO this might eventually need to be moved to proxy
       var properties = modelProxy.parentProxy.item.orderedProperties || [];
       modelProxy.item.orderedProperties = Object.keys(modelProxy.item.properties).concat(properties);
-
+      
       modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
 
       for (var property in modelProxy.item.properties){

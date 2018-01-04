@@ -47,7 +47,7 @@ export class TabService {
     if (tab)
     {
       this.currentTabSubject.next(tab);
-      this.router.navigate([tab.route], {queryParams: tab.params});
+      this.router.navigate([tab.route, tab.params]);
     }
   }
 

@@ -11,14 +11,14 @@ import { ItemProxy } from '../../../common/models/item-proxy.js';
 
 export class RowComponent extends NavigatableComponent {
   @Input()
-  proxyCollection : Array<ItemProxy>
+  itemProxy : ItemProxy
   @Input()
   exactFilter : boolean // TODO - Implement exact Passing
   @Input()
   filterSubject : BehaviorSubject<ProxyFilter>
-  @Input()
-  collapsed : boolean
 
+  collapsed : object;
+  previouslyExpanded : object;
   filter : ProxyFilter;
 
   constructor (protected NavigationService : NavigationService,
@@ -28,6 +28,7 @@ export class RowComponent extends NavigatableComponent {
 
   initialize () {
     this.filterSubject.subscribe(filter => { this.filter = filter })
+    this.previouslyExpanded = {};
     console.log(this);
   }
 
