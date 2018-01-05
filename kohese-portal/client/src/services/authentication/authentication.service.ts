@@ -13,7 +13,7 @@ export class AuthenticationService {
   private token: BehaviorSubject<string> = new BehaviorSubject(localStorage.getItem(this.TOKEN_KEY));
   private jwtHelper: JwtHelper = new JwtHelper();
   private authenticationInformation: BehaviorSubject<any> =
-    new BehaviorSubject(this.UNDEFINED_LOCAL_STORAGE_VALUE);
+    new BehaviorSubject(undefined);
   
   constructor(private httpClient: HttpClient,
     private socketService: SocketService) {
