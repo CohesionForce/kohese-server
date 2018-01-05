@@ -4,6 +4,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TabService } from '../../services/tab/tab.service';
+import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -13,40 +14,45 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 })
 
 export class DashboardComponent extends NavigatableComponent implements OnInit {
-  currentUser : string;
-  itemList: Array<Object>;
+  private currentUser : string;
+  private itemList: Array<Object>;
 
-  assignedItems : Array<any>;
-  assignedFilter : Object;
-  acceptedItems : Array<any>;
-  acceptedFilter : Object;
-  inWorkItems : Array<any>;
-  inWorkFilter: Object;
-  observedIssuesItems : Array<any>;
-  observedIssuesFilter : Object;
-  inAnalysisIssuesItems : Array<any>;
-  inAnalysisIssueFilter : Object;
-  requiresActionItems : Array<any>;
-  requiresActionFilter : Object;
-  assignedTasks : Array<any>;
-  assignedTaskFilter : Object;
-  acceptedTasks : Array<any>;
-  acceptedTasksFilter : Object;
-  inWorkTasks : Array<any>;
-  inWorkTasksFilter : Object;
-  repoStatusSubject : BehaviorSubject<any>;
+  private assignedItems : Array<any>;
+  private assignedFilter : Object;
+  private acceptedItems : Array<any>;
+  private acceptedFilter : Object;
+  private inWorkItems : Array<any>;
+  private inWorkFilter: Object;
+  private observedIssuesItems : Array<any>;
+  private observedIssuesFilter : Object;
+  private inAnalysisIssuesItems : Array<any>;
+  private inAnalysisIssueFilter : Object;
+  private requiresActionItems : Array<any>;
+  private requiresActionFilter : Object;
+  private assignedTasks : Array<any>;
+  private assignedTaskFilter : Object;
+  private acceptedTasks : Array<any>;
+  private acceptedTasksFilter : Object;
+  private inWorkTasks : Array<any>;
+  private inWorkTasksFilter : Object;
+  private repoStatusSubject : BehaviorSubject<any>;
 
 
 
   constructor(private bundleService: BundleService,
               protected NavigationService : NavigationService,
               protected TabService : TabService,
-              private ItemRepository : ItemRepository) {
+              private ItemRepository : ItemRepository,
+              private sessionService: SessionService) {
     super(NavigationService, TabService);
                }
 
   ngOnInit() {
-    this.currentUser = 'Test user'; // TODO - Pull from user service
+    this.sessionService.getSessionUser().subscribe((userProxy) => {
+      if (userProxy) {
+        this.currentUser = userProxy.item.name;
+      }
+    });
     this.itemList = this.testProxies();
     this.assignedItems = this.testProxies();
     this.assignedFilter = {};
