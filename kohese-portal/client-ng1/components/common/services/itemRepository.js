@@ -201,9 +201,13 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
     
   function fetchItems () {
     var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
+    var beginFetching = Date.now();
     $rootScope.$broadcast('syncingRepository');
     KoheseIO.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
+      var gotResponse = Date.now();
       console.log('::: Response for getAll');
+      console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
+      
       var syncSucceeded = false;
       if(response.kdbMatches) {
         console.log('::: KDB is already in sync');
@@ -247,6 +251,9 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         
         syncSucceeded = compareAfterRTH.match;
 
+        var finishedTime = Date.now();
+        console.log('$$$ Processing time: ' + (finishedTime-gotResponse)/1000);
+        
         if(!compareAfterRTH.match) {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
