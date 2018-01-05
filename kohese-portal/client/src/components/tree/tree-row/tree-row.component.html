@@ -1,6 +1,7 @@
 <div
   class="kt-collection"
-  [ngClass]="{'kt-hidden' : itemProxy.item.parentId && collapsed}" >
+  [ngClass]="{'kt-hiddenx' : itemProxy.item.parentId && collapsed}"
+  >
 
   <div class="kt-item"
       id="{{itemProxy.item.id}}"
@@ -14,7 +15,7 @@
                 (click)="navigate('Explore',
                 {id: itemProxy.item.id})">
               <i
-                    (click)="collapsed[itemProxy.item.id] = !collapsed[itemProxy.item.id]; $event.stopPropagation()"
+                    (click)="collapsed[itemProxy.item.id] = !collapsed[itemProxy.item.id];"
                     class="kt-icon fa"
                     [ngClass]="{'fa-caret-down': (itemProxy.children.length > 0) && !collapsed[itemProxy.item.id],
                     'fa-caret-right': (itemProxy.children.length > 0) && collapsed[itemProxy.item.id],

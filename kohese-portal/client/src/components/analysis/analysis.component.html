@@ -1,7 +1,9 @@
 <div style="height: 100%;">
   <horizontal-split-pane>
     <vertical-split-pane class="split-pane-content-primary">
-      <term-view class="split-pane-content-primary"></term-view>
+      <term-view class="split-pane-content-primary"
+                [itemProxy] = "itemProxy"
+                [filterSubject] = "filterSubject"></term-view>
       <document-view
                     [itemProxy] = "itemProxy"
                     [showChildrenSubject] = "showChildrenSubject"
@@ -9,8 +11,12 @@
                     class="split-pane-content-secondary"></document-view>
     </vertical-split-pane>
     <vertical-split-pane class="split-pane-content-secondary">
-      <phrase-view class="split-pane-content-primary"></phrase-view>
-      <sentence-view class="split-pane-content-secondary"></sentence-view>
+      <phrase-view class="split-pane-content-primary"
+                  [itemProxy] = "itemProxy"
+                  [filterSubject] = "filterSubject"></phrase-view>
+      <sentence-view class="split-pane-content-secondary"
+                  [itemProxy] = "itemProxy"
+                  [filterSubject] = "filterSubject"></sentence-view>
     </vertical-split-pane>
   </horizontal-split-pane>
 </div>

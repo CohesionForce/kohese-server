@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service'
 import { TabService } from '../../services/tab/tab.service';
+import { AnalysisService } from '../../services/analysis/analysis.service';
 
 import { ItemProxy } from '../../../../common/models/item-proxy';
 
@@ -20,6 +21,7 @@ export class AnalysisComponent extends NavigatableComponent
 
   /* UI Toggles */
   showChildren : boolean;
+  analysisLoaded : boolean;
 
   /* Data */
   itemProxyId : string;
@@ -37,7 +39,8 @@ export class AnalysisComponent extends NavigatableComponent
   constructor(protected NavigationService : NavigationService,
               protected TabService : TabService,
               private route : ActivatedRoute,
-              private ItemRepository : ItemRepository) {
+              private ItemRepository : ItemRepository,
+              private AnalysisService : AnalysisService) {
     super(NavigationService, TabService)
     this.filterSubject = new BehaviorSubject('')
     this.showChildrenSubject = new BehaviorSubject(true);
@@ -45,9 +48,12 @@ export class AnalysisComponent extends NavigatableComponent
   }
 
   ngOnInit () {
+    this.analysisLoaded = false;
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
       this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+      this.AnalysisService.fetchAnalysis(this.itemProxy);
+
     })
 
     this.filter = ''
