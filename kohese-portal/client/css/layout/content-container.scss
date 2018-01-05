@@ -17,112 +17,108 @@ Created by Josh P
 }
 
 #page-wrapper {
-
   position: fixed;
   top: $topNavHeight;
   left: $leftNavWidth;
   height: 100%;
   width: 100%;
 
-  div {
-    height:100%;
-  }
-
   content-container {
-  #content-container {
-    height: 100%;
-    z-index: 2;
-
-    #tab-bar {
+    #content-container {
       height: 100%;
-         ngb-tabset {
-          .tab-content {
-            .tab-pane {
-              height: 100%;
-              overflow:hidden;
-              .tab-body {
+      z-index: 2;
+      border-radius: $baseBorderRadius;
+
+      #tab-bar {
+        height: 42px;
+        
+        #add-tab-button {
+          background-color: white;
+          margin: 11px 0px;
+          float: left;
+        }
+        
+        ngb-tabset {
+          ngb-tab {
+            float: left;
+            .tab-content {
+              .tab-pane {
                 height: 100%;
-                .singleview {
+                overflow:hidden;
+                .tab-body {
                   height: 100%;
-                  div {
+                  .singleview {
                     height: 100%;
                     div {
                       height: 100%;
+                      div {
+                        height: 100%;
+                      }
                     }
-                }
+                  }
                 }
               }
             }
           }
         }
       }
-    }
 
-
-
-    border-radius: $baseBorderRadius;
-    .delete-tab-button {
-      margin-left: 2px;
-      padding: 1px;
-      &:hover {
-        background-color: red;
-        color: white;
-        border-radius: 50%;
-      }
-    }
-    #add-tab-button {
-      background-color: white;
-    }
-    button {
-      border-radius: $baseBorderRadius;
-
-    }
-
-    .top-content {
-      overflow: auto;
-      left: 0;
-      width: 100%;
-
-      #top-action-bar {
+      .delete-tab-button {
+        margin-left: 2px;
         padding: 1px;
-        width: 100%;
-        height: $topActionBarHeight;
-        .button-selected {
-          background-color: $buttonAccentColor;
+        &:hover {
+          background-color: red;
           color: white;
+          border-radius: 50%;
+        }
+      }
+      
+      button {
+        border-radius: $baseBorderRadius;
+      }
+
+      .top-content {
+        overflow: auto;
+        left: 0;
+        width: 100%;
+
+        #top-action-bar {
+          padding: 1px;
+          width: 100%;
+          height: $topActionBarHeight;
+          .button-selected {
+            background-color: $buttonAccentColor;
+            color: white;
+          }
+        }
+      }
+
+      .bottom-content {
+        position: relative;
+        overflow: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        > div {
+          height: 100%;
         }
       }
     }
 
-    .bottom-content {
-      position: relative;
-      overflow: auto;
-      bottom: 0;
-      right: 0;
-      left: 0;
-      width: 100%;
-      background-color: white;
-      > div {
-        height: 100%;
-      }
+    .left-content {
+      height: inherit;
+      overflow: hidden;
+    }
+
+    .right-content {
+      height: inherit;
+      overflow: hidden;
+    }
+
+    .highlighted {
+       background: yellow;
     }
   }
-
-
-.left-content {
-  height: inherit;
-  overflow: hidden;
-}
-
-.right-content {
-  height: inherit;
-  overflow: hidden;
-}
-
-
-
-.highlighted {
-  background: yellow;
-}
-
 }

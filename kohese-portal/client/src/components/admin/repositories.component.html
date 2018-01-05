@@ -1,16 +1,15 @@
-<div>
-    <div class="version-control-admin">
+<div class="version-control-admin">
         <h4>
             Version Control:
         </h4>
-            <div>
-                <h5>Repository List:</h5>
-                <button (click)="getRemotes()"
-                        class="btn btn-primary">Refresh Repositories</button>
+        <button (click)="getRemotes()"
+                        class="btn btn-primary">Refresh Remotes</button>
+          <h5>Repository List:</h5>
+              <div class="remote-container">
                 <div *ngFor="let repo of remotes">
-                    {{repo}}
+                  {{repo}}
                 </div>
-            </div>
+              </div>
         <div>
             <label for="add-remote-input">Remote Name: </label>
             <input id="add-remote-input" type="text" [(ngModel)]="remoteNameInput"/>
@@ -34,15 +33,14 @@
             <button (click)="push()"
                     class="btn btn-primary">Push</button>
         </div>
-    </div>
-    
-    <hr/>
+        
+        <hr/>
     <h4>
         Repositories:
     </h4>
     <hr/>
     <div class="panel repository-panel"
-         *ngFor="let repository of repositoryList"
+         *ngFor="let repository of itemRepository.getRepositories()"
             >
         <div class="panel-title">
             {{repository.item.name}}
