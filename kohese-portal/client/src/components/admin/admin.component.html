@@ -11,35 +11,32 @@
       <div id="admin-user-list">
         <h2>Users:</h2>
         <div class="card-container" *ngFor="let userProxy of sessionService.getUsers()">
-          <div class="card">
-            <div class="front">
-              <div class="title">
+          <div class="panel panel-default">
+              <div class="panel-title">
                 {{userProxy.item.name}}
               </div>
-              <div class="body">
+              <div class="panel-body">
                 {{userProxy.item.description}}
-              </div>
-              <div class="footer">
                 Modified on {{userProxy.item.modifiedOn | date }} by {{userProxy.item.modifiedBy}}
               </div>
-            </div>
-            <div class="back">
-              <button class="btn btn-primary"
-                (click)="deleteUser(userProxy)">
-                  <i class="fa fa-3x fa-trash"></i>
-                Delete
-              </button>
-              <br/>
-              <button class="btn btn-primary"
-                (click)="editUser(userProxy)">
-                  <i class="fa fa-3x fa-edit"></i>
-                  Edit
-              </button>
+              <div class="panel-footer">
+                <button class="btn btn-primary"
+                  (click)="deleteUser(userProxy)">
+                    <i class="fa fa-trash"></i>
+                      Delete
+                </button>
+                <br/>
+                <button class="btn btn-primary"
+                  (click)="editUser(userProxy)">
+                    <i class="fa fa-edit"></i>
+                      Edit
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-        
+
       <div id="admin-user-form">
         <button class="btn btn-default"
           (click)="addUser()"
@@ -65,4 +62,3 @@
       </div>
     </div>
   </div>
-</div>
