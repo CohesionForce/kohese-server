@@ -16,7 +16,7 @@ module.exports = function (app) {
     var serverAuthentication = require('../server-enableAuth.js');
 
     var usingNG1 = false;
-    
+
     try {
         console.log('::: Checking for configuration');
         var packageConfig = fs.readlinkSync('./package');
@@ -43,14 +43,15 @@ module.exports = function (app) {
         /^\/dashboard.*/,
         /^\/login/,
         /^\/repositories.*/,
-        /^\/explore.*/
+        /^\/explore.*/,
+        /^\/analysis.*/
       ];
 
       app.use(ngRoutes, function (req, res) {
         res.sendFile(path.resolve(clientBundlePath, 'index.html'));
       });
 
-    }    
+    }
 
     //TODO Need to move this to the client-ng2 directory too
     app.use(serveFavicon(path.resolve(__dirname, '../../client-ng1/resources/icons/favicon.ico')));
@@ -59,7 +60,7 @@ module.exports = function (app) {
     app.use(express.static(path.resolve(__dirname, '../../bower_components')));
     app.use('/socket.io-file-client',
             express.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
-    
+
     app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
     app.use('/reports', express.static(path.resolve(__dirname, '../../tmp_reports')));
 
