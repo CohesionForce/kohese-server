@@ -301,7 +301,7 @@ export class ItemRepository {
 
         var finishedTime = Date.now();
         console.log('$$$ Processing time: ' + (finishedTime-gotResponse)/1000);
-        
+
         if(!compareAfterRTH.match) {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
@@ -494,11 +494,11 @@ export class ItemRepository {
           console.log('!!! Item not found for entry: ' + rIdx + ' - ' + entry.id + ' - ' + entry.status );
         }
       }
-    });
+    }.bind(this));
   }
 
   performAnalysis (forProxy) {
-    console.log('::: Performing analysis for ' + forProxy.id);
+    console.log('::: Performing analysis for ' + forProxy.item.id);
 
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/performAnalysis', {kind: forProxy.kind, id:forProxy.item.id}, function (response) {
