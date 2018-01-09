@@ -12,6 +12,7 @@ import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
 import { ActionTableModule } from './components/action-table/action-table.module';
 import { CreateItemModule } from './components/create-item/create-item.module';
+import { TypeCreatorModule } from './components/type-creator/type-creator.module';
 import { PipesModule } from './pipes/pipes.module';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -85,7 +86,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     DetailsModule,
     DocumentViewModule,
     ActionTableModule,
-    CreateItemModule
+    CreateItemModule,
+    TypeCreatorModule
   ],
   providers: [
     ItemRepository,

@@ -1,9 +1,10 @@
-<div style="height: 100%;">
+<div style="height: 100%;" *ngIf="repoLoaded && itemProxy.analysis">
   <split direction="vertical">
     <split-area [size]="50">
       <split direction="horizontal">
         <split-area [size]="50">
-          <term-view></term-view>
+          <term-view [itemProxy] = "itemProxy"
+                [filterSubject] = "filterSubject"></term-view>
         </split-area>
         <split-area [size]="50">
           <document-view
@@ -17,10 +18,12 @@
     <split-area [size]="50">
       <split direction="horizontal">
         <split-area [size]="50">
-          <phrase-view></phrase-view>
+          <phrase-view [itemProxy] = "itemProxy"
+                  [filterSubject] = "filterSubject"></phrase-view>
         </split-area>
         <split-area [size]="50">
-          <sentence-view></sentence-view>
+          <sentence-view [itemProxy] = "itemProxy"
+                  [filterSubject] = "filterSubject"></sentence-view>
         </split-area>
       </split>
     </split-area>

@@ -246,13 +246,17 @@ export class ItemRepository {
   }
 
   fetchItems () {
+    var beginFetching = Date.now();
     var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
+
     this.repositoryStatus.next({
       connected : false,
       message: 'Starting Repository Sync'
     });
     this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, (response) => {
+      var gotResponse = Date.now();
       console.log('::: Response for getAll');
+      console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
       var syncSucceeded = false;
       if(response.kdbMatches) {
         console.log('::: KDB is already in sync');
@@ -295,6 +299,9 @@ export class ItemRepository {
         var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
 
         syncSucceeded = compareAfterRTH.match;
+
+        var finishedTime = Date.now();
+        console.log('$$$ Processing time: ' + (finishedTime-gotResponse)/1000);
 
         if(!compareAfterRTH.match) {
           console.log('*** Repository sync failed');
@@ -492,7 +499,7 @@ export class ItemRepository {
   }
 
   performAnalysis (forProxy) {
-    console.log('::: Performing analysis for ' + forProxy.id);
+    console.log('::: Performing analysis for ' + forProxy.item.id);
 
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/performAnalysis', {kind: forProxy.kind, id:forProxy.item.id}, (response) => {

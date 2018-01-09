@@ -1,3 +1,88 @@
-<h1>
-  Term View
-</h1>
+<div class="panel">
+  <div class="panel-heading">Term View - ({{getTermCount()}}) Terms
+  <span class="dropdown pull-right">
+              <a class="dropdown-toggle" data-toggle="dropdown" >
+                    <span>Options</span>
+              <i class="fa fa-gear"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-user">
+                    <li (click)="showPOS = !showPOS">
+                          <a><i *ngIf="showPOS"
+                          class="fa fa-check-"></i>Show POS</a></li>
+              </ul>
+  </span>
+  </div>
+  <div class="panel-body">
+  <div>
+        <label class="control-label" for="posFilter">
+          POS Filter:
+          <select id="posFilter"
+                  [(ngModel)]="analysisPOSFilterName">
+                 <option *ngFor="let filterCriteria of analysisPOSFilterCriteriaList">{{filterCriteria}}</option>
+          </select>
+        </label>
+        <span>
+              <input type="checkbox" [(ngModel)]="filterExactMatch"
+                          name="summaryFilterExactMatchInput"
+                          style="margin: 5px"/> Exact Match
+              <input type="checkbox" [(ngModel)]="filterIgnoreCase"
+                          name="summaryFilterIgnoreCaseInput"
+                          style="margin: 5px"/> Ignore Case
+        </span>
+        <br/>
+        <input class="input-sm" type="text" [(ngModel)]="analysisFilterInput"
+               placeholder="Filter" style="margin: 5px"
+               [ngStyle]="invalidAnalysisFilterRegex && {'background-color':'pink'}"/>
+
+        <button (click)="submitStringFilter(analysisFilterInput)"
+                class=" btn btn-default fa fa-search"> Submit
+        </button>
+        <label for="term-limit">Limit
+              <input type="text"
+                    [(ngModel)]="loadLimit"/>
+        </label>
+        <!-- <button (click)="getLastFilter()"
+                class="btn btn-default fa fa-chevron-left"> Last Filter
+        </button> -->
+  </div>
+  <div id="term-div">
+     <table id="theTokensSummary"
+            class="table tree-grid table-striped table-condensed table-hover">
+        <thead>
+           <th>
+              <span (click)="newSort('-text')">
+                 Text
+                 <span *ngIf="sortField === '-text'">
+                 <i *ngIf="reverse" class="fa fa-chevron-up"></i>
+                 <i *ngIf="!reverse" class="fa fa-chevron-down"></i>
+                 </span>
+              </span>
+           </th>
+           <th>
+              <span (click)="newSort('-count')">
+                 Count
+                 <span *ngIf="sortField === '-count'">
+                 <i *ngIf="reverse" class="fa fa-chevron-up"></i>
+                 <i *ngIf="!reverse" class="fa fa-chevron-down"></i>
+                 </span>
+              </span>
+           </th>
+           <th *ngIf="showPOS">POS Count</th>
+        </thead>
+        <tbody id="theTokensBody">
+           <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
+           *ngFor="let summary of itemProxy.analysis.extendedTokenSummaryList
+                    | filter:filter:true
+                    | orderBy:sortField:reverse
+                    | slice:loadLimit">
+           <td (click)="submitStringFilter(summary.text)"
+                 class="tree-label"
+                 [innerHTML] ="summary.text | highlightRegex:analysisFilterRegexHighlight:true"></td>
+           <td>{{summary.count}}</td>
+           <td *ngIf="showPOS">{{summary.posCount}}</td>
+           </tr>
+        </tbody>
+     </table>
+  </div>
+  </div>
+</div>

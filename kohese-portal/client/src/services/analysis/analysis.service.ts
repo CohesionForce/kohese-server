@@ -55,7 +55,7 @@ export class AnalysisService {
   performAnalysis (proxy : ItemProxy) : Promise<any> {
     var analysis = this.ItemRepository.performAnalysis(proxy)
 
-    analysis.then(function (results) {
+    analysis.then((results) => {
       if (!proxy.analysis) {
         proxy.analysis = {};
       }

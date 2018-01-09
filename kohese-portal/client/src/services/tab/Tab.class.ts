@@ -25,6 +25,8 @@ export class Tab {
     this.navUpdates = navUpdates
       .filter(update => update.tabID == this.id)
       .subscribe(update => {
+        console.log(this);
+        console.log(update);
       this.route = LocationMap[update.location].route;
       this.title = LocationMap[update.location].title;
       this.type = LocationMap[update.location].type;
