@@ -1,19 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as SocketIoClient from 'socket.io-client';
 
 @Injectable()
 export class SocketService {
   public socket: SocketIOClient.Socket;
-  private initialized: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor() {
-    this.initialize();
-  }
-
-  initialize(): void {
-    this.initialized.next(true);
     this.socket = SocketIoClient();
   }
 
@@ -22,13 +15,7 @@ export class SocketService {
   }
 
   disconnect(): void {
-    if (this.initialized.getValue()) {
-      this.socket.disconnect();
-    }
-  }
-
-  isInitialized(): BehaviorSubject<boolean> {
-    return this.initialized;
+    this.socket.disconnect();
   }
 
   getSocket(): SocketIOClient.Socket {

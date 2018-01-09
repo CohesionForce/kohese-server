@@ -9,6 +9,7 @@ components/
 pages/
 themes/
 */
+@import url(~@angular/material/prebuilt-themes/deeppurple-amber.css);
 .btn-outline {
   color: inherit;
   background-color: transparent;
@@ -274,13 +275,26 @@ table td .glyphicon-remove {
   table td .glyphicon-remove:hover {
     cursor: pointer; }
 
+#explore-container {
+  height: calc(100% - 48px - 12px); }
+  #explore-container #tree-container {
+    height: 100%;
+    width: 50%;
+    overflow: auto;
+    float: left; }
+  #explore-container #details-container {
+    height: 100%;
+    width: 50%;
+    overflow: auto;
+    float: right; }
+
 .knowledge-tree-panel {
   border-collapse: collapse;
   position: relative;
   height: calc(100% - 120px);
   width: calc(100% - 20px);
   padding-left: 20px;
-  overflow: hidden; }
+  overflow: auto; }
 
 .knowledge-tree {
   height: calc(100% - 32px); }
@@ -712,25 +726,20 @@ Created by Josh P
     height: 100%;
     z-index: 2;
     border-radius: 10px; }
-    #page-wrapper content-container #content-container #tab-bar {
-      height: 42px; }
-      #page-wrapper content-container #content-container #tab-bar #add-tab-button {
-        background-color: white;
-        margin: 11px 0px;
-        float: left; }
-      #page-wrapper content-container #content-container #tab-bar ngb-tabset ngb-tab {
-        float: left; }
-        #page-wrapper content-container #content-container #tab-bar ngb-tabset ngb-tab .tab-content .tab-pane {
-          height: 100%;
-          overflow: hidden; }
-          #page-wrapper content-container #content-container #tab-bar ngb-tabset ngb-tab .tab-content .tab-pane .tab-body {
-            height: 100%; }
-            #page-wrapper content-container #content-container #tab-bar ngb-tabset ngb-tab .tab-content .tab-pane .tab-body .singleview {
-              height: 100%; }
-              #page-wrapper content-container #content-container #tab-bar ngb-tabset ngb-tab .tab-content .tab-pane .tab-body .singleview div {
-                height: 100%; }
-                #page-wrapper content-container #content-container #tab-bar ngb-tabset ngb-tab .tab-content .tab-pane .tab-body .singleview div div {
-                  height: 100%; }
+    #page-wrapper content-container #content-container #add-tab-button {
+      background-color: white;
+      margin: 12px 12px;
+      float: left;
+      width: 25px;
+      min-width: 25px;
+      height: 25px;
+      padding: 0px; }
+    #page-wrapper content-container #content-container mat-tab-group {
+      height: 100%; }
+      #page-wrapper content-container #content-container mat-tab-group mat-tab-body {
+        height: 100%; }
+    #page-wrapper content-container #content-container .mat-tab-body-wrapper {
+      height: 100%; }
     #page-wrapper content-container #content-container .delete-tab-button {
       margin-left: 2px;
       padding: 1px; }
@@ -802,55 +811,8 @@ body #layout-bottom {
         height: 100%;
         width: 45%;
         overflow: auto; }
-        .admin-screen .users-screen .user-container #admin-user-list .card-container {
-          perspective: 400px; }
-          .admin-screen .users-screen .user-container #admin-user-list .card-container .card {
-            width: 250px;
-            margin: 20px;
-            transition: all 0.6s ease;
-            transform-style: preserve-3d;
-            border-radius: 30px; }
-            .admin-screen .users-screen .user-container #admin-user-list .card-container .card .front {
-              background-color: #005A31;
-              backface-visibility: hidden;
-              height: 250px;
-              border-radius: 30px; }
-              .admin-screen .users-screen .user-container #admin-user-list .card-container .card .front .title {
-                padding: 10px;
-                font-size: 24px;
-                color: white;
-                background-color: #64be95; }
-              .admin-screen .users-screen .user-container #admin-user-list .card-container .card .front .body {
-                color: white;
-                padding: 10px; }
-              .admin-screen .users-screen .user-container #admin-user-list .card-container .card .front .footer {
-                position: absolute;
-                bottom: 0;
-                width: 250px;
-                padding: 10px;
-                background-color: #c8fff9;
-                color: black; }
-            .admin-screen .users-screen .user-container #admin-user-list .card-container .card .back {
-              border-radius: 30px;
-              position: absolute;
-              top: 0;
-              left: 0;
-              padding: 10px;
-              height: 250px;
-              width: 250px;
-              transform: rotateY(180deg);
-              background-color: #005A31;
-              backface-visibility: hidden;
-              color: white; }
-            .admin-screen .users-screen .user-container #admin-user-list .card-container .card:hover {
-              -webkit-transition-delay: .6s;
-              -moz-transition-delay: .6s;
-              -o-transition-delay: .6s;
-              -ms-transition-delay: .6s;
-              transition-delay: .6s;
-              transform: rotateY(180deg); }
       .admin-screen .users-screen .user-container #admin-user-form {
-        float: left;
+        float: right;
         width: 55%;
         top: 200px;
         right: 0px;

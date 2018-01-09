@@ -1,4 +1,4 @@
-<div style="height:inherit" *ngIf="treeRoot">
+<div *ngIf="treeRoot">
     <div id="top-action-bar">
       <button (click)="expandAll()" class="btn btn-default btn-sm"
         style="margin: 5px">Expand All</button>
@@ -93,7 +93,7 @@
       </div>
     </div>
     <!-- Begin Knowledge Tree -->
-    <div class="knowledge-tree-panel" style="overflow:hidden">
+    <div class="knowledge-tree-panel">
       <div id="theKT" class="knowledge-tree">
         <div class="kt-head">
           <div class="kth-cell kti-name">Name</div>
@@ -105,7 +105,7 @@
             </span>
           </div>
         </div>
-        <div class="kt-body" style="overflow:auto; height: 100%">
+        <div class="kt-body">
   <tree-row *ngFor="let childProxy of treeRoot.children"
             [itemProxy]="childProxy" [filterSubject]="filterSubject"></tree-row>
       </div>

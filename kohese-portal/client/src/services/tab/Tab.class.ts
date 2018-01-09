@@ -1,4 +1,5 @@
 import { Subject } from "rxjs/Subject";
+import { Subscription } from 'rxjs/Subscription';
 import { NavigationUpdate } from "../navigation/NavigationUpdate.class";
 
 import { LocationMap } from '../../constants/LocationMap.data';
@@ -11,7 +12,7 @@ export class Tab {
   params: Object;
   position: number;
 
-  navUpdates : Subject<NavigationUpdate>;
+  private navUpdates: Subscription;
 
   constructor (location: string, params: Object, id: number,
                position: number, navUpdates : Subject<NavigationUpdate>) {
@@ -21,8 +22,7 @@ export class Tab {
     this.params = params;
     this.id = id;
     this.position = position;
-    this.navUpdates = navUpdates;
-    this.navUpdates
+    this.navUpdates = navUpdates
       .filter(update => update.tabID == this.id)
       .subscribe(update => {
       this.route = LocationMap[update.location].route;
@@ -30,10 +30,9 @@ export class Tab {
       this.type = LocationMap[update.location].type;
       this.params = params;
     });
-
   }
 
-  destroy() {
+  destroy(): void {
     this.navUpdates.unsubscribe();
   }
 }
