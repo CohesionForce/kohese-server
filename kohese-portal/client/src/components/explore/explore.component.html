@@ -1,9 +1,8 @@
-<div id="explore-container">
-  <!-- <div class="split-pane-content-primary">Temporary Tree</div> -->
-  <div id="tree-container">
+<split id="explore-container" direction="horizontal">
+  <split-area id="tree-container" [size]="50">
     <tree-view></tree-view>
-  </div>
-  <div id="details-container">
+  </split-area>
+  <split-area id="details-container" [size]="50">
     <details-view *ngIf="proxySelected"></details-view>
-  </div>
-</div>
+  </split-area>
+</split>

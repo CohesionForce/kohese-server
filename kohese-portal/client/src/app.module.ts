@@ -42,7 +42,7 @@ import { AnalysisService } from './services/analysis/analysis.service';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
-import { SplitPaneModule } from 'ng2-split-pane/lib/ng2-split-pane';
+import { AngularSplitModule } from 'angular-split';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
@@ -80,7 +80,7 @@ const AUTHENTICATION_INTERCEPTOR = {
     ToastrModule.forRoot(),
     PipesModule,
     MaterialModule,
-    SplitPaneModule,
+    AngularSplitModule,
     AnalysisModule,
     DetailsModule,
     DocumentViewModule,
