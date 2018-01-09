@@ -29,38 +29,26 @@ Created by Josh P
       z-index: 2;
       border-radius: $baseBorderRadius;
 
-      #tab-bar {
-        height: 42px;
+      #add-tab-button {
+        background-color: white;
+        margin: 12px 12px;
+        float: left;
+        width: 25px;
+        min-width: 25px;
+        height: 25px;
+        padding: 0px;
+      }
+      
+      mat-tab-group {
+        height: 100%;
         
-        #add-tab-button {
-          background-color: white;
-          margin: 11px 0px;
-          float: left;
+        mat-tab-body {
+          height: 100%;
         }
-        
-        ngb-tabset {
-          ngb-tab {
-            float: left;
-            .tab-content {
-              .tab-pane {
-                height: 100%;
-                overflow:hidden;
-                .tab-body {
-                  height: 100%;
-                  .singleview {
-                    height: 100%;
-                    div {
-                      height: 100%;
-                      div {
-                        height: 100%;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+      }
+      
+      .mat-tab-body-wrapper {
+        height: 100%;
       }
 
       .delete-tab-button {

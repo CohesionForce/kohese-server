@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
-import { SocketService } from '../../services/socket/socket.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,8 +12,7 @@ export class LoginComponent {
   private password : string = '';
   private loginSubmitted : boolean = false;
 
-  constructor(private authenticationService: AuthenticationService, private router: Router,
-    private socketService: SocketService) {
+  constructor(private authenticationService: AuthenticationService, private router: Router) {
   }
   
   ngOnInit() {
