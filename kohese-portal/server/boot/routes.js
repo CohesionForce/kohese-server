@@ -44,7 +44,8 @@ module.exports = function (app) {
         /^\/login/,
         /^\/repositories.*/,
         /^\/explore.*/,
-        /^\/analysis.*/
+        /^\/analysis.*/,
+        /^\/typecreator.*/
       ];
 
       app.use(ngRoutes, function (req, res) {

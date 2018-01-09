@@ -1,0 +1,10 @@
+<div>
+    <div *ngIf="!selectedType">
+      Please select a type to edit
+    </div>
+    <div *ngIf="selectedType">
+      <h1>
+          Type editor : {{selectedType.item.name}}
+      </h1>
+    </div>
+</div>

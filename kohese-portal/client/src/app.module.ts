@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
@@ -75,6 +76,7 @@ const AUTHENTICATION_INTERCEPTOR = {
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    FlexLayoutModule,
     HttpClientModule,
     NgbModule.forRoot(),
     BrowserAnimationsModule,

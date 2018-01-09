@@ -1,30 +1,7 @@
 <div id="content-container">
-<<<<<<< HEAD
-    <div id="tab-bar">
-      <button id="add-tab-button" (click)="addTab('Dashboard', {})">
-        <i class="glyphicon glyphicon-plus"></i>
-    </button>
-    <ngb-tabset>
-      <ngb-tab *ngFor="let tab of tabs" label="tab.active"
-        class=" nav nav-tabs">
-        <ng-template ngbTabTitle>
-          <span (click)="setTab(tab)">
-            {{tab.title}}
-            <i (click)="removeTab(tab)" class="delete-tab-button glyphicon glyphicon-remove"></i>
-          </span>
-        </ng-template>
-        <ng-template ngbTabContent
-          class="tab-body"
-          style="height:100%;">
-          <router-outlet></router-outlet>
-        </ng-template>
-      </ngb-tab>
-    </ngb-tabset>
-  </div>
-=======
   <button mat-raised-button id="add-tab-button" (click)="addTab('Dashboard', {})">
     <mat-icon class="glyphicon glyphicon-plus"></mat-icon>
-  </button>	
+  </button>
   <mat-tab-group>
     <mat-tab *ngFor="let tab of tabs" label="tab.active"
       class=" nav nav-tabs">
@@ -37,5 +14,4 @@
       <router-outlet></router-outlet>
     </mat-tab>
   </mat-tab-group>
->>>>>>> 15f55ebd0d063392ea33f93ecfd50747b98895e3
 </div>

@@ -1,3 +1,24 @@
 <div>
-  Type Creator
+  <div style="display: flex; flex-direction: column; flex: 0 1 50%;">
+    <div class="panel col-6"
+        *ngFor="let type of typeList"
+        (click)="selectType(type)"
+        style="width: 40%">
+      <div class="panel-heading">
+        {{type.item.name}}
+      </div>
+      <div class="panel-body">
+        Example Body
+      </div>
+    </div>
+    <type-editor  style="display: flex;
+                         flex-direction: column;
+                         flex: 0 1 50%;
+                         width : 50%;
+                         position : fixed;
+                         right: 0;
+                         top : 98px;"
+    [selectedTypeSubject]="selectedTypeSubject"></type-editor>
+  </div>
+
 </div>
