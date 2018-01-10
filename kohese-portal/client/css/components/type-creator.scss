@@ -1,0 +1,11 @@
+#type-creator {
+  height: 100%;
+  #base-editor {
+    max-height : 500px;
+  }
+  #property-list {
+    height: 500px;
+    overflow: auto;
+    width: 80%
+  }
+}

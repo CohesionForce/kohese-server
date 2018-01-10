@@ -570,6 +570,15 @@ tab div {
           width: 100%;
           overflow: auto; }
 
+#type-creator {
+  height: 100%; }
+  #type-creator #base-editor {
+    max-height: 500px; }
+  #type-creator #property-list {
+    height: 500px;
+    overflow: auto;
+    width: 80%; }
+
 .sidebar {
   color: whitesmoke;
   position: relative;
