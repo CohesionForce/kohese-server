@@ -7,7 +7,7 @@ import { PhraseViewComponent } from "./phrase-view/phrase-view.component";
 import { SentenceViewComponent } from "./sentence-view/sentence-view.component";
 import { TermViewComponent } from "./term-view/term-view.component";
 
-import { SplitPaneModule } from "ng2-split-pane/lib/ng2-split-pane";
+import { AngularSplitModule } from 'angular-split';
 import { DocumentViewModule } from '../document-view/document-view.module';
 import { PipesModule } from "../../pipes/pipes.module";
 
@@ -19,7 +19,7 @@ import { PipesModule } from "../../pipes/pipes.module";
     TermViewComponent
   ],
   imports : [
-    SplitPaneModule,
+    AngularSplitModule,
     DocumentViewModule,
     CommonModule,
     FormsModule,
