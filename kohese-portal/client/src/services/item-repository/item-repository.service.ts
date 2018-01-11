@@ -254,8 +254,9 @@ export class ItemRepository {
       message: 'Starting Repository Sync'
     });
     this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, (response) => {
+      var gotResponse = Date.now();
       console.log('::: Response for getAll');
-     // console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
+      console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
       var syncSucceeded = false;
       if(response.kdbMatches) {
         console.log('::: KDB is already in sync');
@@ -300,7 +301,7 @@ export class ItemRepository {
         syncSucceeded = compareAfterRTH.match;
 
         var finishedTime = Date.now();
-        //console.log('$$$ Processing time: ' + (finishedTime-gotResponse)/1000);
+        console.log('$$$ Processing time: ' + (finishedTime-gotResponse)/1000);
 
         if(!compareAfterRTH.match) {
           console.log('*** Repository sync failed');
