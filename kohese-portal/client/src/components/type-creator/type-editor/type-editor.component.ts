@@ -10,6 +10,9 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import { startWith } from 'rxjs/operators/startWith';
+import { map } from 'rxjs/operators/map';
 
 
 @Component({
@@ -25,15 +28,19 @@ export class TypeEditorComponent extends NavigatableComponent
   /* Data */
   selectedType : ItemProxy;
   validPropertyTypes : Array<string>
-  typeList : Array<ItemProxy>
+  typeProxies : Array<ItemProxy>
+  typeList : Array<string>;
+  filteredTypeList : Array<string>
   arbitraryCounter : number;
 
-  /* Services */
-  formControl : FormControl = new FormControl();
+  /* Form Types */
+
+  baseControl : FormControl = new FormControl();
 
   /* Observables */
   @Input()
   selectedTypeSubject : BehaviorSubject<ItemProxy>;
+  filteredTypes : Observable<string[]>;
 
   /* Subscriptions */
   selectedTypeSubscription : Subscription;
@@ -43,6 +50,7 @@ export class TypeEditorComponent extends NavigatableComponent
               TabService : TabService,
               private ItemRepository : ItemRepository) {
     super(NavigationService, TabService);
+    this.typeList = [];
 
   }
 
@@ -51,18 +59,38 @@ export class TypeEditorComponent extends NavigatableComponent
       if (update.connected) {
         this.repoConnected = true;
         let modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-        this.typeList = modelProxy.getDescendants();
+        this.typeProxies = modelProxy.getDescendants();
+        for (var i = 0; i < this.typeProxies.length; i++) {
+          this.typeList.push(this.typeProxies[i].item.name);
+        }
       }
     })
     this.selectedTypeSubject.subscribe((type) => {
       this.selectedType = type;
+      this.reset();
     })
+    this.filteredTypes = this.baseControl.valueChanges
+      .pipe(
+        startWith(''),
+        map(val => this.filter(val))
+      );
+
     this.validPropertyTypes = ['string',
     'number',
     'object',
     'boolean',
     'array']
     this.arbitraryCounter = 0;
+  }
+
+  reset () {
+    this.baseControl.reset();
+    this.arbitraryCounter = 0;
+    this.filteredTypes = this.baseControl.valueChanges
+    .pipe(
+      startWith(''),
+      map(val => this.filter(val))
+    );
   }
 
   ngOnDestroy () {
@@ -86,6 +114,11 @@ export class TypeEditorComponent extends NavigatableComponent
       required : false
       }
     }
+
+  filter(val: string): string[] {
+    return this.typeList.filter(option =>
+      option.toLowerCase().indexOf(val.toLowerCase()) === 0);
+  }
 }
 
 

@@ -570,11 +570,11 @@ tab div {
           width: 100%;
           overflow: auto; }
 
-#type-creator {
+#type-editor {
   height: 100%; }
-  #type-creator #base-editor {
+  #type-editor #base-editor {
     max-height: 500px; }
-  #type-creator #property-list {
+  #type-editor #property-list {
     height: 500px;
     overflow: auto;
     width: 80%; }

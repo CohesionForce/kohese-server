@@ -1,9 +1,10 @@
 <div class="panel">
-    <div *ngIf="!selectedType">
+  <div *ngIf="!selectedType">
       Please select a type to edit
-    </div>
-    <div *ngIf="selectedType" id="type-creator">
-      <div id="base-editor">
+  </div>
+  <form *ngIf="selectedType"
+         id="type-editor">
+    <div id="base-editor">
       <h1>
           Type editor :
 
@@ -14,16 +15,16 @@
           <br/>
           <label for="name">Name : </label>
           <input mat-input type="text" [(ngModel)]="selectedType.item.name"
-                     label="name">
+                     label="name" name="model-name">
           <br/>
           <mat-form-field>
             <label for="base">Base Class: </label>
-            <input type="text" matInput [formControl]="formControl" [matAutocomplete]="base"
-              [(ngModel)]="selectedType.item.base">
+            <input type="text" matInput [formControl]="baseControl" [matAutocomplete]="base"
+              [(ngModel)]="selectedType.item.base" name="base">
           </mat-form-field>
           <mat-autocomplete #base="matAutocomplete">
-            <mat-option *ngFor="let type of typeList" [value]="type.item.name">
-              {{type.item.name}}
+            <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
+              {{type}}
             </mat-option>
           </mat-autocomplete>
       </div>
@@ -35,14 +36,17 @@
     <mat-list id="property-list">
        <mat-card *ngFor="let property of selectedType.item.properties | mapKey">
           <mat-card-content>
-              <!-- <input mat-input type="text" [(ngModel)]="property"> -->
               {{property}}
               <br/>
-              <mat-checkbox [(ngModel)]="selectedType.item.properties[property].required"> Required</mat-checkbox>
+              <mat-checkbox [(ngModel)]="selectedType.item.properties[property].required"
+                            name="required">
+                Required</mat-checkbox>
               <br/>
               Attribute Type :
               <mat-form-field>
-                <mat-select [required]="true" [(ngModel)]="selectedType.item.properties[property].type">
+                <mat-select [required]="true"
+                            [(ngModel)]="selectedType.item.properties[property].type"
+                            name="prop-type">
                   <mat-option *ngFor="let type of validPropertyTypes" [value]="type">{{type}}</mat-option>
                 </mat-select>
               </mat-form-field>
@@ -54,5 +58,5 @@
           </mat-card-actions>
        </mat-card>
     </mat-list>
-  </div>
+  </form>
 </div>
