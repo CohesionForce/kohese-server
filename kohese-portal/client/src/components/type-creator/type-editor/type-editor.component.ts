@@ -11,8 +11,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
-import { startWith } from 'rxjs/operators/startWith';
-import { map } from 'rxjs/operators/map';
+import 'rxjs/add/operator/startWith';
+import 'rxjs/add/operator/map';
 
 
 @Component({
@@ -68,11 +68,10 @@ export class TypeEditorComponent extends NavigatableComponent
       this.selectedType = type;
       this.reset();
     });
+
     this.filteredTypes = this.baseControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(val => this.filter(val))
-      );
+      .startWith('')
+      .map(val => this.filter(val));
 
     this.validPropertyTypes = ['string',
     'number',
@@ -84,13 +83,7 @@ export class TypeEditorComponent extends NavigatableComponent
   }
 
   reset () {
-    this.baseControl.reset();
     this.arbitraryCounter = 0;
-    this.filteredTypes = this.baseControl.valueChanges
-    .pipe(
-      startWith(''),
-      map(val => this.filter(val))
-    );
   }
 
   ngOnDestroy () {
@@ -116,6 +109,9 @@ export class TypeEditorComponent extends NavigatableComponent
     }
 
   filter(val: string): string[] {
+    if (!val) {
+      val = '';
+    }
     return this.typeList.filter(option =>
       option.toLowerCase().indexOf(val.toLowerCase()) === 0);
   }
