@@ -1,8 +1,8 @@
 import { Input, Component, OnInit, OnDestroy } from '@angular/core';
-import { FormControl } from '@angular/forms'
+import { FormControl } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
-import { ItemProxy } from '../../../../../common/models/item-proxy'
+import { ItemProxy } from '../../../../../common/models/item-proxy';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { TabService } from '../../../services/tab/tab.service';
