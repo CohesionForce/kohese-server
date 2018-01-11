@@ -7,14 +7,13 @@
     <div id="base-editor">
       <h1>
           Type editor :
-
       <button mat-icon-button (click)="upsertType()">
           <i class="fa fa-save fa-2x"></i>
         </button>
       </h1>
           <br/>
           <label for="name">Name : </label>
-          <input mat-input type="text" [(ngModel)]="selectedType.item.name"
+          <input matInput type="text" [(ngModel)]="selectedType.item.name"
                      label="name" name="model-name">
           <br/>
           <mat-form-field>

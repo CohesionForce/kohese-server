@@ -57,27 +57,27 @@ export class TypeEditorComponent extends NavigatableComponent
     this.repoSubscription = this.ItemRepository.getRepoStatusSubject().subscribe((update) => {
       if (update.connected) {
         this.repoConnected = true;
-        let modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
+        let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
         this.typeProxies = modelProxy.getDescendants();
-        for (var i = 0; i < this.typeProxies.length; i++) {
+        for (let i : number = 0; i < this.typeProxies.length; i++) {
           this.typeList.push(this.typeProxies[i].item.name);
         }
       }
     });
-    this.selectedTypeSubject.subscribe((type) => {
+    this.selectedTypeSubject.subscribe((type : object) => {
       this.selectedType = type;
       this.reset();
     });
 
     this.filteredTypes = this.baseControl.valueChanges
       .startWith('')
-      .map(val => this.filter(val));
+      .map((val : string) => this.filter(val));
 
     this.validPropertyTypes = ['string',
     'number',
     'object',
     'boolean',
-    'array']
+    'array'];
 
     this.arbitraryCounter = 0;
   }
@@ -91,7 +91,7 @@ export class TypeEditorComponent extends NavigatableComponent
     this.selectedTypeSubscription.unsubscribe();
   }
 
-  deleteProperty(property) : void {
+  deleteProperty(property : string) : void {
     delete this.selectedType.item.properties[property];
     console.log(this);
   }
@@ -101,18 +101,18 @@ export class TypeEditorComponent extends NavigatableComponent
   }
 
   addProperty() {
-    let newPropKey = 'newProperty' + ++this.arbitraryCounter;
+    let newPropKey : string = 'newProperty' + ++this.arbitraryCounter;
     this.selectedType.item.properties[newPropKey] = {
       type : 'string',
       required : false
       }
-    }
+    };
 
   filter(val: string): string[] {
     if (!val) {
       val = '';
     }
-    return this.typeList.filter(option =>
+    return this.typeList.filter((option : string) =>
       option.toLowerCase().indexOf(val.toLowerCase()) === 0);
   }
 }
