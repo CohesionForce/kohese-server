@@ -23,4 +23,5 @@ import { MaterialModule } from '../../material.module';
     TypeEditorComponent
   ]
 })
+
 export class TypeCreatorModule {}

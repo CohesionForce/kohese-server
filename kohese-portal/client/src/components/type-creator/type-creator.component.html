@@ -1,5 +1,5 @@
 <div>
-  <div style="display: flex; flex-direction: column; flex: 0 1 50%;">
+  <div id="type-list">
     <div class="panel col-6"
         *ngFor="let type of typeList"
         (click)="selectType(type)"
@@ -11,13 +11,7 @@
         Example Body
       </div>
     </div>
-    <type-editor  style="display: flex;
-                         flex-direction: column;
-                         flex: 0 1 50%;
-                         width : 50%;
-                         position : fixed;
-                         right: 0;
-                         top : 98px;"
+    <type-editor id="type-editor"
     [selectedTypeSubject]="selectedTypeSubject"></type-editor>
   </div>
 

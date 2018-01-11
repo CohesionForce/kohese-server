@@ -34,7 +34,6 @@ export class TypeEditorComponent extends NavigatableComponent
   arbitraryCounter : number;
 
   /* Form Types */
-
   baseControl : FormControl = new FormControl();
 
   /* Observables */
@@ -64,11 +63,11 @@ export class TypeEditorComponent extends NavigatableComponent
           this.typeList.push(this.typeProxies[i].item.name);
         }
       }
-    })
+    });
     this.selectedTypeSubject.subscribe((type) => {
       this.selectedType = type;
       this.reset();
-    })
+    });
     this.filteredTypes = this.baseControl.valueChanges
       .pipe(
         startWith(''),
@@ -80,6 +79,7 @@ export class TypeEditorComponent extends NavigatableComponent
     'object',
     'boolean',
     'array']
+
     this.arbitraryCounter = 0;
   }
 
