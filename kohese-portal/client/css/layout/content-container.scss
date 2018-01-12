@@ -25,7 +25,8 @@ Created by Josh P
 
   content-container {
     #content-container {
-      height: 100%;
+      height: calc(100% - #{$topNavHeight});
+      width: calc(100% - #{$leftNavWidth});
       z-index: 2;
       border-radius: $baseBorderRadius;
 

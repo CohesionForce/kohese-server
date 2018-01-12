@@ -1,15 +1,16 @@
-import { NgModule } from "@angular/core/";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
+import { NgModule } from '@angular/core/';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
-import { AnalysisComponent } from "./analysis.component";
-import { PhraseViewComponent } from "./phrase-view/phrase-view.component";
-import { SentenceViewComponent } from "./sentence-view/sentence-view.component";
-import { TermViewComponent } from "./term-view/term-view.component";
+import { AnalysisComponent } from './analysis.component';
+import { PhraseViewComponent } from './phrase-view/phrase-view.component';
+import { SentenceViewComponent } from './sentence-view/sentence-view.component';
+import { TermViewComponent } from './term-view/term-view.component';
 
 import { AngularSplitModule } from 'angular-split';
 import { DocumentViewModule } from '../document-view/document-view.module';
-import { PipesModule } from "../../pipes/pipes.module";
+import { PipesModule } from '../../pipes/pipes.module';
+import { MaterialModule } from '../../material.module';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { PipesModule } from "../../pipes/pipes.module";
     DocumentViewModule,
     CommonModule,
     FormsModule,
-    PipesModule
+    PipesModule,
+    MaterialModule
   ],
   exports : [
     AnalysisComponent,

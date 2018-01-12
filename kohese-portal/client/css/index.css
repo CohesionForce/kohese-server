@@ -723,7 +723,8 @@ Created by Josh P
   height: 100%;
   width: 100%; }
   #page-wrapper content-container #content-container {
-    height: 100%;
+    height: calc(100% - 50px);
+    width: calc(100% - 50px);
     z-index: 2;
     border-radius: 10px; }
     #page-wrapper content-container #content-container #add-tab-button {

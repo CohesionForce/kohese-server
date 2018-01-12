@@ -2,11 +2,10 @@
   <button mat-raised-button id="add-tab-button" (click)="addTab('Dashboard', {})">
     <mat-icon class="glyphicon glyphicon-plus"></mat-icon>
   </button>
-  <mat-tab-group>
-    <mat-tab *ngFor="let tab of tabs" label="tab.active"
-      class=" nav nav-tabs">
+  <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedTabChange)="tabSelectionChanged($event)">
+    <mat-tab *ngFor="let tab of tabs" class="nav nav-tabs">
       <ng-template mat-tab-label>
-        <span (click)="setTab(tab)">
+        <span>
           {{tab.title}}
           <i (click)="removeTab(tab)" class="delete-tab-button glyphicon glyphicon-remove"></i>
         </span>

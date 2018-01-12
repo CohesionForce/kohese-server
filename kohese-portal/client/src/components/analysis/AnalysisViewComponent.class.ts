@@ -9,38 +9,28 @@ import { AnalysisService } from '../../services/analysis/analysis.service';
 //TODO - Implement timeout on filter inputs
 
 @Injectable()
-export class AnalysisViewComponent extends NavigatableComponent{
-  filter : string;
-  filterRegex : RegExp;
-  filterRegexHighlighted : RegExp;
-  invalidFilterRegex : boolean;
+export class AnalysisViewComponent extends NavigatableComponent {
+  protected filterString: string;
+  protected filterRegex: RegExp;
+  private filterRegexHighlighted: RegExp;
+  private invalidFilterRegex: boolean;
 
-  analysisFilterPOS;
-  analysisPOSFilterCriteria;
-  analysisPOSFilterCriteriaList;
-  analysisPOSFilterName;
-
-  protected AnalysisService : AnalysisService;
+  private analysisPOSFilterCriteriaList: Array<any>;
+  private analysisPOSFilterName: string = 'Standard';
 
   constructor(NavigationService : NavigationService,
               TabService : TabService,
-              AnalysisService : AnalysisService) {
+              protected AnalysisService : AnalysisService) {
     super(NavigationService, TabService);
-    this.AnalysisService = AnalysisService;
 
-
-    this.analysisFilterPOS = AnalysisService.filterPOS;
-    this.analysisPOSFilterCriteria = AnalysisService.posFilterCriteria;
     this.analysisPOSFilterCriteriaList = Object.keys(AnalysisService.posFilterCriteria);
-    this.analysisPOSFilterName = 'Standard';
-
   }
 
   onFilterChange () : void {
-    console.log('>>> Filter string changed to: ' + this.filter);
+    console.log('>>> Filter string changed to: ' + this.filterString);
 
     var regexFilter = /^\/(.*)\/([gimy]*)$/;
-    var filterIsRegex = this.filter.match(regexFilter);
+    var filterIsRegex = this.filterString.match(regexFilter);
 
     if (filterIsRegex) {
       try {
@@ -51,8 +41,8 @@ export class AnalysisViewComponent extends NavigatableComponent{
         this.invalidFilterRegex = true;
       }
     } else {
-      let cleanedPhrase = this.filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      if (this.filter !== '') {
+      let cleanedPhrase = this.filterString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (this.filterString !== '') {
         this.filterRegex = new RegExp(cleanedPhrase, 'i');
         this.filterRegexHighlighted = new RegExp('(' + cleanedPhrase + ')', 'gi');
         this.invalidFilterRegex = false;
@@ -66,8 +56,8 @@ export class AnalysisViewComponent extends NavigatableComponent{
 
   filterPhrases (summary) : boolean {
     var MatchesStringFilter;
-    var MatchesPOS = this.analysisFilterPOS(summary,
-      this.analysisPOSFilterCriteria[this.analysisPOSFilterName])
+    var MatchesPOS = this.AnalysisService.filterPOS(summary,
+      this.AnalysisService.posFilterCriteria[this.analysisPOSFilterName])
     if (MatchesPOS) {
       MatchesStringFilter =
             this.filterRegex === null
@@ -75,7 +65,5 @@ export class AnalysisViewComponent extends NavigatableComponent{
     }
 
     return MatchesPOS && MatchesStringFilter
-  };
+  }
 }
-
-
