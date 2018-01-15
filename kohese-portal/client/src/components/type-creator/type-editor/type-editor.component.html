@@ -1,10 +1,61 @@
-<div>
-    <div *ngIf="!selectedType">
+<div class="panel">
+  <div *ngIf="!selectedType">
       Please select a type to edit
-    </div>
-    <div *ngIf="selectedType">
+  </div>
+  <form *ngIf="selectedType"
+         id="editor-container">
+    <div id="base-editor">
       <h1>
-          Type editor : {{selectedType.item.name}}
+          Type editor :
+      <button mat-icon-button (click)="upsertType()">
+          <i class="fa fa-save fa-2x"></i>
+        </button>
       </h1>
-    </div>
+          <br/>
+          <label for="name">Name : </label>
+          <input matInput type="text" [(ngModel)]="selectedType.item.name"
+                     label="name" name="model-name">
+          <br/>
+          <mat-form-field>
+            <label for="base">Base Class: </label>
+            <input type="text" matInput [formControl]="baseControl" [matAutocomplete]="base"
+              [(ngModel)]="selectedType.item.base" name="base">
+          </mat-form-field>
+          <mat-autocomplete #base="matAutocomplete">
+            <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
+              {{type}}
+            </mat-option>
+          </mat-autocomplete>
+      </div>
+
+      <h4> Properties : </h4>
+      <button mat-button (click)="addProperty()">
+        Add Property
+      </button>
+    <mat-list id="property-list">
+       <mat-card *ngFor="let property of selectedType.item.properties | mapKey">
+          <mat-card-content>
+              {{property}}
+              <br/>
+              <mat-checkbox [(ngModel)]="selectedType.item.properties[property].required"
+                            name="required">
+                Required</mat-checkbox>
+              <br/>
+              Attribute Type :
+              <mat-form-field>
+                <mat-select [required]="true"
+                            [(ngModel)]="selectedType.item.properties[property].type"
+                            name="prop-type">
+                  <mat-option *ngFor="let type of validPropertyTypes" [value]="type">{{type}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+          </mat-card-content>
+          <mat-card-actions>
+              <button mat-icon-button (click)="deleteProperty(property)">
+                <i class="fa fa-trash">Delete</i>
+              </button>
+          </mat-card-actions>
+       </mat-card>
+    </mat-list>
+  </form>
 </div>

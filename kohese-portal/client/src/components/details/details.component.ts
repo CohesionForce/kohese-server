@@ -24,6 +24,7 @@ export class DetailsComponent extends NavigatableComponent
   itemProxyId : string;
   itemProxy : ItemProxy;
   parentProxy : ItemProxy;
+  typeProxies : Array<ItemProxy>;
 
   /* Commonmark items */
   reader : Parser;
@@ -61,7 +62,7 @@ export class DetailsComponent extends NavigatableComponent
 
   constructor (protected NavigationService : NavigationService,
                protected TabService : TabService,
-               private route: ActivatedRoute,
+               private route : ActivatedRoute,
                private ItemRepository : ItemRepository,
                private SessionService : SessionService) {
     super(NavigationService, TabService);
@@ -92,6 +93,8 @@ export class DetailsComponent extends NavigatableComponent
           if (!this.itemProxy) {
             // TODO : Throw error modal to the UI
           }
+          let modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
+          this.typeProxies = modelProxy.getDescendants();
           this.proxyList = this.ItemRepository.getShortFormItemList();
           this.userList = this.SessionService.getUsers();
           this.updateParentProxy();

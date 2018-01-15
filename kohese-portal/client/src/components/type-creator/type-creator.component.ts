@@ -7,6 +7,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { TabService } from '../../services/tab/tab.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
 
 @Component({
@@ -28,27 +29,28 @@ export class TypeCreatorComponent extends NavigatableComponent
   selectedTypeSubject : BehaviorSubject<ItemProxy>;
 
   /* Subscriptions */
+  repoStatusSubscription : Subscription;
 
   constructor(NavigationService : NavigationService,
               TabService : TabService,
               private ItemRepository : ItemRepository) {
     super(NavigationService, TabService);
-
   }
 
   ngOnInit () {
-    this.ItemRepository.getRepoStatusSubject().subscribe((update) => {
+    this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
+      .subscribe((update) => {
       if (update.connected) {
         this.modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
         this.typeList = this.modelProxy.getDescendants();
         console.log(this.typeList);
       }
-    })
+    });
     this.selectedTypeSubject = new BehaviorSubject(undefined);
   }
 
   ngOnDestroy () {
-
+    this.repoStatusSubscription.unsubscribe();
   }
 
   selectType(type : ItemProxy) {
