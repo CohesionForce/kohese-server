@@ -3,6 +3,10 @@
   "base": "Item",
   "idInjection": true,
   "properties": {
+    "base": {
+      "type": "string",
+      "required": true
+    },
     "idInjection": {
       "type": "boolean",
       "required": true

@@ -79,7 +79,13 @@ class ItemProxy {
     proxy.item = forItem;
     
     if(!tree.modelMap[kind]){
-      tree.modelMap[kind] = createMissingProxy(kind);
+      // Make sure the map has not been missed due to loading order on the client
+      var kindProxy = ItemProxy.getProxyFor(kind);
+      if (kindProxy){
+        tree.modelMap[kind] = kindProxy;        
+      } else {
+        tree.modelMap[kind] = createMissingProxy(kind);
+      }
     }
     proxy.model = tree.modelMap[kind];
 
@@ -1141,14 +1147,11 @@ class ItemProxy {
       var model = modelDefMap[modelKey];
       model.id = modelKey;
       if (model.base === 'PersistedModel'){
-        delete model.base;
-      }
-      if (model.base){
-        model.parentId = model.base;
-      } else {
         model.parentId = rootModelDef.id;
+      } else {
+        model.parentId = model.base;
       }
-      var proxy = new ItemProxy('Internal-Model', model);
+      var proxy = new ItemProxy('KoheseModel', model);
       tree.modelMap[modelKey] = proxy;
     }
     
