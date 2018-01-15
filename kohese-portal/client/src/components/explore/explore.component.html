@@ -1,11 +1,8 @@
-<vertical-split-pane>
-  <!-- <div class="split-pane-content-primary">Temporary Tree</div> -->
-  <tree-view class="split-pane-content-primary"></tree-view>
-  <details-view
-    *ngIf="proxySelected"
-    class="split-pane-content-secondary"></details-view>
-  <div class="split-pane-content-secondary"
-       *ngIf="!proxySelected">
-    No Item Selected
-  </div>
-</vertical-split-pane>
+<split id="explore-container" direction="horizontal">
+  <split-area id="tree-container" [size]="50">
+    <tree-view></tree-view>
+  </split-area>
+  <split-area id="details-container" [size]="50">
+    <details-view *ngIf="proxySelected"></details-view>
+  </split-area>
+</split>

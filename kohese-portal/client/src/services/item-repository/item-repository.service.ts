@@ -9,6 +9,7 @@ import { ToastrService } from "ngx-toastr";
 import * as ItemProxy from '../../../../common/models/item-proxy';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
 /**
  *
@@ -131,7 +132,7 @@ export class ItemRepository {
   registerKoheseIOListeners () : void {
       // Register the listeners for the Item kinds that are being tracked
       for (var modelName in this.modelTypes) {
-        this.socketService.socket.on(modelName + '/create', function (notification) {
+        this.socketService.socket.on(modelName + '/create', (notification) => {
           console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
           var proxy = ItemProxy.getProxyFor(notification.item.id);
           if (proxy) {
@@ -142,9 +143,9 @@ export class ItemRepository {
 
           this.updateVCState(proxy, notification.status);
           proxy.dirty = false;
-        }.bind(this));
+        });
 
-        this.socketService.socket.on(modelName + '/update', function (notification) {
+        this.socketService.socket.on(modelName + '/update', (notification) => {
           console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
           var proxy = ItemProxy.getProxyFor(notification.item.id);
           if (proxy) {
@@ -157,21 +158,21 @@ export class ItemRepository {
           proxy.dirty = false;
         });
 
-        this.socketService.socket.on(modelName + '/delete', function (notification) {
+        this.socketService.socket.on(modelName + '/delete', (notification) => {
           console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
           var proxy = ItemProxy.getProxyFor(notification.id);
           proxy.deleteItem();
         });
       }
 
-      this.socketService.socket.on('VersionControl/statusUpdated', function (gitStatusMap) {
+      this.socketService.socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
         for (var id in gitStatusMap) {
           var proxy = ItemProxy.getProxyFor(id);
           this.updateVCState(proxy, gitStatusMap[id]);
         }
       });
 
-      this.socketService.socket.on('connect_error', function () {
+      this.socketService.socket.on('connect_error', () => {
         console.log('::: IR: Socket IO Connection Error');
         this.repositoryStatus.next({
           connected : false,
@@ -179,20 +180,20 @@ export class ItemRepository {
         })
       });
 
-      this.socketService.socket.on('reconnect', function () {
+      this.socketService.socket.on('reconnect', () => {
         if (this.authenticationService.getAuthenticationInformation().getValue()) {
           console.log('::: IR: this.authenticationService already authenticated');
           this.fetchItems();
           this.toastrService.success('Reconnected!', 'Server Connection!');
         } else {
           console.log('::: IR: Listening for this.authenticationService authentication');
-          var deregister = this.authenticationService.getAuthenticationInformation()
+          let subscription: Subscription = this.authenticationService.getAuthenticationInformation()
             .subscribe((decodedToken) => {
               if(decodedToken) {
                 console.log('::: IR: Socket Authenticated');
                 this.fetchItems();
                 this.toastrService.success('Reconnected!', 'Server Connection!');
-                deregister();
+                subscription.unsubscribe();
               }
 
           });
@@ -251,8 +252,8 @@ export class ItemRepository {
     this.repositoryStatus.next({
       connected : false,
       message: 'Starting Repository Sync'
-    })
-    this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, function (response) {
+    });
+    this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, (response) => {
       var gotResponse = Date.now();
       console.log('::: Response for getAll');
       console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
@@ -301,7 +302,7 @@ export class ItemRepository {
 
         var finishedTime = Date.now();
         console.log('$$$ Processing time: ' + (finishedTime-gotResponse)/1000);
-        
+
         if(!compareAfterRTH.match) {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
@@ -320,7 +321,7 @@ export class ItemRepository {
       }
       var rootProxy = ItemProxy.getRootProxy();
       this.getStatusFor(rootProxy);
-    }.bind(this));
+    });
   }
 
   getModelTypes () {
@@ -372,7 +373,7 @@ export class ItemRepository {
 
   fetchItem (proxy) {
     var promise = new Promise((resolve, reject) => {
-      this.socketService.socket.emit('Item/findById', {id: proxy.item.id}, function (response) {
+      this.socketService.socket.emit('Item/findById', {id: proxy.item.id}, (response) => {
         proxy.updateItem(response.kind, response.item);
         proxy.dirty = false;
         resolve(response);
@@ -397,7 +398,7 @@ export class ItemRepository {
 
     if(requiredProperties) {
       promise = new Promise((resolve, reject) => {
-        this.socketService.socket.emit('Item/upsert', {kind: proxy.kind, item:proxy.item}, function (response) {
+        this.socketService.socket.emit('Item/upsert', {kind: proxy.kind, item:proxy.item}, (response) => {
           if (response.error) {
             reject(response.error);
           } else {
@@ -441,7 +442,7 @@ export class ItemRepository {
     console.log('::: Preparing to deleteById ' + proxy.kind);
 
     var promise = new Promise((resolve, reject) => {
-      this.socketService.socket.emit('Item/deleteById', {kind: proxy.kind, id: proxy.item.id, recursive: recursive}, function (response) {
+      this.socketService.socket.emit('Item/deleteById', {kind: proxy.kind, id: proxy.item.id, recursive: recursive}, (response) => {
         if (response.error) {
           reject(response.error);
         } else {
@@ -454,19 +455,19 @@ export class ItemRepository {
   }
 
   generateHTMLReportFor (proxy) {
-    this.socketService.socket.emit('Item/generateReport', {onId: proxy.item.id, format: 'html'}, function (results) {
+    this.socketService.socket.emit('Item/generateReport', {onId: proxy.item.id, format: 'html'}, (results) => {
       console.log('::: Report results: ' + results.html);
     });
   }
 
   generateDOCXReportFor (proxy) {
-    this.socketService.socket.emit('Item/generateReport', {onId: proxy.item.id, format: 'docx'}, function (results) {
+    this.socketService.socket.emit('Item/generateReport', {onId: proxy.item.id, format: 'docx'}, (results) => {
       console.log('::: Report results: ' + results.docx);
     });
   }
 
   getHistoryFor (proxy) {
-    this.socketService.socket.emit('Item/getHistory', {onId: proxy.item.id}, function (results) {
+    this.socketService.socket.emit('Item/getHistory', {onId: proxy.item.id}, (results) => {
       if (!proxy.history) {
         proxy.history = {};
       }
@@ -477,7 +478,7 @@ export class ItemRepository {
   }
 
   getStatusFor (repo) {
-    this.socketService.socket.emit('Item/getStatus', {repoId: repo.item.id}, function (results) {
+    this.socketService.socket.emit('Item/getStatus', {repoId: repo.item.id}, (results) => {
       if (!repo.repoStatus) {
         repo.repoStatus = {};
       }
@@ -498,10 +499,10 @@ export class ItemRepository {
   }
 
   performAnalysis (forProxy) {
-    console.log('::: Performing analysis for ' + forProxy.id);
+    console.log('::: Performing analysis for ' + forProxy.item.id);
 
     var promise = new Promise((resolve, reject) => {
-      this.socketService.socket.emit('Item/performAnalysis', {kind: forProxy.kind, id:forProxy.item.id}, function (response) {
+      this.socketService.socket.emit('Item/performAnalysis', {kind: forProxy.kind, id:forProxy.item.id}, (response) => {
         if (response.error) {
           reject(response.error);
         } else {

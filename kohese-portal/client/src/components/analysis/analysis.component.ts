@@ -22,6 +22,7 @@ export class AnalysisComponent extends NavigatableComponent
   /* UI Toggles */
   showChildren : boolean;
   analysisLoaded : boolean;
+  repoLoaded : boolean;
 
   /* Data */
   itemProxyId : string;
@@ -48,14 +49,18 @@ export class AnalysisComponent extends NavigatableComponent
   }
 
   ngOnInit () {
+    this.repoLoaded = false;
     this.analysisLoaded = false;
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
-      this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
-      this.AnalysisService.fetchAnalysis(this.itemProxy);
-
+      this.ItemRepository.getRepoStatusSubject().subscribe(update => {
+        if (update.connected) {
+          this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+          this.AnalysisService.fetchAnalysis(this.itemProxy);
+          this.repoLoaded = true;
+        }
+      })
     })
-
     this.filter = ''
   }
 

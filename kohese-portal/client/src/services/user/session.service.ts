@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 import { SocketService } from '../socket/socket.service';
 import { AuthenticationService } from '../authentication/authentication.service';
 import * as ItemProxy from '../../../../common/models/item-proxy';
@@ -11,13 +12,16 @@ import { ItemRepository } from '../item-repository/item-repository.service';
 export class SessionService {
   private sessions: SessionMap = {};
   private sessionUser: BehaviorSubject<ItemProxy> = new BehaviorSubject(undefined);
+  
+  private itemRepositoryStatusSubscription: Subscription;
 
   constructor(private socketService: SocketService,
     private authenticationService: AuthenticationService,
     private itemRepository: ItemRepository, private router: Router) {
     this.authenticationService.getAuthenticationInformation().subscribe((decodedToken) => {
       if (decodedToken) {
-        this.itemRepository.getRepoStatusSubject().subscribe((status) => {
+        this.itemRepositoryStatusSubscription = this.itemRepository.
+          getRepoStatusSubject().subscribe((status) => {
           if (status.connected) {
             let usersProxy: ItemProxy = this.itemRepository.getRootProxy().getChildByName('Users');
             this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
@@ -26,6 +30,10 @@ export class SessionService {
           }
         });
       } else {
+        if (this.itemRepositoryStatusSubscription) {
+          this.itemRepositoryStatusSubscription.unsubscribe();
+          this.itemRepositoryStatusSubscription = undefined;
+        }
         this.router.navigate(['login']);
       }
     });

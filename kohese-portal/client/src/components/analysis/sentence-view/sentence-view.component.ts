@@ -62,7 +62,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
     this.filterSubjectSubscription.unsubscribe();
   }
 
-  getDetailsCount = function () {
+  getDetailsItemCount = function () {
     return $('#theDetailsBody').find('tr').length;
   };
 

@@ -28,6 +28,12 @@ export class AnalysisViewComponent extends NavigatableComponent{
     super(NavigationService, TabService);
     this.AnalysisService = AnalysisService;
 
+
+    this.analysisFilterPOS = AnalysisService.filterPOS;
+    this.analysisPOSFilterCriteria = AnalysisService.posFilterCriteria;
+    this.analysisPOSFilterCriteriaList = Object.keys(AnalysisService.posFilterCriteria);
+    this.analysisPOSFilterName = 'Standard';
+
   }
 
   onFilterChange () : void {

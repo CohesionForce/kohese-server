@@ -1,0 +1,18 @@
+<div>
+  <div id="type-list">
+    <div class="panel col-6"
+        *ngFor="let type of typeList"
+        (click)="selectType(type)"
+        style="width: 40%">
+      <div class="panel-heading">
+        {{type.item.name}}
+      </div>
+      <div class="panel-body">
+        Example Body
+      </div>
+    </div>
+    <type-editor id="type-editor"
+    [selectedTypeSubject]="selectedTypeSubject"></type-editor>
+  </div>
+
+</div>

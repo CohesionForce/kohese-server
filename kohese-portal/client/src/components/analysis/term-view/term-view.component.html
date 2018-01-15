@@ -72,7 +72,7 @@
         <tbody id="theTokensBody">
            <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
            *ngFor="let summary of itemProxy.analysis.extendedTokenSummaryList
-                    | filter:filterTokens
+                    | filter:filter:true
                     | orderBy:sortField:reverse
                     | slice:loadLimit">
            <td (click)="submitStringFilter(summary.text)"

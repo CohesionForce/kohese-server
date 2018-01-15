@@ -49,6 +49,7 @@ export class TermViewComponent extends AnalysisViewComponent
     this.loadLimit = 100;
     this.sortField = '-count';
     this.reverse = false;
+    console.log(this);
   }
 
   ngOnDestroy () {

@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
@@ -12,6 +13,7 @@ import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
 import { ActionTableModule } from './components/action-table/action-table.module';
 import { CreateItemModule } from './components/create-item/create-item.module';
+import { TypeCreatorModule } from './components/type-creator/type-creator.module';
 import { PipesModule } from './pipes/pipes.module';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -42,7 +44,7 @@ import { AnalysisService } from './services/analysis/analysis.service';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
-import { SplitPaneModule } from 'ng2-split-pane/lib/ng2-split-pane';
+import { AngularSplitModule } from 'angular-split';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
@@ -74,18 +76,20 @@ const AUTHENTICATION_INTERCEPTOR = {
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    FlexLayoutModule,
     HttpClientModule,
     NgbModule.forRoot(),
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
     PipesModule,
     MaterialModule,
-    SplitPaneModule,
+    AngularSplitModule,
     AnalysisModule,
     DetailsModule,
     DocumentViewModule,
     ActionTableModule,
-    CreateItemModule
+    CreateItemModule,
+    TypeCreatorModule
   ],
   providers: [
     ItemRepository,
