@@ -1,5 +1,5 @@
 <div id="content-container">
-  <button mat-raised-button id="add-tab-button" (click)="addTab('Dashboard', {})">
+  <button mat-icon-button id="add-tab-button" (click)="addTab('Dashboard', {})">
     <mat-icon class="glyphicon glyphicon-plus"></mat-icon>
   </button>
   <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedTabChange)="tabSelectionChanged($event)">
