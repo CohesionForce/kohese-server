@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, ViewChildren } from '@angular/core';
 import { NavigatableComponent } from './NavigationComponent.class';
 import { NavigationService } from '../services/navigation/navigation.service';
 import { TabService } from '../services/tab/tab.service';
@@ -16,18 +16,20 @@ export class RowComponent extends NavigatableComponent {
   exactFilter : boolean // TODO - Implement exact Passing
   @Input()
   filterSubject : BehaviorSubject<ProxyFilter>
+  private collapsed: boolean = true;
+  @ViewChildren(RowComponent)
+  private childRows: Array<RowComponent>;
 
-  collapsed : object;
   previouslyExpanded : object;
   filter : ProxyFilter;
 
   constructor (protected NavigationService : NavigationService,
                protected TabService : TabService) {
-      super (NavigationService, TabService);
+    super (NavigationService, TabService);
   }
 
   initialize () {
-    this.filterSubject.subscribe(filter => { this.filter = filter })
+    this.filterSubject.subscribe(filter => { this.filter = filter });
     this.previouslyExpanded = {};
     console.log(this);
   }
@@ -40,25 +42,7 @@ export class RowComponent extends NavigatableComponent {
     console.log ('Root changed') // TODO - Reimplement
   }
 
-  collapseChildren (itemProxy) : void {
-    var childrenList = itemProxy.getDescendants();
-    this.collapsed[itemProxy.item.id] = true;
-    for (var i = 0; i < childrenList.length; i++) {
-      var proxy = childrenList[i];
-      this.collapsed[proxy.item.id] = true;
-    }
-  };
-
-  expandChildren (itemProxy) : void {
-    var childrenList = itemProxy.getDescendants();
-    this.collapsed[itemProxy.item.id] = false;
-    for (var i = 0; i < childrenList.length; i++) {
-      var proxy = childrenList[i];
-      this.collapsed[proxy.item.id] = false;
-    }
-  };
-
-  expandMatchingChildren (itemProxy) : void {
+  expandMatchingChildren(itemProxy: ItemProxy): void {
     var childrenList = itemProxy.children;
     this.collapsed[itemProxy.item.id] = false;
     for (var i = 0; i < childrenList.length; i++) {
@@ -67,7 +51,7 @@ export class RowComponent extends NavigatableComponent {
         this.expandMatchingChildren(proxy);
       }
     }
-  };
+  }
 
   proxyOrChildMatchesFilter (proxy) {
     return this.matchesFilter(proxy) || this.childMatchesFilter(proxy);
@@ -85,8 +69,7 @@ export class RowComponent extends NavigatableComponent {
     return false;
   }
 
-  matchesFilter (proxy: ItemProxy) {
-
+  matchesFilter(proxy: ItemProxy) {
     if (this.filter.textRegex === null && !this.filter.kind && !this.filter.status && !this.filter.dirty) {
       return !this.exactFilter;
     } else {
@@ -123,5 +106,18 @@ export class RowComponent extends NavigatableComponent {
 
   getTypeForFilter (val) {
     return val === null ? 'null' : typeof val;
+  }
+  
+  isCollapsed(): boolean {
+    return this.collapsed;
+  }
+  
+  toggleExpandedState(expand: boolean, descend: boolean): void {
+    this.collapsed = !expand;
+    if (descend) {
+      for (let j: number = 0; j < this.childRows.length; j++) {
+        this.childRows[j].toggleExpandedState(expand, true);
+      }
+    }
   }
 }

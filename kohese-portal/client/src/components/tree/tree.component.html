@@ -1,16 +1,16 @@
 <div *ngIf="treeRoot">
     <div id="top-action-bar">
-      <button (click)="expandAll()" class="btn btn-default btn-sm"
+      <button mat-raised-button (click)="expandAll()" class="btn btn-default btn-sm"
         style="margin: 5px">Expand All</button>
-      <button (click)="expandFiltered()"
+      <button mat-raised-button (click)="expandFiltered()"
         class="btn btn-default btn-sm" style="margin: 5px">Expand
         Filtered</button>
-      <button (click)="collapseAll()"
+      <button mat-raised-button (click)="collapseAll()"
         class="btn btn-default btn-sm" style="margin: 5px">Collapse
         All</button>
-      <button class="btn btn-default btn-sm" (click)="upLevel()"
+      <button mat-raised-button class="btn btn-default btn-sm" (click)="upLevel()"
         [disabled]="isRootDefault">Up Level</button>
-      <button class="btn btn-default btn-sm" (click)="resetRoot()"
+      <button mat-raised-button class="btn btn-default btn-sm" (click)="resetRoot()"
         [disabled]="isRootDefault">Reset Root</button>
       <i (click)="syncLocation()"
          [ngClass]="{ 'btn-green': locationSynced}"
@@ -20,19 +20,17 @@
             {{getItemMatchedCount()}} of
             {{treeRoot.descendantCount}}
         </span>
-
       <div>
         <!-- Start View Control -->
         <span class="control-group">
-          <label class="control-label" for="View"> View </label>
-          <span
-            class="controls">
-            <select id="View"
-                [(ngModel)]="viewType"
-                (change)="onViewTypeChanged()">
-                <option></option>
-                <option *ngFor="let kind of viewList">{{kind}}</option>
-            </select>
+          <span class="controls">
+            <mat-form-field>
+              <mat-select placeholder="View" (selectionChange)="viewSelectionChanged($event)">
+                <mat-option *ngFor="let view of viewList" [value]="view">
+                  {{view}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </span>
         </span>
         <!-- Start View Forking -->
@@ -41,53 +39,66 @@
           <span *ngSwitchCase="Default">
             <span class="control-group">
               <!-- Kind Selection -->
-              <label class="control-label" for="Kind"> Kind </label>
               <span class="controls">
-                <select id="Kind" [(ngModel)]="filter.kind">
-                  <option *ngFor="let kind of kindList">{{kind}}</option>
-                </select>
+                <mat-form-field>
+                  <mat-select placeholder="Kind" (selectionChange)="kindFilterChanged($event)">
+                    <mat-option>{{NO_KIND_SPECIFIED}}</mat-option>
+                    <mat-option *ngFor="let kind of kindList" [value]="kind">
+                      {{kind.item.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <!-- String Filtering -->
+                <mat-form-field>
+                  <input matInput type="text" [(ngModel)]="proxyFilter.text"
+                    [ngStyle]="proxyFilter.invalidRegex && {'background-color':'pink'}"
+                    placeholder="Filter" (input)="filter()"/>
+                </mat-form-field>
               </span>
             </span>
             <!-- Version Control Filtering -->
             <span class="control-group">
-              <label class="control-label" for="Modified"> Modified </label>
-              <input type="checkbox" [(ngModel)]="filter.status" />
+              <mat-checkbox [(ngModel)]="filter.status">
+                Modified
+              </mat-checkbox>
             </span>
             <span class="control-group">
-              <label class="control-label" for="Dirty"> Dirty </label>
-              <input type="checkbox" [(ngModel)]="filter.dirty" />
+              <mat-checkbox [(ngModel)]="filter.dirty">
+                Dirty
+              </mat-checkbox>
             </span>
             <!-- End Version Control Filtering -->
-            <!-- String Filtering -->
-            <input class="input-sm" type="text" [(ngModel)]="filter.text"
-              [ngStyle]="filter.invalidRegex && {'background-color':'pink'}"
-              placeholder="Filter" style="margin: 5px" />
             <!-- Action Filtering -->
-            <div *ngIf="filter.kind === 'Action'" class="control-group">
-              <label class="control-label" for="ActionState"> State </label>
+            <div *ngIf="proxyFilter.kind === 'Action'" class="control-group">
               <span class="controls">
-                  <select id="actionState" [(ngModel)]="filter.actionState">
-                  <option></option>
-                  <option *ngFor="let state of actionStates">{{state.item.name}}</option>
-                </select>
+                <mat-form-field>
+                  <mat-select placeholder="State">
+                    <mat-option *ngFor="let state of actionStates" [(value)]="proxyFilter.actionState">
+                      {{state.item.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
               </span>
-              <span *ngIf="filter.kind === 'Action'" class="control-group">
-                <label class="control-label" for="Assignee"> Assignee </label>
+              <span *ngIf="proxyFilter.kind === 'Action'" class="control-group">
                 <span class="controls">
-                  <select id="actionAssignee" [(ngModel)]="filter.actionAssignee">
-                    <option></option>
-                    <option *ngFor="let user of userList">{{user.item.name}}</option>
-                  </select>
+                  <mat-form-field>
+                    <mat-select placeholder="Assignee">
+                      <mat-option *ngFor="let user of userList" [(value)]="proxyFilter.actionAssignee">
+                        {{user.item.name}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
                 </span>
               </span>
             </div> <!-- End Action Filtering -->
+            <br/>
+            <button mat-raised-button
+              (click)="navigate('Create', { parentId: treeRoot.item.id })">
+              Create Item
+            </button>
           </span>	<!-- End Default Controls -->
           <!-- Start Version Control View -->
           <span *ngSwitchCase="Version Control">
-          </span>
-          <!-- Start Placeholder View -->
-          <span *ngSwitchDefault>
-            {{viewType}} - Not Implemented
           </span>
         </span> <!-- End Switch on View Type -->
       </div>
@@ -97,19 +108,12 @@
       <div id="theKT" class="knowledge-tree">
         <div class="kt-head">
           <div class="kth-cell kti-name">Name</div>
-          <div class="kth-cell pull-right">
-            <span
-              class="create-button"
-              (click)="navigate('Create', {})">
-              Create Item
-            </span>
-          </div>
         </div>
         <div class="kt-body">
-  <tree-row *ngFor="let childProxy of treeRoot.children"
+          <tree-row *ngFor="let childProxy of treeRoot.children"
             [itemProxy]="childProxy" [filterSubject]="filterSubject"></tree-row>
+        </div>
       </div>
-    </div>
-  </div> <!-- End Knowledge Tree -->
+    </div> <!-- End Knowledge Tree -->
 </div>
 <div *ngIf="!treeRoot">Loading . . .</div>

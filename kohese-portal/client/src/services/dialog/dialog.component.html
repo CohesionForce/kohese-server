@@ -1,0 +1,10 @@
+<div>
+  <h1 mat-dialog-title>{{data.title}}</h1>
+  <mat-dialog-content>{{data.text}}</mat-dialog-content>
+  <mat-dialog-actions>
+    <button *ngFor="let label of data.buttonLabels; let j = index" mat-raised-button
+      [mat-dialog-close]="j">
+      {{label}}
+    </button>
+  </mat-dialog-actions>
+</div>
