@@ -6,6 +6,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { TabService } from '../../../services/tab/tab.service';
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 
 @Component({
   selector: 'overview-form',
@@ -21,7 +22,8 @@ export class OverviewFormComponent extends NavigatableComponent
 
   constructor(protected NavigationService : NavigationService,
               protected TabService : TabService,
-              private FormBuilder : FormBuilder) {
+              private FormBuilder : FormBuilder,
+              private DynamicTypesService : DynamicTypesService) {
     super(NavigationService, TabService);
   }
 
