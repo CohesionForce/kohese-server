@@ -45,6 +45,7 @@ module.exports = function (app) {
         /^\/repositories.*/,
         /^\/explore.*/,
         /^\/analysis.*/,
+        /^\/create.*/,
         /^\/typecreator.*/
       ];
 

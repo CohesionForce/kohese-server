@@ -20,7 +20,7 @@ const routes: Routes = [
   { path: 'explore', component: ExploreComponent},
   // { path: 'explore/:id', component: ExploreComponent},
   { path: 'analysis', component: AnalysisComponent },
-  { path: 'create/:parentId', component: CreateItemComponent },
+  { path: 'create', component: CreateItemComponent },
   { path: 'typecreator', component: TypeCreatorComponent}
 ]
 
