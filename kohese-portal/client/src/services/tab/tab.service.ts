@@ -3,70 +3,53 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 
-import * as _ from 'underscore';
 import { Router } from '@angular/router';
 import { NavigationService } from '../navigation/navigation.service';
 import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class TabService {
-  private tabCount : number;
-  private currentTab : Tab;
-  private tabList: Array<Tab>;
+  private nextId: number = 0;
+  private tabList: Array<Tab> = [];
   currentTabSubject: BehaviorSubject<Tab>;
   currentTabListSubject: BehaviorSubject<Array<Tab>>;
 
-  constructor (private router: Router,
+  constructor(private router: Router,
                private NavigationService : NavigationService) {
-    this.tabCount = 0;
     this.initService();
   }
 
   initService() : void {
     // Setting up the base tab
-    let baseTab = new Tab('Dashboard', {}, this.tabCount, 0,
-                            this.NavigationService.getNavUpdates())
-    this.incrementTabs();
+    let baseTab = new Tab('Dashboard', {}, this.nextId++, this.tabList.length,
+                            this.NavigationService.getNavUpdates());
     this.currentTabSubject = new BehaviorSubject(baseTab);
-    this.currentTab = baseTab;
     // Setting up the starting tab list
-    this.tabList = [baseTab];
+    this.tabList.push(baseTab);
     this.currentTabListSubject = new BehaviorSubject(this.tabList);
   }
 
-  private incrementTabs (): void {
-    this.tabCount++
-  }
-
-  getTabId (): number {
-    return this.tabCount;
-  }
-
-  setCurrentTab (tab: Tab): void {
-    console.log(this);
-    if (tab)
-    {
+  setCurrentTab(tab: Tab): void {
+    if (tab) {
       this.currentTabSubject.next(tab);
       this.router.navigate([tab.route, tab.params]);
     }
   }
 
-  getCurrentTab (): BehaviorSubject<Tab> {
+  getCurrentTab(): BehaviorSubject<Tab> {
     return this.currentTabSubject;
   }
 
-  getTabList (): BehaviorSubject<Array<Tab>> {
+  getTabList(): BehaviorSubject<Array<Tab>> {
     return this.currentTabListSubject;
   }
 
-  createTab (location, params): void {
-    var tab = new Tab(location, params, this.tabCount, this.tabList.length,
+  createTab(location: string, params: any): void {
+    let tab: Tab = new Tab(location, params, this.nextId++, this.tabList.length,
                       this.NavigationService.getNavUpdates());
-    this.incrementTabs();
     this.tabList.push(tab);
-    this.setCurrentTab(tab);
     this.currentTabListSubject.next(this.tabList);
-
+    this.setCurrentTab(tab);
   }
 
   removeTab(tab: Tab): void {
@@ -74,14 +57,14 @@ export class TabService {
     // If it is the first tab get the next one
     // If it is the only tab, recreate the base tab
 
-    if (tab.id === this.currentTab.id) {
+    if (tab.id === this.currentTabSubject.getValue().id) {
       if (tab.position === 0) {
         if (this.tabList.length === 1) {
           this.createTab('Dashboard', {});
         } else {
           this.setCurrentTab(this.tabList[1]);
         }
-      } else if (tab.position === this.tabList.length -1) {
+      } else if (tab.position === (this.tabList.length - 1)) {
         this.setCurrentTab(this.tabList[tab.position - 1]);
       } else {
         this.setCurrentTab(this.tabList[tab.position + 1]);
@@ -94,15 +77,9 @@ export class TabService {
     this.currentTabListSubject.next(this.tabList);
   }
 
-  updatePositions () {
+  updatePositions(): void {
     for (var i = 0; i < this.tabList.length; i++) {
       this.tabList[i].position = i;
     }
   }
-
-  //
-  //
-  //
-
-
 }

@@ -5,11 +5,15 @@ import * as _ from 'underscore';
 import { SocketService } from '../socket/socket.service';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { ToastrService } from "ngx-toastr";
+import { DialogService } from '../dialog/dialog.service';
 
 import * as ItemProxy from '../../../../common/models/item-proxy';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
+import { Observable } from 'rxjs/Observable';
+import * as SocketIOFileClient from 'socket.io-file-client';
+import { FileItem } from 'ng2-file-upload';
 
 /**
  *
@@ -30,7 +34,8 @@ export class ItemRepository {
 
   constructor (private socketService: SocketService,
                private authenticationService: AuthenticationService,
-               private toastrService : ToastrService) {
+               private toastrService : ToastrService,
+               private dialogService: DialogService) {
               this.initialize();
               }
 
@@ -385,19 +390,16 @@ export class ItemRepository {
 
   upsertItem (proxy) {
     console.log('::: Preparing to upsert ' + proxy.kind);
-    var promise;
-    var requiredProperties = true;
-
-    for (var i = 0; i < proxy.model.item.requiredProperties.length; i++) {
-      var fieldName = proxy.model.item.requiredProperties[i];
+    let insufficientFields: Array<string> = [];
+    for (let i: number = 0; i < proxy.model.item.requiredProperties.length; i++) {
+      let fieldName: string = proxy.model.item.requiredProperties[i];
       if (!proxy.item[fieldName]) {
-        requiredProperties = false;
-        break;
+        insufficientFields.push(fieldName);
       }
     }
 
-    if(requiredProperties) {
-      promise = new Promise((resolve, reject) => {
+    if(0 === insufficientFields.length) {
+      return new Promise((resolve, reject) => {
         this.socketService.socket.emit('Item/upsert', {kind: proxy.kind, item:proxy.item}, (response) => {
           if (response.error) {
             reject(response.error);
@@ -415,28 +417,12 @@ export class ItemRepository {
         });
       });
     } else {
-      promise = new Promise((resolve, reject) => {
-        resolve();
-      })
-      // TO-DO : Implement Modal Service and integrate
-      // promise = new Promise((resolve, reject) => {
-      //   var modalOptions = {
-      //     actionButtonText : 'Ok',
-      //     closeButtonText : null,
-      //     headerText: 'Invalid field',
-      //     bodyText: 'Please fill out all required fields : ',
-      //     list: proxy.model.item.requiredProperties
-      //   }
-
-      //   var modalDefaults = {
-      //     templateUrl : ModalService.ONE_LIST_TEMPLATE
-      //   }
-
-      //   ModalService.showModal(modalDefaults, modalOptions);
-      //   reject({error: 'User must fill out required fields'})
-      }
-      return promise;
+      this.dialogService.openInformationDialog('Insufficient Data',
+          'Please enter data for the following fields:\n' +
+          insufficientFields.join('\n -\t'));
+      return Promise.reject({error: 'User must fill out required fields'});
     }
+  }
 
   deleteItem (proxy, recursive) {
     console.log('::: Preparing to deleteById ' + proxy.kind);
@@ -512,5 +498,28 @@ export class ItemRepository {
     });
 
     return promise;
+  }
+  
+  importFiles(fileItems: Array<FileItem>, parentId: string): void {
+    let uploader: any = new SocketIOFileClient(this.socketService.getSocket());
+    let files: Array<any> = [];
+    for (let j: number = 0; j < fileItems.length; j++) {
+      files.push(fileItems[j].file);
+    }
+    uploader.on('complete', (file: any) => {
+      let emit: (message: string, data: { file: string; parentItem: string }) => Observable<any> =
+        Observable.bindCallback(this.socketService.getSocket().emit.bind(this.socketService.getSocket()));
+      return emit('ImportDocuments', {
+          file: file.name,
+          parentItem: parentId
+        }).do((results: any) => {
+        if (results.error) {
+          this.toastrService.error('Document Import Failed', 'Import');
+        } else {
+          this.toastrService.success('Document Import Succeeded', 'Import');
+        }
+      });
+    });
+    uploader.upload(files);
   }
 }

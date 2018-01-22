@@ -18,96 +18,49 @@
     &:hover {
       color: white;
       background-color: $buttonAccentColor;
-
     }
   }
+  
   .navbar-disconnected {
     color: white;
     cursor: pointer;
     background-color: red;
   }
+  
   .navbar-syncing {
     background-color: rgba(255, 166, 0, 0.438);
   }
 
   .navbar-top-links {
     margin-right: 0;
-
-    .dropdown {
-      > a {
-        &:hover {
-          background-color: $buttonAccentColor;
-        }
-        > i {
-          color: white;
-        }
-        > span {
-          color: white;
-        }
-      }
-
-    }
-
-    .dropdown-messages, .dropdown-tasks, .dropdown-alerts {
-      width: 310px;
-      margin-left: auto;
-      min-width: 0;
-    }
-    .dropdown-messages {
-      margin-left: 5px;
-    }
-
-    .dropdown-tasks {
-      margin-left: -59px;
-    }
-    .dropdown-user {
-      right: 0;
-      left: auto;
-      :last-child {
-        text-align: center;
-      }
-    }
-
-    .dropdown-alerts {
-      margin-left: -123px;
-    }
-
-    li {
-      display: inline-block;
-      :last-child {
-        margin-right: 15px;
-      }
-      a {
-        padding: 15px;
-        min-height: 50px;
-      }
-      .dropdown-menu {
-        li {
-          display: block;
-          :last-child {
-            margin-right: 5px;
-          }
-          a {
-            padding: 3px 20px;
-            min-height: 0;
-            div {
-              white-space: normal;
-            }
-          }
-        }
-      }
+    height: 100%;
+    
+    #userMenu {
+      height: 100%;
     }
   }
-}
 
-#login-button {
-  height: $topNavHeight;
-  width: 100px;
-  padding: 5px;
-  font-size: 18px;
-  background-color: $primaryColor;
-  color: white;
-  i {
-    margin-right: 15px;
+  li {
+    display: inline-block;
+    :last-child {
+      margin-right: 15px;
+    }
+    
+    a {
+      padding: 15px;
+      min-height: 50px;
+    }
+  }
+
+  #login-button {
+    height: $topNavHeight;
+    width: 100px;
+    padding: 5px;
+    font-size: 18px;
+    background-color: $primaryColor;
+    color: white;
+    i {
+      margin-right: 15px;
+    }
   }
 }

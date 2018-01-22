@@ -9,6 +9,7 @@ import { ItemProxy } from '../../../../../common/models/item-proxy'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
+import { DataProcessingService } from '../../../services/data/data-processing.service';
 
 import * as $ from 'jquery';
 
@@ -22,53 +23,75 @@ import * as $ from 'jquery';
 export class PhraseViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
   /* UI Switches */
-  loadLimit : number;
-  reverse : boolean;
-  sortField : string;
+  private loadLimit: number = 100;
+  private ascending: boolean = true;
+  private sortField: string = 'count';
+  private filters: Array<RegExp> = [];
+  
+  private phrases: Array<any> = [];
   /* Data */
   @Input()
-  itemProxy : ItemProxy;
+  private itemProxy: ItemProxy;
 
   /* Observables */
   @Input()
-  filterSubject : BehaviorSubject<string>;
+  private filterSubject: BehaviorSubject<string>;
 
   /* Subscriptions */
-  filterSubjectSubscription : Subscription;
+  private filterSubjectSubscription: Subscription;
 
-  constructor(NavigationService : NavigationService,
-              TabService : TabService,
-              AnalysisService : AnalysisService) {
+  constructor(NavigationService: NavigationService,
+              TabService: TabService,
+              AnalysisService: AnalysisService,
+              private dataProcessingService: DataProcessingService) {
     super(NavigationService, TabService, AnalysisService);
-
   }
 
-  ngOnInit () {
+  ngOnInit(): void {
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      this.filter = newFilter;
+      this.filterString = newFilter;
       this.onFilterChange();
-    })
-
-
-    this.loadLimit = 100;
-    this.sortField = '-count';
-    this.reverse = false;
+    });
+    
+    this.processPhrases();
   }
 
-  ngOnDestroy () {
+  ngOnDestroy(): void {
     this.filterSubjectSubscription.unsubscribe();
   }
 
-  getPhraseCount = function () {
+  getPhraseCount(): number {
     return $('#thePhrasesBody').find('tr').length;
-  };
-
-  newSort (term : string) {
-    if (this.sortField === term) {
-      this.reverse = !this.reverse;
+  }
+  
+  sort(property: string): void {
+    this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
+    this.sortField = property;
+    this.processPhrases();
+  }
+  
+  filter(f: RegExp): void {
+    let index: number = this.filters.indexOf(f);
+    if (-1 === index) {
+      this.filters.push(f);
     } else {
-      this.sortField = term;
-      this.reverse = false;
+      this.filters.splice(index, 1);
     }
+    
+    this.processPhrases();
+  }
+  
+  processPhrases(): void {
+    this.phrases = this.dataProcessingService.sort(
+      this.dataProcessingService.filter(
+      this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
+        for (let j: number = 0; j < this.filters.length; j++) {
+          if (!this.filters[j].test(input)) {
+            return false;
+          }
+        }
+        
+        return true;
+      }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
   }
 }

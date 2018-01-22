@@ -1,9 +1,11 @@
-import { Component, OnInit, OnDestroy, Output, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitter } from 'events';
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { TabService } from '../../../services/tab/tab.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
 import { RowComponent } from '../../../classes/RowComponent.class';
 import { ProxyFilter } from '../../../classes/ProxyFilter.class';
@@ -15,11 +17,8 @@ import { Subscription } from 'rxjs/Subscription';
   selector: 'tree-row',
   templateUrl : './tree-row.component.html'
 })
-
 export class TreeRowComponent extends RowComponent
                               implements OnInit, OnDestroy {
-
-
   /* UI Triggers
      RowComponent : exactFilter
                     collapsed */
@@ -33,30 +32,30 @@ export class TreeRowComponent extends RowComponent
   /* Subscriptions */
   filterSubscription : Subscription;
 
-  constructor (NavigationService : NavigationService,
-               TabService : TabService) {
+  constructor(NavigationService : NavigationService,
+    TabService : TabService, private dialogService: DialogService,
+    private itemRepository: ItemRepository) {
     super(NavigationService, TabService);
-
   }
 
-  ngOnInit () {
+  ngOnInit(): void {
     this.filterSubscription = this.filterSubject.subscribe(newFilter => {
       this.filter = newFilter;
-    })
-    // Initialize rows to collapsed status
-    this.collapsed = {}
-    for (let itemProxy of this.itemProxy.children) {
-      this.collapsed[itemProxy.item.id] = false;
-    }
+    });
   }
 
-  ngOnDestroy () {
+  ngOnDestroy(): void {
     this.filterSubscription.unsubscribe();
   }
 
-  removeItem (proxy : ItemProxy) {
-    console.log('Remove item');
-    console.log(proxy);
+  removeItem(proxy: ItemProxy): void {
+    this.dialogService.openCustomDialog('Confirm Deletion',
+      'Are you sure you want to delete ' + proxy.item.name + '?',
+      ['Cancel', 'Delete', 'Delete Recursively']).
+      subscribe((result) => {
+      if (result) {
+        this.itemRepository.deleteItem(proxy, (2 === result));
+      }
+    });
   }
 }
-

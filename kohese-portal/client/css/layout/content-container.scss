@@ -25,22 +25,19 @@ Created by Josh P
 
   content-container {
     #content-container {
-      height: 100%;
+      height: calc(100% - #{$topNavHeight});
+      width: calc(100% - #{$leftNavWidth});
       z-index: 2;
       border-radius: $baseBorderRadius;
 
       #add-tab-button {
-        background-color: white;
-        margin: 12px 12px;
         float: left;
-        width: 25px;
-        min-width: 25px;
-        height: 25px;
-        padding: 0px;
       }
       
       mat-tab-group {
         height: 100%;
+        width: calc(100% - 40px);
+        float: left;
         
         mat-tab-body {
           height: 100%;

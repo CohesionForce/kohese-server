@@ -1,8 +1,10 @@
-<split id="explore-container" direction="horizontal">
-  <split-area id="tree-container" [size]="50">
-    <tree-view></tree-view>
-  </split-area>
-  <split-area id="details-container" [size]="50">
-    <details-view *ngIf="proxySelected"></details-view>
-  </split-area>
-</split>
+<div id="explore-container">
+  <split direction="horizontal">
+    <split-area id="tree-container" [size]="50">
+      <tree-view></tree-view>
+    </split-area>
+    <split-area id="details-container" [size]="50">
+      <details-view *ngIf="proxySelected"></details-view>
+    </split-area>
+  </split>
+</div>
