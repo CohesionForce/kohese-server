@@ -1,8 +1,4 @@
-<div
-  class="kt-collection"
-  [ngClass]="{'kt-hiddenx' : itemProxy.item.parentId && collapsed}"
-  >
-
+<div class="kt-collection">
   <div class="kt-item"
       id="{{itemProxy.item.id}}"
       [ngClass]="{'kti-selected-item' : itemProxy.item.id === 1,
@@ -15,10 +11,10 @@
                 (click)="navigate('Explore',
                 {id: itemProxy.item.id})">
               <i
-                    (click)="collapsed[itemProxy.item.id] = !collapsed[itemProxy.item.id];"
+                    (click)="collapsed = !collapsed;"
                     class="kt-icon fa"
-                    [ngClass]="{'fa-caret-down': (itemProxy.children.length > 0) && !collapsed[itemProxy.item.id],
-                    'fa-caret-right': (itemProxy.children.length > 0) && collapsed[itemProxy.item.id],
+                    [ngClass]="{'fa-caret-down': (itemProxy.children.length > 0) && !collapsed,
+                    'fa-caret-right': (itemProxy.children.length > 0) && collapsed,
                     'no-icon': !(itemProxy.children.length > 0)}">
                               </i>
 
@@ -30,23 +26,25 @@
                 <!-- Conditional Icons for Item status -->
                 <span *ngIf="itemProxy.dirty">
                         <img src="resources/icons/versioncontrol/dirty.ico"
-                            title = "Dirty item" />
+                          title = "Dirty item"/>
                 </span>
         </div>
     <div class="kti-cell kti-actions pull-right">
         <!-- Default row actions -->
         <span>
             <i class="fa fa-anchor"
-            (click)="updateRoot(itemProxy)"></i>
+              (click)="updateRoot(itemProxy)"></i>
             <i class="glyphicon glyphicon-remove  pull-right"
-            (click)="removeItem(itemProxy)"> </i>
+              (click)="removeItem(itemProxy)"> </i>
         </span>
     </div>
   </div>
-      <tree-row *ngFor="let childProxy of itemProxy.children"
-                [filterSubject]="filterSubject" [itemProxy]="childProxy"
-                [exactFilter]="exactFilter"></tree-row>
-   <div class="dropdown position-fixed" id="tree-menu-{{itemProxy.item.id}}">
+  <ng-container *ngIf="!collapsed">
+    <tree-row *ngFor="let childProxy of itemProxy.children"
+      [filterSubject]="filterSubject" [itemProxy]="childProxy"
+      [exactFilter]="exactFilter"></tree-row>
+  </ng-container>
+    <!-- <div class="dropdown position-fixed" id="tree-menu-{{itemProxy.item.id}}">
       <ul class="dropdown-menu" role="menu">
           <li class="pointer context-item"
               role="menuitem"
@@ -85,6 +83,5 @@
               </a>
           </li>
       </ul>
-   </div>
+   </div> -->
 </div>
-<!-- Dropdown menu-->

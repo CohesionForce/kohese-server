@@ -1,5 +1,3 @@
-import { RegExp } from "core-js/library/web/timers";
-
 export class ProxyFilter {
   actionAssignee : string;
   actionState : string;

@@ -49,6 +49,8 @@ import { AngularSplitModule } from 'angular-split';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
+import { DataProcessingService } from './services/data/data-processing.service';
+import { DialogService, DialogComponent } from './services/dialog/dialog.service';
 
 const AUTHENTICATION_INTERCEPTOR = {
   provide: HTTP_INTERCEPTORS,
@@ -70,8 +72,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     ExploreComponent,
     TreeRowComponent,
     VersionControlRowComponent,
-    KindIconComponent
-
+    KindIconComponent,
+    DialogComponent
   ],
   imports: [
     BrowserModule,
@@ -92,6 +94,9 @@ const AUTHENTICATION_INTERCEPTOR = {
     CreateItemModule,
     TypeCreatorModule
   ],
+  entryComponents: [
+    DialogComponent
+  ],
   providers: [
     ItemRepository,
     AuthenticationService,
@@ -102,6 +107,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     VersionControlService,
     NavigationService,
     AnalysisService,
+    DataProcessingService,
+    DialogService,
     DynamicTypesService],
   bootstrap: [AppComponent]
 })

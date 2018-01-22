@@ -9,6 +9,7 @@ import { ItemProxy } from '../../../../../common/models/item-proxy'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
+import { DataProcessingService } from '../../../services/data/data-processing.service';
 
 import * as $ from 'jquery';
 @Component({
@@ -18,55 +19,89 @@ import * as $ from 'jquery';
 export class TermViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
    /* UI Switches */
-   loadLimit : number;
-   reverse : boolean;
-   sortField : string;
+   private loadLimit: number = 100;
+   private ascending: boolean = true;
+   private sortField: string = 'count';
+   private filters: Array<RegExp> = [];
+   private filterExactMatch: boolean = false;
+   private filterIgnoreCase: boolean = false;
+   private analysisFilterInput: string;
+   
+   private terms: Array<any>;
    /* Data */
    @Input()
-   itemProxy : ItemProxy;
+   private itemProxy: ItemProxy;
 
    /* Observables */
    @Input()
-   filterSubject : BehaviorSubject<string>;
+   private filterSubject: BehaviorSubject<string>;
 
    /* Subscriptions */
-   filterSubjectSubscription : Subscription;
+   private filterSubjectSubscription: Subscription;
 
-   constructor(NavigationService : NavigationService,
-              TabService : TabService,
-              AnalysisService : AnalysisService) {
-    super(NavigationService, TabService, AnalysisService);
+   constructor(NavigationService: NavigationService,
+              TabService: TabService,
+              AnalysisService: AnalysisService,
+              private dataProcessingService: DataProcessingService) {
+     super(NavigationService, TabService, AnalysisService);
+   }
 
-  }
-
-  ngOnInit () {
+  ngOnInit(): void {
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      this.filter = newFilter;
+      this.filterString = newFilter;
       this.onFilterChange();
-    })
+    });
 
-
-    this.loadLimit = 100;
-    this.sortField = '-count';
-    this.reverse = false;
+    this.processTerms();
     console.log(this);
   }
 
-  ngOnDestroy () {
+  ngOnDestroy(): void {
     this.filterSubjectSubscription.unsubscribe();
   }
 
-  getTermCount = function () {
+  getTermCount(): number {
     return $('#theTokensBody').find('tr').length;
-  };
-
-  newSort (term : string) {
-    if (this.sortField === term) {
-      this.reverse = !this.reverse;
-    } else {
-      this.sortField = term;
-      this.reverse = false;
+  }
+  
+  sort(property: string): void {
+    this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
+    this.sortField = property;
+    this.processTerms();
+  }
+  
+  filter(f: string, manual: boolean): void {
+    if (manual) {
+      if (this.filterExactMatch) {
+        f = '/\\b' + f + '\\b/';
+        if (this.filterIgnoreCase) {
+          f += 'i';
+        }
+      }
     }
+      
+    let regex: RegExp = new RegExp(f);
+    let index: number = this.filters.indexOf(regex);
+    if (-1 === index) {
+      this.filters.push(regex);
+    } else {
+      this.filters.splice(index, 1);
+    }
+    
+    this.processTerms();
   }
 
+  processTerms(): void {
+    this.terms = this.dataProcessingService.sort(
+      this.dataProcessingService.filter(
+      this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
+        for (let j: number = 0; j < this.filters.length; j++) {
+          if (!this.filters[j].test(input)) {
+            return false;
+          }
+        }
+        
+        return true;
+      }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+  }
 }

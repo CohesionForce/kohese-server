@@ -1,34 +1,51 @@
-
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { TabService } from '../../services/tab/tab.service';
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js'
+import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { Subscription } from 'rxjs/Subscription';
+import { FileUploader } from 'ng2-file-upload';
 
 @Component({
   selector : 'create-item',
   templateUrl : './create-item.component.html'
 })
 export class CreateItemComponent extends NavigatableComponent
-                                  implements OnInit, OnDestroy{
+  implements OnInit, OnDestroy {
   @Input()
-  itemProxy : ItemProxy;
+  private itemProxy: ItemProxy;
+  private repoStatusSubscription: Subscription;
+  private types: Array<ItemProxy>;
+  private uploader: FileUploader = new FileUploader({
+    url: ''});
 
   constructor(protected NavigationService : NavigationService,
-              protected TabService : TabService) {
+              protected TabService : TabService,
+              private itemRepository: ItemRepository,
+              private route: ActivatedRoute) {
     super(NavigationService, TabService);
   }
 
-  ngOnInit() {
-
+  ngOnInit(): void {
+    this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
+      .subscribe((update) => {
+      if (update.connected) {
+        this.types = this.itemRepository.getProxyFor('Model-Definitions').
+          getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
+          return ((first.item.name > second.item.name) ?
+            1 : ((first.item.name < second.item.name) ? -1 : 0));
+        });
+      }
+    });
   }
 
-  ngOnDestroy () {
-
+  ngOnDestroy(): void {
+    this.repoStatusSubscription.unsubscribe();
   }
-
 }
 
 // TODO - Implement

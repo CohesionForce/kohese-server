@@ -9,6 +9,7 @@ import { ItemProxy } from '../../../../../common/models/item-proxy'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
+import { DataProcessingService } from '../../../services/data/data-processing.service';
 
 import * as $ from 'jquery';
 
@@ -18,71 +19,69 @@ import * as $ from 'jquery';
 })
 export class SentenceViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
- /* UI Switches */
- loadLimit : number;
- reverse : boolean;
- sortField : string;
- showSentencesInDetails : boolean;
- showPhrasesInDetails : boolean;
- showTokensInDetails : boolean;
- /* Data */
- @Input()
- itemProxy : ItemProxy;
+  /* UI Switches */
+  private loadLimit: number = 100;
+  private ascending: boolean = true;
+  private sortField: string = 'count';
+  private showSentencesInDetails: boolean = true;
+  private showPhrasesInDetails: boolean = false;
+  private showTokensInDetails: boolean = false;
+  
+  private sentences: Array<any>;
+  
+  /* Data */
+  @Input()
+  private itemProxy: ItemProxy;
 
- /* Observables */
- @Input()
- filterSubject : BehaviorSubject<string>;
+  /* Observables */
+  @Input()
+  private filterSubject: BehaviorSubject<string>;
 
- /* Subscriptions */
- filterSubjectSubscription : Subscription;
-  constructor(NavigationService : NavigationService,
-              TabService : TabService,
-              AnalysisService : AnalysisService) {
-  super(NavigationService, TabService, AnalysisService);
-
+  /* Subscriptions */
+  private filterSubjectSubscription: Subscription;
+  
+  constructor(NavigationService: NavigationService,
+              TabService: TabService,
+              AnalysisService: AnalysisService,
+              private dataProcessingService: DataProcessingService) {
+    super(NavigationService, TabService, AnalysisService);
   }
 
-  ngOnInit () {
-    this.showSentencesInDetails = true;
-    this.showPhrasesInDetails = false;
-    this.showTokensInDetails = false;
-
+  ngOnInit(): void {
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      this.filter = newFilter;
+      this.filterString = newFilter;
       this.onFilterChange();
-    })
-
-
-    this.loadLimit = 100;
-    this.sortField = '-count';
-    this.reverse = false;
+    });
+    
+    this.processSentences();
   }
 
-  ngOnDestroy () {
+  ngOnDestroy(): void {
     this.filterSubjectSubscription.unsubscribe();
   }
 
-  getDetailsItemCount = function () {
+  getDetailsItemCount(): number {
     return $('#theDetailsBody').find('tr').length;
-  };
-
-  newSort (term : string) {
-    if (this.sortField === term) {
-      this.reverse = !this.reverse;
-    } else {
-      this.sortField = term;
-      this.reverse = false;
-    }
   }
-  filterDetails (listItem) : boolean {
-    return listItem.displayLevel == 1 &&
-                (this.filterRegex === null ||
-                 this.filterRegex.test(listItem.item.name) ||
-                 this.filterRegex.test(listItem.item.description)) ||
-               (listItem.displayLevel == 2 && this.showSentencesInDetails ||
-                listItem.displayLevel == 3 && this.showPhrasesInDetails ||
-                listItem.displayLevel == 4 && this.showTokensInDetails
-               ) &&
-                (this.filterRegex === null || this.filterRegex.test(listItem.text));
-  };
+  
+  sort(property: string): void {
+    this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
+    this.sortField = property;
+    this.processSentences();
+  }
+  
+  processSentences(): void {
+    this.sentences = this.dataProcessingService.sort(
+      this.dataProcessingService.filter(this.itemProxy.analysis.extendedList,
+      [(listItem: any) => {
+        return listItem.displayLevel === 1 &&
+          (this.filterRegex === null ||
+          this.filterRegex.test(listItem.item.name) ||
+          this.filterRegex.test(listItem.item.description)) ||
+          (listItem.displayLevel === 2 && this.showSentencesInDetails ||
+          listItem.displayLevel === 3 && this.showPhrasesInDetails ||
+          listItem.displayLevel === 4 && this.showTokensInDetails) &&
+          (this.filterRegex === null || this.filterRegex.test(listItem.text));
+      }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+  }
 }

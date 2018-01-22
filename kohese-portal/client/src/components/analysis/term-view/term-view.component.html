@@ -1,15 +1,16 @@
 <div class="panel">
   <div class="panel-heading">Term View - ({{getTermCount()}}) Terms
-  <span class="dropdown pull-right">
-              <a class="dropdown-toggle" data-toggle="dropdown" >
-                    <span>Options</span>
-              <i class="fa fa-gear"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-user">
-                    <li (click)="showPOS = !showPOS">
-                          <a><i *ngIf="showPOS"
-                          class="fa fa-check-"></i>Show POS</a></li>
-              </ul>
+  <span class="pull-right">
+    <button mat-raised-button [matMenuTriggerFor]="optionsMenu">
+      Options
+      <mat-icon class="fa fa-gear"></mat-icon>
+    </button>
+    <mat-menu #optionsMenu="matMenu">
+      <button mat-menu-item (click)="showPOS = !showPOS">
+        Show POS
+        <mat-icon *ngIf="showPOS" class="fa fa-check-"></mat-icon>
+      </button>
+    </mat-menu>
   </span>
   </div>
   <div class="panel-body">
@@ -34,7 +35,7 @@
                placeholder="Filter" style="margin: 5px"
                [ngStyle]="invalidAnalysisFilterRegex && {'background-color':'pink'}"/>
 
-        <button (click)="submitStringFilter(analysisFilterInput)"
+        <button (click)="filter(analysisFilterInput, true)"
                 class=" btn btn-default fa fa-search"> Submit
         </button>
         <label for="term-limit">Limit
@@ -50,20 +51,20 @@
             class="table tree-grid table-striped table-condensed table-hover">
         <thead>
            <th>
-              <span (click)="newSort('-text')">
+              <span (click)="sort('text')">
                  Text
-                 <span *ngIf="sortField === '-text'">
-                 <i *ngIf="reverse" class="fa fa-chevron-up"></i>
-                 <i *ngIf="!reverse" class="fa fa-chevron-down"></i>
+                 <span *ngIf="sortField === 'text'">
+                 <i *ngIf="ascending" class="fa fa-chevron-up"></i>
+                 <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
                  </span>
               </span>
            </th>
            <th>
-              <span (click)="newSort('-count')">
+              <span (click)="sort('count')">
                  Count
-                 <span *ngIf="sortField === '-count'">
-                 <i *ngIf="reverse" class="fa fa-chevron-up"></i>
-                 <i *ngIf="!reverse" class="fa fa-chevron-down"></i>
+                 <span *ngIf="sortField === 'count'">
+                 <i *ngIf="ascending" class="fa fa-chevron-up"></i>
+                 <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
                  </span>
               </span>
            </th>
@@ -71,11 +72,8 @@
         </thead>
         <tbody id="theTokensBody">
            <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
-           *ngFor="let summary of itemProxy.analysis.extendedTokenSummaryList
-                    | filter:filter:true
-                    | orderBy:sortField:reverse
-                    | slice:loadLimit">
-           <td (click)="submitStringFilter(summary.text)"
+           *ngFor="let summary of terms">
+           <td (click)="filter(summary.text, false)"
                  class="tree-label"
                  [innerHTML] ="summary.text | highlightRegex:analysisFilterRegexHighlight:true"></td>
            <td>{{summary.count}}</td>
