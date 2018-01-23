@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -25,6 +25,7 @@ export class OverviewFormComponent extends NavigatableComponent
               private FormBuilder : FormBuilder,
               private DynamicTypesService : DynamicTypesService) {
     super(NavigationService, TabService);
+
   }
 
   ngOnInit () {
@@ -36,7 +37,10 @@ export class OverviewFormComponent extends NavigatableComponent
   }
 
   createFormGroup () : FormGroup {
-    const group = this.FormBuilder.group({});
+    const group = this.FormBuilder.group({
+      name: ['', Validators.required],
+      description: ['']
+    });
     //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
     return group;
   }

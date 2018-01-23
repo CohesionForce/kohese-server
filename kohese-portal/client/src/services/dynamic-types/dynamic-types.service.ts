@@ -10,7 +10,7 @@ export class DynamicTypesService {
   /* Data */
   modelProxy : ItemProxy;
   typeProxyList : Array<ItemProxy>;
-  typeList : Array<KoheseType>;
+  koheseTypes : object;
 
   /* Observables */
 
@@ -18,13 +18,26 @@ export class DynamicTypesService {
   repoStatusSubscription : Subscription;
 
   constructor(private ItemRepository : ItemRepository) {
+    this.koheseTypes = {};
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
     .subscribe((update) => {
     if (update.connected) {
       this.modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-      this.typeList = this.modelProxy.getDescendants();
-      console.log(this.typeList);
+      this.typeProxyList = this.modelProxy.getDescendants();
+      console.log(this.typeProxyList);
+      this.buildKoheseTypes();
       }
     })
+  }
+
+  getKoheseTypes () : object {
+    return this.koheseTypes;
+   }
+
+  buildKoheseTypes () : void {
+    for (var i : number; i < this.typeProxyList.length; i++) {
+      let currentType : ItemProxy = this.typeProxyList[i];
+      this.koheseTypes[currentType.item.name] = new KoheseType(currentType);
+    }
   }
 }
