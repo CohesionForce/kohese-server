@@ -76,8 +76,6 @@ export class DetailsComponent extends NavigatableComponent
 
     // TODO Implement controller restored?
     //   var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
-
-    this.itemProxy = {};
     this.proxyList
 
     /* Subscriptions */
