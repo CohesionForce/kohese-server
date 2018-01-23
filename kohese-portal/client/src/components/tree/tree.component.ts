@@ -70,17 +70,17 @@ export class TreeComponent extends NavigatableComponent
       if (update.connected) {
         this.treeRoot = this.ItemRepository.getRootProxy();
         this.absoluteRoot = this.treeRoot;
+        this.kindList = this.ItemRepository.getProxyFor('Model-Definitions').
+        getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
+        return ((first.item.name > second.item.name) ?
+          1 : ((first.item.name < second.item.name) ? -1 : 0));
+        });
       }
     });
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
     });
 
-    this.kindList = this.ItemRepository.getProxyFor('Model-Definitions').
-      getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
-      return ((first.item.name > second.item.name) ?
-        1 : ((first.item.name < second.item.name) ? -1 : 0));
-    });
     this.userList = this.SessionService.getUsers();
     this.filterSubject = new BehaviorSubject(this.proxyFilter);
 
@@ -97,7 +97,7 @@ export class TreeComponent extends NavigatableComponent
   filter(): void {
     let regexFilter: RegExp = new RegExp('^\/(.*)\/([gimy]*)$');
     let filterIsRegex: any = this.proxyFilter.text.match(regexFilter);
-    
+
     if (filterIsRegex) {
       try {
         this.proxyFilter.textRegex = new RegExp(filterIsRegex[1], filterIsRegex[2]);
@@ -245,7 +245,7 @@ export class TreeComponent extends NavigatableComponent
         this.versionControlEnabled = false;
     }
   }
-  
+
   kindFilterChanged(selection: MatSelectChange): void {
     if (selection.value) {
       this.proxyFilter.kind = selection.value.kind;
