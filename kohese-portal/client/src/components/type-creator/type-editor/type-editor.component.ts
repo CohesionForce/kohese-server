@@ -105,7 +105,7 @@ export class TypeEditorComponent extends NavigatableComponent
     this.selectedType.item.properties[newPropKey] = {
       type : 'string',
       required : false
-      }
+      };
     };
 
   filter(val: string): string[] {

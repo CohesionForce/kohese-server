@@ -76,8 +76,6 @@ export class DetailsComponent extends NavigatableComponent
 
     // TODO Implement controller restored?
     //   var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
-
-    this.itemProxy = {};
     this.proxyList
 
     /* Subscriptions */
@@ -93,7 +91,7 @@ export class DetailsComponent extends NavigatableComponent
           if (!this.itemProxy) {
             // TODO : Throw error modal to the UI
           }
-          let modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
+          let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
           this.typeProxies = modelProxy.getDescendants();
           this.proxyList = this.ItemRepository.getShortFormItemList();
           this.userList = this.SessionService.getUsers();
