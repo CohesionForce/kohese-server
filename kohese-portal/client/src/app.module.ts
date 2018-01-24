@@ -41,6 +41,7 @@ import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
 import { AnalysisService } from './services/analysis/analysis.service';
+import { DynamicTypesService } from './services/dynamic-types/dynamic-types.service';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
@@ -107,7 +108,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     NavigationService,
     AnalysisService,
     DataProcessingService,
-    DialogService],
+    DialogService,
+    DynamicTypesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
