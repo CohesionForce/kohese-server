@@ -1,12 +1,9 @@
 <h2>Details</h2>
 <form [formGroup]="formGroup" novalidate>
   <div class="form-group">
-    <label class="center-block">Name:
-      <input class="form-control" formControlName="name">
-    </label>
-    <label> Description:
-      <input formControlName="description">
-    </label>
+    <div *ngFor="let property of currentType.properties"
+          [innerHTML]="property.template | sanitizeHtml">
+    </div>
   </div>
 </form>
 <p>{{formGroup.value | json }}</p>

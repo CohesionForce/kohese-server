@@ -106,7 +106,7 @@ export class TypeEditorComponent extends NavigatableComponent
       type : 'string',
       required : false
       };
-    };
+  }
 
   filter(val: string): string[] {
     if (!val) {

@@ -35,7 +35,7 @@ export class DynamicTypesService {
    }
 
   buildKoheseTypes () : void {
-    for (var i : number; i < this.typeProxyList.length; i++) {
+    for (var i : number = 0; i < this.typeProxyList.length; i++) {
       let currentType : ItemProxy = this.typeProxyList[i];
       this.koheseTypes[currentType.item.name] = new KoheseType(currentType);
     }

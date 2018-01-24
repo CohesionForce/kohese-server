@@ -23,6 +23,10 @@ export class KoheseType {
     this.relations = typeProxy.item.relations;
     this.acls = typeProxy.item.acls;
     this.methods = typeProxy.item.methods;
-    console.log(this);
+
+    this.properties = [
+      new TypeProperty('name'),
+      new TypeProperty('description')
+    ]
   }
 }

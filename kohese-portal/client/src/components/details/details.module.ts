@@ -10,6 +10,7 @@ import { MaterialModule } from "../../material.module";
 import { DocumentViewModule } from "../document-view/document-view.module";
 import { ActionTableModule } from "../action-table/action-table.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { PipesModule } from "../../pipes/pipes.module";
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
     DocumentViewModule,
     ActionTableModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    PipesModule
   ],
   exports : [
     DetailsComponent,

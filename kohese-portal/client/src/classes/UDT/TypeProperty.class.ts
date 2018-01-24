@@ -1,20 +1,19 @@
+import { TypePropertyData } from './TypeProperty.data';
+
 export class TypeProperty {
   type: string;
   required:boolean;
   enum : Array<string>;
-  format : string;
+  template : string;
   default : any;
+  propertyName : string;
 
-  constructor(options : {
-    type: string,
-    enum? : Array<string>,
-    required?: boolean,
-    format?: string,
-    default : any;
-  }) {
-    this.type = options.type;
-    this.required = options.required || false;
-    this.format = options.format || 'text';
-    this.default = options.default;
+  constructor(typeName : string) {
+    var typeData = TypePropertyData[typeName];
+    this.type = typeData.type;
+    this.template = typeData.template;
+    this.required = typeData.required
+    this.default = typeData.default;
+    this.propertyName = typeData.propertyName;
   }
 }

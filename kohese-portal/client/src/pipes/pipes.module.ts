@@ -5,13 +5,15 @@ import { MapKeyPipe } from './map-key.pipe';
 import { HighlightRegexPipe } from './highlight.pipe';
 import { OrderByPipe } from './orderBy.pipe';
 import { FilterPipe } from './filter.pipe';
+import { SanitizeHtmlPipe } from './sanitizeHtml.pipe';
 
 @NgModule({
   declarations: [
     MapKeyPipe,
     HighlightRegexPipe,
     OrderByPipe,
-    FilterPipe
+    FilterPipe,
+    SanitizeHtmlPipe
   ],
   imports: [
     CommonModule
@@ -20,7 +22,8 @@ import { FilterPipe } from './filter.pipe';
     MapKeyPipe,
     HighlightRegexPipe,
     OrderByPipe,
-    FilterPipe
+    FilterPipe,
+    SanitizeHtmlPipe
   ]
 })
 export class PipesModule {}
