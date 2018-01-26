@@ -3,7 +3,6 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { AnalysisViewComponent } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { TabService } from '../../../services/tab/tab.service';
 
 import { ItemProxy } from '../../../../../common/models/item-proxy'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -41,10 +40,9 @@ export class SentenceViewComponent extends AnalysisViewComponent
   private filterSubjectSubscription: Subscription;
   
   constructor(NavigationService: NavigationService,
-              TabService: TabService,
               AnalysisService: AnalysisService,
               private dataProcessingService: DataProcessingService) {
-    super(NavigationService, TabService, AnalysisService);
+    super(NavigationService, AnalysisService);
   }
 
   ngOnInit(): void {

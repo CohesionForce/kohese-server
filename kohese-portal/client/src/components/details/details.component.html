@@ -26,11 +26,11 @@
                (click)="upsertItem()"
                title=" Save"
                     ></i>
-            <i *ngIf="tab.type === 'singleview'" class="fa fa-clone pull-right"
+            <!-- <i class="fa fa-clone pull-right"
                (click)="navigate('Explore', {id: itemProxy.item.id})"
                title="Split Screen">
-            </i>
-            <i class="fa fa-lg fa-arrows-alt" *ngIf="tab.type === 'dualview'"
+            </i> -->
+            <i class="fa fa-lg fa-arrows-alt"
                (click)="navigate('Investigate', {id: itemProxy.item.id})"
                title="Fullscreen"></i>
         </span>
@@ -47,7 +47,7 @@
                </button>
                <button
                       class= "btn btn-primary"
-                      (click)="addTab('Analysis',
+                      (click)="navigate('Analysis',
                                 {id: itemProxy.item.id})">
                       Analyze
               </button>

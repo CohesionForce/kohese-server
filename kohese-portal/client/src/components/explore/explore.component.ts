@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
-import { TabService } from '../../services/tab/tab.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ActivatedRoute } from '@angular/router';
 
@@ -15,10 +14,9 @@ export class ExploreComponent extends NavigatableComponent
   proxySelected : boolean;
 
   constructor (protected NavigationService : NavigationService,
-               protected TabService : TabService,
                private router : ActivatedRoute) {
-    super(NavigationService, TabService);
-    }
+    super(NavigationService);
+  }
 
   ngOnInit () {
    this.router.params.subscribe(params => {
@@ -28,10 +26,9 @@ export class ExploreComponent extends NavigatableComponent
      } else {
        this.proxySelected = false;
      }
-   })
+   });
   }
 
   ngOnDestroy () {
-
   }
 }

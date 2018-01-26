@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { TabService } from '../../services/tab/tab.service';
 import { VersionControlService } from '../../services/version-control/version-control.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { Observable } from 'rxjs/Observable';
@@ -20,9 +19,9 @@ export class RepositoriesComponent extends NavigatableComponent {
   private pushRemoteNameInput: string;
   
   constructor(private navigationService: NavigationService,
-    private tabService: TabService, private versionControlService: VersionControlService,
+    private versionControlService: VersionControlService,
     private itemRepository: ItemRepository) {
-    super(navigationService, tabService);
+    super(navigationService);
   }
   
   addRemote() {

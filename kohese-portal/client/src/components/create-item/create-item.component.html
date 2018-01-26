@@ -16,9 +16,9 @@
     <span>Import:</span>
   </div>
   <div class="panel-body">
-    <input type="file" ng2FileSelect [uploader]="uploader" multiple="true"/>
+    <input type="file" #fileInput multiple/>
     <br/>
-    <button mat-raised-button (click)="itemRepository.importFiles(uploader.queue, route.snapshot.paramMap.get('parentId'))"
+    <button mat-raised-button (click)="itemRepository.importFiles(fileInput.files, route.snapshot.paramMap.get('parentId'))"
       class="btn btn-primary">Import</button>
   </div>
 </div>

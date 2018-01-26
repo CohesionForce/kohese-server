@@ -3,7 +3,6 @@ import { BundleService } from '../../services/bundle/bundle.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
-import { TabService } from '../../services/tab/tab.service';
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -41,10 +40,9 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
 
   constructor(private bundleService: BundleService,
               protected NavigationService : NavigationService,
-              protected TabService : TabService,
               private ItemRepository : ItemRepository,
               private sessionService: SessionService) {
-    super(NavigationService, TabService);
+    super(NavigationService);
                }
 
   ngOnInit() {

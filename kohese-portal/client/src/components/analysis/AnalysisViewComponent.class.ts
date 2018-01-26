@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { TabService } from '../../services/tab/tab.service';
 import { AnalysisService } from '../../services/analysis/analysis.service';
 
 /* Here is where we will setup the base methods for all the analysis components */
@@ -19,9 +18,8 @@ export class AnalysisViewComponent extends NavigatableComponent {
   private analysisPOSFilterName: string = 'Standard';
 
   constructor(NavigationService : NavigationService,
-              TabService : TabService,
               protected AnalysisService : AnalysisService) {
-    super(NavigationService, TabService);
+    super(NavigationService);
 
     this.analysisPOSFilterCriteriaList = Object.keys(AnalysisService.posFilterCriteria);
   }

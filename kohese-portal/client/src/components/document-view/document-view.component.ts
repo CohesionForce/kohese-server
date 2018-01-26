@@ -4,8 +4,6 @@ import { Parser, HtmlRenderer } from 'commonmark';
 import { ItemProxy } from '../../../../common/models/item-proxy.js';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 
-
-import { TabService } from '../../services/tab/tab.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import * as commonmark from 'commonmark';
@@ -51,9 +49,8 @@ export class DocumentViewComponent extends NavigatableComponent
 
 
 
-  constructor (NavigationService : NavigationService,
-               TabService : TabService) {
-    super(NavigationService, TabService)
+  constructor (NavigationService : NavigationService) {
+    super(NavigationService)
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({sourcepos: true});
   }

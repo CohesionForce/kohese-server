@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
-import { TabService } from '../../services/tab/tab.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { SessionService } from '../../services/user/session.service';
@@ -20,10 +19,9 @@ export class AppBarComponent extends NavigatableComponent implements OnInit {
   private repositorySyncFailed: boolean = false;
 
   constructor(private sessionService: SessionService,
-    protected TabService: TabService,
     protected NavigationService: NavigationService,
     private authenticationService: AuthenticationService) {
-    super(NavigationService, TabService);
+    super(NavigationService);
   }
 
   ngOnInit(): void {
@@ -38,5 +36,6 @@ export class AppBarComponent extends NavigatableComponent implements OnInit {
   
   logout(): void {
     this.authenticationService.logout();
+    this.navigate('Login', {});
   }
 }

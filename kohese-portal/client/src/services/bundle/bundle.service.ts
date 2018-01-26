@@ -2,8 +2,6 @@ import * as _ from 'underscore';
 import { Injectable } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 
-import { TabService } from '../tab/tab.service';
-import { Tab } from '../tab/Tab.class';
 import { Bundle } from './bundle.class';
 import 'rxjs/add/operator/filter';
 
@@ -12,8 +10,7 @@ import 'rxjs/add/operator/filter';
 export class BundleService {
   bundler: Array<any>;
 
-  constructor (private tabService: TabService,
-               private router: Router,
+  constructor (private router: Router,
                private activatedRouter: ActivatedRoute) {
     this.onInit();
     this.bundler = [];

@@ -1,13 +1,12 @@
-import { Component, OnInit, OnDestroy, ViewChildren } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
-import { TabService } from '../../services/tab/tab.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { VersionControlService } from '../../services/version-control/version-control.service';
 import { SessionService } from '../../services/user/session.service';
-import { Tab } from '../../services/tab/Tab.class';
+import { DialogService } from '../../services/dialog/dialog.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -18,6 +17,12 @@ import { MatSelectChange } from '@angular/material';
 
 import * as $ from 'jquery';
 
+let treeRoot: ItemProxy;
+let isRootDefault: boolean = true;
+let rows: Array<TreeRowComponent> = [];
+let expandUponInstantiation: boolean = false;
+let versionControlEnabled: boolean = false;
+
 @Component({
   selector : 'tree-view',
   templateUrl : './tree.component.html'
@@ -26,11 +31,8 @@ export class TreeComponent extends NavigatableComponent
                               implements OnInit, OnDestroy {
     /* UI Toggles */
     private locationSynced: boolean = false;
-    private isRootDefault: boolean = true;
-    private versionControlEnabled: boolean = false;
 
     /* Data */
-    private treeRoot : ItemProxy;
     private absoluteRoot : ItemProxy;
     private proxyFilter: ProxyFilter = new ProxyFilter(); // TODO get definition for Filter
     private selectedItemProxy: ItemProxy;
@@ -40,8 +42,6 @@ export class TreeComponent extends NavigatableComponent
     private userList : Array<any>; // This will eventually be of type KoheseUser
     // TODO Probably want to get this from somewhere else
     private viewList: Array<String> = ['Default','Version Control'];
-    @ViewChildren(RowComponent)
-    private rows: Array<RowComponent>;
     private readonly NO_KIND_SPECIFIED: string = '---';
 
     /* Observables */
@@ -53,23 +53,20 @@ export class TreeComponent extends NavigatableComponent
     private routeSub : Subscription;
 
   constructor (protected NavigationService : NavigationService,
-               protected TabService : TabService,
                private ItemRepository : ItemRepository,
                private VersionControlService : VersionControlService,
                private SessionService : SessionService,
                private route : ActivatedRoute) {
-    super(NavigationService, TabService);
+    super(NavigationService);
   }
 
   ngOnInit(): void {
     // TODO - Test component restoration logic
-    this.currentTabSub = this.TabService.getCurrentTab()
-      .subscribe(currentTab => this.tab = currentTab);
     this.repoStatusSub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
       if (update.connected) {
-        this.treeRoot = this.ItemRepository.getRootProxy();
-        this.absoluteRoot = this.treeRoot;
+        treeRoot = this.ItemRepository.getRootProxy();
+        this.absoluteRoot = treeRoot;
       }
     });
     this.routeSub = this.route.params.subscribe(params => {
@@ -132,29 +129,23 @@ export class TreeComponent extends NavigatableComponent
     return val === null ? 'null' : typeof val;
   }
 
-  // Root handlers
-  updateRoot (newRoot) {
-    this.treeRoot = newRoot;
-    this.isRootDefault = false;
-  }
-
   upLevel(): void {
-    if (!this.isRootDefault) {
-      this.treeRoot = this.treeRoot.parentProxy;
-      this.isRootDefault = (this.treeRoot === this.absoluteRoot);
-      console.log('::: Setting root to ' + this.treeRoot.item.name);
+    if (!isRootDefault) {
+      treeRoot = treeRoot.parentProxy;
+      isRootDefault = (treeRoot === this.absoluteRoot);
+      console.log('::: Setting root to ' + treeRoot.item.name);
     }
   }
 
-  resetRoot () {
-    this.treeRoot = this.absoluteRoot;
-    this.isRootDefault = true;
+  resetRoot(): void {
+    treeRoot = this.absoluteRoot;
+    isRootDefault = true;
   }
 
   expandSyncedNodes(): void {
     /*if (this.selectedItemProxy) {
       var ancestorProxy = this.selectedItemProxy.parentProxy;
-      while(ancestorProxy && ancestorProxy !== this.treeRoot) {
+      while(ancestorProxy && ancestorProxy !== treeRoot) {
         if(this.collapsed[ancestorProxy.item.id] === undefined || this.collapsed[ancestorProxy.item.id]) {
           this.collapsed[ancestorProxy.item.id] = false;
         }
@@ -192,18 +183,18 @@ export class TreeComponent extends NavigatableComponent
 
   /******** List expansion functions */
   expandAll(): void {
-    for (let j: number = 0; j < this.rows.length; j++) {
-      this.rows[j].toggleExpandedState(true, true);
+    for (let j: number = 0; j < rows.length; j++) {
+      rows[j].expand(true);
     }
   }
 
   expandFiltered(): void {
-    //this.expandMatchingChildren(this.treeRoot);
+    //this.expandMatchingChildren(treeRoot);
   }
 
   collapseAll(): void {
-    for (let j: number = 0; j < this.rows.length; j++) {
-      this.rows[j].toggleExpandedState(false, true);
+    for (let j: number = 0; j < rows.length; j++) {
+      rows[j].expand(false);
     }
   }
 
@@ -228,7 +219,7 @@ export class TreeComponent extends NavigatableComponent
   /****** End list expansion functions */
 
   createChildOfSelectedItem(): void {
-    this.addTab('Create', {parentId: this.selectedItemProxy.item.id});
+    this.navigate('Create', {parentId: this.selectedItemProxy.item.id});
   }
 
   viewSelectionChanged(selection: MatSelectChange): void {
@@ -236,13 +227,13 @@ export class TreeComponent extends NavigatableComponent
       case 'Version Control':
         this.proxyFilter.status = true;
         this.proxyFilter.dirty = false;
-        this.versionControlEnabled = true;
+        versionControlEnabled = true;
         this.expandFiltered();
         break;
       default :
         this.proxyFilter.status = false;
         this.proxyFilter.dirty = false;
-        this.versionControlEnabled = false;
+        versionControlEnabled = false;
     }
   }
   
@@ -252,5 +243,79 @@ export class TreeComponent extends NavigatableComponent
     } else {
       this.proxyFilter.kind = undefined;
     }
+  }
+  
+  getTreeRoot(): ItemProxy {
+    return treeRoot;
+  }
+  
+  isRootDefault(): boolean {
+    return isRootDefault;
+  }
+}
+
+@Component({
+  selector: 'tree-row',
+  templateUrl: './tree-row.component.html'
+})
+export class TreeRowComponent extends RowComponent
+  implements OnInit, OnDestroy {
+  /* UI Triggers
+     RowComponent : exactFilter
+                    collapsed */
+
+  /* Observables
+     RowComponent : filterSubject */
+
+  /* Subscriptions */
+  private filterSubscription : Subscription;
+
+  constructor(NavigationService : NavigationService,
+    private dialogService: DialogService,
+    private itemRepository: ItemRepository,
+    private versionControlService: VersionControlService) {
+    super(NavigationService);
+  }
+
+  ngOnInit(): void {
+    rows.push(this);
+    this.filterSubscription = this.filterSubject.subscribe((newFilter) => {
+      this.filter = newFilter;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.filterSubscription.unsubscribe();
+    rows.splice(rows.indexOf(this), 1);
+  }
+
+  removeItem(proxy: ItemProxy): void {
+    this.dialogService.openCustomTextDialog('Confirm Deletion',
+      'Are you sure you want to delete ' + proxy.item.name + '?',
+      ['Cancel', 'Delete', 'Delete Recursively']).
+      subscribe((result) => {
+      if (result) {
+        this.itemRepository.deleteItem(proxy, (2 === result));
+      }
+    });
+  }
+  
+  isVersionControlViewVisible(): boolean {
+    return versionControlEnabled;
+  }
+  
+  revertChanges(itemProxy: ItemProxy): void {
+    this.dialogService.openYesNoDialog('Undo Changes', 'Are you sure that you '
+      + 'want to undo all changes to this item since the previous commit?').
+      subscribe((result) => {
+      if (result) {
+        this.versionControlService.revertItems([itemProxy]);
+      }
+    });
+  }
+  
+  updateRoot(newRoot: ItemProxy): void {
+    treeRoot = newRoot;
+    isRootDefault = false;
   }
 }

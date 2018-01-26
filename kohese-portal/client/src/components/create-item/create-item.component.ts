@@ -3,12 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { TabService } from '../../services/tab/tab.service';
 
 import { ItemProxy } from '../../../../common/models/item-proxy.js';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
-import { FileUploader } from 'ng2-file-upload';
 
 @Component({
   selector : 'create-item',
@@ -20,14 +18,11 @@ export class CreateItemComponent extends NavigatableComponent
   private itemProxy: ItemProxy;
   private repoStatusSubscription: Subscription;
   private types: Array<ItemProxy>;
-  private uploader: FileUploader = new FileUploader({
-    url: ''});
 
   constructor(protected NavigationService : NavigationService,
-              protected TabService : TabService,
               private itemRepository: ItemRepository,
               private route: ActivatedRoute) {
-    super(NavigationService, TabService);
+    super(NavigationService);
   }
 
   ngOnInit(): void {

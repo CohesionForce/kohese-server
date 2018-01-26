@@ -1,24 +1,32 @@
-<div *ngIf="treeRoot">
+<div *ngIf="getTreeRoot()">
     <div id="top-action-bar">
-      <button mat-raised-button (click)="expandAll()" class="btn btn-default btn-sm"
-        style="margin: 5px">Expand All</button>
+      <button mat-raised-button (click)="expandAll()"
+        class="btn btn-default btn-sm">
+        Expand All
+      </button>
       <button mat-raised-button (click)="expandFiltered()"
-        class="btn btn-default btn-sm" style="margin: 5px">Expand
-        Filtered</button>
+        class="btn btn-default btn-sm">
+        Expand Filtered
+      </button>
       <button mat-raised-button (click)="collapseAll()"
-        class="btn btn-default btn-sm" style="margin: 5px">Collapse
-        All</button>
+        class="btn btn-default btn-sm">
+        Collapse All
+      </button>
       <button mat-raised-button class="btn btn-default btn-sm" (click)="upLevel()"
-        [disabled]="isRootDefault">Up Level</button>
+        [disabled]="isRootDefault()">
+        Up Level
+      </button>
       <button mat-raised-button class="btn btn-default btn-sm" (click)="resetRoot()"
-        [disabled]="isRootDefault">Reset Root</button>
+        [disabled]="isRootDefault()">
+        Reset Root
+      </button>
       <i (click)="syncLocation()"
          [ngClass]="{ 'btn-green': locationSynced}"
          class="btn btn-default btn-sm fa fa-exchange">
       </i>
         <span>Showing
             {{getItemMatchedCount()}} of
-            {{treeRoot.descendantCount}}
+            {{getTreeRoot().descendantCount}}
         </span>
       <div>
         <!-- Start View Control -->
@@ -93,13 +101,12 @@
             </div> <!-- End Action Filtering -->
             <br/>
             <button mat-raised-button
-              (click)="navigate('Create', { parentId: treeRoot.item.id })">
+              (click)="navigate('Create', { parentId: getTreeRoot().item.id })">
               Create Item
             </button>
           </span>	<!-- End Default Controls -->
           <!-- Start Version Control View -->
-          <span *ngSwitchCase="Version Control">
-          </span>
+          <span *ngSwitchCase="Version Control"></span>
         </span> <!-- End Switch on View Type -->
       </div>
     </div>
@@ -110,10 +117,11 @@
           <div class="kth-cell kti-name">Name</div>
         </div>
         <div class="kt-body">
-          <tree-row *ngFor="let childProxy of treeRoot.children"
-            [itemProxy]="childProxy" [filterSubject]="filterSubject"></tree-row>
+          <tree-row *ngFor="let childProxy of getTreeRoot().children"
+            [itemProxy]="childProxy" [filterSubject]="filterSubject">
+          </tree-row>
         </div>
       </div>
     </div> <!-- End Knowledge Tree -->
 </div>
-<div *ngIf="!treeRoot">Loading . . .</div>
+<div *ngIf="!getTreeRoot()">Loading...</div>
