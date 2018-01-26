@@ -11,10 +11,15 @@ function loadJSONDoc(filePath) {
 
 //  console.log('::: Loading ' + filePath);
 
-  var fileData = fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
-  var jsonObject = JSON.parse(fileData);
+  try {
+    var fileData = fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
+    var jsonObject = JSON.parse(fileData);
+    return jsonObject;
+  } catch (err){
+    console.log('*** Error processing file:  ' + filePath);
+    throw err;
+  }
 
-  return jsonObject;
 }
 
 module.exports.loadJSONDoc = loadJSONDoc;

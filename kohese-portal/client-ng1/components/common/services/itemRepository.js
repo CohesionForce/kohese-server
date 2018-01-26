@@ -259,6 +259,10 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
           console.log(compareAfterRTH);
           $rootScope.$broadcast('syncRepositoryFailed');
         }
+        
+        console.log('$$$ Model Definitions:');
+        let modelDefs = ItemProxy.getModelDefinitions();
+        console.log(modelDefs);
       }
 
       if(syncSucceeded){
