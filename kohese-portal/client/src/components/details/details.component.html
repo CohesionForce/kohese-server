@@ -1,6 +1,6 @@
 
 
-<div id="details-panel" class="panel" style="margin-right: 30px"> <!--  This inline style needs to go ASAP-->
+<div *ngIf="itemProxy" id="details-panel" class="panel" style="margin-right: 30px"> <!--  This inline style needs to go ASAP-->
     <div class="panel-heading ">
         <span *ngIf="itemProxy.kind">{{itemProxy.kind}} Information: {{itemProxy.item.name}} </span>
         <span *ngIf="!itemProxy.kind">No Item Selected</span>
@@ -71,7 +71,7 @@
                       title = "Dirty item" />
                   </span>
                 </ng-template>
-                TBD - User Defined Types
+                <overview-form [itemProxy]="itemProxy"></overview-form>>
                 <!-- <div class="details-tab" *ngIf="itemProxy.kind ==='Action'">
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>

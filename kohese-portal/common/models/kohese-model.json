@@ -3,6 +3,10 @@
   "base": "Item",
   "idInjection": true,
   "properties": {
+    "base": {
+      "type": "string",
+      "required": true
+    },
     "idInjection": {
       "type": "boolean",
       "required": true
@@ -32,7 +36,15 @@
         "object"
       ],
       "required": true
-    }
+    },
+    "orderedProperties": {
+      "type": [ "string" ],
+      "derived": true
+    },
+    "requiredProperties": {
+      "type": [ "string" ],
+      "derived": true
+    } 
   },
   "validations": [],
   "relations": {},

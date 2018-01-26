@@ -1,4 +1,4 @@
-export class TypeProperty<T> {
+export class TypeProperty {
   type: string;
   required:boolean;
   enum : Array<string>;
