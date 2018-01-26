@@ -276,7 +276,7 @@ table td .glyphicon-remove {
     cursor: pointer; }
 
 #explore-container {
-  height: calc(100% - 48px - 12px); }
+  height: 100%; }
   #explore-container #tree-container {
     height: 100%;
     width: 50%;
@@ -409,7 +409,6 @@ kind-icon {
   border: double 1px black; }
 
 #details-panel {
-  margin-right: 30px;
   height: 100%; }
   #details-panel > .panel-body {
     height: calc(100% - 30px); }
@@ -703,23 +702,6 @@ Created by Josh P
   width: calc(100% - 50px);
   z-index: 2;
   border-radius: 10px; }
-  #page-wrapper #add-tab-button {
-    float: left; }
-  #page-wrapper mat-tab-group {
-    height: 100%;
-    width: calc(100% - 40px);
-    float: left; }
-    #page-wrapper mat-tab-group mat-tab-body {
-      height: 100%; }
-  #page-wrapper .mat-tab-body-wrapper {
-    height: 100%; }
-  #page-wrapper .delete-tab-button {
-    margin-left: 2px;
-    padding: 1px; }
-    #page-wrapper .delete-tab-button:hover {
-      background-color: red;
-      color: white;
-      border-radius: 50%; }
   #page-wrapper button {
     border-radius: 10px; }
   #page-wrapper .top-content {

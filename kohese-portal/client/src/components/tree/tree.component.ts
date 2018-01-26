@@ -48,7 +48,6 @@ export class TreeComponent extends NavigatableComponent
     private filterSubject : BehaviorSubject<ProxyFilter>;
 
     /* Subscriptions */
-    private currentTabSub : Subscription;
     private repoStatusSub : Subscription;
     private routeSub : Subscription;
 
@@ -87,7 +86,6 @@ export class TreeComponent extends NavigatableComponent
   }
 
   ngOnDestroy(): void {
-    this.currentTabSub.unsubscribe();
     this.repoStatusSub.unsubscribe();
   }
 

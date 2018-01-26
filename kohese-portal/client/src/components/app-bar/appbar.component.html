@@ -3,21 +3,16 @@
     *ngIf="(authenticationService.getAuthenticationInformation() | async)">
     <div class="navbar-header">
       <a class="navbar-brand"
-        [ngClass]="{'navbar-syncing': repositorySyncing,
-          'navbar-disconnected': !repositorySynced}"
+        [ngClass]="{'navbar-syncing': repositoryStatus.syncing,
+          'navbar-disconnected': !repositoryStatus.connected}"
         (click)="navigate('Explore', {id : ''})">
         Kohese Portal
         <i class="fa fa-exclamation-triangle"
-          *ngIf="!repositorySynced && !repositorySyncing &&
-          !repositorySyncFailed">
-           - Disconnected
-        </i>
-        <i class="fa fa-exclamation-triangle"
-          *ngIf="repositorySyncing">
+          *ngIf="repositoryStatus.syncing">
            - Syncing
         </i>
         <i class="fa fa-exclamation-triangle"
-          *ngIf="repositorySyncFailed">
+          *ngIf="!repositoryStatus.syncing && !repositoryStatus.connected">
            - Failed Synchronization
         </i>
       </a>

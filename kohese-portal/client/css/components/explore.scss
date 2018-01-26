@@ -1,7 +1,7 @@
 @import '../utils/variables';
 
 #explore-container {
-  height: calc(100% - #{$tabBarHeight} - 12px);
+  height: 100%;
   
   #tree-container {
     height: 100%;

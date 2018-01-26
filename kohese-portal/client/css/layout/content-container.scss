@@ -25,34 +25,6 @@ Created by Josh P
   z-index: 2;
   border-radius: $baseBorderRadius;
 
-  #add-tab-button {
-    float: left;
-  }
-      
-  mat-tab-group {
-    height: 100%;
-    width: calc(100% - 40px);
-    float: left;
-        
-    mat-tab-body {
-      height: 100%;
-    }
-  }
-      
-  .mat-tab-body-wrapper {
-    height: 100%;
-  }
-
-  .delete-tab-button {
-    margin-left: 2px;
-    padding: 1px;
-    &:hover {
-      background-color: red;
-      color: white;
-      border-radius: 50%;
-    }
-  }
-      
   button {
     border-radius: $baseBorderRadius;
   }

@@ -75,6 +75,7 @@ export class ItemRepository {
 
     this.repositoryStatus = new BehaviorSubject({
       connected : false,
+      syncing: false,
       message : 'Initializing Item Repository'
     });
 
@@ -180,6 +181,7 @@ export class ItemRepository {
         console.log('::: IR: Socket IO Connection Error');
         this.repositoryStatus.next({
           connected : false,
+          syncing: false,
           message : 'Error connecting to repository'
         })
       });
@@ -255,6 +257,7 @@ export class ItemRepository {
 
     this.repositoryStatus.next({
       connected : false,
+      syncing: true,
       message: 'Starting Repository Sync'
     });
     this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, (response) => {
@@ -312,6 +315,7 @@ export class ItemRepository {
           console.log(compareAfterRTH);
           this.repositoryStatus.next({
             connected : false,
+            syncing: false,
             message : 'Repository sync failed'
           })
         }
@@ -320,6 +324,7 @@ export class ItemRepository {
       if(syncSucceeded){
         this.repositoryStatus.next({
           connected : true,
+          syncing: false,
           message : 'Item Repository Ready'
         })
       }
