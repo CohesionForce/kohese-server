@@ -1,4 +1,5 @@
-import { Injectable, Component, Inject } from '@angular/core';
+import { Injectable, Component, Inject, TemplateRef } from '@angular/core';
+import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 
@@ -6,19 +7,19 @@ import { Observable } from 'rxjs/Observable';
 export class DialogService {
   constructor(private dialog: MatDialog) {
   }
-  
+
   openConfirmDialog(title: string, text: string): Observable<any> {
     return this.openCustomDialog(title, text, ['Cancel', 'OK']);
   }
-  
+
   openYesNoDialog(title: string, text: string): Observable<any> {
     return this.openCustomDialog(title, text, ['No', 'Yes']);
   }
-  
+
   openInformationDialog(title: string, text: string): Observable<any> {
     return this.openCustomDialog(title, text, ['OK']);
   }
-  
+
   openCustomDialog(title: string, text: string, buttonLabels: Array<string>): Observable<any> {
     return this.dialog.open(DialogComponent, {
       data: {
@@ -26,6 +27,12 @@ export class DialogService {
         text: text,
         buttonLabels: buttonLabels
       }
+    }).afterClosed();
+  }
+
+  openComponentDialog<T>(component: ComponentType<T> | TemplateRef<T>, data: any): Observable<any> {
+    return this.dialog.open(component, {
+      data: data
     }).afterClosed();
   }
 }

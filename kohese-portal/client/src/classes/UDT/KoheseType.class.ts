@@ -24,6 +24,10 @@ export class KoheseType {
     this.acls = typeProxy.item.acls;
     this.methods = typeProxy.item.methods;
 
+    // for (property in typeProxy.item.properties) {
+    //   this.properties[property] = new TypeProperty(property);
+    // }
+
     this.properties = [
       new TypeProperty('name'),
       new TypeProperty('description')

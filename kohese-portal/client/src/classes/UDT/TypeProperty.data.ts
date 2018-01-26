@@ -2,7 +2,7 @@
 
 export let TypePropertyData = {
   name : {
-    type : 'text',
+    inputType : 'text',
     template : `<label class="center-block">Name:
                 <p> Hello World </p>
                   <input class="form-control" formControlName="name">

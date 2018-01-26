@@ -1,10 +1,12 @@
 import { Input, Component, OnInit, OnDestroy } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { ItemProxy } from '../../../../../common/models/item-proxy';
+import { PropertyEditorComponent } from '../property-editor/property-editor.component';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { TabService } from '../../../services/tab/tab.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
@@ -13,11 +15,11 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/map';
-
+import { TypeProperty } from '../../../classes/UDT/TypeProperty.class';
 
 @Component({
   selector: 'type-editor',
-  templateUrl : './type-editor.component.html'
+  templateUrl : './type-editor.component.html',
 })
 
 export class TypeEditorComponent extends NavigatableComponent
@@ -47,7 +49,9 @@ export class TypeEditorComponent extends NavigatableComponent
 
   constructor(NavigationService : NavigationService,
               TabService : TabService,
-              private ItemRepository : ItemRepository) {
+              private ItemRepository : ItemRepository,
+              private DialogService : DialogService,
+              private FormBuilder : FormBuilder) {
     super(NavigationService, TabService);
     this.typeList = [];
 
@@ -101,11 +105,21 @@ export class TypeEditorComponent extends NavigatableComponent
   }
 
   addProperty() {
-    let newPropKey : string = 'newProperty' + ++this.arbitraryCounter;
-    this.selectedType.item.properties[newPropKey] = {
-      type : 'string',
-      required : false
-      };
+    let propertyData = {};
+    let dialogReference =
+      this.DialogService.openComponentDialog(PropertyEditorComponent,
+                                             propertyData);
+    console.log(dialogReference);
+  }
+
+  editProperty(property : TypeProperty) {
+    let propertyData = {
+      property : property
+    };
+    let dialogReference =
+    this.DialogService.openComponentDialog(PropertyEditorComponent,
+                                           propertyData);
+    console.log(dialogReference);
   }
 
   filter(val: string): string[] {
@@ -115,6 +129,23 @@ export class TypeEditorComponent extends NavigatableComponent
     return this.typeList.filter((option : string) =>
       option.toLowerCase().indexOf(val.toLowerCase()) === 0);
   }
-}
 
+//   createFormGroup () : FormGroup {
+//     let formObject = {
+//       name : this.selectedType.name,
+//       base : t
+//     };
+//     for (let i : number = 0; i < this.currentType.properties.length; i ++ ) {
+//       let currentProperty = this.currentType.properties[i]
+//       if (currentProperty.required) {
+//         formObject[currentProperty.propertyName] = [currentProperty.default, Validators.required]
+//       } else {
+//         formObject[currentProperty.propertyName] = currentProperty.default;
+//       }
+//     }
+//     const group = this.FormBuilder.group(formObject);
+//     //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
+//     return group;
+// }
+}
 
