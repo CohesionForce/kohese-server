@@ -276,7 +276,7 @@ table td .glyphicon-remove {
     cursor: pointer; }
 
 #explore-container {
-  height: calc(100% - 48px - 12px); }
+  height: 100%; }
   #explore-container #tree-container {
     height: 100%;
     width: 50%;
@@ -409,7 +409,6 @@ kind-icon {
   border: double 1px black; }
 
 #details-panel {
-  margin-right: 30px;
   height: 100%; }
   #details-panel > .panel-body {
     height: calc(100% - 30px); }
@@ -699,60 +698,40 @@ Created by Josh P
   position: fixed;
   top: 50px;
   left: 50px;
-  height: 100%;
-  width: 100%; }
-  #page-wrapper content-container #content-container {
-    height: calc(100% - 50px);
-    width: calc(100% - 50px);
-    z-index: 2;
+  height: calc(100% - 50px);
+  width: calc(100% - 50px);
+  z-index: 2;
+  border-radius: 10px; }
+  #page-wrapper button {
     border-radius: 10px; }
-    #page-wrapper content-container #content-container #add-tab-button {
-      float: left; }
-    #page-wrapper content-container #content-container mat-tab-group {
-      height: 100%;
-      width: calc(100% - 40px);
-      float: left; }
-      #page-wrapper content-container #content-container mat-tab-group mat-tab-body {
-        height: 100%; }
-    #page-wrapper content-container #content-container .mat-tab-body-wrapper {
-      height: 100%; }
-    #page-wrapper content-container #content-container .delete-tab-button {
-      margin-left: 2px;
-      padding: 1px; }
-      #page-wrapper content-container #content-container .delete-tab-button:hover {
-        background-color: red;
-        color: white;
-        border-radius: 50%; }
-    #page-wrapper content-container #content-container button {
-      border-radius: 10px; }
-    #page-wrapper content-container #content-container .top-content {
-      overflow: auto;
-      left: 0;
-      width: 100%; }
-      #page-wrapper content-container #content-container .top-content #top-action-bar {
-        padding: 1px;
-        width: 100%;
-        height: 43px; }
-        #page-wrapper content-container #content-container .top-content #top-action-bar .button-selected {
-          background-color: #7dd7ae;
-          color: white; }
-    #page-wrapper content-container #content-container .bottom-content {
-      position: relative;
-      overflow: auto;
-      bottom: 0;
-      right: 0;
-      left: 0;
+  #page-wrapper .top-content {
+    overflow: auto;
+    left: 0;
+    width: 100%; }
+    #page-wrapper .top-content #top-action-bar {
+      padding: 1px;
       width: 100%;
-      background-color: white; }
-      #page-wrapper content-container #content-container .bottom-content > div {
-        height: 100%; }
-  #page-wrapper content-container .left-content {
+      height: 43px; }
+      #page-wrapper .top-content #top-action-bar .button-selected {
+        background-color: #7dd7ae;
+        color: white; }
+  #page-wrapper .bottom-content {
+    position: relative;
+    overflow: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    background-color: white; }
+    #page-wrapper .bottom-content > div {
+      height: 100%; }
+  #page-wrapper .left-content {
     height: inherit;
     overflow: hidden; }
-  #page-wrapper content-container .right-content {
+  #page-wrapper .right-content {
     height: inherit;
     overflow: hidden; }
-  #page-wrapper content-container .highlighted {
+  #page-wrapper .highlighted {
     background: yellow; }
 
 body #layout-bottom {
@@ -811,13 +790,17 @@ body #layout-bottom {
     border: 1px solid black; }
 
 #login-form {
+  height: 100%;
+  width: 100%;
   text-align: center; }
   #login-form h1 {
     font-size: 60px;
     margin-top: auto;
     font-family: lobster, arial, sans-serif; }
   #login-form input {
-    margin: 5px; }
+    width: calc(33%);
+    margin: 5px;
+    display: inline; }
   #login-form button {
     color: white;
     padding: 10px;

@@ -64,6 +64,8 @@ export class AdminComponent implements OnInit {
         if (this.passwordInput !== '') {
           this.selectedUserProxy.item.password = this.passwordInput;
         }
+        
+        this.itemRepository.upsertItem(this.selectedUserProxy);
       } else {
         // TODO
         let item: any = {
@@ -75,10 +77,10 @@ export class AdminComponent implements OnInit {
         if (this.passwordInput !== '') {
           item.password = this.passwordInput;
         }
-        this.selectedUserProxy = new ItemProxy('KoheseUser', item);
+        
+        this.itemRepository.createItem('KoheseUser', item);
       }
 
-      this.itemRepository.upsertItem(this.selectedUserProxy);
       this.cancelForm();
     } else {
       alert('Confirmation password does not match password.');

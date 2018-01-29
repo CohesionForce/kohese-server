@@ -9,18 +9,18 @@ export class DialogService {
   }
 
   openConfirmDialog(title: string, text: string): Observable<any> {
-    return this.openCustomDialog(title, text, ['Cancel', 'OK']);
+    return this.openCustomTextDialog(title, text, ['Cancel', 'OK']);
   }
 
   openYesNoDialog(title: string, text: string): Observable<any> {
-    return this.openCustomDialog(title, text, ['No', 'Yes']);
+    return this.openCustomTextDialog(title, text, ['No', 'Yes']);
   }
 
   openInformationDialog(title: string, text: string): Observable<any> {
-    return this.openCustomDialog(title, text, ['OK']);
+    return this.openCustomTextDialog(title, text, ['OK']);
   }
 
-  openCustomDialog(title: string, text: string, buttonLabels: Array<string>): Observable<any> {
+  openCustomTextDialog(title: string, text: string, buttonLabels: Array<string>): Observable<any> {
     return this.dialog.open(DialogComponent, {
       data: {
         title: title,

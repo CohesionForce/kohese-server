@@ -3,7 +3,7 @@
   "base": "Item",
   "idInjection": true,
   "properties": {
-    "model": {
+    "modelName": {
       "type": "string",
       "required": true
     },

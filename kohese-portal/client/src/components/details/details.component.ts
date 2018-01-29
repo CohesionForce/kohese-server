@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
-import { TabService } from '../../services/tab/tab.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
@@ -61,11 +60,10 @@ export class DetailsComponent extends NavigatableComponent
 
 
   constructor (protected NavigationService : NavigationService,
-               protected TabService : TabService,
                private route : ActivatedRoute,
                private ItemRepository : ItemRepository,
                private SessionService : SessionService) {
-    super(NavigationService, TabService);
+    super(NavigationService);
     }
 
   ngOnInit () {

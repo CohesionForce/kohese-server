@@ -39,11 +39,15 @@ export class AuthenticationService {
     }, {
       observe: 'response',
       responseType: 'text'
-    }).mergeMap((httpResponse) => {
+    }).mergeMap((httpResponse: any) => {
+      let t: any = httpResponse.body;
+      localStorage.setItem(this.TOKEN_KEY, t);
+      this.token.next(t);
       this.socketService.connect();
-      localStorage.setItem(this.TOKEN_KEY, httpResponse.body);
-      this.token.next(httpResponse.body);
-      this.authenticationInformation.next(this.jwtHelper.decodeToken(httpResponse.body));
+      this.socketService.getSocket().emit('authenticate', {
+        token: t
+      });
+      this.authenticationInformation.next(this.jwtHelper.decodeToken(t));
       return this.authenticationInformation;
     }) as BehaviorSubject<any>;
   }

@@ -1,7 +1,7 @@
 <div id="login-form">
     <h1>Kohese</h1>
     <form (ngSubmit)="login()">
-        <label for="username"> Username: </label>
+        <label for="username">Username: </label>
           <input id="username"
                  type="text"
                  name="username"
@@ -9,7 +9,7 @@
                  class="form-control"
                  required/>
           <div class="alert alert-danger"
-               *ngIf="(0 === username.length) && loginSubmitted">Username is required</div>
+               *ngIf="loginSubmitted && (0 === username.length)">Username is required</div>
         <br/>
         <label for="password">Password: </label>
           <input  id="password"
@@ -19,7 +19,7 @@
                   [(ngModel)]="password"
                   required/>
           <div class="alert alert-danger"
-               *ngIf="(0 === password.length) && loginSubmitted">Password is required</div>
+               *ngIf="loginSubmitted && (0 === password.length)">Password is required</div>
         <br/>
         <button type="submit"
                 class="btn btn-primary">

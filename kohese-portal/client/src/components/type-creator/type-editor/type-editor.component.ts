@@ -6,8 +6,6 @@ import { ItemProxy } from '../../../../../common/models/item-proxy';
 import { PropertyEditorComponent } from '../property-editor/property-editor.component';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { DialogService } from '../../../services/dialog/dialog.service';
-import { TabService } from '../../../services/tab/tab.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
 import { Subscription } from 'rxjs/Subscription';
@@ -16,6 +14,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/map';
 import { TypeProperty } from '../../../classes/UDT/TypeProperty.class';
+import { DialogService } from 'client/src/services/dialog/dialog.service';
 
 @Component({
   selector: 'type-editor',
@@ -50,11 +49,9 @@ export class TypeEditorComponent extends NavigatableComponent
   repoSubscription : Subscription;
 
   constructor(NavigationService : NavigationService,
-              TabService : TabService,
               private ItemRepository : ItemRepository,
-              private DialogService : DialogService,
-              private FormBuilder : FormBuilder) {
-    super(NavigationService, TabService);
+              private DialogService : DialogService) {
+    super(NavigationService);
     this.typeList = [];
 
   }

@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service'
-import { TabService } from '../../services/tab/tab.service';
 import { AnalysisService } from '../../services/analysis/analysis.service';
 
 import { ItemProxy } from '../../../../common/models/item-proxy';
@@ -38,11 +37,10 @@ export class AnalysisComponent extends NavigatableComponent
   showChildrenSubject : BehaviorSubject<boolean>
 
   constructor(protected NavigationService : NavigationService,
-              protected TabService : TabService,
               private route : ActivatedRoute,
               private ItemRepository : ItemRepository,
               private AnalysisService : AnalysisService) {
-    super(NavigationService, TabService)
+    super(NavigationService);
     this.filterSubject = new BehaviorSubject('')
     this.showChildrenSubject = new BehaviorSubject(true);
 
@@ -65,8 +63,5 @@ export class AnalysisComponent extends NavigatableComponent
   }
 
   ngOnDestroy () {
-
   }
 }
-
-

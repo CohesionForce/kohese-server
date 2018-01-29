@@ -20,90 +20,55 @@ Created by Josh P
   position: fixed;
   top: $topNavHeight;
   left: $leftNavWidth;
-  height: 100%;
-  width: 100%;
+  height: calc(100% - #{$topNavHeight});
+  width: calc(100% - #{$leftNavWidth});
+  z-index: 2;
+  border-radius: $baseBorderRadius;
 
-  content-container {
-    #content-container {
-      height: calc(100% - #{$topNavHeight});
-      width: calc(100% - #{$leftNavWidth});
-      z-index: 2;
-      border-radius: $baseBorderRadius;
+  button {
+    border-radius: $baseBorderRadius;
+  }
 
-      #add-tab-button {
-        float: left;
-      }
-      
-      mat-tab-group {
-        height: 100%;
-        width: calc(100% - 40px);
-        float: left;
-        
-        mat-tab-body {
-          height: 100%;
-        }
-      }
-      
-      .mat-tab-body-wrapper {
-        height: 100%;
-      }
+  .top-content {
+    overflow: auto;
+    left: 0;
+    width: 100%;
 
-      .delete-tab-button {
-        margin-left: 2px;
-        padding: 1px;
-        &:hover {
-          background-color: red;
-          color: white;
-          border-radius: 50%;
-        }
-      }
-      
-      button {
-        border-radius: $baseBorderRadius;
-      }
-
-      .top-content {
-        overflow: auto;
-        left: 0;
-        width: 100%;
-
-        #top-action-bar {
-          padding: 1px;
-          width: 100%;
-          height: $topActionBarHeight;
-          .button-selected {
-            background-color: $buttonAccentColor;
-            color: white;
-          }
-        }
-      }
-
-      .bottom-content {
-        position: relative;
-        overflow: auto;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        width: 100%;
-        background-color: white;
-        > div {
-          height: 100%;
-        }
+    #top-action-bar {
+      padding: 1px;
+      width: 100%;
+      height: $topActionBarHeight;
+      .button-selected {
+        background-color: $buttonAccentColor;
+        color: white;
       }
     }
+  }
 
-    .left-content {
-      height: inherit;
-      overflow: hidden;
+  .bottom-content {
+    position: relative;
+    overflow: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    > div {
+      height: 100%;
     }
+  }
 
-    .right-content {
-      height: inherit;
-      overflow: hidden;
-    }
+  .left-content {
+    height: inherit;
+    overflow: hidden;
+  }
 
-    .highlighted {
-       background: yellow;
-    }
+  .right-content {
+    height: inherit;
+    overflow: hidden;
+  }
+
+  .highlighted {
+     background: yellow;
   }
 }

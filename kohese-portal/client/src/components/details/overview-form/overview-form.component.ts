@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { TabService } from '../../../services/tab/tab.service';
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
@@ -30,11 +29,10 @@ export class OverviewFormComponent extends NavigatableComponent
   repoStatusSubscription : Subscription;
 
   constructor(protected NavigationService : NavigationService,
-              protected TabService : TabService,
               private FormBuilder : FormBuilder,
               private DynamicTypesService : DynamicTypesService,
               private ItemRepository : ItemRepository) {
-    super(NavigationService, TabService);
+    super(NavigationService);
 
   }
 
