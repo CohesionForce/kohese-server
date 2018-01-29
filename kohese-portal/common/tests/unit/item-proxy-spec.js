@@ -43,7 +43,7 @@ describe('ItemProxy Test', function() {
       console.log('-----------------------------------------');      
     }
   }
-  
+ 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -604,7 +604,7 @@ describe('ItemProxy Test', function() {
     dumpHashFor(proxy);
     ItemProxy.loadingComplete();
 
-    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('61a57146a9fa2422b0940680c7449a42db3b71ab');
+    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('cd9c584ed2f5dfdc38814825f5b617c71fc60b53');
     expect(proxy.parentProxy.treeHashEntry.childTreeHashes['test-item-id'])
       .toEqual('53688a4a9207203c25da692d634bd58305ae1313');
     expect(proxy.treeHashEntry.treeHash).toEqual('53688a4a9207203c25da692d634bd58305ae1313');
@@ -756,8 +756,9 @@ describe('ItemProxy Test', function() {
         Category : [ 'name' ],
         Decision : [ 'name', 'decisionState' ],
         Action : [ 'name', 'decisionState', 'actionState' ],
-        KoheseModel : [ 'name', 'idInjection', 'properties', 'validations', 'relations', 'acls', 'methods' ],
+        KoheseModel : [ 'name', 'base', 'idInjection', 'properties', 'validations', 'relations', 'acls', 'methods' ],
         KoheseUser : [ 'name', 'password' ],
+        KoheseView : [ 'name', 'modelName', 'viewProperties' ],
         Observation : [ 'name', 'observedBy', 'observedOn', 'context' ],
         Issue : [ 'name', 'observedBy', 'observedOn', 'context', 'issueState' ],
         Repository : [ 'name' ],
@@ -885,27 +886,27 @@ describe('ItemProxy Test', function() {
         { kind: 'Internal',
           oid: 'ba14baabb49cca43770ca92b36388169a2df5f6c',
           childTreeHashes: 
-           { 'Model-Definitions': 'cb3e15f88d4c8bed83ca40121c69a175b806dd50',
+           { 'Model-Definitions': '82dbc93cc78ba184d2a2847f36121fbd2512a96a',
              'NV-TOP': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8' },
-          treeHash: '19dadbbb0c550bd2a56a539ce04a41fbf990ab1b' },
+          treeHash: 'c52e46ec05b69ec7b938e06694ceea55751a5773' },
        'Model-Definitions': 
         { kind: 'Internal-Model',
           oid: '8109f6a5dfeea6ede032fa99d6cd1b79ef589503',
           childTreeHashes: 
-           { Test: '4b86b0ffd2d8ee9507751331c5c74c1439e3a8c6',
-             'Test-Exclude': '9a5257c8fc7ca9d5dd6d4fd63325a04e2ff99e04' },
-          treeHash: 'cb3e15f88d4c8bed83ca40121c69a175b806dd50' },
+           { Test: 'cb1d87a9246e99489c8b7ae04b32e9c308ee785b',
+             'Test-Exclude': '367e6c670ca1664eb297f8b50a2a040e35037c68' },
+          treeHash: '82dbc93cc78ba184d2a2847f36121fbd2512a96a' },
        Test: 
-        { kind: 'Internal-Model',
-          oid: 'b7d79d44bb83cdc33e0fe85b419d6a4227388ce0',
+        { kind: 'KoheseModel',
+          oid: '4d5c0d6e290bb1d1ebd7cdd17eb620cae1e641f1',
           childTreeHashes: {},
-          treeHash: '4b86b0ffd2d8ee9507751331c5c74c1439e3a8c6',
+          treeHash: 'cb1d87a9246e99489c8b7ae04b32e9c308ee785b',
           parentId: 'Model-Definitions' },
        'Test-Exclude': 
-        { kind: 'Internal-Model',
-          oid: '32baf8d7286b920653652c5150d5b94a9a566dab',
+        { kind: 'KoheseModel',
+          oid: '261d6db1c1ddafda68f4e93da70b26a0e1035621',
           childTreeHashes: {},
-          treeHash: '9a5257c8fc7ca9d5dd6d4fd63325a04e2ff99e04',
+          treeHash: '367e6c670ca1664eb297f8b50a2a040e35037c68',
           parentId: 'Model-Definitions' },
        'NV-TOP': 
         { kind: 'Test',

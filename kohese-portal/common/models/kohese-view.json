@@ -1,0 +1,19 @@
+{
+  "name": "KoheseView",
+  "base": "Item",
+  "idInjection": true,
+  "properties": {
+    "modelName": {
+      "type": "string",
+      "required": true
+    },
+    "viewProperties": {
+      "type": "object",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

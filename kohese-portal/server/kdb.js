@@ -22,6 +22,7 @@ var kdbStore = {
     models: {}
   };
 
+// TODO:  Need to remove dependence on modelConfig file
 var modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
 var mountList = {};
 var kdbDirPath = "kdb";
@@ -40,9 +41,9 @@ function initialize(koheseKdbPath) {
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
   var kdbModel = require('./kdb-model.js');
-  ItemProxy.loadModelDefinitions(kdbModel.modelDef);
   kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
   
+  // TODO:  Need to remove dependence on modelConfig file
   var modelKinds = Object.keys(modelConfig);
   modelKinds.sort();
   console.log("::: ModelKinds: " + modelKinds);
@@ -88,9 +89,15 @@ function initialize(koheseKdbPath) {
     var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
     return createRepoStructure(koheseKDBDirPath).then(function(repo) {
       kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
+
+      // TODO Need to save to the KDB if they do not already exist
+      ItemProxy.loadModelDefinitions(kdbModel.modelDef);    
+      
       return openRepositories();
     });
   } else {
+    // TODO Need to save to the KDB if they do not already exist
+    ItemProxy.loadModelDefinitions(kdbModel.modelDef);    
     return openRepositories();
   }
 }
@@ -208,7 +215,7 @@ function storeModelInstance(proxy, isNewItem){
     
     if (isNewItem) {
       promise = createRepoStructure(repoStoragePath).then(function (repo) {
-        // Need to call create repo structure once that has been removed form validate
+        // Need to call create repo structure once that has been removed from validate
       });
     }
   } else {
@@ -223,7 +230,11 @@ function storeModelInstance(proxy, isNewItem){
   }
   
   return promise.then(function () {
+    // TODO:  This needs to be replaced with a uniform directory approach that does not include Model Kinds
+    kdbFS.createDirIfMissing(path.dirname(filePath));
+    
     kdbFS.storeJSONDoc(filePath, modelInstance);
+    
     if (isNewItem && (modelName === 'Repository')) {
       mountRepository({id: modelInstance.id, parentId: modelInstance.parentId, 'repoStoragePath': repoStoragePath});
     }
@@ -443,16 +454,16 @@ function validateRepositoryStructure (repoDirPath) {
 
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
   
-  // Remove model directories that are no longer needed
-  for (var dirIdx = 0; dirIdx < modelDirList.length; dirIdx++) {
+  // Remove model directories that are no longer needed from the model list
+  // Note: Iterate in reverse to allow array to be modified
+  for (var dirIdx = modelDirList.length - 1; dirIdx >= 0; dirIdx--) {
     var modelDirName = modelDirList[dirIdx];
     if (!modelConfig[modelDirName]) {
-      console.log("::: Removing stored directory for " + modelDirName);
-      kdbFS.deleteFolderRecursive(repoDirPath + "/" + modelDirName);
+      console.log("*** Found unexpected repo directory: " + repoDirPath + " -> " + modelDirName);
+      // Remove the unexpected model kind from the list
+      modelDirList.splice(dirIdx, 1);
     }
   }
-  
-  modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
   
   for(var modelIdx = 0; modelIdx < modelDirList.length; modelIdx++){
     var modelName = modelDirList[modelIdx];

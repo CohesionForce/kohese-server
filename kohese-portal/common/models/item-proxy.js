@@ -13,10 +13,10 @@ var tree = {};
 tree.proxyMap = {};
 tree.repoMap = {};
 tree.modelMap = {
-    'Internal': {},
-    'Internal-Lost': {},
-    'Internal-Model': {},
-    'Internal-State': {}
+    'Internal': {internal: true},
+    'Internal-Lost': {internal: true},
+    'Internal-Model': {internal: true},
+    'Internal-State': {internal: true}
 };
 tree.loading = true;
 
@@ -93,7 +93,7 @@ class ItemProxy {
       tree.repoMap[itemId] = proxy;
     }
     
-    if (kind === 'Internal-Model') {
+    if (kind === 'KoheseModel') {
       tree.modelMap[itemId] = proxy;
     }
     
@@ -1128,8 +1128,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static getModelDefinitions(){
-    var rootModelProxy = ItemProxy.getProxyFor('Model-Definitions');
-    return rootModelProxy.modelDefMap;
+    return tree.modelMap;
   }
   
   //////////////////////////////////////////////////////////////////////////
@@ -1201,7 +1200,7 @@ function createMissingProxy(forId) {
   var lostProxy = new ItemProxy('Internal-Lost', {
     id : forId,
     name : 'Lost Item: ' + forId,
-    description : 'Found children nodes referencing this node as a parent.',
+    description : 'Found node(s) referencing this node.',
     parentId : 'LOST+FOUND'
   });
 

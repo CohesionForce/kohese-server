@@ -62,5 +62,9 @@
   "KoheseModel": {
     "dataSource": "db",
     "public": true
+  },
+  "KoheseView": {
+    "dataSource": "db",
+    "public": true
   }
 }
