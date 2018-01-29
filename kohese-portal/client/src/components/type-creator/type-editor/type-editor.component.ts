@@ -1,4 +1,4 @@
-import { Input, Component, OnInit, OnDestroy } from '@angular/core';
+import { Input, Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
@@ -32,6 +32,7 @@ export class TypeEditorComponent extends NavigatableComponent
   validPropertyTypes : Array<string>
   typeProxies : Array<ItemProxy>
   typeList : Array<string>;
+  viewProxy : ItemProxy;
   filteredTypeList : Array<string>
   arbitraryCounter : number;
 
@@ -42,6 +43,7 @@ export class TypeEditorComponent extends NavigatableComponent
   @Input()
   selectedTypeSubject : BehaviorSubject<ItemProxy>;
   filteredTypes : Observable<string[]>;
+  saveEmitter : EventEmitter<TypeProperty>;
 
   /* Subscriptions */
   selectedTypeSubscription : Subscription;
@@ -66,6 +68,7 @@ export class TypeEditorComponent extends NavigatableComponent
         for (let i : number = 0; i < this.typeProxies.length; i++) {
           this.typeList.push(this.typeProxies[i].item.name);
         }
+        this.viewProxy = this.ItemRepository.getProxyFor('view-item');
       }
     });
     this.selectedTypeSubject.subscribe((type : object) => {
@@ -84,6 +87,7 @@ export class TypeEditorComponent extends NavigatableComponent
     'array'];
 
     this.arbitraryCounter = 0;
+    this.saveEmitter = new EventEmitter();
   }
 
   reset () {
@@ -97,18 +101,27 @@ export class TypeEditorComponent extends NavigatableComponent
 
   deleteProperty(property : string) : void {
     delete this.selectedType.item.properties[property];
+    // TO-DO also queue up
     console.log(this);
   }
 
   upsertType() {
+    this.ItemRepository.upsertItem(this.viewProxy);
     this.ItemRepository.upsertItem(this.selectedType);
   }
 
   addProperty() {
-    let propertyData = {};
+    let propertyData = {
+      saveEmitter : this.saveEmitter
+    };
     let dialogReference =
       this.DialogService.openComponentDialog(PropertyEditorComponent,
                                              propertyData);
+    this.saveEmitter.subscribe((property) => {
+      console.log(property);
+      console.log('On Exit emit');
+      this.viewProxy.item.viewProperties[property.propertyName] = property;
+    })
     console.log(dialogReference);
   }
 
@@ -119,7 +132,6 @@ export class TypeEditorComponent extends NavigatableComponent
     let dialogReference =
     this.DialogService.openComponentDialog(PropertyEditorComponent,
                                            propertyData);
-    console.log(dialogReference);
   }
 
   filter(val: string): string[] {

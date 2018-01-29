@@ -33,18 +33,18 @@
         Add Property
       </button>
     <mat-list id="property-list">
-       <mat-card *ngFor="let property of selectedType.item.properties | mapKey">
+       <mat-card *ngFor="let property of viewProxy.item.viewProperties | mapKey">
           <mat-card-content>
               {{property}}
               <br/>
-              <mat-checkbox [(ngModel)]="selectedType.item.properties[property].required"
+              <mat-checkbox [(ngModel)]="viewProxy.item.viewProperties[property].required"
                             name="required">
                 Required</mat-checkbox>
               <br/>
               Attribute Type :
               <mat-form-field>
                 <mat-select [required]="true"
-                            [(ngModel)]="selectedType.item.properties[property].type"
+                            [(ngModel)]="viewProxy.item.viewProperties[property].type"
                             name="prop-type">
                   <mat-option *ngFor="let type of validPropertyTypes" [value]="type">{{type}}</mat-option>
                 </mat-select>
@@ -54,7 +54,7 @@
               <button mat-icon-button (click)="deleteProperty(property)">
                 <i class="fa fa-trash"> Delete</i>
               </button>
-              <button mat-icon-button (click)="editProperty(property)">
+              <button mat-icon-button (click)="editProperty(viewProxy.item.viewProperties[property])">
                 <i class="fa fa-edit"> Edit</i>
               </button>
           </mat-card-actions>

@@ -1,5 +1,6 @@
-import { Input, Component, OnInit, OnDestroy, EventEmitter} from '@angular/core';
+import { Input, Inject, Component, OnInit, OnDestroy, EventEmitter} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -16,20 +17,22 @@ export class PropertyEditorComponent extends NavigatableComponent
   /* Data */
   @Input()
   property : TypeProperty;
+  templateInput : string;
   /* UI Switches */
-  onExit : EventEmitter<TypeProperty>
+  saveEmitter : EventEmitter<TypeProperty>
   /* Subscriptions */
 
   /* Observables */
 
-  constructor (protected NavigationService : NavigationService,
-               protected TabService : TabService) {
-    super(NavigationService, TabService)
+  constructor (@Inject(MAT_DIALOG_DATA) public data : any,
+               public dialogRef: MatDialogRef<PropertyEditorComponent>,
+               protected NavigationService : NavigationService,
+               protected TabService : TabService,) {
+    super(NavigationService, TabService);
   }
 
   ngOnInit () {
-    this.onExit = new EventEmitter();
-    if(!this.property) {
+    if(!this.data.property) {
       this.property = {
         type : 'text',
         template : '',
@@ -38,15 +41,33 @@ export class PropertyEditorComponent extends NavigatableComponent
         propertyName : '',
         enum : undefined
       }
+    } else {
+        this.property = this.data.property;
     }
+
+    this.saveEmitter = this.data.saveEmitter;
+
+    this.templateInput = this.property.template;
     console.log(this);
   }
 
   ngOnDestroy () {
-    this.onExit.emit(this.property);
-  }
-
-  renderHtml() {
+    this.property.template = this.templateInput
+    this.saveEmitter.emit(this.property);
 
   }
+
+  renderHtml () {
+    this.property.template = this.templateInput;
+  }
+
+  saveProperty () {
+    this.saveEmitter.emit(this.property);
+  }
+
+  close () {
+    this.dialogRef.close();
+  }
+
+
 }

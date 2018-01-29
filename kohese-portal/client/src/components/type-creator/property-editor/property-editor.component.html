@@ -1,4 +1,46 @@
-<div>
+<!-- <div>
+  Editor
+  Name :
+  <input type="text" [(ngModel)]="property.propertyName">
   {{property.propertyName}}
+  Template :
+  <textarea [(ngModel)]="this.templateInput"></textarea>
+  Default:
+  <input type="text" [(ngModel)]="property.default">
+  <hr/>
+  type :
+  <input type="text" [(ngModel)]="property.type">
+  Preview Form Element : <button (click)="renderHtml()">Render</button>
   <div [innerHTML]="property.template | sanitizeHtml"></div>
+</div> -->
+
+<div>
+  <h1 mat-dialog-title>Property Editor</h1>
+  <mat-dialog-content>
+    <div>
+      Editor
+      Name :
+      <input type="text" [(ngModel)]="property.propertyName">
+      {{property.propertyName}}
+      Template :
+      <textarea [(ngModel)]="this.templateInput"></textarea>
+      Default:
+      <input type="text" [(ngModel)]="property.default">
+      <hr/>
+      type :
+      <input type="text" [(ngModel)]="property.type">
+      Preview Form Element : <button (click)="renderHtml()">Render</button>
+      <div [innerHTML]="property.template | sanitizeHtml"></div>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-raised-button
+            (click)="saveProperty()">
+    Save
+    </button>
+    <button mat-raised-button
+            (click)="close()">
+    Cancel
+    </button>
+  </mat-dialog-actions>
 </div>
