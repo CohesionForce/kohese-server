@@ -15,16 +15,14 @@ export class NavigationService {
     this.navUpdates = new Subject<NavigationUpdate>();
   }
 
-  getNavUpdates (): Subject<NavigationUpdate> {
-
+  getNavUpdates(): Subject<NavigationUpdate> {
     return this.navUpdates;
   }
 
-  navigate(location : string, params: object, id : number ) {
-    let newNavUpdate = new NavigationUpdate(location, params, id);
+  navigate(location: string, params: object) {
+    let newNavUpdate = new NavigationUpdate(location, params);
     this.navUpdates.next(newNavUpdate);
     console.log(LocationMap[location]);
     this.router.navigate([LocationMap[location].route, params])
-
   }
 }

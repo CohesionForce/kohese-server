@@ -1,6 +1,8 @@
 @import "../utils/variables";
 
 #login-form {
+  height: 100%;
+  width: 100%;
   text-align: center;
 
   h1 {
@@ -10,7 +12,9 @@
   }
 
   input {
+    width: calc(33%);
     margin: 5px;
+    display: inline;
   }
 
   button {

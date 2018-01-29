@@ -4,7 +4,6 @@ import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { ItemProxy } from '../../../../common/models/item-proxy';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { TabService } from '../../services/tab/tab.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -32,9 +31,8 @@ export class TypeCreatorComponent extends NavigatableComponent
   repoStatusSubscription : Subscription;
 
   constructor(NavigationService : NavigationService,
-              TabService : TabService,
               private ItemRepository : ItemRepository) {
-    super(NavigationService, TabService);
+    super(NavigationService);
   }
 
   ngOnInit () {

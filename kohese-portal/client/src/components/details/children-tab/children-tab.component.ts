@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { TabService } from '../../../services/tab/tab.service';
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 
@@ -17,17 +16,13 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   itemSortField : string;
 
-  constructor(protected NavigationService : NavigationService,
-              protected TabService : TabService) {
-    super(NavigationService, TabService);
+  constructor(protected NavigationService : NavigationService) {
+    super(NavigationService);
   }
 
   ngOnInit() {
-
   }
 
   ngOnDestroy () {
-
   }
-
 }

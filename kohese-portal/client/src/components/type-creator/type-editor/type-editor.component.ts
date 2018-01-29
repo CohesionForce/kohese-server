@@ -5,7 +5,6 @@ import { NavigatableComponent } from '../../../classes/NavigationComponent.class
 import { ItemProxy } from '../../../../../common/models/item-proxy';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { TabService } from '../../../services/tab/tab.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
 import { Subscription } from 'rxjs/Subscription';
@@ -46,9 +45,8 @@ export class TypeEditorComponent extends NavigatableComponent
   repoSubscription : Subscription;
 
   constructor(NavigationService : NavigationService,
-              TabService : TabService,
               private ItemRepository : ItemRepository) {
-    super(NavigationService, TabService);
+    super(NavigationService);
     this.typeList = [];
 
   }

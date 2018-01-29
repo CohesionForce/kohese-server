@@ -1,49 +1,46 @@
 <div class="navbar">
-  <div class="navbar-header">
-    <a class="navbar-brand"
-      [ngClass]="{'navbar-syncing': repositorySyncing,
-                'navbar-disconnected': !repositorySynced}"
-      (click)="addTab('Explore', {id : ''})">
-        Kohese Portal <i class="fa fa-exclamation-triangle"
-                        *ngIf="!repositorySynced && !repositorySyncing && !repositorySyncFailed"> - Disconnected</i>
-                      <i class="fa fa-exclamation-triangle"
-                        *ngIf="repositorySyncing"> - Syncing</i>
-                      <i class="fa fa-exclamation-triangle"
-                        *ngIf="repositorySyncFailed"> - Failed Synchronization</i>
-
-    </a>
-    <a class="navbar-brand" (click)="addTab('Dashboard', {})">Dashboard</a>
-  </div>
-
-  <ul [hidden]="!authenticationService.getAuthenticationInformation()" class="nav navbar-top-links navbar-right">
-    <button mat-button id="userMenu" [matMenuTriggerFor]="userMenu">
-      <mat-icon class="fa fa-user fa-fw"></mat-icon>
-      <span>{{userName}}</span>
-    </button>
-    <mat-menu #userMenu="matMenu">
-      <button mat-menu-item (click)="addTab('Admin', {})">
-        <mat-icon class="fa fa-user-plus"></mat-icon>
-        <span>Users</span>
+  <ng-container
+    *ngIf="(authenticationService.getAuthenticationInformation() | async)">
+    <div class="navbar-header">
+      <a class="navbar-brand"
+        [ngClass]="{'navbar-syncing': repositoryStatus.syncing,
+          'navbar-disconnected': !repositoryStatus.connected}"
+        (click)="navigate('Explore', {id : ''})">
+        Kohese Portal
+        <i class="fa fa-exclamation-triangle"
+          *ngIf="repositoryStatus.syncing">
+           - Syncing
+        </i>
+        <i class="fa fa-exclamation-triangle"
+          *ngIf="!repositoryStatus.syncing && !repositoryStatus.connected">
+           - Failed Synchronization
+        </i>
+      </a>
+      <a class="navbar-brand" (click)="navigate('Dashboard', {})">Dashboard</a>
+    </div>
+    <ul class="nav navbar-top-links navbar-right">
+      <button mat-button id="userMenu" [matMenuTriggerFor]="userMenu">
+        <mat-icon class="fa fa-user fa-fw"></mat-icon>
+        <span>{{userName}}</span>
       </button>
-      <button mat-menu-item (click)="addTab('Repositories', {})">
-        <mat-icon class="fa fa-git-square"></mat-icon>
-        <span>Repositories</span>
-      </button>
-      <button mat-menu-item (click)="addTab('Type-Creator', {})">
-        <mat-icon class="fa fa-note"></mat-icon>
-        <span>Type Creator</span>
-      </button>
-      <button mat-menu-item (click)="logout()">
-        <mat-icon class="fa fa-sign-out fa-fw"></mat-icon>
-        <span>Logout</span>
-      </button>
-    </mat-menu>
-  </ul>
-
-  <button class="nav navbar-top-links navbar-right"
-        id="login-button"
-        [hidden]="!!authenticationService.getAuthenticationInformation()"
-        routerLink="/login">
-    <i class="fa fa-user"></i>Log In
-  </button>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item (click)="navigate('Admin', {})">
+          <mat-icon class="fa fa-user-plus"></mat-icon>
+          <span>Users</span>
+        </button>
+        <button mat-menu-item (click)="navigate('Repositories', {})">
+          <mat-icon class="fa fa-git-square"></mat-icon>
+          <span>Repositories</span>
+        </button>
+        <button mat-menu-item (click)="navigate('Type-Creator', {})">
+          <mat-icon class="fa fa-note"></mat-icon>
+          <span>Type Creator</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon class="fa fa-sign-out fa-fw"></mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </ul>
+  </ng-container>
 </div>

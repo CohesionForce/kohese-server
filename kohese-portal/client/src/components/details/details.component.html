@@ -1,6 +1,6 @@
 
 
-<div *ngIf="itemProxy" id="details-panel" class="panel" style="margin-right: 30px"> <!--  This inline style needs to go ASAP-->
+<div *ngIf="itemProxy" id="details-panel" class="panel">
     <div class="panel-heading ">
         <span *ngIf="itemProxy.kind">{{itemProxy.kind}} Information: {{itemProxy.item.name}} </span>
         <span *ngIf="!itemProxy.kind">No Item Selected</span>
@@ -26,11 +26,11 @@
                (click)="upsertItem()"
                title=" Save"
                     ></i>
-            <i *ngIf="tab.type === 'singleview'" class="fa fa-clone pull-right"
+            <!-- <i class="fa fa-clone pull-right"
                (click)="navigate('Explore', {id: itemProxy.item.id})"
                title="Split Screen">
-            </i>
-            <i class="fa fa-lg fa-arrows-alt" *ngIf="tab.type === 'dualview'"
+            </i> -->
+            <i class="fa fa-lg fa-arrows-alt"
                (click)="navigate('Investigate', {id: itemProxy.item.id})"
                title="Fullscreen"></i>
         </span>
@@ -47,7 +47,7 @@
                </button>
                <button
                       class= "btn btn-primary"
-                      (click)="addTab('Analysis',
+                      (click)="navigate('Analysis',
                                 {id: itemProxy.item.id})">
                       Analyze
               </button>

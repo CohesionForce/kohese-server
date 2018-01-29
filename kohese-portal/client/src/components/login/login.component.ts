@@ -1,31 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
-import { Router } from '@angular/router';
+import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
   selector: 'login',
   templateUrl: './login.component.html'
 })
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private username: string = '';
   private password : string = '';
   private loginSubmitted : boolean = false;
 
-  constructor(private authenticationService: AuthenticationService, private router: Router) {
+  constructor(private authenticationService: AuthenticationService,
+    private navigationService: NavigationService) {
   }
   
-  ngOnInit() {
+  ngOnInit(): void {
   }
 
-  login() {
+  login(): void {
     this.loginSubmitted = true;
     console.log ('Login Submitted');
     this.authenticationService.login({
       username: this.username,
       password: this.password
-    }).subscribe((decodedToken) => {
-      this.router.navigate(['/dashboard']);
+    }).subscribe((decodedToken: string) => {
+      this.navigationService.navigate('Dashboard', {});
       this.loginSubmitted = false;
     }, (err) => {
       console.log(err);

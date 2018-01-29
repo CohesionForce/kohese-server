@@ -1,7 +1,6 @@
-import { Injectable, ViewChildren } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { NavigatableComponent } from './NavigationComponent.class';
 import { NavigationService } from '../services/navigation/navigation.service';
-import { TabService } from '../services/tab/tab.service';
 import { Input } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -11,35 +10,32 @@ import { ItemProxy } from '../../../common/models/item-proxy.js';
 
 export class RowComponent extends NavigatableComponent {
   @Input()
-  itemProxy : ItemProxy
+  protected itemProxy: ItemProxy;
   @Input()
   exactFilter : boolean // TODO - Implement exact Passing
   @Input()
   filterSubject : BehaviorSubject<ProxyFilter>
   private collapsed: boolean = true;
-  @ViewChildren(RowComponent)
-  private childRows: Array<RowComponent>;
 
   previouslyExpanded : object;
   filter : ProxyFilter;
 
-  constructor (protected NavigationService : NavigationService,
-               protected TabService : TabService) {
-    super (NavigationService, TabService);
+  constructor (protected NavigationService : NavigationService) {
+    super (NavigationService);
   }
 
-  initialize () {
+  initialize(): void {
     this.filterSubject.subscribe(filter => { this.filter = filter });
     this.previouslyExpanded = {};
     console.log(this);
   }
+  
+  getProxy(): ItemProxy {
+    return this.itemProxy;
+  }
 
   rowSelected ( ) {
     console.log('Row Selected'); // TODO - Reimplement
-  }
-
-  updateRoot (newRoot : ItemProxy) {
-    console.log ('Root changed') // TODO - Reimplement
   }
 
   expandMatchingChildren(itemProxy: ItemProxy): void {
@@ -104,20 +100,15 @@ export class RowComponent extends NavigatableComponent {
     }
   }
 
-  getTypeForFilter (val) {
+  getTypeForFilter(val): string {
     return val === null ? 'null' : typeof val;
   }
   
-  isCollapsed(): boolean {
-    return this.collapsed;
+  isExpanded(): boolean {
+    return !this.collapsed;
   }
   
-  toggleExpandedState(expand: boolean, descend: boolean): void {
+  expand(expand: boolean): void {
     this.collapsed = !expand;
-    if (descend) {
-      for (let j: number = 0; j < this.childRows.length; j++) {
-        this.childRows[j].toggleExpandedState(expand, true);
-      }
-    }
   }
 }
