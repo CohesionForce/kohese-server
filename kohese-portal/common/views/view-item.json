@@ -1,0 +1,47 @@
+{
+  "model": "Item",
+  "viewProperties": {
+    "id" : {
+      "inputType" : "static",
+      "template" : "<p>Id: Find out how to bind ID through innerHtml </p>",
+      "required" : true,
+      "default" : "",
+      "propertyName" : ""
+    },
+    "name": {
+      "inputType": "text",
+      "template": " <i *ngSwitchCase=\"Task\"\n    class =\"fa fa-tasks\"\n    tooltip=\"Task\"></i>",
+      "required": true,
+      "default": "",
+      "propertyName": "name"
+    },
+    "description": {
+      "inputType": "text",
+      "template": "<label> Description:\n                  <input formControlName=\"description\">\n                </label>",
+      "required": false,
+      "default": "",
+      "propertyName": "description"
+    },
+    "tags": {
+      "inputType" : "text",
+      "template" : "            <input type=\"text\" formControlName=\"tags\"/>",
+      "required" : false,
+      "default" : "",
+      "propertyName" : "tags"
+    },
+    "parentId" : {
+      "inputType" : "autoComplete",
+      "template" : "<input type=\"text\" formControlName=\"parentId\"/>",
+      "required" : true,
+      "default" : "ROOT",
+      "propertyName" : "parentId"
+    }
+  },
+  "id": "view-item",
+  "name": "test item view",
+  "createdBy": "jephillips",
+  "createdOn": 1510596684590,
+  "modifiedBy": "admin",
+  "modifiedOn": 1517006598071,
+  "itemIds": []
+}

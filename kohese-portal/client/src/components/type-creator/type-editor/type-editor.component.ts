@@ -14,7 +14,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/map';
 import { TypeProperty } from '../../../classes/UDT/TypeProperty.class';
-import { DialogService } from 'client/src/services/dialog/dialog.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 
 @Component({
   selector: 'type-editor',

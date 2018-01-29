@@ -4,8 +4,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { TabService } from '../../../services/tab/tab.service';
-
 import { TypeProperty } from '../../../classes/UDT/TypeProperty.class';
 
 @Component({
@@ -26,9 +24,9 @@ export class PropertyEditorComponent extends NavigatableComponent
 
   constructor (@Inject(MAT_DIALOG_DATA) public data : any,
                public dialogRef: MatDialogRef<PropertyEditorComponent>,
-               protected NavigationService : NavigationService,
-               protected TabService : TabService,) {
-    super(NavigationService, TabService);
+               protected NavigationService : NavigationService
+               ) {
+    super(NavigationService);
   }
 
   ngOnInit () {
