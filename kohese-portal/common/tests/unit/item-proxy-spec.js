@@ -758,7 +758,7 @@ describe('ItemProxy Test', function() {
         Action : [ 'name', 'decisionState', 'actionState' ],
         KoheseModel : [ 'name', 'base', 'idInjection', 'properties', 'validations', 'relations', 'acls', 'methods' ],
         KoheseUser : [ 'name', 'password' ],
-        KoheseView : [ 'name', 'model', 'viewProperties' ],
+        KoheseView : [ 'name', 'modelName', 'viewProperties' ],
         Observation : [ 'name', 'observedBy', 'observedOn', 'context' ],
         Issue : [ 'name', 'observedBy', 'observedOn', 'context', 'issueState' ],
         Repository : [ 'name' ],
