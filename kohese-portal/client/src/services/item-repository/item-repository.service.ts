@@ -29,6 +29,8 @@ export class ItemRepository {
     Conflicted
   };
 
+  recentProxies : Array<ItemProxy>;
+
   repositoryStatus : BehaviorSubject<any>;
 
   constructor (private socketService: SocketService,
@@ -105,6 +107,8 @@ export class ItemRepository {
           this.fetchItems();
         }
       });
+
+      this.recentProxies = [];
   }
 
   // Item Proxy Wrapper Methods
@@ -132,6 +136,14 @@ export class ItemRepository {
 
   getRepoStatusSubject () : BehaviorSubject<any> {
     return this.repositoryStatus;
+  }
+
+  registerRecentProxy (itemProxy : ItemProxy) {
+    this.recentProxies.push(itemProxy);
+  }
+
+  getRecentProxies () : Array<ItemProxy> {
+    return this.recentProxies;
   }
 
   registerKoheseIOListeners () : void {
@@ -391,7 +403,7 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   createItem(kind: string, item: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/upsert', {kind: kind, item: item}, (response) => {
@@ -517,7 +529,7 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   importFiles(files: Array<File>, parentId: string): void {
     let uploader: any = new SocketIOFileClient(this.socketService.getSocket());
     uploader.on('complete', (file: File) => {
