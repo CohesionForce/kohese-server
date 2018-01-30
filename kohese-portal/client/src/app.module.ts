@@ -32,7 +32,6 @@ import { ActionTableComponent } from './components/action-table/action-table.com
 import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
 import { AuthenticationService } from './services/authentication/authentication.service';
 import { SocketService } from './services/socket/socket.service';
-import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
@@ -96,7 +95,6 @@ const AUTHENTICATION_INTERCEPTOR = {
     AuthenticationService,
     AUTHENTICATION_INTERCEPTOR,
     SocketService,
-    BundleService,
     SessionService,
     VersionControlService,
     NavigationService,

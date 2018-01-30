@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BundleService } from '../../services/bundle/bundle.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
@@ -36,10 +35,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
   private inWorkTasksFilter : Object;
   private repoStatusSubject : BehaviorSubject<any>;
 
-
-
-  constructor(private bundleService: BundleService,
-              protected NavigationService : NavigationService,
+  constructor(protected NavigationService : NavigationService,
               private ItemRepository : ItemRepository,
               private sessionService: SessionService) {
     super(NavigationService);

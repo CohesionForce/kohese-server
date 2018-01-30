@@ -1,7 +1,7 @@
 import { TypePropertyData } from './TypeProperty.data';
 
 export class TypeProperty {
-  type: string;
+  inputType: string;
   required:boolean;
   enum : Array<string>;
   template : string;
@@ -10,7 +10,7 @@ export class TypeProperty {
 
   constructor(typeName : string) {
     var typeData = TypePropertyData[typeName];
-    this.type = typeData.type;
+    this.inputType = typeData.type;
     this.template = typeData.template;
     this.required = typeData.required
     this.default = typeData.default;

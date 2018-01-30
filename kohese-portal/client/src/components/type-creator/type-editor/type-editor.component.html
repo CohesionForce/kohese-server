@@ -3,6 +3,7 @@
       Please select a type to edit
   </div>
   <form *ngIf="selectedType"
+         formGroup="selectedTypeForm"
          id="editor-container">
     <div id="base-editor">
       <h1>
@@ -13,13 +14,14 @@
       </h1>
           <br/>
           <label for="name">Name : </label>
-          <input matInput type="text" [(ngModel)]="selectedType.item.name"
+          <input matInput type="text"
+                          formControlName="name"
                      label="name" name="model-name">
           <br/>
           <mat-form-field>
             <label for="base">Base Class: </label>
-            <input type="text" matInput [formControl]="baseControl" [matAutocomplete]="base"
-              [(ngModel)]="selectedType.item.base" name="base">
+            <input type="text" matInput [matAutocomplete]="base"
+              formControlName="base" name="base">
           </mat-form-field>
           <mat-autocomplete #base="matAutocomplete">
             <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
@@ -29,7 +31,7 @@
       </div>
 
       <h4> Properties : </h4>
-      <button mat-button (click)="addProperty()">
+      <button mat-button (click)="editProperty()">
         Add Property
       </button>
     <mat-list id="property-list">

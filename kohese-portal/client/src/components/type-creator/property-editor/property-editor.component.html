@@ -17,29 +17,29 @@
 <div>
   <h1 mat-dialog-title>Property Editor</h1>
   <mat-dialog-content>
-    <div>
+    <form [formGroup]="propertyForm">
       Property Name :
       <input type="text"
              formControlName="propertyName"
              [(ngModel)]="property.propertyName">
-      {{property.propertyName}}
       <br/>
       Template :
-      <textarea [(ngModel)]="this.templateInput"
+      <textarea matInput
+                MatTextareaAutosize
+                [(ngModel)]="this.templateInput"
                 formControlName="template"></textarea>
       <br/>
-      type :
+      Input type :
       <input type="text"
-             formControlName="type"
-             [(ngModel)]="property.type">
+             formControlName="inputType">
       <br/>
       Default Value:
-      <input type="text" [(ngModel)]="property.default">
+      <input type="text" formControlName="default">
       <hr/>
       Preview Form Element : <button (click)="renderHtml()">Render</button>
       <br/>
       <div [innerHTML]="property.template | sanitizeHtml"></div>
-    </div>
+    </form>
   </mat-dialog-content>
   <mat-dialog-actions>
     <button mat-raised-button
