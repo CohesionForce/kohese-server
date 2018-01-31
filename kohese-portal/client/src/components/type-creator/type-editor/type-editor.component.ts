@@ -64,8 +64,10 @@ export class TypeEditorComponent extends NavigatableComponent
         let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
         this.typeProxies = modelProxy.getDescendants();
         this.selectedTypeSubject.subscribe((type : object) => {
-          this.selectedType = type;
-          this.reset();
+          if (type) {
+            this.selectedType = type;
+            this.reset();
+          }
         });
         for (let i : number = 0; i < this.typeProxies.length; i++) {
           this.typeList.push(this.typeProxies[i].item.name);
@@ -73,13 +75,6 @@ export class TypeEditorComponent extends NavigatableComponent
         this.viewProxy = this.ItemRepository.getProxyFor('view-item');
       }
     });
-
-
-
-
-    this.filteredTypes = this.selectedTypeForm.get('base').valueChanges
-      .startWith('')
-      .map((val : string) => this.filter(val));
 
     this.validPropertyTypes = ['string',
     'number',
@@ -97,6 +92,11 @@ export class TypeEditorComponent extends NavigatableComponent
       name : [this.selectedType.item.name, Validators.required],
       base : [this.selectedType.item.base, Validators.required]
     })
+
+    this.filteredTypes = this.selectedTypeForm.get('base').valueChanges
+    .startWith('')
+    .map((val : string) => this.filter(val));
+
   }
 
   ngOnDestroy () {
@@ -145,22 +145,5 @@ export class TypeEditorComponent extends NavigatableComponent
       option.toLowerCase().indexOf(val.toLowerCase()) === 0);
   }
 
-//   createFormGroup () : FormGroup {
-//     let formObject = {
-//       name : this.selectedType.name,
-//       base : t
-//     };
-//     for (let i : number = 0; i < this.currentType.properties.length; i ++ ) {
-//       let currentProperty = this.currentType.properties[i]
-//       if (currentProperty.required) {
-//         formObject[currentProperty.propertyName] = [currentProperty.default, Validators.required]
-//       } else {
-//         formObject[currentProperty.propertyName] = currentProperty.default;
-//       }
-//     }
-//     const group = this.FormBuilder.group(formObject);
-//     //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
-//     return group;
-// }
 }
 
