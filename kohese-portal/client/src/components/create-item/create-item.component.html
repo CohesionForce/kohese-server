@@ -18,7 +18,7 @@
   <div class="panel-body">
     <input type="file" #fileInput multiple/>
     <br/>
-    <button mat-raised-button (click)="itemRepository.importFiles(fileInput.files, route.snapshot.paramMap.get('parentId'))"
+    <button mat-raised-button (click)="importFiles(fileInput.files, data.parentId)"
       class="btn btn-primary">Import</button>
   </div>
 </div>

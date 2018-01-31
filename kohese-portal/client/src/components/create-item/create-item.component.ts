@@ -17,11 +17,10 @@ export class CreateItemComponent extends NavigatableComponent
   @Input()
   private itemProxy: ItemProxy;
   private repoStatusSubscription: Subscription;
-  private types: Array<ItemProxy>;
+  types: Array<ItemProxy>;
 
   constructor(protected NavigationService : NavigationService,
-              private itemRepository: ItemRepository,
-              private route: ActivatedRoute) {
+              private itemRepository: ItemRepository,) {
     super(NavigationService);
   }
 
@@ -40,6 +39,10 @@ export class CreateItemComponent extends NavigatableComponent
 
   ngOnDestroy(): void {
     this.repoStatusSubscription.unsubscribe();
+  }
+
+  importFiles () {
+    //fileInput.files, data.parentId
   }
 }
 
