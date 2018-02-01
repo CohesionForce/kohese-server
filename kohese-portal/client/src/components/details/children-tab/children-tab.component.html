@@ -2,63 +2,38 @@
   <label class="control-label" for="Ordered"> Ordered </label>
     <mat-checkbox [(ngModel)]="orderedChildren" (change)="toggleOrderedChildren()">
     </mat-checkbox>
+    <button mat-raised-button
+    (click)="createChild()">
+    Create Child </button>
 </span>
 <span class="pull-right">
-  <span>Showing {{filteredItems.length}} of {{itemProxy.children.length}}</span>
   <input class="input-sm" type="text" [(ngModel)]="filterString" placeholder="Filter" style="margin: 5px"/>
-
 </span>
-<table class="table table-striped table-condensed table-hover">
-  <thead>
-    <th style="width:15px"></th>
-    <th><a (click)="itemSortField = 'itemProxy.item.kind'">Kind</a></th>
-    <th><a (click)="itemSortField = 'itemProxy.item.name'">Name</a></th>
-    <th><a (click)="itemSortField = 'itemProxy.item.actionState'">State</a></th>
-    <th><a (click)="itemSortField = 'itemProxy.item.assignedTo'">Assigned To</a></th>
-    <th><a (click)="itemSortField = 'itemProxy.item.tags'">Tags</a></th>
-    <th><a (click)="itemSortField = 'itemProxy.item.description'">Description</a></th>
-    <th>
-      <span
-          class="create-button pull-right"
-          (click)="createChild()">
-          Create Child
-      </span>
-    </th>
-  </thead>
-  <tbody>
-    <tr>    <tree-root [nodes]="filteredItems" options="treeOptions">
-      <ng-template #treeNodeTemplate let-node let-index="index">
-        <td>{{node.data.kind}}</td>
-        <td>{{node.data.item.name}}</td>
-        <td>TBD</td>
-        <td>{{node.data.item.assignedTo}}</td>
-        <td>Tags</td>
-        <td>Description</td>
-      </ng-template>
-    </tree-root>
-  </tr>
-  </tbody>
-      <!-- <tbody ui-tree-nodes ng-model="detailsCtrl.itemProxy.children">
-      <tr ui-tree-node *ngFor="let proxy of filteredItems = (detailsCtrl.itemProxy.children  | filter:{item: {$: filterString}}) | orderBy:itemSortField">
-          <td><i ui-tree-handle class="fa fa-th" aria-hidden="true" ng-if="detailsCtrl.itemProxy.childrenAreManuallyOrdered()")></i></td>
-          <td>{{proxy.kind}}</td>
-          <td (click)="navigate('Explore', {id : proxy.item.id})"
-              class="tree-label">
-              {{proxy.item.name | highlight:filterString }}
-          <td>
-              <span ng-if="proxy.kind==='Decision'">{{proxy.item.decisionState}}</span>
-              <span ng-if="proxy.kind==='Action'">{{proxy.item.decisionState}}/{{proxy.item.actionState}}</span>
-              <span ng-if="proxy.kind==='Task'">{{proxy.item.taskState}}</span>
-              <span ng-if="proxy.kind==='Issue'">{{proxy.item.issueState}}</span>
-          </td>
-          <td>{{proxy.item.assignedTo}}</td>
-          <td>{{proxy.item.tags}}</td>
-          <td ng-class="{'trim-info': !showDescription, 'trim-info-visible': showDescription}"
-              ng-dblclick="showDescription=!showDescription" ng-init="showDescription=false"
-              ng-bind-html="proxy.item.description | highlight:detailsCtrl.filterString | trustAsHTML"></td>
-          <td class="pull-right">
-              <i class="glyphicon glyphicon-remove" (click)="detailsCtrl.removeItem(proxy)"></i>
-          </td>
-      </tr>
-      </tbody> -->
-  </table>
+<mat-card>
+  <mat-card-title class="panel-heading">
+    <span>ChildrenShowing {{filteredItems.length}} of {{itemProxy.children.length}}</span>
+    <span class="pull-right">
+      <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
+        <mat-icon class="fa fa-gear"></mat-icon>
+      </button>
+      <mat-menu #optionsMenu="matMenu">
+        <button mat-menu-item (click)="childView = 'tree'">
+          <mat-icon *ngIf="childView === 'tree'" class="fa fa-check"></mat-icon>
+          Show as Tree
+        </button>
+        <button mat-menu-item (click)="childView = 'table'">
+            <i *ngIf="childView === 'table'" class="fa fa-check"></i>
+          Show as Table
+        </button>
+      </mat-menu>
+    </span>
+  </mat-card-title>
+  <mat-card-content>
+    <children-table [itemProxy]="itemProxy"
+                    [filteredItems]="filteredItems"
+                    *ngIf="childView === 'table'"></children-table>
+    <children-tree [itemProxy]="itemProxy"
+                   [filteredItems]="filteredItems"
+                   *ngIf="childView === 'tree'"></children-tree>
+  </mat-card-content>
+</mat-card>

@@ -2,6 +2,8 @@ import { NgModule } from "@angular/core/";
 import { DetailsComponent } from './details.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ChildrenTabComponent } from './children-tab/children-tab.component';
+import { ChildrenTreeComponent } from './children-tab/children-tree/children-tree.component';
+import { ChildrenTableComponent } from './children-tab/children-table/children-table.component';
 import { OverviewFormComponent } from './overview-form/overview-form.component';
 
 import { CommonModule } from '@angular/common';
@@ -19,6 +21,8 @@ import { PipesModule } from "../../pipes/pipes.module";
     DetailsComponent,
     HistoryTabComponent,
     ChildrenTabComponent,
+    ChildrenTableComponent,
+    ChildrenTreeComponent,
     OverviewFormComponent
   ],
   imports : [

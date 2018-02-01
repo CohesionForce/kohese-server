@@ -19,6 +19,7 @@ export class ChildrenTabComponent extends NavigatableComponent
   /* Ui Switches */
   orderedChildren : boolean;
   treeOptions : object
+  childView : string
 
   /* Data */
   @Input()
@@ -49,7 +50,7 @@ export class ChildrenTabComponent extends NavigatableComponent
     this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
         if (update.connected) {
-
+          this.childView = 'table';
           console.log(this.filteredItems);
         }
       })
