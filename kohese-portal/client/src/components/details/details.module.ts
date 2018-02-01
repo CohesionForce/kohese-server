@@ -9,6 +9,7 @@ import { OverviewFormComponent } from './overview-form/overview-form.component';
 import { CommonModule } from '@angular/common';
 
 import { MaterialModule } from "../../material.module";
+import { DragulaModule } from 'ng2-dragula';
 import { TreeModule } from 'angular-tree-component';
 import { DocumentViewModule } from "../document-view/document-view.module";
 import { ActionTableModule } from "../action-table/action-table.module";
@@ -33,7 +34,8 @@ import { PipesModule } from "../../pipes/pipes.module";
     FormsModule,
     ReactiveFormsModule,
     PipesModule,
-    TreeModule
+    TreeModule,
+    DragulaModule
   ],
   exports : [
     DetailsComponent,

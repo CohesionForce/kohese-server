@@ -10,9 +10,22 @@
     <th>
     </th>
   </thead>
-  <tbody>
+  <tbody
+    [dragula]="'childrenRows'"
+    [dragulaModel]="filteredItems"
+    *ngFor="let child of filteredItems">
+    <tr >
+    <td>{{child.kind}}</td>
+    <td>{{child.item.name}}</td>
+    <td>{{child.item.actionState}}</td>
+    <td>{{child.item.assignedTo}}</td>
+    <td>{{child.item.tags}}</td>
+    <td>{{child.item.description | truncate : 20}}</td>
+
+    </tr>
   </tbody>
 </table>
+
 
             <!-- <tbody ui-tree-nodes ng-model="detailsCtrl.itemProxy.children">
       <tr ui-tree-node *ngFor="let proxy of filteredItems = (detailsCtrl.itemProxy.children  | filter:{item: {$: filterString}}) | orderBy:itemSortField">

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, EventEmitter, OnChanges } from '@angular/core';
 
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../../services/navigation/navigation.service';
@@ -13,10 +13,9 @@ import { Subscription } from 'rxjs/Subscription';
   templateUrl : './children-table.component.html'
 })
 export class ChildrenTableComponent extends NavigatableComponent
-                                    implements OnInit, OnDestroy {
+                                    implements OnInit, OnDestroy, OnChanges {
   @Input()
   itemProxy : ItemProxy;
-  @Input()
   filteredItems : Array<ItemProxy>;
 
   constructor (protected NavigationService : NavigationService) {
@@ -24,10 +23,15 @@ export class ChildrenTableComponent extends NavigatableComponent
   }
 
   ngOnInit () {
-
+    this.filteredItems = this.itemProxy.children;
   }
 
   ngOnDestroy () {
 
+  }
+
+  ngOnChanges (changes) {
+    this.itemProxy = (changes.itemProxy) ? changes.itemProxy.currentValue : changes.currentValue;
+    this.filteredItems = this.itemProxy.children;
   }
 }

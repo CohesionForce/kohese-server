@@ -42,6 +42,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
+import { DragulaModule } from 'ng2-dragula';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
@@ -87,7 +88,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     ActionTableModule,
     CreateItemModule,
     TypeCreatorModule,
-    TreeModule
+    TreeModule,
+    DragulaModule
   ],
   entryComponents: [
     DialogComponent

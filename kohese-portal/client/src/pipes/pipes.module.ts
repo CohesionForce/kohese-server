@@ -4,12 +4,14 @@ import { CommonModule } from '@angular/common';
 import { MapKeyPipe } from './map-key.pipe';
 import { HighlightRegexPipe } from './highlight.pipe';
 import { SanitizeHtmlPipe } from './sanitizeHtml.pipe';
+import { TruncatePipe } from './truncate.pipe';
 
 @NgModule({
   declarations: [
     MapKeyPipe,
     HighlightRegexPipe,
-    SanitizeHtmlPipe
+    SanitizeHtmlPipe,
+    TruncatePipe
   ],
   imports: [
     CommonModule
@@ -17,7 +19,8 @@ import { SanitizeHtmlPipe } from './sanitizeHtml.pipe';
   exports: [
     MapKeyPipe,
     HighlightRegexPipe,
-    SanitizeHtmlPipe
+    SanitizeHtmlPipe,
+    TruncatePipe
   ]
 })
 export class PipesModule {}
