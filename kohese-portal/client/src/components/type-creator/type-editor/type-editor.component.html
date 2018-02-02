@@ -3,6 +3,7 @@
       Please select a type to edit
   </div>
   <form *ngIf="selectedType"
+         [formGroup]="selectedTypeForm"
          id="editor-container">
     <div id="base-editor">
       <h1>
@@ -13,14 +14,13 @@
       </h1>
           <br/>
           <label for="name">Name : </label>
-          <input matInput type="text" [(ngModel)]="selectedType.item.name"
+          <input matInput type="text"
+                          formControlName="name"
                      label="name" name="model-name">
           <br/>
-          <mat-form-field>
             <label for="base">Base Class: </label>
-            <input type="text" matInput [formControl]="baseControl" [matAutocomplete]="base"
-              [(ngModel)]="selectedType.item.base" name="base">
-          </mat-form-field>
+            <input type="text" matInput [matAutocomplete]="base"
+              formControlName="base" name="base">
           <mat-autocomplete #base="matAutocomplete">
             <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
               {{type}}
@@ -29,7 +29,7 @@
       </div>
 
       <h4> Properties : </h4>
-      <button mat-button (click)="addProperty()">
+      <button mat-button (click)="editProperty()">
         Add Property
       </button>
     <mat-list id="property-list">
@@ -37,22 +37,21 @@
           <mat-card-content>
               {{property}}
               <br/>
-              <mat-checkbox [(ngModel)]="viewProxy.item.viewProperties[property].required"
+              <!-- <mat-checkbox [(ngModel)]="viewProxy.item.viewProperties[property].required"
                             name="required">
                 Required</mat-checkbox>
               <br/>
               Attribute Type :
-              <mat-form-field>
-                <mat-select [required]="true"
+                <mat-select
                             [(ngModel)]="viewProxy.item.viewProperties[property].type"
                             name="prop-type">
                   <mat-option *ngFor="let type of validPropertyTypes" [value]="type">{{type}}</mat-option>
-                </mat-select>
-              </mat-form-field>
+                </mat-select> -->
+                Saving Model not currently implemented. Click edit to modify view.
           </mat-card-content>
           <mat-card-actions>
               <button mat-icon-button (click)="deleteProperty(property)">
-                <i class="fa fa-trash"> Delete</i>
+                <i class="fa fa-trash"> Delete   </i>
               </button>
               <button mat-icon-button (click)="editProperty(viewProxy.item.viewProperties[property])">
                 <i class="fa fa-edit"> Edit</i>

@@ -1,5 +1,5 @@
 import { Input, Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { ItemProxy } from '../../../../../common/models/item-proxy';
@@ -36,7 +36,7 @@ export class TypeEditorComponent extends NavigatableComponent
   arbitraryCounter : number;
 
   /* Form Types */
-  baseControl : FormControl = new FormControl();
+  selectedTypeForm : FormGroup;
 
   /* Observables */
   @Input()
@@ -50,7 +50,8 @@ export class TypeEditorComponent extends NavigatableComponent
 
   constructor(NavigationService : NavigationService,
               private ItemRepository : ItemRepository,
-              private DialogService : DialogService) {
+              private DialogService : DialogService,
+              private FormBuilder : FormBuilder) {
     super(NavigationService);
     this.typeList = [];
 
@@ -62,20 +63,18 @@ export class TypeEditorComponent extends NavigatableComponent
         this.repoConnected = true;
         let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
         this.typeProxies = modelProxy.getDescendants();
+        this.selectedTypeSubject.subscribe((type : object) => {
+          if (type) {
+            this.selectedType = type;
+            this.reset();
+          }
+        });
         for (let i : number = 0; i < this.typeProxies.length; i++) {
           this.typeList.push(this.typeProxies[i].item.name);
         }
         this.viewProxy = this.ItemRepository.getProxyFor('view-item');
       }
     });
-    this.selectedTypeSubject.subscribe((type : object) => {
-      this.selectedType = type;
-      this.reset();
-    });
-
-    this.filteredTypes = this.baseControl.valueChanges
-      .startWith('')
-      .map((val : string) => this.filter(val));
 
     this.validPropertyTypes = ['string',
     'number',
@@ -89,6 +88,15 @@ export class TypeEditorComponent extends NavigatableComponent
 
   reset () {
     this.arbitraryCounter = 0;
+    this.selectedTypeForm = this.FormBuilder.group({
+      name : [this.selectedType.item.name, Validators.required],
+      base : [this.selectedType.item.base, Validators.required]
+    })
+
+    this.filteredTypes = this.selectedTypeForm.get('base').valueChanges
+    .startWith('')
+    .map((val : string) => this.filter(val));
+
   }
 
   ngOnDestroy () {
@@ -103,32 +111,30 @@ export class TypeEditorComponent extends NavigatableComponent
   }
 
   upsertType() {
+    // TO-DO finish impl when save of selected type is possible
+    this.viewProxy.modelName = this.selectedType.item.name;
     this.ItemRepository.upsertItem(this.viewProxy);
-    this.ItemRepository.upsertItem(this.selectedType);
+    // this.ItemRepository.upsertItem(this.selectedType);
   }
 
-  addProperty() {
+  editProperty(property? : TypeProperty) {
     let propertyData = {
       saveEmitter : this.saveEmitter
     };
+
+    if (property) {
+      propertyData['property'] = property;
+    }
+
     let dialogReference =
-      this.DialogService.openComponentDialog(PropertyEditorComponent,
-                                             propertyData);
+    this.DialogService.openComponentDialog(PropertyEditorComponent,
+                                           propertyData);
+
     this.saveEmitter.subscribe((property) => {
       console.log(property);
       console.log('On Exit emit');
       this.viewProxy.item.viewProperties[property.propertyName] = property;
     })
-    console.log(dialogReference);
-  }
-
-  editProperty(property : TypeProperty) {
-    let propertyData = {
-      property : property
-    };
-    let dialogReference =
-    this.DialogService.openComponentDialog(PropertyEditorComponent,
-                                           propertyData);
   }
 
   filter(val: string): string[] {
@@ -139,22 +145,5 @@ export class TypeEditorComponent extends NavigatableComponent
       option.toLowerCase().indexOf(val.toLowerCase()) === 0);
   }
 
-//   createFormGroup () : FormGroup {
-//     let formObject = {
-//       name : this.selectedType.name,
-//       base : t
-//     };
-//     for (let i : number = 0; i < this.currentType.properties.length; i ++ ) {
-//       let currentProperty = this.currentType.properties[i]
-//       if (currentProperty.required) {
-//         formObject[currentProperty.propertyName] = [currentProperty.default, Validators.required]
-//       } else {
-//         formObject[currentProperty.propertyName] = currentProperty.default;
-//       }
-//     }
-//     const group = this.FormBuilder.group(formObject);
-//     //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
-//     return group;
-// }
 }
 

@@ -33,7 +33,6 @@ import { ImportComponent } from './components/import/import.component';
 import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
 import { AuthenticationService } from './services/authentication/authentication.service';
 import { SocketService } from './services/socket/socket.service';
-import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
@@ -43,6 +42,8 @@ import { DynamicTypesService } from './services/dynamic-types/dynamic-types.serv
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
+import { TreeModule } from 'angular-tree-component';
+import { DragulaModule } from 'ng2-dragula';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
@@ -88,7 +89,9 @@ const AUTHENTICATION_INTERCEPTOR = {
     DetailsModule,
     DocumentViewModule,
     ActionTableModule,
-    TypeCreatorModule
+    TypeCreatorModule,
+    TreeModule,
+    DragulaModule
   ],
   entryComponents: [
     DialogComponent,
@@ -100,7 +103,6 @@ const AUTHENTICATION_INTERCEPTOR = {
     AuthenticationService,
     AUTHENTICATION_INTERCEPTOR,
     SocketService,
-    BundleService,
     SessionService,
     VersionControlService,
     NavigationService,

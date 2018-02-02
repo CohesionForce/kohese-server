@@ -1,33 +1,16 @@
-<!-- <div>
-  Editor
-  Name :
-  <input type="text" [(ngModel)]="property.propertyName">
-  {{property.propertyName}}
-  Template :
-  <textarea [(ngModel)]="this.templateInput"></textarea>
-  Default:
-  <input type="text" [(ngModel)]="property.default">
-  <hr/>
-  type :
-  <input type="text" [(ngModel)]="property.type">
-  Preview Form Element : <button (click)="renderHtml()">Render</button>
-  <div [innerHTML]="property.template | sanitizeHtml"></div>
-</div> -->
-
 <div>
   <h1 mat-dialog-title>Property Editor</h1>
   <mat-dialog-content>
-    <div>
+    <form [formGroup]="propertyForm">
       Property Name :
       <input type="text"
              formControlName="propertyName"
-             [(ngModel)]="property.propertyName">
-      {{property.propertyName}}
+             class="pull-right">
       <br/>
       Default Value:
-      <input type="text" [(ngModel)]="property.default">
+      <input type="text" formControlName="default">
       <hr/>
-    </div>
+    </form>
   </mat-dialog-content>
   <mat-dialog-actions>
     <button mat-raised-button

@@ -21,9 +21,13 @@ export class PropertyEditorComponent extends NavigatableComponent
 
   /* Observables */
 
+  /* Utilities */
+  propertyForm : FormGroup;
+
   constructor (@Inject(MAT_DIALOG_DATA) public data : any,
                public dialogRef: MatDialogRef<PropertyEditorComponent>,
-               protected NavigationService : NavigationService
+               protected NavigationService : NavigationService,
+               private FormBuilder : FormBuilder
                ) {
     super(NavigationService);
   }
@@ -43,6 +47,7 @@ export class PropertyEditorComponent extends NavigatableComponent
 
     this.saveEmitter = this.data.saveEmitter;
 
+    this.propertyForm = this.createFormGroup();
     console.log(this);
   }
 
@@ -57,6 +62,18 @@ export class PropertyEditorComponent extends NavigatableComponent
 
   close () {
     this.dialogRef.close();
+  }
+
+  createFormGroup () : FormGroup {
+    let formObject = {
+      propertyName : [this.property.propertyName, Validators.required],
+      inputType : [this.property.inputType, Validators.required],
+    };
+    formObject['default'] = (this.property.default) ? this.property.default :
+                                                      '';
+    const group = this.FormBuilder.group(formObject);
+    //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
+    return group;
   }
 
 
