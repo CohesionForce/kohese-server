@@ -29,18 +29,18 @@ export class KoheseType {
         let userInputDefinition: TypeProperty = viewProxy.item.viewProperties[property];
         let inputType: string = userInputDefinition.inputType;
         let delimiterIndex: number = inputType.indexOf(':');
-        let t: string;
-        let o: any = {};
+        let type: string;
+        let options: any = {};
         if (-1 !== delimiterIndex) {
-          t = inputType.substring(0, delimiterIndex);
-          o = inputType.substring(delimiterIndex + 1);
+          type = inputType.substring(0, delimiterIndex);
+          options = inputType.substring(delimiterIndex + 1);
         } else {
-          t = inputType;
+          type = inputType;
         }
     
         userInputDefinition.inputType = {
-          type: t,
-          options: JSON.parse(o)
+          type: type,
+          options: JSON.parse(options)
         };
         
         this.properties[property] = userInputDefinition;
