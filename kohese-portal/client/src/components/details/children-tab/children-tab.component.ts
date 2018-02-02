@@ -8,6 +8,7 @@ import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector : 'children-tab',
@@ -28,10 +29,9 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   itemSortField : string;
 
-  filteredItems : Array<ItemProxy>;
-
   /* Observables */
   saveEmitter : EventEmitter<ItemProxy>;
+  filterSubject : BehaviorSubject<string>;
 
 
   /* Subscriptions */
@@ -46,21 +46,14 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   ngOnInit() {
     this.orderedChildren = this.itemProxy.childrenAreManuallyOrdered();
-    this.filteredItems = this.itemProxy.children;
     this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
         if (update.connected) {
           this.childView = 'table';
-          console.log(this.filteredItems);
         }
       })
     this.saveEmitter = new EventEmitter();
-    this.treeOptions = {
-      displayField : 'item.name',
-      idField : 'item.id'
-    };
-
-    console.log(this.filteredItems);
+    this.filterSubject = new BehaviorSubject('');
   }
 
   consolelog(any) {
@@ -68,6 +61,11 @@ export class ChildrenTabComponent extends NavigatableComponent
   }
 
   ngOnDestroy () {
+  }
+
+  onFilterUpdate (filter : string) {
+    this.filterSubject.next(filter);
+    console.log(filter);
   }
 
   toggleOrderedChildren () {

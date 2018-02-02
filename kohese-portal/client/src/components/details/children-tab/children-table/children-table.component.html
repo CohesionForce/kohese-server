@@ -1,4 +1,4 @@
-<table class="table table-striped table-condensed table-hover">
+<!-- <table class="table table-striped table-condensed table-hover">
   <thead>
     <th style="width:15px"></th>
     <th><a (click)="itemSortField = 'itemProxy.item.kind'">Kind</a></th>
@@ -24,7 +24,39 @@
 
     </tr>
   </tbody>
-</table>
+</table> -->
+
+<mat-table #childTable [dataSource]="childrenStream">
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+    <mat-cell *matCellDef="let child"> {{child.item.name}}</mat-cell>
+  </ng-container>
+
+  <!-- <ng-container matColumnDef="kind">
+      <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
+      <mat-cell *matCellDef="let child"> {{child.kind}}</mat-cell>
+    </ng-container> -->
+
+  <ng-container matColumnDef="assignedTo">
+      <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
+      <mat-cell *matCellDef="let child"> {{child.item.assignedTo}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="actionState">
+      <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
+      <mat-cell *matCellDef="let child"> {{child.item.actionState}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="description">
+      <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+      <mat-cell *matCellDef="let child"> {{child.item.description | truncate : 30}}</mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
+  <mat-row (click)="navigate('Explore', {id:proxy.item.id})" *matRowDef="let proxy; columns: rowDef"></mat-row>
+</mat-table>
+
+
 
 
             <!-- <tbody ui-tree-nodes ng-model="detailsCtrl.itemProxy.children">

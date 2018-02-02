@@ -7,11 +7,12 @@
     Create Child </button>
 </span>
 <span class="pull-right">
-  <input class="input-sm" type="text" [(ngModel)]="filterString" placeholder="Filter" style="margin: 5px"/>
+  <input class="input-sm" type="text" [(ngModel)]="filterString" (input)="onFilterUpdate($event.target.value)"
+  placeholder="Filter" style="margin: 5px"/>
 </span>
 <mat-card>
   <mat-card-title class="panel-heading">
-    <span>ChildrenShowing {{filteredItems.length}} of {{itemProxy.children.length}}</span>
+    <span>Children View - {{childView}}</span>
     <span class="pull-right">
       <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
         <mat-icon class="fa fa-gear"></mat-icon>
@@ -30,6 +31,7 @@
   </mat-card-title>
   <mat-card-content>
     <children-table [itemProxy]="itemProxy"
+                    [filterSubject]="filterSubject"
                     *ngIf="childView === 'table'"></children-table>
     <children-tree [itemProxy]="itemProxy"
                    *ngIf="childView === 'tree'"></children-tree>
