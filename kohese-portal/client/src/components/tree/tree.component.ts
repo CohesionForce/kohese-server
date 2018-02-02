@@ -10,7 +10,7 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import { ItemProxy } from '../../../../common/models/item-proxy';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { RowComponent } from '../../classes/RowComponent.class';
 import { MatSelectChange } from '@angular/material';
@@ -37,7 +37,7 @@ export class TreeComponent extends NavigatableComponent
     private proxyFilter: ProxyFilter = new ProxyFilter(); // TODO get definition for Filter
     private selectedItemProxy: ItemProxy;
     private itemProxyId : string;
-    private kindList: Array<ItemProxy>;
+    private types: Array<ItemProxy>;
     private actionStates: Array<String> = ['Pending Review', 'In Verification', 'Assigned'];
     private userList : Array<any>; // This will eventually be of type KoheseUser
     // TODO Probably want to get this from somewhere else
@@ -66,10 +66,10 @@ export class TreeComponent extends NavigatableComponent
       if (update.connected) {
         treeRoot = this.ItemRepository.getRootProxy();
         this.absoluteRoot = treeRoot;
-        this.kindList = this.ItemRepository.getProxyFor('Model-Definitions').
-        getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
-        return ((first.item.name > second.item.name) ?
-          1 : ((first.item.name < second.item.name) ? -1 : 0));
+        this.types = this.ItemRepository.getProxyFor('Model-Definitions').
+          getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
+          return ((first.item.name > second.item.name) ?
+            1 : ((first.item.name < second.item.name) ? -1 : 0));
         });
       }
     });

@@ -15,7 +15,6 @@ export class PropertyEditorComponent extends NavigatableComponent
   /* Data */
   @Input()
   property : TypeProperty;
-  templateInput : string;
   /* UI Switches */
   saveEmitter : EventEmitter<TypeProperty>
   /* Subscriptions */
@@ -32,8 +31,7 @@ export class PropertyEditorComponent extends NavigatableComponent
   ngOnInit () {
     if(!this.data.property) {
       this.property = {
-        type : 'text',
-        template : '',
+        inputType : '',
         required : false,
         default : '',
         propertyName : '',
@@ -45,18 +43,12 @@ export class PropertyEditorComponent extends NavigatableComponent
 
     this.saveEmitter = this.data.saveEmitter;
 
-    this.templateInput = this.property.template;
     console.log(this);
   }
 
   ngOnDestroy () {
-    this.property.template = this.templateInput
     this.saveEmitter.emit(this.property);
 
-  }
-
-  renderHtml () {
-    this.property.template = this.templateInput;
   }
 
   saveProperty () {

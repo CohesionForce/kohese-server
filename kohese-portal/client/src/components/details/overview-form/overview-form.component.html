@@ -1,9 +1,25 @@
-<h2>Details</h2>
 <form [formGroup]="formGroup" novalidate>
   <div class="form-group">
-    <div *ngFor="let property of currentType.properties"
-          [innerHTML]="property.template | sanitizeHtml">
-    </div>
+    <ng-container *ngFor="let property of (properties | mapKey)">
+      <ng-container [ngSwitch]="properties[property].inputType.type">
+        <text-user-input *ngSwitchCase="'text'"
+          [formGroup]="formGroup" [fieldId]="property"
+          [fieldName]="properties[property].propertyName"
+          [isMultiLine]="properties[property].inputType.options['isMultiLine']">
+        </text-user-input>
+        <proxy-selector-user-input *ngSwitchCase="'proxy-selector'"
+          [formGroup]="formGroup" [fieldId]="property"
+          [type]="properties[property].inputType.options['type']"
+          [fieldName]="properties[property].propertyName"
+          [useAdvancedSelector]="properties[property].inputType.options['useAdvancedSelector']"
+          [allowMultiSelect]="properties[property].inputType.options['allowMultiSelect']">
+        </proxy-selector-user-input>
+        <date-user-input *ngSwitchCase="'date'"
+          [formGroup]="formGroup" [fieldId]="property"
+          [fieldName]="properties[property].propertyName">
+        </date-user-input>
+        <br/>
+      </ng-container>
+    </ng-container>
   </div>
 </form>
-<p>{{formGroup.value | json }}</p>

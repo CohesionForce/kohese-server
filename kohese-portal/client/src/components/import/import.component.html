@@ -1,0 +1,27 @@
+<div>
+  <overview-form #userInput [type]="typeService.getKoheseTypes()['Item']"
+    [fieldFilter]="filter">
+  </overview-form>
+  <textarea matInput #fileTextArea cols="80" rows="7" placeholder="Files to import"
+    readonly="true">
+  </textarea>
+  <!-- Hide the file input and route its functionality to a button -->
+  <input type="file" #fileInput multiple style="display: none;"
+    (change)="fileTextArea.value = getSelectedFilenames(fileInput.files)"/>
+  <button mat-raised-button (click)="fileInput.click()">
+    Select File(s)...
+  </button>
+</div>
+<ng-container *ngIf="data">
+  <div class="pull-right">
+    <mat-dialog-actions>
+      <button mat-raised-button [mat-dialog-close]="0">
+        Cancel
+      </button>
+      <button mat-raised-button [mat-dialog-close]="1"
+         (click)="itemRepository.importFiles(fileInput.files, userInput.getFormGroup().value.parentId)">
+        Import
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-container>

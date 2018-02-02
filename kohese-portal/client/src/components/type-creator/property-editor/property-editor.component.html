@@ -24,21 +24,9 @@
              [(ngModel)]="property.propertyName">
       {{property.propertyName}}
       <br/>
-      Template :
-      <textarea [(ngModel)]="this.templateInput"
-                formControlName="template"></textarea>
-      <br/>
-      type :
-      <input type="text"
-             formControlName="type"
-             [(ngModel)]="property.type">
-      <br/>
       Default Value:
       <input type="text" [(ngModel)]="property.default">
       <hr/>
-      Preview Form Element : <button (click)="renderHtml()">Render</button>
-      <br/>
-      <div [innerHTML]="property.template | sanitizeHtml"></div>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>

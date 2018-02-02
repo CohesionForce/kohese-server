@@ -207,13 +207,15 @@ export class DetailsComponent extends NavigatableComponent
         this.ItemRepository.getHistoryFor(this.itemProxy);
       };
 
-  upsertItem = function () : void {
-        this.ItemRepository.upsertItem(this.itemProxy)
-          .then(function (updatedItemProxy) {
-            // clear the state of the form
-            // TODO - Get form and set pristine
-          });
-      };
+  upsertItem(item: any) : void {
+    for (let field in item) {
+      this.itemProxy.item[field] = item[field];
+    }
+    this.ItemRepository.upsertItem(this.itemProxy)
+      .then((updatedItemProxy: ItemProxy) => {
+      this.enableEdit = false;
+    });
+  }
 
   showChildrenToggled () : void {
       this.showChildrenSubject.next(this.showChildren);
