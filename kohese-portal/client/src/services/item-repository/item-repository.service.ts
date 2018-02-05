@@ -12,7 +12,6 @@ import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
-import * as SocketIOFileClient from 'socket.io-file-client';
 
 /**
  *
@@ -515,26 +514,5 @@ export class ItemRepository {
     });
 
     return promise;
-  }
-
-  importFiles(files: Array<File>, parentId: string): void {
-    let uploader: any = new SocketIOFileClient(this.socketService.getSocket());
-    uploader.on('complete', (file: File) => {
-      /*
-        Conversion to an Observable requires that the callback be callable
-        multiple times
-      */
-      this.socketService.getSocket().emit('ImportDocuments', {
-        file: file.name,
-        parentItem: parentId
-      }, (results) => {
-        if (results.error) {
-          this.toastrService.error('Document Import Failed', 'Import');
-        } else {
-          this.toastrService.success('Document Import Succeeded', 'Import');
-        }
-      });
-    });
-    uploader.upload(files);
   }
 }

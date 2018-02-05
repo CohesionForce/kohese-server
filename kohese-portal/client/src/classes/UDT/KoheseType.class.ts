@@ -30,19 +30,19 @@ export class KoheseType {
         let inputType: string = userInputDefinition.inputType;
         let delimiterIndex: number = inputType.indexOf(':');
         let type: string;
-        let options: any = {};
+        let options: string = '{}';
         if (-1 !== delimiterIndex) {
           type = inputType.substring(0, delimiterIndex);
           options = inputType.substring(delimiterIndex + 1);
         } else {
           type = inputType;
         }
-    
+
         userInputDefinition.inputType = {
           type: type,
           options: JSON.parse(options)
         };
-        
+
         this.properties[property] = userInputDefinition;
       }
     }

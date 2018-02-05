@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 
 import { ItemProxy } from '../../../../common/models/item-proxy.js';
@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs/Subscription';
 })
 
 export class DocumentViewComponent extends NavigatableComponent
-                                   implements OnInit, OnDestroy {
+                                   implements OnInit, OnDestroy, OnChanges {
   /* UI Toggles */
   showChildren : boolean;
 
@@ -35,6 +35,7 @@ export class DocumentViewComponent extends NavigatableComponent
   /* Utils */
   docReader : Parser;
   docWriter : HtmlRenderer
+  initialized : boolean;
 
   /* Observables */
   @Input()
@@ -53,6 +54,7 @@ export class DocumentViewComponent extends NavigatableComponent
     super(NavigationService)
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({sourcepos: true});
+    this.initialized = false;
   }
 
   ngOnInit() {
@@ -71,6 +73,7 @@ export class DocumentViewComponent extends NavigatableComponent
       this.generateDoc();
     })
 
+    this.initialized = true
   }
 
   ngOnDestroy() {
@@ -87,6 +90,13 @@ export class DocumentViewComponent extends NavigatableComponent
     } else if (this.itemProxy.item.description) {
       var parsed = this.docReader.parse(this.itemProxy.item.description); // parsed is a 'Node' tree
       this.itemDescriptionRendered = this.docWriter.render(parsed); // result is a String
+    }
+  }
+
+  ngOnChanges (changes) {
+    if(this.initialized) {
+      this.itemProxy = (changes.itemProxy) ? changes.itemProxy.currentValue : changes.currentValue;
+      this.generateDoc();
     }
   }
 
