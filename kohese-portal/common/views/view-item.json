@@ -1,40 +1,29 @@
 {
   "model": "Item",
   "viewProperties": {
-    "id" : {
-      "inputType" : "static",
-      "template" : "<p>Id: Find out how to bind ID through innerHtml </p>",
-      "required" : true,
-      "default" : "",
-      "propertyName" : ""
-    },
     "name": {
-      "inputType": "text",
-      "template": " <i *ngSwitchCase=\"Task\"\n    class =\"fa fa-tasks\"\n    tooltip=\"Task\"></i>",
+      "inputType": "text:{\"isMultiLine\":false}",
       "required": true,
       "default": "",
-      "propertyName": "name"
+      "propertyName": "Name"
     },
     "description": {
-      "inputType": "text",
-      "template": "<label> Description:\n                  <input formControlName=\"description\">\n                </label>",
+      "inputType": "text:{\"isMultiLine\":false}",
       "required": false,
       "default": "",
-      "propertyName": "description"
+      "propertyName": "Description"
     },
     "tags": {
-      "inputType" : "text",
-      "template" : "            <input type=\"text\" formControlName=\"tags\"/>",
+      "inputType" : "text:{\"isMultiLine\":false}",
       "required" : false,
       "default" : "",
-      "propertyName" : "tags"
+      "propertyName" : "Tags"
     },
     "parentId" : {
-      "inputType" : "autoComplete",
-      "template" : "<input type=\"text\" formControlName=\"parentId\"/>",
+      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
       "required" : true,
       "default" : "ROOT",
-      "propertyName" : "parentId"
+      "propertyName" : "Parent"
     }
   },
   "id": "view-item",

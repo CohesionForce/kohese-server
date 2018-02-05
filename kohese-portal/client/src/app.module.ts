@@ -12,7 +12,6 @@ import { AnalysisModule } from './components/analysis/analysis.module';
 import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
 import { ActionTableModule } from './components/action-table/action-table.module';
-import { CreateItemModule } from './components/create-item/create-item.module';
 import { TypeCreatorModule } from './components/type-creator/type-creator.module';
 import { PipesModule } from './pipes/pipes.module';
 
@@ -28,6 +27,8 @@ import { TreeComponent, TreeRowComponent } from './components/tree/tree.componen
 import { ExploreComponent } from './components/explore/explore.component';
 import { KindIconComponent } from './components/kind-icon/kind-icon.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
+import { NewComponent } from './components/new/new.component';
+import { ImportComponent } from './components/import/import.component';
 
 import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
 import { AuthenticationService } from './services/authentication/authentication.service';
@@ -69,7 +70,9 @@ const AUTHENTICATION_INTERCEPTOR = {
     ExploreComponent,
     TreeRowComponent,
     KindIconComponent,
-    DialogComponent
+    DialogComponent,
+    NewComponent,
+    ImportComponent
   ],
   imports: [
     BrowserModule,
@@ -87,13 +90,14 @@ const AUTHENTICATION_INTERCEPTOR = {
     DetailsModule,
     DocumentViewModule,
     ActionTableModule,
-    CreateItemModule,
     TypeCreatorModule,
     TreeModule,
     DragulaModule
   ],
   entryComponents: [
-    DialogComponent
+    DialogComponent,
+    NewComponent,
+    ImportComponent
   ],
   providers: [
     ItemRepository,

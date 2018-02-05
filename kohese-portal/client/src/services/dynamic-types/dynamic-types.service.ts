@@ -23,7 +23,11 @@ export class DynamicTypesService {
     .subscribe((update) => {
     if (update.connected) {
       this.modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-      this.typeProxyList = this.modelProxy.getDescendants();
+      this.typeProxyList = this.modelProxy.getDescendants().
+        sort((first: ItemProxy, second: ItemProxy) => {
+        return ((first.item.name > second.item.name) ?
+          1 : ((first.item.name < second.item.name) ? -1 : 0));
+      });
       console.log(this.typeProxyList);
       this.buildKoheseTypes();
       }
@@ -37,7 +41,10 @@ export class DynamicTypesService {
   buildKoheseTypes () : void {
     for (var i : number = 0; i < this.typeProxyList.length; i++) {
       let currentType : ItemProxy = this.typeProxyList[i];
-      this.koheseTypes[currentType.item.name] = new KoheseType(currentType);
+      let viewProxy: ItemProxy = this.ItemRepository.getProxyFor('view-' + currentType.item.name.
+        toLowerCase());
+      this.koheseTypes[currentType.item.name] = new KoheseType(currentType,
+        viewProxy);
     }
   }
 }

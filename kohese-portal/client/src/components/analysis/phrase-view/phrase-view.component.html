@@ -1,57 +1,60 @@
 <div class="panel">
   <div class="panel-heading">Phrase View - ({{getPhraseCount()}}) Phrases
-  <span class="pull-right">
-    <button mat-raised-button [matMenuTriggerFor]="optionsMenu">
-      Options
+    <button mat-raised-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
       <mat-icon class="fa fa-gear"></mat-icon>
+      Options
     </button>
     <mat-menu #optionsMenu="matMenu">
       <button mat-menu-item (click)="showPOS = !showPOS">
-        Show POS
         <mat-icon *ngIf="showPOS" class="fa fa-check-"></mat-icon>
+        Show POS
       </button>
     </mat-menu>
-  </span>
   </div>
-  <div class="panel-body">                <div>
-          <span class="col-xs-4 pull-right">
-          <b>Limit</b>
-          <input class="input-sm col-xs-6 pull-right" type="number" [(ngModel)]="loadLimit"
-          placeholder="Phrase Limit"/>
-          </span>
+  <div class="panel-body">
+    <div>
+      <span class="col-xs-4 pull-right">
+        <mat-form-field>
+          <input matInput class="input-sm col-xs-6 pull-right" type="number"
+            [(ngModel)]="loadLimit" placeholder="Phrase Limit"/>
+        </mat-form-field>
+      </span>
     </div>
-    <div   id="phrase-div">
+    <div id="phrase-div">
       <table id="thePhrasesSummary"
-          class="table tree-grid table-striped table-condensed table-hover">
-          <thead>
-          <th><span (click)="sort('text')">
-                  Text
-                  <span *ngIf="sortField === 'text'">
-                  <i *ngIf="ascending" class="fa fa-chevron-up"></i>
-                  <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
-                  </span>
-          </span></th>
+        class="table tree-grid table-striped table-condensed table-hover">
+        <thead>
+          <th>
+            <span (click)="sort('text')">
+              Text
+              <span *ngIf="sortField === 'text'">
+                <i *ngIf="ascending" class="fa fa-chevron-up"></i>
+                <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
+              </span>
+            </span>
+          </th>
           <th (click)="sort('count')">
-                  <span>Count
-                  <span *ngIf="sortField === 'count'">
-                  <i *ngIf="ascending" class="fa fa-chevron-up"></i>
-                  <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
-                  </span>
-                  </span>
-                  </th>
+            <span>Count
+              <span *ngIf="sortField === 'count'">
+                <i *ngIf="ascending" class="fa fa-chevron-up"></i>
+                <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
+              </span>
+            </span>
+          </th>
           <th *ngIf="showPOS">POS Count</th>
-          </thead>
-          <tbody id="thePhrasesBody">
+        </thead>
+        <tbody id="thePhrasesBody">
           <tr class="tree-grid-row" id="Phrase:{{summary.text}}"
-                  *ngFor="let summary of phrases">
-          <td (click)="filter(summary.text)"
-                  class="tree-label"
-                  [innerHTML]="summary.text | highlightRegex:filterRegexHighlight:true"></td>
-          <td>{{summary.count}}</td>
-          <td *ngIf="showPOS">{{summary.posCount}}</td>
+            *ngFor="let summary of phrases">
+            <td (click)="filter(summary.text)"
+              class="tree-label"
+              [innerHTML]="summary.text | highlightRegex:filterRegexHighlight:true">
+            </td>
+            <td>{{summary.count}}</td>
+            <td *ngIf="showPOS">{{summary.posCount | json}}</td>
           </tr>
-          </tbody>
+        </tbody>
       </table>
-  </div>
+    </div>
   </div>
 </div>

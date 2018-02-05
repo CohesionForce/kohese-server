@@ -51,12 +51,6 @@ export var LocationMap = {
     'params' : {},
     'route' : '/analysis'
   },
-  'Create' : {
-    'type' : 'dual',
-    'title' : 'Create Item',
-    'params' : ['parentId'],
-    'route' : '/create'
-  },
   'Type-Creator' : {
     'type' : 'single',
     'title' : 'Type Creator',

@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, EventEmitter } from '@angular/core';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
-import { CreateItemComponent } from '../../../components/create-item/create-item.component';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
@@ -9,6 +8,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { NewComponent } from '../../new/new.component';
 
 @Component({
   selector : 'children-tab',
@@ -80,7 +80,7 @@ export class ChildrenTabComponent extends NavigatableComponent
     };
 
     let dialogReference =
-    this.DialogService.openComponentDialog(CreateItemComponent,
+    this.DialogService.openComponentDialog(NewComponent,
                                            createData);
 
     this.saveEmitter.subscribe((proxy) => {
