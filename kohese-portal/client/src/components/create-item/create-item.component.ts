@@ -7,6 +7,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { ItemProxy } from '../../../../common/models/item-proxy.js';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
+import { ImportService } from '../../services/import/import.service';
 
 @Component({
   selector : 'create-item',
@@ -20,7 +21,8 @@ export class CreateItemComponent extends NavigatableComponent
   types: Array<ItemProxy>;
 
   constructor(protected NavigationService : NavigationService,
-              private itemRepository: ItemRepository,) {
+              private itemRepository: ItemRepository,
+              private ImportService : ImportService) {
     super(NavigationService);
   }
 
@@ -42,7 +44,7 @@ export class CreateItemComponent extends NavigatableComponent
   }
 
   importFiles (fileInput) {
-    this.itemRepository.importFiles(fileInput, 'ROOT');
+    this.ImportService.importFile(fileInput, 'ROOT');
   }
 }
 
