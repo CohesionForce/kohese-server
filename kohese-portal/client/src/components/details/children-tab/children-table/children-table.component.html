@@ -32,10 +32,10 @@
     <mat-cell *matCellDef="let child"> {{child.item.name}}</mat-cell>
   </ng-container>
 
-  <!-- <ng-container matColumnDef="kind">
+  <ng-container matColumnDef="kind">
       <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
       <mat-cell *matCellDef="let child"> {{child.kind}}</mat-cell>
-    </ng-container> -->
+  </ng-container>
 
   <ng-container matColumnDef="assignedTo">
       <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
@@ -50,6 +50,11 @@
   <ng-container matColumnDef="description">
       <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
       <mat-cell *matCellDef="let child"> {{child.item.description | truncate : 30}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="childrenCount">
+      <mat-header-cell *matHeaderCellDef> Children(#) </mat-header-cell>
+      <mat-cell *matCellDef="let child"> {{child.children.length}}</mat-cell>
   </ng-container>
 
   <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>

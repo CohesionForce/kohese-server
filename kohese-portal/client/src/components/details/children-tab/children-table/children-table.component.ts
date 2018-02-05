@@ -40,7 +40,7 @@ export class ChildrenTableComponent extends NavigatableComponent
   ngOnInit () {
     this.childrenStream = new MatTableDataSource<ItemProxy>(this.itemProxy.children)
     this.initialized = true;
-    this.rowDef = ['name','assignedTo','actionState','description']
+    this.rowDef = ['name','assignedTo','actionState','description', 'childrenCount']
     this.filterSub = this.filterSubject.subscribe((newFilter) => {
       this.childrenStream.filter = newFilter.trim().toLowerCase();
       console.log(this.childrenStream);

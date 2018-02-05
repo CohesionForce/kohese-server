@@ -41,8 +41,8 @@ export class CreateItemComponent extends NavigatableComponent
     this.repoStatusSubscription.unsubscribe();
   }
 
-  importFiles () {
-    //fileInput.files, data.parentId
+  importFiles (fileInput) {
+    this.itemRepository.importFiles(fileInput, 'ROOT');
   }
 }
 
