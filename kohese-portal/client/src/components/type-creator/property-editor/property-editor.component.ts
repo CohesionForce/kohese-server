@@ -1,9 +1,10 @@
 import { Input, Inject, Component, OnInit, OnDestroy, EventEmitter} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { TypeProperty } from '../../../classes/UDT/TypeProperty.class';
 
 @Component({
@@ -25,8 +26,8 @@ export class PropertyEditorComponent extends NavigatableComponent
   propertyForm : FormGroup;
 
   constructor (@Inject(MAT_DIALOG_DATA) public data : any,
-               public dialogRef: MatDialogRef<PropertyEditorComponent>,
                protected NavigationService : NavigationService,
+               private typeService: DynamicTypesService,
                private FormBuilder : FormBuilder
                ) {
     super(NavigationService);
@@ -48,7 +49,6 @@ export class PropertyEditorComponent extends NavigatableComponent
     this.saveEmitter = this.data.saveEmitter;
 
     this.propertyForm = this.createFormGroup();
-    console.log(this);
   }
 
   ngOnDestroy () {
@@ -58,10 +58,6 @@ export class PropertyEditorComponent extends NavigatableComponent
 
   saveProperty () {
     this.saveEmitter.emit(this.property);
-  }
-
-  close () {
-    this.dialogRef.close();
   }
 
   createFormGroup () : FormGroup {
@@ -75,6 +71,4 @@ export class PropertyEditorComponent extends NavigatableComponent
     //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
     return group;
   }
-
-
 }

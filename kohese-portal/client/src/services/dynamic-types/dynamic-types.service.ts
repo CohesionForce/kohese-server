@@ -11,6 +11,12 @@ export class DynamicTypesService {
   modelProxy : ItemProxy;
   typeProxyList : Array<ItemProxy>;
   koheseTypes : object;
+  
+  private readonly USER_INPUT_TYPES: any = {
+    'types': 'Text',
+    'proxy-selector': 'Reference',
+    'date': 'Date'
+  };
 
   /* Observables */
 
@@ -46,5 +52,9 @@ export class DynamicTypesService {
       this.koheseTypes[currentType.item.name] = new KoheseType(currentType,
         viewProxy);
     }
+  }
+  
+  getUserInputTypes(): any {
+    return this.USER_INPUT_TYPES;
   }
 }
