@@ -27,8 +27,4 @@ export class ImportComponent {
 
     return names.join('\n');
   }
-
-  importFiles (fileInfo, parentItem) {
-    this.ImportService.importFile(fileInfo, parentItem);
-  }
 }

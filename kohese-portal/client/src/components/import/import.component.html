@@ -19,7 +19,7 @@
         Cancel
       </button>
       <button mat-raised-button [mat-dialog-close]="1"
-         (click)="importFiles(fileInput.files, userInput.getFormGroup().value.parentId)">
+         (click)="ImportService.importFile(fileInput.files, userInput.getFormGroup().value.parentId)">
         Import
       </button>
     </mat-dialog-actions>
