@@ -2,24 +2,54 @@
   <h1 mat-dialog-title>Property Editor</h1>
   <mat-dialog-content>
     <form [formGroup]="propertyForm">
-      Property Name :
-      <input type="text"
-             formControlName="propertyName"
-             class="pull-right">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Property Name"
+          formControlName="propertyName" class="pull-right"/>
+      </mat-form-field>
       <br/>
-      Default Value:
-      <input type="text" formControlName="default">
-      <hr/>
+      <mat-form-field>
+        <mat-select #inputType placeholder="Input Type"
+          formControlName="inputType">
+          <mat-option
+            *ngFor="let inputType of (typeService.getUserInputTypes() | mapKey)"
+            [value]="inputType">
+            {{typeService.getUserInputTypes()[inputType]}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <br/>
+      <ng-container *ngIf="'proxy-selector' === inputType.value">
+        <mat-form-field>
+          <mat-select placeholder="Reference Type"
+            formControlName="referenceType">
+            <mat-option
+              *ngFor="let type of (typeService.getKoheseTypes() | mapKey)"
+              [value]="typeService.getKoheseTypes()[type]">
+              {{type}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <br/>
+        <mat-checkbox formControlName="isMultivalued">
+          Multivalued
+        </mat-checkbox>
+        <br/>
+      </ng-container>
+      <mat-checkbox formControlName="isRequired">
+        Required
+      </mat-checkbox>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Default Value"
+          formControlName="default"/>
+      </mat-form-field>
     </form>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-raised-button
-            (click)="saveProperty()">
-    Save
+    <button mat-raised-button [mat-dialog-close]="0">
+      Cancel
     </button>
-    <button mat-raised-button
-            (click)="close()">
-    Cancel
+    <button mat-raised-button [mat-dialog-close]="saveProperty()">
+      Finish
     </button>
   </mat-dialog-actions>
 </div>

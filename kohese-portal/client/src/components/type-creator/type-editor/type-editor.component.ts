@@ -132,7 +132,6 @@ export class TypeEditorComponent extends NavigatableComponent
 
     this.saveEmitter.subscribe((property) => {
       console.log(property);
-      console.log('On Exit emit');
       this.viewProxy.item.viewProperties[property.propertyName] = property;
     })
   }
