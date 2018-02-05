@@ -15,6 +15,7 @@ import { DocumentViewModule } from "../document-view/document-view.module";
 import { ActionTableModule } from "../action-table/action-table.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
+import { UserInputModule } from '../user-input/user-input.module';
 
 
 @NgModule({
@@ -34,13 +35,15 @@ import { PipesModule } from "../../pipes/pipes.module";
     FormsModule,
     ReactiveFormsModule,
     PipesModule,
+    UserInputModule,
     TreeModule,
     DragulaModule
   ],
   exports : [
     DetailsComponent,
     HistoryTabComponent,
-    ChildrenTabComponent
+    ChildrenTabComponent,
+    OverviewFormComponent
   ]
 })
 export class DetailsModule {}

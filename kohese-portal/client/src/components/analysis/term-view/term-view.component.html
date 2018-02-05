@@ -1,86 +1,85 @@
 <div class="panel">
   <div class="panel-heading">Term View - ({{getTermCount()}}) Terms
-  <span class="pull-right">
-    <button mat-raised-button [matMenuTriggerFor]="optionsMenu">
-      Options
+    <button mat-raised-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
       <mat-icon class="fa fa-gear"></mat-icon>
+      Options
     </button>
     <mat-menu #optionsMenu="matMenu">
       <button mat-menu-item (click)="showPOS = !showPOS">
-        Show POS
         <mat-icon *ngIf="showPOS" class="fa fa-check-"></mat-icon>
+        Show POS
       </button>
     </mat-menu>
-  </span>
   </div>
   <div class="panel-body">
-  <div>
-        <label class="control-label" for="posFilter">
-          POS Filter:
-          <select id="posFilter"
-                  [(ngModel)]="analysisPOSFilterName">
-                 <option *ngFor="let filterCriteria of analysisPOSFilterCriteriaList">{{filterCriteria}}</option>
-          </select>
-        </label>
-        <span>
-              <input type="checkbox" [(ngModel)]="filterExactMatch"
-                          name="summaryFilterExactMatchInput"
-                          style="margin: 5px"/> Exact Match
-              <input type="checkbox" [(ngModel)]="filterIgnoreCase"
-                          name="summaryFilterIgnoreCaseInput"
-                          style="margin: 5px"/> Ignore Case
-        </span>
-        <br/>
-        <input class="input-sm" type="text" [(ngModel)]="analysisFilterInput"
-               placeholder="Filter" style="margin: 5px"
-               [ngStyle]="invalidAnalysisFilterRegex && {'background-color':'pink'}"/>
-
-        <button (click)="filter(analysisFilterInput, true)"
-                class=" btn btn-default fa fa-search"> Submit
-        </button>
-        <label for="term-limit">Limit
-              <input type="text"
-                    [(ngModel)]="loadLimit"/>
-        </label>
-        <!-- <button (click)="getLastFilter()"
-                class="btn btn-default fa fa-chevron-left"> Last Filter
-        </button> -->
-  </div>
-  <div id="term-div">
-     <table id="theTokensSummary"
-            class="table tree-grid table-striped table-condensed table-hover">
+    <div>
+      <mat-form-field>
+        <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName">
+          <mat-option *ngFor="let filterCriteria of analysisPOSFilterCriteriaList" [value]="filterCriteria">
+            {{filterCriteria}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <span>
+        <mat-checkbox [(ngModel)]="filterExactMatch">
+          Exact Match
+        </mat-checkbox>
+        <mat-checkbox [(ngModel)]="filterIgnoreCase">
+          Ignore Case
+        </mat-checkbox>
+      </span>
+      <br/>
+      <mat-form-field>
+        <input matInput type="text" class="input-sm"
+          [(ngModel)]="analysisFilterInput" placeholder="Filter"
+          [ngStyle]="invalidAnalysisFilterRegex && {'background-color':'pink'}"/>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Limit" [(ngModel)]="loadLimit"/>
+      </mat-form-field>
+      <button mat-raised-button (click)="filter(analysisFilterInput, true)"
+        class="btn btn-default fa fa-search">Submit
+      </button>
+      <!-- <button (click)="getLastFilter()"
+             class="btn btn-default fa fa-chevron-left"> Last Filter
+           </button> -->
+    </div>
+    <div id="term-div">
+      <table id="theTokensSummary"
+        class="table tree-grid table-striped table-condensed table-hover">
         <thead>
-           <th>
-              <span (click)="sort('text')">
-                 Text
-                 <span *ngIf="sortField === 'text'">
-                 <i *ngIf="ascending" class="fa fa-chevron-up"></i>
-                 <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
-                 </span>
+          <th>
+            <span (click)="sort('text')">
+              Text
+              <span *ngIf="sortField === 'text'">
+                <i *ngIf="ascending" class="fa fa-chevron-up"></i>
+                <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
               </span>
-           </th>
-           <th>
-              <span (click)="sort('count')">
-                 Count
-                 <span *ngIf="sortField === 'count'">
-                 <i *ngIf="ascending" class="fa fa-chevron-up"></i>
-                 <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
-                 </span>
+            </span>
+          </th>
+          <th>
+            <span (click)="sort('count')">
+              Count
+              <span *ngIf="sortField === 'count'">
+                <i *ngIf="ascending" class="fa fa-chevron-up"></i>
+                <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
               </span>
-           </th>
-           <th *ngIf="showPOS">POS Count</th>
+            </span>
+          </th>
+          <th *ngIf="showPOS">POS Count</th>
         </thead>
         <tbody id="theTokensBody">
-           <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
-           *ngFor="let summary of terms">
-           <td (click)="filter(summary.text, false)"
-                 class="tree-label"
-                 [innerHTML] ="summary.text | highlightRegex:analysisFilterRegexHighlight:true"></td>
-           <td>{{summary.count}}</td>
-           <td *ngIf="showPOS">{{summary.posCount}}</td>
-           </tr>
+          <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
+            *ngFor="let summary of terms">
+            <td (click)="filter(summary.text, false)"
+              class="tree-label"
+              [innerHTML] ="summary.text | highlightRegex:analysisFilterRegexHighlight:true">
+            </td>
+            <td>{{summary.count}}</td>
+            <td *ngIf="showPOS">{{summary.posCount | json}}</td>
+          </tr>
         </tbody>
-     </table>
-  </div>
+      </table>
+    </div>
   </div>
 </div>

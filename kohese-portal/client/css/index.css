@@ -495,12 +495,6 @@ tab div {
   color: white;
   padding: 5px; }
 
-#typeSelector {
-  padding: 5px; }
-
-#createButton {
-  padding: 5px; }
-
 #analysis-view {
   height: 100%;
   width: 100%;
@@ -576,6 +570,18 @@ tab div {
       height: 500px;
       overflow: auto;
       width: 80%; }
+
+text-user-input mat-form-field {
+  width: 100%;
+  padding: 0px 10px; }
+
+proxy-selector-user-input mat-form-field {
+  width: 100%;
+  padding: 0px 10px; }
+
+date-user-input mat-form-field {
+  width: 100%;
+  padding: 0px 10px; }
 
 .sidebar {
   color: whitesmoke;

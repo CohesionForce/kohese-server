@@ -9,7 +9,6 @@ import { RepositoriesComponent } from './components/admin/repositories.component
 import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeCreatorComponent } from './components/type-creator/type-creator.component';
-import { CreateItemComponent } from './components/create-item/create-item.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -20,7 +19,6 @@ const routes: Routes = [
   { path: 'explore', component: ExploreComponent},
   // { path: 'explore/:id', component: ExploreComponent},
   { path: 'analysis', component: AnalysisComponent },
-  { path: 'create', component: CreateItemComponent },
   { path: 'typecreator', component: TypeCreatorComponent}
 ]
 

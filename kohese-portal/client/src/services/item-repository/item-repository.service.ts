@@ -418,40 +418,27 @@ export class ItemRepository {
     });
   }
 
-  upsertItem (proxy) {
-    console.log('::: Preparing to upsert ' + proxy.kind);
-    let insufficientFields: Array<string> = [];
-    for (let i: number = 0; i < proxy.model.item.requiredProperties.length; i++) {
-      let fieldName: string = proxy.model.item.requiredProperties[i];
-      if (!proxy.item[fieldName]) {
-        insufficientFields.push(fieldName);
-      }
-    }
-
-    if(0 === insufficientFields.length) {
-      return new Promise((resolve, reject) => {
-        this.socketService.socket.emit('Item/upsert', {kind: proxy.kind, item:proxy.item}, (response) => {
-          if (response.error) {
-            reject(response.error);
+  upsertItem(proxy: ItemProxy): Promise<ItemProxy> {
+    return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void),
+      reject: ((value: any) => void)) => {
+      this.socketService.getSocket().emit('Item/upsert', {
+        kind: proxy.kind,
+        item: proxy.item
+      }, (response: any) => {
+        if (response.error) {
+          reject(response.error);
+        } else {
+          if(!proxy.updateItem) {
+            proxy.item = response.item;
+            proxy = new ItemProxy(response.kind, response.item);
           } else {
-            console.log(response);
-            if(!proxy.updateItem) {
-              proxy.item = response.item;
-              proxy = new ItemProxy(response.kind, response.item);
-            } else {
-              proxy.updateItem(response.kind, response.item);
-            }
-            proxy.dirty = false;
-            resolve(proxy);
+            proxy.updateItem(response.kind, response.item);
           }
-        });
+          proxy.dirty = false;
+          resolve(proxy);
+        }
       });
-    } else {
-      this.dialogService.openInformationDialog('Insufficient Data',
-          'Please enter data for the following fields:\n' +
-          insufficientFields.join('\n -\t'));
-      return Promise.reject({error: 'User must fill out required fields'});
-    }
+    });
   }
 
   deleteItem (proxy, recursive) {

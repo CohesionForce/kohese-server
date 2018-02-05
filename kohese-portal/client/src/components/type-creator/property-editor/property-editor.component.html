@@ -7,24 +7,10 @@
              formControlName="propertyName"
              class="pull-right">
       <br/>
-      Template :
-      <textarea matInput
-                MatTextareaAutosize
-                formControlName="template"></textarea>
-      <br/>
-      Input type :
-      <input type="text"
-             formControlName="inputType">
-      <br/>
       Default Value:
       <input type="text" formControlName="default">
       <hr/>
-      Preview Form Element : <button (click)="renderHtml()">Render</button>
-      <br/>
-      <div [innerHTML]="templateInput | sanitizeHtml"></div>
     </form>
-
-<p>{{propertyForm.value | json }}</p>
   </mat-dialog-content>
   <mat-dialog-actions>
     <button mat-raised-button
