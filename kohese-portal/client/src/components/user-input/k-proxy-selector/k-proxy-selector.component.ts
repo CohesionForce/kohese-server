@@ -1,17 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { UserInput } from './user-input.class';
-import { ItemProxy } from '../../../../common/models/item-proxy';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { DialogService } from '../../services/dialog/dialog.service';
-import { TreeComponent } from '../tree/tree.component';
+import { UserInput } from '../user-input.class';
+import { ItemProxy } from '../../../../../common/models/item-proxy';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { TreeComponent } from '../../tree/tree.component';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
-  selector: 'proxy-selector-user-input',
-  templateUrl: './proxy-selector-user-input.component.html'
+  selector: 'k-proxy-selector',
+  templateUrl: './k-proxy-selector.component.html'
 })
-export class ProxySelectorUserInputComponent extends UserInput
+export class KProxySelectorComponent extends UserInput
   implements OnInit {
   @Input()
   public formGroup: FormGroup;

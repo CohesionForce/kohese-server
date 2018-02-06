@@ -47,11 +47,14 @@ export class DynamicTypesService {
   buildKoheseTypes () : void {
     for (var i : number = 0; i < this.typeProxyList.length; i++) {
       let currentType : ItemProxy = this.typeProxyList[i];
-      let viewProxy: ItemProxy = this.ItemRepository.getProxyFor('view-' + currentType.item.name.
-        toLowerCase());
+      let viewProxy: ItemProxy = this.getViewProxyFor(currentType);
       this.koheseTypes[currentType.item.name] = new KoheseType(currentType,
         viewProxy);
     }
+  }
+
+  getViewProxyFor (modelProxy : ItemProxy) : ItemProxy {
+    return this.ItemRepository.getProxyFor('view-' + modelProxy.item.name.toLowerCase());
   }
   
   getUserInputTypes(): any {
