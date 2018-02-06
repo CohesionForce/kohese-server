@@ -1,12 +1,12 @@
 <div class="panel">
   <div class="panel-heading">Phrase View - ({{getPhraseCount()}}) Phrases
-    <button mat-raised-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
-      <mat-icon class="fa fa-gear"></mat-icon>
-      Options
+    <button mat-icon-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
+      <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
     </button>
-    <mat-menu #optionsMenu="matMenu">
+    <mat-menu #optionsMenu="matMenu" [overlapTrigger]="false">
       <button mat-menu-item (click)="showPOS = !showPOS">
-        <mat-icon *ngIf="showPOS" class="fa fa-check-"></mat-icon>
+        <mat-icon *ngIf="showPOS" class="fa fa-check"></mat-icon>
+        <mat-icon *ngIf="!showPOS" class="fa fa-uncheck"></mat-icon>
         Show POS
       </button>
     </mat-menu>

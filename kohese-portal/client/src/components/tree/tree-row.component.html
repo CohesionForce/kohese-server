@@ -14,7 +14,7 @@
         'fa-caret-right': (itemProxy.children.length > 0) && collapsed,
         'no-icon': !(itemProxy.children.length > 0)}">
       </i>
-      <kind-icon kind='itemProxy.kind'></kind-icon>
+      <kind-icon [kind]="itemProxy.kind"></kind-icon>
       <span class="kt-label">
         {{(itemProxy.item.name | highlightRegex )}}
       </span>
