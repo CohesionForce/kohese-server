@@ -258,13 +258,6 @@ export class TreeComponent extends NavigatableComponent
 })
 export class TreeRowComponent extends RowComponent
   implements OnInit, OnDestroy {
-  /* UI Triggers
-     RowComponent : exactFilter
-                    collapsed */
-
-  /* Observables
-     RowComponent : filterSubject */
-
   /* Subscriptions */
   private filterSubscription : Subscription;
 
