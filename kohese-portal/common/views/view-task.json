@@ -1,0 +1,12 @@
+{
+  "model": "Task",
+  "viewProperties": {
+  },
+  "id": "view-task",
+  "name": "Task View Model",
+  "createdBy": "jephillips",
+  "createdOn": 1510596684590,
+  "modifiedBy": "admin",
+  "modifiedOn": 1517006598071,
+  "itemIds": []
+}

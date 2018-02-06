@@ -1,5 +1,5 @@
 {
-  "model": "Item",
+  "model": "Item ",
   "viewProperties": {
     "name": {
       "inputType": "text:{\"isMultiLine\":false}",
@@ -27,7 +27,7 @@
     }
   },
   "id": "view-item",
-  "name": "test item view",
+  "name": "Item View Model",
   "createdBy": "jephillips",
   "createdOn": 1510596684590,
   "modifiedBy": "admin",
