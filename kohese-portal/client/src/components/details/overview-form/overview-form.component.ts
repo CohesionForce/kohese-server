@@ -19,7 +19,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 export class OverviewFormComponent extends NavigatableComponent
   implements OnInit, OnDestroy, OnChanges {
-  public formGroup : FormGroup;
+  /* Data */
   @Input()
   public type : KoheseType;
   @Input()
@@ -29,7 +29,12 @@ export class OverviewFormComponent extends NavigatableComponent
   @Input()
   public fieldFilter: ((fieldName: string) => boolean);
   public properties: any = {};
+  private initialized : boolean;
 
+  /* Utils */
+  public formGroup : FormGroup;
+  
+  /* Subscriptions */
   private repoStatusSubscription : Subscription;
 
   constructor(protected NavigationService : NavigationService,
@@ -37,6 +42,7 @@ export class OverviewFormComponent extends NavigatableComponent
               private typeService: DynamicTypesService,
               private ItemRepository : ItemRepository) {
     super(NavigationService);
+    this.initialized = false;
   }
 
   ngOnInit () {
@@ -52,16 +58,12 @@ export class OverviewFormComponent extends NavigatableComponent
         if (!this.type) {
           this.type = this.typeService.getKoheseTypes()[this.itemProxy.kind];
         }
-        
-        for (let fieldName in this.type.properties) {
-          if (this.fieldFilter(fieldName)) {
-            this.properties[fieldName] = this.type.properties[fieldName];
-          }
-        }
-        
+        this.updateProperties();      
         this.formGroup = this.createFormGroup();
       }
     });
+
+    this.initialized = true;
   }
 
   ngOnDestroy () {
@@ -69,14 +71,37 @@ export class OverviewFormComponent extends NavigatableComponent
   }
   
   ngOnChanges(changes: SimpleChanges): void {
-    let changedInputs: Array<string> = Object.keys(changes);
-    if (-1 !== changedInputs.indexOf('disabled')) {
-      if (this.formGroup) {
-        if (changes['disabled'].currentValue) {
-          this.formGroup.disable();
-        } else {
-          this.formGroup.enable();
+    if (this.initialized) {
+      let changedInputs: Array<string> = Object.keys(changes);
+      console.log(changedInputs);
+
+      if(changes['itemProxy']) {
+        this.itemProxy = changes['itemProxy'].currentValue;
+        this.type = this.typeService.getKoheseTypes()[this.itemProxy.kind];
+        this.updateProperties();
+        this.createFormGroup();
+      }
+
+      if(changes['type']) {
+        this.type = this.typeService.getKoheseTypes()[changes['type'].currentValue]
+      }
+
+      if (-1 !== changedInputs.indexOf('disabled')) {
+        if (this.formGroup) {
+          if (changes['disabled'].currentValue) {
+            this.formGroup.disable();
+          } else {
+            this.formGroup.enable();
+          }
         }
+      }
+    }
+  }
+
+  updateProperties () : void {
+    for (let fieldName in this.type.properties) {
+      if (this.fieldFilter(fieldName)) {
+        this.properties[fieldName] = this.type.properties[fieldName];
       }
     }
   }
@@ -106,7 +131,6 @@ export class OverviewFormComponent extends NavigatableComponent
         propertyMap[propertyKey] = defaultValue;
       }
     }
-    
     return propertyMap;
   }
 }

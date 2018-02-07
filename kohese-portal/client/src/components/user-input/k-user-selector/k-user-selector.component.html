@@ -5,7 +5,7 @@
   </mat-form-field>
   <mat-autocomplete #proxySelector="matAutocomplete"
     [displayWith]="($proxy ? $proxy.item.name : undefined)">
-    <mat-option *ngFor="let proxy of (userProxies | async)"
+    <mat-option *ngFor="let proxy of (filteredProxies | async)"
       [value]="proxy.item.id">
       {{proxy.item.name}}
     </mat-option>

@@ -8,7 +8,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { NewComponent } from '../../new/new.component';
+import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 
 @Component({
   selector : 'children-tab',
@@ -80,7 +80,7 @@ export class ChildrenTabComponent extends NavigatableComponent
     };
 
     let dialogReference =
-    this.DialogService.openComponentDialog(NewComponent,
+    this.DialogService.openComponentDialog(CreateWizardComponent,
                                            createData);
 
     this.saveEmitter.subscribe((proxy) => {

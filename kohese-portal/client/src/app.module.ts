@@ -13,6 +13,7 @@ import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
 import { ActionTableModule } from './components/action-table/action-table.module';
 import { TypeCreatorModule } from './components/type-creator/type-creator.module';
+import { CreateWizardModule } from './components/create-wizard/create-wizard.module';
 import { PipesModule } from './pipes/pipes.module';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -27,8 +28,6 @@ import { TreeComponent, TreeRowComponent } from './components/tree/tree.componen
 import { ExploreComponent } from './components/explore/explore.component';
 import { KindIconComponent } from './components/kind-icon/kind-icon.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
-import { NewComponent } from './components/new/new.component';
-import { ImportComponent } from './components/import/import.component';
 
 import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
 import { AuthenticationService } from './services/authentication/authentication.service';
@@ -44,7 +43,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
-import { DragulaModule } from 'ng2-dragula';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
@@ -70,9 +68,7 @@ const AUTHENTICATION_INTERCEPTOR = {
     ExploreComponent,
     TreeRowComponent,
     KindIconComponent,
-    DialogComponent,
-    NewComponent,
-    ImportComponent
+    DialogComponent
   ],
   imports: [
     BrowserModule,
@@ -92,12 +88,10 @@ const AUTHENTICATION_INTERCEPTOR = {
     ActionTableModule,
     TypeCreatorModule,
     TreeModule,
-    DragulaModule
+    CreateWizardModule
   ],
   entryComponents: [
-    DialogComponent,
-    NewComponent,
-    ImportComponent
+    DialogComponent
   ],
   providers: [
     ItemRepository,
