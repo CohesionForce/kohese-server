@@ -39,7 +39,7 @@ export class OverviewFormComponent extends NavigatableComponent
 
   constructor(protected NavigationService : NavigationService,
               private FormBuilder : FormBuilder,
-              private typeService: DynamicTypesService,
+              private DynamicTypeService: DynamicTypesService,
               private ItemRepository : ItemRepository) {
     super(NavigationService);
     this.initialized = false;
@@ -56,7 +56,7 @@ export class OverviewFormComponent extends NavigatableComponent
     .subscribe((update) => {
       if (update.connected) {
         if (!this.type) {
-          this.type = this.typeService.getKoheseTypes()[this.itemProxy.kind];
+          this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
         }
         this.updateProperties();      
         this.formGroup = this.createFormGroup();
@@ -77,13 +77,13 @@ export class OverviewFormComponent extends NavigatableComponent
 
       if(changes['itemProxy']) {
         this.itemProxy = changes['itemProxy'].currentValue;
-        this.type = this.typeService.getKoheseTypes()[this.itemProxy.kind];
+        this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
         this.updateProperties();
         this.createFormGroup();
       }
 
       if(changes['type']) {
-        this.type = this.typeService.getKoheseTypes()[changes['type'].currentValue]
+        this.type = this.DynamicTypeService.getKoheseTypes()[changes['type'].currentValue]
       }
 
       if (-1 !== changedInputs.indexOf('disabled')) {
@@ -99,11 +99,36 @@ export class OverviewFormComponent extends NavigatableComponent
   }
 
   updateProperties () : void {
+    // Apply properties from my current class 
+    console.log(':: Update Properties ');
     for (let fieldName in this.type.properties) {
       if (this.fieldFilter(fieldName)) {
         this.properties[fieldName] = this.type.properties[fieldName];
       }
     }
+    console.log(':: Current Properties loaded');
+    console.log(this.properties);
+
+    console.log(':: Parent Properties');
+    // Grab properties from my base class
+    let inheritedModel = this.itemProxy.model.item.base;
+    while(inheritedModel != 'PersistedModel') {
+      console.log('Properties of' + inheritedModel)
+      let inheritedProxy = this.ItemRepository.getProxyFor(inheritedModel);
+      let inheritedView = this.DynamicTypeService
+                              .getViewProxyFor(inheritedProxy);
+      if (inheritedView) {
+        console.log(':: View found ');
+        console.log(inheritedView);
+        for (let fieldName in inheritedView.item.viewProperties) {
+          console.log(':: Adding inherited property ' + fieldName);
+          this.properties[fieldName] = inheritedView.item.viewProperties[fieldName];
+        }
+      }
+      inheritedModel = inheritedProxy.item.base;
+    }
+    console.log(':: Update Properties Complete');
+    console.log(this.properties);
   }
 
   createFormGroup () : FormGroup {

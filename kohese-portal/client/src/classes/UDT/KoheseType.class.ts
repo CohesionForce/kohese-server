@@ -28,7 +28,6 @@ export class KoheseType {
       for (let property in viewProxy.item.viewProperties) {
         let userInputDefinition: TypeProperty = viewProxy.item.viewProperties[property];
         let inputType: string = userInputDefinition.inputType;
-        console.log(inputType);
         let delimiterIndex: number = inputType.indexOf(':');
         let type: string;
         let options: string = '{}';

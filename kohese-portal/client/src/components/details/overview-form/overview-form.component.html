@@ -1,4 +1,6 @@
-<form [formGroup]="formGroup" novalidate>
+<form *ngIf="itemProxy"
+      [formGroup]="formGroup" 
+      novalidate>
   <div class="form-group">
     <ng-container *ngFor="let property of (properties | mapKey)">
       <ng-container [ngSwitch]="properties[property].inputType.type">
