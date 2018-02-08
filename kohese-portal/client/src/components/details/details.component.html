@@ -62,16 +62,16 @@
 
 
             </mat-tab>
-            <mat-tab label="Overview">
+            <mat-tab label="Details">
                 <ng-template mat-tab-label>
-                   Overview
+                   Details
                    <!-- TODO ngIf form is dirty -->
                    <span *ngIf="itemForm">
                       <img src="../../../assets/icons/versioncontrol/dirty.ico"
                       title = "Dirty item" />
                   </span>
                 </ng-template>
-                <overview-form #editor [itemProxy]="itemProxy" [disabled]="!enableEdit"></overview-form>
+                <details-form #editor [itemProxy]="itemProxy" [disabled]="!enableEdit"></details-form>
                 <!-- <div class="details-tab" *ngIf="itemProxy.kind ==='Action'">
                     <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
                 </div>

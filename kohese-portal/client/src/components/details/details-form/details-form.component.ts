@@ -13,11 +13,11 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
-  selector: 'overview-form',
-  templateUrl : './overview-form.component.html'
+  selector: 'details-form',
+  templateUrl : './details-form.component.html'
 })
 
-export class OverviewFormComponent extends NavigatableComponent
+export class DetailsFormComponent extends NavigatableComponent
   implements OnInit, OnDestroy, OnChanges {
   /* Data */
   @Input()

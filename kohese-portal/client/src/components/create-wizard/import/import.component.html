@@ -1,7 +1,7 @@
 <div>
-  <overview-form #userInput [type]="typeService.getKoheseTypes()['Item']"
+  <details-form #userInput [type]="typeService.getKoheseTypes()['Item']"
     [fieldFilter]="filter">
-  </overview-form>
+  </details-form>
   <textarea matInput #fileTextArea cols="80" rows="7" placeholder="Files to import"
     readonly="true">
   </textarea>

@@ -4,7 +4,7 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ChildrenTabComponent } from './children-tab/children-tab.component';
 import { ChildrenTreeComponent } from './children-tab/children-tree/children-tree.component';
 import { ChildrenTableComponent } from './children-tab/children-table/children-table.component';
-import { OverviewFormComponent } from './overview-form/overview-form.component';
+import { DetailsFormComponent } from './details-form/details-form.component';
 
 import { CommonModule } from '@angular/common';
 
@@ -24,7 +24,7 @@ import { UserInputModule } from '../user-input/user-input.module';
     ChildrenTabComponent,
     ChildrenTableComponent,
     ChildrenTreeComponent,
-    OverviewFormComponent
+    DetailsFormComponent
   ],
   imports : [
     CommonModule,
@@ -41,7 +41,7 @@ import { UserInputModule } from '../user-input/user-input.module';
     DetailsComponent,
     HistoryTabComponent,
     ChildrenTabComponent,
-    OverviewFormComponent
+    DetailsFormComponent
   ]
 })
 export class DetailsModule {}
