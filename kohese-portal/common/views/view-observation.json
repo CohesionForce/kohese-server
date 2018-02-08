@@ -1,6 +1,26 @@
 {
   "model": "Observation",
   "viewProperties": {
+    "observedBy" : {
+      "inputType" : "user-selector:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "observedBy"
+    },
+    "observedOn" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "observedOn"
+    },    
+    "context" : {
+      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required" : true,
+      "default" : "ROOT",
+      "propertyName" : "context"
+    }
+
+
   },
   "id": "view-observation",
   "name": "Observation View Model",
