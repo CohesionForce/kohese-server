@@ -11,6 +11,7 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'details-form',
@@ -28,6 +29,9 @@ export class DetailsFormComponent extends NavigatableComponent
   public disabled: boolean;
   @Input()
   public fieldFilter: ((fieldName: string) => boolean);
+  @Input() 
+  formGroupSubject : BehaviorSubject<FormGroup>;
+  
   public properties: any = {};
   private initialized : boolean;
 

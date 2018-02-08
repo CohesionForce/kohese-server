@@ -62,7 +62,7 @@
 
 
             </mat-tab>
-            <mat-tab label="Details">
+            <mat-tab label="Details" *ngIf="!itemProxy.model.internal">
                 <ng-template mat-tab-label>
                    Details
                    <!-- TODO ngIf form is dirty -->

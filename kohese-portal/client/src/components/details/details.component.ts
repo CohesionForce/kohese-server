@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { FormGroup } from '@angular/forms';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -31,20 +32,18 @@ export class DetailsComponent extends NavigatableComponent
 
   /* Observables */
   showChildrenSubject : BehaviorSubject<boolean>
+  detailsFormSubject : BehaviorSubject<FormGroup>;
 
   /* Subscriptions */
   routeSub : Subscription;
   repoReadySub : Subscription;
+  detailsFormSubscription : Subscription;
 
   /* UI Switches */
   enableEdit : boolean;
   defaultTab : object;
   uiTreeOptions : object;
   showChildren : boolean;
-
-  /* UI Components */
-  contextInput;
-  resolutionActionsInput;
 
   /* Data */
   kindList : Array<string>;
@@ -56,8 +55,7 @@ export class DetailsComponent extends NavigatableComponent
   currentUser : any;
   proxyList : Array<any>;
   itemDescriptionRendered : string;
-
-
+  detailsFormGroup : FormGroup;
 
   constructor (protected NavigationService : NavigationService,
                private route : ActivatedRoute,
@@ -69,11 +67,8 @@ export class DetailsComponent extends NavigatableComponent
   ngOnInit () {
     this.reader = new commonmark.Parser();
     this.writer = new commonmark.HtmlRenderer();
-    this.showChildren = true;
+    this.showChildren = false;
     this.showChildrenSubject = new BehaviorSubject(this.showChildren);
-
-    // TODO Implement controller restored?
-    //   var controllerRestored = tabService.restoreControllerData(detailsCtrl.tab.id, 'detailsCtrl', this);
 
     /* Subscriptions */
     this.routeSub = this.route.params.subscribe(params => {
@@ -94,7 +89,6 @@ export class DetailsComponent extends NavigatableComponent
           this.proxyList = this.ItemRepository.getShortFormItemList();
           this.userList = this.SessionService.getUsers();
           this.updateParentProxy();
-          this.configureState();
           if (this.itemProxy.item.description) {
             let parsed = this.reader.parse(this.itemProxy.item.description);
             this.itemDescriptionRendered = this.writer.render(parsed);
@@ -104,7 +98,6 @@ export class DetailsComponent extends NavigatableComponent
       })
     });
 
-
     // TODO - Add subscription to the description field of the proxy form and
     // call the document render logic on it
 
@@ -113,23 +106,6 @@ export class DetailsComponent extends NavigatableComponent
 
     this.enableEdit = false;
     this.defaultTab = {active: true }
-    /* TODO Update this to use User Defined types */
-    this.decisionStates = [];
-    this.actionStates = [];
-    this.issueStates = [];
-    this.categoryTags = [];
-
-    this.uiTreeOptions = {
-      dropped: (event) => {
-        if (event.source.index != event.dest.index) {
-          //this.itemForm.$dirty = true;
-          this.itemProxy.updateChildrenManualOrder();
-          console.log('))) Source:    ' + event.source);
-          console.log('))) Source id: ' + event.source.nodeScope.proxy.item.id);
-          console.log('))) Dest   ns: ' + event.dest.nodeScope);
-        }
-      }
-    }
   }
 
   ngOnDestroy () {
@@ -176,26 +152,6 @@ export class DetailsComponent extends NavigatableComponent
       }
     }
 
-  incrementItemInput (type) : void {
-      if(!this.itemProxy.item[type]) {
-        this.itemProxy.item[type] = [];
-      }
-
-        // TODO - This needs to be assessed
-        if (type === 'context') {
-          this.itemProxy.item[type].push({id: this.contextInput.description.id});
-        } else if (type === 'resolutionActions') {
-          this.itemProxy.item[type].push({id: this.resolutionActionsInput.description.id});
-        } else {
-          this.itemProxy.item[type].push({name: ''});
-        }
-    }
-
-  deleteItemInput (type : string, row : number): void {
-        var index = this.itemProxy.item[type].indexOf(row);
-        this.itemProxy.item[type].splice(index, 1);
-    }
-
   generateHTMLReport () : void {
         this.ItemRepository.generateHTMLReportFor(this.itemProxy);
       };
@@ -237,172 +193,5 @@ export class DetailsComponent extends NavigatableComponent
         // TBD:  May need to do something special if the delete fails
       });
   };
-  updateState = function (state : string, type : string) {
-    // TODO - This functionality is trash and needs to be updated,
-    //        The general flow will update with user defined types, so deferring
-
-    // detailsCtrl.currentState = state;
-    // if (type === 'Decision') {
-    //   detailsCtrl.itemProxy.item.decisionState = state;
-    //   if (detailsCtrl.itemProxy.item.decisionState === 'In Analysis') {
-    //     detailsCtrl.accordion.InAnalysis = true;
-    //   } else if (detailsCtrl.itemProxy.item.decisionState === 'In Review') {
-    //     detailsCtrl.accordion.InReview = true;
-    //   } else {
-    //     detailsCtrl.accordion[detailsCtrl.itemProxy.item.decisionState] = true;
-    //   }
-    // } else if (type === 'Action') {
-    //   if (detailsCtrl.itemProxy.item.actionState === 'In Work') {
-    //     detailsCtrl.accordion.InWork = true;
-    //   } else if (detailsCtrl.itemProxy.item.actionState === 'In Verification') {
-    //     detailsCtrl.accordion.InVerification = true;
-    //   } else {
-    //     detailsCtrl.accordion[state] = true;
-    //   }
-    //   detailsCtrl.itemProxy.item.actionState = state;
-    // } else if (type === 'Task') {
-    //   detailsCtrl.itemProxy.item.taskState = state;
-    // }
-    // detailsCtrl.currentState = state;
-    // detailsCtrl.upsertItem();
-    console.log('Update state called - not implemented');
-  };
-
-  configureState () {
-  // TODO - This functionality is trash and needs to be updated,
-  //        The general flow will update with user defined types, so deferring
-
-    //   function configureState () {
-  //     detailsCtrl.accordion = {};
-  //     if (detailsCtrl.itemProxy.item.actionState === 'Proposed'
-  //             && detailsCtrl.itemProxy.item.decisionState != 'Proposed') {
-  //       if (detailsCtrl.itemProxy.item.decisionState === 'In Analysis') {
-  //         detailsCtrl.accordion.InAnalysis = true;
-  //         detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
-  //       }
-  //       if (detailsCtrl.itemProxy.item.decisionState === 'In Review') {
-  //         detailsCtrl.accordion.InReview = true;
-  //         detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
-  //       } else {
-  //         detailsCtrl.accordion[detailsCtrl.itemProxy.item.decisionState] = true;
-  //         detailsCtrl.currentState = detailsCtrl.itemProxy.item.decisionState
-  //       }
-  //     } else {
-  //       if (detailsCtrl.itemProxy.item.actionState != 'In Work'
-  //                 && detailsCtrl.itemProxy.item.actionState != 'Pending Reassign') {
-  //         detailsCtrl.accordion[detailsCtrl.itemProxy.item.actionState] = true;
-  //         detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
-  //       } else {
-  //         if (detailsCtrl.itemProxy.item.actionState === 'In Work') {
-  //           detailsCtrl.accordion.InWork = true;
-  //           detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
-  //         }
-  //         if (detailsCtrl.itemProxy.item.actionState === 'In Verification') {
-  //           detailsCtrl.accordion.InVerification = true;
-  //           detailsCtrl.currentState = detailsCtrl.itemProxy.item.actionState;
-  //         }
-  //       }
-  //     }
-  //   }
-  }
-
-
-
-  /* TODO - Implementation Graveyard
-  //   $scope.$watch('detailsCtrl.itemProxy.dirty', function () {
-  //     if (detailsCtrl.itemProxy && detailsCtrl.itemForm) {
-  //       if(detailsCtrl.itemForm.$dirty !== detailsCtrl.itemProxy.dirty) {
-  //         // itemProxy has changed
-  //         detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
-  //       }
-  //     }
-  //   });
-
-  //   $scope.$watch('detailsCtrl.itemForm.$dirty', function () {
-  //     if (detailsCtrl.itemProxy && detailsCtrl.itemForm) {
-  //       // Detect if itemForm has been changed
-  //       if (detailsCtrl.itemForm.$dirty) {
-  //         detailsCtrl.itemProxy.dirty = detailsCtrl.itemForm.$dirty;
-  //       }
-
-  //       // Detect if existing proxy is already dirty
-  //       if (!detailsCtrl.itemForm.$dirty && detailsCtrl.itemProxy.dirty) {
-  //         detailsCtrl.itemForm.$dirty = detailsCtrl.itemProxy.dirty;
-  //       }
-  //     }
-  //   });
-
-  //   $scope.$watch('detailsCtrl.decisionForm.$dirty', function () {
-  //     if (detailsCtrl.itemProxy && detailsCtrl.decisionForm) {
-  //       // Detect if decisionForm has been changed
-  //       if (detailsCtrl.decisionForm.$dirty) {
-  //         detailsCtrl.itemForm.$dirty = detailsCtrl.decisionForm.$dirty;
-  //       }
-  //     }
-  //   });
-
-  //   $scope.$watch('detailsCtrl.actionForm.$dirty', function () {
-  //     if (detailsCtrl.itemProxy && detailsCtrl.actionForm) {
-  //       // Detect if actionForm has been changed
-  //       if (detailsCtrl.actionForm.$dirty) {
-  //         detailsCtrl.itemForm.$dirty = detailsCtrl.actionForm.$dirty;
-  //       }
-  //     }
-  //   });
-
-  //   $scope.$watch('detailsCtrl.observationForm.$dirty', function () {
-  //     if (detailsCtrl.itemProxy && detailsCtrl.observationForm) {
-  //       // Detect if observationForm has been changed
-  //       if (detailsCtrl.observationForm.$dirty) {
-  //         detailsCtrl.itemForm.$dirty = detailsCtrl.observationForm.$dirty;
-  //       }
-  //     }
-  //   });
-
-  //   $scope.$watch('detailsCtrl.issueForm.$dirty', function () {
-  //     if (detailsCtrl.itemProxy && detailsCtrl.issueForm) {
-  //       // Detect if actionForm has been changed
-  //       if (detailsCtrl.issueForm.$dirty) {
-  //         detailsCtrl.itemForm.$dirty = detailsCtrl.issueForm.$dirty;
-  //       }
-  //     }
-  //   });
-
-
-  //   detailsCtrl.updateItem = function () {
-  //     console.log('::: Item kind has been changed to: ' + detailsCtrl.itemProxy.kind);
-  //     initializeItemStates(detailsCtrl.itemProxy.kind);
-  //   };
-  */
-
-    //   //
-  //   // Datepicker config
-  //   //
-
-  //   detailsCtrl.estimatedStart = false;
-  //   detailsCtrl.dateOptions = {
-  //     formatYear: 'yy'
-  //   };
-
-  //   detailsCtrl.openDatePicker = function ($event, type) {
-  //     detailsCtrl.date = new Date(detailsCtrl.itemProxy.item.estimatedStart);
-  //     if ($event) {
-  //       $event.preventDefault();
-  //       $event.stopPropagation();
-  //     }
-  //     detailsCtrl[type] = true;
-  //   };
-
-  //   detailsCtrl.convertDate = function (type, end) {
-  //     var date = new Date(detailsCtrl.itemProxy.item[type]);
-  //     if (end) {
-  //       // shame.js - I need to refactor this magic number
-  //       detailsCtrl.itemProxy.item[type] = date.valueOf() + 86399;
-  //     } else {
-  //       detailsCtrl.itemProxy.item[type] = date.valueOf();
-  //     }
-  //   };
-
-  /////////////////////////////////////////////////////////////////////////////
 
 }
