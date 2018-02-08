@@ -79,7 +79,7 @@ export class OverviewFormComponent extends NavigatableComponent
         this.itemProxy = changes['itemProxy'].currentValue;
         this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
         this.updateProperties();
-        this.createFormGroup();
+        this.formGroup = this.createFormGroup();
       }
 
       if(changes['type']) {
@@ -99,6 +99,7 @@ export class OverviewFormComponent extends NavigatableComponent
   }
 
   updateProperties () : void {
+    this.properties = {};
     // Apply properties from my current class 
     console.log(':: Update Properties ');
     for (let fieldName in this.type.properties) {
