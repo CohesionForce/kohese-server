@@ -111,21 +111,23 @@ export class OverviewFormComponent extends NavigatableComponent
 
     console.log(':: Parent Properties');
     // Grab properties from my base class
-    let inheritedModel = this.itemProxy.model.item.base;
-    while(inheritedModel != 'PersistedModel') {
-      console.log('Properties of' + inheritedModel)
-      let inheritedProxy = this.ItemRepository.getProxyFor(inheritedModel);
-      let inheritedView = this.DynamicTypeService
-                              .getViewProxyFor(inheritedProxy);
-      if (inheritedView) {
-        console.log(':: View found ');
-        console.log(inheritedView);
-        for (let fieldName in inheritedView.item.viewProperties) {
-          console.log(':: Adding inherited property ' + fieldName);
-          this.properties[fieldName] = inheritedView.item.viewProperties[fieldName];
+    if (this.itemProxy) {
+      let inheritedModel = this.itemProxy.model.item.base;
+      while(inheritedModel != 'PersistedModel') {
+        console.log('Properties of' + inheritedModel)
+        let inheritedProxy = this.ItemRepository.getProxyFor(inheritedModel);
+        let inheritedView = this.DynamicTypeService
+                                .getViewProxyFor(inheritedProxy);
+        if (inheritedView) {
+          console.log(':: View found ');
+          console.log(inheritedView);
+          for (let fieldName in inheritedView.item.viewProperties) {
+            console.log(':: Adding inherited property ' + fieldName);
+            this.properties[fieldName] = inheritedView.item.viewProperties[fieldName];
+          }
         }
+        inheritedModel = inheritedProxy.item.base;
       }
-      inheritedModel = inheritedProxy.item.base;
     }
     console.log(':: Update Properties Complete');
     console.log(this.properties);
