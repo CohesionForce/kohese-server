@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges,
-  SimpleChanges } from '@angular/core';
+import { Component, Input, Output, OnInit, OnDestroy, OnChanges,
+  SimpleChanges, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators,
   AbstractControl } from '@angular/forms';
 
@@ -29,9 +29,9 @@ export class DetailsFormComponent extends NavigatableComponent
   public disabled: boolean;
   @Input()
   public fieldFilter: ((fieldName: string) => boolean);
-  @Input() 
-  formGroupSubject : BehaviorSubject<FormGroup>;
-  
+  @Output()
+  formGroupUpdated = new EventEmitter<FormGroup>()
+
   public properties: any = {};
   private initialized : boolean;
 
@@ -64,6 +64,7 @@ export class DetailsFormComponent extends NavigatableComponent
         }
         this.updateProperties();      
         this.formGroup = this.createFormGroup();
+        this.formGroupUpdated.emit(this.formGroup);
       }
     });
 
@@ -84,6 +85,9 @@ export class DetailsFormComponent extends NavigatableComponent
         this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
         this.updateProperties();
         this.formGroup = this.createFormGroup();
+        console.log(':: Form Group Updated');
+        console.log(this.formGroup);
+        this.formGroupUpdated.emit(this.formGroup);
       }
 
       if(changes['type']) {

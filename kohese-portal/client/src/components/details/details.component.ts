@@ -98,6 +98,8 @@ export class DetailsComponent extends NavigatableComponent
       })
     });
 
+    
+
     // TODO - Add subscription to the description field of the proxy form and
     // call the document render logic on it
 
@@ -151,6 +153,11 @@ export class DetailsComponent extends NavigatableComponent
         }
       }
     }
+
+  onFormGroupUpdated(newFormGroup : any) {
+    this.detailsFormGroup = newFormGroup;
+    console.log(newFormGroup);
+  }
 
   generateHTMLReport () : void {
         this.ItemRepository.generateHTMLReportFor(this.itemProxy);
