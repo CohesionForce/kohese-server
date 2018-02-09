@@ -1,6 +1,48 @@
 {
   "model": "Issue",
-  "viewProperties": {
+  "viewProperties": {    
+    "issueState" : {
+      "inputType" : "k-select:{\"options\":[\"Observed\", \"In Analysis\", \"No Action\"]}",
+      "required" : false,
+      "default" : "Observed",
+      "propertyName" : "issueState"
+    },
+    "observedOn" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "observedOn"
+    },
+    "observedBy" : {
+      "inputType" : "user-selector:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "observedBy"
+    },    
+    "analysisAction" : {
+      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required" : true,
+      "default" : null,
+      "propertyName" : "analysisAction"
+    },
+    "context" : {
+      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required" : true,
+      "default" : null,
+      "propertyName" : "context"
+    },   
+     "resolutionActions" : {
+      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required" : true,
+      "default" : null,
+      "propertyName" : "analysisAction"
+    },
+    "response": {
+      "inputType": "text:{\"isMultiLine\":true}",
+      "required": false,
+      "default": "",
+      "propertyName": "response"
+    }
   },
   "id": "view-issue",
   "name": "Issue View Model",

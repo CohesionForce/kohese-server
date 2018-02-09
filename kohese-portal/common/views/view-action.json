@@ -1,6 +1,54 @@
 {
   "model": "Action",
-  "viewProperties": {
+  "viewProperties": {    
+    "actionState" : {
+      "inputType" : "k-select:{\"options\":[\"Proposed\", \"Assigned\", \"Accepted\", \"In Work\",\"Pending Reassign\", \"Pending Redisposition\", \"In Verification\", \"Verified\", \"Closed\"]}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "taskState"
+    },
+    "assignedTo" : {
+      "inputType" : "user-selector:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "assignedTo"
+    }, 
+    "estimatedStart" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "estimatedStart"
+    },
+    "estimatedCompletion" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "estimatedCompletion"
+    },
+    "estimatedHours": {
+      "inputType" : "text:{\"isMultiLine\":false}",
+      "required" : false,
+      "default" : "",
+      "propertyName" : "estimatedHoursEffort"
+    },
+    "actualStart" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "actualStart"
+    },
+    "actualCompletion" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "actualCompletion"
+    },
+    "actualHours": {
+      "inputType" : "text:{\"isMultiLine\":false}",
+      "required" : false,
+      "default" : "",
+      "propertyName" : "actualHoursEffort"
+    }
   },
   "id": "view-action",
   "name": "Action View Model",

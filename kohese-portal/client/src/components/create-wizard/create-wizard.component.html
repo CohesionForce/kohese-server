@@ -1,0 +1,31 @@
+<mat-horizontal-stepper linear>
+  <mat-step label="Select Type">
+    <mat-grid-list cols="2">
+      <mat-grid-tile> 
+        Select Type : 
+        <select mat-input [(ngModel)]=selectedType>
+          <mat-option *ngFor="let type of types">
+            {{type.item.name}}
+          </mat-option>
+        </select> 
+        <h4>{{selectedType.item.name}}</h4>
+        {{selectedType.item.description}}
+      </mat-grid-tile>
+      <mat-grid-tile>
+        Select Parent : 
+        <select mat-input [(ngModel)]="selectedParent">
+          <mat-option *ngFor="let proxy of recentProxies">
+            {{proxy.item.name}}
+          </mat-option>
+        </select>
+        {{selectedParent.item.name}}
+      </mat-grid-tile>
+  </mat-grid-list>
+  </mat-step>
+  <mat-step label="Details">
+  Details
+  </mat-step>
+  <mat-step label="Review">
+  Review form data
+  </mat-step>
+</mat-horizontal-stepper>

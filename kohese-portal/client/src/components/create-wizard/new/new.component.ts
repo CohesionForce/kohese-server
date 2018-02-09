@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, Optional, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { KoheseType } from '../../classes/UDT/KoheseType.class';
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
 @Component({
   selector: 'new',

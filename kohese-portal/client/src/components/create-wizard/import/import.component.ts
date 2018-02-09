@@ -1,8 +1,8 @@
 import { Component, Optional, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { ImportService } from '../../services/import/import.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { ImportService } from '../../../services/import/import.service';
 
 @Component({
   selector: 'import',

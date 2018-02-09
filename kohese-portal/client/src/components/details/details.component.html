@@ -62,45 +62,19 @@
 
 
             </mat-tab>
-            <mat-tab label="Overview">
+            <mat-tab label="Details" *ngIf="!itemProxy.model.internal">
                 <ng-template mat-tab-label>
-                   Overview
+                   Details
                    <!-- TODO ngIf form is dirty -->
-                   <span *ngIf="itemForm">
+                   <span *ngIf="detailsFormGroup.dirty">
                       <img src="../../../assets/icons/versioncontrol/dirty.ico"
                       title = "Dirty item" />
                   </span>
                 </ng-template>
-                <overview-form #editor [itemProxy]="itemProxy" [disabled]="!enableEdit"></overview-form>
-                <!-- <div class="details-tab" *ngIf="itemProxy.kind ==='Action'">
-                    <ng-include src="'components/common/templates/action-form.new.html'"></ng-include>
-                </div>
-                <div class="details-tab" *ngIf="itemProxy.kind != 'Action' &&
-                itemProxy.kind != 'Decision' && itemProxy.kind != 'Task'
-                && itemProxy.kind != 'Repository'">
-                    <ng-include src="'components/common/templates/itemform.html'"></ng-include>
-                </div>
-                <div class="details-tab" *ngIf="itemProxy.kind ==='Task'">
-                    <ng-include src="'components/common/templates/task-form.html'"></ng-include>
-                </div>
-                <div class="details-tab" *ngIf="itemProxy.kind ==='Decision'">
-                    <accordion>
-                        <ng-include src="'components/common/templates/decision-form.new.html'"></ng-include>
-                    </accordion>
-                </div>
-                <div class="details-tab" *ngIf="itemProxy.kind ==='Repository'">
-                    <ng-include src="'components/common/templates/repository-form.html'"></ng-include>
-                </div> -->
-
+                <details-form #editor [itemProxy]="itemProxy" 
+                                      [disabled]="!enableEdit"
+                                      (formGroupUpdated)="onFormGroupUpdated($event)"></details-form>
             </mat-tab>
-            <!-- <mat-tab *ngIf="itemProxy.kind === 'Observation'">
-                <tab-label>Observation</tab-label>
-                <ng-include src="'components/common/templates/observation-form.html'"></ng-include>
-            </mat-tab>
-            <tab *ngIf="itemProxy.kind === 'Issue'">
-                <tab-label>Issue</tab-label>
-                <ng-include src="'components/common/templates/issue-form.html'"></ng-include>
-            </tab> -->
             <mat-tab>
               <ng-template mat-tab-label>
                   Children ({{itemProxy.children.length}})
