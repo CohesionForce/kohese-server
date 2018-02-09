@@ -11,7 +11,7 @@ import * as SocketIOFileClient from 'socket.io-file-client';
 @Injectable()
 export class ImportService {
   private fileSocket : SocketIOFileClient;
-  private parent: ItemProxy;
+  private parentId: string;
   private uploadListLength : number = 0;
   private importedItems : Array<ItemProxy> = [];
 
@@ -25,7 +25,7 @@ export class ImportService {
     this.fileSocket.on('complete', (fileInfo: any) => {
       let data: any =  {
         file: fileInfo.name,
-        parentItem: parent
+        parentItem: this.parentId
       };
       
       this.SocketService.getSocket().emit('ImportDocuments', data,
@@ -53,11 +53,11 @@ export class ImportService {
     });
   }
 
-  importFile(fileInfo: Array<File>, parentItem: ItemProxy): void {
+  importFile(fileInfo: Array<File>, parentId: string): void {
     this.importedItems = [];
     // Save length of list so we can track when the import is complete
     this.uploadListLength = fileInfo.length;
-    this.parent = parentItem;
+    this.parentId = parentId;
     this.fileSocket.upload(fileInfo);
   }
 }

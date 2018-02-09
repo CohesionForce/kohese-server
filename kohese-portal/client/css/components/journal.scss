@@ -1,0 +1,19 @@
+journal {
+  width: 100%;
+  
+  #contentInputFormField {
+    width: 100%;
+  }
+  
+  #sortStrategyFormField {
+    width: calc(40% - 20px);
+  }
+  
+  #contentFilterFormField {
+    width: calc(60% - 20px);
+  }
+  
+  .highlight {
+    background-color: yellow;
+  }
+}

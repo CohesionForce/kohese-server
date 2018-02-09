@@ -5,6 +5,8 @@ import { ChildrenTabComponent } from './children-tab/children-tab.component';
 import { ChildrenTreeComponent } from './children-tab/children-tree/children-tree.component';
 import { ChildrenTableComponent } from './children-tab/children-table/children-table.component';
 import { OverviewFormComponent } from './overview-form/overview-form.component';
+import { JournalComponent } from './journal/journal.component';
+import { JournalEntryComponent } from './journal/journal-entry/journal-entry.component';
 
 import { CommonModule } from '@angular/common';
 
@@ -25,7 +27,9 @@ import { UserInputModule } from '../user-input/user-input.module';
     ChildrenTabComponent,
     ChildrenTableComponent,
     ChildrenTreeComponent,
-    OverviewFormComponent
+    OverviewFormComponent,
+    JournalComponent,
+    JournalEntryComponent
   ],
   imports : [
     CommonModule,

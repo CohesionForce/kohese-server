@@ -583,6 +583,17 @@ date-user-input mat-form-field {
   width: 100%;
   padding: 0px 10px; }
 
+journal {
+  width: 100%; }
+  journal #contentInputFormField {
+    width: 100%; }
+  journal #sortStrategyFormField {
+    width: calc(40% - 20px); }
+  journal #contentFilterFormField {
+    width: calc(60% - 20px); }
+  journal .highlight {
+    background-color: yellow; }
+
 .sidebar {
   color: whitesmoke;
   position: relative;

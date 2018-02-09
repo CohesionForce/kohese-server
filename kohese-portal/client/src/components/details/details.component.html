@@ -116,9 +116,7 @@
                 <history-tab [itemProxy]="itemProxy"></history-tab>
             </mat-tab>
             <mat-tab label="Journal">
-                <h4>Journal Tab</h4>
-
-                <p><b>This tab is under construction.</b></p>
+              <journal [input]="itemProxy"></journal>
             </mat-tab>
             <mat-tab label="Action Table"
                  *ngIf="itemProxy.children">
