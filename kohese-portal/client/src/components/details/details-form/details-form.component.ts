@@ -71,7 +71,7 @@ export class DetailsFormComponent extends NavigatableComponent
                   parentId : this.createInfo.parent
                 }
               }
-              this.type= this.DynamicTypeService.getViewProxyFor(this.itemProxy.model);
+              this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.model.item.name];
               }
             }
         
@@ -118,7 +118,7 @@ export class DetailsFormComponent extends NavigatableComponent
               parentId : this.createInfo.parent
             }
           }
-          this.type= this.DynamicTypeService.getViewProxyFor(this.itemProxy.model);
+          this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.model.item.name];
           this.updateProperties();
           this.formGroup = this.createFormGroup();
           this.formGroupUpdated.emit(this.formGroup);
