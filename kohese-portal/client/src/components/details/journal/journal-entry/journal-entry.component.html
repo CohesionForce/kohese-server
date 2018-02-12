@@ -1,13 +1,21 @@
 <div id="container" [ngClass]="{ 'issue': ('Issue' === input.kind) }">
   <h5>
-    {{(input.item.createdOn | date:'full')}}
+    Added by {{input.item.createdBy}} on {{(input.item.createdOn | date:'long')}}
   </h5>
   <h5>
-    {{input.item.createdBy}}
+    Observed by {{input.item.observedBy}} on {{(input.item.observedOn | date:'long')}}
   </h5>
-  <h5>
-    Observed by {{input.item.observedBy}} on {{(input.item.observedOn | date:'full')}}
-  </h5>
+  <ng-container *ngIf="(input.item.name.trim())">
+    <h5>
+      {{input.item.name}}
+    </h5>
+  </ng-container>
+  <ng-container *ngIf="!inEditMode">
+    <button mat-icon-button matTooltip="Show in Explore" class="pull-right"
+      (click)="navigationService.navigate('Explore', { id: input.item.id })">
+      <mat-icon class="fa fa-arrow-right"></mat-icon>
+    </button>
+  </ng-container>
   <ng-container
     *ngIf="input.item.createdBy === (sessionService.getSessionUser() | async).item.name">
     <ng-container *ngIf="inEditMode">
@@ -21,10 +29,6 @@
       </button>
     </ng-container>
     <ng-container *ngIf="!inEditMode">
-      <button mat-icon-button matTooltip="Show in Explore" class="pull-right"
-        (click)="navigationService.navigate('Explore', { id: input.item.id })">
-        <mat-icon class="fa fa-arrow-right"></mat-icon>
-      </button>
       <button mat-icon-button matTooltip="Edit" class="pull-right"
         (click)="inEditMode = true">
         <mat-icon class="fa fa-edit"></mat-icon>

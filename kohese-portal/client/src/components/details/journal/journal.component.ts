@@ -199,7 +199,9 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     this.observationFilterText = filterText;
     this.filteredEntries = [];
     for (let j: number = 0; j < this.journalEntries.length; j++) {
-      if (-1 !== this.journalEntries[j].item.description.indexOf(this.observationFilterText)) {
+      let entry: ItemProxy = this.journalEntries[j];
+      if ((!entry.item.description) || (-1 !== entry.item.description.
+        indexOf(this.observationFilterText))) {
         this.filteredEntries.push(this.journalEntries[j]);
       }
     }
