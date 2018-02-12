@@ -4,6 +4,8 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ChildrenTabComponent } from './children-tab/children-tab.component';
 import { ChildrenTreeComponent } from './children-tab/children-tree/children-tree.component';
 import { ChildrenTableComponent } from './children-tab/children-table/children-table.component';
+import { JournalComponent } from './journal/journal.component';
+import { JournalEntryComponent } from './journal/journal-entry/journal-entry.component';
 import { DetailsFormComponent } from './details-form/details-form.component';
 
 import { CommonModule } from '@angular/common';
@@ -24,6 +26,8 @@ import { UserInputModule } from '../user-input/user-input.module';
     ChildrenTabComponent,
     ChildrenTableComponent,
     ChildrenTreeComponent,
+    JournalComponent,
+    JournalEntryComponent,
     DetailsFormComponent
   ],
   imports : [
