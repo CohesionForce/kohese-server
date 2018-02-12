@@ -141,42 +141,8 @@ export class TreeComponent extends NavigatableComponent
   }
 
   expandSyncedNodes(): void {
-    /*if (this.selectedItemProxy) {
-      var ancestorProxy = this.selectedItemProxy.parentProxy;
-      while(ancestorProxy && ancestorProxy !== treeRoot) {
-        if(this.collapsed[ancestorProxy.item.id] === undefined || this.collapsed[ancestorProxy.item.id]) {
-          this.collapsed[ancestorProxy.item.id] = false;
-        }
-        ancestorProxy = ancestorProxy.parentProxy;
-      }
-
-      // TODO : Figure out anchor scrolling in Ng2
-      // $location.hash(this.selectedItemProxy.item.id);
-      // $anchorScroll();
-      // postDigest(function () {
-      //   // Force one more update cycle to update display
-      //   $scope.$apply();
-      //   $anchorScroll();
-      // });
-    }*/
+    // TODO Implement tree sync
   }
-
-  // TODO - Figure out the sync listener along with the anchor scroll dive
-  // syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler (event, data) {
-  //   console.log('::: Sync Item:' + data);
-  //   this.selectedItemProxy = ItemRepository.getProxyFor(data);
-
-  //   if (this.locationSynced) {
-  //     this.expandSyncedNodes();
-  //   }
-  // });
-
-  // syncLocation () {
-  //   this.locationSynced = !this.locationSynced;
-  //   if(this.locationSynced) {
-  //     this.expandSyncedNodes();
-  //   }
-  // };
 
 
   /******** List expansion functions */

@@ -73,9 +73,6 @@ export class DetailsComponent extends NavigatableComponent
     /* Subscriptions */
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
-      // TODO Before we were doing an additional check for parent id to determine
-      // if this was a create case. Decided to not port this over in favor of another solution
-      // Assess if this is correct and remove TODO
       this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
         if (update.connected) {
@@ -92,16 +89,10 @@ export class DetailsComponent extends NavigatableComponent
           if (this.itemProxy.item.description) {
             let parsed = this.reader.parse(this.itemProxy.item.description);
             this.itemDescriptionRendered = this.writer.render(parsed);
-            // TODO Determine if we need to run this through something like $sce
           }
         }
       })
     });
-
-    
-
-    // TODO - Add subscription to the description field of the proxy form and
-    // call the document render logic on it
 
     /* End Subscriptions */
 

@@ -5,8 +5,6 @@ import { AnalysisService } from '../../services/analysis/analysis.service';
 
 /* Here is where we will setup the base methods for all the analysis components */
 
-//TODO - Implement timeout on filter inputs
-
 @Injectable()
 export class AnalysisViewComponent extends NavigatableComponent {
   protected filterString: string;

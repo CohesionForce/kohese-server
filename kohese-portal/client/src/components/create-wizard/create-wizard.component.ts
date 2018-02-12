@@ -74,7 +74,6 @@ export class CreateWizardComponent extends NavigatableComponent
     } else {
       this.selectedType = type;
     }
-    
   }
 
   onFormGroupUpdated(newFormGroup : any) {
