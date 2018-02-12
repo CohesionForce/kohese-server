@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, Optional, Inject} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA, MatTableDataSource, MatStepper } from '@angular/material';
+import { FormGroup, FormControl } from '@angular/forms';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -17,14 +18,23 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 })
 export class CreateWizardComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
+  /* Data */
   @Input()
   private itemProxy: ItemProxy;
-  private repoStatusSubscription: Subscription;
   models : Array<ItemProxy>;
-  types: Array<ItemProxy>;
+  types: Array<ItemProxy> = [];
   recentProxies : Array<ItemProxy>;
   selectedType : ItemProxy;
   selectedParent : ItemProxy;
+
+  createFormGroup : FormGroup;
+
+  /* Observables */
+  typeStream : MatTableDataSource<ItemProxy>;
+
+  /* Subscriptions */
+  private repoStatusSubscription: Subscription;
+
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
               protected NavigationService : NavigationService,
@@ -44,18 +54,32 @@ export class CreateWizardComponent extends NavigatableComponent
             1 : ((first.item.name < second.item.name) ? -1 : 0));
         });
         for (let i = 0; i < this.models.length; i++) {
-          let modelView = this.DynamicTypesService.getViewProxyFor(this.types[i]);
+          let modelView = this.DynamicTypesService.getViewProxyFor(this.models[i]);
           if (modelView) {
-            this.types.push(modelView);
+            this.types.push(this.models[i]);
           }
         }
+        this.typeStream = new MatTableDataSource<ItemProxy>(this.types);
         this.recentProxies = this.itemRepository.getRecentProxies();
-        this.selectedType = this.types[0];
-        this.selectedParent = this.recentProxies[0];
-        console.log(this.selectedType);
-        console.log(this.selectedParent);
+        this.selectedParent = 'ROOT'
+        console.log(this.types);
+        console.log(this.recentProxies);
       }
     });
+  }
+
+  onTypeSelected(type, stepper : MatStepper) {
+    if (this.selectedType === type) {
+      stepper.next();
+    } else {
+      this.selectedType = type;
+    }
+    
+  }
+
+  onFormGroupUpdated(newFormGroup : any) {
+    this.createFormGroup = newFormGroup;
+    console.log(newFormGroup);
   }
 
   ngOnDestroy(): void {

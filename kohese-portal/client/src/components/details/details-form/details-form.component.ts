@@ -29,6 +29,8 @@ export class DetailsFormComponent extends NavigatableComponent
   public disabled: boolean;
   @Input()
   public fieldFilter: ((fieldName: string) => boolean);
+  @Input() 
+  createInfo : any;
   @Output()
   formGroupUpdated = new EventEmitter<FormGroup>()
 
@@ -59,12 +61,25 @@ export class DetailsFormComponent extends NavigatableComponent
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
     .subscribe((update) => {
       if (update.connected) {
-        if (!this.type) {
+        if (this.itemProxy) {
           this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
+        } else if (this.createInfo) {
+            if(this.createInfo.parent && this.createInfo.type) {
+              this.itemProxy = {
+                model : this.createInfo.type.item,
+                item: {
+                  parentId : this.createInfo.parent
+                }
+              }
+              this.type= this.DynamicTypeService.getViewProxyFor(this.itemProxy.model);
+              }
+            }
+        
+        if (this.itemProxy) {
+          this.updateProperties();      
+          this.formGroup = this.createFormGroup();
+          this.formGroupUpdated.emit(this.formGroup);
         }
-        this.updateProperties();      
-        this.formGroup = this.createFormGroup();
-        this.formGroupUpdated.emit(this.formGroup);
       }
     });
 
@@ -92,6 +107,22 @@ export class DetailsFormComponent extends NavigatableComponent
 
       if(changes['type']) {
         this.type = this.DynamicTypeService.getKoheseTypes()[changes['type'].currentValue]
+      }
+
+      if(changes['createInfo']) {
+        this.createInfo = changes['createInfo'].currentValue;
+        if(this.createInfo.parent && this.createInfo.type) {
+          this.itemProxy = {
+            model : this.createInfo.type,
+            item: {
+              parentId : this.createInfo.parent
+            }
+          }
+          this.type= this.DynamicTypeService.getViewProxyFor(this.itemProxy.model);
+          this.updateProperties();
+          this.formGroup = this.createFormGroup();
+          this.formGroupUpdated.emit(this.formGroup);
+        }
       }
 
       if (-1 !== changedInputs.indexOf('disabled')) {
