@@ -13,17 +13,17 @@
     {{proxy.item.name}}
   </mat-option>
 </mat-autocomplete>
-<label>Observed On:</label>
 <mat-form-field>
-  <input matInput type="date" [(ngModel)]="dateObserved"/>
+  <input matInput type="date" placeholder="Date Observed"
+    [(ngModel)]="dateObserved"/>
 </mat-form-field>
 <mat-form-field>
-  <input matInput type="time" [(ngModel)]="timeObserved"/>
+  <input matInput type="time" placeholder="Time Observed"
+    [(ngModel)]="timeObserved"/>
 </mat-form-field>
 <mat-checkbox [(ngModel)]="addAsIssue">
   Add As Issue
 </mat-checkbox>
-<br/>
 <button mat-raised-button class="pull-right" [disabled]="!journalEntryContent"
   (click)="addJournalEntry()">
   Add Journal Entry

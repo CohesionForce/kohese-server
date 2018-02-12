@@ -591,8 +591,14 @@ journal {
     width: calc(40% - 20px); }
   journal #contentFilterFormField {
     width: calc(60% - 20px); }
+  journal journal-entry #container {
+    padding: 5px 5px;
+    border-radius: 12px; }
+  journal .issue {
+    background-color: darkorange; }
   journal .highlight {
-    background-color: yellow; }
+    background-color: #ca6464;
+    color: whitesmoke; }
 
 .sidebar {
   color: whitesmoke;

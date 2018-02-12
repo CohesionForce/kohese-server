@@ -96,6 +96,9 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   
   addJournalEntry(): void {
     let whenObserved: Date = new Date(this.dateObserved);
+    // Handle the timezone offset
+    whenObserved.setTime(whenObserved.getTime() +
+      (whenObserved.getTimezoneOffset() * 60 * 1000));
     let timeComponents: Array<string> = this.timeObserved.split(' ');
     let hms: Array<string> = timeComponents[0].split(':');
     let hour: number = parseInt(hms[0]);
