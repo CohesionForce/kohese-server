@@ -1132,4 +1132,67 @@ describe('ItemProxy Test', function() {
     expect(lostAndFound.descendantCount).toEqual(2);
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  it('Sort Items with Same Name Correctly When Adding Parent After Children', ()=> {
+
+    resetItemRepository();
+    defineTestModel();
+    
+    var aa2 = new ItemProxy('Test', {
+      id: 'AA2',
+      name: 'AA Item',
+      parentId: 'LATE_A'
+    });
+    
+    var aa3 = new ItemProxy('Test', {
+      id: 'AA3',
+      name: 'AA Item',
+      parentId: 'LATE_A'
+    });
+    
+    var aa1 = new ItemProxy('Test', {
+      id: 'AA1',
+      name: 'AA Item',
+      parentId: 'LATE_A'
+    });
+    
+    var lateA = ItemProxy.getProxyFor('LATE_A');
+    
+    var aa = new ItemProxy('Test', {
+      id: 'LATE_A',
+      name: 'LATE_A',
+      parentId: ''
+    });
+
+    expect(lateA.getOrderedChildIds()).toEqual( [ 'AA1', 'AA2', 'AA3' ]);
+    
+    var earlyB = new ItemProxy('Test', {
+      id: 'EARLY_B',
+      name: 'EARLY_B',
+      parentId: ''
+    });
+
+    var bb2 = new ItemProxy('Test', {
+      id: 'BB2',
+      name: 'BB Item',
+      parentId: 'EARLY_B'
+    });
+    
+    var bb3 = new ItemProxy('Test', {
+      id: 'BB3',
+      name: 'BB Item',
+      parentId: 'EARLY_B'
+    });
+    
+    var bb1 = new ItemProxy('Test', {
+      id: 'BB1',
+      name: 'BB Item',
+      parentId: 'EARLY_B'
+    });
+    
+    expect(earlyB.getOrderedChildIds()).toEqual([ 'BB1', 'BB2', 'BB3' ]);
+
+  });
 });

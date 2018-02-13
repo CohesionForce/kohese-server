@@ -796,7 +796,9 @@ class ItemProxy {
     var insertAt = this.children.length;  
     if (!this.item.itemIds){
         for (var childIdx in this.children){
-            if (childProxy.item.name < this.children[childIdx].item.name){
+            if (childProxy.item.name < this.children[childIdx].item.name ||
+               ((childProxy.item.name === this.children[childIdx].item.name) &&
+                 (childProxy.item.id < this.children[childIdx].item.id))) {
               insertAt = childIdx;
               break;
             }
