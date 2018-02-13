@@ -1194,5 +1194,22 @@ describe('ItemProxy Test', function() {
     
     expect(earlyB.getOrderedChildIds()).toEqual([ 'BB1', 'BB2', 'BB3' ]);
 
+    bb3.updateItem('Test', {
+      id: 'BB3',
+      name: 'Another BB Item',
+      parentId: 'EARLY_B'
+    });
+    
+
+    expect(earlyB.getOrderedChildIds()).toEqual([ 'BB3', 'BB1', 'BB2' ]);
+
+    bb3.updateItem('Test', {
+      id: 'BB3',
+      name: 'Later BB Item',
+      parentId: 'EARLY_B'
+    });
+
+   expect(earlyB.getOrderedChildIds()).toEqual([ 'BB1', 'BB2', 'BB3' ]);
+
   });
 });
