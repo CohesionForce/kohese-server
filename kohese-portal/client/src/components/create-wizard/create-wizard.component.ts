@@ -62,7 +62,7 @@ export class CreateWizardComponent extends NavigatableComponent
         }
         this.typeStream = new MatTableDataSource<ItemProxy>(this.types);
         this.recentProxies = this.itemRepository.getRecentProxies();
-        this.selectedParent = 'ROOT'
+        this.selectedParent = ''
         console.log(this.types);
         console.log(this.recentProxies);
       }
