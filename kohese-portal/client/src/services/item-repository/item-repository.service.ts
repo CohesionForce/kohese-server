@@ -12,7 +12,6 @@ import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
-import * as SocketIOFileClient from 'socket.io-file-client';
 
 /**
  *
@@ -28,6 +27,8 @@ export class ItemRepository {
     Staged,
     Conflicted
   };
+
+  recentProxies : Array<ItemProxy>;
 
   repositoryStatus : BehaviorSubject<any>;
 
@@ -105,6 +106,8 @@ export class ItemRepository {
           this.fetchItems();
         }
       });
+
+      this.recentProxies = [];
   }
 
   // Item Proxy Wrapper Methods
@@ -132,6 +135,14 @@ export class ItemRepository {
 
   getRepoStatusSubject () : BehaviorSubject<any> {
     return this.repositoryStatus;
+  }
+
+  registerRecentProxy (itemProxy : ItemProxy) {
+    this.recentProxies.push(itemProxy);
+  }
+
+  getRecentProxies () : Array<ItemProxy> {
+    return this.recentProxies;
   }
 
   registerKoheseIOListeners () : void {
@@ -391,13 +402,18 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   createItem(kind: string, item: any): Promise<any> {
+    console.log('Create item called');
     return new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/upsert', {kind: kind, item: item}, (response) => {
         if (response.error) {
+          console.log('Error');
+          console.log(response);
           reject(response.error);
         } else {
+          console.log('Create succeded');
+          console.log(response);
           let proxy: ItemProxy = new ItemProxy(response.kind, response.item);
           proxy.dirty = false;
           resolve(proxy);
@@ -406,40 +422,27 @@ export class ItemRepository {
     });
   }
 
-  upsertItem (proxy) {
-    console.log('::: Preparing to upsert ' + proxy.kind);
-    let insufficientFields: Array<string> = [];
-    for (let i: number = 0; i < proxy.model.item.requiredProperties.length; i++) {
-      let fieldName: string = proxy.model.item.requiredProperties[i];
-      if (!proxy.item[fieldName]) {
-        insufficientFields.push(fieldName);
-      }
-    }
-
-    if(0 === insufficientFields.length) {
-      return new Promise((resolve, reject) => {
-        this.socketService.socket.emit('Item/upsert', {kind: proxy.kind, item:proxy.item}, (response) => {
-          if (response.error) {
-            reject(response.error);
+  upsertItem(proxy: ItemProxy): Promise<ItemProxy> {
+    return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void),
+      reject: ((value: any) => void)) => {
+      this.socketService.getSocket().emit('Item/upsert', {
+        kind: proxy.kind,
+        item: proxy.item
+      }, (response: any) => {
+        if (response.error) {
+          reject(response.error);
+        } else {
+          if(!proxy.updateItem) {
+            proxy.item = response.item;
+            proxy = new ItemProxy(response.kind, response.item);
           } else {
-            console.log(response);
-            if(!proxy.updateItem) {
-              proxy.item = response.item;
-              proxy = new ItemProxy(response.kind, response.item);
-            } else {
-              proxy.updateItem(response.kind, response.item);
-            }
-            proxy.dirty = false;
-            resolve(proxy);
+            proxy.updateItem(response.kind, response.item);
           }
-        });
+          proxy.dirty = false;
+          resolve(proxy);
+        }
       });
-    } else {
-      this.dialogService.openInformationDialog('Insufficient Data',
-          'Please enter data for the following fields:\n' +
-          insufficientFields.join('\n -\t'));
-      return Promise.reject({error: 'User must fill out required fields'});
-    }
+    });
   }
 
   deleteItem (proxy, recursive) {
@@ -516,26 +519,5 @@ export class ItemRepository {
     });
 
     return promise;
-  }
-  
-  importFiles(files: Array<File>, parentId: string): void {
-    let uploader: any = new SocketIOFileClient(this.socketService.getSocket());
-    uploader.on('complete', (file: File) => {
-      /*
-        Conversion to an Observable requires that the callback be callable
-        multiple times
-      */
-      this.socketService.getSocket().emit('ImportDocuments', {
-        file: file.name,
-        parentItem: parentId
-      }, (results) => {
-        if (results.error) {
-          this.toastrService.error('Document Import Failed', 'Import');
-        } else {
-          this.toastrService.success('Document Import Succeeded', 'Import');
-        }
-      });
-    });
-    uploader.upload(files);
   }
 }

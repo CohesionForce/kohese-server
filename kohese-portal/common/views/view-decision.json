@@ -1,0 +1,42 @@
+{
+  "model": "Decision ",
+  "viewProperties": {
+    "decisionState" : {
+      "inputType" : "k-select:{\"options\":[\"Proposed\", \"In Analysis\", \"In Review\"]}",
+      "required" : true,
+      "default" : "Proposed",
+      "propertyName" : "DecisionState"
+    },
+    "approvedBy" : {
+      "inputType" : "user-selector:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "approvedBy"
+    },
+    "approvedOn" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "approvedOn"
+    },
+    "rationale" : {
+      "inputType" : "text:{\"isMultiLine\":false}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "rationale"
+    },
+    "alternatives" : {
+      "inputType" : "text:{\"isMultiLine\":true}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "alternatives"
+    }
+  },
+  "id": "view-decision",
+  "name": "Decision View Model",
+  "createdBy": "jephillips",
+  "createdOn": 1510596684590,
+  "modifiedBy": "admin",
+  "modifiedOn": 1517006598071,
+  "itemIds": []
+}

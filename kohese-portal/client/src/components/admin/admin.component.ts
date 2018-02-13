@@ -67,7 +67,6 @@ export class AdminComponent implements OnInit {
         
         this.itemRepository.upsertItem(this.selectedUserProxy);
       } else {
-        // TODO
         let item: any = {
           parentId: this.sessionService.getSessionUser().getValue().item.parentId,
           name: this.usernameInput,

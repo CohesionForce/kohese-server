@@ -1,0 +1,25 @@
+<ng-container [formGroup]="formGroup">
+  <ng-container *ngIf="useAdvancedSelector">
+    <mat-form-field>
+      <textarea matInput cols="80" rows="(allowMultiSelect ? 3 : 1)"
+        readonly="true" placeholder="{{fieldName}}" style="display: none;"
+        formControlName="{{fieldId}}" value="{{selectedProxies.join('\n')}}">
+      </textarea>
+    </mat-form-field>
+    <button mat-raised-button (click)="openProxySelectionDialog()">
+      Select...
+    </button>
+  </ng-container>
+  <ng-container *ngIf="!useAdvancedSelector">
+    <mat-form-field>
+      <input matInput type="text" placeholder="{{fieldName}}"
+        formControlName="{{fieldId}}" [matAutocomplete]="proxySelector"/>
+    </mat-form-field>
+    <mat-autocomplete #proxySelector="matAutocomplete">
+      <mat-option *ngFor="let proxy of (filteredProxies | async)"
+        [value]="proxy.item.id">
+        {{proxy.item.name}}
+      </mat-option>
+    </mat-autocomplete>
+  </ng-container>
+</ng-container>

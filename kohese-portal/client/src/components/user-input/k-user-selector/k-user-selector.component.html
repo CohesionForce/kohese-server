@@ -1,0 +1,13 @@
+<ng-container [formGroup]="formGroup">
+  <mat-form-field>
+    <input matInput type="text" placeholder="{{fieldName}}"
+      formControlName="{{fieldId}}" [matAutocomplete]="proxySelector"/>
+  </mat-form-field>
+  <mat-autocomplete #proxySelector="matAutocomplete">
+    <mat-option *ngFor="let proxy of (filteredProxies | async)"
+      [value]="proxy.item.id">
+      {{proxy.item.name}}
+    </mat-option>
+  </mat-autocomplete>
+</ng-container>
+  

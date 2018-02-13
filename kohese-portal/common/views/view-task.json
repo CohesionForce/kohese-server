@@ -1,0 +1,60 @@
+{
+  "model": "Task",
+  "viewProperties": {
+    "taskState" : {
+      "inputType" : "k-select:{\"options\":[\"Proposed\", \"Accepted\", \"In Work\"]}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "taskState"
+    },
+    "assignedTo" : {
+      "inputType" : "user-selector:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "assignedTo"
+    }, 
+    "estimatedStart" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "estimatedStart"
+    },
+    "estimatedCompletion" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "estimatedCompletion"
+    },
+    "estimatedHoursEffort": {
+      "inputType" : "text:{\"isMultiLine\":false}",
+      "required" : false,
+      "default" : "",
+      "propertyName" : "estimatedHoursEffot"
+    },
+    "actualStart" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "actualStart"
+    },
+    "actualCompletion" : {
+      "inputType" : "date:{}",
+      "required" : false,
+      "default" : null,
+      "propertyName" : "actualCompletion"
+    },
+    "actualHours": {
+      "inputType" : "text:{\"isMultiLine\":false}",
+      "required" : false,
+      "default" : "",
+      "propertyName" : "actualHoursEffort"
+    }
+  },
+  "id": "view-task",
+  "name": "Task View Model",
+  "createdBy": "jephillips",
+  "createdOn": 1510596684590,
+  "modifiedBy": "admin",
+  "modifiedOn": 1517006598071,
+  "itemIds": []
+}

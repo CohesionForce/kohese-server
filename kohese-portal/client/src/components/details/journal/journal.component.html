@@ -1,0 +1,52 @@
+<mat-form-field id="contentInputFormField">
+  <textarea matInput placeholder="Journal Entry Content" cols="80" rows="3"
+    [(ngModel)]="journalEntryContent"></textarea>
+</mat-form-field>
+<br/>
+<mat-form-field>
+  <input matInput #userInput type="text" placeholder="Observed By"
+    [matAutocomplete]="userFilter" [(ngModel)]="observingUser"/>
+</mat-form-field>
+<mat-autocomplete #userFilter="matAutocomplete">
+  <mat-option *ngFor="let proxy of filterUsers(userInput.value)"
+    [value]="proxy.item.name">
+    {{proxy.item.name}}
+  </mat-option>
+</mat-autocomplete>
+<mat-form-field>
+  <input matInput type="date" placeholder="Date Observed"
+    [(ngModel)]="dateObserved"/>
+</mat-form-field>
+<mat-form-field>
+  <input matInput type="time" placeholder="Time Observed"
+    [(ngModel)]="timeObserved"/>
+</mat-form-field>
+<mat-checkbox [(ngModel)]="addAsIssue">
+  Add As Issue
+</mat-checkbox>
+<button mat-raised-button class="pull-right" [disabled]="!journalEntryContent"
+  (click)="addJournalEntry()">
+  Add Journal Entry
+</button>
+<br/>
+<hr/>
+<mat-form-field id="sortStrategyFormField">
+  <mat-select placeholder="Sort Strategy" [(value)]="selectedSortStrategy"
+    (selectionChange)="sort($event.value)">
+    <mat-option *ngFor="let strategy of (SORT_STRATEGIES | mapKey)"
+      [value]="strategy">
+      {{SORT_STRATEGIES[strategy]}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+<mat-form-field id="contentFilterFormField">
+  <input matInput #observationFilterInput type="text" placeholder="Filter"
+    (input)="filterObservations(observationFilterInput.value)"/>
+</mat-form-field>
+<br/>
+<div>
+  <journal-entry *ngFor="let entry of filteredEntries" [input]="entry"
+    [journalTargetId]="journalTargetId"
+    (journalTarget)="journalTargetId = ($event ? $event : input.item.id)">
+  </journal-entry>
+</div>

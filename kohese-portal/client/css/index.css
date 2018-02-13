@@ -9,6 +9,7 @@ components/
 pages/
 themes/
 */
+@import url(~angular-tree-component/dist/angular-tree-component.css);
 @import url(~@angular/material/prebuilt-themes/deeppurple-amber.css);
 .btn-outline {
   color: inherit;
@@ -425,6 +426,11 @@ kind-icon {
     height: calc(100% - 43px);
     overflow-y: auto; }
 
+.form-group {
+  width: 100%;
+  height: 500px;
+  overflow: auto; }
+
 .tab-pane {
   overflow: auto; }
   .tab-pane .absolute {
@@ -492,12 +498,6 @@ tab div {
 .angucomplete-holder .angucomplete-selected-row {
   background-color: #005A31;
   color: white;
-  padding: 5px; }
-
-#typeSelector {
-  padding: 5px; }
-
-#createButton {
   padding: 5px; }
 
 #analysis-view {
@@ -575,6 +575,35 @@ tab div {
       height: 500px;
       overflow: auto;
       width: 80%; }
+
+text-user-input mat-form-field {
+  width: 100%;
+  padding: 0px 10px; }
+
+proxy-selector-user-input mat-form-field {
+  width: 100%;
+  padding: 0px 10px; }
+
+date-user-input mat-form-field {
+  width: 100%;
+  padding: 0px 10px; }
+
+journal {
+  width: 100%; }
+  journal #contentInputFormField {
+    width: 100%; }
+  journal #sortStrategyFormField {
+    width: calc(40% - 20px); }
+  journal #contentFilterFormField {
+    width: calc(60% - 20px); }
+  journal journal-entry #container {
+    padding: 5px 5px;
+    border-radius: 12px; }
+  journal .issue {
+    background-color: darkorange; }
+  journal .highlight {
+    background-color: #ca6464;
+    color: whitesmoke; }
 
 .sidebar {
   color: whitesmoke;

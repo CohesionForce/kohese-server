@@ -1,0 +1,9 @@
+<mat-form-field [formGroup]="formGroup">
+  <mat-select placeholder={{fieldName}}
+    formControlName={{fieldId}}>
+    <mat-option *ngFor="let option of options">
+      {{ option }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+

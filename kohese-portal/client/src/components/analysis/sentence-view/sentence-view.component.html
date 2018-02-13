@@ -1,46 +1,48 @@
 <div class="panel">
   <div class="panel-heading">Sentence View - ({{getDetailsItemCount()}}) Sentences</div>
   <div class="panel-body">
-  <div>
-    <span><b>Analysis Details</b> </span>
-          <span class="col-xs-4 pull-right">
-                  <b>Limit</b>
-                  <input class="input-sm col-xs-6 pull-right" type="number" [(ngModel)]="loadLimit"
-                  placeholder="Details Limit"/>
-          </span>
-          </div>
-          <input type="checkbox" [(ngModel)]="showSentencesInDetails" (click)="processSentences()"
-                  name="showSentencesInDetailsInput"
-                  style="margin: 5px"/> Show Sentences in Details
-          <input type="checkbox" [(ngModel)]="showPhrasesInDetails" (click)="processSentences()"
-                  name="showPhrasesInDetailsInput"
-                  style="margin: 5px"/> Show Phrases in Details
-          <input type="checkbox" [(ngModel)]="showTokensInDetails" (click)="processSentences()"
-                  name="showTokensInDetailsInput"
-                  style="margin: 5px"/> Show Tokens in Details
-          <div id="sentence-div">
-          <table id="theDetails"
-                  class="table tree-grid table-striped table-condensed table-hover">
-          <thead>
-                  <th style="width:20%">Type</th>
-                  <th><span (click)="sort('text')">
-                          Text
-                          <span *ngIf="sortField === 'text'">
-                          <i *ngIf="ascending" class="fa fa-chevron-up"></i>
-                          <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
-                          </span>
-                  </span></th>
-          </thead>
-
-          <tbody id="theDetailsBody">
-                  <tr class="level-{{listItem.displayLevel}}"
-                  class="tree-grid-row" id="{{listItem.displayId}}"
-                  *ngFor="let listItem of sentences">
-                  <td class="indented">{{listItem.displayType}}</td>
-                  <td [innerHTML]="listItem.text | highlightRegex:filterRegexHighlight:true"></td>
-                  </tr>
-          </tbody>
-          </table>
-          </div>
-          </div>
+    <div>
+      <span><b>Analysis Details</b></span>
+      <span class="col-xs-4 pull-right">
+        <mat-form-field>
+          <input matInput class="input-sm col-xs-6 pull-right" type="number"
+            [(ngModel)]="loadLimit" placeholder="Details Limit"/>
+        </mat-form-field>
+      </span>
+    </div>
+    <mat-checkbox [(ngModel)]="showSentencesInDetails" (click)="processSentences()">
+      Show Sentences in Details
+    </mat-checkbox>
+    <mat-checkbox [(ngModel)]="showPhrasesInDetails" (click)="processSentences()">
+      Show Phrases in Details
+    </mat-checkbox>
+    <mat-checkbox [(ngModel)]="showTokensInDetails" (click)="processSentences()">
+      Show Tokens in Details
+    </mat-checkbox>
+    <div id="sentence-div">
+      <table id="theDetails"
+        class="table tree-grid table-striped table-condensed table-hover">
+        <thead>
+          <th style="width:20%">Type</th>
+          <th>
+            <span (click)="sort('text')">
+              Text
+              <span *ngIf="sortField === 'text'">
+                <i *ngIf="ascending" class="fa fa-chevron-up"></i>
+                <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
+              </span>
+            </span>
+          </th>
+        </thead>
+        <tbody id="theDetailsBody">
+          <tr class="level-{{listItem.displayLevel}}"
+            class="tree-grid-row" id="{{listItem.displayId}}"
+            *ngFor="let listItem of sentences">
+            <td class="indented">{{listItem.displayType}}</td>
+            <td [innerHTML]="listItem.text | highlightRegex:filterRegexHighlight:true"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

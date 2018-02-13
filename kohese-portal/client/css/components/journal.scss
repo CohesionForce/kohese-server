@@ -1,0 +1,33 @@
+@import '../utils/variables';
+
+journal {
+  width: 100%;
+  
+  #contentInputFormField {
+    width: 100%;
+  }
+  
+  #sortStrategyFormField {
+    width: calc(40% - 20px);
+  }
+  
+  #contentFilterFormField {
+    width: calc(60% - 20px);
+  }
+  
+  journal-entry {
+    #container {
+      padding: 5px 5px;
+      border-radius: 12px;
+    }
+  }
+  
+  .issue {
+    background-color: darkorange;
+  }
+  
+  .highlight {
+    background-color: $secondaryColor + 100;
+    color: whitesmoke;
+  }
+}

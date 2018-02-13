@@ -10,7 +10,7 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import { ItemProxy } from '../../../../common/models/item-proxy';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { RowComponent } from '../../classes/RowComponent.class';
 import { MatSelectChange } from '@angular/material';
@@ -37,7 +37,7 @@ export class TreeComponent extends NavigatableComponent
     private proxyFilter: ProxyFilter = new ProxyFilter(); // TODO get definition for Filter
     private selectedItemProxy: ItemProxy;
     private itemProxyId : string;
-    private kindList: Array<ItemProxy>;
+    private types: Array<ItemProxy>;
     private actionStates: Array<String> = ['Pending Review', 'In Verification', 'Assigned'];
     private userList : Array<any>; // This will eventually be of type KoheseUser
     // TODO Probably want to get this from somewhere else
@@ -66,10 +66,10 @@ export class TreeComponent extends NavigatableComponent
       if (update.connected) {
         treeRoot = this.ItemRepository.getRootProxy();
         this.absoluteRoot = treeRoot;
-        this.kindList = this.ItemRepository.getProxyFor('Model-Definitions').
-        getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
-        return ((first.item.name > second.item.name) ?
-          1 : ((first.item.name < second.item.name) ? -1 : 0));
+        this.types = this.ItemRepository.getProxyFor('Model-Definitions').
+          getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
+          return ((first.item.name > second.item.name) ?
+            1 : ((first.item.name < second.item.name) ? -1 : 0));
         });
       }
     });
@@ -141,42 +141,8 @@ export class TreeComponent extends NavigatableComponent
   }
 
   expandSyncedNodes(): void {
-    /*if (this.selectedItemProxy) {
-      var ancestorProxy = this.selectedItemProxy.parentProxy;
-      while(ancestorProxy && ancestorProxy !== treeRoot) {
-        if(this.collapsed[ancestorProxy.item.id] === undefined || this.collapsed[ancestorProxy.item.id]) {
-          this.collapsed[ancestorProxy.item.id] = false;
-        }
-        ancestorProxy = ancestorProxy.parentProxy;
-      }
-
-      // TODO : Figure out anchor scrolling in Ng2
-      // $location.hash(this.selectedItemProxy.item.id);
-      // $anchorScroll();
-      // postDigest(function () {
-      //   // Force one more update cycle to update display
-      //   $scope.$apply();
-      //   $anchorScroll();
-      // });
-    }*/
+    // TODO Implement tree sync
   }
-
-  // TODO - Figure out the sync listener along with the anchor scroll dive
-  // syncListener = $scope.$on('syncItemLocation', function onNewItemSelectedHandler (event, data) {
-  //   console.log('::: Sync Item:' + data);
-  //   this.selectedItemProxy = ItemRepository.getProxyFor(data);
-
-  //   if (this.locationSynced) {
-  //     this.expandSyncedNodes();
-  //   }
-  // });
-
-  // syncLocation () {
-  //   this.locationSynced = !this.locationSynced;
-  //   if(this.locationSynced) {
-  //     this.expandSyncedNodes();
-  //   }
-  // };
 
 
   /******** List expansion functions */
@@ -258,13 +224,6 @@ export class TreeComponent extends NavigatableComponent
 })
 export class TreeRowComponent extends RowComponent
   implements OnInit, OnDestroy {
-  /* UI Triggers
-     RowComponent : exactFilter
-                    collapsed */
-
-  /* Observables
-     RowComponent : filterSubject */
-
   /* Subscriptions */
   private filterSubscription : Subscription;
 

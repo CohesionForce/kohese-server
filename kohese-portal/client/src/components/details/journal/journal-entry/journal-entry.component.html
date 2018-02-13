@@ -1,0 +1,51 @@
+<div id="container" [ngClass]="{ 'issue': ('Issue' === input.kind) }">
+  <h5>
+    Added by {{input.item.createdBy}} on {{(input.item.createdOn | date:'long')}}
+  </h5>
+  <h5>
+    Observed by {{input.item.observedBy}} on {{(input.item.observedOn | date:'long')}}
+  </h5>
+  <ng-container *ngIf="(input.item.name.trim())">
+    <h5>
+      {{input.item.name}}
+    </h5>
+  </ng-container>
+  <ng-container *ngIf="!inEditMode">
+    <button mat-icon-button matTooltip="Show in Explore" class="pull-right"
+      (click)="navigationService.navigate('Explore', { id: input.item.id })">
+      <mat-icon class="fa fa-arrow-right"></mat-icon>
+    </button>
+  </ng-container>
+  <ng-container
+    *ngIf="input.item.createdBy === (sessionService.getSessionUser() | async).item.name">
+    <ng-container *ngIf="inEditMode">
+      <button mat-icon-button matTooltip="Cancel" class="pull-right"
+        (click)="cancelEditing()">
+        <mat-icon class="fa fa-times"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Save Changes" class="pull-right"
+        (click)="save()">
+        <mat-icon class="fa fa-save"></mat-icon>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="!inEditMode">
+      <button mat-icon-button matTooltip="Edit" class="pull-right"
+        (click)="inEditMode = true">
+        <mat-icon class="fa fa-edit"></mat-icon>
+      </button>
+    </ng-container>
+  </ng-container>
+  <button mat-icon-button matTooltip="Journal Against This" class="pull-right"
+    [ngClass]="{ 'highlight': (journalTargetId === input.item.id) }"
+    (click)="setJournalTarget()">
+    <mat-icon class="fa fa-reply"></mat-icon>
+  </button>
+  <ng-container *ngIf="inEditMode">
+    <textarea matInput #editInput placeholder="Journal Entry Content" cols="80"
+      rows="3" [(ngModel)]="editText"></textarea>
+  </ng-container>
+  <ng-container *ngIf="!inEditMode">
+    <label>{{input.item.description}}</label>
+  </ng-container>
+  <hr/>
+</div>

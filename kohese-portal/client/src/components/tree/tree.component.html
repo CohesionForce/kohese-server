@@ -51,8 +51,8 @@
                 <mat-form-field>
                   <mat-select placeholder="Kind" (selectionChange)="kindFilterChanged($event)">
                     <mat-option>{{NO_KIND_SPECIFIED}}</mat-option>
-                    <mat-option *ngFor="let kind of kindList" [value]="kind">
-                      {{kind.item.name}}
+                    <mat-option *ngFor="let type of types" [value]="type">
+                      {{type.item.name}}
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
@@ -99,11 +99,6 @@
                 </span>
               </span>
             </div> <!-- End Action Filtering -->
-            <br/>
-            <button mat-raised-button
-              (click)="navigate('Create', { parentId: getTreeRoot().item.id })">
-              Create Item
-            </button>
           </span>	<!-- End Default Controls -->
           <!-- Start Version Control View -->
           <span *ngSwitchCase="Version Control"></span>

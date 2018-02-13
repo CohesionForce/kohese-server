@@ -12,8 +12,8 @@ import { AnalysisModule } from './components/analysis/analysis.module';
 import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
 import { ActionTableModule } from './components/action-table/action-table.module';
-import { CreateItemModule } from './components/create-item/create-item.module';
 import { TypeCreatorModule } from './components/type-creator/type-creator.module';
+import { CreateWizardModule } from './components/create-wizard/create-wizard.module';
 import { PipesModule } from './pipes/pipes.module';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -32,16 +32,17 @@ import { ActionTableComponent } from './components/action-table/action-table.com
 import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
 import { AuthenticationService } from './services/authentication/authentication.service';
 import { SocketService } from './services/socket/socket.service';
-import { BundleService } from './services/bundle/bundle.service';
 import { SessionService } from './services/user/session.service';
 import { VersionControlService } from './services/version-control/version-control.service';
 import { NavigationService } from './services/navigation/navigation.service';
 import { AnalysisService } from './services/analysis/analysis.service';
 import { DynamicTypesService } from './services/dynamic-types/dynamic-types.service';
+import { ImportService } from './services/import/import.service';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
+import { TreeModule } from 'angular-tree-component';
 
 import { MaterialModule } from './material.module';
 import { ItemRepository } from './services/item-repository/item-repository.service';
@@ -85,8 +86,9 @@ const AUTHENTICATION_INTERCEPTOR = {
     DetailsModule,
     DocumentViewModule,
     ActionTableModule,
-    CreateItemModule,
-    TypeCreatorModule
+    TypeCreatorModule,
+    TreeModule,
+    CreateWizardModule
   ],
   entryComponents: [
     DialogComponent
@@ -96,14 +98,14 @@ const AUTHENTICATION_INTERCEPTOR = {
     AuthenticationService,
     AUTHENTICATION_INTERCEPTOR,
     SocketService,
-    BundleService,
     SessionService,
     VersionControlService,
     NavigationService,
     AnalysisService,
     DataProcessingService,
     DialogService,
-    DynamicTypesService],
+    DynamicTypesService,
+    ImportService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
