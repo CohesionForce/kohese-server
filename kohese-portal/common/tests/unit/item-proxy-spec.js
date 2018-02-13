@@ -774,6 +774,22 @@ describe('ItemProxy Test', function() {
     var newItem;
     try {
       newItem = new ItemProxy('Item', item);      
+      throw('Failed validation');
+    } catch (err){
+      expect(err).toEqual({ 
+        error : 'Not-Valid', 
+        validation : { 
+          valid : false, 
+          missingProperties : [ 'name' ] 
+        } 
+      });
+    }
+  
+    // Detect if required attribute exists, but is set to null
+    item.name = null;
+    try {
+      newItem = new ItemProxy('Item', item);
+      throw('Failed validation');
     } catch (err){
       expect(err).toEqual({ 
         error : 'Not-Valid', 
@@ -788,7 +804,7 @@ describe('ItemProxy Test', function() {
     item.name = 'Test';
     
     newItem = new ItemProxy('Item', item);
-    
+
     var itemValidation = newItem.validateItem();
     expect(itemValidation.valid).toEqual(true);
     
