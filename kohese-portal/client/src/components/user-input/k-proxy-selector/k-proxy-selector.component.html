@@ -13,7 +13,7 @@
   <ng-container *ngIf="!useAdvancedSelector">
     <mat-form-field>
       <input matInput type="text" placeholder="{{fieldName}}"
-        formControlName="{{fieldId}}" [matAutocomplete]="proxySelector"> 
+        formControlName="{{fieldId}}" [matAutocomplete]="proxySelector"/> 
     </mat-form-field>
     <span *ngIf="selectedProxy">
       {{selectedProxy.item.name}}
