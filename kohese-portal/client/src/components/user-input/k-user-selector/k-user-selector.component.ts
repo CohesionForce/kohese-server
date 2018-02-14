@@ -6,7 +6,6 @@ import { SessionService } from '../../../services/user/session.service';
 import { ItemProxy } from '../../../../../common/models/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
-import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
   selector: 'k-user-selector',
@@ -15,8 +14,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material';
 export class KUserSelectorComponent extends UserInput implements OnInit, OnDestroy {
   userProxies : Array<ItemProxy>;
   filteredProxies : Observable<Array<ItemProxy>>;
-  repoStagingSub : Subscription
-  selectedUser : ItemProxy;
+  repoStagingSub : Subscription;
 
   constructor(private ItemRepository : ItemRepository,
               private SessionService : SessionService) {
