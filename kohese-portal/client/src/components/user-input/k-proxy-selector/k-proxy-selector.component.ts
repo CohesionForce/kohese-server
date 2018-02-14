@@ -25,7 +25,7 @@ export class KProxySelectorComponent extends UserInput
   public selectedProxies: Array<ItemProxy> = [];
   private typeProxies: Array<ItemProxy> = [];
   public filteredProxies: Observable<Array<ItemProxy>>;
-  public selectedUser : ItemProxy;
+  public selectedProxy : ItemProxy;
 
   constructor(private ItemRepository: ItemRepository,
     private dialogService: DialogService) {
@@ -46,9 +46,8 @@ export class KProxySelectorComponent extends UserInput
     });
   }
 
-  onUserSelected (selectedEvent : MatAutocompleteSelectedEvent) {
-    this.selectedUser = this.ItemRepository.getProxyFor(selectedEvent.option.value);
-    console.log(this.selectedUser);
+  onProxySelected (selectedEvent : MatAutocompleteSelectedEvent) {
+    this.selectedProxy = this.ItemRepository.getProxyFor(selectedEvent.option.value);
 } 
 
   

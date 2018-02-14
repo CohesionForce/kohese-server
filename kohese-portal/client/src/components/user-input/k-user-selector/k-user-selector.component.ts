@@ -36,10 +36,6 @@ export class KUserSelectorComponent extends UserInput implements OnInit, OnDestr
         }})
   }
 
-  onUserSelected (selectedEvent : MatAutocompleteSelectedEvent) {
-      this.selectedUser = this.ItemRepository.getProxyFor(selectedEvent.option.value);
-      console.log(this.selectedUser);
-  } 
 
   ngOnDestroy () {
       this.repoStagingSub.unsubscribe();
