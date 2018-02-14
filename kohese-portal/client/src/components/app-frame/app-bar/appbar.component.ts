@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { NavigatableComponent } from '../../classes/NavigationComponent.class';
-import { NavigationService } from '../../services/navigation/navigation.service';
-import { AuthenticationService } from '../../services/authentication/authentication.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { SessionService } from '../../services/user/session.service';
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { AuthenticationService } from '../../../services/authentication/authentication.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { SessionService } from '../../../services/user/session.service';
+import * as ItemProxy from '../../../../../common/models/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
