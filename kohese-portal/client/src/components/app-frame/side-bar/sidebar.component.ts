@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { DialogService } from '../../services/dialog/dialog.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { AuthenticationService } from '../../services/authentication/authentication.service';
-import { CreateWizardComponent } from '../create-wizard/create-wizard.component'; 
-import { ImportComponent } from '../create-wizard/import/import.component';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { AuthenticationService } from '../../../services/authentication/authentication.service';
+import { CreateWizardComponent } from '../../create-wizard/create-wizard.component'; 
+import { ImportComponent } from '../../create-wizard/import/import.component';
 
 @Component({
   selector: 'side-bar',

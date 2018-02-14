@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'highlightRegex'
 })
 
-export class HighlightRegexPipe implements PipeTransform {
+export class HighlightPipe implements PipeTransform {
 
   // TODO - implement highlight transform
   transform(pipedValue) {

@@ -3,9 +3,10 @@
     <input matInput type="text" placeholder="{{fieldName}}"
       formControlName="{{fieldId}}" [matAutocomplete]="proxySelector"/>
   </mat-form-field>
+
   <mat-autocomplete #proxySelector="matAutocomplete">
     <mat-option *ngFor="let proxy of (filteredProxies | async)"
-      [value]="proxy.item.id">
+      [value]="proxy.item.name" >
       {{proxy.item.name}}
     </mat-option>
   </mat-autocomplete>

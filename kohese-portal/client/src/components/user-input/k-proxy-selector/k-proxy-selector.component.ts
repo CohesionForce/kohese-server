@@ -6,6 +6,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { TreeComponent } from '../../tree/tree.component';
 import { Observable } from 'rxjs/Observable';
+import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
   selector: 'k-proxy-selector',
@@ -24,14 +25,15 @@ export class KProxySelectorComponent extends UserInput
   public selectedProxies: Array<ItemProxy> = [];
   private typeProxies: Array<ItemProxy> = [];
   public filteredProxies: Observable<Array<ItemProxy>>;
+  public selectedProxy : ItemProxy;
 
-  constructor(private itemRepository: ItemRepository,
+  constructor(private ItemRepository: ItemRepository,
     private dialogService: DialogService) {
     super();
   }
   
   ngOnInit(): void {
-    this.itemRepository.getRootProxy().visitTree(undefined, (proxy) => {
+    this.ItemRepository.getRootProxy().visitTree(undefined, (proxy) => {
       if ((this.type === proxy.kind) && proxy.item) {
         this.typeProxies.push(proxy);
       }
@@ -43,6 +45,11 @@ export class KProxySelectorComponent extends UserInput
       });
     });
   }
+
+  onProxySelected (selectedEvent : MatAutocompleteSelectedEvent) {
+    this.selectedProxy = this.ItemRepository.getProxyFor(selectedEvent.option.value);
+} 
+
   
   getSelectedProxies(): Array<ItemProxy> {
     return this.selectedProxies;
