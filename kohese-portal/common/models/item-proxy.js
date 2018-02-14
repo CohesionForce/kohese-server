@@ -251,7 +251,8 @@ class ItemProxy {
     
     if (model && model.item && model.item.requiredProperties) {
       model.item.requiredProperties.forEach((property) => {
-        if (!itemContent.hasOwnProperty(property)) {
+        if (!itemContent.hasOwnProperty(property) ||
+            itemContent[property] === null) {
           validationResult.valid = false;
           validationResult.missingProperties.push(property);
         }

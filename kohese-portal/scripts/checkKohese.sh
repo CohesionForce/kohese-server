@@ -19,6 +19,9 @@ function checkProcess {
     then
       echo "::: Killing $procPid"
       kill -9 $procPid
+      sleep 1
+      # Need to recheck
+      checkProcess $1
     fi
   else
     echo "--- Did not find \"$1\""
