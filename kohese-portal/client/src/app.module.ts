@@ -2,7 +2,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 
@@ -16,11 +15,13 @@ import { CreateWizardModule } from './components/create-wizard/create-wizard.mod
 import { PipesModule } from './pipes/pipes.module';
 import { AppFrameModule } from './components/app-frame/app-frame.module';
 import { ServicesModule } from './services/services.module';
+import { AuthenticationModule } from './services/authentication/authentication.module';
+import { LoginModule } from './components/login/login.module';
+import { UserModule } from './services/user/user.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
-import { LoginComponent } from './components/login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RepositoriesComponent } from './components/admin/repositories.component';
 import { TreeComponent, TreeRowComponent } from './components/tree/tree.component';
@@ -40,7 +41,6 @@ import { MaterialModule } from './material.module';
     AppComponent,
     DashboardComponent,
     AdminComponent,
-    LoginComponent,
     RepositoriesComponent,
     TreeComponent,
     ExploreComponent,
@@ -52,7 +52,6 @@ import { MaterialModule } from './material.module';
     AppRoutingModule,
     FormsModule,
     FlexLayoutModule,
-    HttpClientModule,
     NgbModule.forRoot(),
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
@@ -66,7 +65,10 @@ import { MaterialModule } from './material.module';
     TypeCreatorModule,
     TreeModule,
     CreateWizardModule,
-    AppFrameModule
+    AppFrameModule,
+    AuthenticationModule,
+    LoginModule,
+    UserModule
   ],
   providers: [],
   bootstrap: [AppComponent]

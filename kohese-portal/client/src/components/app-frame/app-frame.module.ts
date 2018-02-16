@@ -5,6 +5,7 @@ import { MaterialModule } from "../../material.module";
 import { SideBarComponent } from './side-bar/sidebar.component';
 import { AppBarComponent } from './app-bar/appbar.component';
 import { ServicesModule } from '../../services/services.module';
+import { UserModule } from '../../services/user/user.module'
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { ServicesModule } from '../../services/services.module';
   imports : [
     CommonModule,
     MaterialModule,
-    ServicesModule
+    ServicesModule,
+    UserModule
   ],
   exports : [
     AppBarComponent,

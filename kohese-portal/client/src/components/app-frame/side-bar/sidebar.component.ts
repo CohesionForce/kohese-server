@@ -1,21 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { AuthenticationService } from '../../../services/authentication/authentication.service';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component'; 
 import { ImportComponent } from '../../create-wizard/import/import.component';
+import { CurrentUserService } from '../../../services/user/current-user.service';
 
 @Component({
   selector: 'side-bar',
   templateUrl: './sidebar.component.html'
 })
 export class SideBarComponent implements OnInit {
+  authenticated : boolean = false;
+  
   constructor(private dialogService: DialogService,
     private itemRepository: ItemRepository,
-    private authenticationService: AuthenticationService) {
+    private CurrentUserService: CurrentUserService) {
   }
 
   ngOnInit() {
+    this.CurrentUserService.getCurrentUserSubject().subscribe((userInfo)=>{
+      console.log(userInfo);
+      if(userInfo) {
+        this.authenticated = true;
+      }
+    })
   }
   
   openNewDialog(): void {

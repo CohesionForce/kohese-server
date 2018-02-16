@@ -5,6 +5,7 @@ import 'rxjs/add/operator/mergeMap';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { SocketService } from '../socket/socket.service';
 import { JwtHelper } from 'angular2-jwt';
+import { CurrentUserService } from '../user/current-user.service';
 
 @Injectable()
 export class AuthenticationService {
@@ -12,15 +13,25 @@ export class AuthenticationService {
   private readonly UNDEFINED_LOCAL_STORAGE_VALUE = 'undefined';
   private token: BehaviorSubject<string> = new BehaviorSubject(localStorage.getItem(this.TOKEN_KEY));
   private jwtHelper: JwtHelper = new JwtHelper();
-  private authenticationInformation: BehaviorSubject<any> =
-    new BehaviorSubject(undefined);
   
   constructor(private httpClient: HttpClient,
-    private socketService: SocketService) {
+    private socketService: SocketService,
+    private CurrentUserService : CurrentUserService) {
     let t: any = this.token.getValue();
     if (!((this.UNDEFINED_LOCAL_STORAGE_VALUE === t) || (null == t))) {
-      this.authenticationInformation.next(this.jwtHelper.decodeToken(t));
+      this.CurrentUserService.setCurrentUser(this.jwtHelper.decodeToken(t));
     }
+
+    this.CurrentUserService.getCredentialSubscription().subscribe((credentialCommand)=>{
+      if (credentialCommand) {
+        console.log(credentialCommand);
+        if (credentialCommand.command === 'Login') {
+          this.login(credentialCommand.credentials);
+        } else if (credentialCommand.command === 'Logout') {
+          this.logout();
+        }
+      }
+    })
     
     this.socketService.getSocket().on('connect', () => {
       let t: any = this.token.getValue();
@@ -47,22 +58,16 @@ export class AuthenticationService {
       this.socketService.getSocket().emit('authenticate', {
         token: t
       });
-      this.authenticationInformation.next(this.jwtHelper.decodeToken(t));
-      return this.authenticationInformation;
+      return this.CurrentUserService.setCurrentUser(this.jwtHelper.decodeToken(t));
     }) as BehaviorSubject<any>;
   }
   
   logout(): void {
     this.token.next('');
     localStorage.removeItem(this.TOKEN_KEY);
-    this.authenticationInformation.next(undefined);
+    this.CurrentUserService.setCurrentUser(undefined);
     this.socketService.disconnect();
   }
-  
-  getAuthenticationInformation(): BehaviorSubject<any> {
-    return this.authenticationInformation;
-  }
-  
   getToken(): BehaviorSubject<string> {
     return this.token;
   }

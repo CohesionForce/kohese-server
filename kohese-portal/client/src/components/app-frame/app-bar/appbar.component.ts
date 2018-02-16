@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { AuthenticationService } from '../../../services/authentication/authentication.service';
+import { CurrentUserService } from '../../../services/user/current-user.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import * as ItemProxy from '../../../../../common/models/item-proxy';
@@ -17,13 +17,14 @@ export class AppBarComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   private userName : string;
   private repositoryStatus: any;
+  public authenticated : boolean = false;
   
   private userSubscription: Subscription;
   private repositoryStatusSubscription: Subscription;
 
   constructor(private sessionService: SessionService,
     protected NavigationService: NavigationService,
-    private authenticationService: AuthenticationService,
+    private CurrentUserService: CurrentUserService,
     private itemRepository: ItemRepository) {
     super(NavigationService);
   }
@@ -40,6 +41,12 @@ export class AppBarComponent extends NavigatableComponent
     this.repositoryStatusSubscription = this.itemRepository.getRepoStatusSubject().subscribe((status: any) => {
       this.repositoryStatus = status;
     });
+
+    this.CurrentUserService.getCurrentUserSubject().subscribe((userInfo)=>{
+      if (userInfo) {
+        this.authenticated = true;
+      }
+    })
   }
   
   ngOnDestroy(): void {
@@ -48,7 +55,7 @@ export class AppBarComponent extends NavigatableComponent
   }
   
   logout(): void {
-    this.authenticationService.logout();
+    this.CurrentUserService.logout();
     this.navigate('Login', {});
   }
 }
