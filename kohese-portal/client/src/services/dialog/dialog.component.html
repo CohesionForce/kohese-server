@@ -1,10 +1,33 @@
 <div>
   <h1 mat-dialog-title>{{data.title}}</h1>
-  <mat-dialog-content>{{data.text}}</mat-dialog-content>
+  <mat-dialog-content>
+    {{data.text}}
+    <ng-container *ngIf="data.inputType">
+      <ng-container *ngIf="data.text">
+        <br/>
+        <br/>
+      </ng-container>
+      <mat-form-field>
+        <input matInput type="{{data.inputType}}"
+          placeholder="{{data.fieldName}}" [(ngModel)]="inputtedValue"/>
+      </mat-form-field>
+    </ng-container>
+  </mat-dialog-content>
   <mat-dialog-actions>
-    <button *ngFor="let label of data.buttonLabels; let j = index" mat-raised-button
-      [mat-dialog-close]="j">
-      {{label}}
-    </button>
+    <ng-container *ngIf="data.inputType">
+      <button mat-raised-button [mat-dialog-close]="inputtedValue"
+        class="pull-right">
+        Apply
+      </button>
+      <button mat-raised-button [mat-dialog-close]="0" class="pull-right">
+        Cancel
+      </button>
+    </ng-container>
+    <ng-container *ngIf="!data.inputType">
+      <button *ngFor="let label of data.buttonLabels; let j = index"
+        mat-raised-button [mat-dialog-close]="j" class="pull-right">
+        {{label}}
+      </button>
+    </ng-container>
   </mat-dialog-actions>
 </div>

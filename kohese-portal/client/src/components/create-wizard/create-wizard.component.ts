@@ -83,9 +83,9 @@ export class CreateWizardComponent extends NavigatableComponent
   }
 
   createItem() {
-    this.itemRepository.createItem(this.selectedType.item.name, this.createFormGroup.value)
+    this.itemRepository.buildItem(this.selectedType.item.name, this.createFormGroup.value)
       .then(()=>{
-        console.log('Create Item promise resolve')
+        console.log('Build Item promise resolve')
         this.dialogReference.close();
       });
   }

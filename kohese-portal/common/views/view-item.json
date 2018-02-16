@@ -1,29 +1,30 @@
 {
-  "model": "Item ",
+  "modelName": "Item ",
+  "icon": "fa fa-sticky-note",
   "viewProperties": {
     "name": {
       "inputType": "text:{\"isMultiLine\":false}",
       "required": true,
       "default": "",
-      "propertyName": "Name"
+      "displayName": "Name"
     },
     "description": {
       "inputType": "text:{\"isMultiLine\":false}",
       "required": false,
       "default": "",
-      "propertyName": "Description"
+      "displayName": "Description"
     },
     "tags": {
       "inputType" : "text:{\"isMultiLine\":false}",
       "required" : false,
       "default" : "",
-      "propertyName" : "Tags"
+      "displayName" : "Tags"
     },
     "parentId" : {
       "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
       "required" : true,
       "default" : "ROOT",
-      "propertyName" : "Parent"
+      "displayName" : "Parent"
     }
   },
   "id": "view-item",

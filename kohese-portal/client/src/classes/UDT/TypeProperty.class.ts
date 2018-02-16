@@ -3,12 +3,12 @@ export class TypeProperty {
   required: boolean;
   enum : Array<string>;
   default : any;
-  propertyName : string;
+  displayName : string;
 
   constructor(property: any) {
     this.inputType = property.inputType;
     this.required = property.required
     this.default = property.default;
-    this.propertyName = property.propertyName;
+    this.displayName = property.displayName;
   }
 }

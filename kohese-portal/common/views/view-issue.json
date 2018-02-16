@@ -1,47 +1,48 @@
 {
-  "model": "Issue",
+  "modelName": "Issue",
+  "icon": "fa fa-exclamation-circle",
   "viewProperties": {    
     "issueState" : {
       "inputType" : "k-select:{\"options\":[\"Observed\", \"In Analysis\", \"No Action\"]}",
       "required" : false,
       "default" : "Observed",
-      "propertyName" : "issueState"
+      "displayName" : "issueState"
     },
     "observedOn" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "observedOn"
+      "displayName" : "observedOn"
     },
     "observedBy" : {
       "inputType" : "user-selector:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "observedBy"
+      "displayName" : "observedBy"
     },    
     "analysisAction" : {
       "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
       "required" : true,
       "default" : null,
-      "propertyName" : "analysisAction"
+      "displayName" : "analysisAction"
     },
     "context" : {
       "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
       "required" : true,
       "default" : null,
-      "propertyName" : "context"
+      "displayName" : "context"
     },   
      "resolutionActions" : {
       "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
       "required" : true,
       "default" : null,
-      "propertyName" : "analysisAction"
+      "displayName" : "analysisAction"
     },
     "response": {
       "inputType": "text:{\"isMultiLine\":true}",
       "required": false,
       "default": "",
-      "propertyName": "response"
+      "displayName": "response"
     }
   },
   "id": "view-issue",

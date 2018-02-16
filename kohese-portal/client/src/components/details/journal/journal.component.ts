@@ -124,7 +124,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       type = 'Observation';
     }
-    this.itemRepository.createItem(type, observation).then(
+    this.itemRepository.buildItem(type, observation).then(
       (proxy: ItemProxy) => {
       this.journalEntryContent = '';
       this.refresh();

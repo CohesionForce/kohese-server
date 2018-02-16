@@ -60,4 +60,10 @@ export class DynamicTypesService {
   getUserInputTypes(): any {
     return this.USER_INPUT_TYPES;
   }
+  
+  getIcons(): Array<string> {
+    return ['fa fa-gavel', 'fa fa-user', 'fa fa-tasks', 'fa fa-database',
+      'fa fa-exclamation-circle', 'fa fa-comment', 'fa fa-sticky-note',
+      'fa fa-sitemap', 'fa fa-paper-plane', 'fa fa-trash'];
+  }
 }
