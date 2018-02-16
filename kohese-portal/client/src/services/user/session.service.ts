@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { SocketService } from '../socket/socket.service';
-import { AuthenticationService } from '../authentication/authentication.service';
+import { CurrentUserService } from './current-user.service';
 import * as ItemProxy from '../../../../common/models/item-proxy';
 import { ItemRepository } from '../item-repository/item-repository.service';
 
@@ -16,9 +16,9 @@ export class SessionService {
   private itemRepositoryStatusSubscription: Subscription;
 
   constructor(private socketService: SocketService,
-    private authenticationService: AuthenticationService,
+    private CurrentUserService: CurrentUserService,
     private itemRepository: ItemRepository, private router: Router) {
-    this.authenticationService.getAuthenticationInformation().subscribe((decodedToken) => {
+    this.CurrentUserService.getCurrentUserSubject().subscribe((decodedToken) => {
       if (decodedToken) {
         this.itemRepositoryStatusSubscription = this.itemRepository.
           getRepoStatusSubject().subscribe((status) => {

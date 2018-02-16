@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import * as _ from 'underscore';
 
 import { SocketService } from '../socket/socket.service';
-import { AuthenticationService } from '../authentication/authentication.service';
+import { CurrentUserService } from '../user/current-user.service';
 import { ToastrService } from "ngx-toastr";
 import { DialogService } from '../dialog/dialog.service';
 
@@ -33,7 +33,7 @@ export class ItemRepository {
   repositoryStatus : BehaviorSubject<any>;
 
   constructor (private socketService: SocketService,
-               private authenticationService: AuthenticationService,
+               private CurrentUserService: CurrentUserService,
                private toastrService : ToastrService,
                private dialogService: DialogService) {
               this.initialize();
@@ -97,7 +97,7 @@ export class ItemRepository {
       }
     });
 
-    this.authenticationService.getAuthenticationInformation()
+    this.CurrentUserService.getCurrentUserSubject()
       .subscribe((decodedToken) => {
         console.log('Auth IR');
         if (decodedToken) {
@@ -198,13 +198,13 @@ export class ItemRepository {
       });
 
       this.socketService.socket.on('reconnect', () => {
-        if (this.authenticationService.getAuthenticationInformation().getValue()) {
+        if (this.CurrentUserService.getCurrentUserSubject().getValue()) {
           console.log('::: IR: this.authenticationService already authenticated');
           this.fetchItems();
           this.toastrService.success('Reconnected!', 'Server Connection!');
         } else {
           console.log('::: IR: Listening for this.authenticationService authentication');
-          let subscription: Subscription = this.authenticationService.getAuthenticationInformation()
+          let subscription: Subscription = this.CurrentUserService.getCurrentUserSubject()
             .subscribe((decodedToken) => {
               if(decodedToken) {
                 console.log('::: IR: Socket Authenticated');
