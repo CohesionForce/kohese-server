@@ -407,8 +407,12 @@ export class ItemRepository {
     return new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/upsert', {kind: kind, item: item}, (response) => {
         if (response.error) {
+          console.log('Error');
+          console.log(response);
           reject(response.error);
         } else {
+          console.log('Create succeded');
+          console.log(response);
           let proxy: ItemProxy = new ItemProxy(response.kind, response.item);
           proxy.dirty = false;
           resolve(proxy);

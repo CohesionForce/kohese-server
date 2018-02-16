@@ -3,7 +3,7 @@
       novalidate>
   <div class="form-group">
     <ng-container *ngFor="let property of (properties | mapKey)">
-      <ng-container [ngSwitch]="properties[property].inputType.type">
+      <ng-container [ngSwitch]="properties[property].inputType.type" style="width: 100%;">
         <k-text *ngSwitchCase="'text'"
           [formGroup]="formGroup" [fieldId]="property"
           [fieldName]="properties[property].propertyName"

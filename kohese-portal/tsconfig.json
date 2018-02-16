@@ -18,7 +18,8 @@
       "socket.io-client",
       "node",
       "webpack",
-      "underscore"
+      "underscore",
+      "jasmine"
     ],
     "typeRoots": [
       "./node_modules/@types"

@@ -51,8 +51,10 @@
     </mat-step>
     <mat-step label="Review">
     Review form data
-    <div>
-      <button mat-button matStepperPrevious>Back</button>
+    <div *ngIf="createFormGroup">
+      {{this.createFormGroup.value | json }}
     </div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button (click)="createItem()">Create</button>
     </mat-step>
 </mat-horizontal-stepper>

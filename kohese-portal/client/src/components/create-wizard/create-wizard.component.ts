@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, Optional, Inject} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MAT_DIALOG_DATA, MatTableDataSource, MatStepper } from '@angular/material';
+import { MAT_DIALOG_DATA, MatTableDataSource, MatStepper, MatDialogRef } from '@angular/material';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
@@ -40,7 +40,8 @@ export class CreateWizardComponent extends NavigatableComponent
               protected NavigationService : NavigationService,
               private itemRepository: ItemRepository,
               private ImportService : ImportService,
-              private DynamicTypesService : DynamicTypesService) {
+              private DynamicTypesService : DynamicTypesService,
+              public dialogReference : MatDialogRef<CreateWizardComponent>) {
     super(NavigationService);
   }
 
@@ -61,7 +62,7 @@ export class CreateWizardComponent extends NavigatableComponent
         }
         this.typeStream = new MatTableDataSource<ItemProxy>(this.types);
         this.recentProxies = this.itemRepository.getRecentProxies();
-        this.selectedParent = 'ROOT'
+        this.selectedParent = ''
         console.log(this.types);
         console.log(this.recentProxies);
       }
@@ -79,6 +80,14 @@ export class CreateWizardComponent extends NavigatableComponent
   onFormGroupUpdated(newFormGroup : any) {
     this.createFormGroup = newFormGroup;
     console.log(newFormGroup);
+  }
+
+  createItem() {
+    this.itemRepository.buildItem(this.selectedType.item.name, this.createFormGroup.value)
+      .then(()=>{
+        console.log('Build Item promise resolve')
+        this.dialogReference.close();
+      });
   }
 
   ngOnDestroy(): void {
