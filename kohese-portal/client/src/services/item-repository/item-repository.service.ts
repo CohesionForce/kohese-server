@@ -403,7 +403,7 @@ export class ItemRepository {
     return promise;
   }
 
-  createItem(kind: string, item: any): Promise<any> {
+  buildItem(kind: string, item: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/upsert', {kind: kind, item: item}, (response) => {
         if (response.error) {

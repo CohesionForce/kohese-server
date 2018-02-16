@@ -12,7 +12,7 @@ import { AnalysisModule } from './components/analysis/analysis.module';
 import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
 import { ActionTableModule } from './components/action-table/action-table.module';
-import { TypeCreatorModule } from './components/type-creator/type-creator.module';
+import { TypeEditorModule } from './components/type-editor/type-editor.module';
 import { CreateWizardModule } from './components/create-wizard/create-wizard.module';
 import { PipesModule } from './pipes/pipes.module';
 
@@ -28,6 +28,7 @@ import { TreeComponent, TreeRowComponent } from './components/tree/tree.componen
 import { ExploreComponent } from './components/explore/explore.component';
 import { KindIconComponent } from './components/kind-icon/kind-icon.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
+import { IconSelectorComponent } from './components/icon-selector/icon-selector.component';
 
 import { AuthenticationInterceptor } from './services/authentication/authentication.interceptor';
 import { AuthenticationService } from './services/authentication/authentication.service';
@@ -68,7 +69,8 @@ const AUTHENTICATION_INTERCEPTOR = {
     ExploreComponent,
     TreeRowComponent,
     KindIconComponent,
-    DialogComponent
+    DialogComponent,
+    IconSelectorComponent
   ],
   imports: [
     BrowserModule,
@@ -86,12 +88,13 @@ const AUTHENTICATION_INTERCEPTOR = {
     DetailsModule,
     DocumentViewModule,
     ActionTableModule,
-    TypeCreatorModule,
+    TypeEditorModule,
     TreeModule,
     CreateWizardModule
   ],
   entryComponents: [
-    DialogComponent
+    DialogComponent,
+    IconSelectorComponent
   ],
   providers: [
     ItemRepository,

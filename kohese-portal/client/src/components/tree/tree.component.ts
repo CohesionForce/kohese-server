@@ -207,6 +207,7 @@ export class TreeComponent extends NavigatableComponent
     } else {
       this.proxyFilter.kind = undefined;
     }
+    this.filter();
   }
   
   getTreeRoot(): ItemProxy {

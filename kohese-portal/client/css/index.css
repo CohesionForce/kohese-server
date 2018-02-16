@@ -549,28 +549,6 @@ tab div {
           width: 100%;
           overflow: auto; }
 
-#type-list {
-  display: flex;
-  flex-direction: column;
-  flex: 0 1 50%; }
-
-#type-editor {
-  display: flex;
-  flex-direction: column;
-  flex: 0 1 50%;
-  width: 50%;
-  position: fixed;
-  right: 0;
-  top: 98px; }
-  #type-editor #editor-container {
-    height: 100%; }
-    #type-editor #editor-container #base-editor {
-      max-height: 500px; }
-    #type-editor #editor-container #property-list {
-      height: 500px;
-      overflow: auto;
-      width: 80%; }
-
 text-user-input mat-form-field {
   width: 100%;
   padding: 0px 10px; }
@@ -599,6 +577,10 @@ journal {
   journal .highlight {
     background-color: #ca6464;
     color: whitesmoke; }
+
+icon-selector .highlight {
+  background-color: #ca6464;
+  color: whitesmoke; }
 
 .sidebar {
   color: whitesmoke;
