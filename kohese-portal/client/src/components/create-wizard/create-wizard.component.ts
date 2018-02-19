@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, Optional, Inject} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MAT_DIALOG_DATA, MatTableDataSource, MatStepper, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatTableDataSource, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
@@ -14,7 +14,8 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 
 @Component({
   selector : 'create-wizard',
-  templateUrl : './create-wizard.component.html'
+  templateUrl : './create-wizard.component.html',
+  styleUrls: ['./create-wizard.component.scss']
 })
 export class CreateWizardComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
@@ -26,11 +27,13 @@ export class CreateWizardComponent extends NavigatableComponent
   recentProxies : Array<ItemProxy>;
   selectedType : ItemProxy;
   selectedParent : ItemProxy;
+  rootProxy : ItemProxy;
+  
+  filteredProxies : any;
+  proxySearchControl : FormControl;
 
   createFormGroup : FormGroup;
 
-  /* Observables */
-  typeStream : MatTableDataSource<ItemProxy>;
 
   /* Subscriptions */
   private repoStatusSubscription: Subscription;
@@ -43,12 +46,14 @@ export class CreateWizardComponent extends NavigatableComponent
               private DynamicTypesService : DynamicTypesService,
               public dialogReference : MatDialogRef<CreateWizardComponent>) {
     super(NavigationService);
+    this.proxySearchControl = new FormControl('');
   }
 
   ngOnInit(): void {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update) => {
       if (update.connected) {
+        this.rootProxy = this.itemRepository.getRootProxy();
         this.models = this.itemRepository.getProxyFor('Model-Definitions').
           getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
           return ((first.item.name > second.item.name) ?
@@ -60,11 +65,17 @@ export class CreateWizardComponent extends NavigatableComponent
             this.types.push(this.models[i]);
           }
         }
-        this.typeStream = new MatTableDataSource<ItemProxy>(this.types);
+
+        this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
+          map((text: string) => {
+            return this.rootProxy.children.filter((proxy) => {
+              return (-1 !== proxy.item.name.indexOf(text));
+        });
+      });
+
         this.recentProxies = this.itemRepository.getRecentProxies();
-        this.selectedParent = ''
-        console.log(this.types);
-        console.log(this.recentProxies);
+        this.recentProxies = this.recentProxies.slice().reverse();
+        this.selectedParent = this.rootProxy;
       }
     });
   }
@@ -77,9 +88,13 @@ export class CreateWizardComponent extends NavigatableComponent
     }
   }
 
+  onProxySelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
+    this.selectedParent = selectedProxyEvent.option.value;
+    this.proxySearchControl.setValue(this.selectedParent.item.name);
+  }
+
   onFormGroupUpdated(newFormGroup : any) {
     this.createFormGroup = newFormGroup;
-    console.log(newFormGroup);
   }
 
   createItem() {

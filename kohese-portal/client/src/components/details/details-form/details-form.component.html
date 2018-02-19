@@ -6,28 +6,28 @@
       <ng-container [ngSwitch]="properties[property].inputType.type" style="width: 100%;">
         <k-text *ngSwitchCase="'text'"
           [formGroup]="formGroup" [fieldId]="property"
-          [fieldName]="properties[property].propertyName"
+          [fieldName]="properties[property].displayName"
           [isMultiLine]="properties[property].inputType.options['isMultiLine']">
         </k-text>
         <k-proxy-selector *ngSwitchCase="'proxy-selector'"
           [formGroup]="formGroup" [fieldId]="property"
           [type]="properties[property].inputType.options['type']"
-          [fieldName]="properties[property].propertyName"
+          [fieldName]="properties[property].displayName"
           [useAdvancedSelector]="properties[property].inputType.options['useAdvancedSelector']"
           [allowMultiSelect]="properties[property].inputType.options['allowMultiSelect']">
         </k-proxy-selector>
         <k-date *ngSwitchCase="'date'"
           [formGroup]="formGroup" [fieldId]="property"
-          [fieldName]="properties[property].propertyName">
+          [fieldName]="properties[property].displayName">
         </k-date>
         <k-select *ngSwitchCase="'select'"
          [formGroup]="formGroup" [fieldId]="property"
-         [fieldName]="properties[property].propertyName"
+         [fieldName]="properties[property].displayName"
          [options]="properties[property].inputType.options['options']">
         </k-select>
         <k-user-selector *ngSwitchCase="'user-selector'"
           [formGroup]="formGroup" [fieldId]="property"
-          [fieldName]="properties[property].propertyName">
+          [fieldName]="properties[property].displayName">
         </k-user-selector>
         <br/>
       </ng-container>

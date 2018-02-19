@@ -93,7 +93,6 @@ export class DetailsFormComponent extends NavigatableComponent
   ngOnChanges(changes: SimpleChanges): void {
     if (this.initialized) {
       let changedInputs: Array<string> = Object.keys(changes);
-      console.log(changedInputs);
 
       if(changes['itemProxy']) {
         this.itemProxy = changes['itemProxy'].currentValue;
@@ -112,7 +111,7 @@ export class DetailsFormComponent extends NavigatableComponent
       if(changes['createInfo']) {
         this.createInfo = changes['createInfo'].currentValue;
         // TODO Update with parent selector
-        if(this.createInfo.parent === '' && this.createInfo.type) {
+        if((this.createInfo.parent || this.createInfo.parent === '')  && this.createInfo.type) {
           this.itemProxy = {
             model : this.createInfo.type,
             item: {
