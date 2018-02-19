@@ -14,7 +14,7 @@ import { Observable } from 'rxjs/Observable';
 export class KUserSelectorComponent extends UserInput implements OnInit, OnDestroy {
   userProxies : Array<ItemProxy>;
   filteredProxies : Observable<Array<ItemProxy>>;
-  repoStagingSub : Subscription
+  repoStagingSub : Subscription;
 
   constructor(private ItemRepository : ItemRepository,
               private SessionService : SessionService) {
@@ -33,6 +33,7 @@ export class KUserSelectorComponent extends UserInput implements OnInit, OnDestr
                 })
         }})
   }
+
 
   ngOnDestroy () {
       this.repoStagingSub.unsubscribe();

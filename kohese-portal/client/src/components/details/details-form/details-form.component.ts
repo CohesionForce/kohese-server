@@ -111,7 +111,8 @@ export class DetailsFormComponent extends NavigatableComponent
 
       if(changes['createInfo']) {
         this.createInfo = changes['createInfo'].currentValue;
-        if(this.createInfo.parent && this.createInfo.type) {
+        // TODO Update with parent selector
+        if(this.createInfo.parent === '' && this.createInfo.type) {
           this.itemProxy = {
             model : this.createInfo.type,
             item: {

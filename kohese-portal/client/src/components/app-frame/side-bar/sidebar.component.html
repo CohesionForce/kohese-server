@@ -2,7 +2,7 @@
   <div class="sidebar-nav navbar-collapse">
     <div class="static-side-panel">
       <ng-container
-        *ngIf="(authenticationService.getAuthenticationInformation() | async)">
+        *ngIf="(authenticated)">
         <button mat-icon-button [matMenuTriggerFor]="koheseMenu">
           <mat-icon class="fa fa-plus"></mat-icon>
         </button>

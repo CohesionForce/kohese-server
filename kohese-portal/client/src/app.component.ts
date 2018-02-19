@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { OnInit } from '@angular/core';
-import { ItemRepository } from './services/item-repository/item-repository.service';
-import { SocketService } from './services/socket/socket.service';
+import { AuthenticationService } from './services/authentication/authentication.service';
 
 @Component({
   selector: 'app-root',
@@ -9,8 +8,7 @@ import { SocketService } from './services/socket/socket.service';
 })
 export class AppComponent implements OnInit {
 
-  constructor(private ItemRepository : ItemRepository,
-              private SocketService : SocketService) {
+  constructor(private authenticationService: AuthenticationService) {
 
   }
 

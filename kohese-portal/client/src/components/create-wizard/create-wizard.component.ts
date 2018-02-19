@@ -87,7 +87,12 @@ export class CreateWizardComponent extends NavigatableComponent
       .then(()=>{
         console.log('Build Item promise resolve')
         this.dialogReference.close();
+      }, (error)=> {
+        // TODO show error on review stepper 
+        console.log('*** Failed to upsert: ' + this.selectedType.item.name);
+        console.log(error);
       });
+      
   }
 
   ngOnDestroy(): void {
