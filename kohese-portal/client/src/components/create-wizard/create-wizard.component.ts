@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, Input, Optional, Inject} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MAT_DIALOG_DATA, MatTableDataSource, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
+import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
 import { FormGroup, FormControl } from '@angular/forms';
+import 'rxjs/add/operator/startWith';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -42,9 +43,8 @@ export class CreateWizardComponent extends NavigatableComponent
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
               protected NavigationService : NavigationService,
               private itemRepository: ItemRepository,
-              private ImportService : ImportService,
               private DynamicTypesService : DynamicTypesService,
-              public dialogReference : MatDialogRef<CreateWizardComponent>) {
+              public MatDialogRef : MatDialogRef<CreateWizardComponent>) {
     super(NavigationService);
     this.proxySearchControl = new FormControl('');
   }
@@ -101,7 +101,7 @@ export class CreateWizardComponent extends NavigatableComponent
     this.itemRepository.buildItem(this.selectedType.item.name, this.createFormGroup.value)
       .then(()=>{
         console.log('Build Item promise resolve')
-        this.dialogReference.close();
+        this.MatDialogRef.close();
       }, (error)=> {
         // TODO show error on review stepper 
         console.log('*** Failed to upsert: ' + this.selectedType.item.name);
@@ -112,10 +112,6 @@ export class CreateWizardComponent extends NavigatableComponent
 
   ngOnDestroy(): void {
     this.repoStatusSubscription.unsubscribe();
-  }
-
-  importFiles (fileInput) {
-    this.ImportService.importFile(fileInput, 'ROOT');
   }
 }
 
