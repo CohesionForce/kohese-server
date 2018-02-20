@@ -86,6 +86,11 @@
     <div *ngIf="createFormGroup">
       {{this.createFormGroup.value | json }}
     </div>
+    <div *ngIf="errorMessage">
+      !!!
+      Error : {{errorMessage}}
+      !!!
+    </div>
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button (click)="createItem()">Create</button>
     </mat-step>

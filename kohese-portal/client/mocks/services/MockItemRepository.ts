@@ -36,4 +36,8 @@ export class MockItemRepository {
       new ItemProxy('Item', MockItem)
     ]
   }
+  
+  buildItem() {
+    
+  }
 }

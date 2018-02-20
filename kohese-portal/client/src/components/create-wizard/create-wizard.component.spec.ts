@@ -1,14 +1,15 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CreateWizardComponent } from './create-wizard.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { async } from '@angular/core/testing';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ServicesModule } from '../../services/services.module';
-import { MatDialogModule } from '@angular/material';
+import { MatDialogModule, MatAutocompleteSelectedEvent } from '@angular/material';
 import { MatDialogRef } from '@angular/material';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations'
 
@@ -19,11 +20,12 @@ import { MatStepper } from '@angular/material';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockDynamicTypesService } from '../../../mocks/services/MockDynamicTypesService';
+import { MockItem } from '../../../mocks/data/MockItem';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-
+import * as ItemProxy from '../../../../common/models/item-proxy';
 
 describe('Component: Create Wizard', ()=>{
   let createWizardComponent: CreateWizardComponent;
@@ -46,7 +48,7 @@ describe('Component: Create Wizard', ()=>{
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: DynamicTypesService, useClass: MockDynamicTypesService},
-        {provide: MatDialogRef, useValue : {}}
+        {provide: MatDialogRef, useValue : {close: ()=>{console.log('close')}}}
       ]
     })
 
@@ -103,7 +105,57 @@ describe('Component: Create Wizard', ()=>{
     })
   })
 
-  
+  describe('parent selection', ()=>{
+    let selectedProxyEvent;
+    let selectedProxy;
+
+    beforeEach(()=>{
+      selectedProxy = new ItemProxy('Item', MockItem);
+      selectedProxyEvent = <MatAutocompleteSelectedEvent> {
+        option : {
+          value : selectedProxy
+        }
+      }
+    })
+    it('should set the parent when a proxy is selected by autocomplete', ()=>{
+      createWizardComponent.onProxySelected(selectedProxyEvent);
+      expect(createWizardComponent.selectedParent).toBe(selectedProxy);
+      expect(createWizardComponent.proxySearchControl.value).toBe(createWizardComponent.selectedParent.item.name);
+    })
+  })
+
+  describe('item creation', ()=>{
+    let closeSpy;
+
+    beforeEach(()=>{
+      createWizardComponent.selectedType = new ItemProxy('Item', MockItem)
+      createWizardComponent.createFormGroup = <FormGroup> {
+        value : ItemProxy
+      }
+      
+      closeSpy = spyOn(TestBed.get(MatDialogRef), 'close');
+      
+    })
+
+    it('closes the window when an item is built', async(()=>{
+      let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.resolve());    
+      createWizardComponent.createItem();
+      createWizardFixture.whenStable().then(()=>{
+        expect(buildSpy).toHaveBeenCalled();
+        expect(closeSpy).toHaveBeenCalled();
+      })
+    }))
+
+    it('displays an error when a build fails', async(()=>{
+      let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.reject('Incorrect Fields'));    
+      createWizardComponent.createItem();
+      createWizardFixture.whenStable().then(()=>{
+        expect(buildSpy).toHaveBeenCalled();
+        expect(createWizardComponent.errorMessage).toBe('Incorrect Fields');
+      })
+    }))
+  })
+
   afterEach(()=>{
     createWizardComponent = null;
     createWizardFixture = null;

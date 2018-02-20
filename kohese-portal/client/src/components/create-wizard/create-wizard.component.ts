@@ -30,7 +30,7 @@ export class CreateWizardComponent extends NavigatableComponent
   selectedType : ItemProxy;
   selectedParent : ItemProxy;
   rootProxy : ItemProxy;
-  
+  errorMessage : string;
   filteredProxies : any;
   proxySearchControl : FormControl;
 
