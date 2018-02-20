@@ -12,6 +12,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { Subscription } from 'rxjs/Subscription';
 import { ImportService } from '../../services/import/import.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 @Component({
   selector : 'create-wizard',
@@ -24,7 +25,7 @@ export class CreateWizardComponent extends NavigatableComponent
   @Input()
   private itemProxy: ItemProxy;
   models : Array<ItemProxy>;
-  types: Array<ItemProxy> = [];
+  types: Array<KoheseType> = [];
   recentProxies : Array<ItemProxy>;
   selectedType : ItemProxy;
   selectedParent : ItemProxy;
@@ -54,16 +55,9 @@ export class CreateWizardComponent extends NavigatableComponent
       .subscribe((update) => {
       if (update.connected) {
         this.rootProxy = this.itemRepository.getRootProxy();
-        this.models = this.itemRepository.getProxyFor('Model-Definitions').
-          getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
-          return ((first.item.name > second.item.name) ?
-            1 : ((first.item.name < second.item.name) ? -1 : 0));
-        });
-        for (let i = 0; i < this.models.length; i++) {
-          let modelView = this.DynamicTypesService.getViewProxyFor(this.models[i]);
-          if (modelView) {
-            this.types.push(this.models[i]);
-          }
+        let types = this.DynamicTypesService.getKoheseTypes();
+        for (let type in types) {
+          this.types.push(types[type]);
         }
 
         this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
@@ -82,6 +76,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
   onTypeSelected(type, stepper : MatStepper) {
     if (this.selectedType === type) {
+      console.log(type);
       stepper.next();
     } else {
       this.selectedType = type;

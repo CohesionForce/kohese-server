@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core/";
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations'
 
 import { ImportComponent } from './import/import.component';
 import { NewComponent } from './new/new.component';
@@ -29,7 +30,10 @@ import { TreeModule } from 'angular-tree-component';
     ReactiveFormsModule,
     PipesModule,
     DetailsModule,
-    TreeModule
+    TreeModule,
+    BrowserAnimationsModule,
+    NoopAnimationsModule
+    
   ],
   exports : [
     ImportComponent,
