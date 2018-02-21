@@ -7,7 +7,7 @@ export let MockUserData = {
   "parentId": "7480a310-b509-11e7-ba1e-cbd891de1f92",
   "createdBy": "admin",
   "createdOn": 1508949117209,
-  "modifiedBy": "jephillips",
+  "modifiedBy": "admin",
   "modifiedOn": 1508966827019,
   "itemIds": []
 }

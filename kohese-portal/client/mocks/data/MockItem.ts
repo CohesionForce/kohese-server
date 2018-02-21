@@ -1,5 +1,5 @@
 export let MockItem = {
-  "id": "0f584300-c89e-11e7-84e2-4b279be1c1aa",
+  "id": "test-uuid",
   "name": "Test item",
   "parentId": "44f38b70-bf50-11e7-b267-97e34e682c16",
   "createdBy": "admin",

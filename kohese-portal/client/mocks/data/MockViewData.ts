@@ -29,7 +29,7 @@ export let MockViewData = {
   },
   "id": "view-item",
   "name": "Item View Model",
-  "createdBy": "jephillips",
+  "createdBy": "admin",
   "createdOn": 1510596684590,
   "modifiedBy": "admin",
   "modifiedOn": 1517006598071,
