@@ -1,5 +1,5 @@
 import { Component, Optional, Inject } from '@angular/core';
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({

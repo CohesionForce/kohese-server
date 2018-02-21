@@ -13,7 +13,7 @@ import { MockItemRepository } from '../../../../../mocks/services/MockItemReposi
 import { ProxySelectorTreeComponent } from './proxy-selector-tree.component';
 import { PipesModule } from '../../../../pipes/pipes.module';
 
-describe('Component: ', ()=>{
+describe('Component: Proxy Selector Tree', ()=>{
   let proxySelectorTreeComponent: ProxySelectorTreeComponent;
   let proxySelectorTreeFixture : ComponentFixture<ProxySelectorTreeComponent>;
 

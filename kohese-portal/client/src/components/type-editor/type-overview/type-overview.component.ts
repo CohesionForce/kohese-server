@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 
-import { IconSelectorComponent } from '../../icon-selector/icon-selector.component';
+import { IconSelectorComponent } from '../icon-selector/icon-selector.component';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
