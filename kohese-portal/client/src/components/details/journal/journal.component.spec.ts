@@ -88,16 +88,5 @@ describe('Component: Journal', ()=>{
     it('adds an observation',()=>{
       pending();
     })
-  describe('entry actions', ()=>{
-    it('can add an entry against another entry',()=>{
-      pending();
-    })
-    it('allows a user to edit their comments', ()=>{
-      pending();
-    })
-    it('allows navigation to the details of an observation or issue', ()=>{
-      pending();
-    })
-  })
   })
 })
