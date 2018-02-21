@@ -33,7 +33,7 @@
     <children-table [itemProxy]="itemProxy"
                     [filterSubject]="filterSubject"
                     *ngIf="childView === 'table'"></children-table>
-    <children-tree [itemProxy]="itemProxy"
-                   *ngIf="childView === 'tree'"></children-tree>
+    <proxy-selector-tree [itemProxy]="itemProxy"
+                   *ngIf="childView === 'tree'"></proxy-selector-tree>
   </mat-card-content>
 </mat-card>

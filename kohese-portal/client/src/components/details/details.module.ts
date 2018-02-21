@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core/";
 import { DetailsComponent } from './details.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ChildrenTabComponent } from './children-tab/children-tab.component';
-import { ChildrenTreeComponent } from './children-tab/children-tree/children-tree.component';
+import { ProxySelectorTreeComponent } from './children-tab/proxy-selector-tree/proxy-selector-tree.component';
 import { ChildrenTableComponent } from './children-tab/children-table/children-table.component';
 import { JournalComponent } from './journal/journal.component';
 import { JournalEntryComponent } from './journal/journal-entry/journal-entry.component';
@@ -25,7 +25,7 @@ import { UserInputModule } from '../user-input/user-input.module';
     HistoryTabComponent,
     ChildrenTabComponent,
     ChildrenTableComponent,
-    ChildrenTreeComponent,
+    ProxySelectorTreeComponent,
     JournalComponent,
     JournalEntryComponent,
     DetailsFormComponent
@@ -39,13 +39,14 @@ import { UserInputModule } from '../user-input/user-input.module';
     ReactiveFormsModule,
     PipesModule,
     UserInputModule,
-    TreeModule,
+    TreeModule
   ],
   exports : [
     DetailsComponent,
     HistoryTabComponent,
     ChildrenTabComponent,
-    DetailsFormComponent
+    DetailsFormComponent,
+    ProxySelectorTreeComponent
   ]
 })
 export class DetailsModule {}

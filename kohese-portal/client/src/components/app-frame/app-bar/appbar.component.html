@@ -1,6 +1,6 @@
 <div class="navbar">
   <ng-container
-    *ngIf="(authenticationService.getAuthenticationInformation() | async)">
+    *ngIf="(authenticated)">
     <div class="navbar-header">
       <a class="navbar-brand"
         [ngClass]="{'navbar-syncing': repositoryStatus.syncing,
@@ -36,7 +36,7 @@
           <mat-icon class="fa fa-sitemap"></mat-icon>
           <span>Type Editor</span>
         </button>
-        <button mat-menu-item (click)="logout()">
+        <button mat-menu-item (click)="logout();">
           <mat-icon class="fa fa-sign-out fa-fw"></mat-icon>
           <span>Logout</span>
         </button>

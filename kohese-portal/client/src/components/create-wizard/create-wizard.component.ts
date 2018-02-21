@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, Input, Optional, Inject} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MAT_DIALOG_DATA, MatTableDataSource, MatStepper, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
 import { FormGroup, FormControl } from '@angular/forms';
+import 'rxjs/add/operator/startWith';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -11,10 +12,12 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { Subscription } from 'rxjs/Subscription';
 import { ImportService } from '../../services/import/import.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 @Component({
   selector : 'create-wizard',
-  templateUrl : './create-wizard.component.html'
+  templateUrl : './create-wizard.component.html',
+  styleUrls: ['./create-wizard.component.scss']
 })
 export class CreateWizardComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
@@ -22,15 +25,17 @@ export class CreateWizardComponent extends NavigatableComponent
   @Input()
   private itemProxy: ItemProxy;
   models : Array<ItemProxy>;
-  types: Array<ItemProxy> = [];
+  types: Array<KoheseType> = [];
   recentProxies : Array<ItemProxy>;
   selectedType : ItemProxy;
   selectedParent : ItemProxy;
+  rootProxy : ItemProxy;
+  errorMessage : string;
+  filteredProxies : any;
+  proxySearchControl : FormControl;
 
   createFormGroup : FormGroup;
 
-  /* Observables */
-  typeStream : MatTableDataSource<ItemProxy>;
 
   /* Subscriptions */
   private repoStatusSubscription: Subscription;
@@ -39,63 +44,69 @@ export class CreateWizardComponent extends NavigatableComponent
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
               protected NavigationService : NavigationService,
               private itemRepository: ItemRepository,
-              private ImportService : ImportService,
               private DynamicTypesService : DynamicTypesService,
-              public dialogReference : MatDialogRef<CreateWizardComponent>) {
+              public MatDialogRef : MatDialogRef<CreateWizardComponent>) {
     super(NavigationService);
+    this.proxySearchControl = new FormControl('');
   }
 
   ngOnInit(): void {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update) => {
       if (update.connected) {
-        this.models = this.itemRepository.getProxyFor('Model-Definitions').
-          getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
-          return ((first.item.name > second.item.name) ?
-            1 : ((first.item.name < second.item.name) ? -1 : 0));
-        });
-        for (let i = 0; i < this.models.length; i++) {
-          let modelView = this.DynamicTypesService.getViewProxyFor(this.models[i]);
-          if (modelView) {
-            this.types.push(this.models[i]);
-          }
+        this.rootProxy = this.itemRepository.getRootProxy();
+        let types = this.DynamicTypesService.getKoheseTypes();
+        for (let type in types) {
+          this.types.push(types[type]);
         }
-        this.typeStream = new MatTableDataSource<ItemProxy>(this.types);
+
+        this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
+          map((text: string) => {
+            return this.rootProxy.children.filter((proxy) => {
+              return (-1 !== proxy.item.name.indexOf(text));
+        });
+      });
+
         this.recentProxies = this.itemRepository.getRecentProxies();
-        this.selectedParent = ''
-        console.log(this.types);
-        console.log(this.recentProxies);
+        this.recentProxies = this.recentProxies.slice().reverse();
+        this.selectedParent = this.rootProxy;
       }
     });
   }
 
   onTypeSelected(type, stepper : MatStepper) {
     if (this.selectedType === type) {
+      console.log(type);
       stepper.next();
     } else {
       this.selectedType = type;
     }
   }
 
+  onProxySelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
+    this.selectedParent = selectedProxyEvent.option.value;
+    this.proxySearchControl.setValue(this.selectedParent.item.name);
+  }
+
   onFormGroupUpdated(newFormGroup : any) {
     this.createFormGroup = newFormGroup;
-    console.log(newFormGroup);
   }
 
   createItem() {
     this.itemRepository.buildItem(this.selectedType.item.name, this.createFormGroup.value)
       .then(()=>{
         console.log('Build Item promise resolve')
-        this.dialogReference.close();
+        this.MatDialogRef.close();
+      }, (error)=> {
+        // TODO show error on review stepper 
+        console.log('*** Failed to upsert: ' + this.selectedType.item.name);
+        console.log(error);
       });
+      
   }
 
   ngOnDestroy(): void {
     this.repoStatusSubscription.unsubscribe();
-  }
-
-  importFiles (fileInput) {
-    this.ImportService.importFile(fileInput, 'ROOT');
   }
 }
 

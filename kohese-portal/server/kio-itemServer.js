@@ -215,7 +215,7 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/upsert', function(request, sendResponse){
-    console.log('::: session %s: Received upsert for %s for user %s at %s',
+    console.log('::: session %s: Received upsert for id %s for user %s at %s',
         socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     

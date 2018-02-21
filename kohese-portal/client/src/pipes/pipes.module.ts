@@ -2,14 +2,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MapKeyPipe } from './map-key.pipe';
-import { HighlightRegexPipe } from './highlight.pipe';
+import { HighlightPipe } from './highlight.pipe';
 import { SanitizeHtmlPipe } from './sanitizeHtml.pipe';
 import { TruncatePipe } from './truncate.pipe';
 
 @NgModule({
   declarations: [
     MapKeyPipe,
-    HighlightRegexPipe,
+    HighlightPipe,
     SanitizeHtmlPipe,
     TruncatePipe
   ],
@@ -18,7 +18,7 @@ import { TruncatePipe } from './truncate.pipe';
   ],
   exports: [
     MapKeyPipe,
-    HighlightRegexPipe,
+    HighlightPipe,
     SanitizeHtmlPipe,
     TruncatePipe
   ]
