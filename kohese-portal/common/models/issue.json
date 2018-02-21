@@ -4,15 +4,76 @@
   "idInjection": true,
   "properties": {
     "issueState": {
-      "type": "string",
-      "required": true
+      "type": "StateMachine",
+      "default": "Observed",
+      "required": true,
+      "properties": {
+        "state":{
+          "Observed": {
+            "name": "Observed",
+            "description": "The issue has been Observed."
+           },
+          "InAnalysis": {
+            "name": "In Analysis",
+            "description": "The issue is In Analysis."
+           },
+          "NoAction": {
+            "name": "No Action",
+            "description": "The issue requires No Action."
+           },
+          "Duplicate": {
+            "name": "Duplicate",
+            "description": "The issue is a Duplicate."
+           },
+          "RequiresAction": {
+            "name": "Requires Action",
+            "description": "The issue Requires Action."
+           },
+          "Resolved": {
+            "name": "Resolved",
+            "description": "The issue is Resolved."
+           }
+        },
+        "transition": {
+          "assignAnalysis": {
+            "source": "Observed",
+            "target": "InAnalysis",
+            "guard": {},
+            "requires": ["analysisAction"]
+          },
+          "noActionRequired": {
+            "source": "InAnalysis",
+            "target": "NoAction",
+            "guard": {}
+          },
+          "duplicateOf": {
+            "source": "InAnalysis",
+            "target": "Duplicate",
+            "guard": {},
+            "requires": "relatedIssues"
+          },
+          "requiresAction": {
+            "source": "InAnalysis",
+            "target": "RequiresAction",
+            "guard": {},
+            "requires": "resolutionActions"
+          },
+          "resolve": {
+            "source": "RequiresAction",
+            "target": "Resolved",
+            "guard": {
+              "tbd": "Insert guard to ensure all associated actions are closed"
+            }
+          }
+        }
+      }
     },
     "analysisAction": {
       "type": "string"
     },
     "resolutionActions": {
       "type": [
-        "object"
+        "Action"
       ]
     },
     "response": {
@@ -20,7 +81,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "relatedIssues": {
+      "type": [
+        "Issue"
+      ]
+    }
+  },
   "acls": [],
   "methods": []
 }
