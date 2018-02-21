@@ -9,6 +9,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ServicesModule } from '../../services/services.module';
+import { SessionService } from '../../services/user/session.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+
+import { MockSessionService } from '../../../mocks/services/MockSessionService';
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 
 describe('Component: Details', ()=>{
   let detailsComponent: DetailsComponent;
@@ -25,7 +30,11 @@ describe('Component: Details', ()=>{
          ServicesModule, 
          RouterTestingModule, 
          ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [
+        {provide: SessionService, useClass: MockSessionService},
+        {provide: ItemRepository, useClass: MockItemRepository}
+      ]
     })
 
     detailsFixture = TestBed.createComponent(DetailsComponent);

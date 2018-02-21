@@ -77,7 +77,7 @@ export class AdminComponent implements OnInit {
           item.password = this.passwordInput;
         }
         
-        this.itemRepository.createItem('KoheseUser', item);
+        this.itemRepository.buildItem('KoheseUser', item);
       }
 
       this.cancelForm();

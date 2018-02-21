@@ -24,6 +24,6 @@ export class NewComponent implements OnInit, OnDestroy {
   }
   
   build(item: any): void {
-    this.itemRepository.createItem(this.selectedType.name, item);
+    this.itemRepository.buildItem(this.selectedType.name, item);
   }
 }

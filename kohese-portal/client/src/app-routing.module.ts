@@ -8,7 +8,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RepositoriesComponent } from './components/admin/repositories.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
-import { TypeCreatorComponent } from './components/type-creator/type-creator.component';
+import { TypeEditorComponent } from './components/type-editor/type-editor.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -19,7 +19,7 @@ const routes: Routes = [
   { path: 'explore', component: ExploreComponent},
   // { path: 'explore/:id', component: ExploreComponent},
   { path: 'analysis', component: AnalysisComponent },
-  { path: 'typecreator', component: TypeCreatorComponent}
+  { path: 'typeeditor', component: TypeEditorComponent}
 ]
 
 @NgModule({

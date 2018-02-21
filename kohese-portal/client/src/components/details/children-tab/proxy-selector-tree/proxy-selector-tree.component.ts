@@ -9,11 +9,11 @@ import { ItemRepository } from '../../../../services/item-repository/item-reposi
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
-  selector : 'children-tree',
-  templateUrl : './children-tree.component.html'
+  selector : 'proxy-selector-tree',
+  templateUrl : './proxy-selector-tree.component.html'
 })
 
-export class ChildrenTreeComponent extends NavigatableComponent
+export class ProxySelectorTreeComponent extends NavigatableComponent
                                    implements OnInit, OnDestroy, OnChanges{
   @Input()
   itemProxy : ItemProxy;

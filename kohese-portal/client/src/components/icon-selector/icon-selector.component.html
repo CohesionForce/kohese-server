@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>
+  Icons
+</h2>
+<span *ngFor="let icon of typeService.getIcons(); let j = index">
+  <button mat-icon-button [ngClass]="{ 'highlight': (selectedIcon === icon) }"
+    (click)="setIcon(icon)">
+    <mat-icon class="{{icon}}">
+    </mat-icon>
+  </button>
+  <ng-container *ngIf="0 === ((j + 1) % 7)">
+    <br/>
+  </ng-container>
+</span>
+<br/>
+<ng-container *ngIf="data">
+  <mat-dialog-actions>
+    <button mat-raised-button [mat-dialog-close]="'\0'">
+      Cancel
+    </button>
+    <button mat-raised-button [mat-dialog-close]="selectedIcon">
+      Apply
+    </button>
+  </mat-dialog-actions>
+</ng-container>

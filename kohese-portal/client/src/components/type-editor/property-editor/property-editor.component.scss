@@ -1,0 +1,13 @@
+#propertyListSplitArea {
+  display: flex;
+  flex-direction: column;
+
+  .list-item-button-span {
+    margin-left: auto;
+  }
+}
+
+.highlight {
+  background-color: #660000 + 100;//$secondaryColor + 100;
+  color: whitesmoke;
+}

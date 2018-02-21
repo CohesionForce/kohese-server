@@ -51,11 +51,11 @@ export var LocationMap = {
     'params' : {},
     'route' : '/analysis'
   },
-  'Type-Creator' : {
+  'Type-Editor' : {
     'type' : 'single',
-    'title' : 'Type Creator',
+    'title' : 'Type Editor',
     'params' : [],
-    'route' : '/typecreator'
+    'route' : '/typeeditor'
   }
 }
 

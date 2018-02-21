@@ -1,53 +1,54 @@
 {
-  "model": "Task",
+  "modelName": "Task",
+  "icon": "fa fa-tasks",
   "viewProperties": {
     "taskState" : {
       "inputType" : "k-select:{\"options\":[\"Proposed\", \"Accepted\", \"In Work\"]}",
       "required" : false,
       "default" : null,
-      "propertyName" : "taskState"
+      "displayName" : "taskState"
     },
     "assignedTo" : {
       "inputType" : "user-selector:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "assignedTo"
+      "displayName" : "assignedTo"
     }, 
     "estimatedStart" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "estimatedStart"
+      "displayName" : "estimatedStart"
     },
     "estimatedCompletion" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "estimatedCompletion"
+      "displayName" : "estimatedCompletion"
     },
     "estimatedHoursEffort": {
       "inputType" : "text:{\"isMultiLine\":false}",
       "required" : false,
       "default" : "",
-      "propertyName" : "estimatedHoursEffot"
+      "displayName" : "estimatedHoursEffot"
     },
     "actualStart" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "actualStart"
+      "displayName" : "actualStart"
     },
     "actualCompletion" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "actualCompletion"
+      "displayName" : "actualCompletion"
     },
     "actualHours": {
       "inputType" : "text:{\"isMultiLine\":false}",
       "required" : false,
       "default" : "",
-      "propertyName" : "actualHoursEffort"
+      "displayName" : "actualHoursEffort"
     }
   },
   "id": "view-task",

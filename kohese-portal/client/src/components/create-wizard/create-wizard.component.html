@@ -2,22 +2,26 @@
   <mat-step label="Select Type" >
     <mat-card>
       <mat-card-content>
-        <mat-grid-list cols="3" rowHeight="50px" gutterSize="5px" style="width:50%; display:inline-block">
+        <mat-grid-list cols="3" 
+                      rowHeight="50px"
+                      gutterSize="5px" 
+                      class="left-content"
+                      style="display: inline-block;">
           <mat-grid-tile *ngFor="let type of types"> 
             <mat-chip color="primary" 
                       [selectable]="true" 
                       (click)="onTypeSelected(type, createStepper)"
                       (dblClick)="onTypeSelected(type, createStepper)">
-            {{ type.item.name}}
+            {{ type.name}}
             </mat-chip>
         </mat-grid-tile>
       </mat-grid-list>
-      <mat-card *ngIf="selectedType" style="width:40%; display:inline-block">
+      <mat-card *ngIf="selectedType" class="right-content" style="display: inline-block;">
           <mat-card-title class="panel-heading">
-            <span>{{selectedType.item.name}}</span>
+            <span>{{selectedType.name}}</span>
           </mat-card-title>
           <mat-card-content>
-            {{selectedType.item.description}}
+            {{selectedType.description}}
           </mat-card-content>
       </mat-card>
     </mat-card-content>
@@ -27,21 +31,49 @@
   </mat-card>
   </mat-step>
     <mat-step label="Parent">
-          Select Parent : 
-          <!-- <select mat-input [(ngModel)]="selectedParent">
-            <mat-option *ngFor="let proxy of recentProxies">
-              {{proxy.item.name}}
-            </mat-option>
-          </select> -->
-          {{selectedParent}}
-    <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
-    </div>
+      <mat-tab-group class="left-content" style="display:inline-block">
+        <mat-tab label="Tree">
+          <tree-root [nodes]="rootProxy.children" options="treeOptions">
+              <ng-template #treeNodeTemplate let-node let-index="index">
+                <td (click)="selectedParent = node.data"
+                    matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
+              </ng-template>
+            </tree-root>
+        </mat-tab>
+        <mat-tab label="Selector">
+          <input matInput type="text" placeholder="Enter Proxy" [formControl]="proxySearchControl"
+             [matAutocomplete]="proxySelector"/> 
+        <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onProxySelected($event)" style="width: 400px;">
+          <mat-option *ngFor="let proxy of (filteredProxies | async)"
+            [value]="proxy">
+            {{proxy.item.name}}
+          </mat-option>
+        </mat-autocomplete>
+        </mat-tab>
+        <mat-tab label="Recent">
+          <div *ngFor="let proxy of recentProxies" 
+               (click)="selectedParent = proxy">
+            {{proxy.item.name}}
+          <hr/>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    <mat-card *ngIf="selectedParent" class="right-content" style="display: inline-block;">
+      <mat-card-title class="panel-heading">
+        <span>{{selectedParent.item.name}}</span>
+      </mat-card-title>
+      <mat-card-content>
+        {{selectedParent.item.description}}
+      </mat-card-content>
+  </mat-card>
+  <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button matStepperNext>Next</button>
+  </div>
     </mat-step>
     <mat-step label="Details">
         <details-form #editor 
-          [createInfo]="{type: selectedType, parent: selectedParent}" 
+          [createInfo]="{type: selectedType, parent: selectedParent.item.id}" 
           [disabled]="false"
           (formGroupUpdated)="onFormGroupUpdated($event)"></details-form> 
     <div>
@@ -53,6 +85,11 @@
     Review form data
     <div *ngIf="createFormGroup">
       {{this.createFormGroup.value | json }}
+    </div>
+    <div *ngIf="errorMessage">
+      !!!
+      Error : {{errorMessage}}
+      !!!
     </div>
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button (click)="createItem()">Create</button>

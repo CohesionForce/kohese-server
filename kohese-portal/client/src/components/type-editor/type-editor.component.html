@@ -1,0 +1,30 @@
+<div id="typeLevelOperations">
+  <mat-form-field>
+    <mat-select placeholder="Type" [(value)]="selectedType">
+      <mat-option *ngFor="let type of (types | mapKey)"
+        matTooltip="{{types[type].description}}" [value]="types[type]">
+        <mat-icon class="{{types[type].icon}}"></mat-icon>
+        {{type}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <span class="pull-right">
+    <button mat-icon-button matTooltip="Add Type" (click)="add()">
+      <mat-icon class="fa fa-plus"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Save Type" (click)="save()">
+      <mat-icon class="fa fa-save"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Delete Type" (click)="delete()">
+      <mat-icon class="fa fa-trash"></mat-icon>
+    </button>
+  </span>
+</div>
+<mat-tab-group>
+  <mat-tab label="Overview">
+    <type-overview [type]="selectedType"></type-overview>
+  </mat-tab>
+  <mat-tab label="Properties">
+    <property-editor [type]="selectedType"></property-editor>
+  </mat-tab>
+</mat-tab-group>

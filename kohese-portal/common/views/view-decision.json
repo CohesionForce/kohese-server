@@ -1,35 +1,36 @@
 {
-  "model": "Decision ",
+  "modelName": "Decision ",
+  "icon": "fa fa-gavel",
   "viewProperties": {
     "decisionState" : {
       "inputType" : "k-select:{\"options\":[\"Proposed\", \"In Analysis\", \"In Review\"]}",
       "required" : true,
       "default" : "Proposed",
-      "propertyName" : "DecisionState"
+      "displayName" : "DecisionState"
     },
     "approvedBy" : {
       "inputType" : "user-selector:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "approvedBy"
+      "displayName" : "approvedBy"
     },
     "approvedOn" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "approvedOn"
+      "displayName" : "approvedOn"
     },
     "rationale" : {
       "inputType" : "text:{\"isMultiLine\":false}",
       "required" : false,
       "default" : null,
-      "propertyName" : "rationale"
+      "displayName" : "rationale"
     },
     "alternatives" : {
       "inputType" : "text:{\"isMultiLine\":true}",
       "required" : false,
       "default" : null,
-      "propertyName" : "alternatives"
+      "displayName" : "alternatives"
     }
   },
   "id": "view-decision",

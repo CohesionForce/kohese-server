@@ -2,6 +2,7 @@
 import { NgModule } from "@angular/core/";
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 /* 3rd Party */
 import { ToastrModule } from 'ngx-toastr';
@@ -28,6 +29,8 @@ import { MaterialModule } from "../material.module";
     ToastrModule,
     MaterialModule,
     RouterModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   exports : [
     DialogComponent

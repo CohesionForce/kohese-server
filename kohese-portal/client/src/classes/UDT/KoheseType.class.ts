@@ -2,8 +2,12 @@ import * as ItemProxy from '../../../../common/models/item-proxy';
 import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
+  private dataModelProxy: ItemProxy;
+  private viewModelProxy: ItemProxy;
   name : string;
-  private base : string;
+  description: string;
+  icon: string;
+  base : string;
   private strict : string;
   private idInjection : boolean;
   private trackChanges : boolean;
@@ -13,38 +17,84 @@ export class KoheseType {
   private acls : Array<any>;
   private methods : Array<any>;
 
-  constructor(private typeProxy : ItemProxy, private viewProxy: ItemProxy) {
-    this.name = typeProxy.item.name;
-    this.base = typeProxy.item.base;
-    this.strict = typeProxy.item.strict;
-    this.idInjection = typeProxy.item.idInjection;
-    this.trackChanges = typeProxy.item.trackChanges;
-    this.validations = typeProxy.item.validations;
-    this.relations = typeProxy.item.relations;
-    this.acls = typeProxy.item.acls;
-    this.methods = typeProxy.item.methods;
-
-    if (viewProxy) {
-      for (let property in viewProxy.item.viewProperties) {
-        let userInputDefinition: TypeProperty = viewProxy.item.viewProperties[property];
-        let inputType: string = userInputDefinition.inputType;
-        let delimiterIndex: number = inputType.indexOf(':');
-        let type: string;
-        let options: string = '{}';
-        if (-1 !== delimiterIndex) {
-          type = inputType.substring(0, delimiterIndex);
-          options = inputType.substring(delimiterIndex + 1);
-        } else {
-          type = inputType;
-        }
-
-        userInputDefinition.inputType = {
-          type: type,
-          options: JSON.parse(options)
-        };
-
-        this.properties[property] = userInputDefinition;
-      }
+  constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy) {
+    this.dataModelProxy = dataModelProxy;
+    this.viewModelProxy = viewModelProxy;
+    this.retrieveModelData();
+    if (this.viewModelProxy) {
+      this.retrieveViewData();
     }
+  }
+  
+  retrieveModelData(): void {
+    this.name = this.dataModelProxy.item.name;
+    this.description = this.dataModelProxy.item.description;
+    this.base = this.dataModelProxy.item.base;
+    this.strict = this.dataModelProxy.item.strict;
+    this.idInjection = this.dataModelProxy.item.idInjection;
+    this.trackChanges = this.dataModelProxy.item.trackChanges;
+    this.validations = this.dataModelProxy.item.validations;
+    this.relations = this.dataModelProxy.item.relations;
+    this.acls = this.dataModelProxy.item.acls;
+    this.methods = this.dataModelProxy.item.methods;
+  }
+  
+  retrieveViewData(): void {
+    this.icon = this.viewModelProxy.item.icon;
+    for (let property in this.viewModelProxy.item.viewProperties) {
+      this.properties[property] = this.transformViewProperty(this.viewModelProxy.
+        item.viewProperties[property]);
+    }
+  }
+  
+  synchronizeDataModel(): ItemProxy {
+    this.dataModelProxy.item.name = this.name;
+    this.dataModelProxy.item.description = this.description;
+    this.dataModelProxy.item.base = this.base;
+    this.dataModelProxy.item.strict = this.strict;
+    this.dataModelProxy.item.idInjection = this.idInjection;
+    this.dataModelProxy.item.trackChanges = this.trackChanges;
+    this.dataModelProxy.item.validations = this.validations;
+    this.dataModelProxy.item.relations = this.relations;
+    this.dataModelProxy.item.acls = this.acls;
+    this.dataModelProxy.item.methods = this.methods;
+    return this.dataModelProxy;
+  }
+  
+  synchronizeViewModel(): ItemProxy {
+    this.viewModelProxy.item.icon = this.icon;
+    for (let propertyId in this.properties) {
+      let property: TypeProperty = this.properties[propertyId];
+      property.inputType = property.inputType.type + ':' + JSON.stringify(
+        property.inputType.options);
+      this.viewModelProxy.item.viewProperties[propertyId] = property;
+    }
+    return this.viewModelProxy;
+  }
+  
+  transformViewProperty(property: TypeProperty): any {
+    let inputType: string = property.inputType;
+    let delimiterIndex: number = inputType.indexOf(':');
+    let type: string = inputType.substring(0, delimiterIndex);
+    let options: string = inputType.substring(delimiterIndex + 1);
+
+    property.inputType = {
+      type: type,
+      options: JSON.parse(options)
+    };
+    
+    return property;
+  }
+  
+  editProperty(id: string, property: TypeProperty): void {
+    if (!id) {
+      id = property.displayName;
+    }
+    this.properties[id] = this.transformViewProperty(property);
+    this.retrieveViewData();
+  }
+  
+  deleteProperty(id: string): void {
+    delete this.properties[id];
   }
 }

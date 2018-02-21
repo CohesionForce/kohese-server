@@ -10,7 +10,7 @@ import { AnalysisModule } from './components/analysis/analysis.module';
 import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
 import { ActionTableModule } from './components/action-table/action-table.module';
-import { TypeCreatorModule } from './components/type-creator/type-creator.module';
+import { TypeEditorModule } from './components/type-editor/type-editor.module';
 import { CreateWizardModule } from './components/create-wizard/create-wizard.module';
 import { PipesModule } from './pipes/pipes.module';
 import { AppFrameModule } from './components/app-frame/app-frame.module';
@@ -28,6 +28,7 @@ import { TreeComponent, TreeRowComponent } from './components/tree/tree.componen
 import { ExploreComponent } from './components/explore/explore.component';
 import { KindIconComponent } from './components/kind-icon/kind-icon.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
+import { IconSelectorComponent } from './components/icon-selector/icon-selector.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
@@ -62,13 +63,14 @@ import { MaterialModule } from './material.module';
     DetailsModule,
     DocumentViewModule,
     ActionTableModule,
-    TypeCreatorModule,
+    TypeEditorModule,
     TreeModule,
     CreateWizardModule,
     AppFrameModule,
     AuthenticationModule,
     LoginModule,
-    UserModule
+    UserModule,
+    ServicesModule
   ],
   providers: [],
   bootstrap: [AppComponent]

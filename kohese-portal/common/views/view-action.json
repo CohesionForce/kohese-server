@@ -1,53 +1,54 @@
 {
-  "model": "Action",
+  "modelName": "Action",
+  "icon": "fa fa-paper-plane",
   "viewProperties": {    
     "actionState" : {
       "inputType" : "k-select:{\"options\":[\"Proposed\", \"Assigned\", \"Accepted\", \"In Work\",\"Pending Reassign\", \"Pending Redisposition\", \"In Verification\", \"Verified\", \"Closed\"]}",
       "required" : false,
       "default" : null,
-      "propertyName" : "taskState"
+      "displayName" : "taskState"
     },
     "assignedTo" : {
       "inputType" : "user-selector:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "assignedTo"
+      "displayName" : "assignedTo"
     }, 
     "estimatedStart" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "estimatedStart"
+      "displayName" : "estimatedStart"
     },
     "estimatedCompletion" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "estimatedCompletion"
+      "displayName" : "estimatedCompletion"
     },
     "estimatedHours": {
       "inputType" : "text:{\"isMultiLine\":false}",
       "required" : false,
       "default" : "",
-      "propertyName" : "estimatedHoursEffort"
+      "displayName" : "estimatedHoursEffort"
     },
     "actualStart" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "actualStart"
+      "displayName" : "actualStart"
     },
     "actualCompletion" : {
       "inputType" : "date:{}",
       "required" : false,
       "default" : null,
-      "propertyName" : "actualCompletion"
+      "displayName" : "actualCompletion"
     },
     "actualHours": {
       "inputType" : "text:{\"isMultiLine\":false}",
       "required" : false,
       "default" : "",
-      "propertyName" : "actualHoursEffort"
+      "displayName" : "actualHoursEffort"
     }
   },
   "id": "view-action",

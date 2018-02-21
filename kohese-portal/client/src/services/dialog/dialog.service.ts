@@ -5,6 +5,13 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class DialogService {
+  public readonly INPUT_TYPES: any = {
+    TEXT: 'text',
+    DATE: 'date',
+    TIME: 'time'
+  };
+  public inputtedValue: string;
+  
   constructor(private dialog: MatDialog) {
   }
 
@@ -28,6 +35,17 @@ export class DialogService {
         buttonLabels: buttonLabels
       }
     }).afterClosed();
+  }
+  
+  openInputDialog(title: string, text: string, type: string, fieldName: string): MatDialogRef<DialogComponent> {
+    return this.dialog.open(DialogComponent, {
+      data: {
+        title: title,
+        text: text,
+        inputType: type,
+        fieldName: fieldName
+      }
+    });
   }
 
   openComponentDialog<T>(component: ComponentType<T> | TemplateRef<T>, data: any): MatDialogRef<T> {

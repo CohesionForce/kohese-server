@@ -17,7 +17,7 @@
     </button>
   </ng-container>
   <ng-container
-    *ngIf="input.item.createdBy === (sessionService.getSessionUser() | async).item.name">
+    *ngIf="input.item.createdBy === (sessionService.getSessionUser() | async)?.item.name">
     <ng-container *ngIf="inEditMode">
       <button mat-icon-button matTooltip="Cancel" class="pull-right"
         (click)="cancelEditing()">
