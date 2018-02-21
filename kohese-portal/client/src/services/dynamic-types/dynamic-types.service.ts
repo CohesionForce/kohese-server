@@ -26,25 +26,24 @@ export class DynamicTypesService {
   constructor(private ItemRepository : ItemRepository) {
     this.koheseTypes = {};
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
-    .subscribe((update) => {
-    if (update.connected) {
-      this.modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-      this.typeProxyList = this.modelProxy.getDescendants().
-        sort((first: ItemProxy, second: ItemProxy) => {
-        return ((first.item.name > second.item.name) ?
-          1 : ((first.item.name < second.item.name) ? -1 : 0));
-      });
-      console.log(this.typeProxyList);
-      this.buildKoheseTypes();
+      .subscribe((update: any) => {
+      if (update.connected) {
+        this.modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
+        this.typeProxyList = this.modelProxy.getDescendants().
+          sort((first: ItemProxy, second: ItemProxy) => {
+          return ((first.item.name > second.item.name) ?
+            1 : ((first.item.name < second.item.name) ? -1 : 0));
+        });
+        this.buildKoheseTypes();
       }
     })
   }
 
-  getKoheseTypes () : object {
+  getKoheseTypes(): object {
     return this.koheseTypes;
    }
 
-  buildKoheseTypes () : void {
+  buildKoheseTypes(): void {
     for (var i : number = 0; i < this.typeProxyList.length; i++) {
       let currentType : ItemProxy = this.typeProxyList[i];
       let viewProxy: ItemProxy = this.getViewProxyFor(currentType);
@@ -53,7 +52,7 @@ export class DynamicTypesService {
     }
   }
 
-  getViewProxyFor (modelProxy : ItemProxy) : ItemProxy {
+  getViewProxyFor(modelProxy: ItemProxy): ItemProxy {
     return this.ItemRepository.getProxyFor('view-' + modelProxy.item.name.toLowerCase());
   }
   

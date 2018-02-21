@@ -55,22 +55,8 @@
   display:none;
 }
 
-.kti-filterMatchedExact {
-  background-color:  #ffffcc;
-}
-
 .kti-selected-item {
   background-color: #7dd7ae;
-}
-
-.kti-filterMatchedExact.kti-selected-item {
-  background: repeating-linear-gradient(
-    90deg,
-    #ffffcc,
-    #ffffcc 20px,
-    #7dd7ae 20px,
-    #7dd7ae calc(100% - 20px)
-  );
 }
 
 .kt-item:hover {

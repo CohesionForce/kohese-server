@@ -1,75 +1,73 @@
-<div style="height: 100%;">
-  <split direction="horizontal">
-    <split-area id="propertyListSplitArea" [size]="33">
-      <button mat-icon-button style="margin-left: auto;" (click)="add()">
-        <mat-icon class="fa fa-plus"></mat-icon>
-      </button>
-      <mat-list>
-        <mat-list-item *ngFor="let propertyId of (type.properties | mapKey)">
-          {{propertyId}}
-          <span class="list-item-button-span">
-            <button mat-icon-button
-              [ngClass]="{ 'highlight': (selectedPropertyId === propertyId) }"
-              (click)="selectedPropertyId = propertyId">
-              <mat-icon class="fa fa-edit"></mat-icon>
-            </button>
-            <button mat-icon-button
-              (click)="delete(propertyId)">
-              <mat-icon class="fa fa-trash"></mat-icon>
-            </button>
-          </span>
-        </mat-list-item>
-      </mat-list>
-    </split-area>
-    <split-area [size]="67">
-      <split direction="vertical">
-        <split-area [size]="50">
-          <ng-container *ngIf="type.properties[selectedPropertyId]">
-            <mat-form-field>
-              <input matInput type="text" placeholder="Display Name"
-                [(ngModel)]="type.properties[selectedPropertyId].displayName"/>
-            </mat-form-field>
-            <br/>
-            <mat-form-field>
-              <textarea matInput placeholder="Default Value" rows="3" cols="80"
-                [(ngModel)]="type.properties[selectedPropertyId].defaultValue">
-              </textarea>
-            </mat-form-field>
-            <br/>
-            <mat-checkbox [(ngModel)]="type.properties[selectedPropertyId].required">
-              Required
-            </mat-checkbox>
-          </ng-container>
-        </split-area>
-        <split-area [size]="50">
+<split direction="horizontal">
+  <split-area id="propertyListSplitArea" [size]="33">
+    <button mat-icon-button id="addButton" (click)="add()">
+      <mat-icon class="fa fa-plus"></mat-icon>
+    </button>
+    <mat-list>
+      <mat-list-item *ngFor="let propertyId of (type.properties | mapKey)">
+        {{propertyId}}
+        <span class="list-item-button-span">
+          <button mat-icon-button
+            [ngClass]="{ 'highlight': (selectedPropertyId === propertyId) }"
+            (click)="selectedPropertyId = propertyId">
+            <mat-icon class="fa fa-edit"></mat-icon>
+          </button>
+          <button mat-icon-button
+            (click)="delete(propertyId)">
+            <mat-icon class="fa fa-trash"></mat-icon>
+          </button>
+        </span>
+      </mat-list-item>
+    </mat-list>
+  </split-area>
+  <split-area [size]="67">
+    <split direction="vertical">
+      <split-area [size]="50" class="pad">
+        <ng-container *ngIf="type.properties[selectedPropertyId]">
           <mat-form-field>
-            <mat-select placeholder="Input Type" [(value)]="selectedInputType">
+            <input matInput type="text" placeholder="Display Name"
+              [(ngModel)]="type.properties[selectedPropertyId].displayName"/>
+          </mat-form-field>
+          <br/>
+          <mat-form-field>
+            <textarea matInput placeholder="Default Value" rows="3" cols="80"
+              [(ngModel)]="type.properties[selectedPropertyId].defaultValue">
+            </textarea>
+          </mat-form-field>
+          <br/>
+          <mat-checkbox [(ngModel)]="type.properties[selectedPropertyId].required">
+            Required
+          </mat-checkbox>
+        </ng-container>
+      </split-area>
+      <split-area [size]="50" class="pad">
+        <mat-form-field>
+          <mat-select placeholder="Input Type" [(value)]="selectedInputType">
+            <mat-option
+              *ngFor="let inputType of (typeService.getUserInputTypes() | mapKey)"
+              [value]="inputType">
+              {{typeService.getUserInputTypes()[inputType]}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <br/>
+        <ng-container *ngIf="'proxy-selector' === selectedInputType">
+          <mat-form-field>
+            <mat-select placeholder="Reference Type" [(value)]="inputOptions.type">
               <mat-option
-                *ngFor="let inputType of (typeService.getUserInputTypes() | mapKey)"
-                [value]="inputType">
-                {{typeService.getUserInputTypes()[inputType]}}
+                *ngFor="let type of (typeService.getKoheseTypes() | mapKey)"
+                [value]="typeService.getKoheseTypes()[type]">
+                {{type}}
               </mat-option>
             </mat-select>
           </mat-form-field>
           <br/>
-          <ng-container *ngIf="'proxy-selector' === selectedInputType">
-            <mat-form-field>
-              <mat-select placeholder="Reference Type" [(value)]="inputOptions.type">
-                <mat-option
-                  *ngFor="let type of (typeService.getKoheseTypes() | mapKey)"
-                  [value]="typeService.getKoheseTypes()[type]">
-                  {{type}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <br/>
-            <mat-checkbox [(ngModel)]="inputOptions.allowMultiSelect">
-              Multivalued
-            </mat-checkbox>
-            <br/>
-          </ng-container>
-        </split-area>
-      </split>
-    </split-area>
-  </split>
-</div>
+          <mat-checkbox [(ngModel)]="inputOptions.allowMultiSelect">
+            Multivalued
+          </mat-checkbox>
+          <br/>
+        </ng-container>
+      </split-area>
+    </split>
+  </split-area>
+</split>
