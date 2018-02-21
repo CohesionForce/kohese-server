@@ -38,4 +38,8 @@ describe('Component: Icon Selector', ()=>{
   it('instantiates the Icon Selector component', ()=>{
     expect(selectorComponent).toBeTruthy(); 
   })
+
+  it('sends new icon information to subscribers', ()=>{
+    pending();
+  })
 })
