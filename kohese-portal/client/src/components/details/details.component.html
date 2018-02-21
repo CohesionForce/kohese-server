@@ -89,7 +89,7 @@
                 <history-tab [itemProxy]="itemProxy"></history-tab>
             </mat-tab>
             <mat-tab label="Journal">
-              <journal [input]="itemProxy"></journal>
+              <journal [itemProxy]="itemProxy"></journal>
             </mat-tab>
             <mat-tab label="Action Table"
                  *ngIf="itemProxy.children">

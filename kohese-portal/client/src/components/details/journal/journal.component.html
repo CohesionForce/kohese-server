@@ -45,8 +45,8 @@
 </mat-form-field>
 <br/>
 <div>
-  <journal-entry *ngFor="let entry of filteredEntries" [input]="entry"
+  <journal-entry *ngFor="let entry of filteredEntries" [itemProxy]="entry"
     [journalTargetId]="journalTargetId"
-    (journalTarget)="journalTargetId = ($event ? $event : input.item.id)">
+    (journalTarget)="journalTargetId = ($event ? $event : itemProxy.item.id)">
   </journal-entry>
 </div>
