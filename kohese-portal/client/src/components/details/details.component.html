@@ -65,7 +65,7 @@
             <mat-tab label="Details" *ngIf="!itemProxy.model.internal">
                 <ng-template mat-tab-label>
                    Details
-                   <span *ngIf="detailsFormGroup.dirty">
+                   <span *ngIf="detailsFormGroup?.dirty">
                       <img src="../../../assets/icons/versioncontrol/dirty.ico"
                       title = "Dirty item" />
                   </span>
