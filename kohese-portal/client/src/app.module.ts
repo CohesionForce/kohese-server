@@ -71,6 +71,9 @@ import { MaterialModule } from './material.module';
     UserModule,
     ServicesModule
   ],
+  entryComponents: [
+    IconSelectorComponent
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })
