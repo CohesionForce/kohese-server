@@ -20,7 +20,6 @@ var CreateStates = require('../common/models/createStates.js');
 module.exports.ItemProxy = ItemProxy;
 
 var kdbStore = {
-    ids: {},
     models: {}
   };
 
@@ -69,7 +68,6 @@ function initialize(koheseKdbPath) {
   for(var modelKindIdx in modelKinds){
     var modelKind = modelKinds[modelKindIdx];
     console.log("::: ModelKind: " + modelKind);
-    kdbStore.ids[modelKind] = 0;
     kdbStore.models[modelKind] = {};
   }
 
@@ -151,39 +149,32 @@ function determineRepoStoragePath(repo){
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function retrieveModelInstance(modelName, modelInstanceId) {
-  console.log("::: Retrieving " + modelName + " - " + modelInstanceId);
-  var modelStore = kdbStore.models[modelName];
-  var instance;
+function retrieveAnalysis(forProxy) {
+  let modelInstanceId = forProxy.item.id;
+  console.log("::: Retrieving analysis for " + forProxy.kind + " - " + modelInstanceId);
 
-  if (modelStore[modelInstanceId]) {
-    instance = JSON.parse(modelStore[modelInstanceId]);
-  } else if (modelName === "Analysis") {
-    // Check to see if Analysis is on the disk
-    var sourceInstance = ItemProxy.getProxyFor(modelInstanceId);
+  let analysis;
+
+  if (forProxy.analysis) {
+    analysis = forProxy.analysis;
+  } else {
+    // Load from the repository if it exists
+    var repo = forProxy.getRepositoryProxy();
+    var analysisPath = determineRepoStoragePath(repo) + "/Analysis/" + modelInstanceId + ".json";
     
-    if (sourceInstance) {
-      var repo = sourceInstance.getRepositoryProxy();
-      var analysisPath = determineRepoStoragePath(repo) + "/Analysis/" + modelInstanceId + ".json";
-      var itemRow;
-      
-      try {
-        itemRow = kdbFS.loadJSONDoc(analysisPath);
-      } catch (error){
-        // Do nothing
-        console.log("!!! Analysis for " + modelInstanceId + " not found.");
-      }
-      
-      if(itemRow){
-        modelStore[itemRow.id] = JSON.stringify(itemRow);
-        instance = itemRow;
-      }
+    try {
+      analysis = kdbFS.loadJSONDoc(analysisPath);
+      forProxy.analysis = analysis;
+    } catch (error){
+      // Do nothing
+      console.log("!!! Analysis for " + modelInstanceId + " not found.");
     }
   }
-  return instance;
+
+  return analysis;
 }
 
-module.exports.retrieveModelInstance = retrieveModelInstance;
+module.exports.retrieveAnalysis = retrieveAnalysis;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -285,12 +276,8 @@ function storeModelAnalysis(analysisInstance){
     var repo = proxy.getRepositoryProxy();
     var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
     
-    var modelStore = kdbStore.models[modelName];
-    modelStore[modelInstanceId] = JSON.stringify(analysisInstance);
-    
     kdbFS.storeJSONDoc(analysisPath, analysisInstance);
 
-    
   } else {
     console.log('*** No item found for analysis instance: ' + modelInstanceId);
   }
@@ -531,7 +518,6 @@ function validateRepositoryStructure (repoDirPath) {
           
         }    
     }
-  kdbStore.ids[modelName] += fileList.length;
   }
 }
 
