@@ -71,7 +71,7 @@ export class DetailsFormComponent extends NavigatableComponent
                   parentId : this.createInfo.parent
                 }
               }
-              this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.model.item.name];
+              this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.model.name];
               }
             }
         
@@ -118,7 +118,7 @@ export class DetailsFormComponent extends NavigatableComponent
               parentId : this.createInfo.parent
             }
           }
-          this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.model.item.name];
+          this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.model.name];
           this.updateProperties();
           this.formGroup = this.createFormGroup();
           this.formGroupUpdated.emit(this.formGroup);
@@ -152,7 +152,7 @@ export class DetailsFormComponent extends NavigatableComponent
     console.log(':: Parent Properties');
     // Grab properties from my base class
     if (this.itemProxy) {
-      let inheritedModel = this.itemProxy.model.item.base;
+      let inheritedModel = this.itemProxy.model.base;
       while(inheritedModel != 'PersistedModel') {
         console.log('Properties of' + inheritedModel)
         let inheritedProxy = this.ItemRepository.getProxyFor(inheritedModel);
