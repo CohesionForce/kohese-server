@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -7,21 +7,20 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { VersionControlService } from '../../services/version-control/version-control.service';
 import { SessionService } from '../../services/user/session.service';
 import { DialogService } from '../../services/dialog/dialog.service';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { Subscription } from 'rxjs/Subscription';
 
 import { ItemProxy } from '../../../../common/models/item-proxy';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { RowComponent } from '../../classes/RowComponent.class';
-import { MatSelectChange } from '@angular/material';
-
-import * as $ from 'jquery';
+import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 let treeRoot: ItemProxy;
 let isRootDefault: boolean = true;
 let rows: Array<TreeRowComponent> = [];
 let expandUponInstantiation: boolean = false;
 let versionControlEnabled: boolean = false;
+let selectedProxyId: string = '';
 
 @Component({
   selector : 'tree-view',
@@ -36,49 +35,44 @@ export class TreeComponent extends NavigatableComponent
     private absoluteRoot : ItemProxy;
     private proxyFilter: ProxyFilter = new ProxyFilter(); // TODO get definition for Filter
     private selectedItemProxy: ItemProxy;
-    private itemProxyId : string;
-    private types: Array<ItemProxy>;
-    private actionStates: Array<String> = ['Pending Review', 'In Verification', 'Assigned'];
-    private userList : Array<any>; // This will eventually be of type KoheseUser
+    private koheseTypes: object;
+    public actionStates: Array<string> = ['Pending Review', 'In Verification', 'Assigned'];
+    public userList : Array<ItemProxy>; // This will eventually be of type KoheseUser
     // TODO Probably want to get this from somewhere else
-    private viewList: Array<String> = ['Default','Version Control'];
+    public viewList: Array<string> = ['Default', 'Version Control'];
+    public selectedView: string = this.viewList[0];
+    
     private readonly NO_KIND_SPECIFIED: string = '---';
 
-    /* Observables */
-    private filterSubject : BehaviorSubject<ProxyFilter>;
-
     /* Subscriptions */
-    private repoStatusSub : Subscription;
-    private routeSub : Subscription;
+    private repoStatusSub: Subscription;
+    private routeParametersSubscription: Subscription;
 
   constructor (protected NavigationService : NavigationService,
-               private ItemRepository : ItemRepository,
-               private VersionControlService : VersionControlService,
-               private SessionService : SessionService,
-               private route : ActivatedRoute) {
+    private typeService: DynamicTypesService,
+    private ItemRepository : ItemRepository,
+    private VersionControlService : VersionControlService,
+    private SessionService : SessionService,
+    private route : ActivatedRoute) {
     super(NavigationService);
   }
 
   ngOnInit(): void {
-    // TODO - Test component restoration logic
     this.repoStatusSub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
       if (update.connected) {
         treeRoot = this.ItemRepository.getRootProxy();
         this.absoluteRoot = treeRoot;
-        this.types = this.ItemRepository.getProxyFor('Model-Definitions').
-          getDescendants().sort((first: ItemProxy, second: ItemProxy) => {
-          return ((first.item.name > second.item.name) ?
-            1 : ((first.item.name < second.item.name) ? -1 : 0));
-        });
+        this.koheseTypes = this.typeService.getKoheseTypes();
       }
     });
-    this.routeSub = this.route.params.subscribe(params => {
-      this.itemProxyId = params['id'];
+    
+    this.routeParametersSubscription = this.route.params.
+      subscribe((parameters: Params) => {
+      selectedProxyId = parameters['id'];
     });
 
     this.userList = this.SessionService.getUsers();
-    this.filterSubject = new BehaviorSubject(this.proxyFilter);
 
     // TODO set up @output/@input listeners for selectedItemProxy and row objects
 
@@ -86,52 +80,97 @@ export class TreeComponent extends NavigatableComponent
   }
 
   ngOnDestroy(): void {
+    this.routeParametersSubscription.unsubscribe();
     this.repoStatusSub.unsubscribe();
   }
 
   filter(): void {
-    let regexFilter: RegExp = new RegExp('^\/(.*)\/([gimy]*)$');
-    let filterIsRegex: any = this.proxyFilter.text.match(regexFilter);
-
-    if (filterIsRegex) {
-      try {
-        this.proxyFilter.textRegex = new RegExp(filterIsRegex[1], filterIsRegex[2]);
-        this.proxyFilter.textRegexHighlight = new RegExp('(' + filterIsRegex[1] + ')', 'g' + filterIsRegex[2]);
-        this.proxyFilter.invalidRegex = false;
-      } catch (e) {
-        this.proxyFilter.invalidRegex = true;
-      }
-    } else {
-      let cleanedPhrase: string = this.proxyFilter.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      if(this.proxyFilter.text !== '') {
-        this.proxyFilter.textRegex = new RegExp(cleanedPhrase, 'i');
-        this.proxyFilter.textRegexHighlight = new RegExp('(' + cleanedPhrase + ')', 'gi');
-        this.proxyFilter.invalidRegex = false;
-      } else {
-        this.proxyFilter.textRegex = null;
-        this.proxyFilter.textRegexHighlight = null;
-        this.proxyFilter.invalidRegex = false;
+    for (let j: number = 0; j < rows.length; j++) {
+      rows[j].setVisible(this.shouldRowBeVisible(rows[j].getProxy()));
+    }
+  }
+  
+  shouldRowBeVisible(proxy: ItemProxy): boolean {
+    let matches: boolean = true;
+    if (this.proxyFilter.status && (!proxy.status ||
+      (proxy.status.length === 0))) {
+      matches = false;
+    } else if (this.proxyFilter.dirty && !proxy.dirty) {
+      matches =  false;
+    } else if (this.proxyFilter.kind) {
+      if (proxy.kind !== this.proxyFilter.kind.name) {
+        matches = false;
+      } else if (proxy.kind === 'Action') {
+        if (proxy.item.actionState !== this.proxyFilter.actionState) {
+          matches = false;
+        } else if (proxy.item.assignedTo !== this.proxyFilter.actionAssignee) {
+          matches = false;
+        }
       }
     }
+    
+    if (matches) {
+      matches = false;
+      let filterExpression: RegExp;
+      let filterIsRegex: Array<string> = this.proxyFilter.filterString.
+        match(new RegExp('^\/(.*)\/([gimy]*)$'));
+      if (filterIsRegex) {
+        filterExpression = new RegExp(filterIsRegex[1], filterIsRegex[2]);
+        this.proxyFilter.textRegexHighlight = new RegExp('(' + filterIsRegex[1]
+          + ')', 'g' + filterIsRegex[2]);
+      } else {
+        if(this.proxyFilter.filterString !== '') {
+          let cleanedPhrase: string = this.proxyFilter.filterString.
+            replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          filterExpression = new RegExp(this.proxyFilter.filterString, 'i');
+          this.proxyFilter.textRegexHighlight = new RegExp('(' + cleanedPhrase
+            + ')', 'gi');
+        } else {
+          this.proxyFilter.textRegexHighlight = null;
+        }
+      }
+      
+      for (let key in proxy.item) {
+        if (key.charAt(0) !== '$' &&
+          (typeof proxy.item[key] === 'string') &&
+          proxy.item[key].match(filterExpression)) {
+          matches = true;
+          break;
+        }
+      }
+    }
+    
+    if (!matches) {
+      for (let j: number = 0; j < proxy.children.length; j++) {
+        if (this.shouldRowBeVisible(proxy.children[j])) {
+          matches = true;
+          break;
+        }
+      }
+    }
+    
+    return matches;
   }
 
   getItemCount () {
-    return $('#theKT').find('.kt-item').length;
+    return treeRoot.descendantCount;
   }
 
   getItemMatchedCount () {
-    return $('#theKT').find('.kti-filterMatched').length;
-  }
-
-  getTypeForFilter (val) {
-    return val === null ? 'null' : typeof val;
+    let numberOfVisibleRows: number = 0;
+    for (let j: number = 0; j < rows.length; j++) {
+      if (rows[j].isVisible()) {
+        numberOfVisibleRows++;
+      }
+    }
+    
+    return numberOfVisibleRows;
   }
 
   upLevel(): void {
     if (!isRootDefault) {
       treeRoot = treeRoot.parentProxy;
       isRootDefault = (treeRoot === this.absoluteRoot);
-      console.log('::: Setting root to ' + treeRoot.item.name);
     }
   }
 
@@ -144,16 +183,11 @@ export class TreeComponent extends NavigatableComponent
     // TODO Implement tree sync
   }
 
-
   /******** List expansion functions */
   expandAll(): void {
     for (let j: number = 0; j < rows.length; j++) {
       rows[j].expand(true);
     }
-  }
-
-  expandFiltered(): void {
-    //this.expandMatchingChildren(treeRoot);
   }
 
   collapseAll(): void {
@@ -186,30 +220,20 @@ export class TreeComponent extends NavigatableComponent
     this.navigate('Create', {parentId: this.selectedItemProxy.item.id});
   }
 
-  viewSelectionChanged(selection: MatSelectChange): void {
-    switch (selection.value) {
+  viewSelectionChanged(): void {
+    switch (this.selectedView) {
       case 'Version Control':
         this.proxyFilter.status = true;
         this.proxyFilter.dirty = false;
         versionControlEnabled = true;
-        this.expandFiltered();
         break;
-      default :
+      default:
         this.proxyFilter.status = false;
         this.proxyFilter.dirty = false;
         versionControlEnabled = false;
     }
   }
 
-  kindFilterChanged(selection: MatSelectChange): void {
-    if (selection.value) {
-      this.proxyFilter.kind = selection.value.kind;
-    } else {
-      this.proxyFilter.kind = undefined;
-    }
-    this.filter();
-  }
-  
   getTreeRoot(): ItemProxy {
     return treeRoot;
   }
@@ -225,11 +249,11 @@ export class TreeComponent extends NavigatableComponent
 })
 export class TreeRowComponent extends RowComponent
   implements OnInit, OnDestroy {
-  /* Subscriptions */
-  private filterSubscription : Subscription;
+  public koheseType: any;
 
   constructor(NavigationService : NavigationService,
     private dialogService: DialogService,
+    private typeService: DynamicTypesService,
     private itemRepository: ItemRepository,
     private versionControlService: VersionControlService) {
     super(NavigationService);
@@ -237,23 +261,26 @@ export class TreeRowComponent extends RowComponent
 
   ngOnInit(): void {
     rows.push(this);
-    this.filterSubscription = this.filterSubject.subscribe((newFilter) => {
-      this.filter = newFilter;
-    });
+    this.koheseType = this.typeService.getKoheseTypes()[this.itemProxy.kind];
+    if (!this.koheseType) {
+      this.koheseType = {
+        name: this.itemProxy.kind,
+        icon: 'fa fa-sticky-note'
+      };
+    }
   }
 
   ngOnDestroy(): void {
-    this.filterSubscription.unsubscribe();
     rows.splice(rows.indexOf(this), 1);
   }
 
-  removeItem(proxy: ItemProxy): void {
+  removeItem(): void {
     this.dialogService.openCustomTextDialog('Confirm Deletion',
-      'Are you sure you want to delete ' + proxy.item.name + '?',
+      'Are you sure you want to delete ' + this.itemProxy.item.name + '?',
       ['Cancel', 'Delete', 'Delete Recursively']).
-      subscribe((result) => {
+      subscribe((result: any) => {
       if (result) {
-        this.itemRepository.deleteItem(proxy, (2 === result));
+        this.itemRepository.deleteItem(this.itemProxy, (2 === result));
       }
     });
   }
@@ -262,18 +289,22 @@ export class TreeRowComponent extends RowComponent
     return versionControlEnabled;
   }
   
-  revertChanges(itemProxy: ItemProxy): void {
+  revertChanges(): void {
     this.dialogService.openYesNoDialog('Undo Changes', 'Are you sure that you '
       + 'want to undo all changes to this item since the previous commit?').
-      subscribe((result) => {
+      subscribe((result: any) => {
       if (result) {
-        this.versionControlService.revertItems([itemProxy]);
+        this.versionControlService.revertItems([this.itemProxy]);
       }
     });
   }
   
-  updateRoot(newRoot: ItemProxy): void {
-    treeRoot = newRoot;
+  updateRoot(): void {
+    treeRoot = this.itemProxy;
     isRootDefault = false;
+  }
+  
+  getSelectedProxyId(): string {
+    return selectedProxyId;
   }
 }

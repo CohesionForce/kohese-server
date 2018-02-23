@@ -14,11 +14,13 @@
 <br/>
 <ng-container *ngIf="data">
   <mat-dialog-actions>
-    <button mat-raised-button [mat-dialog-close]="'\0'">
-      Cancel
-    </button>
-    <button mat-raised-button [mat-dialog-close]="selectedIcon">
-      Apply
-    </button>
+    <span class="dialog-actions">
+      <button mat-raised-button [mat-dialog-close]="selectedIcon">
+        Apply
+      </button>
+      <button mat-raised-button [mat-dialog-close]="'\0'">
+        Cancel
+      </button>
+    </span>
   </mat-dialog-actions>
 </ng-container>

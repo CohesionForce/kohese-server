@@ -27,28 +27,30 @@ export class TypeEditorComponent implements OnInit {
   add(): void {
     this.dialogService.openInputDialog('Add Type', '', this.dialogService.
       INPUT_TYPES.TEXT, 'Name').afterClosed().subscribe((name: string) => {
-      let dataModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
-        buildItem('KoheseModel', {
-        name: name,
-        base: '',
-        idInjection: true,
-        properties: {},
-        validations: [],
-        relations: {},
-        acls: [],
-        methods: []
-      });
-      let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
-        buildItem('KoheseView', {
-        name: name,
-        modelName: name,
-        viewProperties: {}
-      });
+      if (name) {
+        let dataModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
+          buildItem('KoheseModel', {
+          name: name,
+          base: '',
+          idInjection: true,
+          properties: {},
+          validations: [],
+          relations: {},
+          acls: [],
+          methods: []
+        });
+        let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
+          buildItem('KoheseView', {
+          name: name,
+          modelName: name,
+          viewProperties: {}
+        });
       
-      Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
-        then((proxies: Array<ItemProxy>) => {
-        this.types[name] = new KoheseType(proxies[0], proxies[1]);
-      });
+        Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
+          then((proxies: Array<ItemProxy>) => {
+          this.types[name] = new KoheseType(proxies[0], proxies[1]);
+        });
+      }
     });
   }
   

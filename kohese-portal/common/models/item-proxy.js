@@ -214,7 +214,7 @@ class ItemProxy {
       var oldKeys = Object.keys(this.item);
       for (var keyIdx in this.model.item.orderedProperties){
         var key = this.model.item.orderedProperties[keyIdx];
-        if (this.item[key]){
+        if (this.item.hasOwnProperty(key)) {
           newItem[key] = this.item[key];
         }
       }

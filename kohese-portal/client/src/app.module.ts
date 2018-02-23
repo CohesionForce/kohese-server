@@ -26,7 +26,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RepositoriesComponent } from './components/admin/repositories.component';
 import { TreeComponent, TreeRowComponent } from './components/tree/tree.component';
 import { ExploreComponent } from './components/explore/explore.component';
-import { KindIconComponent } from './components/kind-icon/kind-icon.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -45,7 +44,6 @@ import { MaterialModule } from './material.module';
     TreeComponent,
     ExploreComponent,
     TreeRowComponent,
-    KindIconComponent
   ],
   imports: [
     BrowserModule,

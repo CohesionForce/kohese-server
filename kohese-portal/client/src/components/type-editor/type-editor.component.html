@@ -1,5 +1,5 @@
 <div id="typeLevelOperations">
-  <mat-form-field>
+  <mat-form-field class="pad">
     <mat-select placeholder="Type" [(value)]="selectedType">
       <mat-option *ngFor="let type of (types | mapKey)"
         matTooltip="{{types[type].description}}" [value]="types[type]">
@@ -20,7 +20,7 @@
     </button>
   </span>
 </div>
-<mat-tab-group>
+<mat-tab-group class="pad">
   <mat-tab label="Overview">
     <type-overview [type]="selectedType"></type-overview>
   </mat-tab>
