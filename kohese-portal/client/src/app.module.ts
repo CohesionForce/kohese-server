@@ -44,7 +44,6 @@ import { MaterialModule } from './material.module';
     TreeComponent,
     ExploreComponent,
     TreeRowComponent,
-    IconSelectorComponent
   ],
   imports: [
     BrowserModule,
