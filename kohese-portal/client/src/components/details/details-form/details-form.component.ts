@@ -64,17 +64,8 @@ export class DetailsFormComponent extends NavigatableComponent
         if (this.itemProxy) {
           this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
         } else if (this.createInfo) {
-            if(this.createInfo.parent && this.createInfo.type) {
-              this.itemProxy = {
-                model : this.createInfo.type.item,
-                item: {
-                  parentId : this.createInfo.parent
-                }
-              }
-              this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.model.name];
-              }
-            }
-        
+          this.buildStubProxy();
+          }
         if (this.itemProxy) {
           this.updateProperties();      
           this.formGroup = this.createFormGroup();
@@ -110,19 +101,7 @@ export class DetailsFormComponent extends NavigatableComponent
 
       if(changes['createInfo']) {
         this.createInfo = changes['createInfo'].currentValue;
-        // TODO Update with parent selector
-        if((this.createInfo.parent || this.createInfo.parent === '')  && this.createInfo.type) {
-          this.itemProxy = {
-            model : this.createInfo.type,
-            item: {
-              parentId : this.createInfo.parent
-            }
-          }
-          this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.model.name];
-          this.updateProperties();
-          this.formGroup = this.createFormGroup();
-          this.formGroupUpdated.emit(this.formGroup);
-        }
+        this.buildStubProxy();
       }
 
       if (-1 !== changedInputs.indexOf('disabled')) {
@@ -134,6 +113,24 @@ export class DetailsFormComponent extends NavigatableComponent
           }
         }
       }
+    }
+  }
+
+  buildStubProxy() {
+    // TODO Update with parent selector
+    if((this.createInfo.parent || this.createInfo.parent === '')  && this.createInfo.type) {
+      // Create a stub item proxy since one does not yet exist
+      this.itemProxy = {
+        kind : this.createInfo.type.name,
+        item: {
+          parentId : this.createInfo.parent
+        },
+        model : this.createInfo.type.dataModelProxy
+      }
+      this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
+      this.updateProperties();
+      this.formGroup = this.createFormGroup();
+      this.formGroupUpdated.emit(this.formGroup);
     }
   }
 
@@ -152,7 +149,7 @@ export class DetailsFormComponent extends NavigatableComponent
     console.log(':: Parent Properties');
     // Grab properties from my base class
     if (this.itemProxy) {
-      let inheritedModel = this.itemProxy.model.base;
+      let inheritedModel = this.itemProxy.model.item.base;
       while(inheritedModel != 'PersistedModel') {
         console.log('Properties of' + inheritedModel)
         let inheritedProxy = this.ItemRepository.getProxyFor(inheritedModel);
