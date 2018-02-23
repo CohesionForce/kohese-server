@@ -27,7 +27,6 @@ import { RepositoriesComponent } from './components/admin/repositories.component
 import { TreeComponent, TreeRowComponent } from './components/tree/tree.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
-import { IconSelectorComponent } from './components/icon-selector/icon-selector.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';

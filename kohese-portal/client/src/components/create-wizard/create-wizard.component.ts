@@ -69,6 +69,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
         this.recentProxies = this.itemRepository.getRecentProxies();
         this.recentProxies = this.recentProxies.slice().reverse();
+        this.selectedType = this.types[0];
         this.selectedParent = this.rootProxy;
       }
     });
@@ -93,13 +94,14 @@ export class CreateWizardComponent extends NavigatableComponent
   }
 
   createItem() {
-    this.itemRepository.buildItem(this.selectedType.item.name, this.createFormGroup.value)
+    this.itemRepository.buildItem(this.selectedType.name, this.createFormGroup.value)
       .then(()=>{
         console.log('Build Item promise resolve')
         this.MatDialogRef.close();
       }, (error)=> {
         // TODO show error on review stepper 
-        console.log('*** Failed to upsert: ' + this.selectedType.item.name);
+        this.errorMessage = error;
+        console.log('*** Failed to upsert: ' + this.selectedType.name);
         console.log(error);
       });
       

@@ -1,10 +1,14 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { DetailsComponent } from './details.component';
-import { JournalComponent } from './journal/journal.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { from } from 'rxjs/observable/from';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
+
+import { DetailsComponent } from './details.component';
+import { JournalComponent } from './journal/journal.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
@@ -14,6 +18,9 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
+import { NavigationService } from '../../services/navigation/navigation.service';
+import { ActivatedRoute } from '@angular/router';
 
 describe('Component: Details', ()=>{
   let detailsComponent: DetailsComponent;
@@ -29,16 +36,24 @@ describe('Component: Details', ()=>{
          PipesModule,
          ServicesModule, 
          RouterTestingModule, 
+         BrowserAnimationsModule
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {provide: SessionService, useClass: MockSessionService},
-        {provide: ItemRepository, useClass: MockItemRepository}
+        {provide: ItemRepository, useClass: MockItemRepository},
+        {provide: NavigationService, useClass: MockNavigationService},
+        {provide: ActivatedRoute, useValue:{
+          params: from([{id: 1}]),
+        }}
       ]
-    })
+    }).compileComponents();
 
     detailsFixture = TestBed.createComponent(DetailsComponent);
     detailsComponent = detailsFixture.componentInstance;
+
+    detailsFixture.detectChanges();
+    
   })
 
   it('instantiates the details component', ()=>{

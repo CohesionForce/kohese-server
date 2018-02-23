@@ -1,23 +1,23 @@
-<div id="container" [ngClass]="{ 'issue': ('Issue' === input.kind) }">
+<div id="container" [ngClass]="{ 'issue': ('Issue' === itemProxy.kind) }">
   <h5>
-    Added by {{input.item.createdBy}} on {{(input.item.createdOn | date:'long')}}
+    Added by {{itemProxy.item.createdBy}} on {{(itemProxy.item.createdOn | date:'long')}}
   </h5>
   <h5>
-    Observed by {{input.item.observedBy}} on {{(input.item.observedOn | date:'long')}}
+    Observed by {{itemProxy.item.observedBy}} on {{(itemProxy.item.observedOn | date:'long')}}
   </h5>
-  <ng-container *ngIf="(input.item.name.trim())">
+  <ng-container *ngIf="(itemProxy.item.name.trim())">
     <h5>
-      {{input.item.name}}
+      {{itemProxy.item.name}}
     </h5>
   </ng-container>
   <ng-container *ngIf="!inEditMode">
     <button mat-icon-button matTooltip="Show in Explore" class="pull-right"
-      (click)="navigationService.navigate('Explore', { id: input.item.id })">
+      (click)="navigationService.navigate('Explore', { id: itemProxy.item.id })">
       <mat-icon class="fa fa-arrow-right"></mat-icon>
     </button>
   </ng-container>
   <ng-container
-    *ngIf="input.item.createdBy === (sessionService.getSessionUser() | async)?.item.name">
+    *ngIf="itemProxy.item.createdBy === (sessionService.getSessionUser() | async)?.item.name">
     <ng-container *ngIf="inEditMode">
       <button mat-icon-button matTooltip="Cancel" class="pull-right"
         (click)="cancelEditing()">
@@ -36,7 +36,7 @@
     </ng-container>
   </ng-container>
   <button mat-icon-button matTooltip="Journal Against This" class="pull-right"
-    [ngClass]="{ 'highlight': (journalTargetId === input.item.id) }"
+    [ngClass]="{ 'highlight': (journalTargetId === itemProxy.item.id) }"
     (click)="setJournalTarget()">
     <mat-icon class="fa fa-reply"></mat-icon>
   </button>
@@ -45,7 +45,7 @@
       rows="3" [(ngModel)]="editText"></textarea>
   </ng-container>
   <ng-container *ngIf="!inEditMode">
-    <label>{{input.item.description}}</label>
+    <label>{{itemProxy.item.description}}</label>
   </ng-container>
   <hr/>
 </div>

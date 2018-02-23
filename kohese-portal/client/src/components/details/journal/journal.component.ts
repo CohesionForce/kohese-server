@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   @Input()
-  public input: ItemProxy;
+  public itemProxy: ItemProxy;
   private initialized: boolean = false;
   private journalEntries: Array<ItemProxy> = [];
   public filteredEntries: Array<ItemProxy> = [];
@@ -71,15 +71,15 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   
   ngOnChanges(changes: SimpleChanges): void {
     if (this.initialized) {
-      this.input = changes['input'].currentValue;
+      this.itemProxy = changes['itemProxy'].currentValue;
       this.refresh();
     }
   }
   
   refresh(): void {
-    this.journalTargetId = this.input.item.id;
+    this.journalTargetId = this.itemProxy.item.id;
     this.journalEntries = [];
-    this.addObservations(this.input);
+    this.addObservations(this.itemProxy);
     this.filterObservations(this.observationFilterText);
     this.sort(this.selectedSortStrategy);
   }
