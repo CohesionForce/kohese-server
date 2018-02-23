@@ -88,7 +88,10 @@
     </div>
     <div *ngIf="errorMessage">
       !!!
-      Error : {{errorMessage}}
+      Error : 
+      <pre>
+        {{errorMessage | json}}
+      </pre>
       !!!
     </div>
       <button mat-button matStepperPrevious>Back</button>
