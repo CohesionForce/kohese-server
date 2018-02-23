@@ -65,7 +65,7 @@
             <mat-tab label="Details" *ngIf="!itemProxy.model.internal">
                 <ng-template mat-tab-label>
                    Details
-                   <span *ngIf="detailsFormGroup.dirty">
+                   <span *ngIf="detailsFormGroup?.dirty">
                       <img src="../../../assets/icons/versioncontrol/dirty.ico"
                       title = "Dirty item" />
                   </span>
@@ -89,7 +89,7 @@
                 <history-tab [itemProxy]="itemProxy"></history-tab>
             </mat-tab>
             <mat-tab label="Journal">
-              <journal [input]="itemProxy"></journal>
+              <journal [itemProxy]="itemProxy"></journal>
             </mat-tab>
             <mat-tab label="Action Table"
                  *ngIf="itemProxy.children">
