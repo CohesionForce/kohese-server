@@ -7,6 +7,8 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { VersionControlService } from '../../services/version-control/version-control.service';
 import { SessionService } from '../../services/user/session.service';
 import { DialogService } from '../../services/dialog/dialog.service';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { StateService } from '../../services/state/state.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -225,18 +227,30 @@ export class TreeComponent extends NavigatableComponent
 })
 export class TreeRowComponent extends RowComponent
   implements OnInit, OnDestroy {
+  private _type: any;
+  get type() {
+    return this._type;
+  }
   /* Subscriptions */
   private filterSubscription : Subscription;
+  
+  get stateService() {
+    return this._stateService;
+  }
 
   constructor(NavigationService : NavigationService,
     private dialogService: DialogService,
     private itemRepository: ItemRepository,
-    private versionControlService: VersionControlService) {
+    private versionControlService: VersionControlService,
+    private _stateService: StateService,
+    private _typeService: DynamicTypesService) {
     super(NavigationService);
   }
 
   ngOnInit(): void {
     rows.push(this);
+    this._type = this._typeService.getKoheseTypes()[this.itemProxy.kind];
+    
     this.filterSubscription = this.filterSubject.subscribe((newFilter) => {
       this.filter = newFilter;
     });
@@ -275,5 +289,12 @@ export class TreeRowComponent extends RowComponent
   updateRoot(newRoot: ItemProxy): void {
     treeRoot = newRoot;
     isRootDefault = false;
+  }
+  
+  public openTransitionDialog(fieldName: string, candidate: string): void {
+    //this.dialogService.openComponentDialog().afterClosed().subscribe(() => {
+      this.itemProxy.item[fieldName] = candidate;
+      this.itemRepository.upsertItem(this.itemProxy);
+    //});
   }
 }

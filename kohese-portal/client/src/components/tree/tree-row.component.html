@@ -31,6 +31,26 @@
     <div class="kti-cell kti-actions pull-right">
       <!-- Default row actions -->
       <span *ngIf="!isVersionControlViewVisible()">
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon class="fa fa-gear"></mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <ng-container
+            *ngIf="((stateService.getTransitionCandidates(itemProxy) | mapKey).length > 0)">
+            <button mat-menu-item [matMenuTriggerFor]="transitionMenu">
+              Transition To...
+            </button>
+          </ng-container>
+        </mat-menu>
+        <mat-menu #transitionMenu="matMenu">
+          <ng-container *ngFor="let fieldName of (stateService.getTransitionCandidates(itemProxy) | mapKey)">
+            <button mat-menu-item
+              *ngFor="let candidate of stateService.getTransitionCandidates(itemProxy)[fieldName]; let j = index"
+              (click)="openTransitionDialog(fieldName, candidate.target)">
+              {{type.stateFlows[fieldName][candidate.target].name}}
+            </button>
+          </ng-container>
+        </mat-menu>
         <i class="fa fa-anchor"
           (click)="updateRoot(itemProxy)">
         </i>
