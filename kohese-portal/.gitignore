@@ -12,6 +12,7 @@
 .DS_Store
 .idea
 .strong-pm
+coverage
 node_modules
 npm-debug.log
 /db.json
