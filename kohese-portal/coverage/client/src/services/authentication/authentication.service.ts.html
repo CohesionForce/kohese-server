@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for client/src/services/authentication/authentication.service.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">All files</a> / <a href="index.html">client/src/services/authentication</a> authentication.service.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">30% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>15/50</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/14</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">12.5% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">28.26% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>13/46</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { SocketService } from '../socket/socket.service';
+import { JwtHelper } from 'angular2-jwt';
+import { CurrentUserService } from '../user/current-user.service';
+&nbsp;
+@Injectable()
+export class AuthenticationService {
+  private readonly <span class="cstat-no" title="statement not covered" >TOKEN_KEY: string = 'auth-token';</span>
+  private readonly <span class="cstat-no" title="statement not covered" >UNDEFINED_LOCAL_STORAGE_VALUE = 'undefined';</span>
+  private <span class="cstat-no" title="statement not covered" >token: BehaviorSubject&lt;string&gt; = new BehaviorSubject(localStorage.getItem(this.TOKEN_KEY));</span>
+  private <span class="cstat-no" title="statement not covered" >jwtHelper: JwtHelper = new JwtHelper();</span>
+  
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  constructor(private <span class="cstat-no" title="statement not covered" ></span>httpClient: HttpClient,</span></span>
+    private <span class="cstat-no" title="statement not covered" >socketService: SocketService,</span>
+    private <span class="cstat-no" title="statement not covered" >CurrentUserService : CurrentUserService)</span> {
+    let t: any = <span class="cstat-no" title="statement not covered" >this.token.getValue();</span>
+<span class="cstat-no" title="statement not covered" >    if (!((this.UNDEFINED_LOCAL_STORAGE_VALUE === t) || (null == t))) {</span>
+<span class="cstat-no" title="statement not covered" >      this.CurrentUserService.setCurrentUser(this.jwtHelper.decodeToken(t));</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this.CurrentUserService.getCredentialSubscription().subscribe(<span class="fstat-no" title="function not covered" >(</span>credentialCommand)=&gt;{</span>
+<span class="cstat-no" title="statement not covered" >      if (credentialCommand) {</span>
+<span class="cstat-no" title="statement not covered" >        console.log(credentialCommand);</span>
+<span class="cstat-no" title="statement not covered" >        if (credentialCommand.command === 'Login') {</span>
+<span class="cstat-no" title="statement not covered" >          this.login(credentialCommand.credentials);</span>
+        } else <span class="cstat-no" title="statement not covered" >if (credentialCommand.command === 'Logout') {</span>
+<span class="cstat-no" title="statement not covered" >          this.logout();</span>
+        }
+      }
+    })
+    
+<span class="cstat-no" title="statement not covered" >    this.socketService.getSocket().on('connect', <span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+      let t: any = <span class="cstat-no" title="statement not covered" >this.token.getValue();</span>
+<span class="cstat-no" title="statement not covered" >      if (!((this.UNDEFINED_LOCAL_STORAGE_VALUE === t) || (null == t))) {</span>
+<span class="cstat-no" title="statement not covered" >        this.socketService.getSocket().emit('authenticate', {</span>
+          token: t
+        });
+      }
+    });
+  }
+  
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  login(</span>credentials: any) : BehaviorSubject&lt;any&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    return this.httpClient.post('/authenticate', {</span>
+      username: credentials.username,
+      password: credentials.password
+    }, {
+      observe: 'response',
+      responseType: 'text'
+    }).mergeMap(<span class="fstat-no" title="function not covered" >(</span>httpResponse: any) =&gt; {
+      let t: any = <span class="cstat-no" title="statement not covered" >httpResponse.body;</span>
+<span class="cstat-no" title="statement not covered" >      localStorage.setItem(this.TOKEN_KEY, t);</span>
+<span class="cstat-no" title="statement not covered" >      this.token.next(t);</span>
+<span class="cstat-no" title="statement not covered" >      this.socketService.connect();</span>
+<span class="cstat-no" title="statement not covered" >      this.socketService.getSocket().emit('authenticate', {</span>
+        token: t
+      });
+<span class="cstat-no" title="statement not covered" >      return this.CurrentUserService.setCurrentUser(this.jwtHelper.decodeToken(t));</span>
+    }) as BehaviorSubject&lt;any&gt;;
+  }
+  
+<span class="fstat-no" title="function not covered" >  logout(): void {</span>
+<span class="cstat-no" title="statement not covered" >    this.token.next('');</span>
+<span class="cstat-no" title="statement not covered" >    localStorage.removeItem(this.TOKEN_KEY);</span>
+<span class="cstat-no" title="statement not covered" >    this.CurrentUserService.setCurrentUser(undefined);</span>
+<span class="cstat-no" title="statement not covered" >    this.socketService.disconnect();</span>
+  }
+<span class="fstat-no" title="function not covered" >  getToken(): BehaviorSubject&lt;string&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    return this.token;</span>
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Feb 26 2018 12:58:54 GMT-0600 (CST)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for client/src/components/details/journal/journal-entry/journal-entry.component.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../../../index.html">All files</a> / <a href="index.html">client/src/components/details/journal/journal-entry</a> journal-entry.component.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">66.67% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>26/39</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">9.09% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>1/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">37.5% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>3/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">64.71% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>22/34</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, Input, Output, EventEmitter, OnInit, OnChanges,
+  SimpleChanges } from '@angular/core';
+import { SessionService } from '../../../../services/user/session.service';
+import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
+import { NavigationService } from '../../../../services/navigation/navigation.service';
+import { ItemProxy } from '../../../../../../common/models/item-proxy';
+&nbsp;
+@Component({
+  selector: 'journal-entry',
+  templateUrl: './journal-entry.component.html'
+})
+export class JournalEntryComponent implements OnInit, OnChanges {
+  @Input()
+  public itemProxy: <span class="branch-0 cbranch-no" title="branch not covered" >ItemProxy<span class="branch-0 cbranch-no" title="branch not covered" >;</span></span>
+  @Output()
+  public journalTarget: EventEmitter&lt;string&gt; = new EventEmitter&lt;string&gt;();
+  @Input()
+  public journalTargetId: string = undefined;
+  private initialized: boolean = false;
+  public inEditMode: boolean = false;
+  public editText: string;
+  
+  constructor(public sessionService: SessionService,
+    private itemRepository: ItemRepository,
+    public navigationService: NavigationService) {
+  }
+  
+  ngOnInit(): void {
+    this.editText = this.itemProxy.item.description;
+    this.initialized = true;
+  }
+  
+<span class="fstat-no" title="function not covered" >  ngOnChanges(</span>changes: SimpleChanges): void {
+<span class="cstat-no" title="statement not covered" >    if (this.initialized) {</span>
+<span class="cstat-no" title="statement not covered" >      if (changes['itemProxy']) {</span>
+<span class="cstat-no" title="statement not covered" >        this.itemProxy = changes['itemProxy'].currentValue;</span>
+      }
+      
+<span class="cstat-no" title="statement not covered" >      if (changes['journalTargetId']) {</span>
+<span class="cstat-no" title="statement not covered" >        this.journalTargetId = changes['journalTargetId'].currentValue;</span>
+      }
+    }
+  }
+  
+<span class="fstat-no" title="function not covered" >  setJournalTarget(): void {</span>
+    let selectedId: string = (<span class="cstat-no" title="statement not covered" >(this.journalTargetId !== this.itemProxy.item.id) ?</span>
+      this.itemProxy.item.id : undefined);
+<span class="cstat-no" title="statement not covered" >    this.journalTarget.emit(selectedId);</span>
+  }
+  
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  save(): void {</span></span>
+<span class="cstat-no" title="statement not covered" >    this.itemProxy.item.description = this.editText;</span>
+<span class="cstat-no" title="statement not covered" >    this.itemRepository.upsertItem(this.itemProxy).then(<span class="fstat-no" title="function not covered" >(</span>proxy: ItemProxy) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      this.inEditMode = false;</span>
+    });
+  }
+  
+<span class="fstat-no" title="function not covered" >  cancelEditing(): void {</span>
+<span class="cstat-no" title="statement not covered" >    this.inEditMode = false;</span>
+<span class="cstat-no" title="statement not covered" >    this.editText = this.itemProxy.item.description;</span>
+  }
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Feb 26 2018 12:58:54 GMT-0600 (CST)
+</div>
+</div>
+<script src="../../../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../../../sorter.js"></script>
+</body>
+</html>

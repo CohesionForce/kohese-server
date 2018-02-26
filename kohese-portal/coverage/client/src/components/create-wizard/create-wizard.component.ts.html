@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for client/src/components/create-wizard/create-wizard.component.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">All files</a> / <a href="index.html">client/src/components/create-wizard</a> create-wizard.component.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">98.28% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>57/58</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">66.67% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>6/9</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.31% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>12/13</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">98.11% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>52/53</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">45x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, OnInit, OnDestroy, Input, Optional, Inject} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
+import { FormGroup, FormControl } from '@angular/forms';
+import 'rxjs/add/operator/startWith';
+&nbsp;
+import { NavigatableComponent } from '../../classes/NavigationComponent.class'
+import { NavigationService } from '../../services/navigation/navigation.service';
+&nbsp;
+import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { Subscription } from 'rxjs/Subscription';
+import { ImportService } from '../../services/import/import.service';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { KoheseType } from '../../classes/UDT/KoheseType.class';
+&nbsp;
+@Component({
+  selector : 'create-wizard',
+  templateUrl : './create-wizard.component.html',
+  styleUrls: ['./create-wizard.component.scss']
+})
+export class CreateWizardComponent extends NavigatableComponent
+  implements OnInit, OnDestroy {
+  /* Data */
+  @Input()
+  private itemProxy: <span class="branch-0 cbranch-no" title="branch not covered" >ItemProxy<span class="branch-0 cbranch-no" title="branch not covered" >;</span></span>
+  models : Array&lt;ItemProxy&gt;;
+  types: Array&lt;KoheseType&gt; = [];
+  recentProxies : Array&lt;ItemProxy&gt;;
+  selectedType : ItemProxy;
+  selectedParent : ItemProxy;
+  rootProxy : ItemProxy;
+  errorMessage : string;
+  filteredProxies : any;
+  proxySearchControl : FormControl;
+&nbsp;
+  createFormGroup : FormGroup;
+&nbsp;
+&nbsp;
+  /* Subscriptions */
+  private repoStatusSubscription: Subscription;
+&nbsp;
+&nbsp;
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
+              protected NavigationService : NavigationService,
+              private itemRepository: ItemRepository,
+              private DynamicTypesService : DynamicTypesService,
+              public MatDialogRef : MatDialogRef&lt;CreateWizardComponent&gt;) {
+    super(NavigationService);
+    this.proxySearchControl = new FormControl('');
+  }
+&nbsp;
+  ngOnInit(): void {
+    this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
+      .subscribe((update) =&gt; {
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (update.connected) {
+        this.rootProxy = this.itemRepository.getRootProxy();
+        let types = this.DynamicTypesService.getKoheseTypes();
+        for (let type in types) {
+          this.types.push(types[type]);
+        }
+&nbsp;
+        this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
+          map((text: string) =&gt; {
+            return this.rootProxy.children.filter((proxy) =&gt; {
+              return (-1 !== proxy.item.name.indexOf(text));
+        });
+      });
+&nbsp;
+        this.recentProxies = this.itemRepository.getRecentProxies();
+        this.recentProxies = this.recentProxies.slice().reverse();
+        this.selectedType = this.types[0];
+        this.selectedParent = this.rootProxy;
+      }
+    });
+  }
+&nbsp;
+  onTypeSelected(type, stepper : MatStepper) {
+    if (this.selectedType === type) {
+      console.log(type);
+      stepper.next();
+    } else {
+      this.selectedType = type;
+    }
+  }
+&nbsp;
+  onProxySelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
+    this.selectedParent = selectedProxyEvent.option.value;
+    this.proxySearchControl.setValue(this.selectedParent.item.name);
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  onFormGroupUpdated(</span>newFormGroup : any) {
+<span class="cstat-no" title="statement not covered" >    this.createFormGroup = newFormGroup;</span>
+  }
+&nbsp;
+  createItem() {
+    this.itemRepository.buildItem(this.selectedType.name, this.createFormGroup.value)
+      .then(()=&gt;{
+        console.log('Build Item promise resolve')
+        this.MatDialogRef.close();
+      }, (error)=&gt; {
+        // TODO show error on review stepper 
+        this.errorMessage = error;
+        console.log('*** Failed to upsert: ' + this.selectedType.name);
+        console.log(error);
+      });
+      
+  }
+&nbsp;
+  ngOnDestroy(): void {
+    this.repoStatusSubscription.unsubscribe();
+  }
+}
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Feb 26 2018 12:58:54 GMT-0600 (CST)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for client/src/services/analysis/analysis.service.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">All files</a> / <a href="index.html">client/src/services/analysis</a> analysis.service.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">10.62% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>12/113</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">10% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">9.17% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>10/109</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core'
+&nbsp;
+import { ItemProxy } from '../../../../common/models/item-proxy.js';
+&nbsp;
+import { ItemRepository } from '../item-repository/item-repository.service';
+&nbsp;
+import * as _ from 'underscore';
+&nbsp;
+@Injectable()
+export class AnalysisService {
+&nbsp;
+  /* Static Definitions */
+<span class="cstat-no" title="statement not covered" >  posFilterCriteria = {</span>
+    'Standard': ['RRC','X','NAC','WHPP','QP','LST','WHNP','PRT','INTJ','WHAVP','PRN','FRAG','WHADJP','PP','CONJP','VP','NX','ADVP','UCP','NP','ADJP','WRB','VB','PRP','JJS','WPS','UH','POS','JJR','WP','PDT','JJ','WDT','SYM','NNPS','VBZ','RP','NNP','FW','VBP','RBS','NNS','EX','VBN','RBR','NN','VBG','RB','MD','CD','VBD','PRPS','LS'],
+    'Modal': ['MD'],
+    'No Filter': ['XKPC','RRC','X','NAC','WHPP','QP','LST','WHNP','PRT','INTJ','WHAVP','PRN','FRAG','WHADJP','PP','CONJP','VP','NX','ADVP','UCP','NP','ADJP','WRB','VB','PRP','JJS','WPS','UH','POS','JJR','WP','TO','PDT','JJ','WDT','SYM','NNPS','IN','VBZ','RP','NNP','FW','VBP','RBS','NNS','EX','VBN','RBR','NN','DT','VBG','RB','MD','CD','VBD','PRPS','LS','CC'],
+    'Pseudo': ['XKPC'],
+    'Noun Phrases': ['NP'],
+    'Verb Phrases': ['VP'],
+    'Noun': ['NX','NP','NNPS','NNP','NNS','NN','PRPS','WP','WPS','PRP','WHNP'],
+    'Verb': ['VP','VB','VBZ','VBP','VBN','VBG','VBD']
+  }
+<span class="fstat-no" title="function not covered" >  constructor (private <span class="cstat-no" title="statement not covered" ></span>ItemRepository : ItemRepository)</span> {
+&nbsp;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  filterPOS (</span>summary, filterCriteria) : boolean {
+<span class="cstat-no" title="statement not covered" >    for(var pos in summary.posCount) {</span>
+<span class="cstat-no" title="statement not covered" >      if (filterCriteria.indexOf(pos) != -1) {</span>
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+      }
+    }
+<span class="cstat-no" title="statement not covered" >    return false;</span>
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  fetchAnalysis (</span>forProxy : ItemProxy) : Promise&lt;any&gt; {</span>
+    var analysisComplete = <span class="cstat-no" title="statement not covered" >new Promise(<span class="fstat-no" title="function not covered" >(</span>resolve, reject) =&gt; {</span>
+      // Note:  This logic does a depth first retrieval to decrease the amount of rework associated with roll-up
+      // Fetch children
+<span class="cstat-no" title="statement not covered" >      for (var childIdx = 0; childIdx &lt; forProxy.children.length; childIdx++) {</span>
+<span class="cstat-no" title="statement not covered" >        this.fetchAnalysis(forProxy.children[childIdx]);</span>
+      }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if (!forProxy.analysis) {</span>
+<span class="cstat-no" title="statement not covered" >        console.log('::: Retrieving analysis for ' + forProxy.item.id + ' - ' + forProxy.item.name);</span>
+<span class="cstat-no" title="statement not covered" >        this.performAnalysis(forProxy).then(<span class="fstat-no" title="function not covered" >function (</span>results) {</span>
+<span class="cstat-no" title="statement not covered" >          resolve(results);</span>
+        });
+      }
+    });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return analysisComplete;</span>
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  performAnalysis (</span>proxy : ItemProxy) : Promise&lt;any&gt; {</span>
+    var analysis = <span class="cstat-no" title="statement not covered" >this.ItemRepository.performAnalysis(proxy)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    analysis.then(<span class="fstat-no" title="function not covered" >(</span>results) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      if (!proxy.analysis) {</span>
+<span class="cstat-no" title="statement not covered" >        proxy.analysis = {};</span>
+      }
+<span class="cstat-no" title="statement not covered" >      proxy.analysis.data = results;</span>
+<span class="cstat-no" title="statement not covered" >      console.log('::: Analysis performed for: ' + proxy.item.id + ' - ' + proxy.item.name);</span>
+<span class="cstat-no" title="statement not covered" >      this.consolidateAnalysis(proxy);</span>
+    });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return analysis;</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  consolidateAnalysis (</span>proxy : ItemProxy) : void {
+<span class="cstat-no" title="statement not covered" >    proxy.analysis.extendedSummaryList = proxy.analysis.data.summaryList;</span>
+<span class="cstat-no" title="statement not covered" >    this.rollUpAnalysis(proxy);</span>
+  }
+&nbsp;
+  AnalysisSummary : {
+    text : string,
+    count : number,
+    posCount : number
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  rollUpAnalysis (</span>proxy : ItemProxy) : void {
+<span class="cstat-no" title="statement not covered" >    if (!proxy.analysis.data) {</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    console.log('--- Rollup for ' + proxy.item.id + ' - ' + proxy.item.name);</span>
+&nbsp;
+    // Initialize the extendedChunkSummary
+<span class="cstat-no" title="statement not covered" >    proxy.analysis.extendedChunkSummary = {};</span>
+<span class="cstat-no" title="statement not covered" >    for (var chunkId in proxy.analysis.data.chunkSummary) {</span>
+      var chunkSummary : any = <span class="cstat-no" title="statement not covered" >{};</span>
+      var chunk = <span class="cstat-no" title="statement not covered" >proxy.analysis.data.chunkSummary[chunkId];</span>
+<span class="cstat-no" title="statement not covered" >      chunkSummary.text = chunk.text;</span>
+<span class="cstat-no" title="statement not covered" >      chunkSummary.count = chunk.count;</span>
+<span class="cstat-no" title="statement not covered" >      chunkSummary.posCount = {};</span>
+<span class="cstat-no" title="statement not covered" >      for (var pos in chunk.posCount) {</span>
+<span class="cstat-no" title="statement not covered" >        chunkSummary.posCount[pos] = chunk.posCount[pos];</span>
+      }
+<span class="cstat-no" title="statement not covered" >      proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;</span>
+    }
+&nbsp;
+    // Initialize the extendedTokenSummary
+<span class="cstat-no" title="statement not covered" >    proxy.analysis.extendedTokenSummary = {};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    for (var tokenId in proxy.analysis.data.tokenSummary) {</span>
+      var tokenSummary : any = <span class="cstat-no" title="statement not covered" >{};</span>
+      var token = <span class="cstat-no" title="statement not covered" >proxy.analysis.data.tokenSummary[tokenId];</span>
+<span class="cstat-no" title="statement not covered" >      tokenSummary.text = token.text;</span>
+<span class="cstat-no" title="statement not covered" >      tokenSummary.count = token.count;</span>
+<span class="cstat-no" title="statement not covered" >      tokenSummary.posCount = {};</span>
+<span class="cstat-no" title="statement not covered" >      for (var pos in token.posCount) {</span>
+<span class="cstat-no" title="statement not covered" >        tokenSummary.posCount[pos] = token.posCount[pos];</span>
+      }
+<span class="cstat-no" title="statement not covered" >      proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (proxy.analysis.data.list) {</span>
+<span class="cstat-no" title="statement not covered" >      proxy.analysis.extendedList = proxy.analysis.data.list.slice();</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    for (var childIdx = 0; childIdx &lt; proxy.children.length; childIdx++) {</span>
+      var topic : any = <span class="cstat-no" title="statement not covered" >{};</span>
+<span class="cstat-no" title="statement not covered" >      topic.displayType = proxy.kind;</span>
+<span class="cstat-no" title="statement not covered" >      topic.item = proxy.children[childIdx].item;</span>
+<span class="cstat-no" title="statement not covered" >      topic.displayId = topic.item.id;</span>
+<span class="cstat-no" title="statement not covered" >      topic.text = topic.item.name;</span>
+<span class="cstat-no" title="statement not covered" >      topic.displayLevel = 1;</span>
+<span class="cstat-no" title="statement not covered" >      proxy.analysis.extendedList.push(topic);</span>
+&nbsp;
+      var child = <span class="cstat-no" title="statement not covered" >proxy.children[childIdx];</span>
+<span class="cstat-no" title="statement not covered" >      if (child.analysis) {</span>
+<span class="cstat-no" title="statement not covered" >        if (child.analysis.extendedList) {</span>
+<span class="cstat-no" title="statement not covered" >          proxy.analysis.extendedList = proxy.analysis.extendedList.concat(child.analysis.extendedList);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >          for (var chunkId in child.analysis.extendedChunkSummary) {</span>
+            var chunk = <span class="cstat-no" title="statement not covered" >child.analysis.extendedChunkSummary[chunkId];</span>
+<span class="cstat-no" title="statement not covered" >            if (proxy.analysis.extendedChunkSummary[chunkId]) {</span>
+<span class="cstat-no" title="statement not covered" >              proxy.analysis.extendedChunkSummary[chunkId].count += chunk.count;</span>
+<span class="cstat-no" title="statement not covered" >              for (var pos in chunk.posCount) {</span>
+<span class="cstat-no" title="statement not covered" >                if (proxy.analysis.extendedChunkSummary[chunkId].posCount[pos]) {</span>
+<span class="cstat-no" title="statement not covered" >                  proxy.analysis.extendedChunkSummary[chunkId].posCount[pos] += chunk.posCount[pos];</span>
+                } else {
+<span class="cstat-no" title="statement not covered" >                  proxy.analysis.extendedChunkSummary[chunkId].posCount[pos] = chunk.posCount[pos];</span>
+                }
+              }
+            } else {
+              var chunkSummary : any= <span class="cstat-no" title="statement not covered" >{};</span>
+<span class="cstat-no" title="statement not covered" >              chunkSummary.text = chunk.text;</span>
+<span class="cstat-no" title="statement not covered" >              chunkSummary.count = chunk.count;</span>
+<span class="cstat-no" title="statement not covered" >              chunkSummary.posCount = {};</span>
+<span class="cstat-no" title="statement not covered" >              for (var pos in chunk.posCount) {</span>
+<span class="cstat-no" title="statement not covered" >                chunkSummary.posCount[pos] = chunk.posCount[pos];</span>
+              }
+<span class="cstat-no" title="statement not covered" >              proxy.analysis.extendedChunkSummary[chunkId] = chunkSummary;</span>
+            }
+          }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >          for (var tokenId in child.analysis.extendedTokenSummary) {</span>
+            var token = <span class="cstat-no" title="statement not covered" >child.analysis.extendedTokenSummary[tokenId];</span>
+<span class="cstat-no" title="statement not covered" >            if (proxy.analysis.extendedTokenSummary[tokenId]) {</span>
+<span class="cstat-no" title="statement not covered" >              proxy.analysis.extendedTokenSummary[tokenId].count += token.count;</span>
+<span class="cstat-no" title="statement not covered" >              for (var pos in token.posCount) {</span>
+<span class="cstat-no" title="statement not covered" >                if (proxy.analysis.extendedTokenSummary[tokenId].posCount[pos]) {</span>
+<span class="cstat-no" title="statement not covered" >                  proxy.analysis.extendedTokenSummary[tokenId].posCount[pos] += token.posCount[pos];</span>
+                } else {
+<span class="cstat-no" title="statement not covered" >                  proxy.analysis.extendedTokenSummary[tokenId].posCount[pos] = token.posCount[pos];</span>
+                }
+              }
+            } else {
+              var tokenSummary : any = <span class="cstat-no" title="statement not covered" >{};</span>
+<span class="cstat-no" title="statement not covered" >              tokenSummary.text = token.text;</span>
+<span class="cstat-no" title="statement not covered" >              tokenSummary.count = token.count;</span>
+<span class="cstat-no" title="statement not covered" >              tokenSummary.posCount = {};</span>
+<span class="cstat-no" title="statement not covered" >              for (var pos in token.posCount) {</span>
+<span class="cstat-no" title="statement not covered" >                tokenSummary.posCount[pos] = token.posCount[pos];</span>
+              }
+<span class="cstat-no" title="statement not covered" >              proxy.analysis.extendedTokenSummary[tokenId] = tokenSummary;</span>
+            }
+          }
+        }
+      }
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    proxy.analysis.extendedTokenSummaryList = _.values(proxy.analysis.extendedTokenSummary);</span>
+<span class="cstat-no" title="statement not covered" >    proxy.analysis.extendedChunkSummaryList = _.values(proxy.analysis.extendedChunkSummary);</span>
+&nbsp;
+    var parentProxy = <span class="cstat-no" title="statement not covered" >this.ItemRepository.getProxyFor(proxy.item.parentId);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (parentProxy) {</span>
+<span class="cstat-no" title="statement not covered" >      console.log('::: Parent found');</span>
+<span class="cstat-no" title="statement not covered" >      if (parentProxy.analysis) {</span>
+<span class="cstat-no" title="statement not covered" >        this.rollUpAnalysis(parentProxy);</span>
+      }
+    }
+  }
+}
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Feb 26 2018 12:58:54 GMT-0600 (CST)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>

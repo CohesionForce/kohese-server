@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for client/src/services/dynamic-types/dynamic-types.service.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">All files</a> / <a href="index.html">client/src/services/dynamic-types</a> dynamic-types.service.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">40% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>12/30</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">11.11% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/9</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">37.04% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>10/27</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core';
+&nbsp;
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { Subscription } from 'rxjs/Subscription';
+import { ItemProxy } from '../../../../common/models/item-proxy';
+import { KoheseType } from '../../classes/UDT/KoheseType.class';
+&nbsp;
+@Injectable()
+export class DynamicTypesService {
+  /* Data */
+  modelProxy : ItemProxy;
+  typeProxyList : Array&lt;ItemProxy&gt;;
+  koheseTypes : object;
+  
+  private readonly <span class="cstat-no" title="statement not covered" >USER_INPUT_TYPES: any = {</span>
+    'types': 'Text',
+    'proxy-selector': 'Reference',
+    'date': 'Date'
+  };
+&nbsp;
+  /* Observables */
+&nbsp;
+  /* Subscriptions */
+  repoStatusSubscription : Subscription;
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >  constructor(private <span class="cstat-no" title="statement not covered" ></span>ItemRepository : ItemRepository)</span> {</span>
+<span class="cstat-no" title="statement not covered" >    this.koheseTypes = {};</span>
+<span class="cstat-no" title="statement not covered" >    this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()</span>
+      .subscribe(<span class="fstat-no" title="function not covered" >(</span>update: any) =&gt; {
+<span class="cstat-no" title="statement not covered" >      if (update.connected) {</span>
+<span class="cstat-no" title="statement not covered" >        this.modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');</span>
+<span class="cstat-no" title="statement not covered" >        this.typeProxyList = this.modelProxy.getDescendants().</span>
+          sort(<span class="fstat-no" title="function not covered" >(</span>first: ItemProxy, second: ItemProxy) =&gt; {
+<span class="cstat-no" title="statement not covered" >          return ((first.item.name &gt; second.item.name) ?</span>
+            1 : ((first.item.name &lt; second.item.name) ? -1 : 0));
+        });
+<span class="cstat-no" title="statement not covered" >        this.buildKoheseTypes();</span>
+      }
+    })
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  getKoheseTypes(): object {</span>
+<span class="cstat-no" title="statement not covered" >    return this.koheseTypes;</span>
+   }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  buildKoheseTypes(): void {</span>
+<span class="cstat-no" title="statement not covered" >    for (var i : number = 0; i &lt; this.typeProxyList.length; i++) {</span>
+      let currentType : ItemProxy = <span class="cstat-no" title="statement not covered" >this.typeProxyList[i];</span>
+      let viewProxy: ItemProxy = <span class="cstat-no" title="statement not covered" >this.getViewProxyFor(currentType);</span>
+<span class="cstat-no" title="statement not covered" >      this.koheseTypes[currentType.item.name] = new KoheseType(currentType,</span>
+        viewProxy);
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  getViewProxyFor(</span>modelProxy: ItemProxy): ItemProxy {
+<span class="cstat-no" title="statement not covered" >    return this.ItemRepository.getProxyFor('view-' + modelProxy.item.name.toLowerCase());</span>
+  }
+  
+<span class="fstat-no" title="function not covered" >  getUserInputTypes(): any {</span>
+<span class="cstat-no" title="statement not covered" >    return this.USER_INPUT_TYPES;</span>
+  }
+  
+<span class="fstat-no" title="function not covered" >  getIcons(): Array&lt;string&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    return ['fa fa-gavel', 'fa fa-user', 'fa fa-tasks', 'fa fa-database',</span>
+      'fa fa-exclamation-circle', 'fa fa-comment', 'fa fa-sticky-note',
+      'fa fa-sitemap', 'fa fa-paper-plane', 'fa fa-trash'];
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Feb 26 2018 12:58:54 GMT-0600 (CST)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>
