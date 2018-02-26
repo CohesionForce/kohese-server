@@ -11,7 +11,12 @@
 
 .kt-icon {
   cursor: pointer;
-  padding : 3px 5px 3px 5px;
+  padding : 5px;
+}
+
+// Used to indent children under their parent
+.kt-collection .kt-collection {
+  padding-left: 15px;
 }
 
 .kt-item {
@@ -69,7 +74,7 @@
 }
 
 .no-icon {
-  padding-left: 12px !important;
+  padding-left: 17px !important;
 }
 
 .trim-info {
