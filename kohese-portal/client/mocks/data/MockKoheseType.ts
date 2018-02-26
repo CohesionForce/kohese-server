@@ -9,7 +9,7 @@ export let MockKoheseType = {
   icon: "fa fa-sticky-note",
   idInjection : true,
   methods : [],
-  name : "",
+  name : "Item",
   properties: {
 
   },

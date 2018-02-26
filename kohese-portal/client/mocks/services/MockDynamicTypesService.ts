@@ -27,6 +27,10 @@ export class MockDynamicTypesService {
   getUserInputTypes () {
 
   }
+
+  getMockKoheseType () {
+    return MockKoheseType
+  }
   
   getIcons() {
     return ['fa fa-gavel', 'fa fa-user', 'fa fa-tasks', 'fa fa-database',
