@@ -29,10 +29,15 @@
       <div class="kti-cell kti-actions pull-right">
         <!-- Default row actions -->
         <span *ngIf="!isVersionControlViewVisible()">
+          <i class="fa fa-anchor" (click)="updateRoot()">
+          </i>
+          <i class="glyphicon glyphicon-remove"
+            (click)="removeItem()">
+          </i>
           <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon class="fa fa-gear"></mat-icon>
+            <mat-icon class="fa fa-bars"></mat-icon>
           </button>
-          <mat-menu #menu="matMenu">
+          <mat-menu #menu="matMenu" [overlapTrigger]="false">
             <ng-container
               *ngIf="((stateService.getTransitionCandidates(itemProxy) | mapKey).length > 0)">
               <button mat-menu-item [matMenuTriggerFor]="transitionMenu">
@@ -50,11 +55,6 @@
               </button>
             </ng-container>
           </mat-menu>
-          <i class="fa fa-anchor" (click)="updateRoot()">
-          </i>
-          <i class="glyphicon glyphicon-remove pull-right"
-            (click)="removeItem()">
-          </i>
         </span>
         <!-- Version Control row actions -->
         <span *ngIf="isVersionControlViewVisible() && itemProxy.vcState">

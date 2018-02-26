@@ -12,7 +12,8 @@ import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
   selector: 'k-proxy-selector',
-  templateUrl: './k-proxy-selector.component.html'
+  templateUrl: './k-proxy-selector.component.html',
+  styleUrls: ['./k-proxy-selector.component.scss']
 })
 export class KProxySelectorComponent extends UserInput
   implements OnInit {
