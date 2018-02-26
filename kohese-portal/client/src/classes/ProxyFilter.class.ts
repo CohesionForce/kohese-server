@@ -1,24 +1,14 @@
-export class ProxyFilter {
-  actionAssignee : string;
-  actionState : string;
-  dirty : boolean;
-  invalidRegex : boolean;
-  kind : string;
-  status : boolean; // This seems wrong
-  text : string;
-  textRegex : RegExp;
-  textRegexHighlight : RegExp;
+import { KoheseType } from './UDT/KoheseType.class';
 
-  constructor () {
-    this.actionAssignee = '';
-    this.actionState = '';
-    this.dirty = false;
-    this.invalidRegex = false;
-    this.kind = '';
-    this.status = false;
-    this.text = '';
-    // TODO - figure out what to do with these
-    this.textRegex = undefined;
-    this.textRegexHighlight = undefined;
+export class ProxyFilter {
+  actionAssignee: string = '';
+  actionState: string = '';
+  dirty: boolean = false;
+  kind: KoheseType;
+  status: boolean = false; // This seems wrong
+  filterString: string = '';
+  textRegexHighlight: RegExp;
+
+  constructor() {
   }
 }

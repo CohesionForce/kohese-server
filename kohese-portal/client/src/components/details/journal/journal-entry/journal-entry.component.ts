@@ -11,7 +11,7 @@ import { ItemProxy } from '../../../../../../common/models/item-proxy';
 })
 export class JournalEntryComponent implements OnInit, OnChanges {
   @Input()
-  public input: ItemProxy;
+  public itemProxy: ItemProxy;
   @Output()
   public journalTarget: EventEmitter<string> = new EventEmitter<string>();
   @Input()
@@ -26,14 +26,14 @@ export class JournalEntryComponent implements OnInit, OnChanges {
   }
   
   ngOnInit(): void {
-    this.editText = this.input.item.description;
+    this.editText = this.itemProxy.item.description;
     this.initialized = true;
   }
   
   ngOnChanges(changes: SimpleChanges): void {
     if (this.initialized) {
-      if (changes['input']) {
-        this.input = changes['input'].currentValue;
+      if (changes['itemProxy']) {
+        this.itemProxy = changes['itemProxy'].currentValue;
       }
       
       if (changes['journalTargetId']) {
@@ -43,20 +43,20 @@ export class JournalEntryComponent implements OnInit, OnChanges {
   }
   
   setJournalTarget(): void {
-    let selectedId: string = ((this.journalTargetId !== this.input.item.id) ?
-      this.input.item.id : undefined);
+    let selectedId: string = ((this.journalTargetId !== this.itemProxy.item.id) ?
+      this.itemProxy.item.id : undefined);
     this.journalTarget.emit(selectedId);
   }
   
   save(): void {
-    this.input.item.description = this.editText;
-    this.itemRepository.upsertItem(this.input).then((proxy: ItemProxy) => {
+    this.itemProxy.item.description = this.editText;
+    this.itemRepository.upsertItem(this.itemProxy).then((proxy: ItemProxy) => {
       this.inEditMode = false;
     });
   }
   
   cancelEditing(): void {
     this.inEditMode = false;
-    this.editText = this.input.item.description;
+    this.editText = this.itemProxy.item.description;
   }
 }

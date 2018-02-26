@@ -92,15 +92,15 @@ describe('Component: Create Wizard', ()=>{
     })
 
     it('updates the selected type when selected for the first time', ()=>{
-      createWizardComponent.onTypeSelected(createWizardComponent.types[0], stepper );
-      expect(createWizardComponent.selectedType).toBe(createWizardComponent.types[0]);
+      createWizardComponent.onTypeSelected(createWizardComponent.types[1], stepper);
+      expect(createWizardComponent.selectedType).toBe(createWizardComponent.types[1]);
       expect(nextSpy).not.toHaveBeenCalled();
     })
 
     it('moves to the next step if a type is double clicked', ()=>{
-      createWizardComponent.onTypeSelected(createWizardComponent.types[0], stepper );
-      createWizardComponent.onTypeSelected(createWizardComponent.types[0], stepper );
-      expect(createWizardComponent.selectedType).toBe(createWizardComponent.types[0]);
+      createWizardComponent.onTypeSelected(createWizardComponent.types[1], stepper);
+      createWizardComponent.onTypeSelected(createWizardComponent.types[1], stepper);
+      expect(createWizardComponent.selectedType).toBe(createWizardComponent.types[1]);
       expect(nextSpy).toHaveBeenCalled();            
     })
   })

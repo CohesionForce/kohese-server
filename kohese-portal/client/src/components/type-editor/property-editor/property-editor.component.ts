@@ -38,12 +38,17 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
   add(): void {
     this.dialogService.openInputDialog('Add Property', '', this.dialogService.
       INPUT_TYPES.TEXT, 'Name').afterClosed().subscribe((name: string) => {
-      this.type.properties[name] = {
-        displayName: name,
-        inputType: ':{}',
-        required: false,
-        defaultValue: ''
-      };
+      if (name) {
+        this.type.properties[name] = {
+          displayName: name,
+          inputType: {
+            type: '',
+            options: {}
+          },
+          required: false,
+          defaultValue: ''
+        };
+      }
     });
   }
   

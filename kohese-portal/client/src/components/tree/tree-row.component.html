@@ -1,107 +1,64 @@
-<div class="kt-collection">
-  <div class="kt-item" id="{{itemProxy.item.id}}"
-    [ngClass]="{'kti-selected-item' : itemProxy.item.id === 1,
-    'kti-filtered': !matchesFilter(itemProxy) && !childMatchesFilter(itemProxy),
-    'kti-filterMatchedExact': matchesFilter(itemProxy, true),
-    'kti-filterMatched': matchesFilter(itemProxy)}">
-    <!-- Checkbox if item has a version control status -->
-    <span *ngIf="isVersionControlViewVisible() && itemProxy.statusFlags"></span>
-    <!-- End conditional Checkbox for Version control -->
-    <div class="kti-name" [style]="{'font-weight': 'bold'}"
-      (click)="navigate('Explore', {id: itemProxy.item.id})">
-      <i (click)="collapsed = !collapsed;" class="kt-icon fa"
-        [ngClass]="{'fa-caret-down': (itemProxy.children.length > 0) && !collapsed,
-        'fa-caret-right': (itemProxy.children.length > 0) && collapsed,
-        'no-icon': !(itemProxy.children.length > 0)}">
-      </i>
-      <kind-icon [kind]="itemProxy.kind"></kind-icon>
-      <span class="kt-label">
-        {{(itemProxy.item.name | highlightRegex )}}
-      </span>
-      <span *ngIf="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
-      <!-- Conditional Icons for Item status -->
-      <span *ngIf="itemProxy.dirty">
-        <img src="assets/icons/versioncontrol/dirty.ico"
-          title = "Dirty item"/>
-      </span>
-      <span *ngIf="isVersionControlViewVisible()">
-        {{itemProxy.status}}
-      </span>
+<ng-container *ngIf="visible">
+  <div class="kt-collection">
+    <div class="kt-item" id="{{itemProxy.item.id}}"
+      [ngClass]="{ 'kti-selected-item': (itemProxy.item.id === getSelectedProxyId()) }">
+      <div class="kti-name" [style]="{'font-weight': 'bold'}"
+        (click)="navigate('Explore', {id: itemProxy.item.id})">
+        <i (click)="collapsed = !collapsed;" class="kt-icon fa"
+          [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && !collapsed,
+          'fa-caret-right': (itemProxy.children.length > 0) && collapsed,
+          'no-icon': !(itemProxy.children.length > 0) }">
+        </i>
+        <span>
+          <mat-icon class="{{koheseType.icon}}" matTooltip="{{koheseType.name}}">
+          </mat-icon>
+        </span>
+        <span class="kt-label">
+          {{(itemProxy.item.name | highlightRegex )}}
+        </span>
+        <span *ngIf="itemProxy.item.tags"> {{itemProxy.item.tags}}</span>
+        <!-- Conditional Icons for Item status -->
+        <span *ngIf="itemProxy.dirty">
+          <img src="assets/icons/versioncontrol/dirty.ico"
+            title = "Dirty item"/>
+        </span>
+        <span *ngIf="isVersionControlViewVisible()">
+          {{itemProxy.status}}
+        </span>
+      </div>
+      <div class="kti-cell kti-actions pull-right">
+        <!-- Default row actions -->
+        <span *ngIf="!isVersionControlViewVisible()">
+          <i class="fa fa-anchor" (click)="updateRoot()">
+          </i>
+          <i class="glyphicon glyphicon-remove pull-right"
+            (click)="removeItem()">
+          </i>
+        </span>
+        <!-- Version Control row actions -->
+        <span *ngIf="isVersionControlViewVisible() && itemProxy.vcState">
+          <!-- VC Status Icons -->
+          <img *ngIf="itemProxy.vcState.Unstaged"
+            src="assets/icons/versioncontrol/unstaged.ico" title="Unstaged"/>
+          <img *ngIf="itemProxy.vcState.Staged"
+            src="assets/icons/versioncontrol/index-mod.ico" title="Staged"/>
+          <!-- Actions -->
+          <i class="fa fa-undo kt-icon"
+            (click)="revertChanges()">
+          </i>
+          <i class="fa fa-plus kt-icon" *ngIf="itemProxy.vcState.Unstaged"
+            (click)="versionControlService.stageItems([itemProxy])">
+          </i>
+          <i class="fa fa-minus kt-icon" *ngIf="itemProxy.vcState.Staged"
+            (click)="versionControlService.unstageItems([itemProxy])">
+          </i>
+        </span>
+      </div>
     </div>
-    <div class="kti-cell kti-actions pull-right">
-      <!-- Default row actions -->
-      <span *ngIf="!isVersionControlViewVisible()">
-        <i class="fa fa-anchor"
-          (click)="updateRoot(itemProxy)">
-        </i>
-        <i class="glyphicon glyphicon-remove pull-right"
-          (click)="removeItem(itemProxy)">
-        </i>
-      </span>
-      <!-- Version Control row actions -->
-      <span *ngIf="isVersionControlViewVisible() && itemProxy.vcState">
-        <!-- VC Status Icons -->
-        <img *ngIf="itemProxy.vcState.Unstaged"
-          src="assets/icons/versioncontrol/unstaged.ico" title="Unstaged"/>
-        <img *ngIf="itemProxy.vcState.Staged"
-          src="assets/icons/versioncontrol/index-mod.ico" title="Staged"/>
-        <!-- Actions -->
-        <i class="fa fa-undo kt-icon"
-          (click)="revertChanges(itemProxy)">
-        </i>
-        <i class="fa fa-plus kt-icon" *ngIf="itemProxy.vcState.Unstaged"
-          (click)="versionControlService.stageItems([itemProxy])">
-        </i>
-        <i class="fa fa-minus kt-icon" *ngIf="itemProxy.vcState.Staged"
-          (click)="versionControlService.unstageItems([itemProxy])">
-        </i>
-      </span>
-    </div>
+    <ng-container *ngIf="!collapsed">
+      <tree-row *ngFor="let childProxy of itemProxy.children"
+        [itemProxy]="childProxy">
+      </tree-row>
+    </ng-container>
   </div>
-  <ng-container *ngIf="!collapsed">
-    <tree-row *ngFor="let childProxy of itemProxy.children"
-      [filterSubject]="filterSubject" [itemProxy]="childProxy"
-      [exactFilter]="exactFilter">
-    </tree-row>
-  </ng-container>
-    <!-- <div class="dropdown position-fixed" id="tree-menu-{{itemProxy.item.id}}">
-      <ul class="dropdown-menu" role="menu">
-          <li class="pointer context-item"
-              role="menuitem"
-              (click)="updateRoot(itemProxy)">
-              <a>
-                  Set as root
-              </a>
-          </li>
-          <li class="pointer context-item"
-              role="menuitem"
-              (click)="navigate('Create',
-                                          {parentId: itemProxy.item.id})">
-              <a>
-                  Create child
-              </a>
-          </li>
-          <li class="pointer context-item"
-              role="menuitem"
-              (click)="collapseChildren(itemProxy)">
-              <a>
-                  Collapse children
-              </a>
-          </li>
-          <li class="pointer context-item"
-              role="menuitem"
-              (click)="expandChildren(itemProxy)">
-              <a>
-                  Expand Children
-              </a>
-          </li>
-          <li class="pointer context-item"
-              role="menuitem"
-              (click)="expandMatchingChildren(itemProxy)">
-              <a>
-                  Expand Matching Children
-              </a>
-          </li>
-      </ul>
-   </div> -->
-</div>
+</ng-container>

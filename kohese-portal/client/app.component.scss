@@ -1,0 +1,94 @@
+//Palette
+$primaryColor: #005A31;
+$accentColor: #CBE32D;
+$lightColor: #F3FAB6;
+$secondaryColor: #660000;
+$secondaryFade: $secondaryColor;
+$buttonAccentColor: $primaryColor + 125;
+
+//Element Sizes
+$leftNavWidth: 50px;
+$topNavHeight: 50px;
+$sidePaneWidth: 250px;
+$tabBarHeight: 48px;
+$topActionBarHeight: 43px;
+
+$baseBorderRadius : 10px;
+
+//font
+$fontColor: black;
+
+body {
+  font-family: FontAwesome, arial, sans-serif;
+  height: 100%; 
+  overflow: hidden;
+  
+  .one-column {
+    width:100%;
+  }
+
+  .two-columns {
+    width: 50%;
+  }
+
+  .three-columns {
+    width: 30%
+  }
+
+  .position-fixed {
+    position: fixed;
+  }
+
+  .inline-block {
+    display: inline-block;
+  }
+
+  .top-align {
+    vertical-align: top;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }
+}
+
+table {
+  th {
+    .glyphicon-plus {
+      color: green;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  td {
+    .glyphicon-remove {
+      color: $secondaryColor + 100;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.pad {
+  padding: 5px;
+}
+
+.highlight {
+  background-color: $secondaryColor + 100;
+  color: whitesmoke;
+}
+
+// Define 3 theme colors
+
+// $kohese-theme-primary: mat-palette($mat-green, 700, 300, 900);
+// $kohese-theme-accent: mat-palette($mat-red);
+// $kohese-them-warn: mat-palette($mat-deep-orange);
+
+// $kohese-theme: mat-light-theme(
+//   $kohese-theme-primary,
+//   $kohese-theme-accent,
+//   $kohese-theme-warn
+// )

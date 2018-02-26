@@ -15,19 +15,22 @@
   </mat-dialog-content>
   <mat-dialog-actions>
     <ng-container *ngIf="data.inputType">
-      <button mat-raised-button [mat-dialog-close]="inputtedValue"
-        class="pull-right">
-        Apply
-      </button>
-      <button mat-raised-button [mat-dialog-close]="0" class="pull-right">
-        Cancel
-      </button>
+      <span class="dialog-actions">
+        <button mat-raised-button [mat-dialog-close]="inputtedValue">
+          Apply
+        </button>
+        <button mat-raised-button [mat-dialog-close]="0">
+          Cancel
+        </button>
+      </span>
     </ng-container>
     <ng-container *ngIf="!data.inputType">
-      <button *ngFor="let label of data.buttonLabels; let j = index"
-        mat-raised-button [mat-dialog-close]="j" class="pull-right">
-        {{label}}
-      </button>
+      <span class="dialog-actions">
+        <button *ngFor="let label of data.buttonLabels; let j = index"
+          mat-raised-button [mat-dialog-close]="j">
+          {{label}}
+        </button>
+      </span>
     </ng-container>
   </mat-dialog-actions>
 </div>

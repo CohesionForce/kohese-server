@@ -14,18 +14,18 @@ export class VersionControlService {
     private toastrService: ToastrService) {
   }
   
-  stageItems(proxies: ItemProxy[]) {
+  stageItems(proxies: Array<ItemProxy>) {
     let data: {
-      proxyIds: string[];
+      proxyIds: Array<string>;
     } = {
       proxyIds: []
     };
     for (let j = 0; j < proxies.length; j++) {
-      data.proxyIds.push(proxies[j].id);
+      data.proxyIds.push(proxies[j].item.id);
     }
     
     this.socketService.getSocket().emit('VersionControl/stage', data,
-      (results) => {
+      (results: any) => {
       if (results.error) {
         this.toastrService.error('Stage Failed', 'Version Control');
       } else {
@@ -34,18 +34,18 @@ export class VersionControlService {
     });
   }
   
-  unstageItems(proxies: ItemProxy[], callback: Function) {
+  unstageItems(proxies: Array<ItemProxy>, callback: Function) {
     let data: {
-      proxyIds: string[];
+      proxyIds: Array<string>;
     } = {
       proxyIds: []
     };
     for (let j = 0; j < proxies.length; j++) {
-      data.proxyIds.push(proxies[j].id);
+      data.proxyIds.push(proxies[j].item.id);
     }
     
     this.socketService.getSocket().emit('VersionControl/unstage', data,
-      (results) => {
+      (results: any) => {
       if (results.error) {
         this.toastrService.error('Unstage Failed', 'Version Control');
       } else {
@@ -58,18 +58,18 @@ export class VersionControlService {
     });
   }
   
-  revertItems(proxies: ItemProxy[]) {
+  revertItems(proxies: Array<ItemProxy>) {
     let data: {
-      proxyIds: string[];
+      proxyIds: Array<string>;
     } = {
       proxyIds: []
     };
     for (let j = 0; j < proxies.length; j++) {
-      data.proxyIds.push(proxies[j].id);
+      data.proxyIds.push(proxies[j].item.id);
     }
     
     this.socketService.getSocket().emit('VersionControl/revert', data,
-      (results) => {
+      (results: any) => {
       if (results.error) {
         this.toastrService.error('Revert Failed', 'Version Control');
       } else {
@@ -78,10 +78,10 @@ export class VersionControlService {
     });
   }
   
-  commitItems(proxies: ItemProxy[], commitMessage: string) {
+  commitItems(proxies: Array<ItemProxy>, commitMessage: string) {
     let proxy: ItemProxy = this.sessionService.getSessionUser().getValue();
     let data: {
-      proxyIds: string[];
+      proxyIds: Array<string>;
       username: string;
       email: string;
       message: string;
@@ -92,11 +92,11 @@ export class VersionControlService {
       message: commitMessage
     };
     for (let j = 0; j < proxies.length; j++) {
-      data.proxyIds.push(proxies[j].id);
+      data.proxyIds.push(proxies[j].item.id);
     }
   
     this.socketService.getSocket().emit('VersionControl/commit', data,
-      (results) => {
+      (results: any) => {
       if (results.error) {
         this.toastrService.error('Commit Failed', 'Version Control');
       } else {
@@ -107,7 +107,7 @@ export class VersionControlService {
   
   push(ids: string[], remoteName: string) {
     let data: {
-      proxyIds: string[];
+      proxyIds: Array<string>;
       remoteName: string;
     } = {
       proxyIds: ids,
@@ -115,7 +115,7 @@ export class VersionControlService {
     };
     
     this.socketService.getSocket().emit('VersionControl/push', data,
-      (results) => {
+      (results: any) => {
       if (results.error) {
         this.toastrService.error('Push Failed', 'Version Control');
       } else {
@@ -136,7 +136,7 @@ export class VersionControlService {
     };
     
     this.socketService.getSocket().emit('VersionControl/addRemote', data,
-      (results) => {
+      (results: any) => {
       if (results.error) {
         this.toastrService.error('Add Remote Failed', 'Version Control');
       } else {
@@ -154,7 +154,7 @@ export class VersionControlService {
     
     let emit: (message: string, data: { proxyId: string; }) => Observable<any> =
       Observable.bindCallback(this.socketService.getSocket().emit.bind(this.socketService.getSocket()));
-    return emit('VersionControl/getRemotes', data).do((results) => {
+    return emit('VersionControl/getRemotes', data).do((results: any) => {
       if (results.error) {
         this.toastrService.error('Remote Retrieval Failed', 'Version Control');
       } else {

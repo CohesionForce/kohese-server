@@ -729,6 +729,116 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  it('Should Ensure Model Is Associated', ()=>{
+
+    resetItemRepository();
+    defineTestModel();
+    
+    var aa = new ItemProxy('Test', {
+        name: 'Item AA',
+        id: 'AA',
+        parentId: 'A'      
+    });
+
+    var a = new ItemProxy('Test', {
+        id: 'A',
+        name: 'Item A'
+    });
+
+    expect(aa.model.item.name).toEqual('Test');
+    expect(a.model.item.name).toEqual('Test');
+    
+    // Handle the case when the child is sent to the client before its parent
+    
+    var bb = new ItemProxy('Test', {
+        name: 'Item BB',
+        id: 'BB',
+        parentId: 'B'      
+    });
+
+    // Note:  Creating the bb instance before the parent, also creates a placeholder 
+    //        for the non-existent parent in Lost+Found of type Lost-Item.
+    //        This allows an update to be called in some paths through the code.
+    //        We need to ensure that the model gets associated correctly in this case.
+    
+    var b = ItemProxy.getProxyFor('B');
+    b.updateItem('Test', {
+        id: 'B',
+        name: 'Item BB'
+    });
+
+    expect(bb.model.item.name).toEqual('Test');
+    expect(b.model.item.name).toEqual('Test');
+    
+  });
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  xit('Should Expand KoheseModel Relations', ()=>{
+    resetItemRepository();
+    
+    var modelDefMap = {
+        ExpandedTest: {
+          'name': 'ExpandedTest',
+          'base': 'PersistedModel',
+          'strict': 'validate',
+          'idInjection': true,
+          'trackChanges': false,
+          'properties': {
+            'id': {
+              'type': 'string',
+              'id': true,
+              'defaultFn': 'guid'
+            },
+            'name': {
+              'type': 'string',
+              'required': true
+            },
+            'xparentId': {
+              'type': 'reference',
+              'default': ''
+            }
+          },
+          'validations': [],
+          'relations': {
+            'xChildren': {
+              "type": "hasMany",
+              "model": "ExpandedTest",
+              "foreignKey": "xParentId"
+            },
+            "xparent": {
+              "type": "belongsTo",
+              "model": "ExpandedTest",
+              "foreignKey": "xparentId"
+            }
+          },
+          'acls': [],
+          'methods': []
+      }
+    };
+    
+    ItemProxy.loadModelDefinitions(modelDefMap);
+    
+    let testA = new ItemProxy('ExpandedTest', {
+      id: 'A',
+      name: 'Test Item: A',
+    });
+    
+    let testAG = new ItemProxy('ExpandedTest', {
+      id: 'AG',
+      parentId: 'A',
+      name: 'Test Item: A -> G',
+    });
+    
+    
+    dumpEnabled = true;
+    dump();
+  });
+  
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   it('Should Load Class Model Definitions', ()=>{
     resetItemRepository();
 

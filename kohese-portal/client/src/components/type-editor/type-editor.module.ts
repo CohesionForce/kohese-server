@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TypeEditorComponent } from './type-editor.component';
 import { TypeOverviewComponent } from './type-overview/type-overview.component';
 import { PropertyEditorComponent } from './property-editor/property-editor.component';
+import { IconSelectorComponent } from './icon-selector/icon-selector.component';
 
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
@@ -14,7 +15,11 @@ import { AngularSplitModule } from 'angular-split';
   declarations: [
     TypeEditorComponent,
     TypeOverviewComponent,
-    PropertyEditorComponent
+    PropertyEditorComponent,
+    IconSelectorComponent
+  ],
+  entryComponents: [
+    IconSelectorComponent
   ],
   imports: [
     CommonModule,

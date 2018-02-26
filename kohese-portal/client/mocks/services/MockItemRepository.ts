@@ -40,4 +40,12 @@ export class MockItemRepository {
   buildItem() {
     
   }
+
+  registerRecentProxy() {
+
+  }
+
+  getShortFormItemList () {
+    
+  }
 }

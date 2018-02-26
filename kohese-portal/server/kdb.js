@@ -11,16 +11,13 @@ var kdbFS = require('./kdb-fs.js');
 var kdbRepo = require('./kdb-repo.js');
 module.exports.kdbRepo = kdbRepo;
 
+var kdbModel = require('./kdb-model.js');
+
 var jsonExt = /\.json$/;
 
 var ItemProxy = require('../common/models/item-proxy.js');
 var CreateStates = require('../common/models/createStates.js');
 module.exports.ItemProxy = ItemProxy;
-
-var kdbStore = {
-    ids: {},
-    models: {}
-  };
 
 // TODO:  Need to remove dependence on modelConfig file
 var modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
@@ -30,8 +27,22 @@ var kdbDirPath = "kdb";
 var koheseKDBDirPath;
 var mountFilePath;
 
-// TODO need to remove kdbStore since it is no longer needed
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function saveLoadedModels() {
+  console.log('::: Determining if model files need to be saved');
 
+  for(var modelName in kdbModel.modelDef){
+    console.log('--- Checking if ' + modelName + ' is in KDB');
+    let modelProxy = ItemProxy.getProxyFor(modelName);
+    modelProxyIsNew = !modelProxy.repoPath;
+    
+    if(modelProxyIsNew){
+      storeModelInstance(modelProxy, modelProxyIsNew);          
+    }
+  }
+}
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -40,20 +51,12 @@ function initialize(koheseKdbPath) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
-  var kdbModel = require('./kdb-model.js');
   kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
   
   // TODO:  Need to remove dependence on modelConfig file
   var modelKinds = Object.keys(modelConfig);
   modelKinds.sort();
   console.log("::: ModelKinds: " + modelKinds);
-
-  for(var modelKindIdx in modelKinds){
-    var modelKind = modelKinds[modelKindIdx];
-    console.log("::: ModelKind: " + modelKind);
-    kdbStore.ids[modelKind] = 0;
-    kdbStore.models[modelKind] = {};
-  }
 
   checkAndCreateDir(kdbDirPath);
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
@@ -90,14 +93,14 @@ function initialize(koheseKdbPath) {
     return createRepoStructure(koheseKDBDirPath).then(function(repo) {
       kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
 
-      // TODO Need to save to the KDB if they do not already exist
       ItemProxy.loadModelDefinitions(kdbModel.modelDef);    
       
       return openRepositories();
     });
   } else {
-    // TODO Need to save to the KDB if they do not already exist
-    ItemProxy.loadModelDefinitions(kdbModel.modelDef);    
+
+    ItemProxy.loadModelDefinitions(kdbModel.modelDef);
+    
     return openRepositories();
   }
 }
@@ -133,39 +136,32 @@ function determineRepoStoragePath(repo){
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function retrieveModelInstance(modelName, modelInstanceId) {
-  console.log("::: Retrieving " + modelName + " - " + modelInstanceId);
-  var modelStore = kdbStore.models[modelName];
-  var instance;
+function retrieveAnalysis(forProxy) {
+  let modelInstanceId = forProxy.item.id;
+  console.log('::: Retrieving analysis for ' + forProxy.kind + ' - ' + modelInstanceId);
 
-  if (modelStore[modelInstanceId]) {
-    instance = JSON.parse(modelStore[modelInstanceId]);
-  } else if (modelName === "Analysis") {
-    // Check to see if Analysis is on the disk
-    var sourceInstance = ItemProxy.getProxyFor(modelInstanceId);
+  let analysis;
+
+  if (forProxy.analysis) {
+    analysis = forProxy.analysis;
+  } else {
+    // Load from the repository if it exists
+    let repo = forProxy.getRepositoryProxy();
+    let analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
     
-    if (sourceInstance) {
-      var repo = sourceInstance.getRepositoryProxy();
-      var analysisPath = determineRepoStoragePath(repo) + "/Analysis/" + modelInstanceId + ".json";
-      var itemRow;
-      
-      try {
-        itemRow = kdbFS.loadJSONDoc(analysisPath);
-      } catch (error){
-        // Do nothing
-        console.log("!!! Analysis for " + modelInstanceId + " not found.");
-      }
-      
-      if(itemRow){
-        modelStore[itemRow.id] = JSON.stringify(itemRow);
-        instance = itemRow;
-      }
+    try {
+      analysis = kdbFS.loadJSONDoc(analysisPath);
+      forProxy.analysis = analysis;
+    } catch (error){
+      // Do nothing
+      console.log('!!! Analysis for ' + modelInstanceId + ' not found.');
     }
   }
-  return instance;
+
+  return analysis;
 }
 
-module.exports.retrieveModelInstance = retrieveModelInstance;
+module.exports.retrieveAnalysis = retrieveAnalysis;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -239,8 +235,6 @@ function storeModelInstance(proxy, isNewItem){
       mountRepository({id: modelInstance.id, parentId: modelInstance.parentId, 'repoStoragePath': repoStoragePath});
     }
     
-    var modelStore = kdbStore.models[modelName];
-    modelStore[modelInstance.id] = JSON.stringify(modelInstance);
     var repositoryPath = ItemProxy.getRootProxy().repoPath.split('Root.json')[0];
     repositoryPath = ItemProxy.getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
     return kdbRepo.getItemStatus(ItemProxy.getRootProxy().item.id,
@@ -267,12 +261,8 @@ function storeModelAnalysis(analysisInstance){
     var repo = proxy.getRepositoryProxy();
     var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
     
-    var modelStore = kdbStore.models[modelName];
-    modelStore[modelInstanceId] = JSON.stringify(analysisInstance);
-    
     kdbFS.storeJSONDoc(analysisPath, analysisInstance);
 
-    
   } else {
     console.log('*** No item found for analysis instance: ' + modelInstanceId);
   }
@@ -304,7 +294,7 @@ function removeModelInstance(proxy){
           delete mountList[proxy.item.id];
           updateMountFile();
           
-          // Should remove the proxies and modelStore instances of all the children, but not delete from disk.
+          // TODO: Should remove the proxies of all the children, but not delete from disk.
           
       } else {
           // Repo is not mounted, so we're deleting an error repo.
@@ -323,10 +313,6 @@ function removeModelInstance(proxy){
     }
   }
   
-  var modelStore = kdbStore.models[modelName];
-  if(modelStore && modelStore[instanceId]){
-    delete modelStore[instanceId];    
-  }
 }
 
 module.exports.removeModelInstance = removeModelInstance;
@@ -338,11 +324,6 @@ module.exports.removeModelInstance = removeModelInstance;
 function removeModelAnalysis(proxy) {
   var modelInstanceId = proxy.item.id;
   
-  var analysisStore = kdbStore.models["Analysis"];
-  if(analysisStore[modelInstanceId]){
-    delete analysisStore[modelInstanceId];
-  }
-
   var repo = proxy.getRepositoryProxy();
   var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
   
@@ -371,7 +352,6 @@ function mountRepository(mountData) {
     
     // Format: mountData = {id: , name: , parentId: , repoStoragePath: } 
     // Attempt to mount the repository. If unable then make it apparent in the client.
-    var modelStore = kdbStore.models['Repository'];
     var repoCanBeMounted = true;
     var repoRoot = {};
     
@@ -395,13 +375,11 @@ function mountRepository(mountData) {
         if(mountList[mountData.id].mounted) {
             proxy = ItemProxy.getProxyFor(mountData.id);
             proxy.updateItem('Repository', repoRoot);
-            modelStore[mountData.id] = JSON.stringify(repoRoot);
         } else {
             mountList[mountData.id].mounted = true;
             repoRoot.mounted = true;
             proxy = new ItemProxy('Repository', repoRoot);
             proxy.repoPath = path.join(mountData.repoStoragePath, 'Root.json');
-            modelStore[mountData.id] = JSON.stringify(repoRoot);
             console.log('::: Validating mounted repository: ' + repoRoot.name);
             validateRepositoryStructure(mountData.repoStoragePath);
         }
@@ -425,7 +403,6 @@ function mountRepository(mountData) {
         mountList[mountData.id].mounted = false;
 
         var proxy = new ItemProxy('Repository', errorRepo);
-        modelStore[errorRepo.id] = JSON.stringify(errorRepo);
     }
 }
 
@@ -468,7 +445,6 @@ function validateRepositoryStructure (repoDirPath) {
   for(var modelIdx = 0; modelIdx < modelDirList.length; modelIdx++){
     var modelName = modelDirList[modelIdx];
     var modelDirPath = repoDirPath + "/" + modelName;
-    var modelStore = kdbStore.models[modelName];
     var fileList;
     
     if(modelName === 'Repository') {
@@ -509,11 +485,8 @@ function validateRepositoryStructure (repoDirPath) {
           var proxy = new ItemProxy(modelName, itemRow);
           proxy.repoPath = itemPath;
           
-          modelStore[itemRow.id] = JSON.stringify(itemRow);
-          
         }    
     }
-  kdbStore.ids[modelName] += fileList.length;
   }
 }
 
@@ -549,6 +522,9 @@ function openRepositories() {
 	    }
 	}
 	console.log(">>> Done loading repositories");
+	
+	// Save bootstrapped models if they are not already in the KDB
+	saveLoadedModels();
 
 	//Load corresponding git repositories
 	var promises = [];

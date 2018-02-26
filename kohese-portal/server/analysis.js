@@ -66,10 +66,12 @@
       XKPC: 'Pseudo Chunk'
   };
 
-  function requestAnalysisJSON(forModelKind, onId, cb) {
-    console.log('::: ANALYZING: ' + forModelKind + ' - ' + onId);
-
-    var instance = kdb.retrieveModelInstance(forModelKind, onId);
+  function requestAnalysisJSON(forProxy, cb) {
+    let onId = forProxy.item.id;
+    let forModelKind= forProxy.kind;
+    console.log('::: ANALYZING: ' + onId);
+    
+    var instance = forProxy.item;
 
     var requestData = {};
     var analysis = {};
@@ -122,9 +124,13 @@
             analysis.raw[key] = JSON.parse(analysisBody[key]);
           }
           consolidateAnalysis(analysis);
+          
           // delete the raw data
           delete analysis.raw;
+
+          forProxy.analysis = analysis;
           kdb.storeModelAnalysis(analysis);
+          
           console.log('::: ANALYSIS Completed: ' + onId);
           cb(analysis);
         } catch (err) {
@@ -152,11 +158,13 @@
     
     console.log('::: Preparing to analyze ' + forModelKind + ' ' + onId);
 
-    var analysis = kdb.retrieveModelInstance('Analysis', onId);
+    let forProxy = kdb.ItemProxy.getProxyFor(onId);
+    let analysis = kdb.retrieveAnalysis(forProxy);
+    
     if (analysis) {
       cb(analysis);
     } else {
-      requestAnalysisJSON(forModelKind, onId, cb);
+      requestAnalysisJSON(forProxy, cb);
     }
   }
   module.exports.performAnalysis = performAnalysis;
