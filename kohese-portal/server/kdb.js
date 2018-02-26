@@ -11,6 +11,8 @@ var kdbFS = require('./kdb-fs.js');
 var kdbRepo = require('./kdb-repo.js');
 module.exports.kdbRepo = kdbRepo;
 
+var kdbModel = require('./kdb-model.js');
+
 var jsonExt = /\.json$/;
 
 var ItemProxy = require('../common/models/item-proxy.js');
@@ -36,11 +38,27 @@ var mountFilePath;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function saveLoadedModels() {
+  console.log('::: Determining if model files need to be saved');
+
+  for(var modelName in kdbModel.modelDef){
+    console.log('--- Checking if ' + modelName + ' is in KDB');
+    let modelProxy = ItemProxy.getProxyFor(modelName);
+    modelProxyIsNew = !modelProxy.repoPath;
+    
+    if(modelProxyIsNew){
+      storeModelInstance(modelProxy, modelProxyIsNew);          
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function initialize(koheseKdbPath) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
-  var kdbModel = require('./kdb-model.js');
   kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
   
   // TODO:  Need to remove dependence on modelConfig file
@@ -90,14 +108,14 @@ function initialize(koheseKdbPath) {
     return createRepoStructure(koheseKDBDirPath).then(function(repo) {
       kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
 
-      // TODO Need to save to the KDB if they do not already exist
       ItemProxy.loadModelDefinitions(kdbModel.modelDef);    
       
       return openRepositories();
     });
   } else {
-    // TODO Need to save to the KDB if they do not already exist
-    ItemProxy.loadModelDefinitions(kdbModel.modelDef);    
+
+    ItemProxy.loadModelDefinitions(kdbModel.modelDef);
+    
     return openRepositories();
   }
 }
@@ -549,6 +567,9 @@ function openRepositories() {
 	    }
 	}
 	console.log(">>> Done loading repositories");
+	
+	// Save bootstrapped models if they are not already in the KDB
+	saveLoadedModels();
 
 	//Load corresponding git repositories
 	var promises = [];

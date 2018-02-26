@@ -27,7 +27,6 @@ import { RepositoriesComponent } from './components/admin/repositories.component
 import { TreeComponent, TreeRowComponent } from './components/tree/tree.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
-import { IconSelectorComponent } from './components/icon-selector/icon-selector.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
@@ -45,7 +44,6 @@ import { MaterialModule } from './material.module';
     TreeComponent,
     ExploreComponent,
     TreeRowComponent,
-    IconSelectorComponent
   ],
   imports: [
     BrowserModule,
@@ -71,10 +69,6 @@ import { MaterialModule } from './material.module';
     UserModule,
     ServicesModule
   ],
-  entryComponents: [
-    IconSelectorComponent
-  ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

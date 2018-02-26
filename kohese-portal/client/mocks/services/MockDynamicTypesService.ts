@@ -1,17 +1,22 @@
 import * as ItemProxy from '../../../common/models/item-proxy';
 import { MockViewData } from '../data/MockViewData';
-
+import { MockItem } from '../data/MockItem';
+import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
+import { MockDataModel } from '../data/MockDataModel';
 
 export class MockDynamicTypesService {
-  mockType = new ItemProxy('KoheseView', MockViewData )
+  mockItem = new ItemProxy('Item', MockDataModel)
+  mockView = new ItemProxy('KoheseView', MockViewData )
+  mockKoheseType;
   constructor() {
-    
+    console.log(this);
+    this.
+    mockKoheseType = new KoheseType(this.mockItem, this.mockView);
+  
   }
   getKoheseTypes () {
     return {
-      'types': 'Text',
-      'proxy-selector': 'Reference',
-      'date': 'Date'
+      'Item' : this.mockKoheseType
     };
   }
 
@@ -20,7 +25,7 @@ export class MockDynamicTypesService {
   }
 
   getViewProxyFor () {
-    return this.mockType;
+    return this.mockView;
   }
 
   getUserInputTypes () {
