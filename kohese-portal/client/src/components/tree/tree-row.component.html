@@ -5,7 +5,7 @@
     <div class="kt-item" id="{{itemProxy.item.id}}"
       (click)="navigate('Explore', {id: itemProxy.item.id})"
       [ngClass]="{ 'kti-selected-item': (itemProxy.item.id === getSelectedProxyId()),
-      'highlight': (visible && matchesFilter) }">
+      'highlight-row': (visible && matchesFilter) }">
       <i (click)="collapsed = !collapsed;" class="kt-icon fa"
         [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && !collapsed,
         'fa-caret-right': (itemProxy.children.length > 0) && collapsed,
@@ -36,7 +36,7 @@
             <mat-icon class="fa fa-anchor"></mat-icon>
           </button>
           <button mat-icon-button (click)="removeItem()">
-            <mat-icon class="glyphicon glyphicon-remove"></mat-icon>
+            <mat-icon class="glyphicon glyphicon-remove delete-button"></mat-icon>
           </button>
         </ng-container>
         <!-- Version Control row actions -->

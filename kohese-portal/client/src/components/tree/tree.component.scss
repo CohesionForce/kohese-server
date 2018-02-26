@@ -90,3 +90,11 @@
   white-space: pre-wrap;
   position: relative;
 }
+
+.highlight-row {
+  background-color: #FFFFCC;
+}
+
+.delete-button {
+  color: $secondaryColor + 100;
+}
