@@ -6,8 +6,6 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../../../material.module'
 import { PipesModule } from '../../../../pipes/pipes.module';
 
-import { SessionService } from '../../../../services/user/session.service';
-
 import { ChildrenTableComponent } from './children-table.component';
 import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 

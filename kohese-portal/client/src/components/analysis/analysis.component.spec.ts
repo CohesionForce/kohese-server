@@ -6,7 +6,6 @@ import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../material.module'
 
-import { SessionService } from '../../services/user/session.service';
 import { AnalysisComponent } from './analysis.component';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';

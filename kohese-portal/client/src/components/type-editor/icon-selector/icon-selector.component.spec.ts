@@ -8,7 +8,6 @@ import { MaterialModule } from '../../../material.module'
 import { IconSelectorComponent } from './icon-selector.component';
 
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
-import { SessionService } from '../../../services/user/session.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 
 describe('Component: Icon Selector', ()=>{
