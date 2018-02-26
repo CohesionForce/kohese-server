@@ -5,7 +5,7 @@ import { AnalysisModule } from './components/analysis/analysis.module'
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { LoginComponent } from './components/login/login.component';
-import { RepositoriesComponent } from './components/admin/repositories.component';
+import { RepositoriesComponent } from './components/admin//repositories/repositories.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeEditorComponent } from './components/type-editor/type-editor.component';
