@@ -60,7 +60,10 @@ describe('Component: Details Form', ()=>{
 
   describe('details view', ()=>{
     beforeEach(()=>{
-      formComponent.itemProxy = new ItemProxy('Item', MockItem)      
+      formComponent.itemProxy = new ItemProxy('Item', MockItem)  
+      formComponent.itemProxy.model.item = {
+        base: 'PersistedModel'
+      }    
     })
 
     describe ('disabled selected', ()=>{

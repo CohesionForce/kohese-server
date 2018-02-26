@@ -75,26 +75,16 @@ class ItemProxy {
       return proxy;
     }
     
-    proxy.kind = kind;
     proxy.item = forItem;
+    proxy.setItemKind(kind);
     
-    if(!tree.modelMap[kind]){
-      // Make sure the map has not been missed due to loading order on the client
-      var kindProxy = ItemProxy.getProxyFor(kind);
-      if (kindProxy){
-        tree.modelMap[kind] = kindProxy;        
-      } else {
-        tree.modelMap[kind] = createMissingProxy(kind);
-      }
-    }
-    proxy.model = tree.modelMap[kind];
-
     if (kind === 'Repository') {
       tree.repoMap[itemId] = proxy;
     }
     
     if (kind === 'KoheseModel') {
       tree.modelMap[itemId] = proxy;
+      // TODO Need to Load Model
     }
     
     if (kind === 'Internal') {
@@ -205,6 +195,24 @@ class ItemProxy {
 
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  setItemKind(kind){
+    // Create a placeholder kind if it does not exist yet
+    if(!tree.modelMap[kind]){
+      // Make sure the map has not been missed due to loading order on the client
+      var kindProxy = ItemProxy.getProxyFor(kind);
+      if (kindProxy){
+        tree.modelMap[kind] = kindProxy;        
+      } else {
+        tree.modelMap[kind] = createMissingProxy(kind);
+      }
+    }
+    this.kind = kind;
+    this.model = tree.modelMap[kind];    
+  }
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -995,7 +1003,7 @@ class ItemProxy {
 
     if (newKind !== this.kind) {
       console.log('::: Proxy kind changed from ' + this.kind + ' to ' + newKind);
-      this.kind = newKind;
+      this.setItemKind(newKind);
     }
 
     // Determine if itemIds array changed
