@@ -756,6 +756,11 @@ describe('ItemProxy Test', function() {
         parentId: 'B'      
     });
 
+    // Note:  Creating the bb instance before the parent, also creates a placeholder 
+    //        for the non-existent parent in Lost+Found of type Lost-Item.
+    //        This allows an update to be called in some paths through the code.
+    //        We need to ensure that the model gets associated correctly in this case.
+    
     var b = ItemProxy.getProxyFor('B');
     b.updateItem('Test', {
         id: 'B',

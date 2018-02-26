@@ -138,7 +138,7 @@ function determineRepoStoragePath(repo){
 //////////////////////////////////////////////////////////////////////////
 function retrieveAnalysis(forProxy) {
   let modelInstanceId = forProxy.item.id;
-  console.log("::: Retrieving analysis for " + forProxy.kind + " - " + modelInstanceId);
+  console.log('::: Retrieving analysis for ' + forProxy.kind + ' - ' + modelInstanceId);
 
   let analysis;
 
@@ -146,15 +146,15 @@ function retrieveAnalysis(forProxy) {
     analysis = forProxy.analysis;
   } else {
     // Load from the repository if it exists
-    var repo = forProxy.getRepositoryProxy();
-    var analysisPath = determineRepoStoragePath(repo) + "/Analysis/" + modelInstanceId + ".json";
+    let repo = forProxy.getRepositoryProxy();
+    let analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
     
     try {
       analysis = kdbFS.loadJSONDoc(analysisPath);
       forProxy.analysis = analysis;
     } catch (error){
       // Do nothing
-      console.log("!!! Analysis for " + modelInstanceId + " not found.");
+      console.log('!!! Analysis for ' + modelInstanceId + ' not found.');
     }
   }
 
