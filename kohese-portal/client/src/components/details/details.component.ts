@@ -104,6 +104,7 @@ export class DetailsComponent extends NavigatableComponent
   ngOnDestroy () {
     this.routeSub.unsubscribe();
     this.repoReadySub.unsubscribe();
+    this.detailsFormSubscription.unsubscribe();
 
     // TODO - implement bundle logic here
   }
