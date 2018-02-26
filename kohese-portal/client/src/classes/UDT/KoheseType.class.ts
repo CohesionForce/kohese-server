@@ -16,6 +16,10 @@ export class KoheseType {
   private relations : object;
   private acls : Array<any>;
   private methods : Array<any>;
+  private _stateFlows: any = {};
+  get stateFlows() {
+    return this._stateFlows;
+  }
 
   constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy) {
     this.dataModelProxy = dataModelProxy;
@@ -37,6 +41,23 @@ export class KoheseType {
     this.relations = this.dataModelProxy.item.relations;
     this.acls = this.dataModelProxy.item.acls;
     this.methods = this.dataModelProxy.item.methods;
+    for (let propertyKey in this.dataModelProxy.item.properties) {
+      let property: any = this.dataModelProxy.item.properties[propertyKey];
+      if ('StateMachine' === property.type) {
+        let states: any = {};
+        for (let fieldName in property.properties.state) {
+          states[fieldName] = property.properties.state[fieldName];
+          states[fieldName].transitionCandidates = [];
+        }
+        
+        for (let transitionKey in property.properties.transition) {
+          let transition: any = property.properties.transition[transitionKey];
+          states[transition.source].transitionCandidates.push(transition);
+        }
+        
+        this._stateFlows[propertyKey] = states;
+      }
+    }
   }
   
   retrieveViewData(): void {
@@ -58,6 +79,7 @@ export class KoheseType {
     this.dataModelProxy.item.relations = this.relations;
     this.dataModelProxy.item.acls = this.acls;
     this.dataModelProxy.item.methods = this.methods;
+    
     return this.dataModelProxy;
   }
   

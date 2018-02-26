@@ -18,6 +18,7 @@ import { DynamicTypesService } from './dynamic-types/dynamic-types.service';
 import { ImportService } from './import/import.service';
 import { DataProcessingService } from './data/data-processing.service';
 import { DialogService, DialogComponent } from './dialog/dialog.service';
+import { StateService } from './state/state.service';
 import { MaterialModule } from "../material.module";
 
 @NgModule({
@@ -48,6 +49,8 @@ import { MaterialModule } from "../material.module";
     DataProcessingService,
     DialogService,
     DynamicTypesService,
-    ImportService]
+    ImportService,
+    StateService
+  ]
 })
 export class ServicesModule {}
