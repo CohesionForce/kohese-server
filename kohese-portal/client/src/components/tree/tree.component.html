@@ -95,15 +95,13 @@
   </div>
   <!-- Begin Knowledge Tree -->
   <div class="knowledge-tree-panel">
-    <div id="theKT" class="knowledge-tree">
-      <div class="kt-head">
-        <div class="kth-cell kti-name">Name</div>
-      </div>
-      <div class="kt-body">
-        <tree-row *ngFor="let childProxy of getTreeRoot().children"
-          [itemProxy]="childProxy">
-        </tree-row>
-      </div>
+    <div class="kt-head kth-cell kti-name">
+      Name
+    </div>
+    <div class="kt-body">
+      <tree-row *ngFor="let childProxy of getTreeRoot().children"
+        [itemProxy]="childProxy">
+      </tree-row>
     </div>
   </div> <!-- End Knowledge Tree -->
 </div>

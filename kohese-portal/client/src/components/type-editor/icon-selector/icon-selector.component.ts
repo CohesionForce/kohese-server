@@ -4,7 +4,8 @@ import { MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'icon-selector',
-  templateUrl: './icon-selector.component.html'
+  templateUrl: './icon-selector.component.html',
+  styleUrls: ['./icon-selector.component.scss']
 })
 export class IconSelectorComponent {
   public selectedIcon: string;
