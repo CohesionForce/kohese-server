@@ -2,13 +2,13 @@ export let MockAnalysis =  {
   "data": {
     "id": "cab0b000-bda5-11e7-85ba-279ecb57e99b",
     "forModelKind": "Item",
-    "name": "Analysis for: Phillips_Joshua_EAR_Part II_171011.md",
+    "name": "Analysis for: TEST_DOC_Part II_171011.md",
     "list": [
       {
         "sofa": 1,
         "begin": 0,
         "end": 37,
-        "text": "Phillips_Joshua_EAR_Part II_171011.md",
+        "text": "TEST_DOC_Part II_171011.md",
         "displayType": "Sentence",
         "displayId": "name-Sentence-0",
         "displayLevel": 2
@@ -18,7 +18,7 @@ export let MockAnalysis =  {
         "begin": 0,
         "end": 24,
         "chunkType": "NP",
-        "text": "Phillips_Joshua_EAR_Part",
+        "text": "TEST_DOC_Part",
         "displayType": "Noun Phrase (NP)",
         "displayId": "name-Chunk-0",
         "displayLevel": 3
@@ -28,7 +28,7 @@ export let MockAnalysis =  {
         "begin": 0,
         "end": 24,
         "pos": "NNP",
-        "text": "Phillips_Joshua_EAR_Part",
+        "text": "TEST_DOC_Part",
         "displayType": "Proper Noun (NNP)",
         "displayId": "name-Token-0",
         "displayLevel": 4
@@ -55,8 +55,8 @@ export let MockAnalysis =  {
       }
     ],
     "chunkSummary": {
-      "Phillips_Joshua_EAR_Part": {
-        "text": "Phillips_Joshua_EAR_Part",
+      "TEST_DOC_Part": {
+        "text": "TEST_DOC_Part",
         "count": 1,
         "displayType": "Chunk",
         "posCount": {
@@ -73,8 +73,8 @@ export let MockAnalysis =  {
       }
     },
     "tokenSummary": {
-      "Phillips_Joshua_EAR_Part": {
-        "text": "Phillips_Joshua_EAR_Part",
+      "TEST_DOC_Part": {
+        "text": "TEST_DOC_Part",
         "count": 1,
         "displayType": "Token",
         "posCount": {
@@ -92,7 +92,7 @@ export let MockAnalysis =  {
     },
     "summaryList": [
       {
-        "text": "Phillips_Joshua_EAR_Part",
+        "text": "TEST_DOC_Part",
         "count": 1,
         "displayType": "Chunk",
         "posCount": {
@@ -108,7 +108,7 @@ export let MockAnalysis =  {
         }
       },
       {
-        "text": "Phillips_Joshua_EAR_Part",
+        "text": "TEST_DOC_Part",
         "count": 1,
         "displayType": "Token",
         "posCount": {
@@ -127,7 +127,7 @@ export let MockAnalysis =  {
   },
   "extendedSummaryList": [
     {
-      "text": "Phillips_Joshua_EAR_Part",
+      "text": "TEST_DOC_Part",
       "count": 1,
       "displayType": "Chunk",
       "posCount": {
@@ -143,7 +143,7 @@ export let MockAnalysis =  {
       }
     },
     {
-      "text": "Phillips_Joshua_EAR_Part",
+      "text": "TEST_DOC_Part",
       "count": 1,
       "displayType": "Token",
       "posCount": {
@@ -160,8 +160,8 @@ export let MockAnalysis =  {
     }
   ],
   "extendedChunkSummary": {
-    "Phillips_Joshua_EAR_Part": {
-      "text": "Phillips_Joshua_EAR_Part",
+    "TEST_DOC_Part": {
+      "text": "TEST_DOC_Part",
       "count": 1,
       "posCount": {
         "NP": 1
@@ -176,8 +176,8 @@ export let MockAnalysis =  {
     }
   },
   "extendedTokenSummary": {
-    "Phillips_Joshua_EAR_Part": {
-      "text": "Phillips_Joshua_EAR_Part",
+    "TEST_DOC_Part": {
+      "text": "TEST_DOC_Part",
       "count": 1,
       "posCount": {
         "NNP": 1
@@ -196,7 +196,7 @@ export let MockAnalysis =  {
       "sofa": 1,
       "begin": 0,
       "end": 37,
-      "text": "Phillips_Joshua_EAR_Part II_171011.md",
+      "text": "TEST_DOC_Part II_171011.md",
       "displayType": "Sentence",
       "displayId": "name-Sentence-0",
       "displayLevel": 2
@@ -206,7 +206,7 @@ export let MockAnalysis =  {
       "begin": 0,
       "end": 24,
       "chunkType": "NP",
-      "text": "Phillips_Joshua_EAR_Part",
+      "text": "TEST_DOC_Part",
       "displayType": "Noun Phrase (NP)",
       "displayId": "name-Chunk-0",
       "displayLevel": 3
@@ -216,7 +216,7 @@ export let MockAnalysis =  {
       "begin": 0,
       "end": 24,
       "pos": "NNP",
-      "text": "Phillips_Joshua_EAR_Part",
+      "text": "TEST_DOC_Part",
       "displayType": "Proper Noun (NNP)",
       "displayId": "name-Token-0",
       "displayLevel": 4
@@ -244,7 +244,7 @@ export let MockAnalysis =  {
   ],
   "extendedTokenSummaryList": [
     {
-      "text": "Phillips_Joshua_EAR_Part",
+      "text": "TEST_DOC_Part",
       "count": 1,
       "posCount": {
         "NNP": 1
@@ -260,7 +260,7 @@ export let MockAnalysis =  {
   ],
   "extendedChunkSummaryList": [
     {
-      "text": "Phillips_Joshua_EAR_Part",
+      "text": "TEST_DOC_Part",
       "count": 1,
       "posCount": {
         "NP": 1
