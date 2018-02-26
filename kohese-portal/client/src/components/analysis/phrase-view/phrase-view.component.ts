@@ -30,11 +30,11 @@ export class PhraseViewComponent extends AnalysisViewComponent
   private phrases: Array<any> = [];
   /* Data */
   @Input()
-  private itemProxy: ItemProxy;
+  public itemProxy: ItemProxy;
 
   /* Observables */
   @Input()
-  private filterSubject: BehaviorSubject<string>;
+  public filterSubject: BehaviorSubject<string>;
 
   /* Subscriptions */
   private filterSubjectSubscription: Subscription;

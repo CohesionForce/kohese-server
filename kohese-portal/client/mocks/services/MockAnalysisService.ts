@@ -1,3 +1,5 @@
+import { MockAnalysis} from '../data/MockAnalysis';
+
 export class MockAnalysisService {
     /* Static Definitions */
     posFilterCriteria = {
@@ -15,8 +17,8 @@ export class MockAnalysisService {
 
   }
 
-  fetchAnalysis () {
-    
+  fetchAnalysis (proxy) {
+    proxy.analysis = MockAnalysis;
   }
 
   filterPOS () {

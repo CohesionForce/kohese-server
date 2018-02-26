@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../../material.module';
-import { TermViewComponent } from './term-view.component';
+import { PhraseViewComponent } from './phrase-view.component';
 import { BehaviorSubject } from 'rxjs';
 import * as ItemProxy from '../../../../../common/models/item-proxy';
 import { MockItem } from '../../../../mocks/data/MockItem';
@@ -18,13 +18,13 @@ import { MockDataProcessingService } from '../../../../mocks/services/MockDataPr
 import { PipesModule } from '../../../pipes/pipes.module';
 import { MockAnalysis } from '../../../../mocks/data/MockAnalysis';
 
-describe('Component: Term View', ()=>{
-  let termComponent: TermViewComponent;
-  let termFixture : ComponentFixture<TermViewComponent>;
+describe('Component: Phrase View', ()=>{
+  let phraseComponent: PhraseViewComponent;
+  let phraseFixture : ComponentFixture<PhraseViewComponent>;
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
-      declarations: [TermViewComponent],
+      declarations: [PhraseViewComponent],
       imports : [CommonModule,
          MaterialModule,
          BrowserAnimationsModule,
@@ -40,18 +40,18 @@ describe('Component: Term View', ()=>{
       ]
     }).compileComponents();
 
-    termFixture = TestBed.createComponent(TermViewComponent);
-    termComponent = termFixture.componentInstance;
+    phraseFixture = TestBed.createComponent(PhraseViewComponent);
+    phraseComponent = phraseFixture.componentInstance;
 
-    termComponent.itemProxy = new ItemProxy('Item', MockItem);
-    termComponent.itemProxy.analysis = MockAnalysis
-    termComponent.filterSubject = new BehaviorSubject('');
+    phraseComponent.itemProxy = new ItemProxy('Item', MockItem);
+    phraseComponent.itemProxy.analysis = MockAnalysis
+    phraseComponent.filterSubject = new BehaviorSubject('');
 
-    termFixture.detectChanges();
+    phraseFixture.detectChanges();
     
   })
 
-  it('instantiates the term component', ()=>{
-    expect(termComponent).toBeTruthy(); 
+  it('instantiates the phrase component', ()=>{
+    expect(phraseComponent).toBeTruthy(); 
   })
 })
