@@ -30,11 +30,11 @@ export class SentenceViewComponent extends AnalysisViewComponent
   
   /* Data */
   @Input()
-  private itemProxy: ItemProxy;
+  public itemProxy: ItemProxy;
 
   /* Observables */
   @Input()
-  private filterSubject: BehaviorSubject<string>;
+  public filterSubject: BehaviorSubject<string>;
 
   /* Subscriptions */
   private filterSubjectSubscription: Subscription;

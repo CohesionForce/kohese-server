@@ -48,4 +48,16 @@ export class MockItemRepository {
   getShortFormItemList () {
     
   }
+
+  getRepositories () {
+    
+  }
+
+  deleteItem () {
+
+  }
+
+  upsertItem() {
+    
+  }
 }

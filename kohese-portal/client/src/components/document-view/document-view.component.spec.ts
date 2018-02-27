@@ -6,7 +6,6 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../material.module'
 
 import { DocumentViewComponent } from './document-view.component';
-import { SessionService } from '../../services/user/session.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';

@@ -10,4 +10,8 @@ export class MockSessionService {
   getSessionUser() {
     return new BehaviorSubject<ItemProxy>(new ItemProxy('KoheseUser', MockUserData));
   }
+
+  getSessions() {
+    return {123: {}}
+  }
 }
