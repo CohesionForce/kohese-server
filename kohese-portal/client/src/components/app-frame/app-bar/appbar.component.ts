@@ -5,6 +5,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { CurrentUserService } from '../../../services/user/current-user.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
+import { SocketService } from '../../../services/socket/socket.service';
 import * as ItemProxy from '../../../../../common/models/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -18,14 +19,17 @@ export class AppBarComponent extends NavigatableComponent
   private userName : string;
   private repositoryStatus: any;
   public authenticated : boolean = false;
-  
   private userSubscription: Subscription;
   private repositoryStatusSubscription: Subscription;
+  get socketService() {
+    return this._socketService;
+  }
 
   constructor(private sessionService: SessionService,
     protected NavigationService: NavigationService,
     private CurrentUserService: CurrentUserService,
-    private itemRepository: ItemRepository) {
+    private itemRepository: ItemRepository,
+    private _socketService: SocketService) {
     super(NavigationService);
   }
 
@@ -46,7 +50,7 @@ export class AppBarComponent extends NavigatableComponent
       if (userInfo) {
         this.authenticated = true;
       }
-    })
+    });
   }
   
   ngOnDestroy(): void {

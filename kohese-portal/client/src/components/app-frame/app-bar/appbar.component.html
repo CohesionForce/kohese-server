@@ -12,8 +12,12 @@
            - Syncing
         </i>
         <i class="fa fa-exclamation-triangle"
-          *ngIf="!repositoryStatus.syncing && !repositoryStatus.connected">
+          *ngIf="socketService.connected && !repositoryStatus.syncing && !repositoryStatus.connected">
            - Failed Synchronization
+        </i>
+        <i class="fa fa-exclamation-triangle"
+          *ngIf="!socketService.connected">
+           - Disconnected
         </i>
       </a>
       <a class="navbar-brand" (click)="navigate('Dashboard', {})">Dashboard</a>
