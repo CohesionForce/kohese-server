@@ -9,7 +9,6 @@ export class RowComponent extends NavigatableComponent {
   public itemProxy: ItemProxy;
   public visible: boolean = true;
   public selected: boolean = false;
-  public collapsed: boolean = true;
 
   constructor (protected NavigationService : NavigationService) {
     super (NavigationService);
@@ -29,9 +28,5 @@ export class RowComponent extends NavigatableComponent {
   
   setSelected(select: boolean): void {
     this.selected = select;
-  }
-  
-  expand(expand: boolean): void {
-    this.collapsed = !expand;
   }
 }

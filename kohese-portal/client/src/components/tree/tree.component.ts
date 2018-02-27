@@ -17,7 +17,7 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 let treeRoot: ItemProxy;
 let isRootDefault: boolean = true;
-let rows: Array<TreeRowComponent> = [];
+let treeMap: any = {};
 let expandUponInstantiation: boolean = false;
 let versionControlEnabled: boolean = false;
 let selectedProxyId: string = '';
@@ -65,6 +65,12 @@ export class TreeComponent extends NavigatableComponent
         treeRoot = this.ItemRepository.getRootProxy();
         this.absoluteRoot = treeRoot;
         this.koheseTypes = this.typeService.getKoheseTypes();
+        
+        treeRoot.visitChildren(undefined, (proxy: ItemProxy) => {
+          treeMap[proxy.item.id] = {
+            expanded: false
+          };
+        });
       }
     });
     
@@ -87,25 +93,28 @@ export class TreeComponent extends NavigatableComponent
 
   filter(): void {
     let show: boolean = true;
-    for (let j: number = 0; j < rows.length; j++) {
-      if (this.proxyFilter.filterString) {
-        let proxy: ItemProxy = rows[j].getProxy();
-        rows[j].matchesFilter = this.doesProxyMatchFilter(proxy);
-        show = rows[j].matchesFilter;
-        if (!show) {
-          for (let j: number = 0; j < proxy.children.length; j++) {
-            if (this.doesProxyMatchFilter(proxy.children[j])) {
-              show = true;
-              break;
+    for (let id in treeMap) {
+      let row: TreeRowComponent = treeMap[id].row;
+      if (row) {
+        if (this.proxyFilter.filterString) {
+          let proxy: ItemProxy = row.getProxy();
+          row.matchesFilter = this.doesProxyMatchFilter(proxy);
+          show = row.matchesFilter;
+          if (!show) {
+            for (let j: number = 0; j < proxy.children.length; j++) {
+              if (this.doesProxyMatchFilter(proxy.children[j])) {
+                show = true;
+                break;
+              }
             }
           }
+        } else {
+          row.matchesFilter = false;
+          this.proxyFilter.textRegexHighlight = null;
         }
-      } else {
-        rows[j].matchesFilter = false;
-        this.proxyFilter.textRegexHighlight = null;
-      }
       
-      rows[j].setVisible(show);
+        row.setVisible(show);
+      }
     }
   }
   
@@ -166,8 +175,8 @@ export class TreeComponent extends NavigatableComponent
 
   getItemMatchedCount () {
     let numberOfVisibleRows: number = 0;
-    for (let j: number = 0; j < rows.length; j++) {
-      if (rows[j].isVisible()) {
+    for (let id in treeMap) {
+      if (treeMap[id].row) {
         numberOfVisibleRows++;
       }
     }
@@ -193,14 +202,14 @@ export class TreeComponent extends NavigatableComponent
 
   /******** List expansion functions */
   expandAll(): void {
-    for (let j: number = 0; j < rows.length; j++) {
-      rows[j].expand(true);
+    for (let id in treeMap) {
+      treeMap[id].expanded = true;
     }
   }
 
   collapseAll(): void {
-    for (let j: number = 0; j < rows.length; j++) {
-      rows[j].expand(false);
+    for (let id in treeMap) {
+      treeMap[id].expanded = false;
     }
   }
 
@@ -276,7 +285,8 @@ export class TreeRowComponent extends RowComponent
   }
 
   ngOnInit(): void {
-    rows.push(this);
+    let treeMapEntry: any = treeMap[this.itemProxy.item.id];
+    treeMapEntry.row = this;
     this.koheseType = this.typeService.getKoheseTypes()[this.itemProxy.kind];
     if (!this.koheseType) {
       this.koheseType = {
@@ -287,7 +297,7 @@ export class TreeRowComponent extends RowComponent
   }
 
   ngOnDestroy(): void {
-    rows.splice(rows.indexOf(this), 1);
+    delete treeMap[this.itemProxy.item.id].row;
   }
 
   removeItem(): void {
@@ -322,5 +332,9 @@ export class TreeRowComponent extends RowComponent
   
   getSelectedProxyId(): string {
     return selectedProxyId;
+  }
+  
+  public getTreeMapEntry(): any {
+    return treeMap[this.itemProxy.item.id];
   }
 }

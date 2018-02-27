@@ -6,9 +6,10 @@
       (click)="navigate('Explore', {id: itemProxy.item.id})"
       [ngClass]="{ 'kti-selected-item': (itemProxy.item.id === getSelectedProxyId()),
       'highlight-row': (visible && matchesFilter) }">
-      <i (click)="collapsed = !collapsed;" class="kt-icon fa"
-        [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && !collapsed,
-        'fa-caret-right': (itemProxy.children.length > 0) && collapsed,
+      <i (click)="getTreeMapEntry().expanded = !getTreeMapEntry().expanded;"
+        class="kt-icon fa"
+        [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && getTreeMapEntry().expanded,
+        'fa-caret-right': (itemProxy.children.length > 0) && !getTreeMapEntry().expanded,
         'no-children': !(itemProxy.children.length > 0) }">
       </i>
       <ng-container *ngIf="koheseType.icon">
@@ -62,7 +63,7 @@
         </ng-container>
       </span>
     </div>
-    <ng-container *ngIf="!collapsed">
+    <ng-container *ngIf="getTreeMapEntry().expanded">
       <tree-row *ngFor="let childProxy of itemProxy.children"
         [itemProxy]="childProxy">
       </tree-row>
