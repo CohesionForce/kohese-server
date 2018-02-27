@@ -34,7 +34,7 @@
   <span class="pull-right">
     <ng-container
       *ngFor="let fieldName of (stateService.getTransitionCandidates(itemProxy) | mapKey)">
-      <button mat-raised-button
+      <button mat-raised-button class="state-button"
         *ngFor="let candidate of stateService.getTransitionCandidates(itemProxy)[fieldName]; let j = index"
         matTooltip="{{type.stateFlows[fieldName][candidate.target].description}}"
         [disabled]="disabled"
