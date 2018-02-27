@@ -52,4 +52,12 @@ export class MockItemRepository {
   getRepositories () {
     
   }
+
+  deleteItem () {
+
+  }
+
+  upsertItem() {
+    
+  }
 }
