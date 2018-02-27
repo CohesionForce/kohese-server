@@ -94,7 +94,18 @@ export class CreateWizardComponent extends NavigatableComponent
   }
 
   createItem() {
-    this.itemRepository.buildItem(this.selectedType.name, this.createFormGroup.value)
+    let item: any = this.createFormGroup.value;
+    /* Set the value of each field that has an unspecified value to that
+    field's default value */
+    let fields: object = this.itemRepository.getProxyFor(this.selectedType.
+      name).item.properties;
+    for (let fieldName in fields) {
+      if (null === item[fieldName]) {
+        item[fieldName] = fields[fieldName].default;
+      }
+    }
+    
+    this.itemRepository.buildItem(this.selectedType.name, item)
       .then(()=>{
         console.log('Build Item promise resolve')
         this.MatDialogRef.close();

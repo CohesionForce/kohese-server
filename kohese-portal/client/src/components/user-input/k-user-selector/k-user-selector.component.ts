@@ -9,7 +9,8 @@ import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'k-user-selector',
-  templateUrl: './k-user-selector.component.html'
+  templateUrl: './k-user-selector.component.html',
+  styleUrls: ['./k-user-selector.component.scss']
 })
 export class KUserSelectorComponent extends UserInput implements OnInit, OnDestroy {
   userProxies : Array<ItemProxy>;

@@ -3,7 +3,8 @@ import { UserInput } from '../user-input.class';
 
 @Component({
   selector: 'k-text',
-  templateUrl: './k-text.component.html'
+  templateUrl: './k-text.component.html',
+  styleUrls: ['./k-text.component.scss']
 })
 export class KTextComponent extends UserInput {
   @Input()
