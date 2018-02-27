@@ -109,13 +109,7 @@ describe('Component: Admin', ()=>{
       let upsertSpy = spyOn(TestBed.get(ItemRepository), 'upsertItem');
       adminComponent.updateUser();
       expect(upsertSpy).toHaveBeenCalled();
-      expect(adminComponent.selectedUserProxy).toContain({
-        item : {
-          password: '1',
-          description: 'test description',
-          email : 'test@test.com',
-          name: 'test user'
-      }})
+      expect(adminComponent.selectedUserProxy).not.toBeDefined()
 
     })
     it('should send a create command when a new user is saved',()=>{
