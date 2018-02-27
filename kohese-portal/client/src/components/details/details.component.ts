@@ -16,7 +16,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector : 'details-view',
-  templateUrl : './details.component.html'
+  templateUrl : './details.component.html',
+  styleUrls: ['./details.component.scss']
 })
 
 export class DetailsComponent extends NavigatableComponent

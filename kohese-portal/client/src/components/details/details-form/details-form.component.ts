@@ -10,12 +10,14 @@ import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { StateService } from '../../../services/state/state.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'details-form',
-  templateUrl : './details-form.component.html'
+  templateUrl : './details-form.component.html',
+  styleUrls: ['./details-form.component.scss']
 })
 
 export class DetailsFormComponent extends NavigatableComponent
@@ -32,10 +34,13 @@ export class DetailsFormComponent extends NavigatableComponent
   @Input() 
   createInfo : any;
   @Output()
-  formGroupUpdated = new EventEmitter<FormGroup>()
+  formGroupUpdated = new EventEmitter<FormGroup>();
 
   public properties: any = {};
   private initialized : boolean;
+  get stateService() {
+    return this._stateService;
+  }
 
   /* Utils */
   public formGroup : FormGroup;
@@ -46,7 +51,8 @@ export class DetailsFormComponent extends NavigatableComponent
   constructor(protected NavigationService : NavigationService,
               private FormBuilder : FormBuilder,
               private DynamicTypeService: DynamicTypesService,
-              private ItemRepository : ItemRepository) {
+              private ItemRepository : ItemRepository,
+              private _stateService: StateService) {
     super(NavigationService);
     this.initialized = false;
   }
@@ -196,5 +202,12 @@ export class DetailsFormComponent extends NavigatableComponent
       }
     }
     return propertyMap;
+  }
+  
+  public openTransitionDialog(fieldName: string, candidate: string): void {
+    //this.dialogService.openComponentDialog().afterClosed().subscribe(() => {
+      this.itemProxy.item[fieldName] = candidate;
+      this.ItemRepository.upsertItem(this.itemProxy);
+    //});
   }
 }
