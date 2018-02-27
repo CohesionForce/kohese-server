@@ -1,10 +1,10 @@
 import { BehaviorSubject} from 'rxjs/BehaviorSubject';
-import { MockItem } from '../data/MockItem';
+import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
 import * as ItemProxy from '../../../common/models/item-proxy';
 
 export class MockItemRepository {
-  mockRootProxy = new ItemProxy('Item', MockItem);
+  mockRootProxy = ItemProxy.getRootProxy();
 
   constructor() {
     this.mockRootProxy.children = [
@@ -46,6 +46,18 @@ export class MockItemRepository {
   }
 
   getShortFormItemList () {
+    
+  }
+
+  getRepositories () {
+    
+  }
+
+  deleteItem () {
+
+  }
+
+  upsertItem() {
     
   }
 }

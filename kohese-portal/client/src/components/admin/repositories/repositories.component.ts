@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { NavigatableComponent } from '../../classes/NavigationComponent.class';
+import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 
-import { NavigationService } from '../../services/navigation/navigation.service';
-import { VersionControlService } from '../../services/version-control/version-control.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { VersionControlService } from '../../../services/version-control/version-control.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { Observable } from 'rxjs/Observable';
 
 @Component({

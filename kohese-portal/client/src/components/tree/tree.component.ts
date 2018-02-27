@@ -25,7 +25,8 @@ let selectedProxyId: string = '';
 
 @Component({
   selector : 'tree-view',
-  templateUrl : './tree.component.html'
+  templateUrl : './tree.component.html',
+  styleUrls: ['./tree.component.scss']
 })
 export class TreeComponent extends NavigatableComponent
                               implements OnInit, OnDestroy {
@@ -86,12 +87,30 @@ export class TreeComponent extends NavigatableComponent
   }
 
   filter(): void {
+    let show: boolean = true;
     for (let j: number = 0; j < rows.length; j++) {
-      rows[j].setVisible(this.shouldRowBeVisible(rows[j].getProxy()));
+      if (this.proxyFilter.filterString) {
+        let proxy: ItemProxy = rows[j].getProxy();
+        rows[j].matchesFilter = this.doesProxyMatchFilter(proxy);
+        show = rows[j].matchesFilter;
+        if (!show) {
+          for (let j: number = 0; j < proxy.children.length; j++) {
+            if (this.doesProxyMatchFilter(proxy.children[j])) {
+              show = true;
+              break;
+            }
+          }
+        }
+      } else {
+        rows[j].matchesFilter = false;
+        this.proxyFilter.textRegexHighlight = null;
+      }
+      
+      rows[j].setVisible(show);
     }
   }
   
-  shouldRowBeVisible(proxy: ItemProxy): boolean {
+  doesProxyMatchFilter(proxy: ItemProxy): boolean {
     let matches: boolean = true;
     if (this.proxyFilter.status && (!proxy.status ||
       (proxy.status.length === 0))) {
@@ -112,40 +131,29 @@ export class TreeComponent extends NavigatableComponent
     
     if (matches) {
       matches = false;
-      let filterExpression: RegExp;
-      let filterIsRegex: Array<string> = this.proxyFilter.filterString.
-        match(new RegExp('^\/(.*)\/([gimy]*)$'));
-      if (filterIsRegex) {
-        filterExpression = new RegExp(filterIsRegex[1], filterIsRegex[2]);
-        this.proxyFilter.textRegexHighlight = new RegExp('(' + filterIsRegex[1]
-          + ')', 'g' + filterIsRegex[2]);
-      } else {
-        if(this.proxyFilter.filterString !== '') {
+      if (this.proxyFilter.filterString) {
+        let filterExpression: RegExp;
+        let filterIsRegex: Array<string> = this.proxyFilter.filterString.
+          match(new RegExp('^\/(.*)\/([gimy]*)$'));
+        if (filterIsRegex) {
+          filterExpression = new RegExp(filterIsRegex[1], filterIsRegex[2]);
+          this.proxyFilter.textRegexHighlight = new RegExp('(' + filterIsRegex[1]
+            + ')', 'g' + filterIsRegex[2]);
+        } else {
           let cleanedPhrase: string = this.proxyFilter.filterString.
             replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
           filterExpression = new RegExp(this.proxyFilter.filterString, 'i');
           this.proxyFilter.textRegexHighlight = new RegExp('(' + cleanedPhrase
             + ')', 'gi');
-        } else {
-          this.proxyFilter.textRegexHighlight = null;
         }
-      }
       
-      for (let key in proxy.item) {
-        if (key.charAt(0) !== '$' &&
-          (typeof proxy.item[key] === 'string') &&
-          proxy.item[key].match(filterExpression)) {
-          matches = true;
-          break;
-        }
-      }
-    }
-    
-    if (!matches) {
-      for (let j: number = 0; j < proxy.children.length; j++) {
-        if (this.shouldRowBeVisible(proxy.children[j])) {
-          matches = true;
-          break;
+        for (let key in proxy.item) {
+          if (key.charAt(0) !== '$' &&
+            (typeof proxy.item[key] === 'string') &&
+            proxy.item[key].match(filterExpression)) {
+            matches = true;
+            break;
+          }
         }
       }
     }
@@ -246,13 +254,22 @@ export class TreeComponent extends NavigatableComponent
 
 @Component({
   selector: 'tree-row',
-  templateUrl: './tree-row.component.html'
+  templateUrl: './tree-row.component.html',
+  styleUrls: ['./tree.component.scss']
 })
 export class TreeRowComponent extends RowComponent
   implements OnInit, OnDestroy {
   private _koheseType: any;
   get koheseType() {
     return this._koheseType;
+  }
+  
+  private _matchesFilter: boolean = false;
+  get matchesFilter() {
+    return this._matchesFilter;
+  }
+  set matchesFilter(matches: boolean) {
+    this._matchesFilter = matches;
   }
   
   get stateService() {

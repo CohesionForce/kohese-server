@@ -11,7 +11,6 @@ import { DetailsFormComponent } from './details-form.component';
 
 import * as ItemProxy from '../../../../../common/models/item-proxy'
 
-import { SessionService } from '../../../services/user/session.service';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
@@ -50,17 +49,26 @@ describe('Component: Details Form', ()=>{
   describe('item creation', ()=>{
     beforeEach(()=>{
       formComponent.createInfo = {
-        parent: new ItemProxy('Item', MockItem),
-        type : TestBed.get(DynamicTypesService).mockType
+        parent: 'test-uuid',
+        type : TestBed.get(DynamicTypesService).getMockKoheseType()
       }
+
+      formComponent.createInfo.type.dataModelProxy.item = {
+        base: 'PersistedModel'
+      } 
+
       formFixture.detectChanges();
-      
+    })
+
+    it('creates a stub proxy from the create information', ()=>{
+      expect(formComponent.itemProxy).toBeTruthy();
+      console.log(formComponent.itemProxy);
     })
   })
 
   describe('details view', ()=>{
     beforeEach(()=>{
-      formComponent.itemProxy = new ItemProxy('Item', MockItem)  
+      formComponent.itemProxy = new ItemProxy('Item', MockItem) 
       formComponent.itemProxy.model.item = {
         base: 'PersistedModel'
       }    

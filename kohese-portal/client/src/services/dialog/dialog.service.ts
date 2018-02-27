@@ -56,7 +56,8 @@ export class DialogService {
 }
 
 @Component({
-  templateUrl: 'dialog.component.html'
+  templateUrl: 'dialog.component.html',
+  styleUrls: ['./dialog.component.scss']
 })
 export class DialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) private data: any) {

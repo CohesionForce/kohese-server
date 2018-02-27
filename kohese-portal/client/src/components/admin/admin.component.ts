@@ -9,15 +9,15 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
   templateUrl: './admin.component.html'
 })
 export class AdminComponent implements OnInit {
-  private usernameInput: string;
-  private descriptionInput: string;
-  private emailInput: string;
-  private passwordInput: string;
-  private confirmPasswordInput: string;
-  private addUserForm: boolean = false;
-  private editUserForm: boolean = false;
-  private currentForm: string;
-  private selectedUserProxy: ItemProxy;
+  usernameInput: string;
+  descriptionInput: string;
+  emailInput: string;
+  passwordInput: string;
+  confirmPasswordInput: string;
+  addUserForm: boolean = false;
+  editUserForm: boolean = false;
+  currentForm: string;
+  selectedUserProxy: ItemProxy;
 
   constructor(private sessionService: SessionService, private itemRepository: ItemRepository) {
   }
@@ -25,6 +25,8 @@ export class AdminComponent implements OnInit {
   ngOnInit() {
   }
 
+  // TODO - Update to use forms module instead of this insanity 
+  
   addUser() {
     this.usernameInput = '';
     this.descriptionInput = '';

@@ -8,7 +8,6 @@ import { MaterialModule } from '../../material.module'
 
 import { ExploreComponent } from './explore.component';
 
-import { SessionService } from '../../services/user/session.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { ActivatedRoute } from '@angular/router';
