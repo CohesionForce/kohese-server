@@ -91,11 +91,13 @@ describe('Component: Details Form', ()=>{
 
       beforeEach(()=>{
         formComponent.disabled = false;
+        formFixture.detectChanges();
       })
     })
     
 
     it('instantiates the Details Form component', ()=>{
+      formFixture.detectChanges();
       expect(formComponent).toBeTruthy(); 
     })
   })
