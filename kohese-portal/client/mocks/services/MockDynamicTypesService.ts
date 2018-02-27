@@ -12,7 +12,7 @@ export class MockDynamicTypesService {
   }
   getKoheseTypes () {
     return {
-      'Item' : MockKoheseType
+      'Item' : MockKoheseType()
     };
   }
 
@@ -29,7 +29,7 @@ export class MockDynamicTypesService {
   }
 
   getMockKoheseType () {
-    return MockKoheseType
+    return MockKoheseType()
   }
   
   getIcons() {

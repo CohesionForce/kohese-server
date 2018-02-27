@@ -8,7 +8,6 @@ import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 
 import { DetailsComponent } from './details.component';
-import { JournalComponent } from './journal/journal.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
@@ -21,6 +20,7 @@ import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ActivatedRoute } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Component: Details', ()=>{
   let detailsComponent: DetailsComponent;
@@ -28,8 +28,7 @@ describe('Component: Details', ()=>{
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
-      declarations: [DetailsComponent,
-                     JournalComponent],
+      declarations: [DetailsComponent],
       imports : [CommonModule,
          FormsModule, 
          MaterialModule,
@@ -38,7 +37,7 @@ describe('Component: Details', ()=>{
          RouterTestingModule, 
          BrowserAnimationsModule
          ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {provide: SessionService, useClass: MockSessionService},
         {provide: ItemRepository, useClass: MockItemRepository},
