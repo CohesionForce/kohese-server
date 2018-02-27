@@ -75,7 +75,9 @@
         <details-form #editor 
           [createInfo]="{type: selectedType, parent: selectedParent.item.id}" 
           [disabled]="false"
-          (formGroupUpdated)="onFormGroupUpdated($event)"></details-form> 
+          (formGroupUpdated)="onFormGroupUpdated($event)"
+          (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
+        </details-form> 
     <div>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>

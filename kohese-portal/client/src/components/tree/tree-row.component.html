@@ -38,27 +38,6 @@
           <button mat-icon-button (click)="removeItem()">
             <mat-icon class="glyphicon glyphicon-remove delete-button"></mat-icon>
           </button>
-          <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon class="fa fa-bars"></mat-icon>
-          </button>
-          <mat-menu #menu="matMenu" [overlapTrigger]="false">
-            <ng-container
-              *ngIf="((stateService.getTransitionCandidates(itemProxy) | mapKey).length > 0)">
-              <button mat-menu-item [matMenuTriggerFor]="transitionMenu">
-                Transition To...
-              </button>
-            </ng-container>
-          </mat-menu>
-          <mat-menu #transitionMenu="matMenu">
-            <ng-container
-              *ngFor="let fieldName of (stateService.getTransitionCandidates(itemProxy) | mapKey)">
-              <button mat-menu-item
-                *ngFor="let candidate of stateService.getTransitionCandidates(itemProxy)[fieldName]; let j = index"
-                (click)="openTransitionDialog(fieldName, candidate.target)">
-                {{koheseType.stateFlows[fieldName][candidate.target].name}}
-              </button>
-            </ng-container>
-          </mat-menu>
         </ng-container>
         <!-- Version Control row actions -->
         <ng-container

@@ -35,12 +35,23 @@ export class DetailsFormComponent extends NavigatableComponent
   createInfo : any;
   @Output()
   formGroupUpdated = new EventEmitter<FormGroup>();
+  private _transitionCandidates: Array<any>;
+  get transitionCandidates() {
+    return this._transitionCandidates;
+  }
+  private _transitionCandidateFieldNames: Array<string>;
+  get transitionCandidateFieldNames() {
+    return this._transitionCandidateFieldNames;
+  }
 
   public properties: any = {};
   private initialized : boolean;
   get stateService() {
     return this._stateService;
   }
+  
+  @Output()
+  private nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
 
   /* Utils */
   public formGroup : FormGroup;
@@ -79,7 +90,7 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       }
     });
-
+    
     this.initialized = true;
   }
 
@@ -134,6 +145,9 @@ export class DetailsFormComponent extends NavigatableComponent
         model : this.createInfo.type.dataModelProxy
       }
       this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
+      for (let fieldName in this.type.stateFlows) {
+        this.itemProxy.item[fieldName] = this.type.properties[fieldName].default;
+      }
       this.updateProperties();
       this.formGroup = this.createFormGroup();
       this.formGroupUpdated.emit(this.formGroup);
@@ -172,6 +186,12 @@ export class DetailsFormComponent extends NavigatableComponent
         inheritedModel = inheritedProxy.item.base;
       }
     }
+    
+    this._transitionCandidates = this._stateService.
+      getTransitionCandidates(this.itemProxy);
+    this._transitionCandidateFieldNames = Object.keys(this.
+      _transitionCandidates);
+      
     console.log(':: Update Properties Complete');
     console.log(this.properties);
   }
@@ -206,8 +226,16 @@ export class DetailsFormComponent extends NavigatableComponent
   
   public openTransitionDialog(fieldName: string, candidate: string): void {
     //this.dialogService.openComponentDialog().afterClosed().subscribe(() => {
+      this.nonFormFieldChanged.emit({
+        fieldName: fieldName,
+        fieldValue: candidate
+      });
+
       this.itemProxy.item[fieldName] = candidate;
-      this.ItemRepository.upsertItem(this.itemProxy);
+      this._transitionCandidates = this._stateService.
+        getTransitionCandidates(this.itemProxy);
+      this._transitionCandidateFieldNames = Object.keys(this.
+        _transitionCandidates);
     //});
   }
 }

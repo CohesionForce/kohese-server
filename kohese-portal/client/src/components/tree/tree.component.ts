@@ -334,11 +334,4 @@ export class TreeRowComponent extends RowComponent
   getSelectedProxyId(): string {
     return selectedProxyId;
   }
-  
-  public openTransitionDialog(fieldName: string, candidate: string): void {
-    //this.dialogService.openComponentDialog().afterClosed().subscribe(() => {
-      this.itemProxy.item[fieldName] = candidate;
-      this.itemRepository.upsertItem(this.itemProxy);
-    //});
-  }
 }

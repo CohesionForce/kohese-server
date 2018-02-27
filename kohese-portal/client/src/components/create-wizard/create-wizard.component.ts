@@ -35,6 +35,7 @@ export class CreateWizardComponent extends NavigatableComponent
   proxySearchControl : FormControl;
 
   createFormGroup : FormGroup;
+  private nonFormFieldValueMap: any = {};
 
 
   /* Subscriptions */
@@ -95,6 +96,10 @@ export class CreateWizardComponent extends NavigatableComponent
 
   createItem() {
     let item: any = this.createFormGroup.value;
+    for (let fieldName in this.nonFormFieldValueMap) {
+      item[fieldName] = this.nonFormFieldValueMap[fieldName];
+    }
+    
     /* Set the value of each field that has an unspecified value to that
     field's default value */
     let fields: object = this.itemRepository.getProxyFor(this.selectedType.
@@ -120,6 +125,10 @@ export class CreateWizardComponent extends NavigatableComponent
 
   ngOnDestroy(): void {
     this.repoStatusSubscription.unsubscribe();
+  }
+  
+  public whenNonFormFieldChanges(updatedField: any): void {
+    this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
   }
 }
 

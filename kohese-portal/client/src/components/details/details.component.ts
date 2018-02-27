@@ -57,6 +57,7 @@ export class DetailsComponent extends NavigatableComponent
   proxyList : Array<any>;
   itemDescriptionRendered : string;
   detailsFormGroup : FormGroup;
+  private nonFormFieldValueMap: any = {};
 
   constructor (protected NavigationService : NavigationService,
                private route : ActivatedRoute,
@@ -167,6 +168,9 @@ export class DetailsComponent extends NavigatableComponent
     for (let field in item) {
       this.itemProxy.item[field] = item[field];
     }
+    for (let fieldName in this.nonFormFieldValueMap) {
+      this.itemProxy.item[fieldName] = this.nonFormFieldValueMap[fieldName];
+    }
     this.ItemRepository.upsertItem(this.itemProxy)
       .then((updatedItemProxy: ItemProxy) => {
       this.enableEdit = false;
@@ -193,4 +197,7 @@ export class DetailsComponent extends NavigatableComponent
       });
   };
 
+  public whenNonFormFieldChanges(updatedField: any): void {
+    this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
+  }
 }
