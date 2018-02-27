@@ -7,7 +7,6 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../material.module'
 
 import { LoginComponent } from './login.component';
-import { SessionService } from '../../services/user/session.service';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { MockAuthenticationService } from '../../../mocks/services/MockAuthenticationService';

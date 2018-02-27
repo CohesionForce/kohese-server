@@ -29,11 +29,11 @@ export class TermViewComponent extends AnalysisViewComponent
    private terms: Array<any>;
    /* Data */
    @Input()
-   private itemProxy: ItemProxy;
+   public itemProxy: ItemProxy;
 
    /* Observables */
    @Input()
-   private filterSubject: BehaviorSubject<string>;
+   public filterSubject: BehaviorSubject<string>;
 
    /* Subscriptions */
    private filterSubjectSubscription: Subscription;
@@ -51,7 +51,6 @@ export class TermViewComponent extends AnalysisViewComponent
     });
 
     this.processTerms();
-    console.log(this);
   }
 
   ngOnDestroy(): void {

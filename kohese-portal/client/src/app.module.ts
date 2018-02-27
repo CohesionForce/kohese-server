@@ -18,12 +18,12 @@ import { ServicesModule } from './services/services.module';
 import { AuthenticationModule } from './services/authentication/authentication.module';
 import { LoginModule } from './components/login/login.module';
 import { UserModule } from './services/user/user.module';
+import { AdminModule } from './components/admin/admin.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RepositoriesComponent } from './components/admin/repositories.component';
 import { TreeComponent, TreeRowComponent } from './components/tree/tree.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
@@ -39,8 +39,6 @@ import { MaterialModule } from './material.module';
   declarations: [
     AppComponent,
     DashboardComponent,
-    AdminComponent,
-    RepositoriesComponent,
     TreeComponent,
     ExploreComponent,
     TreeRowComponent,
@@ -67,7 +65,8 @@ import { MaterialModule } from './material.module';
     AuthenticationModule,
     LoginModule,
     UserModule,
-    ServicesModule
+    ServicesModule,
+    AdminModule
   ],
   bootstrap: [AppComponent]
 })
