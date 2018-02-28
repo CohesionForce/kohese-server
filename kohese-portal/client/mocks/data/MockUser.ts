@@ -1,4 +1,5 @@
-export let MockUserData = {
+export function MockUserData () {
+  return {
   "password": "$2a$10$6mt3XNXCjwYE8Mot9osp5eiHQjhbz9KY/4WYqrGm2OjapGmjosZRy",
   "email": "test@test.net",
   "id": "04b39d10-b9a2-11e7-b085-f7379f8cd936",
@@ -10,4 +11,5 @@ export let MockUserData = {
   "modifiedBy": "admin",
   "modifiedOn": 1508966827019,
   "itemIds": []
+  }
 }

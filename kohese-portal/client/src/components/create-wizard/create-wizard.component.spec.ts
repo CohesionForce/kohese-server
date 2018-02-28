@@ -157,7 +157,5 @@ describe('Component: Create Wizard', ()=>{
   })
 
   afterEach(()=>{
-    createWizardComponent = null;
-    createWizardFixture = null;
   })
 })
