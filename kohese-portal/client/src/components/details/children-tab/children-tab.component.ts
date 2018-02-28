@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, EventEmitter, SimpleChange, OnChanges } from '@angular/core';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -15,7 +15,7 @@ import { CreateWizardComponent } from '../../create-wizard/create-wizard.compone
   templateUrl : './children-tab.component.html'
 })
 export class ChildrenTabComponent extends NavigatableComponent
-                                  implements OnInit, OnDestroy{
+                                  implements OnInit, OnDestroy, OnChanges{
 
   /* Ui Switches */
   orderedChildren : boolean;
@@ -25,8 +25,11 @@ export class ChildrenTabComponent extends NavigatableComponent
   /* Data */
   @Input()
   itemProxy : ItemProxy;
+  @Input() 
+  children : ItemProxy;
+  
   filterString : string;
-
+  initialized : boolean = false;
   itemSortField : string;
 
   /* Observables */
@@ -54,13 +57,18 @@ export class ChildrenTabComponent extends NavigatableComponent
       })
     this.saveEmitter = new EventEmitter();
     this.filterSubject = new BehaviorSubject('');
-  }
-
-  consolelog(any) {
-    console.log(any);
+    this.initialized = true;
   }
 
   ngOnDestroy () {
+    this.repoReadySub.unsubscribe();
+  }
+
+  ngOnChanges (changes) {
+    console.log(changes)
+    if(this.initialized) {
+      this.itemProxy = (changes.itemProxy) ? changes.itemProxy.currentValue : changes.currentValue;
+    }
   }
 
   onFilterUpdate (filter : string) {

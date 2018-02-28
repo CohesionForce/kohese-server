@@ -78,7 +78,7 @@
               <ng-template mat-tab-label>
                   Children ({{itemProxy.children.length}})
               </ng-template>
-              <children-tab [itemProxy]="itemProxy"></children-tab>
+              <children-tab [itemProxy]="itemProxy" [children]="itemProxy.children"></children-tab>
             </mat-tab>
             <mat-tab label="Relations">
                 <h4>Relations Tab</h4>

@@ -17,7 +17,7 @@ import { MatTableDataSource } from '@angular/material'
 export class ChildrenTableComponent extends NavigatableComponent
                                     implements OnInit, OnDestroy, OnChanges {
   @Input()
-  itemProxy : ItemProxy;
+  children : Array<ItemProxy>;
   @Input()
   filterSubject : BehaviorSubject<string>;
 
@@ -38,9 +38,9 @@ export class ChildrenTableComponent extends NavigatableComponent
   }
 
   ngOnInit () {
-    this.childrenStream = new MatTableDataSource<ItemProxy>(this.itemProxy.children)
+    this.childrenStream = new MatTableDataSource<ItemProxy>(this.children)
     this.initialized = true;
-    this.rowDef = ['name','assignedTo','actionState','description', 'childrenCount']
+    this.rowDef = ['kind','name','assignedTo','actionState','description', 'childrenCount']
     this.filterSub = this.filterSubject.subscribe((newFilter) => {
       this.childrenStream.filter = newFilter.trim().toLowerCase();
       console.log(this.childrenStream);
@@ -51,14 +51,11 @@ export class ChildrenTableComponent extends NavigatableComponent
     this.filterSub.unsubscribe();
   }
 
-  consolelog(string) {
-    console.log(string);
-  }
-
   ngOnChanges (changes) {
+    console.log(changes);
     if(this.initialized) {
-      this.itemProxy = (changes.itemProxy) ? changes.itemProxy.currentValue : changes.currentValue;
-      this.childrenStream.data = this.itemProxy.children
+      this.children = (changes.children) ? changes.children.currentValue : changes.currentValue;
+      this.childrenStream.data = this.children
     }
   }
 }

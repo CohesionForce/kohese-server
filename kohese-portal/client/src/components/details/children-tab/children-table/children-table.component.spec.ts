@@ -34,7 +34,7 @@ describe('Component: Children Table', ()=>{
     childrenTableFixture = TestBed.createComponent(ChildrenTableComponent);
     childrenTableComponent = childrenTableFixture.componentInstance;
 
-    childrenTableComponent.itemProxy = new MockItemRepository().getRootProxy();
+    childrenTableComponent.children = new MockItemRepository().getRootProxy().children;
     childrenTableComponent.filterSubject = new BehaviorSubject<string>('');
 
     childrenTableFixture.detectChanges();
