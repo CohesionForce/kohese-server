@@ -86,8 +86,6 @@ export class DetailsComponent extends NavigatableComponent
             this.proxyUpdates = ItemProxy.getChangeSubject().subscribe((change)=>{
               if(change.id === this.itemProxy.item.id) {
                 this.proxyStream.next(change.proxy);
-              } else if (change.proxy.item.parentId === this.itemProxy.item.id) {
-                this.proxyStream.next(change.proxy.parentProxy);
               }
             })
           }

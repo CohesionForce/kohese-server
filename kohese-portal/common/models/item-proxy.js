@@ -834,6 +834,17 @@ class ItemProxy {
     if (this === tree.lostAndFound && tree.lostAndFound.children.length === 1) {
       tree.root.addChild(tree.lostAndFound);
     }
+
+    if(!tree.loading){
+      tree.changeSubject.next({
+        type: 'reference-added',
+        relation: 'children',
+        kind: this.kind,
+        id: this.item.id,
+        proxy: this
+      });
+    }
+
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -868,6 +879,16 @@ class ItemProxy {
     }
 
     this.calculateTreeHash();
+
+    if(!tree.loading){
+      tree.changeSubject.next({
+        type: 'reference-removed',
+        relation: 'children',
+        kind: this.kind,
+        id: this.item.id,
+        proxy: this
+      });
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
