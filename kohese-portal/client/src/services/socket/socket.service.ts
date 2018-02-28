@@ -5,16 +5,9 @@ import * as SocketIoClient from 'socket.io-client';
 @Injectable()
 export class SocketService {
   public socket: SocketIOClient.Socket;
-  private _connected: boolean = false;
 
   constructor() {
     this.socket = SocketIoClient();
-    this.socket.on('connect', () => {
-      this._connected = true;
-    });
-    this.socket.on('connect_error', () => {
-      this._connected = false;
-    });
   }
 
   connect(): void {
@@ -27,9 +20,5 @@ export class SocketService {
 
   getSocket(): SocketIOClient.Socket {
     return this.socket;
-  }
-  
-  get connected() {
-    return this._connected;
   }
 }

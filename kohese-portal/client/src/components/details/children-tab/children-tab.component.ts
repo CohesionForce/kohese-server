@@ -5,7 +5,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, State } from '../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
@@ -48,7 +48,7 @@ export class ChildrenTabComponent extends NavigatableComponent
     this.orderedChildren = this.itemProxy.childrenAreManuallyOrdered();
     this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
-        if (update.connected) {
+        if (State.SYNCHRONIZATION_SUCCEEDED === update.state) {
           this.childView = 'table';
         }
       })

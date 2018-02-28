@@ -8,7 +8,7 @@ import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../common/models/item-proxy.js';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemRepository, State } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ImportService } from '../../services/import/import.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
@@ -53,7 +53,7 @@ export class CreateWizardComponent extends NavigatableComponent
   ngOnInit(): void {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update) => {
-      if (update.connected) {
+      if (State.SYNCHRONIZATION_SUCCEEDED === update.state) {
         this.rootProxy = this.itemRepository.getRootProxy();
         let types = this.DynamicTypesService.getKoheseTypes();
         for (let type in types) {

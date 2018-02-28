@@ -13,6 +13,13 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 
+export enum State {
+  DISCONNECTED,
+  SYNCHRONIZING,
+  SYNCHRONIZATION_FAILED,
+  SYNCHRONIZATION_SUCCEEDED
+};
+  
 /**
  *
  */
@@ -75,8 +82,7 @@ export class ItemRepository {
     };
 
     this.repositoryStatus = new BehaviorSubject({
-      connected : false,
-      syncing: false,
+      state: State.DISCONNECTED,
       message : 'Initializing Item Repository'
     });
 
@@ -191,8 +197,7 @@ export class ItemRepository {
       this.socketService.socket.on('connect_error', () => {
         console.log('::: IR: Socket IO Connection Error');
         this.repositoryStatus.next({
-          connected : false,
-          syncing: false,
+          state: State.DISCONNECTED,
           message : 'Error connecting to repository'
         })
       });
@@ -267,8 +272,7 @@ export class ItemRepository {
     var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
 
     this.repositoryStatus.next({
-      connected : false,
-      syncing: true,
+      state: State.SYNCHRONIZING,
       message: 'Starting Repository Sync'
     });
     this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, (response) => {
@@ -325,8 +329,7 @@ export class ItemRepository {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
           this.repositoryStatus.next({
-            connected : false,
-            syncing: false,
+            state: State.SYNCHRONIZATION_FAILED,
             message : 'Repository sync failed'
           })
         }
@@ -334,8 +337,7 @@ export class ItemRepository {
 
       if(syncSucceeded){
         this.repositoryStatus.next({
-          connected : true,
-          syncing: false,
+          state: State.SYNCHRONIZATION_SUCCEEDED,
           message : 'Item Repository Ready'
         })
       }
