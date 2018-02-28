@@ -4,9 +4,85 @@
   "idInjection": true,
   "properties": {
     "decisionState": {
-      "type": "string",
+      "type": "StateMachine",
       "required": true,
-      "default": "Proposed"
+      "default": "Proposed",
+      "properties": {
+        "state":{
+          "Proposed": {
+            "name": "Proposed",
+            "description": "A decision that has been proposed."
+           },
+          "InAnalysis": {
+            "name": "In Analysis",
+            "description": "A decision that is In Analysis."
+           },
+          "InReview": {
+            "name": "In Review",
+            "description": "A decision that is In Review."
+           },
+          "Approved": {
+            "name": "Approved",
+            "description": "A decision that is Approved."
+           },
+          "Published": {
+            "name": "Published",
+            "description": "A decision that is Published."
+           },
+          "Deferred": {
+            "name": "Deferred",
+            "description": "A decision that is Deferred."
+           },
+          "Disapproved": {
+            "name": "Disapproved",
+            "description": "A decision that is Disapproved."
+           },
+          "InAppeal": {
+            "name": "In Appeal",
+            "description": "A decision that is In Appeal."
+           }
+        },
+        "transition": {
+          "assignAnalysis": {
+            "source": "Proposed",
+            "target": "InAnalysis",
+            "guard": {},
+            "requires": [ "assignment:Analyzer" ]
+          },
+          "reviewForApproval": {
+            "source": "InAnalysis",
+            "target": "InReview",
+            "guard": {}
+          },
+          "approve": {
+            "source": "InReview",
+            "target": "Approved",
+            "guard": {},
+            "requires": ""
+          },
+          "defer": {
+            "source": "InReview",
+            "target": "Deferred",
+            "guard": {},
+            "requires": []
+          },
+          "disapprove": {
+            "source": "InReview",
+            "target": "Disapproved",
+            "guard": {}
+          },
+          "publish": {
+            "source": "Approved",
+            "target": "Published",
+            "guard": {}
+          },
+          "appeal": {
+            "source": "Disapproved",
+            "target": "InAppeal",
+            "guard": {}
+          }
+        }
+      }
     },
     "approvedBy": {
       "type": "string"
