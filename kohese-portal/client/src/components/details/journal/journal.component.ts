@@ -57,6 +57,8 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
         this.userProxies = this.sessionService.getUsers();
         this.observingUser = this.sessionService.getSessionUser().getValue().
           item.name;
+        console.log('ObservingUser');
+        console.log(this.sessionService.getSessionUser().getValue());
       }
     });
     
@@ -209,6 +211,8 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   
   filterUsers(text: string): Array<ItemProxy> {
     return this.userProxies.filter((proxy: ItemProxy) => {
+      console.log('filterUsers');
+      console.log(proxy);
       return (-1 !== proxy.item.name.indexOf(text));
     });
   }
