@@ -3,7 +3,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
@@ -12,26 +12,27 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 })
 
 export class DashboardComponent extends NavigatableComponent implements OnInit {
-  private currentUser : string;
+  currentUser : string;
   private itemList: Array<Object>;
 
-  private assignedItems : Array<any>;
+  assignedItems : Array<any>;
   private assignedFilter : Object;
-  private acceptedItems : Array<any>;
+  acceptedItems : Array<any>;
   private acceptedFilter : Object;
-  private inWorkItems : Array<any>;
+  inWorkItems : Array<any>;
   private inWorkFilter: Object;
-  private observedIssuesItems : Array<any>;
+  observedIssuesItems : Array<any>;
   private observedIssuesFilter : Object;
-  private inAnalysisIssuesItems : Array<any>;
+  inAnalysisIssuesItems : Array<any>;
   private inAnalysisIssueFilter : Object;
-  private requiresActionItems : Array<any>;
+  requiresActionItems : Array<any>;
   private requiresActionFilter : Object;
-  private assignedTasks : Array<any>;
+  assignedTasks : Array<any>;
   private assignedTaskFilter : Object;
-  private acceptedTasks : Array<any>;
+  acceptedTasks : Array<any>;
   private acceptedTasksFilter : Object;
-  private inWorkTasks : Array<any>;
+  inWorkTasks : Array<any>;
+  inVerificationItems : Array<any>;
   private inWorkTasksFilter : Object;
   private repoStatusSubject : BehaviorSubject<any>;
 
@@ -66,9 +67,10 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     this.acceptedTasksFilter = {};
     this.inWorkTasks = this.testProxies();
     this.inWorkTasksFilter = {};
+    this.inVerificationItems = this.testProxies();
     this.repoStatusSubject = this.ItemRepository.getRepoStatusSubject();
     this.repoStatusSubject.subscribe(update => {
-      if (update.connected) {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         console.log(this.ItemRepository.getRootProxy());
       }
     })

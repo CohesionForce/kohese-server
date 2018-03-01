@@ -1,7 +1,8 @@
 import { MockViewData } from './MockViewData';
 import { MockDataModel } from './MockDataModel';
 
-export let MockKoheseType = {
+export function MockKoheseType () {
+  return {
   acls : [],
   base : ['PersistedModel'],
   dataModelProxy : MockDataModel,
@@ -20,4 +21,5 @@ export let MockKoheseType = {
   trackChanges : null,
   validations : [],
   viewModelProxy : MockViewData
+  }
 }

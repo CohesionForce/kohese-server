@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { CurrentUserService } from '../../../services/user/current-user.service';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import * as ItemProxy from '../../../../../common/models/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
@@ -18,9 +18,14 @@ export class AppBarComponent extends NavigatableComponent
   private userName : string;
   private repositoryStatus: any;
   public authenticated : boolean = false;
-  
   private userSubscription: Subscription;
   private repositoryStatusSubscription: Subscription;
+  private _itemRepositoryState: RepoStates;
+  get itemRepositoryState() {
+    return this._itemRepositoryState;
+  }
+  public readonly State: any = RepoStates;
+  public syncStatusString : string;
 
   constructor(private sessionService: SessionService,
     protected NavigationService: NavigationService,
@@ -39,14 +44,27 @@ export class AppBarComponent extends NavigatableComponent
     });
     
     this.repositoryStatusSubscription = this.itemRepository.getRepoStatusSubject().subscribe((status: any) => {
-      this.repositoryStatus = status;
+      this._itemRepositoryState = status.state;
+      switch(this._itemRepositoryState) {
+        case(RepoStates.DISCONNECTED):
+          this.syncStatusString = 'Disconnected';
+          break;
+        case(RepoStates.SYNCHRONIZATION_FAILED):
+          this.syncStatusString = 'Synchronization Failed';
+          break;
+        case(RepoStates.SYNCHRONIZING): 
+          this.syncStatusString = 'Syncing';
+          break;
+        default:
+          this.syncStatusString = '';
+      }
     });
 
     this.CurrentUserService.getCurrentUserSubject().subscribe((userInfo)=>{
       if (userInfo) {
         this.authenticated = true;
       }
-    })
+    });
   }
   
   ngOnDestroy(): void {

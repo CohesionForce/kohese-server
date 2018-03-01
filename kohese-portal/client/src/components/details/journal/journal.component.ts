@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges,
   SimpleChanges } from '@angular/core';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import { ItemProxy } from '../../../../../common/models/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
@@ -29,7 +29,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   };
   public selectedSortStrategy: string = Object.keys(this.SORT_STRATEGIES)[0];
   private userProxies: Array<ItemProxy>;
-  private observingUser: string;
+  observingUser: string;
   public dateObserved: string;
   public timeObserved: string;
   public addAsIssue: boolean = false;
@@ -53,10 +53,12 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     
     this.repositoryStatusSubscription = this.itemRepository.
       getRepoStatusSubject().subscribe((statusObject: any) => {
-      if (statusObject.connected) {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === statusObject.state) {
         this.userProxies = this.sessionService.getUsers();
         this.observingUser = this.sessionService.getSessionUser().getValue().
           item.name;
+        console.log('ObservingUser');
+        console.log(this.sessionService.getSessionUser().getValue());
       }
     });
     

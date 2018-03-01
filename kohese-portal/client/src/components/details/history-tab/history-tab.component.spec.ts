@@ -11,6 +11,9 @@ import { MockItem } from '../../../../mocks/data/MockItem';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { BehaviorSubject } from 'rxjs';
 
 describe('Component: History Tab', ()=>{
   let historyComponent: HistoryTabComponent;
@@ -25,14 +28,15 @@ describe('Component: History Tab', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide: NavigationService, useClass: MockNavigationService}
+        {provide: NavigationService, useClass: MockNavigationService},
+        {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();
 
     historyFixture = TestBed.createComponent(HistoryTabComponent);
     historyComponent = historyFixture.componentInstance;
 
-    historyComponent.itemProxy = new ItemProxy('Item', MockItem);
+    historyComponent.proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem));
 
     historyFixture.detectChanges();
     
