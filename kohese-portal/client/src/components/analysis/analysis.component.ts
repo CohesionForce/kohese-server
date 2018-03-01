@@ -8,7 +8,7 @@ import { AnalysisService } from '../../services/analysis/analysis.service';
 import { ItemProxy } from '../../../../common/models/item-proxy';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
@@ -52,7 +52,7 @@ export class AnalysisComponent extends NavigatableComponent
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
       this.ItemRepository.getRepoStatusSubject().subscribe(update => {
-        if (update.connected) {
+        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
           this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
           this.AnalysisService.fetchAnalysis(this.itemProxy);
           this.repoLoaded = true;

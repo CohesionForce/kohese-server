@@ -12,10 +12,17 @@ import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+  
+export enum RepoStates {
+  DISCONNECTED,
+  SYNCHRONIZING,
+  SYNCHRONIZATION_FAILED,
+  SYNCHRONIZATION_SUCCEEDED
+};
 
 /**
  *
- */
+ */ 
 
 @Injectable()
 export class ItemRepository {
@@ -29,6 +36,7 @@ export class ItemRepository {
   };
 
   recentProxies : Array<ItemProxy>;
+  state : any;
 
   repositoryStatus : BehaviorSubject<any>;
   historySubject : Subject<any>;
@@ -76,8 +84,7 @@ export class ItemRepository {
     };
 
     this.repositoryStatus = new BehaviorSubject({
-      connected : false,
-      syncing: false,
+      state: RepoStates.DISCONNECTED,
       message : 'Initializing Item Repository'
     });
 
@@ -194,8 +201,7 @@ export class ItemRepository {
       this.socketService.socket.on('connect_error', () => {
         console.log('::: IR: Socket IO Connection Error');
         this.repositoryStatus.next({
-          connected : false,
-          syncing: false,
+          state: RepoStates.DISCONNECTED,
           message : 'Error connecting to repository'
         })
       });
@@ -270,8 +276,7 @@ export class ItemRepository {
     var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
 
     this.repositoryStatus.next({
-      connected : false,
-      syncing: true,
+      state: RepoStates.SYNCHRONIZING,
       message: 'Starting Repository Sync'
     });
     this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, (response) => {
@@ -328,8 +333,7 @@ export class ItemRepository {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
           this.repositoryStatus.next({
-            connected : false,
-            syncing: false,
+            state: RepoStates.SYNCHRONIZATION_FAILED,
             message : 'Repository sync failed'
           })
         }
@@ -337,8 +341,7 @@ export class ItemRepository {
 
       if(syncSucceeded){
         this.repositoryStatus.next({
-          connected : true,
-          syncing: false,
+          state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
           message : 'Item Repository Ready'
         })
       }

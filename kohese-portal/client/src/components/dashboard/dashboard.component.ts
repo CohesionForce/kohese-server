@@ -3,7 +3,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
@@ -70,7 +70,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     this.inVerificationItems = this.testProxies();
     this.repoStatusSubject = this.ItemRepository.getRepoStatusSubject();
     this.repoStatusSubject.subscribe(update => {
-      if (update.connected) {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         console.log(this.ItemRepository.getRootProxy());
       }
     })
