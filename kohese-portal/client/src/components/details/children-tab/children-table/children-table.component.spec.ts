@@ -12,10 +12,14 @@ import { MockItemRepository } from '../../../../../mocks/services/MockItemReposi
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
+import * as ItemProxy from '../../../../../../common/models/item-proxy';
+import { MockItem } from '../../../../../mocks/data/MockItem';
 
 describe('Component: Children Table', ()=>{
   let childrenTableComponent: ChildrenTableComponent;
   let childrenTableFixture : ComponentFixture<ChildrenTableComponent>;
+  let mockRepo = new MockItemRepository();
+  let childSubject : BehaviorSubject<Array<ItemProxy>>;
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -34,7 +38,9 @@ describe('Component: Children Table', ()=>{
     childrenTableFixture = TestBed.createComponent(ChildrenTableComponent);
     childrenTableComponent = childrenTableFixture.componentInstance;
 
-    childrenTableComponent.children = new MockItemRepository().getRootProxy().children;
+    childSubject = new BehaviorSubject<Array<ItemProxy>>(mockRepo.getRootProxy().children);
+
+    childrenTableComponent.childrenStream = childSubject; 
     childrenTableComponent.filterSubject = new BehaviorSubject<string>('');
 
     childrenTableFixture.detectChanges();
@@ -43,5 +49,13 @@ describe('Component: Children Table', ()=>{
 
   it('instantiates the ChildrenTable component', ()=>{
     expect(childrenTableComponent).toBeTruthy(); 
+  })
+
+  it('updates the children list when a new array comes in', ()=>{
+    expect(childrenTableComponent.children.length).toBe(5);
+    let newChildren = mockRepo.getRootProxy().children;
+    newChildren.push(new ItemProxy('Item', MockItem));
+    childSubject.next(newChildren);
+    expect(childrenTableComponent.children.length).toBe(6);
   })
 })
