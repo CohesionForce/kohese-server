@@ -165,15 +165,6 @@ export class DetailsComponent extends NavigatableComponent
       this.showChildrenSubject.next(this.showChildren);
     }
 
-  cancel () : void {
-    if (this.itemProxy.dirty) {
-      this.ItemRepository.fetchItem(this.itemProxy)
-        .then((fetchResults) => {
-          // TODO - Get form and set pristine
-        });
-    }
-  };
-
   removeItem (proxy : ItemProxy) : void {
     this.ItemRepository.deleteItem(proxy, false)
       .then(function () {

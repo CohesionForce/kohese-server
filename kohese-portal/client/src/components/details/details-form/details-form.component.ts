@@ -104,15 +104,15 @@ export class DetailsFormComponent extends NavigatableComponent
         this.buildStubProxy();
       }
 
-      if (-1 !== changedInputs.indexOf('disabled')) {
-        if (this.formGroup) {
-          if (changes['disabled'].currentValue) {
+      if (changes['disabled']) {
+        this.disabled = changes['disabled'].currentValue;
+        if (this.disabled) { 
+            this.formGroup = this.createFormGroup();
             this.formGroup.disable();
           } else {
             this.formGroup.enable();
           }
         }
-      }
     }
   }
 
