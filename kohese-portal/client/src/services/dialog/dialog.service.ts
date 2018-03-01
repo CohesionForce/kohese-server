@@ -60,6 +60,6 @@ export class DialogService {
   styleUrls: ['./dialog.component.scss']
 })
 export class DialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) private data: any) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Optional, Inject } from '@angular/core';
+import { Component, Optional, Inject, OnInit } from '@angular/core';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { MAT_DIALOG_DATA } from '@angular/material';
 
@@ -7,11 +7,16 @@ import { MAT_DIALOG_DATA } from '@angular/material';
   templateUrl: './icon-selector.component.html',
   styleUrls: ['./icon-selector.component.scss']
 })
-export class IconSelectorComponent {
+export class IconSelectorComponent implements OnInit{
   public selectedIcon: string;
+  icons : Array<string>;
   
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
-    public typeService: DynamicTypesService) {
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    private typeService: DynamicTypesService) {
+  }
+
+  ngOnInit() {
+    this.icons = this.typeService.getIcons();
   }
   
   setIcon(icon: string): void {

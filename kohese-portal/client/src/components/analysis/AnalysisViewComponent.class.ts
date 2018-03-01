@@ -9,11 +9,10 @@ import { AnalysisService } from '../../services/analysis/analysis.service';
 export class AnalysisViewComponent extends NavigatableComponent {
   protected filterString: string;
   protected filterRegex: RegExp;
-  private filterRegexHighlighted: RegExp;
-  private invalidFilterRegex: boolean;
-
-  private analysisPOSFilterCriteriaList: Array<any>;
-  private analysisPOSFilterName: string = 'Standard';
+  filterRegexHighlighted: RegExp;
+  invalidFilterRegex: boolean 
+  analysisPOSFilterCriteriaList: Array<any>;
+  analysisPOSFilterName: string = 'Standard';
 
   constructor(NavigationService : NavigationService,
               protected AnalysisService : AnalysisService) {

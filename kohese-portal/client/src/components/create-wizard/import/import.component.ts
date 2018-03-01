@@ -12,7 +12,7 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 export class ImportComponent {
   itemType : KoheseType;
 
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private itemRepository: ItemRepository,
     private typeService: DynamicTypesService,
     private importService : ImportService) {
