@@ -3,7 +3,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
-import { ItemRepository, State } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
@@ -68,7 +68,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     this.inWorkTasksFilter = {};
     this.repoStatusSubject = this.ItemRepository.getRepoStatusSubject();
     this.repoStatusSubject.subscribe(update => {
-      if (State.SYNCHRONIZATION_SUCCEEDED === update.state) {
+      if (this.ItemRepository.state.SYNCHRONIZATION_SUCCEEDED === update.state) {
         console.log(this.ItemRepository.getRootProxy());
       }
     })

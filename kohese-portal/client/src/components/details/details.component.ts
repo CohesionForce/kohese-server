@@ -4,7 +4,7 @@ import { FormGroup } from '@angular/forms';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ItemRepository, State } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 import * as ItemProxy from '../../../../common/models/item-proxy.js';
 import { SessionService } from '../../services/user/session.service';
@@ -80,7 +80,7 @@ export class DetailsComponent extends NavigatableComponent
       } else {
         this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
         .subscribe(update => {
-          if (State.SYNCHRONIZATION_SUCCEEDED === update.state) {
+          if (this.ItemRepository.state.SYNCHRONIZATION_SUCCEEDED === update.state) {
             this.repoConnected = true;
             this.updateProxy();
             this.proxyUpdates = ItemProxy.getChangeSubject().subscribe((change)=>{

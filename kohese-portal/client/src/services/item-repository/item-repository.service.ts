@@ -12,13 +12,6 @@ import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
-
-export enum State {
-  DISCONNECTED,
-  SYNCHRONIZING,
-  SYNCHRONIZATION_FAILED,
-  SYNCHRONIZATION_SUCCEEDED
-};
   
 /**
  *
@@ -36,6 +29,7 @@ export class ItemRepository {
   };
 
   recentProxies : Array<ItemProxy>;
+  state : any;
 
   repositoryStatus : BehaviorSubject<any>;
   historySubject : Subject<any>;
@@ -49,6 +43,7 @@ export class ItemRepository {
 
   initialize () : void {
     console.log('Item Repo init');
+    this.state = State.States;
     this.modelTypes = {
       Repository: 'Repository',
       Item: 'Item',
@@ -83,7 +78,7 @@ export class ItemRepository {
     };
 
     this.repositoryStatus = new BehaviorSubject({
-      state: State.DISCONNECTED,
+      state: this.state.DISCONNECTED,
       message : 'Initializing Item Repository'
     });
 
@@ -200,7 +195,7 @@ export class ItemRepository {
       this.socketService.socket.on('connect_error', () => {
         console.log('::: IR: Socket IO Connection Error');
         this.repositoryStatus.next({
-          state: State.DISCONNECTED,
+          state: this.state.DISCONNECTED,
           message : 'Error connecting to repository'
         })
       });
@@ -275,7 +270,7 @@ export class ItemRepository {
     var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
 
     this.repositoryStatus.next({
-      state: State.SYNCHRONIZING,
+      state: this.state.SYNCHRONIZING,
       message: 'Starting Repository Sync'
     });
     this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, (response) => {
@@ -332,7 +327,7 @@ export class ItemRepository {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
           this.repositoryStatus.next({
-            state: State.SYNCHRONIZATION_FAILED,
+            state: this.state.SYNCHRONIZATION_FAILED,
             message : 'Repository sync failed'
           })
         }
@@ -340,7 +335,7 @@ export class ItemRepository {
 
       if(syncSucceeded){
         this.repositoryStatus.next({
-          state: State.SYNCHRONIZATION_SUCCEEDED,
+          state: this.state.SYNCHRONIZATION_SUCCEEDED,
           message : 'Item Repository Ready'
         })
       }
@@ -527,3 +522,12 @@ export class ItemRepository {
     return promise;
   }
 }
+
+module State {
+  export enum States {
+  DISCONNECTED,
+  SYNCHRONIZING,
+  SYNCHRONIZATION_FAILED,
+  SYNCHRONIZATION_SUCCEEDED
+  }
+};

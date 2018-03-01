@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { CurrentUserService } from '../../../services/user/current-user.service';
-import { ItemRepository, State } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import * as ItemProxy from '../../../../../common/models/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
@@ -20,17 +20,18 @@ export class AppBarComponent extends NavigatableComponent
   public authenticated : boolean = false;
   private userSubscription: Subscription;
   private repositoryStatusSubscription: Subscription;
-  private _itemRepositoryState: State;
+  private _itemRepositoryState: any;
   get itemRepositoryState() {
     return this._itemRepositoryState;
   }
-  public readonly State: any = State;
+  public readonly State: any;
 
   constructor(private sessionService: SessionService,
     protected NavigationService: NavigationService,
     private CurrentUserService: CurrentUserService,
     private itemRepository: ItemRepository) {
     super(NavigationService);
+    this.State = this.itemRepository.state; 
   }
 
   ngOnInit(): void {
