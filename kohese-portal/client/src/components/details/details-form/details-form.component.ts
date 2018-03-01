@@ -108,6 +108,7 @@ export class DetailsFormComponent extends NavigatableComponent
         this.disabled = changes['disabled'].currentValue;
         if (this.disabled) { 
             this.formGroup = this.createFormGroup();
+            this.formGroupUpdated.emit(this.formGroup);
             this.formGroup.disable();
           } else {
             this.formGroup.enable();
