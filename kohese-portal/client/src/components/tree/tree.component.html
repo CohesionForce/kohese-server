@@ -43,7 +43,7 @@
         <ng-container *ngSwitchCase="viewList[0]">
           <!-- Kind Selection -->
           <mat-form-field>
-            <mat-select placeholder="Kind" [(value)]="this.proxyFilter.kind"
+            <mat-select placeholder="Kind" [(value)]="getProxyFilter().kind"
               (selectionChange)="filter()">
               <mat-option>{{NO_KIND_SPECIFIED}}</mat-option>
               <mat-option *ngFor="let type of (koheseTypes | mapKey)"
@@ -54,9 +54,9 @@
           </mat-form-field>
           <!-- Action Filtering -->
           <ng-container
-            *ngIf="(proxyFilter.kind && (proxyFilter.kind.name === 'Action'))">
+            *ngIf="(getProxyFilter().kind && (getProxyFilter().kind.name === 'Action'))">
             <mat-form-field>
-              <mat-select placeholder="State" [(value)]="proxyFilter.actionState"
+              <mat-select placeholder="State" [(value)]="getProxyFilter().actionState"
                 (selectionChange)="filter()">
                 <mat-option *ngFor="let state of actionStates" [value]="state">
                   {{state}}
@@ -64,7 +64,7 @@
               </mat-select>
             </mat-form-field>
             <mat-form-field>
-              <mat-select placeholder="Assignee" [(value)]="proxyFilter.actionAssignee"
+              <mat-select placeholder="Assignee" [(value)]="getProxyFilter().actionAssignee"
                 (selectionChange)="filter()">
                 <mat-option *ngFor="let user of userList" [value]="user.item.name">
                   {{user.item.name}}
@@ -74,15 +74,15 @@
           </ng-container> <!-- End Action Filtering -->
           <!-- String Filtering -->
           <mat-form-field>
-            <input matInput type="text" [(ngModel)]="proxyFilter.filterString"
-              [ngStyle]="proxyFilter.invalidRegex && {'background-color':'pink'}"
+            <input matInput type="text" [(ngModel)]="getProxyFilter().filterString"
+              [ngStyle]="getProxyFilter().invalidRegex && {'background-color':'pink'}"
               placeholder="Filter" (input)="filter()"/>
           </mat-form-field>
           <!-- Version Control Filtering -->
-          <mat-checkbox [(ngModel)]="proxyFilter.status" (change)="filter()">
+          <mat-checkbox [(ngModel)]="getProxyFilter().status" (change)="filter()">
             Modified
           </mat-checkbox>
-          <mat-checkbox [(ngModel)]="proxyFilter.dirty" (change)="filter()">
+          <mat-checkbox [(ngModel)]="getProxyFilter().dirty" (change)="filter()">
             Dirty
           </mat-checkbox>
           <!-- End Version Control Filtering -->
