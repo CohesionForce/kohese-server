@@ -211,8 +211,6 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   
   filterUsers(text: string): Array<ItemProxy> {
     return this.userProxies.filter((proxy: ItemProxy) => {
-      console.log('filterUsers');
-      console.log(proxy);
       return (-1 !== proxy.item.name.indexOf(text));
     });
   }

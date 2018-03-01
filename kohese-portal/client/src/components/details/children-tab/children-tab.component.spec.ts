@@ -15,10 +15,12 @@ import { MockDialogService } from '../../../../mocks/services/MockDialogService'
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import * as ItemProxy from '../../../../../common/models/item-proxy';
+import { BehaviorSubject } from 'rxjs';
 
 describe('Component: Children Tab', ()=>{
   let childrenTabComponent: ChildrenTabComponent;
   let childrenTabFixture : ComponentFixture<ChildrenTabComponent>;
+  let proxyStream : BehaviorSubject<ItemProxy>;
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -39,7 +41,8 @@ describe('Component: Children Tab', ()=>{
 
     childrenTabFixture = TestBed.createComponent(ChildrenTabComponent);
     childrenTabComponent = childrenTabFixture.componentInstance;
-    childrenTabComponent.itemProxy = new ItemProxy('Item', MockItem)
+    proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem));
+    childrenTabComponent.proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem));
 
     childrenTabFixture.detectChanges();
     
@@ -47,5 +50,14 @@ describe('Component: Children Tab', ()=>{
 
   it('instantiates the childrenTab component', ()=>{
     expect(childrenTabComponent).toBeTruthy(); 
+  })
+
+  it('updates the proxy when a new proxy is pushed downstream', ()=>{
+    expect(childrenTabComponent.itemProxy.item.name).toBe('Test item');
+    let newProxy = new ItemProxy('Item', MockItem);
+    newProxy.item.name = "A different name";
+    proxyStream.next(newProxy);
+    expect(childrenTabComponent.itemProxy.item.name).toBe('A different name');
+
   })
 })
