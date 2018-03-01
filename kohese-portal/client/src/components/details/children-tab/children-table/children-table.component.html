@@ -1,4 +1,4 @@
-<mat-table #childTable [dataSource]="childrenStream">
+<mat-table *ngIf="tableStream" #childTable [dataSource]="tableStream">
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
     <mat-cell *matCellDef="let child"> {{child.item.name}}</mat-cell>
@@ -6,7 +6,8 @@
 
   <ng-container matColumnDef="kind">
       <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
-      <mat-cell *matCellDef="let child"> {{child.kind}}</mat-cell>
+      <mat-cell *matCellDef="let child">           
+        {{child.kind}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="assignedTo">

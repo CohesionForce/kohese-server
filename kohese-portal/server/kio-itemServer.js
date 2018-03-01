@@ -51,6 +51,10 @@ ItemProxy.getChangeSubject().subscribe(change => {
       kdb.removeModelInstance(change.proxy);
       kio.server.emit(change.kind +'/' + change.type, notification);    
       break;
+    case 'reference-added':
+    case 'refernece-removed':
+      // Ignore
+      break;
     default:
       console.log('*** Not processing change notification: ' + change.type);
     }
