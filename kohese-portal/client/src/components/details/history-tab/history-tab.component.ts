@@ -28,6 +28,10 @@ export class HistoryTabComponent extends NavigatableComponent
   ngOnInit() {
     this.streamSub = this.proxyStream.subscribe((newProxy)=>{
       this.itemProxy = newProxy;
+      if (this.historySub) {
+        this.historySub.unsubscribe()
+      }
+      
       this.historySub = this.itemRepository.getHistoryFor(this.itemProxy)
         .subscribe((historicalProxy)=>{
           if (this.itemProxy.item.id ===
@@ -36,7 +40,8 @@ export class HistoryTabComponent extends NavigatableComponent
                 this.changeRef.markForCheck();
               }
         })
-      this.changeRef.markForCheck();
+      
+      this.changeRef.markForCheck();   
     })
   }
 
