@@ -17,10 +17,11 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 let treeRoot: ItemProxy;
 let isRootDefault: boolean = true;
-let rows: Array<TreeRowComponent> = [];
+let treeMap: any = {};
 let expandUponInstantiation: boolean = false;
 let versionControlEnabled: boolean = false;
 let selectedProxyId: string = '';
+let proxyFilter: ProxyFilter = new ProxyFilter();
 
 @Component({
   selector : 'tree-view',
@@ -34,7 +35,6 @@ export class TreeComponent extends NavigatableComponent
 
     /* Data */
     private absoluteRoot : ItemProxy;
-    private proxyFilter: ProxyFilter = new ProxyFilter(); // TODO get definition for Filter
     private selectedItemProxy: ItemProxy;
     private koheseTypes: object;
     public actionStates: Array<string> = ['Pending Review', 'In Verification', 'Assigned'];
@@ -65,6 +65,12 @@ export class TreeComponent extends NavigatableComponent
         treeRoot = this.ItemRepository.getRootProxy();
         this.absoluteRoot = treeRoot;
         this.koheseTypes = this.typeService.getKoheseTypes();
+        
+        treeRoot.visitChildren(undefined, (proxy: ItemProxy) => {
+          treeMap[proxy.item.id] = {
+            expanded: false
+          };
+        });
       }
     });
     
@@ -86,88 +92,22 @@ export class TreeComponent extends NavigatableComponent
   }
 
   filter(): void {
-    let show: boolean = true;
-    for (let j: number = 0; j < rows.length; j++) {
-      if (this.proxyFilter.filterString) {
-        let proxy: ItemProxy = rows[j].getProxy();
-        rows[j].matchesFilter = this.doesProxyMatchFilter(proxy);
-        show = rows[j].matchesFilter;
-        if (!show) {
-          for (let j: number = 0; j < proxy.children.length; j++) {
-            if (this.doesProxyMatchFilter(proxy.children[j])) {
-              show = true;
-              break;
-            }
-          }
-        }
-      } else {
-        rows[j].matchesFilter = false;
-        this.proxyFilter.textRegexHighlight = null;
+    for (let id in treeMap) {
+      let row: TreeRowComponent = treeMap[id].row;
+      if (row) {
+        row.filter();
       }
-      
-      rows[j].setVisible(show);
     }
   }
   
-  doesProxyMatchFilter(proxy: ItemProxy): boolean {
-    let matches: boolean = true;
-    if (this.proxyFilter.status && (!proxy.status ||
-      (proxy.status.length === 0))) {
-      matches = false;
-    } else if (this.proxyFilter.dirty && !proxy.dirty) {
-      matches =  false;
-    } else if (this.proxyFilter.kind) {
-      if (proxy.kind !== this.proxyFilter.kind.name) {
-        matches = false;
-      } else if (proxy.kind === 'Action') {
-        if (proxy.item.actionState !== this.proxyFilter.actionState) {
-          matches = false;
-        } else if (proxy.item.assignedTo !== this.proxyFilter.actionAssignee) {
-          matches = false;
-        }
-      }
-    }
-    
-    if (matches) {
-      matches = false;
-      if (this.proxyFilter.filterString) {
-        let filterExpression: RegExp;
-        let filterIsRegex: Array<string> = this.proxyFilter.filterString.
-          match(new RegExp('^\/(.*)\/([gimy]*)$'));
-        if (filterIsRegex) {
-          filterExpression = new RegExp(filterIsRegex[1], filterIsRegex[2]);
-          this.proxyFilter.textRegexHighlight = new RegExp('(' + filterIsRegex[1]
-            + ')', 'g' + filterIsRegex[2]);
-        } else {
-          let cleanedPhrase: string = this.proxyFilter.filterString.
-            replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          filterExpression = new RegExp(this.proxyFilter.filterString, 'i');
-          this.proxyFilter.textRegexHighlight = new RegExp('(' + cleanedPhrase
-            + ')', 'gi');
-        }
-      
-        for (let key in proxy.item) {
-          if (key.charAt(0) !== '$' &&
-            (typeof proxy.item[key] === 'string') &&
-            proxy.item[key].match(filterExpression)) {
-            matches = true;
-            break;
-          }
-        }
-      }
-    }
-    
-    return matches;
-  }
-
   getItemCount () {
     return treeRoot.descendantCount;
   }
 
   getItemMatchedCount () {
     let numberOfVisibleRows: number = 0;
-    for (let j: number = 0; j < rows.length; j++) {
-      if (rows[j].isVisible()) {
+    for (let id in treeMap) {
+      if (treeMap[id].row) {
         numberOfVisibleRows++;
       }
     }
@@ -193,14 +133,14 @@ export class TreeComponent extends NavigatableComponent
 
   /******** List expansion functions */
   expandAll(): void {
-    for (let j: number = 0; j < rows.length; j++) {
-      rows[j].expand(true);
+    for (let id in treeMap) {
+      treeMap[id].expanded = true;
     }
   }
 
   collapseAll(): void {
-    for (let j: number = 0; j < rows.length; j++) {
-      rows[j].expand(false);
+    for (let id in treeMap) {
+      treeMap[id].expanded = false;
     }
   }
 
@@ -231,13 +171,13 @@ export class TreeComponent extends NavigatableComponent
   viewSelectionChanged(): void {
     switch (this.selectedView) {
       case 'Version Control':
-        this.proxyFilter.status = true;
-        this.proxyFilter.dirty = false;
+        proxyFilter.status = true;
+        proxyFilter.dirty = false;
         versionControlEnabled = true;
         break;
       default:
-        this.proxyFilter.status = false;
-        this.proxyFilter.dirty = false;
+        proxyFilter.status = false;
+        proxyFilter.dirty = false;
         versionControlEnabled = false;
     }
   }
@@ -248,6 +188,10 @@ export class TreeComponent extends NavigatableComponent
   
   isRootDefault(): boolean {
     return isRootDefault;
+  }
+  
+  public getProxyFilter(): ProxyFilter {
+    return proxyFilter;
   }
 }
 
@@ -263,9 +207,6 @@ export class TreeRowComponent extends RowComponent
   get matchesFilter() {
     return this._matchesFilter;
   }
-  set matchesFilter(matches: boolean) {
-    this._matchesFilter = matches;
-  }
 
   constructor(NavigationService : NavigationService,
     private dialogService: DialogService,
@@ -276,7 +217,8 @@ export class TreeRowComponent extends RowComponent
   }
 
   ngOnInit(): void {
-    rows.push(this);
+    let treeMapEntry: any = treeMap[this.itemProxy.item.id];
+    treeMapEntry.row = this;
     this.koheseType = this.typeService.getKoheseTypes()[this.itemProxy.kind];
     if (!this.koheseType) {
       this.koheseType = {
@@ -284,10 +226,12 @@ export class TreeRowComponent extends RowComponent
         icon: 'fa fa-sticky-note'
       };
     }
+    
+    this.filter();
   }
 
   ngOnDestroy(): void {
-    rows.splice(rows.indexOf(this), 1);
+    delete treeMap[this.itemProxy.item.id].row;
   }
 
   removeItem(): void {
@@ -322,5 +266,90 @@ export class TreeRowComponent extends RowComponent
   
   getSelectedProxyId(): string {
     return selectedProxyId;
+  }
+  
+  public getTreeMapEntry(): any {
+    return treeMap[this.itemProxy.item.id];
+  }
+  
+  public filter(): void {
+    let show: boolean = true;
+    if (proxyFilter.filterString || proxyFilter.kind || proxyFilter.status ||
+      proxyFilter.dirty) {
+      let proxy: ItemProxy = this.getProxy();
+      this._matchesFilter = this.doesProxyMatchFilter(proxy, false);
+      show = this._matchesFilter;
+      if (!show) {
+        for (let j: number = 0; j < proxy.children.length; j++) {
+          if (this.doesProxyMatchFilter(proxy.children[j], true)) {
+            show = true;
+            break;
+          }
+        }
+      }
+    } else {
+      this._matchesFilter = false;
+      proxyFilter.textRegexHighlight = null;
+    }
+    
+    this.setVisible(show);
+  }
+  
+  private doesProxyMatchFilter(proxy: ItemProxy, checkChildren: boolean): boolean {
+    let matches: boolean = true;
+    if (proxyFilter.status && (!proxy.status ||
+      (proxy.status.length === 0))) {
+      matches = false;
+    } else if (proxyFilter.dirty && !proxy.dirty) {
+      matches =  false;
+    } else if (proxyFilter.kind) {
+      if (proxy.kind !== proxyFilter.kind.name) {
+        matches = false;
+      } else if (proxy.kind === 'Action') {
+        if (proxy.item.actionState !== proxyFilter.actionState) {
+          matches = false;
+        } else if (proxy.item.assignedTo !== proxyFilter.actionAssignee) {
+          matches = false;
+        }
+      }
+    }
+    
+    if (matches) {
+      matches = false;
+      let filterExpression: RegExp;
+      let filterIsRegex: Array<string> = proxyFilter.filterString.
+        match(new RegExp('^\/(.*)\/([gimy]*)$'));
+      if (filterIsRegex) {
+        filterExpression = new RegExp(filterIsRegex[1], filterIsRegex[2]);
+        proxyFilter.textRegexHighlight = new RegExp('(' + filterIsRegex[1]
+          + ')', 'g' + filterIsRegex[2]);
+      } else {
+        let cleanedPhrase: string = proxyFilter.filterString.
+          replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        filterExpression = new RegExp(proxyFilter.filterString, 'i');
+        proxyFilter.textRegexHighlight = new RegExp('(' + cleanedPhrase
+          + ')', 'gi');
+      }
+       
+      for (let key in proxy.item) {
+        if (key.charAt(0) !== '$' &&
+          (typeof proxy.item[key] === 'string') &&
+          proxy.item[key].match(filterExpression)) {
+          matches = true;
+          break;
+        }
+      }
+    }
+    
+    if (!matches && checkChildren) {
+      for (let j: number = 0; j < proxy.children.length; j++) {
+        if (this.doesProxyMatchFilter(proxy.children[j], true)) {
+          matches = true;
+          break;
+        }
+      }
+    }
+    
+    return matches;
   }
 }

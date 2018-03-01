@@ -1,71 +1,70 @@
-<ng-container *ngIf="visible">
-  <!-- This div is involved in the indentation of children under their
-    parent -->
-  <div class="kt-collection">
-    <div class="kt-item" id="{{itemProxy.item.id}}"
-      (click)="navigate('Explore', {id: itemProxy.item.id})"
-      [ngClass]="{ 'kti-selected-item': (itemProxy.item.id === getSelectedProxyId()),
-      'highlight-row': (visible && matchesFilter) }">
-      <i (click)="collapsed = !collapsed;" class="kt-icon fa"
-        [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && !collapsed,
-        'fa-caret-right': (itemProxy.children.length > 0) && collapsed,
-        'no-children': !(itemProxy.children.length > 0) }">
-      </i>
-      <ng-container *ngIf="koheseType.icon">
-        <mat-icon matTooltip="{{koheseType.name}}" class="kt-icon {{koheseType.icon}}">
-        </mat-icon>
-      </ng-container>
-      <ng-container *ngIf="!koheseType.icon">
-        <span class="kt-icon no-icon"></span>
-      </ng-container>
-      {{(itemProxy.item.name | highlightRegex)}}
-      <ng-container *ngIf="itemProxy.item.tags">
-        {{itemProxy.item.tags}}
-      </ng-container>
-      <!-- Conditional Icons for Item status -->
-      <ng-container *ngIf="itemProxy.dirty">
-        <img src="assets/icons/versioncontrol/dirty.ico" title="Dirty item"/>
-      </ng-container>
-      <ng-container *ngIf="isVersionControlViewVisible()">
-        {{itemProxy.status}}
-      </ng-container>
-      <span id="rightSpan" class="kti-actions">
-        <!-- Default row actions -->
-        <ng-container *ngIf="!isVersionControlViewVisible()">
-          <button mat-icon-button (click)="updateRoot()">
-            <mat-icon class="fa fa-anchor"></mat-icon>
-          </button>
-          <button mat-icon-button (click)="removeItem()">
-            <mat-icon class="glyphicon glyphicon-remove delete-button"></mat-icon>
-          </button>
-        </ng-container>
-        <!-- Version Control row actions -->
-        <ng-container
-          *ngIf="isVersionControlViewVisible() && itemProxy.vcState">
-          <!-- VC Status Icons -->
-          <img *ngIf="itemProxy.vcState.Unstaged"
-            src="assets/icons/versioncontrol/unstaged.ico" title="Unstaged"/>
-          <img *ngIf="itemProxy.vcState.Staged"
-            src="assets/icons/versioncontrol/index-mod.ico" title="Staged"/>
-          <!-- Actions -->
-          <button mat-icon-button (click)="revertChanges()">
-            <mat-icon class="fa fa-undo kt-icon"></mat-icon>
-          </button>
-          <button mat-icon-button *ngIf="itemProxy.vcState.Unstaged"
-            (click)="versionControlService.stageItems([itemProxy])">
-            <mat-icon class="fa fa-plus kt-icon"></mat-icon>
-          </button>
-          <button mat-icon-button *ngIf="itemProxy.vcState.Staged"
-            (click)="versionControlService.unstageItems([itemProxy])">
-            <mat-icon class="fa fa-minus kt-icon"></mat-icon>
-          </button>
-        </ng-container>
-      </span>
-    </div>
-    <ng-container *ngIf="!collapsed">
-      <tree-row *ngFor="let childProxy of itemProxy.children"
-        [itemProxy]="childProxy">
-      </tree-row>
+<!-- This div is involved in the indentation of children under their
+  parent -->
+<div class="kt-collection" [hidden]="!visible">
+  <div class="kt-item" id="{{itemProxy.item.id}}"
+    (click)="navigate('Explore', {id: itemProxy.item.id})"
+    [ngClass]="{ 'kti-selected-item': (itemProxy.item.id === getSelectedProxyId()),
+    'highlight-row': (visible && matchesFilter) }">
+    <i (click)="getTreeMapEntry().expanded = !getTreeMapEntry().expanded;"
+      class="kt-icon fa"
+      [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && getTreeMapEntry().expanded,
+      'fa-caret-right': (itemProxy.children.length > 0) && !getTreeMapEntry().expanded,
+      'no-children': !(itemProxy.children.length > 0) }">
+    </i>
+    <ng-container *ngIf="koheseType.icon">
+      <mat-icon matTooltip="{{koheseType.name}}" class="kt-icon {{koheseType.icon}}">
+      </mat-icon>
     </ng-container>
+    <ng-container *ngIf="!koheseType.icon">
+      <span class="kt-icon no-icon"></span>
+    </ng-container>
+    {{(itemProxy.item.name | highlightRegex)}}
+    <ng-container *ngIf="itemProxy.item.tags">
+      {{itemProxy.item.tags}}
+    </ng-container>
+    <!-- Conditional Icons for Item status -->
+    <ng-container *ngIf="itemProxy.dirty">
+      <img src="assets/icons/versioncontrol/dirty.ico" title="Dirty item"/>
+    </ng-container>
+    <ng-container *ngIf="isVersionControlViewVisible()">
+      {{itemProxy.status}}
+    </ng-container>
+    <span id="rightSpan" class="kti-actions">
+      <!-- Default row actions -->
+      <ng-container *ngIf="!isVersionControlViewVisible()">
+        <button mat-icon-button (click)="updateRoot()">
+          <mat-icon class="fa fa-anchor"></mat-icon>
+        </button>
+        <button mat-icon-button (click)="removeItem()">
+          <mat-icon class="glyphicon glyphicon-remove delete-button"></mat-icon>
+        </button>
+      </ng-container>
+      <!-- Version Control row actions -->
+      <ng-container
+        *ngIf="isVersionControlViewVisible() && itemProxy.vcState">
+        <!-- VC Status Icons -->
+        <img *ngIf="itemProxy.vcState.Unstaged"
+          src="assets/icons/versioncontrol/unstaged.ico" title="Unstaged"/>
+        <img *ngIf="itemProxy.vcState.Staged"
+          src="assets/icons/versioncontrol/index-mod.ico" title="Staged"/>
+        <!-- Actions -->
+        <button mat-icon-button (click)="revertChanges()">
+          <mat-icon class="fa fa-undo kt-icon"></mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="itemProxy.vcState.Unstaged"
+          (click)="versionControlService.stageItems([itemProxy])">
+          <mat-icon class="fa fa-plus kt-icon"></mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="itemProxy.vcState.Staged"
+          (click)="versionControlService.unstageItems([itemProxy])">
+          <mat-icon class="fa fa-minus kt-icon"></mat-icon>
+        </button>
+      </ng-container>
+    </span>
   </div>
-</ng-container>
+  <ng-container *ngIf="getTreeMapEntry().expanded">
+    <tree-row *ngFor="let childProxy of itemProxy.children"
+      [itemProxy]="childProxy">
+    </tree-row>
+  </ng-container>
+</div>
