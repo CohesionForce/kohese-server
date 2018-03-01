@@ -29,7 +29,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   };
   public selectedSortStrategy: string = Object.keys(this.SORT_STRATEGIES)[0];
   private userProxies: Array<ItemProxy>;
-  private observingUser: string;
+  observingUser: string;
   public dateObserved: string;
   public timeObserved: string;
   public addAsIssue: boolean = false;

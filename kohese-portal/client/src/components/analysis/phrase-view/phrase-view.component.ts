@@ -22,12 +22,13 @@ import * as $ from 'jquery';
 export class PhraseViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
   /* UI Switches */
-  private loadLimit: number = 100;
-  private ascending: boolean = true;
-  private sortField: string = 'count';
-  private filters: Array<RegExp> = [];
+  loadLimit: number = 100;
+  ascending: boolean = true;
+  sortField: string = 'count';
+  filters: Array<RegExp> = [];
+  showPOS: boolean = false;
   
-  private phrases: Array<any> = [];
+  phrases: Array<any> = [];
   /* Data */
   @Input()
   public itemProxy: ItemProxy;
