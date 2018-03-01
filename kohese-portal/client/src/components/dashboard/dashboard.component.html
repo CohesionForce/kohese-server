@@ -102,7 +102,7 @@
                     </mat-panel-title>
                   </mat-expansion-panel-header>
                   <div class="assignment"
-                      *ngFor="let itemProxy of inAnalysisIssueItems">
+                      *ngFor="let itemProxy of inAnalysisIssuesItems">
                       <span (click)="navigate('Explore', {id: itemProxy.item.id})">
                           {{itemProxy.item.name}}
                       </span>
