@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations'
 
 import { ImportComponent } from './import/import.component';
-import { NewComponent } from './new/new.component';
 import { CreateWizardComponent } from './create-wizard.component';
 import { MaterialModule } from "../../material.module";
 import { PipesModule } from "../../pipes/pipes.module";
@@ -16,7 +15,6 @@ import { TreeModule } from 'angular-tree-component';
 @NgModule({
   declarations: [
     ImportComponent,
-    NewComponent,
     CreateWizardComponent,
   ],
   entryComponents: [
@@ -37,7 +35,6 @@ import { TreeModule } from 'angular-tree-component';
   ],
   exports : [
     ImportComponent,
-    NewComponent,
     CreateWizardComponent
   ]
 })

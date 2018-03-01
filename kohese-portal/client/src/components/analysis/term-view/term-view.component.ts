@@ -18,15 +18,17 @@ import * as $ from 'jquery';
 export class TermViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
    /* UI Switches */
-   private loadLimit: number = 100;
-   private ascending: boolean = true;
-   private sortField: string = 'count';
-   private filters: Array<RegExp> = [];
-   private filterExactMatch: boolean = false;
-   private filterIgnoreCase: boolean = false;
-   private analysisFilterInput: string;
+   loadLimit: number = 100;
+   ascending: boolean = true;
+   sortField: string = 'count';
+   filters: Array<RegExp> = [];
+   filterExactMatch: boolean = false;
+   filterIgnoreCase: boolean = false;
+   analysisFilterInput: string;
+   showPOS: boolean = false;
    
-   private terms: Array<any>;
+   terms: Array<any>;
+
    /* Data */
    @Input()
    public itemProxy: ItemProxy;

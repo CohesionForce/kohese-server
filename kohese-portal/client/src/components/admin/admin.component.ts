@@ -18,11 +18,15 @@ export class AdminComponent implements OnInit {
   editUserForm: boolean = false;
   currentForm: string;
   selectedUserProxy: ItemProxy;
+  sessions : any;
+  users : Array<any>
 
   constructor(private sessionService: SessionService, private itemRepository: ItemRepository) {
   }
 
   ngOnInit() {
+    this.sessions = this.sessionService.getSessions();
+    this.users = this.sessionService.getUsers();
   }
 
   // TODO - Update to use forms module instead of this insanity 
@@ -79,7 +83,10 @@ export class AdminComponent implements OnInit {
           item.password = this.passwordInput;
         }
         
-        this.itemRepository.buildItem('KoheseUser', item);
+        this.itemRepository.buildItem('KoheseUser', item)
+          .then(()=>{
+            this.users = this.sessionService.getUsers();
+          });
       }
 
       this.cancelForm();
@@ -89,6 +96,9 @@ export class AdminComponent implements OnInit {
   }
 
   deleteUser(userProxy) {
-    this.itemRepository.deleteItem(userProxy, false);
+    this.itemRepository.deleteItem(userProxy, false)
+      .then(()=>{
+        this.users = this.sessionService.getUsers();
+      });
   }
 }

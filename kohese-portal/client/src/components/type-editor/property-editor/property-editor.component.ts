@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/cor
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import { UserInput } from '../../user-input/user-input.class';
 
 @Component({
   selector: 'property-editor',
@@ -18,6 +19,8 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
     allowMultiSelect: false
   };
   private initialized: boolean = false;
+  types : object
+  userInputs : Array<UserInput>
   
   constructor(private typeService: DynamicTypesService,
     private dialogService: DialogService) {
@@ -25,6 +28,8 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
   
   ngOnInit(): void {
     this.initialized = true;
+    this.types = this.typeService.getKoheseTypes();
+    this.userInputs = this.typeService.getUserInputTypes();
   }
   
   ngOnChanges(changes: SimpleChanges): void {

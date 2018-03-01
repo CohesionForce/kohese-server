@@ -12,16 +12,20 @@ import { Observable } from 'rxjs/Observable';
 })
 
 export class RepositoriesComponent extends NavigatableComponent {
-  private remoteNameInput: string;
-  private remoteUrlInput: string;
-  private remotes: any[] = [];
-  private commitMessageInput: string;
-  private pushRemoteNameInput: string;
+  remoteNameInput: string;
+  remoteUrlInput: string;
+  remotes: any[] = [];
+  commitMessageInput: string;
+  pushRemoteNameInput: string;
+  repositories : Array<any> = [];
   
   constructor(private navigationService: NavigationService,
     private versionControlService: VersionControlService,
     private itemRepository: ItemRepository) {
     super(navigationService);
+    this.repositories = itemRepository.getRepositories();
+    // TODO update this file to do the repo status sequence 
+    // leaving it out since it is currently in flux on another branch
   }
   
   addRemote() {

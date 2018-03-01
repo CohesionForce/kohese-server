@@ -44,7 +44,7 @@
         <mat-form-field>
           <mat-select placeholder="Input Type" [(value)]="selectedInputType">
             <mat-option
-              *ngFor="let inputType of (typeService.getUserInputTypes() | mapKey)"
+              *ngFor="let inputType of userInputs | mapKey"
               [value]="inputType">
               {{typeService.getUserInputTypes()[inputType]}}
             </mat-option>
@@ -55,8 +55,8 @@
           <mat-form-field>
             <mat-select placeholder="Reference Type" [(value)]="inputOptions.type">
               <mat-option
-                *ngFor="let type of (typeService.getKoheseTypes() | mapKey)"
-                [value]="typeService.getKoheseTypes()[type]">
+                *ngFor="let type of types | mapKey"
+                [value]="types[type]">
                 {{type}}
               </mat-option>
             </mat-select>

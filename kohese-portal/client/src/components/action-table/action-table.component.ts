@@ -12,7 +12,7 @@ import { ItemProxy } from '../../../../common/models/item-proxy.js'
 export class ActionTableComponent extends NavigatableComponent
                                   implements OnInit, OnDestroy{
   @Input()
-  private itemProxy : ItemProxy;
+  itemProxy : ItemProxy;
 
   constructor(protected NavigationService : NavigationService) {
     super(NavigationService);
