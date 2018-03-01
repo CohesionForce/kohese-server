@@ -28,7 +28,7 @@ export class SideBarComponent implements OnInit {
   
   openNewDialog(): void {
     this.dialogService.openComponentDialog(CreateWizardComponent, {}).
-      updateSize('70%', 'auto');
+      updateSize('70%', '70%');
   }
   
   openImportDialog(): void {

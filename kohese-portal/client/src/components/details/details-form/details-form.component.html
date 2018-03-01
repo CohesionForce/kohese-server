@@ -1,14 +1,6 @@
 <form *ngIf="itemProxy"
       [formGroup]="formGroup" 
       novalidate class="form-group">
-  <ng-container
-    *ngFor="let fieldName of transitionCandidateFieldNames; let j = index">
-    <ng-container *ngIf="0 === j">
-      <label>Current State:</label>
-    </ng-container>
-    <label>{{type.stateFlows[fieldName][itemProxy.item[fieldName]].name}}</label>
-    <br/>
-  </ng-container>
   <ng-container *ngFor="let property of (properties | mapKey)">
     <ng-container [ngSwitch]="properties[property].inputType.type">
       <k-text *ngSwitchCase="'text'"
@@ -39,16 +31,9 @@
       <br/>
     </ng-container>
   </ng-container>
-  <span class="pull-right">
-    <ng-container
-      *ngFor="let fieldName of transitionCandidateFieldNames">
-      <button mat-raised-button class="state-button"
-        *ngFor="let candidate of transitionCandidates[fieldName]; let j = index"
-        matTooltip="{{type.stateFlows[fieldName][candidate.target].description}}"
-        [disabled]="disabled"
-        (click)="openTransitionDialog(fieldName, candidate.target)">
-        {{type.stateFlows[fieldName][candidate.target].name}}
-      </button>
-    </ng-container>
-  </span>
 </form>
+<div id="detailsFormStateEditorContainer">
+  <k-state-editor [itemProxy]="itemProxy"
+    (stateChanged)="nonFormFieldChanged.emit({ fieldName: $event.fieldName, fieldValue: $event.candidate })">
+  </k-state-editor>
+</div>

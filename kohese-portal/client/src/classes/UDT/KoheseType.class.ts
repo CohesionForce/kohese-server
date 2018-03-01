@@ -1,9 +1,11 @@
 import * as ItemProxy from '../../../../common/models/item-proxy';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
   private dataModelProxy: ItemProxy;
   private viewModelProxy: ItemProxy;
+  private _itemRepository: ItemRepository;
   name : string;
   description: string;
   icon: string;
@@ -16,14 +18,16 @@ export class KoheseType {
   private relations : object;
   private acls : Array<any>;
   private methods : Array<any>;
-  private _stateFlows: any = {};
-  get stateFlows() {
-    return this._stateFlows;
+  private _dataModelFields: any = {};
+  get dataModelFields() {
+    return this._dataModelFields;
   }
 
-  constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy) {
+  constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy,
+    itemRepository: ItemRepository) {
     this.dataModelProxy = dataModelProxy;
     this.viewModelProxy = viewModelProxy;
+    this._itemRepository = itemRepository;
     this.retrieveModelData();
     if (this.viewModelProxy) {
       this.retrieveViewData();
@@ -41,21 +45,24 @@ export class KoheseType {
     this.relations = this.dataModelProxy.item.relations;
     this.acls = this.dataModelProxy.item.acls;
     this.methods = this.dataModelProxy.item.methods;
-    for (let propertyKey in this.dataModelProxy.item.properties) {
-      let property: any = this.dataModelProxy.item.properties[propertyKey];
-      if ('StateMachine' === property.type) {
-        let states: any = {};
-        for (let fieldName in property.properties.state) {
-          states[fieldName] = property.properties.state[fieldName];
-          states[fieldName].transitionCandidates = [];
-        }
-        
-        for (let transitionKey in property.properties.transition) {
-          let transition: any = property.properties.transition[transitionKey];
-          states[transition.source].transitionCandidates.push(transition);
-        }
-        
-        this._stateFlows[propertyKey] = states;
+    
+    let fieldGroups: Array<any> = [];
+    let modelProxy: ItemProxy = this.dataModelProxy;
+    while (modelProxy) {
+      let modelFields: any = {};
+      for (let fieldKey in modelProxy.item.properties) {
+        modelFields[fieldKey] = modelProxy.item.
+          properties[fieldKey];
+      }
+      fieldGroups.push(modelFields);
+      
+      modelProxy = this._itemRepository.getProxyFor(modelProxy.item.base);
+    }
+    
+    fieldGroups.reverse();
+    for (let j: number = 0; j < fieldGroups.length; j++) {
+      for (let fieldKey in fieldGroups[j]) {
+        this._dataModelFields[fieldKey] = fieldGroups[j][fieldKey];
       }
     }
   }

@@ -35,20 +35,9 @@ export class DetailsFormComponent extends NavigatableComponent
   createInfo : any;
   @Output()
   formGroupUpdated = new EventEmitter<FormGroup>();
-  private _transitionCandidates: Array<any>;
-  get transitionCandidates() {
-    return this._transitionCandidates;
-  }
-  private _transitionCandidateFieldNames: Array<string>;
-  get transitionCandidateFieldNames() {
-    return this._transitionCandidateFieldNames;
-  }
 
   public properties: any = {};
   private initialized : boolean;
-  get stateService() {
-    return this._stateService;
-  }
   
   @Output()
   private nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -62,8 +51,7 @@ export class DetailsFormComponent extends NavigatableComponent
   constructor(protected NavigationService : NavigationService,
               private FormBuilder : FormBuilder,
               private DynamicTypeService: DynamicTypesService,
-              private ItemRepository : ItemRepository,
-              private _stateService: StateService) {
+              private ItemRepository : ItemRepository) {
     super(NavigationService);
     this.initialized = false;
   }
@@ -145,8 +133,15 @@ export class DetailsFormComponent extends NavigatableComponent
         model : this.createInfo.type.dataModelProxy
       }
       this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
-      for (let fieldName in this.type.stateFlows) {
-        this.itemProxy.item[fieldName] = this.type.properties[fieldName].default;
+      let modelProxy: ItemProxy = this.itemProxy.model;
+      while (modelProxy) {
+        let t: KoheseType = this.DynamicTypeService.
+          getKoheseTypes()[modelProxy.item.name];
+        for (let fieldName in t.dataModelFields) {
+          this.itemProxy.item[fieldName] = t.dataModelFields[fieldName].
+            default;
+        }
+        modelProxy = this.ItemRepository.getProxyFor(modelProxy.item.base);
       }
       this.updateProperties();
       this.formGroup = this.createFormGroup();
@@ -156,13 +151,16 @@ export class DetailsFormComponent extends NavigatableComponent
 
   updateProperties () : void {
     this.properties = {};
+    let fieldGroups: Array<any> = [{}];
+    let fieldGroup: any = {};
     // Apply properties from my current class 
     console.log(':: Update Properties ');
     for (let fieldName in this.type.properties) {
       if (this.fieldFilter(fieldName)) {
-        this.properties[fieldName] = this.type.properties[fieldName];
+        fieldGroup[fieldName] = this.type.properties[fieldName];
       }
     }
+    fieldGroups.push(fieldGroup);
     console.log(':: Current Properties loaded');
     console.log(this.properties);
 
@@ -178,20 +176,25 @@ export class DetailsFormComponent extends NavigatableComponent
         if (inheritedView) {
           console.log(':: View found ');
           console.log(inheritedView);
+          fieldGroup = {};
           for (let fieldName in inheritedView.item.viewProperties) {
             console.log(':: Adding inherited property ' + fieldName);
-            this.properties[fieldName] = inheritedView.item.viewProperties[fieldName];
+            fieldGroup[fieldName] = inheritedView.item.
+              viewProperties[fieldName];
           }
+          fieldGroups.push(fieldGroup);
         }
         inheritedModel = inheritedProxy.item.base;
       }
     }
     
-    this._transitionCandidates = this._stateService.
-      getTransitionCandidates(this.itemProxy);
-    this._transitionCandidateFieldNames = Object.keys(this.
-      _transitionCandidates);
-      
+    fieldGroups.reverse();
+    for (let j: number = 0; j < fieldGroups.length; j++) {
+      for (let fieldName in fieldGroups[j]) {
+        this.properties[fieldName] = fieldGroups[j][fieldName];
+      }
+    }
+    
     console.log(':: Update Properties Complete');
     console.log(this.properties);
   }
@@ -222,20 +225,5 @@ export class DetailsFormComponent extends NavigatableComponent
       }
     }
     return propertyMap;
-  }
-  
-  public openTransitionDialog(fieldName: string, candidate: string): void {
-    //this.dialogService.openComponentDialog().afterClosed().subscribe(() => {
-      this.nonFormFieldChanged.emit({
-        fieldName: fieldName,
-        fieldValue: candidate
-      });
-
-      this.itemProxy.item[fieldName] = candidate;
-      this._transitionCandidates = this._stateService.
-        getTransitionCandidates(this.itemProxy);
-      this._transitionCandidateFieldNames = Object.keys(this.
-        _transitionCandidates);
-    //});
   }
 }

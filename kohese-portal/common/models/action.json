@@ -17,7 +17,7 @@
             "name": "Assigned",
             "description": "An action that is Assigned."
            },
-          "Pending Reassign": {
+          "PendingReassign": {
             "name": "Pending Reassign",
             "description": "An action that is Pending Reassign."
            },

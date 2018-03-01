@@ -1,0 +1,16 @@
+<div class="state-editor-container">
+  <ng-container
+    *ngFor="let fieldName of transitionCandidateFieldNames">
+    <div class="field-transition-container">
+      <label>{{fieldName}}: {{itemProxy.item[fieldName]}}</label>
+      <br/>
+      <button mat-raised-button class="state-button"
+        *ngFor="let candidate of transitionCandidates[fieldName]"
+        matTooltip="{{koheseType.dataModelFields[fieldName].properties.state[candidate.target].description}}"
+        [disabled]="disabled"
+        (click)="openTransitionDialog(fieldName, candidate.target)">
+        {{koheseType.dataModelFields[fieldName].properties.state[candidate.target].name}}
+      </button>
+    </div>
+  </ng-container>
+</div>

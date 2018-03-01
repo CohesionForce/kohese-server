@@ -9,12 +9,19 @@ export class StateService {
   }
   
   public getTransitionCandidates(proxy: ItemProxy): Array<any> {
-    let type: KoheseType = this._typeService.getKoheseTypes()[proxy.kind];
     let transitionCandidates: any = {};
-    if (type) {
-      for (let fieldName in type.stateFlows) {
-        transitionCandidates[fieldName] = type.stateFlows[fieldName][proxy.item[fieldName]].
-          transitionCandidates;
+    let type: KoheseType = this._typeService.getKoheseTypes()[proxy.kind];
+    for (let fieldName in type.dataModelFields) {
+      let fieldValue: any = type.dataModelFields[fieldName];
+      if ('StateMachine' === fieldValue.type) {
+        transitionCandidates[fieldName] = [];
+        for (let transitionKey in fieldValue.properties.transition) {
+          let transition: any = fieldValue.properties.
+            transition[transitionKey];
+          if (proxy.item[fieldName] === transition.source) {
+            transitionCandidates[fieldName].push(transition);
+          }
+        }
       }
     }
     
