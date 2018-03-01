@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from './current-user.service';
 import * as ItemProxy from '../../../../common/models/item-proxy';
-import { ItemRepository} from '../item-repository/item-repository.service';
+import { ItemRepository, RepoStates} from '../item-repository/item-repository.service';
 
 @Injectable()
 export class SessionService {
@@ -22,7 +22,7 @@ export class SessionService {
       if (decodedToken) {
         this.itemRepositoryStatusSubscription = this.itemRepository.
           getRepoStatusSubject().subscribe((status) => {
-          if (this.itemRepository.state.SYNCHRONIZATION_SUCCEEDED === status.state) {
+          if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
             let usersProxy: ItemProxy = this.itemRepository.getRootProxy().getChildByName('Users');
             this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
           } else {

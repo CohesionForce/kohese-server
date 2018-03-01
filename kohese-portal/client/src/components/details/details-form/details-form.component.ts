@@ -8,7 +8,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -60,7 +60,7 @@ export class DetailsFormComponent extends NavigatableComponent
     
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
     .subscribe((update) => {
-      if (this.ItemRepository.state.SYNCHRONIZATION_SUCCEEDED === update.state) {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         if (this.itemProxy) {
           this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
         } else if (this.createInfo) {

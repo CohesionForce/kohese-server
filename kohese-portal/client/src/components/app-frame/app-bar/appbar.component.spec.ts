@@ -8,14 +8,15 @@ import { MaterialModule } from '../../../material.module'
 
 import { AppBarComponent } from './appbar.component';
 
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
+import { MockItemRepository} from '../../../../mocks/services/MockItemRepository';
 import { CurrentUserService } from '../../../services/user/current-user.service';
 import { MockCurrentUserService } from '../../../../mocks/services/MockCurrentUserService';
 import { SessionService } from '../../../services/user/session.service';
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { BehaviorSubject } from 'rxjs';
 
 describe('Component: App Bar', ()=>{
   let appBarComponent: AppBarComponent;
@@ -41,12 +42,33 @@ describe('Component: App Bar', ()=>{
 
     appBarFixture = TestBed.createComponent(AppBarComponent);
     appBarComponent = appBarFixture.componentInstance;
-
-    appBarFixture.detectChanges();
     
+  })
+  it('displays a syncing message', ()=>{
+    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+      new BehaviorSubject<any>({state : RepoStates.SYNCHRONIZING}))
+    appBarFixture.detectChanges();
+    expect(appBarComponent.syncStatusString).toBe('Syncing');
+  })
+
+  it('displays a sync failed message', ()=>{
+    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+      new BehaviorSubject<any>({state : RepoStates.SYNCHRONIZATION_FAILED}))
+      appBarFixture.detectChanges();
+      expect(appBarComponent.syncStatusString).toBe('Synchronization Failed');
+  })
+
+  it('displays a disconnected message', ()=>{
+    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+      new BehaviorSubject<any>({state : RepoStates.DISCONNECTED}))
+      appBarFixture.detectChanges();
+      expect(appBarComponent.syncStatusString).toBe('Disconnected');
   })
 
   it('instantiates the App Bar component', ()=>{
+    appBarFixture.detectChanges();
     expect(appBarComponent).toBeTruthy(); 
   })
+
+  
 })

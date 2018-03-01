@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges,
   SimpleChanges } from '@angular/core';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import { ItemProxy } from '../../../../../common/models/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
@@ -53,7 +53,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     
     this.repositoryStatusSubscription = this.itemRepository.
       getRepoStatusSubject().subscribe((statusObject: any) => {
-      if (this.itemRepository.state.SYNCHRONIZATION_SUCCEEDED === statusObject.state) {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === statusObject.state) {
         this.userProxies = this.sessionService.getUsers();
         this.observingUser = this.sessionService.getSessionUser().getValue().
           item.name;

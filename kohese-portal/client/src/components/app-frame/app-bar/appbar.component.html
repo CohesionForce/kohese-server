@@ -8,16 +8,8 @@
         (click)="navigate('Explore', {id : ''})">
         Kohese Portal
         <i class="fa fa-exclamation-triangle"
-          *ngIf="(State.SYNCHRONIZING === itemRepositoryState)">
-           - Syncing
-        </i>
-        <i class="fa fa-exclamation-triangle"
-          *ngIf="(State.SYNCHRONIZATION_FAILED === itemRepositoryState)">
-           - Failed Synchronization
-        </i>
-        <i class="fa fa-exclamation-triangle"
-          *ngIf="(State.DISCONNECTED === itemRepositoryState)">
-           - Disconnected
+          *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
+           - {{syncStatusString}}
         </i>
       </a>
       <a class="navbar-brand" (click)="navigate('Dashboard', {})">Dashboard</a>

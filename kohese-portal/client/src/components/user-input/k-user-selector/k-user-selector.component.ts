@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserInput } from '../user-input.class';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 
 import { ItemProxy } from '../../../../../common/models/item-proxy';
@@ -23,7 +23,7 @@ export class KUserSelectorComponent extends UserInput implements OnInit, OnDestr
 
   ngOnInit () { 
     this.repoStagingSub = this.ItemRepository.getRepoStatusSubject().subscribe((update)=>{
-        if (this.ItemRepository.state.SYNCHRONIZATION_SUCCEEDED === update.state) { 
+        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) { 
             this.userProxies = this.SessionService.getUsers()
             this.filteredProxies = this.formGroup.get(this.fieldId).valueChanges.startWith('').
                 map((text: string) => {
