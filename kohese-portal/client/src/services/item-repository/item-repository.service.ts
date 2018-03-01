@@ -31,6 +31,7 @@ export class ItemRepository {
   recentProxies : Array<ItemProxy>;
 
   repositoryStatus : BehaviorSubject<any>;
+  historySubject : Subject<any>;
 
   constructor (private socketService: SocketService,
                private CurrentUserService: CurrentUserService,
@@ -79,6 +80,8 @@ export class ItemRepository {
       syncing: false,
       message : 'Initializing Item Repository'
     });
+
+    this.historySubject = new Subject();
 
     ItemProxy.getChangeSubject().subscribe(change => {
       console.log('+++ Received notification of change: ' + change.type);
@@ -472,7 +475,7 @@ export class ItemRepository {
     });
   }
 
-  getHistoryFor (proxy) {
+  getHistoryFor (proxy) : Subject<any>{
     this.socketService.socket.emit('Item/getHistory', {onId: proxy.item.id}, (results) => {
       if (!proxy.history) {
         proxy.history = {};
@@ -480,7 +483,9 @@ export class ItemRepository {
       proxy.history = results.history;
       console.log('::: History retrieved for: ' + proxy.item.id + ' - ' + proxy.item.name);
       console.log(results);
+      this.historySubject.next(proxy);
     });
+    return this.historySubject;
   }
 
   getStatusFor (repo) {

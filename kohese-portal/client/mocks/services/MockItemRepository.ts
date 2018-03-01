@@ -2,6 +2,7 @@ import { BehaviorSubject} from 'rxjs/BehaviorSubject';
 import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
 import * as ItemProxy from '../../../common/models/item-proxy';
+import { Subject } from 'rxjs';
 
 export class MockItemRepository {
   mockRootProxy = ItemProxy.getRootProxy();
@@ -23,6 +24,10 @@ export class MockItemRepository {
 
   getRootProxy () {
     return this.mockRootProxy;
+  }
+
+  getHistoryFor () {
+    return (new Subject())
   }
 
   getProxyFor () {
