@@ -8,9 +8,9 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 })
 
 export class LoginComponent implements OnInit {
-  private username: string = '';
-  private password : string = '';
-  private loginSubmitted : boolean = false;
+  username: string = '';
+  password : string = '';
+  loginSubmitted : boolean = false;
 
   constructor(private authenticationService: AuthenticationService,
     private navigationService: NavigationService) {

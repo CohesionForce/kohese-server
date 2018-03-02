@@ -80,7 +80,7 @@
               <ng-template mat-tab-label>
                   Children ({{itemProxy.children.length}})
               </ng-template>
-              <children-tab [itemProxy]="itemProxy"></children-tab>
+              <children-tab [proxyStream]="proxyStream"></children-tab>
             </mat-tab>
             <mat-tab label="Relations">
                 <h4>Relations Tab</h4>
@@ -88,7 +88,7 @@
                 <p><b>This tab is under construction.</b></p>
             </mat-tab>
             <mat-tab label="History" select="getHistory()">
-                <history-tab [itemProxy]="itemProxy"></history-tab>
+                <history-tab [proxyStream]="proxyStream"></history-tab>
             </mat-tab>
             <mat-tab label="Journal">
               <journal [itemProxy]="itemProxy"></journal>

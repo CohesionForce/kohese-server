@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { VersionControlService } from '../../services/version-control/version-control.service';
 import { SessionService } from '../../services/user/session.service';
 import { DialogService } from '../../services/dialog/dialog.service';
@@ -62,7 +62,7 @@ export class TreeComponent extends NavigatableComponent
   ngOnInit(): void {
     this.repoStatusSub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
-      if (update.connected) {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         treeRoot = this.ItemRepository.getRootProxy();
         this.absoluteRoot = treeRoot;
         this.koheseTypes = this.typeService.getKoheseTypes();

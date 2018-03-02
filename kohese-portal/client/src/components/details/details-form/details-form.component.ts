@@ -8,7 +8,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 
 import { ItemProxy } from '../../../../../common/models/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { StateService } from '../../../services/state/state.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -65,7 +65,7 @@ export class DetailsFormComponent extends NavigatableComponent
     
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
     .subscribe((update) => {
-      if (update.connected) {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         if (this.itemProxy) {
           this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
         } else if (this.createInfo) {
@@ -109,15 +109,16 @@ export class DetailsFormComponent extends NavigatableComponent
         this.buildStubProxy();
       }
 
-      if (-1 !== changedInputs.indexOf('disabled')) {
-        if (this.formGroup) {
-          if (changes['disabled'].currentValue) {
+      if (changes['disabled']) {
+        this.disabled = changes['disabled'].currentValue;
+        if (this.disabled) { 
+            this.formGroup = this.createFormGroup();
+            this.formGroupUpdated.emit(this.formGroup);
             this.formGroup.disable();
           } else {
             this.formGroup.enable();
           }
         }
-      }
     }
   }
 

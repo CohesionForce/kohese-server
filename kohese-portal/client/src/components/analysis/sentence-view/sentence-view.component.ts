@@ -19,14 +19,14 @@ import * as $ from 'jquery';
 export class SentenceViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
   /* UI Switches */
-  private loadLimit: number = 100;
-  private ascending: boolean = true;
-  private sortField: string = 'count';
-  private showSentencesInDetails: boolean = true;
-  private showPhrasesInDetails: boolean = false;
-  private showTokensInDetails: boolean = false;
+  loadLimit: number = 100;
+  ascending: boolean = true;
+  sortField: string = 'count';
+  showSentencesInDetails: boolean = true;
+  showPhrasesInDetails: boolean = false;
+  showTokensInDetails: boolean = false;
   
-  private sentences: Array<any>;
+  sentences: Array<any>;
   
   /* Data */
   @Input()

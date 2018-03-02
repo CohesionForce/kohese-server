@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates} from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ItemProxy } from '../../../../common/models/item-proxy';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
@@ -27,7 +27,7 @@ export class DynamicTypesService {
     this.koheseTypes = {};
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
       .subscribe((update: any) => {
-      if (update.connected) {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         this.modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
         this.typeProxyList = this.modelProxy.getDescendants().
           sort((first: ItemProxy, second: ItemProxy) => {

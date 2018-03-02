@@ -12,7 +12,7 @@ export class MockDynamicTypesService {
   }
   getKoheseTypes () {
     return {
-      'Item' : MockKoheseType
+      'Item' : MockKoheseType()
     };
   }
 
@@ -25,11 +25,11 @@ export class MockDynamicTypesService {
   }
 
   getUserInputTypes () {
-
+    return {}
   }
 
   getMockKoheseType () {
-    return MockKoheseType
+    return MockKoheseType()
   }
   
   getIcons() {

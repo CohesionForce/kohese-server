@@ -60,7 +60,7 @@ describe('Component: Admin', ()=>{
     })
 
     it('should set the fields to the selected User values', ()=>{
-      let mockProxy = new ItemProxy('KoheseUser', MockUserData)
+      let mockProxy = new ItemProxy('KoheseUser', MockUserData())
       adminComponent.editUser(mockProxy);
       expect(adminComponent.usernameInput).toBe(mockProxy.item.name);
       expect(adminComponent.descriptionInput).toBe(mockProxy.item.description);
@@ -83,7 +83,7 @@ describe('Component: Admin', ()=>{
     })
 
     it('should delete a user', ()=>{
-      let mockProxy = new ItemProxy('KoheseUser', MockUserData);
+      let mockProxy = new ItemProxy('KoheseUser', MockUserData());
       let deleteSpy = spyOn(TestBed.get(ItemRepository), 'deleteItem').and.returnValue(Promise.resolve()); 
       adminComponent.deleteUser(mockProxy);
       expect(deleteSpy).toHaveBeenCalled();
@@ -105,7 +105,7 @@ describe('Component: Admin', ()=>{
       })
     })
     it('should send an update command user when an existing user is saved', ()=>{
-      adminComponent.selectedUserProxy = new ItemProxy('KoheseUser', MockUserData);
+      adminComponent.selectedUserProxy = new ItemProxy('KoheseUser', MockUserData());
       let upsertSpy = spyOn(TestBed.get(ItemRepository), 'upsertItem');
       adminComponent.updateUser();
       expect(upsertSpy).toHaveBeenCalled();

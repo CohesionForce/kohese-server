@@ -4,15 +4,16 @@ import { FormGroup } from '@angular/forms';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import * as ItemProxy from '../../../../common/models/item-proxy.js';
 import { SessionService } from '../../services/user/session.service';
 
 import * as commonmark from 'commonmark';
 import { HtmlRenderer, Parser } from 'commonmark';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector : 'details-view',
@@ -27,18 +28,16 @@ export class DetailsComponent extends NavigatableComponent
   parentProxy : ItemProxy;
   typeProxies : Array<ItemProxy>;
 
-  /* Commonmark items */
-  reader : Parser;
-  writer : HtmlRenderer;
-
   /* Observables */
   showChildrenSubject : BehaviorSubject<boolean>
   detailsFormSubject : BehaviorSubject<FormGroup>;
-
+  proxyStream : BehaviorSubject<ItemProxy>
+  
   /* Subscriptions */
   routeSub : Subscription;
   repoReadySub : Subscription;
   detailsFormSubscription : Subscription;
+  proxyUpdates : Observable<any>;
 
   /* UI Switches */
   enableEdit : boolean;
@@ -58,6 +57,8 @@ export class DetailsComponent extends NavigatableComponent
   itemDescriptionRendered : string;
   detailsFormGroup : FormGroup;
   private nonFormFieldValueMap: any = {};
+  initialized : boolean;
+  repoConnected : boolean = false;
 
   constructor (protected NavigationService : NavigationService,
                private route : ActivatedRoute,
@@ -67,47 +68,60 @@ export class DetailsComponent extends NavigatableComponent
     }
 
   ngOnInit () {
-    this.reader = new commonmark.Parser();
-    this.writer = new commonmark.HtmlRenderer();
+
+    this.proxyStream = new BehaviorSubject({});
     this.showChildren = false;
     this.showChildrenSubject = new BehaviorSubject(this.showChildren);
 
     /* Subscriptions */
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
-      this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
-      .subscribe(update => {
-        if (update.connected) {
-          this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
-          if (!this.itemProxy) {
-            // TODO : Throw error modal to the UI
-          }
-          this.ItemRepository.registerRecentProxy(this.itemProxy);
-          let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-          this.typeProxies = modelProxy.getDescendants();
-          this.proxyList = this.ItemRepository.getShortFormItemList();
-          this.userList = this.SessionService.getUsers();
-          this.updateParentProxy();
-          if (this.itemProxy.item.description) {
-            let parsed = this.reader.parse(this.itemProxy.item.description);
-            this.itemDescriptionRendered = this.writer.render(parsed);
-          }
-        }
-      })
-    });
 
+      if (this.initialized && this.repoConnected) {
+        this.updateProxy();
+      } else {
+        this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
+        .subscribe(update => {
+          if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
+            this.repoConnected = true;
+            this.updateProxy();
+            this.proxyUpdates = ItemProxy.getChangeSubject().subscribe((change)=>{
+              if(change.id === this.itemProxy.item.id) {
+                this.proxyStream.next(change.proxy);
+              }
+            })
+          }
+        })
+        this.initialized = true;
+      }
+    })
     /* End Subscriptions */
-
-
-    this.enableEdit = false;
-    this.defaultTab = {active: true }
   }
 
   ngOnDestroy () {
     this.routeSub.unsubscribe();
     this.repoReadySub.unsubscribe();
+  }
 
-    // TODO - implement bundle logic here
+  updateProxy () {
+    this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+      if (!this.itemProxy) {
+        // TODO : Throw error modal to the UI
+        }
+
+      this.ItemRepository.registerRecentProxy(this.itemProxy);
+
+      // Is this defunct? TODO 
+      let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
+      this.typeProxies = modelProxy.getDescendants();
+
+      this.proxyList = this.ItemRepository.getShortFormItemList();
+      this.userList = this.SessionService.getUsers();
+      this.updateParentProxy();
+
+      this.enableEdit = false;
+      this.defaultTab = {active: true }
+      this.proxyStream.next(this.itemProxy);
   }
 
   updateParentProxy () : void {
@@ -120,31 +134,6 @@ export class DetailsComponent extends NavigatableComponent
 
   getProxyFor(id) : any {
       return this.ItemRepository.getProxyFor(id);
-    }
-
-  initializeItemStates (type : string) : void {
-      // TODO - Don't know how I feel about this implementation
-      // Revisit after initial port
-      if (type === 'Action') {
-        if (!this.itemProxy.item.hasOwnProperty('actionState')) {
-          this.itemProxy.item.actionState = 'Proposed';
-        }
-        if (!this.itemProxy.item.hasOwnProperty('decisionState')) {
-          this.itemProxy.item.decisionState = 'Proposed';
-        }
-      } else if (type === 'Decision') {
-        if (!this.itemProxy.item.hasOwnProperty('decisionState')) {
-          this.itemProxy.item.decisionState = 'Proposed';
-        }
-      } else if (type === 'Task') {
-        if (!this.itemProxy.item.hasOwnProperty('taskState')) {
-          this.itemProxy.item.taskState = 'Proposed';
-        }
-      } else if (type === 'Issue') {
-        if (!this.itemProxy.item.hasOwnProperty('issueState')) {
-          this.itemProxy.item.issueState = 'Observed';
-        }
-      }
     }
 
   onFormGroupUpdated(newFormGroup : any) {
@@ -180,15 +169,6 @@ export class DetailsComponent extends NavigatableComponent
   showChildrenToggled () : void {
       this.showChildrenSubject.next(this.showChildren);
     }
-
-  cancel () : void {
-    if (this.itemProxy.dirty) {
-      this.ItemRepository.fetchItem(this.itemProxy)
-        .then((fetchResults) => {
-          // TODO - Get form and set pristine
-        });
-    }
-  };
 
   removeItem (proxy : ItemProxy) : void {
     this.ItemRepository.deleteItem(proxy, false)
