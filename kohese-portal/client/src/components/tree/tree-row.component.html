@@ -3,12 +3,13 @@
 <div class="kt-collection" [hidden]="!visible">
   <div class="kt-item" id="{{itemProxy.item.id}}"
     (click)="navigate('Explore', {id: itemProxy.item.id})"
-    [ngClass]="{ 'kti-selected-item': (itemProxy.item.id === getSelectedProxyId()),
+    [ngClass]="{ 'kti-selected-item': (itemProxy.item.id === (selectedProxyIdStream | async)),
     'highlight-row': (visible && matchesFilter) }">
-    <i (click)="getTreeMapEntry().expanded = !getTreeMapEntry().expanded;"
+    <i
+      (click)="expand(!expanded, false)"
       class="kt-icon fa"
-      [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && getTreeMapEntry().expanded,
-      'fa-caret-right': (itemProxy.children.length > 0) && !getTreeMapEntry().expanded,
+      [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && expanded,
+      'fa-caret-right': (itemProxy.children.length > 0) && !expanded,
       'no-children': !(itemProxy.children.length > 0) }">
     </i>
     <ng-container *ngIf="koheseType.icon">
@@ -26,13 +27,13 @@
     <ng-container *ngIf="itemProxy.dirty">
       <img src="assets/icons/versioncontrol/dirty.ico" title="Dirty item"/>
     </ng-container>
-    <ng-container *ngIf="isVersionControlViewVisible()">
+    <ng-container *ngIf="'Version Control' === (selectedViewStream | async)">
       {{itemProxy.status}}
     </ng-container>
     <span id="rightSpan" class="kti-actions">
       <!-- Default row actions -->
-      <ng-container *ngIf="!isVersionControlViewVisible()">
-        <button mat-icon-button (click)="updateRoot()">
+      <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
+        <button mat-icon-button (click)="rootChanged.emit(itemProxy)">
           <mat-icon class="fa fa-anchor"></mat-icon>
         </button>
         <button mat-icon-button (click)="removeItem()">
@@ -41,7 +42,7 @@
       </ng-container>
       <!-- Version Control row actions -->
       <ng-container
-        *ngIf="isVersionControlViewVisible() && itemProxy.vcState">
+        *ngIf="('Version Control' === (selectedViewStream | async)) && itemProxy.vcState">
         <!-- VC Status Icons -->
         <img *ngIf="itemProxy.vcState.Unstaged"
           src="assets/icons/versioncontrol/unstaged.ico" title="Unstaged"/>
@@ -62,9 +63,9 @@
       </ng-container>
     </span>
   </div>
-  <ng-container *ngIf="getTreeMapEntry().expanded">
-    <tree-row *ngFor="let childProxy of itemProxy.children"
-      [itemProxy]="childProxy">
-    </tree-row>
-  </ng-container>
+  <tree-row #rows *ngFor="let childProxy of itemProxy.children"
+    [hidden]="!expanded" [itemProxy]="childProxy"
+    (rootChanged)="rootChanged.emit($event)" [selectedViewStream]="selectedViewStream"
+    [filterStream]="filterStream" (visibilityChanged)="visibilityChanged.emit($event)">
+  </tree-row>
 </div>

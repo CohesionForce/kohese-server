@@ -1,4 +1,4 @@
-<div *ngIf="getTreeRoot()">
+<div *ngIf="root">
   <div id="top-action-bar">
     <button mat-raised-button (click)="expandAll()"
       class="btn btn-default btn-sm">
@@ -13,37 +13,37 @@
       Collapse All
     </button>
     <button mat-raised-button class="btn btn-default btn-sm" (click)="upLevel()"
-      [disabled]="isRootDefault()">
+      [disabled]="isRootDefault">
       Up Level
     </button>
     <button mat-raised-button class="btn btn-default btn-sm" (click)="resetRoot()"
-      [disabled]="isRootDefault()">
+      [disabled]="isRootDefault">
       Reset Root
     </button>
     <i (click)="syncLocation()"
       [ngClass]="{ 'btn-green': locationSynced}"
       class="btn btn-default btn-sm fa fa-exchange">
     </i>
-      <span>Showing {{getItemMatchedCount()}} of
-        {{getTreeRoot().descendantCount}}
+      <span>Showing {{numberOfRowsVisible}} of
+        {{root.descendantCount}}
       </span>
     <div>
       <!-- Start View Control -->
       <mat-form-field>
-        <mat-select placeholder="View" (selectionChange)="viewSelectionChanged()"
-          [(value)]="selectedView">
+        <mat-select placeholder="View"
+          (selectionChange)="viewSelectionChanged($event.value)">
           <mat-option *ngFor="let view of viewList" [value]="view">
             {{view}}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <!-- Start View Forking -->
-      <ng-container [ngSwitch]="selectedView">
+      <ng-container [ngSwitch]="(selectedViewStream | async)">
         <!-- Start Default Toolbar -->
         <ng-container *ngSwitchCase="viewList[0]">
           <!-- Kind Selection -->
           <mat-form-field>
-            <mat-select placeholder="Kind" [(value)]="getProxyFilter().kind"
+            <mat-select placeholder="Kind" [(value)]="proxyFilter.kind"
               (selectionChange)="filter()">
               <mat-option>{{NO_KIND_SPECIFIED}}</mat-option>
               <mat-option *ngFor="let type of (koheseTypes | mapKey)"
@@ -54,9 +54,9 @@
           </mat-form-field>
           <!-- Action Filtering -->
           <ng-container
-            *ngIf="(getProxyFilter().kind && (getProxyFilter().kind.name === 'Action'))">
+            *ngIf="(proxyFilter.kind && (proxyFilter.kind.name === 'Action'))">
             <mat-form-field>
-              <mat-select placeholder="State" [(value)]="getProxyFilter().actionState"
+              <mat-select placeholder="State" [(value)]="proxyFilter.actionState"
                 (selectionChange)="filter()">
                 <mat-option *ngFor="let state of actionStates" [value]="state">
                   {{state}}
@@ -64,7 +64,7 @@
               </mat-select>
             </mat-form-field>
             <mat-form-field>
-              <mat-select placeholder="Assignee" [(value)]="getProxyFilter().actionAssignee"
+              <mat-select placeholder="Assignee" [(value)]="proxyFilter.actionAssignee"
                 (selectionChange)="filter()">
                 <mat-option *ngFor="let user of userList" [value]="user.item.name">
                   {{user.item.name}}
@@ -74,15 +74,15 @@
           </ng-container> <!-- End Action Filtering -->
           <!-- String Filtering -->
           <mat-form-field>
-            <input matInput type="text" [(ngModel)]="getProxyFilter().filterString"
-              [ngStyle]="getProxyFilter().invalidRegex && {'background-color':'pink'}"
+            <input matInput type="text" [(ngModel)]="proxyFilter.filterString"
+              [ngStyle]="proxyFilter.invalidRegex && {'background-color':'pink'}"
               placeholder="Filter" (input)="filter()"/>
           </mat-form-field>
           <!-- Version Control Filtering -->
-          <mat-checkbox [(ngModel)]="getProxyFilter().status" (change)="filter()">
+          <mat-checkbox [(ngModel)]="proxyFilter.status" (change)="filter()">
             Modified
           </mat-checkbox>
-          <mat-checkbox [(ngModel)]="getProxyFilter().dirty" (change)="filter()">
+          <mat-checkbox [(ngModel)]="proxyFilter.dirty" (change)="filter()">
             Dirty
           </mat-checkbox>
           <!-- End Version Control Filtering -->
@@ -99,12 +99,16 @@
       Name
     </div>
     <div class="kt-body">
-      <tree-row *ngFor="let childProxy of getTreeRoot().children"
-        [itemProxy]="childProxy">
+      <tree-row #rows *ngFor="let proxy of root.children"
+        [itemProxy]="proxy" (rootChanged)="whenRootChanges($event)"
+        [selectedViewStream]="selectedViewStream"
+        [selectedProxyIdStream]="selectedProxyIdStream"
+        [filterStream]="filterStream"
+        (visibilityChanged)="whenRowVisibilityChanges($event)">
       </tree-row>
     </div>
   </div> <!-- End Knowledge Tree -->
 </div>
-<div *ngIf="!getTreeRoot()">
+<div *ngIf="!root">
   Loading...
 </div>
