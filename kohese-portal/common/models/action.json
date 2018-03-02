@@ -45,7 +45,7 @@
             "guard": {},
             "requires": [ "assignment:Assignee" ]
           },
-          "reassign": {
+          "request-reassign": {
             "source": "Assigned",
             "target": "PendingReassign",
             "guard": {}
@@ -59,6 +59,12 @@
           "defer": {
             "source": "Assigned",
             "target": "InVerification",
+            "guard": {},
+            "requires": []
+          },
+          "reassign": {
+            "source": "PendingReassign",
+            "target": "Assigned",
             "guard": {},
             "requires": []
           },
