@@ -1,11 +1,9 @@
 import * as ItemProxy from '../../../../common/models/item-proxy';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
   private dataModelProxy: ItemProxy;
   private viewModelProxy: ItemProxy;
-  private _itemRepository: ItemRepository;
   name : string;
   description: string;
   icon: string;
@@ -23,11 +21,9 @@ export class KoheseType {
     return this._dataModelFields;
   }
 
-  constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy,
-    itemRepository: ItemRepository) {
+  constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy) {
     this.dataModelProxy = dataModelProxy;
     this.viewModelProxy = viewModelProxy;
-    this._itemRepository = itemRepository;
     this.retrieveModelData();
     if (this.viewModelProxy) {
       this.retrieveViewData();
@@ -48,16 +44,19 @@ export class KoheseType {
     
     let fieldGroups: Array<any> = [];
     let modelProxy: ItemProxy = this.dataModelProxy;
-    while (modelProxy) {
+    let hasBase: boolean = false;
+    
+    do {
       let modelFields: any = {};
       for (let fieldKey in modelProxy.item.properties) {
         modelFields[fieldKey] = modelProxy.item.
           properties[fieldKey];
       }
       fieldGroups.push(modelFields);
-      
-      modelProxy = this._itemRepository.getProxyFor(modelProxy.item.base);
-    }
+ 
+      hasBase = Object.hasOwnProperty(modelProxy.item.base);
+      modelProxy = modelProxy.parent;
+    } while (hasBase);
     
     fieldGroups.reverse();
     for (let j: number = 0; j < fieldGroups.length; j++) {

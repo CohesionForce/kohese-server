@@ -47,8 +47,9 @@ export class DynamicTypesService {
     for (var i : number = 0; i < this.typeProxyList.length; i++) {
       let currentType : ItemProxy = this.typeProxyList[i];
       let viewProxy: ItemProxy = this.getViewProxyFor(currentType);
-      this.koheseTypes[currentType.item.name] = new KoheseType(currentType,
-        viewProxy, this.ItemRepository);
+      let type: KoheseType = new KoheseType(currentType, viewProxy);
+      this.koheseTypes[currentType.item.name] = type;
+      this.modelProxy.type = type;
     }
   }
 

@@ -48,8 +48,7 @@ export class TypeEditorComponent implements OnInit {
       
         Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
           then((proxies: Array<ItemProxy>) => {
-          this.types[name] = new KoheseType(proxies[0], proxies[1], this.
-            itemRepository);
+          this.types[name] = new KoheseType(proxies[0], proxies[1]);
         });
       }
     });
