@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { ItemRepository, RepoStates} from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 @Injectable()

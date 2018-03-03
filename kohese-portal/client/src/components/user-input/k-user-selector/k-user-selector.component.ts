@@ -3,7 +3,7 @@ import { UserInput } from '../user-input.class';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 
-import { ItemProxy } from '../../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 

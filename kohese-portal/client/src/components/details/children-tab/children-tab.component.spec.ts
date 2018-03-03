@@ -14,7 +14,7 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { BehaviorSubject } from 'rxjs';
 
 describe('Component: Children Tab', ()=>{

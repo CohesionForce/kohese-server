@@ -10,7 +10,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
 import { MockItem } from '../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 
 
 describe('Component: Document View', ()=>{

@@ -1,7 +1,7 @@
 import { BehaviorSubject} from 'rxjs/BehaviorSubject';
 import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
-import * as ItemProxy from '../../../common/models/item-proxy';
+import * as ItemProxy from '../../../common/src/item-proxy';
 import { Subject } from 'rxjs';
 import { RepoStates } from '../../src/services/item-repository/item-repository.service';
 

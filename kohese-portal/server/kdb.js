@@ -15,8 +15,8 @@ var kdbModel = require('./kdb-model.js');
 
 var jsonExt = /\.json$/;
 
-var ItemProxy = require('../common/models/item-proxy.js');
-var CreateStates = require('../common/models/createStates.js');
+var ItemProxy = require('../common/src/item-proxy.js');
+var CreateStates = require('../common/src/createStates.js');
 module.exports.ItemProxy = ItemProxy;
 
 // TODO:  Need to remove dependence on modelConfig file

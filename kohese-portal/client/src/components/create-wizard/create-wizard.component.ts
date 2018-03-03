@@ -7,7 +7,7 @@ import 'rxjs/add/operator/startWith';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import { ItemProxy } from '../../../../common/src/item-proxy.js';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ImportService } from '../../services/import/import.service';

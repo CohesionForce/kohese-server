@@ -25,7 +25,7 @@ import { MockItem } from '../../../mocks/data/MockItem';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 
 describe('Component: Create Wizard', ()=>{
   let createWizardComponent: CreateWizardComponent;

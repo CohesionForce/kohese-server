@@ -1,4 +1,4 @@
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
