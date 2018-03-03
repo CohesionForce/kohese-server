@@ -2,6 +2,7 @@
   "name": "Issue",
   "base": "Observation",
   "idInjection": true,
+  "invertItemOrder": true,
   "properties": {
     "issueState": {
       "type": "StateMachine",

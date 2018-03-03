@@ -1228,7 +1228,12 @@ class ItemProxy {
 //      console.log('::: Loading Model ' + model.item.name);
       // TODO this might eventually need to be moved to proxy
       var properties = modelProxy.parentProxy.item.orderedProperties || [];
-      modelProxy.item.orderedProperties = Object.keys(modelProxy.item.properties).concat(properties);
+
+      if (modelProxy.invertItemOrder){
+        modelProxy.item.orderedProperties = Object.keys(modelProxy.item.properties).concat(properties);
+      } else {
+        modelProxy.item.orderedProperties = properties.concat(Object.keys(modelProxy.item.properties));
+      }
 
       modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
       modelProxy.item.derivedProperties = _.clone(modelProxy.parentProxy.item.derivedProperties) || [];
