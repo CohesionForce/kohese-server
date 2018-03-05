@@ -5,6 +5,7 @@ import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform
 
 import { ImportComponent } from './import/import.component';
 import { CreateWizardComponent } from './create-wizard.component';
+import { ParentSelectorComponent } from './parent-selector/parent-selector.component';
 import { MaterialModule } from "../../material.module";
 import { PipesModule } from "../../pipes/pipes.module";
 import { DetailsModule } from "../../components/details/details.module";
@@ -16,6 +17,7 @@ import { TreeModule } from 'angular-tree-component';
   declarations: [
     ImportComponent,
     CreateWizardComponent,
+    ParentSelectorComponent
   ],
   entryComponents: [
     ImportComponent,
@@ -34,6 +36,7 @@ import { TreeModule } from 'angular-tree-component';
     
   ],
   exports : [
+    ParentSelectorComponent,
     ImportComponent,
     CreateWizardComponent
   ]

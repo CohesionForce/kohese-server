@@ -4,19 +4,19 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ImportService } from '../../../services/import/import.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import * as ItemProxy from '../../../../../common/models/item-proxy';
 
 @Component({
   selector: 'import',
   templateUrl: './import.component.html'
 })
 export class ImportComponent {
+  selectedParent : ItemProxy;
   itemType : KoheseType;
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private itemRepository: ItemRepository,
-    private typeService: DynamicTypesService,
     private importService : ImportService) {
-      this.itemType = typeService.getKoheseTypes['Item'];
   }
 
   filter(fieldName: string): boolean {
@@ -34,6 +34,10 @@ export class ImportComponent {
 
   importFile (fileInput, userInput) {
     this.importService.importFile(fileInput.files, 
-                                  userInput.getFormGroup().value.parentId)
+                                  this.selectedParent.item.id)
+  }
+
+  onParentSelected(newParent) {
+    this.selectedParent = newParent;
   }
 }
