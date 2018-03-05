@@ -62,3 +62,16 @@ export class AnalysisViewComponent extends NavigatableComponent {
     return MatchesPOS && MatchesStringFilter
   }
 }
+
+export enum AnalysisViews {
+  TERM_VIEW,
+  SENTENCE_VIEW,
+  PHRASE_VIEW,
+  DOCUMENT_VIEW
+}
+
+export interface AnalysisFilter {
+  source: AnalysisViews,
+  filter : string
+}
+

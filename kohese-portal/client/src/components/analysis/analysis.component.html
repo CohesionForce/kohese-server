@@ -4,7 +4,8 @@
       <split direction="horizontal">
         <split-area [size]="50">
           <term-view [itemProxy] = "itemProxy"
-                [filterSubject] = "filterSubject"></term-view>
+                [filterSubject] = "filterSubject"
+                (newFilter)="onNewFilter($event)"></term-view>
         </split-area>
         <split-area [size]="50">
           <document-view
@@ -19,11 +20,13 @@
       <split direction="horizontal">
         <split-area [size]="50">
           <phrase-view [itemProxy] = "itemProxy"
-                  [filterSubject] = "filterSubject"></phrase-view>
+                       [filterSubject] = "filterSubject"
+                       (newFilter)="onNewFilter($event)"></phrase-view>
         </split-area>
         <split-area [size]="50">
           <sentence-view [itemProxy] = "itemProxy"
-                  [filterSubject] = "filterSubject"></sentence-view>
+                         [filterSubject] = "filterSubject"
+                         (newFilter)="onNewFilter($event)"></sentence-view>
         </split-area>
       </split>
     </split-area>

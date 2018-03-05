@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service'
 import { AnalysisService } from '../../services/analysis/analysis.service';
+import { AnalysisFilter, AnalysisViews} from './AnalysisViewComponent.class';
 
 import { ItemProxy } from '../../../../common/models/item-proxy';
 
