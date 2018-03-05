@@ -16,9 +16,7 @@ export class ImportComponent {
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private itemRepository: ItemRepository,
-    private typeService: DynamicTypesService,
     private importService : ImportService) {
-      this.itemType = typeService.getKoheseTypes['Item'];
   }
 
   filter(fieldName: string): boolean {

@@ -102,6 +102,33 @@ describe('Component: Create Wizard', ()=>{
       expect(nextSpy).toHaveBeenCalled();            
     })
   })
+  describe('parent selection', ()=>{
+    let stepper : MatStepper;
+    let nextSpy;
+    beforeEach(()=>{
+      stepper = <MatStepper> {
+        next : ()=>{
+  
+        }
+      }
+
+      nextSpy = spyOn(stepper, 'next');
+    })
+
+    it('updates the selected parent when selected for the first time', ()=>{
+      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.children[1], stepper);
+      expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy.children[1]);
+      expect(nextSpy).not.toHaveBeenCalled();
+    })
+
+    it('moves to the next step if a parent is double clicked', ()=>{
+      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.children[1], stepper);
+      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.children[1], stepper);
+      expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy.children[1]);
+      expect(nextSpy).toHaveBeenCalled();            
+    })
+  })
+
   describe('item creation', ()=>{
     let closeSpy;
 
