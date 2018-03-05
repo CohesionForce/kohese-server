@@ -14,7 +14,7 @@ import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicT
 import { KoheseType } from '../../../classes/UDT/KoheseType.class'
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../../mocks/data/MockViewData';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { PipesModule } from '../../../pipes/pipes.module';
 
 describe('Component: Type Overview', ()=>{

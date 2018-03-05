@@ -1,7 +1,7 @@
 describe('KDB Test', function() {
 
   var kdb = require('../../../server/kdb.js');
-  var ItemProxy = require('../../../common/models/item-proxy.js');
+  var ItemProxy = require('../../../common/src/item-proxy.js');
   var root = ItemProxy.getRootProxy();
   var lostAndFound = ItemProxy.getProxyFor('LOST+FOUND');
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import { ItemProxy } from '../../../../common/src/item-proxy.js';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 
 import { NavigationService } from '../../services/navigation/navigation.service';

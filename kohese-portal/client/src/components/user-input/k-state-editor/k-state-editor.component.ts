@@ -5,7 +5,7 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { StateService } from '../../../services/state/state.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
-import { ItemProxy } from '../../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'k-state-editor',

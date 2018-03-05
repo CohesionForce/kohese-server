@@ -7,7 +7,7 @@ var fs = require('fs');
 var Path = require('path');
 var child = require('child_process');
 var http = require('http');
-var ItemProxy = require('../common/models/item-proxy.js');
+var ItemProxy = require('../common/src/item-proxy.js');
 
 var mdToKohese = require('./md-to-kohese.js');
 

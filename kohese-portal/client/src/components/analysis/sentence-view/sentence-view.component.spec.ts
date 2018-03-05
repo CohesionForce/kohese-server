@@ -7,7 +7,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../../material.module';
 import { SentenceViewComponent } from './sentence-view.component';
 import { BehaviorSubject } from 'rxjs';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { AnalysisService } from '../../../services/analysis/analysis.service';

@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js'
+import { ItemProxy } from '../../../../common/src/item-proxy.js'
 
 @Component({
   selector : 'action-table',

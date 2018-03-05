@@ -3,7 +3,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges,
 import { SessionService } from '../../../../services/user/session.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
-import { ItemProxy } from '../../../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'journal-entry',

@@ -9,7 +9,7 @@ import { PipesModule } from '../../../pipes/pipes.module';
 
 import { DetailsFormComponent } from './details-form.component';
 
-import * as ItemProxy from '../../../../../common/models/item-proxy'
+import * as ItemProxy from '../../../../../common/src/item-proxy'
 
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';

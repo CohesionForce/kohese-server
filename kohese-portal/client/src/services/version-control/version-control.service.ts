@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { SocketService } from '../socket/socket.service';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs/Observable';
