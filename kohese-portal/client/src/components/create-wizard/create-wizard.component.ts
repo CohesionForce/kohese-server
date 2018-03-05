@@ -84,6 +84,14 @@ export class CreateWizardComponent extends NavigatableComponent
     }
   }
 
+  onParentSelected(newParent, stepper : MatStepper) {
+    if (this.selectedParent === parent) {
+      stepper.next();
+    } else {
+      this.selectedParent = newParent;
+    }
+  }
+
   onProxySelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
     this.selectedParent = selectedProxyEvent.option.value;
     this.proxySearchControl.setValue(this.selectedParent.item.name);
