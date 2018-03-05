@@ -67,6 +67,8 @@ export class TreeRowComponent extends RowComponent
     this._filterStreamSubscription = this.filterStream.subscribe((proxyFilter: ProxyFilter) => {
       this.filter(proxyFilter);
     });
+    
+    this.visibilityChanged.emit(this.isVisible());
   }
   
   ngAfterViewInit(): void {
@@ -126,9 +128,11 @@ export class TreeRowComponent extends RowComponent
       this.expand(true, false);
     }
     
-    this.setVisible(show);
-    this.visibilityChanged.emit(show);
-    this._changeDetector.markForCheck();
+    if (show !== this.isVisible()) {
+      this.setVisible(show);
+      this.visibilityChanged.emit(show);
+      this._changeDetector.markForCheck();
+    }
   }
   
   private doesProxyMatchFilter(proxy: ItemProxy, proxyFilter: ProxyFilter, checkChildren: boolean): boolean {

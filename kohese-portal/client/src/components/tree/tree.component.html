@@ -4,10 +4,6 @@
       class="btn btn-default btn-sm">
       Expand All
     </button>
-    <button mat-raised-button (click)="expandFiltered()"
-      class="btn btn-default btn-sm">
-      Expand Filtered
-    </button>
     <button mat-raised-button (click)="collapseAll()"
       class="btn btn-default btn-sm">
       Collapse All
@@ -24,8 +20,8 @@
       [ngClass]="{ 'btn-green': locationSynced}"
       class="btn btn-default btn-sm fa fa-exchange">
     </i>
-      <span>Showing {{numberOfRowsVisible}} of
-        {{root.descendantCount}}
+      <span>
+        Number of Items: {{root.descendantCount}}
       </span>
     <div>
       <!-- Start View Control -->

@@ -5,7 +5,6 @@ import { TreeRowComponent } from './tree-row.component';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
-import { VersionControlService } from '../../services/version-control/version-control.service';
 import { SessionService } from '../../services/user/session.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
@@ -14,8 +13,6 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { ItemProxy } from '../../../../common/models/item-proxy';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
-import { RowComponent } from '../../classes/RowComponent.class';
-import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 @Component({
   selector : 'tree-view',
@@ -55,7 +52,6 @@ export class TreeComponent extends NavigatableComponent
   constructor (protected NavigationService : NavigationService,
     private typeService: DynamicTypesService,
     private ItemRepository : ItemRepository,
-    private VersionControlService : VersionControlService,
     private SessionService : SessionService,
     private route : ActivatedRoute) {
     super(NavigationService);
@@ -113,13 +109,17 @@ export class TreeComponent extends NavigatableComponent
   /******** List expansion functions */
   expandAll(): void {
     for (let row of this.childrenRows.toArray()) {
-      row.expand(true, true);
+      if (row.isVisible()) {
+        row.expand(true, true);
+      }
     }
   }
 
   collapseAll(): void {
     for (let row of this.childrenRows.toArray()) {
-      row.expand(false, true);
+      if (row.isVisible()) {
+        row.expand(false, true);
+      }
     }
   }
 
