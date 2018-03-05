@@ -1,7 +1,7 @@
 <mat-tab-group class="left-content" style="display:inline-block" *ngIf="repoInitialized">
   <mat-tab label="Recent">
         <div *ngFor="let proxy of recentProxies" 
-             (click)="selectedParent = proxy">
+             (click)="selectParent(proxy)">
           {{proxy.item.name}}
         <hr/>
         </div>
@@ -9,7 +9,7 @@
   <mat-tab label="Tree">
     <tree-root [nodes]="rootProxy.children" options="treeOptions">
         <ng-template #treeNodeTemplate let-node let-index="index">
-          <td (click)="selectedParent = node.data"
+          <td (click)="selectParent(node.data)"
               matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
         </ng-template>
       </tree-root>
@@ -17,7 +17,7 @@
   <mat-tab label="Selector">
     <input matInput type="text" placeholder="Enter Proxy" [formControl]="proxySearchControl"
        [matAutocomplete]="proxySelector"/> 
-  <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onProxySelected($event)" style="width: 400px;">
+  <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onAutoCompleteSelected($event)" style="width: 400px;">
     <mat-option *ngFor="let proxy of (filteredProxies | async)"
       [value]="proxy">
       {{proxy.item.name}}

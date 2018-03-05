@@ -1,7 +1,8 @@
 <div>
-  <details-form #userInput [type]="itemType"
-    [fieldFilter]="filter">
-  </details-form>
+  <div style="height: 400px; overflow: auto;">
+    <parent-selector 
+      (parentSelected)="onParentSelected($event)"></parent-selector>
+  </div>
   <textarea matInput #fileTextArea cols="80" rows="7" placeholder="Files to import"
     readonly="true">
   </textarea>
