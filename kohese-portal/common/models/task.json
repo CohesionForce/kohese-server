@@ -2,6 +2,7 @@
   "name": "Task",
   "base": "Item",
   "idInjection": true,
+  "invertItemOrder": true,
   "properties": {
     "taskState": {
       "type": "StateMachine",

@@ -3,6 +3,7 @@
   "base": "PersistedModel",
   "strict": "validate",
   "idInjection": true,
+  "invertItemOrder": true,
   "trackChanges": false,
   "properties": {
     "id": {

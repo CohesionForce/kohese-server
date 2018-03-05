@@ -2,6 +2,7 @@
   "name": "Decision",
   "base": "Item",
   "idInjection": true,
+  "invertItemOrder": true,
   "properties": {
     "decisionState": {
       "type": "StateMachine",

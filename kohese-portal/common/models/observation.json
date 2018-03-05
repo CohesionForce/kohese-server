@@ -2,6 +2,7 @@
   "name": "Observation",
   "base": "Item",
   "idInjection": true,
+  "invertItemOrder": true,
   "properties": {
     "observedBy": {
       "type": "string",

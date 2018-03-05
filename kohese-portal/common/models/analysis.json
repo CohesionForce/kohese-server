@@ -2,6 +2,7 @@
   "name": "Analysis",
   "base": "PersistedModel",
   "idInjection": true,
+  "invertItemOrder": true,
   "properties": {
     "id": {
       "type": "string",
