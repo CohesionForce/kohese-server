@@ -10,7 +10,6 @@ import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { StateService } from '../../../services/state/state.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 

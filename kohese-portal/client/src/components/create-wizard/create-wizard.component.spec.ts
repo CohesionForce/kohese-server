@@ -138,11 +138,19 @@ describe('Component: Create Wizard', ()=>{
     })
 
     it('closes the window when an item is built', async(()=>{
+      let fieldName: string = 'modifiedOn';
+      let fieldValue: any = new Date().getTime();
+      createWizardComponent.whenNonFormFieldChanges({
+        fieldName: fieldName,
+        fieldValue: fieldValue
+      });
       let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.resolve());    
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();
         expect(closeSpy).toHaveBeenCalled();
+        expect(createWizardComponent.createFormGroup.value[fieldName]).
+          toEqual(fieldValue);
       })
     }))
 

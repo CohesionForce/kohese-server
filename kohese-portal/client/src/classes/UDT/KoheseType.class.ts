@@ -69,8 +69,8 @@ export class KoheseType {
   retrieveViewData(): void {
     this.icon = this.viewModelProxy.item.icon;
     for (let property in this.viewModelProxy.item.viewProperties) {
-      this.properties[property] = this.transformViewProperty(this.viewModelProxy.
-        item.viewProperties[property]);
+      this.properties[property] = this.transformViewProperty(JSON.parse(JSON.
+        stringify(this.viewModelProxy.item.viewProperties[property])));
     }
   }
   

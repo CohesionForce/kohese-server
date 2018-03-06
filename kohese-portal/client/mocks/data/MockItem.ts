@@ -6,7 +6,9 @@ export let MockItem = {
   "createdOn": 1510596684590,
   "modifiedBy": "admin",
   "modifiedOn": 1510596684590,
-  "itemIds": []
+  "itemIds": [],
+  actionState: 'Proposed',
+  decisionState: 'InReview'
 }
 
 export let MockRoot = {
