@@ -17,7 +17,7 @@
             </mat-chip>
           </mat-grid-tile>
         </mat-grid-list>
-        <mat-card *ngIf="selectedType" class="right-content" style="display: inline-block;">
+        <mat-card *ngIf="selectedType" class="right-content" style="display: inline-block; height:400px;">
           <mat-card-title class="panel-heading">
             <span>{{selectedType.name}}</span>
           </mat-card-title>
@@ -32,59 +32,6 @@
       </mat-card>
     </div>
   </mat-step>
-<<<<<<< HEAD
-  <mat-step label="Parent">
-    <div class="step-container">
-      <mat-card>
-        <mat-card-content>
-          <mat-grid-list cols="2" rows="1">
-            <mat-grid-tile>
-              <mat-tab-group>
-                <mat-tab label="Tree">
-                  <tree-root [nodes]="rootProxy.children" options="treeOptions">
-                    <ng-template #treeNodeTemplate let-node let-index="index">
-                      <td (click)="selectedParent = node.data"
-                        matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
-                    </ng-template>
-                  </tree-root>
-                </mat-tab>
-                <mat-tab label="Selector">
-                  <input matInput type="text" placeholder="Enter Proxy" [formControl]="proxySearchControl"
-                    [matAutocomplete]="proxySelector"/> 
-                  <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onProxySelected($event)" style="width: 400px;">
-                    <mat-option *ngFor="let proxy of (filteredProxies | async)"
-                      [value]="proxy">
-                      {{proxy.item.name}}
-                    </mat-option>
-                  </mat-autocomplete>
-                </mat-tab>
-                <mat-tab label="Recent">
-                  <div *ngFor="let proxy of recentProxies" 
-                    (click)="selectedParent = proxy">
-                    {{proxy.item.name}}
-                    <hr/>
-                  </div>
-                </mat-tab>
-              </mat-tab-group>
-            </mat-grid-tile>
-            <mat-grid-tile>
-              <mat-card *ngIf="selectedParent">
-                <mat-card-title class="panel-heading">
-                  <span>{{selectedParent.item.name}}</span>
-                </mat-card-title>
-                <mat-card-content>
-                  {{selectedParent.item.description}}
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-          </mat-grid-list>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button matStepperNext>Next</button>
-        </mat-card-actions>
-      </mat-card>
-=======
     <mat-step label="Parent">
       <parent-selector (parentSelected)="onParentSelected($event, createStepper)"></parent-selector>
   <div>
@@ -100,7 +47,6 @@
     <div>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>
->>>>>>> a258e3249b4b3ae1d62d0a25921da5277cc4c53d
     </div>
   </mat-step>
   <mat-step label="Details">

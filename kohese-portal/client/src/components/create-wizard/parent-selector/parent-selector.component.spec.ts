@@ -6,7 +6,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../../material.module';
 
 import { ParentSelectorComponent } from './parent-selector.component';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
