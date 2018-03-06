@@ -43,8 +43,8 @@ describe('Component: Term View', ()=>{
     termFixture = TestBed.createComponent(TermViewComponent);
     termComponent = termFixture.componentInstance;
 
-    termComponent.itemProxy = new ItemProxy('Item', MockItem);
-    termComponent.itemProxy.analysis = MockAnalysis
+    termComponent.itemProxy = new ItemProxy('Item', MockItem());
+    termComponent.itemProxy.analysis = MockAnalysis()
     termComponent.filterSubject = new BehaviorSubject('');
 
     termFixture.detectChanges();

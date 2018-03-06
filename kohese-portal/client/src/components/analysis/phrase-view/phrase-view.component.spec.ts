@@ -43,8 +43,8 @@ describe('Component: Phrase View', ()=>{
     phraseFixture = TestBed.createComponent(PhraseViewComponent);
     phraseComponent = phraseFixture.componentInstance;
 
-    phraseComponent.itemProxy = new ItemProxy('Item', MockItem);
-    phraseComponent.itemProxy.analysis = MockAnalysis
+    phraseComponent.itemProxy = new ItemProxy('Item', MockItem());
+    phraseComponent.itemProxy.analysis = MockAnalysis()
     phraseComponent.filterSubject = new BehaviorSubject('');
 
     phraseFixture.detectChanges();

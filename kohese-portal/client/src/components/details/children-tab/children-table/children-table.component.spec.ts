@@ -54,7 +54,7 @@ describe('Component: Children Table', ()=>{
   it('updates the children list when a new array comes in', ()=>{
     expect(childrenTableComponent.children.length).toBe(5);
     let newChildren = mockRepo.getRootProxy().children;
-    newChildren.push(new ItemProxy('Item', MockItem));
+    newChildren.push(new ItemProxy('Item', MockItem()));
     childSubject.next(newChildren);
     expect(childrenTableComponent.children.length).toBe(6);
   })

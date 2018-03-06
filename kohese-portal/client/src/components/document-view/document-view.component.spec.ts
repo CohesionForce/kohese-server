@@ -35,7 +35,7 @@ describe('Component: Document View', ()=>{
 
     documentViewComponent.showChildrenSubject = new BehaviorSubject(true);
     documentViewComponent.filterSubject = new BehaviorSubject('');
-    documentViewComponent.itemProxy = new ItemProxy('Item', MockItem);
+    documentViewComponent.itemProxy = new ItemProxy('Item', MockItem());
     documentViewFixture.detectChanges();
     
   })

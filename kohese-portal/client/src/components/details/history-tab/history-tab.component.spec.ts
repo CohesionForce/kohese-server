@@ -36,7 +36,7 @@ describe('Component: History Tab', ()=>{
     historyFixture = TestBed.createComponent(HistoryTabComponent);
     historyComponent = historyFixture.componentInstance;
 
-    historyComponent.proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem));
+    historyComponent.proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem()));
 
     historyFixture.detectChanges();
     

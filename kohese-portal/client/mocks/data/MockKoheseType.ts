@@ -5,7 +5,7 @@ export function MockKoheseType () {
   return {
   acls : [],
   base : ['PersistedModel'],
-  dataModelProxy : MockDataModel,
+  dataModelProxy : MockDataModel(),
   description: "",
   icon: "fa fa-sticky-note",
   idInjection : true,
@@ -20,7 +20,7 @@ export function MockKoheseType () {
   strict: null,
   trackChanges : null,
   validations : [],
-  viewModelProxy : MockViewData,
-  dataModelFields : MockDataModel.properties
+  viewModelProxy : MockViewData(),
+  dataModelFields : MockDataModel().properties
   }
 }

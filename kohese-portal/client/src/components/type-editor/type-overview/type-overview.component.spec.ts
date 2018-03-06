@@ -41,8 +41,8 @@ describe('Component: Type Overview', ()=>{
     typeOverviewFixture = TestBed.createComponent(TypeOverviewComponent);
     typeOverviewComponent = typeOverviewFixture.componentInstance;
     typeOverviewComponent.type = new KoheseType(
-      new ItemProxy('KoheseModel', MockDataModel),
-      new ItemProxy('KoheseView', MockViewData))
+      new ItemProxy('KoheseModel', MockDataModel()),
+      new ItemProxy('KoheseView', MockViewData()))
     typeOverviewFixture.detectChanges();
     
   })

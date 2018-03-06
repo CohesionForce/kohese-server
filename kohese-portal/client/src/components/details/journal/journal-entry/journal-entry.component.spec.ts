@@ -45,7 +45,7 @@ describe('Component: JournalEntry', ()=>{
     journalEntryFixture = TestBed.createComponent(JournalEntryComponent);
     journalEntryComponent = journalEntryFixture.componentInstance;
 
-    journalEntryComponent.itemProxy = new ItemProxy('Item', MockItem);
+    journalEntryComponent.itemProxy = new ItemProxy('Item', MockItem());
 
     journalEntryFixture.detectChanges();
     

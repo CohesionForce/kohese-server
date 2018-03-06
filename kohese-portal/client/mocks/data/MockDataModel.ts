@@ -1,4 +1,5 @@
-export let MockDataModel = {
+export function MockDataModel () { 
+  return {
   "name": "Item",
   "base": "PersistedModel",
   "strict": "validate",
@@ -64,5 +65,6 @@ export let MockDataModel = {
   },
   "acls": [],
   "methods": []
+  }
 }
 

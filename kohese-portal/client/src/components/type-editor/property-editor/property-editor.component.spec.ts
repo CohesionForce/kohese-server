@@ -41,8 +41,8 @@ describe('Component: Property Editor', ()=>{
     propertyEditorFixture = TestBed.createComponent(PropertyEditorComponent);
     propertyEditorComponent = propertyEditorFixture.componentInstance;
     propertyEditorComponent.type = new KoheseType(
-      new ItemProxy('KoheseModel', MockDataModel),
-      new ItemProxy('KoheseView', MockViewData))
+      new ItemProxy('KoheseModel', MockDataModel()),
+      new ItemProxy('KoheseView', MockViewData()))
     propertyEditorFixture.detectChanges();
     
   })

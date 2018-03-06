@@ -133,7 +133,7 @@ describe('Component: Create Wizard', ()=>{
     let closeSpy;
 
     beforeEach(()=>{
-      createWizardComponent.selectedType = new ItemProxy('Item', MockItem)
+      createWizardComponent.selectedType = new ItemProxy('Item', MockItem())
       createWizardComponent.createFormGroup = <FormGroup> {
         value : ItemProxy
       }

@@ -50,7 +50,7 @@ describe('Component: Parent Selector', ()=>{
     let selectedProxy;
   
     beforeEach(()=>{
-      selectedProxy = new ItemProxy('Item', MockItem);
+      selectedProxy = new ItemProxy('Item', MockItem());
       selectedProxyEvent = <MatAutocompleteSelectedEvent> {
         option : {
           value : selectedProxy
