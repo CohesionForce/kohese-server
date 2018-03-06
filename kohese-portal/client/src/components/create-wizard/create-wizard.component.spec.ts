@@ -67,8 +67,6 @@ describe('Component: Create Wizard', ()=>{
     it('requests the required data from the server', ()=>{
       expect(createWizardComponent.rootProxy).toBeDefined;
       expect(createWizardComponent.models).toBeDefined;
-      expect(createWizardComponent.filteredProxies).toBeDefined;
-      expect(createWizardComponent.recentProxies).toBeDefined;
       expect(createWizardComponent.types).toBeDefined;
     })
   
@@ -104,23 +102,30 @@ describe('Component: Create Wizard', ()=>{
       expect(nextSpy).toHaveBeenCalled();            
     })
   })
-
   describe('parent selection', ()=>{
-    let selectedProxyEvent;
-    let selectedProxy;
-
+    let stepper : MatStepper;
+    let nextSpy;
     beforeEach(()=>{
-      selectedProxy = new ItemProxy('Item', MockItem);
-      selectedProxyEvent = <MatAutocompleteSelectedEvent> {
-        option : {
-          value : selectedProxy
+      stepper = <MatStepper> {
+        next : ()=>{
+  
         }
       }
+
+      nextSpy = spyOn(stepper, 'next');
     })
-    it('should set the parent when a proxy is selected by autocomplete', ()=>{
-      createWizardComponent.onProxySelected(selectedProxyEvent);
-      expect(createWizardComponent.selectedParent).toBe(selectedProxy);
-      expect(createWizardComponent.proxySearchControl.value).toBe(createWizardComponent.selectedParent.item.name);
+
+    it('updates the selected parent when selected for the first time', ()=>{
+      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.children[1], stepper);
+      expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy.children[1]);
+      expect(nextSpy).not.toHaveBeenCalled();
+    })
+
+    it('moves to the next step if a parent is double clicked', ()=>{
+      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.children[1], stepper);
+      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.children[1], stepper);
+      expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy.children[1]);
+      expect(nextSpy).toHaveBeenCalled();            
     })
   })
 
@@ -128,7 +133,7 @@ describe('Component: Create Wizard', ()=>{
     let closeSpy;
 
     beforeEach(()=>{
-      createWizardComponent.selectedType = new ItemProxy('Item', MockItem)
+      createWizardComponent.selectedType = new ItemProxy('Item', MockItem())
       createWizardComponent.createFormGroup = <FormGroup> {
         value : ItemProxy
       }

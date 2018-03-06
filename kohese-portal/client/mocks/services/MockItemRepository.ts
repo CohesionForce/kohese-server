@@ -11,11 +11,11 @@ export class MockItemRepository {
 
   constructor() {
     this.mockRootProxy.children = [
-      new ItemProxy('Item', MockViewData),
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem)
+      new ItemProxy('Item', MockViewData()),
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem())
     ]
     this.mockRootProxy.visitChildren = ()=>{}
   }
@@ -32,15 +32,18 @@ export class MockItemRepository {
     return (new Subject())
   }
 
-  getProxyFor () {
-    return new ItemProxy('Item', MockItem);
+  getProxyFor (id: string) {
+    if(id === 'PersistedModel') {
+      return undefined;
+    }
+    return new ItemProxy('Item', MockItem());
   }
 
   getRecentProxies () {
     return [
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem)
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem())
     ]
   }
   

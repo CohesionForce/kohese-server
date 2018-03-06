@@ -43,8 +43,8 @@ describe('Component: Sentence View', ()=>{
     sentenceFixture = TestBed.createComponent(SentenceViewComponent);
     sentenceComponent = sentenceFixture.componentInstance;
 
-    sentenceComponent.itemProxy = new ItemProxy('Item', MockItem);
-    sentenceComponent.itemProxy.analysis = MockAnalysis
+    sentenceComponent.itemProxy = new ItemProxy('Item', MockItem());
+    sentenceComponent.itemProxy.analysis = MockAnalysis()
     sentenceComponent.filterSubject = new BehaviorSubject('');
 
     sentenceFixture.detectChanges();

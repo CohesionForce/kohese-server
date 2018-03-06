@@ -54,7 +54,8 @@ describe('Component: Details Form', ()=>{
       }
 
       formComponent.createInfo.type.dataModelProxy.item = {
-        base: 'PersistedModel'
+        base: 'PersistedModel',
+        name: 'Item'
       } 
 
       formFixture.detectChanges();
@@ -62,13 +63,12 @@ describe('Component: Details Form', ()=>{
 
     it('creates a stub proxy from the create information', ()=>{
       expect(formComponent.itemProxy).toBeTruthy();
-      console.log(formComponent.itemProxy);
     })
   })
 
   describe('details view', ()=>{
     beforeEach(()=>{
-      formComponent.itemProxy = new ItemProxy('Item', MockItem) 
+      formComponent.itemProxy = new ItemProxy('Item', MockItem()) 
       formComponent.itemProxy.model.item = {
         base: 'PersistedModel'
       }    

@@ -33,6 +33,6 @@ export class SideBarComponent implements OnInit {
   
   openImportDialog(): void {
     this.dialogService.openComponentDialog(ImportComponent, {}).
-      updateSize('40%', 'auto');
+      updateSize('70%', 'auto');
   }
 }

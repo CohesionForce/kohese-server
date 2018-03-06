@@ -1,4 +1,5 @@
-export let MockItem = {
+export function MockItem () {
+  return {
   "id": "test-uuid",
   "name": "Test item",
   "parentId": "44f38b70-bf50-11e7-b267-97e34e682c16",
@@ -11,7 +12,8 @@ export let MockItem = {
   decisionState: 'InReview'
 }
 
-export let MockRoot = {
+export function MockRoot () { 
+  return {
   "id": "",
   "name": "Test item",
   "parentId": "44f38b70-bf50-11e7-b267-97e34e682c16",
@@ -20,4 +22,5 @@ export let MockRoot = {
   "modifiedBy": "admin",
   "modifiedOn": 1510596684590,
   "itemIds": []
+  }
 }

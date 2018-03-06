@@ -18,7 +18,7 @@ export class MockAnalysisService {
   }
 
   fetchAnalysis (proxy) {
-    proxy.analysis = MockAnalysis;
+    proxy.analysis = MockAnalysis();
   }
 
   filterPOS () {

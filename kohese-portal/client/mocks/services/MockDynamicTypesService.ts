@@ -6,7 +6,7 @@ import { MockDataModel } from '../data/MockDataModel';
 import { MockKoheseType } from '../data/MockKoheseType';
 
 export class MockDynamicTypesService {
-  mockView = new ItemProxy('KoheseView', MockViewData )
+  mockView = new ItemProxy('KoheseView', MockViewData() )
   constructor() {
 
   }
