@@ -136,10 +136,10 @@ export class DetailsFormComponent extends NavigatableComponent
       this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
       let modelProxy: ItemProxy = this.itemProxy.model;
       while (modelProxy) {
-        let t: KoheseType = this.DynamicTypeService.
+        let type: KoheseType = this.DynamicTypeService.
           getKoheseTypes()[modelProxy.item.name];
-        for (let fieldName in t.dataModelFields) {
-          this.itemProxy.item[fieldName] = t.dataModelFields[fieldName].
+        for (let fieldName in type.dataModelFields) {
+          this.itemProxy.item[fieldName] = type.dataModelFields[fieldName].
             default;
         }
         modelProxy = this.ItemRepository.getProxyFor(modelProxy.item.base);

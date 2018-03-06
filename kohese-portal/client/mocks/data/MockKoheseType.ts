@@ -20,6 +20,7 @@ export function MockKoheseType () {
   strict: null,
   trackChanges : null,
   validations : [],
-  viewModelProxy : MockViewData
+  viewModelProxy : MockViewData,
+  dataModelFields : MockDataModel.properties
   }
 }

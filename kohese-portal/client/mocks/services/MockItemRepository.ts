@@ -32,7 +32,10 @@ export class MockItemRepository {
     return (new Subject())
   }
 
-  getProxyFor () {
+  getProxyFor (id: string) {
+    if(id === 'PersistedModel') {
+      return undefined;
+    }
     return new ItemProxy('Item', MockItem);
   }
 

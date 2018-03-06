@@ -3,6 +3,7 @@ export let MockDataModel = {
   "base": "PersistedModel",
   "strict": "validate",
   "idInjection": true,
+  "invertItemOrder": true,
   "trackChanges": false,
   "properties": {
     "id": {
@@ -64,3 +65,4 @@ export let MockDataModel = {
   "acls": [],
   "methods": []
 }
+
