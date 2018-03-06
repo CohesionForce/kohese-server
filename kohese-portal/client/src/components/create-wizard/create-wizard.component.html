@@ -32,21 +32,11 @@
       </mat-card>
     </div>
   </mat-step>
-    <mat-step label="Parent">
-      <parent-selector (parentSelected)="onParentSelected($event, createStepper)"></parent-selector>
-  <div>
+  <mat-step label="Parent">
+    <parent-selector (parentSelected)="onParentSelected($event, createStepper)"></parent-selector>
+    <div>
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button matStepperNext>Next</button>
-  </div>
-    </mat-step>
-    <mat-step label="Details">
-        <details-form #editor 
-          [createInfo]="{type: selectedType, parent: selectedParent.item.id}" 
-          [disabled]="false"
-          (formGroupUpdated)="onFormGroupUpdated($event)"></details-form> 
-    <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
     </div>
   </mat-step>
   <mat-step label="Details">
@@ -54,7 +44,7 @@
       <mat-card>
         <mat-card-content>
           <details-form #editor 
-            [createInfo]="{type: selectedType, parent: selectedParent.item.id}" 
+            [createInfo]="createInfo" 
             [disabled]="false"
             (formGroupUpdated)="onFormGroupUpdated($event)"
             (nonFormFieldChanged)="whenNonFormFieldChanges($event)">

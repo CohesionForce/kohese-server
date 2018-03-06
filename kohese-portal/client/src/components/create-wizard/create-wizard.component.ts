@@ -30,7 +30,8 @@ export class CreateWizardComponent extends NavigatableComponent
   selectedType : ItemProxy;
   selectedParent : ItemProxy;
   rootProxy : ItemProxy;
-  errorMessage : string;
+  errorMessage : string; 
+  createInfo: object;
 
   createFormGroup : FormGroup;
   private nonFormFieldValueMap: any = {};
@@ -70,6 +71,10 @@ export class CreateWizardComponent extends NavigatableComponent
       stepper.next();
     } else {
       this.selectedType = type;
+      this.createInfo = {
+        parent: this.selectedParent.item.id,
+        type : type
+      }
     }
   }
 
@@ -79,6 +84,10 @@ export class CreateWizardComponent extends NavigatableComponent
       stepper.next();
     } else {
       this.selectedParent = newParent;
+      this.createInfo = {
+        parent : newParent.item.id,
+        type : this.selectedType
+      }
     }
   }
 
