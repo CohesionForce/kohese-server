@@ -31,8 +31,6 @@ export class CreateWizardComponent extends NavigatableComponent
   selectedParent : ItemProxy;
   rootProxy : ItemProxy;
   errorMessage : string;
-  filteredProxies : any;
-  proxySearchControl : FormControl;
 
   createFormGroup : FormGroup;
   private nonFormFieldValueMap: any = {};
@@ -48,7 +46,6 @@ export class CreateWizardComponent extends NavigatableComponent
               private DynamicTypesService : DynamicTypesService,
               public MatDialogRef : MatDialogRef<CreateWizardComponent>) {
     super(NavigationService);
-    this.proxySearchControl = new FormControl('');
   }
 
   ngOnInit(): void {
@@ -61,15 +58,6 @@ export class CreateWizardComponent extends NavigatableComponent
           this.types.push(types[type]);
         }
 
-        this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
-          map((text: string) => {
-            return this.rootProxy.children.filter((proxy) => {
-              return (-1 !== proxy.item.name.indexOf(text));
-        });
-      });
-
-        this.recentProxies = this.itemRepository.getRecentProxies();
-        this.recentProxies = this.recentProxies.slice().reverse();
         this.selectedType = this.types[0];
         this.selectedParent = this.rootProxy;
       }
@@ -85,9 +73,13 @@ export class CreateWizardComponent extends NavigatableComponent
     }
   }
 
-  onProxySelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
-    this.selectedParent = selectedProxyEvent.option.value;
-    this.proxySearchControl.setValue(this.selectedParent.item.name);
+  onParentSelected(newParent, stepper : MatStepper) {
+    console.log(newParent);
+    if (this.selectedParent === newParent) {
+      stepper.next();
+    } else {
+      this.selectedParent = newParent;
+    }
   }
 
   onFormGroupUpdated(newFormGroup : any) {
