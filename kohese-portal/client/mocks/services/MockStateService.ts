@@ -1,6 +1,6 @@
 import { ItemProxy } from '../../../common/src/item-proxy';
 
-export class StateServicePlaceholder {
+export class MockStateService {
   public constructor() {
   }
   
