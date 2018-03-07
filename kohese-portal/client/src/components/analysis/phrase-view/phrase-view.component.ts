@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 
-import { AnalysisViewComponent } from '../AnalysisViewComponent.class';
+import { AnalysisViewComponent, AnalysisViews, AnalysisFilter } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
@@ -27,7 +27,8 @@ export class PhraseViewComponent extends AnalysisViewComponent
   sortField: string = 'count';
   filters: Array<RegExp> = [];
   showPOS: boolean = false;
-  
+  selfFilter: boolean;
+  filteredCount : number;
   phrases: Array<any> = [];
   /* Data */
   @Input()
@@ -35,7 +36,9 @@ export class PhraseViewComponent extends AnalysisViewComponent
 
   /* Observables */
   @Input()
-  public filterSubject: BehaviorSubject<string>;
+  public filterSubject: BehaviorSubject<AnalysisFilter>;
+  @Output()
+  public filterUpdate = new EventEmitter<AnalysisFilter>();
 
   /* Subscriptions */
   private filterSubjectSubscription: Subscription;
@@ -47,9 +50,17 @@ export class PhraseViewComponent extends AnalysisViewComponent
   }
 
   ngOnInit(): void {
+    this.selfFilter = false;
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      this.filterString = newFilter;
-      this.onFilterChange();
+      if (this.selfFilter && newFilter.source != AnalysisViews.PHRASE_VIEW) {
+        return;
+      } else {
+        console.log('Phrase filter from: ');
+        console.log(newFilter);
+        this.filterString = newFilter.filter;
+        this.filter();
+        this.filteredCount = this.getPhraseCount();
+      }
     });
     
     this.processPhrases();
@@ -69,23 +80,35 @@ export class PhraseViewComponent extends AnalysisViewComponent
     this.processPhrases();
   }
   
-  filter(f: RegExp): void {
-    let index: number = this.filters.indexOf(f);
+  filter(): void {
+    let filter = new RegExp(this.filterString);
+    let index: number = this.filters.indexOf(filter);
     if (-1 === index) {
-      this.filters.push(f);
+      this.filters.push(filter);
     } else {
       this.filters.splice(index, 1);
     }
     
     this.processPhrases();
   }
+
+  submitFilter(newFilter) {
+    this.filterUpdate.emit({
+      source: AnalysisViews.PHRASE_VIEW,
+      filter : newFilter,
+      filterOptions: {
+        ignoreCase: false,
+        exactMatch: false
+      }
+    })
+  }
   
   processPhrases(): void {
     this.phrases = this.dataProcessingService.sort(
       this.dataProcessingService.filter(
       this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
-        for (let j: number = 0; j < this.filters.length; j++) {
-          if (!this.filters[j].test(input)) {
+        for (let i: number = 0; i < this.filters.length; i++) {
+          if (!this.filters[i].test(input)) {
             return false;
           }
         }

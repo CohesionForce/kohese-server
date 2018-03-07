@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 
-import { AnalysisViewComponent } from '../AnalysisViewComponent.class';
+import { AnalysisViewComponent, AnalysisFilter, AnalysisViews } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
@@ -25,7 +25,8 @@ export class SentenceViewComponent extends AnalysisViewComponent
   showSentencesInDetails: boolean = true;
   showPhrasesInDetails: boolean = false;
   showTokensInDetails: boolean = false;
-  
+  selfFilter : boolean;
+  filteredCount : number;
   sentences: Array<any>;
   
   /* Data */
@@ -34,7 +35,9 @@ export class SentenceViewComponent extends AnalysisViewComponent
 
   /* Observables */
   @Input()
-  public filterSubject: BehaviorSubject<string>;
+  public filterSubject: BehaviorSubject<AnalysisFilter>;
+  @Output()
+  public filterUpdate = new EventEmitter<AnalysisFilter>();
 
   /* Subscriptions */
   private filterSubjectSubscription: Subscription;
@@ -46,9 +49,17 @@ export class SentenceViewComponent extends AnalysisViewComponent
   }
 
   ngOnInit(): void {
+    this.selfFilter = false;
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      this.filterString = newFilter;
-      this.onFilterChange();
+      if (this.selfFilter && newFilter.source != AnalysisViews.SENTENCE_VIEW) {
+        return;
+      } else {
+        console.log('Sentence filter from: ');
+        console.log(newFilter);
+        this.filterString = newFilter.filter;
+        this.onFilterChange();
+        this.filteredCount = this.getDetailsItemCount();
+      }
     });
     
     this.processSentences();

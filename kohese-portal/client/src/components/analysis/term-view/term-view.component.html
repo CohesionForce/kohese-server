@@ -1,6 +1,10 @@
 <div class="panel">
   <div class="panel-heading">
+<<<<<<< Updated upstream
     Term View - ({{termCount}}) Terms Debug - {{filterString}}
+=======
+    Term View - ({{filteredCount}}) Terms
+>>>>>>> Stashed changes
     <button mat-icon-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
       <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
     </button>
@@ -38,12 +42,9 @@
       <mat-form-field>
         <input matInput type="text" placeholder="Limit" [(ngModel)]="loadLimit"/>
       </mat-form-field>
-      <button mat-raised-button (click)="filter(analysisFilterInput, true)"
+      <button mat-raised-button (click)="submitFilter(analysisFilterInput)"
         class="btn btn-default fa fa-search">Submit
       </button>
-      <!-- <button (click)="getLastFilter()"
-             class="btn btn-default fa fa-chevron-left"> Last Filter
-           </button> -->
     </div>
     <div id="term-div">
       <table id="theTokensSummary"
@@ -72,7 +73,7 @@
         <tbody id="theTokensBody">
           <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
             *ngFor="let summary of terms">
-            <td (click)="filter(summary.text, false)"
+            <td (click)="submitFilter(summary.text)"
               class="tree-label"
               [innerHTML] ="summary.text | highlightRegex:analysisFilterRegexHighlight:true">
             </td>

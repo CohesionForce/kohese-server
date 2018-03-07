@@ -71,7 +71,17 @@ export enum AnalysisViews {
 }
 
 export interface AnalysisFilter {
+<<<<<<< Updated upstream
   source: AnalysisViews,
   filter : string
 }
 
+=======
+  source : AnalysisViews,
+  filter : string,
+  filterOptions : {
+    exactMatch: boolean,
+    ignoreCase: boolean
+  }
+}
+>>>>>>> Stashed changes

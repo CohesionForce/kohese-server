@@ -4,8 +4,13 @@
       <split direction="horizontal">
         <split-area [size]="50">
           <term-view [itemProxy] = "itemProxy"
+<<<<<<< Updated upstream
                 [filterSubject] = "filterSubject"
                 (newFilter)="onNewFilter($event)"></term-view>
+=======
+                     [filterSubject] = "filterSubject"
+                     (filterUpdate)= "onFilter($event)"></term-view>
+>>>>>>> Stashed changes
         </split-area>
         <split-area [size]="50">
           <document-view
@@ -21,12 +26,20 @@
         <split-area [size]="50">
           <phrase-view [itemProxy] = "itemProxy"
                        [filterSubject] = "filterSubject"
+<<<<<<< Updated upstream
                        (newFilter)="onNewFilter($event)"></phrase-view>
+=======
+                       (filterUpdate)= "onFilter($event)"></phrase-view>
+>>>>>>> Stashed changes
         </split-area>
         <split-area [size]="50">
           <sentence-view [itemProxy] = "itemProxy"
                          [filterSubject] = "filterSubject"
+<<<<<<< Updated upstream
                          (newFilter)="onNewFilter($event)"></sentence-view>
+=======
+                         (filterUpdate)= "onFilter($event)"></sentence-view>
+>>>>>>> Stashed changes
         </split-area>
       </split>
     </split-area>

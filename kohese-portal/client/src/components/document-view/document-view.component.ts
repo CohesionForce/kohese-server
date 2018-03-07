@@ -77,7 +77,7 @@ export class DocumentViewComponent extends NavigatableComponent
   }
 
   ngOnDestroy() {
-    if (this.filterSubject) {
+    if (this.filterSubscription) {
       this.filterSubscription.unsubscribe();
     }
     this.showChildrenSubscription.unsubscribe();

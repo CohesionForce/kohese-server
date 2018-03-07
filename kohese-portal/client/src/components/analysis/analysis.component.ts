@@ -11,6 +11,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
+import { AnalysisViews, AnalysisFilter } from './AnalysisViewComponent.class';
 
 @Component({
   selector: 'analysis-view',
@@ -32,9 +33,10 @@ export class AnalysisComponent extends NavigatableComponent
   /* Subscriptions */
   routeSub : Subscription;
   filterSub : Subscription;
+  repoReadySub : Subscription;
 
   /* Observables */
-  filterSubject : BehaviorSubject<string>
+  filterSubject : BehaviorSubject<AnalysisFilter>
   showChildrenSubject : BehaviorSubject<boolean>
 
   constructor(protected NavigationService : NavigationService,
@@ -42,7 +44,14 @@ export class AnalysisComponent extends NavigatableComponent
               private ItemRepository : ItemRepository,
               private AnalysisService : AnalysisService) {
     super(NavigationService);
-    this.filterSubject = new BehaviorSubject('')
+    this.filterSubject = new BehaviorSubject({
+      filter: '',
+      source: AnalysisViews.TERM_VIEW,
+      filterOptions: {
+        exactMatch: false,
+        ignoreCase: false
+      }
+    })
     this.showChildrenSubject = new BehaviorSubject(true);
 
   }
@@ -52,7 +61,7 @@ export class AnalysisComponent extends NavigatableComponent
     this.analysisLoaded = false;
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
-      this.ItemRepository.getRepoStatusSubject().subscribe(update => {
+      this.repoReadySub = this.ItemRepository.getRepoStatusSubject().subscribe(update => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
           this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
           this.AnalysisService.fetchAnalysis(this.itemProxy);
@@ -64,5 +73,11 @@ export class AnalysisComponent extends NavigatableComponent
   }
 
   ngOnDestroy () {
+    this.routeSub.unsubscribe();
+    this.repoReadySub.unsubscribe();
+  }
+
+  onFilter(newFilter) {
+    this.filterSubject.next(newFilter);
   }
 }

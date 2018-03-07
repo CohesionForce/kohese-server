@@ -23,11 +23,13 @@ export class TermViewComponent extends AnalysisViewComponent
    ascending: boolean = true;
    sortField: string = 'count';
    filters: Array<RegExp> = [];
+   filterOptions : object;
    filterExactMatch: boolean = false;
    filterIgnoreCase: boolean = false;
    analysisFilterInput: string;
    showPOS: boolean = false;
-   
+   selfFilter : boolean;
+   filteredCount : number;
    terms: Array<any>;
 
    /* Data */
@@ -37,9 +39,9 @@ export class TermViewComponent extends AnalysisViewComponent
 
    /* Observables */
    @Input()
-   public filterSubject: BehaviorSubject<string>;
+   public filterSubject: BehaviorSubject<AnalysisFilter>;
    @Output()
-   public newFilter = new EventEmitter<AnalysisFilter>()
+   public filterUpdate = new EventEmitter<AnalysisFilter>();
 
    /* Subscriptions */
    private filterSubjectSubscription: Subscription;
@@ -51,10 +53,18 @@ export class TermViewComponent extends AnalysisViewComponent
    }
 
   ngOnInit(): void {
+    this.selfFilter = true;
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      console.log(newFilter)
-      this.filterString = newFilter;
-      this.onFilterChange();
+      if (this.selfFilter && newFilter.source != AnalysisViews.TERM_VIEW) {
+        return;
+      } else {
+        console.log('Term filter from: ');
+        console.log(newFilter);
+        this.filterOptions = newFilter.filterOptions;
+        this.filterString = newFilter.filter;
+        this.onFilterChange();
+        this.filteredCount = this.getTermCount();
+      }
     });
 
     // this.processTerms();
@@ -74,39 +84,50 @@ export class TermViewComponent extends AnalysisViewComponent
     this.sortField = property;
     // this.processTerms();
   }
-  
-  // filter(f: string, manual: boolean): void {
-  //   if (manual) {
-  //     if (this.filterExactMatch) {
-  //       f = '/\\b' + f + '\\b/';
-  //       if (this.filterIgnoreCase) {
-  //         f += 'i';
-  //       }
-  //     }
-  //   }
-      
-  //   let regex: RegExp = new RegExp(f);
-  //   let index: number = this.filters.indexOf(regex);
-  //   if (-1 === index) {
-  //     this.filters.push(regex);
-  //   } else {
-  //     this.filters.splice(index, 1);
-  //   }
-    
-  //   this.processTerms();
-  // }
 
-  // processTerms(): void {
-  //   this.terms = this.dataProcessingService.sort(
-  //     this.dataProcessingService.filter(
-  //     this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
-  //       for (let j: number = 0; j < this.filters.length; j++) {
-  //         if (!this.filters[j].test(input)) {
-  //           return false;
-  //         }
-  //       }
+  submitFilter (filterInput) {
+    this.filterUpdate.next({
+      source: AnalysisViews.TERM_VIEW,
+      filter: filterInput,
+      filterOptions: {
+        exactMatch: this.filterExactMatch,
+        ignoreCase: this.filterIgnoreCase
+      }
+    })
+  }
+  
+  filter(f: string, manual: boolean): void {
+    if (manual) {
+      if (this.filterExactMatch) {
+        f = '/\\b' + f + '\\b/';
+        if (this.filterIgnoreCase) {
+          f += 'i';
+        }
+      }
+    }
+      
+    let regex: RegExp = new RegExp(f);
+    let index: number = this.filters.indexOf(regex);
+    if (-1 === index) {
+      this.filters.push(regex);
+    } else {
+      this.filters.splice(index, 1);
+    }
+    
+    this.processTerms();
+  }
+
+  processTerms(): void {
+    this.terms = this.dataProcessingService.sort(
+      this.dataProcessingService.filter(
+      this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
+        for (let j: number = 0; j < this.filters.length; j++) {
+          if (!this.filters[j].test(input)) {
+            return false;
+          }
+        }
         
-  //       return true;
-  //     }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
-  // }
+        return true;
+      }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+  }
 }
