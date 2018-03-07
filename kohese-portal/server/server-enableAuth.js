@@ -1,6 +1,6 @@
 const server = global.app;
 
-const ItemProxy = require('../common/models/item-proxy.js');
+const ItemProxy = require('../common/src/item-proxy.js');
 
 var usersProxy;
 

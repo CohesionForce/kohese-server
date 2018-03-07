@@ -5,7 +5,7 @@
     "actionState" : {
       "inputType" : "k-select:{\"options\":[\"Proposed\", \"Assigned\", \"Accepted\", \"In Work\",\"Pending Reassign\", \"Pending Redisposition\", \"In Verification\", \"Verified\", \"Closed\"]}",
       "required" : false,
-      "default" : null,
+      "default" : "Proposed",
       "displayName" : "taskState"
     },
     "assignedTo" : {

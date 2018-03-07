@@ -1,4 +1,5 @@
-export let MockViewData = {
+export function MockViewData () {
+  return {
   "modelName": "Item ",
   "icon": "fa fa-sticky-note",
   "viewProperties": {
@@ -34,4 +35,5 @@ export let MockViewData = {
   "modifiedBy": "admin",
   "modifiedOn": 1517006598071,
   "itemIds": []
+  }
 }

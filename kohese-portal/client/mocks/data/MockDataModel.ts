@@ -1,8 +1,10 @@
-export let MockDataModel = {
+export function MockDataModel () { 
+  return {
   "name": "Item",
   "base": "PersistedModel",
   "strict": "validate",
   "idInjection": true,
+  "invertItemOrder": true,
   "trackChanges": false,
   "properties": {
     "id": {
@@ -63,4 +65,6 @@ export let MockDataModel = {
   },
   "acls": [],
   "methods": []
+  }
 }
+

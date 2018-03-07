@@ -5,7 +5,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { CurrentUserService } from '../../../services/user/current-user.service';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
@@ -35,14 +35,6 @@ export class AppBarComponent extends NavigatableComponent
   }
 
   ngOnInit(): void {
-    this.userSubscription = this.sessionService.getSessionUser().subscribe((proxy: ItemProxy) => {
-      if (proxy) {
-        this.userName = proxy.item.name;
-      } else {
-        this.userName = 'Loading';
-      }
-    });
-    
     this.repositoryStatusSubscription = this.itemRepository.getRepoStatusSubject().subscribe((status: any) => {
       this._itemRepositoryState = status.state;
       switch(this._itemRepositoryState) {
@@ -63,6 +55,11 @@ export class AppBarComponent extends NavigatableComponent
     this.CurrentUserService.getCurrentUserSubject().subscribe((userInfo)=>{
       if (userInfo) {
         this.authenticated = true;
+        this.userName = userInfo.username
+        console.log(this);
+      } else {
+        this.authenticated = false;
+        this.userName = undefined;
       }
     });
   }

@@ -1,36 +1,39 @@
 <form *ngIf="itemProxy"
       [formGroup]="formGroup" 
-      novalidate>
-  <div class="form-group">
-    <ng-container *ngFor="let property of (properties | mapKey)">
-      <ng-container [ngSwitch]="properties[property].inputType.type" style="width: 100%;">
-        <k-text *ngSwitchCase="'text'"
-          [formGroup]="formGroup" [fieldId]="property"
-          [fieldName]="properties[property].displayName"
-          [isMultiLine]="properties[property].inputType.options['isMultiLine']">
-        </k-text>
-        <k-proxy-selector *ngSwitchCase="'proxy-selector'"
-          [formGroup]="formGroup" [fieldId]="property"
-          [type]="properties[property].inputType.options['type']"
-          [fieldName]="properties[property].displayName"
-          [useAdvancedSelector]="properties[property].inputType.options['useAdvancedSelector']"
-          [allowMultiSelect]="properties[property].inputType.options['allowMultiSelect']">
-        </k-proxy-selector>
-        <k-date *ngSwitchCase="'date'"
-          [formGroup]="formGroup" [fieldId]="property"
-          [fieldName]="properties[property].displayName">
-        </k-date>
-        <k-select *ngSwitchCase="'select'"
-         [formGroup]="formGroup" [fieldId]="property"
-         [fieldName]="properties[property].displayName"
-         [options]="properties[property].inputType.options['options']">
-        </k-select>
-        <k-user-selector *ngSwitchCase="'user-selector'"
-          [formGroup]="formGroup" [fieldId]="property"
-          [fieldName]="properties[property].displayName">
-        </k-user-selector>
-        <br/>
-      </ng-container>
+      novalidate class="form-group">
+  <ng-container *ngFor="let property of (properties | mapKey)">
+    <ng-container [ngSwitch]="properties[property].inputType.type">
+      <k-text *ngSwitchCase="'text'"
+        [formGroup]="formGroup" [fieldId]="property"
+        [fieldName]="properties[property].displayName"
+        [isMultiLine]="properties[property].inputType.options['isMultiLine']">
+      </k-text>
+      <k-proxy-selector *ngSwitchCase="'proxy-selector'"
+        [formGroup]="formGroup" [fieldId]="property"
+        [type]="properties[property].inputType.options['type']"
+        [fieldName]="properties[property].displayName"
+        [useAdvancedSelector]="properties[property].inputType.options['useAdvancedSelector']"
+        [allowMultiSelect]="properties[property].inputType.options['allowMultiSelect']">
+      </k-proxy-selector>
+      <k-date *ngSwitchCase="'date'"
+        [formGroup]="formGroup" [fieldId]="property"
+        [fieldName]="properties[property].displayName">
+      </k-date>
+      <k-select *ngSwitchCase="'select'"
+       [formGroup]="formGroup" [fieldId]="property"
+       [fieldName]="properties[property].displayName"
+       [options]="properties[property].inputType.options['options']">
+      </k-select>
+      <k-user-selector *ngSwitchCase="'user-selector'"
+        [formGroup]="formGroup" [fieldId]="property"
+        [fieldName]="properties[property].displayName">
+      </k-user-selector>
+      <br/>
     </ng-container>
-  </div>
+  </ng-container>
 </form>
+<div id="detailsFormStateEditorContainer">
+  <k-state-editor [itemProxy]="itemProxy"
+    (stateChanged)="nonFormFieldChanged.emit({ fieldName: $event.fieldName, fieldValue: $event.candidate })">
+  </k-state-editor>
+</div>

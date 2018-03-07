@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import { ItemProxy } from '../../../../common/src/item-proxy.js';
 
 import { ItemRepository } from '../item-repository/item-repository.service';
 

@@ -1,4 +1,4 @@
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
@@ -16,6 +16,10 @@ export class KoheseType {
   private relations : object;
   private acls : Array<any>;
   private methods : Array<any>;
+  private _dataModelFields: any = {};
+  get dataModelFields() {
+    return this._dataModelFields;
+  }
 
   constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy) {
     this.dataModelProxy = dataModelProxy;
@@ -37,6 +41,29 @@ export class KoheseType {
     this.relations = this.dataModelProxy.item.relations;
     this.acls = this.dataModelProxy.item.acls;
     this.methods = this.dataModelProxy.item.methods;
+    
+    let fieldGroups: Array<any> = [];
+    let modelProxy: ItemProxy = this.dataModelProxy;
+    let hasBase: boolean = false;
+    
+    do {
+      let modelFields: any = {};
+      for (let fieldKey in modelProxy.item.properties) {
+        modelFields[fieldKey] = modelProxy.item.
+          properties[fieldKey];
+      }
+      fieldGroups.push(modelFields);
+ 
+      hasBase = Object.hasOwnProperty(modelProxy.item.base);
+      modelProxy = modelProxy.parent;
+    } while (hasBase);
+    
+    fieldGroups.reverse();
+    for (let j: number = 0; j < fieldGroups.length; j++) {
+      for (let fieldKey in fieldGroups[j]) {
+        this._dataModelFields[fieldKey] = fieldGroups[j][fieldKey];
+      }
+    }
   }
   
   retrieveViewData(): void {
@@ -58,6 +85,7 @@ export class KoheseType {
     this.dataModelProxy.item.relations = this.relations;
     this.dataModelProxy.item.acls = this.acls;
     this.dataModelProxy.item.methods = this.methods;
+    
     return this.dataModelProxy;
   }
   

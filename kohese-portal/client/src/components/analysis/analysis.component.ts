@@ -6,7 +6,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { AnalysisService } from '../../services/analysis/analysis.service';
 import { AnalysisFilter, AnalysisViews} from './AnalysisViewComponent.class';
 
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';

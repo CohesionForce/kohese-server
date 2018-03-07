@@ -14,7 +14,7 @@ import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicT
 import { KoheseType } from '../../../classes/UDT/KoheseType.class'
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../../mocks/data/MockViewData';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { PipesModule } from '../../../pipes/pipes.module';
 
 describe('Component: Type Overview', ()=>{
@@ -41,8 +41,8 @@ describe('Component: Type Overview', ()=>{
     typeOverviewFixture = TestBed.createComponent(TypeOverviewComponent);
     typeOverviewComponent = typeOverviewFixture.componentInstance;
     typeOverviewComponent.type = new KoheseType(
-      new ItemProxy('KoheseModel', MockDataModel),
-      new ItemProxy('KoheseView', MockViewData))
+      new ItemProxy('KoheseModel', MockDataModel()),
+      new ItemProxy('KoheseView', MockViewData()))
     typeOverviewFixture.detectChanges();
     
   })

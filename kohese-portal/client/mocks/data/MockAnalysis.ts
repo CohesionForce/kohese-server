@@ -1,4 +1,5 @@
-export let MockAnalysis =  {
+export function MockAnalysis () {
+  return {
   "data": {
     "id": "cab0b000-bda5-11e7-85ba-279ecb57e99b",
     "forModelKind": "Item",
@@ -274,4 +275,5 @@ export let MockAnalysis =  {
       }
     }
   ]
+  }
 }

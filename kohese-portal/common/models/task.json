@@ -2,10 +2,61 @@
   "name": "Task",
   "base": "Item",
   "idInjection": true,
+  "invertItemOrder": true,
   "properties": {
     "taskState": {
-      "type": "string",
-      "required": true
+      "type": "StateMachine",
+      "required": true,
+      "default": "Proposed",
+      "properties": {
+        "state":{
+          "Proposed": {
+            "name": "Proposed",
+            "description": "A task that is Proposed."
+           },
+          "Assigned": {
+            "name": "Assigned",
+            "description": "A task that is Assigned."
+           },
+          "InWork": {
+            "name": "In Work",
+            "description": "A task that is In Work."
+           },
+          "Pending Reassign": {
+            "name": "Pending Reassign",
+            "description": "A task that is Pending Reassign."
+           },
+          "Completed": {
+            "name": "Completed",
+            "description": "A task that is Completed."
+           }
+        },
+        "transition": {
+          "assign": {
+            "source": "Proposed",
+            "target": "Assigned",
+            "guard": {},
+            "requires": [ "assignment:Assignee" ]
+          },
+          "beginWork": {
+            "source": "Assigned",
+            "target": "InWork",
+            "guard": {},
+            "requires": ""
+          },
+          "reassign": {
+            "source": "Assigned",
+            "target": "PendingReassign",
+            "guard": {}
+          },
+          "complete": {
+            "source": "InWork",
+            "target": "Completed",
+            "guard": {},
+            "requires": []
+          }
+        }
+      }
     },
     "predecessors" : {
       "type": [

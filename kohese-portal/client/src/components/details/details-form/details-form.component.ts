@@ -6,16 +6,18 @@ import { FormGroup, FormBuilder, Validators,
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
-import { ItemProxy } from '../../../../../common/models/item-proxy.js';
+import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { StateService } from '../../../services/state/state.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'details-form',
-  templateUrl : './details-form.component.html'
+  templateUrl : './details-form.component.html',
+  styleUrls: ['./details-form.component.scss']
 })
 
 export class DetailsFormComponent extends NavigatableComponent
@@ -32,10 +34,13 @@ export class DetailsFormComponent extends NavigatableComponent
   @Input() 
   createInfo : any;
   @Output()
-  formGroupUpdated = new EventEmitter<FormGroup>()
+  formGroupUpdated = new EventEmitter<FormGroup>();
 
   public properties: any = {};
   private initialized : boolean;
+  
+  @Output()
+  public nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
 
   /* Utils */
   public formGroup : FormGroup;
@@ -73,7 +78,7 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       }
     });
-
+    
     this.initialized = true;
   }
 
@@ -129,6 +134,17 @@ export class DetailsFormComponent extends NavigatableComponent
         model : this.createInfo.type.dataModelProxy
       }
       this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
+      let modelProxy: ItemProxy = this.itemProxy.model;
+      while (modelProxy) {
+        let type: KoheseType = this.DynamicTypeService.
+          getKoheseTypes()[modelProxy.item.name];
+        for (let fieldName in type.dataModelFields) {
+          if (!this.itemProxy.item[fieldName]) {
+            this.itemProxy.item[fieldName] = type.dataModelFields[fieldName].default;
+          }
+        }
+        modelProxy = this.ItemRepository.getProxyFor(modelProxy.item.base);
+      }
       this.updateProperties();
       this.formGroup = this.createFormGroup();
       this.formGroupUpdated.emit(this.formGroup);
@@ -137,13 +153,16 @@ export class DetailsFormComponent extends NavigatableComponent
 
   updateProperties () : void {
     this.properties = {};
+    let fieldGroups: Array<any> = [{}];
+    let fieldGroup: any = {};
     // Apply properties from my current class 
     console.log(':: Update Properties ');
     for (let fieldName in this.type.properties) {
       if (this.fieldFilter(fieldName)) {
-        this.properties[fieldName] = this.type.properties[fieldName];
+        fieldGroup[fieldName] = this.type.properties[fieldName];
       }
     }
+    fieldGroups.push(fieldGroup);
     console.log(':: Current Properties loaded');
     console.log(this.properties);
 
@@ -159,14 +178,25 @@ export class DetailsFormComponent extends NavigatableComponent
         if (inheritedView) {
           console.log(':: View found ');
           console.log(inheritedView);
+          fieldGroup = {};
           for (let fieldName in inheritedView.item.viewProperties) {
             console.log(':: Adding inherited property ' + fieldName);
-            this.properties[fieldName] = inheritedView.item.viewProperties[fieldName];
+            fieldGroup[fieldName] = inheritedView.item.
+              viewProperties[fieldName];
           }
+          fieldGroups.push(fieldGroup);
         }
         inheritedModel = inheritedProxy.item.base;
       }
     }
+    
+    fieldGroups.reverse();
+    for (let j: number = 0; j < fieldGroups.length; j++) {
+      for (let fieldName in fieldGroups[j]) {
+        this.properties[fieldName] = fieldGroups[j][fieldName];
+      }
+    }
+    
     console.log(':: Update Properties Complete');
     console.log(this.properties);
   }

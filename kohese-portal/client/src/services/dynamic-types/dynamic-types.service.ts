@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { ItemRepository, RepoStates} from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 @Injectable()
@@ -47,8 +47,9 @@ export class DynamicTypesService {
     for (var i : number = 0; i < this.typeProxyList.length; i++) {
       let currentType : ItemProxy = this.typeProxyList[i];
       let viewProxy: ItemProxy = this.getViewProxyFor(currentType);
-      this.koheseTypes[currentType.item.name] = new KoheseType(currentType,
-        viewProxy);
+      let type: KoheseType = new KoheseType(currentType, viewProxy);
+      this.koheseTypes[currentType.item.name] = type;
+      this.modelProxy.type = type;
     }
   }
 

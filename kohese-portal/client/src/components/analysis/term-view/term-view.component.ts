@@ -4,7 +4,7 @@ import { AnalysisViewComponent, AnalysisFilter, AnalysisViews } from '../Analysi
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
-import { ItemProxy } from '../../../../../common/models/item-proxy'
+import { ItemProxy } from '../../../../../common/src/item-proxy'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisService } from '../../../services/analysis/analysis.service';

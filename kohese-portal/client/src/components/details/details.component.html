@@ -71,8 +71,10 @@
                   </span>
                 </ng-template>
                 <details-form #editor [itemProxy]="itemProxy" 
-                                      [disabled]="!enableEdit"
-                                      (formGroupUpdated)="onFormGroupUpdated($event)"></details-form>
+                  [disabled]="!enableEdit"
+                  (formGroupUpdated)="onFormGroupUpdated($event)"
+                  (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
+                </details-form>
             </mat-tab>
             <mat-tab>
               <ng-template mat-tab-label>

@@ -9,7 +9,7 @@ import { PipesModule } from '../../../pipes/pipes.module';
 
 import { DetailsFormComponent } from './details-form.component';
 
-import * as ItemProxy from '../../../../../common/models/item-proxy'
+import * as ItemProxy from '../../../../../common/src/item-proxy'
 
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -54,7 +54,8 @@ describe('Component: Details Form', ()=>{
       }
 
       formComponent.createInfo.type.dataModelProxy.item = {
-        base: 'PersistedModel'
+        base: 'PersistedModel',
+        name: 'Item'
       } 
 
       formFixture.detectChanges();
@@ -62,13 +63,12 @@ describe('Component: Details Form', ()=>{
 
     it('creates a stub proxy from the create information', ()=>{
       expect(formComponent.itemProxy).toBeTruthy();
-      console.log(formComponent.itemProxy);
     })
   })
 
   describe('details view', ()=>{
     beforeEach(()=>{
-      formComponent.itemProxy = new ItemProxy('Item', MockItem) 
+      formComponent.itemProxy = new ItemProxy('Item', MockItem()) 
       formComponent.itemProxy.model.item = {
         base: 'PersistedModel'
       }    
