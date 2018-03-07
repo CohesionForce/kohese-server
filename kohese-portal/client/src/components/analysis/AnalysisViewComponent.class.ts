@@ -71,12 +71,6 @@ export enum AnalysisViews {
 }
 
 export interface AnalysisFilter {
-<<<<<<< Updated upstream
-  source: AnalysisViews,
-  filter : string
-}
-
-=======
   source : AnalysisViews,
   filter : string,
   filterOptions : {
@@ -84,4 +78,3 @@ export interface AnalysisFilter {
     ignoreCase: boolean
   }
 }
->>>>>>> Stashed changes
