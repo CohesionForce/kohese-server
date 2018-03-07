@@ -13,7 +13,7 @@ import { KStateEditorComponent } from './k-state-editor.component';
 import * as ItemProxy from '../../../../../common/src/item-proxy';
 
 describe('k-state-editor', () => {
-  let stateEditor: ComponentFixture;
+  let stateEditor: ComponentFixture<KStateEditorComponent>;
   let component: KStateEditorComponent;
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -34,7 +34,7 @@ describe('k-state-editor', () => {
     
     stateEditor = TestBed.createComponent(KStateEditorComponent);
     component = stateEditor.componentInstance;
-    component.itemProxy = new ItemProxy('Item', MockItem);
+    component.itemProxy = new ItemProxy('Item', MockItem());
   });
   
   it('changes the value of fields of type "StateMachine"', () => {

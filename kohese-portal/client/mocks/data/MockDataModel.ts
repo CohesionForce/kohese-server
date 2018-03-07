@@ -227,19 +227,21 @@ export function MockDataModel () {
   }
 }
 
-export let ItemSubclass = {
-  "name": "ItemSubclass",
-  "base": "Item",
-  "strict": "validate",
-  "idInjection": true,
-  "trackChanges": false,
-  "properties": {
-    "subclassProperty": {
-      "type": "string"
-    }
-  },
-  "validations": [],
-  "relations": {},
-  "acls": [],
-  "methods": []
+export function ItemSubclass() {
+  return {
+    "name": "ItemSubclass",
+    "base": "Item",
+    "strict": "validate",
+    "idInjection": true,
+    "trackChanges": false,
+    "properties": {
+      "subclassProperty": {
+        "type": "string"
+      }
+    },
+    "validations": [],
+    "relations": {},
+    "acls": [],
+    "methods": []
+  };
 };

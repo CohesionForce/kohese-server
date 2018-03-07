@@ -5,11 +5,18 @@ import { MockKoheseType } from '../../../mocks/data/MockKoheseType';
 import * as ItemProxy from '../../../../common/src/item-proxy';
 
 describe('StateService', () => {
-  let typeServicePlaceholder: any = jasmine.createSpyObj('DynamicTypesService',
-    ['getKoheseTypes']);
-  typeServicePlaceholder.getKoheseTypes.and.returnValue(MockKoheseType());
-  let stateService: StateService = new StateService(typeServicePlaceholder);
-  let proxy: ItemProxy = new ItemProxy('Item', MockItem);
+  let stateService: StateService;
+  let proxy: ItemProxy;
+  
+  beforeAll(() => {
+    let typeServicePlaceholder: any = jasmine.createSpyObj('DynamicTypesService',
+      ['getKoheseTypes']);
+    typeServicePlaceholder.getKoheseTypes.and.returnValue({
+      Item: MockKoheseType()
+    });
+    stateService = new StateService(typeServicePlaceholder);
+    proxy = new ItemProxy('Item', MockItem());
+  });
 
   it('The data structure returned by the getTransitionCandidates function is' +
      ' correct.', () => {
