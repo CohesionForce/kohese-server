@@ -40,7 +40,7 @@ export class DetailsFormComponent extends NavigatableComponent
   private initialized : boolean;
   
   @Output()
-  private nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
+  public nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
 
   /* Utils */
   public formGroup : FormGroup;
