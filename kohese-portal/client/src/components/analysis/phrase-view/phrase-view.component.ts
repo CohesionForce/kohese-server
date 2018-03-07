@@ -17,18 +17,21 @@ import * as $ from 'jquery';
 
 @Component({
   selector: 'phrase-view',
-  templateUrl : './phrase-view.component.html'
+  templateUrl: './phrase-view.component.html',
+  styleUrls: [
+    './phrase-view.component.scss'
+  ]
 })
 export class PhraseViewComponent extends AnalysisViewComponent
-                                   implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy {
   /* UI Switches */
   loadLimit: number = 100;
   ascending: boolean = true;
   sortField: string = 'count';
   filters: Array<RegExp> = [];
   showPOS: boolean = false;
-  selfFilter: boolean;
-  filteredCount : number;
+  syncFilter: boolean;
+  filteredCount: number;
   phrases: Array<any> = [];
   /* Data */
   @Input()
@@ -44,25 +47,26 @@ export class PhraseViewComponent extends AnalysisViewComponent
   private filterSubjectSubscription: Subscription;
 
   constructor(NavigationService: NavigationService,
-              AnalysisService: AnalysisService,
-              private dataProcessingService: DataProcessingService) {
+    AnalysisService: AnalysisService,
+    private dataProcessingService: DataProcessingService) {
     super(NavigationService, AnalysisService);
   }
 
   ngOnInit(): void {
-    this.selfFilter = false;
+    // If sync filter is enable, allow term filters to be applied
+    this.syncFilter = true;
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      if (this.selfFilter && newFilter.source != AnalysisViews.PHRASE_VIEW) {
+      if (this.syncFilter && newFilter.source === AnalysisViews.TERM_VIEW) {
         return;
       } else {
         console.log('Phrase filter from: ');
         console.log(newFilter);
         this.filterString = newFilter.filter;
-        this.filter();
+        this.onFilterChange();
         this.filteredCount = this.getPhraseCount();
       }
     });
-    
+
     this.processPhrases();
   }
 
@@ -73,13 +77,13 @@ export class PhraseViewComponent extends AnalysisViewComponent
   getPhraseCount(): number {
     return $('#thePhrasesBody').find('tr').length;
   }
-  
+
   sort(property: string): void {
     this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
     this.sortField = property;
     this.processPhrases();
   }
-  
+
   filter(): void {
     let filter = new RegExp(this.filterString);
     let index: number = this.filters.indexOf(filter);
@@ -88,32 +92,32 @@ export class PhraseViewComponent extends AnalysisViewComponent
     } else {
       this.filters.splice(index, 1);
     }
-    
+
     this.processPhrases();
   }
 
   submitFilter(newFilter) {
     this.filterUpdate.emit({
       source: AnalysisViews.PHRASE_VIEW,
-      filter : newFilter,
+      filter: newFilter,
       filterOptions: {
         ignoreCase: false,
         exactMatch: false
       }
     })
   }
-  
+
   processPhrases(): void {
     this.phrases = this.dataProcessingService.sort(
       this.dataProcessingService.filter(
-      this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
-        for (let i: number = 0; i < this.filters.length; i++) {
-          if (!this.filters[i].test(input)) {
-            return false;
+        this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
+          for (let i: number = 0; i < this.filters.length; i++) {
+            if (!this.filters[i].test(input.text)) {
+              return false;
+            }
           }
-        }
-        
-        return true;
-      }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+
+          return true;
+        }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
   }
 }

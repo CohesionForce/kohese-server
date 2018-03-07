@@ -62,12 +62,13 @@ export class TermViewComponent extends AnalysisViewComponent
         console.log(newFilter);
         this.filterOptions = newFilter.filterOptions;
         this.filterString = newFilter.filter;
+        this.filterControl.setValue(newFilter.filter);
         this.onFilterChange();
+        this.processTerms();
         this.filteredCount = this.getTermCount();
       }
     });
 
-    // this.processTerms();
     this.getTermCount();
   }
 

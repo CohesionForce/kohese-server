@@ -14,7 +14,8 @@ import * as $ from 'jquery';
 
 @Component({
   selector: 'sentence-view',
-  templateUrl : './sentence-view.component.html'
+  templateUrl : './sentence-view.component.html',
+  styleUrls: [ './sentence-view.component.scss']
 })
 export class SentenceViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
@@ -25,7 +26,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
   showSentencesInDetails: boolean = true;
   showPhrasesInDetails: boolean = false;
   showTokensInDetails: boolean = false;
-  selfFilter : boolean;
+  syncFilter : boolean;
   filteredCount : number;
   sentences: Array<any>;
   
@@ -49,9 +50,9 @@ export class SentenceViewComponent extends AnalysisViewComponent
   }
 
   ngOnInit(): void {
-    this.selfFilter = false;
+    this.syncFilter = true;
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      if (this.selfFilter && newFilter.source != AnalysisViews.SENTENCE_VIEW) {
+      if (!this.syncFilter && newFilter.source !== AnalysisViews.SENTENCE_VIEW) {
         return;
       } else {
         console.log('Sentence filter from: ');
@@ -59,10 +60,10 @@ export class SentenceViewComponent extends AnalysisViewComponent
         this.filterString = newFilter.filter;
         this.onFilterChange();
         this.filteredCount = this.getDetailsItemCount();
+        this.processSentences();
       }
     });
     
-    this.processSentences();
   }
 
   ngOnDestroy(): void {

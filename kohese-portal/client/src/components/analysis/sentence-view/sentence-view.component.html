@@ -1,5 +1,13 @@
 <div class="panel">
-  <div class="panel-heading">Sentence View - ({{filteredCount}}) Sentences</div>
+  <div class="panel-heading">Sentence View - ({{filteredCount}}) Sentences
+    <div class="pull-right">
+        <button mat-icon-button>
+          <mat-icon class="fa fa-link" style="vertical-align: top;"
+                    (click)="syncFilter = !syncFilter"
+                    [ngClass]="{'syncOn' : syncFilter, 'syncOff' : !syncFilter}"></mat-icon>
+        </button>
+      </div>  
+  </div>
   <div class="panel-body">
     <div>
       <span><b>Analysis Details</b></span>

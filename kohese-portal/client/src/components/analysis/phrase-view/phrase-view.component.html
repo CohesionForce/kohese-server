@@ -1,8 +1,16 @@
 <div class="panel">
   <div class="panel-heading">Phrase View - ({{filteredCount}}) Phrases
-    <button mat-icon-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
-      <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
-    </button>
+    <div class="pull-right">
+      <button mat-icon-button>
+        <mat-icon class="fa fa-link" style="vertical-align: top;"
+                  (click)="syncFilter = !syncFilter"
+                  [ngClass]="{'syncOn' : syncFilter, 'syncOff' : !syncFilter}"></mat-icon>
+      </button>
+      <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
+          <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
+      </button>
+
+    </div>
     <mat-menu #optionsMenu="matMenu" [overlapTrigger]="false">
       <button mat-menu-item (click)="showPOS = !showPOS">
         <mat-icon *ngIf="showPOS" class="fa fa-check"></mat-icon>

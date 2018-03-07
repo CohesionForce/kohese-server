@@ -17,6 +17,7 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { MockDataProcessingService } from '../../../../mocks/services/MockDataProcessingService';
 import { PipesModule } from '../../../pipes/pipes.module';
 import { MockAnalysis } from '../../../../mocks/data/MockAnalysis';
+import { AnalysisViews } from '../AnalysisViewComponent.class';
 
 describe('Component: Term View', ()=>{
   let termComponent: TermViewComponent;
@@ -45,7 +46,14 @@ describe('Component: Term View', ()=>{
 
     termComponent.itemProxy = new ItemProxy('Item', MockItem());
     termComponent.itemProxy.analysis = MockAnalysis()
-    termComponent.filterSubject = new BehaviorSubject('');
+    termComponent.filterSubject = new BehaviorSubject({
+      filter: '',
+      source: AnalysisViews.TERM_VIEW,
+      filterOptions : {
+        exactMatch: false,
+        ignoreCase: false
+      }
+    });
 
     termFixture.detectChanges();
     

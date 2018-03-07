@@ -9,6 +9,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import * as commonmark from 'commonmark';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
+import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class.js';
 
 
 @Component({
@@ -39,7 +40,7 @@ export class DocumentViewComponent extends NavigatableComponent
 
   /* Observables */
   @Input()
-  filterSubject : BehaviorSubject<any>;
+  filterSubject : BehaviorSubject<AnalysisFilter>;
   @Input()
   showChildrenSubject : BehaviorSubject<boolean>;
 
@@ -60,8 +61,8 @@ export class DocumentViewComponent extends NavigatableComponent
   ngOnInit() {
     console.log(this);
     if (this.filterSubject) {
-      this.filterSubscription = this.filterSubject.subscribe(filter => {
-        this.filter = filter;
+      this.filterSubscription = this.filterSubject.subscribe(newFilter => {
+        this.filter = newFilter.filter;
         this.onFilterChange();
       })
     }

@@ -32,13 +32,13 @@
       <br/>
       <mat-form-field>
         <input matInput type="text" class="input-sm"
-          [(ngModel)]="analysisFilterInput" placeholder="Filter"
+          [formControl]="filterControl" placeholder="Filter"
           [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
       </mat-form-field>
       <mat-form-field>
         <input matInput type="text" placeholder="Limit" [(ngModel)]="loadLimit"/>
       </mat-form-field>
-      <button mat-raised-button (click)="submitFilter(analysisFilterInput)"
+      <button mat-raised-button (click)="submitFilter(filterControl.value)"
         class="btn btn-default fa fa-search">Submit
       </button>
     </div>
