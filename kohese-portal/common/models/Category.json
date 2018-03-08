@@ -1,8 +1,10 @@
 {
+  "id": "Category",
   "name": "Category",
+  "parentId": "Item",
   "base": "Item",
-  "invertItemOrder": true,
   "idInjection": true,
+  "invertItemOrder": true,
   "properties": {},
   "validations": [],
   "relations": {},

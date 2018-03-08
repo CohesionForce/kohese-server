@@ -1,18 +1,16 @@
 {
+  "id": "KoheseUser",
   "name": "KoheseUser",
+  "parentId": "Item",
   "base": "Item",
-  "strict": "validate",
   "idInjection": true,
   "invertItemOrder": true,
-  "hidden": [
-    "password"
-  ],
   "properties": {
     "password": {
       "type": "string",
       "required": true
     },
-    "email" : {
+    "email": {
       "type": "string",
       "required": false
     }

@@ -1,5 +1,7 @@
 {
+  "id": "Issue",
   "name": "Issue",
+  "parentId": "Observation",
   "base": "Observation",
   "idInjection": true,
   "invertItemOrder": true,
@@ -9,38 +11,40 @@
       "default": "Observed",
       "required": true,
       "properties": {
-        "state":{
+        "state": {
           "Observed": {
             "name": "Observed",
             "description": "The issue has been Observed."
-           },
+          },
           "InAnalysis": {
             "name": "In Analysis",
             "description": "The issue is In Analysis."
-           },
+          },
           "NoAction": {
             "name": "No Action",
             "description": "The issue requires No Action."
-           },
+          },
           "Duplicate": {
             "name": "Duplicate",
             "description": "The issue is a Duplicate."
-           },
+          },
           "RequiresAction": {
             "name": "Requires Action",
             "description": "The issue Requires Action."
-           },
+          },
           "Resolved": {
             "name": "Resolved",
             "description": "The issue is Resolved."
-           }
+          }
         },
         "transition": {
           "assignAnalysis": {
             "source": "Observed",
             "target": "InAnalysis",
             "guard": {},
-            "requires": ["analysisAction"]
+            "requires": [
+              "analysisAction"
+            ]
           },
           "noActionRequired": {
             "source": "InAnalysis",

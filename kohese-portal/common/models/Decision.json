@@ -1,5 +1,7 @@
 {
+  "id": "Decision",
   "name": "Decision",
+  "parentId": "Item",
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": true,
@@ -9,46 +11,48 @@
       "required": true,
       "default": "Proposed",
       "properties": {
-        "state":{
+        "state": {
           "Proposed": {
             "name": "Proposed",
             "description": "A decision that has been proposed."
-           },
+          },
           "InAnalysis": {
             "name": "In Analysis",
             "description": "A decision that is In Analysis."
-           },
+          },
           "InReview": {
             "name": "In Review",
             "description": "A decision that is In Review."
-           },
+          },
           "Approved": {
             "name": "Approved",
             "description": "A decision that is Approved."
-           },
+          },
           "Published": {
             "name": "Published",
             "description": "A decision that is Published."
-           },
+          },
           "Deferred": {
             "name": "Deferred",
             "description": "A decision that is Deferred."
-           },
+          },
           "Disapproved": {
             "name": "Disapproved",
             "description": "A decision that is Disapproved."
-           },
+          },
           "InAppeal": {
             "name": "In Appeal",
             "description": "A decision that is In Appeal."
-           }
+          }
         },
         "transition": {
           "assignAnalysis": {
             "source": "Proposed",
             "target": "InAnalysis",
             "guard": {},
-            "requires": [ "assignment:Analyzer" ]
+            "requires": [
+              "assignment:Analyzer"
+            ]
           },
           "reviewForApproval": {
             "source": "InAnalysis",

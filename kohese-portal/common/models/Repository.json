@@ -1,5 +1,7 @@
 {
+  "id": "Repository",
   "name": "Repository",
+  "parentId": "Item",
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": true,

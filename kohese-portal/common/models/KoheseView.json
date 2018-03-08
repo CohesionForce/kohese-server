@@ -1,5 +1,7 @@
 {
+  "id": "KoheseView",
   "name": "KoheseView",
+  "parentId": "Item",
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": false,
