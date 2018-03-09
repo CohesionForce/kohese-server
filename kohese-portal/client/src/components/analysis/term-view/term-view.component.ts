@@ -59,7 +59,7 @@ export class TermViewComponent extends AnalysisViewComponent
 
   ngOnInit(): void {
     this.selfFilter = true;
-    this.proxyStream.subscribe((newProxy)=>{
+    this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy)=>{
       this.itemProxy = newProxy;
       if (this.filterString) {
         this.onFilterChange();

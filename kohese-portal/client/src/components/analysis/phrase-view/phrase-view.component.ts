@@ -64,7 +64,7 @@ export class PhraseViewComponent extends AnalysisViewComponent
     // If sync filter is enable, allow term filters to be applied
     this.syncFilter = true;
 
-    this.proxyStream.subscribe((newProxy)=>{
+    this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy)=>{
       this.itemProxy = newProxy;
       if (this.filterString) {
         this.onFilterChange();
@@ -117,12 +117,12 @@ export class PhraseViewComponent extends AnalysisViewComponent
   processPhrases(): void {
     if (!this.filterRegex) {
       this.phrases = this.dataProcessingService.sort(
-        this.itemProxy.analysis.extendedTokenSummaryList,
+        this.itemProxy.analysis.extendedChunkSummaryList,
         [this.sortField], this.ascending).slice(0, this.loadLimit);
     } else {
       this.phrases = this.dataProcessingService.sort(
         this.dataProcessingService.filter(
-        this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
+        this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
           if (!this.filterRegex.test(input.text)) {
             return false;
           }
