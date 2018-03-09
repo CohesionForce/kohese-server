@@ -36,6 +36,7 @@ export class AnalysisComponent extends NavigatableComponent
   /* Observables */
   filterSubject : BehaviorSubject<AnalysisFilter>
   showChildrenSubject : BehaviorSubject<boolean>
+  proxyStream: BehaviorSubject<ItemProxy>;
 
   constructor(protected NavigationService : NavigationService,
               private route : ActivatedRoute,
@@ -62,7 +63,13 @@ export class AnalysisComponent extends NavigatableComponent
       this.repoReadySub = this.ItemRepository.getRepoStatusSubject().subscribe(update => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
           this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
-          this.AnalysisService.fetchAnalysis(this.itemProxy);
+          this.proxyStream = new BehaviorSubject(this.itemProxy);
+          this.AnalysisService.fetchAnalysis(this.itemProxy)
+            .then(()=>{
+              this.proxyStream.next(this.itemProxy);
+            }, (error)=>{
+              console.error(error);
+            });
           this.repoLoaded = true;
         }
       })

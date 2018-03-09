@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
+import { Observable } from 'rxjs';
 
 import { ItemProxy } from '../../../../common/src/item-proxy.js';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
@@ -14,7 +15,8 @@ import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class.js';
 
 @Component({
   selector: 'document-view',
-  templateUrl: './document-view.component.html'
+  templateUrl: './document-view.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class DocumentViewComponent extends NavigatableComponent
@@ -23,7 +25,6 @@ export class DocumentViewComponent extends NavigatableComponent
   showChildren : boolean;
 
   /* Data */
-  @Input()
   itemProxy : ItemProxy;
 
   filter : string;
@@ -43,15 +44,19 @@ export class DocumentViewComponent extends NavigatableComponent
   filterSubject : BehaviorSubject<AnalysisFilter>;
   @Input()
   showChildrenSubject : BehaviorSubject<boolean>;
+  @Input()
+  proxyStream : Observable<ItemProxy>
 
   /* Subscriptions */
   filterSubscription : Subscription;
   showChildrenSubscription : Subscription;
+  proxyStreamSubscription : Subscription;
 
 
 
 
-  constructor (NavigationService : NavigationService) {
+  constructor (NavigationService : NavigationService, 
+               private changeRef : ChangeDetectorRef) {
     super(NavigationService)
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({sourcepos: true});
@@ -59,19 +64,29 @@ export class DocumentViewComponent extends NavigatableComponent
   }
 
   ngOnInit() {
-    console.log(this);
     if (this.filterSubject) {
       this.filterSubscription = this.filterSubject.subscribe(newFilter => {
         this.filter = newFilter.filter;
         this.onFilterChange();
+        this.changeRef.markForCheck();
       })
     }
+
+    this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy)=>{
+      this.itemProxy = newProxy;
+      // TODO - Determine if there is a way to cache and diff the new doc before
+      // regenerating
+      this.generateDoc();
+      this.changeRef.markForCheck();
+    })
+
     this.showChildrenSubscription = this.showChildrenSubject.subscribe(showChildren => {
       console.log(showChildren);
       this.showChildren = showChildren;
       this.docRendered = null;
       this.itemDescriptionRendered = null;
       this.generateDoc();
+      this.changeRef.markForCheck();
     })
 
     this.initialized = true
@@ -82,6 +97,7 @@ export class DocumentViewComponent extends NavigatableComponent
       this.filterSubscription.unsubscribe();
     }
     this.showChildrenSubscription.unsubscribe();
+    this.proxyStreamSubscription.unsubscribe();
   }
 
   generateDoc () : void {
