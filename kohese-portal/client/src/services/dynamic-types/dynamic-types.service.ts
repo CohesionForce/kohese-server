@@ -8,8 +8,6 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
 @Injectable()
 export class DynamicTypesService {
   /* Data */
-  modelProxy : ItemProxy;
-  typeProxyList : Array<ItemProxy>;
   koheseTypes : object;
   
   private readonly USER_INPUT_TYPES: any = {
@@ -28,13 +26,13 @@ export class DynamicTypesService {
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
       .subscribe((update: any) => {
       if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-        this.modelProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-        this.typeProxyList = this.modelProxy.getDescendants().
+        let modelProxy: ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
+        let typeProxies: Array<ItemProxy> = modelProxy.getDescendants().
           sort((first: ItemProxy, second: ItemProxy) => {
           return ((first.item.name > second.item.name) ?
             1 : ((first.item.name < second.item.name) ? -1 : 0));
         });
-        this.buildKoheseTypes();
+        this.buildKoheseTypes(typeProxies);
       }
     })
   }
@@ -43,13 +41,13 @@ export class DynamicTypesService {
     return this.koheseTypes;
    }
 
-  buildKoheseTypes(): void {
-    for (var i : number = 0; i < this.typeProxyList.length; i++) {
-      let currentType : ItemProxy = this.typeProxyList[i];
+  buildKoheseTypes(typeProxies: Array<ItemProxy>): void {
+    for (var i : number = 0; i < typeProxies.length; i++) {
+      let currentType : ItemProxy = typeProxies[i];
       let viewProxy: ItemProxy = this.getViewProxyFor(currentType);
       let type: KoheseType = new KoheseType(currentType, viewProxy);
       this.koheseTypes[currentType.item.name] = type;
-      this.modelProxy.type = type;
+      currentType.type = type;
     }
   }
 

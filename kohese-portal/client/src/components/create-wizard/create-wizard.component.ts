@@ -61,6 +61,10 @@ export class CreateWizardComponent extends NavigatableComponent
 
         this.selectedType = this.types[0];
         this.selectedParent = this.rootProxy;
+        this.createInfo = {
+          parent: this.selectedParent.item.id,
+          type: this.selectedType
+        }
       }
     });
   }

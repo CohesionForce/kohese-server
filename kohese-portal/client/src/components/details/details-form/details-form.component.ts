@@ -10,7 +10,6 @@ import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { StateService } from '../../../services/state/state.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -153,41 +152,22 @@ export class DetailsFormComponent extends NavigatableComponent
 
   updateProperties () : void {
     this.properties = {};
-    let fieldGroups: Array<any> = [{}];
-    let fieldGroup: any = {};
-    // Apply properties from my current class 
+    let fieldGroups: Array<any> = [];
     console.log(':: Update Properties ');
-    for (let fieldName in this.type.properties) {
-      if (this.fieldFilter(fieldName)) {
-        fieldGroup[fieldName] = this.type.properties[fieldName];
-      }
-    }
-    fieldGroups.push(fieldGroup);
-    console.log(':: Current Properties loaded');
-    console.log(this.properties);
-
-    console.log(':: Parent Properties');
-    // Grab properties from my base class
     if (this.itemProxy) {
-      let inheritedModel = this.itemProxy.model.item.base;
-      while(inheritedModel != 'PersistedModel') {
-        console.log('Properties of' + inheritedModel)
-        let inheritedProxy = this.ItemRepository.getProxyFor(inheritedModel);
-        let inheritedView = this.DynamicTypeService
-                                .getViewProxyFor(inheritedProxy);
-        if (inheritedView) {
-          console.log(':: View found ');
-          console.log(inheritedView);
-          fieldGroup = {};
-          for (let fieldName in inheritedView.item.viewProperties) {
-            console.log(':: Adding inherited property ' + fieldName);
-            fieldGroup[fieldName] = inheritedView.item.
-              viewProperties[fieldName];
-          }
-          fieldGroups.push(fieldGroup);
+      let modelProxy: ItemProxy = this.itemProxy.model;
+      do {
+        console.log('Properties of ' + modelProxy.item.name);
+        let koheseType: KoheseType = this.DynamicTypeService.
+          getKoheseTypes()[modelProxy.item.name];
+        let fieldGroup: any = {};
+        for (let fieldKey in koheseType.properties) {
+          fieldGroup[fieldKey] = koheseType.properties[fieldKey];
         }
-        inheritedModel = inheritedProxy.item.base;
-      }
+        fieldGroups.push(fieldGroup);
+
+        modelProxy = modelProxy.parentProxy;
+      } while (modelProxy.item.base);
     }
     
     fieldGroups.reverse();

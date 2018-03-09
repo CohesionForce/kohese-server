@@ -8,7 +8,7 @@ export class StateService {
   public constructor(private _typeService: DynamicTypesService) {
   }
   
-  public getTransitionCandidates(proxy: ItemProxy): Array<any> {
+  public getTransitionCandidates(proxy: ItemProxy): any {
     let transitionCandidates: any = {};
     let type: KoheseType = this._typeService.getKoheseTypes()[proxy.kind];
     for (let fieldName in type.dataModelFields) {
