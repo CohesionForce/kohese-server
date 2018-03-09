@@ -3,7 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../material.module';
 import { StateService } from '../../../services/state/state.service';
-import { StateServicePlaceholder } from '../../../../mocks/services/StateServicePlaceholder';
+import { MockStateService } from '../../../../mocks/services/MockStateService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -22,7 +22,7 @@ describe('k-state-editor', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [{
           provide: StateService,
-          useClass: StateServicePlaceholder
+          useClass: MockStateService
         }, {
           provide: DynamicTypesService,
           useClass: MockDynamicTypesService
