@@ -146,7 +146,8 @@ export class TreeRowComponent extends RowComponent
       if (proxy.kind !== proxyFilter.kind.name) {
         matches = false;
       } else if (proxy.kind === 'Action') {
-        if (proxy.item.actionState !== proxyFilter.actionState) {
+        if (proxyFilter.actionState && (proxy.item.actionState !==
+          proxyFilter.actionState)) {
           matches = false;
         } else if (proxyFilter.actionAssignee && (proxy.item.assignedTo !==
           proxyFilter.actionAssignee)) {
