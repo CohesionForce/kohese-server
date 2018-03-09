@@ -56,11 +56,9 @@ export class PhraseViewComponent extends AnalysisViewComponent
     // If sync filter is enable, allow term filters to be applied
     this.syncFilter = true;
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      if (this.syncFilter && newFilter.source === AnalysisViews.TERM_VIEW) {
+      if (!this.syncFilter && newFilter.source !== AnalysisViews.PHRASE_VIEW) {
         return;
       } else {
-        console.log('Phrase filter from: ');
-        console.log(newFilter);
         this.filterString = newFilter.filter;
         this.onFilterChange();
         this.filteredCount = this.getPhraseCount();

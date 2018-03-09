@@ -55,8 +55,6 @@ export class SentenceViewComponent extends AnalysisViewComponent
       if (!this.syncFilter && newFilter.source !== AnalysisViews.SENTENCE_VIEW) {
         return;
       } else {
-        console.log('Sentence filter from: ');
-        console.log(newFilter);
         this.filterString = newFilter.filter;
         this.onFilterChange();
         this.filteredCount = this.getDetailsItemCount();

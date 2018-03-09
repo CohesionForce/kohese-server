@@ -3,7 +3,7 @@
     <split-area [size]="50">
       <split direction="horizontal">
         <split-area [size]="50">
-          <term-view [itemProxy] = "itemProxy"
+          <term-view [proxyStream] = "proxyStream"
                      [filterSubject] = "filterSubject"
                      (filterUpdate)= "onFilter($event)"></term-view>
         </split-area>

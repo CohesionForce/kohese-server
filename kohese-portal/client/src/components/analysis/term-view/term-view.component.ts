@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
 import { AnalysisViewComponent, AnalysisFilter, AnalysisViews } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
@@ -9,12 +9,14 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
+import { Observable } from 'rxjs';
 
 import * as $ from 'jquery';
 import { FormControl } from '@angular/forms';
 @Component({
   selector: 'term-view',
-  templateUrl : './term-view.component.html'
+  templateUrl : './term-view.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TermViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
@@ -33,11 +35,12 @@ export class TermViewComponent extends AnalysisViewComponent
    terms: Array<any>;
 
    /* Data */
-   @Input()
    public itemProxy: ItemProxy;
    filterControl = new FormControl('');
 
    /* Observables */
+   @Input() 
+   proxyStream : Observable<ItemProxy>;
    @Input()
    public filterSubject: BehaviorSubject<AnalysisFilter>;
    @Output()
@@ -45,35 +48,47 @@ export class TermViewComponent extends AnalysisViewComponent
 
    /* Subscriptions */
    private filterSubjectSubscription: Subscription;
+   private proxyStreamSubscription : Subscription;
 
    constructor(NavigationService: NavigationService,
               AnalysisService: AnalysisService,
-              private dataProcessingService: DataProcessingService) {
+              private dataProcessingService: DataProcessingService,
+              private changeRef : ChangeDetectorRef) {
      super(NavigationService, AnalysisService);
    }
 
   ngOnInit(): void {
     this.selfFilter = true;
-    this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      if (this.selfFilter && newFilter.source != AnalysisViews.TERM_VIEW) {
-        return;
-      } else {
-        console.log('Term filter from: ');
-        console.log(newFilter);
-        this.filterOptions = newFilter.filterOptions;
-        this.filterString = newFilter.filter;
-        this.filterControl.setValue(newFilter.filter);
+    this.proxyStream.subscribe((newProxy)=>{
+      this.itemProxy = newProxy;
+      if (this.filterString) {
         this.onFilterChange();
         this.processTerms();
         this.filteredCount = this.getTermCount();
       }
-    });
+      this.changeRef.markForCheck();
+    })
 
-    this.getTermCount();
+    this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
+      if (this.selfFilter && newFilter.source != AnalysisViews.TERM_VIEW) {
+        return;
+      } else {
+        this.filterOptions = newFilter.filterOptions;
+        this.filterString = newFilter.filter;
+        this.filterControl.setValue(newFilter.filter);
+        if (this.itemProxy) {
+          this.onFilterChange();
+          this.processTerms();
+          this.filteredCount = this.getTermCount();  
+        }
+        this.changeRef.markForCheck();
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.filterSubjectSubscription.unsubscribe();
+    this.proxyStreamSubscription.unsubscribe();
   }
 
   getTermCount(): number {
@@ -83,7 +98,8 @@ export class TermViewComponent extends AnalysisViewComponent
   sort(property: string): void {
     this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
     this.sortField = property;
-    // this.processTerms();
+    this.processTerms();
+    this.changeRef.markForCheck();
   }
 
   submitFilter (filterInput) {
@@ -97,38 +113,20 @@ export class TermViewComponent extends AnalysisViewComponent
     })
   }
   
-  filter(f: string, manual: boolean): void {
-    if (manual) {
-      if (this.filterExactMatch) {
-        f = '/\\b' + f + '\\b/';
-        if (this.filterIgnoreCase) {
-          f += 'i';
-        }
-      }
-    }
-      
-    let regex: RegExp = new RegExp(f);
-    let index: number = this.filters.indexOf(regex);
-    if (-1 === index) {
-      this.filters.push(regex);
-    } else {
-      this.filters.splice(index, 1);
-    }
-    
-    this.processTerms();
-  }
-
   processTerms(): void {
-    this.terms = this.dataProcessingService.sort(
-      this.dataProcessingService.filter(
-      this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
-        for (let j: number = 0; j < this.filters.length; j++) {
-          if (!this.filters[j].test(input)) {
+    if (!this.filterRegex) {
+      this.terms = this.dataProcessingService.sort(
+        this.itemProxy.analysis.extendedTokenSummaryList,
+        [this.sortField], this.ascending).slice(0, this.loadLimit);
+    } else {
+      this.terms = this.dataProcessingService.sort(
+        this.dataProcessingService.filter(
+        this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
+          if (!this.filterRegex.test(input.text)) {
             return false;
           }
-        }
-        
-        return true;
-      }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+          return true;
+        }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+    }
   }
 }
