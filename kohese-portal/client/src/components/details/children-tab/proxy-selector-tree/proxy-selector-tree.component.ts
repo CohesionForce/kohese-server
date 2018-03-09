@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy, Input, EventEmitter, OnChanges } from '@a
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 
-import * as ItemProxy from '../../../../../../common/models/item-proxy.js';
+import * as ItemProxy from '../../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';

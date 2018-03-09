@@ -2,6 +2,7 @@
   "name": "KoheseView",
   "base": "Item",
   "idInjection": true,
+  "invertItemOrder": false,
   "properties": {
     "modelName": {
       "type": "string",

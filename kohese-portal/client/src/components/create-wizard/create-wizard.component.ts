@@ -7,7 +7,7 @@ import 'rxjs/add/operator/startWith';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 
-import { ItemProxy } from '../../../../common/models/item-proxy.js';
+import { ItemProxy } from '../../../../common/src/item-proxy.js';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ImportService } from '../../services/import/import.service';
@@ -30,9 +30,11 @@ export class CreateWizardComponent extends NavigatableComponent
   selectedType : ItemProxy;
   selectedParent : ItemProxy;
   rootProxy : ItemProxy;
-  errorMessage : string;
+  errorMessage : string; 
+  createInfo: object;
 
   createFormGroup : FormGroup;
+  private nonFormFieldValueMap: any = {};
 
 
   /* Subscriptions */
@@ -59,6 +61,10 @@ export class CreateWizardComponent extends NavigatableComponent
 
         this.selectedType = this.types[0];
         this.selectedParent = this.rootProxy;
+        this.createInfo = {
+          parent: this.selectedParent.item.id,
+          type: this.selectedType
+        }
       }
     });
   }
@@ -69,6 +75,10 @@ export class CreateWizardComponent extends NavigatableComponent
       stepper.next();
     } else {
       this.selectedType = type;
+      this.createInfo = {
+        parent: this.selectedParent.item.id,
+        type : type
+      }
     }
   }
 
@@ -78,6 +88,10 @@ export class CreateWizardComponent extends NavigatableComponent
       stepper.next();
     } else {
       this.selectedParent = newParent;
+      this.createInfo = {
+        parent : newParent.item.id,
+        type : this.selectedType
+      }
     }
   }
 
@@ -86,7 +100,22 @@ export class CreateWizardComponent extends NavigatableComponent
   }
 
   createItem() {
-    this.itemRepository.buildItem(this.selectedType.name, this.createFormGroup.value)
+    let item: any = this.createFormGroup.value;
+    for (let fieldName in this.nonFormFieldValueMap) {
+      item[fieldName] = this.nonFormFieldValueMap[fieldName];
+    }
+    
+    /* Set the value of each field that has an unspecified value to that
+    field's default value */
+    let fields: object = this.itemRepository.getProxyFor(this.selectedType.
+      name).item.properties;
+    for (let fieldName in fields) {
+      if (null === item[fieldName]) {
+        item[fieldName] = fields[fieldName].default;
+      }
+    }
+    
+    this.itemRepository.buildItem(this.selectedType.name, item)
       .then(()=>{
         console.log('Build Item promise resolve')
         this.MatDialogRef.close();
@@ -101,6 +130,10 @@ export class CreateWizardComponent extends NavigatableComponent
 
   ngOnDestroy(): void {
     this.repoStatusSubscription.unsubscribe();
+  }
+  
+  public whenNonFormFieldChanges(updatedField: any): void {
+    this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
   }
 }
 

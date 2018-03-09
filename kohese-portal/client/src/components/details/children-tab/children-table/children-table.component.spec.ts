@@ -12,7 +12,7 @@ import { MockItemRepository } from '../../../../../mocks/services/MockItemReposi
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
-import * as ItemProxy from '../../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../../common/src/item-proxy';
 import { MockItem } from '../../../../../mocks/data/MockItem';
 
 describe('Component: Children Table', ()=>{
@@ -54,7 +54,7 @@ describe('Component: Children Table', ()=>{
   it('updates the children list when a new array comes in', ()=>{
     expect(childrenTableComponent.children.length).toBe(5);
     let newChildren = mockRepo.getRootProxy().children;
-    newChildren.push(new ItemProxy('Item', MockItem));
+    newChildren.push(new ItemProxy('Item', MockItem()));
     childSubject.next(newChildren);
     expect(childrenTableComponent.children.length).toBe(6);
   })

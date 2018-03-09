@@ -3,13 +3,14 @@ import { UserInput } from '../user-input.class';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 
-import { ItemProxy } from '../../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'k-user-selector',
-  templateUrl: './k-user-selector.component.html'
+  templateUrl: './k-user-selector.component.html',
+  styleUrls: ['./k-user-selector.component.scss']
 })
 export class KUserSelectorComponent extends UserInput implements OnInit, OnDestroy {
   userProxies : Array<ItemProxy>;

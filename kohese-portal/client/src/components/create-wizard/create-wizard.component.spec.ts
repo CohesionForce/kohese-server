@@ -25,7 +25,7 @@ import { MockItem } from '../../../mocks/data/MockItem';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 
 describe('Component: Create Wizard', ()=>{
   let createWizardComponent: CreateWizardComponent;
@@ -133,7 +133,7 @@ describe('Component: Create Wizard', ()=>{
     let closeSpy;
 
     beforeEach(()=>{
-      createWizardComponent.selectedType = new ItemProxy('Item', MockItem)
+      createWizardComponent.selectedType = new ItemProxy('Item', MockItem())
       createWizardComponent.createFormGroup = <FormGroup> {
         value : ItemProxy
       }
@@ -143,11 +143,19 @@ describe('Component: Create Wizard', ()=>{
     })
 
     it('closes the window when an item is built', async(()=>{
+      let fieldName: string = 'modifiedOn';
+      let fieldValue: any = new Date().getTime();
+      createWizardComponent.whenNonFormFieldChanges({
+        fieldName: fieldName,
+        fieldValue: fieldValue
+      });
       let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.resolve());    
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();
         expect(closeSpy).toHaveBeenCalled();
+        expect(createWizardComponent.createFormGroup.value[fieldName]).
+          toEqual(fieldValue);
       })
     }))
 

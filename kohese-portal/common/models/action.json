@@ -2,10 +2,85 @@
   "name": "Action",
   "base": "Decision",
   "idInjection": true,
+  "invertItemOrder": true,
   "properties": {
     "actionState": {
-      "type": "string",
-      "required": true
+      "type": "StateMachine",
+      "required": true,
+      "default": "Proposed",
+      "properties": {
+        "state":{
+          "Proposed": {
+            "name": "Proposed",
+            "description": "An action that is Proposed."
+           },
+          "Assigned": {
+            "name": "Assigned",
+            "description": "An action that is Assigned."
+           },
+          "PendingReassign": {
+            "name": "Pending Reassign",
+            "description": "An action that is Pending Reassign."
+           },
+          "PendingRedisposition": {
+            "name": "Pending Redisposition",
+            "description": "An action that is Pending Redisposition."
+           },
+          "InVerification": {
+            "name": "In Verification",
+            "description": "An action that is In Verification."
+           },
+          "Verified": {
+            "name": "Verified",
+            "description": "An action that is Verified."
+           },
+          "Closed": {
+            "name": "Closed",
+            "description": "An action that is Closed."
+           }
+        },
+        "transition": {
+          "assign": {
+            "source": "Proposed",
+            "target": "Assigned",
+            "guard": {},
+            "requires": [ "assignment:Assignee" ]
+          },
+          "request-reassign": {
+            "source": "Assigned",
+            "target": "PendingReassign",
+            "guard": {}
+          },
+          "redisposition": {
+            "source": "Assigned",
+            "target": "PendingRedisposition",
+            "guard": {},
+            "requires": ""
+          },
+          "defer": {
+            "source": "Assigned",
+            "target": "InVerification",
+            "guard": {},
+            "requires": []
+          },
+          "reassign": {
+            "source": "PendingReassign",
+            "target": "Assigned",
+            "guard": {},
+            "requires": []
+          },
+          "verify": {
+            "source": "InVerification",
+            "target": "Verified",
+            "guard": {}
+          },
+          "close": {
+            "source": "Verified",
+            "target": "Closed",
+            "guard": {}
+          }
+        }
+      }
     },
     "assignedTo": {
       "type": "string"

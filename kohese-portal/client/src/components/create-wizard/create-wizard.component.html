@@ -1,8 +1,9 @@
-<mat-horizontal-stepper [linear]="true" #createStepper>
+<mat-horizontal-stepper [linear]="true" #createStepper id="buildProcessStepper">
   <mat-step label="Select Type" >
-    <mat-card>
-      <mat-card-content>
-        <mat-grid-list cols="3" 
+    <div class="step-container">
+      <mat-card>
+        <mat-card-content>
+          <mat-grid-list cols="3" 
                       rowHeight="50px"
                       gutterSize="5px" 
                       class="left-content"
@@ -14,53 +15,70 @@
                       (dblClick)="onTypeSelected(type, createStepper)">
             {{ type.name}}
             </mat-chip>
-        </mat-grid-tile>
-      </mat-grid-list>
-      <mat-card *ngIf="selectedType" class="right-content" style="display: inline-block;">
+          </mat-grid-tile>
+        </mat-grid-list>
+        <mat-card *ngIf="selectedType" class="right-content" style="display: inline-block; height:400px;">
           <mat-card-title class="panel-heading">
             <span>{{selectedType.name}}</span>
           </mat-card-title>
           <mat-card-content>
             {{selectedType.description}}
           </mat-card-content>
+        </mat-card>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button matStepperNext [disabled]="!selectedType">Next</button>
+        </mat-card-actions>
       </mat-card>
-    </mat-card-content>
-    <mat-card-actions>
-        <button mat-button matStepperNext [disabled]="!selectedType">Next</button>
-    </mat-card-actions>
-  </mat-card>
+    </div>
   </mat-step>
-    <mat-step label="Parent">
-      <parent-selector (parentSelected)="onParentSelected($event, createStepper)"></parent-selector>
-  <div>
+  <mat-step label="Parent">
+    <parent-selector (parentSelected)="onParentSelected($event, createStepper)"></parent-selector>
+    <div>
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button matStepperNext>Next</button>
-  </div>
-    </mat-step>
-    <mat-step label="Details">
-        <details-form #editor 
-          [createInfo]="{type: selectedType, parent: selectedParent.item.id}" 
-          [disabled]="false"
-          (formGroupUpdated)="onFormGroupUpdated($event)"></details-form> 
-    <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
     </div>
-    </mat-step>
-    <mat-step label="Review">
-    Review form data
-    <div *ngIf="createFormGroup">
-      {{this.createFormGroup.value | json }}
+  </mat-step>
+  <mat-step label="Details">
+    <div class="step-container">
+      <mat-card>
+        <mat-card-content>
+          <details-form #editor 
+            [createInfo]="createInfo" 
+            [disabled]="false"
+            (formGroupUpdated)="onFormGroupUpdated($event)"
+            (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
+          </details-form>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-button matStepperNext>Next</button>
+        </mat-card-actions>
+      </mat-card>
     </div>
-    <div *ngIf="errorMessage">
-      !!!
-      Error : 
-      <pre>
-        {{errorMessage | json}}
-      </pre>
-      !!!
+  </mat-step>
+  <mat-step label="Review">
+    <div class="step-container">
+      <mat-card>
+        <mat-card-content>
+          Review form data
+          <div *ngIf="createFormGroup">
+            {{this.createFormGroup.value | json }}
+          </div>
+          <div *ngIf="errorMessage">
+            !!!
+            Error : 
+            <pre>
+              {{errorMessage | json}}
+            </pre>
+            !!!
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-button (click)="createItem()">Create</button>
+        </mat-card-actions>
+      </mat-card>
     </div>
-      <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="createItem()">Create</button>
-    </mat-step>
+  </mat-step>
 </mat-horizontal-stepper>

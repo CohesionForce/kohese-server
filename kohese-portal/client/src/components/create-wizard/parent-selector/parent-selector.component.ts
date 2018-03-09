@@ -1,6 +1,6 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 

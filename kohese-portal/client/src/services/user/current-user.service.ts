@@ -27,10 +27,10 @@ export class CurrentUserService {
   }
 
   login (credentials: any)  {
-    this.credentialSubscription.next({command : 'login', credentials : credentials})
+    this.credentialSubscription.next({command : 'Login', credentials : credentials})
   }
 
   logout ( ) {
-    this.credentialSubscription.next({command : 'logout', credentials: {}})
+    this.credentialSubscription.next({command : 'Logout', credentials: {}})
   }
 }

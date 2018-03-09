@@ -3,7 +3,7 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 @Component({
   selector: 'type-editor',

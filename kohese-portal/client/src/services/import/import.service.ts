@@ -4,7 +4,7 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from '../socket/socket.service';
 import { ToastrService } from 'ngx-toastr';
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import * as SocketIOFileClient from 'socket.io-file-client';
 

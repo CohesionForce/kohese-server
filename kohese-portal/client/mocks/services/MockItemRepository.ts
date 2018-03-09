@@ -1,7 +1,7 @@
 import { BehaviorSubject} from 'rxjs/BehaviorSubject';
 import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
-import * as ItemProxy from '../../../common/models/item-proxy';
+import * as ItemProxy from '../../../common/src/item-proxy';
 import { Subject } from 'rxjs';
 import { RepoStates } from '../../src/services/item-repository/item-repository.service';
 
@@ -11,11 +11,11 @@ export class MockItemRepository {
 
   constructor() {
     this.mockRootProxy.children = [
-      new ItemProxy('Item', MockViewData),
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem)
+      new ItemProxy('Item', MockViewData()),
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem())
     ]
     this.mockRootProxy.visitChildren = ()=>{}
   }
@@ -32,15 +32,18 @@ export class MockItemRepository {
     return (new Subject())
   }
 
-  getProxyFor () {
-    return new ItemProxy('Item', MockItem);
+  getProxyFor (id: string) {
+    if(id === 'PersistedModel') {
+      return undefined;
+    }
+    return new ItemProxy('Item', MockItem());
   }
 
   getRecentProxies () {
     return [
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem),
-      new ItemProxy('Item', MockItem)
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem()),
+      new ItemProxy('Item', MockItem())
     ]
   }
   

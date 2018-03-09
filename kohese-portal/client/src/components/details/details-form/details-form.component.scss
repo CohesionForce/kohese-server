@@ -1,0 +1,21 @@
+@import '../../../../app.component';
+
+.details-form {
+  height: calc(100% - 44px);
+  
+  .form-container {
+    height : 700px;
+    overflow : auto;
+  }
+}
+
+.form-group {
+  width: 100%;
+  height: 80%;
+  overflow: auto;
+}
+
+#detailsFormStateEditorContainer {
+  height: 20%;
+  width: 100%;
+}

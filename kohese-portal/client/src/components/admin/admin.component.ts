@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 

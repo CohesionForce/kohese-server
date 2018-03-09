@@ -4,7 +4,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ImportService } from '../../../services/import/import.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'import',

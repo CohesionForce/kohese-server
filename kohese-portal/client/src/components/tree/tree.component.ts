@@ -10,7 +10,7 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { Subscription } from 'rxjs/Subscription';
 
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { RowComponent } from '../../classes/RowComponent.class';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
@@ -42,7 +42,7 @@ export class TreeComponent extends NavigatableComponent
     // TODO Probably want to get this from somewhere else
     public viewList: Array<string> = ['Default', 'Version Control'];
     public selectedView: string = this.viewList[0];
-    
+
     private readonly NO_KIND_SPECIFIED: string = '---';
 
     /* Subscriptions */
@@ -67,7 +67,7 @@ export class TreeComponent extends NavigatableComponent
         this.koheseTypes = this.typeService.getKoheseTypes();
       }
     });
-    
+
     this.routeParametersSubscription = this.route.params.
       subscribe((parameters: Params) => {
       selectedProxyId = parameters['id'];
@@ -104,11 +104,11 @@ export class TreeComponent extends NavigatableComponent
         rows[j].matchesFilter = false;
         this.proxyFilter.textRegexHighlight = null;
       }
-      
+
       rows[j].setVisible(show);
     }
   }
-  
+
   doesProxyMatchFilter(proxy: ItemProxy): boolean {
     let matches: boolean = true;
     if (this.proxyFilter.status && (!proxy.status ||
@@ -127,7 +127,7 @@ export class TreeComponent extends NavigatableComponent
         }
       }
     }
-    
+
     if (matches) {
       matches = false;
       if (this.proxyFilter.filterString) {
@@ -145,7 +145,7 @@ export class TreeComponent extends NavigatableComponent
           this.proxyFilter.textRegexHighlight = new RegExp('(' + cleanedPhrase
             + ')', 'gi');
         }
-      
+
         for (let key in proxy.item) {
           if (key.charAt(0) !== '$' &&
             (typeof proxy.item[key] === 'string') &&
@@ -156,7 +156,7 @@ export class TreeComponent extends NavigatableComponent
         }
       }
     }
-    
+
     return matches;
   }
 
@@ -171,7 +171,7 @@ export class TreeComponent extends NavigatableComponent
         numberOfVisibleRows++;
       }
     }
-    
+
     return numberOfVisibleRows;
   }
 
@@ -245,7 +245,7 @@ export class TreeComponent extends NavigatableComponent
   getTreeRoot(): ItemProxy {
     return treeRoot;
   }
-  
+
   isRootDefault(): boolean {
     return isRootDefault;
   }
@@ -258,7 +258,11 @@ export class TreeComponent extends NavigatableComponent
 })
 export class TreeRowComponent extends RowComponent
   implements OnInit, OnDestroy {
-  public koheseType: any;
+  private _koheseType: any;
+  get koheseType() {
+    return this._koheseType;
+  }
+
   private _matchesFilter: boolean = false;
   get matchesFilter() {
     return this._matchesFilter;
@@ -271,15 +275,16 @@ export class TreeRowComponent extends RowComponent
     private dialogService: DialogService,
     private typeService: DynamicTypesService,
     private itemRepository: ItemRepository,
-    private versionControlService: VersionControlService) {
+    private versionControlService: VersionControlService,
+    private _typeService: DynamicTypesService) {
     super(NavigationService);
   }
 
   ngOnInit(): void {
     rows.push(this);
-    this.koheseType = this.typeService.getKoheseTypes()[this.itemProxy.kind];
-    if (!this.koheseType) {
-      this.koheseType = {
+    this._koheseType = this.typeService.getKoheseTypes()[this.itemProxy.kind];
+    if (!this._koheseType) {
+      this._koheseType = {
         name: this.itemProxy.kind,
         icon: 'fa fa-sticky-note'
       };
@@ -300,11 +305,11 @@ export class TreeRowComponent extends RowComponent
       }
     });
   }
-  
+
   isVersionControlViewVisible(): boolean {
     return versionControlEnabled;
   }
-  
+
   revertChanges(): void {
     this.dialogService.openYesNoDialog('Undo Changes', 'Are you sure that you '
       + 'want to undo all changes to this item since the previous commit?').
@@ -314,12 +319,12 @@ export class TreeRowComponent extends RowComponent
       }
     });
   }
-  
+
   updateRoot(): void {
     treeRoot = this.itemProxy;
     isRootDefault = false;
   }
-  
+
   getSelectedProxyId(): string {
     return selectedProxyId;
   }
