@@ -44,8 +44,9 @@ describe('Component: Phrase View', ()=>{
     phraseFixture = TestBed.createComponent(PhraseViewComponent);
     phraseComponent = phraseFixture.componentInstance;
 
-    phraseComponent.itemProxy = new ItemProxy('Item', MockItem());
-    phraseComponent.itemProxy.analysis = MockAnalysis()
+    let mockProxy = new ItemProxy('Item', MockItem());
+    mockProxy.analysis = MockAnalysis();
+    phraseComponent.proxyStream = new BehaviorSubject(mockProxy);
     phraseComponent.filterSubject = new BehaviorSubject({
       filter: '',
       source: AnalysisViews.TERM_VIEW,

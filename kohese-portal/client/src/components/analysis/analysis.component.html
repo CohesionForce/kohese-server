@@ -19,7 +19,7 @@
     <split-area [size]="50">
       <split direction="horizontal">
         <split-area [size]="50">
-          <phrase-view [itemProxy] = "itemProxy"
+          <phrase-view [proxyStream] = "proxyStream"
                        [filterSubject] = "filterSubject"
                        (filterUpdate)= "onFilter($event)"></phrase-view>
         </split-area>

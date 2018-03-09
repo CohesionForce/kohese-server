@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 
 import { AnalysisViewComponent, AnalysisViews, AnalysisFilter } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
@@ -11,7 +11,8 @@ import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
 
 import * as $ from 'jquery';
-
+import { Observable } from 'rxjs';
+import { FormControl } from '@angular/forms';
 
 //TODO - implement cross filter comm
 
@@ -20,7 +21,8 @@ import * as $ from 'jquery';
   templateUrl: './phrase-view.component.html',
   styleUrls: [
     './phrase-view.component.scss'
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PhraseViewComponent extends AnalysisViewComponent
   implements OnInit, OnDestroy {
@@ -33,11 +35,15 @@ export class PhraseViewComponent extends AnalysisViewComponent
   syncFilter: boolean;
   filteredCount: number;
   phrases: Array<any> = [];
+  filterOptions : object;
+  filterControl : FormControl = new FormControl('');
+
   /* Data */
-  @Input()
   public itemProxy: ItemProxy;
 
   /* Observables */
+  @Input()
+  proxyStream : Observable<ItemProxy>;
   @Input()
   public filterSubject: BehaviorSubject<AnalysisFilter>;
   @Output()
@@ -45,31 +51,50 @@ export class PhraseViewComponent extends AnalysisViewComponent
 
   /* Subscriptions */
   private filterSubjectSubscription: Subscription;
+  private proxyStreamSubscription : Subscription;
 
   constructor(NavigationService: NavigationService,
     AnalysisService: AnalysisService,
-    private dataProcessingService: DataProcessingService) {
+    private dataProcessingService: DataProcessingService, 
+    private changeRef : ChangeDetectorRef) {
     super(NavigationService, AnalysisService);
   }
 
   ngOnInit(): void {
     // If sync filter is enable, allow term filters to be applied
     this.syncFilter = true;
-    this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
-      if (!this.syncFilter && newFilter.source !== AnalysisViews.PHRASE_VIEW) {
-        return;
-      } else {
-        this.filterString = newFilter.filter;
+
+    this.proxyStream.subscribe((newProxy)=>{
+      this.itemProxy = newProxy;
+      if (this.filterString) {
         this.onFilterChange();
+        this.processPhrases();
         this.filteredCount = this.getPhraseCount();
       }
-    });
+      this.changeRef.markForCheck();
+    })
 
-    this.processPhrases();
+    this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
+      if (!this.syncFilter && newFilter.source != AnalysisViews.PHRASE_VIEW) {
+        return;
+      } else {
+        this.filterOptions = newFilter.filterOptions;
+        this.filterString = newFilter.filter;
+        this.filterControl.setValue(newFilter.filter);
+        if (this.itemProxy) {
+          this.onFilterChange();
+          this.processPhrases();
+          this.filteredCount = this.getPhraseCount();  
+        }
+        this.changeRef.markForCheck();
+      }
+    });
   }
+
 
   ngOnDestroy(): void {
     this.filterSubjectSubscription.unsubscribe();
+    this.proxyStreamSubscription.unsubscribe();
   }
 
   getPhraseCount(): number {
@@ -80,19 +105,9 @@ export class PhraseViewComponent extends AnalysisViewComponent
     this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
     this.sortField = property;
     this.processPhrases();
+    this.changeRef.markForCheck();
   }
 
-  filter(): void {
-    let filter = new RegExp(this.filterString);
-    let index: number = this.filters.indexOf(filter);
-    if (-1 === index) {
-      this.filters.push(filter);
-    } else {
-      this.filters.splice(index, 1);
-    }
-
-    this.processPhrases();
-  }
 
   submitFilter(newFilter) {
     this.filterUpdate.emit({
@@ -106,16 +121,19 @@ export class PhraseViewComponent extends AnalysisViewComponent
   }
 
   processPhrases(): void {
-    this.phrases = this.dataProcessingService.sort(
-      this.dataProcessingService.filter(
-        this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
-          for (let i: number = 0; i < this.filters.length; i++) {
-            if (!this.filters[i].test(input.text)) {
-              return false;
-            }
+    if (!this.filterRegex) {
+      this.phrases = this.dataProcessingService.sort(
+        this.itemProxy.analysis.extendedTokenSummaryList,
+        [this.sortField], this.ascending).slice(0, this.loadLimit);
+    } else {
+      this.phrases = this.dataProcessingService.sort(
+        this.dataProcessingService.filter(
+        this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
+          if (!this.filterRegex.test(input.text)) {
+            return false;
           }
-
           return true;
         }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+    }
   }
 }
