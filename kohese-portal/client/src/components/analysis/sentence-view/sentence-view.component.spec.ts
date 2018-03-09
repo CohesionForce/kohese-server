@@ -44,8 +44,9 @@ describe('Component: Sentence View', ()=>{
     sentenceFixture = TestBed.createComponent(SentenceViewComponent);
     sentenceComponent = sentenceFixture.componentInstance;
 
-    sentenceComponent.itemProxy = new ItemProxy('Item', MockItem());
-    sentenceComponent.itemProxy.analysis = MockAnalysis()
+    let mockProxy = new ItemProxy('Item', MockItem());
+    mockProxy.analysis = MockAnalysis();
+    sentenceComponent.proxyStream = new BehaviorSubject(mockProxy);
     sentenceComponent.filterSubject = new BehaviorSubject({
       filter: '',
       source: AnalysisViews.TERM_VIEW,

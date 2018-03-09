@@ -105,7 +105,6 @@ export class PhraseViewComponent extends AnalysisViewComponent
     }
   }
 
-
   ngOnDestroy(): void {
     this.filterSubjectSubscription.unsubscribe();
     this.proxyStreamSubscription.unsubscribe();
