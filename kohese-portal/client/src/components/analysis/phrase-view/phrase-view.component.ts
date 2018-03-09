@@ -37,6 +37,7 @@ export class PhraseViewComponent extends AnalysisViewComponent
   phrases: Array<any> = [];
   filterOptions : object;
   filterControl : FormControl = new FormControl('');
+  lastFilter : AnalysisFilter;
 
   /* Data */
   public itemProxy: ItemProxy;
@@ -75,6 +76,7 @@ export class PhraseViewComponent extends AnalysisViewComponent
 
     this.filterSubjectSubscription = this.filterSubject.subscribe(newFilter => {
       if (!this.syncFilter && newFilter.source != AnalysisViews.PHRASE_VIEW) {
+        this.lastFilter = newFilter;
         return;
       } else {
         this.filterOptions = newFilter.filterOptions;
@@ -87,6 +89,20 @@ export class PhraseViewComponent extends AnalysisViewComponent
         this.changeRef.markForCheck();
       }
     });
+  }
+  
+  toggleLink () {
+    this.syncFilter = !this.syncFilter;
+    if (this.syncFilter && this.lastFilter) {
+      this.filterOptions = this.lastFilter.filterOptions;
+      this.filterString = this.lastFilter.filter;
+      this.filterControl.setValue(this.filterString);
+      if (this.itemProxy) {
+        this.onFilterChange();
+        this.processPhrases();
+      }
+      this.changeRef.markForCheck();
+    }
   }
 
 
