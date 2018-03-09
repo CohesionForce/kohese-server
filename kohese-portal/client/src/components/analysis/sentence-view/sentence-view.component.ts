@@ -57,7 +57,6 @@ export class SentenceViewComponent extends AnalysisViewComponent
       } else {
         this.filterString = newFilter.filter;
         this.onFilterChange();
-        this.filteredCount = this.getDetailsItemCount();
         this.processSentences();
       }
     });
@@ -68,10 +67,6 @@ export class SentenceViewComponent extends AnalysisViewComponent
     this.filterSubjectSubscription.unsubscribe();
   }
 
-  getDetailsItemCount(): number {
-    return $('#theDetailsBody').find('tr').length;
-  }
-  
   sort(property: string): void {
     this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
     this.sortField = property;
@@ -91,5 +86,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
           listItem.displayLevel === 4 && this.showTokensInDetails) &&
           (this.filterRegex === null || this.filterRegex.test(listItem.text));
       }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+
+    this.filteredCount = this.sentences.length;
   }
 }

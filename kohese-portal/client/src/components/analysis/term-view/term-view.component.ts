@@ -64,7 +64,6 @@ export class TermViewComponent extends AnalysisViewComponent
       if (this.filterString) {
         this.onFilterChange();
         this.processTerms();
-        this.filteredCount = this.getTermCount();
       }
       this.changeRef.markForCheck();
     })
@@ -79,7 +78,6 @@ export class TermViewComponent extends AnalysisViewComponent
         if (this.itemProxy) {
           this.onFilterChange();
           this.processTerms();
-          this.filteredCount = this.getTermCount();  
         }
         this.changeRef.markForCheck();
       }
@@ -89,10 +87,6 @@ export class TermViewComponent extends AnalysisViewComponent
   ngOnDestroy(): void {
     this.filterSubjectSubscription.unsubscribe();
     this.proxyStreamSubscription.unsubscribe();
-  }
-
-  getTermCount(): number {
-    return $('#theTokensBody').find('tr').length;
   }
   
   sort(property: string): void {
@@ -128,5 +122,7 @@ export class TermViewComponent extends AnalysisViewComponent
           return true;
         }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
     }
+
+    this.filteredCount = this.terms.length;
   }
 }

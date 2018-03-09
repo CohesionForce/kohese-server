@@ -69,7 +69,6 @@ export class PhraseViewComponent extends AnalysisViewComponent
       if (this.filterString) {
         this.onFilterChange();
         this.processPhrases();
-        this.filteredCount = this.getPhraseCount();
       }
       this.changeRef.markForCheck();
     })
@@ -84,7 +83,6 @@ export class PhraseViewComponent extends AnalysisViewComponent
         if (this.itemProxy) {
           this.onFilterChange();
           this.processPhrases();
-          this.filteredCount = this.getPhraseCount();  
         }
         this.changeRef.markForCheck();
       }
@@ -95,10 +93,6 @@ export class PhraseViewComponent extends AnalysisViewComponent
   ngOnDestroy(): void {
     this.filterSubjectSubscription.unsubscribe();
     this.proxyStreamSubscription.unsubscribe();
-  }
-
-  getPhraseCount(): number {
-    return $('#thePhrasesBody').find('tr').length;
   }
 
   sort(property: string): void {
@@ -135,5 +129,7 @@ export class PhraseViewComponent extends AnalysisViewComponent
           return true;
         }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
     }
+
+    this.filteredCount = this.phrases.length;
   }
 }
