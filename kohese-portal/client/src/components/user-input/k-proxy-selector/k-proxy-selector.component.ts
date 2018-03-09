@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { UserInput } from '../user-input.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -6,8 +6,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { TreeComponent } from '../../tree/tree.component';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/map';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
@@ -16,7 +16,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material';
   styleUrls: ['./k-proxy-selector.component.scss']
 })
 export class KProxySelectorComponent extends UserInput
-  implements OnInit {
+  implements OnInit, OnDestroy {
   @Input()
   public formGroup: FormGroup;
   @Input()
@@ -27,8 +27,9 @@ export class KProxySelectorComponent extends UserInput
   public useAdvancedSelector: boolean;
   public selectedProxies: Array<ItemProxy> = [];
   private typeProxies: Array<ItemProxy> = [];
-  public filteredProxies: Observable<Array<ItemProxy>>;
+  public filteredProxies: Array<ItemProxy>;
   public selectedProxy : ItemProxy;
+  private _proxyFilterSubscription: Subscription;
 
   constructor(private ItemRepository: ItemRepository,
     private dialogService: DialogService) {
@@ -41,12 +42,16 @@ export class KProxySelectorComponent extends UserInput
         this.typeProxies.push(proxy);
       }
     }, undefined);
-    this.filteredProxies = this.formGroup.get(this.fieldId).valueChanges.startWith('').
-      map((text: string) => {
-      return this.typeProxies.filter((proxy) => {
+    this._proxyFilterSubscription = this.formGroup.get(this.fieldId).
+      valueChanges.startWith('').subscribe((text: string) => {
+      this.filteredProxies = this.typeProxies.filter((proxy: ItemProxy) => {
         return (-1 !== proxy.item.name.indexOf(text));
       });
     });
+  }
+  
+  public ngOnDestroy(): void {
+    this._proxyFilterSubscription.unsubscribe();
   }
 
   onProxySelected (selectedEvent : MatAutocompleteSelectedEvent) {

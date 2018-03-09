@@ -19,7 +19,7 @@
       {{selectedProxy.item.name}}
     </span>
     <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onProxySelected($event)">
-      <mat-option *ngFor="let proxy of (filteredProxies | async)"
+      <mat-option *ngFor="let proxy of filteredProxies"
         [value]="proxy.item.id">
         {{proxy.item.name}}
       </mat-option>
