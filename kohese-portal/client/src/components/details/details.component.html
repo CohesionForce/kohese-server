@@ -57,7 +57,7 @@
                   <mat-checkbox [(ngModel)]="showChildren" (change)="showChildrenToggled()"
                          type="checkbox"></mat-checkbox>
                 </div>
-                <document-view [itemProxy]="itemProxy"
+                <document-view [proxyStream]="proxyStream"
                                [showChildrenSubject]="showChildrenSubject"></document-view>
 
 

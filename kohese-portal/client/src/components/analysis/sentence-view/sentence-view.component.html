@@ -1,5 +1,13 @@
 <div class="panel">
-  <div class="panel-heading">Sentence View - ({{getDetailsItemCount()}}) Sentences</div>
+  <div class="panel-heading">Sentence View - ({{filteredCount}}) Sentences
+    <div class="pull-right">
+        <button mat-icon-button>
+          <mat-icon class="fa fa-link" style="vertical-align: top;"
+                    (click)="toggleLink()"
+                    [ngClass]="{'syncOn' : syncFilter, 'syncOff' : !syncFilter}"></mat-icon>
+        </button>
+      </div>  
+  </div>
   <div class="panel-body">
     <div>
       <span><b>Analysis Details</b></span>
@@ -10,13 +18,13 @@
         </mat-form-field>
       </span>
     </div>
-    <mat-checkbox [(ngModel)]="showSentencesInDetails" (click)="processSentences()">
+    <mat-checkbox [(ngModel)]="showSentencesInDetails" (click)="onCriteriaChange()">
       Show Sentences in Details
     </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showPhrasesInDetails" (click)="processSentences()">
+    <mat-checkbox [(ngModel)]="showPhrasesInDetails" (click)="onCriteriaChange()">
       Show Phrases in Details
     </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showTokensInDetails" (click)="processSentences()">
+    <mat-checkbox [(ngModel)]="showTokensInDetails" (click)="onCriteriaChange()">
       Show Tokens in Details
     </mat-checkbox>
     <div id="sentence-div">
