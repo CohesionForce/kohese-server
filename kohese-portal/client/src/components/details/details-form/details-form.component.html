@@ -33,7 +33,7 @@
   </ng-container>
 </form>
 <div id="detailsFormStateEditorContainer">
-  <k-state-editor [itemProxy]="itemProxy"
+  <k-state-editor [itemProxy]="itemProxy" [disableTransitioning]="disabled"
     (stateChanged)="nonFormFieldChanged.emit({ fieldName: $event.fieldName, fieldValue: $event.candidate })">
   </k-state-editor>
 </div>

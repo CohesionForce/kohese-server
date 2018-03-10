@@ -8,7 +8,6 @@ import { VersionControlService } from '../../services/version-control/version-co
 import { SessionService } from '../../services/user/session.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { StateService } from '../../services/state/state.service';
 import { Subscription } from 'rxjs/Subscription';
 
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -272,16 +271,11 @@ export class TreeRowComponent extends RowComponent
     this._matchesFilter = matches;
   }
 
-  get stateService() {
-    return this._stateService;
-  }
-
   constructor(NavigationService : NavigationService,
     private dialogService: DialogService,
     private typeService: DynamicTypesService,
     private itemRepository: ItemRepository,
     private versionControlService: VersionControlService,
-    private _stateService: StateService,
     private _typeService: DynamicTypesService) {
     super(NavigationService);
   }

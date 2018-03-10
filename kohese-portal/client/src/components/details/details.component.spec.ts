@@ -58,4 +58,18 @@ describe('Component: Details', ()=>{
   it('instantiates the details component', ()=>{
     expect(detailsComponent).toBeTruthy(); 
   })
+  
+  it('changes non-form fields on the input ItemProxy when changes are saved',
+    () => {
+    let fieldName: string = 'modifiedOn';
+    let fieldValue: any = new Date().getTime();
+    detailsComponent.whenNonFormFieldChanges({
+      fieldName: fieldName,
+      fieldValue: fieldValue
+    });
+    spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.
+      resolve());
+    detailsComponent.upsertItem(detailsComponent.itemProxy.item);
+    expect(detailsComponent.itemProxy.item[fieldName]).toEqual(fieldValue);
+  });
 })

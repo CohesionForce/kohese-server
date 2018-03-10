@@ -7,7 +7,7 @@
       <button mat-raised-button class="state-button"
         *ngFor="let candidate of transitionCandidates[fieldName]"
         matTooltip="{{koheseType.dataModelFields[fieldName].properties.state[candidate.target].description}}"
-        [disabled]="disabled"
+        [disabled]="disableTransitioning"
         (click)="openTransitionDialog(fieldName, candidate.target)">
         {{koheseType.dataModelFields[fieldName].properties.state[candidate.target].name}}
       </button>

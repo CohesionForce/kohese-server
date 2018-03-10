@@ -1,8 +1,16 @@
 <div class="panel">
-  <div class="panel-heading">Phrase View - ({{getPhraseCount()}}) Phrases
-    <button mat-icon-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
-      <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
-    </button>
+  <div class="panel-heading">Phrase View - ({{filteredCount}}) Phrases
+    <div class="pull-right">
+      <button mat-icon-button>
+        <mat-icon class="fa fa-link" style="vertical-align: top;"
+                  (click)="toggleLink()"
+                  [ngClass]="{'syncOn' : syncFilter, 'syncOff' : !syncFilter}"></mat-icon>
+      </button>
+      <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
+          <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
+      </button>
+
+    </div>
     <mat-menu #optionsMenu="matMenu" [overlapTrigger]="false">
       <button mat-menu-item (click)="showPOS = !showPOS">
         <mat-icon *ngIf="showPOS" class="fa fa-check"></mat-icon>
@@ -12,14 +20,26 @@
     </mat-menu>
   </div>
   <div class="panel-body">
-    <div>
-      <span class="col-xs-4 pull-right">
-        <mat-form-field>
-          <input matInput class="input-sm col-xs-6 pull-right" type="number"
-            [(ngModel)]="loadLimit" placeholder="Phrase Limit"/>
-        </mat-form-field>
-      </span>
-    </div>
+    <span>
+      <mat-checkbox [(ngModel)]="filterExactMatch">
+        Exact Match
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="filterIgnoreCase">
+        Ignore Case
+      </mat-checkbox>
+    </span>
+    <br/>
+    <mat-form-field>
+      <input matInput type="text" class="input-sm"
+        [formControl]="filterControl" placeholder="Filter"
+        [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="text" placeholder="Limit" [(ngModel)]="loadLimit"/>
+    </mat-form-field>
+    <button mat-raised-button (click)="submitFilter(filterControl.value)"
+      class="btn btn-default fa fa-search">Submit
+    </button>
     <div id="phrase-div">
       <table id="thePhrasesSummary"
         class="table tree-grid table-striped table-condensed table-hover">
@@ -46,7 +66,7 @@
         <tbody id="thePhrasesBody">
           <tr class="tree-grid-row" id="Phrase:{{summary.text}}"
             *ngFor="let summary of phrases">
-            <td (click)="filter(summary.text)"
+            <td (click)="submitFilter(summary.text)"
               class="tree-label"
               [innerHTML]="summary.text | highlightRegex:filterRegexHighlight:true">
             </td>

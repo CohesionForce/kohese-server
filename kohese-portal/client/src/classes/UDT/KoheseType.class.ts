@@ -44,7 +44,6 @@ export class KoheseType {
     
     let fieldGroups: Array<any> = [];
     let modelProxy: ItemProxy = this.dataModelProxy;
-    let hasBase: boolean = false;
     
     do {
       let modelFields: any = {};
@@ -54,9 +53,8 @@ export class KoheseType {
       }
       fieldGroups.push(modelFields);
  
-      hasBase = Object.hasOwnProperty(modelProxy.item.base);
-      modelProxy = modelProxy.parent;
-    } while (hasBase);
+      modelProxy = modelProxy.parentProxy;
+    } while (modelProxy.item.base);
     
     fieldGroups.reverse();
     for (let j: number = 0; j < fieldGroups.length; j++) {
@@ -69,8 +67,8 @@ export class KoheseType {
   retrieveViewData(): void {
     this.icon = this.viewModelProxy.item.icon;
     for (let property in this.viewModelProxy.item.viewProperties) {
-      this.properties[property] = this.transformViewProperty(this.viewModelProxy.
-        item.viewProperties[property]);
+      this.properties[property] = this.transformViewProperty(JSON.parse(JSON.
+        stringify(this.viewModelProxy.item.viewProperties[property])));
     }
   }
   

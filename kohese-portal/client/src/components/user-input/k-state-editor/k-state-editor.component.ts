@@ -16,6 +16,9 @@ export class KStateEditorComponent extends UserInput implements OnInit,
   OnChanges {
   @Input()
   public itemProxy: ItemProxy;
+  @Input()
+  public disableTransitioning: boolean;
+  
   private _koheseType: KoheseType;
   get koheseType() {
     return this._koheseType;
@@ -55,6 +58,11 @@ export class KStateEditorComponent extends UserInput implements OnInit,
       if (changes['itemProxy']) {
         this.itemProxy = changes['itemProxy'].currentValue;
         this.ngOnInit();
+      }
+      
+      if (changes['disableTransitioning']) {
+        this.disableTransitioning = changes['disableTransitioning'].
+          currentValue;
       }
     }
   }

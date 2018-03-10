@@ -17,6 +17,7 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { MockDataProcessingService } from '../../../../mocks/services/MockDataProcessingService';
 import { PipesModule } from '../../../pipes/pipes.module';
 import { MockAnalysis } from '../../../../mocks/data/MockAnalysis';
+import { AnalysisViews } from '../AnalysisViewComponent.class';
 
 describe('Component: Sentence View', ()=>{
   let sentenceComponent: SentenceViewComponent;
@@ -43,9 +44,17 @@ describe('Component: Sentence View', ()=>{
     sentenceFixture = TestBed.createComponent(SentenceViewComponent);
     sentenceComponent = sentenceFixture.componentInstance;
 
-    sentenceComponent.itemProxy = new ItemProxy('Item', MockItem());
-    sentenceComponent.itemProxy.analysis = MockAnalysis()
-    sentenceComponent.filterSubject = new BehaviorSubject('');
+    let mockProxy = new ItemProxy('Item', MockItem());
+    mockProxy.analysis = MockAnalysis();
+    sentenceComponent.proxyStream = new BehaviorSubject(mockProxy);
+    sentenceComponent.filterSubject = new BehaviorSubject({
+      filter: '',
+      source: AnalysisViews.TERM_VIEW,
+      filterOptions : {
+        exactMatch: false,
+        ignoreCase: false
+      }
+    });
 
     sentenceFixture.detectChanges();
     
