@@ -19,8 +19,6 @@ var ItemProxy = require('../common/src/item-proxy.js');
 var CreateStates = require('../common/src/createStates.js');
 module.exports.ItemProxy = ItemProxy;
 
-// TODO:  Need to remove dependence on modelConfig file
-var modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
 var mountList = {};
 var kdbDirPath = "kdb";
 
@@ -60,11 +58,6 @@ function initialize(koheseKdbPath) {
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
   kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
-
-  // TODO:  Need to remove dependence on modelConfig file
-  var modelKinds = Object.keys(modelConfig);
-  modelKinds.sort();
-  console.log("::: ModelKinds: " + modelKinds);
 
   checkAndCreateDir(kdbDirPath);
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
@@ -424,13 +417,6 @@ function createRepoStructure(repoDirPath) {
 
     checkAndCreateDir(repoDirPath);
 
-    // Check for the model directories
-    for(var modelName in modelConfig){
-      var modelDirPath = repoDirPath + "/" + modelName;
-      var ignoreJSONFiles = (modelName === "Analysis");
-      checkAndCreateDir(modelDirPath, ignoreJSONFiles);
-    }
-
     return kdbRepo.initializeRepository(ItemProxy.getRootProxy().item.id, repoDirPath);
 }
 
@@ -458,11 +444,13 @@ function validateRepositoryStructure (repoDirPath) {
 
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
 
+  let modelDefinitions = ItemProxy.getModelDefinitions();
+
   // Remove model directories that are no longer needed from the model list
   // Note: Iterate in reverse to allow array to be modified
   for (var dirIdx = modelDirList.length - 1; dirIdx >= 0; dirIdx--) {
     var modelDirName = modelDirList[dirIdx];
-    if (!modelConfig[modelDirName]) {
+    if (!modelDefinitions[modelDirName]) {
       console.log("*** Found unexpected repo directory: " + repoDirPath + " -> " + modelDirName);
       // Remove the unexpected model kind from the list
       modelDirList.splice(dirIdx, 1);
