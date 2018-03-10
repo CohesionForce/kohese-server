@@ -27,21 +27,29 @@ var kdbDirPath = "kdb";
 var koheseKDBDirPath;
 var mountFilePath;
 
+let commonModelFiles = 'common/models/';
+let commonViewFiles = 'common/views/';
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function saveLoadedModels() {
-  console.log('::: Determining if model files need to be saved');
+function loadKoheseModelsAndViews() {
+  console.log('::: Load Kohese Models');
 
-  for(var modelName in kdbModel.modelDef){
-    console.log('--- Checking if ' + modelName + ' is in KDB');
-    let modelProxy = ItemProxy.getProxyFor(modelName);
-    modelProxyIsNew = !modelProxy.repoPath;
+  const saveRepoPath = false;
 
-    if(modelProxyIsNew){
-      storeModelInstance(modelProxy, modelProxyIsNew);
-    }
-  }
+  let repoModelFileDir = koheseKDBDirPath + '/KoheseModel';
+  kdbFS.createDirIfMissing(repoModelFileDir);
+  loadModelInstances('KoheseModel', commonModelFiles, false);
+  loadModelInstances('KoheseModel', repoModelFileDir, true);
+
+  let repoViewFileDir = koheseKDBDirPath + '/KoheseView';
+  kdbFS.createDirIfMissing(repoViewFileDir);
+  loadModelInstances('KoheseView', commonViewFiles, false);
+  loadModelInstances('KoheseView', repoViewFileDir, true);
+
+  ItemProxy.modelDefinitionLoadingComplete();
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -93,13 +101,15 @@ function initialize(koheseKdbPath) {
     return createRepoStructure(koheseKDBDirPath).then(function(repo) {
       kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
 
-      ItemProxy.loadModelDefinitions(kdbModel.modelDef);
+      loadKoheseModelsAndViews();
+      // ItemProxy.loadModelDefinitions(kdbModel.modelDef);
 
       return openRepositories();
     });
   } else {
 
-    ItemProxy.loadModelDefinitions(kdbModel.modelDef);
+    loadKoheseModelsAndViews();
+    // ItemProxy.loadModelDefinitions(kdbModel.modelDef);
 
     return openRepositories();
   }
@@ -427,6 +437,23 @@ function createRepoStructure(repoDirPath) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function loadModelInstances (kind, modelDirPath, inRepo) {
+  let fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
+  for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
+    var itemPath = modelDirPath + "/" + fileList[fileIdx];
+    var itemRow = kdbFS.loadJSONDoc(itemPath);
+
+    var proxy = new ItemProxy(kind, itemRow);
+
+    if(inRepo){
+      proxy.repoPath = itemPath;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function validateRepositoryStructure (repoDirPath) {
 
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
@@ -447,7 +474,8 @@ function validateRepositoryStructure (repoDirPath) {
     var modelDirPath = repoDirPath + "/" + modelName;
     var fileList;
 
-    if(modelName === 'Repository') {
+    switch(modelName) {
+      case 'Repository':
         fileList = kdbFS.getRepositoryFileList(modelDirPath, /\.mount$/);
         for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
             var itemPath = modelDirPath + "/" + fileList[fileIdx];
@@ -472,20 +500,18 @@ function validateRepositoryStructure (repoDirPath) {
                              repoStoragePath: subRepoDirPath};
             mountRepository(mountData);
         }
-    } else if (modelName === "Analysis") {
+        break;
+      case 'Analysis':
+      case 'KoheseModel':
+      case 'KoheseView':
 
-      // Skip the Analysis results
+        // Skip this model kind
+        console.log('::: Skipping ' + modelName);
+        break;
 
-    } else {
-        fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
-        for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
-          var itemPath = modelDirPath + "/" + fileList[fileIdx];
-          var itemRow = kdbFS.loadJSONDoc(itemPath);
-
-          var proxy = new ItemProxy(modelName, itemRow);
-          proxy.repoPath = itemPath;
-
-        }
+      default:
+        const inRepo = true;
+        loadModelInstances(modelName, modelDirPath, inRepo);
     }
   }
 }
@@ -522,9 +548,6 @@ function openRepositories() {
 	    }
 	}
 	console.log(">>> Done loading repositories");
-
-	// Save bootstrapped models if they are not already in the KDB
-	saveLoadedModels();
 
 	//Load corresponding git repositories
 	var promises = [];

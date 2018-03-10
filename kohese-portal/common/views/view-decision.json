@@ -1,43 +1,44 @@
 {
-  "modelName": "Decision ",
-  "icon": "fa fa-gavel",
-  "viewProperties": {
-    "decisionState" : {
-      "inputType" : "k-select:{\"options\":[\"Proposed\", \"In Analysis\", \"In Review\"]}",
-      "required" : true,
-      "default" : "Proposed",
-      "displayName" : "DecisionState"
-    },
-    "approvedBy" : {
-      "inputType" : "user-selector:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "approvedBy"
-    },
-    "approvedOn" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "approvedOn"
-    },
-    "rationale" : {
-      "inputType" : "text:{\"isMultiLine\":false}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "rationale"
-    },
-    "alternatives" : {
-      "inputType" : "text:{\"isMultiLine\":true}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "alternatives"
-    }
-  },
   "id": "view-decision",
   "name": "Decision View Model",
+  "parentId": "view-item",
   "createdBy": "jephillips",
   "createdOn": 1510596684590,
   "modifiedBy": "admin",
   "modifiedOn": 1517006598071,
+  "modelName": "Decision",
+  "icon": "fa fa-gavel",
+  "viewProperties": {
+    "decisionState": {
+      "inputType": "k-select:{\"options\":[\"Proposed\", \"In Analysis\", \"In Review\"]}",
+      "required": true,
+      "default": "Proposed",
+      "displayName": "DecisionState"
+    },
+    "approvedBy": {
+      "inputType": "user-selector:{}",
+      "required": false,
+      "default": null,
+      "displayName": "approvedBy"
+    },
+    "approvedOn": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "approvedOn"
+    },
+    "rationale": {
+      "inputType": "text:{\"isMultiLine\":false}",
+      "required": false,
+      "default": null,
+      "displayName": "rationale"
+    },
+    "alternatives": {
+      "inputType": "text:{\"isMultiLine\":true}",
+      "required": false,
+      "default": null,
+      "displayName": "alternatives"
+    }
+  },
   "itemIds": []
 }

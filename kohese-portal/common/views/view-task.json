@@ -1,61 +1,58 @@
 {
+  "id": "view-task",
+  "name": "Task View Model",
+  "parentId": "view-item",
   "modelName": "Task",
   "icon": "fa fa-tasks",
   "viewProperties": {
-    "taskState" : {
-      "inputType" : "k-select:{\"options\":[\"Proposed\", \"Accepted\", \"In Work\"]}",
-      "required" : false,
-      "default" : "Proposed",
-      "displayName" : "taskState"
+    "taskState": {
+      "inputType": "k-select:{\"options\":[\"Proposed\", \"Accepted\", \"In Work\"]}",
+      "required": false,
+      "default": "Proposed",
+      "displayName": "taskState"
     },
-    "assignedTo" : {
-      "inputType" : "user-selector:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "assignedTo"
-    }, 
-    "estimatedStart" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "estimatedStart"
+    "assignedTo": {
+      "inputType": "user-selector:{}",
+      "required": false,
+      "default": null,
+      "displayName": "assignedTo"
     },
-    "estimatedCompletion" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "estimatedCompletion"
+    "estimatedStart": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "estimatedStart"
+    },
+    "estimatedCompletion": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
-      "inputType" : "text:{\"isMultiLine\":false}",
-      "required" : false,
-      "default" : "",
-      "displayName" : "estimatedHoursEffot"
+      "inputType": "text:{\"isMultiLine\":false}",
+      "required": false,
+      "default": "",
+      "displayName": "estimatedHoursEffot"
     },
-    "actualStart" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "actualStart"
+    "actualStart": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "actualStart"
     },
-    "actualCompletion" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "actualCompletion"
+    "actualCompletion": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "actualCompletion"
     },
     "actualHours": {
-      "inputType" : "text:{\"isMultiLine\":false}",
-      "required" : false,
-      "default" : "",
-      "displayName" : "actualHoursEffort"
+      "inputType": "text:{\"isMultiLine\":false}",
+      "required": false,
+      "default": "",
+      "displayName": "actualHoursEffort"
     }
   },
-  "id": "view-task",
-  "name": "Task View Model",
-  "createdBy": "jephillips",
-  "createdOn": 1510596684590,
-  "modifiedBy": "admin",
-  "modifiedOn": 1517006598071,
   "itemIds": []
 }

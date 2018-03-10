@@ -16,6 +16,7 @@ tree.modelMap = {
     'Internal': {internal: true},
     'Internal-Lost': {internal: true},
     'Internal-Model': {internal: true},
+    'Internal-View-Model': {internal: true},
     'Internal-State': {internal: true}
 };
 tree.loading = true;
@@ -131,7 +132,7 @@ class ItemProxy {
   static resetItemRepository() {
 
     console.log('::: Resetting Item Repository');
-    var rootProxy = ItemProxy.getRootProxy();
+    let rootProxy = ItemProxy.getRootProxy();
 
     tree.loading = true;
 
@@ -142,6 +143,17 @@ class ItemProxy {
     rootProxy.visitChildren(null, null, (childProxy) => {
       childProxy.deleteItem();
     });
+
+    // Re-insert rootModelProxy
+    let rootModelProxy = new ItemProxy(tree.rootModelProxy.kind, tree.rootModelProxy.item);
+    let rootViewModelProxy = new ItemProxy(tree.rootViewModelProxy.kind, tree.rootViewModelProxy.item);
+
+    // Remove loaded modelMap
+    for(let key in tree.modelMap){
+      if (!tree.modelMap[key].internal){
+        delete tree.modelMap[key];
+      }
+    }
 
   }
 
@@ -217,11 +229,11 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   checkPropertyOrder(){
-    if (this.model && this.model.item && this.model.item.orderedProperties) {
+    if (this.model && this.model.item && this.model.item.propertyStorageOrder) {
       var newItem = {};
       var oldKeys = Object.keys(this.item);
-      for (var keyIdx in this.model.item.orderedProperties){
-        var key = this.model.item.orderedProperties[keyIdx];
+      for (var keyIdx in this.model.item.propertyStorageOrder){
+        var key = this.model.item.propertyStorageOrder[keyIdx];
         if (this.item.hasOwnProperty(key)) {
           newItem[key] = this.item[key];
         }
@@ -1200,39 +1212,25 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static loadModelDefinitions(modelDefMap) {
-    var rootModelDef = {
-        id: 'Model-Definitions',
-        name: 'Model Definitions'
-    };
-    var rootModelProxy = new ItemProxy('Internal-Model', rootModelDef);
-    rootModelProxy.modelDefMap = modelDefMap;
-
-    for(var modelKey in modelDefMap){
-      var model = modelDefMap[modelKey];
-      model.id = modelKey;
-      if (model.base === 'PersistedModel'){
-        model.parentId = rootModelDef.id;
-      } else {
-        model.parentId = model.base;
-      }
-      var proxy = new ItemProxy('KoheseModel', model);
-      tree.modelMap[modelKey] = proxy;
-    }
-
+  static modelDefinitionLoadingComplete() {
     // Create the key ordering for descendant models
-    var models = rootModelProxy.getDescendants();
+    var models = tree.rootModelProxy.getDescendants();
 
     for(var index in models){
       var modelProxy = models[index];
-//      console.log('::: Loading Model ' + model.item.name);
-      // TODO this might eventually need to be moved to proxy
-      var properties = modelProxy.parentProxy.item.orderedProperties || [];
+      console.log('::: Processing Model Properties ' + modelProxy.item.name);
 
-      if (modelProxy.invertItemOrder){
-        modelProxy.item.orderedProperties = Object.keys(modelProxy.item.properties).concat(properties);
+      let propertyOrder = _.clone(modelProxy.parentProxy.item.propertyOrder) || [];
+      modelProxy.item.propertyOrder = propertyOrder.concat(Object.keys(modelProxy.item.properties));
+
+      let propertyStorageOrder = _.clone(modelProxy.parentProxy.item.propertyStorageOrder) || [];
+
+      if (modelProxy.item.invertItemOrder){
+        console.log('%%% Invert order');
+        modelProxy.item.propertyStorageOrder = Object.keys(modelProxy.item.properties).concat(propertyStorageOrder);
       } else {
-        modelProxy.item.orderedProperties = properties.concat(Object.keys(modelProxy.item.properties));
+        console.log('%%% Don\'t invert order');
+        modelProxy.item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy.item.properties));
       }
 
       modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
@@ -1267,6 +1265,16 @@ tree.lostAndFound = new ItemProxy('Internal', {
 });
 tree.repoMap['LOST+FOUND'] = tree.lostAndFound;
 
+tree.rootModelProxy = new ItemProxy('Internal-Model', {
+  id: 'Model-Definitions',
+  name: 'Model Definitions'
+});
+
+tree.rootViewModelProxy = new ItemProxy('Internal-View-Model', {
+  id: 'View-Model-Definitions',
+  name: 'View Model Definitions'
+});
+
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -1295,11 +1303,12 @@ function copyAttributes(fromItem, toItem) {
       toItem[fromKey] = fromItem[fromKey];
     }
   }
+
   // Check for unexpected values
   for ( var toKey in toItem) {
     if (toKey !== '__deletedProperty' && toItem.hasOwnProperty(toKey) &&
         (toKey.charAt(0) !== '$') && !fromItem.hasOwnProperty(toKey)) {
-      console.log('!!! Deleted Property: ' + toKey);
+      console.log('!!! Deleted Property: ' + toKey + ' in ' + toItem.name);
       if (!toItem.__deletedProperty) {
         toItem.__deletedProperty = {};
       }
