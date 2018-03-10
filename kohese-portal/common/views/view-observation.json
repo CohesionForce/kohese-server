@@ -2,10 +2,6 @@
   "id": "view-observation",
   "name": "Observation View Model",
   "parentId": "view-item",
-  "createdBy": "jephillips",
-  "createdOn": 1510596684590,
-  "modifiedBy": "admin",
-  "modifiedOn": 1517006598071,
   "modelName": "Observation",
   "icon": "fa fa-comment",
   "viewProperties": {

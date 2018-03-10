@@ -1226,10 +1226,8 @@ class ItemProxy {
       let propertyStorageOrder = _.clone(modelProxy.parentProxy.item.propertyStorageOrder) || [];
 
       if (modelProxy.item.invertItemOrder){
-        console.log('%%% Invert order');
         modelProxy.item.propertyStorageOrder = Object.keys(modelProxy.item.properties).concat(propertyStorageOrder);
       } else {
-        console.log('%%% Don\'t invert order');
         modelProxy.item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy.item.properties));
       }
 
