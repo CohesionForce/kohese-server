@@ -20,12 +20,20 @@ export class ChildrenTableComponent extends NavigatableComponent
                                     implements OnInit, OnDestroy {
   @Input()
   filterSubject : BehaviorSubject<string>;
+  private _editableStream: BehaviorSubject<boolean>;
+  get editableStream() {
+    return this._editableStream;
+  }
+  @Input('editableStream')
+  set editableStream(editableStream: BehaviorSubject<boolean>) {
+    this._editableStream = editableStream;
+  }
 
   /* Obvervables */
   filteredItems : Array<ItemProxy>;
   
   @Input()
-  childrenStream : Observable<ItemProxy>;
+  childrenStream : BehaviorSubject<ItemProxy>;
   tableStream : MatTableDataSource<ItemProxy>;
 
   /* Subscriptions */
@@ -47,7 +55,7 @@ export class ChildrenTableComponent extends NavigatableComponent
       this.children = newChildren;
       this.tableStream = new MatTableDataSource<ItemProxy>(this.children)
       this.changeRef.markForCheck();
-    })
+    });
     this.initialized = true;
     this.rowDef = ['kind','name','assignedTo','actionState','description', 'childrenCount']
     this.filterSub = this.filterSubject.subscribe((newFilter) => {
@@ -57,6 +65,30 @@ export class ChildrenTableComponent extends NavigatableComponent
 
   ngOnDestroy () {
     this.filterSub.unsubscribe();
+  }
+  
+  public whenDropOccurs(dropTarget: ItemProxy, dropEvent: any): void {
+    dropEvent.preventDefault();
+    if (this._editableStream.getValue()) {
+      let droppedId: string = dropEvent.dataTransfer.getData('id');
+      if (droppedId) {
+        let removeIndex: number;
+        for (let j: number = 0; j < dropTarget.parentProxy.children.
+          length; j++) {
+          if (dropTarget.parentProxy.children[j].item.id === droppedId) {
+            removeIndex = j;
+            break;
+          }
+        }
+    
+        let proxyToMove: ItemProxy = dropTarget.parentProxy.children.
+          splice(removeIndex, 1)[0];
+        dropTarget.parentProxy.children.splice(dropTarget.parentProxy.children.
+          indexOf(dropTarget) + 1, 0, proxyToMove);
+    
+        this.childrenStream.next(dropTarget.parentProxy.children);
+      }
+    }
   }
 }
 

@@ -32,6 +32,7 @@
   <mat-card-content>
     <children-table [childrenStream]="childrenStream"
                     [filterSubject]="filterSubject"
+                    [editableStream]="editableStream"
                     *ngIf="childView === 'table'"></children-table>
     <proxy-selector-tree [itemProxy]="itemProxy"
                    *ngIf="childView === 'tree'"></proxy-selector-tree>

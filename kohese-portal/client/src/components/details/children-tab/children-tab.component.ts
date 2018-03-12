@@ -27,6 +27,14 @@ export class ChildrenTabComponent extends NavigatableComponent
   /* Data */
   @Input()
   proxyStream : Observable<ItemProxy>;
+  private _editableStream: Observable<boolean>;
+  get editableStream() {
+    return this._editableStream;
+  }
+  @Input('editableStream')
+  set editableStream(editableStream: Observable<boolean>) {
+    this._editableStream = editableStream;
+  }
 
   itemProxy : ItemProxy;
   filterString : string;
