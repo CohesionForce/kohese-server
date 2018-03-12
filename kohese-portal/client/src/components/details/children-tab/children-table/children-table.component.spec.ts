@@ -42,6 +42,7 @@ describe('Component: Children Table', ()=>{
 
     childrenTableComponent.childrenStream = childSubject; 
     childrenTableComponent.filterSubject = new BehaviorSubject<string>('');
+    childrenTableComponent.editableStream = new BehaviorSubject<boolean>(false);
 
     childrenTableFixture.detectChanges();
     
@@ -57,5 +58,39 @@ describe('Component: Children Table', ()=>{
     newChildren.push(new ItemProxy('Item', MockItem()));
     childSubject.next(newChildren);
     expect(childrenTableComponent.children.length).toBe(6);
-  })
+  });
+  
+  it('changes the order of children in their parent', () => {
+    childrenTableComponent.editableStream.next(true);
+    let rootProxy: ItemProxy = ItemProxy.getRootProxy();
+    let changedOrderingType: boolean = false;
+    if (!rootProxy.childrenAreManuallyOrdered()) {
+      rootProxy.toggleChildrenAreManuallyOrdered();
+      changedOrderingType = true;
+    }
+    let initialIndex: number;
+    for (let j: number = 0; j < rootProxy.children.length; j++) {
+      if ('view-item' === rootProxy.children[j].item.id) {
+        initialIndex = j;
+        break;
+      }
+    }
+    let dropEvent: any = jasmine.createSpyObj('DropEvent', ['preventDefault']);
+    dropEvent.dataTransfer = jasmine.createSpyObj('DataTransfer', ['getData']);
+    dropEvent.dataTransfer.getData.and.returnValue('view-item');
+    
+    childrenTableComponent.whenDropOccurs(rootProxy.children[rootProxy.
+      children.length - 1], dropEvent);
+      
+    for (let j: number = 0; j < rootProxy.children.length; j++) {
+      if ('view-item' === rootProxy.children[j].item.id) {
+        expect(initialIndex).not.toEqual(j);
+        break;
+      }
+    }
+    
+    if (changedOrderingType) {
+      rootProxy.toggleChildrenAreManuallyOrdered();
+    }
+  });
 })

@@ -59,5 +59,5 @@ describe('Component: Children Tab', ()=>{
     proxyStream.next(newProxy);
     expect(childrenTabComponent.itemProxy.item.name).toBe('A different name');
 
-  })
+  });
 })

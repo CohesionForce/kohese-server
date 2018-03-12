@@ -11,7 +11,7 @@ export class MockItemRepository {
 
   constructor() {
     this.mockRootProxy.children = [
-      new ItemProxy('Item', MockViewData()),
+      new ItemProxy('KoheseView', MockViewData()),
       new ItemProxy('Item', MockItem()),
       new ItemProxy('Item', MockItem()),
       new ItemProxy('Item', MockItem()),
