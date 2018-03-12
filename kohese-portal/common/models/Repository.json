@@ -1,19 +1,17 @@
 {
-  "name": "KoheseUser",
+  "id": "Repository",
+  "name": "Repository",
+  "parentId": "Item",
   "base": "Item",
-  "strict": "validate",
   "idInjection": true,
   "invertItemOrder": true,
-  "hidden": [
-    "password"
-  ],
   "properties": {
-    "password": {
+    "origin": {
       "type": "string",
-      "required": true
+      "required": false
     },
-    "email" : {
-      "type": "string",
+    "mounted": {
+      "type": "boolean",
       "required": false
     }
   },

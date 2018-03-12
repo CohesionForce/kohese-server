@@ -24,7 +24,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TreeComponent, TreeRowComponent } from './components/tree/tree.component';
+import { TreeComponent } from './components/tree/tree.component';
+import { TreeRowComponent } from './components/tree/tree-row.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
 
@@ -41,7 +42,7 @@ import { MaterialModule } from './material.module';
     DashboardComponent,
     TreeComponent,
     ExploreComponent,
-    TreeRowComponent,
+    TreeRowComponent
   ],
   imports: [
     BrowserModule,

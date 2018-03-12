@@ -1,61 +1,58 @@
 {
-  "modelName": "Action",
-  "icon": "fa fa-paper-plane",
-  "viewProperties": {    
-    "actionState" : {
-      "inputType" : "k-select:{\"options\":[\"Proposed\", \"Assigned\", \"Accepted\", \"In Work\",\"Pending Reassign\", \"Pending Redisposition\", \"In Verification\", \"Verified\", \"Closed\"]}",
-      "required" : false,
-      "default" : "Proposed",
-      "displayName" : "taskState"
-    },
-    "assignedTo" : {
-      "inputType" : "user-selector:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "assignedTo"
-    }, 
-    "estimatedStart" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "estimatedStart"
-    },
-    "estimatedCompletion" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "estimatedCompletion"
-    },
-    "estimatedHours": {
-      "inputType" : "text:{\"isMultiLine\":false}",
-      "required" : false,
-      "default" : "",
-      "displayName" : "estimatedHoursEffort"
-    },
-    "actualStart" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "actualStart"
-    },
-    "actualCompletion" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "actualCompletion"
-    },
-    "actualHours": {
-      "inputType" : "text:{\"isMultiLine\":false}",
-      "required" : false,
-      "default" : "",
-      "displayName" : "actualHoursEffort"
-    }
-  },
   "id": "view-action",
   "name": "Action View Model",
-  "createdBy": "jephillips",
-  "createdOn": 1510596684590,
-  "modifiedBy": "admin",
-  "modifiedOn": 1517006598071,
+  "parentId": "view-decision",
+  "modelName": "Action",
+  "icon": "fa fa-paper-plane",
+  "viewProperties": {
+    "actionState": {
+      "inputType": "k-select:{\"options\":[\"Proposed\", \"Assigned\", \"Accepted\", \"In Work\",\"Pending Reassign\", \"Pending Redisposition\", \"In Verification\", \"Verified\", \"Closed\"]}",
+      "required": false,
+      "default": "Proposed",
+      "displayName": "taskState"
+    },
+    "assignedTo": {
+      "inputType": "user-selector:{}",
+      "required": false,
+      "default": null,
+      "displayName": "assignedTo"
+    },
+    "estimatedStart": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "estimatedStart"
+    },
+    "estimatedCompletion": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "estimatedCompletion"
+    },
+    "estimatedHours": {
+      "inputType": "text:{\"isMultiLine\":false}",
+      "required": false,
+      "default": "",
+      "displayName": "estimatedHoursEffort"
+    },
+    "actualStart": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "actualStart"
+    },
+    "actualCompletion": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "actualCompletion"
+    },
+    "actualHours": {
+      "inputType": "text:{\"isMultiLine\":false}",
+      "required": false,
+      "default": "",
+      "displayName": "actualHoursEffort"
+    }
+  },
   "itemIds": []
 }

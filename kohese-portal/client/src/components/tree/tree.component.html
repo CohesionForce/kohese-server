@@ -1,49 +1,45 @@
-<div *ngIf="getTreeRoot()">
+<div *ngIf="root">
   <div id="top-action-bar">
     <button mat-raised-button (click)="expandAll()"
       class="btn btn-default btn-sm">
       Expand All
-    </button>
-    <button mat-raised-button (click)="expandFiltered()"
-      class="btn btn-default btn-sm">
-      Expand Filtered
     </button>
     <button mat-raised-button (click)="collapseAll()"
       class="btn btn-default btn-sm">
       Collapse All
     </button>
     <button mat-raised-button class="btn btn-default btn-sm" (click)="upLevel()"
-      [disabled]="isRootDefault()">
+      [disabled]="isRootDefault">
       Up Level
     </button>
     <button mat-raised-button class="btn btn-default btn-sm" (click)="resetRoot()"
-      [disabled]="isRootDefault()">
+      [disabled]="isRootDefault">
       Reset Root
     </button>
     <i (click)="syncLocation()"
       [ngClass]="{ 'btn-green': locationSynced}"
       class="btn btn-default btn-sm fa fa-exchange">
     </i>
-      <span>Showing {{getItemMatchedCount()}} of
-        {{getTreeRoot().descendantCount}}
+      <span>
+        Number of Items: {{root.descendantCount}}
       </span>
     <div>
       <!-- Start View Control -->
       <mat-form-field>
-        <mat-select placeholder="View" (selectionChange)="viewSelectionChanged()"
-          [(value)]="selectedView">
+        <mat-select placeholder="View"
+          (selectionChange)="viewSelectionChanged($event.value)">
           <mat-option *ngFor="let view of viewList" [value]="view">
             {{view}}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <!-- Start View Forking -->
-      <ng-container [ngSwitch]="selectedView">
+      <ng-container [ngSwitch]="(selectedViewStream | async)">
         <!-- Start Default Toolbar -->
         <ng-container *ngSwitchCase="viewList[0]">
           <!-- Kind Selection -->
           <mat-form-field>
-            <mat-select placeholder="Kind" [(value)]="this.proxyFilter.kind"
+            <mat-select placeholder="Kind" [(value)]="proxyFilter.kind"
               (selectionChange)="filter()">
               <mat-option>{{NO_KIND_SPECIFIED}}</mat-option>
               <mat-option *ngFor="let type of (koheseTypes | mapKey)"
@@ -99,12 +95,16 @@
       Name
     </div>
     <div class="kt-body">
-      <tree-row *ngFor="let childProxy of getTreeRoot().children"
-        [itemProxy]="childProxy">
+      <tree-row #rows *ngFor="let proxy of root.children"
+        [itemProxy]="proxy" (rootChanged)="whenRootChanges($event)"
+        [selectedViewStream]="selectedViewStream"
+        [selectedProxyIdStream]="selectedProxyIdStream"
+        [filterStream]="filterStream"
+        (visibilityChanged)="whenRowVisibilityChanges($event)">
       </tree-row>
     </div>
   </div> <!-- End Knowledge Tree -->
 </div>
-<div *ngIf="!getTreeRoot()">
+<div *ngIf="!root">
   Loading...
 </div>

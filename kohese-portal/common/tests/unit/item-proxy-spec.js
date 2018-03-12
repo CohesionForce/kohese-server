@@ -1,4 +1,4 @@
-describe('ItemProxy Test', function() {
+describe('ItemProxy Test', function () {
 
   var ItemProxy = require('../../../common/src/item-proxy.js');
 
@@ -14,24 +14,20 @@ describe('ItemProxy Test', function() {
   //
   //////////////////////////////////////////////////////////////////////////
   function resetItemRepository() {
-    var rootProxy = ItemProxy.getRootProxy();
 
-    rootProxy.children.forEach((childProxy) => {
-      childProxy.deleteItem(true);
-    });
-
+    ItemProxy.resetItemRepository();
     ItemProxy.loadingComplete();
 
-    expect(rootProxy.treeHashEntry.treeHash).toEqual('4061d87643bd1c197979c24f2f7fdc013d2b71b3');
+    expect(ItemProxy.getRootProxy().treeHashEntry.treeHash).toEqual('3ac03ab7a2505469c1be68a8462dbd9908fced5a');
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   function dump(message) {
-    if (dumpEnabled){
+    if (dumpEnabled) {
       if (message) {
-         console.log('>>> ' + message);
+        console.log('>>> ' + message);
       }
 
       ItemProxy.dumpAllProxies();
@@ -48,10 +44,10 @@ describe('ItemProxy Test', function() {
   //
   //////////////////////////////////////////////////////////////////////////
   function dumpHashFor(proxy, message) {
-    if (dumpEnabled){
+    if (dumpEnabled) {
       console.log('::: Hash for ' + proxy.item.name);
       if (message) {
-         console.log('>>> ' + message);
+        console.log('>>> ' + message);
       }
 
       console.log(proxy.treeHashEntry);
@@ -64,35 +60,39 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   function defineTestModel() {
     var modelDefMap = {
-        Test: {
-          'name': 'Test',
-          'base': 'PersistedModel',
-          'strict': 'validate',
-          'idInjection': true,
-          'trackChanges': false,
-          'properties': {
-            'id': {
-              'type': 'string',
-              'id': true,
-              'defaultFn': 'guid'
-            },
-            'name': {
-              'type': 'string',
-              'required': true
-            },
-            'parentId': {
-              'type': 'string',
-              'default': ''
-            }
-          },
-          'validations': [],
-          'relations': {},
-          'acls': [],
-          'methods': []
-      },
-      'Test-Exclude': {
+      Test: {
+        'id': 'Test',
         'name': 'Test',
         'base': 'PersistedModel',
+        'strict': 'validate',
+        'parentId': 'Model-Definitions',
+        'idInjection': true,
+        'trackChanges': false,
+        'properties': {
+          'id': {
+            'type': 'string',
+            'id': true,
+            'defaultFn': 'guid'
+          },
+          'name': {
+            'type': 'string',
+            'required': true
+          },
+          'parentId': {
+            'type': 'string',
+            'default': ''
+          }
+        },
+        'validations': [],
+        'relations': {},
+        'acls': [],
+        'methods': []
+      },
+      'Test-Exclude': {
+        'id': 'Test-Exclude',
+        'name': 'Test',
+        'base': 'PersistedModel',
+        'parentId': 'Model-Definitions',
         'strict': 'validate',
         'idInjection': true,
         'trackChanges': false,
@@ -119,28 +119,32 @@ describe('ItemProxy Test', function() {
 
     };
 
-    ItemProxy.loadModelDefinitions(modelDefMap);
+    for (let key in modelDefMap) {
+      let modelProxy = new ItemProxy('KoheseModel', modelDefMap[key]);
+    }
+
+    ItemProxy.modelDefinitionLoadingComplete();
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  function getCopyOfItem (proxy){
+  function getCopyOfItem(proxy) {
     return JSON.parse(JSON.stringify(proxy.item));
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Add Node Without Parent', function() {
+  it('Add Node Without Parent', function () {
     dump('--- Beginning state');
     expect(root).toBeDefined();
     // console.log('::: Adding node without parent');
     aa = new ItemProxy('Test', {
-      id : 'aa',
-      name : 'AA',
-      parentId : 'a',
-      uniq : 'unique'
+      id: 'aa',
+      name: 'AA',
+      parentId: 'a',
+      uniq: 'unique'
     });
     expect(aa).toBeDefined();
     expect(aa).not.toBeNull();
@@ -151,12 +155,12 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Add Parent', function() {
+  it('Add Parent', function () {
     // console.log('::: Adding parent');
     a = new ItemProxy('Test', {
-      id : 'a',
-      name : 'A',
-      parentId : ''
+      id: 'a',
+      name: 'A',
+      parentId: ''
     });
     expect(a).toBeDefined();
     expect(a).not.toBeNull();
@@ -177,12 +181,12 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Add Bs', function() {
+  it('Add Bs', function () {
     // console.log('::: Adding b, bbb');
     b = new ItemProxy('Test', {
-      id : 'b',
-      name : 'B',
-      parentId : ''
+      id: 'b',
+      name: 'B',
+      parentId: ''
     });
 
     expect(b).toBeDefined();
@@ -193,9 +197,9 @@ describe('ItemProxy Test', function() {
     expect(child).toBe(b);
 
     var bbb = new ItemProxy('Test', {
-      id : 'bbb',
-      name : 'BBB',
-      parentId : 'bb'
+      id: 'bbb',
+      name: 'BBB',
+      parentId: 'bb'
     });
 
     var autobb = ItemProxy.getProxyFor('bb');
@@ -208,12 +212,12 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Adding bb', function() {
+  it('Adding bb', function () {
     // console.log('::: Adding bb');
     bb = new ItemProxy('Test', {
-      id : 'bb',
-      name : 'BB',
-      parentId : 'b'
+      id: 'bb',
+      name: 'BB',
+      parentId: 'b'
     });
     dump('Added bb');
 
@@ -222,7 +226,7 @@ describe('ItemProxy Test', function() {
 
   });
 
-  it('Delete a', function() {
+  it('Delete a', function () {
     // console.log('::: Deleting a');
 
     expect(root.children[0].item.id).toBe('a');
@@ -236,7 +240,7 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Changing parent of aa', function() {
+  it('Changing parent of aa', function () {
     // console.log('::: Changing parent of aa');
     // console.log(aa.item);
     newAAItem = JSON.parse(JSON.stringify(aa.item));
@@ -259,7 +263,7 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Deleting description for aa', function() {
+  it('Deleting description for aa', function () {
     // console.log('::: Deleting description for aa');
 
     var temp = aa.item.id;
@@ -276,7 +280,7 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Changing parent of bb to ROOT', function() {
+  it('Changing parent of bb to ROOT', function () {
     // console.log('::: Changing parent of bb to ROOT');
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
     newBBItem.parentId = '';
@@ -291,7 +295,7 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Changing parent of bb to c', function() {
+  it('Changing parent of bb to c', function () {
     // console.log('::: Changing parent of bb to c');
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
     newBBItem.parentId = 'c';
@@ -307,7 +311,7 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Morph b into a NewTest', function() {
+  it('Morph b into a NewTest', function () {
     // console.log('::: Morph b into a NewTest');
     var newBItem = JSON.parse(JSON.stringify(b.item));
     b.updateItem('NewTest', newBItem);
@@ -319,31 +323,31 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Renaming an item', function() {
+  it('Renaming an item', function () {
     // console.log('::: Preparing to rename an item');
     var ab = new ItemProxy('Test', {
-      id : 'ab',
-      name : 'AB',
-      parentId : 'b'
+      id: 'ab',
+      name: 'AB',
+      parentId: 'b'
     });
     var ac = new ItemProxy('Test', {
-      id : 'ac',
-      name : 'AC',
-      parentId : 'b'
+      id: 'ac',
+      name: 'AC',
+      parentId: 'b'
     });
     var ad = new ItemProxy('Test', {
-      id : 'ad',
-      name : 'AD',
-      parentId : 'b'
+      id: 'ad',
+      name: 'AD',
+      parentId: 'b'
     });
     var ae = new ItemProxy('Test', {
-      id : 'ae',
-      name : 'AE',
-      parentId : 'b'
+      id: 'ae',
+      name: 'AE',
+      parentId: 'b'
     });
     dump('Created AB - AE');
 
-    var expectArray = JSON.stringify([ 'aa', 'ab', 'ac', 'ad', 'ae' ]);
+    var expectArray = JSON.stringify(['aa', 'ab', 'ac', 'ad', 'ae']);
     function getChildIds(item) {
       var temp = [];
       for (var i = 0; i < item.children.length; i++) {
@@ -359,7 +363,7 @@ describe('ItemProxy Test', function() {
     ae.updateItem('Item', newAEItem);
     dump('AE Name Updated');
 
-    expectArray = JSON.stringify([ 'ae', 'aa', 'ab', 'ac', 'ad' ]);
+    expectArray = JSON.stringify(['ae', 'aa', 'ab', 'ac', 'ad']);
     expect(getChildIds(b)).toBe(expectArray);
 
     var newABItem = JSON.parse(JSON.stringify(ab.item));
@@ -367,7 +371,7 @@ describe('ItemProxy Test', function() {
     ab.updateItem('Item', newABItem);
     dump('AB Name Updated');
 
-    expectArray = JSON.stringify([ 'ae', 'aa', 'ac', 'ad', 'ab' ]);
+    expectArray = JSON.stringify(['ae', 'aa', 'ac', 'ad', 'ab']);
     expect(getChildIds(b)).toBe(expectArray);
 
     var newAAItem = JSON.parse(JSON.stringify(aa.item));
@@ -375,55 +379,55 @@ describe('ItemProxy Test', function() {
     aa.updateItem('Item', newAAItem);
     dump('AA Name Updated');
 
-    expectArray = JSON.stringify([ 'ae', 'ac', 'ad', 'aa', 'ab' ]);
+    expectArray = JSON.stringify(['ae', 'ac', 'ad', 'aa', 'ab']);
     expect(getChildIds(b)).toBe(expectArray);
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Renaming an ordered item', function() {
+  it('Renaming an ordered item', function () {
     // console.log('::: Preparing to rename an ordered item');
     // console.log('::: Adding d - de');
     var d = new ItemProxy('Test', {
-      id : 'd',
-      name : 'D',
-      parentId : '',
-      itemIds : [ 'da', 'db', 'dc', 'dd', 'de' ]
+      id: 'd',
+      name: 'D',
+      parentId: '',
+      itemIds: ['da', 'db', 'dc', 'dd', 'de']
     });
     var dab = new ItemProxy('Test', {
-      id : 'dab',
-      name : 'DAB',
-      parentId : 'd'
+      id: 'dab',
+      name: 'DAB',
+      parentId: 'd'
     });
     var da = new ItemProxy('Test', {
-      id : 'da',
-      name : 'DA',
-      parentId : 'd'
+      id: 'da',
+      name: 'DA',
+      parentId: 'd'
     });
     var db = new ItemProxy('Test', {
-      id : 'db',
-      name : 'DB',
-      parentId : 'd'
+      id: 'db',
+      name: 'DB',
+      parentId: 'd'
     });
     var dc = new ItemProxy('Test', {
-      id : 'dc',
-      name : 'DC',
-      parentId : 'd'
+      id: 'dc',
+      name: 'DC',
+      parentId: 'd'
     });
     var dd = new ItemProxy('Test', {
-      id : 'dd',
-      name : 'DD',
-      parentId : 'd'
+      id: 'dd',
+      name: 'DD',
+      parentId: 'd'
     });
     var de = new ItemProxy('Test', {
-      id : 'de',
-      name : 'DE',
-      parentId : 'd'
+      id: 'de',
+      name: 'DE',
+      parentId: 'd'
     });
     dump('Created D - DE');
 
-    var expectArray = JSON.stringify([ 'da', 'db', 'dc', 'dd', 'de', 'dab' ]);
+    var expectArray = JSON.stringify(['da', 'db', 'dc', 'dd', 'de', 'dab']);
 
     function getChildIds(proxy) {
       return JSON.stringify(proxy.getOrderedChildIds());
@@ -449,77 +453,77 @@ describe('ItemProxy Test', function() {
     dump('DA Name Updated');
     expect(getChildIds(d)).toBe(expectArray);
 
-    expectArray = JSON.stringify([ 'da', 'db', 'dd', 'de', 'dab' ]);
+    expectArray = JSON.stringify(['da', 'db', 'dd', 'de', 'dab']);
     dc.deleteItem();
     dump('Deleted dc');
     expect(getChildIds(d)).toBe(expectArray);
 
-    expectArray = JSON.stringify([ 'da', 'db', 'dd', 'de', 'daa', 'dab', 'dac' ]);
+    expectArray = JSON.stringify(['da', 'db', 'dd', 'de', 'daa', 'dab', 'dac']);
     dump('Adding daa and dac');
     var dac = new ItemProxy('Test', {
-      id : 'dac',
-      name : 'DAC',
-      parentId : 'd'
+      id: 'dac',
+      name: 'DAC',
+      parentId: 'd'
     });
     var daa = new ItemProxy('Test', {
-      id : 'daa',
-      name : 'DAA',
-      parentId : 'd'
+      id: 'daa',
+      name: 'DAA',
+      parentId: 'd'
     });
     expect(getChildIds(d)).toBe(expectArray);
 
-    expectArray = JSON.stringify([ 'da', 'dd', 'db', 'de', 'daa', 'dab', 'dac' ]);
+    expectArray = JSON.stringify(['da', 'dd', 'db', 'de', 'daa', 'dab', 'dac']);
     var newDItem = JSON.parse(JSON.stringify(d.item));
-    newDItem.itemIds = [ 'da', 'dd', 'db', 'de' ];
+    newDItem.itemIds = ['da', 'dd', 'db', 'de'];
     d.updateItem('Test', newDItem);
     dump('Moved db and dd');
     expect(getChildIds(d)).toBe(expectArray);
 
-    expectArray = JSON.stringify([ 'dab', 'de', 'dd', 'db', 'da', 'daa', 'dac' ]);
+    expectArray = JSON.stringify(['dab', 'de', 'dd', 'db', 'da', 'daa', 'dac']);
     d.deleteItem();
     d = new ItemProxy('Test', {
-      id : 'd',
-      name : 'D',
-      parentId : '',
-      itemIds : [ 'dab', 'de', 'dd', 'db', 'da' ]
+      id: 'd',
+      name: 'D',
+      parentId: '',
+      itemIds: ['dab', 'de', 'dd', 'db', 'da']
     });
     dump('Added d');
     expect(getChildIds(d)).toBe(expectArray);
 
-    expectArray = JSON.stringify([ 'dab', 'de', 'dd', 'db', 'da', 'da1', 'daa', 'dac', 'dz1', 'dz2', 'dz3' ]);
+    expectArray = JSON.stringify(['dab', 'de', 'dd', 'db', 'da', 'da1', 'daa', 'dac', 'dz1', 'dz2', 'dz3']);
     var da1 = new ItemProxy('Test', {
-      id : 'da1',
-      name : 'DA1',
-      parentId : 'd'
+      id: 'da1',
+      name: 'DA1',
+      parentId: 'd'
     });
     var dz1 = new ItemProxy('Test', {
-      id : 'dz1',
-      name : 'DZ1',
-      parentId : 'd'
+      id: 'dz1',
+      name: 'DZ1',
+      parentId: 'd'
     });
     var dz2 = new ItemProxy('Test', {
-      id : 'dz2',
-      name : 'DZ2',
-      parentId : 'd'
+      id: 'dz2',
+      name: 'DZ2',
+      parentId: 'd'
     });
     var dz3 = new ItemProxy('Test', {
-      id : 'dz3',
-      name : 'DZ3',
-      parentId : 'd'
+      id: 'dz3',
+      name: 'DZ3',
+      parentId: 'd'
     });
     dump('Added da1, dz1-dz2');
     expect(getChildIds(d)).toBe(expectArray);
 
-    expectArray = JSON.stringify([ 'de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dz1', 'dz2', 'dz3', 'db' ]);
+    expectArray = JSON.stringify(['de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dz1', 'dz2', 'dz3', 'db']);
     newDItem = JSON.parse(JSON.stringify(d.item));
     newDItem.itemIds = [];
     d.updateItem('Test', newDItem);
     dump('Removed itemIds');
     expect(getChildIds(d)).toBe(expectArray);
 
-    expectArray = JSON.stringify([ 'dac', 'da', 'daa', 'dab', 'de', 'dd', 'dz1', 'dz2', 'db', 'da1', 'dz3' ]);
+    expectArray = JSON.stringify(['dac', 'da', 'daa', 'dab', 'de', 'dd', 'dz1', 'dz2', 'db', 'da1', 'dz3']);
     newDItem = JSON.parse(JSON.stringify(d.item));
-    newDItem.itemIds = [ 'dac', 'da', 'daa', 'dab', 'de', 'dd', 'dz1', 'dz2', 'db' ];
+    newDItem.itemIds = ['dac', 'da', 'daa', 'dab', 'de', 'dd', 'dz1', 'dz2', 'db'];
     d.updateItem('Test', newDItem);
     dump('Added itemIds');
     expect(getChildIds(d)).toBe(expectArray);
@@ -533,9 +537,9 @@ describe('ItemProxy Test', function() {
 
     expectArray = JSON.stringify(['de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dn', 'dz1', 'dz2', 'dz3', 'db']);
     var dn = new ItemProxy('Test', {
-      id : 'dn',
-      name : 'DN',
-      parentId : 'd'
+      id: 'dn',
+      name: 'DN',
+      parentId: 'd'
     });
     dump('Added DN to Auto List');
     expect(getChildIds(d)).toBe(expectArray);
@@ -553,12 +557,12 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Get Ancestors', function() {
+  it('Get Ancestors', function () {
     // console.log('::: Getting AB ancestors');
     var ab = ItemProxy.getProxyFor('ab');
     var abAncestors = ab.getAncestorProxies();
-    var expected = [ 'b', 'ROOT' ];
-    for ( var ancestorIdx in abAncestors) {
+    var expected = ['b', 'ROOT'];
+    for (var ancestorIdx in abAncestors) {
       var ancestor = abAncestors[ancestorIdx];
       // console.log(ancestor.item.id + ' - ' + ancestor.item.name);
 
@@ -569,7 +573,7 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Get Descendants', function() {
+  it('Get Descendants', function () {
     // console.log('::: Getting B Descendants');
     var b = ItemProxy.getProxyFor('b');
     var ac1 = new ItemProxy('Test', {
@@ -578,7 +582,7 @@ describe('ItemProxy Test', function() {
       parentId: 'ac'
     });
     var bDescendants = b.getDescendants();
-    var expectedIds =  [ 'ae', 'ac', 'ac1', 'ad', 'aa', 'ab' ];
+    var expectedIds = ['ae', 'ac', 'ac1', 'ad', 'aa', 'ab'];
 
     var bDescendantIds = [];
     bDescendants.forEach((proxy) => {
@@ -591,10 +595,10 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Hash Before Item Loaded Creates Tree Hash On Internal Node', ()=> {
+  it('Hash Before Item Loaded Creates Tree Hash On Internal Node', () => {
 
     var item = {
-      id:'test-item-id',
+      id: 'test-item-id',
       name: 'TestItem ',
       parentId: 'Not_A_Valid_Parent_Id'
     };
@@ -613,12 +617,12 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Calculates OID and TreeHash For a Leaf Node', ()=> {
+  it('Calculates OID and TreeHash For a Leaf Node', () => {
 
     var thProxy = new ItemProxy('Test', {
-      id : 'TH-Node-A',
-      name : 'Node A',
-      parentId : ''
+      id: 'TH-Node-A',
+      name: 'Node A',
+      parentId: ''
     });
     console.log('::: Node A');
     console.log(thProxy.treeHashEntry);
@@ -651,7 +655,7 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Isolates Repositories in Tree Hash', ()=> {
+  it('Isolates Repositories in Tree Hash', () => {
     var repoA = new ItemProxy('Repository', {
       name: 'Repository A',
       id: 'AAAA-AAAA'
@@ -670,14 +674,14 @@ describe('ItemProxy Test', function() {
     });
 
     const expectedRepoAChildHashes = {
-        'AAAA-1111': '32e9a0cf54ff2a87304865fe3b99723dac910278',
-        'BBBB-BBBB': 'Repository-Mount'
+      'AAAA-1111': '32e9a0cf54ff2a87304865fe3b99723dac910278',
+      'BBBB-BBBB': 'Repository-Mount'
     };
 
     const expectedInitialRepoBChildHashes = {};
 
     const expectedFinalRepoBChildHashes = {
-        'BBBB-1111' : '7b1715172e8c5491ef5265adf78695d7ef9cb9ad'
+      'BBBB-1111': '7b1715172e8c5491ef5265adf78695d7ef9cb9ad'
     };
 
     dumpHashFor(repoA, 'Isolated Nested Repositories');
@@ -706,43 +710,43 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Should Ensure Fields Are In Consistent Order', ()=>{
+  it('Should Ensure Fields Are In Consistent Order', () => {
 
     defineTestModel();
 
     var object1a = {
-        name: 'Some Content',
-        id: 'id-1a1a1a'
+      name: 'Some Content',
+      id: 'id-1a1a1a'
     };
 
     var object1b = {
-        id: 'id_1a1a1a',
-        name: 'Some Content'
+      id: 'id_1a1a1a',
+      name: 'Some Content'
     };
 
     var obj1a = new ItemProxy('Test', object1a);
 
-    expect(Object.keys(obj1a.item)).toEqual([ 'id', 'name' ]);
+    expect(Object.keys(obj1a.item)).toEqual(['id', 'name']);
 
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Should Ensure Model Is Associated', ()=>{
+  it('Should Ensure Model Is Associated', () => {
 
     resetItemRepository();
     defineTestModel();
 
     var aa = new ItemProxy('Test', {
-        name: 'Item AA',
-        id: 'AA',
-        parentId: 'A'
+      name: 'Item AA',
+      id: 'AA',
+      parentId: 'A'
     });
 
     var a = new ItemProxy('Test', {
-        id: 'A',
-        name: 'Item A'
+      id: 'A',
+      name: 'Item A'
     });
 
     expect(aa.model.item.name).toEqual('Test');
@@ -751,9 +755,9 @@ describe('ItemProxy Test', function() {
     // Handle the case when the child is sent to the client before its parent
 
     var bb = new ItemProxy('Test', {
-        name: 'Item BB',
-        id: 'BB',
-        parentId: 'B'
+      name: 'Item BB',
+      id: 'BB',
+      parentId: 'B'
     });
 
     // Note:  Creating the bb instance before the parent, also creates a placeholder
@@ -763,8 +767,8 @@ describe('ItemProxy Test', function() {
 
     var b = ItemProxy.getProxyFor('B');
     b.updateItem('Test', {
-        id: 'B',
-        name: 'Item BB'
+      id: 'B',
+      name: 'Item BB'
     });
 
     expect(bb.model.item.name).toEqual('Test');
@@ -775,50 +779,52 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  xit('Should Expand KoheseModel Relations', ()=>{
+  xit('Should Expand KoheseModel Relations', () => {
     resetItemRepository();
 
     var modelDefMap = {
-        ExpandedTest: {
-          'name': 'ExpandedTest',
-          'base': 'PersistedModel',
-          'strict': 'validate',
-          'idInjection': true,
-          'trackChanges': false,
-          'properties': {
-            'id': {
-              'type': 'string',
-              'id': true,
-              'defaultFn': 'guid'
-            },
-            'name': {
-              'type': 'string',
-              'required': true
-            },
-            'xparentId': {
-              'type': 'reference',
-              'default': ''
-            }
+      ExpandedTest: {
+        'name': 'ExpandedTest',
+        'base': 'PersistedModel',
+        "parentId": "Model-Definitions",
+        'strict': 'validate',
+        'idInjection': true,
+        'trackChanges': false,
+        'properties': {
+          'id': {
+            'type': 'string',
+            'id': true,
+            'defaultFn': 'guid'
           },
-          'validations': [],
-          'relations': {
-            'xChildren': {
-              "type": "hasMany",
-              "model": "ExpandedTest",
-              "foreignKey": "xParentId"
-            },
-            "xparent": {
-              "type": "belongsTo",
-              "model": "ExpandedTest",
-              "foreignKey": "xparentId"
-            }
+          'name': {
+            'type': 'string',
+            'required': true
           },
-          'acls': [],
-          'methods': []
+          'xparentId': {
+            'type': 'reference',
+            'default': ''
+          }
+        },
+        'validations': [],
+        'relations': {
+          'xChildren': {
+            'type': 'hasMany',
+            'model': 'ExpandedTest',
+            'foreignKey': 'xParentId'
+          },
+          'xparent': {
+            'type': 'belongsTo',
+            'model': 'ExpandedTest',
+            'foreignKey': 'xparentId'
+          }
+        },
+        'acls': [],
+        'methods': []
       }
     };
 
-    ItemProxy.loadModelDefinitions(modelDefMap);
+    // TODO Replace this with additional model loading logic
+    // ItemProxy.loadModelDefinitions(modelDefMap);
 
     let testA = new ItemProxy('ExpandedTest', {
       id: 'A',
@@ -839,99 +845,15 @@ describe('ItemProxy Test', function() {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Should Load Class Model Definitions', ()=>{
-    resetItemRepository();
-
-    var fs = require('fs');
-    var modelDefData = fs.readFileSync('./kdb/modelDef.json', {encoding: 'utf8', flag: 'r'});
-    var modelDefMap = JSON.parse(modelDefData);
-
-    ItemProxy.loadModelDefinitions(modelDefMap);
-    ItemProxy.loadingComplete();
-
-    var rootProxy = ItemProxy.getRootProxy();
-    var modelDefProxy = ItemProxy.getProxyFor('Model-Definitions');
-
-    expect(rootProxy.treeHashEntry.childTreeHashes['Model-Definitions'])
-      .toEqual(modelDefProxy.treeHashEntry.treeHash);
-
-    var requiredFields = {};
-    modelDefProxy.visitChildren(null, (proxy) => {
-      requiredFields[proxy.item.name] = proxy.item.requiredProperties;
-    });
-
-    var expectedRequiredFields = {
-        Analysis : [ 'id' ],
-        Item : [ 'name' ],
-        Category : [ 'name' ],
-        Decision : [ 'name', 'decisionState' ],
-        Action : [ 'name', 'decisionState', 'actionState' ],
-        KoheseModel : [ 'name', 'base', 'idInjection', 'properties', 'validations', 'relations', 'acls', 'methods' ],
-        KoheseUser : [ 'name', 'password' ],
-        KoheseView : [ 'name', 'modelName', 'viewProperties' ],
-        Observation : [ 'name', 'observedBy', 'observedOn', 'context' ],
-        Issue : [ 'name', 'observedBy', 'observedOn', 'context', 'issueState' ],
-        Repository : [ 'name' ],
-        Task : [ 'name', 'taskState' ] };
-
-    expect(requiredFields).toEqual(expectedRequiredFields);
-
-    var item = {
-        id: 'new-item',
-        description: 'Missing Name'
-      };
-
-    var newItem;
-    try {
-      newItem = new ItemProxy('Item', item);
-      throw('Failed validation');
-    } catch (err){
-      expect(err).toEqual({
-        error : 'Not-Valid',
-        validation : {
-          valid : false,
-          missingProperties : [ 'name' ]
-        }
-      });
-    }
-
-    // Detect if required attribute exists, but is set to null
-    item.name = null;
-    try {
-      newItem = new ItemProxy('Item', item);
-      throw('Failed validation');
-    } catch (err){
-      expect(err).toEqual({
-        error : 'Not-Valid',
-        validation : {
-          valid : false,
-          missingProperties : [ 'name' ]
-        }
-      });
-    }
-
-    // Add the missing field
-    item.name = 'Test';
-
-    newItem = new ItemProxy('Item', item);
-
-    var itemValidation = newItem.validateItem();
-    expect(itemValidation.valid).toEqual(true);
-
-  });
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  it('should do depth first visit', () =>{
+  it('should do depth first visit', () => {
 
     resetItemRepository();
 
     defineTestModel();
 
-    function createNV(nodeId, parentId, kind){
+    function createNV(nodeId, parentId, kind) {
       var createKind = kind || 'Test';
-      var proxy = new ItemProxy(createKind,{
+      var proxy = new ItemProxy(createKind, {
         id: nodeId,
         name: 'Node Visitor ' + nodeId,
         parentId: parentId
@@ -939,7 +861,7 @@ describe('ItemProxy Test', function() {
     }
 
     var topProxy = new ItemProxy('Test', {
-      id : 'NV-TOP',
+      id: 'NV-TOP',
       name: 'NV Top'
     });
 
@@ -954,11 +876,11 @@ describe('ItemProxy Test', function() {
 
     var order = [];
 
-    function before(proxy){
+    function before(proxy) {
       order.push('Before ' + proxy.item.id);
     }
 
-    function after(proxy){
+    function after(proxy) {
       order.push('After ' + proxy.item.id);
     }
 
@@ -966,376 +888,425 @@ describe('ItemProxy Test', function() {
     order = [];
     topProxy.visitTree(null, before, null);
     expect(order).toEqual(
-        [ 'Before NV-TOP', 'Before A', 'Before AA', 'Before AB', 'Before ABA', 'Before ABB',
-          'Before AC', 'Before B', 'Before C' ]);
+      ['Before NV-TOP', 'Before A', 'Before AA', 'Before AB', 'Before ABA', 'Before ABB',
+        'Before AC', 'Before B', 'Before C']);
 
     // Depth First (Bottom Up)
     order = [];
     topProxy.visitTree(null, null, after);
     expect(order).toEqual(
-        [ 'After AA', 'After ABA', 'After ABB', 'After AB', 'After AC', 'After A', 'After B',
-          'After C', 'After NV-TOP' ]);
+      ['After AA', 'After ABA', 'After ABB', 'After AB', 'After AC', 'After A', 'After B',
+        'After C', 'After NV-TOP']);
 
     // Wrap Visit (Before and After)
     order = [];
     topProxy.visitTree(null, before, after);
     expect(order).toEqual(
-        [ 'Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AB', 'Before ABA',
-          'After ABA', 'Before ABB', 'After ABB', 'After AB', 'Before AC', 'After AC', 'After A',
-          'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP' ]);
+      ['Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AB', 'Before ABA',
+        'After ABA', 'Before ABB', 'After ABB', 'After AB', 'Before AC', 'After AC', 'After A',
+        'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP']);
 
     // Wrap Children
     order = [];
     topProxy.visitChildren(null, before, after);
     expect(order).toEqual(
-        [ 'Before A', 'Before AA', 'After AA', 'Before AB', 'Before ABA', 'After ABA', 'Before ABB',
-          'After ABB', 'After AB', 'Before AC', 'After AC', 'After A', 'Before B', 'After B', 'Before C',
-          'After C' ]);
+      ['Before A', 'Before AA', 'After AA', 'Before AB', 'Before ABA', 'After ABA', 'Before ABB',
+        'After ABB', 'After AB', 'Before AC', 'After AC', 'After A', 'Before B', 'After B', 'Before C',
+        'After C']);
 
     // Exclude Sub-Tree
     order = [];
-    topProxy.visitTree({excludeKind: ['Test-Exclude']}, before, after);
+    topProxy.visitTree({ excludeKind: ['Test-Exclude'] }, before, after);
     expect(order).toEqual(
-        [ 'Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AC', 'After AC', 'After A',
-          'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP' ]);
+      ['Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AC', 'After AC', 'After A',
+        'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP']);
 
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  it('Retrieve Tree Hash Map', ()=> {
+  it('Retrieve Tree Hash Map', () => {
 
     var treeHashMap = ItemProxy.getAllTreeHashes();
     var expectedTreeHashMap = {
-        ROOT:
-        { kind: 'Internal',
-          oid: 'ba14baabb49cca43770ca92b36388169a2df5f6c',
-          childTreeHashes:
-           { 'Model-Definitions': '9812916ed24e1a0821acf37738e8ad955a49fe38',
-             'NV-TOP': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8' },
-          treeHash: '4f593ed2ed930072fb00755ae3790666082950e9' },
-       'Model-Definitions':
-        { kind: 'Internal-Model',
-          oid: '8109f6a5dfeea6ede032fa99d6cd1b79ef589503',
-          childTreeHashes:
-           { Test: '9eb2c72ca2da10dad89dd3d332609d459645e297',
-             'Test-Exclude': 'b329c5aaece0018310d03807ecb2afd350542766' },
-          treeHash: '9812916ed24e1a0821acf37738e8ad955a49fe38' },
-       Test:
-        { kind: 'KoheseModel',
-          oid: '7351ee60583ad9b549de4961df29da39e24d289e',
-          childTreeHashes: {},
-          treeHash: '9eb2c72ca2da10dad89dd3d332609d459645e297',
-          parentId: 'Model-Definitions' },
-       'Test-Exclude':
-        { kind: 'KoheseModel',
-          oid: '6ce9dd8ec027c03784efe74af0972ba320dd4212',
-          childTreeHashes: {},
-          treeHash: 'b329c5aaece0018310d03807ecb2afd350542766',
-          parentId: 'Model-Definitions' },
-       'NV-TOP':
-        { kind: 'Test',
-          oid: '69631d8cdb357d06c2a3bb8a71bf5f96f941ab08',
-          childTreeHashes:
-           { A: 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
-             B: 'e57da6530dffc225601f4b58b6dd839aae6bca3d',
-             C: 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e' },
-          treeHash: 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8' },
-       A:
-        { kind: 'Test',
-          oid: '239ac47533ede73b9896ba578fdd0a775fd6297e',
-          childTreeHashes:
-           { AA: '38d2301582967345cc6c30e5df19359b757db4fb',
-             AB: '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
-             AC: '1d76e2c4dbb6a464995ad802525021924c768088' },
-          treeHash: 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
-          parentId: 'NV-TOP' },
-       AA:
-        { kind: 'Test',
-          oid: '71cea569a1401108ea4ce2ebe40470ba536fc676',
-          childTreeHashes: {},
-          treeHash: '38d2301582967345cc6c30e5df19359b757db4fb',
-          parentId: 'A' },
-       AB:
-        { kind: 'Test-Exclude',
-          oid: 'aa9fa4c32ae23738be8c847304d5fccbc7823116',
-          childTreeHashes:
-           { ABA: '3182f87ce6dc32b512c7ac2b3bec95577a670b49',
-             ABB: 'bc3f80b453f282d816d0450a16af385eb2fdcd8f' },
-          treeHash: '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
-          parentId: 'A' },
-       ABA:
-        { kind: 'Test',
-          oid: '2968d55c37fe84f64ad74e70f2522e51af9a7033',
-          childTreeHashes: {},
-          treeHash: '3182f87ce6dc32b512c7ac2b3bec95577a670b49',
-          parentId: 'AB' },
-       ABB:
-        { kind: 'Test',
-          oid: 'f664223cc5efe2320d22ec1692aa8b8de9b4fb90',
-          childTreeHashes: {},
-          treeHash: 'bc3f80b453f282d816d0450a16af385eb2fdcd8f',
-          parentId: 'AB' },
-       AC:
-        { kind: 'Test',
-          oid: '6f67f295d6a2365bb4cd32469471091402d310dd',
-          childTreeHashes: {},
-          treeHash: '1d76e2c4dbb6a464995ad802525021924c768088',
-          parentId: 'A' },
-       B:
-        { kind: 'Test',
-          oid: '5c69c898222c3219089be690b63e418f09e93799',
-          childTreeHashes: {},
-          treeHash: 'e57da6530dffc225601f4b58b6dd839aae6bca3d',
-          parentId: 'NV-TOP' },
-       C:
-        { kind: 'Test',
-          oid: '3cfa883acec0a529b941b02a57f4187bece8263d',
-          childTreeHashes: {},
-          treeHash: 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
-          parentId: 'NV-TOP' }
+      'ROOT': {
+        'kind': 'Internal',
+        'oid': 'ba14baabb49cca43770ca92b36388169a2df5f6c',
+        'childTreeHashes': {
+          'LOST+FOUND': '6bd4b99ab4c7bd8f7643e93f75dbf081d3adcf23',
+          'Model-Definitions': 'c5f5d0e87c4a32571f7696ff0c8f9f5b86fcad29',
+          'NV-TOP': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
+          'View-Model-Definitions': '5226d1580a592d72b9e6b360e768b90d5d814ae0'
+        },
+        'treeHash': 'bbd99813d205199f90333eb1c07a2fda0aaf6db6'
+      },
+      'LOST+FOUND': {
+        'kind': 'Internal',
+        'oid': 'a428513cdfbef52e379d3506fb820634712667cd',
+        'childTreeHashes': {
+          'KoheseModel': '2dbcdcb277081902336139d7297a5afc9483e633'
+        },
+        'treeHash': '6bd4b99ab4c7bd8f7643e93f75dbf081d3adcf23'
+      },
+      'KoheseModel': {
+        'kind': 'Internal-Lost',
+        'oid': 'b670af8844cd94395e5a440dbd65a8c07ae460f2',
+        'childTreeHashes': {},
+        'treeHash': '2dbcdcb277081902336139d7297a5afc9483e633',
+        'parentId': 'LOST+FOUND'
+      },
+      'Model-Definitions': {
+        'kind': 'Internal-Model',
+        'oid': '8109f6a5dfeea6ede032fa99d6cd1b79ef589503',
+        'childTreeHashes': {
+          'Test': '67af553ac64e266aebebeb36dbcc799b350146a8',
+          'Test-Exclude': '005e6fda295d743d7ee1ea354d65d73521bfd229'
+        },
+        'treeHash': 'c5f5d0e87c4a32571f7696ff0c8f9f5b86fcad29'
+      },
+      'Test': {
+        'kind': 'KoheseModel',
+        'oid': 'a28e109abe292d4cf67d3170626a097bde6e8988',
+        'childTreeHashes': {},
+        'treeHash': '67af553ac64e266aebebeb36dbcc799b350146a8',
+        'parentId': 'Model-Definitions'
+      },
+      'Test-Exclude': {
+        'kind': 'KoheseModel',
+        'oid': '36eb788518379ea4d45c601092901284153fec00',
+        'childTreeHashes': {},
+        'treeHash': '005e6fda295d743d7ee1ea354d65d73521bfd229',
+        'parentId': 'Model-Definitions'
+      },
+      'NV-TOP': {
+        'kind': 'Test',
+        'oid': '69631d8cdb357d06c2a3bb8a71bf5f96f941ab08',
+        'childTreeHashes': {
+          'A': 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
+          'B': 'e57da6530dffc225601f4b58b6dd839aae6bca3d',
+          'C': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e'
+        },
+        'treeHash': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8'
+      },
+      'A': {
+        'kind': 'Test',
+        'oid': '239ac47533ede73b9896ba578fdd0a775fd6297e',
+        'childTreeHashes': {
+          'AA': '38d2301582967345cc6c30e5df19359b757db4fb',
+          'AB': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
+          'AC': '1d76e2c4dbb6a464995ad802525021924c768088'
+        },
+        'treeHash': 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
+        'parentId': 'NV-TOP'
+      },
+      'AA': {
+        'kind': 'Test',
+        'oid': '71cea569a1401108ea4ce2ebe40470ba536fc676',
+        'childTreeHashes': {},
+        'treeHash': '38d2301582967345cc6c30e5df19359b757db4fb',
+        'parentId': 'A'
+      },
+      'AB': {
+        'kind': 'Test-Exclude',
+        'oid': 'aa9fa4c32ae23738be8c847304d5fccbc7823116',
+        'childTreeHashes': {
+          'ABA': '3182f87ce6dc32b512c7ac2b3bec95577a670b49',
+          'ABB': 'bc3f80b453f282d816d0450a16af385eb2fdcd8f'
+        },
+        'treeHash': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
+        'parentId': 'A'
+      },
+      'ABA': {
+        'kind': 'Test',
+        'oid': '2968d55c37fe84f64ad74e70f2522e51af9a7033',
+        'childTreeHashes': {},
+        'treeHash': '3182f87ce6dc32b512c7ac2b3bec95577a670b49',
+        'parentId': 'AB'
+      },
+      'ABB': {
+        'kind': 'Test',
+        'oid': 'f664223cc5efe2320d22ec1692aa8b8de9b4fb90',
+        'childTreeHashes': {},
+        'treeHash': 'bc3f80b453f282d816d0450a16af385eb2fdcd8f',
+        'parentId': 'AB'
+      },
+      'AC': {
+        'kind': 'Test',
+        'oid': '6f67f295d6a2365bb4cd32469471091402d310dd',
+        'childTreeHashes': {},
+        'treeHash': '1d76e2c4dbb6a464995ad802525021924c768088',
+        'parentId': 'A'
+      },
+      'B': {
+        'kind': 'Test',
+        'oid': '5c69c898222c3219089be690b63e418f09e93799',
+        'childTreeHashes': {},
+        'treeHash': 'e57da6530dffc225601f4b58b6dd839aae6bca3d',
+        'parentId': 'NV-TOP'
+      },
+      'C': {
+        'kind': 'Test',
+        'oid': '3cfa883acec0a529b941b02a57f4187bece8263d',
+        'childTreeHashes': {},
+        'treeHash': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
+        'parentId': 'NV-TOP'
+      },
+      'View-Model-Definitions': {
+        'kind': 'Internal-View-Model',
+        'oid': '7927f787b40a11b5fb9bf0e929884a344fa2b9ff',
+        'childTreeHashes': {},
+        'treeHash': '5226d1580a592d72b9e6b360e768b90d5d814ae0'
+      }
     };
 
-    var thmCompare = ItemProxy.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
-    if (!thmCompare.match){
-      console.log('Tree Map');
-      console.log(treeHashMap);
-      console.log('Tree Hash Map Compare');
-      console.log(JSON.stringify(thmCompare,null, '  '));
+  var thmCompare = ItemProxy.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
+  if (!thmCompare.match) {
+    console.log('Tree Map');
+    console.log(treeHashMap);
+    console.log('Tree Hash Map Compare');
+    console.log(JSON.stringify(thmCompare, null, '  '));
+  }
+
+  expect(treeHashMap).toEqual(expectedTreeHashMap);
+});
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+it('Retrieve Delta Tree Hash Map', () => {
+
+  var treeHashMapBefore = ItemProxy.getAllTreeHashes();
+
+  // Delete B
+  var b = ItemProxy.getProxyFor('B');
+  b.deleteItem();
+
+  // Update C
+  var c = ItemProxy.getProxyFor('C');
+  var newCItem = JSON.parse(JSON.stringify(c.item));
+  newCItem.name = 'Updated C';
+  c.updateItem(c.kind, newCItem);
+
+  // Add D
+  var d = new ItemProxy('Test', {
+    id: 'D',
+    name: 'Node Visitor D',
+    parentId: 'NV-TOP'
+  });
+
+  var expectedDeltaMap = {
+    match: false,
+    addedItems: ['D'],
+    changedItems: ['C'],
+    deletedItems: ['B'],
+    childMismatch: {
+      'NV-TOP': {
+        addedChildren: ['D'],
+        deletedChildren: ['B'],
+        changedChildren: {
+          C: {
+            from: 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
+            to: '51f07bc8e0eb82b241784709669f186aee2c3989'
+          }
+        },
+        reorderedChildren: { 1: { from: 'B', to: 'D' } }
+      },
+      ROOT: {
+        addedChildren: [],
+        deletedChildren: [],
+        changedChildren: {
+          'NV-TOP': {
+            from: 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
+            to: '9b63f5728719510e9e8a24eff75fae92a7b4b758'
+          }
+        },
+        reorderedChildren: {}
+      }
     }
+  };
 
-    expect(treeHashMap).toEqual(expectedTreeHashMap);
+  var treeHashMapAfter = ItemProxy.getAllTreeHashes();
+
+  var thmCompare = ItemProxy.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
+
+  expect(thmCompare).toEqual(expectedDeltaMap);
+});
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+it('Should Not Hang When Deleting Lost+Found With Children', () => {
+
+  resetItemRepository();
+  defineTestModel();
+
+  var a = new ItemProxy('Test', {
+    id: 'A',
+    name: 'A Item'
   });
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  it('Retrieve Delta Tree Hash Map', ()=> {
-
-    var treeHashMapBefore = ItemProxy.getAllTreeHashes();
-
-    // Delete B
-    var b = ItemProxy.getProxyFor('B');
-    b.deleteItem();
-
-    // Update C
-    var c = ItemProxy.getProxyFor('C');
-    var newCItem = JSON.parse(JSON.stringify(c.item));
-    newCItem.name = 'Updated C';
-    c.updateItem(c.kind, newCItem);
-
-    // Add D
-    var d = new ItemProxy('Test', {
-      id: 'D',
-      name: 'Node Visitor D',
-      parentId: 'NV-TOP'
-    });
-
-    var expectedDeltaMap = {
-        match : false,
-        addedItems : [ 'D' ],
-        changedItems : [ 'C' ],
-        deletedItems : [ 'B' ],
-        childMismatch : {
-          'NV-TOP' : {
-            addedChildren : [ 'D' ],
-            deletedChildren : [ 'B' ],
-            changedChildren : {
-              C : {
-                from : 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
-                to : '51f07bc8e0eb82b241784709669f186aee2c3989' } },
-            reorderedChildren : { 1 : { from : 'B', to : 'D' } } },
-          ROOT : {
-            addedChildren : [  ],
-            deletedChildren : [  ],
-            changedChildren : {
-              'NV-TOP' : {
-                from : 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
-                to : '9b63f5728719510e9e8a24eff75fae92a7b4b758' } },
-            reorderedChildren : {  } }
-        }
-    };
-
-    var treeHashMapAfter = ItemProxy.getAllTreeHashes();
-
-    var thmCompare = ItemProxy.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
-
-    expect(thmCompare).toEqual(expectedDeltaMap);
+  var bb = new ItemProxy('Test', {
+    id: 'BB',
+    name: 'BB Item',
+    parentId: 'B'
   });
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  it('Should Not Hang When Deleting Lost+Found With Children', ()=> {
+  // Try to delete item only
+  var lfProxy = ItemProxy.getProxyFor('LOST+FOUND');
+  lfProxy.deleteItem();
 
-    resetItemRepository();
-    defineTestModel();
+  // Try to delete item and descendants
+  var lfProxyAfter = ItemProxy.getProxyFor('LOST+FOUND');
+  expect(lfProxyAfter).toEqual(lostAndFound);
+  expect(lfProxyAfter.descendantCount).toEqual(3);
 
-    var a = new ItemProxy('Test', {
-      id: 'A',
-      name: 'A Item'
-    });
+  lostAndFound.deleteItem(true);
+  expect(lfProxyAfter.descendantCount).toEqual(0);
+});
 
-    var bb = new ItemProxy('Test', {
-      id: 'BB',
-      name: 'BB Item',
-      parentId: 'B'
-    });
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+it('Update Tree Hash When Creating Already Existing Item', () => {
 
-    // Try to delete item only
-    var lfProxy = ItemProxy.getProxyFor('LOST+FOUND');
-    lfProxy.deleteItem();
+  resetItemRepository();
+  defineTestModel();
 
-    // Try to delete item and descendants
-    var lfProxyAfter = ItemProxy.getProxyFor('LOST+FOUND');
-    expect(lfProxyAfter).toEqual(lostAndFound);
-    expect(lfProxyAfter.descendantCount).toEqual(2);
-
-    lostAndFound.deleteItem(true);
-    expect(lfProxyAfter.descendantCount).toEqual(0);
+  var a = new ItemProxy('Test', {
+    id: 'A',
+    name: 'A Item'
+  });
+  var aa = new ItemProxy('Test', {
+    id: 'AA',
+    name: 'AA Item',
+    parentId: 'A'
+  });
+  var ab = new ItemProxy('Test', {
+    id: 'AB',
+    name: 'AA Item',
+    parentId: 'A'
   });
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  it('Update Tree Hash When Creating Already Existing Item', ()=> {
-
-    resetItemRepository();
-    defineTestModel();
-
-    var a = new ItemProxy('Test', {
-      id: 'A',
-      name: 'A Item'
-    });
-    var aa = new ItemProxy('Test', {
-      id: 'AA',
-      name: 'AA Item',
-      parentId: 'A'
-    });
-    var ab = new ItemProxy('Test', {
-      id: 'AB',
-      name: 'AA Item',
-      parentId: 'A'
-    });
-
-    var newAA = new ItemProxy('Test', {
-      id: 'AA',
-      name: 'Updated AA Item',
-      parentId: 'A'
-    });
-
-    var expectedATreeHashEntry = {
-        kind: 'Test',
-        oid: '167cc8efd041e787a28a392144edaea329ddc8ca',
-        childTreeHashes:
-         { AB: '90f7ce824ded7365abe31d7ab084837d205a4ff0',
-           AA: 'b19335d15534a0f103ee74de78ad6d9be9189eeb' },
-        treeHash: '377eb414c090b204428ab610f75ebbc99bae7d20'
-    };
-
-    expect(a.treeHashEntry).toEqual(expectedATreeHashEntry);
+  var newAA = new ItemProxy('Test', {
+    id: 'AA',
+    name: 'Updated AA Item',
+    parentId: 'A'
   });
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  it('Prevent Recursion on Updating Lost+Found', ()=> {
+  var expectedATreeHashEntry = {
+    kind: 'Test',
+    oid: '167cc8efd041e787a28a392144edaea329ddc8ca',
+    childTreeHashes:
+      {
+        AB: '90f7ce824ded7365abe31d7ab084837d205a4ff0',
+        AA: 'b19335d15534a0f103ee74de78ad6d9be9189eeb'
+      },
+    treeHash: '377eb414c090b204428ab610f75ebbc99bae7d20'
+  };
 
-    resetItemRepository();
-    defineTestModel();
+  expect(a.treeHashEntry).toEqual(expectedATreeHashEntry);
+});
 
-    var a = new ItemProxy('Test', {
-      id: 'A',
-      name: 'A Item',
-      parentId: 'MISSING'
-    });
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+it('Prevent Recursion on Updating Lost+Found', () => {
 
-    var lfContent = _.clone(lostAndFound.item);
+  resetItemRepository();
+  defineTestModel();
 
-    var lf = new ItemProxy('Internal', lfContent);
-
-    expect(lostAndFound.descendantCount).toEqual(2);
+  var a = new ItemProxy('Test', {
+    id: 'A',
+    name: 'A Item',
+    parentId: 'MISSING'
   });
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  it('Sort Items with Same Name Correctly When Adding Parent After Children', ()=> {
+  var lfContent = _.clone(lostAndFound.item);
 
-    resetItemRepository();
-    defineTestModel();
+  var lf = new ItemProxy('Internal', lfContent);
 
-    var aa2 = new ItemProxy('Test', {
-      id: 'AA2',
-      name: 'AA Item',
-      parentId: 'LATE_A'
-    });
+  expect(lostAndFound.descendantCount).toEqual(3);
+});
 
-    var aa3 = new ItemProxy('Test', {
-      id: 'AA3',
-      name: 'AA Item',
-      parentId: 'LATE_A'
-    });
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+it('Sort Items with Same Name Correctly When Adding Parent After Children', () => {
 
-    var aa1 = new ItemProxy('Test', {
-      id: 'AA1',
-      name: 'AA Item',
-      parentId: 'LATE_A'
-    });
+  resetItemRepository();
+  defineTestModel();
 
-    var lateA = ItemProxy.getProxyFor('LATE_A');
-
-    var aa = new ItemProxy('Test', {
-      id: 'LATE_A',
-      name: 'LATE_A',
-      parentId: ''
-    });
-
-    expect(lateA.getOrderedChildIds()).toEqual( [ 'AA1', 'AA2', 'AA3' ]);
-
-    var earlyB = new ItemProxy('Test', {
-      id: 'EARLY_B',
-      name: 'EARLY_B',
-      parentId: ''
-    });
-
-    var bb2 = new ItemProxy('Test', {
-      id: 'BB2',
-      name: 'BB Item',
-      parentId: 'EARLY_B'
-    });
-
-    var bb3 = new ItemProxy('Test', {
-      id: 'BB3',
-      name: 'BB Item',
-      parentId: 'EARLY_B'
-    });
-
-    var bb1 = new ItemProxy('Test', {
-      id: 'BB1',
-      name: 'BB Item',
-      parentId: 'EARLY_B'
-    });
-
-    expect(earlyB.getOrderedChildIds()).toEqual([ 'BB1', 'BB2', 'BB3' ]);
-
-    bb3.updateItem('Test', {
-      id: 'BB3',
-      name: 'Another BB Item',
-      parentId: 'EARLY_B'
-    });
-
-
-    expect(earlyB.getOrderedChildIds()).toEqual([ 'BB3', 'BB1', 'BB2' ]);
-
-    bb3.updateItem('Test', {
-      id: 'BB3',
-      name: 'Later BB Item',
-      parentId: 'EARLY_B'
-    });
-
-   expect(earlyB.getOrderedChildIds()).toEqual([ 'BB1', 'BB2', 'BB3' ]);
-
+  var aa2 = new ItemProxy('Test', {
+    id: 'AA2',
+    name: 'AA Item',
+    parentId: 'LATE_A'
   });
+
+  var aa3 = new ItemProxy('Test', {
+    id: 'AA3',
+    name: 'AA Item',
+    parentId: 'LATE_A'
+  });
+
+  var aa1 = new ItemProxy('Test', {
+    id: 'AA1',
+    name: 'AA Item',
+    parentId: 'LATE_A'
+  });
+
+  var lateA = ItemProxy.getProxyFor('LATE_A');
+
+  var aa = new ItemProxy('Test', {
+    id: 'LATE_A',
+    name: 'LATE_A',
+    parentId: ''
+  });
+
+  expect(lateA.getOrderedChildIds()).toEqual(['AA1', 'AA2', 'AA3']);
+
+  var earlyB = new ItemProxy('Test', {
+    id: 'EARLY_B',
+    name: 'EARLY_B',
+    parentId: ''
+  });
+
+  var bb2 = new ItemProxy('Test', {
+    id: 'BB2',
+    name: 'BB Item',
+    parentId: 'EARLY_B'
+  });
+
+  var bb3 = new ItemProxy('Test', {
+    id: 'BB3',
+    name: 'BB Item',
+    parentId: 'EARLY_B'
+  });
+
+  var bb1 = new ItemProxy('Test', {
+    id: 'BB1',
+    name: 'BB Item',
+    parentId: 'EARLY_B'
+  });
+
+  expect(earlyB.getOrderedChildIds()).toEqual(['BB1', 'BB2', 'BB3']);
+
+  bb3.updateItem('Test', {
+    id: 'BB3',
+    name: 'Another BB Item',
+    parentId: 'EARLY_B'
+  });
+
+
+  expect(earlyB.getOrderedChildIds()).toEqual(['BB3', 'BB1', 'BB2']);
+
+  bb3.updateItem('Test', {
+    id: 'BB3',
+    name: 'Later BB Item',
+    parentId: 'EARLY_B'
+  });
+
+  expect(earlyB.getOrderedChildIds()).toEqual(['BB1', 'BB2', 'BB3']);
+
+});
 });

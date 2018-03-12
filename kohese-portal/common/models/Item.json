@@ -1,10 +1,10 @@
 {
+  "id": "Item",
   "name": "Item",
+  "parentId": "Model-Definitions",
   "base": "PersistedModel",
-  "strict": "validate",
   "idInjection": true,
   "invertItemOrder": true,
-  "trackChanges": false,
   "properties": {
     "id": {
       "type": "string",

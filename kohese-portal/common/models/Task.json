@@ -1,5 +1,7 @@
 {
+  "id": "Task",
   "name": "Task",
+  "parentId": "Item",
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": true,
@@ -9,34 +11,36 @@
       "required": true,
       "default": "Proposed",
       "properties": {
-        "state":{
+        "state": {
           "Proposed": {
             "name": "Proposed",
             "description": "A task that is Proposed."
-           },
+          },
           "Assigned": {
             "name": "Assigned",
             "description": "A task that is Assigned."
-           },
+          },
           "InWork": {
             "name": "In Work",
             "description": "A task that is In Work."
-           },
+          },
           "Pending Reassign": {
             "name": "Pending Reassign",
             "description": "A task that is Pending Reassign."
-           },
+          },
           "Completed": {
             "name": "Completed",
             "description": "A task that is Completed."
-           }
+          }
         },
         "transition": {
           "assign": {
             "source": "Proposed",
             "target": "Assigned",
             "guard": {},
-            "requires": [ "assignment:Assignee" ]
+            "requires": [
+              "assignment:Assignee"
+            ]
           },
           "beginWork": {
             "source": "Assigned",
@@ -58,7 +62,7 @@
         }
       }
     },
-    "predecessors" : {
+    "predecessors": {
       "type": [
         "object"
       ]

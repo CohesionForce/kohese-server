@@ -1,5 +1,7 @@
 {
+  "id": "Analysis",
   "name": "Analysis",
+  "parentId": "Model-Definitions",
   "base": "PersistedModel",
   "idInjection": true,
   "invertItemOrder": true,

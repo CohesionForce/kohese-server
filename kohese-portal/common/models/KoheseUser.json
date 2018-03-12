@@ -1,19 +1,18 @@
 {
-  "name": "KoheseView",
+  "id": "KoheseUser",
+  "name": "KoheseUser",
+  "parentId": "Item",
   "base": "Item",
   "idInjection": true,
-  "invertItemOrder": false,
+  "invertItemOrder": true,
   "properties": {
-    "modelName": {
+    "password": {
       "type": "string",
       "required": true
     },
-    "icon": {
-      "type": "string"
-    },
-    "viewProperties": {
-      "type": "object",
-      "required": true
+    "email": {
+      "type": "string",
+      "required": false
     }
   },
   "validations": [],

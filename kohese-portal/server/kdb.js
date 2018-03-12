@@ -19,29 +19,35 @@ var ItemProxy = require('../common/src/item-proxy.js');
 var CreateStates = require('../common/src/createStates.js');
 module.exports.ItemProxy = ItemProxy;
 
-// TODO:  Need to remove dependence on modelConfig file
-var modelConfig = kdbFS.loadJSONDoc("server/model-config.json");
 var mountList = {};
 var kdbDirPath = "kdb";
 
 var koheseKDBDirPath;
 var mountFilePath;
 
+let commonModelFiles = 'common/models/';
+let commonViewFiles = 'common/views/';
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function saveLoadedModels() {
-  console.log('::: Determining if model files need to be saved');
+function loadKoheseModelsAndViews() {
+  console.log('::: Load Kohese Models');
 
-  for(var modelName in kdbModel.modelDef){
-    console.log('--- Checking if ' + modelName + ' is in KDB');
-    let modelProxy = ItemProxy.getProxyFor(modelName);
-    modelProxyIsNew = !modelProxy.repoPath;
+  const saveRepoPath = false;
 
-    if(modelProxyIsNew){
-      storeModelInstance(modelProxy, modelProxyIsNew);
-    }
-  }
+  let repoModelFileDir = koheseKDBDirPath + '/KoheseModel';
+  kdbFS.createDirIfMissing(repoModelFileDir);
+  loadModelInstances('KoheseModel', commonModelFiles, false);
+  loadModelInstances('KoheseModel', repoModelFileDir, true);
+
+  let repoViewFileDir = koheseKDBDirPath + '/KoheseView';
+  kdbFS.createDirIfMissing(repoViewFileDir);
+  loadModelInstances('KoheseView', commonViewFiles, false);
+  loadModelInstances('KoheseView', repoViewFileDir, true);
+
+  ItemProxy.modelDefinitionLoadingComplete();
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -52,11 +58,6 @@ function initialize(koheseKdbPath) {
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
   kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
-
-  // TODO:  Need to remove dependence on modelConfig file
-  var modelKinds = Object.keys(modelConfig);
-  modelKinds.sort();
-  console.log("::: ModelKinds: " + modelKinds);
 
   checkAndCreateDir(kdbDirPath);
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
@@ -93,13 +94,13 @@ function initialize(koheseKdbPath) {
     return createRepoStructure(koheseKDBDirPath).then(function(repo) {
       kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
 
-      ItemProxy.loadModelDefinitions(kdbModel.modelDef);
+      loadKoheseModelsAndViews();
 
       return openRepositories();
     });
   } else {
 
-    ItemProxy.loadModelDefinitions(kdbModel.modelDef);
+    loadKoheseModelsAndViews();
 
     return openRepositories();
   }
@@ -414,14 +415,24 @@ function createRepoStructure(repoDirPath) {
 
     checkAndCreateDir(repoDirPath);
 
-    // Check for the model directories
-    for(var modelName in modelConfig){
-      var modelDirPath = repoDirPath + "/" + modelName;
-      var ignoreJSONFiles = (modelName === "Analysis");
-      checkAndCreateDir(modelDirPath, ignoreJSONFiles);
-    }
-
     return kdbRepo.initializeRepository(ItemProxy.getRootProxy().item.id, repoDirPath);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function loadModelInstances (kind, modelDirPath, inRepo) {
+  let fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
+  for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
+    var itemPath = modelDirPath + "/" + fileList[fileIdx];
+    var itemRow = kdbFS.loadJSONDoc(itemPath);
+
+    var proxy = new ItemProxy(kind, itemRow);
+
+    if(inRepo){
+      proxy.repoPath = itemPath;
+    }
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -431,11 +442,13 @@ function validateRepositoryStructure (repoDirPath) {
 
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
 
+  let modelDefinitions = ItemProxy.getModelDefinitions();
+
   // Remove model directories that are no longer needed from the model list
   // Note: Iterate in reverse to allow array to be modified
   for (var dirIdx = modelDirList.length - 1; dirIdx >= 0; dirIdx--) {
     var modelDirName = modelDirList[dirIdx];
-    if (!modelConfig[modelDirName]) {
+    if (!modelDefinitions[modelDirName]) {
       console.log("*** Found unexpected repo directory: " + repoDirPath + " -> " + modelDirName);
       // Remove the unexpected model kind from the list
       modelDirList.splice(dirIdx, 1);
@@ -447,7 +460,8 @@ function validateRepositoryStructure (repoDirPath) {
     var modelDirPath = repoDirPath + "/" + modelName;
     var fileList;
 
-    if(modelName === 'Repository') {
+    switch(modelName) {
+      case 'Repository':
         fileList = kdbFS.getRepositoryFileList(modelDirPath, /\.mount$/);
         for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
             var itemPath = modelDirPath + "/" + fileList[fileIdx];
@@ -472,20 +486,18 @@ function validateRepositoryStructure (repoDirPath) {
                              repoStoragePath: subRepoDirPath};
             mountRepository(mountData);
         }
-    } else if (modelName === "Analysis") {
+        break;
+      case 'Analysis':
+      case 'KoheseModel':
+      case 'KoheseView':
 
-      // Skip the Analysis results
+        // Skip this model kind
+        console.log('::: Skipping ' + modelName);
+        break;
 
-    } else {
-        fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
-        for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
-          var itemPath = modelDirPath + "/" + fileList[fileIdx];
-          var itemRow = kdbFS.loadJSONDoc(itemPath);
-
-          var proxy = new ItemProxy(modelName, itemRow);
-          proxy.repoPath = itemPath;
-
-        }
+      default:
+        const inRepo = true;
+        loadModelInstances(modelName, modelDirPath, inRepo);
     }
   }
 }
@@ -522,9 +534,6 @@ function openRepositories() {
 	    }
 	}
 	console.log(">>> Done loading repositories");
-
-	// Save bootstrapped models if they are not already in the KDB
-	saveLoadedModels();
 
 	//Load corresponding git repositories
 	var promises = [];
