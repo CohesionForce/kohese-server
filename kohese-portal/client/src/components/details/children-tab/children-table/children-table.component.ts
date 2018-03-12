@@ -72,21 +72,23 @@ export class ChildrenTableComponent extends NavigatableComponent
     if (this._editableStream.getValue()) {
       let droppedId: string = dropEvent.dataTransfer.getData('id');
       if (droppedId) {
+        let parentProxy: ItemProxy = dropTarget.parentProxy;
         let removeIndex: number;
-        for (let j: number = 0; j < dropTarget.parentProxy.children.
-          length; j++) {
-          if (dropTarget.parentProxy.children[j].item.id === droppedId) {
+        for (let j: number = 0; j < parentProxy.children.length; j++) {
+          if (parentProxy.children[j].item.id === droppedId) {
             removeIndex = j;
             break;
           }
         }
     
-        let proxyToMove: ItemProxy = dropTarget.parentProxy.children.
+        let proxyToMove: ItemProxy = parentProxy.children.
           splice(removeIndex, 1)[0];
-        dropTarget.parentProxy.children.splice(dropTarget.parentProxy.children.
-          indexOf(dropTarget) + 1, 0, proxyToMove);
+        parentProxy.children.splice(parentProxy.children.indexOf(dropTarget) +
+          1, 0, proxyToMove);
     
-        this.childrenStream.next(dropTarget.parentProxy.children);
+        this.childrenStream.next(parentProxy.children);
+        parentProxy.dirty = true;
+        parentProxy.updateChildrenManualOrder();
       }
     }
   }
