@@ -7,7 +7,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../../material.module';
 import { TermViewComponent } from './term-view.component';
 import { BehaviorSubject } from 'rxjs';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
@@ -17,6 +17,7 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { MockDataProcessingService } from '../../../../mocks/services/MockDataProcessingService';
 import { PipesModule } from '../../../pipes/pipes.module';
 import { MockAnalysis } from '../../../../mocks/data/MockAnalysis';
+import { AnalysisViews } from '../AnalysisViewComponent.class';
 
 describe('Component: Term View', ()=>{
   let termComponent: TermViewComponent;
@@ -43,9 +44,17 @@ describe('Component: Term View', ()=>{
     termFixture = TestBed.createComponent(TermViewComponent);
     termComponent = termFixture.componentInstance;
 
-    termComponent.itemProxy = new ItemProxy('Item', MockItem);
-    termComponent.itemProxy.analysis = MockAnalysis
-    termComponent.filterSubject = new BehaviorSubject('');
+    let mockItem = new ItemProxy('Item', MockItem());
+    mockItem.analysis = MockAnalysis();
+    termComponent.proxyStream = new BehaviorSubject(mockItem);
+    termComponent.filterSubject = new BehaviorSubject({
+      filter: '',
+      source: AnalysisViews.TERM_VIEW,
+      filterOptions : {
+        exactMatch: false,
+        ignoreCase: false
+      }
+    });
 
     termFixture.detectChanges();
     

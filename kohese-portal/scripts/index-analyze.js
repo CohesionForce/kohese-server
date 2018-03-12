@@ -1,7 +1,7 @@
 var fs=require('fs');
 var _=require('underscore');
 
-var ItemProxy=require('../common/models/item-proxy.js');
+var ItemProxy=require('../common/src/item-proxy.js');
 
 var kdbFS = require('../server/kdb-fs.js');
 

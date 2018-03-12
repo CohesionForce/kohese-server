@@ -1,4 +1,4 @@
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
@@ -16,6 +16,10 @@ export class KoheseType {
   private relations : object;
   private acls : Array<any>;
   private methods : Array<any>;
+  private _dataModelFields: any = {};
+  get dataModelFields() {
+    return this._dataModelFields;
+  }
 
   constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy) {
     this.dataModelProxy = dataModelProxy;
@@ -37,13 +41,34 @@ export class KoheseType {
     this.relations = this.dataModelProxy.item.relations;
     this.acls = this.dataModelProxy.item.acls;
     this.methods = this.dataModelProxy.item.methods;
+    
+    let fieldGroups: Array<any> = [];
+    let modelProxy: ItemProxy = this.dataModelProxy;
+    
+    do {
+      let modelFields: any = {};
+      for (let fieldKey in modelProxy.item.properties) {
+        modelFields[fieldKey] = modelProxy.item.
+          properties[fieldKey];
+      }
+      fieldGroups.push(modelFields);
+ 
+      modelProxy = modelProxy.parentProxy;
+    } while (modelProxy.item.base);
+    
+    fieldGroups.reverse();
+    for (let j: number = 0; j < fieldGroups.length; j++) {
+      for (let fieldKey in fieldGroups[j]) {
+        this._dataModelFields[fieldKey] = fieldGroups[j][fieldKey];
+      }
+    }
   }
   
   retrieveViewData(): void {
     this.icon = this.viewModelProxy.item.icon;
     for (let property in this.viewModelProxy.item.viewProperties) {
-      this.properties[property] = this.transformViewProperty(this.viewModelProxy.
-        item.viewProperties[property]);
+      this.properties[property] = this.transformViewProperty(JSON.parse(JSON.
+        stringify(this.viewModelProxy.item.viewProperties[property])));
     }
   }
   
@@ -58,6 +83,7 @@ export class KoheseType {
     this.dataModelProxy.item.relations = this.relations;
     this.dataModelProxy.item.acls = this.acls;
     this.dataModelProxy.item.methods = this.methods;
+    
     return this.dataModelProxy;
   }
   

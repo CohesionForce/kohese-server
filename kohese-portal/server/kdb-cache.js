@@ -10,8 +10,8 @@ var kdbFS = require('./kdb-fs.js');
 
 var nodegit = require('nodegit');
 
-var ItemProxy = require('../common/models/item-proxy.js');
-var ItemCache = require('../common/models/item-cache.js');
+var ItemProxy = require('../common/src/item-proxy.js');
+var ItemCache = require('../common/src/item-cache.js');
 
 const CACHE_DIRECTORY = path.join('kdb', 'cache');
 const OBJECT_DIRECTORY = path.join(CACHE_DIRECTORY, 'git-object');

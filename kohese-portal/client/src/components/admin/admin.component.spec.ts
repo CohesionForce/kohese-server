@@ -13,7 +13,7 @@ import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { PipesModule } from '../../pipes/pipes.module';
 import { MockUserData } from '../../../mocks/data/MockUser';
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 
 describe('Component: Admin', ()=>{
   let adminComponent: AdminComponent;

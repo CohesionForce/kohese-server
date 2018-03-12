@@ -1,6 +1,7 @@
 {
   "name": "Category",
   "base": "Item",
+  "invertItemOrder": true,
   "idInjection": true,
   "properties": {},
   "validations": [],

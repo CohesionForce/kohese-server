@@ -7,6 +7,7 @@ import { KTextComponent } from './k-text/k-text.component';
 import { KProxySelectorComponent } from './k-proxy-selector/k-proxy-selector.component';
 import { KDateComponent } from './k-date/k-date.component';
 import { KSelectComponent } from './k-select/k-select.component';
+import { KStateEditorComponent } from './k-state-editor/k-state-editor.component';
 import { KUserSelectorComponent } from './k-user-selector/k-user-selector.component';
 
 @NgModule({
@@ -15,7 +16,8 @@ import { KUserSelectorComponent } from './k-user-selector/k-user-selector.compon
     KProxySelectorComponent,
     KUserSelectorComponent,
     KDateComponent,
-    KSelectComponent
+    KSelectComponent,
+    KStateEditorComponent
   ],
   imports: [
     CommonModule,
@@ -28,7 +30,8 @@ import { KUserSelectorComponent } from './k-user-selector/k-user-selector.compon
     KProxySelectorComponent,
     KUserSelectorComponent,
     KDateComponent,
-    KSelectComponent
+    KSelectComponent,
+    KStateEditorComponent
   ]
 })
 export class UserInputModule {}

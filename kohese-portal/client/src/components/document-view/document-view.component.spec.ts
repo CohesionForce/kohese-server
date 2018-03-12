@@ -10,7 +10,8 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
 import { MockItem } from '../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
+import { AnalysisViews } from '../analysis/AnalysisViewComponent.class';
 
 
 describe('Component: Document View', ()=>{
@@ -34,8 +35,15 @@ describe('Component: Document View', ()=>{
     documentViewComponent = documentViewFixture.componentInstance;
 
     documentViewComponent.showChildrenSubject = new BehaviorSubject(true);
-    documentViewComponent.filterSubject = new BehaviorSubject('');
-    documentViewComponent.itemProxy = new ItemProxy('Item', MockItem);
+    documentViewComponent.filterSubject = new BehaviorSubject({
+      source : AnalysisViews.TERM_VIEW,
+      filter : '',
+      filterOptions: {
+        exactMatch: false,
+        ignoreCase: true
+      }
+    });
+    documentViewComponent.proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem()));
     documentViewFixture.detectChanges();
     
   })

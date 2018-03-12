@@ -6,7 +6,7 @@ import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 
-import * as ItemProxy from '../../../../common/models/item-proxy.js';
+import * as ItemProxy from '../../../../common/src/item-proxy.js';
 import { SessionService } from '../../services/user/session.service';
 
 import * as commonmark from 'commonmark';
@@ -17,7 +17,8 @@ import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector : 'details-view',
-  templateUrl : './details.component.html'
+  templateUrl : './details.component.html',
+  styleUrls: ['./details.component.scss']
 })
 
 export class DetailsComponent extends NavigatableComponent
@@ -59,6 +60,7 @@ export class DetailsComponent extends NavigatableComponent
   proxyList : Array<any>;
   itemDescriptionRendered : string;
   detailsFormGroup : FormGroup;
+  private nonFormFieldValueMap: any = {};
   initialized : boolean;
   repoConnected : boolean = false;
 
@@ -159,6 +161,9 @@ export class DetailsComponent extends NavigatableComponent
     for (let field in item) {
       this.itemProxy.item[field] = item[field];
     }
+    for (let fieldName in this.nonFormFieldValueMap) {
+      this.itemProxy.item[fieldName] = this.nonFormFieldValueMap[fieldName];
+    }
     this.ItemRepository.upsertItem(this.itemProxy)
       .then((updatedItemProxy: ItemProxy) => {
       this._editableStream.next(false);
@@ -176,4 +181,7 @@ export class DetailsComponent extends NavigatableComponent
       });
   };
 
+  public whenNonFormFieldChanges(updatedField: any): void {
+    this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
+  }
 }
