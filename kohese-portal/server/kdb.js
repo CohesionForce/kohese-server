@@ -95,14 +95,12 @@ function initialize(koheseKdbPath) {
       kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
 
       loadKoheseModelsAndViews();
-      // ItemProxy.loadModelDefinitions(kdbModel.modelDef);
 
       return openRepositories();
     });
   } else {
 
     loadKoheseModelsAndViews();
-    // ItemProxy.loadModelDefinitions(kdbModel.modelDef);
 
     return openRepositories();
   }

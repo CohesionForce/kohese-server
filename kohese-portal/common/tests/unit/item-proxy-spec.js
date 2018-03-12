@@ -786,6 +786,7 @@ describe('ItemProxy Test', function () {
       ExpandedTest: {
         'name': 'ExpandedTest',
         'base': 'PersistedModel',
+        "parentId": "Model-Definitions",
         'strict': 'validate',
         'idInjection': true,
         'trackChanges': false,
@@ -822,7 +823,8 @@ describe('ItemProxy Test', function () {
       }
     };
 
-    ItemProxy.loadModelDefinitions(modelDefMap);
+    // TODO Replace this with additional model loading logic
+    // ItemProxy.loadModelDefinitions(modelDefMap);
 
     let testA = new ItemProxy('ExpandedTest', {
       id: 'A',
