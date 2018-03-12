@@ -1,5 +1,7 @@
 {
+  "id": "Observation",
   "name": "Observation",
+  "parentId": "Item",
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": true,

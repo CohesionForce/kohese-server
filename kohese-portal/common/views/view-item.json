@@ -1,5 +1,8 @@
 {
-  "modelName": "Item ",
+  "id": "view-item",
+  "name": "Item View Model",
+  "parentId": "View-Model-Definitions",
+  "modelName": "Item",
   "icon": "fa fa-sticky-note",
   "viewProperties": {
     "name": {
@@ -15,23 +18,17 @@
       "displayName": "Description"
     },
     "tags": {
-      "inputType" : "text:{\"isMultiLine\":false}",
-      "required" : false,
-      "default" : "",
-      "displayName" : "Tags"
+      "inputType": "text:{\"isMultiLine\":false}",
+      "required": false,
+      "default": "",
+      "displayName": "Tags"
     },
-    "parentId" : {
-      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
-      "required" : true,
-      "default" : "ROOT",
-      "displayName" : "Parent"
+    "parentId": {
+      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required": true,
+      "default": "ROOT",
+      "displayName": "Parent"
     }
   },
-  "id": "view-item",
-  "name": "Item View Model",
-  "createdBy": "jephillips",
-  "createdOn": 1510596684590,
-  "modifiedBy": "admin",
-  "modifiedOn": 1517006598071,
   "itemIds": []
 }

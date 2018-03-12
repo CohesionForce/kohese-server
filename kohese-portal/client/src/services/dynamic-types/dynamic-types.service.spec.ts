@@ -8,7 +8,7 @@ import 'rxjs/add/observable/of';
 
 describe('DynamicTypesService', () => {
   let typeService: DynamicTypesService;
-  
+
   beforeAll(() => {
     let itemRepositoryPlaceholder: any = jasmine.createSpyObj('ItemRepository',
       ['getRepoStatusSubject', 'getProxyFor']);
@@ -16,15 +16,16 @@ describe('DynamicTypesService', () => {
       of({
       state: RepoStates.SYNCHRONIZATION_SUCCEEDED
     }));
-    ItemProxy.loadModelDefinitions({
-      Item: MockDataModel()
-    });
+
+    let modelProxy = new ItemProxy('KoheseModel', MockDataModel());
+    ItemProxy.modelDefinitionLoadingComplete();
+
     itemRepositoryPlaceholder.getProxyFor.and.returnValues(ItemProxy.
       getProxyFor('Model-Definitions'), new ItemProxy('KoheseView',
       MockViewData()));
     typeService = new DynamicTypesService(itemRepositoryPlaceholder);
   });
-  
+
   it('adds each KoheseType to its associated data model ItemProxy', () => {
     expect(ItemProxy.getProxyFor('Item').type).toBeDefined();
   });

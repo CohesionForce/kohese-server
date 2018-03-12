@@ -1,6 +1,8 @@
-export function MockDataModel () { 
+export function MockDataModel () {
   return {
+  "id": "Item",
   "name": "Item",
+  "parentId": "Model-Definitions",
   "base": "PersistedModel",
   "strict": "validate",
   "idInjection": true,

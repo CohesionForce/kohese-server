@@ -1,42 +1,45 @@
 {
+  "id": "view-issue",
+  "name": "Issue View Model",
+  "parentId": "view-observation",
   "modelName": "Issue",
   "icon": "fa fa-exclamation-circle",
-  "viewProperties": {    
-    "issueState" : {
-      "inputType" : "k-select:{\"options\":[\"Observed\", \"In Analysis\", \"No Action\"]}",
-      "required" : false,
-      "default" : "Observed",
-      "displayName" : "issueState"
+  "viewProperties": {
+    "issueState": {
+      "inputType": "k-select:{\"options\":[\"Observed\", \"In Analysis\", \"No Action\"]}",
+      "required": false,
+      "default": "Observed",
+      "displayName": "issueState"
     },
-    "observedOn" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "observedOn"
+    "observedOn": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "observedOn"
     },
-    "observedBy" : {
-      "inputType" : "user-selector:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "observedBy"
-    },    
-    "analysisAction" : {
-      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
-      "required" : true,
-      "default" : null,
-      "displayName" : "analysisAction"
+    "observedBy": {
+      "inputType": "user-selector:{}",
+      "required": false,
+      "default": null,
+      "displayName": "observedBy"
     },
-    "context" : {
-      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
-      "required" : true,
-      "default" : null,
-      "displayName" : "context"
-    },   
-     "resolutionActions" : {
-      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
-      "required" : true,
-      "default" : null,
-      "displayName" : "analysisAction"
+    "analysisAction": {
+      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required": true,
+      "default": null,
+      "displayName": "analysisAction"
+    },
+    "context": {
+      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required": true,
+      "default": null,
+      "displayName": "context"
+    },
+    "resolutionActions": {
+      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required": true,
+      "default": null,
+      "displayName": "analysisAction"
     },
     "response": {
       "inputType": "text:{\"isMultiLine\":true}",
@@ -45,11 +48,5 @@
       "displayName": "response"
     }
   },
-  "id": "view-issue",
-  "name": "Issue View Model",
-  "createdBy": "jephillips",
-  "createdOn": 1510596684590,
-  "modifiedBy": "admin",
-  "modifiedOn": 1517006598071,
   "itemIds": []
 }

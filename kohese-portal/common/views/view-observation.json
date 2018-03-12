@@ -1,33 +1,28 @@
 {
+  "id": "view-observation",
+  "name": "Observation View Model",
+  "parentId": "view-item",
   "modelName": "Observation",
   "icon": "fa fa-comment",
   "viewProperties": {
-    "observedBy" : {
-      "inputType" : "user-selector:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "observedBy"
+    "observedBy": {
+      "inputType": "user-selector:{}",
+      "required": false,
+      "default": null,
+      "displayName": "observedBy"
     },
-    "observedOn" : {
-      "inputType" : "date:{}",
-      "required" : false,
-      "default" : null,
-      "displayName" : "observedOn"
-    },    
-    "context" : {
-      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
-      "required" : true,
-      "default" : "ROOT",
-      "displayName" : "context"
+    "observedOn": {
+      "inputType": "date:{}",
+      "required": false,
+      "default": null,
+      "displayName": "observedOn"
+    },
+    "context": {
+      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required": true,
+      "default": "ROOT",
+      "displayName": "context"
     }
-
-
   },
-  "id": "view-observation",
-  "name": "Observation View Model",
-  "createdBy": "jephillips",
-  "createdOn": 1510596684590,
-  "modifiedBy": "admin",
-  "modifiedOn": 1517006598071,
   "itemIds": []
 }

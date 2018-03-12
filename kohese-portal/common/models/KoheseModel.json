@@ -1,5 +1,7 @@
 {
+  "id": "KoheseModel",
   "name": "KoheseModel",
+  "parentId": "Item",
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": false,
@@ -42,19 +44,30 @@
       ],
       "required": true
     },
-    "orderedProperties": {
-      "type": [ "string" ],
+    "propertyOrder": {
+      "type": [
+        "string"
+      ],
+      "derived": true
+    },
+    "propertyStorageOrder": {
+      "type": [
+        "string"
+      ],
       "derived": true
     },
     "requiredProperties": {
-      "type": [ "string" ],
+      "type": [
+        "string"
+      ],
       "derived": true
     },
     "derivedProperties": {
-      "type": [ "string" ],
+      "type": [
+        "string"
+      ],
       "derived": true
     }
-
   },
   "validations": [],
   "relations": {},

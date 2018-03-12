@@ -1,13 +1,9 @@
 {
-  "modelName": "Repository",
-  "icon": "fa fa-database",
-  "viewProperties": {
-  },
   "id": "view-repository",
   "name": "Repository View Model",
-  "createdBy": "jephillips",
-  "createdOn": 1510596684590,
-  "modifiedBy": "admin",
-  "modifiedOn": 1517006598071,
+  "parentId": "view-item",
+  "modelName": "Repository",
+  "icon": "fa fa-database",
+  "viewProperties": {},
   "itemIds": []
 }
