@@ -1,4 +1,4 @@
-import * as ItemProxy from '../../../common/models/item-proxy';
+import * as ItemProxy from '../../../common/src/item-proxy';
 import { MockViewData } from '../data/MockViewData';
 import { MockItem } from '../data/MockItem';
 import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
@@ -6,7 +6,7 @@ import { MockDataModel } from '../data/MockDataModel';
 import { MockKoheseType } from '../data/MockKoheseType';
 
 export class MockDynamicTypesService {
-  mockView = new ItemProxy('KoheseView', MockViewData )
+  mockView = new ItemProxy('KoheseView', MockViewData() )
   constructor() {
 
   }

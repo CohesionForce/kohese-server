@@ -9,7 +9,7 @@ import { PipesModule } from '../../../pipes/pipes.module';
 
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../../common/src/item-proxy';
 
 import { JournalComponent } from './journal.component';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -42,7 +42,7 @@ describe('Component: Journal', ()=>{
     journalFixture = TestBed.createComponent(JournalComponent);
     journalComponent = journalFixture.componentInstance;
     
-    journalComponent.itemProxy = new ItemProxy('Item', MockItem);
+    journalComponent.itemProxy = new ItemProxy('Item', MockItem());
 
     journalFixture.detectChanges();
     

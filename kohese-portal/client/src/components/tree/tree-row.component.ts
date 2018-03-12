@@ -7,7 +7,7 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { VersionControlService } from '../../services/version-control/version-control.service';
 import { RowComponent } from '../../classes/RowComponent.class';
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { Observable } from 'rxjs/Observable';
@@ -55,7 +55,7 @@ export class TreeRowComponent extends RowComponent
     super(NavigationService);
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.koheseType = this.typeService.getKoheseTypes()[this.itemProxy.kind];
     if (!this.koheseType) {
       this.koheseType = {
@@ -71,13 +71,7 @@ export class TreeRowComponent extends RowComponent
     this.visibilityChanged.emit(this.isVisible());
   }
   
-  ngAfterViewInit(): void {
-    // TODO See if this is needed
-    this.childrenRows.changes.subscribe((change: any) => {
-    });
-  }
-
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this._filterStreamSubscription.unsubscribe();
   }
 

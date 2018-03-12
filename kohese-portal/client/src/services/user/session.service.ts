@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from './current-user.service';
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates} from '../item-repository/item-repository.service';
 
 @Injectable()

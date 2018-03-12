@@ -17,7 +17,7 @@ import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../mocks/data/MockViewData';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 describe('Component: TreeRow', () => {
@@ -41,7 +41,7 @@ describe('Component: TreeRow', () => {
     
     fixture = TestBed.createComponent(TreeRowComponent);
     component = fixture.componentInstance;
-    component.itemProxy = new ItemProxy('Item', MockItem);
+    component.itemProxy = new ItemProxy('Item', MockItem());
     component.filterStream =
       new BehaviorSubject<ProxyFilter>(new ProxyFilter());
     
@@ -52,8 +52,8 @@ describe('Component: TreeRow', () => {
     let filterStream: BehaviorSubject<ProxyFilter> =
       component.filterStream as BehaviorSubject<ProxyFilter>;
     let filter: ProxyFilter = filterStream.getValue();
-    filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel),
-      new ItemProxy('KoheseView', MockViewData));
+    filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
+      new ItemProxy('KoheseView', MockViewData()));
     filterStream.next(filter);
     tick();
     expect(component.isVisible()).toEqual(true);
@@ -68,8 +68,8 @@ describe('Component: TreeRow', () => {
       component.filterStream as BehaviorSubject<ProxyFilter>;
     component.itemProxy.kind = 'Action';
     let filter: ProxyFilter = filterStream.getValue();
-    filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel),
-      new ItemProxy('KoheseView', MockViewData));
+    filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
+      new ItemProxy('KoheseView', MockViewData()));
     filter.kind.name = 'Action';
     filter.actionAssignee = 'admin';
     component.itemProxy.kind = 'Action';

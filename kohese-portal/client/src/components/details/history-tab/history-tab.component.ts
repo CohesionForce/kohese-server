@@ -3,7 +3,7 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDet
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
-import { ItemProxy } from '../../../../../common/models/item-proxy.js';
+import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { Observable, Subscription } from 'rxjs';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 @Component({

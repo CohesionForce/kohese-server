@@ -11,7 +11,7 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { ItemProxy } from '../../../../common/models/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 
 @Component({
@@ -66,7 +66,7 @@ export class TreeComponent extends NavigatableComponent
         this.koheseTypes = this.typeService.getKoheseTypes();
       }
     });
-    
+
     this.routeParametersSubscription = this.route.params.
       subscribe((parameters: Params) => {
       this.selectedProxyIdStream.next(parameters['id']);
@@ -75,12 +75,6 @@ export class TreeComponent extends NavigatableComponent
     this.userList = this.SessionService.getUsers();
 
     // TODO set up sync listener functionality
-  }
-  
-  ngAfterViewInit(): void {
-    // TODO See if this is needed
-    this.childrenRows.changes.subscribe((change: any) => {
-    });
   }
 
   ngOnDestroy(): void {

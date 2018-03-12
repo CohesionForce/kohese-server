@@ -8,7 +8,7 @@ var util = require('util');
 var commonmark = require('commonmark');
 var http = require('http');
 var renderFunc = require('./md-to-kohese-helper.js');
-var ItemProxy = require('../common/models/item-proxy.js');
+var ItemProxy = require('../common/src/item-proxy.js');
 
 var accessToken;
 

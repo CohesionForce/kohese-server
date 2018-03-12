@@ -7,7 +7,7 @@ import { CurrentUserService } from '../user/current-user.service';
 import { ToastrService } from "ngx-toastr";
 import { DialogService } from '../dialog/dialog.service';
 
-import * as ItemProxy from '../../../../common/models/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';

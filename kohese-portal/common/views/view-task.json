@@ -5,7 +5,7 @@
     "taskState" : {
       "inputType" : "k-select:{\"options\":[\"Proposed\", \"Accepted\", \"In Work\"]}",
       "required" : false,
-      "default" : null,
+      "default" : "Proposed",
       "displayName" : "taskState"
     },
     "assignedTo" : {

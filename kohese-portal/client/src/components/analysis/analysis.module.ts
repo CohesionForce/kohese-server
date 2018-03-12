@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core/';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { AnalysisComponent } from './analysis.component';
 import { PhraseViewComponent } from './phrase-view/phrase-view.component';
@@ -25,7 +25,8 @@ import { MaterialModule } from '../../material.module';
     CommonModule,
     FormsModule,
     PipesModule,
-    MaterialModule
+    MaterialModule,
+    ReactiveFormsModule
   ],
   exports : [
     AnalysisComponent,

@@ -1,6 +1,6 @@
 <div class="panel">
   <div class="panel-heading">
-    Term View - ({{getTermCount()}}) Terms
+    Term View - ({{filteredCount}}) Terms
     <button mat-icon-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
       <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
     </button>
@@ -32,18 +32,15 @@
       <br/>
       <mat-form-field>
         <input matInput type="text" class="input-sm"
-          [(ngModel)]="analysisFilterInput" placeholder="Filter"
+          [formControl]="filterControl" placeholder="Filter"
           [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
       </mat-form-field>
       <mat-form-field>
         <input matInput type="text" placeholder="Limit" [(ngModel)]="loadLimit"/>
       </mat-form-field>
-      <button mat-raised-button (click)="filter(analysisFilterInput, true)"
+      <button mat-raised-button (click)="submitFilter(filterControl.value)"
         class="btn btn-default fa fa-search">Submit
       </button>
-      <!-- <button (click)="getLastFilter()"
-             class="btn btn-default fa fa-chevron-left"> Last Filter
-           </button> -->
     </div>
     <div id="term-div">
       <table id="theTokensSummary"
@@ -72,7 +69,7 @@
         <tbody id="theTokensBody">
           <tr class="tree-grid-row" id="Chunk:{{summary.text}}"
             *ngFor="let summary of terms">
-            <td (click)="filter(summary.text, false)"
+            <td (click)="submitFilter(summary.text)"
               class="tree-label"
               [innerHTML] ="summary.text | highlightRegex:analysisFilterRegexHighlight:true">
             </td>
