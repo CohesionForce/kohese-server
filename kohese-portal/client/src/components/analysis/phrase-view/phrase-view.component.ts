@@ -38,6 +38,8 @@ export class PhraseViewComponent extends AnalysisViewComponent
   filterOptions : object;
   filterControl : FormControl = new FormControl('');
   lastFilter : AnalysisFilter;
+  filterExactMatch : boolean = false;
+  filterIgnoreCase : boolean = false;
 
   /* Data */
   public itemProxy: ItemProxy;
@@ -123,8 +125,8 @@ export class PhraseViewComponent extends AnalysisViewComponent
       source: AnalysisViews.PHRASE_VIEW,
       filter: newFilter,
       filterOptions: {
-        ignoreCase: false,
-        exactMatch: false
+        ignoreCase: this.filterIgnoreCase,
+        exactMatch: this.filterExactMatch
       }
     })
   }
