@@ -184,4 +184,11 @@ export class DetailsComponent extends NavigatableComponent
   public whenNonFormFieldChanges(updatedField: any): void {
     this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
   }
+  
+  public cancelEditing(): void {
+    this._editableStream.next(false);
+    this.ItemRepository.fetchItem(this.itemProxy).then((proxy: ItemProxy) => {
+      this.updateProxy();
+    });
+  }
 }

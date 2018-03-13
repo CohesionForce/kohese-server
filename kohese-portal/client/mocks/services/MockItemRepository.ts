@@ -10,13 +10,18 @@ export class MockItemRepository {
   state : any;
 
   constructor() {
-    this.mockRootProxy.children = [
-      new ItemProxy('KoheseView', MockViewData()),
-      new ItemProxy('Item', MockItem()),
-      new ItemProxy('Item', MockItem()),
-      new ItemProxy('Item', MockItem()),
-      new ItemProxy('Item', MockItem())
-    ]
+    new ItemProxy('KoheseView', MockViewData());
+    let numberOfItemsToAdd: number = 7;
+    for (let j: number = 0; j < numberOfItemsToAdd; j++) {
+      let item: any = MockItem();
+      /* Delete the parentId so that this Item will be added as a child of the
+      root proxy */
+      delete item.parentId;
+      // Make the ID of each of these added Items distinct among each other
+      item.id = item.id + (j + 1);
+      new ItemProxy('Item', item);
+    }
+    
     this.mockRootProxy.visitChildren = ()=>{}
   }
 

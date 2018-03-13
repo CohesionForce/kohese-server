@@ -62,7 +62,6 @@ export class ChildrenTabComponent extends NavigatableComponent
     this.proxyStream.subscribe((newProxy : ItemProxy) => {
      this.updateProxy(newProxy); 
     })
-    this.orderedChildren = this.itemProxy.childrenAreManuallyOrdered();
     this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
@@ -81,6 +80,7 @@ export class ChildrenTabComponent extends NavigatableComponent
   updateProxy (newProxy : ItemProxy) {
     this.itemProxy = newProxy;
     this.childrenStream.next(this.itemProxy.children);
+    this.orderedChildren = this.itemProxy.childrenAreManuallyOrdered();
     this.changeRef.markForCheck();
   }
 

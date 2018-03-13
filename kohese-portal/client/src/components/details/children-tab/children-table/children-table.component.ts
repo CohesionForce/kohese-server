@@ -5,7 +5,6 @@ import { NavigationService } from '../../../../services/navigation/navigation.se
 
 import * as ItemProxy from '../../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MatTableDataSource } from '@angular/material'
@@ -40,14 +39,12 @@ export class ChildrenTableComponent extends NavigatableComponent
   filterSub : Subscription;
 
   /* Data */
-  initialized : boolean;
   rowDef : Array<string>;
   children : Array<ItemProxy>;
 
   constructor (protected NavigationService : NavigationService,
                private changeRef : ChangeDetectorRef) {
     super(NavigationService);
-    this.initialized = false;
   }
 
   ngOnInit () {
@@ -56,7 +53,6 @@ export class ChildrenTableComponent extends NavigatableComponent
       this.tableStream = new MatTableDataSource<ItemProxy>(this.children)
       this.changeRef.markForCheck();
     });
-    this.initialized = true;
     this.rowDef = ['kind','name','assignedTo','actionState','description', 'childrenCount']
     this.filterSub = this.filterSubject.subscribe((newFilter) => {
       this.tableStream.filter = newFilter.trim().toLowerCase();
