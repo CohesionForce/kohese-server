@@ -2,10 +2,9 @@
  *
  */
 
-var fs = require('fs');
 var path = require('path');
 
-console.log("::: Begin KDB File Load");
+console.log('::: Begin KDB File Load');
 
 var kdbFS = require('./kdb-fs.js');
 var kdbRepo = require('./kdb-repo.js');
@@ -16,11 +15,12 @@ var kdbModel = require('./kdb-model.js');
 var jsonExt = /\.json$/;
 
 var ItemProxy = require('../common/src/item-proxy.js');
+// eslint-disable-next-line no-unused-vars
 var CreateStates = require('../common/src/createStates.js');
 module.exports.ItemProxy = ItemProxy;
 
 var mountList = {};
-var kdbDirPath = "kdb";
+var kdbDirPath = 'kdb';
 
 var koheseKDBDirPath;
 var mountFilePath;
@@ -33,8 +33,6 @@ let commonViewFiles = 'common/views/';
 //////////////////////////////////////////////////////////////////////////
 function loadKoheseModelsAndViews() {
   console.log('::: Load Kohese Models');
-
-  const saveRepoPath = false;
 
   let repoModelFileDir = koheseKDBDirPath + '/KoheseModel';
   kdbFS.createDirIfMissing(repoModelFileDir);
@@ -57,7 +55,7 @@ function initialize(koheseKdbPath) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
-  kdbFS.storeJSONDoc(kdbDirPath + "/modelDef.json", kdbModel.modelDef);
+  kdbFS.storeJSONDoc(kdbDirPath + '/modelDef.json', kdbModel.modelDef);
 
   checkAndCreateDir(kdbDirPath);
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
@@ -91,6 +89,7 @@ function initialize(koheseKdbPath) {
     console.log('::: Creating a new KDB at ' + koheseKDBDirPath);
     var uuid = require('node-uuid');
     var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
+    // eslint-disable-next-line no-unused-vars
     return createRepoStructure(koheseKDBDirPath).then(function(repo) {
       kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
 
@@ -113,22 +112,22 @@ module.exports.initialize = initialize;
 function determineRepoStoragePath(repo){
   var repoStoragePath;
   if(repo && repo.item.id !== 'ROOT'){
-    console.log("::: Repository => " + repo.item.name);
+    console.log('::: Repository => ' + repo.item.name);
     if(repo.repoPath){
-      repoStoragePath = repo.repoPath.replace("/Root.json", "");
-      repoStoragePath = repoStoragePath.replace(jsonExt, "");
+      repoStoragePath = repo.repoPath.replace('/Root.json', '');
+      repoStoragePath = repoStoragePath.replace(jsonExt, '');
     } else {
       // Must be a new repo
       var parentRepo = repo.parentProxy.getRepositoryProxy();
       var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
-      var repoDirPath = parentRepoStoragePath + "/Repository/" + repo.item.id;
-      repo.repoPath = repoDirPath + ".json";
-      console.log("::: >>> Creating new repo path: " + repoDirPath);
+      var repoDirPath = parentRepoStoragePath + '/Repository/' + repo.item.id;
+      repo.repoPath = repoDirPath + '.json';
+      console.log('::: >>> Creating new repo path: ' + repoDirPath);
 
       repoStoragePath = repoDirPath;
     }
   } else {
-    console.log("::: Repository => KDB Data Store");
+    console.log('::: Repository => KDB Data Store');
     repoStoragePath = koheseKDBDirPath;
   }
   return repoStoragePath;
@@ -172,7 +171,7 @@ function storeModelInstance(proxy, isNewItem){
   var modelName = proxy.kind;
   var modelInstance = proxy.item;
 
-  if(modelName !== "Analysis"){
+  if(modelName !== 'Analysis'){
     // Delete any associated analysis
     removeModelAnalysis(proxy);
   }
@@ -180,30 +179,30 @@ function storeModelInstance(proxy, isNewItem){
   var repo = proxy.getRepositoryProxy();
   var repoStoragePath = determineRepoStoragePath(repo);
 
-  console.log(">>> Repo storage: " + repoStoragePath);
-  var filePath = repoStoragePath + "/" + modelName + "/" + modelInstance.id + ".json";
+  console.log('>>> Repo storage: ' + repoStoragePath);
+  var filePath = repoStoragePath + '/' + modelName + '/' + modelInstance.id + '.json';
 
   var promise = Promise.resolve(true);
-  if (modelName === "Repository"){
+  if (modelName === 'Repository'){
     var parentRepo = proxy.parentProxy.getRepositoryProxy();
     var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
-    var repoMountFilePath = parentRepoStoragePath + "/Repository/" + modelInstance.id + ".json.mount";
+    var repoMountFilePath = parentRepoStoragePath + '/Repository/' + modelInstance.id + '.json.mount';
     var repoMountData = {
       id: modelInstance.id,
       name: modelInstance.name,
       parentId: modelInstance.parentId,
     };
 
-    console.log("::: Repo Mount Information");
+    console.log('::: Repo Mount Information');
     console.log(repoMountData);
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     mountList[repoMountData.id] = {'repoStoragePath': repoStoragePath, name: repoMountData.name};
     updateMountFile();
 
     repoStoragePath = determineRepoStoragePath(proxy);
-    console.log("::: rSP: " + repoStoragePath);
+    console.log('::: rSP: ' + repoStoragePath);
 
-    filePath = repoStoragePath + "/Root.json";
+    filePath = repoStoragePath + '/Root.json';
     var repoRootData = JSON.parse(JSON.stringify(modelInstance));
     delete repoRootData.parentId;
     delete repoRootData.repoStoragePath;
@@ -211,17 +210,18 @@ function storeModelInstance(proxy, isNewItem){
     modelInstance = repoRootData;
 
     if (isNewItem) {
+      // eslint-disable-next-line no-unused-vars
       promise = createRepoStructure(repoStoragePath).then(function (repo) {
         // Need to call create repo structure once that has been removed from validate
       });
     }
   } else {
-    if(modelName !== "Analysis" && filePath !== proxy.repoPath){
-      console.log("}}} Old: " + proxy.repoPath);
+    if(modelName !== 'Analysis' && filePath !== proxy.repoPath){
+      console.log('}}} Old: ' + proxy.repoPath);
       if (proxy.repoPath){
         kdbFS.removeFile(proxy.repoPath);
       }
-      console.log("}}} New: " + filePath);
+      console.log('}}} New: ' + filePath);
       proxy.repoPath = filePath;
     }
   }
@@ -251,7 +251,6 @@ module.exports.storeModelInstance = storeModelInstance;
 //
 //////////////////////////////////////////////////////////////////////////
 function storeModelAnalysis(analysisInstance){
-  var modelName = 'Analysis';
   var modelInstanceId = analysisInstance.id;
 
   var proxy = ItemProxy.getProxyFor(modelInstanceId);
@@ -277,10 +276,10 @@ function removeModelInstance(proxy){
   var modelName = proxy.kind;
   var instanceId = proxy.item.id;
 
-  if(modelName === "Analysis"){
+  if(modelName === 'Analysis'){
     var repo = proxy.getRepositoryProxy();
     var repoStoragePath = determineRepoStoragePath(repo);
-    var filePath = repoStoragePath + "/" + modelName + "/" + instanceId + ".json";
+    var filePath = repoStoragePath + '/' + modelName + '/' + instanceId + '.json';
 
     kdbFS.removeFile(filePath);
   } else if (modelName === 'Repository') {
@@ -340,9 +339,9 @@ module.exports.removeModelAnalysis = removeModelAnalysis;
 function checkAndCreateDir(dirName, ignoreJSONFiles) {
   kdbFS.createDirIfMissing(dirName);
   if(ignoreJSONFiles){
-    kdbFS.createGITIgnoreJSONIfMissing(dirName + "/.gitignore");
+    kdbFS.createGITIgnoreJSONIfMissing(dirName + '/.gitignore');
   } else {
-    kdbFS.createEmptyFileIfMissing(dirName + "/.gitignore");
+    kdbFS.createEmptyFileIfMissing(dirName + '/.gitignore');
   }
 }
 
@@ -357,7 +356,7 @@ function mountRepository(mountData) {
     var repoRoot = {};
 
     if(mountData.repoStoragePath) {
-        console.log("::: Mounting repository: " + mountData.name);
+        console.log('::: Mounting repository: ' + mountData.name);
         try {
             repoRoot = kdbFS.loadJSONDoc(path.join(mountData.repoStoragePath, 'Root.json'));
         } catch(err) {
@@ -369,7 +368,7 @@ function mountRepository(mountData) {
     }
 
     if(repoCanBeMounted) {
-        var proxy;
+        let proxy;
         repoRoot.parentId = mountData.parentId;
 
         // Check to see if the repo has already been mounted. If so, then update it.
@@ -394,16 +393,17 @@ function mountRepository(mountData) {
                          description: 'Error: Unable to load ' + mountData.repoStoragePath,
                          mounted: false
         };
-        console.log("::: Looking at mountList");
+        console.log('::: Looking at mountList');
         console.log(mountList);
-        console.log("::: Looking at mountData");
+        console.log('::: Looking at mountData');
         console.log(mountData);
         if (!mountList[mountData.id]) {
             mountList[mountData.id] = {};
         }
         mountList[mountData.id].mounted = false;
 
-        var proxy = new ItemProxy('Repository', errorRepo);
+        // eslint-disable-next-line no-unused-vars
+        let proxy = new ItemProxy('Repository', errorRepo);
     }
 }
 
@@ -424,7 +424,7 @@ function createRepoStructure(repoDirPath) {
 function loadModelInstances (kind, modelDirPath, inRepo) {
   let fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
   for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
-    var itemPath = modelDirPath + "/" + fileList[fileIdx];
+    var itemPath = modelDirPath + '/' + fileList[fileIdx];
     var itemRow = kdbFS.loadJSONDoc(itemPath);
 
     var proxy = new ItemProxy(kind, itemRow);
@@ -449,7 +449,7 @@ function validateRepositoryStructure (repoDirPath) {
   for (var dirIdx = modelDirList.length - 1; dirIdx >= 0; dirIdx--) {
     var modelDirName = modelDirList[dirIdx];
     if (!modelDefinitions[modelDirName]) {
-      console.log("*** Found unexpected repo directory: " + repoDirPath + " -> " + modelDirName);
+      console.log('*** Found unexpected repo directory: ' + repoDirPath + ' -> ' + modelDirName);
       // Remove the unexpected model kind from the list
       modelDirList.splice(dirIdx, 1);
     }
@@ -457,20 +457,20 @@ function validateRepositoryStructure (repoDirPath) {
 
   for(var modelIdx = 0; modelIdx < modelDirList.length; modelIdx++){
     var modelName = modelDirList[modelIdx];
-    var modelDirPath = repoDirPath + "/" + modelName;
+    var modelDirPath = repoDirPath + '/' + modelName;
     var fileList;
 
     switch(modelName) {
       case 'Repository':
         fileList = kdbFS.getRepositoryFileList(modelDirPath, /\.mount$/);
         for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
-            var itemPath = modelDirPath + "/" + fileList[fileIdx];
+            var itemPath = modelDirPath + '/' + fileList[fileIdx];
             var repoMount = kdbFS.loadJSONDoc(itemPath);
             var subRepoDirPath;
 
             // Check mountFile for the mount path or use a .mount file if necessary
             if(mountList[repoMount.id]) {
-                console.log("==> in mount list");
+                console.log('==> in mount list');
                 subRepoDirPath = mountList[repoMount.id].repoStoragePath;
                 if(!mountList[repoMount.id].name) {
                     mountList[repoMount.id].name = repoMount.name;
@@ -478,7 +478,7 @@ function validateRepositoryStructure (repoDirPath) {
                 }
             }
 
-            console.log("==> sRDP: " + subRepoDirPath);
+            console.log('==> sRDP: ' + subRepoDirPath);
 
             var mountData = {id: repoMount.id,
                              name: repoMount.name,
@@ -523,17 +523,18 @@ function openRepositories() {
 	}
 
 	// Create/validate root repo structure
-	console.log(">>> Validating Root Repository Structure");
+	console.log('>>> Validating Root Repository Structure');
 	validateRepositoryStructure(koheseKDBDirPath);
 
 	// Validate the repositories listed inside the mount file
-	console.log(">>> Mounting and Validating External Repos");
-	for(var id in mountList) {
+	console.log('>>> Mounting and Validating External Repos');
+	for(let id in mountList) {
 	    if(!mountList[id].mounted && mountList[id].repoStoragePath) {
-	        mountRepository({'id': id, name: mountList[id].name, parentId: '', repoStoragePath: mountList[id].repoStoragePath});
+          mountRepository({'id': id, name: mountList[id].name, parentId: '',
+                          repoStoragePath: mountList[id].repoStoragePath});
 	    }
 	}
-	console.log(">>> Done loading repositories");
+	console.log('>>> Done loading repositories');
 
 	//Load corresponding git repositories
 	var promises = [];
@@ -541,9 +542,10 @@ function openRepositories() {
 	index(ItemProxy.getRootProxy(), false);
 
 	// Initialize nodegit repo-open promises
-	for(var id in mountList) {
+	for(let id in mountList) {
 	    if(mountList[id].mounted && mountList[id].repoStoragePath) {
-	      var proxy = ItemProxy.getProxyFor(id);
+	      // eslint-disable-next-line no-unused-vars
+        var proxy = ItemProxy.getProxyFor(id);
 	        //promises.push(kdbRepo.openRepo(ItemProxy.getRootProxy().item.id, proxy.repoPath));
 	        // TODO Once Repositories are version controlled separately,
 	        // index them here.
@@ -552,13 +554,13 @@ function openRepositories() {
 
 	var rootProxy = ItemProxy.getRootProxy();
 	rootProxy.repoPath = path.join(koheseKDBDirPath, 'Root.json');
-	console.log("--- Root descendant count: " + rootProxy.descendantCount);
+	console.log('--- Root descendant count: ' + rootProxy.descendantCount);
 	for(var childIdx in rootProxy.children){
 	  var childProxy = rootProxy.children[childIdx];
-	  console.log("--- Child descendant count of " + childProxy.item.name + ": " + childProxy.descendantCount);
+	  console.log('--- Child descendant count of ' + childProxy.item.name + ': ' + childProxy.descendantCount);
 	}
 
-	console.log("::: End KDB File Load");
+	console.log('::: End KDB File Load');
 	console.log(new Date());
   ItemProxy.loadingComplete();
   console.log(new Date());
@@ -573,7 +575,7 @@ function index(proxy, overwrite) {
   var repositoryPath = proxy.repoPath;
   return kdbRepo.generateCommitHistoryIndices((repositoryPath.endsWith('Root.json') ?
       path.dirname(repositoryPath) : repositoryPath), overwrite).then(function () {
-    console.log("::: Indexing of " + proxy.item.name + " complete.");
+    console.log('::: Indexing of ' + proxy.item.name + ' complete.');
   });
 }
 module.exports.index = index;

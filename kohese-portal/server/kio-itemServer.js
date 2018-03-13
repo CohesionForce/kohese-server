@@ -198,7 +198,7 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getHistory', function(request, sendResponse){
-    console.log("::: Getting history for " + request.onId);
+    console.log('::: Getting history for ' + request.onId);
 
     // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
     kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
@@ -238,7 +238,6 @@ function KIOItemServer(socket){
       }
 
       var proxy;
-      var isNewInstance = false;
 
       if (item.id){
         proxy = ItemProxy.getProxyFor(item.id);
@@ -256,7 +255,6 @@ function KIOItemServer(socket){
 
         proxy.updateItem(kind, item);
       } else {
-        isNewInstance = true;
         proxy = new ItemProxy(kind, item);
       }
 
@@ -374,10 +372,14 @@ function KIOItemServer(socket){
       var proxy = ItemProxy.getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
+
+      // jshint -W083
       promises.push(kdb.kdbRepo.add(repositoryInformation.repositoryProxy.item.id,
           repositoryInformation.relativeFilePath).then(function (returnValue) {
         addStatusMap[proxy.item.id] = returnValue;
       }));
+      // jshint +W083
+
     }
 
     Promise.all(promises).then(function () {
@@ -394,12 +396,11 @@ function KIOItemServer(socket){
   });
 
   socket.on('VersionControl/commit', function (request, sendResponse) {
-    var proxies = [];
     var idsArray = Array.from(request.proxyIds);
 
     kdb.kdbRepo.commit(idsArray, request.username, request.email,
       request.message).then(function (commitIdMap) {
-        var proxies = [];
+        let proxies = [];
         var returnMap = {};
         for (var repositoryId in commitIdMap) {
           returnMap[repositoryId] = commitIdMap[repositoryId].commitId;
@@ -433,7 +434,6 @@ function KIOItemServer(socket){
   });
 
   socket.on('VersionControl/push', function (request, sendResponse) {
-    var proxies = [];
     var idsArray = Array.from(request.proxyIds);
     kdb.kdbRepo.push(idsArray, request.remoteName, socket.koheseUser.username).
       then(function (pushStatusMap) {
@@ -477,19 +477,22 @@ function KIOItemServer(socket){
       var proxy = ItemProxy.getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
-      var repositoryId = repositoryInformation.repositoryProxy.item.id;
+      let repositoryId = repositoryInformation.repositoryProxy.item.id;
       if (!repositoryPathMap[repositoryId]) {
         repositoryPathMap[repositoryId] = [];
       }
       repositoryPathMap[repositoryId].push(repositoryInformation.relativeFilePath);
     }
 
-    for (var repositoryId in repositoryPathMap) {
+    for (let repositoryId in repositoryPathMap) {
       kdb.kdbRepo.reset(repositoryId, repositoryPathMap[repositoryId]).then(
+        // jshint -W083
         function () {
-        sendStatusUpdates(proxies);
-        sendResponse({});
-      }).catch(function (err) {
+          sendStatusUpdates(proxies);
+          sendResponse({});
+        }
+        // jshint +W083
+      ).catch(function (err) {
         console.log(err.stack);
         sendResponse({
           error: err
@@ -509,10 +512,11 @@ function KIOItemServer(socket){
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
 
+      // jshint -W083
+      // eslint-disable-next-line no-unused-vars
       var evaluationPromise = new Promise((resolve, reject) => {
         kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).then((status) => {
 
-          var isNewFile = false;
           var isStaged = false;
           var hasUnstagedChanges = false;
 
@@ -530,9 +534,11 @@ function KIOItemServer(socket){
             // Item is staged, but does not have changes, so it needs to be unstaged to revert it
             kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]).then(() => {
               // file has been unstaged, need to retrieve updated status
-              kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).then((statusAfterUnstage) => {
-                resolve(statusAfterUnstage);
-              });
+              kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).
+                then((statusAfterUnstage) => {
+                  resolve(statusAfterUnstage);
+                }
+              );
             });
           } else {
             resolve(status);
@@ -541,6 +547,8 @@ function KIOItemServer(socket){
       });
       pendingEvaluationPromises.push(evaluationPromise);
     }
+    // jshint +W083
+
 
     // Wait for any pending unstage requests to complete
     Promise.all(pendingEvaluationPromises).then(function(statusArray){
@@ -548,7 +556,7 @@ function KIOItemServer(socket){
       for (var i = 0; i < idsArray.length; i++) {
         var proxy = ItemProxy.getProxyFor(idsArray[i]);
         var repositoryInformation = getRepositoryInformation(proxy);
-        var repositoryId = repositoryInformation.repositoryProxy.item.id;
+        let repositoryId = repositoryInformation.repositoryProxy.item.id;
         var status = statusArray[i];
 
         var isNewUnstagedFile = false;
@@ -574,7 +582,7 @@ function KIOItemServer(socket){
 
       // Checkout any remaining files
       var pendingCheckoutProxies = [];
-      for (var repositoryId in repositoryPathMap) {
+      for (let repositoryId in repositoryPathMap) {
         pendingCheckoutProxies.push(kdb.kdbRepo.checkout(repositoryId, repositoryPathMap[repositoryId], true));
       }
 

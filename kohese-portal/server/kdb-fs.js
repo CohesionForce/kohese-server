@@ -31,7 +31,7 @@ function storeJSONDoc(filePath, doc) {
 
 //  console.log('::: Storing ' + filePath);
 
-  fs.writeFileSync(filePath, JSON.stringify(doc, null, '  '), {encoding: 'utf8', flag: 'w'});  
+  fs.writeFileSync(filePath, JSON.stringify(doc, null, '  '), {encoding: 'utf8', flag: 'w'});
 }
 
 module.exports.storeJSONDoc = storeJSONDoc;
@@ -57,7 +57,7 @@ function storeBinaryFile(filePath, binFile) {
 
 //  console.log('::: Storing ' + filePath);
 
-  fs.writeFileSync(filePath, binFile);  
+  fs.writeFileSync(filePath, binFile);
 }
 
 module.exports.storeBinaryFile = storeBinaryFile;
@@ -105,6 +105,7 @@ function deleteFolderRecursive(dirPath) {
   var files = [];
   if( fs.existsSync(dirPath) ) {
       files = fs.readdirSync(dirPath);
+      // eslint-disable-next-line no-unused-vars
       files.forEach(function(file,index){
           var curPath = dirPath + '/' + file;
           if(fs.lstatSync(curPath).isDirectory()) { // recurse
@@ -142,7 +143,7 @@ module.exports.removeFile = removeFile;
 //////////////////////////////////////////////////////////////////////////
 function getRepositoryFileList(dirPath, fileRegEx) {
   var fileList = fs.readdirSync(dirPath);
-  
+
   // Ignore the following files if they exist
   var ignoreList = ['.git', '.gitignore', '.npmignore', 'Root.json', 'mounts.json', '.project'];
   ignoreFiles(ignoreList);
@@ -155,7 +156,7 @@ function getRepositoryFileList(dirPath, fileRegEx) {
           }
       }
   }
-  
+
   // Filter the list if fileRegEx is supplied
   if (fileRegEx){
     var filteredList = [];
@@ -167,7 +168,7 @@ function getRepositoryFileList(dirPath, fileRegEx) {
     }
     fileList = filteredList;
   }
-  
+
   return fileList;
 }
 
