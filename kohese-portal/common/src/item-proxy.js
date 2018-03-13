@@ -838,6 +838,32 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getSubtreeAsList() {
+
+    let subtreeList = [];
+
+    var document = this;
+
+    var addProxyToList = function(proxy){
+
+      let listItem = {
+        depth: proxy.getDepthFromAncestor(document),
+        proxy: proxy
+      };
+
+      subtreeList.push(listItem);
+    };
+
+    let visitFlags = {};
+    this.visitTree(visitFlags, addProxyToList);
+
+    return subtreeList;
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   addChild(childProxy) {
     if (childProxy.parentProxy === this) {
 //      console.log('::: IP: Child ' + childProxy.item.name + ' already associated with ' + this.item.name);

@@ -55,7 +55,7 @@ export class DocumentViewComponent extends NavigatableComponent
 
 
 
-  constructor (NavigationService : NavigationService, 
+  constructor (NavigationService : NavigationService,
                private changeRef : ChangeDetectorRef) {
     super(NavigationService)
     this.docReader = new commonmark.Parser();
@@ -102,8 +102,25 @@ export class DocumentViewComponent extends NavigatableComponent
 
   generateDoc () : void {
     if (this.showChildren) {
-      var docParsed = this.docReader.parse(this.itemProxy.getDocument());
-      this.docRendered = this.docWriter.render(docParsed);
+      let subtreeAsList = this.itemProxy.getSubtreeAsList();
+
+      let docRendered = '';
+
+      for(let idx in subtreeAsList){
+        let listItem = subtreeAsList[idx];
+
+        if (listItem.depth > 0){
+          // Show the header for any node that is not the root of the document
+          docRendered += '<h' + listItem.depth +'>' +listItem.proxy.item.name + '</h' + listItem.depth + '>';
+        }
+        if (listItem.proxy.item.description){
+          // Show the description if it exists
+          let nodeParsed = this.docReader.parse(listItem.proxy.item.description);
+          docRendered += this.docWriter.render(nodeParsed);
+        }
+      }
+      this.docRendered = docRendered;
+
     } else if (this.itemProxy.item.description) {
       var parsed = this.docReader.parse(this.itemProxy.item.description); // parsed is a 'Node' tree
       this.itemDescriptionRendered = this.docWriter.render(parsed); // result is a String

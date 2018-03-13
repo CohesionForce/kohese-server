@@ -1356,4 +1356,162 @@ it('Sort Items with Same Name Correctly When Adding Parent After Children', () =
   expect(earlyB.getOrderedChildIds()).toEqual(['BB1', 'BB2', 'BB3']);
 
 });
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+it('Gets a subtree as a list', () => {
+  resetItemRepository();
+  defineTestModel();
+
+  let expectedDocAsList = [
+    {
+      'index': '0',
+      'depth': 0,
+      'name': 'Top of the Document'
+    },
+    {
+      'index': '1',
+      'depth': 1,
+      'name': 'Child A',
+      'description': 'This is Child A'
+    },
+    {
+      'index': '2',
+      'depth': 2,
+      'name': 'Child AA',
+      'description': 'This is Child AA'
+    },
+    {
+      'index': '3',
+      'depth': 2,
+      'name': 'Child AB',
+      'description': 'This is Child AB'
+    },
+    {
+      'index': '4',
+      'depth': 3,
+      'name': 'Child ABA',
+      'description': 'This is Child ABA'
+    },
+    {
+      'index': '5',
+      'depth': 3,
+      'name': 'Child ABB',
+      'description': 'This is Child ABB'
+    },
+    {
+      'index': '6',
+      'depth': 3,
+      'name': 'Child ABC',
+      'description': 'This is Child ABC'
+    },
+    {
+      'index': '7',
+      'depth': 2,
+      'name': 'Child AC',
+      'description': 'This is Child AC'
+    },
+    {
+      'index': '8',
+      'depth': 1,
+      'name': 'Child B',
+      'description': 'This is Child B'
+    },
+    {
+      'index': '9',
+      'depth': 1,
+      'name': 'Child C',
+      'description': 'This is Child C'
+    }
+  ];
+
+  let docTop = new ItemProxy('Item', {
+    name: 'Top of the Document',
+    desciption: 'This is the top node in the document'
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  let childA = new ItemProxy('Item', {
+    name: 'Child A',
+    parentId: docTop.item.id,
+    description: 'This is Child A'
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  let childAA = new ItemProxy('Item', {
+    name: 'Child AA',
+    parentId: childA.item.id,
+    description: 'This is Child AA'
+  });
+
+  let childAB = new ItemProxy('Item', {
+    name: 'Child AB',
+    parentId: childA.item.id,
+    description: 'This is Child AB'
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  let childABA = new ItemProxy('Item', {
+    name: 'Child ABA',
+    parentId: childAB.item.id,
+    description: 'This is Child ABA'
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  let childABB = new ItemProxy('Item', {
+    name: 'Child ABB',
+    parentId: childAB.item.id,
+    description: 'This is Child ABB'
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  let childABC = new ItemProxy('Item', {
+    name: 'Child ABC',
+    parentId: childAB.item.id,
+    description: 'This is Child ABC'
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  let childAC = new ItemProxy('Item', {
+    name: 'Child AC',
+    parentId: childA.item.id,
+    description: 'This is Child AC'
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  let childB = new ItemProxy('Item', {
+    name: 'Child B',
+    parentId: docTop.item.id,
+    description: 'This is Child B'
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  let childC = new ItemProxy('Item', {
+    name: 'Child C',
+    parentId: docTop.item.id,
+    description: 'This is Child C'
+  });
+
+  let docAsList = docTop.getSubtreeAsList();
+
+  let simulatedRenderedDoc = [];
+
+  // Flatten the document for comparison
+  for(let idx in docAsList){
+    let listItem = docAsList[idx];
+    simulatedRenderedDoc.push({
+      index: idx,
+      depth: listItem.depth,
+      name: listItem.proxy.item.name,
+      description: listItem.proxy.item.description
+    });
+  }
+
+  // console.log(JSON.stringify(simulatedRenderedDoc, null, '  '));
+
+  expect(simulatedRenderedDoc).toEqual(expectedDocAsList);
+
+});
+
 });
