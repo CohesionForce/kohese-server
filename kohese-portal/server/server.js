@@ -8,7 +8,7 @@ app.use(morgan('short'));
 
 // start the server if `$ node server.js`
 if (require.main === module) {
-  
+
   //Paths may be provided via arguments when starting via -kdb=PATH
   var baseRepoPath = 'kohese-kdb';
   for (var i = 2; i < process.argv.length; i++) {
@@ -23,12 +23,13 @@ if (require.main === module) {
   var kdb = require('./kdb.js');
   global.koheseKDB = kdb;
   kdb.initialize(baseRepoPath).then(function () {
-    
+
     // Establish routes
     var routes = require('./boot/routes.js');
     routes(app);
-    
-    // Setup the KoheseUser relations 
+
+    // Setup the KoheseUser relations
+    // eslint-disable-next-line no-unused-vars
     var enableAuth = require('./server-enableAuth');
 
     console.log('::: Starting Express Services');
@@ -36,24 +37,28 @@ if (require.main === module) {
     var appServer = app.listen(KohesePort, () => {
       console.log('::: Kohese Server listening at port: ' + KohesePort);
     });
-    
+
     console.log('::: Starting Kohese IO');
     var kio = require('./koheseIO.js');
+    // eslint-disable-next-line no-unused-vars
     var kioServer = kio.Server(appServer);
+    // eslint-disable-next-line no-unused-vars
     var itemServer = require('./kio-itemServer.js');
+    // eslint-disable-next-line no-unused-vars
     var fileServer = require('./kio-fileServer.js');
-    
+
     console.log('::: KoheseIO Started');
     app.emit('koheseIO-started');
 
-    
+
     // check to see if 'repl' was passed as an argument. If so, start the REPL service
     for (var i = 2; i < process.argv.length; i++) {
         if(process.argv[i] === 'repl') {
-            var koheseREPL = require('./kohese-repl.js');
-            break;
+          // eslint-disable-next-line no-unused-vars
+          var koheseREPL = require('./kohese-repl.js');
+          break;
         }
     }
   });
-  
+
 }

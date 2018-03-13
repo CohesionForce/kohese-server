@@ -1,17 +1,15 @@
 /** Directory ingester to Kohese
- *  
+ *
  *  Requires: pandoc globally, soffice globally (libreoffice)
  */
 
 var fs = require('fs');
 var Path = require('path');
 var child = require('child_process');
-var http = require('http');
 var ItemProxy = require('../common/src/item-proxy.js');
 
 var mdToKohese = require('./md-to-kohese.js');
 
-var rootId;
 var basePath;
 var tempDirPath;
 
@@ -19,7 +17,7 @@ function importFiles(koheseUserName, files, parentId) {
   if (0 === files.length) {
     return;
   }
-  
+
   basePath = Path.parse(files[0]).dir;
   var tempDir = 'tmp-' + Math.floor((Math.random() * 10000) + 1);
   tempDirPath = Path.join(basePath,tempDir);
@@ -39,7 +37,7 @@ function importFiles(koheseUserName, files, parentId) {
   console.log('All operations are completed. Now cleaning up...');
   deleteFile(tempDirPath);
   console.log('Clean up done!');
-  
+
   return addedIds;
 }
 module.exports.importFiles = importFiles;
@@ -58,22 +56,22 @@ function processToMarkdown(filePath, basePath) {
   var tempPathDirName = Path.join(tempDirPath, path.dir, path.name);
   var mdOutPath = tempPathDirName + '.md';
   var processed = true;
-  
+
   // Need to convert doc extension to lower case for comparison
   var docType = path.ext.toLowerCase();
-  
+
   switch (docType) {
   case '.doc':
     // doc processing
     console.log('::: Processing doc to odt to md');
-    var soffice = child.spawnSync('soffice', 
-        ['--headless', '--convert-to', 'odt', pathDirBase, 
+    var soffice = child.spawnSync('soffice',
+        ['--headless', '--convert-to', 'odt', pathDirBase,
           '--outdir', Path.join(tempDirPath, path.dir) ], { cwd: basePath, encoding : 'utf8' });
     if(soffice.stdout) {
       console.log(soffice.stdout);
     }
-    var docPandoc = child.spawnSync('pandoc', 
-        ['-f', 'odt', '-t', 'commonmark', '--atx-headers', (tempPathDirName + '.odt'), 
+    var docPandoc = child.spawnSync('pandoc',
+        ['-f', 'odt', '-t', 'commonmark', '--atx-headers', (tempPathDirName + '.odt'),
           '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
     if(docPandoc.stdout) {
       console.log(docPandoc.stdout);
@@ -85,8 +83,8 @@ function processToMarkdown(filePath, basePath) {
   case '.odt':
     // odt processing
     console.log('::: Processing odt to md');
-    var odtPandoc = child.spawnSync('pandoc', 
-        ['-f', 'odt', '-t', 'commonmark', '--atx-headers', pathDirBase, '-o', mdOutPath], 
+    var odtPandoc = child.spawnSync('pandoc',
+        ['-f', 'odt', '-t', 'commonmark', '--atx-headers', pathDirBase, '-o', mdOutPath],
         { cwd: basePath, encoding : 'utf8' });
     if(odtPandoc.stdout) {
       console.log(odtPandoc.stdout);
@@ -95,7 +93,7 @@ function processToMarkdown(filePath, basePath) {
   case '.docx':
     // docx processing
     console.log('::: Processing docx to md');
-    var docxPandoc = child.spawnSync('pandoc', 
+    var docxPandoc = child.spawnSync('pandoc',
         ['-f', 'docx', '-t', 'commonmark', '--atx-headers', pathDirBase,
           '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
     if(docxPandoc.stdout) {
@@ -106,8 +104,8 @@ function processToMarkdown(filePath, basePath) {
   case '.html':
     // html processing
     console.log('::: Processing html to md');
-    var htmlPandoc = child.spawnSync('pandoc', 
-        ['-f', 'html', '-t', 'commonmark', '--atx-headers', pathDirBase, 
+    var htmlPandoc = child.spawnSync('pandoc',
+        ['-f', 'html', '-t', 'commonmark', '--atx-headers', pathDirBase,
           '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
     if(htmlPandoc.stdout) {
       console.log(htmlPandoc.stdout);
@@ -116,6 +114,7 @@ function processToMarkdown(filePath, basePath) {
   case '.md':
     // No Processing needed, but do need to copy
     console.log('::: Copying existing md file');
+    // eslint-disable-next-line no-unused-vars
     var cpy = child.spawnSync('cp', [pathDirBase, mdOutPath], { cwd: basePath, encoding : 'utf8' });
     break;
   default:
@@ -124,7 +123,7 @@ function processToMarkdown(filePath, basePath) {
   }
 
   console.log('::: Done processing file ' + path.base);
-  
+
   return {
     wasProcessed: processed,
     outputPath: mdOutPath
@@ -134,7 +133,7 @@ function processToMarkdown(filePath, basePath) {
 function process(koheseUserName, file, parent, addedIds) {
   var fileStat = fs.lstatSync(file);
   var tmpPath = tempDirPath + Path.sep + splitPath(file, basePath);
-  
+
   if (fileStat.isDirectory()) {
     fs.mkdirSync(tmpPath);
     var createTime = Date.now();
@@ -177,7 +176,7 @@ function deleteFile(path) {
     for (var i = 0; i < delList.length; i++) {
       deleteFile(Path.join(path, delList[i]));
     }
-      
+
     fs.rmdirSync(path);
   } else if (fileStat.isFile()) {
     fs.unlinkSync(path);

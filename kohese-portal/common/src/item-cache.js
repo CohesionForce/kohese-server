@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 
 'use strict';
@@ -41,7 +41,7 @@ class ItemCache {
   constructor() {
     throw 'Invalid_Class';
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ class ItemCache {
   static cacheBlob(oid, blob){
     if(!disableObjectFreeze){
       Object.freeze(blob);
-    }          
+    }
     repoBlob[oid] = blob;
   }
 
@@ -102,14 +102,14 @@ class ItemCache {
   static numberOfCommits(){
     return _.size(repoObjects.commit);
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static numberOfTrees(){
     return _.size(repoObjects.tree);
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ class ItemCache {
         meta: _.clone(commitData),
         tree: {}
     };
-    
+
     delete newCommitData.meta.treeId;
     newCommitData.tree = this.expandTree(commitData.treeId);
 
@@ -142,15 +142,15 @@ class ItemCache {
         oid: treeId,
         contents: {}
     };
-    
+
     var treeEntry = this.cachedTree(treeId);
 
     if (!treeEntry){
       console.log('*** Can\'t find cached tree: ' + treeId);
     }
-    
+
     var contents = treeData.contents;
-    
+
     for(var entryName in treeEntry){
       var entry = treeEntry[entryName];
       switch (entry.type) {
@@ -166,7 +166,7 @@ class ItemCache {
           console.log('*** Error: Unexpected Kind ' + entry.kind + ' in tree: ' + treeId);
       }
     }
-    
+
     return treeData;
   }
 
@@ -175,7 +175,7 @@ class ItemCache {
   //// Proxy loading methods
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ class ItemCache {
     this.loadProxiesForRepo(commit.tree);
     ItemProxy.loadingComplete();
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -194,16 +194,16 @@ class ItemCache {
     if(contents.hasOwnProperty('store')) {
       console.log('::: Found store dir for ' + treeData.oid);
     }
-    
+
     if (contents.hasOwnProperty('export')) {
       console.log('::: Found early legacy dir (v0.1) for ' + treeData.oid);
       this.loadProxiesForRepo(contents['export']);
       return;
     }
-    
+
     if (contents.hasOwnProperty('Item')){
       console.log('::: Found legacy dir (v0.2) for ' + treeData.oid);
-      
+
       for(var kind in contents){
         switch (kind) {
           case '.gitignore':
@@ -217,61 +217,63 @@ class ItemCache {
           default:
             this.loadProxiesForKindContents(kind, contents[kind].contents);
         }
-        
+
       }
-      
+
     }
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static loadProxiesForRepoContents(repoDir){
     console.log('::: Processing Repositories');
-    
+
     for(var repoFile in repoDir){
-      
+
       if (!jsonExt.test(repoFile)){
         console.log('>>> Skipping repo file ' + repoFile);
         continue;
       }
 
       console.log('+++ Found Repository ' + repoFile);
-      
+
       var oid = repoDir[repoFile].oid;
 
       var item = this.cachedBlob(oid);
+      // eslint-disable-next-line no-unused-vars
       var proxy = new ItemProxy('Repository', item);
-      
+
       // TODO Need to handle mount files
-      
+
       var repoSubdir = repoDir[item.id];
       if(repoSubdir){
-        this.loadProxiesForRepo(repoSubdir);        
+        this.loadProxiesForRepo(repoSubdir);
       }
     }
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static loadProxiesForKindContents(kind, kindDir){
     console.log('::: Processing ' + kind);
     for(var kindFile in kindDir){
-      
+
       if (!jsonExt.test(kindFile)){
         continue;
       }
-      
+
       var oid = kindDir[kindFile].oid;
 
       var item = this.cachedBlob(oid);
+      // eslint-disable-next-line no-unused-vars
       var proxy = new ItemProxy(kind, item);
-      
+
     }
-    
+
   }
-  
+
 }
 
 module.exports = ItemCache;
