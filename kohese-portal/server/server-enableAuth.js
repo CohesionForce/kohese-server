@@ -1,11 +1,8 @@
-const server = global.app;
-
 const ItemProxy = require('../common/src/item-proxy.js');
 
 var usersProxy;
 
 const SALT_WORK_FACTOR = 10;
-var usersItem;
 
 var bcrypt;
 try {
@@ -26,9 +23,9 @@ try {
 function checkAndCreateUsersItem() {
 
   var rootProxy = ItemProxy.getRootProxy();
-  
+
   usersProxy = rootProxy.getChildByName('Users');
-  
+
   if (!usersProxy){
     // Create Users Item
     console.log('::: Creating Users Item');
@@ -39,13 +36,13 @@ function checkAndCreateUsersItem() {
       createdBy: 'admin',
       createdOn: now,
       modifiedBy: 'admin',
-      modifiedOn: now        
-    });    
+      modifiedOn: now
+    });
   } else {
     console.log('::: Users Item already exists');
     console.log(JSON.stringify(usersProxy.item,null,'  '));
   }
-  
+
   checkAndCreateAdminAccount();
 }
 
@@ -53,9 +50,9 @@ function checkAndCreateUsersItem() {
 //
 //////////////////////////////////////////////////////////////////////////
 function checkAndCreateAdminAccount() {
-  
+
   var adminProxy = usersProxy.getChildByName('admin');
-  
+
   if (!adminProxy){
     console.log('::: Creating admin account');
     var now = Date.now();
@@ -68,7 +65,7 @@ function checkAndCreateAdminAccount() {
        createdOn: now,
        modifiedBy: 'admin',
        modifiedOn: now
-    });      
+    });
   } else {
     console.log('::: Admin account already exists');
   }
@@ -141,7 +138,7 @@ function login(username, password, cb){
   console.log('::: Preparing to evaluate credentials');
 
   var userProxy = usersProxy.getChildByName(username);
-  
+
   if (userProxy){
     hasPassword(userProxy, password, function(err, isMatch) {
       if (err) {
@@ -158,7 +155,7 @@ function login(username, password, cb){
     console.log('*** No matching record is found for user %s', username);
     cb('No such user', null);
   }
-  
+
 }
 module.exports.login = login;
 

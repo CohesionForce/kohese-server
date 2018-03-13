@@ -1,11 +1,9 @@
 /**
- * 
+ *
  */
 
 'use strict';
-var _ = require('underscore');
 var path = require('path');
-var fs = require('fs');
 var kdbFS = require('./kdb-fs.js');
 
 var nodegit = require('nodegit');
@@ -32,15 +30,15 @@ class KDBCache extends ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   constructor(repoPath) {
-    
+
     super();
-    
+
     KDBCache.repoPath = repoPath;
-    
+
     KDBCache.loadCachedObjects();
-    
+
     // Then check index for new commits
-    
+
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -48,7 +46,7 @@ class KDBCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   static convertBlob(object) {
     var blobObject;
-    
+
     try {
       // Try to convert the blob to a JSON object
       blobObject = JSON.parse(object);
@@ -60,7 +58,7 @@ class KDBCache extends ItemCache {
     }
     return blobObject;
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -88,23 +86,23 @@ class KDBCache extends ItemCache {
         if (compareOIDs){
           var koid = ItemProxy.gitFileOID(object);
           if (oid !== koid){
-            console.log('!!! Mismatch for ' + oid + ' - ' + koid);        
+            console.log('!!! Mismatch for ' + oid + ' - ' + koid);
           } else {
             try {
               var item = JSON.parse(object);
               var koid2 = ItemProxy.gitDocumentOID(item);
-              
+
               if (oid !== koid2){
                 console.log('!!! Parse yields mismatch: ' + oid);
                 kdbFS.storeJSONDoc(BLOB_MISMATCH_DIRECTORY + '/' + oid + '_' + koid2 + '.json', item);
-                
+
                 parseMismatch++;
-              }              
+              }
             } catch (err) {
               console.log('*** Error parsing ' + oid);
               console.log(err);
             }
-          }         
+          }
         }
         this.cacheBlob(oid, blob);
       } catch (err) {
@@ -114,9 +112,9 @@ class KDBCache extends ItemCache {
     });
     console.log('::: Found ' + this.numberOfBlobs() + ' blobs');
     if(parseMismatch){
-      console.log('::: Found ' + parseMismatch + ' parse mismatches');      
+      console.log('::: Found ' + parseMismatch + ' parse mismatches');
     }
-    
+
     oidFiles = kdbFS.getRepositoryFileList(TREE_DIRECTORY, /\.json$/);
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(/\.json$/, '');
@@ -124,7 +122,7 @@ class KDBCache extends ItemCache {
       this.cacheTree(oid, object);
     });
     console.log('::: Found ' + this.numberOfTrees() + ' trees');
-    
+
     oidFiles = kdbFS.getRepositoryFileList(COMMIT_DIRECTORY, /\.json$/);
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(/\.json$/, '');
@@ -138,12 +136,12 @@ class KDBCache extends ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   static addCachedObject(type, oid, object) {
-    
+
     switch (type) {
       case 'commit':
         this.cacheCommit(oid, object);
         kdbFS.storeJSONDoc(COMMIT_DIRECTORY + path.sep + oid + '.json', object);
-        
+
         if (expandCommits){
           var expandedCommitFilename = object.time + '_' + oid + '.json';
           kdbFS.storeJSONDoc(EXPAND_COMMIT_DIRECTORY + path.sep + expandedCommitFilename, this.expandCommit(oid));
@@ -158,13 +156,13 @@ class KDBCache extends ItemCache {
         break;
       case 'tree':
         this.cacheTree(oid, object);
-        kdbFS.storeJSONDoc(TREE_DIRECTORY + path.sep + oid + '.json', object);    
+        kdbFS.storeJSONDoc(TREE_DIRECTORY + path.sep + oid + '.json', object);
         break;
       case 'blob':
         object = this.convertBlob(object);
         this.cacheBlob(oid, object);
         if (object.binary) {
-          kdbFS.storeBinaryFile(BLOB_DIRECTORY + path.sep + oid, object.binary);          
+          kdbFS.storeBinaryFile(BLOB_DIRECTORY + path.sep + oid, object.binary);
         } else {
           kdbFS.storeJSONDoc(BLOB_DIRECTORY + path.sep + oid + '.json', object);
         }
@@ -174,14 +172,14 @@ class KDBCache extends ItemCache {
     }
 
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////
   //// Generate index files
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -192,6 +190,7 @@ class KDBCache extends ItemCache {
         var revwalk = nodegit.Revwalk.create(repo);
         revwalk.sorting(nodegit.Revwalk.SORT.TIME);
         revwalk.push(masterCommit.id());
+        // eslint-disable-next-line no-unused-vars
         return revwalk.getCommitsUntil(function (commit) {
           return true;
         }).then(function (commits) {
@@ -209,17 +208,17 @@ class KDBCache extends ItemCache {
     var kdbCache = this;
     var commit = commits.shift();
 
-    // Exit recursion after all commits have been processed  
+    // Exit recursion after all commits have been processed
     if(!commit){
       return;
     }
-    
+
     if (this.cachedCommit(commit.id())){
       console.log('::: Already indexed commit ' + commit.id());
-      return this.indexCommit(repository, commits);      
+      return this.indexCommit(repository, commits);
     } else {
       console.log('::: Processing commit ' + commit.id());
-      
+
       return commit.getTree().then(function (tree) {
         var co = {
           time: commit.timeMs(),
@@ -231,23 +230,24 @@ class KDBCache extends ItemCache {
         for (var j = 0; j < commit.parentcount(); j++) {
           co.parents.push(commit.parentId(j).toString());
         }
-        
+
+        // eslint-disable-next-line no-unused-vars
         var commitDataPromise = new Promise((resolve, reject) => {
           kdbCache.parseTree(repository, tree).then(() => {
             resolve(co);
-          });        
+          });
         });
-        
+
         return commitDataPromise;
       }).then(function (co) {
-        
+
         kdbCache.addCachedObject('commit', commit.id(), co);
-        
+
         return kdbCache.indexCommit(repository, commits);
       }).catch(function (err) {
         console.log(err.stack);
       });
-    }  
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -259,30 +259,32 @@ class KDBCache extends ItemCache {
     var entries = {};
     for (var j = 0; j < tree.entryCount(); j++) {
       var entry = tree.entryByIndex(j);
-      
+
       entries[entry.name()] = {
           type: (entry.isTree() ? 'tree' : 'blob'),
           oid: entry.sha()
       };
-      
+
       if (entry.isTree()) {
         // Retrieve subtree if it is not already cached
         if (!this.cachedTree(entry.sha())){
+          // jshint -W083
           promises.push(entry.getTree().then(function (t) {
             return kdbCache.parseTree(repository, t);
           }));
+          // jshint +W083
         }
       } else {
         // Retrieve Blob if it is not already cached
         var oid = entry.sha();
         if (!this.cachedBlob(oid)){
-          promises.push(this.getContents(repository, oid));       
+          promises.push(this.getContents(repository, oid));
         }
       }
     }
-    
+
     this.addCachedObject('tree', tree.id(), entries);
-    
+
     return Promise.all(promises);
   }
 

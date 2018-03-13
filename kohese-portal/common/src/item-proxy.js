@@ -145,7 +145,9 @@ class ItemProxy {
     });
 
     // Re-insert rootModelProxy
+    // eslint-disable-next-line no-unused-vars
     let rootModelProxy = new ItemProxy(tree.rootModelProxy.kind, tree.rootModelProxy.item);
+    // eslint-disable-next-line no-unused-vars
     let rootViewModelProxy = new ItemProxy(tree.rootViewModelProxy.kind, tree.rootViewModelProxy.item);
 
     // Remove loaded modelMap
@@ -335,7 +337,7 @@ class ItemProxy {
     var length = forText.length;
 //    console.log(forText);
 //    console.log('\n');
-    shaObj.update('blob ' + forText.length + '\0' + forText);
+    shaObj.update('blob ' + length + '\0' + forText);
 
     var oid = shaObj.getHash('HEX');
 
@@ -461,7 +463,7 @@ class ItemProxy {
 
     var fromIds = Object.keys(fromTHMap).sort();
     var toIds = Object.keys(toTHMap).sort();
-    var allIds = _.union(fromIds, toIds);
+    // var allIds = _.union(fromIds, toIds);
     var commonIds = _.intersection(fromIds, toIds);
 
     if(!fromTHMap){
@@ -492,7 +494,7 @@ class ItemProxy {
           var toChildIds = Object.keys(toChildren);
           var fromChildIdsSorted = Object.keys(fromChildren).sort();
           var toChildIdsSorted = Object.keys(toChildren).sort();
-          var allChildIds = _.union(fromChildIdsSorted, toChildIdsSorted);
+          // var allChildIds = _.union(fromChildIdsSorted, toChildIdsSorted);
           var commonChildIds = _.intersection(fromChildIdsSorted, toChildIdsSorted);
 
           var childMismatch = {};

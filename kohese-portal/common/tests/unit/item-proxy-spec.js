@@ -4,7 +4,6 @@ describe('ItemProxy Test', function () {
 
   var root = ItemProxy.getRootProxy();
   var lostAndFound = ItemProxy.getProxyFor('LOST+FOUND');
-  var a, aa, newAAItem, bb, b, ab;
   // console.log(__dirname);
   // console.log('::: Starting Item Proxy Test');
   var dumpEnabled = false;
@@ -120,6 +119,7 @@ describe('ItemProxy Test', function () {
     };
 
     for (let key in modelDefMap) {
+      // eslint-disable-next-line no-unused-vars
       let modelProxy = new ItemProxy('KoheseModel', modelDefMap[key]);
     }
 
@@ -140,7 +140,7 @@ describe('ItemProxy Test', function () {
     dump('--- Beginning state');
     expect(root).toBeDefined();
     // console.log('::: Adding node without parent');
-    aa = new ItemProxy('Test', {
+    let aa = new ItemProxy('Test', {
       id: 'aa',
       name: 'AA',
       parentId: 'a',
@@ -157,19 +157,21 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Add Parent', function () {
     // console.log('::: Adding parent');
-    a = new ItemProxy('Test', {
+    let a = new ItemProxy('Test', {
       id: 'a',
       name: 'A',
       parentId: ''
     });
     expect(a).toBeDefined();
     expect(a).not.toBeNull();
-    var child = root.getChildByName('A');
+
+    let child = root.getChildByName('A');
     expect(child).toBeDefined();
     expect(child).not.toBeNull();
     expect(child).toBe(a);
 
     // Check to make sure that AA was added as a child of A
+    let aa = ItemProxy.getProxyFor('aa');
     child = a.getChildByName('AA');
     expect(child).toBeDefined();
     expect(child).not.toBeNull();
@@ -183,7 +185,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Add Bs', function () {
     // console.log('::: Adding b, bbb');
-    b = new ItemProxy('Test', {
+    let b = new ItemProxy('Test', {
       id: 'b',
       name: 'B',
       parentId: ''
@@ -196,6 +198,7 @@ describe('ItemProxy Test', function () {
     expect(child).not.toBeNull();
     expect(child).toBe(b);
 
+    // eslint-disable-next-line no-unused-vars
     var bbb = new ItemProxy('Test', {
       id: 'bbb',
       name: 'BBB',
@@ -214,12 +217,14 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Adding bb', function () {
     // console.log('::: Adding bb');
-    bb = new ItemProxy('Test', {
+    let bb = new ItemProxy('Test', {
       id: 'bb',
       name: 'BB',
       parentId: 'b'
     });
     dump('Added bb');
+
+    let b = ItemProxy.getProxyFor('b');
 
     expect(b.children[0].item.id).toBe('bb');
     expect(b.item.id).toBe(bb.parentProxy.item.id);
@@ -230,6 +235,8 @@ describe('ItemProxy Test', function () {
     // console.log('::: Deleting a');
 
     expect(root.children[0].item.id).toBe('a');
+
+    let a = ItemProxy.getProxyFor('a');
 
     a.deleteItem();
     dump('Deleted a');
@@ -243,7 +250,9 @@ describe('ItemProxy Test', function () {
   it('Changing parent of aa', function () {
     // console.log('::: Changing parent of aa');
     // console.log(aa.item);
-    newAAItem = JSON.parse(JSON.stringify(aa.item));
+
+    let aa = ItemProxy.getProxyFor('aa');
+    let newAAItem = JSON.parse(JSON.stringify(aa.item));
     newAAItem.parentId = 'b';
     newAAItem.description = 'b with changes';
     delete newAAItem.uniq;
@@ -266,7 +275,9 @@ describe('ItemProxy Test', function () {
   it('Deleting description for aa', function () {
     // console.log('::: Deleting description for aa');
 
-    var temp = aa.item.id;
+    let aa = ItemProxy.getProxyFor('aa');
+    let newAAItem = JSON.parse(JSON.stringify(aa.item));
+    let temp = aa.item.id;
 
     delete newAAItem.description;
     aa.updateItem('Test', newAAItem);
@@ -282,6 +293,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Changing parent of bb to ROOT', function () {
     // console.log('::: Changing parent of bb to ROOT');
+    let bb = ItemProxy.getProxyFor('bb');
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
     newBBItem.parentId = '';
     bb.updateItem('Test', newBBItem);
@@ -297,6 +309,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Changing parent of bb to c', function () {
     // console.log('::: Changing parent of bb to c');
+    let bb = ItemProxy.getProxyFor('bb');
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
     newBBItem.parentId = 'c';
     bb.updateItem('Test', newBBItem);
@@ -313,6 +326,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Morph b into a NewTest', function () {
     // console.log('::: Morph b into a NewTest');
+    let b = ItemProxy.getProxyFor('b');
     var newBItem = JSON.parse(JSON.stringify(b.item));
     b.updateItem('NewTest', newBItem);
     dump('Change b to a NewTest kind');
@@ -330,11 +344,13 @@ describe('ItemProxy Test', function () {
       name: 'AB',
       parentId: 'b'
     });
+    // eslint-disable-next-line no-unused-vars
     var ac = new ItemProxy('Test', {
       id: 'ac',
       name: 'AC',
       parentId: 'b'
     });
+    // eslint-disable-next-line no-unused-vars
     var ad = new ItemProxy('Test', {
       id: 'ad',
       name: 'AD',
@@ -356,6 +372,7 @@ describe('ItemProxy Test', function () {
       return JSON.stringify(temp);
     }
 
+    let b = ItemProxy.getProxyFor('b');
     expect(getChildIds(b)).toBe(expectArray);
 
     var newAEItem = JSON.parse(JSON.stringify(ae.item));
@@ -374,6 +391,7 @@ describe('ItemProxy Test', function () {
     expectArray = JSON.stringify(['ae', 'aa', 'ac', 'ad', 'ab']);
     expect(getChildIds(b)).toBe(expectArray);
 
+    let aa = ItemProxy.getProxyFor('aa');
     var newAAItem = JSON.parse(JSON.stringify(aa.item));
     newAAItem.name = 'B - New Name - AA';
     aa.updateItem('Item', newAAItem);
@@ -395,6 +413,7 @@ describe('ItemProxy Test', function () {
       parentId: '',
       itemIds: ['da', 'db', 'dc', 'dd', 'de']
     });
+    // eslint-disable-next-line no-unused-vars
     var dab = new ItemProxy('Test', {
       id: 'dab',
       name: 'DAB',
@@ -415,6 +434,7 @@ describe('ItemProxy Test', function () {
       name: 'DC',
       parentId: 'd'
     });
+    // eslint-disable-next-line no-unused-vars
     var dd = new ItemProxy('Test', {
       id: 'dd',
       name: 'DD',
@@ -460,11 +480,13 @@ describe('ItemProxy Test', function () {
 
     expectArray = JSON.stringify(['da', 'db', 'dd', 'de', 'daa', 'dab', 'dac']);
     dump('Adding daa and dac');
+    // eslint-disable-next-line no-unused-vars
     var dac = new ItemProxy('Test', {
       id: 'dac',
       name: 'DAC',
       parentId: 'd'
     });
+    // eslint-disable-next-line no-unused-vars
     var daa = new ItemProxy('Test', {
       id: 'daa',
       name: 'DAA',
@@ -491,21 +513,25 @@ describe('ItemProxy Test', function () {
     expect(getChildIds(d)).toBe(expectArray);
 
     expectArray = JSON.stringify(['dab', 'de', 'dd', 'db', 'da', 'da1', 'daa', 'dac', 'dz1', 'dz2', 'dz3']);
+    // eslint-disable-next-line no-unused-vars
     var da1 = new ItemProxy('Test', {
       id: 'da1',
       name: 'DA1',
       parentId: 'd'
     });
+    // eslint-disable-next-line no-unused-vars
     var dz1 = new ItemProxy('Test', {
       id: 'dz1',
       name: 'DZ1',
       parentId: 'd'
     });
+    // eslint-disable-next-line no-unused-vars
     var dz2 = new ItemProxy('Test', {
       id: 'dz2',
       name: 'DZ2',
       parentId: 'd'
     });
+    // eslint-disable-next-line no-unused-vars
     var dz3 = new ItemProxy('Test', {
       id: 'dz3',
       name: 'DZ3',
@@ -536,6 +562,7 @@ describe('ItemProxy Test', function () {
 
 
     expectArray = JSON.stringify(['de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dn', 'dz1', 'dz2', 'dz3', 'db']);
+    // eslint-disable-next-line no-unused-vars
     var dn = new ItemProxy('Test', {
       id: 'dn',
       name: 'DN',
@@ -576,6 +603,7 @@ describe('ItemProxy Test', function () {
   it('Get Descendants', function () {
     // console.log('::: Getting B Descendants');
     var b = ItemProxy.getProxyFor('b');
+    // eslint-disable-next-line no-unused-vars
     var ac1 = new ItemProxy('Test', {
       id: 'ac1',
       name: 'AC1',
@@ -691,6 +719,7 @@ describe('ItemProxy Test', function () {
     expect(repoA.treeHashEntry.treeHash).toEqual('f8730b5510c1d47c3082836728336cd4a68f34d5');
     expect(repoB.treeHashEntry.childTreeHashes).toEqual(expectedInitialRepoBChildHashes);
 
+    // eslint-disable-next-line no-unused-vars
     var b1 = new ItemProxy('Test', {
       name: 'Item B1',
       id: 'BBBB-1111',
@@ -719,6 +748,7 @@ describe('ItemProxy Test', function () {
       id: 'id-1a1a1a'
     };
 
+    // eslint-disable-next-line no-unused-vars
     var object1b = {
       id: 'id_1a1a1a',
       name: 'Some Content'
@@ -782,55 +812,57 @@ describe('ItemProxy Test', function () {
   xit('Should Expand KoheseModel Relations', () => {
     resetItemRepository();
 
-    var modelDefMap = {
-      ExpandedTest: {
-        'name': 'ExpandedTest',
-        'base': 'PersistedModel',
-        "parentId": "Model-Definitions",
-        'strict': 'validate',
-        'idInjection': true,
-        'trackChanges': false,
-        'properties': {
-          'id': {
-            'type': 'string',
-            'id': true,
-            'defaultFn': 'guid'
-          },
-          'name': {
-            'type': 'string',
-            'required': true
-          },
-          'xparentId': {
-            'type': 'reference',
-            'default': ''
-          }
-        },
-        'validations': [],
-        'relations': {
-          'xChildren': {
-            'type': 'hasMany',
-            'model': 'ExpandedTest',
-            'foreignKey': 'xParentId'
-          },
-          'xparent': {
-            'type': 'belongsTo',
-            'model': 'ExpandedTest',
-            'foreignKey': 'xparentId'
-          }
-        },
-        'acls': [],
-        'methods': []
-      }
-    };
+    // var modelDefMap = {
+    //   ExpandedTest: {
+    //     'name': 'ExpandedTest',
+    //     'base': 'PersistedModel',
+    //     'parentId': 'Model-Definitions',
+    //     'strict': 'validate',
+    //     'idInjection': true,
+    //     'trackChanges': false,
+    //     'properties': {
+    //       'id': {
+    //         'type': 'string',
+    //         'id': true,
+    //         'defaultFn': 'guid'
+    //       },
+    //       'name': {
+    //         'type': 'string',
+    //         'required': true
+    //       },
+    //       'xparentId': {
+    //         'type': 'reference',
+    //         'default': ''
+    //       }
+    //     },
+    //     'validations': [],
+    //     'relations': {
+    //       'xChildren': {
+    //         'type': 'hasMany',
+    //         'model': 'ExpandedTest',
+    //         'foreignKey': 'xParentId'
+    //       },
+    //       'xparent': {
+    //         'type': 'belongsTo',
+    //         'model': 'ExpandedTest',
+    //         'foreignKey': 'xparentId'
+    //       }
+    //     },
+    //     'acls': [],
+    //     'methods': []
+    //   }
+    // };
 
     // TODO Replace this with additional model loading logic
     // ItemProxy.loadModelDefinitions(modelDefMap);
 
+    // eslint-disable-next-line no-unused-vars
     let testA = new ItemProxy('ExpandedTest', {
       id: 'A',
       name: 'Test Item: A',
     });
 
+    // eslint-disable-next-line no-unused-vars
     let testAG = new ItemProxy('ExpandedTest', {
       id: 'AG',
       parentId: 'A',
@@ -853,6 +885,7 @@ describe('ItemProxy Test', function () {
 
     function createNV(nodeId, parentId, kind) {
       var createKind = kind || 'Test';
+      // eslint-disable-next-line no-unused-vars
       var proxy = new ItemProxy(createKind, {
         id: nodeId,
         name: 'Node Visitor ' + nodeId,
@@ -1089,6 +1122,7 @@ it('Retrieve Delta Tree Hash Map', () => {
   c.updateItem(c.kind, newCItem);
 
   // Add D
+  // eslint-disable-next-line no-unused-vars
   var d = new ItemProxy('Test', {
     id: 'D',
     name: 'Node Visitor D',
@@ -1141,11 +1175,13 @@ it('Should Not Hang When Deleting Lost+Found With Children', () => {
   resetItemRepository();
   defineTestModel();
 
+  // eslint-disable-next-line no-unused-vars
   var a = new ItemProxy('Test', {
     id: 'A',
     name: 'A Item'
   });
 
+  // eslint-disable-next-line no-unused-vars
   var bb = new ItemProxy('Test', {
     id: 'BB',
     name: 'BB Item',
@@ -1177,17 +1213,20 @@ it('Update Tree Hash When Creating Already Existing Item', () => {
     id: 'A',
     name: 'A Item'
   });
+  // eslint-disable-next-line no-unused-vars
   var aa = new ItemProxy('Test', {
     id: 'AA',
     name: 'AA Item',
     parentId: 'A'
   });
+  // eslint-disable-next-line no-unused-vars
   var ab = new ItemProxy('Test', {
     id: 'AB',
     name: 'AA Item',
     parentId: 'A'
   });
 
+  // eslint-disable-next-line no-unused-vars
   var newAA = new ItemProxy('Test', {
     id: 'AA',
     name: 'Updated AA Item',
@@ -1216,6 +1255,7 @@ it('Prevent Recursion on Updating Lost+Found', () => {
   resetItemRepository();
   defineTestModel();
 
+  // eslint-disable-next-line no-unused-vars
   var a = new ItemProxy('Test', {
     id: 'A',
     name: 'A Item',
@@ -1224,6 +1264,7 @@ it('Prevent Recursion on Updating Lost+Found', () => {
 
   var lfContent = _.clone(lostAndFound.item);
 
+  // eslint-disable-next-line no-unused-vars
   var lf = new ItemProxy('Internal', lfContent);
 
   expect(lostAndFound.descendantCount).toEqual(3);
@@ -1237,18 +1278,21 @@ it('Sort Items with Same Name Correctly When Adding Parent After Children', () =
   resetItemRepository();
   defineTestModel();
 
+  // eslint-disable-next-line no-unused-vars
   var aa2 = new ItemProxy('Test', {
     id: 'AA2',
     name: 'AA Item',
     parentId: 'LATE_A'
   });
 
+  // eslint-disable-next-line no-unused-vars
   var aa3 = new ItemProxy('Test', {
     id: 'AA3',
     name: 'AA Item',
     parentId: 'LATE_A'
   });
 
+  // eslint-disable-next-line no-unused-vars
   var aa1 = new ItemProxy('Test', {
     id: 'AA1',
     name: 'AA Item',
@@ -1257,6 +1301,7 @@ it('Sort Items with Same Name Correctly When Adding Parent After Children', () =
 
   var lateA = ItemProxy.getProxyFor('LATE_A');
 
+  // eslint-disable-next-line no-unused-vars
   var aa = new ItemProxy('Test', {
     id: 'LATE_A',
     name: 'LATE_A',
@@ -1271,6 +1316,7 @@ it('Sort Items with Same Name Correctly When Adding Parent After Children', () =
     parentId: ''
   });
 
+  // eslint-disable-next-line no-unused-vars
   var bb2 = new ItemProxy('Test', {
     id: 'BB2',
     name: 'BB Item',
@@ -1283,6 +1329,7 @@ it('Sort Items with Same Name Correctly When Adding Parent After Children', () =
     parentId: 'EARLY_B'
   });
 
+  // eslint-disable-next-line no-unused-vars
   var bb1 = new ItemProxy('Test', {
     id: 'BB1',
     name: 'BB Item',

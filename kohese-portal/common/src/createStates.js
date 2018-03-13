@@ -1,7 +1,7 @@
 
 var ItemProxy = require('./item-proxy.js');
 
-var internalStates = [ 
+var internalStates = [
   { id: 'State',
     name: 'State',
     description: 'State Category',
@@ -11,7 +11,7 @@ var internalStates = [
     name: 'Action State',
     description: 'Action State Category',
     parentId: 'State',
-    itemIds: 
+    itemIds:
      [ 'State:ActionState:Proposed',
        'State:ActionState:Assigned',
        'State:ActionState:PendingReassign',
@@ -28,7 +28,7 @@ var internalStates = [
     name: 'Assigned',
     description: 'An action that is Assigned.',
     parentId: 'State:ActionState',
-    itemIds: 
+    itemIds:
      [ 'State:ActionState:Assigned:Accepted',
        'State:ActionState:Assigned:InWork' ] },
   { id: 'State:ActionState:Assigned:Accepted',
@@ -70,7 +70,7 @@ var internalStates = [
     name: 'Decision State',
     description: 'Decision State Category',
     parentId: 'State',
-    itemIds: 
+    itemIds:
      [ 'State:DecisionState:Proposed',
        'State:DecisionState:InAnalysis',
        'State:DecisionState:InReview',
@@ -122,7 +122,7 @@ var internalStates = [
     name: 'Issue State',
     description: 'Issue State Category',
     parentId: 'State',
-    itemIds: 
+    itemIds:
      [ 'State:IssueState:Observed',
        'State:IssueState:InAnalysis',
        'State:IssueState:NoAction',
@@ -163,7 +163,7 @@ var internalStates = [
     name: 'Task State',
     description: 'Task State Category',
     parentId: 'State',
-    itemIds: 
+    itemIds:
      [ 'State:TaskState:Proposed',
        'State:TaskState:Assigned',
        'State:TaskState:PendingReassign',
@@ -177,7 +177,7 @@ var internalStates = [
     name: 'Assigned',
     description: 'A task that is Assigned.',
     parentId: 'State:TaskState',
-    itemIds: 
+    itemIds:
      [ 'State:TaskState:Assigned:Accepted',
        'State:TaskState:Assigned:InWork' ] },
   { id: 'State:TaskState:Assigned:Accepted',
@@ -203,5 +203,6 @@ var internalStates = [
 
 for (var idx in internalStates) {
   var item = internalStates[idx];
+  // eslint-disable-next-line no-unused-vars
   var proxy = new ItemProxy('Internal-State', item);
 }

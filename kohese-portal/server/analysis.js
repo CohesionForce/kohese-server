@@ -1,6 +1,4 @@
 
-  var http = require('http');
-  var util = require('util');
   var _und = require('underscore');
   var request = require('request');
   var kdb = require('./kdb.js');
@@ -70,7 +68,7 @@
     let onId = forProxy.item.id;
     let forModelKind= forProxy.kind;
     console.log('::: ANALYZING: ' + onId);
-    
+
     var instance = forProxy.item;
 
     var requestData = {};
@@ -98,16 +96,16 @@
     };
 
 //    console.log('OPTIONS: ' + JSON.stringify(options));
-    
+
     request(options, function(analysisError, analysisResponse, analysisBody) {
       if (analysisError) {
         var error = new Error(
             '*** Failure while communicating with Analysis server');
-        
+
         // jshint -W106
         error.http_code = 504;
-        // jshint +W106 
-        
+        // jshint +W106
+
         error.code = analysisError.code;
         error.syscall = analysisError.syscall;
         console.log(error);
@@ -124,13 +122,13 @@
             analysis.raw[key] = JSON.parse(analysisBody[key]);
           }
           consolidateAnalysis(analysis);
-          
+
           // delete the raw data
           delete analysis.raw;
 
           forProxy.analysis = analysis;
           kdb.storeModelAnalysis(analysis);
-          
+
           console.log('::: ANALYSIS Completed: ' + onId);
           cb(analysis);
         } catch (err) {
@@ -141,7 +139,7 @@
           console.log('<<<');
           console.log(err);
           console.log(err.stack);
-          
+
           var parseError = new Error(
           '*** Failure while parsing analysis');
           parseError.onId = onId;
@@ -155,12 +153,12 @@
   }
 
   function performAnalysis (forModelKind, onId, cb){
-    
+
     console.log('::: Preparing to analyze ' + forModelKind + ' ' + onId);
 
     let forProxy = kdb.ItemProxy.getProxyFor(onId);
     let analysis = kdb.retrieveAnalysis(forProxy);
-    
+
     if (analysis) {
       cb(analysis);
     } else {
@@ -174,9 +172,9 @@
     var pseudoChunk = JSON.parse(JSON.stringify(nextToken));
     pseudoChunk.chunkType = 'XKPC';
     delete pseudoChunk.pos;
-    
+
     addChunkToSummary(onAnalysis, key, 'Pseudo-' + tokenIndex, pseudoChunk);
-    addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);    
+    addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);
   }
 
   function addChunkToSummary(onAnalysis, key, chunkIndex, nextChunk) {
@@ -273,7 +271,7 @@
             while (nextToken && (nextToken.end < nextChunk.begin)){
               addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken);
 
-              
+
               if (tokenIndex < tokenCount) {
                 nextToken = view.Token[++tokenIndex];
               } else {
@@ -282,7 +280,7 @@
             }
 
             addChunkToSummary(onAnalysis, key, chunkIndex, nextChunk);
-              
+
             if (tokenIndex < tokenCount) {
               nextToken = view.Token[tokenIndex];
             }
@@ -290,7 +288,7 @@
                 (nextToken.end <= nextChunk.end)) {
 
               addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);
-              
+
               // Check for more tokens in this chunk
               if (tokenIndex < tokenCount) {
                 nextToken = view.Token[++tokenIndex];
@@ -302,7 +300,7 @@
               nextChunk = view.Chunk[++chunkIndex];
             }
           }
-          
+
           // Check for trailing tokens in the sentence
           if (tokenIndex < tokenCount) {
             nextToken = view.Token[tokenIndex];
@@ -311,7 +309,7 @@
               (nextToken.end <= sentence.end)) {
 
             addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken);
-            
+
             // Check for more tokens in this chunk
             if (tokenIndex < tokenCount) {
               nextToken = view.Token[++tokenIndex];
