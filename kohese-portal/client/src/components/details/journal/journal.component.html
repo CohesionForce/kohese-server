@@ -5,10 +5,11 @@
 <br/>
 <mat-form-field>
   <input matInput #userInput type="text" placeholder="Observed By"
-    [matAutocomplete]="userFilter" [(ngModel)]="observingUser"/>
+    [matAutocomplete]="userFilter" [(ngModel)]="observingUser"
+    (input)="filterUsers(userInput.value)"/>
 </mat-form-field>
 <mat-autocomplete #userFilter="matAutocomplete">
-  <mat-option *ngFor="let proxy of filterUsers(userInput.value)"
+  <mat-option *ngFor="let proxy of filteredUserProxies"
     [value]="proxy.item.name">
     {{proxy.item.name}}
   </mat-option>

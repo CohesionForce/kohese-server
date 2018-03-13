@@ -27,6 +27,10 @@ export class DetailsComponent extends NavigatableComponent
   itemProxy : ItemProxy;
   parentProxy : ItemProxy;
   typeProxies : Array<ItemProxy>;
+  private _itemJson: string;
+  get itemJson() {
+    return this._itemJson;
+  }
 
   /* Observables */
   showChildrenSubject : BehaviorSubject<boolean>
@@ -120,7 +124,8 @@ export class DetailsComponent extends NavigatableComponent
       this.updateParentProxy();
 
       this.enableEdit = false;
-      this.defaultTab = {active: true }
+      this.defaultTab = {active: true };
+    this._itemJson = this.itemProxy.document();
       this.proxyStream.next(this.itemProxy);
   }
 
