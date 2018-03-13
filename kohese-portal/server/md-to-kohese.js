@@ -1,16 +1,12 @@
 /** Parses a provided markdown file and renders it into kohese items, then
  *  sends them to a local kohese server via rest interface.
- *  
+ *
  *  User must set the file and rootItem parameters below.
  */
 var fs = require('fs');
-var util = require('util');
 var commonmark = require('commonmark');
-var http = require('http');
 var renderFunc = require('./md-to-kohese-helper.js');
 var ItemProxy = require('../common/src/item-proxy.js');
-
-var accessToken;
 
 function mdToKohese(koheseUserName, filePath, rootItem) {
   var text;
@@ -21,18 +17,18 @@ function mdToKohese(koheseUserName, filePath, rootItem) {
     console.log('Error reading input file ' + filePath);
     return;
   }
-  
+
   var parsed = new commonmark.Parser().parse(text);
   var walker = parsed.walker();
 
   var item = new ItemProxy('Item',rootItem).item;
-  
+
   var addedIds = [{
     id: item.id,
     name: item.name
   }];
   var lineage = [item.id];
-  
+
   var tmpIdCounter = 0;
   var koheseItem;
   var readyToUpsert = false;
@@ -63,13 +59,13 @@ function mdToKohese(koheseUserName, filePath, rootItem) {
         upsert(koheseItem, render, addedIds, lineage, itemMap);
         readyToUpsert = false;
       }
-      
+
       // Handle increasing jumps in level that are greater than one
       var parent = undefined;
       for (var i = event.node.level - 1; !parent && (i >= 0); i--) {
         parent = lineage[i];
       }
-      
+
       koheseItem = {
           name: '',
           description: '',
@@ -90,7 +86,7 @@ function mdToKohese(koheseUserName, filePath, rootItem) {
         }
         event = walker.next();
       }
-      
+
       if(koheseItem.name === '') {
         koheseItem.name = 'No Heading Title Found';
       }
@@ -107,17 +103,17 @@ function mdToKohese(koheseUserName, filePath, rootItem) {
       console.log('!!! Unknown/Unhandled event: ' + event.node.type +
           ' - Entering: ' + event.entering);
     }
-    
+
     event = walker.next();
   }
-  
+
   for (var id in itemMap) {
     if (itemMap[id].itemIds.length > 0) {
       var proxy = ItemProxy.getProxyFor(id);
       proxy.updateItem(proxy.kind, itemMap[id]);
     }
   }
-  
+
   return addedIds;
 }
 module.exports = mdToKohese;
@@ -139,16 +135,16 @@ function upsert(koheseItem, render, idList, lineageMap, itemMap) {
           name: item.name
         });
         lineageMap[i] = item.id;
-        
+
         for (var id in itemMap) {
           if (JSON.stringify(id) === JSON.stringify(koheseItem.parentId)) {
             itemMap[id].itemIds.push(item.id);
             break;
           }
         }
-        
+
         itemMap[item.id] = item;
-        
+
         break;
       }
     }
