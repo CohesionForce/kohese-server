@@ -51,16 +51,8 @@
                                 {id: itemProxy.item.id})">
                       Analyze
               </button>
-
-		           <div *ngIf="itemProxy.children.length">
-                  <label class="control-label" for="showChildren"> Show Children </label>
-                  <mat-checkbox [(ngModel)]="showChildren" (change)="showChildrenToggled()"
-                         type="checkbox"></mat-checkbox>
-                </div>
                 <document-view [proxyStream]="proxyStream"
-                               [showChildrenSubject]="showChildrenSubject"></document-view>
-
-
+                               [incrementalLoad]="true"></document-view>
             </mat-tab>
             <mat-tab label="Details" *ngIf="!itemProxy.model.internal">
                 <ng-template mat-tab-label>

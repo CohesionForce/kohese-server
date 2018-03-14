@@ -34,7 +34,6 @@ describe('Component: Document View', ()=>{
     documentViewFixture = TestBed.createComponent(DocumentViewComponent);
     documentViewComponent = documentViewFixture.componentInstance;
 
-    documentViewComponent.showChildrenSubject = new BehaviorSubject(true);
     documentViewComponent.filterSubject = new BehaviorSubject({
       source : AnalysisViews.TERM_VIEW,
       filter : '',
