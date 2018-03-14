@@ -23,7 +23,7 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 })
 
 export class DocumentViewComponent extends NavigatableComponent
-  implements OnInit, OnDestroy, OnChanges {
+  implements OnInit, OnDestroy {
   /* UI Toggles */
 
   /* Data */
@@ -151,13 +151,6 @@ export class DocumentViewComponent extends NavigatableComponent
       }
     }
     this.docRendered = docRendered;
-  }
-
-  ngOnChanges(changes) {
-    if (this.initialized) {
-      this.itemProxy = (changes.itemProxy) ? changes.itemProxy.currentValue : changes.currentValue;
-      this.generateDoc();
-    }
   }
 
   onScroll() {
