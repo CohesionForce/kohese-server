@@ -113,13 +113,12 @@ export class DocumentViewComponent extends NavigatableComponent
       if (loadLength > lengthLimit) {
         // Case 2 : Load to the content limit
         newLoad = currentLoad + lengthIndex - 1;
+        if (newLoad > subTree.length) {
+          newLoad = subTree.length;
+        }
       } else if (this.itemsLoaded < subTree.length) {
         // Case 3 : Load based on defined increment
         newLoad = currentLoad + 12;
-        if (newLoad > subTree.length) {
-          // Trim to max length
-          newLoad = subTree.length;
-        }
       } 
     }
 
@@ -137,9 +136,9 @@ export class DocumentViewComponent extends NavigatableComponent
 
     this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
 
-    for (let i = 0; i < this.itemsLoaded; i++) {
+    for (let i = 0; i < this.itemsLoaded && i < subtreeAsList.length; i++) {
       let listItem = subtreeAsList[i];
-
+      
       if (listItem.depth > 0) {
         // Show the header for any node that is not the root of the document
         docRendered += '<h' + listItem.depth + '>' + listItem.proxy.item.name + '</h' + listItem.depth + '>';
