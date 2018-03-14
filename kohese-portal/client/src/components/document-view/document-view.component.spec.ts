@@ -63,12 +63,7 @@ describe('Component: Document View', ()=>{
 
     for (let i = 0; i < 5; i++) {
       let childProxy = new ItemProxy('Item', mockChild);
-      console.log(childProxy)
     } 
-
-
-    console.log("HEY HEY HEY")
-    console.log(documentProxy);
     
     documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
     documentViewComponent.incrementalLoad = false;
@@ -101,7 +96,6 @@ describe('Component: Document View', ()=>{
     
     for (let i = 0; i < 5; i++) {
       let childProxy = new ItemProxy('Item', mockChild);
-      console.log(childProxy);
     } 
 
     documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);

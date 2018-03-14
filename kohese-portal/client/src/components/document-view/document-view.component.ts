@@ -154,7 +154,6 @@ export class DocumentViewComponent extends NavigatableComponent
   }
 
   onScroll() {
-    console.log('scrollDown');
     this.generateDoc();
   }
 
