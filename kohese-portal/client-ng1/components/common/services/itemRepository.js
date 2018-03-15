@@ -242,7 +242,7 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         if(response.addItems) {
           response.addItems.forEach((addedItem) => {
             let iProxy;
-            if (addedItem.item.kind === 'KoheseModel') {
+            if (addedItem.kind === 'KoheseModel') {
               iProxy = new KoheseModel(addedItem.item);
             } else {
               iProxy = new ItemProxy(addedItem.kind, addedItem.item);
@@ -253,7 +253,7 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         if(response.changeItems) {
           response.changeItems.forEach((changededItem) => {
             let iProxy;
-            if (changededItem.item.kind === 'KoheseModel') {
+            if (changededItem.kind === 'KoheseModel') {
               iProxy = new KoheseModel(changededItem.item);
             } else {
               iProxy = new ItemProxy(changededItem.kind, changededItem.item);
@@ -366,7 +366,7 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
             console.log(response);
             if(!proxy.updateItem) {
               proxy.item = response.item;
-              if (response.item.kind === 'KoheseModel') {
+              if (response.kind === 'KoheseModel') {
                 proxy = new KoheseModel(response.item);
               } else {
                 proxy = new ItemProxy(response.kind, response.item);

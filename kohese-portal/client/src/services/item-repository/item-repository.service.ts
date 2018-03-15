@@ -165,7 +165,7 @@ export class ItemRepository {
           if (proxy) {
             proxy.updateItem(notification.kind, notification.item);
           } else {
-            if (proxy.item.kind === 'KoheseModel'){
+            if (notification.kind === 'KoheseModel'){
               proxy = new KoheseModel(notification.item);
             } else {
               proxy = new ItemProxy(notification.kind, notification.item);
@@ -182,7 +182,7 @@ export class ItemRepository {
           if (proxy) {
             proxy.updateItem(notification.kind, notification.item);
           } else {
-            if (proxy.item.kind === 'KoheseModel'){
+            if (notification.kind === 'KoheseModel'){
               proxy = new KoheseModel(notification.item);
             } else {
               proxy = new ItemProxy(notification.kind, notification.item);
