@@ -113,8 +113,7 @@ export class DocumentViewComponent extends NavigatableComponent
     } else {
       // Determine content length
       while (loadLength < lengthLimit && 
-            ( (subTree[lengthIndex]) ||
-              (subTree[lengthIndex] && lengthIndex == 0) )) {
+            ( (subTree[lengthIndex]))) {
         let currentProxy = subTree[lengthIndex].proxy;
         if (!currentProxy.item.description) {
           lengthIndex++;
