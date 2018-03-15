@@ -136,7 +136,7 @@ export class DocumentViewComponent extends NavigatableComponent
 
     this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
 
-    for (let i = 0; i < this.itemsLoaded && i < subtreeAsList.length; i++) {
+    for (let i = 0; i < this.itemsLoaded && i < subtreeAsList.length + 1; i++) {
       let listItem = subtreeAsList[i];
       
       if (listItem.depth > 0) {
