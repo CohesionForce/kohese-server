@@ -7,12 +7,13 @@ import { CurrentUserService } from '../user/current-user.service';
 import { ToastrService } from "ngx-toastr";
 import { DialogService } from '../dialog/dialog.service';
 
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy.js';
+import * as KoheseModel from '../../../../common/src/KoheseModel.js';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
-  
+
 export enum RepoStates {
   DISCONNECTED,
   SYNCHRONIZING,
@@ -22,7 +23,7 @@ export enum RepoStates {
 
 /**
  *
- */ 
+ */
 
 @Injectable()
 export class ItemRepository {
@@ -164,7 +165,11 @@ export class ItemRepository {
           if (proxy) {
             proxy.updateItem(notification.kind, notification.item);
           } else {
-                    proxy = new ItemProxy(notification.kind, notification.item);
+            if (proxy.item.kind === 'KoheseModel'){
+              proxy = new KoheseModel(notification.item);
+            } else {
+              proxy = new ItemProxy(notification.kind, notification.item);
+            }
           }
 
           this.updateVCState(proxy, notification.status);
@@ -177,7 +182,11 @@ export class ItemRepository {
           if (proxy) {
             proxy.updateItem(notification.kind, notification.item);
           } else {
-                    proxy = new ItemProxy(notification.kind, notification.item);
+            if (proxy.item.kind === 'KoheseModel'){
+              proxy = new KoheseModel(notification.item);
+            } else {
+              proxy = new ItemProxy(notification.kind, notification.item);
+            }
           }
 
           this.updateVCState(proxy, notification.status);
@@ -272,6 +281,7 @@ export class ItemRepository {
   }
 
   fetchItems () {
+    console.log('::: Requesting getAll');
     var beginFetching = Date.now();
     var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
 
@@ -288,24 +298,43 @@ export class ItemRepository {
         console.log('::: KDB is already in sync');
         syncSucceeded = true;
       } else {
-        for(var kind in response.cache) {
+        for(let kind in response.cache) {
           console.log('--- Processing ' + kind);
           var kindList = response.cache[kind];
           for (var index in kindList) {
-            var item = JSON.parse(kindList[index]);
-            var iProxy = new ItemProxy(kind, item);
+            let item = JSON.parse(kindList[index]);
+            let iProxy;
+            if (kind === 'KoheseModel'){
+              iProxy = new KoheseModel(item);
+            } else {
+              iProxy = new ItemProxy(kind, item);
+            }
+          }
+          if (kind === 'KoheseModel'){
+            KoheseModel.modelDefinitionLoadingComplete();
           }
         }
 
         if(response.addItems) {
           response.addItems.forEach((addedItem) => {
-            var iProxy = new ItemProxy(addedItem.kind, addedItem.item);
+            let iProxy;
+            if (addedItem.kind === 'KoheseModel'){
+              iProxy = new KoheseModel(addedItem.item);
+
+            } else {
+              iProxy = new ItemProxy(addedItem.kind, addedItem.item);
+            }
           });
         }
 
         if(response.changeItems) {
           response.changeItems.forEach((changededItem) => {
-            var iProxy = new ItemProxy(changededItem.kind, changededItem.item);
+            let iProxy;
+            if (changededItem.kind === 'KoheseModel'){
+              iProxy = new KoheseModel(changededItem.item);
+            } else {
+              iProxy = new ItemProxy(changededItem.kind, changededItem.item);
+            }
           });
         }
 
@@ -386,17 +415,6 @@ export class ItemRepository {
     }
   }
 
-  updateItemProxy (withResults) {
-    var proxy = ItemProxy.getProxyFor(withResults.id);
-
-    if (proxy) {
-      proxy.updateItem(withResults.constructor.modelName, withResults);
-    } else {
-      proxy = new ItemProxy(withResults.constructor.modelName, withResults);
-    }
-    proxy.dirty = false;
-  }
-
   fetchItem (proxy) {
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/findById', {id: proxy.item.id}, (response) => {
@@ -419,7 +437,13 @@ export class ItemRepository {
         } else {
           console.log('Create succeded');
           console.log(response);
-          let proxy: ItemProxy = new ItemProxy(response.kind, response.item);
+          let proxy;
+          if (response.kind === 'KoheseModel'){
+            proxy = new KoheseModel(response.item);
+          } else {
+            proxy = new ItemProxy(response.kind, response.item);
+          }
+
           proxy.dirty = false;
           resolve(proxy);
         }
@@ -438,8 +462,15 @@ export class ItemRepository {
           reject(response.error);
         } else {
           if(!proxy.updateItem) {
+            // TODO Need to figure out why this is here
             proxy.item = response.item;
-            proxy = new ItemProxy(response.kind, response.item);
+
+            if (response.kind === 'KoheseModel'){
+              proxy = new KoheseModel(response.item);
+            } else {
+              proxy = new ItemProxy(response.kind, response.item);
+            }
+
           } else {
             proxy.updateItem(response.kind, response.item);
           }

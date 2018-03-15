@@ -4,7 +4,8 @@
 
 function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
   var _ = require('underscore');
-  var ItemProxy = require('../../../../common/src/item-proxy');
+  var ItemProxy = require('../../../../common/src/item-proxy.js');
+  var KoheseModel = require('../../../../common/src/KoheseModel.js');
   var shortProxyList = [];
   var modelTypes = {
     Repository: 'Repository',
@@ -43,18 +44,18 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
 
   ItemProxy.getChangeSubject().subscribe(change => {
     console.log('+++ Received notification of change: ' + change.type);
-    if(change.proxy){
+    if(change.proxy) {
       console.log(change.kind);
       console.log(change.proxy.item);
     }
 
-    switch (change.type){
-      case 'loaded':
-        console.log('::: ItemProxy is loaded');
-        break;
-      case 'loading':
-        console.log('::: ItemProxy is loading');
-        break;
+    switch (change.type) {
+    case 'loaded':
+      console.log('::: ItemProxy is loaded');
+      break;
+    case 'loading':
+      console.log('::: ItemProxy is loading');
+      break;
     }
   });
 
@@ -67,7 +68,11 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         if (proxy) {
           proxy.updateItem(notification.kind, notification.item);
         } else {
-                	proxy = new ItemProxy(notification.kind, notification.item);
+          if (notification.kind === 'KoheseModel') {
+            proxy = new KoheseModel(notification.item);
+          } else {
+            proxy = new ItemProxy(notification.kind, notification.item);
+          }
         }
 
         updateVCState(proxy, notification.status);
@@ -80,7 +85,11 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         if (proxy) {
           proxy.updateItem(notification.kind, notification.item);
         } else {
-                	proxy = new ItemProxy(notification.kind, notification.item);
+          if (notification.kind === 'KoheseModel') {
+            proxy = new KoheseModel(notification.item);
+          } else {
+            proxy = new ItemProxy(notification.kind, notification.item);
+          }
         }
 
         updateVCState(proxy, notification.status);
@@ -103,7 +112,7 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
 
     KoheseIO.socket.on('connect_error', function () {
       console.log('::: IR: Socket IO Connection Error');
-      $rootScope.$broadcast('serverDisconnected', {})
+      $rootScope.$broadcast('serverDisconnected', {});
     });
 
     KoheseIO.socket.on('reconnect', function () {
@@ -218,19 +227,37 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
           var kindList = response.cache[kind];
           for (var index in kindList) {
             var item = JSON.parse(kindList[index]);
-            var iProxy = new ItemProxy(kind, item);
+            let iProxy;
+            if (kind === 'KoheseModel') {
+              iProxy = new KoheseModel(item);
+            } else {
+              iProxy = new ItemProxy(kind, item);
+            }
+          }
+          if (kind === 'KoheseModel') {
+            KoheseModel.modelDefinitionLoadingComplete();
           }
         }
 
         if(response.addItems) {
           response.addItems.forEach((addedItem) => {
-            var iProxy = new ItemProxy(addedItem.kind, addedItem.item);
+            let iProxy;
+            if (addedItem.item.kind === 'KoheseModel') {
+              iProxy = new KoheseModel(addedItem.item);
+            } else {
+              iProxy = new ItemProxy(addedItem.kind, addedItem.item);
+            }
           });
         }
 
         if(response.changeItems) {
           response.changeItems.forEach((changededItem) => {
-            var iProxy = new ItemProxy(changededItem.kind, changededItem.item);
+            let iProxy;
+            if (changededItem.item.kind === 'KoheseModel') {
+              iProxy = new KoheseModel(changededItem.item);
+            } else {
+              iProxy = new ItemProxy(changededItem.kind, changededItem.item);
+            }
           });
         }
 
@@ -261,11 +288,11 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         }
 
         console.log('$$$ Model Definitions:');
-        let modelDefs = ItemProxy.getModelDefinitions();
+        let modelDefs = KoheseModel.getModelDefinitions();
         console.log(modelDefs);
       }
 
-      if(syncSucceeded){
+      if(syncSucceeded) {
         $rootScope.$broadcast('itemRepositoryReady');
       }
       var rootProxy = ItemProxy.getRootProxy();
@@ -284,7 +311,7 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
       shortProxyList.push({
         name: proxies[i].item.name,
         id: proxies[i].item.id
-      })
+      });
     }
   }
 
@@ -303,17 +330,6 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
         toItem[key] = fromItem[key];
       }
     }
-  }
-
-  function updateItemProxy (withResults) {
-    var proxy = ItemProxy.getProxyFor(withResults.id);
-
-    if (proxy) {
-      proxy.updateItem(withResults.constructor.modelName, withResults);
-    } else {
-      proxy = new ItemProxy(withResults.constructor.modelName, withResults);
-    }
-    proxy.dirty = false;
   }
 
   function fetchItem (proxy) {
@@ -350,7 +366,11 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
             console.log(response);
             if(!proxy.updateItem) {
               proxy.item = response.item;
-              proxy = new ItemProxy(response.kind, response.item);
+              if (response.item.kind === 'KoheseModel') {
+                proxy = new KoheseModel(response.item);
+              } else {
+                proxy = new ItemProxy(response.kind, response.item);
+              }
             } else {
               proxy.updateItem(response.kind, response.item);
             }
@@ -367,15 +387,15 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
           headerText: 'Invalid field',
           bodyText: 'Please fill out all required fields : ',
           list: proxy.model.item.requiredProperties
-        }
+        };
 
         var modalDefaults = {
           templateUrl : ModalService.ONE_LIST_TEMPLATE
-        }
+        };
 
         ModalService.showModal(modalDefaults, modalOptions);
-        reject({error: 'User must fill out required fields'})
-      })
+        reject({error: 'User must fill out required fields'});
+      });
     }
 
     return promise;
@@ -385,13 +405,14 @@ function ItemRepository (KoheseIO, $rootScope, toastr, ModalService) {
     console.log('::: Preparing to deleteById ' + proxy.kind);
 
     var promise = new Promise((resolve, reject) => {
-      KoheseIO.socket.emit('Item/deleteById', {kind: proxy.kind, id: proxy.item.id, recursive: recursive}, function (response) {
-        if (response.error) {
-          reject(response.error);
-        } else {
-          resolve(response);
-        }
-      });
+      KoheseIO.socket.emit('Item/deleteById', {kind: proxy.kind, id: proxy.item.id, recursive: recursive},
+        function (response) {
+          if (response.error) {
+            reject(response.error);
+          } else {
+            resolve(response);
+          }
+        });
     });
 
     return promise;
@@ -464,4 +485,4 @@ export default () => {
       'toastr',
       'app.services.modalservice'])
     .service('ItemRepository', ItemRepository);
-}
+};

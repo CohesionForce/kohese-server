@@ -40,15 +40,29 @@ class KoheseModel extends ItemProxy {
 
     super('KoheseModel', forItem);
 
-    modelMap[itemId] = this;
+    if (!modelMap[itemId]) {
+      modelMap[itemId] = this;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  updateItem(forItem) {
+  updateItem(kind, forItem) {
     console.log('::: Updating KoheseModel: ' + forItem.id);
-    super.updateItem(this.kind, forItem);
+    super.updateItem(kind, forItem);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  deleteItem() {
+    let itemId = this.id;
+    console.log('::: Deleting KoheseModel: ' + itemId);
+    if (modelMap[itemId]){
+      delete modelMap[itemId];
+    }
+    super.deleteItem();
   }
 
   //////////////////////////////////////////////////////////////////////////
