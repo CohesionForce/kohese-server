@@ -1,8 +1,10 @@
 <div class="panel right-zone"
      [ngClass]="{'details-doc' : incrementalLoad}">
-  <div class="panel-heading">Document View</div>
+  <div class="panel-heading">Document View
+    <span class="pull-right">({{itemsLoaded}}/{{itemLength}}) </span>
+  </div>
   <div class="body-container">
-    <div class="panel-body doc-view">
+    <div class="panel-body doc-view" #docView>
         <div  
             data-infinite-scroll
             [infiniteScrollDistance]="2"

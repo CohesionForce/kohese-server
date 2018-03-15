@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 import { Observable } from 'rxjs';
 
@@ -12,6 +12,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class.js';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'document-view',
@@ -25,9 +26,11 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 export class DocumentViewComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   /* UI Toggles */
+  @ViewChild('docView') docView : ElementRef 
 
   /* Data */
   itemProxy: ItemProxy;
+  itemLength : ItemProxy;
 
   filter: string;
   docRendered: string;
@@ -55,7 +58,8 @@ export class DocumentViewComponent extends NavigatableComponent
   proxyStreamSubscription: Subscription;
 
   constructor(NavigationService: NavigationService,
-    private changeRef: ChangeDetectorRef) {
+    private changeRef: ChangeDetectorRef,
+    private router : Router) {
     super(NavigationService)
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true });
@@ -70,6 +74,14 @@ export class DocumentViewComponent extends NavigatableComponent
         this.changeRef.markForCheck();
       })
     }
+
+    this.router.events.subscribe((event)=>{
+      if (!(event instanceof NavigationEnd)) {
+        return;
+      }
+      console.log(this.docView);
+      this.docView.nativeElement.scrollTop = 0;
+    })
 
     this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
       this.itemProxy = newProxy;
@@ -100,7 +112,9 @@ export class DocumentViewComponent extends NavigatableComponent
       newLoad = subTree.length;
     } else {
       // Determine content length
-      while (loadLength < lengthLimit && subTree[lengthIndex - 1]) {
+      while (loadLength < lengthLimit && 
+            ( (subTree[lengthIndex]) ||
+              (subTree[lengthIndex] && lengthIndex == 0) )) {
         let currentProxy = subTree[lengthIndex].proxy;
         if (!currentProxy.item.description) {
           lengthIndex++;
@@ -126,15 +140,21 @@ export class DocumentViewComponent extends NavigatableComponent
   }
 
   generateDoc(): void {
-    let subtreeAsList = this.itemProxy.getSubtreeAsList();
+    let subtreeAsList = this.itemProxy.getSubtreeAsList()
+    this.itemLength = subtreeAsList.length;
 
     let docRendered = '';
 
     if (this.itemsLoaded >= subtreeAsList.length) {
+      this.itemsLoaded = subtreeAsList.length
       return;
     } 
 
     this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
+
+    if (this.itemsLoaded > subtreeAsList.length) {
+      this.itemsLoaded = subtreeAsList.length
+    } 
 
     for (let i = 0; (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
       let listItem = subtreeAsList[i];
