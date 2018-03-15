@@ -100,7 +100,7 @@ export class DocumentViewComponent extends NavigatableComponent
       newLoad = subTree.length;
     } else {
       // Determine content length
-      while (loadLength < lengthLimit && subTree[lengthIndex]) {
+      while (loadLength < lengthLimit && subTree[lengthIndex - 1]) {
         let currentProxy = subTree[lengthIndex].proxy;
         if (!currentProxy.item.description) {
           lengthIndex++;
@@ -130,13 +130,13 @@ export class DocumentViewComponent extends NavigatableComponent
 
     let docRendered = '';
 
-    if (this.itemsLoaded === subtreeAsList.length) {
+    if (this.itemsLoaded >= subtreeAsList.length) {
       return;
     } 
 
     this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
 
-    for (let i = 0; i < this.itemsLoaded && i < subtreeAsList.length + 1; i++) {
+    for (let i = 0; (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
       let listItem = subtreeAsList[i];
       
       if (listItem.depth > 0) {
@@ -154,6 +154,7 @@ export class DocumentViewComponent extends NavigatableComponent
 
   onScroll() {
     this.generateDoc();
+    this.changeRef.markForCheck();
   }
 
   onFilterChange() {
