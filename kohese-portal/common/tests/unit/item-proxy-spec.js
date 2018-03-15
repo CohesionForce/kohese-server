@@ -1,6 +1,7 @@
 describe('ItemProxy Test', function () {
 
   var ItemProxy = require('../../../common/src/item-proxy.js');
+  var KoheseModel = require('../../../common/src/KoheseModel.js');
 
   var root = ItemProxy.getRootProxy();
   var lostAndFound = ItemProxy.getProxyFor('LOST+FOUND');
@@ -89,7 +90,7 @@ describe('ItemProxy Test', function () {
       },
       'Test-Exclude': {
         'id': 'Test-Exclude',
-        'name': 'Test',
+        'name': 'Test-Exclude',
         'base': 'PersistedModel',
         'parentId': 'Model-Definitions',
         'strict': 'validate',
@@ -120,10 +121,10 @@ describe('ItemProxy Test', function () {
 
     for (let key in modelDefMap) {
       // eslint-disable-next-line no-unused-vars
-      let modelProxy = new ItemProxy('KoheseModel', modelDefMap[key]);
+      let modelProxy = new KoheseModel(modelDefMap[key]);
     }
 
-    ItemProxy.modelDefinitionLoadingComplete();
+    KoheseModel.modelDefinitionLoadingComplete();
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -636,7 +637,7 @@ describe('ItemProxy Test', function () {
     dumpHashFor(proxy);
     ItemProxy.loadingComplete();
 
-    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('cd9c584ed2f5dfdc38814825f5b617c71fc60b53');
+    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('2b99e2dda5c6be0762532b093661a895e6fa4f09');
     expect(proxy.parentProxy.treeHashEntry.childTreeHashes['test-item-id'])
       .toEqual('53688a4a9207203c25da692d634bd58305ae1313');
     expect(proxy.treeHashEntry.treeHash).toEqual('53688a4a9207203c25da692d634bd58305ae1313');
@@ -967,36 +968,20 @@ describe('ItemProxy Test', function () {
         'kind': 'Internal',
         'oid': 'ba14baabb49cca43770ca92b36388169a2df5f6c',
         'childTreeHashes': {
-          'LOST+FOUND': '6bd4b99ab4c7bd8f7643e93f75dbf081d3adcf23',
-          'Model-Definitions': 'c5f5d0e87c4a32571f7696ff0c8f9f5b86fcad29',
+          'Model-Definitions': '0ef9fc4be73ed5eb89096160b8d6ab62e248b75b',
           'NV-TOP': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
           'View-Model-Definitions': '5226d1580a592d72b9e6b360e768b90d5d814ae0'
         },
-        'treeHash': 'bbd99813d205199f90333eb1c07a2fda0aaf6db6'
-      },
-      'LOST+FOUND': {
-        'kind': 'Internal',
-        'oid': 'a428513cdfbef52e379d3506fb820634712667cd',
-        'childTreeHashes': {
-          'KoheseModel': '2dbcdcb277081902336139d7297a5afc9483e633'
-        },
-        'treeHash': '6bd4b99ab4c7bd8f7643e93f75dbf081d3adcf23'
-      },
-      'KoheseModel': {
-        'kind': 'Internal-Lost',
-        'oid': 'b670af8844cd94395e5a440dbd65a8c07ae460f2',
-        'childTreeHashes': {},
-        'treeHash': '2dbcdcb277081902336139d7297a5afc9483e633',
-        'parentId': 'LOST+FOUND'
+        'treeHash': 'a791027001e18714f51b78ae87cc10ba70b2443a'
       },
       'Model-Definitions': {
         'kind': 'Internal-Model',
         'oid': '8109f6a5dfeea6ede032fa99d6cd1b79ef589503',
         'childTreeHashes': {
           'Test': '67af553ac64e266aebebeb36dbcc799b350146a8',
-          'Test-Exclude': '005e6fda295d743d7ee1ea354d65d73521bfd229'
+          'Test-Exclude': '26094ef81e18c6c30d1049d3d765d8ef9b3ed45e'
         },
-        'treeHash': 'c5f5d0e87c4a32571f7696ff0c8f9f5b86fcad29'
+        'treeHash': '0ef9fc4be73ed5eb89096160b8d6ab62e248b75b'
       },
       'Test': {
         'kind': 'KoheseModel',
@@ -1007,9 +992,9 @@ describe('ItemProxy Test', function () {
       },
       'Test-Exclude': {
         'kind': 'KoheseModel',
-        'oid': '36eb788518379ea4d45c601092901284153fec00',
+        'oid': '0967834430669111e3f071162af1d15c3f2b173f',
         'childTreeHashes': {},
-        'treeHash': '005e6fda295d743d7ee1ea354d65d73521bfd229',
+        'treeHash': '26094ef81e18c6c30d1049d3d765d8ef9b3ed45e',
         'parentId': 'Model-Definitions'
       },
       'NV-TOP': {
@@ -1100,6 +1085,10 @@ describe('ItemProxy Test', function () {
     console.log('Tree Hash Map Compare');
     console.log(JSON.stringify(thmCompare, null, '  '));
   }
+
+  // let kdbFS = require('../../../server/kdb-fs.js');
+  // kdbFS.storeJSONDoc('t.expected.json', expectedTreeHashMap);
+  // kdbFS.storeJSONDoc('t.thm.json', treeHashMap);
 
   expect(treeHashMap).toEqual(expectedTreeHashMap);
 });
@@ -1195,7 +1184,7 @@ it('Should Not Hang When Deleting Lost+Found With Children', () => {
   // Try to delete item and descendants
   var lfProxyAfter = ItemProxy.getProxyFor('LOST+FOUND');
   expect(lfProxyAfter).toEqual(lostAndFound);
-  expect(lfProxyAfter.descendantCount).toEqual(3);
+  expect(lfProxyAfter.descendantCount).toEqual(2);
 
   lostAndFound.deleteItem(true);
   expect(lfProxyAfter.descendantCount).toEqual(0);
@@ -1267,7 +1256,7 @@ it('Prevent Recursion on Updating Lost+Found', () => {
   // eslint-disable-next-line no-unused-vars
   var lf = new ItemProxy('Internal', lfContent);
 
-  expect(lostAndFound.descendantCount).toEqual(3);
+  expect(lostAndFound.descendantCount).toEqual(2);
 });
 
 //////////////////////////////////////////////////////////////////////////
