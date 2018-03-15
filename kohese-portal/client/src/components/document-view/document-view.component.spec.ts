@@ -13,6 +13,7 @@ import { MockItem, MockDocument } from '../../../mocks/data/MockItem';
 import * as ItemProxy from '../../../../common/src/item-proxy';
 import { AnalysisViews } from '../analysis/AnalysisViewComponent.class';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { RouterTestingModule } from '@angular/router/testing';
 
 
 describe('Component: Document View', ()=>{
@@ -26,7 +27,8 @@ describe('Component: Document View', ()=>{
       imports : [CommonModule,
          MaterialModule,
          BrowserAnimationsModule,
-         InfiniteScrollModule
+         InfiniteScrollModule,
+         RouterTestingModule
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
