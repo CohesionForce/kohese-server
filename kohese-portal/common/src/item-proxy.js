@@ -28,8 +28,9 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  constructor(kind, forItem) {
-    let itemId = forItem.id;
+  constructor(kind, withItem) {
+    var forItem = JSON.parse(JSON.stringify(withItem));
+    var itemId = forItem.id;
 
     if (!itemId){
       itemId = forItem.id = uuidV1();

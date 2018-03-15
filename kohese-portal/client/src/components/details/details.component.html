@@ -51,16 +51,8 @@
                                 {id: itemProxy.item.id})">
                       Analyze
               </button>
-
-		           <div *ngIf="itemProxy.children.length">
-                  <label class="control-label" for="showChildren"> Show Children </label>
-                  <mat-checkbox [(ngModel)]="showChildren" (change)="showChildrenToggled()"
-                         type="checkbox"></mat-checkbox>
-                </div>
                 <document-view [proxyStream]="proxyStream"
-                               [showChildrenSubject]="showChildrenSubject"></document-view>
-
-
+                               [incrementalLoad]="true"></document-view>
             </mat-tab>
             <mat-tab label="Details" *ngIf="!itemProxy.model.internal">
                 <ng-template mat-tab-label>
@@ -103,7 +95,7 @@
                 <h5>Id: {{itemProxy.item.id}}</h5>
                 <h5>OID: {{itemProxy.oid}}</h5>
                 <h5>Tree Hash: {{itemProxy.treeHash}}</h5>
-                <pre>{{itemProxy.document()}}</pre>
+                <pre>{{itemJson}}</pre>
                 <pre>{{itemProxy.treeHashEntry | json}}</pre>
             </mat-tab>
         </mat-tab-group>

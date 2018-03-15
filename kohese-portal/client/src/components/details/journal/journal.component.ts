@@ -29,6 +29,10 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   };
   public selectedSortStrategy: string = Object.keys(this.SORT_STRATEGIES)[0];
   private userProxies: Array<ItemProxy>;
+  private _filteredUserProxies: Array<ItemProxy>;
+  get filteredUserProxies() {
+    return this._filteredUserProxies;
+  }
   observingUser: string;
   public dateObserved: string;
   public timeObserved: string;
@@ -209,8 +213,8 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
   
-  filterUsers(text: string): Array<ItemProxy> {
-    return this.userProxies.filter((proxy: ItemProxy) => {
+  filterUsers(text: string): void {
+    this._filteredUserProxies = this.userProxies.filter((proxy: ItemProxy) => {
       return (-1 !== proxy.item.name.indexOf(text));
     });
   }

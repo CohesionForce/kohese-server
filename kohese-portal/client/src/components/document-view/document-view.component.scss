@@ -1,0 +1,12 @@
+.doc-view {
+  height : 100%;
+  overflow : scroll;
+}
+
+.body-container {
+  height : calc(100% - 40px);
+}
+
+.details-doc {
+  height: calc(100% - 53px);
+}

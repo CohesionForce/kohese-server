@@ -29,10 +29,10 @@ import { TreeRowComponent } from './components/tree/tree-row.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 import { MaterialModule } from './material.module';
 
@@ -49,9 +49,9 @@ import { MaterialModule } from './material.module';
     AppRoutingModule,
     FormsModule,
     FlexLayoutModule,
-    NgbModule.forRoot(),
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
+    InfiniteScrollModule,
     PipesModule,
     MaterialModule,
     AngularSplitModule,

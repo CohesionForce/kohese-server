@@ -46,7 +46,7 @@
             <mat-option
               *ngFor="let inputType of userInputs | mapKey"
               [value]="inputType">
-              {{typeService.getUserInputTypes()[inputType]}}
+              {{userInputs[inputType]}}
             </mat-option>
           </mat-select>
         </mat-form-field>

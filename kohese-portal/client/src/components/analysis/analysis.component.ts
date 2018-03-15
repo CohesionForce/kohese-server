@@ -19,7 +19,6 @@ export class AnalysisComponent extends NavigatableComponent
                                implements OnInit, OnDestroy {
 
   /* UI Toggles */
-  showChildren : boolean;
   analysisLoaded : boolean;
   repoLoaded : boolean;
 
@@ -35,7 +34,6 @@ export class AnalysisComponent extends NavigatableComponent
 
   /* Observables */
   filterSubject : BehaviorSubject<AnalysisFilter>
-  showChildrenSubject : BehaviorSubject<boolean>
   proxyStream: BehaviorSubject<ItemProxy>;
 
   constructor(protected NavigationService : NavigationService,
@@ -51,7 +49,6 @@ export class AnalysisComponent extends NavigatableComponent
         ignoreCase: false
       }
     })
-    this.showChildrenSubject = new BehaviorSubject(true);
 
   }
 
