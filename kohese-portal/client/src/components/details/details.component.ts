@@ -27,9 +27,12 @@ export class DetailsComponent extends NavigatableComponent
   itemProxy : ItemProxy;
   parentProxy : ItemProxy;
   typeProxies : Array<ItemProxy>;
+  private _itemJson: string;
+  get itemJson() {
+    return this._itemJson;
+  }
 
   /* Observables */
-  showChildrenSubject : BehaviorSubject<boolean>
   detailsFormSubject : BehaviorSubject<FormGroup>;
   proxyStream : BehaviorSubject<ItemProxy>;
   private _editableStream: BehaviorSubject<boolean> =
@@ -47,7 +50,6 @@ export class DetailsComponent extends NavigatableComponent
   /* UI Switches */
   defaultTab : object;
   uiTreeOptions : object;
-  showChildren : boolean;
 
   /* Data */
   kindList : Array<string>;
@@ -74,8 +76,6 @@ export class DetailsComponent extends NavigatableComponent
   ngOnInit () {
 
     this.proxyStream = new BehaviorSubject({});
-    this.showChildren = false;
-    this.showChildrenSubject = new BehaviorSubject(this.showChildren);
 
     /* Subscriptions */
     this.routeSub = this.route.params.subscribe(params => {
@@ -123,8 +123,9 @@ export class DetailsComponent extends NavigatableComponent
       this.userList = this.SessionService.getUsers();
       this.updateParentProxy();
 
-      this._editableStream.next(false);
-      this.defaultTab = {active: true }
+    this._editableStream.next(false);
+      this.defaultTab = {active: true };
+    this._itemJson = this.itemProxy.document();
       this.proxyStream.next(this.itemProxy);
   }
 
@@ -169,11 +170,7 @@ export class DetailsComponent extends NavigatableComponent
       this._editableStream.next(false);
     });
   }
-
-  showChildrenToggled () : void {
-      this.showChildrenSubject.next(this.showChildren);
-    }
-
+  
   removeItem (proxy : ItemProxy) : void {
     this.ItemRepository.deleteItem(proxy, false)
       .then(function () {

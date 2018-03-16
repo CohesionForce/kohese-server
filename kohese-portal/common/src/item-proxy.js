@@ -32,7 +32,8 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  constructor(kind, forItem) {
+  constructor(kind, withItem) {
+    var forItem = JSON.parse(JSON.stringify(withItem));
     var itemId = forItem.id;
 
     if (!itemId){
@@ -832,6 +833,32 @@ class ItemProxy {
     this.visitDescendants(displayItem);
 
     return outputBuffer;
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getSubtreeAsList() {
+
+    let subtreeList = [];
+
+    var document = this;
+
+    var addProxyToList = function(proxy){
+
+      let listItem = {
+        depth: proxy.getDepthFromAncestor(document),
+        proxy: proxy
+      };
+
+      subtreeList.push(listItem);
+    };
+
+    let visitFlags = {};
+    this.visitTree(visitFlags, addProxyToList);
+
+    return subtreeList;
 
   }
 
