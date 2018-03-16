@@ -79,6 +79,10 @@
             <mat-tab>
               <ng-template mat-tab-label>
                   Children ({{itemProxy.children.length}})
+                  <ng-container *ngIf="itemProxy.dirty">
+                    <img src="../../../assets/icons/versioncontrol/dirty.ico"
+                      title="Dirty item"/>
+                  </ng-container>
               </ng-template>
               <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
             </mat-tab>
