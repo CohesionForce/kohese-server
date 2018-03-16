@@ -6,7 +6,8 @@ import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector : 'explore-view',
-  templateUrl : './explore.component.html'
+  templateUrl : './explore.component.html',
+  styleUrls: ['./explore.component.scss']
 })
 
 export class ExploreComponent extends NavigatableComponent

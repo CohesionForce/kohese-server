@@ -24,8 +24,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TreeComponent } from './components/tree/tree.component';
-import { TreeRowComponent } from './components/tree/tree-row.component';
+import { TreeComponent, TreeRowComponent } from './components/tree/tree.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
 
@@ -33,6 +32,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
 
 import { MaterialModule } from './material.module';
 
@@ -41,8 +41,8 @@ import { MaterialModule } from './material.module';
     AppComponent,
     DashboardComponent,
     TreeComponent,
-    ExploreComponent,
-    TreeRowComponent
+    TreeRowComponent,
+    ExploreComponent
   ],
   imports: [
     BrowserModule,
@@ -67,7 +67,8 @@ import { MaterialModule } from './material.module';
     LoginModule,
     UserModule,
     ServicesModule,
-    AdminModule
+    AdminModule,
+    VirtualScrollModule
   ],
   bootstrap: [AppComponent]
 })

@@ -1,4 +1,4 @@
-<div *ngIf="root">
+<div *ngIf="root"  style="height: 100%;">
   <div id="top-action-bar">
     <button mat-raised-button (click)="expandAll()"
       class="btn btn-default btn-sm">
@@ -95,16 +95,18 @@
       Name
     </div>
     <div class="kt-body">
-      <tree-row #rows *ngFor="let proxy of root.children"
-        [itemProxy]="proxy" (rootChanged)="whenRootChanges($event)"
-        [selectedViewStream]="selectedViewStream"
-        [selectedProxyIdStream]="selectedProxyIdStream"
-        [filterStream]="filterStream"
-        (visibilityChanged)="whenRowVisibilityChanges($event)">
-      </tree-row>
+      <virtual-scroll #tree [items]="matchingRows">
+        <tree-row *ngFor="let row of tree.viewPortItems"
+          [treeRow]="row" (rootChanged)="whenRootChanges($event)"
+          [selectedViewStream]="selectedViewStream"
+          [selectedProxyIdStream]="selectedProxyIdStream"
+          [filterStream]="filterStream"
+          (visibilityChanged)="whenRowVisibilityChanges($event)">
+        </tree-row>
+      </virtual-scroll>
     </div>
   </div> <!-- End Knowledge Tree -->
 </div>
-<div *ngIf="!root">
+<div *ngIf="!root" style="height: 100%;">
   Loading...
 </div>
