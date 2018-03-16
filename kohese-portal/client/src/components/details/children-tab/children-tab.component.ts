@@ -93,6 +93,7 @@ export class ChildrenTabComponent extends NavigatableComponent
     this.itemProxy.toggleChildrenAreManuallyOrdered();
     this.orderedChildren = this.itemProxy.childrenAreManuallyOrdered();
     this.itemProxy.dirty = true;
+    this.childrenStream.next(this.itemProxy.children);
   }
 
   createChild () {
