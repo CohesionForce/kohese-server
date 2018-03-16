@@ -27,6 +27,14 @@ export class ChildrenTabComponent extends NavigatableComponent
   /* Data */
   @Input()
   proxyStream : Observable<ItemProxy>;
+  private _editableStream: Observable<boolean>;
+  get editableStream() {
+    return this._editableStream;
+  }
+  @Input('editableStream')
+  set editableStream(editableStream: Observable<boolean>) {
+    this._editableStream = editableStream;
+  }
 
   itemProxy : ItemProxy;
   filterString : string;
@@ -54,7 +62,6 @@ export class ChildrenTabComponent extends NavigatableComponent
     this.proxyStream.subscribe((newProxy : ItemProxy) => {
      this.updateProxy(newProxy); 
     })
-    this.orderedChildren = this.itemProxy.childrenAreManuallyOrdered();
     this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
@@ -73,6 +80,7 @@ export class ChildrenTabComponent extends NavigatableComponent
   updateProxy (newProxy : ItemProxy) {
     this.itemProxy = newProxy;
     this.childrenStream.next(this.itemProxy.children);
+    this.orderedChildren = this.itemProxy.childrenAreManuallyOrdered();
     this.changeRef.markForCheck();
   }
 
@@ -84,6 +92,8 @@ export class ChildrenTabComponent extends NavigatableComponent
   toggleOrderedChildren () {
     this.itemProxy.toggleChildrenAreManuallyOrdered();
     this.orderedChildren = this.itemProxy.childrenAreManuallyOrdered();
+    this.itemProxy.dirty = true;
+    this.childrenStream.next(this.itemProxy.children);
   }
 
   createChild () {

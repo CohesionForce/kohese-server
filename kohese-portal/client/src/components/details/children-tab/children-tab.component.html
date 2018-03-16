@@ -1,7 +1,9 @@
 <span class="control-group">
-  <label class="control-label" for="Ordered"> Ordered </label>
-    <mat-checkbox [(ngModel)]="orderedChildren" (change)="toggleOrderedChildren()">
-    </mat-checkbox>
+  <mat-checkbox [(ngModel)]="orderedChildren"
+    (change)="toggleOrderedChildren()"
+    [disabled]="!(editableStream | async)">
+    Ordered
+  </mat-checkbox>
     <button mat-raised-button
     (click)="createChild()">
     Create Child </button>
@@ -32,6 +34,7 @@
   <mat-card-content>
     <children-table [childrenStream]="childrenStream"
                     [filterSubject]="filterSubject"
+                    [editableStream]="editableStream"
                     *ngIf="childView === 'table'"></children-table>
     <proxy-selector-tree [itemProxy]="itemProxy"
                    *ngIf="childView === 'tree'"></proxy-selector-tree>

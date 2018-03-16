@@ -34,7 +34,12 @@ export class DetailsComponent extends NavigatableComponent
 
   /* Observables */
   detailsFormSubject : BehaviorSubject<FormGroup>;
-  proxyStream : BehaviorSubject<ItemProxy>
+  proxyStream : BehaviorSubject<ItemProxy>;
+  private _editableStream: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(false);
+  get editableStream() {
+    return this._editableStream;
+  }
   
   /* Subscriptions */
   routeSub : Subscription;
@@ -43,7 +48,6 @@ export class DetailsComponent extends NavigatableComponent
   proxyUpdates : Observable<any>;
 
   /* UI Switches */
-  enableEdit : boolean;
   defaultTab : object;
   uiTreeOptions : object;
 
@@ -119,7 +123,7 @@ export class DetailsComponent extends NavigatableComponent
       this.userList = this.SessionService.getUsers();
       this.updateParentProxy();
 
-      this.enableEdit = false;
+    this._editableStream.next(false);
       this.defaultTab = {active: true };
     this._itemJson = this.itemProxy.document();
       this.proxyStream.next(this.itemProxy);
@@ -163,7 +167,7 @@ export class DetailsComponent extends NavigatableComponent
     }
     this.ItemRepository.upsertItem(this.itemProxy)
       .then((updatedItemProxy: ItemProxy) => {
-      this.enableEdit = false;
+      this._editableStream.next(false);
     });
   }
   
@@ -176,5 +180,12 @@ export class DetailsComponent extends NavigatableComponent
 
   public whenNonFormFieldChanges(updatedField: any): void {
     this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
+  }
+  
+  public cancelEditing(): void {
+    this._editableStream.next(false);
+    this.ItemRepository.fetchItem(this.itemProxy).then((proxy: ItemProxy) => {
+      this.updateProxy();
+    });
   }
 }
