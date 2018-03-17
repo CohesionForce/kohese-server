@@ -10,16 +10,16 @@
                     (click)="navigate('Explore', {id :itemProxy.item.parentId})"
                     title="Go to Parent"></i>
             <i class="fa fa-lg fa-edit"
-               *ngIf="!enableEdit"
-               (click)="enableEdit=true"
+               *ngIf="!editableStream.getValue()"
+               (click)="editableStream.next(true)"
                title="Edit"></i>
-            <span *ngIf="enableEdit"
+            <span *ngIf="editableStream.getValue()"
                   class="fa fa-stack">
                 <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
-                   (click)="enableEdit = false;"
+                   (click)="cancelEditing()"
                    title="Cancel Edit"></i>
                 <i class="fa fa-stack-1x fa-times stacked-child"
-                   (click)="enableEdit = false;"
+                   (click)="cancelEditing()"
                    title="Cancel Edit"></i>
             </span>
             <i class="fa fa-lg fa-save"
@@ -63,7 +63,7 @@
                   </span>
                 </ng-template>
                 <details-form #editor [itemProxy]="itemProxy" 
-                  [disabled]="!enableEdit"
+                  [disabled]="!editableStream.getValue()"
                   (formGroupUpdated)="onFormGroupUpdated($event)"
                   (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
                 </details-form>
@@ -71,8 +71,12 @@
             <mat-tab>
               <ng-template mat-tab-label>
                   Children ({{itemProxy.children.length}})
+                  <ng-container *ngIf="itemProxy.dirty">
+                    <img src="../../../assets/icons/versioncontrol/dirty.ico"
+                      title="Dirty item"/>
+                  </ng-container>
               </ng-template>
-              <children-tab [proxyStream]="proxyStream"></children-tab>
+              <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
             </mat-tab>
             <mat-tab label="Relations">
                 <h4>Relations Tab</h4>

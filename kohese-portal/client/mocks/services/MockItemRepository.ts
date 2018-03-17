@@ -16,14 +16,18 @@ export class MockItemRepository {
     let modelProxy = new KoheseModel(MockDataModel());
     KoheseModel.modelDefinitionLoadingComplete();
 
+    new ItemProxy('KoheseView', MockViewData());
+    let numberOfItemsToAdd: number = 7;
+    for (let j: number = 0; j < numberOfItemsToAdd; j++) {
+      let item: any = MockItem();
+      /* Delete the parentId so that this Item will be added as a child of the
+      root proxy */
+      delete item.parentId;
+      // Make the ID of each of these added Items distinct among each other
+      item.id = item.id + (j + 1);
+      new ItemProxy('Item', item);
+    }
 
-    this.mockRootProxy.children = [
-      new ItemProxy('Item', MockViewData()),
-      new ItemProxy('Item', MockItem()),
-      new ItemProxy('Item', MockItem()),
-      new ItemProxy('Item', MockItem()),
-      new ItemProxy('Item', MockItem())
-    ]
     this.mockRootProxy.visitChildren = ()=>{}
   }
 
