@@ -417,13 +417,13 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateTreeHash(deferred) {
+  calculateTreeHash(deferredRollup) {
 
     // TODO: Should only have to do this when content is updated
     this.calculateOID();
 
     // Don't calculateTreeHash during initial load
-    if (!this.item || tree.loading){
+    if (!this.item || (tree.loading && !deferredRollup)){
       this.deferTreeHash = true;
       return;
     }
@@ -436,14 +436,19 @@ class ItemProxy {
 
     for (var childIdx in this.children){
       var childProxy = this.children[childIdx];
-      if(childProxy.kind === 'Repository'){
-        treeHashEntry.childTreeHashes[childProxy.item.id] = 'Repository-Mount';
-      } else {
-        if(childProxy.deferTreeHash){
-          this.deferTreeHash = true;
-          return;
-        }
-        treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;
+      switch(childProxy.kind){
+        case 'Repository':
+          treeHashEntry.childTreeHashes[childProxy.item.id] = 'Repository-Mount';
+          break;
+        case 'Internal':
+          treeHashEntry.childTreeHashes[childProxy.item.id] = 'Internal';
+          break;
+        default:
+          if(childProxy.deferTreeHash){
+            this.deferTreeHash = true;
+            return;
+          }
+          treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;
       }
     }
 
@@ -464,7 +469,7 @@ class ItemProxy {
     this.treeHashEntry = treeHashEntry;
 
     // Propagate changes up the tree
-    if (!deferred){
+    if (!deferredRollup){
       if (this.parentProxy){
         this.parentProxy.calculateTreeHash();
       }
@@ -474,11 +479,21 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static calculateAllTreeHashes() {
-    const deferred = true;
-    tree.root.visitTree(null, null, (proxy) => {
-      proxy.calculateTreeHash(deferred);
+  calculateRepoTreeHashes() {
+    const deferredRollup = true;
+    this.visitTree({excludeKind : ['Repository', 'Internal']}, null, (proxy) => {
+      proxy.calculateTreeHash(deferredRollup);
     });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static calculateAllTreeHashes() {
+    for (let repoId in tree.repoMap){
+      let repoProxy = tree.repoMap[repoId];
+      repoProxy.calculateRepoTreeHashes();
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -581,7 +596,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   getTreeHashMap() {
     var treeHashMap = {};
-    this.visitTree({excludeKind : ['Repository']}, (proxy) => {
+    this.visitTree({excludeKind : ['Repository', 'Internal']}, (proxy) => {
       treeHashMap [proxy.item.id] = proxy.treeHashEntry;
     });
     return treeHashMap;
@@ -595,7 +610,7 @@ class ItemProxy {
 
     for(var repoIdx in tree.repoMap){
       var repoProxy = tree.repoMap[repoIdx];
-      repoTreeHashes[repoIdx] = repoProxy.getTreeHashMap();
+      repoTreeHashes[repoIdx] = repoProxy.treeHashEntry;
     }
     return repoTreeHashes;
   }

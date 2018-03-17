@@ -18,6 +18,7 @@ export enum RepoStates {
   DISCONNECTED,
   SYNCHRONIZING,
   SYNCHRONIZATION_FAILED,
+  KOHESEMODELS_SYNCHRONIZED,
   SYNCHRONIZATION_SUCCEEDED
 };
 
@@ -40,6 +41,8 @@ export class ItemRepository {
   state : any;
 
   repositoryStatus : BehaviorSubject<any>;
+  repoSyncStatus = {};
+
   historySubject : Subject<any>;
 
   constructor (private socketService: SocketService,
@@ -92,11 +95,11 @@ export class ItemRepository {
     this.historySubject = new Subject();
 
     ItemProxy.getChangeSubject().subscribe(change => {
-      console.log('+++ Received notification of change: ' + change.type);
-      if(change.proxy){
-        console.log(change.kind);
-        console.log(change.proxy.item);
-      }
+      // console.log('+++ Received notification of change: ' + change.type);
+      // if(change.proxy){
+      //   console.log(change.kind);
+      //   console.log(change.proxy.item);
+      // }
 
       switch (change.type){
         case 'loaded':
@@ -198,7 +201,13 @@ export class ItemRepository {
           var proxy = ItemProxy.getProxyFor(notification.id);
           proxy.deleteItem();
         });
+
       }
+
+      this.socketService.socket.on('Item/BulkUpdate', (bulkUpdate) => {
+        console.log('::: Received Bulk Update');
+        this.processBulkUpdate(bulkUpdate);
+      });
 
       this.socketService.socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
         for (var id in gitStatusMap) {
@@ -280,16 +289,153 @@ export class ItemRepository {
     return this.repoStagingStatus;
   }
 
+  processBulkUpdate(response){
+    for(let kind in response.cache) {
+      console.log('--- Processing ' + kind);
+      var kindList = response.cache[kind];
+      for (var index in kindList) {
+        let item = JSON.parse(kindList[index]);
+        let iProxy;
+        if (kind === 'KoheseModel'){
+          iProxy = new KoheseModel(item);
+        } else {
+          iProxy = new ItemProxy(kind, item);
+        }
+      }
+      if (kind === 'KoheseView'){
+        KoheseModel.modelDefinitionLoadingComplete();
+        console.log('$$$ Sending KM Sync: ' + RepoStates.KOHESEMODELS_SYNCHRONIZED);
+        this.repositoryStatus.next({
+          state: RepoStates.KOHESEMODELS_SYNCHRONIZED,
+          message : 'KoheseModels are available for use'
+        });
+      }
+    }
+
+    if(response.addItems) {
+      response.addItems.forEach((addedItem) => {
+        let iProxy;
+        if (addedItem.kind === 'KoheseModel'){
+          iProxy = new KoheseModel(addedItem.item);
+
+        } else {
+          iProxy = new ItemProxy(addedItem.kind, addedItem.item);
+        }
+      });
+    }
+
+    if(response.changeItems) {
+      response.changeItems.forEach((changededItem) => {
+        let iProxy;
+        if (changededItem.kind === 'KoheseModel'){
+          iProxy = new KoheseModel(changededItem.item);
+        } else {
+          iProxy = new ItemProxy(changededItem.kind, changededItem.item);
+        }
+      });
+    }
+
+    if(response.deleteItems) {
+      response.deleteItems.forEach((deletedItemId) => {
+        var proxy = ItemProxy.getProxyFor(deletedItemId);
+        proxy.deleteItem();
+      });
+    }
+  }
+
   fetchItems () {
-    console.log('::: Requesting getAll');
+
+    // Load feature switch
+    let ifaKey = 'IR-fetch-all';
+    let fetchAllStoredValue = localStorage.getItem(ifaKey)
+    let fetchAll = true;
+    if (fetchAllStoredValue){
+      fetchAll = JSON.parse(fetchAllStoredValue);
+    };
+    console.log('$$$ Fetch All: ' + fetchAll);
+
+    if (fetchAll){
+      this.fetchAllItems(null);
+    } else {
+      console.log('::: Fetching Items');
+      var beginFetching = Date.now();
+      var origRepoTreeHashes = ItemProxy.getRepoTreeHashes();
+
+      this.repositoryStatus.next({
+        state: RepoStates.SYNCHRONIZING,
+        message: 'Starting Repository Sync'
+      });
+
+      // console.log('$$$ Client Repo THM');
+      // console.log(origRepoTreeHashes);
+
+      this.socketService.socket.emit('Item/getRepoHashmap', {repoTreeHashes: origRepoTreeHashes}, (response) => {
+        var gotResponse = Date.now();
+        // console.log('::: Response for getRepoHashmap');
+        // console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
+
+        // console.log('$$$ Server Repo THM');
+        // console.log(response);
+
+        let repoSyncPending = false;
+
+        for(let repoId in response.repoTreeHashes){
+          let repoTreeHash = response.repoTreeHashes[repoId];
+          let repoProxy = ItemProxy.getProxyFor(repoId);
+          let syncRequired = true;
+          if (repoProxy && repoProxy.treeHashEntry){
+            // A previous fetch has occurried, check to see if there an opportunity to skip resync
+            let rTHMCompare = ItemProxy.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
+            if (rTHMCompare.match){
+              syncRequired = false;
+              // console.log('$$$ Sync not required ' + repoId);
+              this.repoSyncStatus[repoId] = RepoStates.SYNCHRONIZATION_SUCCEEDED;
+            }
+          }
+
+          if (syncRequired){
+            this.fetchAllItems(repoId);
+            this.repoSyncStatus[repoId] = RepoStates.SYNCHRONIZING;
+            repoSyncPending = true;
+          }
+        }
+
+        if (!repoSyncPending){
+          this.repositoryStatus.next({
+            state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
+            message : 'Item Repository Ready'
+          });
+        }
+      });
+    }
+  }
+
+  fetchAllItems(forRepoId) {
+    console.log('::: Requesting getAll: ' + forRepoId);
     var beginFetching = Date.now();
-    var origRepoTreeHashes = ItemProxy.getAllTreeHashes();
+
+    let origRepoTreeHashes;
+    if (!forRepoId){
+      origRepoTreeHashes = ItemProxy.getAllTreeHashes()
+    } else {
+      let repoProxy = ItemProxy.getProxyFor(forRepoId);
+      if (repoProxy){
+        origRepoTreeHashes = repoProxy.getTreeHashMap();
+      }
+    }
 
     this.repositoryStatus.next({
       state: RepoStates.SYNCHRONIZING,
       message: 'Starting Repository Sync'
     });
-    this.socketService.socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes}, (response) => {
+
+    let request = {
+      forRepoId: forRepoId,
+      repoTreeHashes: origRepoTreeHashes
+    };
+    console.log(request);
+
+    this.socketService.socket.emit('Item/getAll', request, (response) => {
       var gotResponse = Date.now();
       console.log('::: Response for getAll');
       console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
@@ -298,59 +444,22 @@ export class ItemRepository {
         console.log('::: KDB is already in sync');
         syncSucceeded = true;
       } else {
-        for(let kind in response.cache) {
-          console.log('--- Processing ' + kind);
-          var kindList = response.cache[kind];
-          for (var index in kindList) {
-            let item = JSON.parse(kindList[index]);
-            let iProxy;
-            if (kind === 'KoheseModel'){
-              iProxy = new KoheseModel(item);
-            } else {
-              iProxy = new ItemProxy(kind, item);
-            }
-          }
-          if (kind === 'KoheseModel'){
-            KoheseModel.modelDefinitionLoadingComplete();
-          }
-        }
 
-        if(response.addItems) {
-          response.addItems.forEach((addedItem) => {
-            let iProxy;
-            if (addedItem.kind === 'KoheseModel'){
-              iProxy = new KoheseModel(addedItem.item);
-
-            } else {
-              iProxy = new ItemProxy(addedItem.kind, addedItem.item);
-            }
-          });
-        }
-
-        if(response.changeItems) {
-          response.changeItems.forEach((changededItem) => {
-            let iProxy;
-            if (changededItem.kind === 'KoheseModel'){
-              iProxy = new KoheseModel(changededItem.item);
-            } else {
-              iProxy = new ItemProxy(changededItem.kind, changededItem.item);
-            }
-          });
-        }
-
-        if(response.deleteItems) {
-          response.deleteItems.forEach((deletedItemId) => {
-            var proxy = ItemProxy.getProxyFor(deletedItemId);
-            proxy.deleteItem();
-          });
-        }
-
-        if(response.sentAll) {
-          ItemProxy.loadingComplete();
-        }
+        this.processBulkUpdate(response);
 
         console.log('::: Compare Repo Tree Hashes After Update');
-        var updatedTreeHashes = ItemProxy.getAllTreeHashes();
+        var updatedTreeHashes;
+        if (!forRepoId){
+          ItemProxy.loadingComplete();
+          updatedTreeHashes = ItemProxy.getAllTreeHashes()
+        } else {
+          let repoProxy = ItemProxy.getProxyFor(forRepoId);
+          if (repoProxy){
+            repoProxy.calculateRepoTreeHashes();
+            updatedTreeHashes = repoProxy.getTreeHashMap();
+          }
+        }
+
         var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
 
         syncSucceeded = compareAfterRTH.match;
@@ -364,18 +473,41 @@ export class ItemRepository {
           this.repositoryStatus.next({
             state: RepoStates.SYNCHRONIZATION_FAILED,
             message : 'Repository sync failed'
-          })
+          });
+          if (forRepoId){
+            this.repoSyncStatus[forRepoId] = RepoStates.SYNCHRONIZATION_FAILED;
+          }
         }
       }
 
       if(syncSucceeded){
-        this.repositoryStatus.next({
-          state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
-          message : 'Item Repository Ready'
-        })
+        if (forRepoId){
+          this.repoSyncStatus[forRepoId] = RepoStates.SYNCHRONIZATION_SUCCEEDED;
+
+          let sendFinalSyncRequest = true;
+
+          for(let repoId in this.repoSyncStatus){
+            if(this.repoSyncStatus[repoId] != RepoStates.SYNCHRONIZATION_SUCCEEDED) {
+              console.log('$$$ Still waiting on repo sync: ' + repoId);
+              sendFinalSyncRequest = false;
+            }
+          }
+
+          if (sendFinalSyncRequest){
+            // All of the incremental syncs have succeeded, need to check for any new deltas
+            this.fetchAllItems(null);
+          }
+        } else {
+          // Final repo sync
+          this.repositoryStatus.next({
+            state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
+            message : 'Item Repository Ready'
+          });
+
+          var rootProxy = ItemProxy.getRootProxy();
+          this.getStatusFor(rootProxy);
+        }
       }
-      var rootProxy = ItemProxy.getRootProxy();
-      this.getStatusFor(rootProxy);
     });
   }
 

@@ -1,7 +1,9 @@
 import { BehaviorSubject} from 'rxjs/BehaviorSubject';
 import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
+import { MockDataModel } from '../data/MockDataModel';
 import * as ItemProxy from '../../../common/src/item-proxy';
+import * as KoheseModel from '../../../common/src/KoheseModel';
 import { Subject } from 'rxjs';
 import { RepoStates } from '../../src/services/item-repository/item-repository.service';
 
@@ -10,6 +12,11 @@ export class MockItemRepository {
   state : any;
 
   constructor() {
+
+    let modelProxy = new KoheseModel(MockDataModel());
+    KoheseModel.modelDefinitionLoadingComplete();
+
+
     this.mockRootProxy.children = [
       new ItemProxy('Item', MockViewData()),
       new ItemProxy('Item', MockItem()),
@@ -46,9 +53,9 @@ export class MockItemRepository {
       new ItemProxy('Item', MockItem())
     ]
   }
-  
+
   buildItem() {
-    
+
   }
 
   registerRecentProxy() {
@@ -56,11 +63,11 @@ export class MockItemRepository {
   }
 
   getShortFormItemList () {
-    
+
   }
 
   getRepositories () {
-    
+
   }
 
   deleteItem () {
@@ -68,6 +75,6 @@ export class MockItemRepository {
   }
 
   upsertItem() {
-    
+
   }
 }

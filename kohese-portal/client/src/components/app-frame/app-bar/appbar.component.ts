@@ -36,19 +36,27 @@ export class AppBarComponent extends NavigatableComponent
 
   ngOnInit(): void {
     this.repositoryStatusSubscription = this.itemRepository.getRepoStatusSubject().subscribe((status: any) => {
-      this._itemRepositoryState = status.state;
-      switch(this._itemRepositoryState) {
+      switch(status.state) {
         case(RepoStates.DISCONNECTED):
+          this._itemRepositoryState = status.state;
           this.syncStatusString = 'Disconnected';
           break;
         case(RepoStates.SYNCHRONIZATION_FAILED):
+          this._itemRepositoryState = status.state;
           this.syncStatusString = 'Synchronization Failed';
           break;
-        case(RepoStates.SYNCHRONIZING): 
+        case(RepoStates.SYNCHRONIZING):
+          this._itemRepositoryState = status.state;
           this.syncStatusString = 'Syncing';
           break;
-        default:
+        case(RepoStates.SYNCHRONIZATION_SUCCEEDED):
+          this._itemRepositoryState = status.state;
           this.syncStatusString = '';
+          break;
+        default:
+          console.log('!!! Ignoring state: ' + this._itemRepositoryState);
+          console.log('!!! Should be 3 for KM Sync...')
+          // TODO This should be state value of 3, but it is logging as 1
       }
     });
 
@@ -63,12 +71,12 @@ export class AppBarComponent extends NavigatableComponent
       }
     });
   }
-  
+
   ngOnDestroy(): void {
     this.userSubscription.unsubscribe();
     this.repositoryStatusSubscription.unsubscribe();
   }
-  
+
   logout(): void {
     this.CurrentUserService.logout();
     this.navigate('Login', {});
