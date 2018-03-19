@@ -24,7 +24,7 @@
             "name": "In Work",
             "description": "A task that is In Work."
           },
-          "Pending Reassign": {
+          "PendingReassign": {
             "name": "Pending Reassign",
             "description": "A task that is Pending Reassign."
           },
