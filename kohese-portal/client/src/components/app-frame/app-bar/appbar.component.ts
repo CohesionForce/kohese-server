@@ -53,10 +53,6 @@ export class AppBarComponent extends NavigatableComponent
           this._itemRepositoryState = status.state;
           this.syncStatusString = '';
           break;
-        default:
-          console.log('!!! Ignoring state: ' + this._itemRepositoryState);
-          console.log('!!! Should be 3 for KM Sync...')
-          // TODO This should be state value of 3, but it is logging as 1
       }
     });
 
