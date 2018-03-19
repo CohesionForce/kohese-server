@@ -304,7 +304,6 @@ export class ItemRepository {
       }
       if (kind === 'KoheseView'){
         KoheseModel.modelDefinitionLoadingComplete();
-        console.log('$$$ Sending KM Sync: ' + RepoStates.KOHESEMODELS_SYNCHRONIZED);
         this.repositoryStatus.next({
           state: RepoStates.KOHESEMODELS_SYNCHRONIZED,
           message : 'KoheseModels are available for use'

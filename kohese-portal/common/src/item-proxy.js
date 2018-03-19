@@ -280,14 +280,14 @@ class ItemProxy {
     if (tree.KoheseModel) {
       let modelProxy = tree.KoheseModel.getModelProxyFor(kind);
       if(modelProxy && (modelProxy.kind === 'KoheseModel')){
-        if (modelProxy.constructor.name !== 'KoheseModel'){
-          modelProxy.dumpProxy();
-          throw({
-            error: 'Class Mismatch',
-            expected: 'KoheseModel',
-            found: modelProxy.constructor.name
-          });
-        }
+        // if (modelProxy.constructor.name !== 'KoheseModel'){
+        //   modelProxy.dumpProxy();
+        //   throw({
+        //     error: 'Class Mismatch',
+        //     expected: 'KoheseModel',
+        //     found: modelProxy.constructor.name
+        //   });
+        // }
         validation = modelProxy.validateItemContent(forItem);
 
         if (!validation.valid){
