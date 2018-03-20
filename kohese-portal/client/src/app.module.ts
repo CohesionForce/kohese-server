@@ -21,7 +21,7 @@ import { UserModule } from './services/user/user.module';
 import { AdminModule } from './components/admin/admin.module';
 
 import { AppRoutingModule } from './app-routing.module';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { DashboardModule } from './components/dashboard/dashboard.module';
 import { AdminComponent } from './components/admin/admin.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TreeComponent } from './components/tree/tree.component';
@@ -33,13 +33,13 @@ import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { MaterialModule } from './material.module';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent,
     TreeComponent,
     ExploreComponent,
     TreeRowComponent
@@ -51,6 +51,7 @@ import { MaterialModule } from './material.module';
     FlexLayoutModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
+    MarkdownModule.forRoot(),
     InfiniteScrollModule,
     PipesModule,
     MaterialModule,
@@ -67,7 +68,8 @@ import { MaterialModule } from './material.module';
     LoginModule,
     UserModule,
     ServicesModule,
-    AdminModule
+    AdminModule,
+    DashboardModule
   ],
   bootstrap: [AppComponent]
 })

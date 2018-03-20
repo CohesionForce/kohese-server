@@ -28,6 +28,10 @@
         [formGroup]="formGroup" [fieldId]="property"
         [fieldName]="properties[property].displayName">
       </k-user-selector>
+      <k-markdown *ngSwitchCase="'markdown'"
+        [formGroup]="formGroup" [fieldId]="property"
+        [fieldName]="properties[property].displayName"
+        [editableStream]="editableStream"></k-markdown>
       <br/>
     </ng-container>
   </ng-container>

@@ -2,6 +2,7 @@ import { Component, Input, Output, OnInit, OnDestroy, OnChanges,
   SimpleChanges, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators,
   AbstractControl } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -27,7 +28,7 @@ export class DetailsFormComponent extends NavigatableComponent
   @Input()
   public itemProxy: ItemProxy;
   @Input()
-  public disabled: boolean;
+  editableStream : Observable<boolean>
   @Input()
   public fieldFilter: ((fieldName: string) => boolean);
   @Input() 
@@ -37,6 +38,7 @@ export class DetailsFormComponent extends NavigatableComponent
 
   public properties: any = {};
   private initialized : boolean;
+  public disabled: boolean;
   
   @Output()
   public nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -46,6 +48,7 @@ export class DetailsFormComponent extends NavigatableComponent
   
   /* Subscriptions */
   private repoStatusSubscription : Subscription;
+  private editableStreamSubscription : Subscription;
 
   constructor(protected NavigationService : NavigationService,
               private FormBuilder : FormBuilder,
@@ -60,6 +63,22 @@ export class DetailsFormComponent extends NavigatableComponent
       this.fieldFilter = ((fieldName: string) => {
         return true;
       });
+    }
+
+    if (this.editableStream) {
+      this.editableStreamSubscription = this.editableStream.subscribe((editable)=>{
+        this.disabled = !editable; // The form logic is currently backwards irt the rest of the details component
+        if (this.disabled) { 
+          this.formGroup = this.createFormGroup();
+          this.formGroupUpdated.emit(this.formGroup);
+          this.formGroup.disable();
+        } else {
+          this.formGroup.enable();
+        }
+      })
+    } else {
+      // Set editable stream as defaulted to true when it is not provided
+      this.editableStream = new BehaviorSubject<boolean>(true);
     }
     
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
@@ -83,6 +102,9 @@ export class DetailsFormComponent extends NavigatableComponent
 
   ngOnDestroy () {
     this.repoStatusSubscription.unsubscribe();
+    if (this.editableStreamSubscription) {
+      this.editableStreamSubscription.unsubscribe();
+    }
   }
   
   ngOnChanges(changes: SimpleChanges): void {
@@ -107,17 +129,6 @@ export class DetailsFormComponent extends NavigatableComponent
         this.createInfo = changes['createInfo'].currentValue;
         this.buildStubProxy();
       }
-
-      if (changes['disabled']) {
-        this.disabled = changes['disabled'].currentValue;
-        if (this.disabled) { 
-            this.formGroup = this.createFormGroup();
-            this.formGroupUpdated.emit(this.formGroup);
-            this.formGroup.disable();
-          } else {
-            this.formGroup.enable();
-          }
-        }
     }
   }
 
