@@ -63,7 +63,7 @@
                   </span>
                 </ng-template>
                 <details-form #editor [itemProxy]="itemProxy" 
-                  [disabled]="!editableStream.getValue()"
+                  [editableStream]="editableStream"
                   (formGroupUpdated)="onFormGroupUpdated($event)"
                   (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
                 </details-form>

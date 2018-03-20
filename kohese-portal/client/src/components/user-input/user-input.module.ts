@@ -9,6 +9,9 @@ import { KDateComponent } from './k-date/k-date.component';
 import { KSelectComponent } from './k-select/k-select.component';
 import { KStateEditorComponent } from './k-state-editor/k-state-editor.component';
 import { KUserSelectorComponent } from './k-user-selector/k-user-selector.component';
+import { KMarkdownComponent } from './k-markdown/k-markdown.component';
+
+import { MarkdownModule } from 'ngx-markdown';
 
 @NgModule({
   declarations: [
@@ -17,13 +20,15 @@ import { KUserSelectorComponent } from './k-user-selector/k-user-selector.compon
     KUserSelectorComponent,
     KDateComponent,
     KSelectComponent,
-    KStateEditorComponent
+    KStateEditorComponent,
+    KMarkdownComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MaterialModule
+    MaterialModule,
+    MarkdownModule.forChild()
   ],
   exports: [
     KTextComponent,
@@ -31,7 +36,8 @@ import { KUserSelectorComponent } from './k-user-selector/k-user-selector.compon
     KUserSelectorComponent,
     KDateComponent,
     KSelectComponent,
-    KStateEditorComponent
+    KStateEditorComponent,
+    KMarkdownComponent
   ]
 })
 export class UserInputModule {}
