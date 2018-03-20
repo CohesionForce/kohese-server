@@ -1,4 +1,4 @@
-<div *ngIf="root"  style="height: 100%;">
+<div *ngIf="(treeRootStream | async)"  style="height: 100%;">
   <div id="top-action-bar">
     <button mat-raised-button (click)="expandAll()"
       class="btn btn-default btn-sm">
@@ -21,7 +21,7 @@
       class="btn btn-default btn-sm fa fa-exchange">
     </i>
       <span>
-        Number of Items: {{root.descendantCount}}
+        Number of Items: {{(treeRootStream | async).descendantCount}}
       </span>
     <div>
       <!-- Start View Control -->
@@ -95,18 +95,16 @@
       Name
     </div>
     <div class="kt-body">
-      <virtual-scroll #tree [items]="matchingRows">
+      <virtual-scroll #tree [items]="visibleRows">
         <tree-row *ngFor="let row of tree.viewPortItems"
-          [treeRow]="row" (rootChanged)="whenRootChanges($event)"
+          [treeRow]="row" [treeRootStream]="treeRootStream"
           [selectedViewStream]="selectedViewStream"
-          [selectedProxyIdStream]="selectedProxyIdStream"
-          [filterStream]="filterStream"
-          (visibilityChanged)="whenRowVisibilityChanges($event)">
+          [selectedProxyIdStream]="selectedProxyIdStream">
         </tree-row>
       </virtual-scroll>
     </div>
   </div> <!-- End Knowledge Tree -->
 </div>
-<div *ngIf="!root" style="height: 100%;">
+<div *ngIf="!(treeRootStream | async)" style="height: 100%;">
   Loading...
 </div>

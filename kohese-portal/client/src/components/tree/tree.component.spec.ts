@@ -45,8 +45,8 @@ describe('Component: Tree', () => {
   });
   
   it('filters when the selected view changes', () => {
-    expect(component.filterStream.getValue().status).toEqual(false);
+    expect(component.proxyFilter.status).toEqual(false);
     component.viewSelectionChanged('Version Control');
-    expect(component.filterStream.getValue().status).toEqual(true);
+    expect(component.proxyFilter.status).toEqual(true);
   });
 });

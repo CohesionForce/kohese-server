@@ -17,6 +17,7 @@ import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../mocks/data/MockViewData';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
+import { TreeRow } from './tree-row.class';
 import * as ItemProxy from '../../../../common/src/item-proxy';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -41,108 +42,84 @@ describe('Component: TreeRow', () => {
     
     fixture = TestBed.createComponent(TreeRowComponent);
     component = fixture.componentInstance;
-    component.itemProxy = new ItemProxy('Item', MockItem());
-    component.filterStream =
-      new BehaviorSubject<ProxyFilter>(new ProxyFilter());
+    component.treeRow = new TreeRow(new ItemProxy('Item', MockItem()));
+    component.treeRootStream = new BehaviorSubject<ItemProxy>(ItemProxy.
+      getRootProxy());
     
     fixture.detectChanges();
   });
   
-  it('filters based on type', fakeAsync(() => {
-    let filterStream: BehaviorSubject<ProxyFilter> =
-      component.filterStream as BehaviorSubject<ProxyFilter>;
-    let filter: ProxyFilter = filterStream.getValue();
+  it('filters based on type', () => {
+    let filter: ProxyFilter = new ProxyFilter();
     filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()));
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(true);
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(true);
     filter.kind.name = 'Isaiah';
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(false);
-  }));
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(false);
+  });
   
-  it('filters based on the user assigned to an Action', fakeAsync(() => {
-    let filterStream: BehaviorSubject<ProxyFilter> =
-      component.filterStream as BehaviorSubject<ProxyFilter>;
-    component.itemProxy.kind = 'Action';
-    let filter: ProxyFilter = filterStream.getValue();
+  it('filters based on the user assigned to an Action', () => {
+    component.treeRow.itemProxy.kind = 'Action';
+    let filter: ProxyFilter = new ProxyFilter();
     filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()));
     filter.kind.name = 'Action';
     filter.actionAssignee = 'admin';
-    component.itemProxy.kind = 'Action';
-    component.itemProxy.item.assignedTo = 'admin';
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(true);
+    component.treeRow.itemProxy.kind = 'Action';
+    component.treeRow.itemProxy.item.assignedTo = 'admin';
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(true);
     filter.actionAssignee = 'John';
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(false);
-  }));
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(false);
+  });
   
   it('filters based on whether there is a version control status',
-    fakeAsync(() => {
-    let filterStream: BehaviorSubject<ProxyFilter> =
-      component.filterStream as BehaviorSubject<ProxyFilter>;
-    let filter: ProxyFilter = filterStream.getValue();
+    () => {
+    let filter: ProxyFilter = new ProxyFilter();
     filter.status = true;
     let statuses: Array<string> = [];
-    component.itemProxy.status = statuses;
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(false);
+    component.treeRow.itemProxy.status = statuses;
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(false);
     statuses.push('Hezekiah');
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(true);
-  }));
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(true);
+  });
   
-  it('filters based on whether there are unsaved changes', fakeAsync(() => {
-    let filterStream: BehaviorSubject<ProxyFilter> =
-      component.filterStream as BehaviorSubject<ProxyFilter>;
-    let filter: ProxyFilter = filterStream.getValue();
+  it('filters based on whether there are unsaved changes', () => {
+    let filter: ProxyFilter = new ProxyFilter();
     filter.dirty = true;
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(false);
-    component.itemProxy.dirty = true;
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(true);
-  }));
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(false);
+    component.treeRow.itemProxy.dirty = true;
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(true);
+  });
   
-  it('filters based on the content of string fields', fakeAsync(() => {
-    let filterStream: BehaviorSubject<ProxyFilter> =
-      component.filterStream as BehaviorSubject<ProxyFilter>;
-    let filter: ProxyFilter = filterStream.getValue();
+  it('filters based on the content of string fields', () => {
+    let filter: ProxyFilter = new ProxyFilter();
     filter.filterString = 'Joshua';
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(false);
-    component.itemProxy.item.description = 'Zechariah Joshua Luke';
-    filterStream.next(filter);
-    tick();
-    expect(component.isVisible()).toEqual(true);
-  }));
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(false);
+    component.treeRow.itemProxy.item.description = 'Zechariah Joshua Luke';
+    component.treeRow.filter(filter);
+    expect(component.treeRow.visible).toEqual(true);
+  });
   
   it('expands tree-rows that pass the filter and have a version control ' +
-    'status when the version control view is selected', fakeAsync(() => {
-    let filterStream: BehaviorSubject<ProxyFilter> =
-      component.filterStream as BehaviorSubject<ProxyFilter>;
-    let filter: ProxyFilter = filterStream.getValue();
+    'status when the version control view is selected', () => {
+    let filter: ProxyFilter = new ProxyFilter();
     let statuses: Array<string> = ['Luke'];
-    component.itemProxy.status = statuses;
+    component.treeRow.itemProxy.status = statuses;
     filter.status = true;
     filter.filterString = 'Timothy';
-    filterStream.next(filter);
-    tick();
-    expect(component.expanded).toEqual(false);
-    component.itemProxy.item.description = 'Titus Philemon Timothy';
-    filterStream.next(filter);
-    tick();
-    expect(component.expanded).toEqual(true);
-  }));
+    component.treeRow.filter(filter);
+    expect(component.treeRow.expanded).toEqual(false);
+    component.treeRow.itemProxy.item.description = 'Titus Philemon Timothy';
+    component.treeRow.filter(filter);
+    expect(component.treeRow.expanded).toEqual(true);
+  });
 });
