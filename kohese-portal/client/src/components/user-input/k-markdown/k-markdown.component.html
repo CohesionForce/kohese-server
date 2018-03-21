@@ -1,0 +1,11 @@
+<mat-form-field class="variable-data" [formGroup]="formGroup" *ngIf="editable">
+  Description : 
+  <textarea matInput  formControlName="{{fieldId}}"
+            matTextareaAutosize 
+            matAutosizeMinRows = "3"
+            matAutosizeMaxRows = "25">  
+  </textarea>
+</mat-form-field>
+<markdown class="variable-binding"
+          [data]="markdownData">
+</markdown>

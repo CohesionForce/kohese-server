@@ -27,11 +27,19 @@ export class DetailsComponent extends NavigatableComponent
   itemProxy : ItemProxy;
   parentProxy : ItemProxy;
   typeProxies : Array<ItemProxy>;
+  private _itemJson: string;
+  get itemJson() {
+    return this._itemJson;
+  }
 
   /* Observables */
-  showChildrenSubject : BehaviorSubject<boolean>
   detailsFormSubject : BehaviorSubject<FormGroup>;
-  proxyStream : BehaviorSubject<ItemProxy>
+  proxyStream : BehaviorSubject<ItemProxy>;
+  private _editableStream: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(false);
+  get editableStream() {
+    return this._editableStream;
+  }
   
   /* Subscriptions */
   routeSub : Subscription;
@@ -40,10 +48,8 @@ export class DetailsComponent extends NavigatableComponent
   proxyUpdates : Observable<any>;
 
   /* UI Switches */
-  enableEdit : boolean;
   defaultTab : object;
   uiTreeOptions : object;
-  showChildren : boolean;
 
   /* Data */
   kindList : Array<string>;
@@ -70,8 +76,6 @@ export class DetailsComponent extends NavigatableComponent
   ngOnInit () {
 
     this.proxyStream = new BehaviorSubject({});
-    this.showChildren = false;
-    this.showChildrenSubject = new BehaviorSubject(this.showChildren);
 
     /* Subscriptions */
     this.routeSub = this.route.params.subscribe(params => {
@@ -119,8 +123,9 @@ export class DetailsComponent extends NavigatableComponent
       this.userList = this.SessionService.getUsers();
       this.updateParentProxy();
 
-      this.enableEdit = false;
-      this.defaultTab = {active: true }
+    this._editableStream.next(false);
+      this.defaultTab = {active: true };
+    this._itemJson = this.itemProxy.document();
       this.proxyStream.next(this.itemProxy);
   }
 
@@ -162,14 +167,10 @@ export class DetailsComponent extends NavigatableComponent
     }
     this.ItemRepository.upsertItem(this.itemProxy)
       .then((updatedItemProxy: ItemProxy) => {
-      this.enableEdit = false;
+      this._editableStream.next(false);
     });
   }
-
-  showChildrenToggled () : void {
-      this.showChildrenSubject.next(this.showChildren);
-    }
-
+  
   removeItem (proxy : ItemProxy) : void {
     this.ItemRepository.deleteItem(proxy, false)
       .then(function () {
@@ -179,5 +180,12 @@ export class DetailsComponent extends NavigatableComponent
 
   public whenNonFormFieldChanges(updatedField: any): void {
     this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
+  }
+  
+  public cancelEditing(): void {
+    this._editableStream.next(false);
+    this.ItemRepository.fetchItem(this.itemProxy).then((proxy: ItemProxy) => {
+      this.updateProxy();
+    });
   }
 }

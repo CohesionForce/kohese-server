@@ -1,0 +1,12 @@
+.variable-data, 
+.variable-binding {
+  width : 45%;
+  display: inline-block;
+  height : 425px;
+  overflow: auto;
+}
+
+.variable-data {
+  border-right: gray 1px solid;
+  margin-right: 5px;
+}

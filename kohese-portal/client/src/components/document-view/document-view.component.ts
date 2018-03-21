@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 import { Observable } from 'rxjs';
 
@@ -11,55 +11,58 @@ import * as commonmark from 'commonmark';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class.js';
-
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'document-view',
   templateUrl: './document-view.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls : [
+    './document-view.component.scss'
+  ]
 })
 
 export class DocumentViewComponent extends NavigatableComponent
-                                   implements OnInit, OnDestroy, OnChanges {
+  implements OnInit, OnDestroy {
   /* UI Toggles */
-  showChildren : boolean;
+  @ViewChild('docView') docView : ElementRef 
 
   /* Data */
-  itemProxy : ItemProxy;
+  itemProxy: ItemProxy;
+  itemLength : ItemProxy;
 
-  filter : string;
-  docRendered : string;
-  itemDescriptionRendered : string;
-  filterRegex : RegExp;
-  filterRegexHighlighted : RegExp;
-  invalidFilterRegex : boolean;
+  filter: string;
+  docRendered: string;
+  itemDescriptionRendered: string;
+  filterRegex: RegExp;
+  filterRegexHighlighted: RegExp;
+  invalidFilterRegex: boolean;
+  itemsLoaded: number = 0;
 
   /* Utils */
-  docReader : Parser;
-  docWriter : HtmlRenderer
-  initialized : boolean;
+  docReader: Parser;
+  docWriter: HtmlRenderer
+  initialized: boolean;
 
   /* Observables */
   @Input()
-  filterSubject : BehaviorSubject<AnalysisFilter>;
+  filterSubject: BehaviorSubject<AnalysisFilter>;
   @Input()
-  showChildrenSubject : BehaviorSubject<boolean>;
+  proxyStream: Observable<ItemProxy>
   @Input()
-  proxyStream : Observable<ItemProxy>
+  incrementalLoad: boolean;
 
   /* Subscriptions */
-  filterSubscription : Subscription;
-  showChildrenSubscription : Subscription;
-  proxyStreamSubscription : Subscription;
+  filterSubscription: Subscription;
+  proxyStreamSubscription: Subscription;
 
-
-
-
-  constructor (NavigationService : NavigationService, 
-               private changeRef : ChangeDetectorRef) {
+  constructor(NavigationService: NavigationService,
+    private changeRef: ChangeDetectorRef,
+    private router : Router) {
     super(NavigationService)
     this.docReader = new commonmark.Parser();
-    this.docWriter = new commonmark.HtmlRenderer({sourcepos: true});
+    this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true });
     this.initialized = false;
   }
 
@@ -72,23 +75,22 @@ export class DocumentViewComponent extends NavigatableComponent
       })
     }
 
-    this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy)=>{
+    this.router.events.subscribe((event)=>{
+      if (!(event instanceof NavigationEnd)) {
+        return;
+      }
+      console.log(this.docView);
+      this.docView.nativeElement.scrollTop = 0;
+    })
+
+    this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
       this.itemProxy = newProxy;
+      this.itemsLoaded = 0;
       // TODO - Determine if there is a way to cache and diff the new doc before
       // regenerating
       this.generateDoc();
       this.changeRef.markForCheck();
     })
-
-    this.showChildrenSubscription = this.showChildrenSubject.subscribe(showChildren => {
-      console.log(showChildren);
-      this.showChildren = showChildren;
-      this.docRendered = null;
-      this.itemDescriptionRendered = null;
-      this.generateDoc();
-      this.changeRef.markForCheck();
-    })
-
     this.initialized = true
   }
 
@@ -96,28 +98,85 @@ export class DocumentViewComponent extends NavigatableComponent
     if (this.filterSubscription) {
       this.filterSubscription.unsubscribe();
     }
-    this.showChildrenSubscription.unsubscribe();
     this.proxyStreamSubscription.unsubscribe();
   }
 
-  generateDoc () : void {
-    if (this.showChildren) {
-      var docParsed = this.docReader.parse(this.itemProxy.getDocument());
-      this.docRendered = this.docWriter.render(docParsed);
-    } else if (this.itemProxy.item.description) {
-      var parsed = this.docReader.parse(this.itemProxy.item.description); // parsed is a 'Node' tree
-      this.itemDescriptionRendered = this.docWriter.render(parsed); // result is a String
+  determineLoad (subTree : Array<any>, currentLoad : number ) : number {
+    let newLoad : number = 0;
+    let loadLength : number = 0;
+    let lengthIndex : number = 0;
+    const lengthLimit : number = 8000
+
+    // Case 1 : Load the whole document
+    if (!this.incrementalLoad) {
+      newLoad = subTree.length;
+    } else {
+      // Determine content length
+      while (loadLength < lengthLimit && 
+            ( (subTree[lengthIndex]))) {
+        let currentProxy = subTree[lengthIndex].proxy;
+        if (!currentProxy.item.description) {
+          lengthIndex++;
+          continue;
+        } 
+        loadLength += currentProxy.item.description.length;
+        lengthIndex++;
+      }
+
+      if (loadLength > lengthLimit) {
+        // Case 2 : Load to the content limit
+        newLoad = currentLoad + lengthIndex - 1;
+        if (newLoad > subTree.length) {
+          newLoad = subTree.length;
+        }
+      } else if (this.itemsLoaded < subTree.length) {
+        // Case 3 : Load based on defined increment
+        newLoad = currentLoad + 12;
+      } 
     }
+
+    return newLoad;
   }
 
-  ngOnChanges (changes) {
-    if(this.initialized) {
-      this.itemProxy = (changes.itemProxy) ? changes.itemProxy.currentValue : changes.currentValue;
-      this.generateDoc();
+  generateDoc(): void {
+    let subtreeAsList = this.itemProxy.getSubtreeAsList()
+    this.itemLength = subtreeAsList.length;
+
+    let docRendered = '';
+
+    if (this.itemsLoaded >= subtreeAsList.length) {
+      this.itemsLoaded = subtreeAsList.length
+      return;
+    } 
+
+    this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
+
+    if (this.itemsLoaded > subtreeAsList.length) {
+      this.itemsLoaded = subtreeAsList.length
+    } 
+
+    for (let i = 0; (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
+      let listItem = subtreeAsList[i];
+      
+      if (listItem.depth > 0) {
+        // Show the header for any node that is not the root of the document
+        docRendered += '<h' + listItem.depth + '>' + listItem.proxy.item.name + '</h' + listItem.depth + '>';
+      }
+      if (listItem.proxy.item.description) {
+        // Show the description if it exists
+        let nodeParsed = this.docReader.parse(listItem.proxy.item.description);
+        docRendered += this.docWriter.render(nodeParsed);
+      }
     }
+    this.docRendered = docRendered;
   }
 
-  onFilterChange () {
+  onScroll() {
+    this.generateDoc();
+    this.changeRef.markForCheck();
+  }
+
+  onFilterChange() {
     console.log('>>> Filter string changed to: ' + this.filter);
 
     var regexFilter = /^\/(.*)\/([gimy]*)$/;

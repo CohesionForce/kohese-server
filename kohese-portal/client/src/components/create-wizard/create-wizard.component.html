@@ -45,7 +45,6 @@
         <mat-card-content>
           <details-form #editor 
             [createInfo]="createInfo" 
-            [disabled]="false"
             (formGroupUpdated)="onFormGroupUpdated($event)"
             (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
           </details-form>

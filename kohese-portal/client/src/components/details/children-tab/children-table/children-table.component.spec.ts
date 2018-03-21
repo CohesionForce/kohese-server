@@ -18,8 +18,7 @@ import { MockItem } from '../../../../../mocks/data/MockItem';
 describe('Component: Children Table', ()=>{
   let childrenTableComponent: ChildrenTableComponent;
   let childrenTableFixture : ComponentFixture<ChildrenTableComponent>;
-  let mockRepo = new MockItemRepository();
-  let childSubject : BehaviorSubject<Array<ItemProxy>>;
+  let mockRepo: MockItemRepository;
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -37,11 +36,12 @@ describe('Component: Children Table', ()=>{
 
     childrenTableFixture = TestBed.createComponent(ChildrenTableComponent);
     childrenTableComponent = childrenTableFixture.componentInstance;
+    mockRepo = new MockItemRepository();
 
-    childSubject = new BehaviorSubject<Array<ItemProxy>>(mockRepo.getRootProxy().children);
-
-    childrenTableComponent.childrenStream = childSubject; 
+    childrenTableComponent.childrenStream =
+      new BehaviorSubject<Array<ItemProxy>>(mockRepo.getRootProxy().children);
     childrenTableComponent.filterSubject = new BehaviorSubject<string>('');
+    childrenTableComponent.editableStream = new BehaviorSubject<boolean>(false);
 
     childrenTableFixture.detectChanges();
     
@@ -52,10 +52,48 @@ describe('Component: Children Table', ()=>{
   })
 
   it('updates the children list when a new array comes in', ()=>{
-    expect(childrenTableComponent.children.length).toBe(5);
-    let newChildren = mockRepo.getRootProxy().children;
-    newChildren.push(new ItemProxy('Item', MockItem()));
-    childSubject.next(newChildren);
-    expect(childrenTableComponent.children.length).toBe(6);
-  })
+    expect(childrenTableComponent.childrenStream.getValue().length).toEqual(11);
+    let item: any = MockItem();
+    /* Delete the parentId so that this Item will be added as a child of the
+    root proxy */
+    delete item.parentId;
+    new ItemProxy('Item', item);
+    childrenTableComponent.childrenStream.next(mockRepo.getRootProxy().
+      children);
+    expect(childrenTableComponent.childrenStream.getValue().length).toEqual(12);
+  });
+  
+  it('changes the order of children in their parent', () => {
+    childrenTableComponent.editableStream.next(true);
+    let rootProxy: ItemProxy = ItemProxy.getRootProxy();
+    let changedOrderingType: boolean = false;
+    if (!rootProxy.childrenAreManuallyOrdered()) {
+      rootProxy.toggleChildrenAreManuallyOrdered();
+      changedOrderingType = true;
+    }
+    let initialIndex: number;
+    for (let j: number = 0; j < rootProxy.children.length; j++) {
+      if ('test-uuid3' === rootProxy.children[j].item.id) {
+        initialIndex = j;
+        break;
+      }
+    }
+    let dropEvent: any = jasmine.createSpyObj('DropEvent', ['preventDefault']);
+    dropEvent.dataTransfer = jasmine.createSpyObj('DataTransfer', ['getData']);
+    dropEvent.dataTransfer.getData.and.returnValue('test-uuid3');
+    
+    childrenTableComponent.whenDropOccurs(rootProxy.children[rootProxy.
+      children.length - 1], dropEvent);
+      
+    for (let j: number = 0; j < rootProxy.children.length; j++) {
+      if ('test-uuid3' === rootProxy.children[j].item.id) {
+        expect(initialIndex).not.toEqual(j);
+        break;
+      }
+    }
+    
+    if (changedOrderingType) {
+      rootProxy.toggleChildrenAreManuallyOrdered();
+    }
+  });
 })
