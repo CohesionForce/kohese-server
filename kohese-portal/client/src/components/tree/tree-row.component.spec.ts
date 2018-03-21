@@ -1,4 +1,4 @@
-import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
@@ -121,5 +121,9 @@ describe('Component: TreeRow', () => {
     component.treeRow.itemProxy.item.description = 'Titus Philemon Timothy';
     component.treeRow.filter(filter);
     expect(component.treeRow.expanded).toEqual(true);
+  });
+  
+  it('calculates the correct number of pixels by which to indent', () => {
+    expect(component.getIndentationStyle()['padding-left']).toEqual('30px');
   });
 });

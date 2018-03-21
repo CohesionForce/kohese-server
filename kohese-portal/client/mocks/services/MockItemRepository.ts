@@ -21,8 +21,6 @@ export class MockItemRepository {
       item.id = item.id + (j + 1);
       new ItemProxy('Item', item);
     }
-    
-    this.mockRootProxy.visitChildren = ()=>{}
   }
 
   getRepoStatusSubject () {
@@ -74,5 +72,9 @@ export class MockItemRepository {
 
   upsertItem() {
     
+  }
+  
+  public getChangeSubject(): Subject<any> {
+    return ItemProxy.getChangeSubject();
   }
 }
