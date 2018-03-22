@@ -62,7 +62,6 @@ export class TreeComponent extends NavigatableComponent
   }
 
   ngOnInit(): void {
-    let initialized: boolean = false;
     let repositoryStatusSubscription: Subscription = this.ItemRepository.
       getRepoStatusSubject().subscribe(update => {
         switch (update.state) {
@@ -122,14 +121,15 @@ export class TreeComponent extends NavigatableComponent
         
             this.setVisibleRows();
             
-            initialized = true;
             if (repositoryStatusSubscription) {
               repositoryStatusSubscription.unsubscribe();
             }
         }
     });
     
-    if (initialized) {
+    if (this.absoluteRoot) {
+      /* The ItemRepository was already in an eligible state for dependent
+      initialization to be performed */
       repositoryStatusSubscription.unsubscribe();
     }
 
