@@ -4,6 +4,7 @@
   "parentId": "Model-Definitions",
   "base": "PersistedModel",
   "idInjection": true,
+  "isMetaModel": true,
   "invertItemOrder": true,
   "properties": {
     "id": {
@@ -37,6 +38,10 @@
     },
     "modifiedOn": {
       "type": "number"
+    },
+    "loadPending": {
+      "type": "boolean",
+      "derived": true
     }
   },
   "validations": [],

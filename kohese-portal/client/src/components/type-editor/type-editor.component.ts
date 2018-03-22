@@ -1,18 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'type-editor',
   templateUrl: './type-editor.component.html',
   styleUrls: ['./type-editor.component.scss']
 })
-export class TypeEditorComponent implements OnInit {
+export class TypeEditorComponent implements OnInit, OnDestroy {
   public types: any;
   public selectedType: KoheseType;
+  
+  /* Subscriptions */
+  repoStatusSubscription : Subscription;
   
   constructor(public typeService: DynamicTypesService,
     private dialogService: DialogService,
@@ -20,8 +24,19 @@ export class TypeEditorComponent implements OnInit {
   }
   
   ngOnInit(): void {
-    this.types = this.typeService.getKoheseTypes();
-    this.selectedType = this.types[Object.keys(this.types)[0]];
+    this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
+    .subscribe((update: any) => {
+      switch (update.state){
+        case RepoStates.KOHESEMODELS_SYNCHRONIZED:
+        case RepoStates.SYNCHRONIZATION_SUCCEEDED:
+          this.types = this.typeService.getKoheseTypes();
+          this.selectedType = this.types[Object.keys(this.types)[0]];
+      }
+  })
+  }
+
+  ngOnDestroy(): void {
+    this.repoStatusSubscription.unsubscribe();
   }
   
   add(): void {

@@ -9,7 +9,7 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
 export class DynamicTypesService {
   /* Data */
   koheseTypes : object;
-  
+
   private readonly USER_INPUT_TYPES: any = {
     'types': 'Text',
     'proxy-selector': 'Reference',
@@ -25,15 +25,20 @@ export class DynamicTypesService {
     this.koheseTypes = {};
     this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
       .subscribe((update: any) => {
-      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-        let modelProxy: ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-        let typeProxies: Array<ItemProxy> = modelProxy.getDescendants().
-          sort((first: ItemProxy, second: ItemProxy) => {
-          return ((first.item.name > second.item.name) ?
-            1 : ((first.item.name < second.item.name) ? -1 : 0));
-        });
-        this.buildKoheseTypes(typeProxies);
-      }
+        switch (update.state){
+          case RepoStates.KOHESEMODELS_SYNCHRONIZED:
+          case RepoStates.SYNCHRONIZATION_SUCCEEDED:
+            let modelProxy: ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
+            let typeProxies: Array<ItemProxy> = modelProxy.getDescendants().
+              sort((first: ItemProxy, second: ItemProxy) => {
+              return ((first.item.name > second.item.name) ?
+                1 : ((first.item.name < second.item.name) ? -1 : 0));
+            });
+            this.buildKoheseTypes(typeProxies);
+            if (this.repoStatusSubscription){
+              this.repoStatusSubscription.unsubscribe();
+            }
+        }
     })
   }
 
@@ -54,11 +59,11 @@ export class DynamicTypesService {
   getViewProxyFor(modelProxy: ItemProxy): ItemProxy {
     return this.ItemRepository.getProxyFor('view-' + modelProxy.item.name.toLowerCase());
   }
-  
+
   getUserInputTypes(): any {
     return this.USER_INPUT_TYPES;
   }
-  
+
   getIcons(): Array<string> {
     return ['fa fa-gavel', 'fa fa-user', 'fa fa-tasks', 'fa fa-database',
       'fa fa-exclamation-circle', 'fa fa-comment', 'fa fa-sticky-note',

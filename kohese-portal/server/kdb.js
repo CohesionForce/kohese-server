@@ -15,6 +15,8 @@ var kdbModel = require('./kdb-model.js');
 var jsonExt = /\.json$/;
 
 var ItemProxy = require('../common/src/item-proxy.js');
+var KoheseModel = require('../common/src/KoheseModel.js');
+
 // eslint-disable-next-line no-unused-vars
 var CreateStates = require('../common/src/createStates.js');
 module.exports.ItemProxy = ItemProxy;
@@ -44,7 +46,7 @@ function loadKoheseModelsAndViews() {
   loadModelInstances('KoheseView', commonViewFiles, false);
   loadModelInstances('KoheseView', repoViewFileDir, true);
 
-  ItemProxy.modelDefinitionLoadingComplete();
+  KoheseModel.modelDefinitionLoadingComplete();
 
 }
 
@@ -425,9 +427,17 @@ function loadModelInstances (kind, modelDirPath, inRepo) {
   let fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
   for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
     var itemPath = modelDirPath + '/' + fileList[fileIdx];
-    var itemRow = kdbFS.loadJSONDoc(itemPath);
+    var itemPayload = kdbFS.loadJSONDoc(itemPath);
 
-    var proxy = new ItemProxy(kind, itemRow);
+    let proxy;
+
+    switch (kind){
+      case 'KoheseModel':
+        proxy = new KoheseModel(itemPayload);
+        break;
+      default:
+        proxy = new ItemProxy(kind, itemPayload);
+    }
 
     if(inRepo){
       proxy.repoPath = itemPath;
@@ -442,7 +452,7 @@ function validateRepositoryStructure (repoDirPath) {
 
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
 
-  let modelDefinitions = ItemProxy.getModelDefinitions();
+  let modelDefinitions = KoheseModel.getModelDefinitions();
 
   // Remove model directories that are no longer needed from the model list
   // Note: Iterate in reverse to allow array to be modified

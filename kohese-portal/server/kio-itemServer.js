@@ -87,14 +87,64 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  function consoleLogObject(message, object){
+    if (message){
+      console.log(message);
+    }
+    console.log(JSON.stringify(object, null, '  '));
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Item/getRepoHashmap', function(request, sendResponse){
+    var username = 'Unknown';
+    if (socket.koheseUser){
+      username = socket.koheseUser.username;
+    }
+    console.log('::: session %s: Received getRepoHashmap for user %s at %s', socket.id, username,
+                socket.handshake.address);
+
+    // consoleLogObject('$$$ Request', request);
+
+    var repoTreeHashes = ItemProxy.getRepoTreeHashes();
+
+    // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
+
+    var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+
+    // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
+
+    let response = {
+      repoTreeHashes: repoTreeHashes
+    };
+
+    // consoleLogObject('$$$ Response', response);
+
+    console.log('::: Sending getRepoHashmap response');
+    sendResponse(response);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getAll', function(request, sendResponse){
     var username = 'Unknown';
     if (socket.koheseUser){
       username = socket.koheseUser.username;
     }
-    console.log('::: session %s: Received getAll for user %s at %s', socket.id, username, socket.handshake.address);
+    console.log('::: session %s: Received getAll for user %s at %s for repo %s',
+                socket.id, username, socket.handshake.address, request.forRepoId);
 
     var repoTreeHashes = ItemProxy.getAllTreeHashes();
+    if (!request.forRepoId){
+      repoTreeHashes = ItemProxy.getAllTreeHashes();
+    } else {
+      let repoProxy = ItemProxy.getProxyFor(request.forRepoId);
+      if (repoProxy){
+        repoTreeHashes = repoProxy.getTreeHashMap();
+      }
+    }
 
     var response = {};
     if(!_.isEqual(request.repoTreeHashes, repoTreeHashes)){
@@ -105,10 +155,16 @@ function KIOItemServer(socket){
             repoTreeHashes: repoTreeHashes,
             cache: {},
             sentAll: true
-          };
+        };
 
-        var rootProxy = ItemProxy.getRootProxy();
-        rootProxy.visitChildren(null, (proxy) => {
+        let repoProxy;
+        if (request.forRepoId){
+          repoProxy = ItemProxy.getProxyFor(request.forRepoId);
+        } else {
+          repoProxy = ItemProxy.getRootProxy();
+        }
+
+        repoProxy.visitChildren(null, (proxy) => {
           if (!response.cache[proxy.kind]){
             response.cache[proxy.kind] = {};
           }
@@ -148,9 +204,8 @@ function KIOItemServer(socket){
       response.kdbMatches = true;
     }
 
-    console.log('::: Sending getAll response');
     sendResponse(response);
-    console.log('::: Sent getAll response');
+    console.log('::: Sent getAll response for repo: ' + request.forRepoId);
   });
 
   //////////////////////////////////////////////////////////////////////////
