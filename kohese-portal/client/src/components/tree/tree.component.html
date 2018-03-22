@@ -72,7 +72,7 @@
           <mat-form-field>
             <input matInput type="text" [(ngModel)]="proxyFilter.filterString"
               [ngStyle]="proxyFilter.invalidRegex && {'background-color':'pink'}"
-              placeholder="Filter" (input)="filter()"/>
+              placeholder="Filter" (input)="whenFilterStringChanges()"/>
           </mat-form-field>
           <!-- Version Control Filtering -->
           <mat-checkbox [(ngModel)]="proxyFilter.status" (change)="filter()">

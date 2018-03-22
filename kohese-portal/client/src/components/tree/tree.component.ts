@@ -37,6 +37,7 @@ export class TreeComponent extends NavigatableComponent
     public isRootDefault: boolean = true;
     public selectedProxyIdStream: BehaviorSubject<string> = new BehaviorSubject<string>('');
     public proxyFilter: ProxyFilter = new ProxyFilter();
+    private _filterDelayIdentifier: number;
     // TODO Probably want to get this from somewhere else
     public viewList: Array<string> = ['Default', 'Version Control'];
     public selectedViewStream: BehaviorSubject<string> = new BehaviorSubject<string>(this.viewList[0]);
@@ -216,6 +217,17 @@ export class TreeComponent extends NavigatableComponent
     
     this.selectedViewStream.next(viewSelected);
     this.filter();
+  }
+  
+  public whenFilterStringChanges(): void {
+    if (this._filterDelayIdentifier) {
+      clearTimeout(this._filterDelayIdentifier);
+    }
+    
+    this._filterDelayIdentifier = setTimeout(() => {
+      this.filter();
+      this._filterDelayIdentifier = undefined;
+    }, 1000);
   }
   
   private changeTreeRoot(proxy: ItemProxy): void {

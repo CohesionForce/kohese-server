@@ -14,6 +14,7 @@ import { SessionService } from '../../services/user/session.service';
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { ActivatedRoute } from '@angular/router';
 import { TreeComponent } from './tree.component';
+import { TreeRow } from './tree-row.class';
 import { MockItem } from '../../../mocks/data/MockItem';
 import * as ItemProxy from '../../../../common/src/item-proxy';
 import { Observable } from 'rxjs/Observable';
@@ -103,4 +104,13 @@ describe('Component: Tree', () => {
     component.collapseAll();
     expect(component.visibleRows.length).toEqual(numberOfInitiallyVisibleRows);
   });
+  
+  it('correctly responds to the tree root changing', fakeAsync(() => {
+    let initialTreeRoot: ItemProxy = component.treeRootStream.getValue();
+    let initialVisibleRows: Array<TreeRow> = component.visibleRows;
+    component.treeRootStream.next(ItemProxy.getRootProxy().children[0]);
+    tick();
+    expect(initialTreeRoot).not.toEqual(component.treeRootStream.getValue());
+    expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
+  }));
 });
