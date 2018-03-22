@@ -59,7 +59,7 @@ describe('KDB Test', function() {
       ItemProxy.loadingComplete();
 //      dump();
 
-//      var modelDef = ItemProxy.getModelDefinitions();
+//      var modelDef = KoheseModel.getModelDefinitions();
 
       var repoTreeHashes = kdb.ItemProxy.getRepoTreeHashes();
 //      console.log(repoTreeHashes);
@@ -82,6 +82,7 @@ describe('KDB Test', function() {
       let repoAsList = rootProxy.getSubtreeAsList();
       var timeAfterGetDoc = new Date();
       var deltaTimeGetDoc = timeAfterGetDoc - timeBeforeGetDoc;
+      console.log('Item Count in Repo List:  ' + repoAsList.length);
       console.log('Time to get entire repo as doc: ' + deltaTimeGetDoc);
 
       done();

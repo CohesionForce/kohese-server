@@ -2,6 +2,8 @@ import { Input, Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@
 import { Observable, Subscription } from 'rxjs';
 
 import { UserInput } from '../user-input.class';
+import { MarkdownCheatSheetComponent } from './markdown-cheat-sheet.component';
+import { DialogService } from '../../../services/dialog/dialog.service';
 
 @Component({
   selector: 'k-markdown',
@@ -23,7 +25,7 @@ export class KMarkdownComponent extends UserInput
   editableStreamSub : Subscription;
   formGroupSub : Subscription;
 
-  constructor () {
+  constructor (private dialogService : DialogService) {
     super();
   }
 
@@ -40,18 +42,27 @@ export class KMarkdownComponent extends UserInput
   }
 
   ngOnDestroy () {
-    this.editableStreamSub.unsubscribe();
+    if (this.editableStreamSub) {
+      this.editableStreamSub.unsubscribe();
+    }
     this.formGroupSub.unsubscribe();
   }
 
   ngOnChanges (changes : SimpleChanges) {
     if (changes['formGroup']) {
-      this.formGroupSub.unsubscribe();
+      if (this.formGroupSub) {
+        this.formGroupSub.unsubscribe();
+      }
       this.formGroup = changes['formGroup'].currentValue;
       this.markdownData = this.formGroup.get(this.fieldId).value;
       this.formGroupSub = this.formGroup.get(this.fieldId).valueChanges.subscribe(value => {
         this.markdownData = value;
       })
     }
+  }
+
+  showCheatSheet() {
+    this.dialogService.openComponentDialog(MarkdownCheatSheetComponent, {
+    });
   }
 }  

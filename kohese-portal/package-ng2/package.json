@@ -36,6 +36,7 @@
     "angular-tree-component": "^7.0.1",
     "angular-ui-router": "^0.3.2",
     "angular2-jwt": "^0.2.3",
+    "angular2-virtual-scroll": "^0.3.2",
     "bcrypt": "^0.8.5",
     "bcryptjs": "^2.3.0",
     "body-parser": "^1.13.3",
