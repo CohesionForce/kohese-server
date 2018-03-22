@@ -53,9 +53,7 @@ describe('Component: Tree', () => {
     expect(component.proxyFilter.status).toEqual(true);
   });
   
-  it('builds a TreeRow for a new Item and, if that TreeRow should be ' +
-    'visible, inserts it into the Array of visible TreeRows at the ' +
-    'correct index', fakeAsync(() => {
+  it('builds a TreeRow for a new Item', fakeAsync(() => {
     let item: any = MockItem();
     item.id = 'Kurios Iesous';
     item.parentId = 'test-uuid3';
