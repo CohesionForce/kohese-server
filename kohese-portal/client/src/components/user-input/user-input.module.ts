@@ -12,6 +12,7 @@ import { KUserSelectorComponent } from './k-user-selector/k-user-selector.compon
 import { KMarkdownComponent } from './k-markdown/k-markdown.component';
 
 import { MarkdownModule } from 'ngx-markdown';
+import { MarkdownCheatSheetComponent } from './k-markdown/markdown-cheat-sheet.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { MarkdownModule } from 'ngx-markdown';
     KDateComponent,
     KSelectComponent,
     KStateEditorComponent,
-    KMarkdownComponent
+    KMarkdownComponent,
+    MarkdownCheatSheetComponent
   ],
   imports: [
     CommonModule,
@@ -38,6 +40,9 @@ import { MarkdownModule } from 'ngx-markdown';
     KSelectComponent,
     KStateEditorComponent,
     KMarkdownComponent
+  ],
+  entryComponents: [
+    MarkdownCheatSheetComponent
   ]
 })
 export class UserInputModule {}

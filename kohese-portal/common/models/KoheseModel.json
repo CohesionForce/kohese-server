@@ -3,12 +3,17 @@
   "name": "KoheseModel",
   "parentId": "Item",
   "base": "Item",
-  "idInjection": true,
+  "idInjection": false,
+  "isMetaModel": true,
   "invertItemOrder": false,
   "properties": {
     "base": {
       "type": "string",
       "required": true
+    },
+    "isMetaModel": {
+      "type": "boolean",
+      "default": false
     },
     "idInjection": {
       "type": "boolean",

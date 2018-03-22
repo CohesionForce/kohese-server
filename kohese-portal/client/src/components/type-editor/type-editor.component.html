@@ -1,4 +1,4 @@
-<div id="typeLevelOperations">
+<div id="typeLevelOperations" *ngIf="types">
   <mat-form-field class="pad">
     <mat-select placeholder="Type" [(value)]="selectedType">
       <mat-option *ngFor="let type of (types | mapKey)"
@@ -19,6 +19,9 @@
       <mat-icon class="fa fa-trash"></mat-icon>
     </button>
   </span>
+</div>
+<div *ngIf="!types">
+  <h3>Loading Types ...<mat-spinner diameter="20"></mat-spinner> </h3> 
 </div>
 <mat-tab-group class="pad">
   <mat-tab label="Overview">

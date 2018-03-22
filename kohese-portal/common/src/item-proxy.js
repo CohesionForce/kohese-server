@@ -9,17 +9,13 @@ var uuidV1 = require('uuid/v1');
 
 var Rx = require('rxjs/Rx');
 
+
 var tree = {};
 tree.proxyMap = {};
 tree.repoMap = {};
-tree.modelMap = {
-    'Internal': {internal: true},
-    'Internal-Lost': {internal: true},
-    'Internal-Model': {internal: true},
-    'Internal-View-Model': {internal: true},
-    'Internal-State': {internal: true}
-};
 tree.loading = true;
+tree.KoheseModel = null;
+tree.proxyHasDeferredModelAssociation = {};
 
 tree.changeSubject = new Rx.Subject();
 
@@ -41,25 +37,10 @@ class ItemProxy {
       console.log('::: Allocating new id: ' + itemId);
     }
 
-    var validation = ItemProxy.validateItemContent(kind, forItem);
+    ItemProxy.validateItemContent(kind, forItem);
 
-    if (!validation.valid){
-      // TODO Need to remove this bypass logic which is needed to load some existing data
-      if(tree.loading){
-        console.log('*** Error: Invalid data item');
-        console.log('Kind: ' + kind);
-        console.log(forItem);
-        console.log(validation);
-      } else {
-        throw ({
-          error: 'Not-Valid',
-          validation: validation
-        });
+    let proxy = tree.proxyMap[itemId];
 
-      }
-    }
-
-    var proxy = tree.proxyMap[itemId];
     if (!proxy) {
 //      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
       proxy = this;
@@ -68,7 +49,20 @@ class ItemProxy {
       tree.proxyMap[itemId] = proxy;
     }
 
+    switch (kind){
+      case 'Internal':
+      case 'Internal-Lost':
+      case 'Internal-Model':
+      case 'Internal-View-Model':
+      case 'Internal-State':
+        proxy.internal = true;
+        break;
+      default:
+        // Do Nothing
+      }
+
     if (proxy.item &&
+        (!proxy.item.loadPending) &&
         (proxy.kind !== 'Internal') &&
         (proxy.kind !== 'Internal-Lost') &&
         (proxy.kind !== 'Internal-Model')){
@@ -77,16 +71,16 @@ class ItemProxy {
       return proxy;
     }
 
+    let loadPending;
+    if (proxy && proxy.item){
+      loadPending = proxy.item.loadPending;
+    }
+
     proxy.item = forItem;
     proxy.setItemKind(kind);
 
     if (kind === 'Repository') {
       tree.repoMap[itemId] = proxy;
-    }
-
-    if (kind === 'KoheseModel') {
-      tree.modelMap[itemId] = proxy;
-      // TODO Need to Load Model
     }
 
     if (kind === 'Internal') {
@@ -109,6 +103,12 @@ class ItemProxy {
 
     parent.addChild(proxy);
 
+    if (loadPending && (proxy.item.parentId !== 'LOST+FOUND')){
+      // Remove load pending since the item has now been loaded
+      delete proxy.item.loadPending;
+      delete proxy.internal;
+    }
+
     if (proxy.children){
       proxy.sortChildren();
     }
@@ -125,6 +125,18 @@ class ItemProxy {
     }
 
     return proxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static registerKoheseModelClass(KoheseModel) {
+    tree.KoheseModel = KoheseModel;
+
+    for (let id in tree.proxyHasDeferredModelAssociation){
+      let proxy = tree.proxyHasDeferredModelAssociation[id];
+      proxy.setItemKind(proxy.kind);
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -151,11 +163,9 @@ class ItemProxy {
     // eslint-disable-next-line no-unused-vars
     let rootViewModelProxy = new ItemProxy(tree.rootViewModelProxy.kind, tree.rootViewModelProxy.item);
 
-    // Remove loaded modelMap
-    for(let key in tree.modelMap){
-      if (!tree.modelMap[key].internal){
-        delete tree.modelMap[key];
-      }
+
+    if (tree.KoheseModel){
+      tree.KoheseModel.removeLoadedModels();
     }
 
   }
@@ -214,18 +224,17 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   setItemKind(kind){
-    // Create a placeholder kind if it does not exist yet
-    if(!tree.modelMap[kind]){
-      // Make sure the map has not been missed due to loading order on the client
-      var kindProxy = ItemProxy.getProxyFor(kind);
-      if (kindProxy){
-        tree.modelMap[kind] = kindProxy;
-      } else {
-        tree.modelMap[kind] = createMissingProxy(kind);
-      }
-    }
     this.kind = kind;
-    this.model = tree.modelMap[kind];
+
+    if (tree.KoheseModel){
+      this.model = tree.KoheseModel.getModelProxyFor(kind);
+      if (this.internal && !this.model.internal) {
+        // Item was previously created in lost and found
+        delete this.internal;
+      }
+    } else {
+      tree.proxyHasDeferredModelAssociation[this.item.id] = this;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -263,26 +272,41 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static validateItemContent(kind, itemContent){
-
-    var model = tree.modelMap[kind];
-
-    var validationResult = {
-      valid: true,
-      missingProperties: []
+  static validateItemContent (kind, forItem) {
+    let validation = {
+      valid : true
     };
 
-    if (model && model.item && model.item.requiredProperties) {
-      model.item.requiredProperties.forEach((property) => {
-        if (!itemContent.hasOwnProperty(property) ||
-            itemContent[property] === null) {
-          validationResult.valid = false;
-          validationResult.missingProperties.push(property);
-        }
-      });
-    }
+    if (tree.KoheseModel) {
+      let modelProxy = tree.KoheseModel.getModelProxyFor(kind);
+      if(modelProxy && (modelProxy.kind === 'KoheseModel')){
+        // if (modelProxy.constructor.name !== 'KoheseModel'){
+        //   modelProxy.dumpProxy();
+        //   throw({
+        //     error: 'Class Mismatch',
+        //     expected: 'KoheseModel',
+        //     found: modelProxy.constructor.name
+        //   });
+        // }
+        validation = modelProxy.validateItemContent(forItem);
 
-    return validationResult;
+        if (!validation.valid){
+          // TODO Need to remove this bypass logic which is needed to load some existing data
+          if(tree.loading){
+            console.log('*** Error: Invalid data item');
+            console.log('Kind: ' + kind);
+            console.log(forItem);
+            console.log(validation);
+          } else {
+            throw ({
+              error: 'Not-Valid',
+              validation: validation
+            });
+
+          }
+        }
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -309,7 +333,7 @@ class ItemProxy {
     let clone = this.cloneItem();
 
     // Determine if derived properiteis need to be stripped
-    if (!this.model.internal && this.model.item.derivedProperties && this.model.item.derivedProperties.length) {
+    if (!this.internal && this.model && this.model.item.derivedProperties && this.model.item.derivedProperties.length) {
       let derivedProperties = this.model.item.derivedProperties;
       for(let idx in derivedProperties){
         let key = derivedProperties[idx];
@@ -393,13 +417,13 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateTreeHash(deferred) {
+  calculateTreeHash(deferredRollup) {
 
     // TODO: Should only have to do this when content is updated
     this.calculateOID();
 
     // Don't calculateTreeHash during initial load
-    if (!this.item || tree.loading){
+    if (!this.item || (tree.loading && !deferredRollup)){
       this.deferTreeHash = true;
       return;
     }
@@ -412,14 +436,19 @@ class ItemProxy {
 
     for (var childIdx in this.children){
       var childProxy = this.children[childIdx];
-      if(childProxy.kind === 'Repository'){
-        treeHashEntry.childTreeHashes[childProxy.item.id] = 'Repository-Mount';
-      } else {
-        if(childProxy.deferTreeHash){
-          this.deferTreeHash = true;
-          return;
-        }
-        treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;
+      switch(childProxy.kind){
+        case 'Repository':
+          treeHashEntry.childTreeHashes[childProxy.item.id] = 'Repository-Mount';
+          break;
+        case 'Internal':
+          treeHashEntry.childTreeHashes[childProxy.item.id] = 'Internal';
+          break;
+        default:
+          if(childProxy.deferTreeHash){
+            this.deferTreeHash = true;
+            return;
+          }
+          treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;
       }
     }
 
@@ -440,7 +469,7 @@ class ItemProxy {
     this.treeHashEntry = treeHashEntry;
 
     // Propagate changes up the tree
-    if (!deferred){
+    if (!deferredRollup){
       if (this.parentProxy){
         this.parentProxy.calculateTreeHash();
       }
@@ -450,11 +479,21 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static calculateAllTreeHashes() {
-    const deferred = true;
-    tree.root.visitTree(null, null, (proxy) => {
-      proxy.calculateTreeHash(deferred);
+  calculateRepoTreeHashes() {
+    const deferredRollup = true;
+    this.visitTree({excludeKind : ['Repository', 'Internal']}, null, (proxy) => {
+      proxy.calculateTreeHash(deferredRollup);
     });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static calculateAllTreeHashes() {
+    for (let repoId in tree.repoMap){
+      let repoProxy = tree.repoMap[repoId];
+      repoProxy.calculateRepoTreeHashes();
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -557,7 +596,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   getTreeHashMap() {
     var treeHashMap = {};
-    this.visitTree({excludeKind : ['Repository']}, (proxy) => {
+    this.visitTree({excludeKind : ['Repository', 'Internal']}, (proxy) => {
       treeHashMap [proxy.item.id] = proxy.treeHashEntry;
     });
     return treeHashMap;
@@ -571,7 +610,7 @@ class ItemProxy {
 
     for(var repoIdx in tree.repoMap){
       var repoProxy = tree.repoMap[repoIdx];
-      repoTreeHashes[repoIdx] = repoProxy.getTreeHashMap();
+      repoTreeHashes[repoIdx] = repoProxy.treeHashEntry;
     }
     return repoTreeHashes;
   }
@@ -774,7 +813,7 @@ class ItemProxy {
     }
 
     console.log('=== ' + thisIndent + this.item.id + ' - ' + this.item.name +
-        ' - ' + this.kind);
+        ' - ' + this.kind + ' <' + this.constructor.name + '>');
 
     for ( var childIdx in this.children) {
       var childProxy = this.children[childIdx];
@@ -1078,22 +1117,7 @@ class ItemProxy {
   updateItem(modelKind, withItem) {
 //    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
 
-    var validation = ItemProxy.validateItemContent(modelKind, withItem);
-
-    if (!validation.valid){
-      // TODO Need to remove this bypass logic which is needed to load some existing data
-      if(tree.loading){
-        console.log('*** Error: Invalid data item');
-        console.log('Kind: ' + modelKind);
-        console.log(withItem);
-        console.log(validation);
-      } else {
-        throw ({
-          error: 'Not-Valid',
-          validation: validation
-        });
-      }
-    }
+    ItemProxy.validateItemContent(modelKind, withItem);
 
     // Determine if item kind changed
     var newKind = modelKind;
@@ -1232,49 +1256,7 @@ class ItemProxy {
 
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getModelDefinitions(){
-    return tree.modelMap;
-  }
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static modelDefinitionLoadingComplete() {
-    // Create the key ordering for descendant models
-    var models = tree.rootModelProxy.getDescendants();
-
-    for(var index in models){
-      var modelProxy = models[index];
-      console.log('::: Processing Model Properties ' + modelProxy.item.name);
-
-      let propertyOrder = _.clone(modelProxy.parentProxy.item.propertyOrder) || [];
-      modelProxy.item.propertyOrder = propertyOrder.concat(Object.keys(modelProxy.item.properties));
-
-      let propertyStorageOrder = _.clone(modelProxy.parentProxy.item.propertyStorageOrder) || [];
-
-      if (modelProxy.item.invertItemOrder){
-        modelProxy.item.propertyStorageOrder = Object.keys(modelProxy.item.properties).concat(propertyStorageOrder);
-      } else {
-        modelProxy.item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy.item.properties));
-      }
-
-      modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
-      modelProxy.item.derivedProperties = _.clone(modelProxy.parentProxy.item.derivedProperties) || [];
-
-      for (var property in modelProxy.item.properties){
-        var propertySettings = modelProxy.item.properties[property];
-        if (propertySettings.required){
-          modelProxy.item.requiredProperties.push(property);
-        }
-        if (propertySettings.derived){
-          modelProxy.item.derivedProperties.push(property);
-        }
-      }
-    }
-  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1312,8 +1294,10 @@ function createMissingProxy(forId) {
     id : forId,
     name : 'Lost Item: ' + forId,
     description : 'Found node(s) referencing this node.',
-    parentId : 'LOST+FOUND'
+    parentId : 'LOST+FOUND',
+    loadPending: true
   });
+  lostProxy.internal = true;
 
   return lostProxy;
 }

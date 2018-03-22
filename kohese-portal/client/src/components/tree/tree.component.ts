@@ -60,11 +60,16 @@ export class TreeComponent extends NavigatableComponent
   ngOnInit(): void {
     this.repoStatusSub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
-      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-        this.root = this.ItemRepository.getRootProxy();
-        this.absoluteRoot = this.root;
-        this.koheseTypes = this.typeService.getKoheseTypes();
-      }
+        switch (update.state){
+          case RepoStates.KOHESEMODELS_SYNCHRONIZED:
+          case RepoStates.SYNCHRONIZATION_SUCCEEDED:
+            this.root = this.ItemRepository.getRootProxy();
+            this.absoluteRoot = this.root;
+            this.koheseTypes = this.typeService.getKoheseTypes();
+            if (this.repoStatusSub){
+              this.repoStatusSub.unsubscribe();
+            }
+          }
     });
 
     this.routeParametersSubscription = this.route.params.
@@ -79,8 +84,10 @@ export class TreeComponent extends NavigatableComponent
 
   ngOnDestroy(): void {
     this.routeParametersSubscription.unsubscribe();
-    this.repoStatusSub.unsubscribe();
-  }
+    if (this.repoStatusSub){
+      this.repoStatusSub.unsubscribe();
+    }
+}
 
   filter(): void {
     this.filterStream.next(this.proxyFilter);
@@ -147,16 +154,16 @@ export class TreeComponent extends NavigatableComponent
         this.proxyFilter.status = false;
         this.proxyFilter.dirty = false;
     }
-    
+
     this.selectedViewStream.next(viewSelected);
     this.filterStream.next(this.proxyFilter);
   }
-  
+
   public whenRootChanges(proxy: ItemProxy): void {
     this.root = proxy;
     this.isRootDefault = false;
   }
-  
+
   public whenRowVisibilityChanges(visible: boolean): void {
     if (visible) {
       this._numberOfRowsVisible++;
