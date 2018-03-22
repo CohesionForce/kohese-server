@@ -42,13 +42,17 @@ export class KMarkdownComponent extends UserInput
   }
 
   ngOnDestroy () {
-    this.editableStreamSub.unsubscribe();
+    if (this.editableStreamSub) {
+      this.editableStreamSub.unsubscribe();
+    }
     this.formGroupSub.unsubscribe();
   }
 
   ngOnChanges (changes : SimpleChanges) {
     if (changes['formGroup']) {
-      this.formGroupSub.unsubscribe();
+      if (this.formGroupSub) {
+        this.formGroupSub.unsubscribe();
+      }
       this.formGroup = changes['formGroup'].currentValue;
       this.markdownData = this.formGroup.get(this.fieldId).value;
       this.formGroupSub = this.formGroup.get(this.fieldId).valueChanges.subscribe(value => {
