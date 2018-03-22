@@ -7,7 +7,10 @@
     "pretest": "jshint .",
     "start": "node --max_old_space_size=2048 .",
     "dist": "cd dist && node .",
-    "wp": "webpack-dev-server --inline --progress --port 8000"
+    "wp": "webpack-dev-server --inline --progress --port 8000",  
+    "ngsw-config": "node_modules/.bin/ngsw-config client/bundle client/ngsw-config.json",
+    "ngsw-copy": "cp node_modules/@angular/service-worker/ngsw-worker.js client",
+    "build-prod-ngsw": "ng build --prod && npm run ngsw-config && npm run ngsw-copy"
   },
   "dependencies": {
     "@angular/animations": "^5.2.3",
@@ -22,6 +25,7 @@
     "@angular/platform-browser": "^5.2.3",
     "@angular/platform-browser-dynamic": "^5.2.3",
     "@angular/router": "^5.2.3",
+    "@angular/service-worker": "^5.2.9",
     "@angular/upgrade": "^5.0.3",
     "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.7",
     "@types/core-js": "^0.9.43",

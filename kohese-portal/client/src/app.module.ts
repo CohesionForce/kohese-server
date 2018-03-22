@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { AppComponent } from './app.component';
 
@@ -37,6 +38,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { MaterialModule } from './material.module';
+import { environment } from '../environments/environment.prod';
 
 @NgModule({
   declarations: [
@@ -51,6 +53,7 @@ import { MaterialModule } from './material.module';
     FormsModule,
     FlexLayoutModule,
     BrowserAnimationsModule,
+    ServiceWorkerModule.register('/ngsw-worker.js', {enabled : environment.production}),
     ToastrModule.forRoot(),
     MarkdownModule.forRoot(),
     InfiniteScrollModule,
