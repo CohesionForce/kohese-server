@@ -32,6 +32,7 @@ import { ActionTableComponent } from './components/action-table/action-table.com
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MarkdownModule } from 'ngx-markdown';
 
@@ -41,8 +42,8 @@ import { MaterialModule } from './material.module';
   declarations: [
     AppComponent,
     TreeComponent,
-    ExploreComponent,
-    TreeRowComponent
+    TreeRowComponent,
+    ExploreComponent
   ],
   imports: [
     BrowserModule,
@@ -69,6 +70,7 @@ import { MaterialModule } from './material.module';
     UserModule,
     ServicesModule,
     AdminModule,
+    VirtualScrollModule,
     DashboardModule
   ],
   bootstrap: [AppComponent]
