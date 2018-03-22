@@ -276,19 +276,6 @@ table td .glyphicon-remove {
   table td .glyphicon-remove:hover {
     cursor: pointer; }
 
-#explore-container {
-  height: 100%; }
-  #explore-container #tree-container {
-    height: 100%;
-    width: 50%;
-    overflow: auto;
-    float: left; }
-  #explore-container #details-container {
-    height: 100%;
-    width: 50%;
-    overflow: auto;
-    float: right; }
-
 .quick-item {
   position: fixed;
   z-index: 10;
