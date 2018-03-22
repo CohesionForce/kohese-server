@@ -1,6 +1,7 @@
 import { DynamicTypesService } from './dynamic-types.service';
 import { RepoStates } from '../item-repository/item-repository.service';
 import * as ItemProxy from '../../../../common/src/item-proxy';
+import * as KoheseModel from '../../../../common/src/KoheseModel';
 import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../mocks/data/MockViewData';
 import { Observable } from 'rxjs/Observable';
@@ -17,8 +18,8 @@ describe('DynamicTypesService', () => {
       state: RepoStates.SYNCHRONIZATION_SUCCEEDED
     }));
 
-    let modelProxy = new ItemProxy('KoheseModel', MockDataModel());
-    ItemProxy.modelDefinitionLoadingComplete();
+    let modelProxy = new KoheseModel(MockDataModel());
+    KoheseModel.modelDefinitionLoadingComplete();
 
     itemRepositoryPlaceholder.getProxyFor.and.returnValues(ItemProxy.
       getProxyFor('Model-Definitions'), new ItemProxy('KoheseView',

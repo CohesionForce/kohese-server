@@ -47,7 +47,6 @@ export class TreeComponent extends NavigatableComponent
     private readonly NO_KIND_SPECIFIED: string = '---';
 
     /* Subscriptions */
-    private repoStatusSub: Subscription;
     private routeParametersSubscription: Subscription;
     private _treeRootChangeSubscription: Subscription;
     private _itemProxySubscription: Subscription;
@@ -63,64 +62,76 @@ export class TreeComponent extends NavigatableComponent
   }
 
   ngOnInit(): void {
-    this.repoStatusSub = this.ItemRepository.getRepoStatusSubject()
-      .subscribe(update => {
-      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-        this.absoluteRoot = this.ItemRepository.getRootProxy();
-        this._treeRootStream = new BehaviorSubject<ItemProxy>(this.
-          absoluteRoot);
-        this.koheseTypes = this.typeService.getKoheseTypes();
+    let initialized: boolean = false;
+    let repositoryStatusSubscription: Subscription = this.ItemRepository.
+      getRepoStatusSubject().subscribe(update => {
+        switch (update.state) {
+          case RepoStates.KOHESEMODELS_SYNCHRONIZED:
+          case RepoStates.SYNCHRONIZATION_SUCCEEDED:
+            this.absoluteRoot = this.ItemRepository.getRootProxy();
+            this._treeRootStream = new BehaviorSubject<ItemProxy>(this.
+              absoluteRoot);
+            this.koheseTypes = this.typeService.getKoheseTypes();
         
-        this.absoluteRoot.visitChildren(undefined, (proxy: ItemProxy) => {
-          let row: TreeRow = new TreeRow(proxy);
-          this._updateVisibleRowsSubscriptions.push(row.updateVisibleRows.
-            subscribe((updateVisibleRows: boolean) => {
-            if (updateVisibleRows) {
-              this.setVisibleRows();
-            }
-          }));
-          this._rowMap.set(proxy.item.id, row);
-          this._rows.push(row);
-        });
+            this.absoluteRoot.visitChildren(undefined, (proxy: ItemProxy) => {
+              let row: TreeRow = new TreeRow(proxy);
+              this._updateVisibleRowsSubscriptions.push(row.updateVisibleRows.
+                subscribe((updateVisibleRows: boolean) => {
+                if (updateVisibleRows) {
+                  this.setVisibleRows();
+                }
+              }));
+              this._rowMap.set(proxy.item.id, row);
+              this._rows.push(row);
+            });
         
-        this._treeRootChangeSubscription = this._treeRootStream.subscribe(
-          (proxy: ItemProxy) => {
-          this.changeTreeRoot(proxy);
-        });
+            this._treeRootChangeSubscription = this._treeRootStream.subscribe(
+              (proxy: ItemProxy) => {
+              this.changeTreeRoot(proxy);
+            });
         
-        this._itemProxySubscription = this.ItemRepository.getChangeSubject().
-          subscribe((notification: any) => {
-          if ('create' === notification.type) {
-            let row: TreeRow = new TreeRow(notification.proxy);
-            this._rowMap.set(notification.id, row);
-            let parentRowIndex: number = this._rows.indexOf(this._rowMap.get(
-              notification.proxy.parentProxy.item.id));
-            let parentRowIndexOffset: number = notification.proxy.parentProxy.
-              children.indexOf(notification.proxy);
-            if (0 !== parentRowIndexOffset) {
-              parentRowIndexOffset += notification.proxy.parentProxy.
-                children[parentRowIndexOffset].descendantCount;
-            }
-            this._rows.splice(parentRowIndex + parentRowIndexOffset + 1, 0,
-              row);
-            this._updateVisibleRowsSubscriptions.push(row.updateVisibleRows.
-              subscribe((updateVisibleRows: boolean) => {
-              if (updateVisibleRows) {
+            this._itemProxySubscription = this.ItemRepository.
+              getChangeSubject().subscribe((notification: any) => {
+              if ('create' === notification.type) {
+                let row: TreeRow = new TreeRow(notification.proxy);
+                this._rowMap.set(notification.id, row);
+                let parentRowIndex: number = this._rows.indexOf(this._rowMap.
+                  get(notification.proxy.parentProxy.item.id));
+                let parentRowIndexOffset: number = notification.proxy.
+                  parentProxy.children.indexOf(notification.proxy);
+                if (0 !== parentRowIndexOffset) {
+                  parentRowIndexOffset += notification.proxy.parentProxy.
+                    children[parentRowIndexOffset].descendantCount;
+                }
+                this._rows.splice(parentRowIndex + parentRowIndexOffset + 1, 0,
+                  row);
+                this._updateVisibleRowsSubscriptions.push(row.
+                  updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
+                  if (updateVisibleRows) {
+                    this.setVisibleRows();
+                  }
+                }));
+                this.setVisibleRows();
+              } else if ('delete' === notification.type) {
+                let row: TreeRow = this._rowMap.get(notification.id);
+                this._rows.splice(this._rows.indexOf(row), 1);
+                this._rowMap.delete(notification.id);
                 this.setVisibleRows();
               }
-            }));
-            this.setVisibleRows();
-          } else if ('delete' === notification.type) {
-            let row: TreeRow = this._rowMap.get(notification.id);
-            this._rows.splice(this._rows.indexOf(row), 1);
-            this._rowMap.delete(notification.id);
-            this.setVisibleRows();
-          }
-        });
+            });
         
-        this.setVisibleRows();
-      }
+            this.setVisibleRows();
+            
+            initialized = true;
+            if (repositoryStatusSubscription) {
+              repositoryStatusSubscription.unsubscribe();
+            }
+        }
     });
+    
+    if (initialized) {
+      repositoryStatusSubscription.unsubscribe();
+    }
 
     this.routeParametersSubscription = this.route.params.
       subscribe((parameters: Params) => {
@@ -134,12 +145,12 @@ export class TreeComponent extends NavigatableComponent
   
   ngOnDestroy(): void {
     this.routeParametersSubscription.unsubscribe();
-    for (let j: number = 0; j < this._updateVisibleRowsSubscriptions.length; j++) {
+    for (let j: number = 0; j < this._updateVisibleRowsSubscriptions.length;
+      j++) {
       this._updateVisibleRowsSubscriptions[j].unsubscribe();
     }
     this._treeRootChangeSubscription.unsubscribe();
     this._itemProxySubscription.unsubscribe();
-    this.repoStatusSub.unsubscribe();
   }
 
   filter(): void {
@@ -214,7 +225,7 @@ export class TreeComponent extends NavigatableComponent
         this.proxyFilter.status = false;
         this.proxyFilter.dirty = false;
     }
-    
+
     this.selectedViewStream.next(viewSelected);
     this.filter();
   }

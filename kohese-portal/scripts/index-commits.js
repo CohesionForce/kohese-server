@@ -10,9 +10,13 @@ const repositoryPath = process.argv[2];
 var beforeTime = Date.now();
 kdbCache.loadCachedObjects();
 var afterTime = Date.now();
-var deltaTime = afterTime-beforeTime;
-console.log('--- Load Cached Objects Time: ' + deltaTime/1000);
+var deltaLoadTime = afterTime-beforeTime;
 
+beforeTime = Date.now();
 kdbCache.generateCommitHistoryIndices(repositoryPath).then(() => {
+  afterTime = Date.now();
+  var deltaUpdateTime = afterTime-beforeTime;
   console.log('::: Finished Indexing');
+  console.log('--- Load Cached Objects Time:   ' + deltaLoadTime/1000);
+  console.log('--- Update Cached Objects Time: ' + deltaUpdateTime/1000);
 });
