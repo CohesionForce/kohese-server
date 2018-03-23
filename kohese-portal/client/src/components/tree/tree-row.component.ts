@@ -10,6 +10,7 @@ import { RowComponent } from '../../classes/RowComponent.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
+import { CompareItemsComponent } from '../compare-items/compare-items.component';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -197,5 +198,11 @@ export class TreeRowComponent extends RowComponent
         row.expand(expand, true);
       }
     }
+  }
+  
+  public openComparisonDialog(): void {
+    this.dialogService.openComponentDialog(CompareItemsComponent, {
+      baseProxy: this.itemProxy
+    }).updateSize('70%', '70%');
   }
 }

@@ -28,6 +28,7 @@ import { TreeComponent } from './components/tree/tree.component';
 import { TreeRowComponent } from './components/tree/tree-row.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
+import { CompareItemsComponent } from './components/compare-items/compare-items.component';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
@@ -42,7 +43,8 @@ import { MaterialModule } from './material.module';
     AppComponent,
     TreeComponent,
     ExploreComponent,
-    TreeRowComponent
+    TreeRowComponent,
+    CompareItemsComponent
   ],
   imports: [
     BrowserModule,
@@ -70,6 +72,9 @@ import { MaterialModule } from './material.module';
     ServicesModule,
     AdminModule,
     DashboardModule
+  ],
+  entryComponents: [
+    CompareItemsComponent
   ],
   bootstrap: [AppComponent]
 })

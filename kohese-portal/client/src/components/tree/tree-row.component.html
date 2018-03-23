@@ -33,6 +33,14 @@
     <span id="rightSpan" class="kti-actions">
       <!-- Default row actions -->
       <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon class="fa fa-bars"></mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" [overlapTrigger]="false">
+          <button mat-menu-item (click)="openComparisonDialog()">
+            Compare With...
+          </button>
+        </mat-menu>
         <button mat-icon-button (click)="rootChanged.emit(itemProxy)">
           <mat-icon class="fa fa-anchor"></mat-icon>
         </button>

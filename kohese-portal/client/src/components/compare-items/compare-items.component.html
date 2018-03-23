@@ -1,0 +1,55 @@
+<span id="topContainer">
+  <mat-checkbox [(ngModel)]="baseOnRight" style="margin-left: auto;">
+    Base On Right
+  </mat-checkbox>
+  <button mat-icon-button (click)="save()"
+    [disabled]="!(editableStream | async)">
+    <mat-icon class="fa fa-save"></mat-icon>
+  </button>
+</span>
+<div id="itemSelectionContainer">
+  <parent-selector (parentSelected)="whenLeftItemChanges($event)">
+  </parent-selector>
+  <parent-selector (parentSelected)="whenRightItemChanges($event)">
+  </parent-selector>
+</div>
+<split id="comparisonContainer" direction="horizontal">
+  <split-area #leftSplitArea [size]="50">
+    <ng-container *ngIf="baseOnRight">
+      <details-form [type]="(changeProxyStream | async)?.model.type"
+        [itemProxy]="(changeProxyStream | async)"
+        [editableStream]="editableStream">
+      </details-form>
+    </ng-container>
+    <ng-container *ngIf="!baseOnRight">
+      <details-form [type]="(baseProxyStream | async)?.model.type"
+        [itemProxy]="(baseProxyStream | async)"
+        [editableStream]="editableStream">
+      </details-form>
+    </ng-container>
+  </split-area>
+  <split-area #rightSplitArea [size]="50">
+    <ng-container *ngIf="baseOnRight">
+      <details-form [type]="(baseProxyStream | async)?.model.type"
+        [itemProxy]="(baseProxyStream | async)"
+        [editableStream]="editableStream">
+      </details-form>
+    </ng-container>
+    <ng-container *ngIf="!baseOnRight">
+      <details-form [type]="(changeProxyStream | async)?.model.type"
+        [itemProxy]="(changeProxyStream | async)"
+        [editableStream]="editableStream">
+      </details-form>
+    </ng-container>
+  </split-area>
+</split>
+<ng-container *ngIf="dialogParameters">
+  <div id="dialogButtonContainer">
+    <mat-dialog-actions>
+      <button mat-raised-button [mat-dialog-close]="0"
+        style="margin-left: auto;">
+        Close
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-container>
