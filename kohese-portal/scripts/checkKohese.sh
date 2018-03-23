@@ -49,5 +49,5 @@ do
   esac
 done
 
-checkProcess "node ."
+checkProcess kohese-server 
 checkProcess uima-server
