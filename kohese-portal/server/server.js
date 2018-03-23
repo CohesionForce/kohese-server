@@ -1,3 +1,5 @@
+process.title = "kohese-server";
+
 var express = require('express');
 var morgan = require('morgan');
 

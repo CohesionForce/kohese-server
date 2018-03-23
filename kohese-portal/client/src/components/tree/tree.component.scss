@@ -9,14 +9,14 @@
   overflow: auto;
 }
 
+virtual-scroll {
+  height: 100%;
+  width: 100%;
+}
+
 .kt-icon {
   cursor: pointer;
   padding : 5px;
-}
-
-// Used to indent children under their parent
-.kt-collection .kt-collection {
-  padding-left: 15px;
 }
 
 .kt-item {

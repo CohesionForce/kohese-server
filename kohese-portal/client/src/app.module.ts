@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { AppComponent } from './app.component';
 
@@ -33,17 +34,19 @@ import { CompareItemsComponent } from './components/compare-items/compare-items.
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { MaterialModule } from './material.module';
+import { environment } from '../environments/environment.prod';
 
 @NgModule({
   declarations: [
     AppComponent,
     TreeComponent,
-    ExploreComponent,
     TreeRowComponent,
+    ExploreComponent,
     CompareItemsComponent
   ],
   imports: [
@@ -52,6 +55,7 @@ import { MaterialModule } from './material.module';
     FormsModule,
     FlexLayoutModule,
     BrowserAnimationsModule,
+    ServiceWorkerModule.register('/ngsw-worker.js', {enabled : environment.production}),
     ToastrModule.forRoot(),
     MarkdownModule.forRoot(),
     InfiniteScrollModule,
@@ -71,6 +75,7 @@ import { MaterialModule } from './material.module';
     UserModule,
     ServicesModule,
     AdminModule,
+    VirtualScrollModule,
     DashboardModule
   ],
   entryComponents: [

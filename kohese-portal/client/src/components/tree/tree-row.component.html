@@ -1,79 +1,73 @@
-<!-- This div is involved in the indentation of children under their
-  parent -->
-<div class="kt-collection" [hidden]="!visible">
-  <div class="kt-item" id="{{itemProxy.item.id}}"
-    (click)="navigate('Explore', {id: itemProxy.item.id})"
-    [ngClass]="{ 'kti-selected-item': (itemProxy.item.id === (selectedProxyIdStream | async)),
-    'highlight-row': (visible && matchesFilter) }">
-    <i
-      (click)="expand(!expanded, false)"
-      class="kt-icon fa"
-      [ngClass]="{ 'fa-caret-down': (itemProxy.children.length > 0) && expanded,
-      'fa-caret-right': (itemProxy.children.length > 0) && !expanded,
-      'no-children': !(itemProxy.children.length > 0) }">
-    </i>
-    <ng-container *ngIf="koheseType.icon">
-      <mat-icon matTooltip="{{koheseType.name}}" class="kt-icon {{koheseType.icon}}">
-      </mat-icon>
+<div class="kt-item" id="{{treeRow.itemProxy.item.id}}"
+  (click)="navigate('Explore', {id: treeRow.itemProxy.item.id})"
+  [ngClass]="{ 'kti-selected-item': (treeRow.itemProxy.item.id === (selectedProxyIdStream | async)),
+  'highlight-row': (treeRow.visible && treeRow.matchesFilter) }"
+  [ngStyle]="getIndentationStyle()">
+  <i class="kt-icon fa"
+    (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
+    [ngClass]="{ 'fa-caret-down': (treeRow.itemProxy.children.length > 0) && treeRow.expanded,
+    'fa-caret-right': (treeRow.itemProxy.children.length > 0) && !treeRow.expanded,
+    'no-children': !(treeRow.itemProxy.children.length > 0) }">
+  </i>
+  <ng-container *ngIf="koheseType.icon">
+    <mat-icon matTooltip="{{koheseType.name}}"
+      class="kt-icon {{koheseType.icon}}">
+    </mat-icon>
+  </ng-container>
+  <ng-container *ngIf="!koheseType.icon">
+    <span class="kt-icon no-icon"></span>
+  </ng-container>
+  {{(treeRow.itemProxy.item.name | highlightRegex)}}
+  <ng-container *ngIf="treeRow.itemProxy.item.tags">
+    {{treeRow.itemProxy.item.tags}}
+  </ng-container>
+  <!-- Conditional Icons for Item status -->
+  <ng-container *ngIf="treeRow.itemProxy.dirty">
+    <img src="assets/icons/versioncontrol/dirty.ico" title="Dirty item"/>
+  </ng-container>
+  <ng-container *ngIf="'Version Control' === (selectedViewStream | async)">
+    {{treeRow.itemProxy.status}}
+  </ng-container>
+  <span id="rightSpan" class="kti-actions">
+    <!-- Default row actions -->
+    <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon class="fa fa-bars"></mat-icon>
+      </button>
+      <mat-menu #menu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item (click)="openComparisonDialog()">
+          Compare With...
+        </button>
+      </mat-menu>
+      <button mat-icon-button
+        (click)="treeRootStream.next(treeRow.itemProxy); $event.stopPropagation()">
+        <mat-icon class="fa fa-anchor"></mat-icon>
+      </button>
+      <button mat-icon-button (click)="removeItem(); $event.stopPropagation()">
+        <mat-icon class="glyphicon glyphicon-remove delete-button"></mat-icon>
+      </button>
     </ng-container>
-    <ng-container *ngIf="!koheseType.icon">
-      <span class="kt-icon no-icon"></span>
+    <!-- Version Control row actions -->
+    <ng-container
+      *ngIf="('Version Control' === (selectedViewStream | async)) && treeRow.itemProxy.vcState">
+      <!-- VC Status Icons -->
+      <img *ngIf="treeRow.itemProxy.vcState.Unstaged"
+        src="assets/icons/versioncontrol/unstaged.ico" title="Unstaged"/>
+      <img *ngIf="treeRow.itemProxy.vcState.Staged"
+        src="assets/icons/versioncontrol/index-mod.ico" title="Staged"/>
+      <!-- Actions -->
+      <button mat-icon-button
+        (click)="revertChanges(); $event.stopPropagation()">
+        <mat-icon class="fa fa-undo kt-icon"></mat-icon>
+      </button>
+      <button mat-icon-button *ngIf="treeRow.itemProxy.vcState.Unstaged"
+        (click)="versionControlService.stageItems([treeRow.itemProxy]); $event.stopPropagation()">
+        <mat-icon class="fa fa-plus kt-icon"></mat-icon>
+      </button>
+      <button mat-icon-button *ngIf="treeRow.itemProxy.vcState.Staged"
+        (click)="versionControlService.unstageItems([treeRow.itemProxy]); $event.stopPropagation()">
+        <mat-icon class="fa fa-minus kt-icon"></mat-icon>
+      </button>
     </ng-container>
-    {{(itemProxy.item.name | highlightRegex)}}
-    <ng-container *ngIf="itemProxy.item.tags">
-      {{itemProxy.item.tags}}
-    </ng-container>
-    <!-- Conditional Icons for Item status -->
-    <ng-container *ngIf="itemProxy.dirty">
-      <img src="assets/icons/versioncontrol/dirty.ico" title="Dirty item"/>
-    </ng-container>
-    <ng-container *ngIf="'Version Control' === (selectedViewStream | async)">
-      {{itemProxy.status}}
-    </ng-container>
-    <span id="rightSpan" class="kti-actions">
-      <!-- Default row actions -->
-      <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
-        <button mat-icon-button [matMenuTriggerFor]="menu">
-          <mat-icon class="fa fa-bars"></mat-icon>
-        </button>
-        <mat-menu #menu="matMenu" [overlapTrigger]="false">
-          <button mat-menu-item (click)="openComparisonDialog()">
-            Compare With...
-          </button>
-        </mat-menu>
-        <button mat-icon-button (click)="rootChanged.emit(itemProxy)">
-          <mat-icon class="fa fa-anchor"></mat-icon>
-        </button>
-        <button mat-icon-button (click)="removeItem()">
-          <mat-icon class="glyphicon glyphicon-remove delete-button"></mat-icon>
-        </button>
-      </ng-container>
-      <!-- Version Control row actions -->
-      <ng-container
-        *ngIf="('Version Control' === (selectedViewStream | async)) && itemProxy.vcState">
-        <!-- VC Status Icons -->
-        <img *ngIf="itemProxy.vcState.Unstaged"
-          src="assets/icons/versioncontrol/unstaged.ico" title="Unstaged"/>
-        <img *ngIf="itemProxy.vcState.Staged"
-          src="assets/icons/versioncontrol/index-mod.ico" title="Staged"/>
-        <!-- Actions -->
-        <button mat-icon-button (click)="revertChanges()">
-          <mat-icon class="fa fa-undo kt-icon"></mat-icon>
-        </button>
-        <button mat-icon-button *ngIf="itemProxy.vcState.Unstaged"
-          (click)="versionControlService.stageItems([itemProxy])">
-          <mat-icon class="fa fa-plus kt-icon"></mat-icon>
-        </button>
-        <button mat-icon-button *ngIf="itemProxy.vcState.Staged"
-          (click)="versionControlService.unstageItems([itemProxy])">
-          <mat-icon class="fa fa-minus kt-icon"></mat-icon>
-        </button>
-      </ng-container>
-    </span>
-  </div>
-  <tree-row #rows *ngFor="let childProxy of itemProxy.children"
-    [hidden]="!expanded" [itemProxy]="childProxy"
-    (rootChanged)="rootChanged.emit($event)" [selectedViewStream]="selectedViewStream"
-    [filterStream]="filterStream" (visibilityChanged)="visibilityChanged.emit($event)">
-  </tree-row>
+  </span>
 </div>

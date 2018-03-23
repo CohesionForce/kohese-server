@@ -1,4 +1,4 @@
-<div *ngIf="root">
+<div *ngIf="(treeRootStream | async)"  style="height: 100%;">
   <div id="top-action-bar">
     <button mat-raised-button (click)="expandAll()"
       class="btn btn-default btn-sm">
@@ -21,7 +21,7 @@
       class="btn btn-default btn-sm fa fa-exchange">
     </i>
       <span>
-        Number of Items: {{root.descendantCount}}
+        Number of Items: {{(treeRootStream | async).descendantCount}}
       </span>
     <div>
       <!-- Start View Control -->
@@ -72,7 +72,7 @@
           <mat-form-field>
             <input matInput type="text" [(ngModel)]="proxyFilter.filterString"
               [ngStyle]="proxyFilter.invalidRegex && {'background-color':'pink'}"
-              placeholder="Filter" (input)="filter()"/>
+              placeholder="Filter" (input)="whenFilterStringChanges()"/>
           </mat-form-field>
           <!-- Version Control Filtering -->
           <mat-checkbox [(ngModel)]="proxyFilter.status" (change)="filter()">
@@ -95,16 +95,16 @@
       Name
     </div>
     <div class="kt-body">
-      <tree-row #rows *ngFor="let proxy of root.children"
-        [itemProxy]="proxy" (rootChanged)="whenRootChanges($event)"
-        [selectedViewStream]="selectedViewStream"
-        [selectedProxyIdStream]="selectedProxyIdStream"
-        [filterStream]="filterStream"
-        (visibilityChanged)="whenRowVisibilityChanges($event)">
-      </tree-row>
+      <virtual-scroll #tree [items]="visibleRows">
+        <tree-row *ngFor="let row of tree.viewPortItems"
+          [treeRow]="row" [treeRootStream]="treeRootStream"
+          [selectedViewStream]="selectedViewStream"
+          [selectedProxyIdStream]="selectedProxyIdStream">
+        </tree-row>
+      </virtual-scroll>
     </div>
   </div> <!-- End Knowledge Tree -->
 </div>
-<div *ngIf="!root">
+<div *ngIf="!(treeRootStream | async)" style="height: 100%;">
   Loading...
 </div>
