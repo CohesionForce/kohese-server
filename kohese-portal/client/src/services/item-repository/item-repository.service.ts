@@ -9,6 +9,7 @@ import { DialogService } from '../dialog/dialog.service';
 
 import * as ItemProxy from '../../../../common/src/item-proxy.js';
 import * as KoheseModel from '../../../../common/src/KoheseModel.js';
+import { CacheManager } from '../../../cache-worker/CacheManager';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -342,7 +343,50 @@ export class ItemRepository {
     }
   }
 
+  // TODO
+  cacheFetched : boolean = false;
+
+  fetchCache () {
+    if (!this.cacheFetched){
+      console.log('$$$ Fetch Cache');
+
+      CacheManager.loadCache();
+
+      let requestTime = Date.now();
+
+      this.socketService.socket.emit('Item/getItemCache', {
+        timestamp: {
+          requestTime: requestTime
+        },
+        cacheFetched: this.cacheFetched
+      },
+        (response) => {
+          var responseReceiptTime = Date.now();
+          let timestamp = response.timestamp;
+          timestamp.responseReceiptTime = responseReceiptTime;
+          console.log(timestamp);
+          console.log('::: Response for getItemCache');
+          for(let tsKey in timestamp){
+            console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
+          }
+          // console.log('$$$ Request receipt time: ' + (responseReceiptTime-timestamp.requestReceiptTime)/1000);
+          // console.log('$$$ Response time: ' + (timestamp.responseTransmitTime-timestamp.request)/1000);
+          // console.log('$$$ Response reeipt time: ' + (responseReceiptTime-response.timestamp.requestReceiptTime)/1000);
+          // console.log('$$$ Overall response receipt time: ' + (responseReceiptTime-requestTime)/1000);
+          console.log(response.objectMap.commit);
+          // this.cacheFetched = true;
+      }
+      );
+    }
+  }
+
   fetchItems () {
+
+    // TODO Remove this
+    if (!this.cacheFetched){
+      this.fetchCache();
+      // return;
+    }
 
     // Load feature switch
     let ifaKey = 'IR-fetch-all';
