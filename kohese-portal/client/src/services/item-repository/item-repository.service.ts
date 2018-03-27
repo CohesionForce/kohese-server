@@ -161,6 +161,8 @@ export class ItemRepository {
   }
 
   registerKoheseIOListeners () : void {
+      CacheManager.authenticate();
+
       // Register the listeners for the Item kinds that are being tracked
       for (var modelName in this.modelTypes) {
         this.socketService.socket.on(modelName + '/create', (notification) => {
@@ -291,6 +293,7 @@ export class ItemRepository {
   }
 
   processBulkUpdate(response){
+    console.log('::: Processing Bulk Update');
     for(let kind in response.cache) {
       console.log('--- Processing ' + kind);
       var kindList = response.cache[kind];
@@ -300,7 +303,14 @@ export class ItemRepository {
         if (kind === 'KoheseModel'){
           iProxy = new KoheseModel(item);
         } else {
-          iProxy = new ItemProxy(kind, item);
+          try {
+            iProxy = new ItemProxy(kind, item);
+          } catch(error){
+            console.log('*** Error processing item:');
+            console.log(kind);
+            console.log(item);
+            console.log(error);
+          }
         }
       }
       if (kind === 'KoheseView'){
@@ -343,49 +353,36 @@ export class ItemRepository {
     }
   }
 
-  // TODO
   cacheFetched : boolean = false;
-
-  fetchCache () {
-    if (!this.cacheFetched){
-      console.log('$$$ Fetch Cache');
-
-      CacheManager.loadCache();
-
-      let requestTime = Date.now();
-
-      this.socketService.socket.emit('Item/getItemCache', {
-        timestamp: {
-          requestTime: requestTime
-        },
-        cacheFetched: this.cacheFetched
-      },
-        (response) => {
-          var responseReceiptTime = Date.now();
-          let timestamp = response.timestamp;
-          timestamp.responseReceiptTime = responseReceiptTime;
-          console.log(timestamp);
-          console.log('::: Response for getItemCache');
-          for(let tsKey in timestamp){
-            console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
-          }
-          // console.log('$$$ Request receipt time: ' + (responseReceiptTime-timestamp.requestReceiptTime)/1000);
-          // console.log('$$$ Response time: ' + (timestamp.responseTransmitTime-timestamp.request)/1000);
-          // console.log('$$$ Response reeipt time: ' + (responseReceiptTime-response.timestamp.requestReceiptTime)/1000);
-          // console.log('$$$ Overall response receipt time: ' + (responseReceiptTime-requestTime)/1000);
-          console.log(response.objectMap.commit);
-          // this.cacheFetched = true;
-      }
-      );
-    }
-  }
 
   fetchItems () {
 
     // TODO Remove this
     if (!this.cacheFetched){
-      this.fetchCache();
-      // return;
+      let beforeFetch = Date.now();
+
+      this.repositoryStatus.next({
+        state: RepoStates.SYNCHRONIZING,
+        message: 'Starting Repository Sync'
+      });
+
+      CacheManager.getAllItems((response) => {
+        let afterFetch = Date.now();
+        console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
+        this.processBulkUpdate(response);
+        let processingComplete = Date.now();
+        console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
+        ItemProxy.loadingComplete();
+        let treehashComplete = Date.now();
+        console.log('$$$ TreeHash time: ' + (treehashComplete - processingComplete)/1000);
+
+        this.cacheFetched = true;
+
+        // TODO Remove after cache is complete
+        // Invoke fetch to peform a delta update
+        this.fetchItems();
+    });
+      return;
     }
 
     // Load feature switch
