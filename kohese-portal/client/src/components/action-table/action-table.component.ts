@@ -43,7 +43,6 @@ export class ActionTableComponent extends NavigatableComponent
   }
 
   getRowIndent (row) {
-    console.log(row);
     return {
       'padding-left' : row.depth * 10 + 'px'
     }

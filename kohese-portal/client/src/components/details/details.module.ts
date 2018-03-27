@@ -7,6 +7,7 @@ import { ChildrenTableComponent } from './children-tab/children-table/children-t
 import { JournalComponent } from './journal/journal.component';
 import { JournalEntryComponent } from './journal/journal-entry/journal-entry.component';
 import { DetailsFormComponent } from './details-form/details-form.component';
+import { ReferencesTabComponent } from './references-tab/references-tab.component';
 
 import { CommonModule } from '@angular/common';
 
@@ -23,6 +24,7 @@ import { UserInputModule } from '../user-input/user-input.module';
   declarations: [
     DetailsComponent,
     HistoryTabComponent,
+    ReferencesTabComponent,
     ChildrenTabComponent,
     ChildrenTableComponent,
     ProxySelectorTreeComponent,
