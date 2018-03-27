@@ -45,6 +45,12 @@ class ItemProxy {
 //      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
       proxy = this;
       proxy.children = [];
+      proxy.relations = {
+        Item: {
+          parent: null,
+          children: proxy.children
+        }
+      };
       proxy.descendantCount = 0;
       tree.proxyMap[itemId] = proxy;
     }
@@ -904,6 +910,37 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getRelationIdMap(){
+    console.log("::: Getting relation id map");
+    console.log(this.relations);
+    let relationIdMap = {};
+    for(let kindKey in this.relations)
+    {
+      relationIdMap[kindKey] = {};
+
+      let relationsForKind = this.relations[kindKey];
+      for(let relationKey in relationsForKind){
+        let relationList = relationsForKind[relationKey];
+        if (Array.isArray(relationList)){
+          relationIdMap[kindKey][relationKey] = [];
+          for(let index = 0; index < relationList.length; index++){
+            relationIdMap[kindKey][relationKey].push(relationList[index].item.id);
+          }
+        } else {
+          if (relationList){
+            relationIdMap[kindKey][relationKey] = relationList.item.id;
+          } else {
+            relationIdMap[kindKey][relationKey] = null;
+          }
+        }
+      }
+    }
+    return relationIdMap;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   addChild(childProxy) {
     if (childProxy.parentProxy === this) {
 //      console.log('::: IP: Child ' + childProxy.item.name + ' already associated with ' + this.item.name);
@@ -930,9 +967,11 @@ class ItemProxy {
 
           this.children.splice(insertAt, 0, childProxy);
           childProxy.parentProxy = this;
+          childProxy.relations.Item.parent = this;
     } else {
         this.children.push(childProxy);
         childProxy.parentProxy = this;
+        childProxy.relations.Item.parent = this;
         this.sortChildren();
     }
     // update descendant count
@@ -973,6 +1012,7 @@ class ItemProxy {
     });
 
     delete childProxy.parentProxy;
+    childProxy.relations.Item.parent = null;
 
     // update descendant count
     var deltaCount = 1 + childProxy.descendantCount;
