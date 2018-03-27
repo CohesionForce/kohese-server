@@ -62,7 +62,7 @@
                       title = "Dirty item" />
                   </span>
                 </ng-template>
-                <details-form #editor [itemProxy]="itemProxy" 
+                <details-form #editor [itemProxy]="itemProxy"
                   [editableStream]="editableStream"
                   (formGroupUpdated)="onFormGroupUpdated($event)"
                   (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
@@ -95,12 +95,16 @@
               <action-table [proxyStream]="proxyStream"></action-table>
             </mat-tab>
             <mat-tab label="Raw Data">
-                <h4>Document Tab</h4>
+                <h4>Raw Data Tab</h4>
                 <h5>Id: {{itemProxy.item.id}}</h5>
                 <h5>OID: {{itemProxy.oid}}</h5>
                 <h5>Tree Hash: {{itemProxy.treeHash}}</h5>
+                <h5>Item Data:</h5>
                 <pre>{{itemJson}}</pre>
+                <h5>Tree Hash Entry:</h5>
                 <pre>{{itemProxy.treeHashEntry | json}}</pre>
+                <h5>Relations:</h5>
+                <pre>{{relationIdMap | json}}</pre>
             </mat-tab>
         </mat-tab-group>
     </div>
