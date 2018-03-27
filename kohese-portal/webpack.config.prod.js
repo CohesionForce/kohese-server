@@ -489,9 +489,9 @@ module.exports = {
       "sourceMap": false,
       "filename": "scripts.[hash:20].bundle.js",
       "scripts": [
-        "/home/jephillips/kohese-server/kohese-portal/node_modules/marked/lib/marked.js"
+        "node_modules/marked/lib/marked.js"
       ],
-      "basePath": "/home/jephillips/kohese-server/kohese-portal"
+      "basePath": ""
     }),
     new CopyWebpackPlugin([
       {
