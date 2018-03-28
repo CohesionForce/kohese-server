@@ -34,4 +34,9 @@ export class ProxySelectorDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close(this.selectedProxy);
     console.log('selectProxy - dialog')
   }
+
+  closeDialog () {
+    this.dialogRef.close();
+    console.log('closeDialog - dialog');
+  }
 }

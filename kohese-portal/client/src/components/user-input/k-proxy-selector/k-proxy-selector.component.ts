@@ -68,7 +68,7 @@ export class KProxySelectorComponent extends UserInput
     }).updateSize('60%', '60%').afterClosed().subscribe((selected)=>{
       if (selected instanceof Array) {
         this.selectedProxies = selected;
-      } else {
+      } else if (selected) {
         this.selectedProxy = selected;
         this.formGroup.controls[this.fieldId].setValue(selected.item.id); 
         console.log(this.formGroup);
