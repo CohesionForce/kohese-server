@@ -54,12 +54,6 @@
               "assignment:Assignee"
             ]
           },
-          "beginWork": {
-            "source": "Assigned",
-            "target": "InWork",
-            "guard": {},
-            "requires": ""
-          },
           "request-reassign": {
             "source": "Assigned",
             "target": "PendingReassign",

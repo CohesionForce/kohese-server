@@ -74,12 +74,14 @@
       }
     },
     "analysisAction": {
-      "type": "string"
+      "type": "string",
+      "relation": true
     },
     "resolutionActions": {
       "type": [
         "Action"
-      ]
+      ],
+      "relation": true
     },
     "response": {
       "type": "string"

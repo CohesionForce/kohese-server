@@ -134,6 +134,7 @@ class KoheseModel extends ItemProxy {
       modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
       modelProxy.item.derivedProperties = _.clone(modelProxy.parentProxy.item.derivedProperties) || [];
       modelProxy.item.stateProperties = _.clone(modelProxy.parentProxy.item.stateProperties) || [];
+      modelProxy.item.relationProperties = _.clone(modelProxy.parentProxy.item.relationProperties) || [];
 
       for (var property in modelProxy.item.properties){
         var propertySettings = modelProxy.item.properties[property];
@@ -145,6 +146,9 @@ class KoheseModel extends ItemProxy {
         }
         if (propertySettings.type && (propertySettings.type ==='StateMachine')){
           modelProxy.item.stateProperties.push(property);
+        }
+        if (propertySettings.relation){
+          modelProxy.item.relationProperties.push(property);
         }
       }
     }

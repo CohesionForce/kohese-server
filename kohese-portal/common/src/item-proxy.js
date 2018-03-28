@@ -163,6 +163,76 @@ class ItemProxy {
         seperatorRequired = true;
       }
     }
+
+    if (this.model && this.model.item && this.model.item.relationProperties){
+      for(let relationPropertyIdx in this.model.item.relationProperties){
+        let relationProperty = this.model.item.relationProperties[relationPropertyIdx];
+        if (this.item){
+          let relationValue = this.item[relationProperty];
+          if (relationValue){
+            let relationList = [];
+            let isSingle = true;
+            if(Array.isArray(relationValue)){
+              relationList = relationValue;
+              isSingle = false;
+            } else {
+              relationList = [ relationValue ];
+            }
+            for(let relIdx in relationList){
+              let refId = relationList[relIdx];
+              let refProxy = ItemProxy.getProxyFor(refId);
+              if(!refProxy){
+                createMissingProxy(relationValue);
+                refProxy=ItemProxy.getProxyFor(refId);
+              }
+              this.addReference(refProxy, relationProperty, isSingle);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  addReference(toProxy, forProperty, isSingle){
+
+    // Add reference to the referencing proxy
+    if (!this.relations[this.kind]){
+      this.relations[this.kind] = {};
+    }
+
+    if (isSingle){
+      this.relations[this.kind][forProperty] = toProxy;
+    } else {
+      if (!this.relations[this.kind][forProperty]){
+        this.relations[this.kind][forProperty] = [];
+      }
+
+      if (!this.relations[this.kind][forProperty].includes(toProxy))
+      this.relations[this.kind][forProperty].push(toProxy);
+    }
+
+    // Add reference to the referenced proxy
+    if (!toProxy.relations[this.kind]){
+      toProxy.relations[this.kind] = {};
+    }
+    let refInProperty = 'ref-in-' + forProperty;
+    if (!toProxy.relations[this.kind][refInProperty]){
+      toProxy.relations[this.kind][refInProperty] = [];
+    }
+
+    if (!toProxy.relations[this.kind][refInProperty].includes(this))
+    toProxy.relations[this.kind][refInProperty].push(this);
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  removeReference(toProxy, forProperty){
   }
 
   //////////////////////////////////////////////////////////////////////////
