@@ -12,17 +12,17 @@ import { MatTableDataSource } from '@angular/material';
   templateUrl: './references-tab.component.html',
   changeDetection : ChangeDetectionStrategy.OnPush,
   styleUrls: ['./references-tab.component.scss']
-}) 
+})
 export class ReferencesTabComponent extends NavigatableComponent
  implements OnInit, OnDestroy {
-  
+
   /* Data */
-  @Input() 
+  @Input()
   proxyStream : Observable<ItemProxy>;
   itemProxy : ItemProxy
   multiRefStreams : Array<ReferenceTableInfo> = [] ;
   singleRefInfo : Array<ReferenceInfo> = [];
-  rowDef : Array<string> = ['name','kind','description'];
+  rowDef : Array<string> = ['kind','name','state','description'];
 
   /* Subscriptions */
   proxySubscription : Subscription;
@@ -51,15 +51,17 @@ export class ReferencesTabComponent extends NavigatableComponent
               (this.itemProxy.relations[relCategory][relation])
             })
           } else {
-            this.singleRefInfo.push({
+            let singleArray = [ this.itemProxy.relations[relCategory][relation] ];
+            this.multiRefStreams.push({
               relationName : relation,
-              referenceProxy : this.itemProxy.relations[relCategory][relation]
+              tableStream : new MatTableDataSource
+              (singleArray)
             })
           }
         }
       }
       this.changeRef.markForCheck();
-      
+
     })
   }
 

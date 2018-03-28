@@ -13,25 +13,30 @@
 <div *ngFor="let referenceInfo of multiRefStreams">
   <h2>{{referenceInfo.relationName}} </h2>
     <mat-table *ngIf="referenceInfo" [dataSource]="referenceInfo.tableStream">
-        <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-          <mat-cell *matCellDef="let reference"> {{reference.item.name}}</mat-cell>
-        </ng-container>
-      
-        <ng-container matColumnDef="kind">
-            <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
-            <mat-cell *matCellDef="let reference">
-              {{reference.kind}}</mat-cell>
-        </ng-container>
- 
-        <ng-container matColumnDef="description">
-            <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-            <mat-cell *matCellDef="let reference"> {{reference.item.description | truncate : 30}}</mat-cell>
-        </ng-container>
-            
-        <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
-        <mat-row (click)="navigate('Explore', {id:proxy.item.id})"
-          *matRowDef="let proxy; columns: rowDef">
-        </mat-row>
+      <ng-container matColumnDef="kind">
+        <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
+        <mat-cell *matCellDef="let reference"> {{reference.kind}}</mat-cell>
+      </ng-container>
+
+
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+        <mat-cell *matCellDef="let reference"> {{reference.item.name}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="state">
+        <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
+        <mat-cell *matCellDef="let reference">{{reference.state}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+        <mat-cell *matCellDef="let reference"> {{reference.item.description | truncate : 30}}</mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
+      <mat-row (click)="navigate('Explore', {id:proxy.item.id})"
+        *matRowDef="let proxy; columns: rowDef">
+      </mat-row>
     </mat-table>
-</div> 
+</div>

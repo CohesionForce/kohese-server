@@ -36,7 +36,7 @@ export class ActionTableComponent extends NavigatableComponent
       this.changeRef.markForCheck();
     })
 
-    this.rowDef = ['name', 'taskState', 'actionState', 'assignedTo']
+    this.rowDef = ['name', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort']
   }
 
   ngOnDestroy () {

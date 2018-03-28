@@ -123,7 +123,9 @@ export class DetailsComponent extends NavigatableComponent
 
       this.proxyList = this.ItemRepository.getShortFormItemList();
       this.userList = this.SessionService.getUsers();
-      this.relationIdMap = this.itemProxy.getRelationIdMap();
+      if(this.itemProxy){
+        this.relationIdMap = this.itemProxy.getRelationIdMap();
+      }
       this.updateParentProxy();
 
     this._editableStream.next(false);

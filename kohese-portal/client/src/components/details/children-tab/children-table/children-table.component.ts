@@ -30,7 +30,7 @@ export class ChildrenTableComponent extends NavigatableComponent
 
   /* Obvervables */
   filteredItems : Array<ItemProxy>;
-  
+
   @Input()
   childrenStream : BehaviorSubject<ItemProxy>;
   tableStream : MatTableDataSource<ItemProxy>;
@@ -53,7 +53,7 @@ export class ChildrenTableComponent extends NavigatableComponent
       this.tableStream = new MatTableDataSource<ItemProxy>(this.children)
       this.changeRef.markForCheck();
     });
-    this.rowDef = ['kind','name','assignedTo','actionState','description', 'childrenCount']
+    this.rowDef = ['kind','name','assignedTo','state','description', 'childrenCount']
     this.filterSub = this.filterSubject.subscribe((newFilter) => {
       this.tableStream.filter = newFilter.trim().toLowerCase();
     })
@@ -62,7 +62,7 @@ export class ChildrenTableComponent extends NavigatableComponent
   ngOnDestroy () {
     this.filterSub.unsubscribe();
   }
-  
+
   public whenDropOccurs(dropTarget: ItemProxy, dropEvent: any): void {
     dropEvent.preventDefault();
     if (this._editableStream.getValue()) {
@@ -77,12 +77,12 @@ export class ChildrenTableComponent extends NavigatableComponent
               break;
             }
           }
-    
+
           let proxyToMove: ItemProxy = parentProxy.children.
             splice(removeIndex, 1)[0];
           parentProxy.children.splice(parentProxy.children.
             indexOf(dropTarget) + 1, 0, proxyToMove);
-    
+
           this.childrenStream.next(parentProxy.children);
           parentProxy.dirty = true;
           parentProxy.updateChildrenManualOrder();

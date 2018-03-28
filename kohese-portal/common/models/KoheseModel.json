@@ -72,6 +72,12 @@
         "string"
       ],
       "derived": true
+    },
+    "stateProperties": {
+      "type": [
+        "string"
+      ],
+      "derived": true
     }
   },
   "validations": [],

@@ -123,6 +123,9 @@
     "actualCompletion": {
       "type": "number"
     },
+    "remainingHoursEffort": {
+      "type": "number"
+    },
     "actualHoursEffort": {
       "type": "number"
     }

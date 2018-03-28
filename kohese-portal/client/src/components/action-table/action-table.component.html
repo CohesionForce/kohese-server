@@ -12,14 +12,24 @@
         <mat-cell *matCellDef="let action"> {{action.proxy.item.assignedTo}}</mat-cell>
     </ng-container>
 
-    <ng-container matColumnDef="actionState">
-        <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
-        <mat-cell *matCellDef="let action"> {{action.proxy.item.actionState}} / {{action.proxy.item.decisionState}}</mat-cell>
+    <ng-container matColumnDef="state">
+        <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
+        <mat-cell *matCellDef="let action"> {{action.proxy.state}} </mat-cell>
     </ng-container>
 
-    <ng-container matColumnDef="taskState">
-        <mat-header-cell *matHeaderCellDef> Task  </mat-header-cell>
-        <mat-cell *matCellDef="let action"> {{action.proxy.item.taskState}}</mat-cell>
+    <ng-container matColumnDef="estimatedHoursEffort">
+      <mat-header-cell *matHeaderCellDef> Estimated Hours </mat-header-cell>
+      <mat-cell *matCellDef="let action"> {{action.proxy.item.estimatedHoursEffort}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="remainingHoursEffort">
+      <mat-header-cell *matHeaderCellDef> Remaining Hours </mat-header-cell>
+      <mat-cell *matCellDef="let action"> {{action.proxy.item.remainingHoursEffort}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actualHoursEffort">
+      <mat-header-cell *matHeaderCellDef> Actual Hours </mat-header-cell>
+      <mat-cell *matCellDef="let action"> {{action.proxy.item.actualHoursEffort}}</mat-cell>
     </ng-container>
 
     <mat-header-row style="position: sticky; top: 0; background-color: inherit" *matHeaderRowDef="rowDef"></mat-header-row>

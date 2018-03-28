@@ -120,6 +120,7 @@ class ItemProxy {
     }
 
     proxy.calculateTreeHash();
+    proxy.caclulateDerivedProperties();
 
     if(!tree.loading){
       tree.changeSubject.next({
@@ -142,6 +143,25 @@ class ItemProxy {
     for (let id in tree.proxyHasDeferredModelAssociation){
       let proxy = tree.proxyHasDeferredModelAssociation[id];
       proxy.setItemKind(proxy.kind);
+      proxy.caclulateDerivedProperties();
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  caclulateDerivedProperties(){
+    if (this.model && this.model.item && this.model.item.stateProperties){
+      let seperatorRequired = false;
+      this.state = '';
+      for(let statePropertyIdx in this.model.item.stateProperties){
+        let stateProperty = this.model.item.stateProperties[statePropertyIdx];
+        if(seperatorRequired){
+          this.state += '/';
+        }
+        this.state += this.item[stateProperty];
+        seperatorRequired = true;
+      }
     }
   }
 
@@ -911,7 +931,6 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   getRelationIdMap(){
-    console.log("::: Getting relation id map");
     console.log(this.relations);
     let relationIdMap = {};
     for(let kindKey in this.relations)
@@ -1172,6 +1191,8 @@ class ItemProxy {
 
     // Copy the withItem into the current proxy
     copyAttributes(withItem, this.item);
+    this.caclulateDerivedProperties();
+
 
     // Ensure sort order is maintained
     if(this.parentProxy){
