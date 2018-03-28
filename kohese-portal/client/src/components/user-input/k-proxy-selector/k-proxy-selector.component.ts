@@ -36,10 +36,10 @@ export class KProxySelectorComponent extends UserInput
       let selected = this.formGroup.controls[this.fieldId].value;
       if (selected instanceof Array) {
         for (let i = 0; i < selected.length; i++) {
-          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i]))
+          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i].id))
         } 
       } else if (selected) {
-          this.selectedProxy = ItemProxy.getProxyFor(selected);
+          this.selectedProxy = ItemProxy.getProxyFor(selected.id);
       }
   }
   
@@ -64,13 +64,13 @@ export class KProxySelectorComponent extends UserInput
       if (selected instanceof Array) {
         let selectedIds = [];
         for (let i = 0; i < selected.length; i++) {
-          selectedIds.push(selected[i].item.id);
+          selectedIds.push({ id : selected[i].item.id});
         }
         this.selectedProxies = selected;
         this.formGroup.controls[this.fieldId].setValue(selectedIds);
       } else if (selected) {
         this.selectedProxy = selected;
-        this.formGroup.controls[this.fieldId].setValue(selected.item.id); 
+        this.formGroup.controls[this.fieldId].setValue({id: selected.item.id}); 
         console.log(this.formGroup);
       }
     })
