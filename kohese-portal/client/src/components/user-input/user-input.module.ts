@@ -16,6 +16,7 @@ import { MarkdownCheatSheetComponent } from './k-markdown/markdown-cheat-sheet.c
 import { ProxySelectorComponent } from './k-proxy-selector/proxy-selector/proxy-selector.component';
 import { TreeModule } from 'angular-tree-component';
 import { PipesModule } from '../../pipes/pipes.module';
+import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { PipesModule } from '../../pipes/pipes.module';
     KStateEditorComponent,
     KMarkdownComponent,
     MarkdownCheatSheetComponent,
-    ProxySelectorComponent
+    ProxySelectorComponent,
+    ProxySelectorDialogComponent
   ],
   imports: [
     CommonModule,
@@ -50,7 +52,7 @@ import { PipesModule } from '../../pipes/pipes.module';
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,
-    ProxySelectorComponent
+    ProxySelectorDialogComponent
   ]
 })
 export class UserInputModule {}

@@ -6,7 +6,8 @@ import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
   selector: 'proxy-selector',
-  templateUrl: './proxy-selector.component.html'
+  templateUrl: './proxy-selector.component.html',
+  styles : ['./proxy-selector.component.scss']
 })
 export class ProxySelectorComponent implements OnInit {
   
@@ -45,12 +46,15 @@ export class ProxySelectorComponent implements OnInit {
   selectProxy (selection : ItemProxy) {
     this.selectedProxy = selection;
     this.proxySelected.emit(selection)
+    console.log('select Proxy - selector')
+    console.log(this.selectedProxy);
   }
 
   onAutoCompleteSelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
     this.selectedProxy = selectedProxyEvent.option.value;
     this.proxySelected.next(selectedProxyEvent.option.value);
     this.proxySearchControl.setValue(selectedProxyEvent.option.value.item.name);
+    console.log('autoComplete Selected');
   }
 
 }

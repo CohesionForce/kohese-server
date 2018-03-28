@@ -9,6 +9,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/startWith';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
+import { ProxySelectorDialogComponent } from './proxy-selector-dialog/proxy-selector-dialog.component';
 
 @Component({
   selector: 'k-proxy-selector',
@@ -17,8 +18,6 @@ import { MatAutocompleteSelectedEvent } from '@angular/material';
 })
 export class KProxySelectorComponent extends UserInput
   implements OnInit, OnDestroy {
-  @Input()
-  public formGroup: FormGroup;
   @Input()
   public type: string;
   @Input()
@@ -64,11 +63,16 @@ export class KProxySelectorComponent extends UserInput
   }
   
   openProxySelectionDialog(): void {
-    // TODO
-    /*this.dialogService.openComponentDialog(TreeComponent, {
+    this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       allowMultiSelect: this.allowMultiSelect
-    }).afterClosed((proxies) => {
-      this.selectedProxies = proxies;
-    });*/
+    }).updateSize('60%', '60%').afterClosed().subscribe((selected)=>{
+      if (selected instanceof Array) {
+        this.selectedProxies = selected;
+      } else {
+        this.selectedProxy = selected;
+        this.formGroup.controls[this.fieldId].setValue(selected.item.id); 
+        console.log(this.formGroup);
+      }
+    })
   }
 }
