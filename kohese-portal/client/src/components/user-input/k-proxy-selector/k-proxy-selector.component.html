@@ -1,7 +1,8 @@
 <ng-container [formGroup]="formGroup">
-  <h4> {{fieldName}} : 
-      <button mat-raised-button (click)="openProxySelectionDialog()"> Select </button></h4>
   <div [ngClass]="{'multiSelect' : allowMultiSelect}">
+  <h4> {{fieldName}} : 
+    <button mat-raised-button (click)="openProxySelectionDialog()"> Select </button>
+  </h4>
     <span *ngIf="selectedProxy && !allowMultiSelect">
       {{selectedProxy.item.name}}
     </span>
