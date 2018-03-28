@@ -1,5 +1,5 @@
-<div style="height: 100%;">
-  <mat-tab-group class="left-content" style="display:inline-block" *ngIf="repoInitialized">
+<div id="proxySelectorContainer">
+  <mat-tab-group class="left-content" *ngIf="repoInitialized">
     <mat-tab label="Recent">
       <div *ngFor="let proxy of recentProxies"
         (click)="selectParent(proxy)">
@@ -16,9 +16,11 @@
       </tree-root>
     </mat-tab>
     <mat-tab label="Selector">
-      <input matInput type="text" placeholder="Enter Proxy" [formControl]="proxySearchControl"
-        [matAutocomplete]="proxySelector"/> 
-      <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onAutoCompleteSelected($event)" style="width: 400px;">
+      <mat-form-field style="width: 100%;">
+        <input matInput type="text" placeholder="Proxy" [formControl]="proxySearchControl"
+          [matAutocomplete]="proxySelector"/>
+      </mat-form-field>
+      <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onAutoCompleteSelected($event)">
         <mat-option *ngFor="let proxy of (filteredProxies | async)"
           [value]="proxy">
           {{proxy.item.name}}
@@ -26,7 +28,7 @@
       </mat-autocomplete>
     </mat-tab>
   </mat-tab-group>
-  <mat-card *ngIf="selectedParent" class="right-content" style="display: inline-block;">
+  <mat-card *ngIf="selectedParent" class="right-content">
     <mat-card-title class="panel-heading">
       <span>{{selectedParent.item.name}}</span>
     </mat-card-title>

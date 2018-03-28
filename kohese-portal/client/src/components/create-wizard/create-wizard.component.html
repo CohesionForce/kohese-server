@@ -44,7 +44,7 @@
       <mat-card>
         <mat-card-content>
           <details-form #editor 
-            [createInfo]="createInfo" 
+            [proxyStream]="proxyPlaceholderStream" 
             (formGroupUpdated)="onFormGroupUpdated($event)"
             (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
           </details-form>

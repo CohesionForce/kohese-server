@@ -1,53 +1,143 @@
-<span id="topContainer">
-  <mat-checkbox [(ngModel)]="baseOnRight" style="margin-left: auto;">
+<span id="optionsContainer">
+  <mat-checkbox [(ngModel)]="baseOnRight">
     Base On Right
   </mat-checkbox>
-  <button mat-icon-button (click)="save()"
-    [disabled]="!(editableStream | async)">
-    <mat-icon class="fa fa-save"></mat-icon>
-  </button>
+  <mat-checkbox (change)="filterFields($event.checked)">
+    Show Differences Only
+  </mat-checkbox>
 </span>
-<div id="itemSelectionContainer">
-  <parent-selector (parentSelected)="whenLeftItemChanges($event)">
-  </parent-selector>
-  <parent-selector (parentSelected)="whenRightItemChanges($event)">
-  </parent-selector>
+<div style="height: 80%; width: 100%;">
+  <split direction="horizontal">
+    <split-area #leftSplitArea [size]="50">
+      <ng-container *ngIf="baseOnRight">
+        <div style="height: 25%; width: 100%;">
+          <parent-selector (parentSelected)="whenChangeProxyChanges($event)">
+          </parent-selector>
+        </div>
+        <div style="height: 70%; width: 100%;">
+          <ng-container *ngIf="(changeProxyStream | async)">
+            <span class="header-span">
+              <button mat-icon-button class="flex-right-align"
+                [ngClass]="{ 'highlight': (changeItemEditableStream | async) }"
+                [disabled]="!allowEditing"
+                (click)="toggleEditability(changeItemEditableStream)">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+              <button mat-icon-button
+                (click)="save(changeProxyStream.getValue())"
+                [disabled]="!(changeItemEditableStream | async)">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+            </span>
+            <div class="field-editor-container">
+              <details-form [type]="(changeProxyStream | async).model.type"
+                [proxyStream]="changeProxyStream"
+                [editableStream]="changeItemEditableStream"
+                [fieldFilterStream]="fieldFilterStream">
+              </details-form>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!baseOnRight">
+        <div style="height: 25%; width: 100%;">
+          <parent-selector (parentSelected)="whenBaseProxyChanges($event)">
+          </parent-selector>
+        </div>
+        <div style="height: 70%; width: 100%;">
+          <ng-container *ngIf="(baseProxyStream | async)">
+            <span class="header-span">
+              <button mat-icon-button class="flex-right-align"
+                [ngClass]="{ 'highlight': (baseItemEditableStream | async) }"
+                [disabled]="!allowEditing"
+                (click)="toggleEditability(baseItemEditableStream)">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+              <button mat-icon-button
+                (click)="save(baseProxyStream.getValue())"
+                [disabled]="!(baseItemEditableStream | async)">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+            </span>
+            <div class="field-editor-container">
+              <details-form [type]="(baseProxyStream | async).model.type"
+                [proxyStream]="baseProxyStream"
+                [editableStream]="baseItemEditableStream"
+                [fieldFilterStream]="fieldFilterStream">
+              </details-form>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </split-area>
+    <split-area #rightSplitArea [size]="50">
+      <ng-container *ngIf="baseOnRight">
+        <div style="height: 25%; width: 100%;">
+          <parent-selector (parentSelected)="whenBaseProxyChanges($event)">
+          </parent-selector>
+        </div>
+        <div style="height: 70%; width: 100%;">
+          <ng-container *ngIf="(baseProxyStream | async)">
+            <span class="header-span">
+              <button mat-icon-button class="flex-right-align"
+                [ngClass]="{ 'highlight': (baseItemEditableStream | async) }"
+                [disabled]="!allowEditing"
+                (click)="toggleEditability(baseItemEditableStream)">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+              <button mat-icon-button
+                (click)="save(baseProxyStream.getValue())"
+                [disabled]="!(baseItemEditableStream | async)">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+            </span>
+            <div class="field-editor-container">
+              <details-form [type]="(baseProxyStream | async).model.type"
+                [proxyStream]="baseProxyStream"
+                [editableStream]="baseItemEditableStream"
+                [fieldFilterStream]="fieldFilterStream">
+              </details-form>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!baseOnRight">
+        <div style="height: 25%; width: 100%;">
+          <parent-selector (parentSelected)="whenChangeProxyChanges($event)">
+          </parent-selector>
+        </div>
+        <div style="height: 70%; width: 100%;">
+          <ng-container *ngIf="(changeProxyStream | async)">
+            <span class="header-span">
+              <button mat-icon-button class="flex-right-align"
+                [ngClass]="{ 'highlight': (changeItemEditableStream | async) }"
+                [disabled]="!allowEditing"
+                (click)="toggleEditability(changeItemEditableStream)">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+              <button mat-icon-button
+                (click)="save(changeProxyStream.getValue())"
+                [disabled]="!(changeItemEditableStream | async)">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+            </span>
+            <div class="field-editor-container">
+              <details-form [type]="(changeProxyStream | async).model.type"
+                [proxyStream]="changeProxyStream"
+                [editableStream]="changeItemEditableStream"
+                [fieldFilterStream]="fieldFilterStream">
+              </details-form>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </split-area>
+  </split>
 </div>
-<split id="comparisonContainer" direction="horizontal">
-  <split-area #leftSplitArea [size]="50">
-    <ng-container *ngIf="baseOnRight">
-      <details-form [type]="(changeProxyStream | async)?.model.type"
-        [itemProxy]="(changeProxyStream | async)"
-        [editableStream]="editableStream">
-      </details-form>
-    </ng-container>
-    <ng-container *ngIf="!baseOnRight">
-      <details-form [type]="(baseProxyStream | async)?.model.type"
-        [itemProxy]="(baseProxyStream | async)"
-        [editableStream]="editableStream">
-      </details-form>
-    </ng-container>
-  </split-area>
-  <split-area #rightSplitArea [size]="50">
-    <ng-container *ngIf="baseOnRight">
-      <details-form [type]="(baseProxyStream | async)?.model.type"
-        [itemProxy]="(baseProxyStream | async)"
-        [editableStream]="editableStream">
-      </details-form>
-    </ng-container>
-    <ng-container *ngIf="!baseOnRight">
-      <details-form [type]="(changeProxyStream | async)?.model.type"
-        [itemProxy]="(changeProxyStream | async)"
-        [editableStream]="editableStream">
-      </details-form>
-    </ng-container>
-  </split-area>
-</split>
 <ng-container *ngIf="dialogParameters">
-  <div id="dialogButtonContainer">
+  <div class="pull-right">
     <mat-dialog-actions>
-      <button mat-raised-button [mat-dialog-close]="0"
-        style="margin-left: auto;">
+      <button mat-raised-button [mat-dialog-close]="0">
         Close
       </button>
     </mat-dialog-actions>

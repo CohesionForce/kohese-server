@@ -6,7 +6,8 @@ import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
   selector: 'parent-selector',
-  templateUrl: './parent-selector.component.html'
+  templateUrl: './parent-selector.component.html',
+  styleUrls: ['./parent-selector.component.scss']
 })
 export class ParentSelectorComponent implements OnInit {
   
