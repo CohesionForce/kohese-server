@@ -1,20 +1,20 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemRepository, RepoStates } from '../../../../services/item-repository/item-repository.service';
+import * as ItemProxy from '../../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
-  selector: 'parent-selector',
-  templateUrl: './parent-selector.component.html'
+  selector: 'proxy-selector',
+  templateUrl: './proxy-selector.component.html'
 })
-export class ParentSelectorComponent implements OnInit {
+export class ProxySelectorComponent implements OnInit {
   
   /* Data */
   rootProxy : ItemProxy;
-  selectedParent : ItemProxy;
+  selectedProxy : ItemProxy;
   @Output()
-  parentSelected : EventEmitter<ItemProxy> = new EventEmitter();
+  proxySelected : EventEmitter<ItemProxy> = new EventEmitter();
   repoInitialized : boolean = false;
   proxySearchControl : FormControl;
   filteredProxies : any;
@@ -42,14 +42,14 @@ export class ParentSelectorComponent implements OnInit {
     })
   }
 
-  selectParent (selection : ItemProxy) {
-    this.selectedParent = selection;
-    this.parentSelected.emit(selection)
+  selectProxy (selection : ItemProxy) {
+    this.selectedProxy = selection;
+    this.proxySelected.emit(selection)
   }
 
   onAutoCompleteSelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
-    this.selectedParent = selectedProxyEvent.option.value;
-    this.parentSelected.next(selectedProxyEvent.option.value);
+    this.selectedProxy = selectedProxyEvent.option.value;
+    this.proxySelected.next(selectedProxyEvent.option.value);
     this.proxySearchControl.setValue(selectedProxyEvent.option.value.item.name);
   }
 
