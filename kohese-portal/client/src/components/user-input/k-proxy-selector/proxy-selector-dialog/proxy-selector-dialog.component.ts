@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, Input, Output } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, Inject, Optional } from '@angular/core';
 
 import * as ItemProxy from '../../../../../../common/src/item-proxy';
 
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'proxy-selector-dialog',
@@ -10,11 +10,14 @@ import { MatDialogRef } from '@angular/material';
 })
 export class ProxySelectorDialogComponent implements OnInit, OnDestroy {
   /* Data */
-  selectedProxy : ItemProxy
+  selected : any
+  multiSelect : boolean;
 
 
-  constructor (private dialogRef : MatDialogRef<ProxySelectorDialogComponent>) {
-    
+  constructor (private dialogRef : MatDialogRef<ProxySelectorDialogComponent>,
+              @Optional() @Inject(MAT_DIALOG_DATA) private data: any,) {
+    this.multiSelect = data.allowMultiSelect;
+    this.selected = data.selected;
   }
 
   ngOnInit () {
@@ -25,13 +28,13 @@ export class ProxySelectorDialogComponent implements OnInit, OnDestroy {
 
   }
 
-  onProxySelected (newProxy) {
-    this.selectedProxy = newProxy;
+  onProxySelected (newSelection) {
+    this.selected = newSelection;
     console.log('onProxySelected - dialog')
   }
 
   selectProxy () {
-    this.dialogRef.close(this.selectedProxy);
+    this.dialogRef.close(this.selected);
     console.log('selectProxy - dialog')
   }
 

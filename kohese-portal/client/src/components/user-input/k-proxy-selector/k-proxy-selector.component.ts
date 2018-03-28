@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { UserInput } from '../user-input.class';
-import { ItemProxy } from '../../../../../common/src/item-proxy';
+import * as ItemProxy  from '../../../../../common/src/item-proxy';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { TreeComponent } from '../../tree/tree.component';
@@ -25,10 +25,7 @@ export class KProxySelectorComponent extends UserInput
   @Input()
   public useAdvancedSelector: boolean;
   public selectedProxies: Array<ItemProxy> = [];
-  private typeProxies: Array<ItemProxy> = [];
-  public filteredProxies: Array<ItemProxy>;
   public selectedProxy : ItemProxy;
-  private _proxyFilterSubscription: Subscription;
 
   constructor(private ItemRepository: ItemRepository,
     private dialogService: DialogService) {
@@ -36,21 +33,18 @@ export class KProxySelectorComponent extends UserInput
   }
   
   ngOnInit(): void {
-    this.ItemRepository.getRootProxy().visitTree(undefined, (proxy) => {
-      if ((this.type === proxy.kind) && proxy.item) {
-        this.typeProxies.push(proxy);
+      let selected = this.formGroup.controls[this.fieldId].value;
+      if (selected instanceof Array) {
+        for (let i = 0; i < selected.length; i++) {
+          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i]))
+        } 
+      } else if (selected) {
+          this.selectedProxy = ItemProxy.getProxyFor(selected);
       }
-    }, undefined);
-    this._proxyFilterSubscription = this.formGroup.get(this.fieldId).
-      valueChanges.startWith('').subscribe((text: string) => {
-      this.filteredProxies = this.typeProxies.filter((proxy: ItemProxy) => {
-        return (-1 !== proxy.item.name.indexOf(text));
-      });
-    });
   }
   
   public ngOnDestroy(): void {
-    this._proxyFilterSubscription.unsubscribe();
+
   }
 
   onProxySelected (selectedEvent : MatAutocompleteSelectedEvent) {
@@ -64,10 +58,16 @@ export class KProxySelectorComponent extends UserInput
   
   openProxySelectionDialog(): void {
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
-      allowMultiSelect: this.allowMultiSelect
+      allowMultiSelect: this.allowMultiSelect,
+      selected : (this.selectedProxy) ? this.selectedProxy : this.selectedProxies 
     }).updateSize('60%', '60%').afterClosed().subscribe((selected)=>{
       if (selected instanceof Array) {
+        let selectedIds = [];
+        for (let i = 0; i < selected.length; i++) {
+          selectedIds.push(selected[i].item.id);
+        }
         this.selectedProxies = selected;
+        this.formGroup.controls[this.fieldId].setValue(selectedIds);
       } else if (selected) {
         this.selectedProxy = selected;
         this.formGroup.controls[this.fieldId].setValue(selected.item.id); 

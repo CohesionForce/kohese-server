@@ -1,7 +1,9 @@
 <div>
   <div style="height: 400px; overflow: auto;">
     <proxy-selector 
-      (proxySelected)="onProxySelected($event)"></proxy-selector>
+      (proxySelected)="onProxySelected($event)"
+      [multiSelect]="multiSelect"
+      [selection]="selection"></proxy-selector>
   </div>
 </div>
 <ng-container>

@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import { ItemRepository, RepoStates } from '../../../../services/item-repository/item-repository.service';
 import * as ItemProxy from '../../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
@@ -12,8 +12,14 @@ import { MatAutocompleteSelectedEvent } from '@angular/material';
 export class ProxySelectorComponent implements OnInit {
   
   /* Data */
+  @Input() 
+  multiSelect : boolean;
+  @Input() 
+  selection : any;
+
   rootProxy : ItemProxy;
   selectedProxy : ItemProxy;
+  selectedProxies : Array<ItemProxy> = [];
   @Output()
   proxySelected : EventEmitter<ItemProxy> = new EventEmitter();
   repoInitialized : boolean = false;
@@ -26,7 +32,6 @@ export class ProxySelectorComponent implements OnInit {
   }
 
   ngOnInit () {
-    console.log('ps init')
     this.itemRepository.getRepoStatusSubject().subscribe((update)=>{
       if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         this.rootProxy = this.itemRepository.getRootProxy();
@@ -41,20 +46,30 @@ export class ProxySelectorComponent implements OnInit {
         this.repoInitialized = true;
       }
     })
+
+    if (this.selection) {
+      if (this.selection instanceof Array) {
+        this.selectedProxies = this.selection;
+      } else {
+        this.selectedProxy = this.selection;
+      }
+    }
   }
 
   selectProxy (selection : ItemProxy) {
-    this.selectedProxy = selection;
-    this.proxySelected.emit(selection)
-    console.log('select Proxy - selector')
-    console.log(this.selectedProxy);
+    if (this.multiSelect) {
+      this.selectedProxies.push(selection);
+      this.proxySelected.emit(this.selectedProxies);
+    } else {
+      this.selectedProxy = selection;
+      this.proxySelected.emit(selection) 
+    }
   }
 
   onAutoCompleteSelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
     this.selectedProxy = selectedProxyEvent.option.value;
     this.proxySelected.next(selectedProxyEvent.option.value);
     this.proxySearchControl.setValue(selectedProxyEvent.option.value.item.name);
-    console.log('autoComplete Selected');
   }
 
 }

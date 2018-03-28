@@ -1,12 +1,17 @@
 <ng-container [formGroup]="formGroup">
-  <ng-container>
-    <mat-form-field style="width: 50%;">
-      <input matInput type="text" placeholder="{{fieldName}}"
-        formControlName="{{fieldId}}"/> 
-    </mat-form-field>
-    <span *ngIf="selectedProxy">
+  <h4> {{fieldName}} : 
+      <button mat-raised-button (click)="openProxySelectionDialog()"> Select </button></h4>
+  <div [ngClass]="{'multiSelect' : allowMultiSelect}">
+    <span *ngIf="selectedProxy && !allowMultiSelect">
       {{selectedProxy.item.name}}
     </span>
-    <button mat-button (click)="openProxySelectionDialog()"> Select </button>
-  </ng-container>
+  <div *ngIf="allowMultiSelect">
+    Selections : 
+    <hr>
+    <div *ngFor="let selection of selectedProxies" 
+          (click)="navigate('Explore', {id: selection.item.id})">
+      {{ selection.item.name }}  
+    </div>
+  </div>
+  </div>
 </ng-container>
