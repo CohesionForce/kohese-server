@@ -19,7 +19,8 @@
       "node",
       "webpack",
       "underscore",
-      "jasmine"
+      "jasmine",
+      "sharedworker"
     ],
     "typeRoots": [
       "./node_modules/@types"

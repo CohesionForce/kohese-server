@@ -92,7 +92,7 @@
             <mat-tab label="Action Table"
                  *ngIf="itemProxy.children">
 
-              <action-table itemProxy="itemProxy"></action-table>
+              <action-table [proxyStream]="proxyStream"></action-table>
             </mat-tab>
             <mat-tab label="Raw Data">
                 <h4>Document Tab</h4>

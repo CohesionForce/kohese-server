@@ -9,6 +9,7 @@ import { DialogService } from '../dialog/dialog.service';
 
 import * as ItemProxy from '../../../../common/src/item-proxy.js';
 import * as KoheseModel from '../../../../common/src/KoheseModel.js';
+import { CacheManager } from '../../../cache-worker/CacheManager';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -160,6 +161,8 @@ export class ItemRepository {
   }
 
   registerKoheseIOListeners () : void {
+      CacheManager.authenticate();
+
       // Register the listeners for the Item kinds that are being tracked
       for (var modelName in this.modelTypes) {
         this.socketService.socket.on(modelName + '/create', (notification) => {
@@ -290,6 +293,7 @@ export class ItemRepository {
   }
 
   processBulkUpdate(response){
+    console.log('::: Processing Bulk Update');
     for(let kind in response.cache) {
       console.log('--- Processing ' + kind);
       var kindList = response.cache[kind];
@@ -299,7 +303,14 @@ export class ItemRepository {
         if (kind === 'KoheseModel'){
           iProxy = new KoheseModel(item);
         } else {
-          iProxy = new ItemProxy(kind, item);
+          try {
+            iProxy = new ItemProxy(kind, item);
+          } catch(error){
+            console.log('*** Error processing item:');
+            console.log(kind);
+            console.log(item);
+            console.log(error);
+          }
         }
       }
       if (kind === 'KoheseView'){
@@ -342,7 +353,37 @@ export class ItemRepository {
     }
   }
 
+  cacheFetched : boolean = false;
+
   fetchItems () {
+
+    // TODO Remove this
+    if (!this.cacheFetched){
+      let beforeFetch = Date.now();
+
+      this.repositoryStatus.next({
+        state: RepoStates.SYNCHRONIZING,
+        message: 'Starting Repository Sync'
+      });
+
+      CacheManager.getAllItems((response) => {
+        let afterFetch = Date.now();
+        console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
+        this.processBulkUpdate(response);
+        let processingComplete = Date.now();
+        console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
+        ItemProxy.loadingComplete();
+        let treehashComplete = Date.now();
+        console.log('$$$ TreeHash time: ' + (treehashComplete - processingComplete)/1000);
+
+        this.cacheFetched = true;
+
+        // TODO Remove after cache is complete
+        // Invoke fetch to peform a delta update
+        this.fetchItems();
+    });
+      return;
+    }
 
     // Load feature switch
     let ifaKey = 'IR-fetch-all';

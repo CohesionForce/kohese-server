@@ -22,7 +22,7 @@ const { AngularCompilerPlugin } = require('@ngtools/webpack');
 const nodeModules = path.join(process.cwd(), 'node_modules');
 const realNodeModules = fs.realpathSync(nodeModules);
 const genDirNodeModules = path.join(process.cwd(), 'client', '$$_gendir', 'node_modules');
-const entryPoints = ["inline","polyfills","sw-register","styles","scripts","vendor","main"];
+const entryPoints = ["inline","polyfills","sw-register","styles","scripts","vendor","cache-worker","main"];
 const minimizeCss = true;
 const baseHref = "";
 const deployUrl = "";
@@ -153,6 +153,9 @@ module.exports = {
     "main": [
       "./client/bootstrap.ts"
     ],
+    "cache-worker" : [
+      './client/cache-worker/cache-worker.ts'
+      ],
     "polyfills": [
       "./client/polyfills.ts"
     ],
@@ -489,9 +492,9 @@ module.exports = {
       "sourceMap": false,
       "filename": "scripts.[hash:20].bundle.js",
       "scripts": [
-        "./node_modules/marked/lib/marked.js"
+        "node_modules/marked/lib/marked.js"
       ],
-      "basePath": "."
+      "basePath": ""
     }),
     new CopyWebpackPlugin([
       {
