@@ -28,6 +28,10 @@
             "name": "Pending Redisposition",
             "description": "An action that is Pending Redisposition."
           },
+          "InWork": {
+            "name": "In Work",
+            "description": "An action that is In Work."
+          },
           "InVerification": {
             "name": "In Verification",
             "description": "An action that is In Verification."
@@ -50,6 +54,12 @@
               "assignment:Assignee"
             ]
           },
+          "beginWork": {
+            "source": "Assigned",
+            "target": "InWork",
+            "guard": {},
+            "requires": ""
+          },
           "request-reassign": {
             "source": "Assigned",
             "target": "PendingReassign",
@@ -61,8 +71,14 @@
             "guard": {},
             "requires": ""
           },
-          "defer": {
+          "beginWork": {
             "source": "Assigned",
+            "target": "InWork",
+            "guard": {},
+            "requires": []
+          },
+          "requestVerification": {
+            "source": "InWork",
             "target": "InVerification",
             "guard": {},
             "requires": []
