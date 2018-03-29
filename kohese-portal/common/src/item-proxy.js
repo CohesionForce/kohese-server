@@ -180,9 +180,12 @@ class ItemProxy {
             }
             for(let relIdx in relationList){
               let refId = relationList[relIdx];
+              if (refId.hasOwnProperty('id')){
+                refId = refId.id;
+              }
               let refProxy = ItemProxy.getProxyFor(refId);
               if(!refProxy){
-                createMissingProxy(relationValue);
+                createMissingProxy(refId);
                 refProxy=ItemProxy.getProxyFor(refId);
               }
               this.addReference(refProxy, relationProperty, isSingle);
