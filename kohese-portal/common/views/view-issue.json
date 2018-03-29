@@ -36,10 +36,10 @@
       "displayName": "context"
     },
     "resolutionActions": {
-      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "inputType": "proxy-selector:{\"allowMultiSelect\":true,\"type\":\"Item\",\"useAdvancedSelector\":false}",
       "required": true,
       "default": null,
-      "displayName": "analysisAction"
+      "displayName": "resolutionActions"
     },
     "response": {
       "inputType": "text:{\"isMultiLine\":true}",

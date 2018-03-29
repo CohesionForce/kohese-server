@@ -40,7 +40,7 @@ export class DetailsComponent extends NavigatableComponent
   get editableStream() {
     return this._editableStream;
   }
-  
+
   /* Subscriptions */
   routeSub : Subscription;
   repoReadySub : Subscription;
@@ -60,6 +60,7 @@ export class DetailsComponent extends NavigatableComponent
   userList : Array<any>
   currentUser : any;
   proxyList : Array<any>;
+  relationIdMap : any;
   itemDescriptionRendered : string;
   detailsFormGroup : FormGroup;
   private nonFormFieldValueMap: any = {};
@@ -92,6 +93,7 @@ export class DetailsComponent extends NavigatableComponent
             this.proxyUpdates = ItemProxy.getChangeSubject().subscribe((change)=>{
               if(change.id === this.itemProxy.item.id) {
                 this.proxyStream.next(change.proxy);
+                this.relationIdMap = this.itemProxy.getRelationIdMap();
               }
             })
           }
@@ -115,12 +117,15 @@ export class DetailsComponent extends NavigatableComponent
 
       this.ItemRepository.registerRecentProxy(this.itemProxy);
 
-      // Is this defunct? TODO 
+      // Is this defunct? TODO
       let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
       this.typeProxies = modelProxy.getDescendants();
 
       this.proxyList = this.ItemRepository.getShortFormItemList();
       this.userList = this.SessionService.getUsers();
+      if(this.itemProxy){
+        this.relationIdMap = this.itemProxy.getRelationIdMap();
+      }
       this.updateParentProxy();
 
     this._editableStream.next(false);
@@ -170,7 +175,7 @@ export class DetailsComponent extends NavigatableComponent
       this._editableStream.next(false);
     });
   }
-  
+
   removeItem (proxy : ItemProxy) : void {
     this.ItemRepository.deleteItem(proxy, false)
       .then(function () {
@@ -181,7 +186,7 @@ export class DetailsComponent extends NavigatableComponent
   public whenNonFormFieldChanges(updatedField: any): void {
     this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
   }
-  
+
   public cancelEditing(): void {
     this._editableStream.next(false);
     this.ItemRepository.fetchItem(this.itemProxy).then((proxy: ItemProxy) => {

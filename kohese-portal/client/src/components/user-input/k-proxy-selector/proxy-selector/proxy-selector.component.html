@@ -1,7 +1,7 @@
-<mat-tab-group class="left-content" style="display:inline-block" *ngIf="repoInitialized">
+<mat-tab-group class="left-content" style="display:inline-block; height: 600px; overflow: auto; width: 50%" *ngIf="repoInitialized">
   <mat-tab label="Recent">
         <div *ngFor="let proxy of recentProxies" 
-             (click)="selectParent(proxy)">
+             (click)="selectProxy(proxy)">
           {{proxy.item.name}}
         <hr/>
         </div>
@@ -9,7 +9,7 @@
   <mat-tab label="Tree">
     <tree-root [nodes]="rootProxy.children" options="treeOptions">
         <ng-template #treeNodeTemplate let-node let-index="index">
-          <td (click)="selectParent(node.data)"
+          <td (click)="selectProxy(node.data)"
               matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
         </ng-template>
       </tree-root>
@@ -24,13 +24,20 @@
     </mat-option>
   </mat-autocomplete>
   </mat-tab>
-
 </mat-tab-group>
-<mat-card *ngIf="selectedParent" class="right-content" style="display: inline-block;">
-<mat-card-title class="panel-heading">
-  <span>{{selectedParent.item.name}}</span>
-</mat-card-title>
-<mat-card-content>
-  {{selectedParent.item.description}}
-</mat-card-content>
+<mat-card *ngIf="selectedProxy && !multiSelect" class="right-content" style="display: inline-block; height: 600px; overflow: auto; width: 40%">
+  <mat-card-title class="panel-heading">
+    <span>{{selectedProxy.item.name}}</span>
+  </mat-card-title>
+  <mat-card-content>
+    {{selectedProxy.item.description}}
+  </mat-card-content>
 </mat-card>
+<div *ngIf="multiSelect" class="right-content" style="display: inline-block; height: 600px; overflow: auto; width: 40%">
+  <h4>Selections :</h4>
+  <div *ngFor="let selection of selectedProxies">
+    {{selection.item.name}}
+  </div>
+</div>
+
+

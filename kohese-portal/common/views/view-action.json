@@ -47,6 +47,12 @@
       "default": null,
       "displayName": "actualCompletion"
     },
+    "remainingHours": {
+      "inputType": "text:{\"isMultiLine\":false}",
+      "required": false,
+      "default": "",
+      "displayName": "remainingHoursEffort"
+    },
     "actualHours": {
       "inputType": "text:{\"isMultiLine\":false}",
       "required": false,

@@ -45,6 +45,12 @@ class ItemProxy {
 //      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
       proxy = this;
       proxy.children = [];
+      proxy.relations = {
+        Item: {
+          parent: null,
+          children: proxy.children
+        }
+      };
       proxy.descendantCount = 0;
       tree.proxyMap[itemId] = proxy;
     }
@@ -114,6 +120,7 @@ class ItemProxy {
     }
 
     proxy.calculateTreeHash();
+    proxy.caclulateDerivedProperties();
 
     if(!tree.loading){
       tree.changeSubject.next({
@@ -136,7 +143,99 @@ class ItemProxy {
     for (let id in tree.proxyHasDeferredModelAssociation){
       let proxy = tree.proxyHasDeferredModelAssociation[id];
       proxy.setItemKind(proxy.kind);
+      proxy.caclulateDerivedProperties();
     }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  caclulateDerivedProperties(){
+    if (this.model && this.model.item && this.model.item.stateProperties){
+      let seperatorRequired = false;
+      this.state = '';
+      for(let statePropertyIdx in this.model.item.stateProperties){
+        let stateProperty = this.model.item.stateProperties[statePropertyIdx];
+        if(seperatorRequired){
+          this.state += '/';
+        }
+        this.state += this.item[stateProperty];
+        seperatorRequired = true;
+      }
+    }
+
+    if (this.model && this.model.item && this.model.item.relationProperties){
+      for(let relationPropertyIdx in this.model.item.relationProperties){
+        let relationProperty = this.model.item.relationProperties[relationPropertyIdx];
+        if (this.item){
+          let relationValue = this.item[relationProperty];
+          if (relationValue){
+            let relationList = [];
+            let isSingle = true;
+            if(Array.isArray(relationValue)){
+              relationList = relationValue;
+              isSingle = false;
+            } else {
+              relationList = [ relationValue ];
+            }
+            for(let relIdx in relationList){
+              let refId = relationList[relIdx];
+              if (refId.hasOwnProperty('id')){
+                refId = refId.id;
+              }
+              let refProxy = ItemProxy.getProxyFor(refId);
+              if(!refProxy){
+                createMissingProxy(refId);
+                refProxy=ItemProxy.getProxyFor(refId);
+              }
+              this.addReference(refProxy, relationProperty, isSingle);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  addReference(toProxy, forProperty, isSingle){
+
+    // Add reference to the referencing proxy
+    if (!this.relations[this.kind]){
+      this.relations[this.kind] = {};
+    }
+
+    if (isSingle){
+      this.relations[this.kind][forProperty] = toProxy;
+    } else {
+      if (!this.relations[this.kind][forProperty]){
+        this.relations[this.kind][forProperty] = [];
+      }
+
+      if (!this.relations[this.kind][forProperty].includes(toProxy))
+      this.relations[this.kind][forProperty].push(toProxy);
+    }
+
+    // Add reference to the referenced proxy
+    if (!toProxy.relations[this.kind]){
+      toProxy.relations[this.kind] = {};
+    }
+    let refInProperty = 'ref-in-' + forProperty;
+    if (!toProxy.relations[this.kind][refInProperty]){
+      toProxy.relations[this.kind][refInProperty] = [];
+    }
+
+    if (!toProxy.relations[this.kind][refInProperty].includes(this))
+    toProxy.relations[this.kind][refInProperty].push(this);
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  removeReference(toProxy, forProperty){
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -904,6 +1003,36 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getRelationIdMap(){
+    console.log(this.relations);
+    let relationIdMap = {};
+    for(let kindKey in this.relations)
+    {
+      relationIdMap[kindKey] = {};
+
+      let relationsForKind = this.relations[kindKey];
+      for(let relationKey in relationsForKind){
+        let relationList = relationsForKind[relationKey];
+        if (Array.isArray(relationList)){
+          relationIdMap[kindKey][relationKey] = [];
+          for(let index = 0; index < relationList.length; index++){
+            relationIdMap[kindKey][relationKey].push(relationList[index].item.id);
+          }
+        } else {
+          if (relationList){
+            relationIdMap[kindKey][relationKey] = relationList.item.id;
+          } else {
+            relationIdMap[kindKey][relationKey] = null;
+          }
+        }
+      }
+    }
+    return relationIdMap;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   addChild(childProxy) {
     if (childProxy.parentProxy === this) {
 //      console.log('::: IP: Child ' + childProxy.item.name + ' already associated with ' + this.item.name);
@@ -930,9 +1059,11 @@ class ItemProxy {
 
           this.children.splice(insertAt, 0, childProxy);
           childProxy.parentProxy = this;
+          childProxy.relations.Item.parent = this;
     } else {
         this.children.push(childProxy);
         childProxy.parentProxy = this;
+        childProxy.relations.Item.parent = this;
         this.sortChildren();
     }
     // update descendant count
@@ -973,6 +1104,7 @@ class ItemProxy {
     });
 
     delete childProxy.parentProxy;
+    childProxy.relations.Item.parent = null;
 
     // update descendant count
     var deltaCount = 1 + childProxy.descendantCount;
@@ -1132,6 +1264,8 @@ class ItemProxy {
 
     // Copy the withItem into the current proxy
     copyAttributes(withItem, this.item);
+    this.caclulateDerivedProperties();
+
 
     // Ensure sort order is maintained
     if(this.parentProxy){

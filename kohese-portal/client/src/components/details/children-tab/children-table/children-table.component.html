@@ -15,9 +15,9 @@
       <mat-cell *matCellDef="let child"> {{child.item.assignedTo}}</mat-cell>
   </ng-container>
 
-  <ng-container matColumnDef="actionState">
+  <ng-container matColumnDef="state">
       <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
-      <mat-cell *matCellDef="let child"> {{child.item.actionState}}</mat-cell>
+      <mat-cell *matCellDef="let child"> {{child.state}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="description">
