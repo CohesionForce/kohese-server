@@ -1,4 +1,4 @@
-import { TestBed, ComponentFixture} from '@angular/core/testing';
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
 
@@ -18,6 +18,8 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 describe('Component: Details Form', ()=>{
   let formComponent: DetailsFormComponent;
@@ -44,59 +46,23 @@ describe('Component: Details Form', ()=>{
 
     formFixture = TestBed.createComponent(DetailsFormComponent);
     formComponent = formFixture.componentInstance;
+    let proxy: ItemProxy = new ItemProxy('Item', MockItem());
+    proxy.model.item = {
+      base: 'PersistedModel'
+    };
+    formComponent.proxyStream = new BehaviorSubject<ItemProxy>(proxy);
+    formComponent.editableStream = new BehaviorSubject<boolean>(false);
     
-  })
-  describe('item creation', ()=>{
-    pending('Awaiting production code changes related to KoheseModels');
-    beforeEach(()=>{
-      formComponent.createInfo = {
-        parent: 'test-uuid',
-        type : TestBed.get(DynamicTypesService).getMockKoheseType()
-      }
+    formFixture.detectChanges();
+  });
 
-      formFixture.detectChanges();
-    })
-
-    it('creates a stub proxy from the create information', ()=>{
-      expect(formComponent.itemProxy).toBeTruthy();
-    })
-  })
-
-  describe('details view', ()=>{
-    beforeEach(()=>{
-      formComponent.itemProxy = new ItemProxy('Item', MockItem()) 
-      formComponent.itemProxy.model.item = {
-        base: 'PersistedModel'
-      }    
-    })
-
-    describe ('disabled selected', ()=>{
-      pending('Awaiting production code changes related to KoheseModels');
-      beforeEach(()=>{
-        formComponent.disabled = true;
-        formFixture.detectChanges();
-      })
-
-      it('disables the form group', ()=>{
-        expect(formComponent.formGroup.disabled).toBe(true);
-      })
-
-    })
-
-    describe('enabled selected', ()=>{
-
-      beforeEach(()=>{
-        formComponent.disabled = false;
-        formFixture.detectChanges();
-      })
-    })
+  it('builds a DetailsFormComponent', () => {
+    expect(formComponent).toBeTruthy();
+  });
     
-
-    it('instantiates the Details Form component', ()=>{
-      pending('Awaiting production code changes related to KoheseModels');
-      formFixture.detectChanges();
-      expect(formComponent).toBeTruthy(); 
-    })
-  })
-
+  it('enables editing', fakeAsync(() => {
+    formComponent.editableStream.next(true);
+    tick();
+    expect(formComponent.formGroup.disabled).toBe(false);
+  }));
 })

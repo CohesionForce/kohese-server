@@ -12,6 +12,7 @@ export class MockDynamicTypesService {
   }
   getKoheseTypes () {
     return {
+      'Kurios Iesous': MockKoheseType(),
       'Item' : MockKoheseType()
     };
   }

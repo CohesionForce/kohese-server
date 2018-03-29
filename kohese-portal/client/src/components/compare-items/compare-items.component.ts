@@ -1,4 +1,4 @@
-import { Component, Optional, Inject, Input, OnInit, ChangeDetectionStrategy,
+import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
   ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';

@@ -83,4 +83,11 @@ export class MockItemRepository {
   public getChangeSubject(): Subject<any> {
     return ItemProxy.getChangeSubject();
   }
+  
+  public fetchItem(proxy: ItemProxy): Promise<ItemProxy> {
+    let id: string = proxy.item.id;
+    proxy.updateItem(proxy.kind, MockItem());
+    proxy.item.id = id;
+    return Promise.resolve(proxy);
+  }
 }
