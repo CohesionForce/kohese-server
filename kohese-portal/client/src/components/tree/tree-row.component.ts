@@ -115,6 +115,6 @@ export class TreeRowComponent extends NavigatableComponent
     this.dialogService.openComponentDialog(CompareItemsComponent, {
       baseProxy: this._treeRow.itemProxy,
       editable: true
-    }).updateSize('70%', '70%');
+    }).updateSize('90%', '90%');
   }
 }
