@@ -10,7 +10,7 @@
     <mat-tab label="Tree">
       <tree-root [nodes]="rootProxy.children" options="treeOptions">
         <ng-template #treeNodeTemplate let-node let-index="index">
-          <td (click)="selectParent(node.data)"
+          <td (click)="selectProxy(node.data)"
             matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
         </ng-template>
       </tree-root>
@@ -28,12 +28,12 @@
       </mat-autocomplete>
     </mat-tab>
   </mat-tab-group>
-  <mat-card *ngIf="selectedParent" class="right-content">
+  <mat-card *ngIf="selectedProxy && !multiSelect" class="right-content">
     <mat-card-title class="panel-heading">
-      <span>{{selectedParent.item.name}}</span>
+      <span>{{selectedProxy.item.name}}</span>
     </mat-card-title>
     <mat-card-content>
-      {{selectedParent.item.description}}
+      {{selectedProxy.item.description}}
     </mat-card-content>
   </mat-card>
   <div *ngIf="multiSelect" class="right-content">
