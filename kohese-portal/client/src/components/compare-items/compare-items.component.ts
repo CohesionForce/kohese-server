@@ -1,7 +1,9 @@
 import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
   ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
+import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ProxySelectorDialogComponent } from '../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -70,6 +72,7 @@ export class CompareItemsComponent implements OnInit {
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
     private _changeDetectorRef: ChangeDetectorRef,
+    private _dialogService: DialogService,
     private _itemRepository: ItemRepository) {
   }
   
@@ -245,5 +248,20 @@ export class CompareItemsComponent implements OnInit {
         });
       }
     }
+  }
+  
+  public openProxySelectionDialog(
+    proxyStream: BehaviorSubject<ItemProxy>): void {
+    this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+      selected: proxyStream.getValue()
+    }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
+      if (selection) {
+        if (proxyStream === this._baseProxyStream) {
+          this.whenBaseProxyChanges(selection);
+        } else {
+          this.whenChangeProxyChanges(selection);
+        }
+      }
+    });
   }
 }

@@ -20,6 +20,7 @@ import { AuthenticationModule } from './services/authentication/authentication.m
 import { LoginModule } from './components/login/login.module';
 import { UserModule } from './services/user/user.module';
 import { AdminModule } from './components/admin/admin.module';
+import { CompareItemsModule } from './components/compare-items/compare-items.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
@@ -46,8 +47,7 @@ import { environment } from '../environments/environment.prod';
     AppComponent,
     TreeComponent,
     TreeRowComponent,
-    ExploreComponent,
-    CompareItemsComponent
+    ExploreComponent
   ],
   imports: [
     BrowserModule,
@@ -76,10 +76,8 @@ import { environment } from '../environments/environment.prod';
     ServicesModule,
     AdminModule,
     VirtualScrollModule,
-    DashboardModule
-  ],
-  entryComponents: [
-    CompareItemsComponent
+    DashboardModule,
+    CompareItemsModule
   ],
   bootstrap: [AppComponent]
 })

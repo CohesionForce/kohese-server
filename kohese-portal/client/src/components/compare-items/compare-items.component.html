@@ -1,34 +1,69 @@
 <span id="optionsContainer">
-  <mat-checkbox [(ngModel)]="baseOnRight">
+  <mat-checkbox [(ngModel)]="baseOnRight" class="flex-right-align">
     Base On Right
   </mat-checkbox>
   <mat-checkbox (change)="filterFields($event.checked)">
     Show Differences Only
   </mat-checkbox>
 </span>
-<div style="height: 80%; width: 100%;">
+<div style="height: 85%; width: 100%;">
   <split direction="horizontal">
+    <mat-menu #baseMenu="matMenu" [overlapTrigger]="false">
+      <button mat-menu-item
+        (click)="openProxySelectionDialog(baseProxyStream)">
+        <mat-icon class="fa fa-mouse-pointer"></mat-icon>
+        Select...
+      </button>
+      <button mat-menu-item
+        [disabled]="!(allowEditing && baseProxyStream.getValue())"
+        (click)="toggleEditability(baseItemEditableStream)">
+        <ng-container *ngIf="(baseItemEditableStream | async)">
+          <mat-icon class="fa fa-check"></mat-icon>
+        </ng-container>
+        <ng-container *ngIf="!(baseItemEditableStream | async)">
+          <mat-icon class="fa fa-uncheck"></mat-icon>
+        </ng-container>
+        Edit
+      </button>
+      <button mat-menu-item [disabled]="!(baseItemEditableStream | async)"
+        (click)="save(baseProxyStream.getValue())">
+        <mat-icon class="fa fa-save"></mat-icon>
+        Save
+      </button>
+    </mat-menu>
+    <mat-menu #changeMenu="matMenu" [overlapTrigger]="false">
+      <button mat-menu-item
+        (click)="openProxySelectionDialog(changeProxyStream)">
+        <mat-icon class="fa fa-mouse-pointer"></mat-icon>
+        Select...
+      </button>
+      <button mat-menu-item
+        [disabled]="!(allowEditing && changeProxyStream.getValue())"
+        (click)="toggleEditability(changeItemEditableStream)">
+        <ng-container *ngIf="(changeItemEditableStream | async)">
+          <mat-icon class="fa fa-check"></mat-icon>
+        </ng-container>
+        <ng-container *ngIf="!(changeItemEditableStream | async)">
+          <mat-icon class="fa fa-uncheck"></mat-icon>
+        </ng-container>
+        Edit
+      </button>
+      <button mat-menu-item [disabled]="!(changeItemEditableStream | async)"
+        (click)="save(changeProxyStream.getValue())">
+        <mat-icon class="fa fa-save"></mat-icon>
+        Save
+      </button>
+    </mat-menu>
     <split-area #leftSplitArea [size]="50">
       <ng-container *ngIf="baseOnRight">
-        <div style="height: 25%; width: 100%;">
-          <proxy-selector (proxySelected)="whenChangeProxyChanges($event)">
-          </proxy-selector>
-        </div>
-        <div style="height: 70%; width: 100%;">
+        <div style="height: 100%; width: 100%;">
+          <span class="header-span">
+            <button mat-icon-button [matMenuTriggerFor]="changeMenu"
+              class="flex-right-align">
+              <mat-icon class="fa fa-bars"></mat-icon>
+            </button>
+          </span>
           <ng-container *ngIf="(changeProxyStream | async)">
-            <span class="header-span">
-              <button mat-icon-button class="flex-right-align"
-                [ngClass]="{ 'highlight': (changeItemEditableStream | async) }"
-                [disabled]="!allowEditing"
-                (click)="toggleEditability(changeItemEditableStream)">
-                <mat-icon class="fa fa-edit"></mat-icon>
-              </button>
-              <button mat-icon-button
-                (click)="save(changeProxyStream.getValue())"
-                [disabled]="!(changeItemEditableStream | async)">
-                <mat-icon class="fa fa-save"></mat-icon>
-              </button>
-            </span>
             <div class="field-editor-container">
               <details-form [type]="(changeProxyStream | async).model.type"
                 [proxyStream]="changeProxyStream"
@@ -40,25 +75,14 @@
         </div>
       </ng-container>
       <ng-container *ngIf="!baseOnRight">
-        <div style="height: 25%; width: 100%;">
-          <proxy-selector (proxySelected)="whenBaseProxyChanges($event)">
-          </proxy-selector>
-        </div>
-        <div style="height: 70%; width: 100%;">
+        <div style="height: 100%; width: 100%;">
+          <span class="header-span">
+            <button mat-icon-button [matMenuTriggerFor]="baseMenu"
+              class="flex-right-align">
+              <mat-icon class="fa fa-bars"></mat-icon>
+            </button>
+          </span>
           <ng-container *ngIf="(baseProxyStream | async)">
-            <span class="header-span">
-              <button mat-icon-button class="flex-right-align"
-                [ngClass]="{ 'highlight': (baseItemEditableStream | async) }"
-                [disabled]="!allowEditing"
-                (click)="toggleEditability(baseItemEditableStream)">
-                <mat-icon class="fa fa-edit"></mat-icon>
-              </button>
-              <button mat-icon-button
-                (click)="save(baseProxyStream.getValue())"
-                [disabled]="!(baseItemEditableStream | async)">
-                <mat-icon class="fa fa-save"></mat-icon>
-              </button>
-            </span>
             <div class="field-editor-container">
               <details-form [type]="(baseProxyStream | async).model.type"
                 [proxyStream]="baseProxyStream"
@@ -72,25 +96,14 @@
     </split-area>
     <split-area #rightSplitArea [size]="50">
       <ng-container *ngIf="baseOnRight">
-        <div style="height: 25%; width: 100%;">
-          <proxy-selector (proxySelected)="whenBaseProxyChanges($event)">
-          </proxy-selector>
-        </div>
-        <div style="height: 70%; width: 100%;">
+        <div style="height: 100%; width: 100%;">
+          <span class="header-span">
+            <button mat-icon-button [matMenuTriggerFor]="baseMenu"
+              class="flex-right-align">
+              <mat-icon class="fa fa-bars"></mat-icon>
+            </button>
+          </span>
           <ng-container *ngIf="(baseProxyStream | async)">
-            <span class="header-span">
-              <button mat-icon-button class="flex-right-align"
-                [ngClass]="{ 'highlight': (baseItemEditableStream | async) }"
-                [disabled]="!allowEditing"
-                (click)="toggleEditability(baseItemEditableStream)">
-                <mat-icon class="fa fa-edit"></mat-icon>
-              </button>
-              <button mat-icon-button
-                (click)="save(baseProxyStream.getValue())"
-                [disabled]="!(baseItemEditableStream | async)">
-                <mat-icon class="fa fa-save"></mat-icon>
-              </button>
-            </span>
             <div class="field-editor-container">
               <details-form [type]="(baseProxyStream | async).model.type"
                 [proxyStream]="baseProxyStream"
@@ -102,25 +115,14 @@
         </div>
       </ng-container>
       <ng-container *ngIf="!baseOnRight">
-        <div style="height: 25%; width: 100%;">
-          <proxy-selector (proxySelected)="whenChangeProxyChanges($event)">
-          </proxy-selector>
-        </div>
-        <div style="height: 70%; width: 100%;">
+        <div style="height: 100%; width: 100%;">
+          <span class="header-span">
+            <button mat-icon-button [matMenuTriggerFor]="changeMenu"
+              class="flex-right-align">
+              <mat-icon class="fa fa-bars"></mat-icon>
+            </button>
+          </span>
           <ng-container *ngIf="(changeProxyStream | async)">
-            <span class="header-span">
-              <button mat-icon-button class="flex-right-align"
-                [ngClass]="{ 'highlight': (changeItemEditableStream | async) }"
-                [disabled]="!allowEditing"
-                (click)="toggleEditability(changeItemEditableStream)">
-                <mat-icon class="fa fa-edit"></mat-icon>
-              </button>
-              <button mat-icon-button
-                (click)="save(changeProxyStream.getValue())"
-                [disabled]="!(changeItemEditableStream | async)">
-                <mat-icon class="fa fa-save"></mat-icon>
-              </button>
-            </span>
             <div class="field-editor-container">
               <details-form [type]="(changeProxyStream | async).model.type"
                 [proxyStream]="changeProxyStream"

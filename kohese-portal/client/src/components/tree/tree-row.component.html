@@ -31,6 +31,13 @@
   <span id="rightSpan" class="kti-actions">
     <!-- Default row actions -->
     <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
+      <button mat-icon-button
+        (click)="treeRootStream.next(treeRow.itemProxy); $event.stopPropagation()">
+        <mat-icon class="fa fa-anchor"></mat-icon>
+      </button>
+      <button mat-icon-button (click)="removeItem(); $event.stopPropagation()">
+        <mat-icon class="glyphicon glyphicon-remove delete-button"></mat-icon>
+      </button>
       <button mat-icon-button [matMenuTriggerFor]="menu"
         (click)="$event.stopPropagation()">
         <mat-icon class="fa fa-bars"></mat-icon>
@@ -40,13 +47,6 @@
           Compare With...
         </button>
       </mat-menu>
-      <button mat-icon-button
-        (click)="treeRootStream.next(treeRow.itemProxy); $event.stopPropagation()">
-        <mat-icon class="fa fa-anchor"></mat-icon>
-      </button>
-      <button mat-icon-button (click)="removeItem(); $event.stopPropagation()">
-        <mat-icon class="glyphicon glyphicon-remove delete-button"></mat-icon>
-      </button>
     </ng-container>
     <!-- Version Control row actions -->
     <ng-container
