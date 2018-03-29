@@ -2,7 +2,7 @@
   <mat-tab-group class="left-content" *ngIf="repoInitialized">
     <mat-tab label="Recent">
       <div *ngFor="let proxy of recentProxies"
-        (click)="selectParent(proxy)">
+        (click)="selectProxy(proxy)">
         {{proxy.item.name}}
         <hr/>
       </div>
@@ -36,4 +36,10 @@
       {{selectedParent.item.description}}
     </mat-card-content>
   </mat-card>
+  <div *ngIf="multiSelect" class="right-content">
+    <h4>Selections:</h4>
+    <div *ngFor="let selection of selectedProxies">
+      {{selection.item.name}}
+    </div>
+  </div>
 </div>

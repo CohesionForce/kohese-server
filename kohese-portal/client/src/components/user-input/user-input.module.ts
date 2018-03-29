@@ -13,6 +13,10 @@ import { KMarkdownComponent } from './k-markdown/k-markdown.component';
 
 import { MarkdownModule } from 'ngx-markdown';
 import { MarkdownCheatSheetComponent } from './k-markdown/markdown-cheat-sheet.component';
+import { ProxySelectorComponent } from './k-proxy-selector/proxy-selector/proxy-selector.component';
+import { TreeModule } from 'angular-tree-component';
+import { PipesModule } from '../../pipes/pipes.module';
+import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 
 @NgModule({
   declarations: [
@@ -23,14 +27,18 @@ import { MarkdownCheatSheetComponent } from './k-markdown/markdown-cheat-sheet.c
     KSelectComponent,
     KStateEditorComponent,
     KMarkdownComponent,
-    MarkdownCheatSheetComponent
+    MarkdownCheatSheetComponent,
+    ProxySelectorComponent,
+    ProxySelectorDialogComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    MarkdownModule.forChild()
+    MarkdownModule.forChild(),
+    TreeModule,
+    PipesModule
   ],
   exports: [
     KTextComponent,
@@ -39,10 +47,12 @@ import { MarkdownCheatSheetComponent } from './k-markdown/markdown-cheat-sheet.c
     KDateComponent,
     KSelectComponent,
     KStateEditorComponent,
-    KMarkdownComponent
+    KMarkdownComponent,
+    ProxySelectorComponent
   ],
   entryComponents: [
-    MarkdownCheatSheetComponent
+    MarkdownCheatSheetComponent,
+    ProxySelectorDialogComponent
   ]
 })
 export class UserInputModule {}

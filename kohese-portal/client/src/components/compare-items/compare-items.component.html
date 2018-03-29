@@ -11,8 +11,8 @@
     <split-area #leftSplitArea [size]="50">
       <ng-container *ngIf="baseOnRight">
         <div style="height: 25%; width: 100%;">
-          <parent-selector (parentSelected)="whenChangeProxyChanges($event)">
-          </parent-selector>
+          <proxy-selector (proxySelected)="whenChangeProxyChanges($event)">
+          </proxy-selector>
         </div>
         <div style="height: 70%; width: 100%;">
           <ng-container *ngIf="(changeProxyStream | async)">
@@ -41,8 +41,8 @@
       </ng-container>
       <ng-container *ngIf="!baseOnRight">
         <div style="height: 25%; width: 100%;">
-          <parent-selector (parentSelected)="whenBaseProxyChanges($event)">
-          </parent-selector>
+          <proxy-selector (proxySelected)="whenBaseProxyChanges($event)">
+          </proxy-selector>
         </div>
         <div style="height: 70%; width: 100%;">
           <ng-container *ngIf="(baseProxyStream | async)">
@@ -73,8 +73,8 @@
     <split-area #rightSplitArea [size]="50">
       <ng-container *ngIf="baseOnRight">
         <div style="height: 25%; width: 100%;">
-          <parent-selector (parentSelected)="whenBaseProxyChanges($event)">
-          </parent-selector>
+          <proxy-selector (proxySelected)="whenBaseProxyChanges($event)">
+          </proxy-selector>
         </div>
         <div style="height: 70%; width: 100%;">
           <ng-container *ngIf="(baseProxyStream | async)">
@@ -103,8 +103,8 @@
       </ng-container>
       <ng-container *ngIf="!baseOnRight">
         <div style="height: 25%; width: 100%;">
-          <parent-selector (parentSelected)="whenChangeProxyChanges($event)">
-          </parent-selector>
+          <proxy-selector (proxySelected)="whenChangeProxyChanges($event)">
+          </proxy-selector>
         </div>
         <div style="height: 70%; width: 100%;">
           <ng-container *ngIf="(changeProxyStream | async)">

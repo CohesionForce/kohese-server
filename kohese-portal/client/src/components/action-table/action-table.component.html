@@ -1,28 +1,37 @@
 <mat-table *ngIf="tableStream" #actionTable [dataSource]="tableStream">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-      <mat-cell *matCellDef="let action" [ngStyle]="getRowIndent(action)"> 
-        <span class="{{action.proxy.model.type.icon}}"></span>  
+      <mat-cell *matCellDef="let action" [ngStyle]="getRowIndent(action)">
+        <span class="{{action.proxy.model.type?.icon}}"></span>
         {{action.proxy.item.name}}
       </mat-cell>
     </ng-container>
-  
+
     <ng-container matColumnDef="assignedTo">
         <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
         <mat-cell *matCellDef="let action"> {{action.proxy.item.assignedTo}}</mat-cell>
     </ng-container>
-  
-    <ng-container matColumnDef="actionState">
-        <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
-        <mat-cell *matCellDef="let action"> {{action.proxy.item.actionState}} / {{action.proxy.item.decisionState}}</mat-cell>
+
+    <ng-container matColumnDef="state">
+        <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
+        <mat-cell *matCellDef="let action"> {{action.proxy.state}} </mat-cell>
     </ng-container>
-  
-    <ng-container matColumnDef="taskState">
-        <mat-header-cell *matHeaderCellDef> Task  </mat-header-cell>
-        <mat-cell *matCellDef="let action"> {{action.proxy.item.taskState}}</mat-cell>
-    </ng-container> 
+
+    <ng-container matColumnDef="estimatedHoursEffort">
+      <mat-header-cell *matHeaderCellDef> Estimated Hours </mat-header-cell>
+      <mat-cell *matCellDef="let action"> {{action.proxy.item.estimatedHoursEffort}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="remainingHoursEffort">
+      <mat-header-cell *matHeaderCellDef> Remaining Hours </mat-header-cell>
+      <mat-cell *matCellDef="let action"> {{action.proxy.item.remainingHoursEffort}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actualHoursEffort">
+      <mat-header-cell *matHeaderCellDef> Actual Hours </mat-header-cell>
+      <mat-cell *matCellDef="let action"> {{action.proxy.item.actualHoursEffort}}</mat-cell>
+    </ng-container>
 
     <mat-header-row style="position: sticky; top: 0; background-color: inherit" *matHeaderRowDef="rowDef"></mat-header-row>
     <mat-row (click)="navigate('Explore', {id:action.proxy.item.id})" *matRowDef="let action; columns: rowDef"></mat-row>
 </mat-table>
-  

@@ -1,21 +1,27 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { ItemRepository, RepoStates } from '../../../../services/item-repository/item-repository.service';
+import * as ItemProxy from '../../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
-  selector: 'parent-selector',
-  templateUrl: './parent-selector.component.html',
-  styleUrls: ['./parent-selector.component.scss']
+  selector: 'proxy-selector',
+  templateUrl: './proxy-selector.component.html',
+  styles : ['./proxy-selector.component.scss']
 })
-export class ParentSelectorComponent implements OnInit {
+export class ProxySelectorComponent implements OnInit {
   
   /* Data */
+  @Input() 
+  multiSelect : boolean;
+  @Input() 
+  selection : any;
+
   rootProxy : ItemProxy;
-  selectedParent : ItemProxy;
+  selectedProxy : ItemProxy;
+  selectedProxies : Array<ItemProxy> = [];
   @Output()
-  parentSelected : EventEmitter<ItemProxy> = new EventEmitter();
+  proxySelected : EventEmitter<ItemProxy> = new EventEmitter();
   repoInitialized : boolean = false;
   proxySearchControl : FormControl;
   filteredProxies : any;
@@ -26,7 +32,6 @@ export class ParentSelectorComponent implements OnInit {
   }
 
   ngOnInit () {
-    console.log('ps init')
     this.itemRepository.getRepoStatusSubject().subscribe((update)=>{
       if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         this.rootProxy = this.itemRepository.getRootProxy();
@@ -41,16 +46,29 @@ export class ParentSelectorComponent implements OnInit {
         this.repoInitialized = true;
       }
     })
+
+    if (this.selection) {
+      if (this.selection instanceof Array) {
+        this.selectedProxies = this.selection;
+      } else {
+        this.selectedProxy = this.selection;
+      }
+    }
   }
 
-  selectParent (selection : ItemProxy) {
-    this.selectedParent = selection;
-    this.parentSelected.emit(selection)
+  selectProxy (selection : ItemProxy) {
+    if (this.multiSelect) {
+      this.selectedProxies.push(selection);
+      this.proxySelected.emit(this.selectedProxies);
+    } else {
+      this.selectedProxy = selection;
+      this.proxySelected.emit(selection) 
+    }
   }
 
   onAutoCompleteSelected(selectedProxyEvent : MatAutocompleteSelectedEvent) {
-    this.selectedParent = selectedProxyEvent.option.value;
-    this.parentSelected.next(selectedProxyEvent.option.value);
+    this.selectedProxy = selectedProxyEvent.option.value;
+    this.proxySelected.next(selectedProxyEvent.option.value);
     this.proxySearchControl.setValue(selectedProxyEvent.option.value.item.name);
   }
 

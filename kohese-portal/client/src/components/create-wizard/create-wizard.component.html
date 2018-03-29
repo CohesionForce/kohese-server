@@ -33,7 +33,7 @@
     </div>
   </mat-step>
   <mat-step label="Parent">
-    <parent-selector (parentSelected)="onParentSelected($event, createStepper)"></parent-selector>
+    <proxy-selector (proxySelected)="onParentSelected($event, createStepper)"></proxy-selector>
     <div>
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button matStepperNext>Next</button>

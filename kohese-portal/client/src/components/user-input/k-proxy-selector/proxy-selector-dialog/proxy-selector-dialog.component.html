@@ -1,0 +1,21 @@
+<div>
+  <div style="height: 400px; overflow: auto;">
+    <proxy-selector 
+      (proxySelected)="onProxySelected($event)"
+      [multiSelect]="multiSelect"
+      [selection]="selection"></proxy-selector>
+  </div>
+</div>
+<ng-container>
+  <div class="pull-right">
+    <mat-dialog-actions>
+      <button mat-raised-button (click)="closeDialog()">
+        Cancel
+      </button>
+      <button mat-raised-button
+         (click)="selectProxy()">
+        Confirm
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-container>

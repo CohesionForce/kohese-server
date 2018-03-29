@@ -29,11 +29,11 @@
       "default": null,
       "displayName": "estimatedCompletion"
     },
-    "estimatedHoursEffort": {
+    "estimatedHours": {
       "inputType": "text:{\"isMultiLine\":false}",
       "required": false,
       "default": "",
-      "displayName": "estimatedHoursEffot"
+      "displayName": "estimatedHoursEffort"
     },
     "actualStart": {
       "inputType": "date:{}",
@@ -46,6 +46,12 @@
       "required": false,
       "default": null,
       "displayName": "actualCompletion"
+    },
+    "remainingHours": {
+      "inputType": "text:{\"isMultiLine\":false}",
+      "required": false,
+      "default": "",
+      "displayName": "remainingHoursEffort"
     },
     "actualHours": {
       "inputType": "text:{\"isMultiLine\":false}",

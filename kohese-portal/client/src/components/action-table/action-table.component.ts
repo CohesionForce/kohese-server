@@ -36,14 +36,13 @@ export class ActionTableComponent extends NavigatableComponent
       this.changeRef.markForCheck();
     })
 
-    this.rowDef = ['name', 'taskState', 'actionState', 'assignedTo']
+    this.rowDef = ['name', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort']
   }
 
   ngOnDestroy () {
   }
 
   getRowIndent (row) {
-    console.log(row);
     return {
       'padding-left' : row.depth * 10 + 'px'
     }
