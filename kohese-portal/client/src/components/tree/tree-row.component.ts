@@ -113,8 +113,10 @@ export class TreeRowComponent extends NavigatableComponent
   
   public openComparisonDialog(): void {
     this.dialogService.openComponentDialog(CompareItemsComponent, {
-      baseProxy: this._treeRow.itemProxy,
-      editable: true
+      data : {
+        baseProxy: this._treeRow.itemProxy,
+        editable: true
+      }
     }).updateSize('90%', '90%');
   }
 }

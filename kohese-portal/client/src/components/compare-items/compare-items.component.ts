@@ -253,7 +253,9 @@ export class CompareItemsComponent implements OnInit {
   public openProxySelectionDialog(
     proxyStream: BehaviorSubject<ItemProxy>): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
-      selected: proxyStream.getValue()
+      data : {
+        selected: proxyStream.getValue()
+      }
     }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
       if (selection) {
         if (proxyStream === this._baseProxyStream) {
