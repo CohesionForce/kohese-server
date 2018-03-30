@@ -1,8 +1,8 @@
 <mat-table *ngIf="tableStream" #actionTable [dataSource]="tableStream">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-      <mat-cell *matCellDef="let action" [ngStyle]="getRowIndent(action)">
-        <span class="{{action.proxy.model.type?.icon}}"></span>
+      <mat-cell *matCellDef="let action">
+        <span class="{{action.proxy.model.type?.icon}}" [ngStyle]="getRowIndent(action)"></span>
         {{action.proxy.item.name}}
       </mat-cell>
     </ng-container>
