@@ -153,6 +153,10 @@ export class CreateWizardComponent extends NavigatableComponent
   ngOnDestroy(): void {
     this.repoStatusSubscription.unsubscribe();
   }
+
+  cancel () {
+    this.MatDialogRef.close();
+  }
   
   public whenNonFormFieldChanges(updatedField: any): void {
     this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;

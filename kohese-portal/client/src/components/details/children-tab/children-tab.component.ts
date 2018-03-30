@@ -97,14 +97,17 @@ export class ChildrenTabComponent extends NavigatableComponent
   }
 
   createChild () {
-    let createData = {
-      saveEmitter : this.saveEmitter,
-      parentId : this.itemProxy.item.id
+    let createConfig = {
+      disableClose : true,
+      data : {
+        saveEmitter : this.saveEmitter,
+        parentId : this.itemProxy.item.id,
+      }
     };
 
     let dialogReference =
     this.DialogService.openComponentDialog(CreateWizardComponent,
-                                           createData);
+                                           createConfig).updateSize('70%','70%');
 
     this.saveEmitter.subscribe((proxy) => {
       console.log(proxy);

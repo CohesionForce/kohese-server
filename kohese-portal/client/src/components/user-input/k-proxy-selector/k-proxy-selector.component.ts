@@ -58,8 +58,10 @@ export class KProxySelectorComponent extends UserInput
   
   openProxySelectionDialog(): void {
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
-      allowMultiSelect: this.allowMultiSelect,
-      selected : (this.selectedProxy) ? this.selectedProxy : this.selectedProxies 
+      data : {
+        allowMultiSelect: this.allowMultiSelect,
+        selected : (this.selectedProxy) ? this.selectedProxy : this.selectedProxies 
+      }
     }).updateSize('60%', '60%').afterClosed().subscribe((selected)=>{
       if (selected instanceof Array) {
         let selectedIds = [];
