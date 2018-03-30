@@ -29,7 +29,7 @@
       "default": null,
       "displayName": "estimatedCompletion"
     },
-    "estimatedHours": {
+    "estimatedHoursEffort": {
       "inputType": "text:{\"isMultiLine\":false}",
       "required": false,
       "default": "",
@@ -47,13 +47,13 @@
       "default": null,
       "displayName": "actualCompletion"
     },
-    "remainingHours": {
+    "remainingHoursEffort": {
       "inputType": "text:{\"isMultiLine\":false}",
       "required": false,
       "default": "",
       "displayName": "remainingHoursEffort"
     },
-    "actualHours": {
+    "actualHoursEffort": {
       "inputType": "text:{\"isMultiLine\":false}",
       "required": false,
       "default": "",
