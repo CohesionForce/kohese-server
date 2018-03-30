@@ -119,31 +119,6 @@ export class CompareItemsComponent implements OnInit {
       this.addFieldListeners(leftDetailsFormForm, rightDetailsFormForm);
     }
   }
-
-  /* 
-      scrollSource.onscroll = () => {
-      if (pos === 'Left') {
-      setTimeout(()=>{
-       if(!this.syncLeft) {
-         this.syncRight = true;
-         scrollTarget.scrollTop = scrollSource.scrollTop;
-         console.log('left');
-       } 
-       this.syncLeft = false;
-      }, 200)
-      } else if (pos === 'Right') {
-        setTimeout(()=>{
-        if(!this.syncLeft) {
-          this.syncRight = true;
-          scrollTarget.scrollTop = scrollSource.scrollTop;
-          console.log('right');
-        }
-        this.syncRight = false;
-        }, 200)
-      }
-    };
-    console.log(scrollSource);
-  */
   
   private addScrollListener(scrollSource: any, scrollTarget: any, sourcePos : string): void {
     scrollSource.onscroll = (scrollEvent: any) => {
