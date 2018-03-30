@@ -31,35 +31,47 @@ export class KProxySelectorComponent extends UserInput
     private dialogService: DialogService) {
     super();
   }
-  
+
   ngOnInit(): void {
       let selected = this.formGroup.controls[this.fieldId].value;
       if (selected instanceof Array) {
         for (let i = 0; i < selected.length; i++) {
-          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i].id))
-        } 
+          if (selected[i].hasOwnProperty('id')){
+            // Must be a reference
+            this.selectedProxies.push(ItemProxy.getProxyFor(selected[i].id))
+          } else {
+            // Must be an id field insteaad of a reference
+            this.selectedProxies.push(ItemProxy.getProxyFor(selected[i]))
+          }
+        }
       } else if (selected) {
-          this.selectedProxy = ItemProxy.getProxyFor(selected.id);
+          if (selected.hasOwnProperty('id')){
+             // Must be a reference
+             this.selectedProxy = ItemProxy.getProxyFor(selected.id);
+          } else {
+            // Must be an id field insteaad of a reference
+            this.selectedProxy = ItemProxy.getProxyFor(selected);
+          }
       }
   }
-  
+
   public ngOnDestroy(): void {
 
   }
 
   onProxySelected (selectedEvent : MatAutocompleteSelectedEvent) {
     this.selectedProxy = this.ItemRepository.getProxyFor(selectedEvent.option.value);
-} 
+}
 
-  
+
   getSelectedProxies(): Array<ItemProxy> {
     return this.selectedProxies;
   }
-  
+
   openProxySelectionDialog(): void {
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       allowMultiSelect: this.allowMultiSelect,
-      selected : (this.selectedProxy) ? this.selectedProxy : this.selectedProxies 
+      selected : (this.selectedProxy) ? this.selectedProxy : this.selectedProxies
     }).updateSize('60%', '60%').afterClosed().subscribe((selected)=>{
       if (selected instanceof Array) {
         let selectedIds = [];
@@ -70,7 +82,7 @@ export class KProxySelectorComponent extends UserInput
         this.formGroup.controls[this.fieldId].setValue(selectedIds);
       } else if (selected) {
         this.selectedProxy = selected;
-        this.formGroup.controls[this.fieldId].setValue({id: selected.item.id}); 
+        this.formGroup.controls[this.fieldId].setValue({id: selected.item.id});
         console.log(this.formGroup);
       }
     })

@@ -20,8 +20,8 @@ export class ReferencesTabComponent extends NavigatableComponent
   @Input()
   proxyStream : Observable<ItemProxy>;
   itemProxy : ItemProxy
-  multiRefStreams : Array<ReferenceTableInfo> = [] ;
-  singleRefInfo : Array<ReferenceInfo> = [];
+  multiReferencesStream : Array<ReferenceTableInfo> = [] ;
+  multiReferencedByStream : Array<ReferenceTableInfo> = [] ;
   rowDef : Array<string> = ['kind','name','state','description'];
 
   /* Subscriptions */
@@ -34,29 +34,36 @@ export class ReferencesTabComponent extends NavigatableComponent
 
   ngOnInit () {
     this.proxySubscription = this.proxyStream.subscribe((newProxy) => {
-      this.multiRefStreams = [];
-      this.singleRefInfo = [];
+      this.multiReferencesStream = [];
+      this.multiReferencedByStream = [];
       this.itemProxy = newProxy;
-      let relCatKeys = Object.keys(this.itemProxy.relations);
-      for(let relCategory of relCatKeys) {
-        console.log('Relations' + relCategory);
-        let relationKeys = Object.keys(this.itemProxy.relations[relCategory]);
-        for (let relation of relationKeys ) {
-          console.log('Relation' + relation)
-          if (this.itemProxy.relations[relCategory][relation] instanceof Array) {
+      let relTypeKeys = Object.keys(this.itemProxy.relations);
+      for(let relType of relTypeKeys){
+        console.log('RelationType' + relType);
+        let relCatKeys = Object.keys(this.itemProxy.relations[relType]);
+        for(let relCategory of relCatKeys) {
+          console.log('RelationKind' + relCategory);
+          let relationKeys = Object.keys(this.itemProxy.relations[relType][relCategory]);
+          for (let relation of relationKeys ) {
+            console.log('Relation' + relation)
+            let relationList = this.itemProxy.relations[relType][relCategory][relation];
+            if (!(relationList instanceof Array)) {
+              relationList = [ relationList ];
+            }
             console.log('Array' + relation);
-            this.multiRefStreams.push({
-              relationName : relation,
-              tableStream : new MatTableDataSource
-              (this.itemProxy.relations[relCategory][relation])
-            })
-          } else {
-            let singleArray = [ this.itemProxy.relations[relCategory][relation] ];
-            this.multiRefStreams.push({
-              relationName : relation,
-              tableStream : new MatTableDataSource
-              (singleArray)
-            })
+            if (relType === 'references'){
+              this.multiReferencesStream.push({
+                relationKind : relCategory,
+                relationName : relation,
+                tableStream : new MatTableDataSource (relationList)
+              })
+            } else {
+              this.multiReferencedByStream.push({
+                relationKind : relCategory,
+                relationName : relation,
+                tableStream : new MatTableDataSource (relationList)
+              })
+            }
           }
         }
       }
@@ -72,11 +79,7 @@ export class ReferencesTabComponent extends NavigatableComponent
  }
 
  interface ReferenceTableInfo {
+  relationKind : string;
   relationName : string;
   tableStream : MatTableDataSource<ItemProxy>
- }
-
- interface ReferenceInfo {
-   relationName : string;
-   referenceProxy : ItemProxy;
  }
