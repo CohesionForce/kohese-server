@@ -13,29 +13,24 @@ import { MatTableDataSource } from '@angular/material';
   changeDetection : ChangeDetectionStrategy.OnPush,
   styleUrls: ['./references-tab.component.scss']
 })
-export class ReferencesTabComponent extends NavigatableComponent
- implements OnInit, OnDestroy {
+export class ReferencesTabComponent implements OnInit, OnDestroy {
 
   /* Data */
   @Input()
   proxyStream : Observable<ItemProxy>;
   itemProxy : ItemProxy
-  multiReferencesStream : Array<ReferenceTableInfo> = [] ;
-  multiReferencedByStream : Array<ReferenceTableInfo> = [] ;
-  rowDef : Array<string> = ['kind','name','state','description'];
-
+  referenceInfo : Array<ReferenceTableInfo> = [] ;
+  referencedByInfo : Array<ReferenceTableInfo> = [] ;
   /* Subscriptions */
   proxySubscription : Subscription;
 
-  constructor (private navigationService : NavigationService,
-               private changeRef : ChangeDetectorRef ) {
-    super(navigationService);
+  constructor ( private changeRef : ChangeDetectorRef ) {
   }
 
   ngOnInit () {
     this.proxySubscription = this.proxyStream.subscribe((newProxy) => {
-      this.multiReferencesStream = [];
-      this.multiReferencedByStream = [];
+      this.referenceInfo = [];
+      this.referencedByInfo = [];
       this.itemProxy = newProxy;
       let relTypeKeys = Object.keys(this.itemProxy.relations);
       for(let relType of relTypeKeys){
@@ -52,13 +47,13 @@ export class ReferencesTabComponent extends NavigatableComponent
             }
             console.log('Array' + relation);
             if (relType === 'references'){
-              this.multiReferencesStream.push({
+              this.referenceInfo.push({
                 relationKind : relCategory,
                 relationName : relation,
                 tableStream : new MatTableDataSource (relationList)
               })
             } else {
-              this.multiReferencedByStream.push({
+              this.referencedByInfo.push({
                 relationKind : relCategory,
                 relationName : relation,
                 tableStream : new MatTableDataSource (relationList)
@@ -78,7 +73,7 @@ export class ReferencesTabComponent extends NavigatableComponent
 
  }
 
- interface ReferenceTableInfo {
+ export interface ReferenceTableInfo {
   relationKind : string;
   relationName : string;
   tableStream : MatTableDataSource<ItemProxy>
