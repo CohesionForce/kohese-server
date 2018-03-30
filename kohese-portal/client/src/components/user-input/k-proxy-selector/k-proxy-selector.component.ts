@@ -90,9 +90,11 @@ export class KProxySelectorComponent extends UserInput
         }
         this.selectedProxies = selected;
         this.formGroup.controls[this.fieldId].setValue(selectedIds);
+        this.formGroup.controls[this.fieldId].markAsDirty();
       } else if (selected) {
         this.selectedProxy = selected;
         this.formGroup.controls[this.fieldId].setValue({id: selected.item.id});
+        this.formGroup.controls[this.fieldId].markAsDirty();
         console.log(this.formGroup);
       }
     })
