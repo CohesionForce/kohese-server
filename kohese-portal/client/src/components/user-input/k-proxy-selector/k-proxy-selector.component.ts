@@ -26,36 +26,58 @@ export class KProxySelectorComponent extends UserInput
   public useAdvancedSelector: boolean;
   public selectedProxies: Array<ItemProxy> = [];
   public selectedProxy : ItemProxy;
+  @Input()
+  editableStream : Observable<boolean>;
+  editableStreamSub : Subscription;
+  editable : boolean;
 
   constructor(private ItemRepository: ItemRepository,
     private dialogService: DialogService) {
     super();
   }
-  
+
   ngOnInit(): void {
       let selected = this.formGroup.controls[this.fieldId].value;
       if (selected instanceof Array) {
         for (let i = 0; i < selected.length; i++) {
-          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i].id))
-        } 
+          if (selected[i].hasOwnProperty('id')){
+            // Must be a reference
+            this.selectedProxies.push(ItemProxy.getProxyFor(selected[i].id))
+          } else {
+            // Must be an id field insteaad of a reference
+            this.selectedProxies.push(ItemProxy.getProxyFor(selected[i]))
+          }
+        }
       } else if (selected) {
-          this.selectedProxy = ItemProxy.getProxyFor(selected.id);
+          if (selected.hasOwnProperty('id')){
+             // Must be a reference
+             this.selectedProxy = ItemProxy.getProxyFor(selected.id);
+          } else {
+            // Must be an id field insteaad of a reference
+            this.selectedProxy = ItemProxy.getProxyFor(selected);
+          }
       }
-  }
-  
-  public ngOnDestroy(): void {
 
+      this.editableStreamSub = this.editableStream.subscribe((editable)=>{
+        this.editable = editable;
+      })
+  }
+
+  public ngOnDestroy(): void {
+    if (this.editableStreamSub) {
+      this.editableStreamSub.unsubscribe();
+    }
   }
 
   onProxySelected (selectedEvent : MatAutocompleteSelectedEvent) {
     this.selectedProxy = this.ItemRepository.getProxyFor(selectedEvent.option.value);
-} 
+}
 
-  
+
   getSelectedProxies(): Array<ItemProxy> {
     return this.selectedProxies;
   }
-  
+
   openProxySelectionDialog(): void {
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data : {
@@ -70,9 +92,11 @@ export class KProxySelectorComponent extends UserInput
         }
         this.selectedProxies = selected;
         this.formGroup.controls[this.fieldId].setValue(selectedIds);
+        this.formGroup.controls[this.fieldId].markAsDirty();
       } else if (selected) {
         this.selectedProxy = selected;
-        this.formGroup.controls[this.fieldId].setValue({id: selected.item.id}); 
+        this.formGroup.controls[this.fieldId].setValue({id: selected.item.id});
+        this.formGroup.controls[this.fieldId].markAsDirty();
         console.log(this.formGroup);
       }
     })

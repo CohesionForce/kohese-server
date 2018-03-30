@@ -14,7 +14,8 @@
             [type]="properties[property].inputType.options['type']"
             [fieldName]="properties[property].displayName"
             [useAdvancedSelector]="properties[property].inputType.options['useAdvancedSelector']"
-            [allowMultiSelect]="properties[property].inputType.options['allowMultiSelect']">
+            [allowMultiSelect]="properties[property].inputType.options['allowMultiSelect']"
+            [editableStream]="editableStream">
           </k-proxy-selector>
           <k-date *ngSwitchCase="'date'"
             [formGroup]="formGroup" [fieldId]="property"
