@@ -14,6 +14,8 @@ import { ImportService } from '../../services/import/import.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 @Component({
   selector : 'create-wizard',
   templateUrl : './create-wizard.component.html',
@@ -31,8 +33,11 @@ export class CreateWizardComponent extends NavigatableComponent
   selectedParent : ItemProxy;
   rootProxy : ItemProxy;
   errorMessage : string; 
-  createInfo: object;
-
+  private _proxyPlaceholderStream: BehaviorSubject<ItemProxy> =
+    new BehaviorSubject<ItemProxy>(undefined);
+  get proxyPlaceholderStream() {
+    return this._proxyPlaceholderStream;
+  }
   createFormGroup : FormGroup;
   private nonFormFieldValueMap: any = {};
 
@@ -61,10 +66,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
         this.selectedType = this.types[0];
         this.selectedParent = this.rootProxy;
-        this.createInfo = {
-          parent: this.selectedParent.item.id,
-          type: this.selectedType
-        }
+        this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
       }
     });
   }
@@ -75,10 +77,7 @@ export class CreateWizardComponent extends NavigatableComponent
       stepper.next();
     } else {
       this.selectedType = type;
-      this.createInfo = {
-        parent: this.selectedParent.item.id,
-        type : type
-      }
+      this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
     }
   }
 
@@ -88,11 +87,34 @@ export class CreateWizardComponent extends NavigatableComponent
       stepper.next();
     } else {
       this.selectedParent = newParent;
-      this.createInfo = {
-        parent : newParent.item.id,
-        type : this.selectedType
-      }
+      this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
     }
+  }
+  
+  private buildProxyPlaceholder(): any {
+    let proxyPlaceholder: any = {
+      kind: this.selectedType.name,
+      item: {
+        parentId: this.selectedParent.item.id
+      },
+      model: this.selectedType.dataModelProxy
+    };
+    
+    let modelProxy: ItemProxy = proxyPlaceholder.model;
+    while (modelProxy.item.base) {
+      let type: KoheseType = this.DynamicTypesService.
+        getKoheseTypes()[modelProxy.item.name];
+      for (let fieldName in type.dataModelFields) {
+        if (!proxyPlaceholder.item[fieldName]) {
+          proxyPlaceholder.item[fieldName] = type.dataModelFields[fieldName].
+            default;
+        }
+      }
+      
+      modelProxy = modelProxy.parentProxy;
+    }
+    
+    return proxyPlaceholder;
   }
 
   onFormGroupUpdated(newFormGroup : any) {
@@ -130,6 +152,10 @@ export class CreateWizardComponent extends NavigatableComponent
 
   ngOnDestroy(): void {
     this.repoStatusSubscription.unsubscribe();
+  }
+
+  cancel () {
+    this.MatDialogRef.close();
   }
   
   public whenNonFormFieldChanges(updatedField: any): void {

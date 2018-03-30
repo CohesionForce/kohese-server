@@ -62,7 +62,7 @@
                       title = "Dirty item" />
                   </span>
                 </ng-template>
-                <details-form #editor [itemProxy]="itemProxy"
+                <details-form #editor [proxyStream]="proxyStream" 
                   [editableStream]="editableStream"
                   (formGroupUpdated)="onFormGroupUpdated($event)"
                   (nonFormFieldChanged)="whenNonFormFieldChanges($event)">

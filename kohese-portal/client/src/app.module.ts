@@ -20,6 +20,7 @@ import { AuthenticationModule } from './services/authentication/authentication.m
 import { LoginModule } from './components/login/login.module';
 import { UserModule } from './services/user/user.module';
 import { AdminModule } from './components/admin/admin.module';
+import { CompareItemsModule } from './components/compare-items/compare-items.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
@@ -29,6 +30,7 @@ import { TreeComponent } from './components/tree/tree.component';
 import { TreeRowComponent } from './components/tree/tree-row.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { ActionTableComponent } from './components/action-table/action-table.component';
+import { CompareItemsComponent } from './components/compare-items/compare-items.component';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
@@ -74,7 +76,8 @@ import { environment } from '../environments/environment.prod';
     ServicesModule,
     AdminModule,
     VirtualScrollModule,
-    DashboardModule
+    DashboardModule,
+    CompareItemsModule
   ],
   bootstrap: [AppComponent]
 })

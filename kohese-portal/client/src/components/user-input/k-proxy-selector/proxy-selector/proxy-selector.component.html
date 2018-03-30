@@ -1,43 +1,45 @@
-<mat-tab-group class="left-content" style="display:inline-block; height: 600px; overflow: auto; width: 50%" *ngIf="repoInitialized">
-  <mat-tab label="Recent">
-        <div *ngFor="let proxy of recentProxies" 
-             (click)="selectProxy(proxy)">
-          {{proxy.item.name}}
+<div id="proxySelectorContainer">
+  <mat-tab-group *ngIf="repoInitialized">
+    <mat-tab label="Recent">
+      <div *ngFor="let proxy of recentProxies"
+        (click)="selectProxy(proxy)">
+        {{proxy.item.name}}
         <hr/>
-        </div>
-  </mat-tab>
-  <mat-tab label="Tree">
-    <tree-root [nodes]="rootProxy.children" options="treeOptions">
+      </div>
+    </mat-tab>
+    <mat-tab label="Tree">
+      <tree-root [nodes]="rootProxy.children" options="treeOptions">
         <ng-template #treeNodeTemplate let-node let-index="index">
           <td (click)="selectProxy(node.data)"
-              matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
+            matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
         </ng-template>
       </tree-root>
-  </mat-tab>
-  <mat-tab label="Selector">
-    <input matInput type="text" placeholder="Enter Proxy" [formControl]="proxySearchControl"
-       [matAutocomplete]="proxySelector"/> 
-  <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onAutoCompleteSelected($event)" style="width: 400px;">
-    <mat-option *ngFor="let proxy of (filteredProxies | async)"
-      [value]="proxy">
-      {{proxy.item.name}}
-    </mat-option>
-  </mat-autocomplete>
-  </mat-tab>
-</mat-tab-group>
-<mat-card *ngIf="selectedProxy && !multiSelect" class="right-content" style="display: inline-block; height: 600px; overflow: auto; width: 40%">
-  <mat-card-title class="panel-heading">
-    <span>{{selectedProxy.item.name}}</span>
-  </mat-card-title>
-  <mat-card-content>
-    {{selectedProxy.item.description}}
-  </mat-card-content>
-</mat-card>
-<div *ngIf="multiSelect" class="right-content" style="display: inline-block; height: 600px; overflow: auto; width: 40%">
-  <h4>Selections :</h4>
-  <div *ngFor="let selection of selectedProxies">
-    {{selection.item.name}}
+    </mat-tab>
+    <mat-tab label="Selector">
+      <mat-form-field style="width: 100%;">
+        <input matInput type="text" placeholder="Proxy" [formControl]="proxySearchControl"
+          [matAutocomplete]="proxySelector"/>
+      </mat-form-field>
+      <mat-autocomplete #proxySelector="matAutocomplete"  (optionSelected)="onAutoCompleteSelected($event)">
+        <mat-option *ngFor="let proxy of (filteredProxies | async)"
+          [value]="proxy">
+          {{proxy.item.name}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-tab>
+  </mat-tab-group>
+  <mat-card *ngIf="selectedProxy && !multiSelect">
+    <mat-card-title class="panel-heading">
+      <span>{{selectedProxy.item.name}}</span>
+    </mat-card-title>
+    <mat-card-content>
+      {{selectedProxy.item.description}}
+    </mat-card-content>
+  </mat-card>
+  <div *ngIf="multiSelect">
+    <h4>Selections:</h4>
+    <div *ngFor="let selection of selectedProxies">
+      {{selection.item.name}}
+    </div>
   </div>
 </div>
-
-

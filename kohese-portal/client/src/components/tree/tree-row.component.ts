@@ -8,6 +8,7 @@ import { VersionControlService } from '../../services/version-control/version-co
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TreeRow } from './tree-row.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { CompareItemsComponent } from '../compare-items/compare-items.component';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -108,5 +109,14 @@ export class TreeRowComponent extends NavigatableComponent
     return {
       'padding-left': indentationAmount + 'px'
     };
+  }
+  
+  public openComparisonDialog(): void {
+    this.dialogService.openComponentDialog(CompareItemsComponent, {
+      data : {
+        baseProxy: this._treeRow.itemProxy,
+        editable: true
+      }
+    }).updateSize('90%', '90%');
   }
 }

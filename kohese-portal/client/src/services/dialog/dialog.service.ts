@@ -48,10 +48,8 @@ export class DialogService {
     });
   }
 
-  openComponentDialog<T>(component: ComponentType<T> | TemplateRef<T>, data: any): MatDialogRef<T> {
-    return this.dialog.open(component, {
-      data: data
-    });
+  openComponentDialog<T>(component: ComponentType<T> | TemplateRef<T>, config : any): MatDialogRef<T> {
+    return this.dialog.open(component, config);
   }
 }
 

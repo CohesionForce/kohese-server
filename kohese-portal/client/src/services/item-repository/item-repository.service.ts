@@ -592,7 +592,7 @@ export class ItemRepository {
       this.socketService.socket.emit('Item/findById', {id: proxy.item.id}, (response) => {
         proxy.updateItem(response.kind, response.item);
         proxy.dirty = false;
-        resolve(response);
+        resolve(proxy);
       });
     });
 

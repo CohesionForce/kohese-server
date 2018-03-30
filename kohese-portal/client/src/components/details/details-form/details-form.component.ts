@@ -2,14 +2,12 @@ import { Component, Input, Output, OnInit, OnDestroy, OnChanges,
   SimpleChanges, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators,
   AbstractControl } from '@angular/forms';
-import { Observable } from 'rxjs';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
-import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -26,20 +24,21 @@ export class DetailsFormComponent extends NavigatableComponent
   @Input()
   public type : KoheseType;
   @Input()
-  public itemProxy: ItemProxy;
+  public proxyStream: BehaviorSubject<ItemProxy>;
   @Input()
-  editableStream : Observable<boolean>
+  editableStream : BehaviorSubject<boolean>
   @Input()
-  public fieldFilter: ((fieldName: string) => boolean);
-  @Input() 
-  createInfo : any;
+  public fieldFilterStream: BehaviorSubject<((fieldName: string) => boolean)>;
   @Output()
   formGroupUpdated = new EventEmitter<FormGroup>();
 
   public properties: any = {};
   private initialized : boolean;
-  public disabled: boolean;
   
+  private _nonFormFieldMap: Map<string, any> = new Map<string, any>();
+  get nonFormFieldMap() {
+    return this._nonFormFieldMap;
+  }
   @Output()
   public nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
 
@@ -47,117 +46,73 @@ export class DetailsFormComponent extends NavigatableComponent
   public formGroup : FormGroup;
   
   /* Subscriptions */
-  private repoStatusSubscription : Subscription;
   private editableStreamSubscription : Subscription;
+  private _fieldFilterSubscription: Subscription;
+  private _proxyStreamSubscription: Subscription;
 
   constructor(protected NavigationService : NavigationService,
               private FormBuilder : FormBuilder,
-              private DynamicTypeService: DynamicTypesService,
-              private ItemRepository : ItemRepository) {
+              private DynamicTypeService: DynamicTypesService) {
     super(NavigationService);
     this.initialized = false;
   }
 
   ngOnInit () {
-    if (!this.fieldFilter) {
-      this.fieldFilter = ((fieldName: string) => {
-        return true;
-      });
-    }
-
-    if (this.editableStream) {
-      this.editableStreamSubscription = this.editableStream.subscribe((editable)=>{
-        this.disabled = !editable; // The form logic is currently backwards irt the rest of the details component
-        if (this.disabled) { 
-          this.formGroup = this.createFormGroup();
-          this.formGroupUpdated.emit(this.formGroup);
-          this.formGroup.disable();
-        } else {
-          this.formGroup.enable();
-        }
-      })
-    } else {
+    if (!this.editableStream) {
       // Set editable stream as defaulted to true when it is not provided
       this.editableStream = new BehaviorSubject<boolean>(true);
     }
     
-    this.repoStatusSubscription = this.ItemRepository.getRepoStatusSubject()
-    .subscribe((update) => {
-      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-        if (this.itemProxy) {
-          this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
-        } else if (this.createInfo) {
-          this.buildStubProxy();
-          }
-        if (this.itemProxy) {
-          this.updateProperties();      
-          this.formGroup = this.createFormGroup();
-          this.formGroupUpdated.emit(this.formGroup);
+    this.editableStreamSubscription = this.editableStream.subscribe(
+      (editable: boolean) => {
+      if (this.formGroup) {
+        if (editable) { 
+          this.formGroup.enable();
+        } else {
+          this.formGroup.disable();
         }
       }
+    });
+    
+    if (!this.fieldFilterStream) {
+      this.fieldFilterStream =
+        new BehaviorSubject<((fieldName: string) => boolean)>(
+        ((fieldName: string) => {
+        return true;
+      }));
+    }
+    
+    this._fieldFilterSubscription = this.fieldFilterStream.subscribe(
+      (fieldFilter: Function) => {
+      this.updateProperties();
+      this.formGroup = this.createFormGroup();
+      this.formGroupUpdated.emit(this.formGroup);
+    });
+    
+    this._proxyStreamSubscription = this.proxyStream.subscribe(
+      (proxy: ItemProxy) => {
+      this.type = this.DynamicTypeService.getKoheseTypes()[proxy.kind];
+      this.updateProperties();
+      this.formGroup = this.createFormGroup();
+      this.formGroupUpdated.emit(this.formGroup);
     });
     
     this.initialized = true;
   }
 
   ngOnDestroy () {
-    this.repoStatusSubscription.unsubscribe();
-    if (this.editableStreamSubscription) {
-      this.editableStreamSubscription.unsubscribe();
-    }
+    this._proxyStreamSubscription.unsubscribe();
+    this._fieldFilterSubscription.unsubscribe();
+    this.editableStreamSubscription.unsubscribe();
   }
   
   ngOnChanges(changes: SimpleChanges): void {
     if (this.initialized) {
       let changedInputs: Array<string> = Object.keys(changes);
 
-      if(changes['itemProxy']) {
-        this.itemProxy = changes['itemProxy'].currentValue;
-        this.type = this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
-        this.updateProperties();
-        this.formGroup = this.createFormGroup();
-        console.log(':: Form Group Updated');
-        console.log(this.formGroup);
-        this.formGroupUpdated.emit(this.formGroup);
-      }
-
       if(changes['type']) {
         this.type = this.DynamicTypeService.getKoheseTypes()[changes['type'].currentValue]
       }
-
-      if(changes['createInfo']) {
-        this.createInfo = changes['createInfo'].currentValue;
-        this.buildStubProxy();
-      }
-    }
-  }
-
-  buildStubProxy() {
-    // TODO Update with parent selector
-    if((this.createInfo.parent || this.createInfo.parent === '')  && this.createInfo.type) {
-      // Create a stub item proxy since one does not yet exist
-      this.itemProxy = {
-        kind : this.createInfo.type.name,
-        item: {
-          parentId : this.createInfo.parent
-        },
-        model : this.createInfo.type.dataModelProxy
-      }
-      this.type= this.DynamicTypeService.getKoheseTypes()[this.itemProxy.kind];
-      let modelProxy: ItemProxy = this.itemProxy.model;
-      while (modelProxy) {
-        let type: KoheseType = this.DynamicTypeService.
-          getKoheseTypes()[modelProxy.item.name];
-        for (let fieldName in type.dataModelFields) {
-          if (!this.itemProxy.item[fieldName]) {
-            this.itemProxy.item[fieldName] = type.dataModelFields[fieldName].default;
-          }
-        }
-        modelProxy = this.ItemRepository.getProxyFor(modelProxy.item.base);
-      }
-      this.updateProperties();
-      this.formGroup = this.createFormGroup();
-      this.formGroupUpdated.emit(this.formGroup);
     }
   }
 
@@ -165,8 +120,8 @@ export class DetailsFormComponent extends NavigatableComponent
     this.properties = {};
     let fieldGroups: Array<any> = [];
     console.log(':: Update Properties ');
-    if (this.itemProxy) {
-      let modelProxy: ItemProxy = this.itemProxy.model;
+    if (this.proxyStream.getValue()) {
+      let modelProxy: ItemProxy = this.proxyStream.getValue().model;
       do {
         console.log('Properties of ' + modelProxy.item.name);
         let koheseType: KoheseType = this.DynamicTypeService.
@@ -184,7 +139,9 @@ export class DetailsFormComponent extends NavigatableComponent
     fieldGroups.reverse();
     for (let j: number = 0; j < fieldGroups.length; j++) {
       for (let fieldName in fieldGroups[j]) {
-        this.properties[fieldName] = fieldGroups[j][fieldName];
+        if (this.fieldFilterStream.getValue()(fieldName)) {
+          this.properties[fieldName] = fieldGroups[j][fieldName];
+        }
       }
     }
     
@@ -195,7 +152,7 @@ export class DetailsFormComponent extends NavigatableComponent
   createFormGroup () : FormGroup {
     const group = this.FormBuilder.group(this.buildPropertyMap(true));
     //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
-    if (this.disabled) {
+    if (!this.editableStream.getValue()) {
       group.disable();
     }
     return group;
@@ -209,8 +166,9 @@ export class DetailsFormComponent extends NavigatableComponent
     let propertyMap: any = {};
     for (let propertyKey in this.properties) {
       let currentProperty: any = this.properties[propertyKey];
-      let defaultValue: any = (this.itemProxy ?
-        this.itemProxy.item[propertyKey] : currentProperty.default);
+      let defaultValue: any = (this.proxyStream.getValue() ?
+        this.proxyStream.getValue().item[propertyKey] : currentProperty.
+        default);
       if (includeValidation && currentProperty.required) {
         propertyMap[propertyKey] = [defaultValue, Validators.required];
       } else {
@@ -218,5 +176,13 @@ export class DetailsFormComponent extends NavigatableComponent
       }
     }
     return propertyMap;
+  }
+  
+  public whenNonFormFieldChanges(fieldName: string, fieldValue, any): void {
+    this._nonFormFieldMap.set(fieldName, fieldValue);
+    this.nonFormFieldChanged.emit({
+      fieldName: fieldName,
+      fieldValue: fieldValue
+    });
   }
 }
