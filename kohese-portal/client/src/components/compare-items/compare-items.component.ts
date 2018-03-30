@@ -15,8 +15,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CompareItemsComponent implements OnInit {
-  syncLeft : boolean = false;
-  syncRight : boolean = true;
+  private syncLeft : boolean = false;
+  private syncRight : boolean = false;
 
   private _baseProxyStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
