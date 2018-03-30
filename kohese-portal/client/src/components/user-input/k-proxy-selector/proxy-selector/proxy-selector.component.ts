@@ -7,7 +7,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material';
 @Component({
   selector: 'proxy-selector',
   templateUrl: './proxy-selector.component.html',
-  styles : ['./proxy-selector.component.scss']
+  styleUrls: ['./proxy-selector.component.scss']
 })
 export class ProxySelectorComponent implements OnInit {
   

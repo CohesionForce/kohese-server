@@ -8,59 +8,22 @@
 </span>
 <div style="height: 85%; width: 100%;">
   <split direction="horizontal">
-    <mat-menu #baseMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item
-        (click)="openProxySelectionDialog(baseProxyStream)">
-        <mat-icon class="fa fa-mouse-pointer"></mat-icon>
-        Select...
-      </button>
-      <button mat-menu-item
-        [disabled]="!(allowEditing && baseProxyStream.getValue())"
-        (click)="toggleEditability(baseItemEditableStream)">
-        <ng-container *ngIf="(baseItemEditableStream | async)">
-          <mat-icon class="fa fa-check"></mat-icon>
-        </ng-container>
-        <ng-container *ngIf="!(baseItemEditableStream | async)">
-          <mat-icon class="fa fa-uncheck"></mat-icon>
-        </ng-container>
-        Edit
-      </button>
-      <button mat-menu-item [disabled]="!(baseItemEditableStream | async)"
-        (click)="save(baseProxyStream.getValue())">
-        <mat-icon class="fa fa-save"></mat-icon>
-        Save
-      </button>
-    </mat-menu>
-    <mat-menu #changeMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item
-        (click)="openProxySelectionDialog(changeProxyStream)">
-        <mat-icon class="fa fa-mouse-pointer"></mat-icon>
-        Select...
-      </button>
-      <button mat-menu-item
-        [disabled]="!(allowEditing && changeProxyStream.getValue())"
-        (click)="toggleEditability(changeItemEditableStream)">
-        <ng-container *ngIf="(changeItemEditableStream | async)">
-          <mat-icon class="fa fa-check"></mat-icon>
-        </ng-container>
-        <ng-container *ngIf="!(changeItemEditableStream | async)">
-          <mat-icon class="fa fa-uncheck"></mat-icon>
-        </ng-container>
-        Edit
-      </button>
-      <button mat-menu-item [disabled]="!(changeItemEditableStream | async)"
-        (click)="save(changeProxyStream.getValue())">
-        <mat-icon class="fa fa-save"></mat-icon>
-        Save
-      </button>
-    </mat-menu>
     <split-area #leftSplitArea [size]="50">
       <ng-container *ngIf="baseOnRight">
         <div style="height: 100%; width: 100%;">
           <span class="header-span">
-            <button mat-icon-button [matMenuTriggerFor]="changeMenu"
-              class="flex-right-align">
-              <mat-icon class="fa fa-bars"></mat-icon>
+            <button mat-icon-button class="flex-right-align"
+              (click)="openProxySelectionDialog(changeProxyStream)">
+              <mat-icon class="fa fa-mouse-pointer"></mat-icon>
+            </button>
+            <button mat-icon-button
+              [disabled]="!(allowEditing && changeProxyStream.getValue())"
+              (click)="toggleEditability(changeItemEditableStream)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+            </button>
+            <button mat-icon-button [disabled]="!(changeItemEditableStream | async)"
+              (click)="save(changeProxyStream.getValue())">
+              <mat-icon class="fa fa-save"></mat-icon>
             </button>
           </span>
           <ng-container *ngIf="(changeProxyStream | async)">
@@ -77,9 +40,18 @@
       <ng-container *ngIf="!baseOnRight">
         <div style="height: 100%; width: 100%;">
           <span class="header-span">
-            <button mat-icon-button [matMenuTriggerFor]="baseMenu"
-              class="flex-right-align">
-              <mat-icon class="fa fa-bars"></mat-icon>
+            <button mat-icon-button class="flex-right-align"
+              (click)="openProxySelectionDialog(baseProxyStream)">
+              <mat-icon class="fa fa-mouse-pointer"></mat-icon>
+            </button>
+            <button mat-icon-button
+              [disabled]="!(allowEditing && baseProxyStream.getValue())"
+              (click)="toggleEditability(baseItemEditableStream)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+            </button>
+            <button mat-icon-button [disabled]="!(baseItemEditableStream | async)"
+              (click)="save(baseProxyStream.getValue())">
+              <mat-icon class="fa fa-save"></mat-icon>
             </button>
           </span>
           <ng-container *ngIf="(baseProxyStream | async)">
@@ -98,9 +70,18 @@
       <ng-container *ngIf="baseOnRight">
         <div style="height: 100%; width: 100%;">
           <span class="header-span">
-            <button mat-icon-button [matMenuTriggerFor]="baseMenu"
-              class="flex-right-align">
-              <mat-icon class="fa fa-bars"></mat-icon>
+            <button mat-icon-button class="flex-right-align"
+              (click)="openProxySelectionDialog(baseProxyStream)">
+              <mat-icon class="fa fa-mouse-pointer"></mat-icon>
+            </button>
+            <button mat-icon-button
+              [disabled]="!(allowEditing && baseProxyStream.getValue())"
+              (click)="toggleEditability(baseItemEditableStream)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+            </button>
+            <button mat-icon-button [disabled]="!(baseItemEditableStream | async)"
+              (click)="save(baseProxyStream.getValue())">
+              <mat-icon class="fa fa-save"></mat-icon>
             </button>
           </span>
           <ng-container *ngIf="(baseProxyStream | async)">
@@ -117,9 +98,18 @@
       <ng-container *ngIf="!baseOnRight">
         <div style="height: 100%; width: 100%;">
           <span class="header-span">
-            <button mat-icon-button [matMenuTriggerFor]="changeMenu"
-              class="flex-right-align">
-              <mat-icon class="fa fa-bars"></mat-icon>
+            <button mat-icon-button class="flex-right-align"
+              (click)="openProxySelectionDialog(changeProxyStream)">
+              <mat-icon class="fa fa-mouse-pointer"></mat-icon>
+            </button>
+            <button mat-icon-button
+              [disabled]="!(allowEditing && changeProxyStream.getValue())"
+              (click)="toggleEditability(changeItemEditableStream)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+            </button>
+            <button mat-icon-button [disabled]="!(changeItemEditableStream | async)"
+              (click)="save(changeProxyStream.getValue())">
+              <mat-icon class="fa fa-save"></mat-icon>
             </button>
           </span>
           <ng-container *ngIf="(changeProxyStream | async)">

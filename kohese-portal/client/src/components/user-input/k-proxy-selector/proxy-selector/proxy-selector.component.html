@@ -1,5 +1,5 @@
 <div id="proxySelectorContainer">
-  <mat-tab-group class="left-content" *ngIf="repoInitialized">
+  <mat-tab-group *ngIf="repoInitialized">
     <mat-tab label="Recent">
       <div *ngFor="let proxy of recentProxies"
         (click)="selectProxy(proxy)">
@@ -28,7 +28,7 @@
       </mat-autocomplete>
     </mat-tab>
   </mat-tab-group>
-  <mat-card *ngIf="selectedProxy && !multiSelect" class="right-content">
+  <mat-card *ngIf="selectedProxy && !multiSelect">
     <mat-card-title class="panel-heading">
       <span>{{selectedProxy.item.name}}</span>
     </mat-card-title>
@@ -36,7 +36,7 @@
       {{selectedProxy.item.description}}
     </mat-card-content>
   </mat-card>
-  <div *ngIf="multiSelect" class="right-content">
+  <div *ngIf="multiSelect">
     <h4>Selections:</h4>
     <div *ngFor="let selection of selectedProxies">
       {{selection.item.name}}
