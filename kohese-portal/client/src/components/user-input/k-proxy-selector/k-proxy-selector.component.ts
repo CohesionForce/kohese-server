@@ -26,6 +26,10 @@ export class KProxySelectorComponent extends UserInput
   public useAdvancedSelector: boolean;
   public selectedProxies: Array<ItemProxy> = [];
   public selectedProxy : ItemProxy;
+  @Input()
+  editableStream : Observable<boolean>;
+  editableStreamSub : Subscription;
+  editable : boolean;
 
   constructor(private ItemRepository: ItemRepository,
     private dialogService: DialogService) {
@@ -53,10 +57,16 @@ export class KProxySelectorComponent extends UserInput
             this.selectedProxy = ItemProxy.getProxyFor(selected);
           }
       }
+
+      this.editableStreamSub = this.editableStream.subscribe((editable)=>{
+        this.editable = editable;
+      })
   }
 
   public ngOnDestroy(): void {
-
+    if (this.editableStreamSub) {
+      this.editableStreamSub.unsubscribe();
+    }
   }
 
   onProxySelected (selectedEvent : MatAutocompleteSelectedEvent) {
