@@ -1,8 +1,10 @@
 import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
   ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
+
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { DetailsFormComponent } from '../details/details-form/details-form.component';
 import { ProxySelectorDialogComponent } from '../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
@@ -71,7 +73,11 @@ export class CompareItemsComponent implements OnInit {
   private _rightSplitArea: ElementRef;
   @ViewChild('leftSplitArea')
   private _leftSplitArea: ElementRef;
-  
+  @ViewChild('baseDetailsForm')
+  private _baseDetailsFormComponent: DetailsFormComponent;
+  @ViewChild('changeDetailsForm')
+  private _changeDetailsFormComponent: DetailsFormComponent;
+    
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
     private _changeDetectorRef: ChangeDetectorRef,
@@ -240,8 +246,35 @@ export class CompareItemsComponent implements OnInit {
     }
   }
   
-  public save(proxy: ItemProxy): void {
-    this._itemRepository.upsertItem(proxy);
+  public saveCurrentProxy(proxyStream: BehaviorSubject<ItemProxy>): void {
+    let proxy: ItemProxy = proxyStream.getValue();
+    let detailsFormComponent: DetailsFormComponent;
+    if (proxyStream === this._baseProxyStream) {
+      detailsFormComponent = this._baseDetailsFormComponent;
+    } else {
+      detailsFormComponent = this._changeDetailsFormComponent;
+    }
+    
+    let item: any = detailsFormComponent.formGroup.value;
+    for (let fieldName in item) {
+      proxy.item[fieldName] = item[fieldName];
+    }
+    let fieldNames: Array<string> = Array.from(detailsFormComponent.
+      nonFormFieldMap.keys());
+    for (let j: number = 0; j < fieldNames.length; j++) {
+      proxy.item[fieldNames[j]] = detailsFormComponent.nonFormFieldMap.get(
+        fieldNames[j]);
+    }
+
+    this._itemRepository.upsertItem(proxy).then((returnedProxy: ItemProxy) => {
+      if (proxyStream === this._baseProxyStream) {
+        this._baseItemEditableStream.next(false);
+      } else {
+        this._changeItemEditableStream.next(false);
+      }
+      
+      this._changeDetectorRef.markForCheck();
+    });
   }
   
   public filterFields(showDifferencesOnly: boolean): void {

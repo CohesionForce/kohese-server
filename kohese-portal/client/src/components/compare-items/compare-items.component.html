@@ -17,18 +17,20 @@
               <mat-icon class="fa fa-mouse-pointer"></mat-icon>
             </button>
             <button mat-icon-button
+              [ngClass]="{ 'highlight': (changeItemEditableStream | async) }"
               [disabled]="!(allowEditing && changeProxyStream.getValue())"
               (click)="toggleEditability(changeItemEditableStream)">
               <mat-icon class="fa fa-edit"></mat-icon>
             </button>
             <button mat-icon-button [disabled]="!(changeItemEditableStream | async)"
-              (click)="save(changeProxyStream.getValue())">
+              (click)="saveCurrentProxy(changeProxyStream)">
               <mat-icon class="fa fa-save"></mat-icon>
             </button>
           </span>
           <ng-container *ngIf="(changeProxyStream | async)">
             <div class="field-editor-container">
-              <details-form [type]="(changeProxyStream | async).model.type"
+              <details-form #changeDetailsForm
+                [type]="(changeProxyStream | async).model.type"
                 [proxyStream]="changeProxyStream"
                 [editableStream]="changeItemEditableStream"
                 [fieldFilterStream]="fieldFilterStream">
@@ -45,18 +47,20 @@
               <mat-icon class="fa fa-mouse-pointer"></mat-icon>
             </button>
             <button mat-icon-button
+              [ngClass]="{ 'highlight': (baseItemEditableStream | async) }"
               [disabled]="!(allowEditing && baseProxyStream.getValue())"
               (click)="toggleEditability(baseItemEditableStream)">
               <mat-icon class="fa fa-edit"></mat-icon>
             </button>
             <button mat-icon-button [disabled]="!(baseItemEditableStream | async)"
-              (click)="save(baseProxyStream.getValue())">
+              (click)="saveCurrentProxy(baseProxyStream)">
               <mat-icon class="fa fa-save"></mat-icon>
             </button>
           </span>
           <ng-container *ngIf="(baseProxyStream | async)">
             <div class="field-editor-container">
-              <details-form [type]="(baseProxyStream | async).model.type"
+              <details-form #baseDetailsForm
+                [type]="(baseProxyStream | async).model.type"
                 [proxyStream]="baseProxyStream"
                 [editableStream]="baseItemEditableStream"
                 [fieldFilterStream]="fieldFilterStream">
@@ -75,18 +79,20 @@
               <mat-icon class="fa fa-mouse-pointer"></mat-icon>
             </button>
             <button mat-icon-button
+              [ngClass]="{ 'highlight': (baseItemEditableStream | async) }"
               [disabled]="!(allowEditing && baseProxyStream.getValue())"
               (click)="toggleEditability(baseItemEditableStream)">
               <mat-icon class="fa fa-edit"></mat-icon>
             </button>
             <button mat-icon-button [disabled]="!(baseItemEditableStream | async)"
-              (click)="save(baseProxyStream.getValue())">
+              (click)="saveCurrentProxy(baseProxyStream)">
               <mat-icon class="fa fa-save"></mat-icon>
             </button>
           </span>
           <ng-container *ngIf="(baseProxyStream | async)">
             <div class="field-editor-container">
-              <details-form [type]="(baseProxyStream | async).model.type"
+              <details-form #baseDetailsForm
+                [type]="(baseProxyStream | async).model.type"
                 [proxyStream]="baseProxyStream"
                 [editableStream]="baseItemEditableStream"
                 [fieldFilterStream]="fieldFilterStream">
@@ -103,18 +109,20 @@
               <mat-icon class="fa fa-mouse-pointer"></mat-icon>
             </button>
             <button mat-icon-button
+              [ngClass]="{ 'highlight': (changeItemEditableStream | async) }"
               [disabled]="!(allowEditing && changeProxyStream.getValue())"
               (click)="toggleEditability(changeItemEditableStream)">
               <mat-icon class="fa fa-edit"></mat-icon>
             </button>
             <button mat-icon-button [disabled]="!(changeItemEditableStream | async)"
-              (click)="save(changeProxyStream.getValue())">
+              (click)="saveCurrentProxy(changeProxyStream)">
               <mat-icon class="fa fa-save"></mat-icon>
             </button>
           </span>
           <ng-container *ngIf="(changeProxyStream | async)">
             <div class="field-editor-container">
-              <details-form [type]="(changeProxyStream | async).model.type"
+              <details-form #changeDetailsForm
+                [type]="(changeProxyStream | async).model.type"
                 [proxyStream]="changeProxyStream"
                 [editableStream]="changeItemEditableStream"
                 [fieldFilterStream]="fieldFilterStream">

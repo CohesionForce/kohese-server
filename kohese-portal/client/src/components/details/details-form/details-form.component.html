@@ -40,7 +40,7 @@
     <div id="detailsFormStateEditorContainer">
       <k-state-editor [itemProxy]="(proxyStream | async)"
         [disableTransitioning]="!(editableStream | async)"
-        (stateChanged)="nonFormFieldChanged.emit({ fieldName: $event.fieldName, fieldValue: $event.candidate })">
+        (stateChanged)="whenNonFormFieldChanges($event.fieldName, $event.candidate)">
       </k-state-editor>
     </div>
   </ng-container>

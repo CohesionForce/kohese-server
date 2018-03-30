@@ -35,6 +35,10 @@ export class DetailsFormComponent extends NavigatableComponent
   public properties: any = {};
   private initialized : boolean;
   
+  private _nonFormFieldMap: Map<string, any> = new Map<string, any>();
+  get nonFormFieldMap() {
+    return this._nonFormFieldMap;
+  }
   @Output()
   public nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
 
@@ -172,5 +176,13 @@ export class DetailsFormComponent extends NavigatableComponent
       }
     }
     return propertyMap;
+  }
+  
+  public whenNonFormFieldChanges(fieldName: string, fieldValue, any): void {
+    this._nonFormFieldMap.set(fieldName, fieldValue);
+    this.nonFormFieldChanged.emit({
+      fieldName: fieldName,
+      fieldValue: fieldValue
+    });
   }
 }
