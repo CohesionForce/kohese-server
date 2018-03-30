@@ -15,6 +15,9 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CompareItemsComponent implements OnInit {
+  private syncLeft : boolean = false;
+  private syncRight : boolean = false;
+
   private _baseProxyStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
   get baseProxyStream() {
@@ -97,8 +100,8 @@ export class CompareItemsComponent implements OnInit {
     let leftDetailsFormForm: any = this._leftSplitArea.nativeElement.
       getElementsByTagName('form')[0];
     if (rightDetailsFormForm && leftDetailsFormForm) {
-      this.addScrollListener(rightDetailsFormForm, leftDetailsFormForm);
-      this.addScrollListener(leftDetailsFormForm, rightDetailsFormForm);
+      this.addScrollListener(rightDetailsFormForm, leftDetailsFormForm, 'Left');
+      this.addScrollListener(leftDetailsFormForm, rightDetailsFormForm, 'Right');
       this.addFieldListeners(leftDetailsFormForm, rightDetailsFormForm);
     }
   }
@@ -111,30 +114,59 @@ export class CompareItemsComponent implements OnInit {
     let leftDetailsFormForm: any = this._leftSplitArea.nativeElement.
       getElementsByTagName('form')[0];
     if (rightDetailsFormForm && leftDetailsFormForm) {
-      this.addScrollListener(rightDetailsFormForm, leftDetailsFormForm);
-      this.addScrollListener(leftDetailsFormForm, rightDetailsFormForm);
+      this.addScrollListener(rightDetailsFormForm, leftDetailsFormForm, 'Left');
+      this.addScrollListener(leftDetailsFormForm, rightDetailsFormForm, 'Right');
       this.addFieldListeners(leftDetailsFormForm, rightDetailsFormForm);
     }
   }
   
-  private addScrollListener(scrollSource: any, scrollTarget: any): void {
+  private addScrollListener(scrollSource: any, scrollTarget: any, sourcePos : string): void {
     scrollSource.onscroll = (scrollEvent: any) => {
-      let currentScrollTop: number = scrollSource.scrollTop;
-      let percentHeightScrolled: number = currentScrollTop /
-        (scrollSource.scrollHeight - scrollSource.
-        offsetHeight);
-      scrollTarget.scrollTop = percentHeightScrolled *
-        (scrollTarget.scrollHeight - scrollTarget.
-        offsetHeight);
-      
-      let currentScrollLeft: number = scrollSource.scrollLeft;
-      let percentWidthScrolled: number = currentScrollLeft /
-        (scrollSource.scrollWidth - scrollSource.
-        offsetWidth);
-      scrollTarget.scrollLeft = percentWidthScrolled *
-        (scrollTarget.scrollWidth - scrollTarget.
-        offsetWidth);
-    };
+      if (sourcePos === 'Left') {
+      setTimeout(()=>{
+        if (!this.syncLeft) {
+          this.syncRight = true;
+          let currentScrollTop: number = scrollSource.scrollTop;
+          let percentHeightScrolled: number = currentScrollTop /
+            (scrollSource.scrollHeight - scrollSource.
+            offsetHeight);
+          scrollTarget.scrollTop = percentHeightScrolled *
+            (scrollTarget.scrollHeight - scrollTarget.
+            offsetHeight);
+          
+          let currentScrollLeft: number = scrollSource.scrollLeft;
+          let percentWidthScrolled: number = currentScrollLeft /
+            (scrollSource.scrollWidth - scrollSource.
+            offsetWidth);
+          scrollTarget.scrollLeft = percentWidthScrolled *
+            (scrollTarget.scrollWidth - scrollTarget.
+            offsetWidth);
+        }
+        this.syncLeft = false;
+      }, 150);
+    } else if (sourcePos === 'Right') {
+      setTimeout(()=>{
+        if (!this.syncRight) {
+          this.syncLeft = true;
+          let currentScrollTop: number = scrollSource.scrollTop;
+          let percentHeightScrolled: number = currentScrollTop /
+            (scrollSource.scrollHeight - scrollSource.
+            offsetHeight);
+          scrollTarget.scrollTop = percentHeightScrolled *
+            (scrollTarget.scrollHeight - scrollTarget.
+            offsetHeight);
+          
+          let currentScrollLeft: number = scrollSource.scrollLeft;
+          let percentWidthScrolled: number = currentScrollLeft /
+            (scrollSource.scrollWidth - scrollSource.
+            offsetWidth);
+          scrollTarget.scrollLeft = percentWidthScrolled *
+            (scrollTarget.scrollWidth - scrollTarget.
+            offsetWidth);
+        }
+        this.syncRight = false;
+      }, 150)}
+    }
   }
   
   private addFieldListeners(leftDetailsFormForm: any,
