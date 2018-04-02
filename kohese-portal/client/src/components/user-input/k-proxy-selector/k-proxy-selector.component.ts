@@ -57,6 +57,7 @@ export class KProxySelectorComponent extends UserInput
       if (changes['formGroup']) {
         this.formGroup = changes['formGroup'].currentValue;
         this.initSelections();
+        console.log(this.formGroup);
         }
       }
     }
