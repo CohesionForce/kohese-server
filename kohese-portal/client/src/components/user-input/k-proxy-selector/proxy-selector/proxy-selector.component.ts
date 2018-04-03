@@ -21,7 +21,7 @@ export class ProxySelectorComponent implements OnInit {
   rootProxy: ItemProxy;
   selectedProxy: ItemProxy;
   selectedProxies: Array<ItemProxy> = [];
-  selectedMap : Map<string, ItemProxy>;
+  selectedMap : Map<string, ItemProxy> = new Map();
   @Output()
   proxySelected: EventEmitter<ItemProxy> = new EventEmitter();
   repoInitialized: boolean = false;
@@ -29,8 +29,7 @@ export class ProxySelectorComponent implements OnInit {
   filteredProxies: any;
   recentProxies: Array<ItemProxy>;
 
-  constructor(private itemRepository: ItemRepository,
-              private navigationService : NavigationService) {
+  constructor(private itemRepository: ItemRepository) {
     this.proxySearchControl = new FormControl('');
   }
 
@@ -53,7 +52,6 @@ export class ProxySelectorComponent implements OnInit {
     if (this.selection) {
       if (this.selection instanceof Array) {
         this.selectedProxies = this.selection;
-        this.selectedMap = new Map();
         for (let i = 0; i < this.selectedProxies.length; i++) {
           let proxy = this.selectedProxies[i];
           this.selectedMap.set(proxy.item.id, proxy);
@@ -100,9 +98,5 @@ export class ProxySelectorComponent implements OnInit {
         this.selectedMap.delete(selection.item.id);
       }
     }
-  }
-
-  navigate (location : string, params: object) {
-    this.navigationService.navigate(location, params);
   }
 }
