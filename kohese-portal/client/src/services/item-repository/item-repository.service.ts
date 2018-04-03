@@ -6,6 +6,7 @@ import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from '../user/current-user.service';
 import { ToastrService } from "ngx-toastr";
 import { DialogService } from '../dialog/dialog.service';
+import { VersionControlService } from '../version-control/version-control.service';
 
 import * as ItemProxy from '../../../../common/src/item-proxy.js';
 import * as KoheseModel from '../../../../common/src/KoheseModel.js';
@@ -31,12 +32,6 @@ export enum RepoStates {
 export class ItemRepository {
   shortProxyList : Array<ItemProxy>;
   modelTypes : Object;
-  VCStateLookup : Object;
-  repoStagingStatus : {
-    Unstaged,
-    Staged,
-    Conflicted
-  };
 
   recentProxies : Array<ItemProxy>;
   state : any;
@@ -47,11 +42,12 @@ export class ItemRepository {
   historySubject : Subject<any>;
 
   constructor (private socketService: SocketService,
-               private CurrentUserService: CurrentUserService,
-               private toastrService : ToastrService,
-               private dialogService: DialogService) {
-              this.initialize();
-              }
+    private CurrentUserService: CurrentUserService,
+    private toastrService : ToastrService,
+    private dialogService: DialogService,
+    private _versionControlService: VersionControlService) {
+    this.initialize();
+  }
 
   initialize () : void {
     console.log('Item Repo init');
@@ -65,27 +61,6 @@ export class ItemRepository {
       Issue: 'Issue',
       Category: 'Category',
       KoheseUser: 'KoheseUser'
-    };
-    this.VCStateLookup = {
-      CURRENT: {state: 'Current', substate: ''},
-      INDEX_NEW: {state: 'Staged', substate: 'New'},
-      INDEX_MODIFIED: {state: 'Staged', substate: 'Modified'},
-      INDEX_DELETED: {state: 'Staged', substate: 'Deleted'},
-      INDEX_RENAMED: {state: 'Staged', substate: 'Renamed'},
-      INDEX_TYPECHANGE: {state: 'Staged', substate: 'TypeChange'}, // Shouldn't happen
-      WT_NEW: {state: 'Unstaged', substate: 'New'},
-      WT_MODIFIED: {state: 'Unstaged', substate: 'Modified'},
-      WT_DELETED: {state: 'Unstaged', substate: 'Deleted'},
-      WT_TYPECHANGE: {state: 'Unstaged', substate: 'TypeChange'}, // Shouldn't happen
-      WT_RENAMED: {state: 'Unstaged', substate: 'Renamed'},
-      WT_UNREADABLE: {state: 'Unstaged', substate: 'Unreadable'}, // Shouldn't happen
-      IGNORED: {state: 'Ignored', substate: ''},
-      CONFLICTED: {state: 'Conflict', substate: ''}
-    }
-    this.repoStagingStatus = {
-      Unstaged: {},
-      Staged: {},
-      Conflicted: {}
     };
 
     this.repositoryStatus = new BehaviorSubject({
@@ -178,7 +153,7 @@ export class ItemRepository {
             }
           }
 
-          this.updateVCState(proxy, notification.status);
+          this.updateStatus(proxy, notification.status);
           proxy.dirty = false;
         });
 
@@ -195,7 +170,7 @@ export class ItemRepository {
             }
           }
 
-          this.updateVCState(proxy, notification.status);
+          this.updateStatus(proxy, notification.status);
           proxy.dirty = false;
         });
 
@@ -215,7 +190,7 @@ export class ItemRepository {
       this.socketService.socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
         for (var id in gitStatusMap) {
           var proxy = ItemProxy.getProxyFor(id);
-          this.updateVCState(proxy, gitStatusMap[id]);
+          this.updateStatus(proxy, gitStatusMap[id]);
         }
       });
 
@@ -247,50 +222,6 @@ export class ItemRepository {
         }
       });
     }
-
-  updateVCState (proxy, newStatus) : void {
-    var oldVCState = proxy.vcState;
-    var newVCState = {
-      Unstaged : {},
-      Staged : {}
-    };
-    var itemId = proxy.item.id;
-
-    for (var idx in newStatus) {
-      var s = newStatus[idx];
-      var vc = this.VCStateLookup[newStatus[idx]];
-      newVCState[vc.state] = vc.substate;
-    }
-
-    if(oldVCState && oldVCState.Unstaged && !(newVCState && newVCState.Unstaged)) {
-      // Item removed from working tree
-      delete this.repoStagingStatus.Unstaged[itemId];
-    }
-    if(oldVCState && oldVCState.Staged && !(newVCState && newVCState.Staged)) {
-      // Item removed from index
-      delete this.repoStagingStatus.Staged[itemId];
-    }
-    if(newVCState && newVCState.Unstaged && !(oldVCState && oldVCState.Unstaged)) {
-      // Item added to working tree
-      this.repoStagingStatus.Unstaged[itemId] = proxy;
-    }
-    if(newVCState && newVCState.Staged && !(oldVCState && oldVCState.Staged)) {
-      // Item add to index
-      this.repoStagingStatus.Staged[itemId] = proxy;
-    }
-
-    if (newStatus.length > 0) {
-      proxy.status = newStatus;
-      proxy.vcState = newVCState;
-    } else {
-      delete proxy.status;
-      delete proxy.vcState;
-    }
-  }
-
-  getRepoStagingStatus () {
-    return this.repoStagingStatus;
-  }
 
   processBulkUpdate(response){
     console.log('::: Processing Bulk Update');
@@ -707,7 +638,7 @@ export class ItemRepository {
 
         var proxy = ItemProxy.getProxyFor(entry.id);
         if (proxy) {
-          this.updateVCState(proxy, entry.status);
+          this.updateStatus(proxy, entry.status);
         } else {
           console.log('!!! Item not found for entry: ' + rIdx + ' - ' + entry.id + ' - ' + entry.status );
         }
@@ -729,5 +660,18 @@ export class ItemRepository {
     });
 
     return promise;
+  }
+  
+  private updateStatus(proxy: ItemProxy, statuses: Array<string>): void {
+    if (statuses.length > 0) {
+      proxy.status = this._versionControlService.translateStatus(statuses);
+    } else {
+      delete proxy.status;
+    }
+    
+    ItemProxy.getChangeSubject().next({
+      type: 'update',
+      proxy: proxy
+    });
   }
 }

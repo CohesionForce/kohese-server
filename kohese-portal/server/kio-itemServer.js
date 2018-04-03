@@ -421,7 +421,6 @@ function KIOItemServer(socket){
     var idsArray = Array.from(request.proxyIds);
     var proxies = [];
     var promises = [];
-    var addStatusMap = {};
     for (var i = 0; i < idsArray.length; i++) {
       console.log('--- Adding proxy for: ' + idsArray[i]);
       var proxy = ItemProxy.getProxyFor(idsArray[i]);
@@ -430,9 +429,7 @@ function KIOItemServer(socket){
 
       // jshint -W083
       promises.push(kdb.kdbRepo.add(repositoryInformation.repositoryProxy.item.id,
-          repositoryInformation.relativeFilePath).then(function (returnValue) {
-        addStatusMap[proxy.item.id] = returnValue;
-      }));
+          repositoryInformation.relativeFilePath));
       // jshint +W083
 
     }
@@ -440,8 +437,9 @@ function KIOItemServer(socket){
     Promise.all(promises).then(function () {
       console.log('::: session %s: Sending response for VersionControl/stage for user %s at %s',
         socket.id, socket.koheseUser.username, socket.handshake.address);
-      sendStatusUpdates(proxies);
-      sendResponse(addStatusMap);
+      updateStatus(proxies).then((statusMap) => {
+        sendResponse(statusMap);
+      });
     }).catch(function (err) {
       console.log(err.stack);
       sendResponse({
@@ -478,8 +476,9 @@ function KIOItemServer(socket){
           }
         }
 
-        sendStatusUpdates(proxies);
-        sendResponse(returnMap);
+        updateStatus(proxies).then((statusMap) => {
+          sendResponse(statusMap);
+        });
     }).catch(function (err) {
       console.log(err.stack);
       sendResponse({
@@ -543,8 +542,9 @@ function KIOItemServer(socket){
       kdb.kdbRepo.reset(repositoryId, repositoryPathMap[repositoryId]).then(
         // jshint -W083
         function () {
-          sendStatusUpdates(proxies);
-          sendResponse({});
+          updateStatus(proxies).then((statusMap) => {
+            sendResponse(statusMap);
+          });
         }
         // jshint +W083
       ).catch(function (err) {
@@ -654,8 +654,9 @@ function KIOItemServer(socket){
           proxy.updateItem(proxy.kind, item);
         }
 
-        sendStatusUpdates(proxies);
-        sendResponse({});
+        updateStatus(proxies).then((statusMap) => {
+          sendResponse(statusMap);
+        });
       }).catch(function (err) {
         console.log(err.stack);
         sendResponse({
@@ -689,22 +690,21 @@ function KIOItemServer(socket){
 
 }
 
-function sendStatusUpdates(proxies) {
+function updateStatus(proxies) {
   var statusMap = {};
   var promises = [];
-  for (var i = 0; i < proxies.length; i++) {
+  for (let i = 0; i < proxies.length; i++) {
     var repositoryInformation = getRepositoryInformation(proxies[i]);
     let promise = kdb.kdbRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
         repositoryInformation.relativeFilePath);
-    promises.push(promise);
+    promises.push(promise.then((status) => {
+      statusMap[proxies[i].item.id] = status;
+    }));
   }
 
-  Promise.all(promises).then((statusArray) => {
-    for (var i = 0; i < proxies.length; i++) {
-      statusMap[proxies[i].item.id] = statusArray[i];
-    }
-
+  return Promise.all(promises).then(() => {
     kio.server.emit('VersionControl/statusUpdated', statusMap);
+    return statusMap;
   });
 }
 

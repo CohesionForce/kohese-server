@@ -25,9 +25,6 @@
   <ng-container *ngIf="treeRow.itemProxy.dirty">
     <img src="assets/icons/versioncontrol/dirty.ico" title="Dirty item"/>
   </ng-container>
-  <ng-container *ngIf="'Version Control' === (selectedViewStream | async)">
-    {{treeRow.itemProxy.status}}
-  </ng-container>
   <span id="rightSpan" class="kti-actions">
     <!-- Default row actions -->
     <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
@@ -50,23 +47,25 @@
     </ng-container>
     <!-- Version Control row actions -->
     <ng-container
-      *ngIf="('Version Control' === (selectedViewStream | async)) && treeRow.itemProxy.vcState">
+      *ngIf="('Version Control' === (selectedViewStream | async)) && treeRow.itemProxy.status">
       <!-- VC Status Icons -->
-      <img *ngIf="treeRow.itemProxy.vcState.Unstaged"
-        src="assets/icons/versioncontrol/unstaged.ico" title="Unstaged"/>
-      <img *ngIf="treeRow.itemProxy.vcState.Staged"
-        src="assets/icons/versioncontrol/index-mod.ico" title="Staged"/>
+      <img *ngIf="treeRow.itemProxy.status['Unstaged']"
+        src="assets/icons/versioncontrol/unstaged.ico"
+        title="Unstaged - {{treeRow.itemProxy.status['Unstaged']}}"/>
+      <img *ngIf="treeRow.itemProxy.status['Staged']"
+        src="assets/icons/versioncontrol/index-mod.ico"
+        title="Staged - {{treeRow.itemProxy.status['Staged']}}"/>
       <!-- Actions -->
       <button mat-icon-button
         (click)="revertChanges(); $event.stopPropagation()">
         <mat-icon class="fa fa-undo kt-icon"></mat-icon>
       </button>
-      <button mat-icon-button *ngIf="treeRow.itemProxy.vcState.Unstaged"
-        (click)="versionControlService.stageItems([treeRow.itemProxy]); $event.stopPropagation()">
+      <button mat-icon-button *ngIf="treeRow.itemProxy.status['Unstaged']"
+        (click)="stageChanges(); $event.stopPropagation()">
         <mat-icon class="fa fa-plus kt-icon"></mat-icon>
       </button>
-      <button mat-icon-button *ngIf="treeRow.itemProxy.vcState.Staged"
-        (click)="versionControlService.unstageItems([treeRow.itemProxy]); $event.stopPropagation()">
+      <button mat-icon-button *ngIf="treeRow.itemProxy.status['Staged']"
+        (click)="unstageChanges(); $event.stopPropagation()">
         <mat-icon class="fa fa-minus kt-icon"></mat-icon>
       </button>
     </ng-container>
