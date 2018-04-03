@@ -15,47 +15,27 @@ module.exports = function (app) {
 
     var serverAuthentication = require('../server-enableAuth.js');
 
-    var usingNG1 = false;
+    var clientBundlePath = path.resolve(__dirname, '../../client/bundle');
 
-    try {
-        console.log('::: Checking for configuration');
-        var packageConfig = fs.readlinkSync('./package');
-        console.log('::: Found ' + packageConfig);
-        usingNG1 = (packageConfig.match(/^package-ng1/) !== null);
-        console.log('!!! Using NG1:  ' + usingNG1);
-    } catch (err) {
-        console.log('*** Error: ' + err);
-        console.log(err.stack);
-        process.exit(1);
-    }
+    app.use(express.static(clientBundlePath));
 
+    var ngRoutes = [
+      /^\/admin.*/,
+      /^\/dashboard.*/,
+      /^\/login/,
+      /^\/repositories.*/,
+      /^\/explore.*/,
+      /^\/analysis.*/,
+      /^\/typeeditor.*/
+    ];
 
-    if (usingNG1) {
-      app.use(express.static(path.resolve(__dirname, '../../client-ng1')));
+    app.use(ngRoutes, function (req, res) {
+      res.sendFile(path.resolve(clientBundlePath, 'index.html'));
+    });
 
-    } else {
-      var clientBundlePath = path.resolve(__dirname, '../../client/bundle');
-
-      app.use(express.static(clientBundlePath));
-
-      var ngRoutes = [
-        /^\/admin.*/,
-        /^\/dashboard.*/,
-        /^\/login/,
-        /^\/repositories.*/,
-        /^\/explore.*/,
-        /^\/analysis.*/,
-        /^\/typeeditor.*/
-      ];
-
-      app.use(ngRoutes, function (req, res) {
-        res.sendFile(path.resolve(clientBundlePath, 'index.html'));
-      });
-
-    }
 
     //TODO Need to move this to the client-ng2 directory too
-    app.use(serveFavicon(path.resolve(__dirname, '../../client-ng1/resources/icons/favicon.ico')));
+    app.use(serveFavicon(path.resolve(__dirname, '../../client/assets/icons/favicon.ico')));
 
 
     app.use(express.static(path.resolve(__dirname, '../../bower_components')));
@@ -67,11 +47,7 @@ module.exports = function (app) {
 
     app.use(bodyParser.json());
 
-    if (usingNG1) {
-      app.post('/login', authenticate);
-    } else {
-      app.post('/authenticate', authenticate);
-    }
+    app.post('/authenticate', authenticate);
 
 
     function authenticate(req, res, next) {
@@ -125,11 +101,7 @@ module.exports = function (app) {
       next();
     });
 
-    if(usingNG1){
-      app.use(expressJwt({secret: jwtSecret}).unless({path: ['/login']}));
-    } else {
-      app.use(expressJwt({secret: jwtSecret}).unless({path: ngRoutes}));
-    }
+    app.use(expressJwt({secret: jwtSecret}).unless({path: ngRoutes}));
 
     function decodeAuthToken(authToken){
       var decodedToken = jwt.verify(authToken, jwtSecret);
