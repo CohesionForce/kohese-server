@@ -65,6 +65,7 @@ export class KProxySelectorComponent extends UserInput
   initSelections () {
     let selected = this.formGroup.controls[this.fieldId].value;
     if (selected instanceof Array) {
+      this.selectedProxies = [];
       for (let i = 0; i < selected.length; i++) {
         if (selected[i].hasOwnProperty('id')){
           // Must be a reference
