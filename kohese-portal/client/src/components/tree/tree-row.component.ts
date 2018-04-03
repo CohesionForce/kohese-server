@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
@@ -44,13 +46,15 @@ export class TreeRowComponent extends NavigatableComponent
   public koheseType: any;
   
   private _updateDisplaySubscription: Subscription;
+  private _itemProxyChangeSubscription: Subscription;
   
   public constructor(private _navigationService: NavigationService,
     private dialogService: DialogService,
     private typeService: DynamicTypesService,
     private itemRepository: ItemRepository,
     private versionControlService: VersionControlService,
-    private _changeDetector: ChangeDetectorRef) {
+    private _changeDetector: ChangeDetectorRef,
+    private _toastrService: ToastrService) {
     super(_navigationService);
   }
 
@@ -70,9 +74,17 @@ export class TreeRowComponent extends NavigatableComponent
         this._changeDetector.markForCheck();
       }
     });
+    
+    this._itemProxyChangeSubscription = this.itemRepository.getChangeSubject().
+      subscribe((notification: any) => {
+      if (this._treeRow.itemProxy.item.id === notification.proxy.item.id) {
+        this._changeDetector.markForCheck();
+      }
+    });
   }
   
   public ngOnDestroy(): void {
+    this._itemProxyChangeSubscription.unsubscribe();
     this._updateDisplaySubscription.unsubscribe();
   }
 
@@ -93,7 +105,36 @@ export class TreeRowComponent extends NavigatableComponent
       + 'want to undo all changes to this item since the previous commit?').
       subscribe((result: any) => {
       if (result) {
-        this.versionControlService.revertItems([this._treeRow.itemProxy]);
+        this.versionControlService.revertItems([this._treeRow.itemProxy]).
+          subscribe((statusMap: any) => {
+          if (statusMap.error) {
+            this._toastrService.error('Revert Failed', 'Version Control');
+          } else {
+            this._toastrService.success('Revert Succeeded', 'Version Control');
+          }
+        });
+      }
+    });
+  }
+  
+  public stageChanges(): void {
+    this.versionControlService.stageItems([this._treeRow.itemProxy]).subscribe(
+      (statusMap: any) => {
+      if (statusMap.error) {
+        this._toastrService.error('Stage Failed', 'Version Control');
+      } else {
+        this._toastrService.success('Stage Succeeded', 'Version Control');
+      }
+    });
+  }
+  
+  public unstageChanges(): void {
+    this.versionControlService.unstageItems([this._treeRow.itemProxy]).
+      subscribe((statusMap: any) => {
+      if (statusMap.error) {
+        this._toastrService.error('Unstage Failed', 'Version Control');
+      } else {
+        this._toastrService.success('Unstage Succeeded', 'Version Control');
       }
     });
   }
