@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { UserInput } from '../user-input.class';
 import * as ItemProxy  from '../../../../../common/src/item-proxy';
@@ -30,6 +30,7 @@ export class KProxySelectorComponent extends UserInput
   editableStream : Observable<boolean>;
   editableStreamSub : Subscription;
   editable : boolean;
+  initialized : boolean = false;
 
   constructor(private ItemRepository: ItemRepository,
     private dialogService: DialogService) {
@@ -37,35 +38,54 @@ export class KProxySelectorComponent extends UserInput
   }
 
   ngOnInit(): void {
-      let selected = this.formGroup.controls[this.fieldId].value;
-      if (selected instanceof Array) {
-        for (let i = 0; i < selected.length; i++) {
-          if (selected[i].hasOwnProperty('id')){
-            // Must be a reference
-            this.selectedProxies.push(ItemProxy.getProxyFor(selected[i].id))
-          } else {
-            // Must be an id field insteaad of a reference
-            this.selectedProxies.push(ItemProxy.getProxyFor(selected[i]))
-          }
-        }
-      } else if (selected) {
-          if (selected.hasOwnProperty('id')){
-             // Must be a reference
-             this.selectedProxy = ItemProxy.getProxyFor(selected.id);
-          } else {
-            // Must be an id field insteaad of a reference
-            this.selectedProxy = ItemProxy.getProxyFor(selected);
-          }
-      }
-
       this.editableStreamSub = this.editableStream.subscribe((editable)=>{
         this.editable = editable;
       })
+
+      this.initSelections();
+      this.initialized = true;
   }
 
   public ngOnDestroy(): void {
     if (this.editableStreamSub) {
       this.editableStreamSub.unsubscribe();
+    }
+  }
+
+  ngOnChanges (changes : SimpleChanges) {
+    if (this.initialized) {
+      if (changes['formGroup']) {
+        this.formGroup = changes['formGroup'].currentValue;
+        this.initSelections();
+        console.log(this.formGroup);
+        }
+      }
+    }
+
+  initSelections () {
+    let selected = this.formGroup.controls[this.fieldId].value;
+    if (selected instanceof Array) {
+      this.selectedProxies = [];
+      for (let i = 0; i < selected.length; i++) {
+        if (selected[i].hasOwnProperty('id')){
+          // Must be a reference
+          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i].id))
+        } else {
+          // Must be an id field insteaad of a reference
+          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i]))
+        }
+      }
+    } else if (selected) {
+        if (selected.hasOwnProperty('id')){
+           // Must be a reference
+           this.selectedProxy = ItemProxy.getProxyFor(selected.id);
+        } else {
+          // Must be an id field insteaad of a reference
+          this.selectedProxy = ItemProxy.getProxyFor(selected);
+        }
+    } else if (!selected) {
+      this.selectedProxy = undefined;
+      this.selectedProxies = undefined;
     }
   }
 

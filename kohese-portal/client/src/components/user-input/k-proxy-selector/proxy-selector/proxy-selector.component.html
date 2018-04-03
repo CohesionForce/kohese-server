@@ -1,17 +1,26 @@
 <div id="proxySelectorContainer">
   <mat-tab-group *ngIf="repoInitialized">
     <mat-tab label="Recent">
-      <div *ngFor="let proxy of recentProxies"
-        (click)="selectProxy(proxy)">
-        {{proxy.item.name}}
+      <div *ngFor="let proxy of recentProxies">
+        <span *ngIf="!selectedMap.get(proxy.item.id)"
+              (click)="selectProxy(proxy)">
+          {{proxy.item.name}}
+        </span>
+        <span *ngIf="selectedMap.get(proxy.item.id)"
+              (click)="removeSelection(proxy)">
+          {{proxy.item.name}} <i class="fa fa-check"></i>
+        </span>
         <hr/>
       </div>
     </mat-tab>
     <mat-tab label="Tree">
       <tree-root [nodes]="rootProxy.children" options="treeOptions">
         <ng-template #treeNodeTemplate let-node let-index="index">
-          <td (click)="selectProxy(node.data)"
+          <td (click)="selectProxy(node.data)" *ngIf="!selectedMap.get(node.data.item.id)"
             matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
+          <td *ngIf="selectedMap.get(node.data.item.id)" (click)="removeSelection(node.data)"> 
+            {{node.data.item.name}} <i class="fa fa-check"></i>
+          </td>
         </ng-template>
       </tree-root>
     </mat-tab>
@@ -38,8 +47,13 @@
   </mat-card>
   <div *ngIf="multiSelect">
     <h4>Selections:</h4>
-    <div *ngFor="let selection of selectedProxies">
-      {{selection.item.name}}
+    <div *ngFor="let selection of selectedProxies">  
+      <span>
+        {{selection.item.name | truncate : 30}}
+        <span style="margin-left: auto;">
+          <button mat-icon-button class="fa fa-remove" (click)="removeSelection(selection)"></button>
+        </span>
+      </span>
     </div>
   </div>
 </div>
