@@ -1,5 +1,8 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef,
+  ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { VirtualScrollComponent } from 'angular2-virtual-scroll';
+
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
@@ -20,7 +23,10 @@ import { ProxyFilter } from '../../classes/ProxyFilter.class';
 export class TreeComponent extends NavigatableComponent
                               implements OnInit, OnDestroy {
     /* UI Toggles */
-    private locationSynced: boolean = false;
+    private _synchronizeWithSelection: boolean = false;
+    get synchronizeWithSelection() {
+      return this._synchronizeWithSelection;
+    }
 
     /* Data */
     private _rowMap: Map<string, TreeRow> = new Map<string, TreeRow>();
@@ -45,6 +51,8 @@ export class TreeComponent extends NavigatableComponent
     public actionStates: Array<string> = ['Pending Review', 'In Verification', 'Assigned'];
     public userList : Array<ItemProxy>; // This will eventually be of type KoheseUser
     private readonly NO_KIND_SPECIFIED: string = '---';
+    @ViewChild(VirtualScrollComponent)
+    private _virtualScrollComponent: VirtualScrollComponent;
 
     /* Subscriptions */
     private routeParametersSubscription: Subscription;
@@ -136,6 +144,9 @@ export class TreeComponent extends NavigatableComponent
     this.routeParametersSubscription = this.route.params.
       subscribe((parameters: Params) => {
       this.selectedProxyIdStream.next(parameters['id']);
+      if (this._synchronizeWithSelection) {
+        this.showSelection();
+      }
     });
 
     this.userList = this.SessionService.getUsers();
@@ -163,10 +174,6 @@ export class TreeComponent extends NavigatableComponent
 
   resetRoot(): void {
     this.changeTreeRoot(this.absoluteRoot);
-  }
-
-  expandSyncedNodes(): void {
-    // TODO Implement tree sync
   }
 
   /******** List expansion functions */
@@ -239,6 +246,32 @@ export class TreeComponent extends NavigatableComponent
       this.filter();
       this._filterDelayIdentifier = undefined;
     }, 1000);
+  }
+  
+  public toggleSelectionSynchronization(): void {
+    this._synchronizeWithSelection = !this._synchronizeWithSelection;
+    if (this._synchronizeWithSelection) {
+      this.showSelection();
+    }
+  }
+  
+  private showSelection(): void {
+    let selectedRow: TreeRow = this._rowMap.get(this.selectedProxyIdStream.
+      getValue());
+    let parentId: string = selectedRow.itemProxy.parentProxy.item.id;
+    let treeRootId: string = this._treeRootStream.getValue().item.id;
+    while (parentId !== treeRootId) {
+      let parentRow: TreeRow = this._rowMap.get(parentId);
+      if (!parentRow) {
+        break;
+      }
+      
+      parentRow.expanded = true;
+      parentId = parentRow.itemProxy.parentProxy.item.id;
+    }
+        
+    this.setVisibleRows();
+    this._virtualScrollComponent.scrollInto(selectedRow);
   }
   
   private changeTreeRoot(proxy: ItemProxy): void {

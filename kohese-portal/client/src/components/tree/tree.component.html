@@ -16,10 +16,11 @@
       [disabled]="isRootDefault">
       Reset Root
     </button>
-    <i (click)="syncLocation()"
-      [ngClass]="{ 'btn-green': locationSynced}"
-      class="btn btn-default btn-sm fa fa-exchange">
-    </i>
+    <button mat-icon-button (click)="toggleSelectionSynchronization()"
+      matTooltip="Toggle selection synchronization for the tree"
+      [ngClass]="{ 'highlight': synchronizeWithSelection }">
+      <mat-icon class="fa fa-exchange"></mat-icon>
+    </button>
       <span>
         Number of Items: {{(treeRootStream | async).descendantCount}}
       </span>
