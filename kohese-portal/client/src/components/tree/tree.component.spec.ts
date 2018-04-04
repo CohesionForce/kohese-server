@@ -2,6 +2,8 @@ import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testin
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
+
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -37,8 +39,8 @@ describe('Component: Tree', () => {
               })
           } }
       ],
-      imports: [FormsModule, BrowserAnimationsModule, MaterialModule,
-        PipesModule],
+      imports: [FormsModule, BrowserAnimationsModule, VirtualScrollModule,
+        MaterialModule, PipesModule],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     
@@ -110,5 +112,29 @@ describe('Component: Tree', () => {
     tick();
     expect(initialTreeRoot).not.toEqual(component.treeRootStream.getValue());
     expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
+  }));
+  
+  it('synchronizes with selection', fakeAsync(() => {
+    component.selectedProxyIdStream.next('Item');
+    tick();
+    
+    let index: number = -1;
+    for (let j: number = 0; j < component.visibleRows.length; j++) {
+      if ('Item' === component.visibleRows[j].itemProxy.item.id) {
+        index = j;
+        break;
+      }
+    }
+    expect(index).toEqual(-1);
+    
+    component.toggleSelectionSynchronization();
+    
+    for (let j: number = 0; j < component.visibleRows.length; j++) {
+      if ('Item' === component.visibleRows[j].itemProxy.item.id) {
+        index = j;
+        break;
+      }
+    }
+    expect(index).not.toEqual(-1);
   }));
 });
