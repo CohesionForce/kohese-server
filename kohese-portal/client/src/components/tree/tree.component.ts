@@ -118,13 +118,13 @@ export class TreeComponent extends NavigatableComponent
                     this.setVisibleRows();
                   }
                 }));
-                this.setVisibleRows();
               } else if ('delete' === notification.type) {
                 let row: TreeRow = this._rowMap.get(notification.id);
                 this._rows.splice(this._rows.indexOf(row), 1);
                 this._rowMap.delete(notification.id);
-                this.setVisibleRows();
               }
+              
+              this.setVisibleRows();
             });
         
             this.setVisibleRows();
