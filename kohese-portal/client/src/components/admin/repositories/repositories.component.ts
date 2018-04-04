@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
+import { SessionService } from '../../../services/user/session.service';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -24,7 +26,9 @@ export class RepositoriesComponent extends NavigatableComponent implements
   
   constructor(private navigationService: NavigationService,
     private versionControlService: VersionControlService,
-    private itemRepository: ItemRepository) {
+    private itemRepository: ItemRepository,
+    private _toastrService: ToastrService,
+    private _sessionService: SessionService) {
     super(navigationService);
     // TODO update this file to do the repo status sequence 
     // leaving it out since it is currently in flux on another branch
@@ -46,15 +50,27 @@ export class RepositoriesComponent extends NavigatableComponent implements
   addRemote() {
     if ((this.remoteNameInput !== '') && (this.remoteUrlInput !== '')) {
       this.versionControlService.addRemote(this.itemRepository.getRootProxy().item.id,
-        this.remoteNameInput, this.remoteUrlInput);
+        this.remoteNameInput, this.remoteUrlInput).subscribe((remoteName: any) => {
+        if (remoteName.error) {
+          this._toastrService.error('Add Remote Failed', 'Version Control');
+        } else {
+          this._toastrService.success('Add Remote Succeeded', 'Version Control');
+        }
+      });
     } else {
       alert('Please specify both a remote name and URL.');
     }
   }
   
   getRemotes() {
-    this.versionControlService.getRemotes(this.itemRepository.getRootProxy().item.id).subscribe((r) => {
-      this.remotes = r;
+    this.versionControlService.getRemotes(this.itemRepository.getRootProxy().
+      item.id).subscribe((remotes: any) => {
+      this.remotes = remotes;
+      if (remotes.error) {
+        this._toastrService.error('Remote Retrieval Failed', 'Version Control');
+      } else {
+        this._toastrService.success('Remote Retrieval Succeeded', 'Version Control');
+      }
     });
   }
   
@@ -63,10 +79,25 @@ export class RepositoriesComponent extends NavigatableComponent implements
       this.commitMessageInput = '<No message supplied>';
     }
     
-    this.versionControlService.commitItems([this.itemRepository.getRootProxy()], this.commitMessageInput);
+    this.versionControlService.commitItems([this.itemRepository.
+      getRootProxy()], this._sessionService.getSessionUser().getValue(),
+      this.commitMessageInput).subscribe((statusMap: any) => {
+      if (statusMap.error) {
+        this._toastrService.error('Commit Failed', 'Version Control');
+      } else {
+        this._toastrService.success('Commit Succeeded', 'Version Control');
+      }
+    });
   }
   
   push() {
-    this.versionControlService.push([this.itemRepository.getRootProxy().item.id], this.pushRemoteNameInput);
+    this.versionControlService.push([this.itemRepository.getRootProxy().item.
+      id], this.pushRemoteNameInput).subscribe((pushStatusMap: any) => {
+      if (pushStatusMap.error) {
+        this._toastrService.error('Push Failed', 'Version Control');
+      } else {
+        this._toastrService.success('Push Succeeded', 'Version Control');
+      }
+    });
   }
 }

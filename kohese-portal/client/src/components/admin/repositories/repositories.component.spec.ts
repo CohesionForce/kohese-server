@@ -3,7 +3,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 import { MaterialModule } from '../../../material.module'
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -13,6 +14,8 @@ import { VersionControlService } from '../../../services/version-control/version
 import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { SessionService } from '../../../services/user/session.service';
+import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 
 describe('Component: Repositories', ()=>{
   let repositoriesComponent: RepositoriesComponent;
@@ -25,13 +28,15 @@ describe('Component: Repositories', ()=>{
          MaterialModule,
          BrowserAnimationsModule,
          FormsModule,
-         ReactiveFormsModule
+         ReactiveFormsModule,
+         ToastrModule.forRoot()
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: VersionControlService, useClass: MockVersionControlService},
-        {provide: NavigationService, useClass: MockNavigationService}
+        {provide: NavigationService, useClass: MockNavigationService},
+        { provide: SessionService, useClass: MockSessionService }
       ]
     }).compileComponents();
 

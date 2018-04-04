@@ -2,63 +2,36 @@ import { Injectable } from '@angular/core';
 
 import * as ItemProxy from '../../../../common/src/item-proxy';
 import { SocketService } from '../socket/socket.service';
-import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs/Observable';
-import { SessionService } from '../user/session.service';
 import 'rxjs/add/observable/bindCallback';
-import 'rxjs/add/operator/do';
 
 @Injectable()
 export class VersionControlService {
-  constructor(private socketService: SocketService, private sessionService: SessionService,
-    private toastrService: ToastrService) {
-  }
-  
-  stageItems(proxies: Array<ItemProxy>) {
-    let data: {
-      proxyIds: Array<string>;
-    } = {
-      proxyIds: []
-    };
-    for (let j = 0; j < proxies.length; j++) {
-      data.proxyIds.push(proxies[j].item.id);
-    }
+  private _emitReturningObservable: (message: string, data: any) => Observable<any> =
+    Observable.bindCallback(this.socketService.getSocket().emit.bind(this.
+    socketService.getSocket()));
     
-    this.socketService.getSocket().emit('VersionControl/stage', data,
-      (results: any) => {
-      if (results.error) {
-        this.toastrService.error('Stage Failed', 'Version Control');
-      } else {
-        this.toastrService.success('Stage Succeeded', 'Version Control');
-      }
-    });
-  }
-  
-  unstageItems(proxies: Array<ItemProxy>, callback: Function) {
-    let data: {
-      proxyIds: Array<string>;
-    } = {
-      proxyIds: []
-    };
-    for (let j = 0; j < proxies.length; j++) {
-      data.proxyIds.push(proxies[j].item.id);
-    }
-    
-    this.socketService.getSocket().emit('VersionControl/unstage', data,
-      (results: any) => {
-      if (results.error) {
-        this.toastrService.error('Unstage Failed', 'Version Control');
-      } else {
-        this.toastrService.success('Unstage Succeeded', 'Version Control');
-      }
+  private readonly _VERSION_CONTROL_STATUS_MAP: any = {
+    CURRENT: { state: 'Current', substate: '' },
+    IGNORED: { state: 'Ignored', substate: '' },
+    CONFLICTED: { state: 'Conflict', substate: '' },
+    INDEX_NEW: { state: 'Staged', substate: 'New' },
+    INDEX_MODIFIED: { state: 'Staged', substate: 'Modified' },
+    INDEX_RENAMED: { state: 'Staged', substate: 'Renamed' },
+    INDEX_DELETED: { state: 'Staged', substate: 'Deleted' },
+    INDEX_TYPECHANGE: { state: 'Staged', substate: 'TypeChange' }, // Shouldn't happen
+    WT_NEW: { state: 'Unstaged', substate: 'New' },
+    WT_MODIFIED: { state: 'Unstaged', substate: 'Modified' },
+    WT_RENAMED: { state: 'Unstaged', substate: 'Renamed' },
+    WT_DELETED: { state: 'Unstaged', substate: 'Deleted' },
+    WT_TYPECHANGE: { state: 'Unstaged', substate: 'TypeChange' }, // Shouldn't happen
+    WT_UNREADABLE: { state: 'Unstaged', substate: 'Unreadable' } // Shouldn't happen
+  };
 
-      if (callback) {
-        callback(!results.error);
-      }
-    });
+  public constructor(private socketService: SocketService) {
   }
   
-  revertItems(proxies: Array<ItemProxy>) {
+  public stageItems(proxies: Array<ItemProxy>): Observable<any> {
     let data: {
       proxyIds: Array<string>;
     } = {
@@ -68,18 +41,37 @@ export class VersionControlService {
       data.proxyIds.push(proxies[j].item.id);
     }
     
-    this.socketService.getSocket().emit('VersionControl/revert', data,
-      (results: any) => {
-      if (results.error) {
-        this.toastrService.error('Revert Failed', 'Version Control');
-      } else {
-        this.toastrService.success('Revert Succeeded', 'Version Control');
-      }
-    });
+    return this._emitReturningObservable('VersionControl/stage', data);
   }
   
-  commitItems(proxies: Array<ItemProxy>, commitMessage: string) {
-    let proxy: ItemProxy = this.sessionService.getSessionUser().getValue();
+  public unstageItems(proxies: Array<ItemProxy>): Observable<any> {
+    let data: {
+      proxyIds: Array<string>;
+    } = {
+      proxyIds: []
+    };
+    for (let j = 0; j < proxies.length; j++) {
+      data.proxyIds.push(proxies[j].item.id);
+    }
+    
+    return this._emitReturningObservable('VersionControl/unstage', data);
+  }
+  
+  public revertItems(proxies: Array<ItemProxy>): Observable<any> {
+    let data: {
+      proxyIds: Array<string>;
+    } = {
+      proxyIds: []
+    };
+    for (let j = 0; j < proxies.length; j++) {
+      data.proxyIds.push(proxies[j].item.id);
+    }
+    
+    return this._emitReturningObservable('VersionControl/revert', data);
+  }
+  
+  public commitItems(proxies: Array<ItemProxy>, committerProxy: ItemProxy,
+    commitMessage: string): Observable<any> {
     let data: {
       proxyIds: Array<string>;
       username: string;
@@ -87,25 +79,18 @@ export class VersionControlService {
       message: string;
     } = {
       proxyIds: [],
-      username: proxy.item.name,
-      email: proxy.item.email,
+      username: committerProxy.item.name,
+      email: committerProxy.item.email,
       message: commitMessage
     };
     for (let j = 0; j < proxies.length; j++) {
       data.proxyIds.push(proxies[j].item.id);
     }
   
-    this.socketService.getSocket().emit('VersionControl/commit', data,
-      (results: any) => {
-      if (results.error) {
-        this.toastrService.error('Commit Failed', 'Version Control');
-      } else {
-        this.toastrService.success('Commit Succeeded', 'Version Control');
-      }
-    });
+    return this._emitReturningObservable('VersionControl/commit', data);
   }
   
-  push(ids: string[], remoteName: string) {
+  public push(ids: string[], remoteName: string): Observable<any> {
     let data: {
       proxyIds: Array<string>;
       remoteName: string;
@@ -114,17 +99,10 @@ export class VersionControlService {
       remoteName: remoteName
     };
     
-    this.socketService.getSocket().emit('VersionControl/push', data,
-      (results: any) => {
-      if (results.error) {
-        this.toastrService.error('Push Failed', 'Version Control');
-      } else {
-        this.toastrService.success('Push Succeeded', 'Version Control');
-      }
-    });
+    return this._emitReturningObservable('VersionControl/push', data);
   }
   
-  addRemote(id: string, remoteName: string, url: string) {
+  public addRemote(id: string, remoteName: string, url: string): Observable<any> {
     let data: {
       proxyId: string;
       remoteName: string;
@@ -135,14 +113,7 @@ export class VersionControlService {
       url: url
     };
     
-    this.socketService.getSocket().emit('VersionControl/addRemote', data,
-      (results: any) => {
-      if (results.error) {
-        this.toastrService.error('Add Remote Failed', 'Version Control');
-      } else {
-        this.toastrService.success('Add Remote Succeeded', 'Version Control');
-      }
-    });
+    return this._emitReturningObservable('VersionControl/addRemote', data);
   }
   
   getRemotes(id: string): Observable<any> {
@@ -152,14 +123,16 @@ export class VersionControlService {
       proxyId: id
     };
     
-    let emit: (message: string, data: { proxyId: string; }) => Observable<any> =
-      Observable.bindCallback(this.socketService.getSocket().emit.bind(this.socketService.getSocket()));
-    return emit('VersionControl/getRemotes', data).do((results: any) => {
-      if (results.error) {
-        this.toastrService.error('Remote Retrieval Failed', 'Version Control');
-      } else {
-        this.toastrService.success('Remote Retrieval Succeeded', 'Version Control');
-      }
-    });
+    return this._emitReturningObservable('VersionControl/getRemotes', data);
+  }
+  
+  public translateStatus(statuses: Array<string>): any {
+    let translatedStatus: any = {};
+    for (let j: number = 0; j < statuses.length; j++) {
+      let statusValue: any = this._VERSION_CONTROL_STATUS_MAP[statuses[j]];
+      translatedStatus[statusValue.state] = statusValue.substate;
+    }
+    
+    return translatedStatus;
   }
 }

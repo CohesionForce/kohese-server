@@ -1,5 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ChangeDetectorRef } from '@angular/core';
+import { ToastrModule } from 'ngx-toastr';
+
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -37,7 +39,7 @@ describe('Component: TreeRow', () => {
           useClass: MockVersionControlService },
         { provide: ChangeDetectorRef, useValue: {} }
       ],
-      imports: [MaterialModule, PipesModule]
+      imports: [ToastrModule.forRoot(), MaterialModule, PipesModule]
     }).compileComponents();
     
     fixture = TestBed.createComponent(TreeRowComponent);
