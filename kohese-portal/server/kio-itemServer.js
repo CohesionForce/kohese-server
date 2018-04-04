@@ -27,37 +27,40 @@ ItemProxy.getChangeSubject().subscribe(change => {
     console.log(change.proxy.item);
   }
 
-  switch (change.type){
-    case 'create':
-    case 'update':
-      kdb.storeModelInstance(change.proxy, change.type === 'create')
-      .then(function (status) {
+  // Ignore internal instances
+  if (!change.proxy.internal){
+    switch (change.type){
+      case 'create':
+      case 'update':
+        kdb.storeModelInstance(change.proxy, change.type === 'create')
+        .then(function (status) {
+          var notification = {
+              type: change.type,
+              kind: change.kind,
+              id: change.proxy.item.id,
+              item: change.proxy.item,
+              status: status
+          };
+          kio.server.emit(change.kind +'/' + change.type, notification);
+        });
+        break;
+      case 'delete':
         var notification = {
-            type: change.type,
-            kind: change.kind,
-            id: change.proxy.item.id,
-            item: change.proxy.item,
-            status: status
+          type: change.type,
+          kind: change.kind,
+          id: change.proxy.item.id
         };
+        kdb.removeModelInstance(change.proxy);
         kio.server.emit(change.kind +'/' + change.type, notification);
-      });
-      break;
-    case 'delete':
-      var notification = {
-        type: change.type,
-        kind: change.kind,
-        id: change.proxy.item.id
-      };
-      kdb.removeModelInstance(change.proxy);
-      kio.server.emit(change.kind +'/' + change.type, notification);
-      break;
-    case 'reference-added':
-    case 'refernece-removed':
-      // Ignore
-      break;
-    default:
-      console.log('*** Not processing change notification: ' + change.type);
-    }
+        break;
+      case 'reference-added':
+      case 'refernece-removed':
+        // Ignore
+        break;
+      default:
+        console.log('*** Not processing change notification: ' + change.type);
+      }
+  }
 
 });
 
@@ -97,6 +100,55 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  socket.on('Item/getItemCache', function(request, sendResponse){
+    let username = 'Unknown';
+    let requestReceiptTime = Date.now();
+    if (socket.koheseUser){
+      username = socket.koheseUser.username;
+    }
+    console.log('::: session %s: Received getItemCache for user %s at %s', socket.id, username,
+                socket.handshake.address);
+
+    consoleLogObject('$$$ Request', request);
+
+    let rootProxy = ItemProxy.getRootProxy();
+    let objectMap = rootProxy.cache.getObjectMap();
+
+    let response = {
+      timestamp: {
+        requestTime: request.timestamp.requestTime,
+        requestReceiptTime: requestReceiptTime,
+        responseTransmitTime: null
+      },
+      objectMap: objectMap
+      // {
+      //   commit: objectMap.commit,
+      //   tree: objectMap.tree
+      // }
+    };
+
+    // let treeIdx = 0;
+    // let keyCount = 0;
+    // response.objectMap.treeSlice[0] = {};
+    // for (let key in objectMap.tree){
+    //   response.objectMap.treeSlice[treeIdx][key] = objectMap.tree[key];
+    //   keyCount++;
+    //   if(keyCount === 500){
+    //     keyCount = 0;
+    //     treeIdx++;
+    //     response.objectMap.treeSlice[treeIdx] = {};
+    //   }
+    // }
+
+    response.timestamp.responseTransmitTime = Date.now();
+
+    console.log('::: Sending getItemCache response');
+    sendResponse(response);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getRepoHashmap', function(request, sendResponse){
     var username = 'Unknown';
     if (socket.koheseUser){
@@ -111,7 +163,7 @@ function KIOItemServer(socket){
 
     // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
 
-    var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+    // var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 
     // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
 
@@ -129,6 +181,7 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getAll', function(request, sendResponse){
+    let requestTime = Date.now();
     var username = 'Unknown';
     if (socket.koheseUser){
       username = socket.koheseUser.username;
@@ -205,7 +258,9 @@ function KIOItemServer(socket){
     }
 
     sendResponse(response);
+    let responseTransmitTime = Date.now();
     console.log('::: Sent getAll response for repo: ' + request.forRepoId);
+    console.log('$$$ Elapsed time: ' + (responseTransmitTime - requestTime)/1000);
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -427,10 +482,8 @@ function KIOItemServer(socket){
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
 
-      // jshint -W083
       promises.push(kdb.kdbRepo.add(repositoryInformation.repositoryProxy.item.id,
           repositoryInformation.relativeFilePath));
-      // jshint +W083
 
     }
 

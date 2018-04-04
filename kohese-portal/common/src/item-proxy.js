@@ -383,7 +383,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static resetItemRepository() {
+  static resetItemRepository(skipModels) {
 
     console.log('::: Resetting Item Repository');
     let rootProxy = ItemProxy.getRootProxy();
@@ -394,21 +394,29 @@ class ItemProxy {
       type: 'loading'
     });
 
+    rootProxy.removeChild(tree.rootModelProxy);
+    rootProxy.removeChild(tree.rootViewModelProxy);
+
     rootProxy.visitChildren(null, null, (childProxy) => {
       childProxy.deleteItem();
     });
 
-    // Re-insert rootModelProxy
-    // eslint-disable-next-line no-unused-vars
-    let rootModelProxy = new ItemProxy(tree.rootModelProxy.kind, tree.rootModelProxy.item);
-    // eslint-disable-next-line no-unused-vars
-    let rootViewModelProxy = new ItemProxy(tree.rootViewModelProxy.kind, tree.rootViewModelProxy.item);
-
-
-    if (tree.KoheseModel){
-      tree.KoheseModel.removeLoadedModels();
+    // Delete children of models if we are not skipping models
+    if (!skipModels) {
+      tree.rootModelProxy.visitChildren(null, null, (childProxy) => {
+        childProxy.deleteItem();
+      });
+      tree.rootViewModelProxy.visitChildren(null, null, (childProxy) => {
+        childProxy.deleteItem();
+      });
+      if (tree.KoheseModel){
+        tree.KoheseModel.removeLoadedModels();
+      }
     }
 
+    // Re-insert rootModelProxy
+    rootProxy.addChild(tree.rootModelProxy);
+    rootProxy.addChild(tree.rootViewModelProxy);
   }
 
   //////////////////////////////////////////////////////////////////////////

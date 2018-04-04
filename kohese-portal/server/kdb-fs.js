@@ -89,6 +89,18 @@ module.exports.createGITIgnoreJSONIfMissing = createGITIgnoreJSONIfMissing;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function createGITIgnoreAllIfMissing(filePath) {
+  if (!fs.existsSync(filePath)) {
+    console.log('::: Creating .gitignore for directory as ' + filePath);
+    fs.writeFileSync(filePath, '*', {encoding: 'utf8', flag: 'w'});
+  }
+}
+
+module.exports.createGITIgnoreAllIfMissing = createGITIgnoreAllIfMissing;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function createDirIfMissing(dirName) {
   if (!fs.existsSync(dirName)) {
     console.log('::: Creating ' + dirName);
