@@ -376,7 +376,7 @@ class KDBCache extends ItemCache {
           // jshint +W083
         }
       } else {
-        // Retrieve Blob if it is not already get
+        // Retrieve Blob if it is not already cached
         var oid = entry.sha();
         if (!this.getBlob(oid)){
           promises.push(this.getContents(repository, oid));
