@@ -23,7 +23,7 @@ import { ProxyFilter } from '../../classes/ProxyFilter.class';
 export class TreeComponent extends NavigatableComponent
                               implements OnInit, OnDestroy {
     /* UI Toggles */
-    private _synchronizeWithSelection: boolean = false;
+    private _synchronizeWithSelection: boolean = true;
     get synchronizeWithSelection() {
       return this._synchronizeWithSelection;
     }
@@ -126,8 +126,17 @@ export class TreeComponent extends NavigatableComponent
               
               this.setVisibleRows();
             });
+            
+            this.routeParametersSubscription = this.route.params.
+              subscribe((parameters: Params) => {
+              this.selectedProxyIdStream.next(parameters['id']);
+              if (this._synchronizeWithSelection) {
+                this.showSelection();
+              }
+            });
         
             this.setVisibleRows();
+            this.showSelection();
             
             if (repositoryStatusSubscription) {
               repositoryStatusSubscription.unsubscribe();
@@ -140,18 +149,8 @@ export class TreeComponent extends NavigatableComponent
       initialization to be performed */
       repositoryStatusSubscription.unsubscribe();
     }
-
-    this.routeParametersSubscription = this.route.params.
-      subscribe((parameters: Params) => {
-      this.selectedProxyIdStream.next(parameters['id']);
-      if (this._synchronizeWithSelection) {
-        this.showSelection();
-      }
-    });
-
+    
     this.userList = this.SessionService.getUsers();
-
-    // TODO set up sync listener functionality
   }
   
   ngOnDestroy(): void {
@@ -256,22 +255,26 @@ export class TreeComponent extends NavigatableComponent
   }
   
   private showSelection(): void {
-    let selectedRow: TreeRow = this._rowMap.get(this.selectedProxyIdStream.
-      getValue());
-    let parentId: string = selectedRow.itemProxy.parentProxy.item.id;
-    let treeRootId: string = this._treeRootStream.getValue().item.id;
-    while (parentId !== treeRootId) {
-      let parentRow: TreeRow = this._rowMap.get(parentId);
-      if (!parentRow) {
-        break;
-      }
+    let id: string = this.selectedProxyIdStream.getValue();
+    if (id) {
+      let selectedRow: TreeRow = this._rowMap.get(id);
+      let parentId: string = selectedRow.itemProxy.parentProxy.item.id;
+      let treeRootId: string = this._treeRootStream.getValue().item.id;
+      while (parentId !== treeRootId) {
+        let parentRow: TreeRow = this._rowMap.get(parentId);
+        if (!parentRow) {
+          break;
+        }
       
-      parentRow.expanded = true;
-      parentId = parentRow.itemProxy.parentProxy.item.id;
-    }
+        parentRow.expanded = true;
+        parentId = parentRow.itemProxy.parentProxy.item.id;
+      }
         
-    this.setVisibleRows();
-    this._virtualScrollComponent.scrollInto(selectedRow);
+      this.setVisibleRows();
+      if (this._virtualScrollComponent) {
+        this._virtualScrollComponent.scrollInto(selectedRow);
+      }
+    }
   }
   
   private changeTreeRoot(proxy: ItemProxy): void {
