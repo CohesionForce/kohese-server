@@ -1,0 +1,55 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "NPM Start",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": [
+          "run",
+          "server"
+        ],
+        "port": 9229
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "NPM Test KDB",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": [
+          "run",
+          "server",
+          "--",
+          "-kdb=testKDB"
+        ],
+        "port": 9229
+      },
+      {
+            "type": "node",
+            "request": "launch",
+            "name": "JN Test-IP",
+            "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
+            "args": [
+              "common/tests/unit/item-proxy-spec.js"
+            ],
+            "cwd": "${workspaceRoot}",
+            "sourceMaps": true
+        },
+        {
+              "type": "node",
+              "request": "launch",
+              "name": "JN Test-KDB",
+              "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
+              "args": [
+                "server/tests/integration/kdb-spec.js"
+              ],
+              "cwd": "${workspaceRoot}",
+              "sourceMaps": true
+          }
+    ]
+}
