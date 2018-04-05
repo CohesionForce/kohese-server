@@ -42,10 +42,11 @@ virtual-scroll {
 
 #rightSpan {
   margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .kti-selected-item {
-  background-color: #7dd7ae;
+  border: 3px solid $primaryColor + 100;
 }
 
 .kt-item:hover {

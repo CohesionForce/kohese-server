@@ -87,6 +87,7 @@ class ItemProxy {
 
     proxy.item = forItem;
     proxy.setItemKind(kind);
+    proxy.status = {};
 
     if (kind === 'Repository') {
       tree.repoMap[itemId] = proxy;
@@ -131,7 +132,6 @@ class ItemProxy {
     proxy.calculateTreeHash();
     proxy.caclulateDerivedProperties();
     proxy.updateReferences();
-
 
     if(!tree.loading){
       tree.changeSubject.next({

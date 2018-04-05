@@ -666,7 +666,9 @@ export class ItemRepository {
     if (statuses.length > 0) {
       proxy.status = this._versionControlService.translateStatus(statuses);
     } else {
-      delete proxy.status;
+      for (let fieldName in proxy.status) {
+        delete proxy.status[fieldName];
+      }
     }
     
     ItemProxy.getChangeSubject().next({

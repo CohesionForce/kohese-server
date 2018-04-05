@@ -57,12 +57,6 @@ export class TreeRow {
       proxyFilter.textRegexHighlight = null;
     }
     
-    /* Expand tree-rows that have version control system changes to one or more
-    children */
-    if (proxyFilter.status && show) {
-      this._expanded = true;
-    }
-    
     if (show !== this._visible) {
       this._visible = show;
     }
@@ -71,8 +65,7 @@ export class TreeRow {
   private doesProxyMatchFilter(proxy: ItemProxy, proxyFilter: ProxyFilter,
     checkChildren: boolean): boolean {
     let matches: boolean = true;
-    if (proxyFilter.status && (!proxy.status ||
-      (proxy.status.length === 0))) {
+    if (proxyFilter.status && (Object.keys(proxy.status).length === 0)) {
       matches = false;
     } else if (proxyFilter.dirty && !proxy.dirty) {
       matches =  false;
