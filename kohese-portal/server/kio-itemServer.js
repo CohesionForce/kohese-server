@@ -53,8 +53,11 @@ ItemProxy.getChangeSubject().subscribe(change => {
         kdb.removeModelInstance(change.proxy);
         kio.server.emit(change.kind +'/' + change.type, notification);
         break;
+      case 'loading':
+      case 'loaded':
       case 'reference-added':
-      case 'refernece-removed':
+      case 'reference-removed':
+      case 'reference-reordered':
         // Ignore
         break;
       default:

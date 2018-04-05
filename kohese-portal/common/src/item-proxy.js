@@ -340,7 +340,7 @@ class ItemProxy {
     }
 
     if (isSingle){
-      if (this.relations.references[this.kind][forProperty] == toProxy){
+      if (this.relations.references[this.kind][forProperty] === toProxy){
         // console.log('%%% Removing reference to ' + toProxy.item.id);
         delete this.relations.references[this.kind][forProperty];
       }
@@ -1620,7 +1620,7 @@ function copyAttributes(fromItem, toProxy) {
       modifications[fromKey] = {
         from: toProxy.item[fromKey],
         to: fromItem[fromKey]
-      }
+      };
       toProxy.item[fromKey] = fromItem[fromKey];
     }
   }
@@ -1636,21 +1636,12 @@ function copyAttributes(fromItem, toProxy) {
       modifications[toKey] = {
         from: toProxy.item[toKey],
         to: fromItem[toKey]
-      }
+      };
       toProxy.item.__deletedProperty[toKey] = toProxy.item[toKey];
       delete toProxy.item[toKey];
     }
   }
   return modifications;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function proxyIndex(forProxy, inArray) {
-  return inArray.findIndex((proxy) => {
-    return (proxy.item.id === forProxy.item.id);
-  });
 }
 
 //////////////////////////////////////////////////////////////////////////
