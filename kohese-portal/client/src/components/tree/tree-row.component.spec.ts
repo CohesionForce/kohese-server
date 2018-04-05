@@ -111,20 +111,6 @@ describe('Component: TreeRow', () => {
     expect(component.treeRow.visible).toEqual(true);
   });
   
-  it('expands tree-rows that pass the filter and have a version control ' +
-    'status when the version control view is selected', () => {
-    let filter: ProxyFilter = new ProxyFilter();
-    let statuses: Array<string> = ['Luke'];
-    component.treeRow.itemProxy.status = statuses;
-    filter.status = true;
-    filter.filterString = 'Timothy';
-    component.treeRow.filter(filter);
-    expect(component.treeRow.expanded).toEqual(false);
-    component.treeRow.itemProxy.item.description = 'Titus Philemon Timothy';
-    component.treeRow.filter(filter);
-    expect(component.treeRow.expanded).toEqual(true);
-  });
-  
   it('calculates the correct number of pixels by which to indent', () => {
     expect(component.getIndentationStyle()['padding-left']).toEqual('30px');
   });

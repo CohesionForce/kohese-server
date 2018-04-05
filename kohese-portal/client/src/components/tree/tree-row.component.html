@@ -1,4 +1,5 @@
 <div class="kt-item" id="{{treeRow.itemProxy.item.id}}"
+  matTooltip="{{treeRow.itemProxy.item.name}}"
   (click)="navigate('Explore', {id: treeRow.itemProxy.item.id})"
   [ngClass]="{ 'kti-selected-item': (treeRow.itemProxy.item.id === (selectedProxyIdStream | async)),
   'highlight-row': (treeRow.visible && treeRow.matchesFilter) }"
@@ -17,15 +18,24 @@
   <ng-container *ngIf="!koheseType.icon">
     <span class="kt-icon no-icon"></span>
   </ng-container>
-  {{(treeRow.itemProxy.item.name | highlightRegex)}}
-  <ng-container *ngIf="treeRow.itemProxy.item.tags">
-    {{treeRow.itemProxy.item.tags}}
-  </ng-container>
+  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+    {{treeRow.itemProxy.item.name}}
+    <ng-container *ngIf="treeRow.itemProxy.item.tags">
+      {{treeRow.itemProxy.item.tags}}
+    </ng-container>
+  </span>
   <!-- Conditional Icons for Item status -->
   <ng-container *ngIf="treeRow.itemProxy.dirty">
     <img src="assets/icons/versioncontrol/dirty.ico" title="Dirty item"/>
   </ng-container>
-  <span id="rightSpan" class="kti-actions">
+  <span id="rightSpan">
+    <!-- VC Status Icons -->
+    <img *ngIf="treeRow.itemProxy.status['Unstaged']"
+      src="assets/icons/versioncontrol/unstaged.ico"
+      title="Unstaged - {{treeRow.itemProxy.status['Unstaged']}}"/>
+    <img *ngIf="treeRow.itemProxy.status['Staged']"
+      src="assets/icons/versioncontrol/index-mod.ico"
+      title="Staged - {{treeRow.itemProxy.status['Staged']}}"/>
     <!-- Default row actions -->
     <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
       <button mat-icon-button
@@ -47,14 +57,7 @@
     </ng-container>
     <!-- Version Control row actions -->
     <ng-container
-      *ngIf="('Version Control' === (selectedViewStream | async)) && treeRow.itemProxy.status">
-      <!-- VC Status Icons -->
-      <img *ngIf="treeRow.itemProxy.status['Unstaged']"
-        src="assets/icons/versioncontrol/unstaged.ico"
-        title="Unstaged - {{treeRow.itemProxy.status['Unstaged']}}"/>
-      <img *ngIf="treeRow.itemProxy.status['Staged']"
-        src="assets/icons/versioncontrol/index-mod.ico"
-        title="Staged - {{treeRow.itemProxy.status['Staged']}}"/>
+      *ngIf="('Version Control' === (selectedViewStream | async))">
       <!-- Actions -->
       <button mat-icon-button
         (click)="revertChanges(); $event.stopPropagation()">

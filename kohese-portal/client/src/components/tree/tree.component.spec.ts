@@ -128,7 +128,7 @@ describe('Component: Tree', () => {
     expect(index).toEqual(-1);
     
     /* Since the selection is to be synchronized by default, call the
-    toggleSelectionSynchronization function twice to trigger the showing of the
+    toggleSelectionSynchronization function twice to trigger showing the
     selected Item */
     component.toggleSelectionSynchronization();
     component.toggleSelectionSynchronization();
