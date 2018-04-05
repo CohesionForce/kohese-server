@@ -73,7 +73,7 @@ class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  cachedCommit(oid){
+  getCommit(oid){
     return this.repoCommit[oid];
   }
 
@@ -88,7 +88,7 @@ class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  cachedTree(oid){
+  getTree(oid){
     return this.repoTree[oid];
   }
 
@@ -105,7 +105,7 @@ class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  cachedBlob(oid){
+  getBlob(oid){
     return this.repoBlob[oid];
   }
 
@@ -134,7 +134,7 @@ class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   expandCommit(oid){
-    var commitData = this.cachedCommit(oid);
+    var commitData = this.getCommit(oid);
 
     var newCommitData = {
         meta: _.clone(commitData),
@@ -156,7 +156,7 @@ class ItemCache {
         contents: {}
     };
 
-    var treeEntry = this.cachedTree(treeId);
+    var treeEntry = this.getTree(treeId);
 
     if (!treeEntry){
       console.log('*** Can\'t find cached tree: ' + treeId);
@@ -253,7 +253,7 @@ class ItemCache {
 
       var oid = repoDir[repoFile].oid;
 
-      var item = this.cachedBlob(oid);
+      var item = this.getBlob(oid);
       // eslint-disable-next-line no-unused-vars
       var proxy = new ItemProxy('Repository', item);
 
@@ -279,7 +279,7 @@ class ItemCache {
 
       var oid = kindDir[kindFile].oid;
 
-      var item = this.cachedBlob(oid);
+      var item = this.getBlob(oid);
       // eslint-disable-next-line no-unused-vars
       var proxy = new ItemProxy(kind, item);
 

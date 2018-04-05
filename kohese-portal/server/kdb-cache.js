@@ -226,7 +226,7 @@ class KDBCache extends ItemCache {
       return;
     }
 
-    if (this.cachedCommit(commit.id())){
+    if (this.getCommit(commit.id())){
       // console.log('::: Already indexed commit ' + commit.id());
       return this.indexCommit(repository, commits);
     } else {
@@ -280,7 +280,7 @@ class KDBCache extends ItemCache {
 
       if (entry.isTree()) {
         // Retrieve subtree if it is not already cached
-        if (!this.cachedTree(entry.sha())){
+        if (!this.getTree(entry.sha())){
           // jshint -W083
           promises.push(entry.getTree().then(function (t) {
             return kdbCache.parseTree(repository, t);
@@ -288,9 +288,9 @@ class KDBCache extends ItemCache {
           // jshint +W083
         }
       } else {
-        // Retrieve Blob if it is not already cached
+        // Retrieve Blob if it is not already get
         var oid = entry.sha();
-        if (!this.cachedBlob(oid)){
+        if (!this.getBlob(oid)){
           promises.push(this.getContents(repository, oid));
         }
       }
