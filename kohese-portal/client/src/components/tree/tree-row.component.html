@@ -60,6 +60,7 @@
       *ngIf="('Version Control' === (selectedViewStream | async))">
       <!-- Actions -->
       <button mat-icon-button
+        *ngIf="((treeRow.itemProxy.status | mapKey).length > 0)"
         (click)="revertChanges(); $event.stopPropagation()">
         <mat-icon class="fa fa-undo kt-icon"></mat-icon>
       </button>

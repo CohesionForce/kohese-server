@@ -34,60 +34,53 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-      <!-- Start View Forking -->
-      <ng-container [ngSwitch]="(selectedViewStream | async)">
-        <!-- Start Default Toolbar -->
-        <ng-container *ngSwitchCase="viewList[0]">
-          <!-- Kind Selection -->
-          <mat-form-field>
-            <mat-select placeholder="Kind" [(value)]="proxyFilter.kind"
-              (selectionChange)="filter()">
-              <mat-option>{{NO_KIND_SPECIFIED}}</mat-option>
-              <mat-option *ngFor="let type of (koheseTypes | mapKey)"
-                [value]="koheseTypes[type]">
-                {{type}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <!-- Action Filtering -->
-          <ng-container
-            *ngIf="(proxyFilter.kind && (proxyFilter.kind.name === 'Action'))">
-            <mat-form-field>
-              <mat-select placeholder="State" [(value)]="proxyFilter.actionState"
-                (selectionChange)="filter()">
-                <mat-option *ngFor="let state of actionStates" [value]="state">
-                  {{state}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field>
-              <mat-select placeholder="Assignee" [(value)]="proxyFilter.actionAssignee"
-                (selectionChange)="filter()">
-                <mat-option *ngFor="let user of userList" [value]="user.item.name">
-                  {{user.item.name}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </ng-container> <!-- End Action Filtering -->
-          <!-- String Filtering -->
-          <mat-form-field>
-            <input matInput type="text" [(ngModel)]="proxyFilter.filterString"
-              [ngStyle]="proxyFilter.invalidRegex && {'background-color':'pink'}"
-              placeholder="Filter" (input)="whenFilterStringChanges()"/>
-          </mat-form-field>
-          <!-- Version Control Filtering -->
-          <mat-checkbox [(ngModel)]="proxyFilter.status" (change)="filter()">
-            Modified
-          </mat-checkbox>
-          <mat-checkbox [(ngModel)]="proxyFilter.dirty" (change)="filter()">
-            Dirty
-          </mat-checkbox>
-          <!-- End Version Control Filtering -->
-        </ng-container>	<!-- End Default Controls -->
-        <!-- Start Version Control View -->
-        <ng-container *ngSwitchCase="viewList[1]">
-        </ng-container>
-      </ng-container> <!-- End Switch on View Type -->
+      <!-- Start Default Toolbar -->
+      <!-- Kind Selection -->
+      <mat-form-field>
+        <mat-select placeholder="Kind" [(value)]="proxyFilter.kind"
+          (selectionChange)="filter()">
+          <mat-option>{{NO_KIND_SPECIFIED}}</mat-option>
+          <mat-option *ngFor="let type of (koheseTypes | mapKey)"
+            [value]="koheseTypes[type]">
+            {{type}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <!-- Action Filtering -->
+      <ng-container
+        *ngIf="(proxyFilter.kind && (proxyFilter.kind.name === 'Action'))">
+        <mat-form-field>
+          <mat-select placeholder="State" [(value)]="proxyFilter.actionState"
+            (selectionChange)="filter()">
+            <mat-option *ngFor="let state of actionStates" [value]="state">
+              {{state}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select placeholder="Assignee" [(value)]="proxyFilter.actionAssignee"
+            (selectionChange)="filter()">
+            <mat-option *ngFor="let user of userList" [value]="user.item.name">
+              {{user.item.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-container> <!-- End Action Filtering -->
+      <!-- String Filtering -->
+      <mat-form-field>
+        <input matInput type="text" [(ngModel)]="proxyFilter.filterString"
+          [ngStyle]="proxyFilter.invalidRegex && {'background-color':'pink'}"
+          placeholder="Filter" (input)="whenFilterStringChanges()"/>
+      </mat-form-field>
+      <!-- Version Control Filtering -->
+      <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
+        <mat-checkbox [(ngModel)]="proxyFilter.status" (change)="filter()">
+          Modified
+        </mat-checkbox>
+      </ng-container>
+      <mat-checkbox [(ngModel)]="proxyFilter.dirty" (change)="filter()">
+        Dirty
+      </mat-checkbox>
     </div>
   </div>
   <!-- Begin Knowledge Tree -->

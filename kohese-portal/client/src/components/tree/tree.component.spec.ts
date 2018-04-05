@@ -35,7 +35,7 @@ describe('Component: Tree', () => {
         { provide: SessionService, useClass: MockSessionService },
         { provide: ActivatedRoute, useValue: {
             params: Observable.of({
-                id: 7
+                id: ''
               })
           } }
       ],
