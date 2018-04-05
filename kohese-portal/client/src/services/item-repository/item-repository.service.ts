@@ -9,6 +9,7 @@ import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
 import * as ItemProxy from '../../../../common/src/item-proxy.js';
+import * as ItemCache from '../../../../common/src/item-cache.js';
 import * as KoheseModel from '../../../../common/src/KoheseModel.js';
 import { CacheManager } from '../../../cache-worker/CacheManager';
 import { Subject } from 'rxjs/Subject';
@@ -300,7 +301,10 @@ export class ItemRepository {
       CacheManager.getAllItems((response) => {
         let afterFetch = Date.now();
         console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
-        this.processBulkUpdate(response);
+        this.processBulkUpdate(response.allItems);
+        let rootProxy = ItemProxy.getRootProxy();
+        rootProxy.cache = new ItemCache();
+        rootProxy.cache.setObjectMap(response.objectMap);
         let processingComplete = Date.now();
         console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
         ItemProxy.loadingComplete();
@@ -661,7 +665,7 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   private updateStatus(proxy: ItemProxy, statuses: Array<string>): void {
     if (statuses.length > 0) {
       proxy.status = this._versionControlService.translateStatus(statuses);
@@ -670,7 +674,7 @@ export class ItemRepository {
         delete proxy.status[fieldName];
       }
     }
-    
+
     ItemProxy.getChangeSubject().next({
       type: 'update',
       proxy: proxy
