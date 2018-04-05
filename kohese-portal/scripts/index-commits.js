@@ -1,22 +1,28 @@
-var kdbCache = require('../server/kdb-cache.js');
+'use strict';
 
-const repositoryPath = process.argv[2];
+//Paths may be provided via arguments when starting via -kdb=PATH
+var baseRepoPath;
+for (var i = 2; i < process.argv.length; i++) {
+  var arg = process.argv[i].split('=');
+  if((arg[0] === '-kdb') && (arg[1] !== '')) {
+    baseRepoPath = arg[1];
+    break;
+  }
+}
+
+if (!baseRepoPath){
+  console.log('*** KDB repo must be supplied');
+  console.log('usage: node scripts/index-commits.js -kdb=repo-subdir');
+  process.exit(1);
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Main Processing
 //////////////////////////////////////////////////////////////////////////
 
-// Load Cached Objects From Prior Runs
-var beforeTime = Date.now();
-kdbCache.loadCachedObjects();
-var afterTime = Date.now();
-var deltaLoadTime = afterTime-beforeTime;
-
-beforeTime = Date.now();
-kdbCache.generateCommitHistoryIndices(repositoryPath).then(() => {
-  afterTime = Date.now();
-  var deltaUpdateTime = afterTime-beforeTime;
-  console.log('::: Finished Indexing');
-  console.log('--- Load Cached Objects Time:   ' + deltaLoadTime/1000);
-  console.log('--- Update Cached Objects Time: ' + deltaUpdateTime/1000);
+// Load the KDB
+var kdb = require('../server/kdb.js');
+global.koheseKDB = kdb;
+kdb.initialize(baseRepoPath).then(function () {
+  console.log('::: Finished cache update for: ' + baseRepoPath);
 });
