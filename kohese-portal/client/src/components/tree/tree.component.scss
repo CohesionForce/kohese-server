@@ -45,7 +45,7 @@ virtual-scroll {
 }
 
 .kti-selected-item {
-  background-color: #7dd7ae;
+  border: 3px solid $primaryColor + 100;
 }
 
 .kt-item:hover {
