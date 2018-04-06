@@ -1,0 +1,10 @@
+<span *ngIf="editableField && !editable">
+    {{action.proxy.item[column]}}
+</span>
+<span *ngIf="editableField && editable">
+  <input matInput type="number" class="input-sm" 
+        [(ngModel)]="action.proxy.item[column]"/>
+</span>
+<span *ngIf="!editableField">
+ ---
+</span>
