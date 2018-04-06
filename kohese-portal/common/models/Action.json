@@ -96,6 +96,12 @@
         }
       }
     },
+    "predecessors" : {
+      "type": [
+        "Item"
+      ],
+      "relation": true
+    },
     "assignedTo": {
       "type": "string"
     },

@@ -64,8 +64,9 @@
     },
     "predecessors": {
       "type": [
-        "object"
-      ]
+        "Item"
+      ],
+      "relation": true
     },
     "assignedTo": {
       "type": "string"

@@ -48,6 +48,7 @@
     <ng-container matColumnDef="actions" *ngIf="editable">
       <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
       <mat-cell *matCellDef="let action" style="z-index: 10">
+        <button mat-icon-button class="fa fa-edit"></button>
         <button mat-icon-button class="fa fa-save" (click)="saveRow(action.proxy)"></button>
       </mat-cell>
     </ng-container>
