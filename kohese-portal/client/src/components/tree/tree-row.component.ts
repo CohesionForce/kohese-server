@@ -77,9 +77,11 @@ export class TreeRowComponent extends NavigatableComponent
     
     this._itemProxyChangeSubscription = this.itemRepository.getChangeSubject().
       subscribe((notification: any) => {
-      if (this._treeRow.itemProxy.item.id === notification.proxy.item.id) {
-        this._changeDetector.markForCheck();
-      }
+        if (notification.proxy) {
+          if (this._treeRow.itemProxy.item.id === notification.proxy.item.id) {
+            this._changeDetector.markForCheck();
+          }
+        }
     });
   }
   
