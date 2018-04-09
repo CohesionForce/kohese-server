@@ -15,7 +15,6 @@ var _ = require('underscore');
 
 var jsonExt = /\.json$/;
 
-const compareOIDs = false;
 const expandRepoCommits = true;
 
 class KDBCache extends ItemCache {
@@ -38,7 +37,6 @@ class KDBCache extends ItemCache {
     this.repoCommitDirectory = path.join(this.objectDirectory, 'repoCommit');
     this.repoTreeDirectory = path.join(this.objectDirectory, 'repoTree');
     this.blobDirectory = path.join(this.objectDirectory, 'blob');
-    this.blobMismatchDirectory = path.join(this.objectDirectory, 'mismatch_blob');
     this.kCommitDirectory = path.join(this.objectDirectory, 'kCommit');
     this.kTreeDirectory = path.join(this.objectDirectory, 'kTree');
     this.expandedRepoCommitDirectory = path.join(this.cacheDirectory, 'expanded-repo-commit');
@@ -50,7 +48,6 @@ class KDBCache extends ItemCache {
     kdbFS.createDirIfMissing(this.repoCommitDirectory);
     kdbFS.createDirIfMissing(this.repoTreeDirectory);
     kdbFS.createDirIfMissing(this.blobDirectory);
-    kdbFS.createDirIfMissing(this.blobMismatchDirectory);
     kdbFS.createDirIfMissing(this.kCommitDirectory);
     kdbFS.createDirIfMissing(this.kTreeDirectory);
     kdbFS.createDirIfMissing(this.expandedRepoCommitDirectory);
@@ -141,28 +138,6 @@ class KDBCache extends ItemCache {
       try {
         var object = kdbFS.loadBinaryFile(this.blobDirectory + '/' + oidFile);
         var blob = this.convertBlob(object);
-
-        if (compareOIDs){
-          var koid = ItemProxy.gitFileOID(object);
-          if (oid !== koid){
-            console.log('!!! Mismatch for ' + oid + ' - ' + koid);
-          } else {
-            try {
-              var item = JSON.parse(object);
-              var koid2 = ItemProxy.gitDocumentOID(item);
-
-              if (oid !== koid2){
-                console.log('!!! Parse yields mismatch: ' + oid);
-                kdbFS.storeJSONDoc(this.blobMismatchDirectory + '/' + oid + '_' + koid2 + '.json', item);
-
-                parseMismatch++;
-              }
-            } catch (err) {
-              console.log('*** Error parsing ' + oid);
-              console.log(err);
-            }
-          }
-        }
         this.cacheBlob(oid, blob);
       } catch (err) {
         console.log('*** Could not load cached blob:  ' + oid);
@@ -253,12 +228,12 @@ class KDBCache extends ItemCache {
         kdbFS.storeJSONDoc(this.repoTreeDirectory + path.sep + oid + '.json', object);
         break;
       case 'blob':
-        object = this.convertBlob(object);
-        this.cacheBlob(oid, object);
-        if (object.binary) {
-          kdbFS.storeBinaryFile(this.blobDirectory + path.sep + oid, object.binary);
+        let convertedBlob = this.convertBlob(object);
+        this.cacheBlob(oid, convertedBlob);
+        if (convertedBlob.binary) {
+          kdbFS.storeBinaryFile(this.blobDirectory + path.sep + oid, convertedBlob.binary);
         } else {
-          kdbFS.storeJSONDoc(this.blobDirectory + path.sep + oid + '.json', object);
+          kdbFS.storeBinaryFile(this.blobDirectory + path.sep + oid + '.json', object);
         }
         break;
       default:

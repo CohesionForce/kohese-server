@@ -139,6 +139,66 @@ class ItemCache {
     return _.size(this.blobMap);
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+  //// Proxy loading methods
+  //////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  loadProxiesForCommit(commitId){
+    let commit = this.getCommit(commitId);
+    let lafTreeRoot;
+    const LOST_AND_FOUND = 'LOST+FOUND';
+
+    console.log('$$$ Loading commit: ');
+    console.log(JSON.stringify(commit, [ 'time', 'author', 'message', 'parents' ], '  '));
+
+    for(let repoId in commit.repoTreeRoots){
+      let repoTreeHashEntry = commit.repoTreeRoots[repoId];
+      this.loadProxiesForTree(repoId, repoTreeHashEntry);
+    }
+
+    console.log('$$$ Loading complete');
+    ItemProxy.getRootProxy().dumpProxy();
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  loadProxiesForTree(treeId, treeHashEntry){
+    console.log('$$$ Processing tree: ' + treeId);
+    console.log(treeHashEntry);
+    let kind = treeHashEntry.kind;
+
+    switch(kind){
+      case 'Internal':
+      case 'Internal-Lost':
+      case 'Internal-Model':
+      case 'Internal-View-Model':
+      case 'Internal-State':
+        console.log('::: Only processing children for internal kind: ' + kind);
+        break;
+      default:
+        let item = this.getBlob(treeHashEntry.oid);
+        if (item){
+          let treeProxy = new ItemProxy(kind,  item);
+        } else {
+          console.log('*** Could not find item for: ' + kind + ' - ' + treeId);
+        }
+    }
+
+    for(let childId in treeHashEntry.childTreeHashes){
+      console.log('$$$ Child: ' + childId);
+      let childTreeHash = treeHashEntry.childTreeHashes[childId];
+      let childTreeHashEntry = this.getTree(childTreeHash);
+      this.loadProxiesForTree(childId, childTreeHashEntry);
+    }
+  }
+
 }
 
 module.exports = ItemCache;
