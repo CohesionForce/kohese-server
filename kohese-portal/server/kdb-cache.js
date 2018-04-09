@@ -37,6 +37,7 @@ class KDBCache extends ItemCache {
     this.repoCommitDirectory = path.join(this.objectDirectory, 'repoCommit');
     this.repoTreeDirectory = path.join(this.objectDirectory, 'repoTree');
     this.blobDirectory = path.join(this.objectDirectory, 'blob');
+    this.blobMismatchDirectory = path.join(this.objectDirectory, 'mismatch_blob');
     this.kCommitDirectory = path.join(this.objectDirectory, 'kCommit');
     this.kTreeDirectory = path.join(this.objectDirectory, 'kTree');
     this.expandedRepoCommitDirectory = path.join(this.cacheDirectory, 'expanded-repo-commit');
@@ -48,6 +49,7 @@ class KDBCache extends ItemCache {
     kdbFS.createDirIfMissing(this.repoCommitDirectory);
     kdbFS.createDirIfMissing(this.repoTreeDirectory);
     kdbFS.createDirIfMissing(this.blobDirectory);
+    kdbFS.createDirIfMissing(this.blobMismatchDirectory);
     kdbFS.createDirIfMissing(this.kCommitDirectory);
     kdbFS.createDirIfMissing(this.kTreeDirectory);
     kdbFS.createDirIfMissing(this.expandedRepoCommitDirectory);
@@ -132,7 +134,6 @@ class KDBCache extends ItemCache {
     console.log('::: Loading cached objects');
     var oidFiles = kdbFS.getRepositoryFileList(this.blobDirectory);
 
-    var parseMismatch = 0;
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(jsonExt, '');
       try {
@@ -144,10 +145,22 @@ class KDBCache extends ItemCache {
         console.log(err);
       }
     });
+
+    // Load any blobs that have alternate representations
+    oidFiles = kdbFS.getRepositoryFileList(this.blobMismatchDirectory);
+
+    oidFiles.forEach((oidFile) => {
+      var oid = oidFile.replace(jsonExt, '');
+      try {
+        var object = kdbFS.loadBinaryFile(this.blobMismatchDirectory + '/' + oidFile);
+        var blob = this.convertBlob(object);
+        this.cacheBlob(oid, blob);
+      } catch (err) {
+        console.log('*** Could not load cached blob:  ' + oid);
+        console.log(err);
+      }
+    });
     console.log('::: Found ' + this.numberOfBlobs() + ' blobs');
-    if(parseMismatch){
-      console.log('::: Found ' + parseMismatch + ' parse mismatches');
-    }
 
     oidFiles = kdbFS.getRepositoryFileList(this.repoTreeDirectory, jsonExt);
     oidFiles.forEach((oidFile) => {
@@ -211,7 +224,7 @@ class KDBCache extends ItemCache {
           let treeHashEntry = proxy.treeHashEntry;
 
           if(!this.getTree(treeHashEntry.treeHash)){
-            this.cacheCommit(treeHashEntry.treeHash, treeHashEntry);
+            this.cacheTree(treeHashEntry.treeHash, treeHashEntry);
             kdbFS.storeJSONDoc(this.kTreeDirectory + path.sep + treeHashEntry.treeHash + '.json', treeHashEntry);
           }
         });
@@ -220,6 +233,7 @@ class KDBCache extends ItemCache {
         let kCommit = JSON.parse(JSON.stringify(object));
         delete kCommit.treeId;
         kCommit.repoTreeRoots = ItemProxy.getRepoTreeHashes();
+        this.cacheCommit(oid, kCommit);
         kdbFS.storeJSONDoc(this.kCommitDirectory + path.sep + oid + '.json', kCommit);
 
         break;
@@ -229,6 +243,10 @@ class KDBCache extends ItemCache {
         break;
       case 'blob':
         let convertedBlob = this.convertBlob(object);
+        let koid = ItemProxy.gitDocumentOID(convertedBlob);
+        if (koid !== oid){
+          console.log('$$$ Mismatch oid:' + koid + ' = ' + oid);
+        }
         this.cacheBlob(oid, convertedBlob);
         if (convertedBlob.binary) {
           kdbFS.storeBinaryFile(this.blobDirectory + path.sep + oid, convertedBlob.binary);
@@ -531,6 +549,17 @@ class KDBCache extends ItemCache {
       var item = this.getBlob(oid);
       // eslint-disable-next-line no-unused-vars
       var proxy = new ItemProxy(kind, item);
+      let koid = proxy.oid;
+      if (koid !== oid){
+        let mismatchedBlob = this.getBlob(koid);
+        if (!mismatchedBlob){
+          // Need to store the mismatched blob so it can be retrieved
+          console.log('!!! Detected oid mismatch: ' + koid + ' = ' + oid);
+          let updatedItem = proxy.strippedDocument();
+          this.cacheBlob(koid, updatedItem);
+          kdbFS.storeJSONDoc(this.blobMismatchDirectory + '/' + koid + '.json', updatedItem);
+        }
+      }
 
     }
 
