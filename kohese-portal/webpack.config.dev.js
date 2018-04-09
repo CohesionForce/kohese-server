@@ -165,8 +165,8 @@ module.exports = {
   },
   "output": {
     "path": path.join(process.cwd(), "client/bundle"),
-    "filename": "[name].bundle.js",
-    "chunkFilename": "[id].chunk.js",
+    "filename": "[name].[chunkhash:20].bundle.js",
+    "chunkFilename": "[id].[chunkhash:20].chunk.js",
     "crossOriginLoading": false
   },
   "module": {
@@ -460,7 +460,7 @@ module.exports = {
     new ScriptsWebpackPlugin({
       "name": "scripts",
       "sourceMap": true,
-      "filename": "scripts.bundle.js",
+      "filename": "scripts.[hash:20].bundle.js",
       "scripts": [
         "node_modules/marked/lib/marked.js"
       ],
