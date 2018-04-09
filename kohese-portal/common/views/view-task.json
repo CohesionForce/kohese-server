@@ -58,6 +58,12 @@
       "required": false,
       "default": "",
       "displayName": "actualHoursEffort"
+    },
+    "predecessors": {
+      "inputType": "proxy-selector:{\"allowMultiSelect\":true,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required": false,
+      "default": null,
+      "displayName": "predecessors"
     }
   },
   "itemIds": []
