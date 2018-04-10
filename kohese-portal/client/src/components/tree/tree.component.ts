@@ -258,21 +258,23 @@ export class TreeComponent extends NavigatableComponent
     let id: string = this.selectedProxyIdStream.getValue();
     if (id) {
       let selectedRow: TreeRow = this._rowMap.get(id);
-      let parentId: string = selectedRow.itemProxy.parentProxy.item.id;
-      let treeRootId: string = this._treeRootStream.getValue().item.id;
-      while (parentId !== treeRootId) {
-        let parentRow: TreeRow = this._rowMap.get(parentId);
-        if (!parentRow) {
-          break;
-        }
+      if (selectedRow) {
+        let parentId: string = selectedRow.itemProxy.parentProxy.item.id;
+        let treeRootId: string = this._treeRootStream.getValue().item.id;
+        while (parentId !== treeRootId) {
+          let parentRow: TreeRow = this._rowMap.get(parentId);
+          if (!parentRow) {
+            break;
+          }
       
-        parentRow.expanded = true;
-        parentId = parentRow.itemProxy.parentProxy.item.id;
-      }
+          parentRow.expanded = true;
+          parentId = parentRow.itemProxy.parentProxy.item.id;
+        }
         
-      this.setVisibleRows();
-      if (this._virtualScrollComponent) {
-        this._virtualScrollComponent.scrollInto(selectedRow);
+        this.setVisibleRows();
+        if (this._virtualScrollComponent) {
+          this._virtualScrollComponent.scrollInto(selectedRow);
+        }
       }
     }
   }
