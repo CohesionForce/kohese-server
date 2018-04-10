@@ -4,7 +4,7 @@ import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../common/src/item-proxy.js'
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
 import { MatTableDataSource } from '@angular/material';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
@@ -25,6 +25,8 @@ export class ActionTableComponent extends NavigatableComponent
   editableStream : Observable<boolean>
   editableStreamSubscription : Subscription
   editable : boolean;
+  editableRows : any = {};
+  rowActionStream : Subject<any> = new Subject();
 
   baseRowDef : Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort'];
   actionRowDef : Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'actions'];
@@ -43,7 +45,11 @@ export class ActionTableComponent extends NavigatableComponent
 
     this.proxyStreamSub = this.proxyStream.subscribe((newProxy : ItemProxy) => {
       this.itemProxy = newProxy;
-      this.tableStream = new MatTableDataSource(this.itemProxy.getSubtreeAsList());
+      let proxyList = this.itemProxy.getSubtreeAsList();
+      this.tableStream = new MatTableDataSource(proxyList);
+      for (let row of proxyList) {
+        this.editableRows[row.proxy.item.id] = false;
+      }
       this.changeRef.markForCheck();
     })
 
@@ -79,6 +85,21 @@ export class ActionTableComponent extends NavigatableComponent
     this.itemRepository.upsertItem(savedAction)
       .then((updatedItemProxy: ItemProxy) => {
         console.log((updatedItemProxy));
+        this.editableRows[updatedItemProxy.item.id] = false;
+        this.changeRef.markForCheck();
+        this.rowActionStream.next({
+          type: 'Save',
+          rowProxy: savedAction
+        })
       });
+  }
+
+  toggleRowEdit(action : ItemProxy) {
+    this.editableRows[action.item.id] = !this.editableRows[action.item.id];
+    this.changeRef.markForCheck();
+    this.rowActionStream.next({
+      type: 'Edit',
+      rowProxy : action
+    })
   }
 }
