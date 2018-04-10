@@ -161,8 +161,8 @@ module.exports = {
     ],
     "styles": [
       "./client/css/index.css",
-      "./bower_components/bootstrap/dist/css/bootstrap.css",
-      "./bower_components/font-awesome/css/font-awesome.css",
+      "./node_modules/bootstrap/dist/css/bootstrap.css",
+      "./node_modules/font-awesome/css/font-awesome.css",
       "./node_modules/ngx-toastr/toastr.css"
     ]
   },
@@ -208,8 +208,8 @@ module.exports = {
       {
         "exclude": [
           path.join(process.cwd(), "client/css/index.css"),
-          path.join(process.cwd(), "bower_components/bootstrap/dist/css/bootstrap.css"),
-          path.join(process.cwd(), "bower_components/font-awesome/css/font-awesome.css"),
+          path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.css"),
+          path.join(process.cwd(), "node_modules/font-awesome/css/font-awesome.css"),
           path.join(process.cwd(), "node_modules/ngx-toastr/toastr.css")
         ],
         "test": /\.css$/,
@@ -235,8 +235,8 @@ module.exports = {
       {
         "exclude": [
           path.join(process.cwd(), "client/css/index.css"),
-          path.join(process.cwd(), "bower_components/bootstrap/dist/css/bootstrap.css"),
-          path.join(process.cwd(), "bower_components/font-awesome/css/font-awesome.css"),
+          path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.css"),
+          path.join(process.cwd(), "node_modules/font-awesome/css/font-awesome.css"),
           path.join(process.cwd(), "node_modules/ngx-toastr/toastr.css")
         ],
         "test": /\.scss$|\.sass$/,
@@ -270,8 +270,8 @@ module.exports = {
       {
         "exclude": [
           path.join(process.cwd(), "client/css/index.css"),
-          path.join(process.cwd(), "bower_components/bootstrap/dist/css/bootstrap.css"),
-          path.join(process.cwd(), "bower_components/font-awesome/css/font-awesome.css"),
+          path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.css"),
+          path.join(process.cwd(), "node_modules/font-awesome/css/font-awesome.css"),
           path.join(process.cwd(), "node_modules/ngx-toastr/toastr.css")
         ],
         "test": /\.less$/,
@@ -303,8 +303,8 @@ module.exports = {
       {
         "exclude": [
           path.join(process.cwd(), "client/css/index.css"),
-          path.join(process.cwd(), "bower_components/bootstrap/dist/css/bootstrap.css"),
-          path.join(process.cwd(), "bower_components/font-awesome/css/font-awesome.css"),
+          path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.css"),
+          path.join(process.cwd(), "node_modules/font-awesome/css/font-awesome.css"),
           path.join(process.cwd(), "node_modules/ngx-toastr/toastr.css")
         ],
         "test": /\.styl$/,
@@ -337,8 +337,8 @@ module.exports = {
       {
         "include": [
           path.join(process.cwd(), "client/css/index.css"),
-          path.join(process.cwd(), "bower_components/bootstrap/dist/css/bootstrap.css"),
-          path.join(process.cwd(), "bower_components/font-awesome/css/font-awesome.css"),
+          path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.css"),
+          path.join(process.cwd(), "node_modules/font-awesome/css/font-awesome.css"),
           path.join(process.cwd(), "node_modules/ngx-toastr/toastr.css")
         ],
         "test": /\.css$/,
@@ -366,8 +366,8 @@ module.exports = {
       {
         "include": [
           path.join(process.cwd(), "client/css/index.css"),
-          path.join(process.cwd(), "bower_components/bootstrap/dist/css/bootstrap.css"),
-          path.join(process.cwd(), "bower_components/font-awesome/css/font-awesome.css"),
+          path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.css"),
+          path.join(process.cwd(), "node_modules/font-awesome/css/font-awesome.css"),
           path.join(process.cwd(), "node_modules/ngx-toastr/toastr.css")
         ],
         "test": /\.scss$|\.sass$/,
@@ -403,8 +403,8 @@ module.exports = {
       {
         "include": [
           path.join(process.cwd(), "client/css/index.css"),
-          path.join(process.cwd(), "bower_components/bootstrap/dist/css/bootstrap.css"),
-          path.join(process.cwd(), "bower_components/font-awesome/css/font-awesome.css"),
+          path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.css"),
+          path.join(process.cwd(), "node_modules/font-awesome/css/font-awesome.css"),
           path.join(process.cwd(), "node_modules/ngx-toastr/toastr.css")
         ],
         "test": /\.less$/,
@@ -438,8 +438,8 @@ module.exports = {
       {
         "include": [
           path.join(process.cwd(), "client/css/index.css"),
-          path.join(process.cwd(), "bower_components/bootstrap/dist/css/bootstrap.css"),
-          path.join(process.cwd(), "bower_components/font-awesome/css/font-awesome.css"),
+          path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.css"),
+          path.join(process.cwd(), "node_modules/font-awesome/css/font-awesome.css"),
           path.join(process.cwd(), "node_modules/ngx-toastr/toastr.css")
         ],
         "test": /\.styl$/,
