@@ -84,7 +84,6 @@ module.exports = function(grunt) {
 					      'client/bundle.js',
 					      'client/css/index.css',
 					      'client/components/**/*.html',
-					      'bower_components/**/*',
 					      ],
 					      // Should be a better solution to copying bower cmpns.
 					      dest: 'dist/',

@@ -55,7 +55,7 @@ import { environment } from '../environments/environment.prod';
     FormsModule,
     FlexLayoutModule,
     BrowserAnimationsModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', {enabled : environment.production}),
+    ServiceWorkerModule.register('/ngsw-worker.js', {enabled : true}),
     ToastrModule.forRoot(),
     MarkdownModule.forRoot(),
     InfiniteScrollModule,

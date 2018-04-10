@@ -1,7 +1,7 @@
 
 
 <div *ngIf="itemProxy" id="details-panel" class="panel">
-    <div class="panel-heading ">
+    <div class="panel-heading " style="padding : 10px;">
         <span *ngIf="itemProxy.kind">{{itemProxy.kind}} Information: {{itemProxy.item.name}} </span>
         <span *ngIf="!itemProxy.kind">No Item Selected</span>
         <span class="pull-right item-actions">
