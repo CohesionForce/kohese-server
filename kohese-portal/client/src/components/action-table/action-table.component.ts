@@ -26,8 +26,8 @@ export class ActionTableComponent extends NavigatableComponent
   editableStreamSubscription : Subscription
   editable : boolean;
 
-  baseRowDef : Array<string> = ['name', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort'];
-  actionRowDef : Array<string> = ['name', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'actions'];
+  baseRowDef : Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort'];
+  actionRowDef : Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'actions'];
 
   /* Subscriptions */
   proxyStreamSub : Subscription;
@@ -75,6 +75,7 @@ export class ActionTableComponent extends NavigatableComponent
 
   saveRow(savedAction : ItemProxy) {
     console.log('Save row');
+    console.log(savedAction);
     this.itemRepository.upsertItem(savedAction)
       .then((updatedItemProxy: ItemProxy) => {
         console.log((updatedItemProxy));
