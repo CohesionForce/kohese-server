@@ -37,14 +37,19 @@ export class CacheManager {
 //
 //////////////////////////////////////////////////////////////////////////
 let scripts = document.scripts;
-let cacheWorkerBundle = 'cache-worker.bundle.js';
+let cacheWorkerBundle;
 for (let scriptIdx in scripts){
   let script = scripts[scriptIdx];
   if(script.attributes){
-    let scriptName = script.attributes[1].value;
-    if(scriptName.match(/^cache-worker/)){
-      cacheWorkerBundle = scriptName;
-    }  
+    for(let idx in script.attributes){
+      let attribute = script.attributes[idx];
+      if (attribute.value){
+        if(attribute.value.match(/^cache-worker/)){
+          cacheWorkerBundle = attribute.value;
+        }
+
+      }
+    }
   }
 }
 console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
