@@ -166,7 +166,7 @@ function KIOItemServer(socket){
 
     // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
 
-    // var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+    // var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 
     // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
 
@@ -232,7 +232,7 @@ function KIOItemServer(socket){
         // Send deltas to client
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
-        var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+        var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 //        console.log(thmCompare);
 
         response = {

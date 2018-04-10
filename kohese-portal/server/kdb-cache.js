@@ -549,7 +549,7 @@ class KDBCache extends ItemCache {
       var oid = kindDir[kindFile].oid;
 
       var item = this.getBlob(oid);
-      // eslint-disable-next-line no-unused-vars
+
       var proxy = new ItemProxy(kind, item, treeConfig);
       let koid = proxy.oid;
       if (koid !== oid){

@@ -29,10 +29,10 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   constructor(kind, withItem, treeConfig) {
     if (!treeConfig){
-      console.log('$$$ Using working tree');
+      // console.log('$$$ Using working tree');
       treeConfig = workingTree;
     } else {
-      console.log('$$$ Using tree: ' + treeConfig.treeId);
+      // console.log('$$$ Using tree: ' + treeConfig.treeId);
     }
 
     var forItem = JSON.parse(JSON.stringify(withItem));
@@ -42,7 +42,7 @@ class ItemProxy {
       itemId = forItem.id = uuidV1();
       console.log('::: Allocating new id: ' + itemId);
     } else {
-      console.log('::: Constructor called for ' + itemId);
+      // console.log('::: Constructor called for ' + itemId);
     }
 
     ItemProxy.validateItemContent(kind, forItem);
@@ -50,7 +50,7 @@ class ItemProxy {
     let proxy = treeConfig.proxyMap[itemId];
 
     if (!proxy) {
-     console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
+    //  console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
       proxy = this;
       proxy.treeConfig = treeConfig;
       proxy.children = [];
@@ -393,6 +393,30 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  removeAllReferences(){
+    let references = this.relations.references;
+
+    for(let kindKey in references)
+    {
+      let relationsForKind = references[kindKey];
+      for(let relationKey in relationsForKind){
+        let relationList = relationsForKind[relationKey];
+        if (Array.isArray(relationList)){
+          for(let index = 0; index < relationList.length; index++){
+            this.removeReference(relationList[index], relationKey, false);
+          }
+        } else {
+          if (relationList){
+            this.removeReference(relationList, relationKey, true);
+          }
+        }
+      }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static getWorkingTree() {
     // TODO remove all references
     return workingTree;
@@ -662,14 +686,6 @@ class ItemProxy {
     this.visitTree({excludeKind : ['Repository', 'Internal']}, null, (proxy) => {
       proxy.calculateTreeHash(deferredRollup);
     });
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static compareTreeHashMap(fromTHMap, toTHMap){
-    // TODO remove all references
-    return TreeConfiguration.compareTreeHashMap(fromTHMap, toTHMap);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1296,6 +1312,9 @@ class ItemProxy {
       this.parentProxy.removeChild(this);
     }
 
+    // Unlink from all referred items
+    this.removeAllReferences();
+
     if (deleteDescendants){
       // Delete children depth first (after visit)
       this.visitChildren(null, null, (childProxy) => {
@@ -1368,6 +1387,8 @@ class TreeConfiguration {
       return treeConfig;
     }
 
+    console.log('::: Creating TreeConfiguration for: ' + treeId);
+
     this.treeId = treeId;
     this.proxyMap = {};
     this.repoMap = {};
@@ -1413,7 +1434,6 @@ class TreeConfiguration {
   //
   //////////////////////////////////////////////////////////////////////////
   getChangeSubject() {
-    // TODO remove all references
     return this.changeSubject;
   }
 
@@ -1434,7 +1454,7 @@ class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   reset(skipModels) {
 
-    console.log('::: Resetting Tree Configuration ' + this.treeId);
+    console.log('::: Resetting TreeConfiguration for: ' + this.treeId);
     let rootProxy = this.getRootProxy();
 
     this.loading = true;
@@ -1466,6 +1486,8 @@ class TreeConfiguration {
     // Re-insert rootModelProxy
     rootProxy.addChild(this.rootModelProxy);
     rootProxy.addChild(this.rootViewModelProxy);
+
+    this.dumpAllProxies();
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1483,6 +1505,7 @@ class TreeConfiguration {
   //
   //////////////////////////////////////////////////////////////////////////
   getProxyFor(id) {
+    // TODO Need to remove this returning of the ROOT when the string is empty
 	  if(id === '') {
 		  return this.root;
 	  }
@@ -1508,10 +1531,6 @@ class TreeConfiguration {
     var toIds = Object.keys(toTHMap).sort();
     // var allIds = _.union(fromIds, toIds);
     var commonIds = _.intersection(fromIds, toIds);
-
-    if(!fromTHMap){
-      console.log('*** From is undefined');
-    }
 
     var thmCompare = {
       match: _.isEqual(fromTHMap, toTHMap),
@@ -1610,24 +1629,10 @@ class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getRepositories(){
-    var repoList = [];
-    for(var id in this.proxyMap){
-      var proxy = this.proxyMap[id];
-      if (proxy.kind === 'Repository'){
-        repoList.push(proxy);
-      }
-    }
-    return repoList;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   getRepositories() {
     var repoList = [];
-    for(var id in this.proxyMap){
-      var proxy = this.proxyMap[id];
+    for(var id in this.repoMap){
+      var proxy = this.repoMap[id];
       if (proxy.kind === 'Repository'){
         repoList.push(proxy);
       }

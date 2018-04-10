@@ -360,7 +360,7 @@ export class ItemRepository {
           let syncRequired = true;
           if (repoProxy && repoProxy.treeHashEntry){
             // A previous fetch has occurried, check to see if there an opportunity to skip resync
-            let rTHMCompare = ItemProxy.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
+            let rTHMCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
             if (rTHMCompare.match){
               syncRequired = false;
               // console.log('$$$ Sync not required ' + repoId);
@@ -435,7 +435,7 @@ export class ItemRepository {
           }
         }
 
-        var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
+        var compareAfterRTH = ItemProxy.TreeConfiguration.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
 
         syncSucceeded = compareAfterRTH.match;
 

@@ -1078,7 +1078,7 @@ describe('ItemProxy Test', function () {
       }
     };
 
-  var thmCompare = ItemProxy.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
+  var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
   if (!thmCompare.match) {
     console.log('Tree Map');
     console.log(treeHashMap);
@@ -1151,7 +1151,7 @@ it('Retrieve Delta Tree Hash Map', () => {
 
   var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
 
-  var thmCompare = ItemProxy.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
+  var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
 
   expect(thmCompare).toEqual(expectedDeltaMap);
 });

@@ -150,8 +150,6 @@ class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   loadProxiesForCommit(commitId, treeConfig){
     let commit = this.getCommit(commitId);
-    let lafTreeRoot;
-    const LOST_AND_FOUND = 'LOST+FOUND';
 
     console.log('$$$ Loading commit: ');
     console.log(JSON.stringify(commit, [ 'time', 'author', 'message', 'parents' ], '  '));
