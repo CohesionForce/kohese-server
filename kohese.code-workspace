@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "kohese-portal"
+		}
+	],
+	"settings": {
+		"workbench.editor.enablePreviewFromQuickOpen": false
+	}
+}
