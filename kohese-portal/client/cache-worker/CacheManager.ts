@@ -23,6 +23,7 @@ export class CacheManager {
   //////////////////////////////////////////////////////////////////////////
   static getAllItems(callback) {
     console.log('$$$ requesting getAllItems');
+
     let requestId;
     if (callback){
       requestId = this.nextRequestId++;
@@ -35,7 +36,19 @@ export class CacheManager {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-let cacheWorker : SharedWorker.SharedWorker = new SharedWorker('cache-worker.bundle.js')
+let scripts = document.scripts;
+let cacheWorkerBundle = 'cache-worker.bundle.js';
+for (let scriptIdx in scripts){
+  let script = scripts[scriptIdx];
+  if(script.attributes){
+    let scriptName = script.attributes[1].value;
+    if(scriptName.match(/^cache-worker/)){
+      cacheWorkerBundle = scriptName;
+    }  
+  }
+}
+console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
+let cacheWorker : SharedWorker.SharedWorker = new SharedWorker(cacheWorkerBundle);
 
 //////////////////////////////////////////////////////////////////////////
 //

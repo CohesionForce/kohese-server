@@ -2,7 +2,7 @@
   <ng-container
     *ngIf="(authenticated)">
     <div class="navbar-header">
-      <a class="navbar-brand"
+      <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
           'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
         (click)="navigate('Explore', {id : ''})">
@@ -11,8 +11,8 @@
           *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
            - {{syncStatusString}}
         </i>
-      </a>
-      <a class="navbar-brand" (click)="navigate('Dashboard', {})">Dashboard</a>
+      </span>
+      <span class="navbar-brand" (click)="navigate('Dashboard', {})">Dashboard</span>
     </div>
     <ul class="nav navbar-top-links navbar-right">
       <button mat-button id="userMenu" [matMenuTriggerFor]="userMenu">
