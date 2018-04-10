@@ -156,7 +156,7 @@
 
     console.log('::: Preparing to analyze ' + forModelKind + ' ' + onId);
 
-    let forProxy = kdb.ItemProxy.getProxyFor(onId);
+    let forProxy = kdb.ItemProxy.getWorkingTree().getProxyFor(onId);
     let analysis = kdb.retrieveAnalysis(forProxy);
 
     if (analysis) {

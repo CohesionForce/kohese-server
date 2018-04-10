@@ -211,15 +211,15 @@ class KDBCache extends ItemCache {
         }
 
         // Store HashMap
-        let skipModels = true;
-        ItemProxy.resetItemRepository(skipModels);
-        this.loadProxiesForRepoCommit(oid);
-        var treeHash = ItemProxy.getAllTreeHashes();
+        let treeConfig = new ItemProxy.TreeConfiguration(oid);
+        this.loadProxiesForRepoCommit(oid, treeConfig);
+        treeConfig.loadingComplete();
+        var treeHash = treeConfig.getAllTreeHashes();
         var hashmapFilename = object.time + '_' + oid + '.json';
         kdbFS.storeJSONDoc(this.hashmapDirectory + path.sep + hashmapFilename, treeHash);
 
         // Store kTrees
-        let repoProxy = ItemProxy.getRootProxy();
+        let repoProxy = treeConfig.getRootProxy();
         repoProxy.visitTree(null,(proxy) => {
           let treeHashEntry = proxy.treeHashEntry;
 
@@ -232,9 +232,11 @@ class KDBCache extends ItemCache {
         // Store kCommits
         let kCommit = JSON.parse(JSON.stringify(object));
         delete kCommit.treeId;
-        kCommit.repoTreeRoots = ItemProxy.getRepoTreeHashes();
+        kCommit.repoTreeRoots = treeConfig.getRepoTreeHashes();
         this.cacheCommit(oid, kCommit);
         kdbFS.storeJSONDoc(this.kCommitDirectory + path.sep + oid + '.json', kCommit);
+
+        treeConfig.reset();
 
         break;
       case 'repoTree':
@@ -459,16 +461,16 @@ class KDBCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForRepoCommit(commitId){
+  loadProxiesForRepoCommit(commitId, treeConfig){
     var commit = this.expandRepoCommit(commitId);
-    this.loadProxiesForRepoRootDir(commit.tree);
-    ItemProxy.loadingComplete();
+    this.loadProxiesForRepoRootDir(commit.tree, treeConfig);
+    treeConfig.loadingComplete();
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForRepoRootDir(treeData){
+  loadProxiesForRepoRootDir(treeData, treeConfig){
     var contents = treeData.contents;
 
     if(contents.hasOwnProperty('store')) {
@@ -477,7 +479,7 @@ class KDBCache extends ItemCache {
 
     if (contents.hasOwnProperty('export')) {
       console.log('::: Found early legacy dir (v0.1) for ' + treeData.oid);
-      this.loadProxiesForRepoRootDir(contents['export']);
+      this.loadProxiesForRepoRootDir(contents['export'], treeConfig);
       return;
     }
 
@@ -492,10 +494,10 @@ class KDBCache extends ItemCache {
             console.log('--- Skipping ' + kind);
             break;
           case 'Repository':
-            this.loadProxiesForRepoContents(contents.Repository.contents);
+            this.loadProxiesForRepoContents(contents.Repository.contents, treeConfig);
             break;
           default:
-            this.loadProxiesForKindContents(kind, contents[kind].contents);
+            this.loadProxiesForKindContents(kind, contents[kind].contents, treeConfig);
         }
 
       }
@@ -506,7 +508,7 @@ class KDBCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForRepoContents(repoDir){
+  loadProxiesForRepoContents(repoDir, treeConfig){
     console.log('::: Processing Repositories');
 
     for(var repoFile in repoDir){
@@ -522,13 +524,13 @@ class KDBCache extends ItemCache {
 
       var item = this.getBlob(oid);
       // eslint-disable-next-line no-unused-vars
-      var proxy = new ItemProxy('Repository', item);
+      var proxy = new ItemProxy('Repository', item, treeConfig);
 
       // TODO Need to handle mount files
 
       var repoSubdir = repoDir[item.id];
       if(repoSubdir){
-        this.loadProxiesForRepoRootDir(repoSubdir);
+        this.loadProxiesForRepoRootDir(repoSubdir, treeConfig);
       }
     }
   }
@@ -536,7 +538,7 @@ class KDBCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForKindContents(kind, kindDir){
+  loadProxiesForKindContents(kind, kindDir, treeConfig){
     console.log('::: Processing ' + kind);
     for(var kindFile in kindDir){
 
@@ -548,14 +550,14 @@ class KDBCache extends ItemCache {
 
       var item = this.getBlob(oid);
       // eslint-disable-next-line no-unused-vars
-      var proxy = new ItemProxy(kind, item);
+      var proxy = new ItemProxy(kind, item, treeConfig);
       let koid = proxy.oid;
       if (koid !== oid){
         let mismatchedBlob = this.getBlob(koid);
         if (!mismatchedBlob){
           // Need to store the mismatched blob so it can be retrieved
           console.log('!!! Detected oid mismatch: ' + koid + ' = ' + oid);
-          let updatedItem = proxy.strippedDocument();
+          let updatedItem = proxy.cloneItemAndStripDerived();
           this.cacheBlob(koid, updatedItem);
           kdbFS.storeJSONDoc(this.blobMismatchDirectory + '/' + koid + '.json', updatedItem);
         }

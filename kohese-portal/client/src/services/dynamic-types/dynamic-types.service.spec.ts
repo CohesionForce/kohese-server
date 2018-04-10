@@ -28,6 +28,6 @@ describe('DynamicTypesService', () => {
   });
 
   it('adds each KoheseType to its associated data model ItemProxy', () => {
-    expect(ItemProxy.getProxyFor('Item').type).toBeDefined();
+    expect(ItemProxy.getWorkingTree().getProxyFor('Item').type).toBeDefined();
   });
 });

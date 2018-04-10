@@ -44,11 +44,11 @@ describe('Component: Children Table', ()=>{
     childrenTableComponent.editableStream = new BehaviorSubject<boolean>(false);
 
     childrenTableFixture.detectChanges();
-    
+
   })
 
   it('instantiates the ChildrenTable component', ()=>{
-    expect(childrenTableComponent).toBeTruthy(); 
+    expect(childrenTableComponent).toBeTruthy();
   })
 
   it('updates the children list when a new array comes in', ()=>{
@@ -62,10 +62,10 @@ describe('Component: Children Table', ()=>{
       children);
     expect(childrenTableComponent.childrenStream.getValue().length).toEqual(12);
   });
-  
+
   it('changes the order of children in their parent', () => {
     childrenTableComponent.editableStream.next(true);
-    let rootProxy: ItemProxy = ItemProxy.getRootProxy();
+    let rootProxy: ItemProxy = ItemProxy.getWorkingTree().getRootProxy();
     let changedOrderingType: boolean = false;
     if (!rootProxy.childrenAreManuallyOrdered()) {
       rootProxy.toggleChildrenAreManuallyOrdered();
@@ -81,17 +81,17 @@ describe('Component: Children Table', ()=>{
     let dropEvent: any = jasmine.createSpyObj('DropEvent', ['preventDefault']);
     dropEvent.dataTransfer = jasmine.createSpyObj('DataTransfer', ['getData']);
     dropEvent.dataTransfer.getData.and.returnValue('test-uuid3');
-    
+
     childrenTableComponent.whenDropOccurs(rootProxy.children[rootProxy.
       children.length - 1], dropEvent);
-      
+
     for (let j: number = 0; j < rootProxy.children.length; j++) {
       if ('test-uuid3' === rootProxy.children[j].item.id) {
         expect(initialIndex).not.toEqual(j);
         break;
       }
     }
-    
+
     if (changedOrderingType) {
       rootProxy.toggleChildrenAreManuallyOrdered();
     }

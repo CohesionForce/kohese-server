@@ -69,19 +69,19 @@ export class KProxySelectorComponent extends UserInput
       for (let i = 0; i < selected.length; i++) {
         if (selected[i].hasOwnProperty('id')){
           // Must be a reference
-          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i].id))
+          this.selectedProxies.push(ItemProxy.getWorkingTree().getProxyFor(selected[i].id))
         } else {
           // Must be an id field insteaad of a reference
-          this.selectedProxies.push(ItemProxy.getProxyFor(selected[i]))
+          this.selectedProxies.push(ItemProxy.getWorkingTree().getProxyFor(selected[i]))
         }
       }
     } else if (selected) {
         if (selected.hasOwnProperty('id')){
            // Must be a reference
-           this.selectedProxy = ItemProxy.getProxyFor(selected.id);
+           this.selectedProxy = ItemProxy.getWorkingTree().getProxyFor(selected.id);
         } else {
           // Must be an id field insteaad of a reference
-          this.selectedProxy = ItemProxy.getProxyFor(selected);
+          this.selectedProxy = ItemProxy.getWorkingTree().getProxyFor(selected);
         }
     } else if (!selected) {
       this.selectedProxy = undefined;
@@ -102,7 +102,7 @@ export class KProxySelectorComponent extends UserInput
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data : {
         allowMultiSelect: this.allowMultiSelect,
-        selected : (this.selectedProxy) ? this.selectedProxy : this.selectedProxies 
+        selected : (this.selectedProxy) ? this.selectedProxy : this.selectedProxies
       }
     }).updateSize('60%', '60%').afterClosed().subscribe((selected)=>{
       if (selected instanceof Array) {

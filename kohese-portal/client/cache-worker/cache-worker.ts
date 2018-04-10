@@ -156,7 +156,7 @@ function fetchItemCache(){
       serverCache.objectMap = response.objectMap;
       let itemCache = new ItemCache();
       itemCache.setObjectMap(response.objectMap)
-      ItemProxy.getRootProxy().cache = itemCache;
+      ItemProxy.getWorkingTree().getRootProxy().cache = itemCache;
       cacheFetched = true;
 
       repoState = RepoStates.SYNCHRONIZATION_SUCCEEDED;
@@ -219,7 +219,7 @@ function processBulkUpdate(response){
 
   if(response.deleteItems) {
     response.deleteItems.forEach((deletedItemId) => {
-      var proxy = ItemProxy.getProxyFor(deletedItemId);
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
       proxy.deleteItem();
     });
   }
@@ -239,7 +239,7 @@ function syncWithServer(){
 
       // Update local ItemProxy
       processBulkUpdate(response);
-      ItemProxy.loadingComplete();
+      ItemProxy.getWorkingTree().loadingComplete();
       let processingCompleteTime = Date.now();
       console.log('::: Processing completed at ' + (processingCompleteTime-responseReceiptTime)/1000);
 

@@ -9,15 +9,14 @@ var uuidV1 = require('uuid/v1');
 
 var Rx = require('rxjs/Rx');
 
+let treeConfigMap = {
+  'WORKING': null,
+  'STAGED': null,
+};
+let workingTree;
 
-var tree = {};
-tree.proxyMap = {};
-tree.repoMap = {};
-tree.loading = true;
-tree.KoheseModel = null;
-tree.proxyHasDeferredModelAssociation = {};
-
-tree.changeSubject = new Rx.Subject();
+// Forward declare KoheseModel while waiting for registration to occur
+let KoheseModel;
 
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
@@ -28,22 +27,32 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  constructor(kind, withItem) {
+  constructor(kind, withItem, treeConfig) {
+    if (!treeConfig){
+      console.log('$$$ Using working tree');
+      treeConfig = workingTree;
+    } else {
+      console.log('$$$ Using tree: ' + treeConfig.treeId);
+    }
+
     var forItem = JSON.parse(JSON.stringify(withItem));
     var itemId = forItem.id;
 
     if (!itemId){
       itemId = forItem.id = uuidV1();
       console.log('::: Allocating new id: ' + itemId);
+    } else {
+      console.log('::: Constructor called for ' + itemId);
     }
 
     ItemProxy.validateItemContent(kind, forItem);
 
-    let proxy = tree.proxyMap[itemId];
+    let proxy = treeConfig.proxyMap[itemId];
 
     if (!proxy) {
-//      console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
+     console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
       proxy = this;
+      proxy.treeConfig = treeConfig;
       proxy.children = [];
       proxy.relations = {
         references: {
@@ -55,7 +64,7 @@ class ItemProxy {
         referencedBy: {}
       };
       proxy.descendantCount = 0;
-      tree.proxyMap[itemId] = proxy;
+      proxy.treeConfig.proxyMap[itemId] = proxy;
     }
 
     switch (kind){
@@ -90,7 +99,7 @@ class ItemProxy {
     proxy.status = {};
 
     if (kind === 'Repository') {
-      tree.repoMap[itemId] = proxy;
+      proxy.treeConfig.repoMap[itemId] = proxy;
     }
 
     if (kind === 'Internal') {
@@ -110,11 +119,11 @@ class ItemProxy {
       forItem.parentId = parentId;
     }
 
-    var parent = tree.proxyMap[parentId];
+    var parent = proxy.treeConfig.proxyMap[parentId];
 
     if (!parent) {
       // Create the parent before it is found
-      parent = createMissingProxy(parentId);
+      parent = createMissingProxy(parentId, proxy.treeConfig);
     }
 
     parent.addChild(proxy);
@@ -133,8 +142,8 @@ class ItemProxy {
     proxy.caclulateDerivedProperties();
     proxy.updateReferences();
 
-    if(!tree.loading){
-      tree.changeSubject.next({
+    if(!proxy.treeConfig.loading){
+      proxy.treeConfig.changeSubject.next({
         type: 'create',
         kind: proxy.kind,
         id: proxy.item.id,
@@ -148,15 +157,16 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static registerKoheseModelClass(KoheseModel) {
-    tree.KoheseModel = KoheseModel;
+  static registerKoheseModelClass(KoheseModelClass) {
+    KoheseModel = KoheseModelClass;
 
-    for (let id in tree.proxyHasDeferredModelAssociation){
-      let proxy = tree.proxyHasDeferredModelAssociation[id];
-      proxy.setItemKind(proxy.kind);
-      proxy.caclulateDerivedProperties();
-      proxy.updateReferences();
-
+    for (let treeConfig in treeConfigMap){
+      for (let id in treeConfig.proxyHasDeferredModelAssociation){
+        let proxy = treeConfig.proxyHasDeferredModelAssociation[id];
+        proxy.setItemKind(proxy.kind);
+        proxy.caclulateDerivedProperties();
+        proxy.updateReferences();
+      }
     }
   }
 
@@ -251,10 +261,10 @@ class ItemProxy {
               if (refId.hasOwnProperty('id')){
                 refId = refId.id;
               }
-              let refProxy = ItemProxy.getProxyFor(refId);
+              let refProxy = this.treeConfig.getProxyFor(refId);
               if(!refProxy){
-                createMissingProxy(refId);
-                refProxy=ItemProxy.getProxyFor(refId);
+                createMissingProxy(refId, this.treeConfig);
+                refProxy = this.treeConfig.getProxyFor(refId);
               }
               newRelationIds.push(refId);
               this.addReference(refProxy, relationProperty, isSingle);
@@ -271,7 +281,7 @@ class ItemProxy {
               if (!newRelationIds.includes(oldRefId)){
                 // Old Ref is no longer associated
                 // console.log('%%% oldRefId: ' + oldRefId);
-                let oldRefProxy = ItemProxy.getProxyFor(oldRefId);
+                let oldRefProxy = this.treeConfig.getProxyFor(oldRefId);
                 if (oldRefProxy){
                   this.removeReference(oldRefProxy, relationProperty, isSingle);
                 } else {
@@ -318,8 +328,8 @@ class ItemProxy {
 
     if (!toProxy.relations.referencedBy[this.kind][forProperty].includes(this)){
       toProxy.relations.referencedBy[this.kind][forProperty].push(this);
-      if(!tree.loading){
-        tree.changeSubject.next({
+      if(!this.treeConfig.loading){
+        this.treeConfig.changeSubject.next({
           type: 'reference-added',
           relation: 'forProperty',
           kind: this.kind,
@@ -368,8 +378,8 @@ class ItemProxy {
     if (proxyIdx > -1){
       // console.log('%%% Removing reference from array for ' + toProxy.item.id);
       toProxy.relations.referencedBy[this.kind][forProperty].splice(proxyIdx, 1);
-      if(!tree.loading){
-        tree.changeSubject.next({
+      if(!this.treeConfig.loading){
+        this.treeConfig.changeSubject.next({
           type: 'reference-removed',
           relation: 'forProperty',
           kind: this.kind,
@@ -383,89 +393,9 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static resetItemRepository(skipModels) {
-
-    console.log('::: Resetting Item Repository');
-    let rootProxy = ItemProxy.getRootProxy();
-
-    tree.loading = true;
-
-    tree.changeSubject.next({
-      type: 'loading'
-    });
-
-    rootProxy.removeChild(tree.rootModelProxy);
-    rootProxy.removeChild(tree.rootViewModelProxy);
-
-    rootProxy.visitChildren(null, null, (childProxy) => {
-      childProxy.deleteItem();
-    });
-
-    // Delete children of models if we are not skipping models
-    if (!skipModels) {
-      tree.rootModelProxy.visitChildren(null, null, (childProxy) => {
-        childProxy.deleteItem();
-      });
-      tree.rootViewModelProxy.visitChildren(null, null, (childProxy) => {
-        childProxy.deleteItem();
-      });
-      if (tree.KoheseModel){
-        tree.KoheseModel.removeLoadedModels();
-      }
-    }
-
-    // Re-insert rootModelProxy
-    rootProxy.addChild(tree.rootModelProxy);
-    rootProxy.addChild(tree.rootViewModelProxy);
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getRootProxy() {
-    return tree.root;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getChangeSubject() {
-    return tree.changeSubject;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static loadingComplete() {
-    tree.loading = false;
-    ItemProxy.calculateAllTreeHashes();
-    tree.changeSubject.next({
-      type: 'loaded'
-    });
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getAllItemProxies() {
-    var itemProxyList = [];
-    for ( var key in tree.proxyMap) {
-      itemProxyList.push(tree.proxyMap[key]);
-    }
-    return itemProxyList;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getProxyFor(id) {
-
-    // console.log('::: IP: Getting proxy for ' + id);
-	if(id === '') {
-		return tree.root;
-	}
-    return tree.proxyMap[id];
-
+  static getWorkingTree() {
+    // TODO remove all references
+    return workingTree;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -474,14 +404,14 @@ class ItemProxy {
   setItemKind(kind){
     this.kind = kind;
 
-    if (tree.KoheseModel){
-      this.model = tree.KoheseModel.getModelProxyFor(kind);
+    if (KoheseModel){
+      this.model = KoheseModel.getModelProxyFor(kind);
       if (this.internal && !this.model.internal) {
         // Item was previously created in lost and found
         delete this.internal;
       }
     } else {
-      tree.proxyHasDeferredModelAssociation[this.item.id] = this;
+      this.treeConfig.proxyHasDeferredModelAssociation[this.item.id] = this;
     }
   }
 
@@ -525,8 +455,8 @@ class ItemProxy {
       valid : true
     };
 
-    if (tree.KoheseModel) {
-      let modelProxy = tree.KoheseModel.getModelProxyFor(kind);
+    if (KoheseModel) {
+      let modelProxy = KoheseModel.getModelProxyFor(kind);
       if(modelProxy && (modelProxy.kind === 'KoheseModel')){
         // if (modelProxy.constructor.name !== 'KoheseModel'){
         //   modelProxy.dumpProxy();
@@ -540,7 +470,7 @@ class ItemProxy {
 
         if (!validation.valid){
           // TODO Need to remove this bypass logic which is needed to load some existing data
-          if(tree.loading){
+          if(workingTree.loading){
             console.log('*** Error: Invalid data item');
             console.log('Kind: ' + kind);
             console.log(forItem);
@@ -671,7 +601,7 @@ class ItemProxy {
     this.calculateOID();
 
     // Don't calculateTreeHash during initial load
-    if (!this.item || (tree.loading && !deferredRollup)){
+    if (!this.item || (this.treeConfig.loading && !deferredRollup)){
       this.deferTreeHash = true;
       return;
     }
@@ -737,106 +667,9 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static calculateAllTreeHashes() {
-    for (let repoId in tree.repoMap){
-      let repoProxy = tree.repoMap[repoId];
-      repoProxy.calculateRepoTreeHashes();
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   static compareTreeHashMap(fromTHMap, toTHMap){
-
-    var fromIds = Object.keys(fromTHMap).sort();
-    var toIds = Object.keys(toTHMap).sort();
-    // var allIds = _.union(fromIds, toIds);
-    var commonIds = _.intersection(fromIds, toIds);
-
-    if(!fromTHMap){
-      console.log('*** From is undefined');
-    }
-
-    var thmCompare = {
-      match: _.isEqual(fromTHMap, toTHMap),
-      addedItems: _.difference(toIds, fromIds),
-      changedItems: [],
-      deletedItems: _.difference(fromIds, toIds),
-      childMismatch: {}
-  };
-
-    commonIds.forEach((key) => {
-      var fromNode = fromTHMap[key];
-      var toNode = toTHMap[key];
-
-      if (!_.isEqual(fromNode.treeHash, toNode.treeHash)) {
-
-        if (fromNode.oid !== toNode.oid){
-          thmCompare.changedItems.push(key);
-        } else {
-          // Found structural difference at child level
-          var fromChildren = fromNode.childTreeHashes;
-          var toChildren = toNode.childTreeHashes;
-          var fromChildIds = Object.keys(fromChildren);
-          var toChildIds = Object.keys(toChildren);
-          var fromChildIdsSorted = Object.keys(fromChildren).sort();
-          var toChildIdsSorted = Object.keys(toChildren).sort();
-          // var allChildIds = _.union(fromChildIdsSorted, toChildIdsSorted);
-          var commonChildIds = _.intersection(fromChildIdsSorted, toChildIdsSorted);
-
-          var childMismatch = {};
-          childMismatch.addedChildren = _.difference(toChildIdsSorted, fromChildIdsSorted);
-          childMismatch.deletedChildren = _.difference(fromChildIdsSorted, toChildIdsSorted);
-
-
-          // Check for different tree hashes
-          var changedChildren = {};
-          commonChildIds.forEach((childId) => {
-            var fromOID = fromChildren[childId];
-            var toOID = toChildren[childId];
-
-            if (fromOID !== toOID){
-              changedChildren[childId] ={
-                  from: fromOID,
-                  to: toOID
-              };
-       }
-          });
-          childMismatch.changedChildren = changedChildren;
-
-          // Check for different order
-          var reorderedChildren = {};
-          for (var idx = 0; idx < fromChildIds.length; idx++){
-            if(fromChildIds[idx] !== toChildIds[idx]){
-              reorderedChildren[idx] = {
-                  from: fromChildIds[idx],
-                  to: toChildIds[idx]
-              };
-            }
-          }
-          childMismatch.reorderedChildren = reorderedChildren;
-
-          thmCompare.childMismatch[key] = childMismatch;
-        }
-      }
-
-    });
-
-    return thmCompare;
-
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getAllTreeHashes() {
-    var proxyTreeHashes = {};
-    tree.root.visitTree(null,(proxy) => {
-      proxyTreeHashes[proxy.item.id] = proxy.treeHashEntry;
-    });
-
-    return proxyTreeHashes;
+    // TODO remove all references
+    return TreeConfiguration.compareTreeHashMap(fromTHMap, toTHMap);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -848,19 +681,6 @@ class ItemProxy {
       treeHashMap [proxy.item.id] = proxy.treeHashEntry;
     });
     return treeHashMap;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getRepoTreeHashes() {
-    var repoTreeHashes = {};
-
-    for(var repoIdx in tree.repoMap){
-      var repoProxy = tree.repoMap[repoIdx];
-      repoTreeHashes[repoIdx] = repoProxy.treeHashEntry;
-    }
-    return repoTreeHashes;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -897,25 +717,6 @@ class ItemProxy {
     return depth;
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getRepositories(){
-    var repoList = [];
-    for(var id in tree.proxyMap){
-      var proxy = tree.proxyMap[id];
-      if (proxy.kind === 'Repository'){
-        repoList.push(proxy);
-      }
-    }
-    return repoList;
-  }
-
-//  static getRepositories2(){
-//    var repoList = [tree.rootProxy];
-//    tree.rootProxy.visit(null, );
-//  }
-//
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -1035,17 +836,6 @@ class ItemProxy {
         proxyStack.push(descendant.children[childIdx]);
       }
       descendant = proxyStack.pop();
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static dumpAllProxies() {
-    for ( var proxyId in tree.proxyMap) {
-      var proxy = tree.proxyMap[proxyId];
-      console.log('::: Dumping ' + proxy.item.id + ' - ' + proxy.item.name +
-          ' - ' + proxy.kind);
     }
   }
 
@@ -1228,12 +1018,12 @@ class ItemProxy {
     }
 
     // update display of lostAndFound node
-    if (this === tree.lostAndFound && tree.lostAndFound.children.length === 1) {
-      tree.root.addChild(tree.lostAndFound);
+    if (this === this.treeConfig.lostAndFound && this.treeConfig.lostAndFound.children.length === 1) {
+      this.treeConfig.root.addChild(this.treeConfig.lostAndFound);
     }
 
-    if(!tree.loading){
-      tree.changeSubject.next({
+    if(!this.treeConfig.loading){
+      this.treeConfig.changeSubject.next({
         type: 'reference-added',
         relation: 'children',
         kind: this.kind,
@@ -1268,8 +1058,8 @@ class ItemProxy {
     }
 
     // update display of lostAndFound node
-    if (this === tree.lostAndFound && tree.lostAndFound.children.length === 0) {
-      tree.root.removeChild(tree.lostAndFound);
+    if (this === this.treeConfig.lostAndFound && this.treeConfig.lostAndFound.children.length === 0) {
+      this.treeConfig.root.removeChild(this.treeConfig.lostAndFound);
     }
 
     if (this.kind === 'Internal-Lost' && this.children.length === 0) {
@@ -1278,8 +1068,8 @@ class ItemProxy {
 
     this.calculateTreeHash();
 
-    if(!tree.loading){
-      tree.changeSubject.next({
+    if(!this.treeConfig.loading){
+      this.treeConfig.changeSubject.next({
         type: 'reference-removed',
         relation: 'children',
         kind: this.kind,
@@ -1333,7 +1123,7 @@ class ItemProxy {
     }
     let orderAfterSort = this.getOrderedChildIds();
     if (!_.isEqual(orderBeforeSort, orderAfterSort)){
-      tree.changeSubject.next({
+      this.treeConfig.changeSubject.next({
         type: 'reference-reordered',
         relation: 'children',
         kind: this.kind,
@@ -1459,13 +1249,13 @@ class ItemProxy {
 
       var newParentProxy;
       if (newParentId === '') {
-        newParentProxy = tree.root;
+        newParentProxy = this.treeConfig.root;
       } else {
-        newParentProxy = tree.proxyMap[newParentId];
+        newParentProxy = this.treeConfig.proxyMap[newParentId];
       }
 
       if (!newParentProxy) {
-        newParentProxy = createMissingProxy(newParentId);
+        newParentProxy = createMissingProxy(newParentId, this.treeConfig);
       }
 
       newParentProxy.addChild(this);
@@ -1478,8 +1268,8 @@ class ItemProxy {
         delete this.analysis;
     }
 
-    if(!tree.loading){
-      tree.changeSubject.next({
+    if(!this.treeConfig.loading){
+      this.treeConfig.changeSubject.next({
         type: 'update',
         kind: this.kind,
         id: this.item.id,
@@ -1498,8 +1288,8 @@ class ItemProxy {
 //    console.log('::: Deleting proxy for ' + byId);
 
     var attemptToDeleteRestrictedNode = (
-        (this.item.id === tree.lostAndFound.item.id) ||
-        (this.item.id === tree.root.item.id));
+        (this.item.id === this.treeConfig.lostAndFound.item.id) ||
+        (this.item.id === this.treeConfig.root.item.id));
 
     // Unlink from parent
     if (this.parentProxy && !attemptToDeleteRestrictedNode) {
@@ -1515,45 +1305,45 @@ class ItemProxy {
 //        console.log('::: -> Not removing ' + this.item.name);
       } else {
 //        console.log('::: -> Removing all references');
-        if(!tree.loading){
-          tree.changeSubject.next({
+        if(!this.treeConfig.loading){
+          this.treeConfig.changeSubject.next({
             type: 'delete',
             kind: this.kind,
             id: this.item.id,
             proxy: this
           });
         }
-        delete tree.proxyMap[byId];
+        delete this.treeConfig.proxyMap[byId];
       }
     } else {
       // Remove this item and leave any children under Lost+Found
       if (this.children.length !== 0) {
         if (!attemptToDeleteRestrictedNode){
 //          console.log('::: -> Node still has children');
-          if(!tree.loading){
-            tree.changeSubject.next({
+          if(!this.treeConfig.loading){
+            this.treeConfig.changeSubject.next({
               type: 'delete',
               kind: this.kind,
               id: this.item.id,
               proxy: this
             });
           }
-          createMissingProxy(byId);
+          createMissingProxy(byId, this.treeConfig);
         }
       } else {
         if (attemptToDeleteRestrictedNode){
 //          console.log('::: -> Not removing ' + this.item.name);
         } else {
 //          console.log('::: -> Removing all references');
-          if(!tree.loading){
-            tree.changeSubject.next({
+          if(!this.treeConfig.loading){
+            this.treeConfig.changeSubject.next({
               type: 'delete',
               kind: this.kind,
               id: this.item.id,
               proxy: this
             });
           }
-          delete tree.proxyMap[byId];
+          delete this.treeConfig.proxyMap[byId];
         }
       }
     }
@@ -1566,41 +1356,310 @@ class ItemProxy {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-tree.root = new ItemProxy('Internal', {
-  id: 'ROOT',
-  name : 'Root of Knowledge Tree'
-});
-tree.repoMap['ROOT'] = tree.root;
+class TreeConfiguration {
 
-tree.lostAndFound = new ItemProxy('Internal', {
-  id : 'LOST+FOUND',
-  name : 'Lost-And-Found',
-  description : 'Collection of node(s) that are no longer connected.'
-});
-tree.repoMap['LOST+FOUND'] = tree.lostAndFound;
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  constructor (treeId){
+    let treeConfig = treeConfigMap[treeId];
 
-tree.rootModelProxy = new ItemProxy('Internal-Model', {
-  id: 'Model-Definitions',
-  name: 'Model Definitions'
-});
+    if (treeConfig){
+      return treeConfig;
+    }
 
-tree.rootViewModelProxy = new ItemProxy('Internal-View-Model', {
-  id: 'View-Model-Definitions',
-  name: 'View Model Definitions'
-});
+    this.treeId = treeId;
+    this.proxyMap = {};
+    this.repoMap = {};
+    this.loading = true;
+    this.proxyHasDeferredModelAssociation = {};
 
+    this.changeSubject = new Rx.Subject();
+
+    this.root = new ItemProxy('Internal', {
+      id: 'ROOT',
+      name : 'Root of Knowledge Tree'
+    }, this);
+    this.repoMap['ROOT'] = this.root;
+
+    this.lostAndFound = new ItemProxy('Internal', {
+      id : 'LOST+FOUND',
+      name : 'Lost-And-Found',
+      description : 'Collection of node(s) that are no longer connected.'
+    }, this);
+    this.repoMap['LOST+FOUND'] = this.lostAndFound;
+
+    this.rootModelProxy = new ItemProxy('Internal-Model', {
+      id: 'Model-Definitions',
+      name: 'Model Definitions'
+    }, this);
+
+    this.rootViewModelProxy = new ItemProxy('Internal-View-Model', {
+      id: 'View-Model-Definitions',
+      name: 'View Model Definitions'
+    }, this);
+
+    return this;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getRootProxy() {
+    return this.root;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getChangeSubject() {
+    // TODO remove all references
+    return this.changeSubject;
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  loadingComplete() {
+    this.loading = false;
+    this.calculateAllTreeHashes();
+    this.changeSubject.next({
+      type: 'loaded'
+    });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  reset(skipModels) {
+
+    console.log('::: Resetting Tree Configuration ' + this.treeId);
+    let rootProxy = this.getRootProxy();
+
+    this.loading = true;
+
+    this.changeSubject.next({
+      type: 'loading'
+    });
+
+    rootProxy.removeChild(this.rootModelProxy);
+    rootProxy.removeChild(this.rootViewModelProxy);
+
+    rootProxy.visitChildren(null, null, (childProxy) => {
+      childProxy.deleteItem();
+    });
+
+    // Delete children of models if we are not skipping models
+    if (!skipModels) {
+      this.rootModelProxy.visitChildren(null, null, (childProxy) => {
+        childProxy.deleteItem();
+      });
+      this.rootViewModelProxy.visitChildren(null, null, (childProxy) => {
+        childProxy.deleteItem();
+      });
+      if (KoheseModel){
+        KoheseModel.removeLoadedModels();
+      }
+    }
+
+    // Re-insert rootModelProxy
+    rootProxy.addChild(this.rootModelProxy);
+    rootProxy.addChild(this.rootViewModelProxy);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getAllItemProxies() {
+    var itemProxyList = [];
+    for ( var key in this.proxyMap) {
+      itemProxyList.push(this.proxyMap[key]);
+    }
+    return itemProxyList;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getProxyFor(id) {
+	  if(id === '') {
+		  return this.root;
+	  }
+    return this.proxyMap[id];
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  calculateAllTreeHashes() {
+    for (let repoId in this.repoMap){
+      let repoProxy = this.repoMap[repoId];
+      repoProxy.calculateRepoTreeHashes();
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static compareTreeHashMap(fromTHMap, toTHMap){
+
+    var fromIds = Object.keys(fromTHMap).sort();
+    var toIds = Object.keys(toTHMap).sort();
+    // var allIds = _.union(fromIds, toIds);
+    var commonIds = _.intersection(fromIds, toIds);
+
+    if(!fromTHMap){
+      console.log('*** From is undefined');
+    }
+
+    var thmCompare = {
+      match: _.isEqual(fromTHMap, toTHMap),
+      addedItems: _.difference(toIds, fromIds),
+      changedItems: [],
+      deletedItems: _.difference(fromIds, toIds),
+      childMismatch: {}
+  };
+
+    commonIds.forEach((key) => {
+      var fromNode = fromTHMap[key];
+      var toNode = toTHMap[key];
+
+      if (!_.isEqual(fromNode.treeHash, toNode.treeHash)) {
+
+        if (fromNode.oid !== toNode.oid){
+          thmCompare.changedItems.push(key);
+        } else {
+          // Found structural difference at child level
+          var fromChildren = fromNode.childTreeHashes;
+          var toChildren = toNode.childTreeHashes;
+          var fromChildIds = Object.keys(fromChildren);
+          var toChildIds = Object.keys(toChildren);
+          var fromChildIdsSorted = Object.keys(fromChildren).sort();
+          var toChildIdsSorted = Object.keys(toChildren).sort();
+          // var allChildIds = _.union(fromChildIdsSorted, toChildIdsSorted);
+          var commonChildIds = _.intersection(fromChildIdsSorted, toChildIdsSorted);
+
+          var childMismatch = {};
+          childMismatch.addedChildren = _.difference(toChildIdsSorted, fromChildIdsSorted);
+          childMismatch.deletedChildren = _.difference(fromChildIdsSorted, toChildIdsSorted);
+
+
+          // Check for different tree hashes
+          var changedChildren = {};
+          commonChildIds.forEach((childId) => {
+            var fromOID = fromChildren[childId];
+            var toOID = toChildren[childId];
+
+            if (fromOID !== toOID){
+              changedChildren[childId] ={
+                  from: fromOID,
+                  to: toOID
+              };
+       }
+          });
+          childMismatch.changedChildren = changedChildren;
+
+          // Check for different order
+          var reorderedChildren = {};
+          for (var idx = 0; idx < fromChildIds.length; idx++){
+            if(fromChildIds[idx] !== toChildIds[idx]){
+              reorderedChildren[idx] = {
+                  from: fromChildIds[idx],
+                  to: toChildIds[idx]
+              };
+            }
+          }
+          childMismatch.reorderedChildren = reorderedChildren;
+
+          thmCompare.childMismatch[key] = childMismatch;
+        }
+      }
+
+    });
+
+    return thmCompare;
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getAllTreeHashes() {
+    var proxyTreeHashes = {};
+    this.root.visitTree(null,(proxy) => {
+      proxyTreeHashes[proxy.item.id] = proxy.treeHashEntry;
+    });
+
+    return proxyTreeHashes;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getRepoTreeHashes() {
+    var repoTreeHashes = {};
+
+    for(var repoIdx in this.repoMap){
+      var repoProxy = this.repoMap[repoIdx];
+      repoTreeHashes[repoIdx] = repoProxy.treeHashEntry;
+    }
+    return repoTreeHashes;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getRepositories(){
+    var repoList = [];
+    for(var id in this.proxyMap){
+      var proxy = this.proxyMap[id];
+      if (proxy.kind === 'Repository'){
+        repoList.push(proxy);
+      }
+    }
+    return repoList;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getRepositories() {
+    var repoList = [];
+    for(var id in this.proxyMap){
+      var proxy = this.proxyMap[id];
+      if (proxy.kind === 'Repository'){
+        repoList.push(proxy);
+      }
+    }
+    return repoList;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  dumpAllProxies() {
+    for ( var proxyId in this.proxyMap) {
+      var proxy = this.proxyMap[proxyId];
+      console.log('::: Dumping ' + proxy.item.id + ' - ' + proxy.item.name +
+          ' - ' + proxy.kind);
+    }
+  }
+}
+
+workingTree = new TreeConfiguration('WORKING');
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function createMissingProxy(forId) {
+function createMissingProxy(forId, treeConfig) {
   var lostProxy = new ItemProxy('Internal-Lost', {
     id : forId,
     name : 'Lost Item: ' + forId,
     description : 'Found node(s) referencing this node.',
     parentId : 'LOST+FOUND',
     loadPending: true
-  });
+  }, treeConfig);
   lostProxy.internal = true;
 
   return lostProxy;
@@ -1648,3 +1707,4 @@ function copyAttributes(fromItem, toProxy) {
 //
 //////////////////////////////////////////////////////////////////////////
 module.exports = ItemProxy;
+module.exports.TreeConfiguration = TreeConfiguration;

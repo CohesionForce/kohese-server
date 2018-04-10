@@ -9,14 +9,14 @@ kdb.initialize('kohese-kdb').then(function () {
 
   if(process.argv[2]) {
     itemId = process.argv[2];
-    root = ItemProxy.getProxyFor(itemId);
+    root = ItemProxy.getWorkingTree().getProxyFor(itemId);
     if (root === undefined) {
       console.log('*** Could not find an item by id:  ' + itemId);
       process.exit();
     }
   } else {
     console.log('::: No item id provided, so selected the root repository');
-    root = ItemProxy.getRootProxy();
+    root = ItemProxy.getWorkingTree().getRootProxy();
   }
 
   var descendants = root.getDescendants();

@@ -148,7 +148,7 @@ class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForCommit(commitId){
+  loadProxiesForCommit(commitId, treeConfig){
     let commit = this.getCommit(commitId);
     let lafTreeRoot;
     const LOST_AND_FOUND = 'LOST+FOUND';
@@ -158,18 +158,17 @@ class ItemCache {
 
     for(let repoId in commit.repoTreeRoots){
       let repoTreeHashEntry = commit.repoTreeRoots[repoId];
-      this.loadProxiesForTree(repoId, repoTreeHashEntry);
+      this.loadProxiesForTree(repoId, repoTreeHashEntry, treeConfig);
     }
 
     console.log('$$$ Loading complete');
-    ItemProxy.getRootProxy().dumpProxy();
 
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForTree(treeId, treeHashEntry){
+  loadProxiesForTree(treeId, treeHashEntry, treeConfig){
     console.log('$$$ Processing tree: ' + treeId);
     console.log(treeHashEntry);
     let kind = treeHashEntry.kind;
@@ -185,7 +184,7 @@ class ItemCache {
       default:
         let item = this.getBlob(treeHashEntry.oid);
         if (item){
-          let treeProxy = new ItemProxy(kind,  item);
+          let treeProxy = new ItemProxy(kind,  item, treeConfig);
         } else {
           console.log('*** Could not find item for: ' + kind + ' - ' + treeId);
         }
@@ -195,7 +194,7 @@ class ItemCache {
       console.log('$$$ Child: ' + childId);
       let childTreeHash = treeHashEntry.childTreeHashes[childId];
       let childTreeHashEntry = this.getTree(childTreeHash);
-      this.loadProxiesForTree(childId, childTreeHashEntry);
+      this.loadProxiesForTree(childId, childTreeHashEntry, treeConfig);
     }
   }
 

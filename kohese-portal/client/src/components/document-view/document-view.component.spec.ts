@@ -19,7 +19,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 describe('Component: Document View', ()=>{
   let documentViewComponent: DocumentViewComponent;
   let documentViewFixture : ComponentFixture<DocumentViewComponent>;
-  ItemProxy.resetItemRepository();
+  ItemProxy.getWorkingTree().reset();
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -47,13 +47,13 @@ describe('Component: Document View', ()=>{
         ignoreCase: true
       }
     });
-    
+
   })
 
   it('instantiates the Document View component', ()=>{
     let documentProxy = new ItemProxy('Item', MockDocument());
     documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
-    expect(documentViewComponent).toBeTruthy(); 
+    expect(documentViewComponent).toBeTruthy();
   })
 
   it('loads the whole document when incremental load is off', ()=>{
@@ -65,14 +65,14 @@ describe('Component: Document View', ()=>{
 
     for (let i = 0; i < 5; i++) {
       let childProxy = new ItemProxy('Item', mockChild);
-    } 
-    
+    }
+
     documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
     documentViewComponent.incrementalLoad = false;
     documentViewFixture.detectChanges();
     expect(documentViewComponent.itemsLoaded).toBe(6)
   })
-  
+
   it('loads only a subset of the document when incremental load is on', ()=>{
     let documentProxy = new ItemProxy('Item', MockItem());
 
@@ -81,7 +81,7 @@ describe('Component: Document View', ()=>{
     delete mockChild.id;
     for (let i = 0; i < 40; i++) {
       let childProxy = new ItemProxy('Item', mockChild);
-    } 
+    }
 
     documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
     documentViewComponent.incrementalLoad = true;
@@ -89,16 +89,16 @@ describe('Component: Document View', ()=>{
     expect(documentViewComponent.itemsLoaded).toBe(12);
   })
 
-  it('stops loading at the character limit', ()=>{   
+  it('stops loading at the character limit', ()=>{
     let documentProxy = new ItemProxy('Item', MockDocument());
-    
+
     let mockChild = MockDocument();
     mockChild.parentId = documentProxy.item.id;
     delete mockChild.id;
-    
+
     for (let i = 0; i < 5; i++) {
       let childProxy = new ItemProxy('Item', mockChild);
-    } 
+    }
 
     documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
     documentViewComponent.incrementalLoad = true;
@@ -107,6 +107,6 @@ describe('Component: Document View', ()=>{
   })
 
   afterEach(()=>{
-    ItemProxy.resetItemRepository();
+    ItemProxy.getWorkingTree().reset();
   })
 })
