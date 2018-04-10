@@ -9,10 +9,7 @@ var uuidV1 = require('uuid/v1');
 
 var Rx = require('rxjs/Rx');
 
-let treeConfigMap = {
-  'WORKING': null,
-  'STAGED': null,
-};
+let treeConfigMap = {};
 let workingTree;
 
 // Forward declare KoheseModel while waiting for registration to occur
@@ -160,7 +157,8 @@ class ItemProxy {
   static registerKoheseModelClass(KoheseModelClass) {
     KoheseModel = KoheseModelClass;
 
-    for (let treeConfig in treeConfigMap){
+    for (let treeId in treeConfigMap){
+      let treeConfig = treeConfigMap[treeId];
       for (let id in treeConfig.proxyHasDeferredModelAssociation){
         let proxy = treeConfig.proxyHasDeferredModelAssociation[id];
         proxy.setItemKind(proxy.kind);
@@ -1419,6 +1417,8 @@ class TreeConfiguration {
       id: 'View-Model-Definitions',
       name: 'View Model Definitions'
     }, this);
+
+    treeConfigMap[treeId] = this;
 
     return this;
   }
