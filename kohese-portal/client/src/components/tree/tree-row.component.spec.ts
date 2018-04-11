@@ -45,8 +45,8 @@ describe('Component: TreeRow', () => {
     fixture = TestBed.createComponent(TreeRowComponent);
     component = fixture.componentInstance;
     component.treeRow = new TreeRow(new ItemProxy('Item', MockItem()));
-    component.treeRootStream = new BehaviorSubject<ItemProxy>(ItemProxy.
-      getRootProxy());
+    component.treeRootStream = 
+      new BehaviorSubject<ItemProxy>(ItemProxy.getWorkingTree().getRootProxy());
     
     fixture.detectChanges();
   });

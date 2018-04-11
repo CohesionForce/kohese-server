@@ -21,9 +21,10 @@ describe('DynamicTypesService', () => {
     let modelProxy = new KoheseModel(MockDataModel());
     KoheseModel.modelDefinitionLoadingComplete();
 
-    itemRepositoryPlaceholder.getProxyFor.and.returnValues(ItemProxy.
-      getProxyFor('Model-Definitions'), new ItemProxy('KoheseView',
-      MockViewData()));
+    itemRepositoryPlaceholder.getProxyFor.and
+        .returnValues(ItemProxy.getWorkingTree()
+          .getProxyFor('Model-Definitions'), new ItemProxy('KoheseView',
+                                                         MockViewData()));
     typeService = new DynamicTypesService(itemRepositoryPlaceholder);
   });
 
