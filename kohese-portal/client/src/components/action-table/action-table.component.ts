@@ -45,6 +45,7 @@ export class ActionTableComponent extends NavigatableComponent
 
     this.proxyStreamSub = this.proxyStream.subscribe((newProxy : ItemProxy) => {
       this.itemProxy = newProxy;
+      console.log(this.itemProxy);
       let proxyList = this.itemProxy.getSubtreeAsList();
       this.tableStream = new MatTableDataSource(proxyList);
       for (let row of proxyList) {
