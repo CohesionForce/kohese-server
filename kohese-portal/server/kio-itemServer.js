@@ -209,7 +209,10 @@ function KIOItemServer(socket){
 
         response = {
             repoTreeHashes: repoTreeHashes,
-            cache: {},
+            cache: {
+              KoheseModel: {},
+              KoheseView: {},
+              KoheseUser: {}},
             sentAll: true
         };
 
