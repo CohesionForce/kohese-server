@@ -1,7 +1,7 @@
 /** Loads local KDB then deletes an item and its children based on user interaction.
  *  Usage: node scripts/delete-item.js itemId
- *  
- *  Note: Must be ran from kohese-portal directory. 
+ *
+ *  Note: Must be ran from kohese-portal directory.
  *  May need to restart local server to reflect changes.
  */
 var prompt = require('prompt');
@@ -18,7 +18,7 @@ if(process.argv[2]) {
 
 var KDB = require('../server/kdb.js');
 
-var baseItem = KDB.ItemProxy.getProxyFor(itemId)
+var baseItem = KDB.ItemProxy.getWorkingTree().getProxyFor(itemId)
 if (baseItem === undefined) {
 	console.log('Error: Provided ID not found.');
 	process.exit();
@@ -30,7 +30,7 @@ console.log('Note: The specified item has ' + baseItem.getDescendants().length +
 
 var delPrompt = {properties: {deleteAns: {
     description: 'Delete the item and all its descendants? (Y/N): ',
-	pattern: /^[YNyn]{1}$/, 
+	pattern: /^[YNyn]{1}$/,
 	message: 'Please enter Y or N',
 	required: true}}};
 
@@ -43,7 +43,7 @@ prompt.get(delPrompt, function (err, result) {
 		process.exit();
 	} else if (result.deleteAns === 'y' || result.deleteAns === 'Y'){
 		console.log('Now deleting item ' + baseItem.item.id + ' and all of its descendants...');
-		
+
 		var descendants = baseItem.getDescendants();
 		// Order is important as we don't want to delete items with children.
 		// Going through the descendant list backwards means we start from
@@ -54,16 +54,16 @@ prompt.get(delPrompt, function (err, result) {
 				console.log('Error: Unexpected children');
 				process.exit();
 			}
-			
+
 			// Calling the proxy delete isn't enough as it only deletes
 			// the local in-memory copy. We need to delete it from the disk!
 			//toBeDeleted.deleteItem();
 			KDB.removeModelInstance(toBeDeleted.kind, toBeDeleted.item.id);
 			toBeDeleted = descendants.pop();
 		}
-		
+
 		KDB.removeModelInstance(baseItem.kind, baseItem.item.id);
-		
+
 		console.log('Done deleting items!');
 	}
 });

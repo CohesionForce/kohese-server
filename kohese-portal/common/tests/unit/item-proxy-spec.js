@@ -3,8 +3,8 @@ describe('ItemProxy Test', function () {
   var ItemProxy = require('../../../common/src/item-proxy.js');
   var KoheseModel = require('../../../common/src/KoheseModel.js');
 
-  var root = ItemProxy.getRootProxy();
-  var lostAndFound = ItemProxy.getProxyFor('LOST+FOUND');
+  var root = ItemProxy.getWorkingTree().getRootProxy();
+  var lostAndFound = ItemProxy.getWorkingTree().getProxyFor('LOST+FOUND');
   // console.log(__dirname);
   // console.log('::: Starting Item Proxy Test');
   var dumpEnabled = false;
@@ -15,10 +15,10 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   function resetItemRepository() {
 
-    ItemProxy.resetItemRepository();
-    ItemProxy.loadingComplete();
+    ItemProxy.getWorkingTree().reset();
+    ItemProxy.getWorkingTree().loadingComplete();
 
-    expect(ItemProxy.getRootProxy().treeHashEntry.treeHash).toEqual('3ac03ab7a2505469c1be68a8462dbd9908fced5a');
+    expect(ItemProxy.getWorkingTree().getRootProxy().treeHashEntry.treeHash).toEqual('3ac03ab7a2505469c1be68a8462dbd9908fced5a');
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ describe('ItemProxy Test', function () {
         console.log('>>> ' + message);
       }
 
-      ItemProxy.dumpAllProxies();
+      ItemProxy.getWorkingTree().dumpAllProxies();
       // console.log('');
       root.dumpProxy();
       // console.log('Root Descendants: ' + root.descendantCount);
@@ -172,7 +172,7 @@ describe('ItemProxy Test', function () {
     expect(child).toBe(a);
 
     // Check to make sure that AA was added as a child of A
-    let aa = ItemProxy.getProxyFor('aa');
+    let aa = ItemProxy.getWorkingTree().getProxyFor('aa');
     child = a.getChildByName('AA');
     expect(child).toBeDefined();
     expect(child).not.toBeNull();
@@ -206,7 +206,7 @@ describe('ItemProxy Test', function () {
       parentId: 'bb'
     });
 
-    var autobb = ItemProxy.getProxyFor('bb');
+    var autobb = ItemProxy.getWorkingTree().getProxyFor('bb');
 
     expect(autobb.item.parentId).toBe('LOST+FOUND');
 
@@ -225,7 +225,7 @@ describe('ItemProxy Test', function () {
     });
     dump('Added bb');
 
-    let b = ItemProxy.getProxyFor('b');
+    let b = ItemProxy.getWorkingTree().getProxyFor('b');
 
     expect(b.children[0].item.id).toBe('bb');
     expect(b.item.id).toBe(bb.parentProxy.item.id);
@@ -237,7 +237,7 @@ describe('ItemProxy Test', function () {
 
     expect(root.children[0].item.id).toBe('a');
 
-    let a = ItemProxy.getProxyFor('a');
+    let a = ItemProxy.getWorkingTree().getProxyFor('a');
 
     a.deleteItem();
     dump('Deleted a');
@@ -252,7 +252,7 @@ describe('ItemProxy Test', function () {
     // console.log('::: Changing parent of aa');
     // console.log(aa.item);
 
-    let aa = ItemProxy.getProxyFor('aa');
+    let aa = ItemProxy.getWorkingTree().getProxyFor('aa');
     let newAAItem = JSON.parse(JSON.stringify(aa.item));
     newAAItem.parentId = 'b';
     newAAItem.description = 'b with changes';
@@ -276,7 +276,7 @@ describe('ItemProxy Test', function () {
   it('Deleting description for aa', function () {
     // console.log('::: Deleting description for aa');
 
-    let aa = ItemProxy.getProxyFor('aa');
+    let aa = ItemProxy.getWorkingTree().getProxyFor('aa');
     let newAAItem = JSON.parse(JSON.stringify(aa.item));
     let temp = aa.item.id;
 
@@ -294,7 +294,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Changing parent of bb to ROOT', function () {
     // console.log('::: Changing parent of bb to ROOT');
-    let bb = ItemProxy.getProxyFor('bb');
+    let bb = ItemProxy.getWorkingTree().getProxyFor('bb');
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
     newBBItem.parentId = '';
     bb.updateItem('Test', newBBItem);
@@ -310,13 +310,13 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Changing parent of bb to c', function () {
     // console.log('::: Changing parent of bb to c');
-    let bb = ItemProxy.getProxyFor('bb');
+    let bb = ItemProxy.getWorkingTree().getProxyFor('bb');
     var newBBItem = JSON.parse(JSON.stringify(bb.item));
     newBBItem.parentId = 'c';
     bb.updateItem('Test', newBBItem);
     dump('Changed bb parent to c');
 
-    var c = ItemProxy.getProxyFor('c');
+    var c = ItemProxy.getWorkingTree().getProxyFor('c');
     expect(bb.item.parentId).toBe('c');
     expect(bb.parentProxy).toBe(c);
     expect(c.getChildByName('BB')).toBe(bb);
@@ -327,7 +327,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Morph b into a NewTest', function () {
     // console.log('::: Morph b into a NewTest');
-    let b = ItemProxy.getProxyFor('b');
+    let b = ItemProxy.getWorkingTree().getProxyFor('b');
     var newBItem = JSON.parse(JSON.stringify(b.item));
     b.updateItem('NewTest', newBItem);
     dump('Change b to a NewTest kind');
@@ -373,7 +373,7 @@ describe('ItemProxy Test', function () {
       return JSON.stringify(temp);
     }
 
-    let b = ItemProxy.getProxyFor('b');
+    let b = ItemProxy.getWorkingTree().getProxyFor('b');
     expect(getChildIds(b)).toBe(expectArray);
 
     var newAEItem = JSON.parse(JSON.stringify(ae.item));
@@ -392,7 +392,7 @@ describe('ItemProxy Test', function () {
     expectArray = JSON.stringify(['ae', 'aa', 'ac', 'ad', 'ab']);
     expect(getChildIds(b)).toBe(expectArray);
 
-    let aa = ItemProxy.getProxyFor('aa');
+    let aa = ItemProxy.getWorkingTree().getProxyFor('aa');
     var newAAItem = JSON.parse(JSON.stringify(aa.item));
     newAAItem.name = 'B - New Name - AA';
     aa.updateItem('Item', newAAItem);
@@ -587,7 +587,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Get Ancestors', function () {
     // console.log('::: Getting AB ancestors');
-    var ab = ItemProxy.getProxyFor('ab');
+    var ab = ItemProxy.getWorkingTree().getProxyFor('ab');
     var abAncestors = ab.getAncestorProxies();
     var expected = ['b', 'ROOT'];
     for (var ancestorIdx in abAncestors) {
@@ -603,7 +603,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Get Descendants', function () {
     // console.log('::: Getting B Descendants');
-    var b = ItemProxy.getProxyFor('b');
+    var b = ItemProxy.getWorkingTree().getProxyFor('b');
     // eslint-disable-next-line no-unused-vars
     var ac1 = new ItemProxy('Test', {
       id: 'ac1',
@@ -635,7 +635,7 @@ describe('ItemProxy Test', function () {
 
     dumpHashFor(proxy.parentProxy);
     dumpHashFor(proxy);
-    ItemProxy.loadingComplete();
+    ItemProxy.getWorkingTree().loadingComplete();
 
     expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('2b99e2dda5c6be0762532b093661a895e6fa4f09');
     expect(proxy.parentProxy.treeHashEntry.childTreeHashes['test-item-id'])
@@ -796,7 +796,7 @@ describe('ItemProxy Test', function () {
     //        This allows an update to be called in some paths through the code.
     //        We need to ensure that the model gets associated correctly in this case.
 
-    var b = ItemProxy.getProxyFor('B');
+    var b = ItemProxy.getWorkingTree().getProxyFor('B');
     b.updateItem('Test', {
       id: 'B',
       name: 'Item BB'
@@ -962,7 +962,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Retrieve Tree Hash Map', () => {
 
-    var treeHashMap = ItemProxy.getAllTreeHashes();
+    var treeHashMap = ItemProxy.getWorkingTree().getAllTreeHashes();
     var expectedTreeHashMap = {
       'ROOT': {
         'kind': 'Internal',
@@ -1078,7 +1078,7 @@ describe('ItemProxy Test', function () {
       }
     };
 
-  var thmCompare = ItemProxy.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
+  var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
   if (!thmCompare.match) {
     console.log('Tree Map');
     console.log(treeHashMap);
@@ -1098,14 +1098,14 @@ describe('ItemProxy Test', function () {
 //////////////////////////////////////////////////////////////////////////
 it('Retrieve Delta Tree Hash Map', () => {
 
-  var treeHashMapBefore = ItemProxy.getAllTreeHashes();
+  var treeHashMapBefore = ItemProxy.getWorkingTree().getAllTreeHashes();
 
   // Delete B
-  var b = ItemProxy.getProxyFor('B');
+  var b = ItemProxy.getWorkingTree().getProxyFor('B');
   b.deleteItem();
 
   // Update C
-  var c = ItemProxy.getProxyFor('C');
+  var c = ItemProxy.getWorkingTree().getProxyFor('C');
   var newCItem = JSON.parse(JSON.stringify(c.item));
   newCItem.name = 'Updated C';
   c.updateItem(c.kind, newCItem);
@@ -1149,9 +1149,9 @@ it('Retrieve Delta Tree Hash Map', () => {
     }
   };
 
-  var treeHashMapAfter = ItemProxy.getAllTreeHashes();
+  var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
 
-  var thmCompare = ItemProxy.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
+  var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
 
   expect(thmCompare).toEqual(expectedDeltaMap);
 });
@@ -1178,11 +1178,11 @@ it('Should Not Hang When Deleting Lost+Found With Children', () => {
   });
 
   // Try to delete item only
-  var lfProxy = ItemProxy.getProxyFor('LOST+FOUND');
+  var lfProxy = ItemProxy.getWorkingTree().getProxyFor('LOST+FOUND');
   lfProxy.deleteItem();
 
   // Try to delete item and descendants
-  var lfProxyAfter = ItemProxy.getProxyFor('LOST+FOUND');
+  var lfProxyAfter = ItemProxy.getWorkingTree().getProxyFor('LOST+FOUND');
   expect(lfProxyAfter).toEqual(lostAndFound);
   expect(lfProxyAfter.descendantCount).toEqual(2);
 
@@ -1288,7 +1288,7 @@ it('Sort Items with Same Name Correctly When Adding Parent After Children', () =
     parentId: 'LATE_A'
   });
 
-  var lateA = ItemProxy.getProxyFor('LATE_A');
+  var lateA = ItemProxy.getWorkingTree().getProxyFor('LATE_A');
 
   // eslint-disable-next-line no-unused-vars
   var aa = new ItemProxy('Test', {

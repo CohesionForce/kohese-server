@@ -32,7 +32,7 @@ class KoheseModel extends ItemProxy {
     }
 
     if (forItem.parentId){
-      let parentProxy = ItemProxy.getProxyFor(forItem.parentId);
+      let parentProxy = ItemProxy.getWorkingTree().getProxyFor(forItem.parentId);
       if(!parentProxy){
         // Parent model has not been loaded yet
         createMissingModelProxy(forItem.parentId);
@@ -100,7 +100,7 @@ class KoheseModel extends ItemProxy {
     // Create a placeholder kind if it does not exist yet
     if (!modelProxy) {
       // Make sure the map has not been missed due to loading order on the client
-      modelProxy = ItemProxy.getProxyFor(kind);
+      modelProxy = ItemProxy.getWorkingTree().getProxyFor(kind);
       if (modelProxy) {
         modelMap[kind] = modelProxy;
       }
@@ -113,7 +113,7 @@ class KoheseModel extends ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   static modelDefinitionLoadingComplete() {
     // Create the key ordering for descendant models
-    let rootModelProxy = ItemProxy.getProxyFor('Model-Definitions');
+    let rootModelProxy = ItemProxy.getWorkingTree().getProxyFor('Model-Definitions');
     var models = rootModelProxy.getDescendants();
 
     for(var index in models){

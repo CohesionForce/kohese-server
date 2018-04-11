@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 import { RepoStates } from '../../src/services/item-repository/item-repository.service';
 
 export class MockItemRepository {
-  mockRootProxy = ItemProxy.getRootProxy();
+  mockRootProxy = ItemProxy.getWorkingTree().getRootProxy();
   state : any;
 
   constructor() {
@@ -79,11 +79,11 @@ export class MockItemRepository {
   upsertItem() {
 
   }
-  
+
   public getChangeSubject(): Subject<any> {
-    return ItemProxy.getChangeSubject();
+    return ItemProxy.getWorkingTree().getChangeSubject();
   }
-  
+
   public fetchItem(proxy: ItemProxy): Promise<ItemProxy> {
     let id: string = proxy.item.id;
     proxy.updateItem(proxy.kind, MockItem());

@@ -1,6 +1,6 @@
 /**
  *  Create a remote REPL interface accessible via scripts/remoteConnect.js
- *  
+ *
  *  Note: This is only used if the server is started with a 'repl' argument
  */
 
@@ -13,7 +13,7 @@ console.log('::: Starting Remote REPL Interface');
 var replServer = net.createServer(function(socket) {
 
     socket.on('error', function(err) {
-        console.log(err); 
+        console.log(err);
     });
 
     console.log('::: User ' + socket.remoteAddress + ' connected to REPL Server');
@@ -64,25 +64,25 @@ function defineCommands(replConsole) {
             this.displayPrompt();
         }
     });
-    
+
     replConsole.defineCommand('getKDBPath', {
         help: 'Print the current KDB Path',
         action: function() {
-            var kdbPath = global.koheseKDB.ItemProxy.getRootProxy().repoPath;
+            var kdbPath = global.koheseKDB.ItemProxy.getWorkingTree().getRootProxy().repoPath;
             this.outputStream.write(kdbPath + '\n');
             this.displayPrompt();
         }
     });
-    
+
     replConsole.defineCommand('restart', {
         help: 'restarts the server in a terrible way',
         action: function() {
             var child = require('child_process');
-            var kdbPath = global.koheseKDB.ItemProxy.getRootProxy().repoPath;
+            var kdbPath = global.koheseKDB.ItemProxy.getWorkingTree().getRootProxy().repoPath;
             kdbPath = kdbPath.replace(/\/Root.json$/,'');
             kdbPath = kdbPath.replace(/^kdb\//, '');
-            child.spawn('gnome-terminal', 
-                ['-e', 'node . -kdb=' + kdbPath + ' repl', '--title', 'Kohese Server : ' + kdbPath], 
+            child.spawn('gnome-terminal',
+                ['-e', 'node . -kdb=' + kdbPath + ' repl', '--title', 'Kohese Server : ' + kdbPath],
                 {detached: true});
             process.exit();
             // If the current process exits before spawning a new one may need to do:
