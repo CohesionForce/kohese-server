@@ -21,22 +21,22 @@ function testGetItemStatus(proxy){
   console.log("::: Get Item Status");
 
   var itemStatus = KDB.kdbRepo.getItemStatus(proxy);
-  console.log(itemStatus);  
+  console.log(itemStatus);
 }
 
 function testHistory(proxy) {
   console.log("::: Test History");
-  
+
   KDB.kdbRepo.walkHistoryForFile(proxy, function (history) {
     console.log(history);
   });
 }
 
-var proxy = KDB.ItemProxy.getProxyFor(forItemId);
+var proxy = KDB.ItemProxy.getWorkingTree().getProxyFor(forItemId);
 
 var kgitPrompt = {properties: {kgitAns: {
   description: 'Ready to kgit? (Y/N): ',
-pattern: /^[YNyn]{1}$/, 
+pattern: /^[YNyn]{1}$/,
 message: 'Please enter Y or N',
 required: true}}};
 

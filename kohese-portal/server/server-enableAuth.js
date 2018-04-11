@@ -22,7 +22,7 @@ try {
 //////////////////////////////////////////////////////////////////////////
 function checkAndCreateUsersItem() {
 
-  var rootProxy = ItemProxy.getRootProxy();
+  var rootProxy = ItemProxy.getWorkingTree().getRootProxy();
 
   usersProxy = rootProxy.getChildByName('Users');
 

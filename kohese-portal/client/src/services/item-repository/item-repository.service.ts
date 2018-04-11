@@ -9,6 +9,7 @@ import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
 import * as ItemProxy from '../../../../common/src/item-proxy.js';
+import * as ItemCache from '../../../../common/src/item-cache.js';
 import * as KoheseModel from '../../../../common/src/KoheseModel.js';
 import { CacheManager } from '../../../cache-worker/CacheManager';
 import { Subject } from 'rxjs/Subject';
@@ -70,7 +71,7 @@ export class ItemRepository {
 
     this.historySubject = new Subject();
 
-    ItemProxy.getChangeSubject().subscribe(change => {
+    ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
       // console.log('+++ Received notification of change: ' + change.type);
       // if(change.proxy){
       //   console.log(change.kind);
@@ -102,23 +103,23 @@ export class ItemRepository {
 
   // Item Proxy Wrapper Methods
   getRootProxy(): ItemProxy {
-    return ItemProxy.getRootProxy();
+    return ItemProxy.getWorkingTree().getRootProxy();
   }
 
   getChangeSubject(): Subject<any> {
-    return ItemProxy.getChangeSubject();
+    return ItemProxy.getWorkingTree().getChangeSubject();
   }
 
   getProxyFor(id: string): ItemProxy {
-    return ItemProxy.getProxyFor(id);
+    return ItemProxy.getWorkingTree().getProxyFor(id);
   }
 
   getAllItemProxies(): Array<ItemProxy> {
-    return ItemProxy.getAllItemProxies();
+    return ItemProxy.getWorkingTree().getAllItemProxies();
   }
 
   getRepositories(): Array<ItemProxy> {
-    return ItemProxy.getRepositories();
+    return ItemProxy.getWorkingTree().getRepositories();
   }
 
   // End Item Proxy Wrapper
@@ -142,7 +143,7 @@ export class ItemRepository {
       for (var modelName in this.modelTypes) {
         this.socketService.socket.on(modelName + '/create', (notification) => {
           console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
-          var proxy = ItemProxy.getProxyFor(notification.item.id);
+          var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
           if (proxy) {
             proxy.updateItem(notification.kind, notification.item);
           } else {
@@ -159,7 +160,7 @@ export class ItemRepository {
 
         this.socketService.socket.on(modelName + '/update', (notification) => {
           console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
-          var proxy = ItemProxy.getProxyFor(notification.item.id);
+          var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
           if (proxy) {
             proxy.updateItem(notification.kind, notification.item);
           } else {
@@ -176,7 +177,7 @@ export class ItemRepository {
 
         this.socketService.socket.on(modelName + '/delete', (notification) => {
           console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
-          var proxy = ItemProxy.getProxyFor(notification.id);
+          var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
           proxy.deleteItem();
         });
 
@@ -189,7 +190,7 @@ export class ItemRepository {
 
       this.socketService.socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
         for (var id in gitStatusMap) {
-          var proxy = ItemProxy.getProxyFor(id);
+          var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
           this.updateStatus(proxy, gitStatusMap[id]);
         }
       });
@@ -278,7 +279,7 @@ export class ItemRepository {
 
     if(response.deleteItems) {
       response.deleteItems.forEach((deletedItemId) => {
-        var proxy = ItemProxy.getProxyFor(deletedItemId);
+        var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
         proxy.deleteItem();
       });
     }
@@ -300,10 +301,13 @@ export class ItemRepository {
       CacheManager.getAllItems((response) => {
         let afterFetch = Date.now();
         console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
-        this.processBulkUpdate(response);
+        this.processBulkUpdate(response.allItems);
+        let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
+        rootProxy.cache = new ItemCache();
+        rootProxy.cache.setObjectMap(response.objectMap);
         let processingComplete = Date.now();
         console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
-        ItemProxy.loadingComplete();
+        ItemProxy.getWorkingTree().loadingComplete();
         let treehashComplete = Date.now();
         console.log('$$$ TreeHash time: ' + (treehashComplete - processingComplete)/1000);
 
@@ -330,7 +334,7 @@ export class ItemRepository {
     } else {
       console.log('::: Fetching Items');
       var beginFetching = Date.now();
-      var origRepoTreeHashes = ItemProxy.getRepoTreeHashes();
+      var origRepoTreeHashes = ItemProxy.getWorkingTree().getRepoTreeHashes();
 
       this.repositoryStatus.next({
         state: RepoStates.SYNCHRONIZING,
@@ -352,11 +356,11 @@ export class ItemRepository {
 
         for(let repoId in response.repoTreeHashes){
           let repoTreeHash = response.repoTreeHashes[repoId];
-          let repoProxy = ItemProxy.getProxyFor(repoId);
+          let repoProxy = ItemProxy.getWorkingTree().getProxyFor(repoId);
           let syncRequired = true;
           if (repoProxy && repoProxy.treeHashEntry){
             // A previous fetch has occurried, check to see if there an opportunity to skip resync
-            let rTHMCompare = ItemProxy.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
+            let rTHMCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
             if (rTHMCompare.match){
               syncRequired = false;
               // console.log('$$$ Sync not required ' + repoId);
@@ -387,9 +391,9 @@ export class ItemRepository {
 
     let origRepoTreeHashes;
     if (!forRepoId){
-      origRepoTreeHashes = ItemProxy.getAllTreeHashes()
+      origRepoTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes()
     } else {
-      let repoProxy = ItemProxy.getProxyFor(forRepoId);
+      let repoProxy = ItemProxy.getWorkingTree().getProxyFor(forRepoId);
       if (repoProxy){
         origRepoTreeHashes = repoProxy.getTreeHashMap();
       }
@@ -421,17 +425,17 @@ export class ItemRepository {
         console.log('::: Compare Repo Tree Hashes After Update');
         var updatedTreeHashes;
         if (!forRepoId){
-          ItemProxy.loadingComplete();
-          updatedTreeHashes = ItemProxy.getAllTreeHashes()
+          ItemProxy.getWorkingTree().loadingComplete();
+          updatedTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes()
         } else {
-          let repoProxy = ItemProxy.getProxyFor(forRepoId);
+          let repoProxy = ItemProxy.getWorkingTree().getProxyFor(forRepoId);
           if (repoProxy){
             repoProxy.calculateRepoTreeHashes();
             updatedTreeHashes = repoProxy.getTreeHashMap();
           }
         }
 
-        var compareAfterRTH = ItemProxy.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
+        var compareAfterRTH = ItemProxy.TreeConfiguration.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
 
         syncSucceeded = compareAfterRTH.match;
 
@@ -475,7 +479,7 @@ export class ItemRepository {
             message : 'Item Repository Ready'
           });
 
-          var rootProxy = ItemProxy.getRootProxy();
+          var rootProxy = ItemProxy.getWorkingTree().getRootProxy();
           this.getStatusFor(rootProxy);
         }
       }
@@ -491,7 +495,7 @@ export class ItemRepository {
   }
 
   createShortFormItemList () {
-    var proxies = ItemProxy.getAllItemProxies();
+    var proxies = ItemProxy.getWorkingTree().getAllItemProxies();
     this.shortProxyList=[];
     for (var i = 0; i < proxies.length; i++ ) {
       this.shortProxyList.push({
@@ -636,7 +640,7 @@ export class ItemRepository {
         var entry = repo.repoStatus[rIdx];
         console.log('+++ ' + rIdx + ' - ' + entry.id + ' - ' + entry.status );
 
-        var proxy = ItemProxy.getProxyFor(entry.id);
+        var proxy = ItemProxy.getWorkingTree().getProxyFor(entry.id);
         if (proxy) {
           this.updateStatus(proxy, entry.status);
         } else {
@@ -661,7 +665,7 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   private updateStatus(proxy: ItemProxy, statuses: Array<string>): void {
     if (statuses.length > 0) {
       proxy.status = this._versionControlService.translateStatus(statuses);
@@ -670,8 +674,8 @@ export class ItemRepository {
         delete proxy.status[fieldName];
       }
     }
-    
-    ItemProxy.getChangeSubject().next({
+
+    ItemProxy.getWorkingTree().getChangeSubject().next({
       type: 'update',
       proxy: proxy
     });

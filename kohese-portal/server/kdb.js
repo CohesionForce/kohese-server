@@ -65,7 +65,7 @@ function initialize(koheseKdbPath) {
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
   //TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
 
-  ItemProxy.getRootProxy().repoPath = path.join(koheseKDBDirPath, 'Root.json');
+  ItemProxy.getWorkingTree().getRootProxy().repoPath = path.join(koheseKDBDirPath, 'Root.json');
 
   // Check to see if a Root.json exists. If not, assume brand new kdb
   var create = false;
@@ -240,9 +240,9 @@ function storeModelInstance(proxy, isNewItem){
       mountRepository({id: modelInstance.id, parentId: modelInstance.parentId, 'repoStoragePath': repoStoragePath});
     }
 
-    var repositoryPath = ItemProxy.getRootProxy().repoPath.split('Root.json')[0];
-    repositoryPath = ItemProxy.getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
-    return kdbRepo.getItemStatus(ItemProxy.getRootProxy().item.id,
+    var repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
+    repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
+    return kdbRepo.getItemStatus(ItemProxy.getWorkingTree().getRootProxy().item.id,
         repositoryPath);
   }).then((status) => {
     return status;
@@ -257,7 +257,7 @@ module.exports.storeModelInstance = storeModelInstance;
 function storeModelAnalysis(analysisInstance){
   var modelInstanceId = analysisInstance.id;
 
-  var proxy = ItemProxy.getProxyFor(modelInstanceId);
+  var proxy = ItemProxy.getWorkingTree().getProxyFor(modelInstanceId);
 
   if (proxy) {
     console.log('::: Storing analysis for ' + proxy.item.id + ' - ' + proxy.item.name);
@@ -377,7 +377,7 @@ function mountRepository(mountData) {
 
         // Check to see if the repo has already been mounted. If so, then update it.
         if(mountList[mountData.id].mounted) {
-            proxy = ItemProxy.getProxyFor(mountData.id);
+            proxy = ItemProxy.getWorkingTree().getProxyFor(mountData.id);
             proxy.updateItem('Repository', repoRoot);
         } else {
             mountList[mountData.id].mounted = true;
@@ -419,7 +419,7 @@ function createRepoStructure(repoDirPath) {
 
     checkAndCreateDir(repoDirPath);
 
-    return kdbRepo.initializeRepository(ItemProxy.getRootProxy().item.id, repoDirPath);
+    return kdbRepo.initializeRepository(ItemProxy.getWorkingTree().getRootProxy().item.id, repoDirPath);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -540,7 +540,7 @@ function openRepositories() {
 	    // Do nothing; the mount list will get written when validating if necessary
 	}
 
-  let rootProxy = ItemProxy.getRootProxy();
+  let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
   rootProxy.cache = new KDBCache(koheseKDBDirPath);
 
   return rootProxy.cache.updateCache().then(() => {
@@ -562,7 +562,7 @@ function openRepositories() {
 
 	  //Load corresponding git repositories
 	  var promises = [];
-    promises.push(kdbRepo.openRepo(ItemProxy.getRootProxy().item.id, koheseKDBDirPath));
+    promises.push(kdbRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, koheseKDBDirPath));
 
     index(rootProxy, false);
 
@@ -570,8 +570,8 @@ function openRepositories() {
 	  for(let id in mountList) {
 	    if(mountList[id].mounted && mountList[id].repoStoragePath) {
 	      // eslint-disable-next-line no-unused-vars
-        var proxy = ItemProxy.getProxyFor(id);
-	        //promises.push(kdbRepo.openRepo(ItemProxy.getRootProxy().item.id, proxy.repoPath));
+        var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+	        //promises.push(kdbRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, proxy.repoPath));
 	        // TODO Once Repositories are version controlled separately,
 	        // index them here.
 	    }
@@ -588,7 +588,7 @@ function openRepositories() {
       // Need to wait for all repos to be loaded before continuing
       console.log('::: End KDB File Load');
       console.log(new Date());
-      ItemProxy.loadingComplete();
+      ItemProxy.getWorkingTree().loadingComplete();
       console.log(new Date());
     });
   });

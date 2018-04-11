@@ -30,7 +30,7 @@ for (var i in process.argv) {
 }
 // End argument processing
 
-var document = KDB.ItemProxy.getProxyFor(forItemId);
+var document = KDB.ItemProxy.getWorkingTree().getProxyFor(forItemId);
 if (!document) {
 	console.log('!!! Item id not found.')
 	process.exit();

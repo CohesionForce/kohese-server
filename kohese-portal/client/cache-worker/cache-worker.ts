@@ -2,10 +2,15 @@ console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
 import * as ItemProxy from '../../common/src/item-proxy.js';
+import * as ItemCache from '../../common/src/item-cache.js';
 import * as KoheseModel from '../../common/src/KoheseModel.js';
 
 let socket : SocketIOClient.Socket = SocketIoClient();
-let allItems;
+let serverCache = {
+  allItems: null,
+  objectMap: null
+}
+let cacheFetched = false;
 
 enum RepoStates {
   DISCONNECTED,
@@ -62,7 +67,7 @@ let repoSyncCallback = [];
         break;
       case 'getItemCache':
       console.log('$$$ getItemCache');
-      fetchItemCache();
+      // fetchItemCache();
         break;
       case 'getAllItems':
       console.log('$$$ getAllItems');
@@ -129,15 +134,15 @@ function processAuthToken(port, request){
 //
 //////////////////////////////////////////////////////////////////////////
 function fetchItemCache(){
-  console.log('$$$ Fetch Item Cache');
-  let requestTime = Date.now();
+  if (!cacheFetched){
+    console.log('$$$ Fetch Item Cache');
+    let requestTime = Date.now();
 
-  socket.emit('Item/getItemCache', {
-    timestamp: {
-      requestTime: requestTime
+    socket.emit('Item/getItemCache', {
+      timestamp: {
+        requestTime: requestTime
+      }
     },
-    cacheFetched: false
-  },
     (response) => {
       var responseReceiptTime = Date.now();
       let timestamp = response.timestamp;
@@ -148,9 +153,24 @@ function fetchItemCache(){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
       console.log(Object.keys(response.objectMap));
-      // this.cacheFetched = true;
+      serverCache.objectMap = response.objectMap;
+      let itemCache = new ItemCache();
+      itemCache.setObjectMap(response.objectMap)
+      ItemProxy.getWorkingTree().getRootProxy().cache = itemCache;
+      cacheFetched = true;
+
+      repoState = RepoStates.SYNCHRONIZATION_SUCCEEDED;
+
+      // Deliver sync results to all pending clients
+      for(let cbIdx in repoSyncCallback){
+        let callback = repoSyncCallback[cbIdx];
+        callback(serverCache);
+      }
+      repoSyncCallback = [];
+    });
+  } else {
+    console.log('$$$ Cache has already been fetched');
   }
-  );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -199,7 +219,7 @@ function processBulkUpdate(response){
 
   if(response.deleteItems) {
     response.deleteItems.forEach((deletedItemId) => {
-      var proxy = ItemProxy.getProxyFor(deletedItemId);
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
       proxy.deleteItem();
     });
   }
@@ -219,20 +239,14 @@ function syncWithServer(){
 
       // Update local ItemProxy
       processBulkUpdate(response);
-      ItemProxy.loadingComplete();
+      ItemProxy.getWorkingTree().loadingComplete();
       let processingCompleteTime = Date.now();
       console.log('::: Processing completed at ' + (processingCompleteTime-responseReceiptTime)/1000);
-      repoState = RepoStates.SYNCHRONIZATION_SUCCEEDED;
 
       // TODO need to remove this storage of allItems response
-      allItems = response;
+      serverCache.allItems = response;
 
-      // Deliver sync results to all pending clients
-      for(let cbIdx in repoSyncCallback){
-        let callback = repoSyncCallback[cbIdx];
-        callback(response);
-      }
-      repoSyncCallback = [];
+      fetchItemCache();
 
     }
   );
@@ -245,9 +259,9 @@ function fetchAllItems(callback){
   console.log('$$$ Fetch All Items');
 
   // Determine if repo is already synched
-  if (allItems){
+  if (serverCache.allItems){
     console.log('$$$ getAll: Sending cached items');
-    callback(allItems);
+    callback(serverCache);
     return;
   }
 

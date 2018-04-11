@@ -7,7 +7,7 @@ import { MaterialModule } from '../../material.module'
 
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
-import { ActionTableComponent } from './action-table.component'; 
+import { ActionTableComponent } from './action-table.component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { BehaviorSubject } from 'rxjs';
 import * as ItemProxy from '../../../../common/src/item-proxy';
@@ -17,7 +17,7 @@ import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
 describe('Component: Action Table', ()=>{
   let actionTableComponent: ActionTableComponent;
   let actionTableFixture : ComponentFixture<ActionTableComponent>;
-  let mockItemRepository = new MockItemRepository();  
+  let mockItemRepository = new MockItemRepository();
   beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [ActionTableComponent],
@@ -39,14 +39,14 @@ describe('Component: Action Table', ()=>{
     actionTableComponent.proxyStream = new BehaviorSubject<any>(mockItemRepository.getRootProxy());
 
     actionTableFixture.detectChanges();
-    
+
   })
 
   it('instantiates the actionTable component', ()=>{
-    expect(actionTableComponent).toBeTruthy(); 
+    expect(actionTableComponent).toBeTruthy();
   })
 
   afterEach(()=>{
-    ItemProxy.resetItemRepository();
+    ItemProxy.getWorkingTree().reset();
   })
 })
