@@ -133,7 +133,8 @@ describe('Component: Create Wizard', ()=>{
     let closeSpy;
 
     beforeEach(()=>{
-      createWizardComponent.selectedType = new ItemProxy('Item', MockItem())
+      createWizardComponent.selectedType = TestBed.get(DynamicTypesService).
+        getKoheseTypes()['Kurios Iesous'];
       createWizardComponent.createFormGroup = <FormGroup> {
         value : ItemProxy
       }

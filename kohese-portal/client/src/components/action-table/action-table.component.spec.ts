@@ -12,6 +12,7 @@ import { PipesModule } from '../../pipes/pipes.module';
 import { BehaviorSubject } from 'rxjs';
 import * as ItemProxy from '../../../../common/src/item-proxy';
 
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
 
 describe('Component: Action Table', ()=>{
@@ -30,7 +31,8 @@ describe('Component: Action Table', ()=>{
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {provide: NavigationService, useClass : MockNavigationService},
-        {provide: ChangeDetectorRef, useValue : {markForCheck : ()=>{}}}
+        {provide: ChangeDetectorRef, useValue : {markForCheck : ()=>{}}},
+        {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();
 
