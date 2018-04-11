@@ -11,7 +11,7 @@
     <ng-container matColumnDef="predecessors">
       <mat-header-cell *matHeaderCellDef> Predecessors</mat-header-cell>
       <mat-cell *matCellDef="let action">
-        <ul> 
+        <ul *ngIf="action.proxy.relations.references[action.proxy.kind]"> 
           <li *ngFor="let predecessor of action.proxy.relations.references[action.proxy.kind].predecessors"> 
             {{predecessor.item.name}}
           </li>
