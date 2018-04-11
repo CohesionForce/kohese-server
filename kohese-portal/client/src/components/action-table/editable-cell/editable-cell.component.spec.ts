@@ -16,7 +16,12 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 describe('Component: Editable Cell ', ()=>{
   let editableCellComponent: EditableCellComponent;
   let editableCellFixture : ComponentFixture<EditableCellComponent>;
+  let editableStream = new BehaviorSubject<boolean>(true);
+  let rowActionStream = new Subject<any>();    
+  let actionProxy = new ItemProxy('Item', MockItem())
 
+  actionProxy.model = new KoheseModel(MockDataModel());
+  
   beforeEach(async(()=>{
     TestBed.configureTestingModule({
       declarations: [EditableCellComponent],
@@ -36,11 +41,11 @@ describe('Component: Editable Cell ', ()=>{
     editableCellComponent.column = 'estimatedHoursEffort';
     editableCellComponent.action = {
       depth : 0,
-      proxy : new ItemProxy('Item', MockItem())
-    };
-    editableCellComponent.action.proxy.model = new KoheseModel(MockDataModel());
-    editableCellComponent.editableStream = new BehaviorSubject<boolean>(true);
-    editableCellComponent.rowActionStream = new Subject<any>();    
+      proxy : actionProxy
+    }
+
+    editableCellComponent.editableStream = editableStream;
+    editableCellComponent.rowActionStream = rowActionStream;   
 
     editableCellFixture.detectChanges();
     
@@ -62,6 +67,17 @@ describe('Component: Editable Cell ', ()=>{
       name: new SimpleChange(null, newProxy, true)
     })
   }))
+  it('disables when details editability changes', ()=>{
+    editableStream.next(false);
+    expect(editableCellComponent.editable).toBeFalsy();
+  })
+  it('enables when row specific editability changes', ()=>{
+    rowActionStream.next({
+      type: 'Edit',
+      rowProxy : actionProxy,
+      })
+    expect(editableCellComponent.editable).toBeTruthy();
+  })
 
   afterEach(()=>{
     ItemProxy.getWorkingTree().reset();

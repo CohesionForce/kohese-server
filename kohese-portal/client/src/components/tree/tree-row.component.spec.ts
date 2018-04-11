@@ -22,6 +22,7 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { TreeRow } from './tree-row.class';
 import * as ItemProxy from '../../../../common/src/item-proxy';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('Component: TreeRow', () => {
   let fixture: ComponentFixture<TreeRowComponent>;
@@ -39,7 +40,7 @@ describe('Component: TreeRow', () => {
           useClass: MockVersionControlService },
         { provide: ChangeDetectorRef, useValue: {} }
       ],
-      imports: [ToastrModule.forRoot(), MaterialModule, PipesModule]
+      imports: [ToastrModule.forRoot(), MaterialModule, PipesModule, BrowserAnimationsModule]
     }).compileComponents();
     
     fixture = TestBed.createComponent(TreeRowComponent);
