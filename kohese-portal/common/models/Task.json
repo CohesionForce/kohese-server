@@ -69,7 +69,11 @@
       "relation": true
     },
     "assignedTo": {
-      "type": "string"
+      "type": "string",
+      "relation": {
+        "kind": "KoheseUser",
+        "foreignKey": "username"
+      }
     },
     "estimatedStart": {
       "type": "number"

@@ -172,16 +172,35 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   caclulateDerivedProperties(){
-    if (this.model && this.model.item && this.model.item.stateProperties){
-      let seperatorRequired = false;
-      this.state = '';
-      for(let statePropertyIdx in this.model.item.stateProperties){
-        let stateProperty = this.model.item.stateProperties[statePropertyIdx];
-        if(seperatorRequired){
-          this.state += '/';
+    if (this.model && this.model.item){
+      if (this.model.item.stateProperties){
+        let seperatorRequired = false;
+        this.state = '';
+        for(let statePropertyIdx in this.model.item.stateProperties){
+          let stateProperty = this.model.item.stateProperties[statePropertyIdx];
+          if(seperatorRequired){
+            this.state += '/';
+          }
+          this.state += this.item[stateProperty];
+          seperatorRequired = true;
         }
-        this.state += this.item[stateProperty];
-        seperatorRequired = true;
+      }
+      if (this.model.item.calculatedProperties.length){
+        for (let cpIdx in this.model.item.calculatedProperties){
+          // TODO Need to expand calculation with complex calculations
+          let propertyName = this.model.item.calculatedProperties[cpIdx];
+          let property = this.model.item.properties[propertyName];
+          let calculation = property.calculated;
+
+          // Note:  This only supports assignment calculations
+          this.item[propertyName] = this.item[calculation];
+        }
+      }
+      if (this.model.item.idProperties){
+        for (let idIdx in this.model.item.idProperties){
+          let idName = this.model.item.idProperties[idIdx];
+          this.treeConfig.addIdMap(this.kind, idName, this);
+        }
       }
     }
   }
@@ -190,10 +209,18 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateReferences(){
+    // console.log('$$$ Updating References for: ' + this.item.id);
     let oldReferences = this.getRelationIdMap().references;
     if (this.model && this.model.item && this.model.item.relationProperties){
       for(let relationPropertyIdx in this.model.item.relationProperties){
         let relationProperty = this.model.item.relationProperties[relationPropertyIdx];
+        let relationPropertyDefn = this.model.item.classProperties[relationProperty];
+
+        let foreignKeyDefn;
+        if (typeof relationPropertyDefn.relation === 'object'){
+          foreignKeyDefn = relationPropertyDefn.relation;
+        }
+
         if (this.item){
           let relationValue = this.item[relationProperty];
           let oldRelationIds = [];
@@ -215,7 +242,7 @@ class ItemProxy {
               let valueUpdated = false;
               for(let idx in relationValue){
                 let thisRelationValue = relationValue[idx];
-                if (!thisRelationValue.hasOwnProperty('id')){
+                if (!foreignKeyDefn && !thisRelationValue.hasOwnProperty('id')){
                   valueUpdated = true;
                   // console.log('%%% Updating reference style for ' + relationProperty + ' from ' + thisRelationValue);
                   thisRelationValue = {id: thisRelationValue};
@@ -239,7 +266,7 @@ class ItemProxy {
               isSingle = true;
 
               // Check for reference style
-              if(!relationValue.hasOwnProperty('id')){
+              if(!foreignKeyDefn && !relationValue.hasOwnProperty('id')){
                 // Update the property to have the correct reference style
                 // console.log('==================');
                 // console.log(JSON.stringify(this.item, null, '  '));
@@ -259,13 +286,24 @@ class ItemProxy {
               if (refId.hasOwnProperty('id')){
                 refId = refId.id;
               }
-              let refProxy = this.treeConfig.getProxyFor(refId);
-              if(!refProxy){
-                createMissingProxy(refId, this.treeConfig);
+
+              let refProxy;
+              if (foreignKeyDefn){
+                refProxy = this.treeConfig.getProxyByProperty(foreignKeyDefn.kind, foreignKeyDefn.foreignKey, refId);
+                if (!refProxy){
+                  console.log('*** Could not find proxy for: ' + refId);
+                }
+              } else {
                 refProxy = this.treeConfig.getProxyFor(refId);
+                if(!refProxy){
+                  createMissingProxy(refId, this.treeConfig);
+                  refProxy = this.treeConfig.getProxyFor(refId);
+                }
               }
-              newRelationIds.push(refId);
-              this.addReference(refProxy, relationProperty, isSingle);
+              if (refProxy){
+                newRelationIds.push(refProxy.item.id);
+                this.addReference(refProxy, relationProperty, isSingle);
+              }
             }
 
             if (!Array.isArray(oldRelationIds)){
@@ -1389,6 +1427,7 @@ class TreeConfiguration {
 
     this.treeId = treeId;
     this.proxyMap = {};
+    this.idMap = {};
     this.repoMap = {};
     this.loading = true;
     this.proxyHasDeferredModelAssociation = {};
@@ -1444,6 +1483,34 @@ class TreeConfiguration {
     return this.changeSubject;
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  addIdMap(kind, idProperty, forProxy){
+    let idValue = forProxy.item[idProperty];
+    if (!this.idMap[kind]){
+      // Create empty map for the kind
+      this.idMap[kind] = {};
+    }
+    if (!this.idMap[kind][idProperty]){
+      // Create empty map for the kind
+      this.idMap[kind][idProperty] = {};
+    }
+    // console.log('$$$ Adding map for: ' + kind + ' - ' + idProperty + ' - ' + idValue);
+    this.idMap[kind][idProperty][idValue] = forProxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  removeIdMap(kind, idProperty, forProxy){
+    let idValue = forProxy.item[idProperty];
+    if (this.idMap[kind] && this.idMap[kind][idProperty] &&
+        this.idMap[kind][idProperty][idValue])
+    {
+      delete this.idMap[kind][idProperty][idValue];
+    }
+  }
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -1517,6 +1584,19 @@ class TreeConfiguration {
 		  return this.root;
 	  }
     return this.proxyMap[id];
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getProxyByProperty(kind, idProperty, idValue) {
+    let proxy;
+    if (this.idMap[kind] && this.idMap[kind][idProperty] &&
+      this.idMap[kind][idProperty][idValue])
+    {
+      proxy = this.idMap[kind][idProperty][idValue];
+    }
+    return proxy;
   }
 
   //////////////////////////////////////////////////////////////////////////

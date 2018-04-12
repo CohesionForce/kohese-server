@@ -13,6 +13,12 @@
     "email": {
       "type": "string",
       "required": false
+    },
+    "username": {
+      "type": "string",
+      "derived": true,
+      "id": true,
+      "calculated": "name"
     }
   },
   "validations": [],

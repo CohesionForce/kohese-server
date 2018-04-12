@@ -48,7 +48,7 @@ describe('KDB Test', function() {
     dumpEnabled = true;
 
 
-    kdb.initialize('testKDB').then(() => {
+    kdb.initialize('kohese-kdb').then(() => {
 
       console.log('::: KDB is initialized');
 
