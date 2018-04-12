@@ -2,7 +2,7 @@
   <dashboard-selector [user]="currentUser"
                       (dashboardSelected)="dashboardSelected($event)"
   ></dashboard-selector>
-  <div class="col2" style="height : 100%">
+  <div class="right-content" style="height : 100%">
     <div *ngIf="dashboardType === dashboardTypes.assignments">
       <assignment-dashboard [assignmentListStream]="assignmentListStream"
                             [assignmentTypeStream]="assignmentTypeStream"></assignment-dashboard>

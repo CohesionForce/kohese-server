@@ -1,0 +1,12 @@
+<mat-card>
+    <mat-card-title>
+      {{assignment.item.name}} (Active)
+    </mat-card-title>
+    <mat-card-content>
+      {{assignment.item.details | truncate : 200}}
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button (click)="navigate('Explore', {id: assignment.item.id})">Details</button>
+    </mat-card-actions>
+  </mat-card>
+  

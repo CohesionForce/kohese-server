@@ -9,13 +9,20 @@ import { DashboardSelectorComponent } from './dashboard-selector/dashboard-selec
 import { UserInputModule } from '../user-input/user-input.module';
 import { AssignmentDashboardComponent } from './assignment-dashboard/assignment-dashboard.component'
 import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
+import { PipesModule } from "../../pipes/pipes.module";
+import { ActiveAssignmentComponent } from "./assignment-dashboard/active-assignment/active-assignment.component";
+import { DueAssignmentComponent } from "./assignment-dashboard/due-assignment/due-assignment.component";
+import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-assignment/completed-assignment.component";
 
 @NgModule({
   declarations: [
     DashboardComponent,
     DashboardSelectorComponent,
     AssignmentDashboardComponent,
-    UserDashboardComponent
+    UserDashboardComponent,
+    ActiveAssignmentComponent,
+    DueAssignmentComponent,
+    CompletedAssignmentComponent
   ],
   entryComponents: [
     KMarkdownComponent
@@ -24,7 +31,8 @@ import { UserDashboardComponent } from './user-dashboard/user-dashboard.componen
     CommonModule,
     ServicesModule,
     MaterialModule,
-    UserInputModule
+    UserInputModule,
+    PipesModule
   ],
   exports : [
     DashboardComponent

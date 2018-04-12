@@ -28,9 +28,13 @@ export class AssignmentDashboardComponent extends NavigatableComponent
   assignmentType : DashboardSelections;
   assignmentTypeSub : Subscription;
 
+  assignmentTypes = {};
+
   constructor(private navigationService : NavigationService,
               private changeRef : ChangeDetectorRef) {
     super (navigationService);
+    this.assignmentTypes = DashboardSelections;
+    console.log(this.assignmentTypes)
   }
 
   ngOnInit() {

@@ -1,3 +1,14 @@
 <div *ngFor="let assignment of sortedAssignmentList">
-  {{assignment.item.name}}
+  <span [ngSwitch]="assignmentType">
+    <span *ngSwitchCase="assignmentTypes.ACTIVE_ASSIGNMENTS">
+      <active-assignment [assignment]="assignment"></active-assignment>
+    </span>
+    <span *ngSwitchCase="assignmentTypes.DUE_ASSIGNMENTS">
+      <due-assignment [assignment]="assignment"></due-assignment>
+    </span>
+    <span *ngSwitchCase="assignmentTypes.COMPLETED_ASSIGNMENTS">
+      <completed-assignment [assignment]="assignment"></completed-assignment>
+    </span>
+  </span>
+  <hr>
 </div>
