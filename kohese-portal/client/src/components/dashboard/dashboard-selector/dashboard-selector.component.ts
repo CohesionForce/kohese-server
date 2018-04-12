@@ -27,8 +27,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit () {
-    console.log(this);
-    this.dashboardSelected.emit(DashboardSelections.ACTIVE_ASSIGNMENTS);
+    this.selectDashboard('active');
   }
 
   ngOnDestroy () {

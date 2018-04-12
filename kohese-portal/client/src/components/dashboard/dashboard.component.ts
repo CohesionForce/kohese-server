@@ -19,8 +19,8 @@ import { DashboardSelections } from './dashboard-selector/dashboard-selector.com
 export class DashboardComponent extends NavigatableComponent implements OnInit {
   currentUser : ItemProxy;
   username : string;
+  assignmentListStream : BehaviorSubject<Array<ItemProxy>> = new BehaviorSubject<Array<ItemProxy>>([]);
   private itemList: Array<Object>;
-  dashboardTitle : string = '';
   private repoStatusSubject : BehaviorSubject<any>;
 
   // UI Switches 
@@ -29,6 +29,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     'userPreferences' : 1
   }
   dashboardType : any;
+  assignmentTypeStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(undefined);
 
   constructor(protected navigationService : NavigationService,
               private itemRepository : ItemRepository,
@@ -41,11 +42,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
       if (userProxy) {
         this.currentUser = userProxy;
         this.username = userProxy.item.name;
-        console.log ('HEY!!!!!!!!!!!!!!!!!!');
-        console.log(this.currentUser.relations.referencedBy)
-        for(let referenceCategory in this.currentUser.relations.referencedBy) {
-
-        }
+        this.buildAssignmentList();
       }
     });
     this.repoStatusSubject = this.itemRepository.getRepoStatusSubject();
@@ -59,21 +56,31 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
   dashboardSelected(dashboard : DashboardSelections) {
     switch (dashboard) {
       case (DashboardSelections.ACTIVE_ASSIGNMENTS) :
-        this.dashboardTitle = 'Active Assignments'
         this.dashboardType = this.dashboardTypes.assignments;
+        this.assignmentTypeStream.next(DashboardSelections.ACTIVE_ASSIGNMENTS);
         break;
       case (DashboardSelections.COMPLETED_ASSIGNMENTS) :
-        this.dashboardTitle = 'Completed Assignments';
         this.dashboardType = this.dashboardTypes.assignments;
+        this.assignmentTypeStream.next(DashboardSelections.COMPLETED_ASSIGNMENTS);
         break;
       case (DashboardSelections.DUE_ASSIGNMENTS) :
-        this.dashboardTitle = 'Due Assignments';
         this.dashboardType = this.dashboardTypes.assignments;
+        this.assignmentTypeStream.next(DashboardSelections.DUE_ASSIGNMENTS);
         break;
       case (DashboardSelections.USER_PREFERENCES) :
-        this.dashboardTitle = 'User Preferences'
         this.dashboardType = this.dashboardTypes.userPreferences; 
         break;
     }
+  }
+
+  buildAssignmentList () {
+    let assignmentList = [];
+    for(let referenceCategory in this.currentUser.relations.referencedBy) {
+      for(let reference in this.currentUser.relations.referencedBy[referenceCategory].assignedTo)
+        assignmentList.push(
+          this.currentUser.relations.referencedBy[referenceCategory].assignedTo[reference]
+        )
+    }
+    this.assignmentListStream.next(assignmentList);  
   }
 }

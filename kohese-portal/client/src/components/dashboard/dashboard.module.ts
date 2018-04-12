@@ -7,11 +7,13 @@ import { MaterialModule } from '../../material.module';
 import { DashboardComponent } from './dashboard.component';
 import { DashboardSelectorComponent } from './dashboard-selector/dashboard-selector.component';
 import { UserInputModule } from '../user-input/user-input.module';
+import { AssignmentDashboardComponent } from './assignment-dashboard/assignment-dashboard.component'
 
 @NgModule({
   declarations: [
     DashboardComponent,
-    DashboardSelectorComponent
+    DashboardSelectorComponent,
+    AssignmentDashboardComponent
   ],
   entryComponents: [
     KMarkdownComponent

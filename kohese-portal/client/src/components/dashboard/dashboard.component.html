@@ -3,11 +3,9 @@
                       (dashboardSelected)="dashboardSelected($event)"
   ></dashboard-selector>
   <div class="col2" style="height : 100%">
-    <h2>
-      {{dashboardTitle}}
-    </h2>
     <div *ngIf="dashboardType === dashboardTypes.assignments">
-      Assignments : 
+      <assignment-dashboard [assignmentListStream]="assignmentListStream"
+                            [assignmentTypeStream]="assignmentTypeStream"></assignment-dashboard>
     </div>
     <div *ngIf="dashboardType === dashboardTypes.userPreferences">
       User :
