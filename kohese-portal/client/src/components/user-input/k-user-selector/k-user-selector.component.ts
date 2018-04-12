@@ -14,7 +14,8 @@ import { Observable } from 'rxjs/Observable';
 })
 export class KUserSelectorComponent extends UserInput implements OnInit, OnDestroy {
   userProxies : Array<ItemProxy>;
-  filteredProxies : Observable<Array<ItemProxy>>;
+  filteredProxiesSub : Subscription;
+  filteredProxies : Array<ItemProxy>;
   repoStagingSub : Subscription;
 
   constructor(private ItemRepository : ItemRepository,
@@ -26,18 +27,24 @@ export class KUserSelectorComponent extends UserInput implements OnInit, OnDestr
     this.repoStagingSub = this.ItemRepository.getRepoStatusSubject().subscribe((update)=>{
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) { 
             this.userProxies = this.SessionService.getUsers()
-            this.filteredProxies = this.formGroup.get(this.fieldId).valueChanges.startWith('').
-                map((text: string) => {
-                    return this.userProxies.filter((proxy) => {
-                        return (-1 !== proxy.item.name.indexOf(text));
-                    });
-                })
-        }})
+            this.filteredProxiesSub = 
+                this.formGroup.get(this.fieldId).valueChanges
+                    .startWith('')
+                    .map((text: string) => {
+                        return this.userProxies.filter((proxy) => {
+                            return (-1 !== proxy.item.name.indexOf(text));
+                        });
+                    })
+                    .subscribe((filteredProxies)=> {
+                        this.filteredProxies = filteredProxies;
+                    })
+            }})
   }
 
 
   ngOnDestroy () {
       this.repoStagingSub.unsubscribe();
-  }
+      this.filteredProxiesSub.unsubscribe();
+    }
 }
 

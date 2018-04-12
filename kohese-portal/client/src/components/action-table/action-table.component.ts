@@ -4,7 +4,7 @@ import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../common/src/item-proxy.js'
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
 import { MatTableDataSource } from '@angular/material';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
@@ -25,9 +25,11 @@ export class ActionTableComponent extends NavigatableComponent
   editableStream : Observable<boolean>
   editableStreamSubscription : Subscription
   editable : boolean;
+  editableRows : any = {};
+  rowActionStream : Subject<any> = new Subject();
 
-  baseRowDef : Array<string> = ['name', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort'];
-  actionRowDef : Array<string> = ['name', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'actions'];
+  baseRowDef : Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort'];
+  actionRowDef : Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'actions'];
 
   /* Subscriptions */
   proxyStreamSub : Subscription;
@@ -43,7 +45,16 @@ export class ActionTableComponent extends NavigatableComponent
 
     this.proxyStreamSub = this.proxyStream.subscribe((newProxy : ItemProxy) => {
       this.itemProxy = newProxy;
-      this.tableStream = new MatTableDataSource(this.itemProxy.getSubtreeAsList());
+      console.log(this.itemProxy);
+      let proxyList = this.itemProxy.getSubtreeAsList();
+      this.tableStream = new MatTableDataSource(proxyList);
+      for (let row of proxyList) {
+        this.editableRows[row.proxy.item.id] = false;
+        if (!row.proxy.relations.references[row.proxy.kind]) {
+          console.log(row);
+          console.log ('bad row');
+        }
+      }
       this.changeRef.markForCheck();
     })
 
@@ -75,9 +86,25 @@ export class ActionTableComponent extends NavigatableComponent
 
   saveRow(savedAction : ItemProxy) {
     console.log('Save row');
+    console.log(savedAction);
     this.itemRepository.upsertItem(savedAction)
       .then((updatedItemProxy: ItemProxy) => {
         console.log((updatedItemProxy));
+        this.editableRows[updatedItemProxy.item.id] = false;
+        this.changeRef.markForCheck();
+        this.rowActionStream.next({
+          type: 'Save',
+          rowProxy: savedAction
+        })
       });
+  }
+
+  toggleRowEdit(action : ItemProxy) {
+    this.editableRows[action.item.id] = !this.editableRows[action.item.id];
+    this.changeRef.markForCheck();
+    this.rowActionStream.next({
+      type: 'Edit',
+      rowProxy : action
+    })
   }
 }

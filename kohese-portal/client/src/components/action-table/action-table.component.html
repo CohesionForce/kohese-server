@@ -8,6 +8,17 @@
       </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="predecessors">
+      <mat-header-cell *matHeaderCellDef> Predecessors</mat-header-cell>
+      <mat-cell *matCellDef="let action">
+        <ul *ngIf="action.proxy.relations.references[action.proxy.kind]"> 
+          <li *ngFor="let predecessor of action.proxy.relations.references[action.proxy.kind].predecessors"> 
+            {{predecessor.item.name}}
+          </li>
+        </ul>
+      </mat-cell>
+    </ng-container>
+
     <ng-container matColumnDef="assignedTo">
         <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
         <mat-cell *matCellDef="let action"> {{action.proxy.item.assignedTo}}</mat-cell>
@@ -23,6 +34,7 @@
       <mat-cell *matCellDef="let action"> 
           <editable-cell [column]="'estimatedHoursEffort'"
                          [action]="action"
+                         [rowActionStream]="rowActionStream"
                          [editableStream]="editableStream"></editable-cell>
       </mat-cell>
     </ng-container>
@@ -32,6 +44,7 @@
       <mat-cell *matCellDef="let action"> 
           <editable-cell [column]="'remainingHoursEffort'"
                          [action]="action"
+                         [rowActionStream]="rowActionStream"
                          [editableStream]="editableStream"></editable-cell>
       </mat-cell>
     </ng-container>
@@ -41,6 +54,7 @@
       <mat-cell *matCellDef="let action"> 
           <editable-cell [column]="'actualHoursEffort'"
                          [action]="action"
+                         [rowActionStream]="rowActionStream"
                          [editableStream]="editableStream"></editable-cell>
       </mat-cell>
     </ng-container>
@@ -48,8 +62,13 @@
     <ng-container matColumnDef="actions" *ngIf="editable">
       <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
       <mat-cell *matCellDef="let action" style="z-index: 10">
-        <button mat-icon-button class="fa fa-edit"></button>
-        <button mat-icon-button class="fa fa-save" (click)="saveRow(action.proxy)"></button>
+          <button mat-icon-button class="fa fa-edit"
+                  *ngIf="!editableRows[action.proxy.item.id]"
+                  (click)="toggleRowEdit(action.proxy)"></button>
+          <button mat-icon-button class="fa fa-close"
+                  *ngIf="editableRows[action.proxy.item.id]"
+                  (click)="toggleRowEdit(action.proxy)"></button>
+          <button mat-icon-button class="fa fa-save" (click)="saveRow(action.proxy)"></button>
       </mat-cell>
     </ng-container>
 
