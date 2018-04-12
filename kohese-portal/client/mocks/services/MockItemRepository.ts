@@ -42,10 +42,7 @@ export class MockItemRepository {
   }
 
   getProxyFor (id: string) {
-    if(id === 'PersistedModel') {
-      return undefined;
-    }
-    return new ItemProxy('Item', MockItem());
+    return ItemProxy.getProxyFor(id);
   }
 
   getRecentProxies () {
@@ -56,8 +53,8 @@ export class MockItemRepository {
     ]
   }
 
-  buildItem() {
-
+  public buildItem(type: string, item: any): Promise<ItemProxy> {
+    return Promise.resolve(new ItemProxy(type, item));
   }
 
   registerRecentProxy() {
