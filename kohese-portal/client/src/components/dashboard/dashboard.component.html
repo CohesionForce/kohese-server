@@ -7,10 +7,9 @@
       <assignment-dashboard [assignmentListStream]="assignmentListStream"
                             [assignmentTypeStream]="assignmentTypeStream"></assignment-dashboard>
     </div>
-    <div *ngIf="dashboardType === dashboardTypes.userPreferences">
-      User :
+    <div *ngIf="dashboardType === dashboardTypes.userPreferences && currentUser">
+      <user-dashboard [user]="currentUser"></user-dashboard>
     </div>
-    {{dashboardType}}
   </div>
 </div>
 

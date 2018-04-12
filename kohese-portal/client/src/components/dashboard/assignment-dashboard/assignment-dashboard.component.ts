@@ -11,7 +11,7 @@ import { Observable, Subscription } from 'rxjs';
 @Component({
   selector : 'assignment-dashboard',
   templateUrl : './assignment-dashboard.component.html',
-  styleUrls : [],
+  styleUrls : ['./assignment-dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssignmentDashboardComponent extends NavigatableComponent 

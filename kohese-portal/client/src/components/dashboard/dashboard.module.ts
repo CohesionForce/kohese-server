@@ -8,12 +8,14 @@ import { DashboardComponent } from './dashboard.component';
 import { DashboardSelectorComponent } from './dashboard-selector/dashboard-selector.component';
 import { UserInputModule } from '../user-input/user-input.module';
 import { AssignmentDashboardComponent } from './assignment-dashboard/assignment-dashboard.component'
+import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
 
 @NgModule({
   declarations: [
     DashboardComponent,
     DashboardSelectorComponent,
-    AssignmentDashboardComponent
+    AssignmentDashboardComponent,
+    UserDashboardComponent
   ],
   entryComponents: [
     KMarkdownComponent

@@ -22,6 +22,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   @Output()
   dashboardSelected : EventEmitter<DashboardSelections> = new EventEmitter();
   selectedDashboard : string;
+  
   constructor () {
 
   }

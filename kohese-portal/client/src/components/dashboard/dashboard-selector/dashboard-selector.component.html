@@ -22,11 +22,13 @@
             [ngClass]="{'selectedDashListItem' : selectedDashboard === 'completed'}">Completed</h4>
       </div>  
     <mat-divider></mat-divider>
-    <h3 class="dashListHeader"> User</h3>
-      <div>
-        <h4 class="dashListItem" 
-           (click)="selectDashboard('preferences')"
-           [ngClass]="{'selectedDashListItem' : selectedDashboard === 'preferences'}">Preferences</h4>
-      </div>
+    <div *ngIf="user">
+      <h3 class="dashListHeader"> User</h3>
+        <div>
+          <h4 class="dashListItem" 
+            (click)="selectDashboard('preferences')"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard === 'preferences'}">Preferences</h4>
+        </div>
     </div>
+  </div>
 </div>
