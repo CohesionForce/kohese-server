@@ -32,7 +32,8 @@ import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-a
     ServicesModule,
     MaterialModule,
     UserInputModule,
-    PipesModule
+    PipesModule,
+    UserInputModule
   ],
   exports : [
     DashboardComponent

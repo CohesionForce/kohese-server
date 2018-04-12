@@ -17,4 +17,9 @@ export class ActiveAssignmentComponent extends NavigatableComponent {
   constructor (private navigationService : NavigationService) {
     super (navigationService);
   }
+
+  stateChanged(a, b) {
+    console.log(a);
+    console.log(b);
+  }
 }

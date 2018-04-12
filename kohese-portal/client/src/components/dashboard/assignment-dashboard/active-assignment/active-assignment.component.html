@@ -3,7 +3,12 @@
       {{assignment.item.name}} (Active)
     </mat-card-title>
     <mat-card-content>
-      {{assignment.item.details | truncate : 200}}
+      Estimated Start : {{assignment.item.estimatedStart | date}} <br>
+      Estimated Completion : {{ assignment.item.estimatedComplete | date }} <br>
+      Estimated Hours Effort : {{ assignment.item.estimatedHoursEffort }} <br>
+    <k-state-editor [itemProxy]="assignment"
+                    [disableTransitioning]="false"
+                    (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button (click)="navigate('Explore', {id: assignment.item.id})">Details</button>
