@@ -1,87 +1,79 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
+import * as ItemProxy from '../../../../common/src/item-proxy';
+
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+import { DashboardSelections } from './dashboard-selector/dashboard-selector.component';
+
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html'
+  templateUrl: './dashboard.component.html',
+  styleUrls : ['./dashboard.component.scss']
 })
 
 export class DashboardComponent extends NavigatableComponent implements OnInit {
-  currentUser : string;
+  currentUser : ItemProxy;
+  username : string;
   private itemList: Array<Object>;
-
-  assignedItems : Array<any>;
-  private assignedFilter : Object;
-  acceptedItems : Array<any>;
-  private acceptedFilter : Object;
-  inWorkItems : Array<any>;
-  private inWorkFilter: Object;
-  observedIssuesItems : Array<any>;
-  private observedIssuesFilter : Object;
-  inAnalysisIssuesItems : Array<any>;
-  private inAnalysisIssueFilter : Object;
-  requiresActionItems : Array<any>;
-  private requiresActionFilter : Object;
-  assignedTasks : Array<any>;
-  private assignedTaskFilter : Object;
-  acceptedTasks : Array<any>;
-  private acceptedTasksFilter : Object;
-  inWorkTasks : Array<any>;
-  inVerificationItems : Array<any>;
-  private inWorkTasksFilter : Object;
+  dashboardTitle : string = '';
   private repoStatusSubject : BehaviorSubject<any>;
 
-  constructor(protected NavigationService : NavigationService,
-              private ItemRepository : ItemRepository,
+  // UI Switches 
+  dashboardTypes = {
+    'assignments' : 0,
+    'userPreferences' : 1
+  }
+  dashboardType : any;
+
+  constructor(protected navigationService : NavigationService,
+              private itemRepository : ItemRepository,
               private sessionService: SessionService) {
-    super(NavigationService);
+    super(navigationService);
                }
 
   ngOnInit() {
     this.sessionService.getSessionUser().subscribe((userProxy) => {
       if (userProxy) {
-        this.currentUser = userProxy.item.name;
+        this.currentUser = userProxy;
+        this.username = userProxy.item.name;
+        console.log ('HEY!!!!!!!!!!!!!!!!!!');
+        console.log(this.currentUser.relations.referencedBy)
+        for(let referenceCategory in this.currentUser.relations.referencedBy) {
+
+        }
       }
     });
-    this.itemList = this.testProxies();
-    this.assignedItems = this.testProxies();
-    this.assignedFilter = {};
-    this.acceptedItems = this.testProxies();
-    this.acceptedFilter = {};
-    this.inWorkItems = this.testProxies();
-    this.inWorkFilter = {};
-    this.observedIssuesItems = this.testProxies();
-    this.observedIssuesFilter = {};
-    this.inAnalysisIssuesItems = this.testProxies();
-    this.inAnalysisIssueFilter = {};
-    this.requiresActionFilter = {};
-    this.requiresActionItems = this.testProxies();
-    this.assignedTasks = this.testProxies();
-    this.assignedTaskFilter = {};
-    this.acceptedTasks = this.testProxies();
-    this.acceptedTasksFilter = {};
-    this.inWorkTasks = this.testProxies();
-    this.inWorkTasksFilter = {};
-    this.inVerificationItems = this.testProxies();
-    this.repoStatusSubject = this.ItemRepository.getRepoStatusSubject();
+    this.repoStatusSubject = this.itemRepository.getRepoStatusSubject();
     this.repoStatusSubject.subscribe(update => {
       if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-        console.log(this.ItemRepository.getRootProxy());
+        // Do something eventually?
       }
     })
   }
 
-  testProxies () : Array<object> {
-    return [
-      {item: {
-        name: 'Test proxy'
-        }
-      }
-    ]
+  dashboardSelected(dashboard : DashboardSelections) {
+    switch (dashboard) {
+      case (DashboardSelections.ACTIVE_ASSIGNMENTS) :
+        this.dashboardTitle = 'Active Assignments'
+        this.dashboardType = this.dashboardTypes.assignments;
+        break;
+      case (DashboardSelections.COMPLETED_ASSIGNMENTS) :
+        this.dashboardTitle = 'Completed Assignments';
+        this.dashboardType = this.dashboardTypes.assignments;
+        break;
+      case (DashboardSelections.DUE_ASSIGNMENTS) :
+        this.dashboardTitle = 'Due Assignments';
+        this.dashboardType = this.dashboardTypes.assignments;
+        break;
+      case (DashboardSelections.USER_PREFERENCES) :
+        this.dashboardTitle = 'User Preferences'
+        this.dashboardType = this.dashboardTypes.userPreferences; 
+        break;
+    }
   }
 }

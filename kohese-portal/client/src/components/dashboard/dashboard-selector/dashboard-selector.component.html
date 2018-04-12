@@ -1,0 +1,32 @@
+<div class="col user-dash" style="height : 100%;">
+    <h2>
+      <span *ngIf="user">
+          {{user.item.name}}
+      </span>
+      <span *ngIf="!user">
+          Loading . . . 
+      </span>
+    </h2>
+    <hr>
+    <div>
+      <h3 class="dashListHeader"> Assignments</h3>
+      <div>
+        <h4 class="dashListItem" 
+           (click)="selectDashboard('active')"
+           [ngClass]="{'selectedDashListItem' : selectedDashboard === 'active'}">Active</h4>
+        <h4 class="dashListItem" 
+            (click)="selectDashboard('due')"
+           [ngClass]="{'selectedDashListItem' : selectedDashboard === 'due'}">Due</h4>
+        <h4 class="dashListItem" 
+            (click)="selectDashboard('completed')"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard === 'completed'}">Completed</h4>
+      </div>  
+    <mat-divider></mat-divider>
+    <h3 class="dashListHeader"> User</h3>
+      <div>
+        <h4 class="dashListItem" 
+           (click)="selectDashboard('preferences')"
+           [ngClass]="{'selectedDashListItem' : selectedDashboard === 'preferences'}">Preferences</h4>
+      </div>
+    </div>
+</div>

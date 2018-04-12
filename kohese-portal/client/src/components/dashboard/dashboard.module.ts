@@ -5,11 +5,13 @@ import { KMarkdownComponent } from "../user-input/k-markdown/k-markdown.componen
 import { ServicesModule } from '../../services/services.module';
 import { MaterialModule } from '../../material.module';
 import { DashboardComponent } from './dashboard.component';
+import { DashboardSelectorComponent } from './dashboard-selector/dashboard-selector.component';
 import { UserInputModule } from '../user-input/user-input.module';
 
 @NgModule({
   declarations: [
-    DashboardComponent
+    DashboardComponent,
+    DashboardSelectorComponent
   ],
   entryComponents: [
     KMarkdownComponent
