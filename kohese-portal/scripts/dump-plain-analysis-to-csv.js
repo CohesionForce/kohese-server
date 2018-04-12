@@ -15,7 +15,7 @@ if(process.argv[2]){
 
 console.log("::: Begin dumping for " + forItemId);
 
-var document = KDB.ItemProxy.getProxyFor(forItemId);
+var document = KDB.ItemProxy.getWorkingTree().getProxyFor(forItemId);
 console.log("::: Found proxy: " + document.item.name);
 
 

@@ -24,7 +24,7 @@ import { Observable } from 'rxjs/Observable';
 describe('Component: Tree', () => {
   let fixture: ComponentFixture<TreeComponent>;
   let component: TreeComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [TreeComponent],
@@ -43,18 +43,18 @@ describe('Component: Tree', () => {
         MaterialModule, PipesModule],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(TreeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-  
+
   it('filters when the selected view changes', () => {
     expect(component.proxyFilter.status).toEqual(false);
     component.viewSelectionChanged('Version Control');
     expect(component.proxyFilter.status).toEqual(true);
   });
-  
+
   it('builds a TreeRow for a new Item', fakeAsync(() => {
     let item: any = MockItem();
     item.id = 'Kurios Iesous';
@@ -65,7 +65,7 @@ describe('Component: Tree', () => {
         break;
       }
     }
-    ItemProxy.getChangeSubject().next({
+    ItemProxy.getWorkingTree().getChangeSubject().next({
       type: 'create',
       kind: 'Item',
       id: item.id,
@@ -81,12 +81,12 @@ describe('Component: Tree', () => {
     }
     expect(newRowIndex).toEqual(6);
   }));
-  
+
   it('removes the TreeRow for a deleted Item', fakeAsync(() => {
     let numberOfVisibleRows: number = component.visibleRows.length;
-    let proxy: ItemProxy = ItemProxy.getProxyFor('test-uuid6');
+    let proxy: ItemProxy = ItemProxy.getWorkingTree().getProxyFor('test-uuid6');
     proxy.deleteItem();
-    ItemProxy.getChangeSubject().next({
+    ItemProxy.getWorkingTree().getChangeSubject().next({
       type: 'delete',
       kind: 'Item',
       id: proxy.item.id,
@@ -95,7 +95,7 @@ describe('Component: Tree', () => {
     tick();
     expect(component.visibleRows.length).toEqual(numberOfVisibleRows - 1);
   }));
-  
+
   it('expands and collapses all TreeRows', () => {
     let numberOfInitiallyVisibleRows: number = component.visibleRows.length;
     component.expandAll();
@@ -104,20 +104,20 @@ describe('Component: Tree', () => {
     component.collapseAll();
     expect(component.visibleRows.length).toEqual(numberOfInitiallyVisibleRows);
   });
-  
+
   it('correctly responds to the tree root changing', fakeAsync(() => {
     let initialTreeRoot: ItemProxy = component.treeRootStream.getValue();
     let initialVisibleRows: Array<TreeRow> = component.visibleRows;
-    component.treeRootStream.next(ItemProxy.getRootProxy().children[0]);
+    component.treeRootStream.next(ItemProxy.getWorkingTree().getRootProxy().children[0]);
     tick();
     expect(initialTreeRoot).not.toEqual(component.treeRootStream.getValue());
     expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
   }));
-  
+
   it('synchronizes with selection', fakeAsync(() => {
     component.selectedProxyIdStream.next('Item');
     tick();
-    
+
     let index: number = -1;
     for (let j: number = 0; j < component.visibleRows.length; j++) {
       if ('Item' === component.visibleRows[j].itemProxy.item.id) {
@@ -126,13 +126,13 @@ describe('Component: Tree', () => {
       }
     }
     expect(index).toEqual(-1);
-    
+
     /* Since the selection is to be synchronized by default, call the
     toggleSelectionSynchronization function twice to trigger showing the
     selected Item */
     component.toggleSelectionSynchronization();
     component.toggleSelectionSynchronization();
-    
+
     for (let j: number = 0; j < component.visibleRows.length; j++) {
       if ('Item' === component.visibleRows[j].itemProxy.item.id) {
         index = j;

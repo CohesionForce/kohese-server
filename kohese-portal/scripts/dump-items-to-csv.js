@@ -3,7 +3,7 @@ var forItemId="db13bfc0-ae41-11e5-af49-9b039241499e";
 console.log("::: Begin dumping for " + forItemId);
 var KDB = require('../server/kdb.js');
 
-var document = KDB.ItemProxy.getProxyFor(forItemId);
+var document = KDB.ItemProxy.getWorkingTree().getProxyFor(forItemId);
 
 console.log("KUID,Parent KUID,Child Count,Name,Description");
 var displayItem = function(proxy){

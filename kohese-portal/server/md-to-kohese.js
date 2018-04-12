@@ -109,7 +109,7 @@ function mdToKohese(koheseUserName, filePath, rootItem) {
 
   for (var id in itemMap) {
     if (itemMap[id].itemIds.length > 0) {
-      var proxy = ItemProxy.getProxyFor(id);
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
       proxy.updateItem(proxy.kind, itemMap[id]);
     }
   }

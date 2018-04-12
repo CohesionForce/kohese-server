@@ -20,7 +20,7 @@ if(global.app){
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-ItemProxy.getChangeSubject().subscribe(change => {
+ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
   console.log('+++ Received notification of change: ' + change.type);
   if(change.proxy){
     console.log(change.kind);
@@ -82,7 +82,7 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received findById for %s for user %s at %s',
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
-    var proxy = ItemProxy.getProxyFor(request.id);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.id);
     sendResponse({
       kind: proxy.kind,
       item: proxy.item
@@ -114,7 +114,7 @@ function KIOItemServer(socket){
 
     consoleLogObject('$$$ Request', request);
 
-    let rootProxy = ItemProxy.getRootProxy();
+    let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
     let objectMap = rootProxy.cache.getObjectMap();
 
     let response = {
@@ -162,11 +162,11 @@ function KIOItemServer(socket){
 
     // consoleLogObject('$$$ Request', request);
 
-    var repoTreeHashes = ItemProxy.getRepoTreeHashes();
+    var repoTreeHashes = ItemProxy.getWorkingTree().getRepoTreeHashes();
 
     // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
 
-    // var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+    // var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 
     // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
 
@@ -192,11 +192,11 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received getAll for user %s at %s for repo %s',
                 socket.id, username, socket.handshake.address, request.forRepoId);
 
-    var repoTreeHashes = ItemProxy.getAllTreeHashes();
+    var repoTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes();
     if (!request.forRepoId){
-      repoTreeHashes = ItemProxy.getAllTreeHashes();
+      repoTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes();
     } else {
-      let repoProxy = ItemProxy.getProxyFor(request.forRepoId);
+      let repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.forRepoId);
       if (repoProxy){
         repoTreeHashes = repoProxy.getTreeHashMap();
       }
@@ -215,9 +215,9 @@ function KIOItemServer(socket){
 
         let repoProxy;
         if (request.forRepoId){
-          repoProxy = ItemProxy.getProxyFor(request.forRepoId);
+          repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.forRepoId);
         } else {
-          repoProxy = ItemProxy.getRootProxy();
+          repoProxy = ItemProxy.getWorkingTree().getRootProxy();
         }
 
         repoProxy.visitChildren(null, (proxy) => {
@@ -232,7 +232,7 @@ function KIOItemServer(socket){
         // Send deltas to client
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
-        var thmCompare = ItemProxy.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+        var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 //        console.log(thmCompare);
 
         response = {
@@ -243,13 +243,13 @@ function KIOItemServer(socket){
         };
 
         thmCompare.addedItems.forEach((itemId) => {
-          var proxy = ItemProxy.getProxyFor(itemId);
+          var proxy = ItemProxy.getWorkingTree().getProxyFor(itemId);
           response.addItems.push({kind: proxy.kind, item: proxy.item});
 //          console.log(proxy.item);
         });
 
         thmCompare.changedItems.forEach((itemId) => {
-          var proxy = ItemProxy.getProxyFor(itemId);
+          var proxy = ItemProxy.getWorkingTree().getProxyFor(itemId);
           response.changeItems.push({kind: proxy.kind, item: proxy.item});
 //          console.log(proxy.item);
         });
@@ -271,7 +271,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getStatus', function(request, sendResponse){
 
-    var repoProxy = ItemProxy.getProxyFor(request.repoId);
+    var repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
     console.log('::: Getting status for repo: ' + repoProxy.item.name);
 
     kdb.kdbRepo.getStatus(request.repoId, function(status){
@@ -353,7 +353,7 @@ function KIOItemServer(socket){
       var proxy;
 
       if (item.id){
-        proxy = ItemProxy.getProxyFor(item.id);
+        proxy = ItemProxy.getWorkingTree().getProxyFor(item.id);
 
         // TODO need to move user password processing based on model definition
         if (proxy.kind === 'KoheseUser'){
@@ -394,7 +394,7 @@ function KIOItemServer(socket){
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
 
-    var proxy = ItemProxy.getProxyFor(request.id);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.id);
     proxy.deleteItem(request.recursive);
 
     console.log('Deleted %s #%s#', request.kind, request.id);
@@ -431,7 +431,7 @@ function KIOItemServer(socket){
 
     console.log('::: Generating ' + outFormat + ' Report for ' + forItemId);
 
-    var proxy = ItemProxy.getProxyFor(forItemId);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(forItemId);
     var result = {};
 
     if (!proxy){
@@ -481,7 +481,7 @@ function KIOItemServer(socket){
     var promises = [];
     for (var i = 0; i < idsArray.length; i++) {
       console.log('--- Adding proxy for: ' + idsArray[i]);
-      var proxy = ItemProxy.getProxyFor(idsArray[i]);
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
 
@@ -526,7 +526,7 @@ function KIOItemServer(socket){
               }
 
               if (foundId) {
-                proxies.push(ItemProxy.getProxyFor(fileName));
+                proxies.push(ItemProxy.getWorkingTree().getProxyFor(fileName));
               }
             }
           }
@@ -584,7 +584,7 @@ function KIOItemServer(socket){
     var repositoryPathMap = {};
     var idsArray = Array.from(request.proxyIds);
     for (var i = 0; i < idsArray.length; i++) {
-      var proxy = ItemProxy.getProxyFor(idsArray[i]);
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
       let repositoryId = repositoryInformation.repositoryProxy.item.id;
@@ -619,7 +619,7 @@ function KIOItemServer(socket){
     var pendingEvaluationPromises = [];
 
     for (var i = 0; i < idsArray.length; i++) {
-      var proxy = ItemProxy.getProxyFor(idsArray[i]);
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
       var repositoryInformation = getRepositoryInformation(proxy);
       var repositoryId = repositoryInformation.repositoryProxy.item.id;
 
@@ -665,7 +665,7 @@ function KIOItemServer(socket){
     Promise.all(pendingEvaluationPromises).then(function(statusArray){
       // Determine if items need to be checked out or deleted
       for (var i = 0; i < idsArray.length; i++) {
-        var proxy = ItemProxy.getProxyFor(idsArray[i]);
+        var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
         var repositoryInformation = getRepositoryInformation(proxy);
         let repositoryId = repositoryInformation.repositoryProxy.item.id;
         var status = statusArray[i];

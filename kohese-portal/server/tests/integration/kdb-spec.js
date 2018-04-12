@@ -2,8 +2,8 @@ describe('KDB Test', function() {
 
   var kdb = require('../../../server/kdb.js');
   var ItemProxy = require('../../../common/src/item-proxy.js');
-  var root = ItemProxy.getRootProxy();
-  var lostAndFound = ItemProxy.getProxyFor('LOST+FOUND');
+  var root = ItemProxy.getWorkingTree().getRootProxy();
+  var lostAndFound = ItemProxy.getWorkingTree().getProxyFor('LOST+FOUND');
 
   var dumpEnabled = false;
 
@@ -16,7 +16,7 @@ describe('KDB Test', function() {
          console.log('>>> ' + message);
       }
 
-      ItemProxy.dumpAllProxies();
+      ItemProxy.getWorkingTree().dumpAllProxies();
       // console.log('');
       root.dumpProxy();
       // console.log('Root Descendants: ' + root.descendantCount);
@@ -48,24 +48,24 @@ describe('KDB Test', function() {
     dumpEnabled = true;
 
 
-    kdb.initialize('kohese-kdb').then(() => {
+    kdb.initialize('testKDB').then(() => {
 
       console.log('::: KDB is initialized');
 
-      var rootProxy = kdb.ItemProxy.getRootProxy();
+      var rootProxy = kdb.ItemProxy.getWorkingTree().getRootProxy();
       console.log(rootProxy.item);
 
 
-      ItemProxy.loadingComplete();
+      ItemProxy.getWorkingTree().loadingComplete();
 //      dump();
 
 //      var modelDef = KoheseModel.getModelDefinitions();
 
-      var repoTreeHashes = kdb.ItemProxy.getRepoTreeHashes();
+      var repoTreeHashes = kdb.ItemProxy.getWorkingTree().getRepoTreeHashes();
 //      console.log(repoTreeHashes);
 
       var timeBefore = new Date();
-      var treeHashMap = kdb.ItemProxy.getAllTreeHashes();
+      var treeHashMap = kdb.ItemProxy.getWorkingTree().getAllTreeHashes();
       var timeAfter = new Date();
       var deltaTime = timeAfter - timeBefore;
       console.log('Time to getAllTH: ' + deltaTime);
@@ -75,7 +75,7 @@ describe('KDB Test', function() {
       console.log('::: Writing the file');
       fs.writeFileSync('thm.out', JSON.stringify(treeHashMap, null, '  '), {encoding: 'utf8', flag: 'w'});
 
-      var repoTreeHashMap = kdb.ItemProxy.getRepoTreeHashes();
+      var repoTreeHashMap = kdb.ItemProxy.getWorkingTree().getRepoTreeHashes();
       fs.writeFileSync('rthm.out', JSON.stringify(repoTreeHashMap, null, '  '), {encoding: 'utf8', flag: 'w'});
 
       var timeBeforeGetDoc = new Date();

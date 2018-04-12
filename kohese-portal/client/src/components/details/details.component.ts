@@ -89,8 +89,8 @@ export class DetailsComponent extends NavigatableComponent
           if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
             this.repoConnected = true;
             this.updateProxy();
-            this.proxyUpdates = ItemProxy.getChangeSubject().subscribe((change)=>{
-              if(change.id === this.itemProxyId) {
+            this.proxyUpdates = ItemProxy.getWorkingTree().getChangeSubject().subscribe((change)=>{
+              if(change.id === this.itemProxy.item.id) {
                 this.proxyStream.next(change.proxy);
                 this.relationIdMap = this.itemProxy.getRelationIdMap();
               }
