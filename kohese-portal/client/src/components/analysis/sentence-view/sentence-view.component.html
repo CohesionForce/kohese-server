@@ -6,7 +6,7 @@
                     (click)="toggleLink()"
                     [ngClass]="{'syncOn' : syncFilter, 'syncOff' : !syncFilter}"></mat-icon>
         </button>
-      </div>  
+      </div>
   </div>
   <div class="panel-body">
     <div>
@@ -18,20 +18,23 @@
         </mat-form-field>
       </span>
     </div>
-    <mat-checkbox [(ngModel)]="showSentencesInDetails" (click)="onCriteriaChange()">
-      Show Sentences in Details
+    <mat-checkbox [(ngModel)]="showItemsInDetails" (ngModelChange)="onCriteriaChange()">
+      Items
     </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showPhrasesInDetails" (click)="onCriteriaChange()">
-      Show Phrases in Details
+    <mat-checkbox [(ngModel)]="showSentencesInDetails" (ngModelChange)="onCriteriaChange()">
+      Sentences
     </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showTokensInDetails" (click)="onCriteriaChange()">
-      Show Tokens in Details
+    <mat-checkbox [(ngModel)]="showPhrasesInDetails" (ngModelChange)="onCriteriaChange()">
+      Phrases
+    </mat-checkbox>
+    <mat-checkbox [(ngModel)]="showTokensInDetails" (ngModelChange)="onCriteriaChange()">
+      Tokens
     </mat-checkbox>
     <div id="sentence-div">
       <table id="theDetails"
         class="table tree-grid table-striped table-condensed table-hover">
         <thead>
-          <th style="width:20%">Type</th>
+          <th style="width:20%, min-width:200px, max-width:350px">Type</th>
           <th>
             <span (click)="sort('text')">
               Text
@@ -46,7 +49,7 @@
           <tr class="level-{{listItem.displayLevel}}"
             class="tree-grid-row" id="{{listItem.displayId}}"
             *ngFor="let listItem of sentences">
-            <td class="indented">{{listItem.displayType}}</td>
+            <td><span class="indented">{{listItem.displayType}}</span></td>
             <td [innerHTML]="listItem.text | highlightRegex:filterRegexHighlight:true"></td>
           </tr>
         </tbody>

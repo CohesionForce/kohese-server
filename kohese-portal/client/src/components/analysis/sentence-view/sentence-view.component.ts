@@ -24,7 +24,8 @@ export class SentenceViewComponent extends AnalysisViewComponent
   /* UI Switches */
   loadLimit: number = 100;
   ascending: boolean = true;
-  sortField: string = 'count';
+  sortField: string = null;
+  showItemsInDetails: boolean = true;
   showSentencesInDetails: boolean = true;
   showPhrasesInDetails: boolean = false;
   showTokensInDetails: boolean = false;
@@ -33,12 +34,12 @@ export class SentenceViewComponent extends AnalysisViewComponent
   sentences: Array<any>;
   filterOptions : object;
   lastFilter : AnalysisFilter;
-  
+
   /* Data */
   public itemProxy: ItemProxy;
 
   /* Observables */
-  @Input() 
+  @Input()
   public proxyStream : Observable<ItemProxy>;
   @Input()
   public filterSubject: BehaviorSubject<AnalysisFilter>;
@@ -48,7 +49,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
   /* Subscriptions */
   private filterSubjectSubscription: Subscription;
   private proxyStreamSubscription : Subscription;
-  
+
   constructor(NavigationService: NavigationService,
               AnalysisService: AnalysisService,
               private dataProcessingService: DataProcessingService,
@@ -94,8 +95,16 @@ export class SentenceViewComponent extends AnalysisViewComponent
   }
 
   sort(property: string): void {
-    this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
-    this.sortField = property;
+    if (this.sortField === property){
+      if (this.ascending){
+        this.ascending = false;
+      } else {
+        this.sortField = null;
+      }
+    } else {
+      this.sortField = property;
+      this.ascending = true;
+    }
     this.processSentences();
   }
 
@@ -116,14 +125,18 @@ export class SentenceViewComponent extends AnalysisViewComponent
     this.sentences = this.dataProcessingService.sort(
       this.dataProcessingService.filter(this.itemProxy.analysis.extendedList,
       [(listItem: any) => {
-        return listItem.displayLevel === 1 &&
-          (this.filterRegex === null ||
-          this.filterRegex.test(listItem.item.name) ||
-          this.filterRegex.test(listItem.item.description)) ||
-          (listItem.displayLevel === 2 && !this.showSentencesInDetails ||
-          listItem.displayLevel === 3 && !this.showPhrasesInDetails ||
-          listItem.displayLevel === 4 && !this.showTokensInDetails) &&
-          (this.filterRegex === null || this.filterRegex.test(listItem.text));
+
+        let result =
+          (((listItem.displayLevel === 1 && this.showItemsInDetails) &&
+           (this.filterRegex === null ||
+            this.filterRegex.test(listItem.item.name) ||
+            this.filterRegex.test(listItem.item.description)))) ||
+          (((listItem.displayLevel === 2 && this.showSentencesInDetails) ||
+            (listItem.displayLevel === 3 && this.showPhrasesInDetails) ||
+            (listItem.displayLevel === 4 && this.showTokensInDetails)) &&
+          (this.filterRegex === null || this.filterRegex.test(listItem.text)));
+
+        return result;
       }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
 
     this.filteredCount = this.sentences.length;
