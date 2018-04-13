@@ -17,7 +17,6 @@ export class HistoryTabComponent extends NavigatableComponent
   proxyStream : Observable<ItemProxy>
   streamSub : Subscription;
   itemProxy : ItemProxy;
-  historySub : Subscription;
 
   constructor(protected NavigationService : NavigationService,
               private changeRef : ChangeDetectorRef,
@@ -28,25 +27,14 @@ export class HistoryTabComponent extends NavigatableComponent
   ngOnInit() {
     this.streamSub = this.proxyStream.subscribe((newProxy)=>{
       this.itemProxy = newProxy;
-      if (this.historySub) {
-        this.historySub.unsubscribe()
-      }
-      
-      this.historySub = this.itemRepository.getHistoryFor(this.itemProxy)
-        .subscribe((historicalProxy)=>{
-          if (this.itemProxy.item.id ===
-              historicalProxy.item.id) {
-                this.itemProxy = historicalProxy;
-                this.changeRef.markForCheck();
-              }
-        })
-      
-      this.changeRef.markForCheck();   
+      this.itemRepository.getHistoryFor(this.itemProxy).subscribe(
+        (history: Array<any>) => {
+          this.changeRef.markForCheck();
+      });
     })
   }
 
   ngOnDestroy () {
     this.streamSub.unsubscribe();
-    this.historySub.unsubscribe();
   }
 }

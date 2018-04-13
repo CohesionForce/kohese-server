@@ -60,4 +60,27 @@ describe('Component: compare-items', () => {
     tick();
     expect(component.selectedChangeStream.getValue().item.name).not.toEqual(name);
   }));
+  
+  it('responds to changing the base and change ItemProxies', fakeAsync(() => {
+    ItemProxy.getWorkingTree().getChangeSubject().next({
+      proxy: component.selectedBaseStream.getValue()
+    });
+    tick();
+    
+    component.whenSelectedBaseChanges(component.selectedBaseStream.getValue());
+    tick();
+    expect(component.selectedBaseVersion).toEqual('Unstaged');
+    expect(component.allowBaseEditing).toEqual(true);
+    
+    ItemProxy.getWorkingTree().getChangeSubject().next({
+      proxy: component.selectedChangeStream.getValue()
+    });
+    tick();
+    
+    component.whenSelectedChangeChanges(component.selectedChangeStream.
+      getValue());
+    tick();
+    expect(component.selectedChangeVersion).toEqual('Unstaged');
+    expect(component.allowChangeEditing).toEqual(true);
+  }));
 });
