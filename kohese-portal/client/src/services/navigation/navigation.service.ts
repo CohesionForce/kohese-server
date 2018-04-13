@@ -28,14 +28,12 @@ export class NavigationService {
   }
 
   addTab(location: string, params : object) {
-    console.log(LocationMap[location]);
-    console.log(params);
     let routeInfo = LocationMap[location];
     let route = this.routeBase;
     route += routeInfo.route;
     if (params) {
       for (let param in params) {
-        route += ';' + params[param];
+        route += ';' + param + '=' + params[param];
       }
     }
     let newTab = window.open(route);
