@@ -7,18 +7,18 @@
   </div>
   <mat-card [ngClass]="{'uneditable' : !editable, 'editable': editable}" class="right-content">
     <mat-card-title>
-      {{assignment.item.name}} (Due)
+      {{assignment.item.name}} 
     </mat-card-title>
     <mat-card-content class="card-body">
-      <div class="card-info">
-        Estimated Start : {{assignment.item.estimatedStart | date}}
+      <div class="card-info" style="display: inline-block">
+             Estimated Start : {{assignment.item.estimatedStart | date}}
         <br> Estimated Completion : {{ assignment.item.estimatedCompletion | date }}
         <br> Estimated Hours Effort : {{ assignment.item.estimatedHoursEffort }}
-        <br>
-      </div>
-      <div class="card-state">
+      
         <k-state-editor [itemProxy]="assignment" [disableTransitioning]="!editable" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
       </div>
+      <dependency-info [relations]="assignment.relations"
+                       [kind]="assignment.kind"></dependency-info>
     </mat-card-content>
     <mat-card-actions>
         <button mat-raised-button (click)="navigate('Explore', {id: assignment.item.id})">

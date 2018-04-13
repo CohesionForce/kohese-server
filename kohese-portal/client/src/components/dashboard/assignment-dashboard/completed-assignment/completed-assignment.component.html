@@ -7,14 +7,19 @@
     </div>
     <mat-card [ngClass]="{'uneditable' : !editable, 'editable': editable}" class="right-content">
     <mat-card-title>
-      {{assignment.item.name}} (Completed)
+      {{assignment.item.name}} 
     </mat-card-title>
     <mat-card-content>
-      {{assignment.item.details | truncate : 200}}
-      Estimated Start : {{assignment.item.estimatedCompletion | date}} <br>
-      Estimated Completion : {{assignment.item.estimatedCompletion | date}} <br>
-      Estimated Hours : {{assignment.item.estimatedHoursEffort }} <br>
-      Completed On : {{assignment.item.actualCompletion | date}} <br>
+      <div style="display : inline-block">
+        <h4>Time Estimates : </h4>
+        {{assignment.item.details | truncate : 200}}
+        Estimated Start : {{assignment.item.estimatedCompletion | date}} <br>
+        Estimated Completion : {{assignment.item.estimatedCompletion | date}} <br>
+        Estimated Hours : {{assignment.item.estimatedHoursEffort }} <br>
+        Completed On : {{assignment.item.actualCompletion | date}} <br>
+      </div>
+      <dependency-info [relations]="assignment.relations"
+                       [kind]="assignment.kind"></dependency-info>
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button (click)="navigate('Explore', {id: assignment.item.id})">
