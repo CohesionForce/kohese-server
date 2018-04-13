@@ -1,4 +1,4 @@
-<div *ngFor="let assignment of sortedAssignmentList">
+<div *ngFor="let assignment of sortedAssignmentList" style="padding : 10px;">
   <span [ngSwitch]="assignmentType">
     <span *ngSwitchCase="assignmentTypes.ACTIVE_ASSIGNMENTS">
       <active-assignment [assignment]="assignment"></active-assignment>

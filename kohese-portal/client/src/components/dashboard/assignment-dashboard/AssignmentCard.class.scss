@@ -1,0 +1,21 @@
+
+.flex-container {
+  display : flex;
+}
+
+.left-content {
+  width : 2.5%;
+  color : whitesmoke;
+  background-color: #660000;
+}
+
+.right-content {
+  flex : 2;
+}
+
+.uneditable {
+  background-color : lightgray
+}
+.editable {
+  background-color : whitesmoke;
+}

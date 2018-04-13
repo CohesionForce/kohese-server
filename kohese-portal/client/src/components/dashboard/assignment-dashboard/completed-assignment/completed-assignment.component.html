@@ -1,4 +1,10 @@
-<mat-card>
+<div class="flex-container">
+    <div class="left-content">
+      <button mat-icon-button class="fa fa-edit" *ngIf="!editable" (click)="toggleEdit(editable)"></button>
+      <button mat-icon-button class="fa fa-times" *ngIf="editable" (click)="toggleEdit(editable)"></button>
+      <br>
+    </div>
+    <mat-card [ngClass]="{'uneditable' : !editable, 'editable': editable}" class="right-content">
     <mat-card-title>
       {{assignment.item.name}} (Completed)
     </mat-card-title>
@@ -6,11 +12,12 @@
       {{assignment.item.details | truncate : 200}}
       Estimated Start : {{assignment.item.estimatedCompletion | date}} <br>
       Estimated Completion : {{assignment.item.estimatedCompletion | date}} <br>
-      Estimated Hours : {{assignment.item.estimatedHours }} <br>
+      Estimated Hours : {{assignment.item.estimatedHoursEffort }} <br>
       Completed On : {{assignment.item.actualCompletion | date}} <br>
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button (click)="navigate('Explore', {id: assignment.item.id})">Details</button>
     </mat-card-actions>
   </mat-card>
+</div>
   

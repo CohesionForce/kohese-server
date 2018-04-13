@@ -1,16 +1,26 @@
-<mat-card>
-  <mat-card-title>
-    {{assignment.item.name}} (Due)
-  </mat-card-title>
-  <mat-card-content>
-    Estimated Start : {{assignment.item.estimatedStart | date}} <br>
-    Estimated Completion : {{ assignment.item.estimatedComplete | date }} <br>
-    Estimated Hours Effort : {{ assignment.item.estimatedHoursEffort }} <br>
-    <k-state-editor [itemProxy]="assignment"
-                    [disableTransitioning]="false"
-                    (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
-  </mat-card-content>
-  <mat-card-actions>
-    <button mat-raised-button (click)="navigate('Explore', {id: assignment.item.id})">Details</button> 
-  </mat-card-actions>
-</mat-card>
+<div class="flex-container">
+  <div class="left-content">
+    <button mat-icon-button class="fa fa-edit" *ngIf="!editable" (click)="toggleEdit(editable)"></button>
+    <button mat-icon-button class="fa fa-times" *ngIf="editable" (click)="toggleEdit(editable)"></button>
+    <br>
+  </div>
+  <mat-card [ngClass]="{'uneditable' : !editable, 'editable': editable}" class="right-content">
+    <mat-card-title>
+      {{assignment.item.name}} (Due)
+    </mat-card-title>
+    <mat-card-content class="card-body">
+      <div class="card-info">
+        Estimated Start : {{assignment.item.estimatedStart | date}}
+        <br> Estimated Completion : {{ assignment.item.estimatedCompletion | date }}
+        <br> Estimated Hours Effort : {{ assignment.item.estimatedHoursEffort }}
+        <br>
+      </div>
+      <div class="card-state">
+        <k-state-editor [itemProxy]="assignment" [disableTransitioning]="!editable" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button (click)="navigate('Explore', {id: assignment.item.id})">Details</button>
+    </mat-card-actions>
+  </mat-card>
+</div>
