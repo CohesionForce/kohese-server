@@ -10,4 +10,8 @@ export class NavigatableComponent {
   navigate (location : string, params: object) {
     this.NavigationService.navigate(location, params);
   }
+
+  addTab (location : string, params : object) {
+    this.NavigationService.addTab(location, params)
+  }
 }

@@ -10,9 +10,11 @@ import { LocationMap } from '../../constants/LocationMap.data'
 
 export class NavigationService {
   navUpdates : Subject<NavigationUpdate>;
+  routeBase: string;
 
   constructor(private router : Router) {
     this.navUpdates = new Subject<NavigationUpdate>();
+    this.routeBase = 'http://localhost:3000'
   }
 
   getNavUpdates(): Subject<NavigationUpdate> {
@@ -23,5 +25,19 @@ export class NavigationService {
     let newNavUpdate = new NavigationUpdate(location, params);
     this.navUpdates.next(newNavUpdate);
     this.router.navigate([LocationMap[location].route, params])
+  }
+
+  addTab(location: string, params : object) {
+    console.log(LocationMap[location]);
+    console.log(params);
+    let routeInfo = LocationMap[location];
+    let route = this.routeBase;
+    route += routeInfo.route;
+    if (params) {
+      for (let param in params) {
+        route += ';' + params[param];
+      }
+    }
+    let newTab = window.open(route);
   }
 }

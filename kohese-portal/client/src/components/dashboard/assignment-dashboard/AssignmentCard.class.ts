@@ -23,4 +23,8 @@ export class AssignmentCard extends NavigatableComponent {
     console.log(a);
     console.log(b);
   }
+
+  upsertItem() {
+    
+  }
 }
