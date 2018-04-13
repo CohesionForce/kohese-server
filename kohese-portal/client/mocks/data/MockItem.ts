@@ -40,3 +40,27 @@ export function MockDocument () {
     "itemIds": []
     }
 }
+
+export function MockAction () {
+  return {
+    "actionState": "Verified",
+    "assignedTo": "test-user",
+    "estimatedStart": 151007,
+    "estimatedCompletion": 151007,
+    "estimatedHoursEffort": 3,
+    "actualStart": 151007,
+    "actualCompletion": 151007,
+    "decisionState": "Approved",
+    "approvedBy": "test-approver",
+    "id": "3fc4e570-6c75-11e5-95f3-e91e0a47fde1",
+    "name": "test action",
+    "tags": "",
+    "description": "test-description",
+    "parentId": "eadf1e70-66db-11e5-89f1-33a86f9e302a",
+    "createdBy": "test-user",
+    "createdOn": 1444168654148,
+    "modifiedBy": "test-user",
+    "modifiedOn": 1444767003567,
+    "itemIds": []
+  }
+}

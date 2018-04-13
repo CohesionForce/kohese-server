@@ -50,10 +50,6 @@ export class ActionTableComponent extends NavigatableComponent
       this.tableStream = new MatTableDataSource(proxyList);
       for (let row of proxyList) {
         this.editableRows[row.proxy.item.id] = false;
-        if (!row.proxy.relations.references[row.proxy.kind]) {
-          console.log(row);
-          console.log ('bad row');
-        }
       }
       this.changeRef.markForCheck();
     })
