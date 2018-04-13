@@ -1,14 +1,15 @@
 import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
-  ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+  ChangeDetectorRef, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DetailsFormComponent } from '../details/details-form/details-form.component';
 import { ProxySelectorDialogComponent } from '../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
-import { ItemProxy } from '../../../../common/src/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'compare-items',
@@ -16,20 +17,20 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
   styleUrls: ['./compare-items.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CompareItemsComponent implements OnInit {
+export class CompareItemsComponent implements OnInit, OnDestroy {
   private syncLeft : boolean = false;
   private syncRight : boolean = false;
 
-  private _baseProxyStream: BehaviorSubject<ItemProxy> =
+  private _selectedBaseStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
-  get baseProxyStream() {
-    return this._baseProxyStream;
+  get selectedBaseStream() {
+    return this._selectedBaseStream;
   }
   
-  private _changeProxyStream: BehaviorSubject<ItemProxy> =
+  private _selectedChangeStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
-  get changeProxyStream() {
-    return this._changeProxyStream;
+  get selectedChangeStream() {
+    return this._selectedChangeStream;
   }
   
   private _baseOnRight: boolean = false;
@@ -40,20 +41,46 @@ export class CompareItemsComponent implements OnInit {
     this._baseOnRight = baseOnRight;
   }
   
-  private _allowEditing: boolean = false;
-  get allowEditing() {
-    return this._allowEditing;
-  }
-  private _baseItemEditableStream: BehaviorSubject<boolean> =
-    new BehaviorSubject<boolean>(false);
-  get baseItemEditableStream() {
-    return this._baseItemEditableStream;
+  private _allowBaseEditing: boolean = false;
+  get allowBaseEditing() {
+    return this._allowBaseEditing;
   }
   
-  private _changeItemEditableStream: BehaviorSubject<boolean> =
+  private _allowChangeEditing: boolean = false;
+  get allowChangeEditing() {
+    return this._allowChangeEditing;
+  }
+  
+  private _baseEditableStream: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
-  get changeItemEditableStream() {
-    return this._changeItemEditableStream;
+  get baseEditableStream() {
+    return this._baseEditableStream;
+  }
+  
+  private _changeEditableStream: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(false);
+  get changeEditableStream() {
+    return this._changeEditableStream;
+  }
+  
+  private _selectedBaseVersion: string;
+  get selectedBaseVersion() {
+    return this._selectedBaseVersion;
+  }
+  
+  private _selectedChangeVersion: string;
+  get selectedChangeVersion() {
+    return this._selectedChangeVersion;
+  }
+  
+  private _baseVersions: Array<any> = [];
+  get baseVersions() {
+    return this._baseVersions;
+  }
+  
+  private _changeVersions: Array<any> = [];
+  get changeVersions() {
+    return this._changeVersions;
   }
   
   private _fieldFilterStream: BehaviorSubject<((fieldName: string) => boolean)> =
@@ -77,6 +104,8 @@ export class CompareItemsComponent implements OnInit {
   private _baseDetailsFormComponent: DetailsFormComponent;
   @ViewChild('changeDetailsForm')
   private _changeDetailsFormComponent: DetailsFormComponent;
+  
+  private _itemProxyChangeSubscription: Subscription;
     
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
@@ -89,18 +118,68 @@ export class CompareItemsComponent implements OnInit {
     if (this._dialogParameters) {
       let baseProxy: ItemProxy = this._dialogParameters['baseProxy'];
       if (baseProxy) {
-        this.whenBaseProxyChanges(baseProxy);
+        this.whenSelectedBaseChanges(baseProxy);
       }
       
       if (this._dialogParameters['editable']) {
-        this._allowEditing = true;
+        this._allowBaseEditing = true;
+        this._allowChangeEditing = true;
       }
     }
+    
+    this._itemProxyChangeSubscription = this._itemRepository.
+      getChangeSubject().subscribe((notification: any) => {
+      if (notification.proxy) {
+        if (this._selectedBaseStream.getValue() && (this._selectedBaseStream.
+          getValue().item.id === notification.proxy.item.id)) {
+          this.whenSelectedBaseChanges(this._selectedBaseStream.getValue());
+        }
+      
+        if (this._selectedChangeStream.getValue() && (this.
+          _selectedChangeStream.getValue().item.id === notification.proxy.item.
+          id)) {
+          this.whenSelectedChangeChanges(this._selectedChangeStream.
+            getValue());
+        }
+      }
+    });
   }
   
-  public whenBaseProxyChanges(baseProxy: ItemProxy): void {
-    this._baseProxyStream.next(baseProxy);
+  public ngOnDestroy(): void {
+    this._itemProxyChangeSubscription.unsubscribe();
+  }
+  
+  public whenSelectedBaseChanges(baseProxy: ItemProxy): void {
+    this._itemRepository.getHistoryFor(baseProxy).subscribe(
+      (history: Array<any>) => {
+      this._baseVersions = history;
+      if (!baseProxy.status['Unstaged'] && (this._baseVersions.length > 0)) {
+        /* If there are no unstaged changes to the selected Item, change the
+        commit ID of the most recent commit that included that Item to
+        'Unstaged' to operate on the working tree version of that Item. */
+        this._baseVersions[0].commit = 'Unstaged';
+      }
+      let uncommittedVersions: Array<any> = [];
+      for (let statusName in baseProxy.status) {
+        uncommittedVersions.push({
+          commit: statusName,
+          message: statusName
+        });
+      }
+      this._baseVersions.splice(0, 0, ...uncommittedVersions);
+      this._selectedBaseStream.next(baseProxy);
+      this.whenSelectedBaseVersionChanges('Unstaged');
+    });
+  }
+  
+  public whenSelectedBaseVersionChanges(versionIdentifier: string): void {
+    this._selectedBaseVersion = versionIdentifier;
+    this._selectedBaseStream.next(this.getVersionProxy(versionIdentifier, this.
+      _selectedBaseStream.getValue().item.id));
+    this._allowBaseEditing = (('Staged' === versionIdentifier) || (this.
+      _baseVersions[0].commit === versionIdentifier));
     this._changeDetectorRef.detectChanges();
+    
     let rightDetailsFormForm: any = this._rightSplitArea.nativeElement.
       getElementsByTagName('form')[0];
     let leftDetailsFormForm: any = this._leftSplitArea.nativeElement.
@@ -112,9 +191,38 @@ export class CompareItemsComponent implements OnInit {
     }
   }
   
-  public whenChangeProxyChanges(changeProxy: ItemProxy): void {
-    this._changeProxyStream.next(changeProxy);
+  public whenSelectedChangeChanges(changeProxy: ItemProxy): void {
+    this._itemRepository.getHistoryFor(changeProxy).subscribe(
+      (history: Array<any>) => {
+      this._changeVersions = history;
+      if (!changeProxy.status['Unstaged'] && (this._changeVersions.
+        length > 0)) {
+        /* If there are no unstaged changes to the selected Item, change the
+        commit ID of the most recent commit that included that Item to
+        'Unstaged' to operate on the working tree version of that Item. */
+        this._changeVersions[0].commit = 'Unstaged';
+      }
+      let uncommittedVersions: Array<any> = [];
+      for (let statusName in changeProxy.status) {
+        uncommittedVersions.push({
+          commit: statusName,
+          message: statusName
+        });
+      }
+      this._changeVersions.splice(0, 0, ...uncommittedVersions);
+      this._selectedChangeStream.next(changeProxy);
+      this.whenSelectedChangeVersionChanges('Unstaged');
+    });
+  }
+  
+  public whenSelectedChangeVersionChanges(versionIdentifier: string): void {
+    this._selectedChangeVersion = versionIdentifier;
+    this._selectedChangeStream.next(this.getVersionProxy(versionIdentifier, this.
+      _selectedChangeStream.getValue().item.id));
+    this._allowChangeEditing = (('Staged' === versionIdentifier) || (this.
+      _changeVersions[0].commit === versionIdentifier));
     this._changeDetectorRef.detectChanges();
+    
     let rightDetailsFormForm: any = this._rightSplitArea.nativeElement.
       getElementsByTagName('form')[0];
     let leftDetailsFormForm: any = this._leftSplitArea.nativeElement.
@@ -124,6 +232,19 @@ export class CompareItemsComponent implements OnInit {
       this.addScrollListener(leftDetailsFormForm, rightDetailsFormForm, 'Right');
       this.addFieldListeners(leftDetailsFormForm, rightDetailsFormForm);
     }
+  }
+  
+  private getVersionProxy(versionIdentifier: string, itemId: string): ItemProxy {
+    let treeConfiguration: ItemProxy.TreeConfiguration = ItemProxy.
+      TreeConfiguration.getTreeConfigFor(versionIdentifier);
+    if (!treeConfiguration) {
+      treeConfiguration = new ItemProxy.TreeConfiguration(versionIdentifier);
+      ItemProxy.getWorkingTree().getRootProxy().cache.loadProxiesForCommit(
+        versionIdentifier, treeConfiguration);
+      treeConfiguration.loadingComplete();
+    }
+    
+    return treeConfiguration.getProxyFor(itemId);
   }
   
   private addScrollListener(scrollSource: any, scrollTarget: any, sourcePos : string): void {
@@ -178,12 +299,12 @@ export class CompareItemsComponent implements OnInit {
   private addFieldListeners(leftDetailsFormForm: any,
     rightDetailsFormForm: any): void {
     let baseFieldNames: Array<string> = [];
-    for (let fieldName in this._baseProxyStream.getValue().item) {
+    for (let fieldName in this._selectedBaseStream.getValue().item) {
       baseFieldNames.push(fieldName);
     }
     
     let changeFieldNames: Array<string> = [];
-    for (let fieldName in this._changeProxyStream.getValue().item) {
+    for (let fieldName in this._selectedChangeStream.getValue().item) {
       changeFieldNames.push(fieldName);
     }
     
@@ -246,10 +367,17 @@ export class CompareItemsComponent implements OnInit {
     }
   }
   
+  public toggleBaseOnRight(): void {
+    this._baseOnRight = !this._baseOnRight;
+    
+    // Add the scroll and field change listeners, if appropriate
+    this.whenSelectedBaseVersionChanges(this._selectedBaseVersion);
+  }
+  
   public saveCurrentProxy(proxyStream: BehaviorSubject<ItemProxy>): void {
     let proxy: ItemProxy = proxyStream.getValue();
     let detailsFormComponent: DetailsFormComponent;
-    if (proxyStream === this._baseProxyStream) {
+    if (proxyStream === this._selectedBaseStream) {
       detailsFormComponent = this._baseDetailsFormComponent;
     } else {
       detailsFormComponent = this._changeDetailsFormComponent;
@@ -267,21 +395,19 @@ export class CompareItemsComponent implements OnInit {
     }
 
     this._itemRepository.upsertItem(proxy).then((returnedProxy: ItemProxy) => {
-      if (proxyStream === this._baseProxyStream) {
-        this._baseItemEditableStream.next(false);
+      if (proxyStream === this._selectedBaseStream) {
+        this._baseEditableStream.next(false);
       } else {
-        this._changeItemEditableStream.next(false);
+        this._changeEditableStream.next(false);
       }
-      
-      this._changeDetectorRef.markForCheck();
     });
   }
   
   public filterFields(showDifferencesOnly: boolean): void {
     if (showDifferencesOnly) {
       this._fieldFilterStream.next(((fieldName: string) => {
-        let baseProxy: ItemProxy = this._baseProxyStream.getValue();
-        let changeProxy: ItemProxy = this._changeProxyStream.getValue();
+        let baseProxy: ItemProxy = this._selectedBaseStream.getValue();
+        let changeProxy: ItemProxy = this._selectedChangeStream.getValue();
         if (baseProxy && changeProxy && (baseProxy.item[fieldName] ===
           changeProxy.item[fieldName])) {
           return false;
@@ -301,15 +427,15 @@ export class CompareItemsComponent implements OnInit {
     editableStream.next(editable);
     if (!editable) {
       // If editing was canceled, reset the appropriate ItemProxy
-      if (editableStream === this._baseItemEditableStream) {
-        this._itemRepository.fetchItem(this._baseProxyStream.getValue()).then(
+      if (editableStream === this._baseEditableStream) {
+        this._itemRepository.fetchItem(this._selectedBaseStream.getValue()).then(
           (proxy: ItemProxy) => {
-          this.whenBaseProxyChanges(proxy);
+          this.whenSelectedBaseChanges(proxy);
         });
       } else {
-        this._itemRepository.fetchItem(this._changeProxyStream.getValue()).
+        this._itemRepository.fetchItem(this._selectedChangeStream.getValue()).
           then((proxy: ItemProxy) => {
-          this.whenChangeProxyChanges(proxy);
+          this.whenSelectedChangeChanges(proxy);
         });
       }
     }
@@ -323,10 +449,10 @@ export class CompareItemsComponent implements OnInit {
       }
     }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
       if (selection) {
-        if (proxyStream === this._baseProxyStream) {
-          this.whenBaseProxyChanges(selection);
+        if (proxyStream === this._selectedBaseStream) {
+          this.whenSelectedBaseChanges(selection);
         } else {
-          this.whenChangeProxyChanges(selection);
+          this.whenSelectedChangeChanges(selection);
         }
       }
     });

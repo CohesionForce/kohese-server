@@ -1,4 +1,7 @@
 import { BehaviorSubject} from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+
 import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
 import { MockDataModel } from '../data/MockDataModel';
@@ -37,8 +40,15 @@ export class MockItemRepository {
     return this.mockRootProxy;
   }
 
-  getHistoryFor () {
-    return (new Subject())
+  public getHistoryFor(proxy: ItemProxy): Observable<Array<any>> {
+    let historyObject: any = {
+      author: 'Kurios Iesous',
+      commit: 'Kurios Iesous',
+      message: 'Kurios Iesous.',
+      date: 0
+    };
+    proxy.history = [historyObject];
+    return Observable.of(JSON.parse(JSON.stringify(proxy.history)));
   }
 
   getProxyFor (id: string) {
