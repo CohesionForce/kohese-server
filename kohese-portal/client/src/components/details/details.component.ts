@@ -90,7 +90,7 @@ export class DetailsComponent extends NavigatableComponent
             this.repoConnected = true;
             this.updateProxy();
             this.proxyUpdates = ItemProxy.getWorkingTree().getChangeSubject().subscribe((change)=>{
-              if(change.id === this.itemProxy.item.id) {
+              if(this.itemProxy === change.proxy) {
                 this.proxyStream.next(change.proxy);
                 this.relationIdMap = this.itemProxy.getRelationIdMap();
               }
