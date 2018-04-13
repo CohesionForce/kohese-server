@@ -14,7 +14,7 @@ export class NavigationService {
 
   constructor(private router : Router) {
     this.navUpdates = new Subject<NavigationUpdate>();
-    this.routeBase = 'http://localhost:3000'
+    this.routeBase = window.location.protocol + "//" + window.location.host;
   }
 
   getNavUpdates(): Subject<NavigationUpdate> {
