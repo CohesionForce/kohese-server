@@ -141,4 +141,19 @@ describe('Component: Tree', () => {
     }
     expect(index).not.toEqual(-1);
   }));
+  
+  it('does not produce an error when the value of selectedProxyIdStream is ' +
+    'invalid', fakeAsync(() => {
+    let id: string = '-1';
+    expect(ItemProxy.getProxyFor(id)).not.toBeDefined();
+    component.selectedProxyIdStream.next(id);
+    tick();
+    /* Since the selection is to be synchronized by default, call the
+    toggleSelectionSynchronization function twice to trigger showing the
+    selected Item */
+    component.toggleSelectionSynchronization();
+    component.toggleSelectionSynchronization();
+    
+    expect(true).toEqual(true);
+  }));
 });

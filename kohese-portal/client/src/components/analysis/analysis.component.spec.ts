@@ -48,5 +48,9 @@ describe('Component: Analysis', ()=>{
 
   it('instantiates the analysis component', ()=>{
     expect(analysisComponent).toBeTruthy(); 
-  })
+  });
+  
+  it('does not produce an error when the URL contains an invalid id', () => {
+    expect(analysisComponent.itemProxy).not.toBeDefined();
+  });
 })

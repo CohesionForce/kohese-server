@@ -12,7 +12,10 @@ import { PipesModule } from '../../pipes/pipes.module';
 import { BehaviorSubject } from 'rxjs';
 import * as ItemProxy from '../../../../common/src/item-proxy';
 
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { MockItem } from '../../../mocks/data/MockItem';
 
 describe('Component: Action Table', ()=>{
   let actionTableComponent: ActionTableComponent;
@@ -30,13 +33,23 @@ describe('Component: Action Table', ()=>{
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {provide: NavigationService, useClass : MockNavigationService},
-        {provide: ChangeDetectorRef, useValue : {markForCheck : ()=>{}}}
+        {provide: ChangeDetectorRef, useValue : {markForCheck : ()=>{}}},
+        {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();
 
     actionTableFixture = TestBed.createComponent(ActionTableComponent);
     actionTableComponent = actionTableFixture.componentInstance;
-    actionTableComponent.proxyStream = new BehaviorSubject<any>(mockItemRepository.getRootProxy());
+    let itemProxy = mockItemRepository.getRootProxy(); 
+    itemProxy.getSubtreeAsList = ()=>{ 
+      return [
+        { depth: 0, proxy: new ItemProxy('Item', MockItem())},
+        { depth: 0, proxy: new ItemProxy('Item', MockItem())},
+        { depth: 0, proxy: new ItemProxy('Item', MockItem())}
+      ]
+    }
+    actionTableComponent.proxyStream = new BehaviorSubject<any>(itemProxy);
+    actionTableComponent.editableStream = new BehaviorSubject<boolean>(true);
 
     actionTableFixture.detectChanges();
 

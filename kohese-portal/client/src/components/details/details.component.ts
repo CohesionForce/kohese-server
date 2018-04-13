@@ -25,7 +25,6 @@ export class DetailsComponent extends NavigatableComponent
                               implements OnInit, OnDestroy {
   itemProxyId : string;
   itemProxy : ItemProxy;
-  parentProxy : ItemProxy;
   typeProxies : Array<ItemProxy>;
   private _itemJson: string;
   get itemJson() {
@@ -110,37 +109,25 @@ export class DetailsComponent extends NavigatableComponent
   }
 
   updateProxy () {
-    this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
-      if (!this.itemProxy) {
-        // TODO : Throw error modal to the UI
-        }
+    // Is this defunct? TODO
+    let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
+    this.typeProxies = modelProxy.getDescendants();
 
-      this.ItemRepository.registerRecentProxy(this.itemProxy);
-
-      // Is this defunct? TODO
-      let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-      this.typeProxies = modelProxy.getDescendants();
-
-      this.proxyList = this.ItemRepository.getShortFormItemList();
-      this.userList = this.SessionService.getUsers();
-      if(this.itemProxy){
-        this.relationIdMap = this.itemProxy.getRelationIdMap();
-      }
-      this.updateParentProxy();
-
+    this.proxyList = this.ItemRepository.getShortFormItemList();
+    this.userList = this.SessionService.getUsers();
     this._editableStream.next(false);
-      this.defaultTab = {active: true };
-    this._itemJson = this.itemProxy.document();
-      this.proxyStream.next(this.itemProxy);
-  }
+    this.defaultTab = { active: true };
+    this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+    if (this.itemProxy) {
+      this.ItemRepository.registerRecentProxy(this.itemProxy);
+      this.relationIdMap = this.itemProxy.getRelationIdMap();
+      this._itemJson = this.itemProxy.document();
+    } else {
+      // TODO : Throw error modal to the UI
+    }
 
-  updateParentProxy () : void {
-        if (this.itemProxy && this.itemProxy.item.parentId) {
-          this.parentProxy = this.ItemRepository.getProxyFor(this.itemProxy.item.parentId);
-        } else {
-          this.parentProxy = {};
-        }
-      };
+    this.proxyStream.next(this.itemProxy);
+  }
 
   getProxyFor(id) : any {
       return this.ItemRepository.getProxyFor(id);

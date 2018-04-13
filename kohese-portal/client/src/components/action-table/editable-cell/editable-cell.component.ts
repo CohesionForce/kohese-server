@@ -13,6 +13,9 @@ export class EditableCellComponent implements OnInit, OnDestroy, OnChanges{
   action : any;
   @Input()
   editableStream : Observable<boolean>;
+  @Input() 
+  rowActionStream : Observable<any>;
+  rowActionStreamSub : Subscription;
   editableStreamSub : Subscription;
   editable : boolean = false;
   editableField : boolean = false;
@@ -24,19 +27,35 @@ export class EditableCellComponent implements OnInit, OnDestroy, OnChanges{
   }
 
   ngOnInit () {
-    this.editableStreamSub = this.editableStream.subscribe((editable)=>{
-      this.editable = editable;
-    })
-    
-    this.initialized = true;
-    if (this.action.proxy.model.item.name === 'Task' ||
-        this.action.proxy.model.item.name === 'Action') {
-      this.editableField = true;
+    if (this.action.proxy.model.internal) {
+      this.editableField = false;
+    } else {
+      this.editableStreamSub = this.editableStream.subscribe((editable)=>{
+        if (!editable) {
+          this.editable = false;
+        }
+      })
+      
+      this.initialized = true;
+      if (this.action.proxy.model.item.name === 'Task' ||
+          this.action.proxy.model.item.name === 'Action') {
+        this.editableField = true;
+      }
+      this.rowActionStreamSub = this.rowActionStream.subscribe(rowAction => {
+        if (rowAction.rowProxy.item.id === this.action.proxy.item.id ) {
+          if (rowAction.type === 'Edit')  {
+            this.editable = !this.editable
+          } else if (rowAction.type === 'Save') {
+            this.editable = false;
+          }
+        }
+      })
     }
   }
 
   ngOnDestroy () {
     this.editableStreamSub.unsubscribe();
+    this.rowActionStreamSub.unsubscribe();
   }
 
   ngOnChanges (changes : SimpleChanges) {

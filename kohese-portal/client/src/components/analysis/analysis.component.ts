@@ -20,7 +20,6 @@ export class AnalysisComponent extends NavigatableComponent
 
   /* UI Toggles */
   analysisLoaded : boolean;
-  repoLoaded : boolean;
 
   /* Data */
   itemProxyId : string;
@@ -53,7 +52,6 @@ export class AnalysisComponent extends NavigatableComponent
   }
 
   ngOnInit () {
-    this.repoLoaded = false;
     this.analysisLoaded = false;
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
@@ -61,13 +59,13 @@ export class AnalysisComponent extends NavigatableComponent
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
           this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
           this.proxyStream = new BehaviorSubject(this.itemProxy);
-          this.AnalysisService.fetchAnalysis(this.itemProxy)
-            .then(()=>{
+          if (this.itemProxy) {
+            this.AnalysisService.fetchAnalysis(this.itemProxy).then(() => {
               this.proxyStream.next(this.itemProxy);
-            }, (error)=>{
+            }).catch((error: any) => {
               console.error(error);
             });
-          this.repoLoaded = true;
+          }
         }
       })
     })

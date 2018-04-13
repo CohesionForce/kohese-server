@@ -1,7 +1,7 @@
-import { TestBed, ComponentFixture} from '@angular/core/testing';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { from } from 'rxjs/observable/from';
+import { of } from 'rxjs/observable/of';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -43,7 +43,7 @@ describe('Component: Details', ()=>{
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ActivatedRoute, useValue:{
-          params: from([{id: 1}]),
+          params: Observable.of({ id: '1' })
         }}
       ]
     }).compileComponents();
@@ -67,9 +67,15 @@ describe('Component: Details', ()=>{
       fieldName: fieldName,
       fieldValue: fieldValue
     });
+    detailsComponent.itemProxy = TestBed.get(ItemRepository).getProxyFor(
+      'test-uuid7');
     spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.
       resolve());
     detailsComponent.upsertItem(detailsComponent.itemProxy.item);
     expect(detailsComponent.itemProxy.item[fieldName]).toEqual(fieldValue);
+  });
+  
+  it('does not produce an error when the URL contains an invalid id', () => {
+    expect(detailsComponent.itemProxy).not.toBeDefined();
   });
 })

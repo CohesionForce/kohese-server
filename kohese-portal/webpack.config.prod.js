@@ -501,7 +501,7 @@ module.exports = {
         "context": "client",
         "to": "",
         "from": {
-          "glob": "client/assets/**/*",
+          "glob": "assets/**/*",
           "dot": true
         }
       },
@@ -509,7 +509,7 @@ module.exports = {
         "context": "client",
         "to": "",
         "from": {
-          "glob": "client/favicon.ico",
+          "glob": "favicon.ico",
           "dot": true
         }
       }
