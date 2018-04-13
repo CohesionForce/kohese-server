@@ -1,13 +1,13 @@
 <div *ngFor="let assignment of sortedAssignmentList" style="padding : 10px;">
   <span [ngSwitch]="assignmentType">
     <span *ngSwitchCase="assignmentTypes.ACTIVE_ASSIGNMENTS">
-      <active-assignment [assignment]="assignment"></active-assignment>
+      <active-assignment [itemProxy]="assignment"></active-assignment>
     </span>
     <span *ngSwitchCase="assignmentTypes.DUE_ASSIGNMENTS">
-      <due-assignment [assignment]="assignment"></due-assignment>
+      <due-assignment [itemProxy]="assignment"></due-assignment>
     </span>
     <span *ngSwitchCase="assignmentTypes.COMPLETED_ASSIGNMENTS">
-      <completed-assignment [assignment]="assignment"></completed-assignment>
+      <completed-assignment [itemProxy]="assignment"></completed-assignment>
     </span>
   </span>
   <hr>

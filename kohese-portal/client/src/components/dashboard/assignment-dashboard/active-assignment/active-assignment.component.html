@@ -1,4 +1,4 @@
-<div class="flex-container">
+<div class="flex-container" *ngIf="assignment">
   <div class="left-content">
     <button mat-icon-button class="fa fa-edit" *ngIf="!editable" (click)="toggleEdit(editable)"></button>
     <button mat-icon-button class="fa fa-times" *ngIf="editable" (click)="toggleEdit(editable)"></button>

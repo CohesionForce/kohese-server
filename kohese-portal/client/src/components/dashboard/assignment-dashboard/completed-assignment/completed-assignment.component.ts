@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, OnInit } from '@angular/core'
 import * as ItemProxy from '../../../../../../common/src/item-proxy';
 import {NavigatableComponent} from '../../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
@@ -8,17 +8,29 @@ import { ItemRepository } from '../../../../services/item-repository/item-reposi
 @Component({
   selector : 'completed-assignment',
   templateUrl: 'completed-assignment.component.html',
-  styleUrls : ['../AssignmentCard.class.scss']
+  styleUrls : ['../AssignmentCard.class.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CompletedAssignmentComponent extends AssignmentCard {
+export class CompletedAssignmentComponent extends AssignmentCard implements OnInit ,OnDestroy {
 
   /* Data */
   @Input() 
-  assignment : ItemProxy 
+  itemProxy : ItemProxy 
 
   constructor (navigationService : NavigationService,
-               itemRepository : ItemRepository) {
-    super (navigationService, itemRepository);
-    
+              itemRepository : ItemRepository, 
+              changeRef : ChangeDetectorRef) {
+    super (navigationService, itemRepository, changeRef);
+    console.log(this);
   }
+  
+  ngOnInit () {
+    this.assignmentProxyStream.next(this.itemProxy);
+  }
+
+  ngOnDestroy () {
+    this.destroy();
+  }
+
+
 }
