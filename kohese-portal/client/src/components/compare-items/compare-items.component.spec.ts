@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testin
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularSplitModule } from 'angular-split';
 
 import { MaterialModule } from '../../material.module';
@@ -21,6 +22,7 @@ describe('Component: compare-items', () => {
       imports : [
         CommonModule,
         FormsModule,
+        BrowserAnimationsModule,
         MaterialModule,
         ServicesModule,
         AngularSplitModule
@@ -34,8 +36,8 @@ describe('Component: compare-items', () => {
       createComponent(CompareItemsComponent);
     component = compareItemsFixture.componentInstance;
     let proxy: ItemProxy = new ItemProxy('Item', MockItem());
-    component.baseProxyStream.next(proxy);
-    component.changeProxyStream.next(proxy);
+    component.selectedBaseStream.next(proxy);
+    component.selectedChangeStream.next(proxy);
     
     compareItemsFixture.detectChanges();
   });
@@ -44,18 +46,18 @@ describe('Component: compare-items', () => {
     fakeAsync(() => {
     let name: string = 'Kurios Iesous';
     
-    component.toggleEditability(component.baseItemEditableStream);
+    component.toggleEditability(component.baseEditableStream);
     tick();
-    component.baseProxyStream.getValue().item.name = name;
-    component.toggleEditability(component.baseItemEditableStream);
+    component.selectedBaseStream.getValue().item.name = name;
+    component.toggleEditability(component.baseEditableStream);
     tick();
-    expect(component.baseProxyStream.getValue().item.name).not.toEqual(name);
+    expect(component.selectedBaseStream.getValue().item.name).not.toEqual(name);
     
-    component.toggleEditability(component.changeItemEditableStream);
+    component.toggleEditability(component.changeEditableStream);
     tick();
-    component.changeProxyStream.getValue().item.name = name;
-    component.toggleEditability(component.changeItemEditableStream);
+    component.selectedChangeStream.getValue().item.name = name;
+    component.toggleEditability(component.changeEditableStream);
     tick();
-    expect(component.changeProxyStream.getValue().item.name).not.toEqual(name);
+    expect(component.selectedChangeStream.getValue().item.name).not.toEqual(name);
   }));
 });

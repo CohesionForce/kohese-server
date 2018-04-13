@@ -16,6 +16,7 @@ import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -39,8 +40,6 @@ export class ItemRepository {
 
   repositoryStatus : BehaviorSubject<any>;
   repoSyncStatus = {};
-
-  historySubject : Subject<any>;
 
   constructor (private socketService: SocketService,
     private CurrentUserService: CurrentUserService,
@@ -68,8 +67,6 @@ export class ItemRepository {
       state: RepoStates.DISCONNECTED,
       message : 'Initializing Item Repository'
     });
-
-    this.historySubject = new Subject();
 
     ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
       // console.log('+++ Received notification of change: ' + change.type);
@@ -616,17 +613,15 @@ export class ItemRepository {
     });
   }
 
-  getHistoryFor (proxy) : Subject<any>{
-    this.socketService.socket.emit('Item/getHistory', {onId: proxy.item.id}, (results) => {
-      if (!proxy.history) {
-        proxy.history = {};
-      }
-      proxy.history = results.history;
-      console.log('::: History retrieved for: ' + proxy.item.id + ' - ' + proxy.item.name);
-      console.log(results);
-      this.historySubject.next(proxy);
+  public getHistoryFor(proxy: ItemProxy): Observable<any> {
+    let emitReturningObservable: (message: string, data: any) => Observable<any> =
+      Observable.bindCallback(this.socketService.getSocket().emit.bind(this.
+      socketService.getSocket()));
+    return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).
+      map((response: any) => {
+      proxy.history = response.history;
+      return proxy.history;
     });
-    return this.historySubject;
   }
 
   getStatusFor (repo) {

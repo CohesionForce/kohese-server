@@ -17,6 +17,13 @@ split {
     width: 100%;
     display: flex;
     flex-direction: row;
+    
+    .button-span {
+      width: 50%;
+      margin-left: auto;
+      display: flex;
+      flex-direction: row;
+    }
   }
   
   .field-editor-container {

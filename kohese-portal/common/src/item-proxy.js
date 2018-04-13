@@ -42,7 +42,7 @@ class ItemProxy {
       // console.log('::: Constructor called for ' + itemId);
     }
 
-    ItemProxy.validateItemContent(kind, forItem);
+    ItemProxy.validateItemContent(kind, forItem, treeConfig);
 
     let proxy = treeConfig.proxyMap[itemId];
 
@@ -503,14 +503,14 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   validateItem(){
 
-    return ItemProxy.validateItemContent(this.kind, this.item);
+    return ItemProxy.validateItemContent(this.kind, this.item, this.treeConfig);
 
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static validateItemContent (kind, forItem) {
+  static validateItemContent (kind, forItem, treeConfig) {
     let validation = {
       valid : true
     };
@@ -530,7 +530,7 @@ class ItemProxy {
 
         if (!validation.valid){
           // TODO Need to remove this bypass logic which is needed to load some existing data
-          if(workingTree.loading){
+          if(treeConfig.loading){
             console.log('*** Error: Invalid data item');
             console.log('Kind: ' + kind);
             console.log(forItem);
@@ -1252,7 +1252,7 @@ class ItemProxy {
   updateItem(modelKind, withItem) {
 //    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
 
-    ItemProxy.validateItemContent(modelKind, withItem);
+    ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
 
     // Determine if item kind changed
     var newKind = modelKind;
@@ -1739,7 +1739,8 @@ class TreeConfiguration {
   }
 }
 
-workingTree = new TreeConfiguration('WORKING');
+workingTree = new TreeConfiguration('Unstaged');
+new TreeConfiguration('Staged');
 
 //////////////////////////////////////////////////////////////////////////
 //
