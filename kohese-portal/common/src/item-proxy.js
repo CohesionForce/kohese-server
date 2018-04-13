@@ -11,6 +11,7 @@ var Rx = require('rxjs/Rx');
 
 let treeConfigMap = {};
 let workingTree;
+let stagedTree;
 
 // Forward declare KoheseModel while waiting for registration to occur
 let KoheseModel;
@@ -1175,13 +1176,15 @@ class ItemProxy {
     }
     let orderAfterSort = this.getOrderedChildIds();
     if (!_.isEqual(orderBeforeSort, orderAfterSort)){
-      this.treeConfig.changeSubject.next({
-        type: 'reference-reordered',
-        relation: 'children',
-        kind: this.kind,
-        id: this.item.id,
-        proxy: this
-      });
+      if (!this.treeConfig.loading){
+        this.treeConfig.changeSubject.next({
+          type: 'reference-reordered',
+          relation: 'children',
+          kind: this.kind,
+          id: this.item.id,
+          proxy: this
+        });
+      }
     }
   }
 
@@ -1472,6 +1475,22 @@ class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static getWorkingTree() {
+    return workingTree;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getStagedTree() {
+    return stagedTree;
+  }
+
+
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   getRootProxy() {
     return this.root;
   }
@@ -1740,7 +1759,7 @@ class TreeConfiguration {
 }
 
 workingTree = new TreeConfiguration('Unstaged');
-new TreeConfiguration('Staged');
+stagedTree = new TreeConfiguration('Staged');
 
 //////////////////////////////////////////////////////////////////////////
 //

@@ -1,5 +1,7 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef,
-  ViewChild } from '@angular/core';
+import {
+  Component, OnInit, OnDestroy, ChangeDetectorRef,
+  ViewChild
+} from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { VirtualScrollComponent } from 'angular2-virtual-scroll';
 
@@ -16,55 +18,55 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 
 @Component({
-  selector : 'tree-view',
-  templateUrl : './tree.component.html',
+  selector: 'tree-view',
+  templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss']
 })
 export class TreeComponent extends NavigatableComponent
-                              implements OnInit, OnDestroy {
-    /* UI Toggles */
-    private _synchronizeWithSelection: boolean = true;
-    get synchronizeWithSelection() {
-      return this._synchronizeWithSelection;
-    }
+  implements OnInit, OnDestroy {
+  /* UI Toggles */
+  private _synchronizeWithSelection: boolean = true;
+  get synchronizeWithSelection() {
+    return this._synchronizeWithSelection;
+  }
 
-    /* Data */
-    private _rowMap: Map<string, TreeRow> = new Map<string, TreeRow>();
-    private _rows: Array<TreeRow> = [];
-    private _visibleRows: Array<TreeRow> = [];
-    get visibleRows() {
-      return this._visibleRows;
-    }
-    private _treeRootStream: BehaviorSubject<ItemProxy>;
-    get treeRootStream() {
-      return this._treeRootStream;
-    }
-    private absoluteRoot : ItemProxy;
-    public isRootDefault: boolean = true;
-    public selectedProxyIdStream: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    public proxyFilter: ProxyFilter = new ProxyFilter();
-    private _filterDelayIdentifier: any;
-    // TODO Probably want to get this from somewhere else
-    public viewList: Array<string> = ['Default', 'Version Control'];
-    public selectedViewStream: BehaviorSubject<string> = new BehaviorSubject<string>(this.viewList[0]);
-    private koheseTypes: object;
-    public actionStates: Array<string> = ['Pending Review', 'In Verification', 'Assigned'];
-    public userList : Array<ItemProxy>; // This will eventually be of type KoheseUser
-    private readonly NO_KIND_SPECIFIED: string = '---';
-    @ViewChild(VirtualScrollComponent)
-    private _virtualScrollComponent: VirtualScrollComponent;
+  /* Data */
+  private _rowMap: Map<string, TreeRow> = new Map<string, TreeRow>();
+  private _rows: Array<TreeRow> = [];
+  private _visibleRows: Array<TreeRow> = [];
+  get visibleRows() {
+    return this._visibleRows;
+  }
+  private _treeRootStream: BehaviorSubject<ItemProxy>;
+  get treeRootStream() {
+    return this._treeRootStream;
+  }
+  private absoluteRoot: ItemProxy;
+  public isRootDefault: boolean = true;
+  public selectedProxyIdStream: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public proxyFilter: ProxyFilter = new ProxyFilter();
+  private _filterDelayIdentifier: any;
+  // TODO Probably want to get this from somewhere else
+  public viewList: Array<string> = ['Default', 'Version Control'];
+  public selectedViewStream: BehaviorSubject<string> = new BehaviorSubject<string>(this.viewList[0]);
+  private koheseTypes: object;
+  public actionStates: Array<string> = ['Pending Review', 'In Verification', 'Assigned'];
+  public userList: Array<ItemProxy>; // This will eventually be of type KoheseUser
+  private readonly NO_KIND_SPECIFIED: string = '---';
+  @ViewChild(VirtualScrollComponent)
+  private _virtualScrollComponent: VirtualScrollComponent;
 
-    /* Subscriptions */
-    private routeParametersSubscription: Subscription;
-    private _treeRootChangeSubscription: Subscription;
-    private _itemProxySubscription: Subscription;
-    private _updateVisibleRowsSubscriptions: Array<Subscription> = [];
+  /* Subscriptions */
+  private routeParametersSubscription: Subscription;
+  private _treeRootChangeSubscription: Subscription;
+  private _itemProxySubscription: Subscription;
+  private _updateVisibleRowsSubscriptions: Array<Subscription> = [];
 
-  constructor (protected NavigationService : NavigationService,
+  constructor(protected NavigationService: NavigationService,
     private typeService: DynamicTypesService,
-    private ItemRepository : ItemRepository,
-    private SessionService : SessionService,
-    private route : ActivatedRoute,
+    private ItemRepository: ItemRepository,
+    private SessionService: SessionService,
+    private route: ActivatedRoute,
     private _changeDetector: ChangeDetectorRef) {
     super(NavigationService);
   }
@@ -86,57 +88,57 @@ export class TreeComponent extends NavigatableComponent
 
             this._treeRootChangeSubscription = this._treeRootStream.subscribe(
               (proxy: ItemProxy) => {
-              this.changeTreeRoot(proxy);
-            });
+                this.changeTreeRoot(proxy);
+              });
 
             this._itemProxySubscription = this.ItemRepository.
               getChangeSubject().subscribe((notification: any) => {
-              switch (notification.type){
-                case 'create': {
-
-                    let row: TreeRow = new TreeRow(notification.proxy);
-                    this._rowMap.set(notification.id, row);
-                    let parentRowIndex: number = this._rows.indexOf(this._rowMap.
-                      get(notification.proxy.parentProxy.item.id));
-                    let parentRowIndexOffset: number = notification.proxy.
-                      parentProxy.children.indexOf(notification.proxy);
-                    if (0 !== parentRowIndexOffset) {
-                      parentRowIndexOffset += notification.proxy.parentProxy.
-                        children[parentRowIndexOffset].descendantCount;
-                    }
-                    this._rows.splice(parentRowIndex + parentRowIndexOffset + 1, 0,
-                      row);
-                    this._updateVisibleRowsSubscriptions.push(row.
-                      updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
-                      if (updateVisibleRows) {
-                        this.setVisibleRows();
+                switch (notification.type) {
+                  case 'create':
+                    {
+                      let row: TreeRow = new TreeRow(notification.proxy);
+                      this._rowMap.set(notification.id, row);
+                      let parentRowIndex: number = this._rows.indexOf(this._rowMap.
+                        get(notification.proxy.parentProxy.item.id));
+                      let parentRowIndexOffset: number = notification.proxy.
+                        parentProxy.children.indexOf(notification.proxy);
+                      if (0 !== parentRowIndexOffset) {
+                        parentRowIndexOffset += notification.proxy.parentProxy.
+                          children[parentRowIndexOffset].descendantCount;
                       }
-                    }));
-                  }
-                  break;
-                case 'delete': {
+                      this._rows.splice(parentRowIndex + parentRowIndexOffset + 1, 0,
+                        row);
+                      this._updateVisibleRowsSubscriptions.push(row.
+                        updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
+                        if (updateVisibleRows) {
+                          this.setVisibleRows();
+                        }
+                      }));
+                    }
+                    break;
+                  case 'delete':
+                    {
+                      let row: TreeRow = this._rowMap.get(notification.id);
+                      this._rows.splice(this._rows.indexOf(row), 1);
+                      this._rowMap.delete(notification.id);
+                    }
+                    break;
+                  case 'loaded':
+                    this.absoluteRoot.visitChildren(undefined, (proxy: ItemProxy) => {
+                      this.addTreeRow(proxy);
+                    });
+                }
 
-                    let row: TreeRow = this._rowMap.get(notification.id);
-                    this._rows.splice(this._rows.indexOf(row), 1);
-                    this._rowMap.delete(notification.id);
-                  }
-                  break;
-                case 'loaded':
-                  this.absoluteRoot.visitChildren(undefined, (proxy: ItemProxy) => {
-                    this.addTreeRow(proxy);
-                  });
-              }
-
-              this.setVisibleRows();
-            });
+                this.setVisibleRows();
+              });
 
             this.routeParametersSubscription = this.route.params.
               subscribe((parameters: Params) => {
-              this.selectedProxyIdStream.next(parameters['id']);
-              if (this._synchronizeWithSelection) {
-                this.showSelection();
-              }
-            });
+                this.selectedProxyIdStream.next(parameters['id']);
+                if (this._synchronizeWithSelection) {
+                  this.showSelection();
+                }
+              });
 
             this.setVisibleRows();
             this.showSelection();
@@ -145,7 +147,7 @@ export class TreeComponent extends NavigatableComponent
               repositoryStatusSubscription.unsubscribe();
             }
         }
-    });
+      });
 
     if (this.absoluteRoot) {
       /* The ItemRepository was already in an eligible state for dependent
@@ -295,10 +297,10 @@ export class TreeComponent extends NavigatableComponent
     let row: TreeRow = new TreeRow(forProxy);
     this._updateVisibleRowsSubscriptions.push(row.updateVisibleRows.
       subscribe((updateVisibleRows: boolean) => {
-      if (updateVisibleRows) {
-        this.setVisibleRows();
-      }
-    }));
+        if (updateVisibleRows) {
+          this.setVisibleRows();
+        }
+      }));
     this._rowMap.set(forProxy.item.id, row);
     this._rows.push(row);
     return row;
@@ -336,7 +338,11 @@ export class TreeComponent extends NavigatableComponent
     for (let j: number = 0; j < proxy.children.length; j++) {
       let childProxy = proxy.children[j];
       let row: TreeRow = this._rowMap.get(childProxy.item.id);
-      functionToApply(row);
+      if (row){
+        functionToApply(row);
+      } else {
+        console.log('*** Error: Row needed for child: ' + childProxy.item.id);
+      }
     }
   }
 }
