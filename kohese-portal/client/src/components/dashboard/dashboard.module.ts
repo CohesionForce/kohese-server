@@ -13,6 +13,7 @@ import { PipesModule } from "../../pipes/pipes.module";
 import { ActiveAssignmentComponent } from "./assignment-dashboard/active-assignment/active-assignment.component";
 import { DueAssignmentComponent } from "./assignment-dashboard/due-assignment/due-assignment.component";
 import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-assignment/completed-assignment.component";
+import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/dependency-info.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-a
     UserDashboardComponent,
     ActiveAssignmentComponent,
     DueAssignmentComponent,
-    CompletedAssignmentComponent
+    CompletedAssignmentComponent,
+    DependencyInfoComponent
   ],
   entryComponents: [
     KMarkdownComponent

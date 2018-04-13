@@ -7,15 +7,21 @@
   </div>
   <mat-card [ngClass]="{'uneditable' : !editable, 'editable': editable}" class="right-content">
     <mat-card-title>
-      {{assignment.item.name}} (Active)
+      {{assignment.item.name}} 
     </mat-card-title>
     <mat-card-content>
-      Estimated Start : {{assignment.item.estimatedStart | date}} <br>
-      Estimated Completion : {{ assignment.item.estimatedComplete | date }} <br>
-      Estimated Hours Effort : {{ assignment.item.estimatedHoursEffort }} <br>
-    <k-state-editor [itemProxy]="assignment"
-                    [disableTransitioning]="!editable"
-                    (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
+      <div style="display: inline-block">
+        <h4>Time Estimates</h4>
+        Estimated Start : {{assignment.item.estimatedStart | date}} <br>
+        Estimated Completion : {{ assignment.item.estimatedComplete | date }} <br>
+        Estimated Hours Effort : {{ assignment.item.estimatedHoursEffort }} <br>
+        <k-state-editor [itemProxy]="assignment"
+                        [disableTransitioning]="!editable"
+                        (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
+      </div>
+      
+      <dependency-info [relations]="assignment.relations"
+                       [kind]="assignment.kind"></dependency-info>
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button (click)="addTab('Explore', {id: assignment.item.id})">
