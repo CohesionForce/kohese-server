@@ -7,6 +7,7 @@ import { MockViewData } from '../data/MockViewData';
 import { MockDataModel } from '../data/MockDataModel';
 import * as ItemProxy from '../../../common/src/item-proxy';
 import * as KoheseModel from '../../../common/src/KoheseModel';
+import { Subject } from 'rxjs';
 import { RepoStates } from '../../src/services/item-repository/item-repository.service';
 
 export class MockItemRepository {
