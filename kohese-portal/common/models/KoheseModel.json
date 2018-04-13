@@ -49,6 +49,10 @@
       ],
       "required": true
     },
+    "classProperties": {
+      "type": "object",
+      "derived": true
+    },
     "propertyOrder": {
       "type": [
         "string"
@@ -73,6 +77,12 @@
       ],
       "derived": true
     },
+    "calculatedProperties": {
+      "type": [
+        "string"
+      ],
+      "derived": true
+    },
     "stateProperties": {
       "type": [
         "string"
@@ -80,6 +90,12 @@
       "derived": true
     },
     "relationProperties": {
+      "type": [
+        "string"
+      ],
+      "derived": true
+    },
+    "idProperties": {
       "type": [
         "string"
       ],

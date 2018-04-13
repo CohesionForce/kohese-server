@@ -48,6 +48,10 @@ function loadKoheseModelsAndViews() {
   loadModelInstances('KoheseView', commonViewFiles, false);
   loadModelInstances('KoheseView', repoViewFileDir, true);
 
+  let repoUserFileDir = koheseKDBDirPath + '/KoheseUser';
+  kdbFS.createDirIfMissing(repoUserFileDir);
+  loadModelInstances('KoheseUser', repoUserFileDir, true);
+
   KoheseModel.modelDefinitionLoadingComplete();
 
 }
@@ -505,6 +509,7 @@ function validateRepositoryStructure (repoDirPath) {
       case 'Analysis':
       case 'KoheseModel':
       case 'KoheseView':
+      case 'KoheseUser':
 
         // Skip this model kind
         console.log('::: Skipping ' + modelName);

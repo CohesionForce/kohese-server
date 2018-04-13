@@ -103,7 +103,11 @@
       "relation": true
     },
     "assignedTo": {
-      "type": "string"
+      "type": "string",
+      "relation": {
+        "kind": "KoheseUser",
+        "foreignKey": "username"
+      }
     },
     "associatedWorkflow": {
       "type": "string"

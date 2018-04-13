@@ -131,24 +131,34 @@ class KoheseModel extends ItemProxy {
         modelProxy.item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy.item.properties));
       }
 
+      modelProxy.item.classProperties = _.clone(modelProxy.parentProxy.item.classProperties) || {};
       modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
       modelProxy.item.derivedProperties = _.clone(modelProxy.parentProxy.item.derivedProperties) || [];
+      modelProxy.item.calculatedProperties = _.clone(modelProxy.parentProxy.item.calculatedProperties) || [];
       modelProxy.item.stateProperties = _.clone(modelProxy.parentProxy.item.stateProperties) || [];
       modelProxy.item.relationProperties = _.clone(modelProxy.parentProxy.item.relationProperties) || [];
+      modelProxy.item.idProperties = _.clone(modelProxy.parentProxy.item.idProperties) || [];
 
       for (var property in modelProxy.item.properties){
         var propertySettings = modelProxy.item.properties[property];
+        modelProxy.item.classProperties[property] = propertySettings;
         if (propertySettings.required){
           modelProxy.item.requiredProperties.push(property);
         }
         if (propertySettings.derived){
           modelProxy.item.derivedProperties.push(property);
+          if(propertySettings.calculated){
+            modelProxy.item.calculatedProperties.push(property);
+          }
         }
         if (propertySettings.type && (propertySettings.type ==='StateMachine')){
           modelProxy.item.stateProperties.push(property);
         }
         if (propertySettings.relation){
           modelProxy.item.relationProperties.push(property);
+        }
+        if (propertySettings.id){
+          modelProxy.item.idProperties.push(property);
         }
       }
     }

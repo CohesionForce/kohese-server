@@ -10,7 +10,7 @@
     "id": {
       "type": "string",
       "id": true,
-      "defaultFn": "guid"
+      "defaultFn": "uuidV1"
     },
     "name": {
       "type": "string",
