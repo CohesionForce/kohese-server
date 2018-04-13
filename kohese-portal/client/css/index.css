@@ -271,9 +271,9 @@ table th .glyphicon-plus {
   table th .glyphicon-plus:hover {
     cursor: pointer; }
 
-table td .glyphicon-remove {
+table td .fa-times {
   color: #ca6464; }
-  table td .glyphicon-remove:hover {
+  table td .fa-times:hover {
     cursor: pointer; }
 
 .quick-item {

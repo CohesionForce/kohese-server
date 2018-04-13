@@ -191,8 +191,11 @@ class ItemCache {
     for(let childId in treeHashEntry.childTreeHashes){
       console.log('$$$ Child: ' + childId);
       let childTreeHash = treeHashEntry.childTreeHashes[childId];
-      let childTreeHashEntry = this.getTree(childTreeHash);
-      this.loadProxiesForTree(childId, childTreeHashEntry, treeConfig);
+      if ((childTreeHash !== 'Repository-Mount') &&
+        (childTreeHash !== 'Internal')) {
+        let childTreeHashEntry = this.getTree(childTreeHash);
+        this.loadProxiesForTree(childId, childTreeHashEntry, treeConfig);
+      }
     }
   }
 
