@@ -91,29 +91,40 @@ export class TreeComponent extends NavigatableComponent
 
             this._itemProxySubscription = this.ItemRepository.
               getChangeSubject().subscribe((notification: any) => {
-              if ('create' === notification.type) {
-                let row: TreeRow = new TreeRow(notification.proxy);
-                this._rowMap.set(notification.id, row);
-                let parentRowIndex: number = this._rows.indexOf(this._rowMap.
-                  get(notification.proxy.parentProxy.item.id));
-                let parentRowIndexOffset: number = notification.proxy.
-                  parentProxy.children.indexOf(notification.proxy);
-                if (0 !== parentRowIndexOffset) {
-                  parentRowIndexOffset += notification.proxy.parentProxy.
-                    children[parentRowIndexOffset].descendantCount;
-                }
-                this._rows.splice(parentRowIndex + parentRowIndexOffset + 1, 0,
-                  row);
-                this._updateVisibleRowsSubscriptions.push(row.
-                  updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
-                  if (updateVisibleRows) {
-                    this.setVisibleRows();
+              switch (notification.type){
+                case 'create': {
+
+                    let row: TreeRow = new TreeRow(notification.proxy);
+                    this._rowMap.set(notification.id, row);
+                    let parentRowIndex: number = this._rows.indexOf(this._rowMap.
+                      get(notification.proxy.parentProxy.item.id));
+                    let parentRowIndexOffset: number = notification.proxy.
+                      parentProxy.children.indexOf(notification.proxy);
+                    if (0 !== parentRowIndexOffset) {
+                      parentRowIndexOffset += notification.proxy.parentProxy.
+                        children[parentRowIndexOffset].descendantCount;
+                    }
+                    this._rows.splice(parentRowIndex + parentRowIndexOffset + 1, 0,
+                      row);
+                    this._updateVisibleRowsSubscriptions.push(row.
+                      updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
+                      if (updateVisibleRows) {
+                        this.setVisibleRows();
+                      }
+                    }));
                   }
-                }));
-              } else if ('delete' === notification.type) {
-                let row: TreeRow = this._rowMap.get(notification.id);
-                this._rows.splice(this._rows.indexOf(row), 1);
-                this._rowMap.delete(notification.id);
+                  break;
+                case 'delete': {
+
+                    let row: TreeRow = this._rowMap.get(notification.id);
+                    this._rows.splice(this._rows.indexOf(row), 1);
+                    this._rowMap.delete(notification.id);
+                  }
+                  break;
+                case 'loaded':
+                  this.absoluteRoot.visitChildren(undefined, (proxy: ItemProxy) => {
+                    this.addTreeRow(proxy);
+                  });
               }
 
               this.setVisibleRows();
@@ -325,10 +336,6 @@ export class TreeComponent extends NavigatableComponent
     for (let j: number = 0; j < proxy.children.length; j++) {
       let childProxy = proxy.children[j];
       let row: TreeRow = this._rowMap.get(childProxy.item.id);
-      if (!row){
-        // TreeRow needs to be created for childProxy
-        row = this.addTreeRow(childProxy);
-      }
       functionToApply(row);
     }
   }

@@ -21,7 +21,7 @@ export class ProxySelectorDialogComponent implements OnInit, OnDestroy {
     if (this.multiSelect) {
       this.selected = $.extend(true, [], data.selected);
     } else {
-      this.selected = $.extend(true, {}, data.selected);
+      this.selected = data.selected;
     }
   }
 

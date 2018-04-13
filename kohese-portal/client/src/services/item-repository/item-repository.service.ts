@@ -613,14 +613,16 @@ export class ItemRepository {
     });
   }
 
-  public getHistoryFor(proxy: ItemProxy): Observable<any> {
+  public getHistoryFor(proxy: ItemProxy): Observable<Array<any>> {
     let emitReturningObservable: (message: string, data: any) => Observable<any> =
       Observable.bindCallback(this.socketService.getSocket().emit.bind(this.
       socketService.getSocket()));
     return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).
       map((response: any) => {
       proxy.history = response.history;
-      return proxy.history;
+      /* Return a copy of the history so that subscribers may modify the
+      returned history, if desired. */
+      return JSON.parse(JSON.stringify(proxy.history));
     });
   }
 
