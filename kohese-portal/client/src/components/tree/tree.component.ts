@@ -59,7 +59,7 @@ export class TreeComponent extends NavigatableComponent
     private _treeRootChangeSubscription: Subscription;
     private _itemProxySubscription: Subscription;
     private _updateVisibleRowsSubscriptions: Array<Subscription> = [];
-    
+
   constructor (protected NavigationService : NavigationService,
     private typeService: DynamicTypesService,
     private ItemRepository : ItemRepository,
@@ -79,24 +79,16 @@ export class TreeComponent extends NavigatableComponent
             this._treeRootStream = new BehaviorSubject<ItemProxy>(this.
               absoluteRoot);
             this.koheseTypes = this.typeService.getKoheseTypes();
-        
+
             this.absoluteRoot.visitChildren(undefined, (proxy: ItemProxy) => {
-              let row: TreeRow = new TreeRow(proxy);
-              this._updateVisibleRowsSubscriptions.push(row.updateVisibleRows.
-                subscribe((updateVisibleRows: boolean) => {
-                if (updateVisibleRows) {
-                  this.setVisibleRows();
-                }
-              }));
-              this._rowMap.set(proxy.item.id, row);
-              this._rows.push(row);
+              this.addTreeRow(proxy);
             });
-        
+
             this._treeRootChangeSubscription = this._treeRootStream.subscribe(
               (proxy: ItemProxy) => {
               this.changeTreeRoot(proxy);
             });
-        
+
             this._itemProxySubscription = this.ItemRepository.
               getChangeSubject().subscribe((notification: any) => {
               if ('create' === notification.type) {
@@ -123,10 +115,10 @@ export class TreeComponent extends NavigatableComponent
                 this._rows.splice(this._rows.indexOf(row), 1);
                 this._rowMap.delete(notification.id);
               }
-              
+
               this.setVisibleRows();
             });
-            
+
             this.routeParametersSubscription = this.route.params.
               subscribe((parameters: Params) => {
               this.selectedProxyIdStream.next(parameters['id']);
@@ -134,25 +126,25 @@ export class TreeComponent extends NavigatableComponent
                 this.showSelection();
               }
             });
-        
+
             this.setVisibleRows();
             this.showSelection();
-            
+
             if (repositoryStatusSubscription) {
               repositoryStatusSubscription.unsubscribe();
             }
         }
     });
-    
+
     if (this.absoluteRoot) {
       /* The ItemRepository was already in an eligible state for dependent
       initialization to be performed */
       repositoryStatusSubscription.unsubscribe();
     }
-    
+
     this.userList = this.SessionService.getUsers();
   }
-  
+
   ngOnDestroy(): void {
     this.routeParametersSubscription.unsubscribe();
     for (let j: number = 0; j < this._updateVisibleRowsSubscriptions.length;
@@ -184,7 +176,7 @@ export class TreeComponent extends NavigatableComponent
       }
     };
     this.applyToChildTreeRows(this._treeRootStream.getValue(), expandFunction);
-    
+
     this.setVisibleRows();
   }
 
@@ -197,7 +189,7 @@ export class TreeComponent extends NavigatableComponent
     };
     this.applyToChildTreeRows(this._treeRootStream.getValue(),
       collapseFunction);
-    
+
     this.setVisibleRows();
   }
 
@@ -235,25 +227,25 @@ export class TreeComponent extends NavigatableComponent
     this.selectedViewStream.next(viewSelected);
     this.filter();
   }
-  
+
   public whenFilterStringChanges(): void {
     if (this._filterDelayIdentifier) {
       clearTimeout(this._filterDelayIdentifier);
     }
-    
+
     this._filterDelayIdentifier = setTimeout(() => {
       this.filter();
       this._filterDelayIdentifier = undefined;
     }, 1000);
   }
-  
+
   public toggleSelectionSynchronization(): void {
     this._synchronizeWithSelection = !this._synchronizeWithSelection;
     if (this._synchronizeWithSelection) {
       this.showSelection();
     }
   }
-  
+
   private showSelection(): void {
     let id: string = this.selectedProxyIdStream.getValue();
     if (id) {
@@ -266,11 +258,11 @@ export class TreeComponent extends NavigatableComponent
           if (!parentRow) {
             break;
           }
-      
+
           parentRow.expanded = true;
           parentId = parentRow.itemProxy.parentProxy.item.id;
         }
-        
+
         this.setVisibleRows();
         if (this._virtualScrollComponent) {
           this._virtualScrollComponent.scrollInto(selectedRow);
@@ -278,7 +270,7 @@ export class TreeComponent extends NavigatableComponent
       }
     }
   }
-  
+
   private changeTreeRoot(proxy: ItemProxy): void {
     // This purpose of this check is to prevent non-terminating looping
     if (proxy !== this._treeRootStream.getValue()) {
@@ -287,7 +279,20 @@ export class TreeComponent extends NavigatableComponent
     this.isRootDefault = (proxy === this.absoluteRoot);
     this.setVisibleRows();
   }
-  
+
+  private addTreeRow(forProxy): TreeRow {
+    let row: TreeRow = new TreeRow(forProxy);
+    this._updateVisibleRowsSubscriptions.push(row.updateVisibleRows.
+      subscribe((updateVisibleRows: boolean) => {
+      if (updateVisibleRows) {
+        this.setVisibleRows();
+      }
+    }));
+    this._rowMap.set(forProxy.item.id, row);
+    this._rows.push(row);
+    return row;
+  }
+
   private setVisibleRows(): void {
     this._visibleRows = [];
     let treeRoot: ItemProxy = this._treeRootStream.getValue();
@@ -314,11 +319,16 @@ export class TreeComponent extends NavigatableComponent
       this._visibleRows[j].updateDisplay.next(true);
     }
   }
-  
+
   private applyToChildTreeRows(proxy: ItemProxy, functionToApply: (row:
     TreeRow) => void): void {
     for (let j: number = 0; j < proxy.children.length; j++) {
-      let row: TreeRow = this._rowMap.get(proxy.children[j].item.id);
+      let childProxy = proxy.children[j];
+      let row: TreeRow = this._rowMap.get(childProxy.item.id);
+      if (!row){
+        // TreeRow needs to be created for childProxy
+        row = this.addTreeRow(childProxy);
+      }
       functionToApply(row);
     }
   }
