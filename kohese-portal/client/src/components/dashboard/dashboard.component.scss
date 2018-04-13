@@ -1,0 +1,17 @@
+.flex-grid {
+  display: flex;
+}
+
+
+
+.col {
+  flex : 1;
+}
+
+.right-content {
+  flex : 4;
+  height: 100%;
+  overflow: auto !important;
+
+}
+

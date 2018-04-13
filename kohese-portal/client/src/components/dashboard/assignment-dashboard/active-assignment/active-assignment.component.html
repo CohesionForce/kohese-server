@@ -1,0 +1,34 @@
+<div class="flex-container" *ngIf="assignment">
+  <div class="left-content">
+    <button mat-icon-button class="fa fa-edit" *ngIf="!editable" (click)="toggleEdit(editable)"></button>
+    <button mat-icon-button class="fa fa-times" *ngIf="editable" (click)="toggleEdit(editable)"></button>
+    <br>
+    <button mat-icon-button class="fa fa-save" *ngIf="editable" (click)="upsertItem()"></button>
+  </div>
+  <mat-card [ngClass]="{'uneditable' : !editable, 'editable': editable}" class="right-content">
+    <mat-card-title>
+      {{assignment.item.name}} 
+    </mat-card-title>
+    <mat-card-content>
+      <div style="display: inline-block">
+        <h4>Time Estimates</h4>
+        Estimated Start : {{assignment.item.estimatedStart | date}} <br>
+        Estimated Completion : {{ assignment.item.estimatedComplete | date }} <br>
+        Estimated Hours Effort : {{ assignment.item.estimatedHoursEffort }} <br>
+        <k-state-editor [itemProxy]="assignment"
+                        [disableTransitioning]="!editable"
+                        (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
+      </div>
+      
+      <dependency-info [relations]="assignment.relations"
+                       [kind]="assignment.kind"></dependency-info>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button (click)="addTab('Explore', {id: assignment.item.id})">
+        Details <i class="fa fa-arrow-right"></i>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+  
