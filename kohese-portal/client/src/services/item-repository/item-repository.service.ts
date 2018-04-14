@@ -285,16 +285,17 @@ export class ItemRepository {
         let afterFetch = Date.now();
         console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
         this.processBulkUpdate(response.allItems);
-        let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
-        rootProxy.cache = new ItemCache();
-        rootProxy.cache.setObjectMap(response.objectMap);
+
+        let itemCache = new ItemCache();
+        itemCache.setObjectMap(response.objectMap);
+        ItemProxy.TreeConfiguration.setItemCache(itemCache);
+        this.cacheFetched = true;
+
         let processingComplete = Date.now();
         console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
         ItemProxy.getWorkingTree().loadingComplete();
         let treehashComplete = Date.now();
         console.log('$$$ TreeHash time: ' + (treehashComplete - processingComplete)/1000);
-
-        this.cacheFetched = true;
 
         // TODO Remove after cache is complete
         // Invoke fetch to peform a delta update

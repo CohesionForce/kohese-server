@@ -114,8 +114,8 @@ function KIOItemServer(socket){
 
     consoleLogObject('$$$ Request', request);
 
-    let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
-    let objectMap = rootProxy.cache.getObjectMap();
+    let itemCache = ItemProxy.TreeConfiguration.getItemCache();
+    let objectMap = itemCache.getObjectMap();
 
     let response = {
       timestamp: {

@@ -252,7 +252,7 @@ function fetchItemCache(){
       serverCache.objectMap = response.objectMap;
       let itemCache = new ItemCache();
       itemCache.setObjectMap(response.objectMap)
-      ItemProxy.getWorkingTree().getRootProxy().cache = itemCache;
+      ItemProxy.TreeConfiguration.setItemCache(itemCache);
       cacheFetched = true;
 
       repoState = RepoStates.SYNCHRONIZATION_SUCCEEDED;

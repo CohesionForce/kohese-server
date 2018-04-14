@@ -26,13 +26,13 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   get selectedBaseStream() {
     return this._selectedBaseStream;
   }
-  
+
   private _selectedChangeStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
   get selectedChangeStream() {
     return this._selectedChangeStream;
   }
-  
+
   private _baseOnRight: boolean = false;
   get baseOnRight() {
     return this._baseOnRight;
@@ -40,49 +40,49 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   set baseOnRight(baseOnRight: boolean) {
     this._baseOnRight = baseOnRight;
   }
-  
+
   private _allowBaseEditing: boolean = false;
   get allowBaseEditing() {
     return this._allowBaseEditing;
   }
-  
+
   private _allowChangeEditing: boolean = false;
   get allowChangeEditing() {
     return this._allowChangeEditing;
   }
-  
+
   private _baseEditableStream: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   get baseEditableStream() {
     return this._baseEditableStream;
   }
-  
+
   private _changeEditableStream: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   get changeEditableStream() {
     return this._changeEditableStream;
   }
-  
+
   private _selectedBaseVersion: string;
   get selectedBaseVersion() {
     return this._selectedBaseVersion;
   }
-  
+
   private _selectedChangeVersion: string;
   get selectedChangeVersion() {
     return this._selectedChangeVersion;
   }
-  
+
   private _baseVersions: Array<any> = [];
   get baseVersions() {
     return this._baseVersions;
   }
-  
+
   private _changeVersions: Array<any> = [];
   get changeVersions() {
     return this._changeVersions;
   }
-  
+
   private _fieldFilterStream: BehaviorSubject<((fieldName: string) => boolean)> =
     new BehaviorSubject<((fieldName: string) => boolean)>(
     ((fieldName: string) => {
@@ -91,11 +91,11 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   get fieldFilterStream() {
     return this._fieldFilterStream;
   }
-  
+
   get dialogParameters() {
     return this._dialogParameters;
   }
-  
+
   @ViewChild('rightSplitArea')
   private _rightSplitArea: ElementRef;
   @ViewChild('leftSplitArea')
@@ -104,29 +104,29 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   private _baseDetailsFormComponent: DetailsFormComponent;
   @ViewChild('changeDetailsForm')
   private _changeDetailsFormComponent: DetailsFormComponent;
-  
+
   private _itemProxyChangeSubscription: Subscription;
-    
+
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
     private _changeDetectorRef: ChangeDetectorRef,
     private _dialogService: DialogService,
     private _itemRepository: ItemRepository) {
   }
-  
+
   public ngOnInit(): void {
     if (this._dialogParameters) {
       let baseProxy: ItemProxy = this._dialogParameters['baseProxy'];
       if (baseProxy) {
         this.whenSelectedBaseChanges(baseProxy);
       }
-      
+
       if (this._dialogParameters['editable']) {
         this._allowBaseEditing = true;
         this._allowChangeEditing = true;
       }
     }
-    
+
     this._itemProxyChangeSubscription = this._itemRepository.
       getChangeSubject().subscribe((notification: any) => {
       if (notification.proxy) {
@@ -134,7 +134,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
           getValue().item.id === notification.proxy.item.id)) {
           this.whenSelectedBaseChanges(this._selectedBaseStream.getValue());
         }
-      
+
         if (this._selectedChangeStream.getValue() && (this.
           _selectedChangeStream.getValue().item.id === notification.proxy.item.
           id)) {
@@ -144,11 +144,11 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this._itemProxyChangeSubscription.unsubscribe();
   }
-  
+
   public whenSelectedBaseChanges(baseProxy: ItemProxy): void {
     this._itemRepository.getHistoryFor(baseProxy).subscribe(
       (history: Array<any>) => {
@@ -171,7 +171,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       this.whenSelectedBaseVersionChanges('Unstaged');
     });
   }
-  
+
   public whenSelectedBaseVersionChanges(versionIdentifier: string): void {
     this._selectedBaseVersion = versionIdentifier;
     this._selectedBaseStream.next(this.getVersionProxy(versionIdentifier, this.
@@ -179,7 +179,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     this._allowBaseEditing = (('Staged' === versionIdentifier) || (this.
       _baseVersions[0].commit === versionIdentifier));
     this._changeDetectorRef.detectChanges();
-    
+
     let rightDetailsFormForm: any = this._rightSplitArea.nativeElement.
       getElementsByTagName('form')[0];
     let leftDetailsFormForm: any = this._leftSplitArea.nativeElement.
@@ -190,7 +190,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       this.addFieldListeners(leftDetailsFormForm, rightDetailsFormForm);
     }
   }
-  
+
   public whenSelectedChangeChanges(changeProxy: ItemProxy): void {
     this._itemRepository.getHistoryFor(changeProxy).subscribe(
       (history: Array<any>) => {
@@ -214,7 +214,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       this.whenSelectedChangeVersionChanges('Unstaged');
     });
   }
-  
+
   public whenSelectedChangeVersionChanges(versionIdentifier: string): void {
     this._selectedChangeVersion = versionIdentifier;
     this._selectedChangeStream.next(this.getVersionProxy(versionIdentifier, this.
@@ -222,7 +222,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     this._allowChangeEditing = (('Staged' === versionIdentifier) || (this.
       _changeVersions[0].commit === versionIdentifier));
     this._changeDetectorRef.detectChanges();
-    
+
     let rightDetailsFormForm: any = this._rightSplitArea.nativeElement.
       getElementsByTagName('form')[0];
     let leftDetailsFormForm: any = this._leftSplitArea.nativeElement.
@@ -233,20 +233,20 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       this.addFieldListeners(leftDetailsFormForm, rightDetailsFormForm);
     }
   }
-  
+
   private getVersionProxy(versionIdentifier: string, itemId: string): ItemProxy {
     let treeConfiguration: ItemProxy.TreeConfiguration = ItemProxy.
       TreeConfiguration.getTreeConfigFor(versionIdentifier);
     if (!treeConfiguration) {
       treeConfiguration = new ItemProxy.TreeConfiguration(versionIdentifier);
-      ItemProxy.getWorkingTree().getRootProxy().cache.loadProxiesForCommit(
-        versionIdentifier, treeConfiguration);
+      let itemCache = ItemProxy.TreeConfiguration.getItemCache();
+      itemCache.loadProxiesForCommit(versionIdentifier, treeConfiguration);
       treeConfiguration.loadingComplete();
     }
-    
+
     return treeConfiguration.getProxyFor(itemId);
   }
-  
+
   private addScrollListener(scrollSource: any, scrollTarget: any, sourcePos : string): void {
     scrollSource.onscroll = (scrollEvent: any) => {
       if (sourcePos === 'Left') {
@@ -260,7 +260,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
           scrollTarget.scrollTop = percentHeightScrolled *
             (scrollTarget.scrollHeight - scrollTarget.
             offsetHeight);
-          
+
           let currentScrollLeft: number = scrollSource.scrollLeft;
           let percentWidthScrolled: number = currentScrollLeft /
             (scrollSource.scrollWidth - scrollSource.
@@ -282,7 +282,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
           scrollTarget.scrollTop = percentHeightScrolled *
             (scrollTarget.scrollHeight - scrollTarget.
             offsetHeight);
-          
+
           let currentScrollLeft: number = scrollSource.scrollLeft;
           let percentWidthScrolled: number = currentScrollLeft /
             (scrollSource.scrollWidth - scrollSource.
@@ -295,19 +295,19 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }, 150)}
     }
   }
-  
+
   private addFieldListeners(leftDetailsFormForm: any,
     rightDetailsFormForm: any): void {
     let baseFieldNames: Array<string> = [];
     for (let fieldName in this._selectedBaseStream.getValue().item) {
       baseFieldNames.push(fieldName);
     }
-    
+
     let changeFieldNames: Array<string> = [];
     for (let fieldName in this._selectedChangeStream.getValue().item) {
       changeFieldNames.push(fieldName);
     }
-    
+
     let commonFieldNames: Array<string> = [];
     if (baseFieldNames.length > changeFieldNames.length) {
       for (let j: number = 0; j < baseFieldNames.length; j++) {
@@ -323,7 +323,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }
     }
 
-    let baseDetailsFormForm: any;    
+    let baseDetailsFormForm: any;
     let changeDetailsFormForm: any;
     if (this._baseOnRight) {
       baseDetailsFormForm = rightDetailsFormForm;
@@ -332,7 +332,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       changeDetailsFormForm = rightDetailsFormForm;
       baseDetailsFormForm = leftDetailsFormForm;
     }
-    
+
     let baseFormFieldMap: Map<string, any> = new Map<string, any>();
     let baseFormFields: Array<any> = baseDetailsFormForm.querySelectorAll(
       '[ng-reflect-name]');
@@ -343,7 +343,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
         baseFormFieldMap.set(fieldName, baseFormFields[j]);
       }
     }
-    
+
     let changeFormFields: Array<any> = changeDetailsFormForm.querySelectorAll(
       '[ng-reflect-name]');
     for (let j: number = 0; j < changeFormFields.length; j++) {
@@ -358,7 +358,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
             changeFormFields[j].style['background-color'] = '';
           }
         };
-        
+
         changeFormFields[j].onchange();
         baseFormFieldMap.get(fieldName).onchange = (changeEvent: any) => {
           changeFormFields[j].onchange();
@@ -366,14 +366,14 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   public toggleBaseOnRight(): void {
     this._baseOnRight = !this._baseOnRight;
-    
+
     // Add the scroll and field change listeners, if appropriate
     this.whenSelectedBaseVersionChanges(this._selectedBaseVersion);
   }
-  
+
   public saveCurrentProxy(proxyStream: BehaviorSubject<ItemProxy>): void {
     let proxy: ItemProxy = proxyStream.getValue();
     let detailsFormComponent: DetailsFormComponent;
@@ -382,7 +382,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     } else {
       detailsFormComponent = this._changeDetailsFormComponent;
     }
-    
+
     let item: any = detailsFormComponent.formGroup.value;
     for (let fieldName in item) {
       proxy.item[fieldName] = item[fieldName];
@@ -402,7 +402,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public filterFields(showDifferencesOnly: boolean): void {
     if (showDifferencesOnly) {
       this._fieldFilterStream.next(((fieldName: string) => {
@@ -421,7 +421,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }));
     }
   }
-  
+
   public toggleEditability(editableStream: BehaviorSubject<boolean>): void {
     let editable: boolean = !editableStream.getValue();
     editableStream.next(editable);
@@ -440,7 +440,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   public openProxySelectionDialog(
     proxyStream: BehaviorSubject<ItemProxy>): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
