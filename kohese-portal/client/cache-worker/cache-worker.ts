@@ -253,6 +253,7 @@ function fetchItemCache(){
       let itemCache = new ItemCache();
       itemCache.setObjectMap(response.objectMap)
       ItemProxy.TreeConfiguration.setItemCache(itemCache);
+      console.log('### Head: ' + itemCache.getRef('HEAD'));
       cacheFetched = true;
 
       repoState = RepoStates.SYNCHRONIZATION_SUCCEEDED;
