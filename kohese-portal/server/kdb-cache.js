@@ -284,8 +284,6 @@ class KDBCache extends ItemCache {
 
         let masterCommitId = masterCommit.id();
         revwalk.push(masterCommitId);
-        console.log('### MCI: ');
-        console.log(masterCommitId);
         kdbCache.cacheRef('HEAD', masterCommitId.tostrS());
 
         // eslint-disable-next-line no-unused-vars
