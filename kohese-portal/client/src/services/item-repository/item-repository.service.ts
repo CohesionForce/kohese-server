@@ -286,10 +286,12 @@ export class ItemRepository {
         console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
         this.processBulkUpdate(response.allItems);
 
-        let itemCache = new ItemCache();
-        itemCache.setObjectMap(response.objectMap);
-        ItemProxy.TreeConfiguration.setItemCache(itemCache);
-        this.cacheFetched = true;
+        if(response.objectMap){
+          let itemCache = new ItemCache();
+          itemCache.setObjectMap(response.objectMap);
+          ItemProxy.TreeConfiguration.setItemCache(itemCache);
+          this.cacheFetched = true;
+        }
 
         let processingComplete = Date.now();
         console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
