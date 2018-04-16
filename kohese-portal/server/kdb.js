@@ -19,8 +19,6 @@ var jsonExt = /\.json$/;
 var ItemProxy = require('../common/src/item-proxy.js');
 var KoheseModel = require('../common/src/KoheseModel.js');
 
-// eslint-disable-next-line no-unused-vars
-var CreateStates = require('../common/src/createStates.js');
 module.exports.ItemProxy = ItemProxy;
 
 var mountList = {};
