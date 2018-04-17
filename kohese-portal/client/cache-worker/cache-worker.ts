@@ -356,7 +356,7 @@ function fetchAllItems(callback){
   console.log('$$$ Fetch All Items');
 
   // Determine if repo is already synched
-  if (serverCache.allItems){
+  if (serverCache.objectMap){
     console.log('$$$ getAll: Sending cached items');
     callback(serverCache);
     return;
