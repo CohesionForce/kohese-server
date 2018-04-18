@@ -13,7 +13,7 @@
       <div style="display : inline-block">
         <h4>Time Estimates : </h4>
         {{assignment.item.details | truncate : 200}}
-        Estimated Start : {{assignment.item.estimatedCompletion | date}} <br>
+        Estimated Start : {{assignment.item.estimatedStart | date}} <br>
         Estimated Completion : {{assignment.item.estimatedCompletion | date}} <br>
         Estimated Hours : {{assignment.item.estimatedHoursEffort }} <br>
         Completed On : {{assignment.item.actualCompletion | date}} <br>
