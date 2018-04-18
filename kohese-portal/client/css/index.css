@@ -375,23 +375,6 @@ table td .fa-times {
           width: 100%;
           overflow: auto; }
 
-journal {
-  width: 100%; }
-  journal #contentInputFormField {
-    width: 100%; }
-  journal #sortStrategyFormField {
-    width: calc(40% - 20px); }
-  journal #contentFilterFormField {
-    width: calc(60% - 20px); }
-  journal journal-entry #container {
-    padding: 5px 5px;
-    border-radius: 12px; }
-  journal .issue {
-    background-color: darkorange; }
-  journal .highlight {
-    background-color: #ca6464;
-    color: whitesmoke; }
-
 icon-selector .highlight {
   background-color: #ca6464;
   color: whitesmoke; }
