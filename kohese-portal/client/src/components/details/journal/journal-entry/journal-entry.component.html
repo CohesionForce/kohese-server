@@ -51,6 +51,11 @@
         <div>
           State: {{itemProxy.item.issueState}}
         </div>
+        <ng-container *ngIf="itemProxy.item.response">
+          <div>
+            Response: {{itemProxy.item.response}}
+          </div>
+        </ng-container>
       </ng-container>
     </div>
   </div>

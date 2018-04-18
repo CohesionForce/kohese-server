@@ -133,19 +133,33 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   }
   
   addJournalEntry(): void {
-    let whenObserved: Date = new Date(this.dateObserved);
+    let whenObserved: Date;
+    if (this.dateObserved) {
+      whenObserved = new Date(this.dateObserved);
+    } else {
+      whenObserved = new Date();
+    }
     // Handle the timezone offset
     whenObserved.setTime(whenObserved.getTime() +
       (whenObserved.getTimezoneOffset() * 60 * 1000));
-    let timeComponents: Array<string> = this.timeObserved.split(' ');
-    let hms: Array<string> = timeComponents[0].split(':');
-    let hour: number = parseInt(hms[0]);
-    if ('PM' === timeComponents[1]) {
-      hour += 12;
+    let hour: number;
+    let minutes: number;
+    if (this.timeObserved) {
+      let timeComponents: Array<string> = this.timeObserved.split(' ');
+      let hms: Array<string> = timeComponents[0].split(':');
+      hour = parseInt(hms[0]);
+      if ('PM' === timeComponents[1]) {
+        hour += 12;
+      }
+      minutes = parseInt(hms[1]);
+    } else {
+      let d: Date = new Date();
+      hour = d.getHours();
+      minutes = d.getMinutes();
     }
     
     whenObserved.setHours(hour);
-    whenObserved.setMinutes(parseInt(hms[1]));
+    whenObserved.setMinutes(minutes);
     
     let observation: any = {
       name: this._observationName,
@@ -164,6 +178,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     }
     this.itemRepository.buildItem(type, observation).then(
       (proxy: ItemProxy) => {
+      this._observationName = '';
       this.journalEntryContent = '';
       this.refresh();
     });
