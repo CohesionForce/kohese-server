@@ -51,17 +51,6 @@ export class ItemRepository {
 
   initialize () : void {
     console.log('Item Repo init');
-    this.modelTypes = {
-      Repository: 'Repository',
-      Item: 'Item',
-      Decision: 'Decision',
-      Action: 'Action',
-      Task: 'Task',
-      Observation: 'Observation',
-      Issue: 'Issue',
-      Category: 'Category',
-      KoheseUser: 'KoheseUser'
-    };
 
     this.repositoryStatus = new BehaviorSubject({
       state: RepoStates.DISCONNECTED,
@@ -137,48 +126,45 @@ export class ItemRepository {
       CacheManager.authenticate();
 
       // Register the listeners for the Item kinds that are being tracked
-      for (var modelName in this.modelTypes) {
-        this.socketService.socket.on(modelName + '/create', (notification) => {
-          console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
-          var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
-          if (proxy) {
-            proxy.updateItem(notification.kind, notification.item);
+      this.socketService.socket.on('Item/create', (notification) => {
+        console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
+        var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
+        if (proxy) {
+          proxy.updateItem(notification.kind, notification.item);
+        } else {
+          if (notification.kind === 'KoheseModel'){
+            proxy = new KoheseModel(notification.item);
           } else {
-            if (notification.kind === 'KoheseModel'){
-              proxy = new KoheseModel(notification.item);
-            } else {
-              proxy = new ItemProxy(notification.kind, notification.item);
-            }
+            proxy = new ItemProxy(notification.kind, notification.item);
           }
+        }
 
-          this.updateStatus(proxy, notification.status);
-          proxy.dirty = false;
-        });
+        this.updateStatus(proxy, notification.status);
+        proxy.dirty = false;
+      });
 
-        this.socketService.socket.on(modelName + '/update', (notification) => {
-          console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
-          var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
-          if (proxy) {
-            proxy.updateItem(notification.kind, notification.item);
+      this.socketService.socket.on('Item/update', (notification) => {
+        console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
+        var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
+        if (proxy) {
+          proxy.updateItem(notification.kind, notification.item);
+        } else {
+          if (notification.kind === 'KoheseModel'){
+            proxy = new KoheseModel(notification.item);
           } else {
-            if (notification.kind === 'KoheseModel'){
-              proxy = new KoheseModel(notification.item);
-            } else {
-              proxy = new ItemProxy(notification.kind, notification.item);
-            }
+            proxy = new ItemProxy(notification.kind, notification.item);
           }
+        }
 
-          this.updateStatus(proxy, notification.status);
-          proxy.dirty = false;
-        });
+        this.updateStatus(proxy, notification.status);
+        proxy.dirty = false;
+      });
 
-        this.socketService.socket.on(modelName + '/delete', (notification) => {
-          console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
-          var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
-          proxy.deleteItem();
-        });
-
-      }
+      this.socketService.socket.on('Item/delete', (notification) => {
+        console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
+        var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
+        proxy.deleteItem();
+      });
 
       this.socketService.socket.on('Item/BulkUpdate', (bulkUpdate) => {
         console.log('::: Received Bulk Update');
@@ -299,16 +285,19 @@ export class ItemRepository {
         let afterFetch = Date.now();
         console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
         this.processBulkUpdate(response.allItems);
-        let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
-        rootProxy.cache = new ItemCache();
-        rootProxy.cache.setObjectMap(response.objectMap);
+
+        if(response.objectMap){
+          let itemCache = new ItemCache();
+          itemCache.setObjectMap(response.objectMap);
+          ItemProxy.TreeConfiguration.setItemCache(itemCache);
+          this.cacheFetched = true;
+        }
+
         let processingComplete = Date.now();
         console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
         ItemProxy.getWorkingTree().loadingComplete();
         let treehashComplete = Date.now();
         console.log('$$$ TreeHash time: ' + (treehashComplete - processingComplete)/1000);
-
-        this.cacheFetched = true;
 
         // TODO Remove after cache is complete
         // Invoke fetch to peform a delta update
@@ -481,14 +470,6 @@ export class ItemRepository {
         }
       }
     });
-  }
-
-  getModelTypes () {
-    return this.modelTypes;
-  }
-
-  getModelList () : Array<String> {
-    return Object.keys(this.modelTypes);
   }
 
   createShortFormItemList () {

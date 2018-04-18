@@ -19,8 +19,6 @@ var jsonExt = /\.json$/;
 var ItemProxy = require('../common/src/item-proxy.js');
 var KoheseModel = require('../common/src/KoheseModel.js');
 
-// eslint-disable-next-line no-unused-vars
-var CreateStates = require('../common/src/createStates.js');
 module.exports.ItemProxy = ItemProxy;
 
 var mountList = {};
@@ -546,10 +544,11 @@ function openRepositories() {
 	}
 
   let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
-  rootProxy.cache = new KDBCache(koheseKDBDirPath);
+  let kdbCache = new KDBCache(koheseKDBDirPath);
+  ItemProxy.TreeConfiguration.setItemCache(kdbCache);
 
-  return rootProxy.cache.updateCache().then(() => {
-    console.log('::: Finished cache update: ' + rootProxy.cache.repoPath);
+  return kdbCache.updateCache().then(() => {
+    console.log('::: Finished cache update: ' + kdbCache.repoPath);
 
   	// Create/validate root repo structure
 	  console.log('>>> Validating Root Repository Structure');
