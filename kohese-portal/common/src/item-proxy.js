@@ -92,7 +92,10 @@ class ItemProxy {
       loadPending = proxy.item.loadPending;
     }
 
-    proxy.item = forItem;
+ 
+    proxy.item = {};
+    copyAttributes(forItem, proxy);
+   
     proxy.setItemKind(kind);
     proxy.status = {};
 
@@ -1799,7 +1802,7 @@ function copyAttributes(fromItem, toProxy) {
   // Check for unexpected values
   for ( var toKey in toProxy.item) {
     if (toKey !== '__deletedProperty' && toProxy.item.hasOwnProperty(toKey) &&
-        (toKey.charAt(0) !== '$') && !fromItem.hasOwnProperty(toKey)) {
+        (toKey.charAt(0) !== '$') && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey))) {
       // console.log('!!! Deleted Property: ' + toKey + ' in ' + toProxy.item.name);
       if (!toProxy.item.__deletedProperty) {
         toProxy.item.__deletedProperty = {};
