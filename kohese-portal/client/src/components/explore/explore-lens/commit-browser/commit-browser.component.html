@@ -1,0 +1,31 @@
+<div style="display: flex; height: 90%">
+  <mat-list style="flex : 1; height: 100%; overflow: auto;">
+    <mat-list-item *ngFor="let commit of commitList | mapKey"
+                  (click)="onCommitSelected(commitList[commit])">
+      {{commitList[commit].message}}
+    </mat-list-item>
+  </mat-list>
+  <div style="flex : 1;">
+    <h1>Selected Commit : </h1>
+    <div *ngIf=!selectedCommit> No commit Selected</div>
+    <div *ngIf="selectedCommit">
+  
+      <h3>Author : {{selectedCommit.author}}</h3>
+      <h3>Message : {{selectedCommit.message}}</h3>
+      <h3>Time : {{selectedCommit.time | date }}</h3>
+      <h3>Parents : </h3>
+      <div style="height: 100%; overflow:auto;">
+        <mat-list>
+          <mat-list-item *ngFor="let parentIdx of selectedCommit.parents | mapKey">
+            {{commitList[selectedCommit.parents[parentIdx]].message}}
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </div>  
+
+  </div>
+</div>
+<mat-dialog-actions>
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-button (click)="confirm()">Confirm</button>
+</mat-dialog-actions>
