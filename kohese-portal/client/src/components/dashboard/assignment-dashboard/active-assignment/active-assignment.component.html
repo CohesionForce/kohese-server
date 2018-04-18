@@ -13,7 +13,7 @@
       <div style="display: inline-block">
         <h4>Time Estimates</h4>
         Estimated Start : {{assignment.item.estimatedStart | date}} <br>
-        Estimated Completion : {{ assignment.item.estimatedComplete | date }} <br>
+        Estimated Completion : {{ assignment.item.estimatedCompletion | date }} <br>
         Estimated Hours Effort : {{ assignment.item.estimatedHoursEffort }} <br>
         <k-state-editor [itemProxy]="assignment"
                         [disableTransitioning]="!editable"
