@@ -70,7 +70,6 @@ class ItemProxy {
       case 'Internal-Lost':
       case 'Internal-Model':
       case 'Internal-View-Model':
-      case 'Internal-State':
         proxy.internal = true;
         break;
       default:
