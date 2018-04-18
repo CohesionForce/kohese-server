@@ -228,7 +228,6 @@ class ItemCache {
       case 'Internal-Lost':
       case 'Internal-Model':
       case 'Internal-View-Model':
-      case 'Internal-State':
         console.log('::: Only processing children for internal kind: ' + kind);
         break;
       default:
