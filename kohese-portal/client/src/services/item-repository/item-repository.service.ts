@@ -41,6 +41,8 @@ export class ItemRepository {
   repositoryStatus : BehaviorSubject<any>;
   repoSyncStatus = {};
 
+  currentTreeConfigSubject : BehaviorSubject<any> = new BehaviorSubject<any>(undefined);
+
   constructor (private socketService: SocketService,
     private CurrentUserService: CurrentUserService,
     private toastrService : ToastrService,
@@ -87,26 +89,6 @@ export class ItemRepository {
       this.recentProxies = [];
   }
 
-  // Item Proxy Wrapper Methods
-  getRootProxy(): ItemProxy {
-    return ItemProxy.getWorkingTree().getRootProxy();
-  }
-
-  getChangeSubject(): Subject<any> {
-    return ItemProxy.getWorkingTree().getChangeSubject();
-  }
-
-  getProxyFor(id: string): ItemProxy {
-    return ItemProxy.getWorkingTree().getProxyFor(id);
-  }
-
-  getAllItemProxies(): Array<ItemProxy> {
-    return ItemProxy.getWorkingTree().getAllItemProxies();
-  }
-
-  getRepositories(): Array<ItemProxy> {
-    return ItemProxy.getWorkingTree().getRepositories();
-  }
 
   // End Item Proxy Wrapper
 
@@ -460,6 +442,7 @@ export class ItemRepository {
           }
         } else {
           // Final repo sync
+          this.currentTreeConfigSubject.next(ItemProxy.TreeConfiguration.getWorkingTree());
           this.repositoryStatus.next({
             state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
             message : 'Item Repository Ready'
@@ -472,7 +455,7 @@ export class ItemRepository {
     });
   }
 
-  createShortFormItemList () {
+  private createShortFormItemList () {
     var proxies = ItemProxy.getWorkingTree().getAllItemProxies();
     this.shortProxyList=[];
     for (var i = 0; i < proxies.length; i++ ) {
@@ -483,7 +466,7 @@ export class ItemRepository {
     }
   }
 
-  getShortFormItemList () {
+  private getShortFormItemList () {
     this.createShortFormItemList();
     return this.shortProxyList;
   }
@@ -657,5 +640,22 @@ export class ItemRepository {
       type: 'update',
       proxy: proxy
     });
+  }
+
+  getTreeConfig() : Observable<any> {
+    return this.currentTreeConfigSubject;
+  }
+
+  setTreeConfig(treeId : string) : void{
+    let treeConfiguration: ItemProxy.TreeConfiguration = 
+      ItemProxy.TreeConfiguration.getTreeConfigFor(treeId);
+    if (!treeConfiguration) {
+      treeConfiguration = new ItemProxy.TreeConfiguration(treeId);
+      let itemCache = ItemProxy.TreeConfiguration.getItemCache();
+      itemCache.loadProxiesForCommit(treeId, treeConfiguration);
+      treeConfiguration.loadingComplete();
+    }
+
+    this.currentTreeConfigSubject.next(treeConfiguration);
   }
 }

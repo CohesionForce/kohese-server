@@ -47,6 +47,9 @@ export class TreeRowComponent extends NavigatableComponent
   
   private _updateDisplaySubscription: Subscription;
   private _itemProxyChangeSubscription: Subscription;
+
+  treeConfig : any;
+  treeConfigSubscription : Subscription;
   
   public constructor(private _navigationService: NavigationService,
     private dialogService: DialogService,
@@ -75,19 +78,23 @@ export class TreeRowComponent extends NavigatableComponent
       }
     });
     
-    this._itemProxyChangeSubscription = this.itemRepository.getChangeSubject().
-      subscribe((notification: any) => {
-        if (notification.proxy) {
-          if (this._treeRow.itemProxy.item.id === notification.proxy.item.id) {
-            this._changeDetector.markForCheck();
+    this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
+      this.treeConfig = newConfig;
+      this._itemProxyChangeSubscription = this.treeConfig.getChangeSubject()
+        .subscribe((notification: any) => {
+          if (notification.proxy) {
+            if (this._treeRow.itemProxy.item.id === notification.proxy.item.id) {
+              this._changeDetector.markForCheck();
+            }
           }
-        }
-    });
+      });
+    })
   }
   
   public ngOnDestroy(): void {
     this._itemProxyChangeSubscription.unsubscribe();
     this._updateDisplaySubscription.unsubscribe();
+    this.treeConfigSubscription.unsubscribe();
   }
 
   public removeItem(): void {

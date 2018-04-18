@@ -12,6 +12,7 @@ import { ItemRepository, RepoStates} from '../item-repository/item-repository.se
 export class SessionService {
   private sessions: SessionMap = {};
   private sessionUser: BehaviorSubject<ItemProxy> = new BehaviorSubject(undefined);
+  private treeConfig : any;
   
   private itemRepositoryStatusSubscription: Subscription;
 
@@ -20,15 +21,15 @@ export class SessionService {
     private itemRepository: ItemRepository, private router: Router) {
     this.CurrentUserService.getCurrentUserSubject().subscribe((decodedToken) => {
       if (decodedToken) {
-        this.itemRepositoryStatusSubscription = this.itemRepository.
-          getRepoStatusSubject().subscribe((status) => {
-          if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
-            let usersProxy: ItemProxy = this.itemRepository.getRootProxy().getChildByName('Users');
+        this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
+          if (newConfig) {
+            this.treeConfig = newConfig;            
+            let usersProxy: ItemProxy = this.treeConfig.getRootProxy().getChildByName('Users');
             this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
           } else {
             this.sessionUser.next(undefined);
           }
-        });
+        })
       } else {
         if (this.itemRepositoryStatusSubscription) {
           this.itemRepositoryStatusSubscription.unsubscribe();
@@ -67,7 +68,7 @@ export class SessionService {
   
   getUsers(): Array<ItemProxy> {
     let users: Array<ItemProxy> = [];
-    this.itemRepository.getRootProxy().visitChildren(undefined, (proxy) => {
+    this.treeConfig.getRootProxy().visitChildren(undefined, (proxy) => {
       if (proxy.kind === 'KoheseUser') {
         users.push(proxy);
       }

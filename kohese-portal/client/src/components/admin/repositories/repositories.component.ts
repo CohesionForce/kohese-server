@@ -9,6 +9,8 @@ import { SessionService } from '../../../services/user/session.service';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
+import * as ItemProxy from '../../../../../common/src/item-proxy';
+
 @Component({
   selector: 'repositories',
   templateUrl: './repositories.component.html'
@@ -22,7 +24,11 @@ export class RepositoriesComponent extends NavigatableComponent implements
   commitMessageInput: string;
   pushRemoteNameInput: string;
   repositories: Array<any>;
-  private _repositoryStatusSubscription: Subscription;
+  rootProxy : ItemProxy;
+
+  /* Subscriptions */
+  repositoryStatusSubscription: Subscription;
+  treeConfigSubscription : Subscription;
   
   constructor(private navigationService: NavigationService,
     private versionControlService: VersionControlService,
@@ -35,21 +41,26 @@ export class RepositoriesComponent extends NavigatableComponent implements
   }
   
   public ngOnInit(): void {
-    this._repositoryStatusSubscription = this.itemRepository.
+    this.repositoryStatusSubscription = this.itemRepository.
       getRepoStatusSubject().subscribe((status: any) => {
       if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.status) {
-        this.repositories = this.itemRepository.getRepositories();
+        this.treeConfigSubscription = 
+          this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
+            this.repositories = newConfig.getRepositories();
+            this.rootProxy = newConfig.getRootProxy();
+        })
       }
     });
   }
   
   public ngOnDestroy(): void {
-    this._repositoryStatusSubscription.unsubscribe();
+    this.repositoryStatusSubscription.unsubscribe();
+    this.treeConfigSubscription.unsubscribe();
   }
   
   addRemote() {
     if ((this.remoteNameInput !== '') && (this.remoteUrlInput !== '')) {
-      this.versionControlService.addRemote(this.itemRepository.getRootProxy().item.id,
+      this.versionControlService.addRemote(this.rootProxy.item.id,
         this.remoteNameInput, this.remoteUrlInput).subscribe((remoteName: any) => {
         if (remoteName.error) {
           this._toastrService.error('Add Remote Failed', 'Version Control');
@@ -63,15 +74,15 @@ export class RepositoriesComponent extends NavigatableComponent implements
   }
   
   getRemotes() {
-    this.versionControlService.getRemotes(this.itemRepository.getRootProxy().
-      item.id).subscribe((remotes: any) => {
-      this.remotes = remotes;
-      if (remotes.error) {
-        this._toastrService.error('Remote Retrieval Failed', 'Version Control');
-      } else {
-        this._toastrService.success('Remote Retrieval Succeeded', 'Version Control');
-      }
-    });
+    this.versionControlService.getRemotes(this.rootProxy.item.id)
+      .subscribe((remotes: any) => {
+        this.remotes = remotes;
+        if (remotes.error) {
+          this._toastrService.error('Remote Retrieval Failed', 'Version Control');
+        } else {
+          this._toastrService.success('Remote Retrieval Succeeded', 'Version Control');
+        }
+      });
   }
   
   commit() {
@@ -79,8 +90,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
       this.commitMessageInput = '<No message supplied>';
     }
     
-    this.versionControlService.commitItems([this.itemRepository.
-      getRootProxy()], this._sessionService.getSessionUser().getValue(),
+    this.versionControlService.commitItems([this.rootProxy], this._sessionService.getSessionUser().getValue(),
       this.commitMessageInput).subscribe((statusMap: any) => {
       if (statusMap.error) {
         this._toastrService.error('Commit Failed', 'Version Control');
@@ -91,7 +101,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
   }
   
   push() {
-    this.versionControlService.push([this.itemRepository.getRootProxy().item.
+    this.versionControlService.push([this.rootProxy.item.
       id], this.pushRemoteNameInput).subscribe((pushStatusMap: any) => {
       if (pushStatusMap.error) {
         this._toastrService.error('Push Failed', 'Version Control');

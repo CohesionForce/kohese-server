@@ -14,26 +14,27 @@ import { HtmlRenderer, Parser } from 'commonmark';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 
 @Component({
-  selector : 'details-view',
-  templateUrl : './details.component.html',
+  selector: 'details-view',
+  templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss']
 })
 
 export class DetailsComponent extends NavigatableComponent
-                              implements OnInit, OnDestroy {
-  itemProxyId : string;
-  itemProxy : ItemProxy;
-  typeProxies : Array<ItemProxy>;
+  implements OnInit, OnDestroy {
+  itemProxyId: string;
+  itemProxy: ItemProxy;
+  typeProxies: Array<ItemProxy>;
   private _itemJson: string;
   get itemJson() {
     return this._itemJson;
   }
 
   /* Observables */
-  detailsFormSubject : BehaviorSubject<FormGroup>;
-  proxyStream : BehaviorSubject<ItemProxy>;
+  detailsFormSubject: BehaviorSubject<FormGroup>;
+  proxyStream: BehaviorSubject<ItemProxy>;
   private _editableStream: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   get editableStream() {
@@ -41,39 +42,41 @@ export class DetailsComponent extends NavigatableComponent
   }
 
   /* Subscriptions */
-  routeSub : Subscription;
-  repoReadySub : Subscription;
-  detailsFormSubscription : Subscription;
-  proxyUpdates : Observable<any>;
+  routeSub: Subscription;
+  repoReadySub: Subscription;
+  detailsFormSubscription: Subscription;
+  proxyUpdates: Subscription;
+  currentTreeConfigSubscription: Subscription;
 
   /* UI Switches */
-  defaultTab : object;
-  uiTreeOptions : object;
+  defaultTab: object;
+  uiTreeOptions: object;
 
   /* Data */
-  kindList : Array<string>;
-  decisionStates : Array<string>;
-  actionStates : Array<string>;
-  issueStates : Array<string>;
-  categoryTags : Array<string>;
-  userList : Array<any>
-  currentUser : any;
-  proxyList : Array<any>;
-  relationIdMap : any;
-  itemDescriptionRendered : string;
-  detailsFormGroup : FormGroup;
+  treeConfig: any;
+  kindList: Array<string>;
+  decisionStates: Array<string>;
+  actionStates: Array<string>;
+  issueStates: Array<string>;
+  categoryTags: Array<string>;
+  userList: Array<any>
+  currentUser: any;
+  proxyList: Array<any>;
+  relationIdMap: any;
+  itemDescriptionRendered: string;
+  detailsFormGroup: FormGroup;
   private nonFormFieldValueMap: any = {};
-  initialized : boolean;
-  repoConnected : boolean = false;
+  initialized: boolean;
+  repoConnected: boolean = false;
 
-  constructor (protected NavigationService : NavigationService,
-               private route : ActivatedRoute,
-               private ItemRepository : ItemRepository,
-               private SessionService : SessionService) {
+  constructor(protected NavigationService: NavigationService,
+    private route: ActivatedRoute,
+    private ItemRepository: ItemRepository,
+    private SessionService: SessionService) {
     super(NavigationService);
-    }
+  }
 
-  ngOnInit () {
+  ngOnInit() {
 
     this.proxyStream = new BehaviorSubject({});
 
@@ -85,39 +88,43 @@ export class DetailsComponent extends NavigatableComponent
         this.updateProxy();
       } else {
         this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
-        .subscribe(update => {
-          if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-            this.repoConnected = true;
-            this.updateProxy();
-            this.proxyUpdates = ItemProxy.getWorkingTree().getChangeSubject().subscribe((change)=>{
-              if(this.itemProxy === change.proxy) {
-                this.proxyStream.next(change.proxy);
-                this.relationIdMap = this.itemProxy.getRelationIdMap();
-              }
-            })
-          }
-        })
+          .subscribe(update => {
+            if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
+              this.currentTreeConfigSubscription = this.ItemRepository.getTreeConfig()
+                .subscribe((newConfig) => {
+                  this.treeConfig = newConfig;
+                  // Unsubscribe from old tree updates 
+                  if (this.proxyUpdates) {
+                    this.proxyUpdates.unsubscribe();
+                    this.proxyUpdates = undefined;
+                  }
+                  this.repoConnected = true;
+                  this.updateProxy();
+                  this.proxyUpdates = newConfig.getChangeSubject().subscribe((change) => {
+                    if (this.itemProxy === change.proxy) {
+                      this.proxyStream.next(change.proxy);
+                      this.relationIdMap = this.itemProxy.getRelationIdMap();
+                    }
+                  })
+                })
+            }
+          })
         this.initialized = true;
       }
     })
     /* End Subscriptions */
   }
 
-  ngOnDestroy () {
+  ngOnDestroy() {
     this.routeSub.unsubscribe();
     this.repoReadySub.unsubscribe();
   }
 
-  updateProxy () {
-    // Is this defunct? TODO
-    let modelProxy : ItemProxy = this.ItemRepository.getProxyFor('Model-Definitions');
-    this.typeProxies = modelProxy.getDescendants();
-
-    this.proxyList = this.ItemRepository.getShortFormItemList();
+  updateProxy() {
     this.userList = this.SessionService.getUsers();
     this._editableStream.next(false);
     this.defaultTab = { active: true };
-    this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+    this.itemProxy = this.treeConfig.getProxyFor(this.itemProxyId);
     if (this.itemProxy) {
       this.ItemRepository.registerRecentProxy(this.itemProxy);
       this.relationIdMap = this.itemProxy.getRelationIdMap();
@@ -129,28 +136,28 @@ export class DetailsComponent extends NavigatableComponent
     this.proxyStream.next(this.itemProxy);
   }
 
-  getProxyFor(id) : any {
-      return this.ItemRepository.getProxyFor(id);
-    }
+  getProxyFor(id): any {
+    return this.treeConfig.getProxyFor(id);
+  }
 
-  onFormGroupUpdated(newFormGroup : any) {
+  onFormGroupUpdated(newFormGroup: any) {
     this.detailsFormGroup = newFormGroup;
     console.log(newFormGroup);
   }
 
-  generateHTMLReport () : void {
-        this.ItemRepository.generateHTMLReportFor(this.itemProxy);
-      };
+  generateHTMLReport(): void {
+    this.ItemRepository.generateHTMLReportFor(this.itemProxy);
+  };
 
-  generateDOCXReport () : void {
-        this.ItemRepository.generateDOCXReportFor(this.itemProxy);
-      };
+  generateDOCXReport(): void {
+    this.ItemRepository.generateDOCXReportFor(this.itemProxy);
+  };
 
-  getHistory = function () : void {
-        this.ItemRepository.getHistoryFor(this.itemProxy);
-      };
+  getHistory = function (): void {
+    this.ItemRepository.getHistoryFor(this.itemProxy);
+  };
 
-  upsertItem(item: any) : void {
+  upsertItem(item: any): void {
     for (let field in item) {
       this.itemProxy.item[field] = item[field];
     }
@@ -159,11 +166,11 @@ export class DetailsComponent extends NavigatableComponent
     }
     this.ItemRepository.upsertItem(this.itemProxy)
       .then((updatedItemProxy: ItemProxy) => {
-      this._editableStream.next(false);
-    });
+        this._editableStream.next(false);
+      });
   }
 
-  removeItem (proxy : ItemProxy) : void {
+  removeItem(proxy: ItemProxy): void {
     this.ItemRepository.deleteItem(proxy, false)
       .then(function () {
         // TBD:  May need to do something special if the delete fails

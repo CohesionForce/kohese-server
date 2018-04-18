@@ -25,11 +25,12 @@ export class AnalysisComponent extends NavigatableComponent
   itemProxyId : string;
   itemProxy : ItemProxy;
   filter : string;
+  treeConfig : any;
 
   /* Subscriptions */
   routeSub : Subscription;
   filterSub : Subscription;
-  repoReadySub : Subscription;
+  treeConfigSub : Subscription;
 
   /* Observables */
   filterSubject : BehaviorSubject<AnalysisFilter>
@@ -55,9 +56,10 @@ export class AnalysisComponent extends NavigatableComponent
     this.analysisLoaded = false;
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
-      this.repoReadySub = this.ItemRepository.getRepoStatusSubject().subscribe(update => {
-        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+      this.treeConfigSub = this.ItemRepository.getTreeConfig().subscribe((newConfig) => {
+        if (newConfig) {
+          this.treeConfig = newConfig;
+          this.itemProxy = this.treeConfig.getProxyFor(this.itemProxyId);
           this.proxyStream = new BehaviorSubject(this.itemProxy);
           if (this.itemProxy) {
             this.AnalysisService.fetchAnalysis(this.itemProxy).then(() => {
@@ -74,7 +76,7 @@ export class AnalysisComponent extends NavigatableComponent
 
   ngOnDestroy () {
     this.routeSub.unsubscribe();
-    this.repoReadySub.unsubscribe();
+    this.treeConfigSub.unsubscribe();
   }
 
   onFilter(newFilter) {

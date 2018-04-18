@@ -54,7 +54,9 @@ export class EditableCellComponent implements OnInit, OnDestroy, OnChanges{
   }
 
   ngOnDestroy () {
-    this.editableStreamSub.unsubscribe();
+    if (this.editableStreamSub) {
+      this.editableStreamSub.unsubscribe();
+    }
     this.rowActionStreamSub.unsubscribe();
   }
 

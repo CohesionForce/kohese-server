@@ -31,8 +31,11 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
 
   }
 
-  onCommitSelected (newCommit) {
-    this.selectedCommit = newCommit;
+  onCommitSelected (newCommit, commitIdx) {
+    this.selectedCommit = {
+      commit : newCommit,
+      commitId : commitIdx
+    }
   }
 
   ngOnDestroy () {

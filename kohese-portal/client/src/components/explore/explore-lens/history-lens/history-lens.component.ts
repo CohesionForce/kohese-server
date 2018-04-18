@@ -30,16 +30,15 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
           this.commitList = ItemProxy.TreeConfiguration.getItemCache().getCommits();
         }
     })
-
-
   }
 
   openCommitBrowser () {
     this.dialogService.openComponentDialog(CommitBrowserComponent, {})
       .updateSize('70%', '70%').afterClosed().subscribe((newRecord)=>{
         if (newRecord) {
-          this.selectedCommit = newRecord;
-          
+          this.selectedCommit = newRecord.commit;
+          console.log(newRecord);
+          this.itemRepository.setTreeConfig(newRecord.commitId);       
         }
       })
   }
