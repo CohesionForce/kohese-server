@@ -21,21 +21,15 @@ import { LoginModule } from './components/login/login.module';
 import { UserModule } from './services/user/user.module';
 import { AdminModule } from './components/admin/admin.module';
 import { CompareItemsModule } from './components/compare-items/compare-items.module';
-
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
-import { AdminComponent } from './components/admin/admin.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TreeComponent } from './components/tree/tree.component';
-import { TreeRowComponent } from './components/tree/tree-row.component';
-import { ExploreComponent } from './components/explore/explore.component';
-import { ActionTableComponent } from './components/action-table/action-table.component';
-import { CompareItemsComponent } from './components/compare-items/compare-items.component';
+import { ExploreModule } from './components/explore/explore.module';
+import { TreeViewModule } from './components/tree/tree.module'
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
-import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MarkdownModule } from 'ngx-markdown';
 
@@ -44,10 +38,7 @@ import { environment } from '../environments/environment.prod';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    TreeComponent,
-    TreeRowComponent,
-    ExploreComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -75,9 +66,10 @@ import { environment } from '../environments/environment.prod';
     UserModule,
     ServicesModule,
     AdminModule,
-    VirtualScrollModule,
     DashboardModule,
-    CompareItemsModule
+    CompareItemsModule,
+    ExploreModule,
+    TreeViewModule
   ],
   bootstrap: [AppComponent]
 })

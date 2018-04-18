@@ -3,10 +3,34 @@
     <div class="static-side-panel">
       <ng-container
         *ngIf="(authenticated)">
-        <button mat-icon-button [matMenuTriggerFor]="koheseMenu">
+        <div class="lens-selector">
+          <button mat-icon-button [matMenuTriggerFor]="lensMenu">
+          <span [ngSwitch]="currentLens">
+            <span *ngSwitchCase="LENSES.HISTORY">
+              <mat-icon class="custom-font-icon h-icon"></mat-icon>
+            </span>
+            <span *ngSwitchCase="LENSES.DEFAULT"> 
+              <mat-icon class="custom-font-icon d-icon"></mat-icon>
+            </span>
+            <span *ngSwitchCase="LENSES.BRANCH"> 
+              <mat-icon class="custom-font-icon b-icon"></mat-icon>
+            </span>
+            <span *ngSwitchCase="LENSES.SPHERE"> 
+              <mat-icon class="custom-font-icon s-icon"></mat-icon>
+            </span>
+          </span>
+          </button>
+          <mat-menu #lensMenu="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item (click)="changeLens(LENSES.DEFAULT)">Default</button>
+            <button mat-menu-item (click)="changeLens(LENSES.HISTORY)">History</button>
+            <button mat-menu-item (click)="changeLens(LENSES.BRANCH)">Branch</button>
+            <button mat-menu-item (click)="changeLens(LENSES.SPHERE)">Sphere</button>
+          </mat-menu>
+        </div>
+        <button mat-icon-button [matMenuTriggerFor]="createMenu">
           <mat-icon class="fa fa-plus"></mat-icon>
         </button>
-        <mat-menu #koheseMenu="matMenu" [overlapTrigger]="false">
+        <mat-menu #createMenu="matMenu" [overlapTrigger]="false">
           <button mat-menu-item (click)="openNewDialog()">
             New
           </button>
