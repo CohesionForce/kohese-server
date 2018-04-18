@@ -120,14 +120,110 @@ function processAuthToken(port, request){
       console.log('::: Item Cache Worker is authenticated');
       authenticated = true;
 
-      // TODO Test loading entire git cache
-      // fetchItemCache(socket);
+      registerKoheseIOListeners();
+
     });
     socket.on('connect_error', () => {
       console.log('::: IR: Socket IO Connection Error');
       authenticated = false;
     });
   }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function registerKoheseIOListeners() {
+
+  // Register the listeners for the Item kinds that are being tracked
+  socket.on('Item/create', (notification) => {
+    console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
+    if (proxy) {
+      proxy.updateItem(notification.kind, notification.item);
+    } else {
+      if (notification.kind === 'KoheseModel'){
+        proxy = new KoheseModel(notification.item);
+      } else {
+        proxy = new ItemProxy(notification.kind, notification.item);
+      }
+    }
+
+    console.log('@@@ updateStatus: ');
+    console.log(notification.status);
+    // this.updateStatus(proxy, notification.status);
+    proxy.dirty = false;
+  });
+
+  socket.on('Item/update', (notification) => {
+    console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
+    if (proxy) {
+      proxy.updateItem(notification.kind, notification.item);
+    } else {
+      if (notification.kind === 'KoheseModel'){
+        proxy = new KoheseModel(notification.item);
+      } else {
+        proxy = new ItemProxy(notification.kind, notification.item);
+      }
+    }
+
+    console.log('@@@ updateStatus: ');
+    console.log(notification.status);
+    // this.updateStatus(proxy, notification.status);
+    proxy.dirty = false;
+  });
+
+  socket.on('Item/delete', (notification) => {
+    console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
+    proxy.deleteItem();
+  });
+
+  socket.on('Item/BulkUpdate', (bulkUpdate) => {
+    console.log('::: Received Bulk Update');
+    processBulkUpdate(bulkUpdate);
+  });
+
+  socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
+    for (var id in gitStatusMap) {
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+
+      console.log('@@@ statusUpdate: ');
+      console.log(gitStatusMap);
+      // this.updateStatus(proxy, gitStatusMap[id]);
+    }
+  });
+
+  socket.on('connect_error', () => {
+    console.log('@@@ ::: IR: Socket IO Connection Error');
+    // this.repositoryStatus.next({
+    //   state: RepoStates.DISCONNECTED,
+    //   message : 'Error connecting to repository'
+    // })
+  });
+
+  socket.on('reconnect', () => {
+    // TODO Remove CurrentUserService
+
+    // if (this.CurrentUserService.getCurrentUserSubject().getValue()) {
+    //   console.log('::: IR: this.authenticationService already authenticated');
+    //   this.fetchItems();
+    //   this.toastrService.success('Reconnected!', 'Server Connection!');
+    // } else {
+    //   console.log('::: IR: Listening for this.authenticationService authentication');
+    //   let subscription: Subscription = this.CurrentUserService.getCurrentUserSubject()
+    //     .subscribe((decodedToken) => {
+    //       if(decodedToken) {
+    //         console.log('::: IR: Socket Authenticated');
+    //         this.fetchItems();
+    //         this.toastrService.success('Reconnected!', 'Server Connection!');
+    //         subscription.unsubscribe();
+    //       }
+
+    //   });
+    // }
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -156,7 +252,8 @@ function fetchItemCache(){
       serverCache.objectMap = response.objectMap;
       let itemCache = new ItemCache();
       itemCache.setObjectMap(response.objectMap)
-      ItemProxy.getWorkingTree().getRootProxy().cache = itemCache;
+      ItemProxy.TreeConfiguration.setItemCache(itemCache);
+      console.log('### Head: ' + itemCache.getRef('HEAD'));
       cacheFetched = true;
 
       repoState = RepoStates.SYNCHRONIZATION_SUCCEEDED;
@@ -259,7 +356,7 @@ function fetchAllItems(callback){
   console.log('$$$ Fetch All Items');
 
   // Determine if repo is already synched
-  if (serverCache.allItems){
+  if (serverCache.objectMap){
     console.log('$$$ getAll: Sending cached items');
     callback(serverCache);
     return;

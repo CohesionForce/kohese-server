@@ -41,7 +41,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
               item: change.proxy.item,
               status: status
           };
-          kio.server.emit(change.kind +'/' + change.type, notification);
+          kio.server.emit('Item/' + change.type, notification);
         });
         break;
       case 'delete':
@@ -51,7 +51,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
           id: change.proxy.item.id
         };
         kdb.removeModelInstance(change.proxy);
-        kio.server.emit(change.kind +'/' + change.type, notification);
+        kio.server.emit('Item/' + change.type, notification);
         break;
       case 'loading':
       case 'loaded':
@@ -114,8 +114,8 @@ function KIOItemServer(socket){
 
     consoleLogObject('$$$ Request', request);
 
-    let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
-    let objectMap = rootProxy.cache.getObjectMap();
+    let itemCache = ItemProxy.TreeConfiguration.getItemCache();
+    let objectMap = itemCache.getObjectMap();
 
     let response = {
       timestamp: {

@@ -281,7 +281,11 @@ class KDBCache extends ItemCache {
       return repo.getMasterCommit().then(function (masterCommit) {
         var revwalk = nodegit.Revwalk.create(repo);
         revwalk.sorting(nodegit.Revwalk.SORT.TIME);
-        revwalk.push(masterCommit.id());
+
+        let masterCommitId = masterCommit.id();
+        revwalk.push(masterCommitId);
+        kdbCache.cacheRef('HEAD', masterCommitId.tostrS());
+
         // eslint-disable-next-line no-unused-vars
         return revwalk.getCommitsUntil(function (commit) {
           return true;
