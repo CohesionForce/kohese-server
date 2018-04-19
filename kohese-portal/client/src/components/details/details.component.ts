@@ -26,6 +26,7 @@ export class DetailsComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   itemProxyId: string;
   itemProxy: ItemProxy;
+  itemProxyError : boolean;
   typeProxies: Array<ItemProxy>;
   private _itemJson: string;
   get itemJson() {
@@ -129,8 +130,10 @@ export class DetailsComponent extends NavigatableComponent
       this.ItemRepository.registerRecentProxy(this.itemProxy);
       this.relationIdMap = this.itemProxy.getRelationIdMap();
       this._itemJson = this.itemProxy.document();
+      this.itemProxyError = false;
     } else {
       // TODO : Throw error modal to the UI
+      this.itemProxyError = true;
     }
 
     this.proxyStream.next(this.itemProxy);

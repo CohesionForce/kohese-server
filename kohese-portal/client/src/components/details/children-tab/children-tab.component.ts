@@ -60,7 +60,11 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   ngOnInit() {
     this.proxyStream.subscribe((newProxy : ItemProxy) => {
-     this.updateProxy(newProxy); 
+      if (newProxy) {
+        this.updateProxy(newProxy);
+      } else {
+        this.itemProxy = undefined;
+      } 
     })
     this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
