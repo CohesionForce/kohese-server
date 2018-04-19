@@ -1,8 +1,8 @@
 <div style="display: flex; height: 90%">
   <mat-list style="flex : 1; height: 100%; overflow: auto;">
-    <mat-list-item *ngFor="let commit of commitList | mapKey"
-                  (click)="onCommitSelected(commitList[commit], commit)">
-      {{commitList[commit].message}}
+    <mat-list-item *ngFor="let commitRecord of commitList"
+                  (click)="onCommitSelected(commitRecord.commit, commitRecord.commitId)">
+      {{commitRecord.commit.message}} - {{commitRecord.commit.time | date :'medium'}}
     </mat-list-item>
   </mat-list>
   <div style="flex : 1;">
@@ -11,12 +11,12 @@
     <div *ngIf="selectedCommit">
       <h3>Author : {{selectedCommit.commit.author}}</h3>
       <h3>Message : {{selectedCommit.commit.message}}</h3>
-      <h3>Time : {{selectedCommit.commit.time | date }}</h3>
+      <h3>Time : {{selectedCommit.commit.time | date :'medium'}}</h3>
       <h3>Parents : </h3>
       <div style="height: 100%; overflow:auto;">
         <mat-list>
-          <mat-list-item *ngFor="let parentIdx of selectedCommit.commit.parents | mapKey">
-            {{commitList[selectedCommit.commit.parents[parentIdx]].message}}
+          <mat-list-item *ngFor="let parent of selectedCommit.parents">
+            {{parent.message}} - {{parent.time | date :'medium'}}
           </mat-list-item>
         </mat-list>
       </div>

@@ -5,6 +5,18 @@ import * as ItemProxy from '../../../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates } from "../../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
 
+interface CommitViewItem {
+  commitId : string
+  commit : {
+    author : string,
+    message : string,
+    parents : Array<string>,
+    repoTreeRoots : {},
+    time : number
+  }
+  parents : Array<any>;
+}
+
 @Component({
   selector: 'commit-browser',
   templateUrl : './commit-browser.component.html',
@@ -13,8 +25,9 @@ import { MatDialogRef } from "@angular/material";
 export class CommitBrowserComponent implements OnInit, OnDestroy {
 
   repoStatusSubscription : Subscription;
-  commitList : Array<any>;
-  selectedCommit : any;
+  commitList : Array<CommitViewItem> = [];
+  selectedCommit : CommitViewItem;
+  commitMap : any;
   
   constructor (private itemRepository : ItemRepository,
               private matDialogRef : MatDialogRef<CommitBrowserComponent>) {
@@ -24,7 +37,29 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update)=>{
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.commitList = ItemProxy.TreeConfiguration.getItemCache().getCommits();
+          this.commitMap = ItemProxy.TreeConfiguration.getItemCache().getCommits();
+          // Convert to array for sorting in the view
+          for (let commitId in this.commitMap) {
+            let commitView = {
+              commitId : commitId,
+              commit : this.commitMap[commitId],
+              parents : []
+            }
+            commitView.parents = []
+            for (let parent in this.commitMap[commitId].parents) {
+              commitView.parents.push(this.commitMap[parent])
+            }
+            
+            this.commitList.push(commitView)
+          }
+          // Sort into reverse chronological order
+          this.commitList.sort((a, b)=>{
+            if (a.commit.time > b.commit.time) {
+              return -1;
+            } else {
+              return 1;
+            }
+          })
         }
     })
 
@@ -32,10 +67,16 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
   }
 
   onCommitSelected (newCommit, commitIdx) {
-    this.selectedCommit = {
-      commit : newCommit,
-      commitId : commitIdx
+    console.log('bp')
+    let newCommitView : CommitViewItem = {
+      commit: newCommit,
+      commitId : commitIdx,
+      parents : []
     }
+    for (let parent of this.commitMap[commitIdx].parents) {
+      newCommitView.parents.push(this.commitMap[parent])
+    }
+    this.selectedCommit = newCommitView;
   }
 
   ngOnDestroy () {
@@ -49,4 +90,7 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
   confirm() {
     this.matDialogRef.close(this.selectedCommit)
   }
+
+  
 }
+
