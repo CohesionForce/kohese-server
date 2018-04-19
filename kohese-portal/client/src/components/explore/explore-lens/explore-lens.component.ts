@@ -40,10 +40,6 @@ export class ExploreLensComponent implements OnInit, OnDestroy {
 
   }
 
-  openSelectCommitDialog () {
-
-  }
-
   ngOnDestroy () {
     this.lensSubscription.unsubscribe();
     this.repoStatusSubscription.unsubscribe();

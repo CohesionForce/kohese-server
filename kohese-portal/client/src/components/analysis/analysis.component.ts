@@ -7,7 +7,7 @@ import { AnalysisService } from '../../services/analysis/analysis.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisViews, AnalysisFilter } from './AnalysisViewComponent.class';
 
