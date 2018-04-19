@@ -455,22 +455,6 @@ export class ItemRepository {
     });
   }
 
-  private createShortFormItemList () {
-    var proxies = ItemProxy.getWorkingTree().getAllItemProxies();
-    this.shortProxyList=[];
-    for (var i = 0; i < proxies.length; i++ ) {
-      this.shortProxyList.push({
-        name: proxies[i].item.name,
-        id: proxies[i].item.id
-      })
-    }
-  }
-
-  private getShortFormItemList () {
-    this.createShortFormItemList();
-    return this.shortProxyList;
-  }
-
   copyAttributes (fromItem, toItem) {
     // TBD: Need to remove
     console.log('### Deprecated call to copyAttributes');

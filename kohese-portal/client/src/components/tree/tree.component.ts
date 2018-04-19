@@ -141,9 +141,15 @@ export class TreeComponent extends NavigatableComponent
       j++) {
       this._updateVisibleRowsSubscriptions[j].unsubscribe();
     }
-    this._treeRootChangeSubscription.unsubscribe();
-    this._itemProxySubscription.unsubscribe();
-    this.currentTreeConfigSubscription.unsubscribe();
+    if (this._treeRootChangeSubscription) {
+      this._treeRootChangeSubscription.unsubscribe();
+    }
+    if (this._itemProxySubscription) {
+      this._itemProxySubscription.unsubscribe();
+    }
+    if (this.currentTreeConfigSubscription) {
+      this.currentTreeConfigSubscription.unsubscribe();
+    }
   }
 
   filter(): void {

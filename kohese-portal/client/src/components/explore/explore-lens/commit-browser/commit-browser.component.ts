@@ -67,7 +67,6 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
   }
 
   onCommitSelected (newCommit, commitIdx) {
-    console.log('bp')
     let newCommitView : CommitViewItem = {
       commit: newCommit,
       commitId : commitIdx,
