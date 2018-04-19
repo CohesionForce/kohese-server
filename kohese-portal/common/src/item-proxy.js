@@ -70,7 +70,6 @@ class ItemProxy {
       case 'Internal-Lost':
       case 'Internal-Model':
       case 'Internal-View-Model':
-      case 'Internal-State':
         proxy.internal = true;
         break;
       default:
@@ -92,7 +91,10 @@ class ItemProxy {
       loadPending = proxy.item.loadPending;
     }
 
-    proxy.item = forItem;
+ 
+    proxy.item = {};
+    copyAttributes(forItem, proxy);
+   
     proxy.setItemKind(kind);
     proxy.status = {};
 
@@ -1468,6 +1470,23 @@ class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static setItemCache(itemCache) {
+    if (this.cache){
+      console.log('*** Error: Unexpected replacement of cache');
+    }
+    this.itemCache = itemCache;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getItemCache() {
+    return this.itemCache;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static getTreeConfigFor(treeId) {
     return treeConfigMap[treeId];
   }
@@ -1799,7 +1818,7 @@ function copyAttributes(fromItem, toProxy) {
   // Check for unexpected values
   for ( var toKey in toProxy.item) {
     if (toKey !== '__deletedProperty' && toProxy.item.hasOwnProperty(toKey) &&
-        (toKey.charAt(0) !== '$') && !fromItem.hasOwnProperty(toKey)) {
+        (toKey.charAt(0) !== '$') && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey))) {
       // console.log('!!! Deleted Property: ' + toKey + ' in ' + toProxy.item.name);
       if (!toProxy.item.__deletedProperty) {
         toProxy.item.__deletedProperty = {};

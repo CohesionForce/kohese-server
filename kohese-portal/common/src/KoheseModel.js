@@ -7,8 +7,7 @@ let modelMap = {
   'Internal': { internal: true, kind: 'Internal' },
   'Internal-Lost': { internal: true, kind: 'Internal' },
   'Internal-Model': { internal: true, kind: 'Internal' },
-  'Internal-View-Model': { internal: true, kind: 'Internal' },
-  'Internal-State': { internal: true, kind: 'Internal' }
+  'Internal-View-Model': { internal: true, kind: 'Internal' }
 };
 
 class KoheseModel extends ItemProxy {

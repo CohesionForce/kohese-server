@@ -127,7 +127,10 @@ export class TreeComponent extends NavigatableComponent
                     this.absoluteRoot.visitChildren(undefined, (proxy: ItemProxy) => {
                       this.addTreeRow(proxy);
                     });
-                }
+                    this.setVisibleRows();
+                    this.showSelection();
+                    return;
+              }
 
                 this.setVisibleRows();
               });
