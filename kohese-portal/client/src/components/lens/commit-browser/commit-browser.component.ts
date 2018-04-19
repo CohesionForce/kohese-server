@@ -1,8 +1,8 @@
 import { Component, Input, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
-import { ItemRepository, RepoStates } from "../../../../services/item-repository/item-repository.service";
+import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemRepository, RepoStates } from "../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
 
 interface CommitViewItem {

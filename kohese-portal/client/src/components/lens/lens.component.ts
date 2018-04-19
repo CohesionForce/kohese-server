@@ -1,16 +1,16 @@
 import { Component, Input, OnInit, OnDestroy } from "@angular/core";
-import { LensService, ApplicationLens } from "../../../services/lens-service/lens.service";
+import { LensService, ApplicationLens } from "../../services/lens-service/lens.service";
 import { Subscription } from 'rxjs';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
-import { ItemRepository, RepoStates } from "../../../services/item-repository/item-repository.service";
+import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemRepository, RepoStates } from "../../services/item-repository/item-repository.service";
 
 @Component({
-  selector: 'explore-lens',
-  templateUrl : './explore-lens.component.html',
-  styleUrls : ['./explore-lens.component.scss']
+  selector: 'lens',
+  templateUrl : './lens.component.html',
+  styleUrls : ['./lens.component.scss']
 })
-export class ExploreLensComponent implements OnInit, OnDestroy {
+export class LensComponent implements OnInit, OnDestroy {
 
   currentLens : ApplicationLens;
   lensSubscription : Subscription;

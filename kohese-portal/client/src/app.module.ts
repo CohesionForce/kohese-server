@@ -35,6 +35,7 @@ import { MarkdownModule } from 'ngx-markdown';
 
 import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
+import { LensModule } from './components/lens/lens.module';
 
 @NgModule({
   declarations: [
@@ -69,7 +70,8 @@ import { environment } from '../environments/environment.prod';
     DashboardModule,
     CompareItemsModule,
     ExploreModule,
-    TreeViewModule
+    TreeViewModule,
+    LensModule
   ],
   bootstrap: [AppComponent]
 })
