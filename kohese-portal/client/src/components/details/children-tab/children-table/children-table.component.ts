@@ -37,6 +37,7 @@ export class ChildrenTableComponent extends NavigatableComponent
 
   /* Subscriptions */
   filterSub : Subscription;
+  childrenStreamSub : Subscription;
 
   /* Data */
   rowDef : Array<string>;
@@ -48,7 +49,8 @@ export class ChildrenTableComponent extends NavigatableComponent
   }
 
   ngOnInit () {
-    this.childrenStream.subscribe((newChildren : Array<ItemProxy>)=>{
+    this.childrenStreamSub = 
+      this.childrenStream.subscribe((newChildren : Array<ItemProxy>)=>{
       this.children = newChildren;
       this.tableStream = new MatTableDataSource<ItemProxy>(this.children)
       this.changeRef.markForCheck();
@@ -61,6 +63,7 @@ export class ChildrenTableComponent extends NavigatableComponent
 
   ngOnDestroy () {
     this.filterSub.unsubscribe();
+    this.childrenStreamSub.unsubscribe();
   }
 
   public whenDropOccurs(dropTarget: ItemProxy, dropEvent: any): void {

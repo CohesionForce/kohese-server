@@ -8,6 +8,11 @@ import { MaterialModule } from '../../../../material.module'
 import { CompletedAssignmentComponent } from './completed-assignment.component';
 import { MockAction } from '../../../../../mocks/data/MockItem';
 import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { NavigationService } from '../../../../services/navigation/navigation.service';
+import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
+import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
+import { PipesModule } from '../../../../pipes/pipes.module';
 
 describe('Component: Completed Assignment', ()=>{
   let completedAssignmentComponent: CompletedAssignmentComponent;
@@ -18,10 +23,13 @@ describe('Component: Completed Assignment', ()=>{
       declarations: [CompletedAssignmentComponent],
       imports : [CommonModule,
          MaterialModule,
-         BrowserAnimationsModule
+         BrowserAnimationsModule,
+         PipesModule
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
+        {provide : NavigationService, useClass: MockNavigationService},
+        {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();
 

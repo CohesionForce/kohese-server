@@ -1,0 +1,28 @@
+.lens-selector {
+  width : 100%;
+  height : 50px;
+  padding : 5px;
+}
+
+.custom-font-icon {
+  width: 100%;
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: bold;
+  font-size : xx-large;
+  color : white; 
+}
+.h-icon:before { 
+  content : 'H';
+}
+
+.d-icon:before {
+  content: 'D'
+}
+
+.s-icon:before {
+  content: 'S'
+}
+.b-icon:before {
+  content: 'B'
+}
+

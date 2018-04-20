@@ -14,6 +14,7 @@ import * as ItemProxy from '../../../../common/src/item-proxy';
 
 import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../mocks/data/MockItem';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 describe('Component: Action Table', ()=>{
   let actionTableComponent: ActionTableComponent;

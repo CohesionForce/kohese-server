@@ -7,38 +7,39 @@ import { AnalysisService } from '../../services/analysis/analysis.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { AnalysisViews, AnalysisFilter } from './AnalysisViewComponent.class';
 
 @Component({
   selector: 'analysis-view',
-  templateUrl : './analysis.component.html'
+  templateUrl: './analysis.component.html'
 })
 export class AnalysisComponent extends NavigatableComponent
-                               implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy {
 
   /* UI Toggles */
-  analysisLoaded : boolean;
+  analysisLoaded: boolean;
 
   /* Data */
-  itemProxyId : string;
-  itemProxy : ItemProxy;
-  filter : string;
+  itemProxyId: string;
+  itemProxy: ItemProxy;
+  filter: string;
+  treeConfig: any;
 
   /* Subscriptions */
-  routeSub : Subscription;
-  filterSub : Subscription;
-  repoReadySub : Subscription;
+  routeSub: Subscription;
+  filterSub: Subscription;
+  treeConfigSub: Subscription;
 
   /* Observables */
-  filterSubject : BehaviorSubject<AnalysisFilter>
+  filterSubject: BehaviorSubject<AnalysisFilter>
   proxyStream: BehaviorSubject<ItemProxy>;
 
-  constructor(protected NavigationService : NavigationService,
-              private route : ActivatedRoute,
-              private ItemRepository : ItemRepository,
-              private AnalysisService : AnalysisService) {
+  constructor(protected NavigationService: NavigationService,
+    private route: ActivatedRoute,
+    private ItemRepository: ItemRepository,
+    private AnalysisService: AnalysisService) {
     super(NavigationService);
     this.filterSubject = new BehaviorSubject({
       filter: '',
@@ -51,18 +52,19 @@ export class AnalysisComponent extends NavigatableComponent
 
   }
 
-  ngOnInit () {
+  ngOnInit() {
     this.analysisLoaded = false;
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
-      this.repoReadySub = this.ItemRepository.getRepoStatusSubject().subscribe(update => {
-        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.itemProxy = this.ItemRepository.getProxyFor(this.itemProxyId);
+      this.treeConfigSub = this.ItemRepository.getTreeConfig().subscribe((newConfig) => {
+        if (newConfig) {
+          this.treeConfig = newConfig;
+          this.itemProxy = this.treeConfig.getProxyFor(this.itemProxyId);
           this.proxyStream = new BehaviorSubject(this.itemProxy);
           if (this.itemProxy) {
             this.AnalysisService.fetchAnalysis(this.itemProxy).then(() => {
               this.proxyStream.next(this.itemProxy);
-            }).catch((error: any) => {
+            },(error: any) => {
               console.error(error);
             });
           }
@@ -72,9 +74,11 @@ export class AnalysisComponent extends NavigatableComponent
     this.filter = ''
   }
 
-  ngOnDestroy () {
+  ngOnDestroy() {
     this.routeSub.unsubscribe();
-    this.repoReadySub.unsubscribe();
+    if (this.treeConfigSub) {
+      this.treeConfigSub.unsubscribe();
+    }
   }
 
   onFilter(newFilter) {
