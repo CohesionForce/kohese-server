@@ -13,33 +13,33 @@ import { AnalysisViews, AnalysisFilter } from './AnalysisViewComponent.class';
 
 @Component({
   selector: 'analysis-view',
-  templateUrl : './analysis.component.html'
+  templateUrl: './analysis.component.html'
 })
 export class AnalysisComponent extends NavigatableComponent
-                               implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy {
 
   /* UI Toggles */
-  analysisLoaded : boolean;
+  analysisLoaded: boolean;
 
   /* Data */
-  itemProxyId : string;
-  itemProxy : ItemProxy;
-  filter : string;
-  treeConfig : any;
+  itemProxyId: string;
+  itemProxy: ItemProxy;
+  filter: string;
+  treeConfig: any;
 
   /* Subscriptions */
-  routeSub : Subscription;
-  filterSub : Subscription;
-  treeConfigSub : Subscription;
+  routeSub: Subscription;
+  filterSub: Subscription;
+  treeConfigSub: Subscription;
 
   /* Observables */
-  filterSubject : BehaviorSubject<AnalysisFilter>
+  filterSubject: BehaviorSubject<AnalysisFilter>
   proxyStream: BehaviorSubject<ItemProxy>;
 
-  constructor(protected NavigationService : NavigationService,
-              private route : ActivatedRoute,
-              private ItemRepository : ItemRepository,
-              private AnalysisService : AnalysisService) {
+  constructor(protected NavigationService: NavigationService,
+    private route: ActivatedRoute,
+    private ItemRepository: ItemRepository,
+    private AnalysisService: AnalysisService) {
     super(NavigationService);
     this.filterSubject = new BehaviorSubject({
       filter: '',
@@ -52,7 +52,7 @@ export class AnalysisComponent extends NavigatableComponent
 
   }
 
-  ngOnInit () {
+  ngOnInit() {
     this.analysisLoaded = false;
     this.routeSub = this.route.params.subscribe(params => {
       this.itemProxyId = params['id'];
@@ -64,7 +64,7 @@ export class AnalysisComponent extends NavigatableComponent
           if (this.itemProxy) {
             this.AnalysisService.fetchAnalysis(this.itemProxy).then(() => {
               this.proxyStream.next(this.itemProxy);
-            }).catch((error: any) => {
+            },(error: any) => {
               console.error(error);
             });
           }
@@ -74,9 +74,11 @@ export class AnalysisComponent extends NavigatableComponent
     this.filter = ''
   }
 
-  ngOnDestroy () {
+  ngOnDestroy() {
     this.routeSub.unsubscribe();
-    this.treeConfigSub.unsubscribe();
+    if (this.treeConfigSub) {
+      this.treeConfigSub.unsubscribe();
+    }
   }
 
   onFilter(newFilter) {
