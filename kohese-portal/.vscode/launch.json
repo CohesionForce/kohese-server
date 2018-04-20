@@ -4,22 +4,42 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
       {
         "type": "node",
         "request": "launch",
-        "name": "NPM Start",
+        "name": "Launch Kohese-KDB",
+        "program": "${workspaceFolder}/server/server.js",
+        "args": [
+          "-kdb=kohese-kdb"
+        ]
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch TestKDB",
+        "program": "${workspaceFolder}/server/server.js",
+        "args": [
+          "-kdb=testKDB"
+        ]
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "(BROKEN) NPM Start",
         "runtimeExecutable": "npm",
         "runtimeArgs": [
           "run",
           "server"
+        ],
+        "args": [
+          "-kdb=kohese-kdb"
         ],
         "port": 9229
       },
       {
         "type": "node",
         "request": "launch",
-        "name": "NPM Test KDB",
+        "name": "(BROKEN) NPM Test KDB",
         "runtimeExecutable": "npm",
         "runtimeArgs": [
           "run",

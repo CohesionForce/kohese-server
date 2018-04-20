@@ -103,6 +103,60 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  socket.on('Item/getMetamodel', function(request, sendResponse){
+    let requestReceiptTime = Date.now();
+    var username = 'Unknown';
+    if (socket.koheseUser){
+      username = socket.koheseUser.username;
+    }
+
+    console.log('::: session %s: Received getMetamodel for user %s at %s for repo %s',
+                socket.id, username, socket.handshake.address, request.forRepoId);
+
+    let response = {
+      timestamp: {
+        requestTime: request.timestamp.requestTime,
+        requestReceiptTime: requestReceiptTime,
+        responseTransmitTime: null
+      },
+      cache: {
+        KoheseModel: {},
+        KoheseView: {},
+        KoheseUser: {}}
+    };
+
+    let repoProxy;
+    repoProxy = ItemProxy.getWorkingTree().getRootProxy();
+
+    function addItemToResponse(proxy){
+      if (!response.cache[proxy.kind]){
+        response.cache[proxy.kind] = {};
+      }
+      var kindCache = response.cache[proxy.kind];
+      kindCache[proxy.item.id] = JSON.stringify(proxy.item);
+    }
+
+    repoProxy.getChildByName('Model Definitions').visitChildren(null, (proxy) => {
+      addItemToResponse(proxy);
+    });
+
+    repoProxy.getChildByName('View Model Definitions').visitChildren(null, (proxy) => {
+      addItemToResponse(proxy);
+    });
+
+    repoProxy.getChildByName('Users').visitChildren(null, (proxy) => {
+      addItemToResponse(proxy);
+    });
+
+    response.timestamp.responseTransmitTime = Date.now();
+
+    console.log('::: Sending getMetaModel response');
+    sendResponse(response);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getItemCache', function(request, sendResponse){
     let username = 'Unknown';
     let requestReceiptTime = Date.now();

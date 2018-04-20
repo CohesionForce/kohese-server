@@ -81,7 +81,7 @@ export class TreeComponent extends NavigatableComponent
             this.currentTreeConfigSubscription = this.ItemRepository.getTreeConfig()
               .subscribe((newConfig) => {
                 if (newConfig) {
-                  // Unsubscribe from old tree updates 
+                  // Unsubscribe from old tree updates
                   if (this._itemProxySubscription) {
                     this._itemProxySubscription.unsubscribe();
                     this._itemProxySubscription = undefined;
@@ -95,6 +95,12 @@ export class TreeComponent extends NavigatableComponent
                   this.absoluteRoot.visitChildren(undefined, (proxy: ItemProxy) => {
                     this.addTreeRow(proxy);
                   });
+
+                  // Create tree row for the lost and found proxy
+                  let lostAndFoundProxy = this.absoluteRoot.treeConfig.getLostAndFoundProxy();
+                  if(!this._rowMap.get(lostAndFoundProxy.item.id)){
+                    this.addTreeRow(lostAndFoundProxy);
+                  }
 
                   this._treeRootChangeSubscription = this._treeRootStream.subscribe(
                     (proxy: ItemProxy) => {
