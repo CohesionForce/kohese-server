@@ -32,7 +32,6 @@ export class ExploreComponent extends NavigatableComponent
      if (params['id']) {
       this.proxySelected = true;
       this.routeId = params['id'];
-      this
      } else {
        this.proxySelected = false;
      }

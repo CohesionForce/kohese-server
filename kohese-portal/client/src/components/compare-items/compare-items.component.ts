@@ -111,6 +111,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
 
   treeConfig: any;
   treeConfigSub: Subscription;
+  historySubscription : Subscription;
 
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
@@ -154,12 +155,19 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._itemProxyChangeSubscription.unsubscribe();
+    if (this._itemProxyChangeSubscription) {
+      this._itemProxyChangeSubscription.unsubscribe();
+    }
+    if (this.historySubscription) {
+      this.historySubscription.unsubscribe();
+    }
     this.treeConfigSub.unsubscribe();
+
   }
 
   public whenSelectedBaseChanges(baseProxy: ItemProxy): void {
-    this._itemRepository.getHistoryFor(baseProxy).subscribe(
+    this.historySubscription = 
+      this._itemRepository.getHistoryFor(baseProxy).subscribe(
       (history: Array<any>) => {
         this._baseVersions = history;
         if (!baseProxy.status['Unstaged'] && (this._baseVersions.length > 0)) {

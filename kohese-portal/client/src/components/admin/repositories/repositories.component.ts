@@ -24,12 +24,12 @@ export class RepositoriesComponent extends NavigatableComponent implements
   commitMessageInput: string;
   pushRemoteNameInput: string;
   repositories: Array<any>;
-  rootProxy : ItemProxy;
+  rootProxy: ItemProxy;
 
   /* Subscriptions */
   repositoryStatusSubscription: Subscription;
-  treeConfigSubscription : Subscription;
-  
+  treeConfigSubscription: Subscription;
+
   constructor(private navigationService: NavigationService,
     private versionControlService: VersionControlService,
     private itemRepository: ItemRepository,
@@ -39,40 +39,42 @@ export class RepositoriesComponent extends NavigatableComponent implements
     // TODO update this file to do the repo status sequence 
     // leaving it out since it is currently in flux on another branch
   }
-  
+
   public ngOnInit(): void {
     this.repositoryStatusSubscription = this.itemRepository.
       getRepoStatusSubject().subscribe((status: any) => {
-      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.status) {
-        this.treeConfigSubscription = 
-          this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
-            this.repositories = newConfig.getRepositories();
-            this.rootProxy = newConfig.getRootProxy();
-        })
-      }
-    });
+        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.status) {
+          this.treeConfigSubscription =
+            this.itemRepository.getTreeConfig().subscribe((newConfig) => {
+              this.repositories = newConfig.getRepositories();
+              this.rootProxy = newConfig.getRootProxy();
+            })
+        }
+      });
   }
-  
+
   public ngOnDestroy(): void {
     this.repositoryStatusSubscription.unsubscribe();
-    this.treeConfigSubscription.unsubscribe();
+    if (this.treeConfigSubscription) {
+      this.treeConfigSubscription.unsubscribe();
+    }
   }
-  
+
   addRemote() {
     if ((this.remoteNameInput !== '') && (this.remoteUrlInput !== '')) {
       this.versionControlService.addRemote(this.rootProxy.item.id,
         this.remoteNameInput, this.remoteUrlInput).subscribe((remoteName: any) => {
-        if (remoteName.error) {
-          this._toastrService.error('Add Remote Failed', 'Version Control');
-        } else {
-          this._toastrService.success('Add Remote Succeeded', 'Version Control');
-        }
-      });
+          if (remoteName.error) {
+            this._toastrService.error('Add Remote Failed', 'Version Control');
+          } else {
+            this._toastrService.success('Add Remote Succeeded', 'Version Control');
+          }
+        });
     } else {
       alert('Please specify both a remote name and URL.');
     }
   }
-  
+
   getRemotes() {
     this.versionControlService.getRemotes(this.rootProxy.item.id)
       .subscribe((remotes: any) => {
@@ -84,30 +86,30 @@ export class RepositoriesComponent extends NavigatableComponent implements
         }
       });
   }
-  
+
   commit() {
     if (this.commitMessageInput === '') {
       this.commitMessageInput = '<No message supplied>';
     }
-    
+
     this.versionControlService.commitItems([this.rootProxy], this._sessionService.getSessionUser().getValue(),
       this.commitMessageInput).subscribe((statusMap: any) => {
-      if (statusMap.error) {
-        this._toastrService.error('Commit Failed', 'Version Control');
-      } else {
-        this._toastrService.success('Commit Succeeded', 'Version Control');
-      }
-    });
+        if (statusMap.error) {
+          this._toastrService.error('Commit Failed', 'Version Control');
+        } else {
+          this._toastrService.success('Commit Succeeded', 'Version Control');
+        }
+      });
   }
-  
+
   push() {
     this.versionControlService.push([this.rootProxy.item.
       id], this.pushRemoteNameInput).subscribe((pushStatusMap: any) => {
-      if (pushStatusMap.error) {
-        this._toastrService.error('Push Failed', 'Version Control');
-      } else {
-        this._toastrService.success('Push Succeeded', 'Version Control');
-      }
-    });
+        if (pushStatusMap.error) {
+          this._toastrService.error('Push Failed', 'Version Control');
+        } else {
+          this._toastrService.success('Push Succeeded', 'Version Control');
+        }
+      });
   }
 }

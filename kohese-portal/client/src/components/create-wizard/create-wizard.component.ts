@@ -33,7 +33,6 @@ export class CreateWizardComponent extends NavigatableComponent
   selectedParent: ItemProxy;
   rootProxy: ItemProxy;
   errorMessage: string;
-  treeConfigSub: Subscription;
   treeConfig;
   private _proxyPlaceholderStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
@@ -45,7 +44,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
 
   /* Subscriptions */
-  private repoStatusSubscription: Subscription;
+  private treeConfigSub: Subscription;
 
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
@@ -154,7 +153,7 @@ export class CreateWizardComponent extends NavigatableComponent
   }
 
   ngOnDestroy(): void {
-    this.repoStatusSubscription.unsubscribe();
+    this.treeConfigSub.unsubscribe();
   }
 
   cancel() {

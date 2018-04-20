@@ -41,6 +41,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.currentUserSubscription.unsubscribe();
+    this.lensSubscription.unsubscribe();
   }
 
   changeLens(lens : ApplicationLens) {

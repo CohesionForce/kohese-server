@@ -1,4 +1,4 @@
-import { BehaviorSubject} from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 
@@ -12,7 +12,11 @@ import { RepoStates } from '../../src/services/item-repository/item-repository.s
 
 export class MockItemRepository {
   mockRootProxy = ItemProxy.getWorkingTree().getRootProxy();
-  state : any;
+  state: any;
+  currentTreeConfigSubject: BehaviorSubject<any> = new BehaviorSubject<any>({
+
+  })
+
 
   constructor() {
 
@@ -32,11 +36,11 @@ export class MockItemRepository {
     }
   }
 
-  getRepoStatusSubject () {
-    return new BehaviorSubject<any>({state : RepoStates.SYNCHRONIZATION_SUCCEEDED})
+  getRepoStatusSubject() {
+    return new BehaviorSubject<any>({ state: RepoStates.SYNCHRONIZATION_SUCCEEDED })
   }
 
-  getRootProxy () {
+  getRootProxy() {
     return this.mockRootProxy;
   }
 
@@ -51,11 +55,11 @@ export class MockItemRepository {
     return Observable.of(JSON.parse(JSON.stringify(proxy.history)));
   }
 
-  getProxyFor (id: string) {
+  getProxyFor(id: string) {
     return ItemProxy.getProxyFor(id);
   }
 
-  getRecentProxies () {
+  getRecentProxies() {
     return [
       new ItemProxy('Item', MockItem()),
       new ItemProxy('Item', MockItem()),
@@ -71,15 +75,15 @@ export class MockItemRepository {
 
   }
 
-  getShortFormItemList () {
+  getShortFormItemList() {
 
   }
 
-  getRepositories () {
+  getRepositories() {
 
   }
 
-  deleteItem () {
+  deleteItem() {
 
   }
 
@@ -96,5 +100,20 @@ export class MockItemRepository {
     proxy.updateItem(proxy.kind, MockItem());
     proxy.item.id = id;
     return Promise.resolve(proxy);
+  }
+  setTreeConfig() {
+
+  }
+  
+  getTreeConfig(): Observable<any> {
+
+    return new BehaviorSubject<any>({
+      getProxyFor: () => {
+        return new ItemProxy('Item', MockItem());
+      },
+      getRootProxy: () => {
+        return this.getRootProxy();
+      }
+    })
   }
 }

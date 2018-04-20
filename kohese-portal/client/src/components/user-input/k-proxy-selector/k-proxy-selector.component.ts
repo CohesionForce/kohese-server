@@ -48,10 +48,10 @@ export class KProxySelectorComponent extends UserInput
     this.treeConfigSub = this.ItemRepository.getTreeConfig().subscribe((newConfig) => {
       if (newConfig) {
         this.treeConfig = newConfig;
+        this.initSelections();
       }
     })
 
-    this.initSelections();
     this.initialized = true;
   }
 
@@ -78,19 +78,21 @@ export class KProxySelectorComponent extends UserInput
       for (let i = 0; i < selected.length; i++) {
         if (selected[i].hasOwnProperty('id')) {
           // Must be a reference
-          this.selectedProxies.push(ItemProxy.getWorkingTree().getProxyFor(selected[i].id))
+          this.selectedProxies.push(this.treeConfig.getProxyFor(selected[i].id))
         } else {
           // Must be an id field insteaad of a reference
-          this.selectedProxies.push(ItemProxy.getWorkingTree().getProxyFor(selected[i]))
+          this.selectedProxies.push(this.treeConfig.getProxyFor(selected[i]))
         }
       }
     } else if (selected) {
       if (selected.hasOwnProperty('id')) {
         // Must be a reference
-        this.selectedProxy = ItemProxy.getWorkingTree().getProxyFor(selected.id);
+        // TODO - Update to handle non-editable historical records
+        this.selectedProxy = this.treeConfig.getProxyFor(selected.id);
       } else {
+        // TODO - Update to handle non-editable historical records
         // Must be an id field insteaad of a reference
-        this.selectedProxy = ItemProxy.getWorkingTree().getProxyFor(selected);
+        this.selectedProxy = this.treeConfig.getProxyFor(selected);
       }
     } else if (!selected) {
       this.selectedProxy = undefined;
@@ -99,7 +101,7 @@ export class KProxySelectorComponent extends UserInput
   }
 
   onProxySelected(selectedEvent: MatAutocompleteSelectedEvent) {
-    this.selectedProxy = this.treeConfig(selectedEvent.option.value);
+    this.selectedProxy = this.treeConfig.getProxyFor(selectedEvent.option.value);
   }
 
 
