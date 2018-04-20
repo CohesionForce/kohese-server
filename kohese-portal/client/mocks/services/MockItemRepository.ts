@@ -104,7 +104,7 @@ export class MockItemRepository {
   setTreeConfig() {
 
   }
-  
+
   getTreeConfig(): Observable<any> {
 
     return new BehaviorSubject<any>({
@@ -113,6 +113,9 @@ export class MockItemRepository {
       },
       getRootProxy: () => {
         return this.getRootProxy();
+      },
+      getChangeSubject: () => {
+        return new BehaviorSubject<any>(undefined);
       }
     })
   }

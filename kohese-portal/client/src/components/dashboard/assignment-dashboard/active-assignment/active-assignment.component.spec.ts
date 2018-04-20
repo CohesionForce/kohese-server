@@ -8,6 +8,10 @@ import { MaterialModule } from '../../../../material.module'
 import { ActiveAssignmentComponent } from './active-assignment.component';
 import { MockAction } from '../../../../../mocks/data/MockItem';
 import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { NavigationService } from '../../../../services/navigation/navigation.service';
+import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
+import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 
 describe('Component: Active Assignment', ()=>{
   let activeAssignmentComponent: ActiveAssignmentComponent;
@@ -22,6 +26,8 @@ describe('Component: Active Assignment', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
+        {provide : NavigationService, useClass: MockNavigationService},
+        {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();
 

@@ -166,6 +166,9 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   }
 
   public whenSelectedBaseChanges(baseProxy: ItemProxy): void {
+    if (this.historySubscription) {
+      this.historySubscription.unsubscribe();
+    }
     this.historySubscription = 
       this._itemRepository.getHistoryFor(baseProxy).subscribe(
       (history: Array<any>) => {
@@ -209,7 +212,11 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   }
 
   public whenSelectedChangeChanges(changeProxy: ItemProxy): void {
-    this._itemRepository.getHistoryFor(changeProxy).subscribe(
+    if (this.historySubscription) {
+      this.historySubscription.unsubscribe();
+    }
+    this.historySubscription = 
+      this._itemRepository.getHistoryFor(changeProxy).subscribe(
       (history: Array<any>) => {
         this._changeVersions = history;
         if (!changeProxy.status['Unstaged'] && (this._changeVersions.
