@@ -26,7 +26,7 @@ export class DetailsComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   itemProxyId: string;
   itemProxy: ItemProxy;
-  itemProxyError : boolean;
+  itemProxyError: boolean;
   typeProxies: Array<ItemProxy>;
   private _itemJson: string;
   get itemJson() {
@@ -44,7 +44,7 @@ export class DetailsComponent extends NavigatableComponent
 
   /* Subscriptions */
   routeSub: Subscription;
-  repoReadySub: Subscription;
+  treeConfigSub: Subscription;
   detailsFormSubscription: Subscription;
   proxyUpdates: Subscription;
   currentTreeConfigSubscription: Subscription;
@@ -55,14 +55,6 @@ export class DetailsComponent extends NavigatableComponent
 
   /* Data */
   treeConfig: any;
-  kindList: Array<string>;
-  decisionStates: Array<string>;
-  actionStates: Array<string>;
-  issueStates: Array<string>;
-  categoryTags: Array<string>;
-  userList: Array<any>
-  currentUser: any;
-  proxyList: Array<any>;
   relationIdMap: any;
   itemDescriptionRendered: string;
   detailsFormGroup: FormGroup;
@@ -88,28 +80,25 @@ export class DetailsComponent extends NavigatableComponent
       if (this.initialized && this.repoConnected) {
         this.updateProxy();
       } else {
-        this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
-          .subscribe(update => {
-            if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-              this.currentTreeConfigSubscription = this.ItemRepository.getTreeConfig()
-                .subscribe((newConfig) => {
-                  this.treeConfig = newConfig;
-                  // Unsubscribe from old tree updates 
-                  if (this.proxyUpdates) {
-                    this.proxyUpdates.unsubscribe();
-                    this.proxyUpdates = undefined;
-                  }
-                  this.repoConnected = true;
-                  this.updateProxy();
-                  this.proxyUpdates = newConfig.getChangeSubject().subscribe((change) => {
-                    if (this.itemProxy === change.proxy) {
-                      this.proxyStream.next(change.proxy);
-                      this.relationIdMap = this.itemProxy.getRelationIdMap();
-                    }
-                  })
-                })
+        this.treeConfigSub = this.currentTreeConfigSubscription = this.ItemRepository.getTreeConfig()
+          .subscribe((newConfig) => {
+            this.treeConfig = newConfig;
+            // Unsubscribe from old tree updates 
+            if (this.proxyUpdates) {
+              this.proxyUpdates.unsubscribe();
+              this.proxyUpdates = undefined;
             }
+            this.repoConnected = true;
+            this.updateProxy();
+            this.proxyUpdates = newConfig.getChangeSubject().subscribe((change) => {
+              if (this.itemProxy === change.proxy) {
+                this.proxyStream.next(change.proxy);
+                this.relationIdMap = this.itemProxy.getRelationIdMap();
+              }
+            })
           })
+
+
         this.initialized = true;
       }
     })
@@ -118,11 +107,15 @@ export class DetailsComponent extends NavigatableComponent
 
   ngOnDestroy() {
     this.routeSub.unsubscribe();
-    this.repoReadySub.unsubscribe();
+    if (this.treeConfigSub) {
+      this.treeConfigSub.unsubscribe();
+    }
+    if (this.proxyUpdates) {
+      this.proxyUpdates.unsubscribe();
+    }
   }
 
   updateProxy() {
-    this.userList = this.SessionService.getUsers();
     this._editableStream.next(false);
     this.defaultTab = { active: true };
     this.itemProxy = this.treeConfig.getProxyFor(this.itemProxyId);
