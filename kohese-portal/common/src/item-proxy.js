@@ -91,10 +91,10 @@ class ItemProxy {
       loadPending = proxy.item.loadPending;
     }
 
- 
+
     proxy.item = {};
     copyAttributes(forItem, proxy);
-   
+
     proxy.setItemKind(kind);
     proxy.status = {};
 
@@ -1041,6 +1041,11 @@ class ItemProxy {
       childProxy.parentProxy.removeChild(childProxy);
     }
 
+    // update display of lostAndFound node if this is the first child
+    if (this === this.treeConfig.lostAndFound && this.treeConfig.lostAndFound.children.length === 0) {
+      this.treeConfig.root.addChild(this.treeConfig.lostAndFound);
+    }
+
     // Determine where to insert the new child
     var insertAt = this.children.length;
     if (!this.item.itemIds){
@@ -1070,11 +1075,6 @@ class ItemProxy {
     while (ancestorProxy){
       ancestorProxy.descendantCount += deltaCount;
       ancestorProxy = ancestorProxy.parentProxy;
-    }
-
-    // update display of lostAndFound node
-    if (this === this.treeConfig.lostAndFound && this.treeConfig.lostAndFound.children.length === 1) {
-      this.treeConfig.root.addChild(this.treeConfig.lostAndFound);
     }
 
     if(!this.treeConfig.loading){
@@ -1512,6 +1512,13 @@ class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   getRootProxy() {
     return this.root;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getLostAndFoundProxy() {
+    return this.lostAndFound;
   }
 
   //////////////////////////////////////////////////////////////////////////

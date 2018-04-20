@@ -86,6 +86,12 @@ export class TreeComponent extends NavigatableComponent
               this.addTreeRow(proxy);
             });
 
+            // Create tree row for the lost and found proxy
+            let lostAndFoundProxy = this.absoluteRoot.treeConfig.getLostAndFoundProxy();
+            if(!this._rowMap.get(lostAndFoundProxy.item.id)){
+              this.addTreeRow(lostAndFoundProxy);
+            }
+
             this._treeRootChangeSubscription = this._treeRootStream.subscribe(
               (proxy: ItemProxy) => {
                 this.changeTreeRoot(proxy);
