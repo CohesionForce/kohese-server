@@ -5,9 +5,12 @@ import { ItemProxy } from '../../../../common/src/item-proxy.js';
 import { ItemRepository } from '../item-repository/item-repository.service';
 
 import * as _ from 'underscore';
+import { Subscription } from 'rxjs';
 
 @Injectable()
 export class AnalysisService {
+  treeConfig : any;
+  treeConfigSubscription : Subscription;
 
   /* Static Definitions */
   posFilterCriteria = {
@@ -21,7 +24,11 @@ export class AnalysisService {
     'Verb': ['VP','VB','VBZ','VBP','VBN','VBG','VBD']
   }
   constructor (private ItemRepository : ItemRepository) {
-
+    this.treeConfigSubscription = this.ItemRepository.getTreeConfig().subscribe((newConfig)=>{
+      if (newConfig) {
+        this.treeConfig = newConfig
+      }
+    })
   }
 
   filterPOS (summary, filterCriteria) : boolean {
@@ -186,7 +193,7 @@ export class AnalysisService {
     proxy.analysis.extendedTokenSummaryList = _.values(proxy.analysis.extendedTokenSummary);
     proxy.analysis.extendedChunkSummaryList = _.values(proxy.analysis.extendedChunkSummary);
 
-    var parentProxy = this.ItemRepository.getProxyFor(proxy.item.parentId);
+    var parentProxy = this.treeConfig.getProxyFor(proxy.item.parentId);
 
     if (parentProxy) {
       console.log('::: Parent found');

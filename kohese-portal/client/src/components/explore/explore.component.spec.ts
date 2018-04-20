@@ -11,6 +11,7 @@ import { ExploreComponent } from './explore.component';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { ActivatedRoute } from '@angular/router';
+import { LensModule } from '../lens/lens.module';
 
 describe('Component: Explore', ()=>{
   let exploreComponent: ExploreComponent;
@@ -21,7 +22,7 @@ describe('Component: Explore', ()=>{
       declarations: [ExploreComponent],
       imports : [CommonModule,
          MaterialModule,
-         BrowserAnimationsModule
+         BrowserAnimationsModule,
          ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [

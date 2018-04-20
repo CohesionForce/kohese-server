@@ -49,6 +49,7 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   /* Subscriptions */
   repoReadySub : Subscription;
+  proxyChanges : Subscription;
 
 
   constructor(protected NavigationService : NavigationService,
@@ -59,8 +60,12 @@ export class ChildrenTabComponent extends NavigatableComponent
   }
 
   ngOnInit() {
-    this.proxyStream.subscribe((newProxy : ItemProxy) => {
-     this.updateProxy(newProxy); 
+    this.proxyChanges = this.proxyStream.subscribe((newProxy : ItemProxy) => {
+      if (newProxy) {
+        this.updateProxy(newProxy);
+      } else {
+        this.itemProxy = undefined;
+      } 
     })
     this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {
@@ -75,6 +80,7 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   ngOnDestroy () {
     this.repoReadySub.unsubscribe();
+    this.proxyChanges.unsubscribe();
   }
 
   updateProxy (newProxy : ItemProxy) {

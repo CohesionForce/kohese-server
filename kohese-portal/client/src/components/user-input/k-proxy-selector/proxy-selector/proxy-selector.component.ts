@@ -4,6 +4,7 @@ import * as ItemProxy from '../../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'proxy-selector',
@@ -21,7 +22,7 @@ export class ProxySelectorComponent implements OnInit {
   rootProxy: ItemProxy;
   selectedProxy: ItemProxy;
   selectedProxies: Array<ItemProxy> = [];
-  selectedMap : Map<string, ItemProxy> = new Map();
+  selectedMap: Map<string, ItemProxy> = new Map();
   @Output()
   proxySelected: EventEmitter<ItemProxy> = new EventEmitter();
   repoInitialized: boolean = false;
@@ -29,47 +30,51 @@ export class ProxySelectorComponent implements OnInit {
   filteredProxies: any;
   recentProxies: Array<ItemProxy>;
 
+  treeConfig: any;
+  treeConfigSub: Subscription;
+
   constructor(private itemRepository: ItemRepository) {
     this.proxySearchControl = new FormControl('');
   }
 
   ngOnInit() {
-    this.itemRepository.getRepoStatusSubject().subscribe((update) => {
-      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-        this.rootProxy = this.itemRepository.getRootProxy();
-        this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
-          map((text: string) => {
-            return this.rootProxy.children.filter((proxy) => {
-              return (-1 !== proxy.item.name.indexOf(text));
+    this.treeConfigSub =
+      this.itemRepository.getTreeConfig().subscribe((newConfig) => {
+        if (newConfig) {
+          this.treeConfig = newConfig;
+          this.rootProxy = this.treeConfig.getRootProxy();
+          this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
+            map((text: string) => {
+              return this.rootProxy.children.filter((proxy) => {
+                return (-1 !== proxy.item.name.indexOf(text));
+              });
             });
-          });
-        this.recentProxies = this.itemRepository.getRecentProxies();
-        this.recentProxies = this.recentProxies.slice().reverse();
-        this.repoInitialized = true;
-      }
-    })
-
-    if (this.selection) {
-      if (this.selection instanceof Array) {
-        this.selectedProxies = this.selection;
-        for (let i = 0; i < this.selectedProxies.length; i++) {
-          let proxy = this.selectedProxies[i];
-          this.selectedMap.set(proxy.item.id, proxy);
+          this.recentProxies = this.itemRepository.getRecentProxies();
+          this.recentProxies = this.recentProxies.slice().reverse();
+          this.repoInitialized = true;
         }
-      } else {
-        this.selectedProxy = this.selection;
-      }
-    }
+        if (this.selection) {
+          if (this.selection instanceof Array) {
+            this.selectedProxies = this.selection;
+            for (let i = 0; i < this.selectedProxies.length; i++) {
+              let proxy = this.selectedProxies[i];
+              this.selectedMap.set(proxy.item.id, proxy);
+            }
+          } else {
+            this.selectedProxy = this.selection;
+          }
+        }
+      })
   }
 
   selectProxy(selection: ItemProxy) {
     if (this.multiSelect) {
-      let matchesSelection : boolean = false;
+      let matchesSelection: boolean = false;
       for (let i = 0; i < this.selectedProxies.length; i++) {
         let proxy = this.selectedProxies[i];
-        if (proxy === selection) { 
+        if (proxy === selection) {
           matchesSelection = true;
-          break;          
+          break;
         }
       }
       if (!matchesSelection) {

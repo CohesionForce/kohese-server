@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, OnDestroy } from '@angular/core'
 
 import * as ItemProxy from '../../../../common/src/item-proxy';
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html'
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
   usernameInput: string;
   descriptionInput: string;
   emailInput: string;
@@ -21,12 +22,21 @@ export class AdminComponent implements OnInit {
   sessions : any;
   users : Array<any>
 
+  treeConfigSub : Subscription;
+
   constructor(private sessionService: SessionService, private itemRepository: ItemRepository) {
   }
 
   ngOnInit() {
-    this.sessions = this.sessionService.getSessions();
-    this.users = this.sessionService.getUsers();
+    this.treeConfigSub = 
+      this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
+        this.sessions = this.sessionService.getSessions();
+        this.users = this.sessionService.getUsers();
+    })
+  }
+
+  ngOnDestroy () {
+    this.treeConfigSub.unsubscribe();
   }
 
   // TODO - Update to use forms module instead of this insanity 

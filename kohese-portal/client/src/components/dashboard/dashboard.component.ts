@@ -5,7 +5,7 @@ import * as ItemProxy from '../../../../common/src/item-proxy';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { DashboardSelections } from './dashboard-selector/dashboard-selector.component';
@@ -45,12 +45,6 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
         this.buildAssignmentList();
       }
     });
-    this.repoStatusSubject = this.itemRepository.getRepoStatusSubject();
-    this.repoStatusSubject.subscribe(update => {
-      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-        // Do something eventually?
-      }
-    })
   }
 
   dashboardSelected(dashboard : DashboardSelections) {

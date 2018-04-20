@@ -18,7 +18,7 @@ import { Router, NavigationEnd } from '@angular/router';
   selector: 'document-view',
   templateUrl: './document-view.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls : [
+  styleUrls: [
     './document-view.component.scss'
   ]
 })
@@ -26,11 +26,11 @@ import { Router, NavigationEnd } from '@angular/router';
 export class DocumentViewComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   /* UI Toggles */
-  @ViewChild('docView') docView : ElementRef 
+  @ViewChild('docView') docView: ElementRef
 
   /* Data */
   itemProxy: ItemProxy;
-  itemLength : ItemProxy;
+  itemLength: ItemProxy;
 
   filter: string;
   docRendered: string;
@@ -59,7 +59,7 @@ export class DocumentViewComponent extends NavigatableComponent
 
   constructor(NavigationService: NavigationService,
     private changeRef: ChangeDetectorRef,
-    private router : Router) {
+    private router: Router) {
     super(NavigationService)
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true });
@@ -75,7 +75,7 @@ export class DocumentViewComponent extends NavigatableComponent
       })
     }
 
-    this.router.events.subscribe((event)=>{
+    this.router.events.subscribe((event) => {
       if (!(event instanceof NavigationEnd)) {
         return;
       }
@@ -84,12 +84,16 @@ export class DocumentViewComponent extends NavigatableComponent
     })
 
     this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
-      this.itemProxy = newProxy;
-      this.itemsLoaded = 0;
-      // TODO - Determine if there is a way to cache and diff the new doc before
-      // regenerating
-      this.generateDoc();
-      this.changeRef.markForCheck();
+      if (newProxy) {
+        this.itemProxy = newProxy;
+        this.itemsLoaded = 0;
+        // TODO - Determine if there is a way to cache and diff the new doc before
+        // regenerating
+        this.generateDoc();
+        this.changeRef.markForCheck();
+      } else {
+        this.itemProxy = undefined
+      }
     })
     this.initialized = true
   }
@@ -101,24 +105,24 @@ export class DocumentViewComponent extends NavigatableComponent
     this.proxyStreamSubscription.unsubscribe();
   }
 
-  determineLoad (subTree : Array<any>, currentLoad : number ) : number {
-    let newLoad : number = 0;
-    let loadLength : number = 0;
-    let lengthIndex : number = 0;
-    const lengthLimit : number = 8000
+  determineLoad(subTree: Array<any>, currentLoad: number): number {
+    let newLoad: number = 0;
+    let loadLength: number = 0;
+    let lengthIndex: number = 0;
+    const lengthLimit: number = 8000
 
     // Case 1 : Load the whole document
     if (!this.incrementalLoad) {
       newLoad = subTree.length;
     } else {
       // Determine content length
-      while (loadLength < lengthLimit && 
-            ( (subTree[lengthIndex]))) {
+      while (loadLength < lengthLimit &&
+        ((subTree[lengthIndex]))) {
         let currentProxy = subTree[lengthIndex].proxy;
         if (!currentProxy.item.description) {
           lengthIndex++;
           continue;
-        } 
+        }
         loadLength += currentProxy.item.description.length;
         lengthIndex++;
       }
@@ -132,7 +136,7 @@ export class DocumentViewComponent extends NavigatableComponent
       } else if (this.itemsLoaded < subTree.length) {
         // Case 3 : Load based on defined increment
         newLoad = currentLoad + 12;
-      } 
+      }
     }
 
     return newLoad;
@@ -147,17 +151,17 @@ export class DocumentViewComponent extends NavigatableComponent
     if (this.itemsLoaded >= subtreeAsList.length) {
       this.itemsLoaded = subtreeAsList.length
       return;
-    } 
+    }
 
     this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
 
     if (this.itemsLoaded > subtreeAsList.length) {
       this.itemsLoaded = subtreeAsList.length
-    } 
+    }
 
     for (let i = 0; (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
       let listItem = subtreeAsList[i];
-      
+
       if (listItem.depth > 0) {
         // Show the header for any node that is not the root of the document
         docRendered += '<h' + listItem.depth + '>' + listItem.proxy.item.name + '</h' + listItem.depth + '>';

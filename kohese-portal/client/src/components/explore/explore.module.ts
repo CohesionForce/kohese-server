@@ -2,19 +2,22 @@ import { NgModule } from "@angular/core/";
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from "../../material.module";
 
-import { AdminComponent} from './admin.component';
-import { RepositoriesComponent } from './repositories/repositories.component'
+import { AngularSplitModule} from 'angular-split';
 
 import { ServicesModule } from '../../services/services.module';
-import { UserModule } from '../../services/user/user.module'
+import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ExploreComponent } from "./explore.component";
+
+import { TreeViewModule } from "../tree/tree.module";
+import { LensModule } from '../lens/lens.module'
+import { DetailsModule } from "../details/details.module";
 import { PipesModule } from "../../pipes/pipes.module";
-import { LensModule } from "../lens/lens.module";
+
 
 @NgModule({
   declarations: [
-    AdminComponent,
-    RepositoriesComponent
+    ExploreComponent
   ],
   entryComponents: [
   ],
@@ -22,15 +25,17 @@ import { LensModule } from "../lens/lens.module";
     CommonModule,
     MaterialModule,
     ServicesModule,
-    UserModule,
+    BrowserModule,
     FormsModule,
     ReactiveFormsModule,
+    AngularSplitModule,
+    TreeViewModule,
+    DetailsModule,
     PipesModule,
     LensModule
   ],
   exports : [
-    AdminComponent,
-    RepositoriesComponent
+    ExploreComponent,
   ]
 })
-export class AdminModule {}
+export class ExploreModule {}
