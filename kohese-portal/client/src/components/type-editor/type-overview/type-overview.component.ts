@@ -36,9 +36,9 @@ export class TypeOverviewComponent implements OnInit, OnChanges {
   refresh(): void {
     this.filteredTypes = {};
     let types: any = this.typeService.getKoheseTypes();
-    for (let fieldName in types) {
-      if (this.type.name !== fieldName) {
-        this.filteredTypes[fieldName] = types[fieldName];
+    for (let typeName in types) {
+      if (this.type.dataModelProxy.item.name !== typeName) {
+        this.filteredTypes[typeName] = types[typeName];
       }
     }
   }
@@ -47,7 +47,7 @@ export class TypeOverviewComponent implements OnInit, OnChanges {
     this.dialogService.openComponentDialog(IconSelectorComponent, {}).
       afterClosed().subscribe((result: string) => {
       if ('\0' !== result) {
-        this.type.icon = result;
+        this.type.viewModelProxy.item.icon = result;
       }
     });
   }

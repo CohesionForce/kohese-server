@@ -13,14 +13,37 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
   @Input()
   public type: KoheseType;
   public selectedPropertyId: string;
-  public selectedInputType: string;
+
+  get isMultivalued() {
+    return this.type.fields[this.selectedPropertyId].type.
+      startsWith('[');
+  }
+  set isMultivalued(isMultivalued: boolean) {
+    let type: string = this.type.fields[this.selectedPropertyId].type;
+    if (isMultivalued) {
+      type = '[ ' + type + ' ]';
+    } else {
+      type = type.substring(2, type.length - 2);
+    }
+
+    this.type.fields[this.selectedPropertyId].type = type;
+  }
+
   public inputOptions: any = {
-    type: '',
-    allowMultiSelect: false
+    type: ''
   };
   private initialized: boolean = false;
-  types : object
-  userInputs : Array<UserInput>
+  userInputs : Array<UserInput>;
+  private _types: any = {
+    'Boolean': 'boolean',
+    'Number': 'number',
+    'String': 'string',
+    'Object': 'object',
+    'State': 'StateMachine'
+  };
+  get types() {
+    return this._types;
+  }
   
   constructor(private typeService: DynamicTypesService,
     private dialogService: DialogService) {
@@ -28,7 +51,9 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
   
   ngOnInit(): void {
     this.initialized = true;
-    this.types = this.typeService.getKoheseTypes();
+    for (let type in this.typeService.getKoheseTypes()) {
+      this._types[type] = type;
+    }
     this.userInputs = this.typeService.getUserInputTypes();
   }
   
@@ -44,14 +69,19 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
     this.dialogService.openInputDialog('Add Property', '', this.dialogService.
       INPUT_TYPES.TEXT, 'Name').afterClosed().subscribe((name: string) => {
       if (name) {
-        this.type.properties[name] = {
-          displayName: name,
-          inputType: {
-            type: '',
-            options: {}
-          },
+        this.type.fields[name] = {
+          type: 'boolean',
           required: false,
-          defaultValue: ''
+          relation: false,
+          views: {
+            'form': {
+              displayName: name,
+              inputType: {
+                type: '',
+                options: {}
+              }
+            }
+          }
         };
       }
     });
@@ -62,7 +92,7 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
       'Are you sure that you want to delete ' + propertyId + '?').
       subscribe((choiceValue: any) => {
       if (choiceValue) {
-        delete this.type.properties[propertyId];
+        delete this.type.fields[propertyId];
       }
     });
   }

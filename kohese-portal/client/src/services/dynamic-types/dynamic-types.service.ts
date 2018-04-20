@@ -11,9 +11,13 @@ export class DynamicTypesService {
   koheseTypes : object;
 
   private readonly USER_INPUT_TYPES: any = {
-    'types': 'Text',
+    'text': 'Text',
+    'date': 'Date',
+    'select': 'Select',
+    'markdown': 'Markdown',
     'proxy-selector': 'Reference',
-    'date': 'Date'
+    'user-selector': 'User Name',
+    'state-editor': 'State Editor'
   };
 
   /* Observables */
@@ -49,8 +53,13 @@ export class DynamicTypesService {
   buildKoheseTypes(typeProxies: Array<ItemProxy>): void {
     for (var i : number = 0; i < typeProxies.length; i++) {
       let currentType : ItemProxy = typeProxies[i];
-      let viewProxy: ItemProxy = this.getViewProxyFor(currentType);
-      let type: KoheseType = new KoheseType(currentType, viewProxy);
+      let viewModelProxyMap: any = {};
+      let modelProxy: ItemProxy = currentType;
+      do {
+        viewModelProxyMap[modelProxy.item.id] = this.getViewProxyFor(modelProxy);
+        modelProxy = modelProxy.parentProxy;
+      } while (modelProxy.item.base)
+      let type: KoheseType = new KoheseType(currentType, viewModelProxyMap);
       this.koheseTypes[currentType.item.name] = type;
       currentType.type = type;
     }

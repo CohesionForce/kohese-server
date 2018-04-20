@@ -1,13 +1,16 @@
 <mat-form-field>
-  <input matInput type="text" placeholder="Name" [(ngModel)]="type.name"/>
+  <input matInput type="text" placeholder="Name"
+    [(ngModel)]="type.dataModelProxy.item.name"/>
 </mat-form-field>
 <br/>
 <label>
   Icon:
-  <span>
-    <mat-icon class="{{type.icon}}">
-    </mat-icon>
-  </span>
+  <ng-container *ngIf="type.viewModelProxy">
+    <span>
+      <mat-icon class="{{type.viewModelProxy.item.icon}}">
+      </mat-icon>
+    </span>
+  </ng-container>
 </label>
 <button mat-raised-button (click)="openIconSelectionDialog()">
   Select Icon...
@@ -15,9 +18,13 @@
 <br/>
 <br/>
 <mat-form-field>
-  <mat-select placeholder="Parent Type" [(ngModel)]="type.base">
+  <mat-select placeholder="Parent Type"
+    [(ngModel)]="type.dataModelProxy.item.base">
     <mat-option *ngFor="let t of (filteredTypes | mapKey)" [value]="t">
-      <mat-icon class="{{filteredTypes[t].icon}}"></mat-icon>
+      <ng-container *ngIf="filteredTypes[t].viewModelProxy">
+        <mat-icon class="{{filteredTypes[t].viewModelProxy.item.icon}}">
+        </mat-icon>
+      </ng-container>
       {{t}}
     </mat-option>
   </mat-select>
@@ -25,6 +32,6 @@
 <br/>
 <mat-form-field>
   <textarea matInput placeholder="Description" rows="3" cols="80"
-    [(ngModel)]="type.description">
+    [(ngModel)]="type.dataModelProxy.item.description">
   </textarea>
 </mat-form-field>

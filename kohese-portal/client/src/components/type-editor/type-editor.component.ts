@@ -63,35 +63,44 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       
         Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
           then((proxies: Array<ItemProxy>) => {
-          this.types[name] = new KoheseType(proxies[0], proxies[1]);
+          let viewModelProxyMap: any = {};
+          let modelProxy: ItemProxy = proxies[0];
+          do {
+            viewModelProxyMap[modelProxy.item.id] = this.itemRepository.
+              getProxyFor('view-' + modelProxy.item.name);
+            modelProxy = modelProxy.parentProxy;
+          } while (modelProxy.item.base)
+          this.types[name] = new KoheseType(proxies[0], viewModelProxyMap);
         });
       }
     });
   }
   
   save(): void {
-    this.itemRepository.upsertItem(this.selectedType.synchronizeDataModel()).
+    this.selectedType.synchronizeModels();
+    this.itemRepository.upsertItem(this.selectedType.dataModelProxy).
       catch((error: any) => {
-      console.log('Error saving data model for ' + this.selectedType.name
-        + '.');
+      console.log('Error saving data model for ' + this.selectedType.
+        dataModelProxy.item.name + '.');
       console.log(error);
     });
-    this.itemRepository.upsertItem(this.selectedType.synchronizeViewModel()).
+    this.itemRepository.upsertItem(this.selectedType.viewModelProxy).
       catch((error: any) => {
-      console.log('Error saving view model for ' + this.selectedType.name
-        + '.');
+      console.log('Error saving view model for ' + this.selectedType.
+        dataModelProxy.item.name + '.');
       console.log(error);
     });
   }
   
   delete(): void {
-    this.dialogService.openYesNoDialog('Delete ' + this.selectedType.name,
-      'Are you sure that you want to delete ' + this.selectedType.name + '?').
+    this.dialogService.openYesNoDialog('Delete ' + this.selectedType.
+      dataModelProxy.item.name, 'Are you sure that you want to delete ' + this.
+      selectedType.dataModelProxy.item.name + '?').
       subscribe((choiceValue: any) => {
       if (choiceValue) {
-        this.itemRepository.deleteItem(this.selectedType.synchronizeDataModel(), false);
-        this.itemRepository.deleteItem(this.selectedType.synchronizeViewModel(), false);
-        delete this.types[this.selectedType.name];
+        this.itemRepository.deleteItem(this.selectedType.dataModelProxy, false);
+        this.itemRepository.deleteItem(this.selectedType.viewModelProxy, false);
+        delete this.types[this.selectedType.dataModelProxy.item.name];
       }
     });
   }

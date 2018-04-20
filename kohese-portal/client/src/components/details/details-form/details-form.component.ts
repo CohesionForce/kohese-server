@@ -32,7 +32,6 @@ export class DetailsFormComponent extends NavigatableComponent
   @Output()
   formGroupUpdated = new EventEmitter<FormGroup>();
 
-  public properties: any = {};
   private initialized : boolean;
   
   private _nonFormFieldMap: Map<string, any> = new Map<string, any>();
@@ -84,7 +83,6 @@ export class DetailsFormComponent extends NavigatableComponent
     
     this._fieldFilterSubscription = this.fieldFilterStream.subscribe(
       (fieldFilter: Function) => {
-      this.updateProperties();
       this.formGroup = this.createFormGroup();
       this.formGroupUpdated.emit(this.formGroup);
     });
@@ -92,7 +90,6 @@ export class DetailsFormComponent extends NavigatableComponent
     this._proxyStreamSubscription = this.proxyStream.subscribe(
       (proxy: ItemProxy) => {
       this.type = this.DynamicTypeService.getKoheseTypes()[proxy.kind];
-      this.updateProperties();
       this.formGroup = this.createFormGroup();
       this.formGroupUpdated.emit(this.formGroup);
     });
@@ -116,39 +113,6 @@ export class DetailsFormComponent extends NavigatableComponent
     }
   }
 
-  updateProperties () : void {
-    this.properties = {};
-    let fieldGroups: Array<any> = [];
-    console.log(':: Update Properties ');
-    if (this.proxyStream.getValue()) {
-      let modelProxy: ItemProxy = this.proxyStream.getValue().model;
-      do {
-        console.log('Properties of ' + modelProxy.item.name);
-        let koheseType: KoheseType = this.DynamicTypeService.
-          getKoheseTypes()[modelProxy.item.name];
-        let fieldGroup: any = {};
-        for (let fieldKey in koheseType.properties) {
-          fieldGroup[fieldKey] = koheseType.properties[fieldKey];
-        }
-        fieldGroups.push(fieldGroup);
-
-        modelProxy = modelProxy.parentProxy;
-      } while (modelProxy.item.base);
-    }
-    
-    fieldGroups.reverse();
-    for (let j: number = 0; j < fieldGroups.length; j++) {
-      for (let fieldName in fieldGroups[j]) {
-        if (this.fieldFilterStream.getValue()(fieldName)) {
-          this.properties[fieldName] = fieldGroups[j][fieldName];
-        }
-      }
-    }
-    
-    console.log(':: Update Properties Complete');
-    console.log(this.properties);
-  }
-
   createFormGroup () : FormGroup {
     const group = this.FormBuilder.group(this.buildPropertyMap(true));
     //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
@@ -164,8 +128,8 @@ export class DetailsFormComponent extends NavigatableComponent
   
   buildPropertyMap(includeValidation: boolean): any {
     let propertyMap: any = {};
-    for (let propertyKey in this.properties) {
-      let currentProperty: any = this.properties[propertyKey];
+    for (let propertyKey in this.type.fields) {
+      let currentProperty: any = this.type.fields[propertyKey];
       let defaultValue: any = (this.proxyStream.getValue() ?
         this.proxyStream.getValue().item[propertyKey] : currentProperty.
         default);

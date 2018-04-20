@@ -104,10 +104,9 @@ export class CreateWizardComponent extends NavigatableComponent
     while (modelProxy.item.base) {
       let type: KoheseType = this.DynamicTypesService.
         getKoheseTypes()[modelProxy.item.name];
-      for (let fieldName in type.dataModelFields) {
+      for (let fieldName in type.fields) {
         if (!proxyPlaceholder.item[fieldName]) {
-          proxyPlaceholder.item[fieldName] = type.dataModelFields[fieldName].
-            default;
+          proxyPlaceholder.item[fieldName] = type.fields[fieldName].default;
         }
       }
       
