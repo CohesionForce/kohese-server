@@ -29,7 +29,7 @@
   </mat-form-field>
   <mat-form-field>
     <input matInput type="text" placeholder="Observing Activity" readonly
-      [ngModel]="observingActivity?.item.name"
+      [ngModel]="observingActivityName"
       (click)="openObservingActivitySelectionDialog()"/>
   </mat-form-field>
   <mat-checkbox [(ngModel)]="addAsIssue">
@@ -37,7 +37,7 @@
   </mat-checkbox>
   <br/>
   <button mat-raised-button class="pull-right"
-    [disabled]="(!observationName || !observingActivity)"
+    [disabled]="(!observationName || !observingActivityName)"
     (click)="addJournalEntry()">
     Add Observation
   </button>

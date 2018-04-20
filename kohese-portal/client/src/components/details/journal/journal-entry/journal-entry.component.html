@@ -8,7 +8,7 @@
         <mat-icon class="fa fa-reply"></mat-icon>
       </button>
       <ng-container
-        *ngIf="itemProxy.item.createdBy === (sessionService.getSessionUser() | async)?.item.name">
+        *ngIf="itemProxy.item.createdBy === (sessionService.getSessionUser() | async).item.name">
         <ng-container *ngIf="!inEditMode">
           <button mat-icon-button matTooltip="Edit" (click)="inEditMode = true">
             <mat-icon class="fa fa-edit"></mat-icon>

@@ -48,8 +48,9 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   public dateObserved: string;
   public timeObserved: string;
   private _observingActivity: ItemProxy;
-  get observingActivity() {
-    return this._observingActivity;
+  private _observingActivityName: string;
+  get observingActivityName() {
+    return this._observingActivityName;
   }
   public addAsIssue: boolean = false;
   private observationFilterText: string = '';
@@ -70,11 +71,6 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
       now.getHours()) + ':' + (now.getMinutes() < 10 ? '0' + now.getMinutes() :
       now.getMinutes()) + ':' + (now.getSeconds() < 10 ?
       '0' + now.getSeconds() : now.getSeconds());
-    
-    let type: string = this.itemProxy.kind;
-    if ((type === 'Task') || (type === 'Action')) {
-      this._observingActivity = this.itemProxy;
-    }
     
     this.repositoryStatusSubscription = this.itemRepository.
       getRepoStatusSubject().subscribe((statusObject: any) => {
@@ -109,6 +105,12 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     this.addObservations(this.itemProxy);
     this.filterObservations(this.observationFilterText);
     this.sort(this.selectedSortStrategy);
+    
+    let type: string = this.itemProxy.kind;
+    if ((type === 'Task') || (type === 'Action')) {
+      this._observingActivity = this.itemProxy;
+      this._observingActivityName = this.itemProxy.item.name;
+    }
   }
   
   addObservations(proxy: ItemProxy): void {
@@ -272,6 +274,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     }).updateSize('70%', '70%').afterClosed().subscribe((proxy: ItemProxy) => {
       if (proxy) {
         this._observingActivity = proxy;
+        this._observingActivityName = proxy.item.name;
       }
     });
   }
