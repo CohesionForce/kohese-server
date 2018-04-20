@@ -14,7 +14,8 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { CurrentUserService } from '../../../services/user/current-user.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockCurrentUserService } from '../../../../mocks/services/MockCurrentUserService';
-
+import { LensService } from '../../../services/lens-service/lens.service';
+import { MockLensService } from '../../../../mocks/services/MockLensService';
 
 describe('Component: SideBar', ()=>{
   let sideBarComponent: SideBarComponent;
@@ -33,7 +34,8 @@ describe('Component: SideBar', ()=>{
       providers: [
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: DialogService, useClass: MockDialogService},
-        {provide: CurrentUserService, useClass: MockCurrentUserService}
+        {provide: CurrentUserService, useClass: MockCurrentUserService},
+        {provide: LensService, useClass: MockLensService}
       ]
     }).compileComponents();
 

@@ -1,5 +1,5 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
@@ -14,6 +14,7 @@ import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { PipesModule } from '../../pipes/pipes.module';
 import { MockUserData } from '../../../mocks/data/MockUser';
 import * as ItemProxy from '../../../../common/src/item-proxy';
+import { LensModule } from '../lens/lens.module';
 
 describe('Component: Admin', ()=>{
   let adminComponent: AdminComponent;
@@ -29,7 +30,7 @@ describe('Component: Admin', ()=>{
          FormsModule,
          ReactiveFormsModule
          ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: SessionService, useClass: MockSessionService}

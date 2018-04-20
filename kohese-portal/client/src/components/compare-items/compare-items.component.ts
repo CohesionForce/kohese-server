@@ -1,5 +1,7 @@
-import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
-  ChangeDetectorRef, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import {
+  Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
+  ChangeDetectorRef, ViewChild, ElementRef, OnDestroy
+} from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 
 import { DialogService } from '../../services/dialog/dialog.service';
@@ -18,8 +20,8 @@ import { Subscription } from 'rxjs/Subscription';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CompareItemsComponent implements OnInit, OnDestroy {
-  private syncLeft : boolean = false;
-  private syncRight : boolean = false;
+  private syncLeft: boolean = false;
+  private syncRight: boolean = false;
 
   private _selectedBaseStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
@@ -85,9 +87,9 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
 
   private _fieldFilterStream: BehaviorSubject<((fieldName: string) => boolean)> =
     new BehaviorSubject<((fieldName: string) => boolean)>(
-    ((fieldName: string) => {
-    return true;
-  }));
+      ((fieldName: string) => {
+        return true;
+      }));
   get fieldFilterStream() {
     return this._fieldFilterStream;
   }
@@ -106,6 +108,10 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   private _changeDetailsFormComponent: DetailsFormComponent;
 
   private _itemProxyChangeSubscription: Subscription;
+
+  treeConfig: any;
+  treeConfigSub: Subscription;
+  historySubscription : Subscription;
 
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
@@ -126,50 +132,64 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
         this._allowChangeEditing = true;
       }
     }
+    this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe((newConfig) => {
+      this.treeConfig = newConfig;
+      this._itemProxyChangeSubscription = this.treeConfig.getChangeSubject()
+        .subscribe((notification: any) => {
+          if (notification.proxy) {
+            if (this._selectedBaseStream.getValue() && (this._selectedBaseStream.
+              getValue().item.id === notification.proxy.item.id)) {
+              this.whenSelectedBaseChanges(this._selectedBaseStream.getValue());
+            }
 
-    this._itemProxyChangeSubscription = this._itemRepository.
-      getChangeSubject().subscribe((notification: any) => {
-      if (notification.proxy) {
-        if (this._selectedBaseStream.getValue() && (this._selectedBaseStream.
-          getValue().item.id === notification.proxy.item.id)) {
-          this.whenSelectedBaseChanges(this._selectedBaseStream.getValue());
-        }
+            if (this._selectedChangeStream.getValue() && (this.
+              _selectedChangeStream.getValue().item.id === notification.proxy.item.
+                id)) {
+              this.whenSelectedChangeChanges(this._selectedChangeStream.
+                getValue());
+            }
+          }
+        });
+    })
 
-        if (this._selectedChangeStream.getValue() && (this.
-          _selectedChangeStream.getValue().item.id === notification.proxy.item.
-          id)) {
-          this.whenSelectedChangeChanges(this._selectedChangeStream.
-            getValue());
-        }
-      }
-    });
   }
 
   public ngOnDestroy(): void {
-    this._itemProxyChangeSubscription.unsubscribe();
+    if (this._itemProxyChangeSubscription) {
+      this._itemProxyChangeSubscription.unsubscribe();
+    }
+    if (this.historySubscription) {
+      this.historySubscription.unsubscribe();
+    }
+    this.treeConfigSub.unsubscribe();
+
   }
 
   public whenSelectedBaseChanges(baseProxy: ItemProxy): void {
-    this._itemRepository.getHistoryFor(baseProxy).subscribe(
+    if (this.historySubscription) {
+      this.historySubscription.unsubscribe();
+    }
+    this.historySubscription = 
+      this._itemRepository.getHistoryFor(baseProxy).subscribe(
       (history: Array<any>) => {
-      this._baseVersions = history;
-      if (!baseProxy.status['Unstaged'] && (this._baseVersions.length > 0)) {
-        /* If there are no unstaged changes to the selected Item, change the
-        commit ID of the most recent commit that included that Item to
-        'Unstaged' to operate on the working tree version of that Item. */
-        this._baseVersions[0].commit = 'Unstaged';
-      }
-      let uncommittedVersions: Array<any> = [];
-      for (let statusName in baseProxy.status) {
-        uncommittedVersions.push({
-          commit: statusName,
-          message: statusName
-        });
-      }
-      this._baseVersions.splice(0, 0, ...uncommittedVersions);
-      this._selectedBaseStream.next(baseProxy);
-      this.whenSelectedBaseVersionChanges('Unstaged');
-    });
+        this._baseVersions = history;
+        if (!baseProxy.status['Unstaged'] && (this._baseVersions.length > 0)) {
+          /* If there are no unstaged changes to the selected Item, change the
+          commit ID of the most recent commit that included that Item to
+          'Unstaged' to operate on the working tree version of that Item. */
+          this._baseVersions[0].commit = 'Unstaged';
+        }
+        let uncommittedVersions: Array<any> = [];
+        for (let statusName in baseProxy.status) {
+          uncommittedVersions.push({
+            commit: statusName,
+            message: statusName
+          });
+        }
+        this._baseVersions.splice(0, 0, ...uncommittedVersions);
+        this._selectedBaseStream.next(baseProxy);
+        this.whenSelectedBaseVersionChanges('Unstaged');
+      });
   }
 
   public whenSelectedBaseVersionChanges(versionIdentifier: string): void {
@@ -192,27 +212,31 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   }
 
   public whenSelectedChangeChanges(changeProxy: ItemProxy): void {
-    this._itemRepository.getHistoryFor(changeProxy).subscribe(
+    if (this.historySubscription) {
+      this.historySubscription.unsubscribe();
+    }
+    this.historySubscription = 
+      this._itemRepository.getHistoryFor(changeProxy).subscribe(
       (history: Array<any>) => {
-      this._changeVersions = history;
-      if (!changeProxy.status['Unstaged'] && (this._changeVersions.
-        length > 0)) {
-        /* If there are no unstaged changes to the selected Item, change the
-        commit ID of the most recent commit that included that Item to
-        'Unstaged' to operate on the working tree version of that Item. */
-        this._changeVersions[0].commit = 'Unstaged';
-      }
-      let uncommittedVersions: Array<any> = [];
-      for (let statusName in changeProxy.status) {
-        uncommittedVersions.push({
-          commit: statusName,
-          message: statusName
-        });
-      }
-      this._changeVersions.splice(0, 0, ...uncommittedVersions);
-      this._selectedChangeStream.next(changeProxy);
-      this.whenSelectedChangeVersionChanges('Unstaged');
-    });
+        this._changeVersions = history;
+        if (!changeProxy.status['Unstaged'] && (this._changeVersions.
+          length > 0)) {
+          /* If there are no unstaged changes to the selected Item, change the
+          commit ID of the most recent commit that included that Item to
+          'Unstaged' to operate on the working tree version of that Item. */
+          this._changeVersions[0].commit = 'Unstaged';
+        }
+        let uncommittedVersions: Array<any> = [];
+        for (let statusName in changeProxy.status) {
+          uncommittedVersions.push({
+            commit: statusName,
+            message: statusName
+          });
+        }
+        this._changeVersions.splice(0, 0, ...uncommittedVersions);
+        this._selectedChangeStream.next(changeProxy);
+        this.whenSelectedChangeVersionChanges('Unstaged');
+      });
   }
 
   public whenSelectedChangeVersionChanges(versionIdentifier: string): void {
@@ -247,52 +271,53 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     return treeConfiguration.getProxyFor(itemId);
   }
 
-  private addScrollListener(scrollSource: any, scrollTarget: any, sourcePos : string): void {
+  private addScrollListener(scrollSource: any, scrollTarget: any, sourcePos: string): void {
     scrollSource.onscroll = (scrollEvent: any) => {
       if (sourcePos === 'Left') {
-      setTimeout(()=>{
-        if (!this.syncLeft) {
-          this.syncRight = true;
-          let currentScrollTop: number = scrollSource.scrollTop;
-          let percentHeightScrolled: number = currentScrollTop /
-            (scrollSource.scrollHeight - scrollSource.
-            offsetHeight);
-          scrollTarget.scrollTop = percentHeightScrolled *
-            (scrollTarget.scrollHeight - scrollTarget.
-            offsetHeight);
+        setTimeout(() => {
+          if (!this.syncLeft) {
+            this.syncRight = true;
+            let currentScrollTop: number = scrollSource.scrollTop;
+            let percentHeightScrolled: number = currentScrollTop /
+              (scrollSource.scrollHeight - scrollSource.
+                offsetHeight);
+            scrollTarget.scrollTop = percentHeightScrolled *
+              (scrollTarget.scrollHeight - scrollTarget.
+                offsetHeight);
 
-          let currentScrollLeft: number = scrollSource.scrollLeft;
-          let percentWidthScrolled: number = currentScrollLeft /
-            (scrollSource.scrollWidth - scrollSource.
-            offsetWidth);
-          scrollTarget.scrollLeft = percentWidthScrolled *
-            (scrollTarget.scrollWidth - scrollTarget.
-            offsetWidth);
-        }
-        this.syncLeft = false;
-      }, 150);
-    } else if (sourcePos === 'Right') {
-      setTimeout(()=>{
-        if (!this.syncRight) {
-          this.syncLeft = true;
-          let currentScrollTop: number = scrollSource.scrollTop;
-          let percentHeightScrolled: number = currentScrollTop /
-            (scrollSource.scrollHeight - scrollSource.
-            offsetHeight);
-          scrollTarget.scrollTop = percentHeightScrolled *
-            (scrollTarget.scrollHeight - scrollTarget.
-            offsetHeight);
+            let currentScrollLeft: number = scrollSource.scrollLeft;
+            let percentWidthScrolled: number = currentScrollLeft /
+              (scrollSource.scrollWidth - scrollSource.
+                offsetWidth);
+            scrollTarget.scrollLeft = percentWidthScrolled *
+              (scrollTarget.scrollWidth - scrollTarget.
+                offsetWidth);
+          }
+          this.syncLeft = false;
+        }, 150);
+      } else if (sourcePos === 'Right') {
+        setTimeout(() => {
+          if (!this.syncRight) {
+            this.syncLeft = true;
+            let currentScrollTop: number = scrollSource.scrollTop;
+            let percentHeightScrolled: number = currentScrollTop /
+              (scrollSource.scrollHeight - scrollSource.
+                offsetHeight);
+            scrollTarget.scrollTop = percentHeightScrolled *
+              (scrollTarget.scrollHeight - scrollTarget.
+                offsetHeight);
 
-          let currentScrollLeft: number = scrollSource.scrollLeft;
-          let percentWidthScrolled: number = currentScrollLeft /
-            (scrollSource.scrollWidth - scrollSource.
-            offsetWidth);
-          scrollTarget.scrollLeft = percentWidthScrolled *
-            (scrollTarget.scrollWidth - scrollTarget.
-            offsetWidth);
-        }
-        this.syncRight = false;
-      }, 150)}
+            let currentScrollLeft: number = scrollSource.scrollLeft;
+            let percentWidthScrolled: number = currentScrollLeft /
+              (scrollSource.scrollWidth - scrollSource.
+                offsetWidth);
+            scrollTarget.scrollLeft = percentWidthScrolled *
+              (scrollTarget.scrollWidth - scrollTarget.
+                offsetWidth);
+          }
+          this.syncRight = false;
+        }, 150)
+      }
     }
   }
 
@@ -430,13 +455,13 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       if (editableStream === this._baseEditableStream) {
         this._itemRepository.fetchItem(this._selectedBaseStream.getValue()).then(
           (proxy: ItemProxy) => {
-          this.whenSelectedBaseChanges(proxy);
-        });
+            this.whenSelectedBaseChanges(proxy);
+          });
       } else {
         this._itemRepository.fetchItem(this._selectedChangeStream.getValue()).
           then((proxy: ItemProxy) => {
-          this.whenSelectedChangeChanges(proxy);
-        });
+            this.whenSelectedChangeChanges(proxy);
+          });
       }
     }
   }
@@ -444,7 +469,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   public openProxySelectionDialog(
     proxyStream: BehaviorSubject<ItemProxy>): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
-      data : {
+      data: {
         selected: proxyStream.getValue()
       }
     }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {

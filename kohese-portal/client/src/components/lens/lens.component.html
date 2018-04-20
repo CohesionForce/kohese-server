@@ -1,0 +1,11 @@
+<span *ngIf="currentLens != LENSES.DEFAULT" class="lens-bar">
+  <div *ngIf="currentLens === LENSES.HISTORY" class="history-lens">
+    <history-lens></history-lens>
+  </div>
+  <div *ngIf="currentLens === LENSES.BRANCH" class="branch-lens">
+    <span style="font-weight: bold; font-size: large">Branch</span>
+  </div>
+  <div *ngIf="currentLens === LENSES.SPHERE" class="sphere-lens">
+    <span style="font-weight: bold; font-size: large">Sphere</span>
+  </div>
+</span>
