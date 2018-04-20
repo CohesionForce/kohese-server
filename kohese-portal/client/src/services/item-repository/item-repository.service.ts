@@ -272,6 +272,7 @@ export class ItemRepository {
 
   fetchItems () {
 
+    // this.cacheFetched = true;
     // TODO Remove this
     if (!this.cacheFetched){
       let beforeFetch = Date.now();
@@ -281,17 +282,34 @@ export class ItemRepository {
         message: 'Starting Repository Sync'
       });
 
-      CacheManager.getAllItems((response) => {
+      CacheManager.sync((response) => {
         let afterFetch = Date.now();
         console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
-        this.processBulkUpdate(response.allItems);
+
+        if(response.metaModel){
+          console.log('::: Processing MetaModel');
+          this.processBulkUpdate({cache: response.metaModel});
+        }
 
         if(response.objectMap){
+          console.log('::: Processing Cache');
           let itemCache = new ItemCache();
           itemCache.setObjectMap(response.objectMap);
           ItemProxy.TreeConfiguration.setItemCache(itemCache);
+
+          let workingTree = ItemProxy.TreeConfiguration.getWorkingTree();
+          let headCommit = itemCache.getRef('HEAD');
+          console.log('### Head: ' + headCommit);
+
+          // TODO Need to load the HEAD commit
+          console.log('$$$ Loading HEAD Commit');
+          itemCache.loadProxiesForCommit(headCommit, workingTree);
+          workingTree.loadingComplete();
+
           this.cacheFetched = true;
         }
+
+        this.processBulkUpdate(response.allItems);
 
         let processingComplete = Date.now();
         console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
@@ -412,7 +430,7 @@ export class ItemRepository {
         var updatedTreeHashes;
         if (!forRepoId){
           ItemProxy.getWorkingTree().loadingComplete();
-          updatedTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes()
+          updatedTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes();
         } else {
           let repoProxy = ItemProxy.getWorkingTree().getProxyFor(forRepoId);
           if (repoProxy){
@@ -431,6 +449,14 @@ export class ItemRepository {
         if(!compareAfterRTH.match) {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
+          console.log('$$$ Evaluating differences:');
+          let workingTree = ItemProxy.TreeConfiguration.getWorkingTree();
+          for (let idx in compareAfterRTH.changedItems){
+            let itemId = compareAfterRTH.changedItems[idx];
+            let changedProxy = workingTree.getProxyFor(itemId);
+            console.log('$$$ Proxy for: ' + itemId);
+            console.log(changedProxy);
+          }
           this.repositoryStatus.next({
             state: RepoStates.SYNCHRONIZATION_FAILED,
             message : 'Repository sync failed'

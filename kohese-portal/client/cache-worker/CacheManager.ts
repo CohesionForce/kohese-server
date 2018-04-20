@@ -21,15 +21,15 @@ export class CacheManager {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static getAllItems(callback) {
-    console.log('$$$ requesting getAllItems');
+  static sync(callback) {
+    console.log('$$$ requesting sync');
 
     let requestId;
     if (callback){
       requestId = this.nextRequestId++;
       this.callbackMap[requestId] = callback;
     }
-    cacheWorker.port.postMessage({type: 'getAllItems', requestId: requestId});
+    cacheWorker.port.postMessage({type: 'sync', requestId: requestId});
   }
 }
 
