@@ -1,3 +1,41 @@
-<p>
-  user-statistics works!
-</p>
+<div *ngIf="project" style="width: 100%">
+
+  <mat-list class="left-content">
+    <mat-list-item 
+      style="border: 1px solid black; padding : 10px;" 
+      *ngFor="let user of project.users" 
+      (click)="selectUser(user)"
+      [ngClass]="{'selected-user' : user === 
+                        selectedUser}">
+      <mat-icon class="fa fa-user"></mat-icon>{{ user.item.name}}
+    </mat-list-item>
+  </mat-list>
+
+  <div class="right-content">
+    <mat-table *ngIf="selectedAssignments" [dataSource]="tableStream">
+      <ng-container matColumnDef="kind">
+        <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
+        <mat-cell *matCellDef="let assignment"> {{assignment.kind}}</mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+        <mat-cell *matCellDef="let assignment"> {{assignment.item.name}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="state">
+        <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
+        <mat-cell *matCellDef="let assignment">{{assignment.state}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="assignedTo">
+        <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
+        <mat-cell *matCellDef="let assignment"> {{assignment.item.assignedTo}}</mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
+      <mat-row (click)="addTab('Explore', {id:proxy.item.id})"
+        *matRowDef="let proxy; columns: rowDef">
+      </mat-row>
+    </mat-table>
+  </div>
+</div>

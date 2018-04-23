@@ -1,7 +1,14 @@
-<div *ngIf="!projectInfo">
+<div *ngIf="!project" style="padding: 20px;">
   <h1> Please select a project :
-    <button mat-button (click)="openProjectSelection()"> Select </button>
+    <button mat-raised-button (click)="openProjectSelection()"> Select </button>
   </h1>
 </div>
-<project-overview *ngIf="dashboardSelection === DashboardSelections.PROJECT_OVERVIEW"></project-overview>
-<user-statistics *ngIf="dashboardSelection === DashboardSelections.USER_STATISTICS"></user-statistics>
+<div *ngIf="project" style="padding: 20px;">
+  <h1>{{ project.proxy.item.name }}
+    <button mat-raised-button (click)="openProjectSelection()"> Change Project</button>
+  </h1>
+</div>
+<project-overview *ngIf="dashboardSelection === DashboardSelections.PROJECT_OVERVIEW"
+                  [projectStream]="projectStream"></project-overview>
+<user-statistics *ngIf="dashboardSelection === DashboardSelections.USER_STATISTICS"
+                  [projectStream]="projectStream"></user-statistics>

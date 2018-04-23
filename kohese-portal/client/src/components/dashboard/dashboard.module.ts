@@ -18,6 +18,7 @@ import { LensModule } from "../lens/lens.module";
 import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard.component";
 import { ProjectOverviewComponent } from "./project-dashboard/project-overview/project-overview.component";
 import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
+import { ActionTableModule } from "../action-table/action-table.module";
 
 @NgModule({
   declarations: [
