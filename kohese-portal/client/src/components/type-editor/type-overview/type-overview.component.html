@@ -1,37 +1,41 @@
-<mat-form-field>
-  <input matInput type="text" placeholder="Name"
-    [(ngModel)]="type.dataModelProxy.item.name"/>
-</mat-form-field>
-<br/>
-<label>
-  Icon:
-  <ng-container *ngIf="type.viewModelProxy">
-    <span>
-      <mat-icon class="{{type.viewModelProxy.item.icon}}">
-      </mat-icon>
-    </span>
-  </ng-container>
-</label>
-<button mat-raised-button (click)="openIconSelectionDialog()">
-  Select Icon...
-</button>
-<br/>
-<br/>
-<mat-form-field>
-  <mat-select placeholder="Parent Type"
-    [(ngModel)]="type.dataModelProxy.item.base">
-    <mat-option *ngFor="let t of (filteredTypes | mapKey)" [value]="t">
-      <ng-container *ngIf="filteredTypes[t].viewModelProxy">
-        <mat-icon class="{{filteredTypes[t].viewModelProxy.item.icon}}">
-        </mat-icon>
+<div style="height: 100%; width: 100%;">
+  <ng-container *ngIf="koheseType">
+    <mat-form-field>
+      <input matInput type="text" placeholder="Name"
+        [(ngModel)]="koheseType.dataModelProxy.item.name"/>
+    </mat-form-field>
+    <br/>
+    <label>
+      Icon:
+      <ng-container *ngIf="koheseType.viewModelProxy">
+        <span>
+          <mat-icon class="{{koheseType.viewModelProxy.item.icon}}">
+          </mat-icon>
+        </span>
       </ng-container>
-      {{t}}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
-<br/>
-<mat-form-field>
-  <textarea matInput placeholder="Description" rows="3" cols="80"
-    [(ngModel)]="type.dataModelProxy.item.description">
-  </textarea>
-</mat-form-field>
+    </label>
+    <button mat-raised-button (click)="openIconSelectionDialog()">
+      Select Icon...
+    </button>
+    <br/>
+    <br/>
+    <mat-form-field>
+      <mat-select placeholder="Parent Type"
+        [(ngModel)]="koheseType.dataModelProxy.item.base">
+        <mat-option *ngFor="let t of (filteredTypes | mapKey)" [value]="t">
+          <ng-container *ngIf="filteredTypes[t].viewModelProxy">
+            <mat-icon class="{{filteredTypes[t].viewModelProxy.item.icon}}">
+            </mat-icon>
+          </ng-container>
+          {{t}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br/>
+    <mat-form-field>
+      <textarea matInput placeholder="Description" rows="3" cols="80"
+        [(ngModel)]="koheseType.dataModelProxy.item.description">
+      </textarea>
+    </mat-form-field>
+  </ng-container>
+</div>
