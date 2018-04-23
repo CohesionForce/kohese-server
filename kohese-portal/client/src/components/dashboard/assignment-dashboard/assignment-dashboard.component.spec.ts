@@ -10,6 +10,8 @@ import { BehaviorSubject } from 'rxjs';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;
@@ -25,7 +27,9 @@ describe('Component: ', ()=>{
          BrowserAnimationsModule
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [
+      providers: [ {
+        provide : NavigationService, useClass: MockNavigationService
+      }
       ]
     }).compileComponents();
 

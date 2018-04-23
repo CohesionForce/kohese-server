@@ -8,7 +8,7 @@ import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { DashboardSelections } from './dashboard-selector/dashboard-selector.component';
+import { DashboardSelections, DashboardSelectionInfo, DashboardTypes } from './dashboard-selector/dashboard-selector.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,12 +23,14 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
   private itemList: Array<Object>;
   private repoStatusSubject : BehaviorSubject<any>;
 
-  // UI Switches 
-  dashboardTypes = {
-    'assignments' : 0,
-    'userPreferences' : 1
-  }
-  dashboardType : any;
+  selectedDashboard : DashboardSelectionInfo = {
+    dashboard : undefined,
+    dashboardType : undefined
+  };
+
+  DashboardSelections : any = DashboardSelections;
+  DashboardTypes : any = DashboardTypes
+
   assignmentTypeStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(undefined);
 
   constructor(protected navigationService : NavigationService,
@@ -47,23 +49,19 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     });
   }
 
-  dashboardSelected(dashboard : DashboardSelections) {
-    switch (dashboard) {
+  dashboardSelected(dashboard : DashboardSelectionInfo) {
+    let assignment
+    switch (dashboard.dashboard) {
       case (DashboardSelections.ACTIVE_ASSIGNMENTS) :
-        this.dashboardType = this.dashboardTypes.assignments;
-        this.assignmentTypeStream.next(DashboardSelections.ACTIVE_ASSIGNMENTS);
-        break;
       case (DashboardSelections.COMPLETED_ASSIGNMENTS) :
-        this.dashboardType = this.dashboardTypes.assignments;
-        this.assignmentTypeStream.next(DashboardSelections.COMPLETED_ASSIGNMENTS);
-        break;
       case (DashboardSelections.DUE_ASSIGNMENTS) :
-        this.dashboardType = this.dashboardTypes.assignments;
-        this.assignmentTypeStream.next(DashboardSelections.DUE_ASSIGNMENTS);
+        this.selectedDashboard = dashboard;
+        this.assignmentTypeStream.next(this.selectedDashboard.dashboard);
         break;
-      case (DashboardSelections.USER_PREFERENCES) :
-        this.dashboardType = this.dashboardTypes.userPreferences; 
-        break;
+      default : 
+        this.selectedDashboard = dashboard;
+        console.log('Unhandled Dashboard Selection');
+        console.log(dashboard);
     }
   }
 
