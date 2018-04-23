@@ -31,7 +31,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
   DashboardSelections : any = DashboardSelections;
   DashboardTypes : any = DashboardTypes
 
-  assignmentTypeStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(undefined);
+  dashboardSelectionStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(undefined);
 
   constructor(protected navigationService : NavigationService,
               private itemRepository : ItemRepository,
@@ -55,8 +55,10 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
       case (DashboardSelections.ACTIVE_ASSIGNMENTS) :
       case (DashboardSelections.COMPLETED_ASSIGNMENTS) :
       case (DashboardSelections.DUE_ASSIGNMENTS) :
+      case (DashboardSelections.PROJECT_OVERVIEW) :
+      case (DashboardSelections.USER_STATISTICS) :
         this.selectedDashboard = dashboard;
-        this.assignmentTypeStream.next(this.selectedDashboard.dashboard);
+        this.dashboardSelectionStream.next(this.selectedDashboard.dashboard);
         break;
       default : 
         this.selectedDashboard = dashboard;

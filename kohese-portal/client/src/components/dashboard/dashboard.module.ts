@@ -16,6 +16,8 @@ import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-a
 import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/dependency-info.component';
 import { LensModule } from "../lens/lens.module";
 import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard.component";
+import { ProjectOverviewComponent } from "./project-dashboard/project-overview/project-overview.component";
+import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
 
 @NgModule({
   declarations: [
@@ -27,7 +29,9 @@ import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard
     DueAssignmentComponent,
     CompletedAssignmentComponent,
     DependencyInfoComponent,
-    ProjectDashboardComponent
+    ProjectDashboardComponent,
+    ProjectOverviewComponent,
+    UserStatisticsComponent
   ],
   entryComponents: [
     KMarkdownComponent

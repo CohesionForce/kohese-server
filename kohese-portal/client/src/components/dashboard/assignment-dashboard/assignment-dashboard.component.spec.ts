@@ -16,7 +16,7 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;
   let assignmentDashboardFixture : ComponentFixture<AssignmentDashboardComponent>;
-  let assignmentTypeStream = new BehaviorSubject<DashboardSelections>(DashboardSelections.ACTIVE_ASSIGNMENTS);
+  let dashboardSelectionStream = new BehaviorSubject<DashboardSelections>(DashboardSelections.ACTIVE_ASSIGNMENTS);
   let assignmentListStream = new BehaviorSubject<Array<ItemProxy>>(new MockItemRepository().getRootProxy().children)
 
   beforeEach(()=>{
@@ -35,7 +35,7 @@ describe('Component: ', ()=>{
 
     assignmentDashboardFixture = TestBed.createComponent(AssignmentDashboardComponent);
     assignmentDashboardComponent = assignmentDashboardFixture.componentInstance;
-    assignmentDashboardComponent.assignmentTypeStream = assignmentTypeStream;
+    assignmentDashboardComponent.dashboardSelectionStream = dashboardSelectionStream;
     assignmentDashboardComponent.assignmentListStream = assignmentListStream;
 
     assignmentDashboardFixture.detectChanges();
