@@ -219,8 +219,8 @@ class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   loadProxiesForTree(treeId, treeHashEntry, treeConfig){
-    console.log('$$$ Processing tree: ' + treeId);
-    console.log(treeHashEntry);
+    // console.log('$$$ Processing tree: ' + treeId);
+    // console.log(treeHashEntry);
     let kind = treeHashEntry.kind;
 
     switch(kind){
@@ -228,7 +228,7 @@ class ItemCache {
       case 'Internal-Lost':
       case 'Internal-Model':
       case 'Internal-View-Model':
-        console.log('::: Only processing children for internal kind: ' + kind);
+        // console.log('::: Only processing children for internal kind: ' + kind);
         break;
       default:
         let item = this.getBlob(treeHashEntry.oid);
@@ -241,7 +241,7 @@ class ItemCache {
     }
 
     for(let childId in treeHashEntry.childTreeHashes){
-      console.log('$$$ Child: ' + childId);
+      // console.log('$$$ Child: ' + childId);
       let childTreeHash = treeHashEntry.childTreeHashes[childId];
       if ((childTreeHash !== 'Repository-Mount') &&
         (childTreeHash !== 'Internal')) {
@@ -250,7 +250,6 @@ class ItemCache {
       }
     }
   }
-
 }
 
 module.exports = ItemCache;

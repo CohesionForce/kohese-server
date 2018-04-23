@@ -3,7 +3,7 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
-import { ItemProxy } from '../../../../common/src/item-proxy';
+import * as ItemProxy from '../../../../common/src/item-proxy';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -14,9 +14,11 @@ import { Subscription } from 'rxjs';
 export class TypeEditorComponent implements OnInit, OnDestroy {
   public types: any;
   public selectedType: KoheseType;
+  private _treeConfiguration: ItemProxy.TreeConfiguration;
   
   /* Subscriptions */
   repoStatusSubscription : Subscription;
+  private _treeConfigurationSubscription: Subscription;
   
   constructor(public typeService: DynamicTypesService,
     private dialogService: DialogService,
@@ -29,13 +31,21 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       switch (update.state){
         case RepoStates.KOHESEMODELS_SYNCHRONIZED:
         case RepoStates.SYNCHRONIZATION_SUCCEEDED:
-          this.types = this.typeService.getKoheseTypes();
-          this.selectedType = this.types[Object.keys(this.types)[0]];
+          this._treeConfigurationSubscription = this.itemRepository.
+            getTreeConfig().subscribe(
+            (treeConfiguration: ItemProxy.TreeConfiguration) => {
+            this._treeConfiguration = treeConfiguration;
+            this.types = this.typeService.getKoheseTypes();
+            this.selectedType = this.types[Object.keys(this.types)[0]];
+          });
       }
   })
   }
 
   ngOnDestroy(): void {
+    if (this._treeConfigurationSubscription) {
+      this._treeConfigurationSubscription.unsubscribe();
+    }
     this.repoStatusSubscription.unsubscribe();
   }
   
@@ -66,7 +76,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           let viewModelProxyMap: any = {};
           let modelProxy: ItemProxy = proxies[0];
           do {
-            viewModelProxyMap[modelProxy.item.id] = this.itemRepository.
+            viewModelProxyMap[modelProxy.item.id] = this._treeConfiguration.
               getProxyFor('view-' + modelProxy.item.name);
             modelProxy = modelProxy.parentProxy;
           } while (modelProxy.item.base)

@@ -63,9 +63,9 @@ export class AssignmentDashboardComponent extends NavigatableComponent
       case (DashboardSelections.ACTIVE_ASSIGNMENTS) :
         sortedArray = assignmentList.sort((a , b) => {
           if (a.item.modifiedOn >= b.item.modifiedOn) {
-            return a;
+            return 1;
           } else
-            return b;
+            return -1;
         })
       break;
       /////////////////
@@ -76,9 +76,9 @@ export class AssignmentDashboardComponent extends NavigatableComponent
           }
         }).sort((a, b)=>{
           if (a.item.estimatedCompletion <= b.item.estimatedCompletion) {
-            return a;
+            return -1;
           } else {
-            return b;
+            return 1;
           }
         })
         break;
@@ -90,9 +90,9 @@ export class AssignmentDashboardComponent extends NavigatableComponent
           }
         }).sort((a, b)=>{
           if (a.item.actualCompletion >= b.item.actualCompletion) {
-            return a;
+            return -1;
           } else {
-            return b;
+            return 1;
           }
         })
         break;

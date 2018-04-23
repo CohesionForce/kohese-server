@@ -19,6 +19,7 @@ import { ImportService } from './import/import.service';
 import { DataProcessingService } from './data/data-processing.service';
 import { DialogService, DialogComponent } from './dialog/dialog.service';
 import { StateService } from './state/state.service';
+import { LensService } from './lens-service/lens.service';
 import { MaterialModule } from "../material.module";
 
 @NgModule({
@@ -50,7 +51,8 @@ import { MaterialModule } from "../material.module";
     DialogService,
     DynamicTypesService,
     ImportService,
-    StateService
+    StateService,
+    LensService
   ]
 })
 export class ServicesModule {}

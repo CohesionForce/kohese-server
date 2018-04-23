@@ -14,6 +14,7 @@ import { ActiveAssignmentComponent } from "./assignment-dashboard/active-assignm
 import { DueAssignmentComponent } from "./assignment-dashboard/due-assignment/due-assignment.component";
 import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-assignment/completed-assignment.component";
 import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/dependency-info.component';
+import { LensModule } from "../lens/lens.module";
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/
     MaterialModule,
     UserInputModule,
     PipesModule,
-    UserInputModule
+    UserInputModule,
+    LensModule
   ],
   exports : [
     DashboardComponent

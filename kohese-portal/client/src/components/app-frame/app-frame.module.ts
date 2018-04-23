@@ -6,6 +6,8 @@ import { SideBarComponent } from './side-bar/sidebar.component';
 import { AppBarComponent } from './app-bar/appbar.component';
 import { ServicesModule } from '../../services/services.module';
 import { UserModule } from '../../services/user/user.module'
+import { BrowserModule } from "@angular/platform-browser";
+import { FormsModule } from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -18,7 +20,9 @@ import { UserModule } from '../../services/user/user.module'
     CommonModule,
     MaterialModule,
     ServicesModule,
-    UserModule
+    UserModule,
+    BrowserModule,
+    FormsModule
   ],
   exports : [
     AppBarComponent,

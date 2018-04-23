@@ -1,6 +1,6 @@
 
 
-<div *ngIf="itemProxy" id="details-panel" class="panel">
+<div *ngIf="itemProxy && !itemProxyError" id="details-panel" class="panel">
     <div class="panel-heading " style="padding : 10px;">
         <span *ngIf="itemProxy.kind">{{itemProxy.kind}} Information: {{itemProxy.item.name}} </span>
         <span *ngIf="!itemProxy.kind">No Item Selected</span>
@@ -26,10 +26,6 @@
                (click)="upsertItem(detailsFormGroup.value)"
                title=" Save"
                     ></i>
-            <!-- <i class="fa fa-clone pull-right"
-               (click)="navigate('Explore', {id: itemProxy.item.id})"
-               title="Split Screen">
-            </i> -->
             <i class="fa fa-lg fa-arrows-alt"
                (click)="navigate('Investigate', {id: itemProxy.item.id})"
                title="Fullscreen"></i>

@@ -9,6 +9,7 @@ import { ServicesModule } from '../../services/services.module';
 import { UserModule } from '../../services/user/user.module'
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
+import { LensModule } from "../lens/lens.module";
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { PipesModule } from "../../pipes/pipes.module";
     UserModule,
     FormsModule,
     ReactiveFormsModule,
-    PipesModule
+    PipesModule,
+    LensModule
   ],
   exports : [
     AdminComponent,

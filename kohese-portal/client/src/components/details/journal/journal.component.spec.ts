@@ -1,4 +1,4 @@
-import { TestBed, ComponentFixture} from '@angular/core/testing';
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -12,6 +12,8 @@ import { MockItem } from '../../../../mocks/data/MockItem';
 import * as ItemProxy from '../../../../../common/src/item-proxy';
 
 import { JournalComponent } from './journal.component';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
@@ -34,6 +36,7 @@ describe('Component: Journal', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
+        {provide : DialogService, useClass: MockDialogService},
         {provide : ItemRepository, useClass: MockItemRepository},
         {provide : SessionService, useClass: MockSessionService}
       ]
@@ -50,7 +53,21 @@ describe('Component: Journal', ()=>{
 
   it('instantiates the Journal component', ()=>{
     expect(JournalComponent).toBeTruthy(); 
-  })
+  });
+  
+  it('builds an Observation', fakeAsync(() => {
+    journalComponent.observationName = 'Kurios Iesous';
+    journalComponent.openObservingActivitySelectionDialog();
+    tick();
+    spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.
+      resolve());
+    journalComponent.addJournalEntry();
+    let observation: any = TestBed.get(ItemRepository).buildItem.calls.
+      argsFor(0)[1];
+    expect(observation.name).toEqual('Kurios Iesous');
+    expect(observation.parentId).toEqual(ItemProxy.getWorkingTree().
+      getRootProxy().item.id);
+  }));
 
   describe('sorting', ()=>{
     it('sorts by eldest first when observed',()=>{
@@ -77,16 +94,5 @@ describe('Component: Journal', ()=>{
     it('sorts by issues last', ()=>{
       pending();
     })
-  })
-  describe('add entry', ()=>{
-    it('sends the correct create info to the server',()=>{
-      pending();
-    })
-    it('adds an issue',()=>{
-      pending();
-    })
-    it('adds an observation',()=>{
-      pending();
-    })
-  })
+  });
 })

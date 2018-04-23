@@ -7,7 +7,8 @@ import { ItemProxy } from '../../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'journal-entry',
-  templateUrl: './journal-entry.component.html'
+  templateUrl: './journal-entry.component.html',
+  styleUrls: ['../journal.component.scss']
 })
 export class JournalEntryComponent implements OnInit, OnChanges {
   @Input()

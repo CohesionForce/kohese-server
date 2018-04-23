@@ -56,7 +56,7 @@ export class AppBarComponent extends NavigatableComponent
       }
     });
 
-    this.CurrentUserService.getCurrentUserSubject().subscribe((userInfo)=>{
+    this.userSubscription = this.CurrentUserService.getCurrentUserSubject().subscribe((userInfo)=>{
       if (userInfo) {
         this.authenticated = true;
         this.userName = userInfo.username
