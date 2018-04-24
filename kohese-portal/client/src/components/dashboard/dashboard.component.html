@@ -12,7 +12,9 @@
       <user-dashboard [user]="currentUser"></user-dashboard>
     </div>
     <div *ngIf="selectedDashboard.dashboardType === DashboardTypes.PROJECT">
-      <project-dashboard [dashboardSelectionStream]="dashboardSelectionStream"></project-dashboard>
+      <project-dashboard [dashboardSelectionStream]="dashboardSelectionStream"
+                         (projectSelected)="onProjectSelected($event)"
+                         [savedProject]="selectedProject"></project-dashboard>
     </div>
   </div>
 </div>

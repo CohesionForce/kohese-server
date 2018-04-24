@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from '@angular/core';
 import * as ItemProxy from '../../../../../common/src/item-proxy';
 
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
@@ -21,8 +21,13 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
   dashboardSelectionSub: Subscription;
   dashboardSelection: DashboardSelections;
 
+  @Input()
+  savedProject : ProjectInfo;
   project: ProjectInfo;
   projectStream : BehaviorSubject<ProjectInfo>;
+
+  @Output()
+  projectSelected : EventEmitter<ProjectInfo> = new EventEmitter<ProjectInfo>();
 
   constructor(private dialogService: DialogService) { }
 
@@ -32,6 +37,10 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
       this.dashboardSelectionStream.subscribe((dashboard) => {
         this.dashboardSelection = dashboard;
       })
+    if (this.savedProject) {
+      this.project = this.savedProject;
+      this.projectStream.next(this.project);
+    }
   }
 
   ngOnDestroy() {
@@ -47,6 +56,7 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
         if (selection) {
           this.project = selection
           this.projectStream.next(this.project);
+          this.projectSelected.emit(this.project);
         }
       });
   }

@@ -9,6 +9,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { DashboardSelections, DashboardSelectionInfo, DashboardTypes } from './dashboard-selector/dashboard-selector.component';
+import { ProjectInfo } from '../../services/project-service/project.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,6 +28,8 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     dashboard : undefined,
     dashboardType : undefined
   };
+
+  selectedProject : ProjectInfo;
 
   DashboardSelections : any = DashboardSelections;
   DashboardTypes : any = DashboardTypes
@@ -76,5 +79,9 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
         )
     }
     this.assignmentListStream.next(assignmentList);  
+  }
+
+  onProjectSelected(newProject : ProjectInfo) {
+    this.selectedProject = newProject;
   }
 }
