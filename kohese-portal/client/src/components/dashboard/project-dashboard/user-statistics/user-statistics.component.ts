@@ -20,7 +20,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   projectStreamSub : Subscription;
   project : ProjectInfo;
 
-  selectedUser : ItemProxy;
+  selectedUserMap : Map<string, ItemProxy> = new Map<string, ItemProxy>();
   selectedAssignments : Array<any>;
   tableStream : MatTableDataSource<ItemProxy>;
   rowDef = ['kind','name','state','assignedTo']
@@ -42,16 +42,25 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.projectStreamSub.unsubscribe();
   }
 
-  selectUser(user : ItemProxy) {
+  toggleUser(user : ItemProxy) {
+    // Determine if user needs to be added or removed from the selected list
     this.selectedAssignments = [];
-    this.selectedUser = user;
-    for (let kind in user.relations.referencedBy) {
-      for (let assignmentIdx in user.relations.referencedBy[kind].assignedTo) {
-        this.selectedAssignments.push(
-          user.relations.referencedBy[kind].assignedTo[assignmentIdx]
-        )
-      }
+    if (this.selectedUserMap.get(user.item.name)) {
+      this.selectedUserMap.delete(user.item.name)
+    } else {
+      this.selectedUserMap.set(user.item.name, user);
     }
+
+    Array.from(this.selectedUserMap.values(), (user : ItemProxy) =>{
+      for (let kind in user.relations.referencedBy) {
+        for (let assignmentIdx in user.relations.referencedBy[kind].assignedTo) {
+          this.selectedAssignments.push(
+            user.relations.referencedBy[kind].assignedTo[assignmentIdx]
+          )
+        }
+      }      
+    })
+
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
 
     console.log(this);
