@@ -21,6 +21,7 @@ import { DialogService, DialogComponent } from './dialog/dialog.service';
 import { StateService } from './state/state.service';
 import { LensService } from './lens-service/lens.service';
 import { MaterialModule } from "../material.module";
+import { ProjectService } from "./project-service/project.service";
 
 @NgModule({
   declarations: [
@@ -32,7 +33,7 @@ import { MaterialModule } from "../material.module";
     MaterialModule,
     RouterModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   exports : [
     DialogComponent
@@ -52,7 +53,8 @@ import { MaterialModule } from "../material.module";
     DynamicTypesService,
     ImportService,
     StateService,
-    LensService
+    LensService,
+    ProjectService
   ]
 })
 export class ServicesModule {}

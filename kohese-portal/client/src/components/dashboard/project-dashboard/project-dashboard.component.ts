@@ -4,12 +4,8 @@ import * as ItemProxy from '../../../../../common/src/item-proxy';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
-
-export interface ProjectInfo {
-  proxy: ItemProxy,
-  users: Array<any>
-}
+import { ProjectSelectorComponent} from './project-selector/project-selector.component'
+import { ProjectInfo } from '../../../services/project-service/project.service';
 
 @Component({
   selector: 'project-dashboard',
@@ -43,40 +39,19 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
   }
 
   openProjectSelection() {
-    this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+    this.dialogService.openComponentDialog(ProjectSelectorComponent, {
       data : {}
     })
-      .updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
+      .updateSize('70%', '70%').afterClosed().subscribe((selection: ProjectInfo) => {
         console.log(selection);
         if (selection) {
-          this.project = this.generateProjectInfo(selection)
+          this.project = selection
           this.projectStream.next(this.project);
         }
       });
   }
 
-  generateProjectInfo(proxy : ItemProxy) : ProjectInfo {
-    let userMap = {};
-    let userList = [];
-    let projectList = proxy.getSubtreeAsList();
-    for (let idx in projectList) {
-      let currentProxy = projectList[idx].proxy;
-      if (currentProxy.relations.references[currentProxy.kind]) {
-        let assignedProxy = currentProxy.relations.references[currentProxy.kind].assignedTo;
-        if (assignedProxy && !userMap[assignedProxy.item.name]) {
-          userMap[assignedProxy.item.name] = assignedProxy;  
-        }
-      }
-    }
-    for (let user in userMap) {
-      userList.push(userMap[user]);
-    }
 
-    return {
-      proxy : proxy,
-      users : userList 
-    }
-  }
 
 
 }

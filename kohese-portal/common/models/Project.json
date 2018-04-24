@@ -1,0 +1,29 @@
+{
+  "id": "Project",
+  "name": "Project",
+  "parentId": "Item",
+  "base": "Item",
+  "idInjection": true,
+  "invertItemOrder": true,
+  "properties": {
+    "projectItems": {
+      "type": [
+        "Item"
+      ],
+      "relation": true
+    },
+    "subscribed": {
+      "type": [
+        "string"
+      ],
+      "relation": {
+        "kind": "KoheseUser",
+        "foreignKey": "username"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

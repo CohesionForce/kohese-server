@@ -19,6 +19,7 @@ import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard
 import { ProjectOverviewComponent } from "./project-dashboard/project-overview/project-overview.component";
 import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
 import { ActionTableModule } from "../action-table/action-table.module";
+import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 
 @NgModule({
   declarations: [
@@ -32,10 +33,12 @@ import { ActionTableModule } from "../action-table/action-table.module";
     DependencyInfoComponent,
     ProjectDashboardComponent,
     ProjectOverviewComponent,
-    UserStatisticsComponent
+    UserStatisticsComponent,
+    ProjectSelectorComponent
   ],
   entryComponents: [
-    KMarkdownComponent
+    KMarkdownComponent,
+    ProjectSelectorComponent
   ],
   imports : [
     CommonModule,
@@ -52,6 +55,3 @@ import { ActionTableModule } from "../action-table/action-table.module";
 
 })
 export class DashboardModule {}
-
-
-// TODO Implement

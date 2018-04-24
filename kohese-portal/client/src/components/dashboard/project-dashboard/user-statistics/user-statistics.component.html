@@ -3,7 +3,7 @@
   <mat-list class="left-content">
     <mat-list-item 
       style="border: 1px solid black; padding : 10px;" 
-      *ngFor="let user of project.users" 
+      *ngFor="let user of project.userList" 
       (click)="selectUser(user)"
       [ngClass]="{'selected-user' : user === 
                         selectedUser}">

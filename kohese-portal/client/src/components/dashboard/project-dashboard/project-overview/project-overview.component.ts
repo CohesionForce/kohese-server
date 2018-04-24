@@ -1,5 +1,5 @@
-import { Component, OnInit, Input} from '@angular/core';
-import { ProjectInfo } from '../project-dashboard.component';
+import { Component, OnInit, Input, OnDestroy} from '@angular/core';
+import { ProjectInfo } from '../../../../services/project-service/project.service';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -7,7 +7,7 @@ import { Observable, Subscription } from 'rxjs';
   templateUrl: './project-overview.component.html',
   styleUrls: ['./project-overview.component.scss']
 })
-export class ProjectOverviewComponent implements OnInit {
+export class ProjectOverviewComponent implements OnInit, OnDestroy {
   @Input()
   projectStream : Observable<ProjectInfo>;
   projectStreamSub : Subscription;
@@ -18,7 +18,16 @@ export class ProjectOverviewComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.projectStreamSub = this.projectStream.subscribe((newProject)=>{
+      if (newProject) {
+        this.project = newProject;
+        console.log(this);
+      }
+    })
+  }
 
+  ngOnDestroy () {
+    this.projectStreamSub.unsubscribe();
   }
 
 }

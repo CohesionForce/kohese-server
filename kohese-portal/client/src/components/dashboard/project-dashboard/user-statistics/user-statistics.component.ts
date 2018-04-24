@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { ProjectInfo } from '../project-dashboard.component';
+
+import { ProjectInfo } from '../../../../services/project-service/project.service';
 import { Subscription, Observable } from 'rxjs';
 
 import * as ItemProxy from '../../../../../../common/src/item-proxy';
