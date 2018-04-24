@@ -65,8 +65,15 @@ export class ProjectService {
       for (let projectItemIdx in projectItems) {
         let currentProjectItem : ItemProxy = projectItems[projectItemIdx];
         let projectItemSubTree  : Array<ItemProxy> = currentProjectItem.getSubtreeAsList();
-        projectItemSubTree.filter((item)=>{
-          return item.proxy.relations.references[item.proxy.kind].referencedBy
+        projectItemSubTree = projectItemSubTree.filter((item)=>{
+          // TODO Update when assignments are pulled out into the higher proxy
+          let proxyRelations = item.proxy.getRelationsByAttribute();
+
+          return proxyRelations.references && proxyRelations.references.assignedTo;
+
+          // return (item.proxy.model.item) 
+          // && (item.proxy.model.item.classProperties.assignedTo) 
+          // && (item.proxy.relations.references[item.proxy.kind].assignedTo)
         })
         for (let itemIdx in projectItemSubTree) {
           let proxy = projectItemSubTree[itemIdx].proxy; 

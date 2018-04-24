@@ -211,6 +211,41 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getRelationsByAttribute() {
+    let relationMap = {};
+    for(let refTypeKey in this.relations){
+      relationMap[refTypeKey] = {};
+      for(let kindKey in this.relations[refTypeKey])
+      {
+        relationMap[refTypeKey] = {};
+
+        let relationsForKind = this.relations[refTypeKey][kindKey];
+        for(let relationKey in relationsForKind){
+          if (!relationMap[refTypeKey][relationKey]){
+            relationMap[refTypeKey][relationKey] = {};
+          }
+          let relationList = relationsForKind[relationKey];
+          if (Array.isArray(relationList)){
+            relationMap[refTypeKey][relationKey][kindKey] = [];
+            for(let index = 0; index < relationList.length; index++){
+              relationMap[refTypeKey][relationKey][kindKey].push(relationList[index]);
+            }
+          } else {
+            if (relationList){
+              relationMap[refTypeKey][relationKey][kindKey] = relationList;
+            } else {
+              delete relationMap[refTypeKey][relationKey];
+            }
+          }
+        }
+      }
+    }
+    return relationMap;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   updateReferences(){
     // console.log('$$$ Updating References for: ' + this.item.id);
     let oldReferences = this.getRelationIdMap().references;
