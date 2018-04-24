@@ -5,19 +5,19 @@
         <mat-list>
           <mat-list-item *ngFor="let project of projectList"
                          (click)="selectProject(project)">
-                         {{project.project.item.name}}
+                         {{project.proxy.item.name}}
           </mat-list-item>
         </mat-list>
       </div>
       <div class="project-preview" style="height: 100%; overflow: auto; width: 70%;">
         <mat-card *ngIf="selectedProject && !multiSelect">
           <mat-card-title class="panel-heading">
-            <span>{{selectedProject.project.item.name}}</span>
+            <span>{{selectedProject.proxy.item.name}}</span>
           </mat-card-title>
           <mat-card-content>
-            <h5>Description :</h5> {{selectedProject.project.item.description}}
+            <h5>Description :</h5> {{selectedProject.proxy.item.description}}
             <h5>Project Items : </h5>
-            <div *ngFor="let projectItem of selectedProject.project.relations.references.Project.projectItems">
+            <div *ngFor="let projectItem of selectedProject.proxy.relations.references.Project.projectItems">
               {{projectItem.item.name}}
             </div>
           </mat-card-content>

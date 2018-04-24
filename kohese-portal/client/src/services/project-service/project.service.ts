@@ -90,7 +90,7 @@ export class ProjectService {
 
     projectList.push({
       userList : userList,
-      project : currentProject
+      proxy : currentProject
     })
   }
     return projectList;

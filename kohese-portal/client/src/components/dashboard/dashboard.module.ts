@@ -20,6 +20,7 @@ import { ProjectOverviewComponent } from "./project-dashboard/project-overview/p
 import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
 import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
+import { TreeModule } from "angular-tree-component";
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { ProjectSelectorComponent } from "./project-dashboard/project-selector/p
     UserInputModule,
     PipesModule,
     UserInputModule,
-    LensModule
+    LensModule,
+    TreeModule
   ],
   exports : [
     DashboardComponent

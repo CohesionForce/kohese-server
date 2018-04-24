@@ -10,7 +10,7 @@
     </mat-list-item>
   </mat-list>
 
-  <div class="right-content">
+  <div class="right-content" style="overflow: auto">
     <mat-table *ngIf="selectedAssignments" [dataSource]="tableStream">
       <ng-container matColumnDef="kind">
         <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
