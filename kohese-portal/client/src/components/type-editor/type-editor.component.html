@@ -1,7 +1,7 @@
 <div style="height: 100%; width: 100%;">
   <ng-container *ngIf="types">
     <div style="height: 7%; width: 100%;">
-      <mat-form-field class="pad">
+      <mat-form-field class="pad" style="width: 25%;">
         <mat-select placeholder="Type" [value]="(koheseTypeStream | async)"
           (selectionChange)="koheseTypeStream.next($event.value)">
           <mat-option *ngFor="let type of (types | mapKey)"
@@ -19,10 +19,12 @@
         <button mat-icon-button matTooltip="Add Type" (click)="add()">
           <mat-icon class="fa fa-plus"></mat-icon>
         </button>
-        <button mat-icon-button matTooltip="Save Type" (click)="save()">
+        <button mat-icon-button matTooltip="Save Type" (click)="save()"
+          [disabled]="!koheseTypeStream.getValue() || koheseTypeStream.getValue().dataModelProxy.item.isMetaModel">
           <mat-icon class="fa fa-save"></mat-icon>
         </button>
-        <button mat-icon-button matTooltip="Delete Type" (click)="delete()">
+        <button mat-icon-button matTooltip="Delete Type" (click)="delete()"
+          [disabled]="!koheseTypeStream.getValue() || koheseTypeStream.getValue().dataModelProxy.item.isMetaModel">
           <mat-icon class="fa fa-trash"></mat-icon>
         </button>
       </span>

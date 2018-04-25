@@ -37,7 +37,15 @@ class ItemProxy {
     var itemId = forItem.id;
 
     if (!itemId){
-      itemId = forItem.id = uuidV1();
+      if ('KoheseModel' === kind) {
+        forItem.id = forItem.name;
+      } else if ('KoheseView' === kind) {
+        forItem.id = 'view-' + forItem.name.toLowerCase();
+      } else {
+        forItem.id = uuidV1();
+      }
+      
+      itemId = forItem.id;
       console.log('::: Allocating new id: ' + itemId);
     } else {
       // console.log('::: Constructor called for ' + itemId);

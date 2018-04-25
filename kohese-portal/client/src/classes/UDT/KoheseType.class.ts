@@ -1,5 +1,4 @@
 import * as ItemProxy from '../../../../common/src/item-proxy';
-import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
   get dataModelProxy() {
@@ -20,16 +19,35 @@ export class KoheseType {
     this.compileFields();
   }
   
-  public synchronizeModels(): void {
-    for (let fieldKey in this._fields) {
-      let field: any = this._fields[fieldKey];
-      if ('views' === fieldKey) {
-        this.viewModelProxy.item.viewProperties[fieldKey] = field.views[
-          'form'];
-      } else if (this._dataModelProxy.item[fieldKey]) {
-        this._dataModelProxy.item[fieldKey] = field;
+  public addProperty(propertyId: string): void {
+    let property: any = {
+      type: 'boolean',
+      required: false,
+      relation: false
+    };
+    let viewProperty: any = {
+      displayName: propertyId,
+      inputType: {
+        type: '',
+        options: {}
       }
+    };
+    let combinedProperty: any = JSON.parse(JSON.stringify(property));
+    combinedProperty.views = {};
+    this._dataModelProxy.item.properties[propertyId] = property;
+    if (this.viewModelProxy) {
+      this.viewModelProxy.item.viewProperties[propertyId] = viewProperty;
+      combinedProperty.views['form'] = JSON.parse(JSON.stringify(viewProperty));
     }
+    this._fields[propertyId] = combinedProperty;
+  }
+  
+  public deleteProperty(propertyId: string): void {
+    delete this._dataModelProxy.item.properties[propertyId];
+    if (this.viewModelProxy) {
+      delete this.viewModelProxy.item.viewProperties[propertyId];
+    }
+    delete this._fields[propertyId];
   }
   
   private compileFields(): void {

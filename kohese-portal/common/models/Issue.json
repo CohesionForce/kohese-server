@@ -75,13 +75,19 @@
     },
     "analysisAction": {
       "type": "string",
-      "relation": true
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     },
     "resolutionActions": {
       "type": [
         "Action"
       ],
-      "relation": true
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     },
     "response": {
       "type": "string"

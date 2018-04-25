@@ -95,24 +95,18 @@ export class CreateWizardComponent extends NavigatableComponent
 
   private buildProxyPlaceholder(): any {
     let proxyPlaceholder: any = {
-      kind: this.selectedType.name,
+      kind: this.selectedType.dataModelProxy.item.name,
       item: {
         parentId: this.selectedParent.item.id
       },
       model: this.selectedType.dataModelProxy
     };
 
-    let modelProxy: ItemProxy = proxyPlaceholder.model;
-    while (modelProxy.item.base) {
-      let type: KoheseType = this.DynamicTypesService.
-        getKoheseTypes()[modelProxy.item.name];
-      for (let fieldName in type.fields) {
-        if (!proxyPlaceholder.item[fieldName]) {
-          proxyPlaceholder.item[fieldName] = type.fields[fieldName].default;
-        }
+    for (let fieldName in this.selectedType.fields) {
+      if (!proxyPlaceholder.item[fieldName]) {
+        proxyPlaceholder.item[fieldName] = this.selectedType.fields[fieldName].
+          default;
       }
-
-      modelProxy = modelProxy.parentProxy;
     }
 
     return proxyPlaceholder;

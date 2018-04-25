@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
@@ -40,9 +41,10 @@ describe('Component: Property Editor', ()=>{
 
     propertyEditorFixture = TestBed.createComponent(PropertyEditorComponent);
     propertyEditorComponent = propertyEditorFixture.componentInstance;
-    propertyEditorComponent.type = new KoheseType(
-      new ItemProxy('KoheseModel', MockDataModel()),
-      new ItemProxy('KoheseView', MockViewData()))
+    propertyEditorComponent.koheseTypeStream = new BehaviorSubject<KoheseType>(
+      new KoheseType(new ItemProxy('KoheseModel', MockDataModel()), {
+      'KoheseView': new ItemProxy('KoheseView', MockViewData())
+    }));
     propertyEditorFixture.detectChanges();
     
   })

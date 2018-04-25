@@ -58,7 +58,7 @@ describe('Component: TreeRow', () => {
       new ItemProxy('KoheseView', MockViewData()));
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(true);
-    filter.kind.name = 'Isaiah';
+    filter.kind.dataModelProxy.item.name = 'Isaiah';
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(false);
   });
@@ -68,7 +68,7 @@ describe('Component: TreeRow', () => {
     let filter: ProxyFilter = new ProxyFilter();
     filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()));
-    filter.kind.name = 'Action';
+    filter.kind.dataModelProxy.item.name = 'Action';
     filter.actionAssignee = 'admin';
     component.treeRow.itemProxy.kind = 'Action';
     component.treeRow.itemProxy.item.assignedTo = 'admin';

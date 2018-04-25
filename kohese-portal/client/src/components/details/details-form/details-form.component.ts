@@ -85,12 +85,6 @@ export class DetailsFormComponent extends NavigatableComponent
           }));
     }
 
-    this._fieldFilterSubscription = this.fieldFilterStream.subscribe(
-      (fieldFilter: Function) => {
-      this.formGroup = this.createFormGroup();
-      this.formGroupUpdated.emit(this.formGroup);
-    });
-    
     this._proxyStreamSubscription = this.proxyStream.subscribe(
       (newProxy: ItemProxy) => {
       if (newProxy) {
@@ -98,6 +92,12 @@ export class DetailsFormComponent extends NavigatableComponent
         this.formGroup = this.createFormGroup();
         this.formGroupUpdated.emit(this.formGroup);
       }
+    });
+    
+    this._fieldFilterSubscription = this.fieldFilterStream.subscribe(
+      (fieldFilter: Function) => {
+      this.formGroup = this.createFormGroup();
+      this.formGroupUpdated.emit(this.formGroup);
     });
     
     this.initialized = true;

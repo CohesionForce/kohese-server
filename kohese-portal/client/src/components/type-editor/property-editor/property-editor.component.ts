@@ -26,15 +26,20 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     return this._koheseType;
   }
   
+  private _idProperties: any = {};
+  get idProperties() {
+    return this._idProperties;
+  }
+  
   public selectedPropertyId: string;
 
-  get isMultivalued() {
+  get multivalued() {
     return this._koheseType.fields[this.selectedPropertyId].type.
       startsWith('[');
   }
-  set isMultivalued(isMultivalued: boolean) {
+  set multivalued(multivalued: boolean) {
     let type: string = this._koheseType.fields[this.selectedPropertyId].type;
-    if (isMultivalued) {
+    if (multivalued) {
       type = '[ ' + type + ' ]';
     } else {
       type = type.substring(2, type.length - 2);
@@ -66,8 +71,18 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
   }
   
   ngOnInit(): void {
-    for (let type in this.typeService.getKoheseTypes()) {
+    let koheseTypes: any = this.typeService.getKoheseTypes();
+    for (let type in koheseTypes) {
       this._types[type] = type;
+      for (let propertyName in koheseTypes[type].dataModelProxy.item.properties) {
+        if (koheseTypes[type].dataModelProxy.item.properties[propertyName].id) {
+          if (!this._idProperties[type]) {
+            this._idProperties[type] = [];
+          }
+          
+          this._idProperties[type].push(propertyName);
+        }
+      }
     }
     this.userInputs = this.typeService.getUserInputTypes();
     this._koheseTypeStreamSubscription = this._koheseTypeStream.subscribe(
@@ -85,21 +100,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     this.dialogService.openInputDialog('Add Property', '', this.dialogService.
       INPUT_TYPES.TEXT, 'Name').afterClosed().subscribe((name: string) => {
       if (name) {
-        this._koheseType.fields[name] = {
-          type: 'boolean',
-          required: false,
-          relation: false,
-          views: {
-            'form': {
-              displayName: name,
-              inputType: {
-                type: '',
-                options: {}
-              }
-            }
-          }
-        };
-        this._koheseType.synchronizeModels();
+        this._koheseType.addProperty(name);
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -110,10 +111,27 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       'Are you sure that you want to delete ' + propertyId + '?').
       subscribe((choiceValue: any) => {
       if (choiceValue) {
-        delete this._koheseType.fields[propertyId];
-        this._koheseType.synchronizeModels();
+        this._koheseType.deleteProperty(propertyId);
         this._changeDetectorRef.markForCheck();
       }
     });
+  }
+  
+  public changeRelationness(checked: boolean): void {
+    if (checked) {
+      this._koheseType.dataModelProxy.item.properties[this.selectedPropertyId].
+        relation = {
+        kind: 'Item',
+        foreignKey: 'id'
+      };
+    } else {
+      delete this._koheseType.dataModelProxy.item.properties[this.
+        selectedPropertyId].relation;
+    }
+  }
+  
+  public areRelationsEqual(option: any, selection: any): boolean {
+    return ((option.kind === selection.kind) && (option.foreignKey ===
+      selection.foreignKey));
   }
 }

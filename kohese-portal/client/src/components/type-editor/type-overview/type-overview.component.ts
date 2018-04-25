@@ -11,6 +11,7 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 @Component({
   selector: 'type-overview',
   templateUrl: './type-overview.component.html',
+  styleUrls: ['./type-overview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TypeOverviewComponent implements OnInit, OnDestroy {
@@ -62,5 +63,10 @@ export class TypeOverviewComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       }
     });
+  }
+  
+  public changeParentType(type: string): void {
+    this._koheseType.dataModelProxy.item.base = type;
+    this._koheseType.dataModelProxy.item.parentId = type;
   }
 }
