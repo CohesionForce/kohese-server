@@ -7,7 +7,7 @@ import { MaterialModule } from '../../../../material.module'
 
 import { ActiveAssignmentComponent } from './active-assignment.component';
 import { MockAction } from '../../../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
@@ -36,10 +36,10 @@ describe('Component: Active Assignment', ()=>{
     activeAssignmentComponent.assignment = new ItemProxy('Action', MockAction());
 
     activeAssignmentFixture.detectChanges();
-    
+
   })
 
   it('instantiates the activeAssignment component', ()=>{
-    expect(activeAssignmentComponent).toBeTruthy(); 
+    expect(activeAssignmentComponent).toBeTruthy();
   })
 })

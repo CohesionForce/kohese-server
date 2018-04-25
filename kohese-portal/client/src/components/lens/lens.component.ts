@@ -2,7 +2,7 @@ import { Component, Input, OnInit, OnDestroy } from "@angular/core";
 import { LensService, ApplicationLens } from "../../services/lens-service/lens.service";
 import { Subscription } from 'rxjs';
 
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates } from "../../services/item-repository/item-repository.service";
 
 @Component({
@@ -33,7 +33,7 @@ export class LensComponent implements OnInit, OnDestroy {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update)=>{
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.commitList = ItemProxy.TreeConfiguration.getItemCache().getCommits();
+          this.commitList = TreeConfiguration.getItemCache().getCommits();
         }
     })
 

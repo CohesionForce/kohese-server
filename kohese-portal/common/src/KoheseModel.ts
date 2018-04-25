@@ -1,6 +1,6 @@
 'use strict'; //Required for use of 'class'
-var ItemProxy = require('./item-proxy.js');
-var _ = require('underscore');
+import { ItemProxy }  from './item-proxy';
+import * as  _ from 'underscore';
 
 
 let modelMap = {
@@ -10,7 +10,7 @@ let modelMap = {
   'Internal-View-Model': { internal: true, kind: 'Internal' }
 };
 
-class KoheseModel extends ItemProxy {
+export class KoheseModel extends ItemProxy {
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -57,7 +57,7 @@ class KoheseModel extends ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   deleteItem() {
-    let itemId = this.id;
+    let itemId = this.item.id;
     console.log('::: Deleting KoheseModel: ' + itemId);
     if (modelMap[itemId]){
       delete modelMap[itemId];
@@ -185,7 +185,6 @@ class KoheseModel extends ItemProxy {
   }
 
 }
-module.exports = KoheseModel;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -202,6 +201,3 @@ function createMissingModelProxy(forKind) {
 
   return lostProxy;
 }
-
-
-

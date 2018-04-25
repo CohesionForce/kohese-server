@@ -1,11 +1,11 @@
 import { VersionControlService } from './version-control.service';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { MockItem } from '../../../mocks/data/MockItem';
 
 describe('Service: version-control', () => {
   let proxy: ItemProxy;
   let versionControlService: VersionControlService;
-  
+
   beforeAll(() => {
     let item: any = MockItem();
     item.id = 'Kurios Iesous';
@@ -22,28 +22,28 @@ describe('Service: version-control', () => {
     versionControlService = new VersionControlService(
       placeholderSocketService);
   });
-  
+
   it('stages changes', (done: Function) => {
     versionControlService.stageItems([proxy]).subscribe((statusMap: any) => {
       expect(true).toEqual(true);
       done();
     });
   });
-  
+
   it('un-stages changes', (done: Function) => {
     versionControlService.unstageItems([proxy]).subscribe((statusMap: any) => {
       expect(true).toEqual(true);
       done();
     });
   });
-  
+
   it('reverts changes', (done: Function) => {
     versionControlService.revertItems([proxy]).subscribe((statusMap: any) => {
       expect(true).toEqual(true);
       done();
     });
   });
-  
+
   it('commits changes', (done: Function) => {
     versionControlService.commitItems([proxy], {
       item: {
@@ -55,7 +55,7 @@ describe('Service: version-control', () => {
       done();
     });
   });
-  
+
   it('propagates committed changes', (done: Function) => {
     versionControlService.push(['Kurios Iesous'], 'Kurios Iesous').subscribe(
       (returnValue: any) => {
@@ -63,7 +63,7 @@ describe('Service: version-control', () => {
       done();
     });
   });
-  
+
   it('adds a Remote', (done: Function) => {
     versionControlService.addRemote('Kurios Iesous', 'Kurios Iesous',
       'Kurios Iesous').subscribe((returnValue: any) => {
@@ -71,7 +71,7 @@ describe('Service: version-control', () => {
       done();
     });
   });
-  
+
   it('returns a list of Remotes', (done: Function) => {
     versionControlService.getRemotes('Kurios Iesous').subscribe(
       (returnValue: any) => {
@@ -79,7 +79,7 @@ describe('Service: version-control', () => {
       done();
     });
   });
-  
+
   it('translates a version control status', () => {
     expect(Object.keys(versionControlService.translateStatus(['CURRENT'])).
       length).toEqual(1);

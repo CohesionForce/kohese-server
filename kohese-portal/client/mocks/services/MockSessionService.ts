@@ -1,5 +1,5 @@
 import { MockUserData } from '../data/MockUser';
-import * as ItemProxy from '../../../common/src/item-proxy';
+import { ItemProxy } from '../../../common/src/item-proxy';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 export class MockSessionService {

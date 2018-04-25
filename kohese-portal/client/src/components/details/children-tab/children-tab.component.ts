@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy, Input, EventEmitter, SimpleChange, OnChan
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy.js';
+import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -44,7 +44,7 @@ export class ChildrenTabComponent extends NavigatableComponent
   /* Observables */
   saveEmitter : EventEmitter<ItemProxy>;
   filterSubject : BehaviorSubject<string>;
-  childrenStream : BehaviorSubject<ItemProxy> = new BehaviorSubject([]);
+  childrenStream : BehaviorSubject<Array<ItemProxy>> = new BehaviorSubject([]);
 
 
   /* Subscriptions */
@@ -65,7 +65,7 @@ export class ChildrenTabComponent extends NavigatableComponent
         this.updateProxy(newProxy);
       } else {
         this.itemProxy = undefined;
-      } 
+      }
     })
     this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
       .subscribe(update => {

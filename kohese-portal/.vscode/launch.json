@@ -8,7 +8,7 @@
         "type": "node",
         "request": "launch",
         "name": "Launch Kohese-KDB",
-        "program": "${workspaceFolder}/server/server.js",
+        "program": "${workspaceFolder}/build/server/server.js",
         "args": [
           "-kdb=kohese-kdb"
         ]
@@ -17,7 +17,7 @@
         "type": "node",
         "request": "launch",
         "name": "Launch TestKDB",
-        "program": "${workspaceFolder}/server/server.js",
+        "program": "${workspaceFolder}/build/server/server.js",
         "args": [
           "-kdb=testKDB"
         ]
@@ -55,7 +55,7 @@
             "name": "JN Test-IP",
             "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
             "args": [
-              "common/tests/unit/item-proxy-spec.js"
+              "build/common/tests/unit/item-proxy-spec.js"
             ],
             "cwd": "${workspaceRoot}",
             "sourceMaps": true
@@ -66,7 +66,7 @@
               "name": "JN Test-KDB",
               "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
               "args": [
-                "server/tests/integration/kdb-spec.js"
+                "build/server/tests/integration/kdb-spec.js"
               ],
               "cwd": "${workspaceRoot}",
               "sourceMaps": true

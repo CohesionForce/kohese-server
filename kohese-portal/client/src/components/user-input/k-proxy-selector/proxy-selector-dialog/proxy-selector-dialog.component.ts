@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, Output, Inject, Optional } from '@angular/core';
 
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import * as $ from 'jquery'
 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';

@@ -1,1 +1,1 @@
-jasmine-node common/tests/unit/item-proxy-spec.js
+jasmine-node build/common/tests/unit/item-proxy-spec.js

@@ -24,6 +24,7 @@ bower_components
 /db.json.*
 tmp/
 /dist/
+/build/
 *.css
 *.ccs.map
 package

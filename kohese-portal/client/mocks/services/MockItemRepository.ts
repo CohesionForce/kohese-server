@@ -5,8 +5,8 @@ import 'rxjs/add/observable/of';
 import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
 import { MockDataModel } from '../data/MockDataModel';
-import * as ItemProxy from '../../../common/src/item-proxy';
-import * as KoheseModel from '../../../common/src/KoheseModel';
+import { ItemProxy } from '../../../common/src/item-proxy';
+import { KoheseModel } from '../../../common/src/KoheseModel';
 import { Subject } from 'rxjs';
 import { RepoStates } from '../../src/services/item-repository/item-repository.service';
 
@@ -56,7 +56,7 @@ export class MockItemRepository {
   }
 
   getProxyFor(id: string) {
-    return ItemProxy.getProxyFor(id);
+    return this.mockRootProxy.treeConfig.getProxyFor(id);
   }
 
   getRecentProxies() {

@@ -1,9 +1,11 @@
+import { ItemProxy, TreeConfiguration } from '../../../common/src/item-proxy';
+
 describe('KDB Test', function() {
 
-  var kdb = require('../../../server/kdb.js');
-  var ItemProxy = require('../../../common/src/item-proxy.js');
-  var root = ItemProxy.getWorkingTree().getRootProxy();
-  var lostAndFound = ItemProxy.getWorkingTree().getProxyFor('LOST+FOUND');
+  let kdb = require ('../../../server/kdb');
+
+  var root = TreeConfiguration.getWorkingTree().getRootProxy();
+  var lostAndFound = TreeConfiguration.getWorkingTree().getProxyFor('LOST+FOUND');
 
   var dumpEnabled = false;
 
@@ -67,7 +69,7 @@ describe('KDB Test', function() {
       var timeBefore = new Date();
       var treeHashMap = kdb.ItemProxy.getWorkingTree().getAllTreeHashes();
       var timeAfter = new Date();
-      var deltaTime = timeAfter - timeBefore;
+      var deltaTime : number = timeAfter - timeBefore;
       console.log('Time to getAllTH: ' + deltaTime);
 
       var fs = require('fs');
@@ -81,7 +83,7 @@ describe('KDB Test', function() {
       var timeBeforeGetDoc = new Date();
       let repoAsList = rootProxy.getSubtreeAsList();
       var timeAfterGetDoc = new Date();
-      var deltaTimeGetDoc = timeAfterGetDoc - timeBeforeGetDoc;
+      var deltaTimeGetDoc : number = timeAfterGetDoc - timeBeforeGetDoc;
       console.log('Item Count in Repo List:  ' + repoAsList.length);
       console.log('Time to get entire repo as doc: ' + deltaTimeGetDoc);
 

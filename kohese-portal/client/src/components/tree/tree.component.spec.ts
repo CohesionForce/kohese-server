@@ -18,7 +18,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TreeComponent } from './tree.component';
 import { TreeRow } from './tree-row.class';
 import { MockItem } from '../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { Observable } from 'rxjs/Observable';
 
 describe('Component: Tree', () => {
@@ -141,7 +141,7 @@ describe('Component: Tree', () => {
     }
     expect(index).not.toEqual(-1);
   }));
-  
+
   it('does not produce an error when the value of selectedProxyIdStream is ' +
     'invalid', fakeAsync(() => {
     let id: string = '-1';
@@ -153,7 +153,7 @@ describe('Component: Tree', () => {
     selected Item */
     component.toggleSelectionSynchronization();
     component.toggleSelectionSynchronization();
-    
+
     expect(true).toEqual(true);
   }));
 });

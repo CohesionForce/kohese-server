@@ -29,7 +29,7 @@ export class CreateWizardComponent extends NavigatableComponent
   models: Array<ItemProxy>;
   types: Array<KoheseType> = [];
   recentProxies: Array<ItemProxy>;
-  selectedType: ItemProxy;
+  selectedType: KoheseType;
   selectedParent: ItemProxy;
   rootProxy: ItemProxy;
   errorMessage: string;
@@ -144,7 +144,7 @@ export class CreateWizardComponent extends NavigatableComponent
         console.log('Build Item promise resolve')
         this.MatDialogRef.close();
       }, (error) => {
-        // TODO show error on review stepper 
+        // TODO show error on review stepper
         this.errorMessage = error;
         console.log('*** Failed to upsert: ' + this.selectedType.name);
         console.log(error);

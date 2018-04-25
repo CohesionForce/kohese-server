@@ -3,7 +3,7 @@ import { Component, Input, ChangeDetectionStrategy, OnInit, OnDestroy, ChangeDet
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { Subscription, Observable } from 'rxjs';
 import { MatTableDataSource } from '@angular/material';
 

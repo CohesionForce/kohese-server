@@ -1,6 +1,6 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import { ItemRepository, RepoStates } from '../../../../services/item-repository/item-repository.service';
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
@@ -24,7 +24,7 @@ export class ProxySelectorComponent implements OnInit {
   selectedProxies: Array<ItemProxy> = [];
   selectedMap: Map<string, ItemProxy> = new Map();
   @Output()
-  proxySelected: EventEmitter<ItemProxy> = new EventEmitter();
+  proxySelected: EventEmitter<SelectedProxyInfo> = new EventEmitter();
   repoInitialized: boolean = false;
   proxySearchControl: FormControl;
   filteredProxies: any;
@@ -80,12 +80,16 @@ export class ProxySelectorComponent implements OnInit {
       if (!matchesSelection) {
         this.selectedProxies.push(selection);
         this.selectedMap.set(selection.item.id, selection);
-        this.proxySelected.emit(this.selectedProxies);
+        this.proxySelected.emit({
+          selectedProxies: this.selectedProxies}
+        );
       }
 
     } else {
       this.selectedProxy = selection;
-      this.proxySelected.emit(selection)
+      this.proxySelected.emit({
+        selectedProxy : this.selectedProxy
+      })
     }
   }
 
@@ -104,4 +108,9 @@ export class ProxySelectorComponent implements OnInit {
       }
     }
   }
+}
+
+export interface SelectedProxyInfo {
+  selectedProxies? : Array<ItemProxy>,
+  selectedProxy? : ItemProxy
 }

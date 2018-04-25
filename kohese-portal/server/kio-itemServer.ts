@@ -4,7 +4,7 @@ const kdbFs = require('./kdb-fs.js');
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('./analysis.js');
-var ItemProxy = require('../common/src/item-proxy.js');
+import { ItemProxy, TreeConfiguration } from '../common/src/item-proxy';
 var serverAuthentication = require('./server-enableAuth.js');
 const Path = require('path');
 const importer = require('./directory-ingest.js');
@@ -168,7 +168,7 @@ function KIOItemServer(socket){
 
     consoleLogObject('$$$ Request', request);
 
-    let itemCache = ItemProxy.TreeConfiguration.getItemCache();
+    let itemCache = TreeConfiguration.getItemCache();
     let objectMap = itemCache.getObjectMap();
 
     let response = {
@@ -220,7 +220,7 @@ function KIOItemServer(socket){
 
     // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
 
-    // var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+    // var thmCompare = TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 
     // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
 
@@ -256,7 +256,7 @@ function KIOItemServer(socket){
       }
     }
 
-    var response = {};
+    var response : any = {};
     if(!_.isEqual(request.repoTreeHashes, repoTreeHashes)){
       if (_.size(request.repoTreeHashes) === 0){
         console.log('--- KDB Does Not Match: Full response will be sent');
@@ -289,7 +289,7 @@ function KIOItemServer(socket){
         // Send deltas to client
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
-        var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+        var thmCompare = TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
 //        console.log(thmCompare);
 
         response = {
@@ -489,7 +489,7 @@ function KIOItemServer(socket){
     console.log('::: Generating ' + outFormat + ' Report for ' + forItemId);
 
     var proxy = ItemProxy.getWorkingTree().getProxyFor(forItemId);
-    var result = {};
+    var result : any = {};
 
     if (!proxy){
       console.log('*** Could not find proxy for: ' + forItemId);

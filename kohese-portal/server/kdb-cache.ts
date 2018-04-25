@@ -8,8 +8,8 @@ var kdbFS = require('./kdb-fs.js');
 
 var nodegit = require('nodegit');
 
-var ItemProxy = require('../common/src/item-proxy.js');
-var ItemCache = require('../common/src/item-cache.js');
+import { ItemProxy, TreeConfiguration } from '../common/src/item-proxy';
+import { ItemCache } from '../common/src/item-cache';
 
 var _ = require('underscore');
 
@@ -17,7 +17,21 @@ var jsonExt = /\.json$/;
 
 const expandRepoCommits = true;
 
-class KDBCache extends ItemCache {
+export class KDBCache extends ItemCache {
+
+  public repoCommitMap;
+  public repoTreeMap;
+  public repoPath;
+  public cacheDirectory;
+  public objectDirectory;
+  public repoCommitDirectory;
+  public repoTreeDirectory;
+  public blobDirectory;
+  public blobMismatchDirectory;
+  public kCommitDirectory;
+  public kTreeDirectory;
+  public expandedRepoCommitDirectory;
+  public hashmapDirectory;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -211,7 +225,7 @@ class KDBCache extends ItemCache {
         }
 
         // Store HashMap
-        let treeConfig = new ItemProxy.TreeConfiguration(oid);
+        let treeConfig = new TreeConfiguration(oid);
         this.loadProxiesForRepoCommit(oid, treeConfig);
         treeConfig.loadingComplete();
         var treeHash = treeConfig.getAllTreeHashes();
@@ -572,5 +586,3 @@ class KDBCache extends ItemCache {
   }
 
 }
-
-module.exports = KDBCache;

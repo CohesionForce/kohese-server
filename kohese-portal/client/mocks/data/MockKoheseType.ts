@@ -1,6 +1,6 @@
 import { MockViewData } from './MockViewData';
 import { MockDataModel } from './MockDataModel';
-import * as ItemProxy from '../../../common/src/item-proxy';
+import { ItemProxy } from '../../../common/src/item-proxy';
 
 export function MockKoheseType () {
   return {

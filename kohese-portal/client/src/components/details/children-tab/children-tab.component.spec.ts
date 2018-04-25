@@ -14,7 +14,7 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { BehaviorSubject } from 'rxjs';
 
 describe('Component: Children Tab', ()=>{
@@ -45,11 +45,11 @@ describe('Component: Children Tab', ()=>{
     childrenTabComponent.proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem()));
 
     childrenTabFixture.detectChanges();
-    
+
   })
 
   it('instantiates the childrenTab component', ()=>{
-    expect(childrenTabComponent).toBeTruthy(); 
+    expect(childrenTabComponent).toBeTruthy();
   })
 
   it('updates the proxy when a new proxy is pushed downstream', ()=>{

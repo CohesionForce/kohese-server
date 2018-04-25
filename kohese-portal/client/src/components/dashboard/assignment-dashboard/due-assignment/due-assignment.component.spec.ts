@@ -7,7 +7,7 @@ import { MaterialModule } from '../../../../material.module'
 
 import { DueAssignmentComponent } from './due-assignment.component';
 import { MockAction } from '../../../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
@@ -36,10 +36,10 @@ describe('Component: ', ()=>{
     dueAssignmentComponent.assignment = new ItemProxy('Action', MockAction());
 
     dueAssignmentFixture.detectChanges();
-    
+
   })
 
   it('instantiates the dueAssignment component', ()=>{
-    expect(dueAssignmentComponent).toBeTruthy(); 
+    expect(dueAssignmentComponent).toBeTruthy();
   })
 })
