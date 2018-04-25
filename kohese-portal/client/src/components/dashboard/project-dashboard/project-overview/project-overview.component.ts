@@ -56,7 +56,7 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
       data : {
         itemProxy : proxy
       }
-    }).updateSize('70%', '70%')
+    }).updateSize('80%', '80%')
       .afterClosed().subscribe((results)=>{
 
       });

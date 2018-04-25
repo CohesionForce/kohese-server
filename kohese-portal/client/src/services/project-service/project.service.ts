@@ -58,7 +58,7 @@ export class ProjectService {
     for (let projectIdx in treeList) {
       // Find users with assignments in project
       let userMap = {};
-      let userList = [];
+      let users = [];
       let currentProject = treeList[projectIdx];
       // Get referenced project items 
       let projectItems = currentProject.relations.references.Project.projectItems;
@@ -85,11 +85,11 @@ export class ProjectService {
       }
 
     for (let user in userMap) {
-      userList.push(userMap[user]);
+      users.push(userMap[user]);
     }
 
     projectList.push({
-      userList : userList,
+      users : users,
       proxy : currentProject
     })
   }

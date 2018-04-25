@@ -23,21 +23,21 @@
   <mat-dialog-content>
     <mat-tab-group>
       <mat-tab label="Document" class="dialog-content">
-        <mat-card style="height:400px">
+        <mat-card style="height:450px">
           <mat-card-content style="height: 100%; overflow: auto;">
             <document-view [proxyStream]="proxyStream" [incrementalLoad]="true"></document-view>
           </mat-card-content>
         </mat-card>
       </mat-tab>
       <mat-tab label="Details" class="dialog-content">
-        <mat-card style="height:400px">
+        <mat-card style="height:450px">
           <mat-card-content style="height: 100%; overflow: auto;">
             <details-form [proxyStream]="proxyStream" [editableStream]="editableStream" (formGroupUpdated)="onFormGroupUpdated($event)" (nonFormFieldChanged)="onNonFormFieldChanges($event)"></details-form>
           </mat-card-content>
         </mat-card>
       </mat-tab>
       <mat-tab label="References" class="dialog-contnet">
-        <mat-card style="height:400px">
+        <mat-card style="height:450px">
           <mat-card-content style="height: 100%; overflow: auto;">
             <references-tab [proxyStream]="proxyStream" [routingStrategy]="'tab'"></references-tab>
           </mat-card-content>

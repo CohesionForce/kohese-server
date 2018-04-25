@@ -7,6 +7,8 @@ import * as ItemProxy from '../../../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MatTableDataSource } from '@angular/material';
+import { DialogService } from '../../../../services/dialog/dialog.service';
+import { DetailsDialogComponent } from '../../../details/details-dialog/details-dialog.component';
 
 @Component({
   selector: 'user-statistics',
@@ -25,7 +27,8 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   tableStream : MatTableDataSource<ItemProxy>;
   rowDef = ['kind','name','state','assignedTo']
 
-  constructor(protected navigationService : NavigationService) {
+  constructor(protected navigationService : NavigationService,
+              protected dialogService : DialogService) {
     super(navigationService)
    }
 
@@ -50,6 +53,24 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     } else {
       this.selectedUserMap.set(user.item.name, user);
     }
+    this.buildSelectedAssignments();
+  }
+
+  selectAll () {
+    for (let idx in this.project.users) {
+      let user = this.project.users[idx];
+      this.selectedUserMap.set(user.item.name, user);
+    }
+    this.buildSelectedAssignments();
+  }
+
+  deselectAll () {
+    this.selectedUserMap = new Map<string, ItemProxy>();
+    this.buildSelectedAssignments();
+  }
+
+  buildSelectedAssignments () {
+    this.selectedAssignments = [];
 
     Array.from(this.selectedUserMap.values(), (user : ItemProxy) =>{
       for (let kind in user.relations.referencedBy) {
@@ -60,10 +81,20 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         }
       }      
     })
-
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
-
-    console.log(this);
   }
+
+  openProxyDetails(proxy: ItemProxy) {
+    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+      data : {
+        itemProxy : proxy
+      }
+    }).updateSize('80%', '80%')
+      .afterClosed().subscribe((results)=>{
+
+      });
+  }
+
+
 
 }
