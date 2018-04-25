@@ -18,6 +18,8 @@ export class ReferencesTabComponent implements OnInit, OnDestroy {
   /* Data */
   @Input()
   proxyStream: Observable<ItemProxy>;
+  @Input()
+  routingStrategy : string; 
   itemProxy: ItemProxy
   referenceInfo: Array<ReferenceTableInfo> = [];
   referencedByInfo: Array<ReferenceTableInfo> = [];
@@ -28,6 +30,7 @@ export class ReferencesTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    console.log(this);
     this.proxySubscription = this.proxyStream.subscribe((newProxy) => {
       if (newProxy) {
         this.referenceInfo = [];

@@ -1,8 +1,10 @@
-import { Component, OnInit, Input, OnDestroy} from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { ProjectInfo } from '../../../../services/project-service/project.service';
 import { Observable, Subscription } from 'rxjs';
 
 import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { DialogService } from '../../../../services/dialog/dialog.service';
+import { DetailsDialogComponent } from '../../../details/details-dialog/details-dialog.component';
 
 @Component({
   selector: 'project-overview',
@@ -11,19 +13,19 @@ import * as ItemProxy from '../../../../../../common/src/item-proxy';
 })
 export class ProjectOverviewComponent implements OnInit, OnDestroy {
   @Input()
-  projectStream : Observable<ProjectInfo>;
-  projectStreamSub : Subscription;
-  project : ProjectInfo
+  projectStream: Observable<ProjectInfo>;
+  projectStreamSub: Subscription;
+  project: ProjectInfo
 
-  projectItems : Array<ItemProxy>;
-  activityList : Array<ItemProxy> = [];
+  projectItems: Array<ItemProxy>;
+  activityList: Array<ItemProxy> = [];
 
-  constructor() { 
+  constructor(private dialogService: DialogService) {
 
   }
 
   ngOnInit() {
-    this.projectStreamSub = this.projectStream.subscribe((newProject : ProjectInfo)=>{
+    this.projectStreamSub = this.projectStream.subscribe((newProject: ProjectInfo) => {
       if (newProject) {
         this.project = newProject;
         this.projectItems = newProject.proxy.getRelationsByAttribute().references.projectItems.Project;
@@ -34,7 +36,7 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
         }
         // Strip non-unique values
         this.activityList = Array.from(new Set(this.activityList));
-        this.activityList.sort((a,b)=>{
+        this.activityList.sort((a, b) => {
           if (a.item.modifiedOn > b.item.modifiedOn) {
             return -1
           } else if (a.item.modifiedOn <= b.item.modifiedOn) {
@@ -45,8 +47,19 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
     })
   }
 
-  ngOnDestroy () {
+  ngOnDestroy() {
     this.projectStreamSub.unsubscribe();
+  }
+
+  openProxyDetails(proxy: ItemProxy) {
+    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+      data : {
+        itemProxy : proxy
+      }
+    }).updateSize('70%', '70%')
+      .afterClosed().subscribe((results)=>{
+
+      });
   }
 
 }

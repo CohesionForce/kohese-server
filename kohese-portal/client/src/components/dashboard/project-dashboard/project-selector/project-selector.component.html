@@ -1,4 +1,7 @@
 <div>
+  <div mat-dialog-title class="project-dialog-title">
+    <h3>Project Selection</h3>
+  </div>
   <div style="height: 400px;">
     <div id="projectSelectorContainer" style="height: 100%; width : 100%;">
       <div class="project-list" style="height : 100%; overflow:auto; width: 20%;">
@@ -6,6 +9,7 @@
           <mat-list-item *ngFor="let project of projectList"
                          (click)="selectProject(project)">
                          {{project.proxy.item.name}}
+              <mat-divider></mat-divider>
           </mat-list-item>
         </mat-list>
       </div>

@@ -1,11 +1,52 @@
-<div>
-    <mat-dialog-title>
-
-    </mat-dialog-title>
-    <mat-dialog-content>
-    
-    </mat-dialog-content>
-    <mat-dialog-actions>
-      <button mat-raised-button (click)=close()></button>
+<div class="dialog">
+  <div mat-dialog-title class="dialog-title">
+    <span style="font-size: large">{{itemProxy.item.name}}</span>
+      <span class="pull-right item-actions">
+        <i mat-icon-button class="fa fa-lg fa-edit"
+            *ngIf="!editableStream.getValue()"
+            (click)="editableStream.next(true)"
+            title="Edit"></i>
+        <span *ngIf="editableStream.getValue()"
+              class="fa fa-stack">
+          <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
+              (click)="cancelEditing()"
+              title="Cancel Edit"></i>
+          <i class="fa fa-stack-1x fa-times stacked-child"
+              (click)="cancelEditing()"
+              title="Cancel Edit"></i>
+        </span>
+          <i mat-icon-button class="fa fa-lg fa-save"
+              (click)="upsertItem(detailsFormGroup.value)"
+              title=" Save"></i>
+    </span>
   </div>
-  
+  <mat-dialog-content>
+    <mat-tab-group>
+      <mat-tab label="Document" class="dialog-content">
+        <mat-card style="height:400px">
+          <mat-card-content style="height: 100%; overflow: auto;">
+            <document-view [proxyStream]="proxyStream" [incrementalLoad]="true"></document-view>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+      <mat-tab label="Details" class="dialog-content">
+        <mat-card style="height:400px">
+          <mat-card-content style="height: 100%; overflow: auto;">
+            <details-form [proxyStream]="proxyStream" [editableStream]="editableStream" (formGroupUpdated)="onFormGroupUpdated($event)" (nonFormFieldChanged)="onNonFormFieldChanges($event)"></details-form>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+      <mat-tab label="References" class="dialog-contnet">
+        <mat-card style="height:400px">
+          <mat-card-content style="height: 100%; overflow: auto;">
+            <references-tab [proxyStream]="proxyStream" [routingStrategy]="'tab'"></references-tab>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-raised-button (click)=close()>Close</button>
+    <button mat-raised-button (click)="addTab('Explore', {id: itemProxy.item.id})">Explore</button>
+  </mat-dialog-actions>
+</div>
