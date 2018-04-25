@@ -50,6 +50,17 @@ export class KoheseType {
     delete this._fields[propertyId];
   }
   
+  public updateProperty(propertyId: string, property: any): void {
+    this._fields[propertyId] = JSON.parse(JSON.stringify(property));
+    if (this.viewModelProxy) {
+      this.viewModelProxy.item.viewProperties[propertyId] = JSON.parse(JSON.
+        stringify(property.views['form']));
+    }
+    delete property.views;
+    this._dataModelProxy.item.properties[propertyId] = JSON.parse(JSON.
+      stringify(property));
+  }
+  
   private compileFields(): void {
     let fieldGroups: Array<any> = [];
     let modelProxy: ItemProxy = this._dataModelProxy;

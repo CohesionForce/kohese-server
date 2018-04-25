@@ -38,14 +38,17 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       startsWith('[');
   }
   set multivalued(multivalued: boolean) {
-    let type: string = this._koheseType.fields[this.selectedPropertyId].type;
+    let property: any = this._koheseType.fields[this.selectedPropertyId];
+    let type: string = property.type;
     if (multivalued) {
       type = '[ ' + type + ' ]';
     } else {
       type = type.substring(2, type.length - 2);
     }
 
-    this._koheseType.fields[this.selectedPropertyId].type = type;
+    property.type = type;
+    this._koheseType.updateProperty(this.selectedPropertyId, property);
+    this._changeDetectorRef.markForCheck();
   }
 
   public inputOptions: any = {
@@ -117,17 +120,29 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     });
   }
   
+  public updateProperty(propertyIdSequence: Array<string>, value: any): void {
+    let property: any = this._koheseType.fields[this.selectedPropertyId];
+    let subProperty: any = property;
+    for (let j: number = 0; j < propertyIdSequence.length - 1; j++) {
+      subProperty = subProperty[propertyIdSequence[j]];
+    }
+    subProperty[propertyIdSequence[propertyIdSequence.length - 1]] = value;
+    this._koheseType.updateProperty(this.selectedPropertyId, property);
+    this._changeDetectorRef.markForCheck();
+  }
+  
   public changeRelationness(checked: boolean): void {
+    let property: any = this._koheseType.fields[this.selectedPropertyId];
     if (checked) {
-      this._koheseType.dataModelProxy.item.properties[this.selectedPropertyId].
-        relation = {
+      property.relation = {
         kind: 'Item',
         foreignKey: 'id'
       };
     } else {
-      delete this._koheseType.dataModelProxy.item.properties[this.
-        selectedPropertyId].relation;
+      delete property.relation;
     }
+    this._koheseType.updateProperty(this.selectedPropertyId, property);
+    this._changeDetectorRef.markForCheck();
   }
   
   public areRelationsEqual(option: any, selection: any): boolean {

@@ -51,5 +51,13 @@ describe('Component: Type Overview', ()=>{
 
   it('instantiates the typeOverview component', ()=>{
     expect(typeOverviewComponent).toBeTruthy(); 
-  })
+  });
+  
+  it('changes the parent type of types', () => {
+    typeOverviewComponent.changeParentType('Kurios Iesous');
+    expect(typeOverviewComponent.koheseType.dataModelProxy.item.base).toEqual(
+      'Kurios Iesous');
+    expect(typeOverviewComponent.koheseType.dataModelProxy.item.parentId).
+      toEqual('Kurios Iesous');
+  });
 })

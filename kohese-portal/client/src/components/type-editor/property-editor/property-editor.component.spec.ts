@@ -43,13 +43,55 @@ describe('Component: Property Editor', ()=>{
     propertyEditorComponent = propertyEditorFixture.componentInstance;
     propertyEditorComponent.koheseTypeStream = new BehaviorSubject<KoheseType>(
       new KoheseType(new ItemProxy('KoheseModel', MockDataModel()), {
-      'KoheseView': new ItemProxy('KoheseView', MockViewData())
+      'Item': new ItemProxy('KoheseView', MockViewData())
     }));
+    propertyEditorComponent.selectedPropertyId = 'name';
     propertyEditorFixture.detectChanges();
     
   })
 
   it('instantiates the Property Editor component', ()=>{
     expect(propertyEditorComponent).toBeTruthy(); 
-  })
+  });
+  
+  it('updates properties of types', () => {
+    propertyEditorComponent.updateProperty(['views', 'form', 'inputType',
+      'type'], 'Kurios Iesous');
+    expect(propertyEditorComponent.koheseType.fields[propertyEditorComponent.
+      selectedPropertyId].views['form'].inputType.type).toEqual(
+      'Kurios Iesous');
+  });
+  
+  it('determines and changes multivalued-ness of properties', () => {
+    propertyEditorComponent.multivalued = true;
+    expect(propertyEditorComponent.multivalued).toEqual(true);
+    
+    propertyEditorComponent.multivalued = false;
+    expect(propertyEditorComponent.multivalued).toEqual(false);
+  });
+  
+  it('changes whether a property is a relation', () => {
+    propertyEditorComponent.changeRelationness(true);
+    expect(propertyEditorComponent.koheseType.fields[propertyEditorComponent.
+      selectedPropertyId].relation).toBeDefined();
+    
+    propertyEditorComponent.changeRelationness(false);
+    expect(propertyEditorComponent.koheseType.fields[propertyEditorComponent.
+      selectedPropertyId].relation).not.toBeDefined();
+  });
+  
+  it('determines if two relations are equal', () => {
+    let firstRelation: any = {
+      kind: 'Kurios Iesous',
+      foreignKey: 'Kurios Iesous'
+    };
+    
+    let secondRelation: any = {
+      kind: 'Anything else',
+      foreignKey: 'Any other thing'
+    };
+    
+    expect(propertyEditorComponent.areRelationsEqual(secondRelation,
+      firstRelation)).toEqual(false);
+  });
 })

@@ -28,10 +28,11 @@
         <split direction="vertical">
           <split-area [size]="50" class="pad">
             <ng-container
-              *ngIf="koheseType.dataModelProxy.item.properties[selectedPropertyId]">
+              *ngIf="koheseType.fields[selectedPropertyId]">
               <mat-form-field>
                 <mat-select placeholder="Type"
-                  [(ngModel)]="koheseType.dataModelProxy.item.properties[selectedPropertyId].type"
+                  [ngModel]="koheseType.fields[selectedPropertyId].type"
+                  (ngModelChange)="updateProperty(['type'], $event)"
                   [disabled]="koheseType.dataModelProxy.item.isMetaModel">
                   <mat-option *ngFor="let type of (types | mapKey)"
                     [value]="types[type]">
@@ -41,23 +42,25 @@
               </mat-form-field>
               <br/>
               <mat-checkbox
-                [(ngModel)]="koheseType.dataModelProxy.item.properties[selectedPropertyId].id"
+                [ngModel]="koheseType.fields[selectedPropertyId].id"
+                (ngModelChange)="updateProperty(['id'], $event)"
                 [disabled]="koheseType.dataModelProxy.item.isMetaModel">
                 ID Field
               </mat-checkbox>
               <br/>
               <mat-checkbox
-                [checked]="koheseType.dataModelProxy.item.properties[selectedPropertyId].relation"
+                [checked]="koheseType.fields[selectedPropertyId].relation"
                 (change)="changeRelationness($event.checked)"
                 [disabled]="koheseType.dataModelProxy.item.isMetaModel">
                 Reference Field
               </mat-checkbox>
               <br/>
               <ng-container
-                *ngIf="koheseType.dataModelProxy.item.properties[selectedPropertyId].relation">
+                *ngIf="koheseType.fields[selectedPropertyId].relation">
                 <mat-form-field>
                   <mat-select placeholder="Reference Type"
-                    [(ngModel)]="koheseType.dataModelProxy.item.properties[selectedPropertyId].relation"
+                    [ngModel]="koheseType.fields[selectedPropertyId].relation"
+                    (ngModelChange)="updateProperty(['relation'], $event)"
                     [compareWith]="areRelationsEqual"
                     [disabled]="koheseType.dataModelProxy.item.isMetaModel">
                     <mat-optgroup *ngFor="let typeName of (idProperties | mapKey)"
@@ -78,7 +81,8 @@
               </mat-checkbox>
               <br/>
               <mat-checkbox
-                [(ngModel)]="koheseType.dataModelProxy.item.properties[selectedPropertyId].required"
+                [ngModel]="koheseType.fields[selectedPropertyId].required"
+                (ngModelChange)="updateProperty(['required'], $event)"
                 [disabled]="koheseType.dataModelProxy.item.isMetaModel">
                 Required
               </mat-checkbox>
@@ -86,7 +90,8 @@
               <mat-form-field>
                 <textarea matInput placeholder="Default Value" rows="3"
                   cols="80"
-                  [(ngModel)]="koheseType.dataModelProxy.item.properties[selectedPropertyId].defaultValue"
+                  [ngModel]="koheseType.fields[selectedPropertyId].default"
+                  (ngModelChange)="updateProperty(['default'], $event)"
                   [disabled]="koheseType.dataModelProxy.item.isMetaModel">
                 </textarea>
               </mat-form-field>
@@ -94,15 +99,17 @@
           </split-area>
           <split-area [size]="50" class="pad">
             <ng-container
-              *ngIf="koheseType.viewModelProxy && koheseType.viewModelProxy.item.viewProperties[selectedPropertyId]">
+              *ngIf="koheseType.fields[selectedPropertyId] && koheseType.fields[selectedPropertyId].views['form']">
               <mat-form-field>
                 <input matInput type="text" placeholder="Display Name"
-                  [(ngModel)]="koheseType.viewModelProxy.item.viewProperties[selectedPropertyId].displayName"/>
+                  [ngModel]="koheseType.fields[selectedPropertyId].views['form'].displayName"
+                  (ngModelChange)="updateProperty(['views', 'form', 'displayName'], $event)"/>
               </mat-form-field>
               <br/>
               <mat-form-field>
                 <mat-select placeholder="Input Type"
-                  [(value)]="koheseType.viewModelProxy.item.viewProperties[selectedPropertyId].inputType.type">
+                  [ngModel]="koheseType.fields[selectedPropertyId].views['form'].inputType.type"
+                  (ngModelChange)="updateProperty(['views', 'form', 'inputType', 'type'], $event)">
                   <mat-option
                     *ngFor="let inputType of userInputs | mapKey"
                     [value]="inputType">
