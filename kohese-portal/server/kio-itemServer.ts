@@ -788,7 +788,7 @@ function KIOItemServer(socket){
     try {
       var absolutes = [];
       var root = Path.dirname(fs.realpathSync(__dirname));
-      root = Path.join(root, 'data_import', socket.koheseUser.username);
+      root = Path.join(root, '..', 'data_import', socket.koheseUser.username);
       absolutes.push(Path.join(root, request.file));
 
       var results = importer.importFiles(socket.koheseUser.username, absolutes, request.parentItem);
