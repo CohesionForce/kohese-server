@@ -3,8 +3,8 @@ import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
-  public dataModelProxy: KoheseModel;
-  public viewModelProxy: ItemProxy;
+  private dataModelProxy: KoheseModel;
+  private viewModelProxy: ItemProxy;
   name : string;
   description: string;
   icon: string;
@@ -73,7 +73,7 @@ export class KoheseType {
     }
   }
 
-  synchronizeDataModel(): ItemProxy {
+  synchronizeDataModel(): KoheseModel {
     this.dataModelProxy.item.name = this.name;
     this.dataModelProxy.item.description = this.description;
     this.dataModelProxy.item.base = this.base;

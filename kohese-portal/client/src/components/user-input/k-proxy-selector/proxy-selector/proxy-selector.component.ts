@@ -61,7 +61,7 @@ export class ProxySelectorComponent implements OnInit {
               this.selectedMap.set(proxy.item.id, proxy);
             }
           } else {
-            this.selectedProxy = this.selection;
+            this.selectedProxy = this.selection.selectedProxy;
           }
         }
       })
@@ -110,6 +110,7 @@ export class ProxySelectorComponent implements OnInit {
   }
 }
 
+// TODO Need to ripple use of this interface through system or else revert to old Observable
 export interface SelectedProxyInfo {
   selectedProxies? : Array<ItemProxy>,
   selectedProxy? : ItemProxy

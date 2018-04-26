@@ -12,6 +12,7 @@ import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy'
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
+import { SelectedProxyInfo } from '../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'compare-items',
@@ -470,14 +471,15 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     proxyStream: BehaviorSubject<ItemProxy>): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {
-        selected: proxyStream.getValue()
+        selected: proxyStream.getValue(),
+        allowMultiSelect : false
       }
-    }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
+    }).updateSize('70%', '70%').afterClosed().subscribe((selection: SelectedProxyInfo) => {
       if (selection) {
         if (proxyStream === this._selectedBaseStream) {
-          this.whenSelectedBaseChanges(selection);
+          this.whenSelectedBaseChanges(selection.selectedProxy);
         } else {
-          this.whenSelectedChangeChanges(selection);
+          this.whenSelectedChangeChanges(selection.selectedProxy);
         }
       }
     });

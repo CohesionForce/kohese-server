@@ -15,6 +15,7 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { SelectedProxyInfo } from '../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'create-wizard',
@@ -83,12 +84,12 @@ export class CreateWizardComponent extends NavigatableComponent
     }
   }
 
-  onParentSelected(newParent, stepper: MatStepper) {
-    console.log(newParent);
-    if (this.selectedParent === newParent) {
+  onParentSelected(newParent : SelectedProxyInfo, stepper: MatStepper) {
+    console.log(newParent.selectedProxy);
+    if (this.selectedParent === newParent.selectedProxy) {
       stepper.next();
     } else {
-      this.selectedParent = newParent;
+      this.selectedParent = newParent.selectedProxy;
       this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
     }
   }
@@ -99,7 +100,7 @@ export class CreateWizardComponent extends NavigatableComponent
       item: {
         parentId: this.selectedParent.item.id
       },
-      model: this.selectedType.dataModelProxy
+      model: this.selectedType.synchronizeDataModel()
     };
 
     let modelProxy: ItemProxy = proxyPlaceholder.model;

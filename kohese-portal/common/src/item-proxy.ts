@@ -4,9 +4,9 @@
 
 'use strict'; //Required for use of 'class'
 import * as  _ from 'underscore';
-import SHA from 'jssha';
-import uuidV1 from 'uuid/v1';
-import * as Rx from 'rxjs/Rx';
+import * as SHA from 'jssha';
+import * as uuidV1 from 'uuid/v1';
+import { Subject } from 'rxjs/Subject';
 
 let treeConfigMap = {};
 let workingTree;
@@ -1471,7 +1471,7 @@ export class TreeConfiguration {
   public repoMap;
   public loading : boolean = true;
   public proxyHasDeferredModelAssociation;
-  public changeSubject;
+  public changeSubject : Subject<any>;
 
   public root;
   public lostAndFound;
@@ -1499,7 +1499,7 @@ export class TreeConfiguration {
     this.loading = true;
     this.proxyHasDeferredModelAssociation = {};
 
-    this.changeSubject = new Rx.Subject();
+    this.changeSubject = new Subject<any>();
 
     this.root = new ItemProxy('Internal', {
       id: 'ROOT',
