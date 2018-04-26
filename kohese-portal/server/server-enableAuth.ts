@@ -1,4 +1,4 @@
-const ItemProxy = require('../common/src/item-proxy.js');
+import { ItemProxy } from '../common/src/item-proxy';
 
 var usersProxy;
 
@@ -126,7 +126,7 @@ function validatePassword(plainPassword) {
   if (typeof plainPassword === 'string' && plainPassword) {
     return true;
   }
-  var err =  new Error('Invalid password: ' + plainPassword);
+  var err : any =  new Error('Invalid password: ' + plainPassword);
   err.statusCode = 422;
   throw err;
 }

@@ -7,7 +7,7 @@ import { MaterialModule } from '../../../../material.module'
 
 import { CompletedAssignmentComponent } from './completed-assignment.component';
 import { MockAction } from '../../../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
@@ -38,10 +38,10 @@ describe('Component: Completed Assignment', ()=>{
     completedAssignmentComponent.assignment = new ItemProxy('Action', MockAction());
 
     completedAssignmentFixture.detectChanges();
-    
+
   })
 
   it('instantiates the completedAssignment component', ()=>{
-    expect(completedAssignmentComponent).toBeTruthy(); 
+    expect(completedAssignmentComponent).toBeTruthy();
   })
 })

@@ -71,8 +71,8 @@
 
     var instance = forProxy.item;
 
-    var requestData = {};
-    var analysis = {};
+    var requestData : any = {};
+    var analysis : any = {};
     analysis.id = onId;
     analysis.raw = {};
     analysis.forModelKind = forModelKind;
@@ -99,7 +99,7 @@
 
     request(options, function(analysisError, analysisResponse, analysisBody) {
       if (analysisError) {
-        var error = new Error(
+        var error : any = new Error(
             '*** Failure while communicating with Analysis server');
 
         // jshint -W106
@@ -140,7 +140,7 @@
           console.log(err);
           console.log(err.stack);
 
-          var parseError = new Error(
+          var parseError : any = new Error(
           '*** Failure while parsing analysis');
           parseError.onId = onId;
           console.log(parseError);
@@ -187,7 +187,7 @@
     if (typeof onAnalysis.chunkSummary[nextChunk.text] !== 'undefined') {
       onAnalysis.chunkSummary[nextChunk.text].count++;
     } else {
-      var chunkSummary = {};
+      var chunkSummary : any = {};
       chunkSummary.text = nextChunk.text;
       chunkSummary.count = 1;
       chunkSummary.displayType = 'Chunk';
@@ -211,7 +211,7 @@
     if (typeof onAnalysis.tokenSummary[nextToken.text] !== 'undefined') {
       onAnalysis.tokenSummary[nextToken.text].count++;
     } else {
-      var tokenSummary = {};
+      var tokenSummary : any = {};
       tokenSummary.text = nextToken.text;
       tokenSummary.count = 1;
       tokenSummary.displayType = 'Token';
@@ -228,8 +228,8 @@
 
   function consolidateAnalysis(onAnalysis) {
     onAnalysis.list = [];
-    var nextChunk = {};
-    var nextToken = {};
+    var nextChunk : any = {};
+    var nextToken : any = {};
 
     onAnalysis.chunkSummary = {};
     onAnalysis.tokenSummary = {};

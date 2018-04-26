@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
 import { ItemRepository } from "../item-repository/item-repository.service";
 import { Subscription } from "rxjs";
 
@@ -36,7 +36,7 @@ export class ProjectService {
           this.currentConfig = newConfig.config;
 
           if (!this.workingConfigLoaded) {
-            this.workingConfig = ItemProxy.TreeConfiguration.getWorkingTree();
+            this.workingConfig = TreeConfiguration.getWorkingTree();
             this.workingProjects = this.generateProjectInfo(this.workingConfig.getAllItemProxies())
           }
 
@@ -55,7 +55,7 @@ export class ProjectService {
             }
           })
 
-          // Generate Project Info 
+          // Generate Project Info
           this.projects = this.generateProjectInfo(currentTree);
         }
       })
@@ -84,7 +84,7 @@ export class ProjectService {
       let currentProject = this.workingProjects[projectIdx];
       let projectItems = currentProject.proxy.item.projectItems;
       for (let projectItemIdx in projectItems) {
-        let currentProjectItem: ItemProxy = 
+        let currentProjectItem: ItemProxy =
           this.currentConfig.getProxyFor(projectItems[projectItemIdx].id)
         if (!currentProjectItem) {
           // Project item is not found in current tree configuration
@@ -95,7 +95,7 @@ export class ProjectService {
         }
 
         foundProjectItems.push(currentProjectItem);
-        let projectItemSubTree: Array<ItemProxy> = currentProjectItem.getSubtreeAsList();
+        let projectItemSubTree: Array<any> = currentProjectItem.getSubtreeAsList();
 
         projectItemSubTree = projectItemSubTree.filter((item) => {
           // TODO Update when assignments are pulled out into the higher proxy
@@ -138,11 +138,11 @@ export class ProjectService {
       let userMap = {};
       let users = [];
       let currentProject = treeList[projectIdx];
-      // Get referenced project items 
+      // Get referenced project items
       let projectItems = currentProject.relations.references.Project.projectItems;
       for (let projectItemIdx in projectItems) {
         let currentProjectItem: ItemProxy = projectItems[projectItemIdx];
-        let projectItemSubTree: Array<ItemProxy> = currentProjectItem.getSubtreeAsList();
+        let projectItemSubTree: Array<any> = currentProjectItem.getSubtreeAsList();
         projectItemSubTree = projectItemSubTree.filter((item) => {
           // TODO Update when assignments are pulled out into the higher proxy
           let proxyRelations = item.proxy.getRelationsByAttribute();

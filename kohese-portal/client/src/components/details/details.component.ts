@@ -6,7 +6,8 @@ import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 
-import * as ItemProxy from '../../../../common/src/item-proxy.js';
+import { ItemProxy } from '../../../../common/src/item-proxy.js';
+import { SessionService } from '../../services/user/session.service';
 
 import * as commonmark from 'commonmark';
 import { HtmlRenderer, Parser } from 'commonmark';
@@ -17,8 +18,8 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { ProxyDetailsComponent } from './ProxyDetails.Class';
 
 /* This component serves as a manager for viewing proxy details in the explore view.
-   It functions by retrieving an id from the route parameters and then retrieving 
-   the proxy from the current tree configuration object 
+   It functions by retrieving an id from the route parameters and then retrieving
+   the proxy from the current tree configuration object
 */
 
 @Component({
@@ -64,7 +65,7 @@ export class DetailsComponent extends ProxyDetailsComponent
         this.treeConfigSub = this.currentTreeConfigSubscription = this.itemRepository.getTreeConfig()
           .subscribe((newConfig) => {
             this.treeConfig = newConfig.config;
-            // Unsubscribe from old tree updates 
+            // Unsubscribe from old tree updates
             if (this.proxyUpdates) {
               this.proxyUpdates.unsubscribe();
               this.proxyUpdates = undefined;

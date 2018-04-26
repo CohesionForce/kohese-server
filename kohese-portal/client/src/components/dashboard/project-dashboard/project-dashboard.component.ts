@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from '@angular/core';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy} from '../../../../../common/src/item-proxy';
 
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';

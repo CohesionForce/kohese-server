@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { ProjectInfo, ProjectService } from '../../../../services/project-service/project.service';
 
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy} from '../../../../../../common/src/item-proxy';
 import { MatDialogRef } from '@angular/material';
 
 
@@ -16,7 +16,7 @@ export class ProjectSelectorComponent implements OnInit {
 
   isMultiSelect : boolean // unused as of right now
   projectList : Array<ProjectInfo>;
-  selectedProject : ItemProxy;
+  selectedProject : ProjectInfo;
   historicalMode : boolean;
 
   constructor(private dialogRef : MatDialogRef<ProjectSelectorComponent>,

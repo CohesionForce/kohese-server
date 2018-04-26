@@ -2,12 +2,12 @@ import { StateService } from './state.service';
 import { DynamicTypesService } from '../dynamic-types/dynamic-types.service';
 import { MockItem } from '../../../mocks/data/MockItem';
 import { MockKoheseType } from '../../../mocks/data/MockKoheseType';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 describe('StateService', () => {
   let stateService: StateService;
   let proxy: ItemProxy;
-  
+
   beforeAll(() => {
     let typeServicePlaceholder: any = jasmine.createSpyObj('DynamicTypesService',
       ['getKoheseTypes']);

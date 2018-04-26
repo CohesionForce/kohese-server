@@ -1,4 +1,4 @@
-import * as ItemProxy from '../../../common/src/item-proxy';
+import { ItemProxy } from '../../../common/src/item-proxy';
 import { MockViewData } from '../data/MockViewData';
 import { MockItem } from '../data/MockItem';
 import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
@@ -32,7 +32,7 @@ export class MockDynamicTypesService {
   getMockKoheseType () {
     return MockKoheseType()
   }
-  
+
   getIcons() {
     return ['fa fa-gavel', 'fa fa-user', 'fa fa-tasks', 'fa fa-database',
     'fa fa-exclamation-circle', 'fa fa-comment', 'fa fa-sticky-note',

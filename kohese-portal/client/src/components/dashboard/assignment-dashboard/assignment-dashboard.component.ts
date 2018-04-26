@@ -3,7 +3,7 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDet
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 
 import { Observable, Subscription } from 'rxjs';
@@ -14,7 +14,7 @@ import { Observable, Subscription } from 'rxjs';
   styleUrls : ['./assignment-dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssignmentDashboardComponent extends NavigatableComponent 
+export class AssignmentDashboardComponent extends NavigatableComponent
                                           implements OnInit, OnDestroy {
   /* Data */
   @Input()

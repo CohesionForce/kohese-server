@@ -25,7 +25,7 @@ import { MockItem } from '../../../mocks/data/MockItem';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 describe('Component: Create Wizard', ()=>{
   let createWizardComponent: CreateWizardComponent;
@@ -36,7 +36,7 @@ describe('Component: Create Wizard', ()=>{
       declarations: [CreateWizardComponent],
       imports : [CommonModule,
          FormsModule,
-         ReactiveFormsModule, 
+         ReactiveFormsModule,
          MaterialModule,
          PipesModule,
          ServicesModule,
@@ -61,19 +61,19 @@ describe('Component: Create Wizard', ()=>{
 
   describe('initialization', ()=>{
     it('instantiates the createWizard component', ()=>{
-      expect(createWizardComponent).toBeTruthy(); 
+      expect(createWizardComponent).toBeTruthy();
     })
-    
+
     it('requests the required data from the server', ()=>{
       expect(createWizardComponent.rootProxy).toBeDefined;
       expect(createWizardComponent.models).toBeDefined;
       expect(createWizardComponent.types).toBeDefined;
     })
-  
+
     it('starts with the root proxy selected when no parent is provided', ()=>{
       expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy)
     })
-  
+
   })
 
   describe('type selection', ()=>{
@@ -82,7 +82,7 @@ describe('Component: Create Wizard', ()=>{
     beforeEach(()=>{
       stepper = <MatStepper> {
         next : ()=>{
-  
+
         }
       }
 
@@ -99,7 +99,7 @@ describe('Component: Create Wizard', ()=>{
       createWizardComponent.onTypeSelected(createWizardComponent.types[1], stepper);
       createWizardComponent.onTypeSelected(createWizardComponent.types[1], stepper);
       expect(createWizardComponent.selectedType).toBe(createWizardComponent.types[1]);
-      expect(nextSpy).toHaveBeenCalled();            
+      expect(nextSpy).toHaveBeenCalled();
     })
   })
   describe('parent selection', ()=>{
@@ -108,7 +108,7 @@ describe('Component: Create Wizard', ()=>{
     beforeEach(()=>{
       stepper = <MatStepper> {
         next : ()=>{
-  
+
         }
       }
 
@@ -125,7 +125,7 @@ describe('Component: Create Wizard', ()=>{
       createWizardComponent.onParentSelected(createWizardComponent.rootProxy.children[1], stepper);
       createWizardComponent.onParentSelected(createWizardComponent.rootProxy.children[1], stepper);
       expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy.children[1]);
-      expect(nextSpy).toHaveBeenCalled();            
+      expect(nextSpy).toHaveBeenCalled();
     })
   })
 
@@ -138,9 +138,9 @@ describe('Component: Create Wizard', ()=>{
       createWizardComponent.createFormGroup = <FormGroup> {
         value : ItemProxy
       }
-      
+
       closeSpy = spyOn(TestBed.get(MatDialogRef), 'close');
-      
+
     })
 
     it('closes the window when an item is built', async(()=>{
@@ -150,7 +150,7 @@ describe('Component: Create Wizard', ()=>{
         fieldName: fieldName,
         fieldValue: fieldValue
       });
-      let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.resolve());    
+      let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.resolve());
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();
@@ -161,7 +161,7 @@ describe('Component: Create Wizard', ()=>{
     }))
 
     it('displays an error when a build fails', async(()=>{
-      let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.reject('Incorrect Fields'));    
+      let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.reject('Incorrect Fields'));
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();

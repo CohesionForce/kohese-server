@@ -10,7 +10,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockUserData } from '../../../../mocks/data/MockUser'
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 
 describe('Component: ', ()=>{
@@ -35,14 +35,14 @@ describe('Component: ', ()=>{
     userDashboardComponent.user = new ItemProxy('KoheseUser', MockUserData())
 
     userDashboardFixture.detectChanges();
-    
+
   })
 
   it('instantiates the userDashboard component', ()=>{
-    expect(userDashboardComponent).toBeTruthy(); 
+    expect(userDashboardComponent).toBeTruthy();
   })
 
   afterEach(()=>{
     ItemProxy.getWorkingTree().reset();
-  }) 
+  })
 })

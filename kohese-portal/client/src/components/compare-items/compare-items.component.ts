@@ -8,10 +8,11 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DetailsFormComponent } from '../details/details-form/details-form.component';
 import { ProxySelectorDialogComponent } from '../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
+import { SelectedProxyInfo } from '../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'compare-items',
@@ -169,7 +170,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     if (this.historySubscription) {
       this.historySubscription.unsubscribe();
     }
-    this.historySubscription = 
+    this.historySubscription =
       this._itemRepository.getHistoryFor(baseProxy).subscribe(
       (history: Array<any>) => {
         this._baseVersions = history;
@@ -215,7 +216,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     if (this.historySubscription) {
       this.historySubscription.unsubscribe();
     }
-    this.historySubscription = 
+    this.historySubscription =
       this._itemRepository.getHistoryFor(changeProxy).subscribe(
       (history: Array<any>) => {
         this._changeVersions = history;
@@ -259,11 +260,11 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   }
 
   private getVersionProxy(versionIdentifier: string, itemId: string): ItemProxy {
-    let treeConfiguration: ItemProxy.TreeConfiguration = ItemProxy.
+    let treeConfiguration: TreeConfiguration =
       TreeConfiguration.getTreeConfigFor(versionIdentifier);
     if (!treeConfiguration) {
-      treeConfiguration = new ItemProxy.TreeConfiguration(versionIdentifier);
-      let itemCache = ItemProxy.TreeConfiguration.getItemCache();
+      treeConfiguration = new TreeConfiguration(versionIdentifier);
+      let itemCache = TreeConfiguration.getItemCache();
       itemCache.loadProxiesForCommit(versionIdentifier, treeConfiguration);
       treeConfiguration.loadingComplete();
     }
@@ -470,14 +471,15 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     proxyStream: BehaviorSubject<ItemProxy>): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {
-        selected: proxyStream.getValue()
+        selected: proxyStream.getValue(),
+        allowMultiSelect : false
       }
-    }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
+    }).updateSize('70%', '70%').afterClosed().subscribe((selection: SelectedProxyInfo) => {
       if (selection) {
         if (proxyStream === this._selectedBaseStream) {
-          this.whenSelectedBaseChanges(selection);
+          this.whenSelectedBaseChanges(selection.selectedProxy);
         } else {
-          this.whenSelectedChangeChanges(selection);
+          this.whenSelectedChangeChanges(selection.selectedProxy);
         }
       }
     });

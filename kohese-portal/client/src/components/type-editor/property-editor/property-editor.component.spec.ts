@@ -14,7 +14,8 @@ import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicT
 import { KoheseType } from '../../../classes/UDT/KoheseType.class'
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../../mocks/data/MockViewData';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { PipesModule } from '../../../pipes/pipes.module';
 
 describe('Component: Property Editor', ()=>{
@@ -41,13 +42,13 @@ describe('Component: Property Editor', ()=>{
     propertyEditorFixture = TestBed.createComponent(PropertyEditorComponent);
     propertyEditorComponent = propertyEditorFixture.componentInstance;
     propertyEditorComponent.type = new KoheseType(
-      new ItemProxy('KoheseModel', MockDataModel()),
+      new KoheseModel(MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()))
     propertyEditorFixture.detectChanges();
-    
+
   })
 
   it('instantiates the Property Editor component', ()=>{
-    expect(propertyEditorComponent).toBeTruthy(); 
+    expect(propertyEditorComponent).toBeTruthy();
   })
 })

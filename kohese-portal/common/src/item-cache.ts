@@ -4,8 +4,8 @@
 
 'use strict';
 
-var _ = require('underscore');
-var ItemProxy = require('./item-proxy.js');
+import * as   _ from 'underscore';
+import { ItemProxy } from './item-proxy';
 
 // TODO set back to false and/or remove disable check below
 const disableObjectFreeze = false;
@@ -25,7 +25,13 @@ const disableObjectFreeze = false;
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-class ItemCache {
+export class ItemCache {
+
+  public refs;
+  public tags;
+  public kCommitMap;
+  public kTreeMap;
+  public blobMap;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -234,9 +240,10 @@ class ItemCache {
         let item = this.getBlob(treeHashEntry.oid);
         if (item){
           // eslint-disable-next-line no-unused-vars
-          let treeProxy = new ItemProxy(kind,  item, treeConfig);
+          let treeProxy : ItemProxy = new ItemProxy(kind,  item, treeConfig);
         } else {
-          console.log('*** Could not find item for: ' + kind + ' - ' + treeId);
+          console.log('*** Could not find item for: ' + kind + ' - with oid - ' + treeHashEntry.treeId);
+          console.log(treeHashEntry);
         }
     }
 
@@ -251,5 +258,3 @@ class ItemCache {
     }
   }
 }
-
-module.exports = ItemCache;

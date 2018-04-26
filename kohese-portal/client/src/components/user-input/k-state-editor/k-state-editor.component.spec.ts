@@ -10,7 +10,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { KStateEditorComponent } from './k-state-editor.component';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 describe('k-state-editor', () => {
   let stateEditor: ComponentFixture<KStateEditorComponent>;
@@ -31,12 +31,12 @@ describe('k-state-editor', () => {
           useClass: MockItemRepository
         }]
     }).compileComponents();
-    
+
     stateEditor = TestBed.createComponent(KStateEditorComponent);
     component = stateEditor.componentInstance;
     component.itemProxy = new ItemProxy('Item', MockItem());
   });
-  
+
   it('changes the value of fields of type "StateMachine"', () => {
     component.openTransitionDialog('actionState', 'Assigned');
     expect(component.itemProxy.item['actionState']).toEqual('Assigned');

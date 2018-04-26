@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 @Injectable()
@@ -37,8 +38,8 @@ export class DynamicTypesService {
                 this.treeConfig = newConfig.config;
 
                 let modelProxy: ItemProxy = this.treeConfig.getProxyFor('Model-Definitions');
-                let typeProxies: Array<ItemProxy> = modelProxy.getDescendants().
-                  sort((first: ItemProxy, second: ItemProxy) => {
+                let typeProxies: Array<KoheseModel> = modelProxy.getDescendants().
+                  sort((first: KoheseModel, second: KoheseModel) => {
                     return ((first.item.name > second.item.name) ?
                       1 : ((first.item.name < second.item.name) ? -1 : 0));
                   });
@@ -56,13 +57,13 @@ export class DynamicTypesService {
     return this.koheseTypes;
   }
 
-  buildKoheseTypes(typeProxies: Array<ItemProxy>): void {
+  buildKoheseTypes(typeProxies: Array<KoheseModel>): void {
     for (var i: number = 0; i < typeProxies.length; i++) {
-      let currentType: ItemProxy = typeProxies[i];
-      let viewProxy: ItemProxy = this.getViewProxyFor(currentType);
-      let type: KoheseType = new KoheseType(currentType, viewProxy);
-      this.koheseTypes[currentType.item.name] = type;
-      currentType.type = type;
+      let currentModel: KoheseModel = typeProxies[i];
+      let viewProxy: ItemProxy = this.getViewProxyFor(currentModel);
+      let type: KoheseType = new KoheseType(currentModel, viewProxy);
+      this.koheseTypes[currentModel.item.name] = type;
+      currentModel.type = type;
     }
   }
 

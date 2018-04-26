@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { ProjectInfo } from '../../../../services/project-service/project.service';
 import { Observable, Subscription } from 'rxjs';
 
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy} from '../../../../../../common/src/item-proxy';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from '../../../details/details-dialog/details-dialog.component';
 

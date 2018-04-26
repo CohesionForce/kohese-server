@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter } from "@angular/core";
 import { Subscription } from 'rxjs';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy, TreeConfiguration } from '../../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates, TreeConfigType } from "../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
 import { DialogService } from "../../../services/dialog/dialog.service";
@@ -18,8 +18,8 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
   commitList : Array<any>;
   selectedCommit : any;
   commitSelected : EventEmitter<any> = new EventEmitter<any>();
-  
-  constructor (private itemRepository : ItemRepository, 
+
+  constructor (private itemRepository : ItemRepository,
                private dialogService : DialogService) {
   }
 
@@ -27,7 +27,7 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update)=>{
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.commitList = ItemProxy.TreeConfiguration.getItemCache().getCommits();
+          this.commitList = TreeConfiguration.getItemCache().getCommits();
         }
     })
   }
@@ -38,7 +38,7 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
         if (newRecord) {
           this.selectedCommit = newRecord.commit;
           console.log(newRecord);
-          this.itemRepository.setTreeConfig(newRecord.commitId, TreeConfigType.HISTORICAL);       
+          this.itemRepository.setTreeConfig(newRecord.commitId, TreeConfigType.HISTORICAL);
         }
       })
   }
