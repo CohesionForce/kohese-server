@@ -36,7 +36,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.projectStreamSub = this.projectStream.subscribe((newProject)=>{
       if (newProject) {
         this.project = newProject;
-        console.log(this);
+        this.deselectAll();
       }
     })
   }
