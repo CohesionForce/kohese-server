@@ -22,4 +22,12 @@
       </mat-list-item>
     </mat-list>
   </div>
+  <div class="project-tree"*ngIf="lostProjectItems">
+      <h4 style="position: sticky">Lost Items : </h4>
+      <tree-root [nodes]="lostProjectItems" options="treeOptions">
+         <ng-template #treeNodeTemplate let-node let-index="index">
+           <td (click)="openProxyDetails(node.data)" matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
+         </ng-template> 
+      </tree-root>
+      </div>
 </div>

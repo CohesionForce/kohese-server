@@ -18,6 +18,7 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
   project: ProjectInfo
 
   projectItems: Array<ItemProxy>;
+  lostProjectItems : Array<ItemProxy>;
   activityList: Array<ItemProxy> = [];
 
   constructor(private dialogService: DialogService) {
@@ -27,8 +28,16 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.projectStreamSub = this.projectStream.subscribe((newProject: ProjectInfo) => {
       if (newProject) {
+        // Reset bound table collections
+        this.projectItems = []
+        this.lostProjectItems = undefined;
+
         this.project = newProject;
         this.projectItems = newProject.projectItems;
+        if (newProject.lostProjectItems) {
+          this.lostProjectItems = newProject.lostProjectItems;
+        }
+
         this.activityList = [];
         for (let proxy of this.projectItems) {
           let newItems = proxy.getDescendants();
