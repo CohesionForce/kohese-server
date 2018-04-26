@@ -32,8 +32,9 @@
               <mat-form-field>
                 <mat-select placeholder="Type"
                   [ngModel]="koheseType.fields[selectedPropertyId].type"
-                  (ngModelChange)="updateProperty(['type'], $event)"
-                  [disabled]="koheseType.dataModelProxy.item.isMetaModel">
+                  (ngModelChange)="updateProperty(['type'], convertTypeString($event))"
+                  [disabled]="koheseType.dataModelProxy.item.isMetaModel"
+                  [compareWith]="areTypesSame">
                   <mat-option *ngFor="let type of (types | mapKey)"
                     [value]="types[type]">
                     {{type}}

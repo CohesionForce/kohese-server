@@ -1,15 +1,17 @@
 import { MockDataModel, ItemSubclass } from '../../../mocks/data/MockDataModel';
-import { MockItemSubclassView } from '../../../mocks/data/MockViewData';
+import { MockViewData,
+  MockItemSubclassView } from '../../../mocks/data/MockViewData';
 import { KoheseType } from './KoheseType.class';
 import * as ItemProxy from '../../../../common/src/item-proxy';
+import * as KoheseModel from '../../../../common/src/KoheseModel';
 
 describe('Class: KoheseType', () => {
   let koheseType: KoheseType;
   
   beforeEach(() => {
-    new ItemProxy('KoheseModel', MockDataModel());
-    koheseType = new KoheseType(new ItemProxy('KoheseModel',
-      ItemSubclass()), {
+    new KoheseModel(MockDataModel());
+    koheseType = new KoheseType(new KoheseModel(ItemSubclass()), {
+      'Item': new ItemProxy('KoheseView', MockViewData()),
       'ItemSubclass': new ItemProxy('KoheseView', MockItemSubclassView())
     });
   });
@@ -22,7 +24,7 @@ describe('Class: KoheseType', () => {
   });
   
   it('adds properties to types', () => {
-    let propertyId: string = 'Kurios Iesous';
+    let propertyId: string = 'propertyId';
     koheseType.addProperty(propertyId);
     expect(koheseType.dataModelProxy.item.properties[propertyId]).
       toBeDefined();
@@ -44,17 +46,23 @@ describe('Class: KoheseType', () => {
   it('updates properties of types', () => {
     let propertyId: string = 'subclassProperty';
     let property: any = koheseType.fields[propertyId];
-    property.default = 'Kurios Iesous';
-    property.views['form'].displayName = 'Kurios Iesous';
+    let defaultValue: string = 'default';
+    property.default = defaultValue;
+    let displayNameValue: string = 'displayName';
+    property.views['form'].displayName = displayNameValue;
     koheseType.updateProperty(propertyId, property);
     
     expect(koheseType.dataModelProxy.item.properties[propertyId].default).
-      toEqual('Kurios Iesous');
+      toEqual(defaultValue);
     expect(koheseType.viewModelProxy.item.viewProperties[propertyId].
-      displayName).toEqual('Kurios Iesous');
+      displayName).toEqual(displayNameValue);
     expect(koheseType.fields[propertyId].default).toEqual(
-      'Kurios Iesous');
+      defaultValue);
     expect(koheseType.fields[propertyId].views['form'].displayName).toEqual(
-      'Kurios Iesous');
+      displayNameValue);
+  });
+  
+  it('sets the "form" view for superclass properties', () => {
+    expect(koheseType.fields['name'].views['form']).toBeDefined();
   });
 });

@@ -125,21 +125,22 @@ export class CreateWizardComponent extends NavigatableComponent
     /* Set the value of each field that has an unspecified value to that
     field's default value */
     let fields: object = this.treeConfig.getProxyFor(this.selectedType.
-      name).item.properties;
+      dataModelProxy.item.name).item.properties;
     for (let fieldName in fields) {
       if (null === item[fieldName]) {
         item[fieldName] = fields[fieldName].default;
       }
     }
 
-    this.itemRepository.buildItem(this.selectedType.name, item)
-      .then(() => {
+    this.itemRepository.buildItem(this.selectedType.dataModelProxy.item.name,
+      item).then(() => {
         console.log('Build Item promise resolve')
         this.MatDialogRef.close();
       }, (error) => {
         // TODO show error on review stepper 
         this.errorMessage = error;
-        console.log('*** Failed to upsert: ' + this.selectedType.name);
+        console.log('*** Failed to upsert: ' + this.selectedType.
+          dataModelProxy.item.name);
         console.log(error);
       });
 

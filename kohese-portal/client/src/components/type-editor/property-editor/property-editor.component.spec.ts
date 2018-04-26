@@ -16,6 +16,7 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class'
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../../mocks/data/MockViewData';
 import * as ItemProxy from '../../../../../common/src/item-proxy';
+import * as KoheseModel from '../../../../../common/src/KoheseModel';
 import { PipesModule } from '../../../pipes/pipes.module';
 
 describe('Component: Property Editor', ()=>{
@@ -42,7 +43,7 @@ describe('Component: Property Editor', ()=>{
     propertyEditorFixture = TestBed.createComponent(PropertyEditorComponent);
     propertyEditorComponent = propertyEditorFixture.componentInstance;
     propertyEditorComponent.koheseTypeStream = new BehaviorSubject<KoheseType>(
-      new KoheseType(new ItemProxy('KoheseModel', MockDataModel()), {
+      new KoheseType(new KoheseModel(MockDataModel()), {
       'Item': new ItemProxy('KoheseView', MockViewData())
     }));
     propertyEditorComponent.selectedPropertyId = 'name';
@@ -60,6 +61,28 @@ describe('Component: Property Editor', ()=>{
     expect(propertyEditorComponent.koheseType.fields[propertyEditorComponent.
       selectedPropertyId].views['form'].inputType.type).toEqual(
       'Kurios Iesous');
+  });
+  
+  it('converts type strings to their multivalued form, if appropriate', () => {
+    propertyEditorComponent.multivalued = true;
+    expect(propertyEditorComponent.convertTypeString('type')).toEqual(
+      '[ type ]');
+    
+    propertyEditorComponent.multivalued = false;
+    expect(propertyEditorComponent.convertTypeString('type')).toEqual('type');
+  });
+  
+  it('determines whether two type strings represent the same type', () => {
+    expect(propertyEditorComponent.areTypesSame('type', '[ type ]')).toEqual(
+      true);
+    
+    expect(propertyEditorComponent.areTypesSame('[ type ]', 'type')).toEqual(
+      false);
+    
+    expect(propertyEditorComponent.areTypesSame('type', 'type')).toEqual(
+      true);
+    
+    expect(propertyEditorComponent.areTypesSame('type', 't')).toEqual(false);
   });
   
   it('determines and changes multivalued-ness of properties', () => {

@@ -131,6 +131,26 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
+  public convertTypeString(type: string): string {
+    if (this._koheseType.fields[this.selectedPropertyId].type.startsWith(
+      '[')) {
+      type = '[ ' + type + ' ]';
+    }
+    
+    return type;
+  }
+  
+  public areTypesSame(option: any, selection: any): boolean {
+    let selectionType: string;
+    if (selection.startsWith('[')) {
+      selectionType = selection.substring(2, selection.length - 2);
+    } else {
+      selectionType = selection;
+    }
+    
+    return (option === selectionType);
+  }
+  
   public changeRelationness(checked: boolean): void {
     let property: any = this._koheseType.fields[this.selectedPropertyId];
     if (checked) {

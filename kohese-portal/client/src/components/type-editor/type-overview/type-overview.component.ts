@@ -56,8 +56,9 @@ export class TypeOverviewComponent implements OnInit, OnDestroy {
   }
   
   openIconSelectionDialog(): void {
-    this.dialogService.openComponentDialog(IconSelectorComponent, {}).
-      afterClosed().subscribe((result: string) => {
+    this.dialogService.openComponentDialog(IconSelectorComponent, {
+      data: {}
+    }).afterClosed().subscribe((result: string) => {
       if ('\0' !== result) {
         this._koheseType.viewModelProxy.item.icon = result;
         this._changeDetectorRef.markForCheck();

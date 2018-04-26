@@ -71,9 +71,9 @@ export class KoheseType {
         let field: any = JSON.parse(JSON.stringify(modelProxy.item.
           properties[fieldKey]));
         field.views = {};
-        if (this.viewModelProxy) {
-          let viewProperty: any = this.viewModelProxy.item.viewProperties[
-            fieldKey];
+        if (this._viewModelProxyMap[modelProxy.item.name]) {
+          let viewProperty: any = this._viewModelProxyMap[modelProxy.item.
+            name].item.viewProperties[fieldKey];
           if (viewProperty) {
             field.views['form'] = JSON.parse(JSON.
               stringify(viewProperty));
