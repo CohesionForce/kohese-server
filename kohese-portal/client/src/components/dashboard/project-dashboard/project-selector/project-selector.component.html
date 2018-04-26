@@ -25,7 +25,7 @@
           <mat-card-content>
             <h5>Description :</h5> {{selectedProject.proxy.item.description}}
             <h5>Project Items : </h5>
-            <div *ngFor="let projectItem of selectedProject.proxy.relations.references.Project.projectItems">
+            <div *ngFor="let projectItem of selectedProject.projectItems">
               {{projectItem.item.name}}
             </div>
             <div *ngIf="historicalMode">

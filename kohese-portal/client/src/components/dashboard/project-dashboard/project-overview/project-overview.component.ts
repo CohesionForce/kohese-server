@@ -28,7 +28,7 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
     this.projectStreamSub = this.projectStream.subscribe((newProject: ProjectInfo) => {
       if (newProject) {
         this.project = newProject;
-        this.projectItems = newProject.proxy.getRelationsByAttribute().references.projectItems.Project;
+        this.projectItems = newProject.projectItems;
         this.activityList = [];
         for (let proxy of this.projectItems) {
           let newItems = proxy.getDescendants();

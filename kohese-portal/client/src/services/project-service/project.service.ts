@@ -6,6 +6,7 @@ import { Subscription } from "rxjs";
 export interface ProjectInfo {
   proxy: ItemProxy,
   users: Array<any>
+  projectItems : Array<ItemProxy>,
   lostProjectItems?: Array<ItemProxy>
 }
 
@@ -79,18 +80,21 @@ export class ProjectService {
       let userMap = {};
       let users = [];
       let lostProjectItems = [];
+      let foundProjectItems = [];
       let currentProject = this.workingProjects[projectIdx];
       let projectItems = currentProject.proxy.item.projectItems;
       for (let projectItemIdx in projectItems) {
         let currentProjectItem: ItemProxy = 
           this.currentConfig.getProxyFor(projectItems[projectItemIdx].id)
         if (!currentProjectItem) {
+          // Project item is not found in current tree configuration
           currentProjectItem =
              this.workingConfig.getProxyFor(projectItems[projectItemIdx].id)
           lostProjectItems.push(currentProjectItem);
           continue;
         }
 
+        foundProjectItems.push(currentProjectItem);
         let projectItemSubTree: Array<ItemProxy> = currentProjectItem.getSubtreeAsList();
 
         projectItemSubTree = projectItemSubTree.filter((item) => {
@@ -116,6 +120,7 @@ export class ProjectService {
       projectList.push({
         users: users,
         proxy: currentProject.proxy,
+        projectItems : foundProjectItems,
         lostProjectItems: lostProjectItems
       })
     }
@@ -160,7 +165,8 @@ export class ProjectService {
 
       projectList.push({
         users: users,
-        proxy: currentProject
+        proxy: currentProject,
+        projectItems : projectItems
       })
     }
     return projectList;
