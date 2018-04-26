@@ -46,8 +46,8 @@ export class RepositoriesComponent extends NavigatableComponent implements
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.status) {
           this.treeConfigSubscription =
             this.itemRepository.getTreeConfig().subscribe((newConfig) => {
-              this.repositories = newConfig.getRepositories();
-              this.rootProxy = newConfig.getRootProxy();
+              this.repositories = newConfig.config.getRepositories();
+              this.rootProxy = newConfig.config.getRootProxy();
             })
         }
       });

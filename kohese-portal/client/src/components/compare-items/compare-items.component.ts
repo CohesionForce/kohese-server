@@ -133,7 +133,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }
     }
     this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe((newConfig) => {
-      this.treeConfig = newConfig;
+      this.treeConfig = newConfig.config;
       this._itemProxyChangeSubscription = this.treeConfig.getChangeSubject()
         .subscribe((notification: any) => {
           if (notification.proxy) {

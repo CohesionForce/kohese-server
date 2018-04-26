@@ -63,7 +63,7 @@ export class DetailsComponent extends ProxyDetailsComponent
       } else {
         this.treeConfigSub = this.currentTreeConfigSubscription = this.itemRepository.getTreeConfig()
           .subscribe((newConfig) => {
-            this.treeConfig = newConfig;
+            this.treeConfig = newConfig.config;
             // Unsubscribe from old tree updates 
             if (this.proxyUpdates) {
               this.proxyUpdates.unsubscribe();
@@ -71,7 +71,7 @@ export class DetailsComponent extends ProxyDetailsComponent
             }
             this.repoConnected = true;
             this.updateProxy();
-            this.proxyUpdates = newConfig.getChangeSubject().subscribe((change) => {
+            this.proxyUpdates = this.treeConfig.getChangeSubject().subscribe((change) => {
               if (this.itemProxy === change.proxy) {
                 this.proxyStream.next(change.proxy);
                 this.relationIdMap = this.itemProxy.getRelationIdMap();

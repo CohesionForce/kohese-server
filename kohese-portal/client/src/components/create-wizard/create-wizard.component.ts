@@ -59,7 +59,7 @@ export class CreateWizardComponent extends NavigatableComponent
     this.treeConfigSub = this.itemRepository.getTreeConfig()
       .subscribe((newConfig) => {
         if (newConfig) {
-          this.treeConfig = newConfig;
+          this.treeConfig = newConfig.config;
           this.rootProxy = this.treeConfig.getRootProxy();
           let types = this.DynamicTypesService.getKoheseTypes();
           for (let type in types) {

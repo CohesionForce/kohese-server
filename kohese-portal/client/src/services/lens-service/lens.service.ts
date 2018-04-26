@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs';
-import { ItemRepository } from '../item-repository/item-repository.service';
+import { ItemRepository, TreeConfigType } from '../item-repository/item-repository.service';
 
 @Injectable()
 export class LensService {
@@ -12,7 +12,7 @@ export class LensService {
 
   setLens(newLens: ApplicationLens) {
     if (newLens === ApplicationLens.DEFAULT) {
-      this.itemRepository.setTreeConfig('Unstaged');
+      this.itemRepository.setTreeConfig('Unstaged', TreeConfigType.DEFAULT);
     }
     this.lensSubject.next(newLens);
   }

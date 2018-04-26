@@ -87,7 +87,7 @@ export class TreeComponent extends NavigatableComponent
                     this._itemProxySubscription = undefined;
                   }
 
-                  this.absoluteRoot = newConfig.getRootProxy();
+                  this.absoluteRoot = newConfig.config.getRootProxy();
                   this._treeRootStream = new BehaviorSubject<ItemProxy>(this.
                     absoluteRoot);
                   this.koheseTypes = this.typeService.getKoheseTypes();
@@ -107,7 +107,7 @@ export class TreeComponent extends NavigatableComponent
                       this.changeTreeRoot(proxy);
                     });
 
-                  this._itemProxySubscription = newConfig.
+                  this._itemProxySubscription = newConfig.config.
                     getChangeSubject().subscribe((notification: any) => {
                       this.calculateRows(notification);
                     })

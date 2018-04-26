@@ -17,6 +17,7 @@ export class ProjectSelectorComponent implements OnInit {
   isMultiSelect : boolean // unused as of right now
   projectList : Array<ProjectInfo>;
   selectedProject : ItemProxy;
+  historicalMode : boolean;
 
   constructor(private dialogRef : MatDialogRef<ProjectSelectorComponent>,
               private projectService : ProjectService) {
@@ -25,7 +26,8 @@ export class ProjectSelectorComponent implements OnInit {
 
   ngOnInit() {
     this.projectList = this.projectService.getProjects();
-    console.log(this.projectList);
+    this.historicalMode = this.projectService.isHistorical();
+
   }
 
   closeDialog () {
@@ -40,4 +42,12 @@ export class ProjectSelectorComponent implements OnInit {
     this.dialogRef.close(this.selectedProject);
   }
 
+  toggleCurrentProjects (checked) {
+    console.log(checked);
+    if (checked) {
+      this.projectList = this.projectService.generateWorkingProjects();
+    } else {
+      this.projectList = this.projectService.getProjects();
+    }
+  }
 }

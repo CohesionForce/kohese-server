@@ -47,7 +47,7 @@ export class KProxySelectorComponent extends UserInput
 
     this.treeConfigSub = this.ItemRepository.getTreeConfig().subscribe((newConfig) => {
       if (newConfig) {
-        this.treeConfig = newConfig;
+        this.treeConfig = newConfig.config;
         this.initSelections();
       }
     })

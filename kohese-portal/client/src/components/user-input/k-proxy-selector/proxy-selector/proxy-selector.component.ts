@@ -41,7 +41,7 @@ export class ProxySelectorComponent implements OnInit {
     this.treeConfigSub =
       this.itemRepository.getTreeConfig().subscribe((newConfig) => {
         if (newConfig) {
-          this.treeConfig = newConfig;
+          this.treeConfig = newConfig.config;
           this.rootProxy = this.treeConfig.getRootProxy();
           this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
             map((text: string) => {
