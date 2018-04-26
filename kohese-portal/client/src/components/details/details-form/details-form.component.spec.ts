@@ -10,7 +10,9 @@ import { PipesModule } from '../../../pipes/pipes.module';
 import { DetailsFormComponent } from './details-form.component';
 
 import * as ItemProxy from '../../../../../common/src/item-proxy'
+import * as KoheseModel from '../../../../../common/src/KoheseModel';
 
+import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
@@ -46,6 +48,8 @@ describe('Component: Details Form', ()=>{
 
     formFixture = TestBed.createComponent(DetailsFormComponent);
     formComponent = formFixture.componentInstance;
+    new KoheseModel(MockDataModel());
+    KoheseModel.modelDefinitionLoadingComplete();
     let proxy: ItemProxy = new ItemProxy('Item', MockItem());
     proxy.model.item = {
       base: 'PersistedModel'

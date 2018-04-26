@@ -17,8 +17,10 @@ import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { ActivatedRoute } from '@angular/router';
 import { TreeComponent } from './tree.component';
 import { TreeRow } from './tree-row.class';
+import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockItem } from '../../../mocks/data/MockItem';
 import * as ItemProxy from '../../../../common/src/item-proxy';
+import * as KoheseModel from '../../../../common/src/KoheseModel';
 import { Observable } from 'rxjs/Observable';
 
 describe('Component: Tree', () => {
@@ -56,6 +58,8 @@ describe('Component: Tree', () => {
   });
 
   it('builds a TreeRow for a new Item', fakeAsync(() => {
+    new KoheseModel(MockDataModel());
+    KoheseModel.modelDefinitionLoadingComplete();
     let item: any = MockItem();
     item.id = 'Kurios Iesous';
     item.parentId = 'test-uuid3';
@@ -145,7 +149,8 @@ describe('Component: Tree', () => {
   it('does not produce an error when the value of selectedProxyIdStream is ' +
     'invalid', fakeAsync(() => {
     let id: string = '-1';
-    expect(ItemProxy.getProxyFor(id)).not.toBeDefined();
+    expect(ItemProxy.TreeConfiguration.getWorkingTree().getProxyFor(id)).not.
+      toBeDefined();
     component.selectedProxyIdStream.next(id);
     tick();
     /* Since the selection is to be synchronized by default, call the

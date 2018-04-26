@@ -13,10 +13,6 @@ import { RepoStates } from '../../src/services/item-repository/item-repository.s
 export class MockItemRepository {
   mockRootProxy = ItemProxy.getWorkingTree().getRootProxy();
   state: any;
-  currentTreeConfigSubject: BehaviorSubject<any> = new BehaviorSubject<any>({
-
-  })
-
 
   constructor() {
 
@@ -56,7 +52,7 @@ export class MockItemRepository {
   }
 
   getProxyFor(id: string) {
-    return ItemProxy.getProxyFor(id);
+    return ItemProxy.TreeConfiguration.getWorkingTree().getProxyFor(id);
   }
 
   getRecentProxies() {
@@ -106,17 +102,7 @@ export class MockItemRepository {
   }
 
   getTreeConfig(): Observable<any> {
-
-    return new BehaviorSubject<any>({
-      getProxyFor: () => {
-        return new ItemProxy('Item', MockItem());
-      },
-      getRootProxy: () => {
-        return this.getRootProxy();
-      },
-      getChangeSubject: () => {
-        return new BehaviorSubject<any>(undefined);
-      }
-    })
+    return new BehaviorSubject<TreeConfiguration>(ItemProxy.TreeConfiguration.
+      getWorkingTree());
   }
 }

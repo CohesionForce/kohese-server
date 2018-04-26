@@ -9,6 +9,8 @@ import { AssignmentDashboardComponent } from './assignment-dashboard.component';
 import { BehaviorSubject } from 'rxjs';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import * as ItemProxy from '../../../../../common/src/item-proxy';
 
 describe('Component: ', ()=>{
@@ -26,6 +28,7 @@ describe('Component: ', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
+        { provide: NavigationService, useClass: MockNavigationService }
       ]
     }).compileComponents();
 

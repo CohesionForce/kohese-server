@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { from } from 'rxjs/observable/from';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/from';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
@@ -10,6 +11,8 @@ import { ExploreComponent } from './explore.component';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { ActivatedRoute } from '@angular/router';
 import { LensModule } from '../lens/lens.module';
 
@@ -28,8 +31,9 @@ describe('Component: Explore', ()=>{
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ActivatedRoute, useValue:{
-          params: from([{id: 1}])
-        }}
+          params: Observable.from([{id: 'test-uuid7'}])
+        }},
+        {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();
 
@@ -42,8 +46,9 @@ describe('Component: Explore', ()=>{
 
   it('instantiates the Explore component', ()=>{
     expect(exploreComponent).toBeTruthy(); 
-  })
-  it('should display the details view when an id is provided', ()=>{
+  });
+  
+  it('should display details-view', () => {
     expect(exploreComponent.proxySelected).toBeTruthy();
-  })
+  });
 })
