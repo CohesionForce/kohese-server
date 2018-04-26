@@ -11,15 +11,6 @@
         "Item"
       ],
       "relation": true
-    },
-    "subscribed": {
-      "type": [
-        "string"
-      ],
-      "relation": {
-        "kind": "KoheseUser",
-        "foreignKey": "username"
-      }
     }
   },
   "validations": [],
