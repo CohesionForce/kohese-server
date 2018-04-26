@@ -5,14 +5,14 @@
   "license": "EPL-1.0",
   "scripts": {
     "server": "node --max_old_space_size=2048 .",
-    "build": "webpack --config webpack.config.dev.js",
-    "build-prod": "webpack --config webpack.config.prod.js && npm run sw-config && npm run sw-copy",
+    "build-client": "webpack --config webpack.config.dev.js",
+    "build-client-prod": "webpack --config webpack.config.prod.js && npm run sw-config && npm run sw-copy",
     "start": "webpack-dev-server --port=4200",
     "test": "karma start --log-level error ./karma.conf.js",
     "pree2e": "webdriver-manager update --standalone false --gecko false --quiet",
     "e2e": "protractor ./protractor.conf.js",
-    "sw-config": "ngsw-config dist/client/bundle client/ngsw-config.json",
-    "sw-copy": "cp node_modules/@angular/service-worker/ngsw-worker.js dist/client/bundle"
+    "sw-config": "ngsw-config build/client/bundle client/ngsw-config.json",
+    "sw-copy": "cp node_modules/@angular/service-worker/ngsw-worker.js build/client/bundle"
   },
   "dependencies": {
     "@angular/animations": "^5.2.3",
