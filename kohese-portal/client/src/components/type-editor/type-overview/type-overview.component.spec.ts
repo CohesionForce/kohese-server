@@ -15,6 +15,7 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class'
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../../mocks/data/MockViewData';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { PipesModule } from '../../../pipes/pipes.module';
 
 describe('Component: Type Overview', ()=>{
@@ -41,7 +42,7 @@ describe('Component: Type Overview', ()=>{
     typeOverviewFixture = TestBed.createComponent(TypeOverviewComponent);
     typeOverviewComponent = typeOverviewFixture.componentInstance;
     typeOverviewComponent.type = new KoheseType(
-      new ItemProxy('KoheseModel', MockDataModel()),
+      new KoheseModel(MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()))
     typeOverviewFixture.detectChanges();
 

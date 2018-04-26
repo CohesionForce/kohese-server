@@ -8,14 +8,14 @@ describe('Service: version-control', () => {
 
   beforeAll(() => {
     let item: any = MockItem();
-    item.id = 'Kurios Iesous';
+    item.id = 'test-uuid';
     proxy = new ItemProxy('Item', item);
     let placeholderSocketService: any = jasmine.createSpyObj('SocketService',
       ['getSocket']);
     placeholderSocketService.getSocket.and.returnValue({
       emit: (message: string, data: any, callbackFunction: Function) => {
         callbackFunction({
-          'Kurios Iesous': ['CURRENT']
+          'test-uuid': ['CURRENT']
         });
       }
     });
@@ -45,19 +45,19 @@ describe('Service: version-control', () => {
   });
 
   it('commits changes', (done: Function) => {
-    versionControlService.commitItems([proxy], {
-      item: {
-        name: 'Kurios Iesous',
-        email: 'KuriosIesous@KuriosIesous'
-      }
-    }, 'Kurios Iesous.').subscribe((statusMap: any) => {
+    versionControlService.commitItems([proxy],
+      new ItemProxy('KoheseUser', {
+        name: 'Test User',
+        email: 'TestUser@test.kohese.com'
+      }),
+      'Test Commit Message.').subscribe((statusMap: any) => {
       expect(true).toEqual(true);
       done();
     });
   });
 
   it('propagates committed changes', (done: Function) => {
-    versionControlService.push(['Kurios Iesous'], 'Kurios Iesous').subscribe(
+    versionControlService.push(['test-uuid'], 'test-remote-name').subscribe(
       (returnValue: any) => {
       expect(true).toEqual(true);
       done();
@@ -65,15 +65,15 @@ describe('Service: version-control', () => {
   });
 
   it('adds a Remote', (done: Function) => {
-    versionControlService.addRemote('Kurios Iesous', 'Kurios Iesous',
-      'Kurios Iesous').subscribe((returnValue: any) => {
+    versionControlService.addRemote('test-id', 'test-remote-name',
+      'test-url').subscribe((returnValue: any) => {
       expect(true).toEqual(true);
       done();
     });
   });
 
   it('returns a list of Remotes', (done: Function) => {
-    versionControlService.getRemotes('Kurios Iesous').subscribe(
+    versionControlService.getRemotes('test-id').subscribe(
       (returnValue: any) => {
       expect(true).toEqual(true);
       done();

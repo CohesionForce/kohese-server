@@ -21,6 +21,7 @@ import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { TreeRow } from './tree-row.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -54,7 +55,7 @@ describe('Component: TreeRow', () => {
 
   it('filters based on type', () => {
     let filter: ProxyFilter = new ProxyFilter();
-    filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
+    filter.kind = new KoheseType(new KoheseModel(MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()));
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(true);
@@ -66,7 +67,7 @@ describe('Component: TreeRow', () => {
   it('filters based on the user assigned to an Action', () => {
     component.treeRow.itemProxy.kind = 'Action';
     let filter: ProxyFilter = new ProxyFilter();
-    filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
+    filter.kind = new KoheseType(new KoheseModel(MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()));
     filter.kind.name = 'Action';
     filter.actionAssignee = 'admin';

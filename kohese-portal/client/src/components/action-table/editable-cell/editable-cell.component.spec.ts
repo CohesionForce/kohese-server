@@ -8,7 +8,7 @@ import { EditableCellComponent } from './editable-cell.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import * as KoheseModel from '../../../../../common/src/KoheseModel';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
@@ -58,7 +58,7 @@ describe('Component: Editable Cell ', ()=>{
   it('updates when a new action is provided', async(()=>{
     let newProxy = new ItemProxy('Item', MockItem());
     newProxy.item.name = 'New Action';
-    newProxy.item.model = new ItemProxy('KoheseModel', MockDataModel());
+    newProxy.item.model = new KoheseModel(MockDataModel());
     editableCellComponent.action = {
       depth : 0,
       proxy : newProxy

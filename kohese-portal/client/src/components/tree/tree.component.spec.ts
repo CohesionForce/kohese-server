@@ -145,7 +145,7 @@ describe('Component: Tree', () => {
   it('does not produce an error when the value of selectedProxyIdStream is ' +
     'invalid', fakeAsync(() => {
     let id: string = '-1';
-    expect(ItemProxy.getProxyFor(id)).not.toBeDefined();
+    expect(ItemProxy.getWorkingTree().getProxyFor(id)).not.toBeDefined();
     component.selectedProxyIdStream.next(id);
     tick();
     /* Since the selection is to be synchronized by default, call the
