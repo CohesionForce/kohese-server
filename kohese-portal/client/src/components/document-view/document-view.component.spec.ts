@@ -10,7 +10,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
 import { MockItem, MockDocument } from '../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { AnalysisViews } from '../analysis/AnalysisViewComponent.class';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { RouterTestingModule } from '@angular/router/testing';

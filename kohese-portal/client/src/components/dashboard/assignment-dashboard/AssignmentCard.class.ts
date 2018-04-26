@@ -2,13 +2,13 @@ import { NavigatableComponent } from "../../../classes/NavigationComponent.class
 import { NavigationService } from "../../../services/navigation/navigation.service";
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { ChangeDetectorRef } from "@angular/core";
 
 export class AssignmentCard extends NavigatableComponent {
 
-  editable : boolean; 
+  editable : boolean;
   assignmentProxyStreamSub : Subscription;
   assignmentProxyStream : BehaviorSubject<ItemProxy>;
   assignment : ItemProxy;
@@ -21,8 +21,8 @@ export class AssignmentCard extends NavigatableComponent {
     this.assignmentProxyStream = new BehaviorSubject<ItemProxy>(undefined);
     this.assignmentProxyStreamSub = this.assignmentProxyStream.subscribe((assignment)=>{
       this.assignment = assignment;
-      
-    }) 
+
+    })
   }
 
   toggleEdit (editable : boolean ) {

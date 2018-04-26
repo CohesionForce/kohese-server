@@ -4,7 +4,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ImportService } from '../../../services/import/import.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { SelectedProxyInfo } from '../../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'import',
@@ -33,11 +34,11 @@ export class ImportComponent {
   }
 
   importFile (fileInput, userInput) {
-    this.importService.importFile(fileInput.files, 
+    this.importService.importFile(fileInput.files,
                                   this.selectedParent.item.id)
   }
 
-  onParentSelected(newParent) {
-    this.selectedParent = newParent;
+  onParentSelected(newParent: SelectedProxyInfo) {
+    this.selectedParent = newParent.selectedProxy;
   }
 }

@@ -3,10 +3,10 @@
  *
  *  User must set the file and rootItem parameters below.
  */
-var fs = require('fs');
+import * as fs from 'fs';
 var commonmark = require('commonmark');
 var renderFunc = require('./md-to-kohese-helper.js');
-var ItemProxy = require('../common/src/item-proxy.js');
+import { ItemProxy } from '../common/src/item-proxy.js';
 
 function mdToKohese(koheseUserName, filePath, rootItem) {
   var text;

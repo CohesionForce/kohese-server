@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy, Input, EventEmitter, OnChanges, ChangeDet
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 
-import * as ItemProxy from '../../../../../../common/src/item-proxy.js';
+import { ItemProxy } from '../../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -32,7 +32,7 @@ export class ChildrenTableComponent extends NavigatableComponent
   filteredItems : Array<ItemProxy>;
 
   @Input()
-  childrenStream : BehaviorSubject<ItemProxy>;
+  childrenStream : BehaviorSubject<Array<ItemProxy>>;
   tableStream : MatTableDataSource<ItemProxy>;
 
   /* Subscriptions */
@@ -49,7 +49,7 @@ export class ChildrenTableComponent extends NavigatableComponent
   }
 
   ngOnInit () {
-    this.childrenStreamSub = 
+    this.childrenStreamSub =
       this.childrenStream.subscribe((newChildren : Array<ItemProxy>)=>{
       this.children = newChildren;
       this.tableStream = new MatTableDataSource<ItemProxy>(this.children)

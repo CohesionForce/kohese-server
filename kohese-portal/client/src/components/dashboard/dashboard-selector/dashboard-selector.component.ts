@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 
 export enum DashboardSelections {
@@ -15,14 +15,14 @@ export enum DashboardSelections {
   styleUrls: ['./dashboard-selector.component.scss']
 })
 export class DashboardSelectorComponent implements OnInit, OnDestroy {
-  @Input() 
+  @Input()
   user : ItemProxy;
   dashboards : DashboardSelections;
 
   @Output()
   dashboardSelected : EventEmitter<DashboardSelections> = new EventEmitter();
   selectedDashboard : string;
-  
+
   constructor () {
 
   }
@@ -45,16 +45,16 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         this.selectedDashboard = 'due';
         this.dashboardSelected.emit(DashboardSelections.DUE_ASSIGNMENTS);
         break;
-      case('completed') : 
+      case('completed') :
         this.selectedDashboard = 'completed';
         this.dashboardSelected.emit(DashboardSelections.COMPLETED_ASSIGNMENTS);
         break;
-      case('preferences') : 
+      case('preferences') :
         this.selectedDashboard = 'preferences';
         this.dashboardSelected.emit(DashboardSelections.USER_PREFERENCES);
         break;
-      default : 
-        this.dashboardSelected.emit(undefined); 
+      default :
+        this.dashboardSelected.emit(undefined);
         console.error('Invalid Dashboard selection :');
         console.error(dashboard);
     }

@@ -1,9 +1,9 @@
 console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
-import * as ItemProxy from '../../common/src/item-proxy.js';
-import * as ItemCache from '../../common/src/item-cache.js';
-import * as KoheseModel from '../../common/src/KoheseModel.js';
+import { ItemProxy, TreeConfiguration } from '../../common/src/item-proxy';
+import { ItemCache } from '../../common/src/item-cache';
+import { KoheseModel } from '../../common/src/KoheseModel';
 
 let socket : SocketIOClient.Socket = SocketIoClient();
 let serverCache = {
@@ -287,16 +287,16 @@ function getItemCache(){
       serverCache.objectMap = response.objectMap;
       let itemCache = new ItemCache();
       itemCache.setObjectMap(response.objectMap)
-      ItemProxy.TreeConfiguration.setItemCache(itemCache);
+      TreeConfiguration.setItemCache(itemCache);
       let headCommit = itemCache.getRef('HEAD');
       console.log('### Head: ' + headCommit);
       cacheFetched = true;
 
       // TODO Need to load the HEAD commit
       console.log('$$$ Loading HEAD Commit');
-      let workingTree = ItemProxy.TreeConfiguration.getWorkingTree();
+      let workingTree = TreeConfiguration.getWorkingTree();
       itemCache.loadProxiesForCommit(headCommit, workingTree);
-      workingTree.loadingComplete();
+      workingTree.calculateAllTreeHashes();
 
       getAll();
     });
@@ -364,7 +364,7 @@ function getAll(){
   let requestTime = Date.now();
   repoState = RepoStates.SYNCHRONIZING;
 
-  let origRepoTreeHashes = ItemProxy.TreeConfiguration.getWorkingTree().getAllTreeHashes();
+  let origRepoTreeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
 
   socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes},
     (response) => {

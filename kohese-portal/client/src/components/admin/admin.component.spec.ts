@@ -13,7 +13,7 @@ import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { PipesModule } from '../../pipes/pipes.module';
 import { MockUserData } from '../../../mocks/data/MockUser';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { LensModule } from '../lens/lens.module';
 
 describe('Component: Admin', ()=>{
@@ -41,11 +41,11 @@ describe('Component: Admin', ()=>{
     adminComponent = adminFixture.componentInstance;
 
     adminFixture.detectChanges();
-    
+
   })
 
   it('instantiates the admin component', ()=>{
-    expect(adminComponent).toBeTruthy(); 
+    expect(adminComponent).toBeTruthy();
   })
 
   describe('user actions', ()=>{
@@ -85,7 +85,7 @@ describe('Component: Admin', ()=>{
 
     it('should delete a user', ()=>{
       let mockProxy = new ItemProxy('KoheseUser', MockUserData());
-      let deleteSpy = spyOn(TestBed.get(ItemRepository), 'deleteItem').and.returnValue(Promise.resolve()); 
+      let deleteSpy = spyOn(TestBed.get(ItemRepository), 'deleteItem').and.returnValue(Promise.resolve());
       adminComponent.deleteUser(mockProxy);
       expect(deleteSpy).toHaveBeenCalled();
     })

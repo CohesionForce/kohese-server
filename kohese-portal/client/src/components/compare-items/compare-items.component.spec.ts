@@ -11,11 +11,11 @@ import { CompareItemsComponent } from './compare-items.component';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 describe('Component: compare-items', () => {
   let component: CompareItemsComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [CompareItemsComponent],
@@ -38,21 +38,21 @@ describe('Component: compare-items', () => {
     let proxy: ItemProxy = new ItemProxy('Item', MockItem());
     component.selectedBaseStream.next(proxy);
     component.selectedChangeStream.next(proxy);
-    
+
     compareItemsFixture.detectChanges();
   });
-  
+
   it('resets the ItemProxy that was being edited when editing is canceled',
     fakeAsync(() => {
     let name: string = 'Kurios Iesous';
-    
+
     component.toggleEditability(component.baseEditableStream);
     tick();
     component.selectedBaseStream.getValue().item.name = name;
     component.toggleEditability(component.baseEditableStream);
     tick();
     expect(component.selectedBaseStream.getValue().item.name).not.toEqual(name);
-    
+
     component.toggleEditability(component.changeEditableStream);
     tick();
     component.selectedChangeStream.getValue().item.name = name;
@@ -60,23 +60,23 @@ describe('Component: compare-items', () => {
     tick();
     expect(component.selectedChangeStream.getValue().item.name).not.toEqual(name);
   }));
-  
+
   it('responds to changing the base and change ItemProxies', fakeAsync(() => {
     ItemProxy.getWorkingTree().getChangeSubject().next({
       proxy: component.selectedBaseStream.getValue()
     });
     tick();
-    
+
     component.whenSelectedBaseChanges(component.selectedBaseStream.getValue());
     tick();
     expect(component.selectedBaseVersion).toEqual('Unstaged');
     expect(component.allowBaseEditing).toEqual(true);
-    
+
     ItemProxy.getWorkingTree().getChangeSubject().next({
       proxy: component.selectedChangeStream.getValue()
     });
     tick();
-    
+
     component.whenSelectedChangeChanges(component.selectedChangeStream.
       getValue());
     tick();

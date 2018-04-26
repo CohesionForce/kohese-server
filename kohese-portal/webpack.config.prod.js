@@ -167,7 +167,7 @@ module.exports = {
     ]
   },
   "output": {
-    "path": path.join(process.cwd(), "client/bundle"),
+    "path": path.join(process.cwd(), "build/client/bundle"),
     "filename": "[name].[chunkhash:20].bundle.js",
     "chunkFilename": "[id].[chunkhash:20].chunk.js",
     "crossOriginLoading": false

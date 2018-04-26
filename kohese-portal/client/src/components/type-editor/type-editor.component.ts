@@ -4,6 +4,7 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -14,15 +15,15 @@ import { Subscription } from 'rxjs';
 export class TypeEditorComponent implements OnInit, OnDestroy {
   public types: any;
   public selectedType: KoheseType;
-  
+
   /* Subscriptions */
   repoStatusSubscription : Subscription;
-  
+
   constructor(public typeService: DynamicTypesService,
     private dialogService: DialogService,
     private itemRepository: ItemRepository) {
   }
-  
+
   ngOnInit(): void {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
     .subscribe((update: any) => {
@@ -38,7 +39,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.repoStatusSubscription.unsubscribe();
   }
-  
+
   add(): void {
     this.dialogService.openInputDialog('Add Type', '', this.dialogService.
       INPUT_TYPES.TEXT, 'Name').afterClosed().subscribe((name: string) => {
@@ -60,15 +61,17 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           modelName: name,
           viewProperties: {}
         });
-      
+
         Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
           then((proxies: Array<ItemProxy>) => {
-          this.types[name] = new KoheseType(proxies[0], proxies[1]);
+            let modelProxy = <KoheseModel>proxies[0];
+            let viewProxy = proxies[1];
+          this.types[name] = new KoheseType(modelProxy, viewProxy);
         });
       }
     });
   }
-  
+
   save(): void {
     this.itemRepository.upsertItem(this.selectedType.synchronizeDataModel()).
       catch((error: any) => {
@@ -83,7 +86,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       console.log(error);
     });
   }
-  
+
   delete(): void {
     this.dialogService.openYesNoDialog('Delete ' + this.selectedType.name,
       'Are you sure that you want to delete ' + this.selectedType.name + '?').

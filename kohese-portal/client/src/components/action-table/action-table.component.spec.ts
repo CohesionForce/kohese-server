@@ -10,7 +10,7 @@ import { MockNavigationService } from '../../../mocks/services/MockNavigationSer
 import { ActionTableComponent } from './action-table.component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { BehaviorSubject } from 'rxjs';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../mocks/data/MockItem';
@@ -39,8 +39,8 @@ describe('Component: Action Table', ()=>{
 
     actionTableFixture = TestBed.createComponent(ActionTableComponent);
     actionTableComponent = actionTableFixture.componentInstance;
-    let itemProxy = mockItemRepository.getRootProxy(); 
-    itemProxy.getSubtreeAsList = ()=>{ 
+    let itemProxy = mockItemRepository.getRootProxy();
+    itemProxy.getSubtreeAsList = ()=>{
       return [
         { depth: 0, proxy: new ItemProxy('Item', MockItem())},
         { depth: 0, proxy: new ItemProxy('Item', MockItem())},

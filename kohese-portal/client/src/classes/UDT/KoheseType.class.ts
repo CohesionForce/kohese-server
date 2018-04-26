@@ -1,8 +1,9 @@
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { TypeProperty } from './TypeProperty.class';
 
 export class KoheseType {
-  private dataModelProxy: ItemProxy;
+  private dataModelProxy: KoheseModel;
   private viewModelProxy: ItemProxy;
   name : string;
   description: string;
@@ -21,7 +22,7 @@ export class KoheseType {
     return this._dataModelFields;
   }
 
-  constructor(dataModelProxy: ItemProxy, viewModelProxy: ItemProxy) {
+  constructor(dataModelProxy: KoheseModel, viewModelProxy: ItemProxy) {
     this.dataModelProxy = dataModelProxy;
     this.viewModelProxy = viewModelProxy;
     this.retrieveModelData();
@@ -29,7 +30,7 @@ export class KoheseType {
       this.retrieveViewData();
     }
   }
-  
+
   retrieveModelData(): void {
     this.name = this.dataModelProxy.item.name;
     this.description = this.dataModelProxy.item.description;
@@ -41,10 +42,10 @@ export class KoheseType {
     this.relations = this.dataModelProxy.item.relations;
     this.acls = this.dataModelProxy.item.acls;
     this.methods = this.dataModelProxy.item.methods;
-    
+
     let fieldGroups: Array<any> = [];
     let modelProxy: ItemProxy = this.dataModelProxy;
-    
+
     do {
       let modelFields: any = {};
       for (let fieldKey in modelProxy.item.properties) {
@@ -52,10 +53,10 @@ export class KoheseType {
           properties[fieldKey];
       }
       fieldGroups.push(modelFields);
- 
+
       modelProxy = modelProxy.parentProxy;
     } while (modelProxy.item.base);
-    
+
     fieldGroups.reverse();
     for (let j: number = 0; j < fieldGroups.length; j++) {
       for (let fieldKey in fieldGroups[j]) {
@@ -63,7 +64,7 @@ export class KoheseType {
       }
     }
   }
-  
+
   retrieveViewData(): void {
     this.icon = this.viewModelProxy.item.icon;
     for (let property in this.viewModelProxy.item.viewProperties) {
@@ -71,8 +72,8 @@ export class KoheseType {
         stringify(this.viewModelProxy.item.viewProperties[property])));
     }
   }
-  
-  synchronizeDataModel(): ItemProxy {
+
+  synchronizeDataModel(): KoheseModel {
     this.dataModelProxy.item.name = this.name;
     this.dataModelProxy.item.description = this.description;
     this.dataModelProxy.item.base = this.base;
@@ -83,10 +84,10 @@ export class KoheseType {
     this.dataModelProxy.item.relations = this.relations;
     this.dataModelProxy.item.acls = this.acls;
     this.dataModelProxy.item.methods = this.methods;
-    
+
     return this.dataModelProxy;
   }
-  
+
   synchronizeViewModel(): ItemProxy {
     this.viewModelProxy.item.icon = this.icon;
     for (let propertyId in this.properties) {
@@ -97,7 +98,7 @@ export class KoheseType {
     }
     return this.viewModelProxy;
   }
-  
+
   transformViewProperty(property: TypeProperty): any {
     let inputType: string = property.inputType;
     let delimiterIndex: number = inputType.indexOf(':');
@@ -108,10 +109,10 @@ export class KoheseType {
       type: type,
       options: JSON.parse(options)
     };
-    
+
     return property;
   }
-  
+
   editProperty(id: string, property: TypeProperty): void {
     if (!id) {
       id = property.displayName;
@@ -119,7 +120,7 @@ export class KoheseType {
     this.properties[id] = this.transformViewProperty(property);
     this.retrieveViewData();
   }
-  
+
   deleteProperty(id: string): void {
     delete this.properties[id];
   }

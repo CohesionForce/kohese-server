@@ -2,7 +2,7 @@
  * Knowledge Database File System
  */
 
-var fs = require('fs');
+let fs = require('fs');
 
 //////////////////////////////////////////////////////////////////////////
 //

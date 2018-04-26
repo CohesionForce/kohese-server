@@ -2,15 +2,14 @@
  * Knowledge Database Repo Management
  */
 
+let nodegit = require ('nodegit');
+import * as path from 'path';
+import * as fs from 'fs';
 
-var nodegit = require('nodegit');
-var path = require('path');
-const fs = require('fs');
-
-var itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
-var repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
-var repoList = {};
-var stageMap = {};
+let itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
+let repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
+let repoList = {};
+let stageMap = {};
 const INDEX_DIRECTORY = path.join('kdb', 'index');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -46,7 +45,7 @@ function getCommitFilesChanged(commit) {
         }));
       })(j);
     }
-    
+
     return Promise.all(diffPromise).then(function () {
       return paths;
     });
@@ -68,7 +67,7 @@ function generateCommitHistoryIndices(repositoryPath, overwrite) {
         if (!fs.existsSync(INDEX_DIRECTORY)) {
           fs.mkdirSync(INDEX_DIRECTORY);
         }
-        
+
         var promises = [];
         for (var j = 0; j < commits.length; j++) {
           if (overwrite || !fs.existsSync(path.join(INDEX_DIRECTORY,
@@ -76,7 +75,7 @@ function generateCommitHistoryIndices(repositoryPath, overwrite) {
             promises.push(indexCommit(commits[j]));
           }
         }
-        
+
         return Promise.all(promises);
       });
     });
@@ -95,7 +94,7 @@ function indexCommit(commit) {
     for (var j = 0; j < commit.parentcount(); j++) {
       entryMap.meta.parents.push(commit.parentId(j).toString());
     }
-    
+
     fs.writeFileSync(path.join(INDEX_DIRECTORY, commit.id() + '.json'),
       JSON.stringify(entryMap, null, '  '), {encoding: 'utf8', flag: 'w'});
     return Promise.resolve(true);
@@ -123,29 +122,29 @@ function getIndexEntries(tree, paths) {
         }));
       })(j);
     }
-    
+
     p = Promise.all(entryPromises);
   } else {
     p = parseTree(tree);
   }
-  
+
   return p.then(function (entries) {
     var entryMap = {
       meta: {},
       objects: {}
     };
-    
+
     entries.sort(function (e1, e2) {
       return (e1.uuid > e2.uuid ? 1 : (e1.uuid < e2.uuid ? -1 : 0));
     });
-    
+
     for (var j = 0; j < entries.length; j++) {
       entryMap.objects[entries[j].uuid] = {
           oid: entries[j].oid,
           kind: entries[j].kind
         };
     }
-    
+
     return entryMap;
   });
 }
@@ -170,7 +169,7 @@ function parseTree(tree) {
       }
     }
   }
-  
+
   return Promise.all(promises).then(function (results) {
     var objects = [];
     for (var j = 0; j < results.length; j++) {
@@ -182,7 +181,7 @@ function parseTree(tree) {
         objects.push(results[j]);
       }
     }
-    
+
     return Promise.resolve(objects);
   });
 }
@@ -225,7 +224,7 @@ function add(repositoryId, filePath) {
             return true;
           }
         }
-        
+
         return false;
       });
     });
@@ -259,7 +258,7 @@ function commit(repositoryIds, userName, eMail, message) {
                   filePaths.push(status.path());
                 }
               }
-              
+
               return repo.createCommit('HEAD', signature, signature, message,
                   treeId, parentCommits).then(function (commitId) {
                 commitIdMap[repositoryIds[iIndex]] = {
@@ -278,7 +277,7 @@ function commit(repositoryIds, userName, eMail, message) {
       }));
     })(i);
   }
-  
+
   return Promise.all(promises).then(function () {
     return commitIdMap;
   });
@@ -306,12 +305,12 @@ function push(repositoryIds, remoteName, defaultUser) {
         }).then(function (status) {
           pushStatusMap[repositoryIds[iIndex]] = status;
         }).catch(function(err){
-          console.log(err); 
+          console.log(err);
         });
       }));
     })(i);
   }
-  
+
   return Promise.all(promises).then(function () {
     return pushStatusMap;
   });
@@ -431,7 +430,7 @@ function merge(repositoryId, signature) {
     if (index.hasConflicts()) {
       // TODO Handle conflicts
     }
-    
+
     return index.writeTreeTo(repository).then(function (treeId) {
       return repository.createCommit('HEAD', signature, signature, 'Merge from master to HEAD.', treeId, [hc, mc]);
     });
@@ -456,9 +455,9 @@ module.exports.pull = pull;
 function getStatus (repositoryId, callback){
   //This code gets working directory changes similar to git status
   repoList[repositoryId].getStatusExt().then(function(statuses) {
-    
+
     var repoStatus = [];
-    
+
     statuses.forEach(function(file) {
       repoStatus.push({
         path: file.path(),
@@ -484,10 +483,10 @@ function getItemStatus(repositoryId, filePath) {
         status.push(statusKey);
       }
     }
-    
+
     return status;
   });
-  
+
 }
 module.exports.getItemStatus = getItemStatus;
 
@@ -495,7 +494,7 @@ module.exports.getItemStatus = getItemStatus;
 //
 //////////////////////////////////////////////////////////////////////////
 function walkHistoryForFile(itemId, callback){
-  
+
   // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
 
   var commitFiles = fs.readdirSync(INDEX_DIRECTORY);
@@ -513,12 +512,12 @@ function walkHistoryForFile(itemId, callback){
       });
     }
   }
-  
+
   if (relatedCommits.length > 0) {
     relatedCommits.sort(function (c1, c2) {
       return c2.date - c1.date;
     });
-    
+
     var j = relatedCommits.length - 1;
     var lastEntry = relatedCommits[j].indexEntry;
     while (j--) {
@@ -530,12 +529,12 @@ function walkHistoryForFile(itemId, callback){
       }
     }
   }
-  
+
   var historyResponse = {
       id: itemId,
       history: relatedCommits
   };
-  
+
   callback(historyResponse);
 }
 module.exports.walkHistoryForFile = walkHistoryForFile;
