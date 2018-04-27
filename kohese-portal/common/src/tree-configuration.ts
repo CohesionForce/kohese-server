@@ -137,7 +137,6 @@ export class TreeConfiguration {
 
     if (!workingTree){
       workingTree = new TreeConfiguration('Unstaged');
-      stagedTree = new TreeConfiguration('Staged');
     }
     return workingTree;
   }
@@ -146,6 +145,9 @@ export class TreeConfiguration {
   //
   //////////////////////////////////////////////////////////////////////////
   static getStagedTree() {
+    if (!stagedTree){
+      stagedTree = new TreeConfiguration('Staged');
+    }
     return stagedTree;
   }
 
