@@ -5,6 +5,8 @@
   "license": "EPL-1.0",
   "scripts": {
     "server": "node --max_old_space_size=2048 .",
+    "build-all": "npm run build-server && npm run build-client",
+    "build-server": "(tsc --p server/tsconfig.json; echo \"TSC Return Value: $?\")",
     "build-client": "webpack --config webpack.config.dev.js",
     "build-client-prod": "webpack --config webpack.config.prod.js && npm run sw-config && npm run sw-copy",
     "start": "webpack-dev-server --port=4200",
