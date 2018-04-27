@@ -1,5 +1,7 @@
 import { VersionControlService } from './version-control.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
+import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockItem } from '../../../mocks/data/MockItem';
 
 describe('Service: version-control', () => {
@@ -7,6 +9,8 @@ describe('Service: version-control', () => {
   let versionControlService: VersionControlService;
 
   beforeAll(() => {
+    new KoheseModel(MockDataModel());
+    KoheseModel.modelDefinitionLoadingComplete();
     let item: any = MockItem();
     item.id = 'test-uuid';
     proxy = new ItemProxy('Item', item);

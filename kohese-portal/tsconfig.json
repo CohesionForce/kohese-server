@@ -32,8 +32,6 @@
     ]
   },
   "exclude": [
-    "client",
-    "common",
     "scripts",
     "server",
     "node_modules",

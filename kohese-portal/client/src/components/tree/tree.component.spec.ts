@@ -17,8 +17,10 @@ import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { ActivatedRoute } from '@angular/router';
 import { TreeComponent } from './tree.component';
 import { TreeRow } from './tree-row.class';
+import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockItem } from '../../../mocks/data/MockItem';
-import { ItemProxy } from '../../../../common/src/item-proxy';
+import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { Observable } from 'rxjs/Observable';
 
 describe('Component: Tree', () => {
@@ -56,6 +58,8 @@ describe('Component: Tree', () => {
   });
 
   it('builds a TreeRow for a new Item', fakeAsync(() => {
+    new KoheseModel(MockDataModel());
+    KoheseModel.modelDefinitionLoadingComplete();
     let item: any = MockItem();
     item.id = 'Kurios Iesous';
     item.parentId = 'test-uuid3';
@@ -110,7 +114,7 @@ describe('Component: Tree', () => {
     let initialVisibleRows: Array<TreeRow> = component.visibleRows;
     component.treeRootStream.next(ItemProxy.getWorkingTree().getRootProxy().children[0]);
     tick();
-    expect(initialTreeRoot).not.toEqual(component.treeRootStream.getValue());
+    expect(initialTreeRoot).not.toBe(component.treeRootStream.getValue());
     expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
   }));
 
@@ -145,7 +149,8 @@ describe('Component: Tree', () => {
   it('does not produce an error when the value of selectedProxyIdStream is ' +
     'invalid', fakeAsync(() => {
     let id: string = '-1';
-    expect(ItemProxy.getWorkingTree().getProxyFor(id)).not.toBeDefined();
+    expect(TreeConfiguration.getWorkingTree().getProxyFor(id)).not.
+      toBeDefined();
     component.selectedProxyIdStream.next(id);
     tick();
     /* Since the selection is to be synchronized by default, call the
