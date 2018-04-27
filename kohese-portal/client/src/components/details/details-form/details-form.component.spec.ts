@@ -9,8 +9,8 @@ import { PipesModule } from '../../../pipes/pipes.module';
 
 import { DetailsFormComponent } from './details-form.component';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy'
-import * as KoheseModel from '../../../../../common/src/KoheseModel';
+import { ItemProxy } from '../../../../../common/src/item-proxy'
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockItem } from '../../../../mocks/data/MockItem';
@@ -56,14 +56,14 @@ describe('Component: Details Form', ()=>{
     };
     formComponent.proxyStream = new BehaviorSubject<ItemProxy>(proxy);
     formComponent.editableStream = new BehaviorSubject<boolean>(false);
-    
+
     formFixture.detectChanges();
   });
 
   it('builds a DetailsFormComponent', () => {
     expect(formComponent).toBeTruthy();
   });
-    
+
   it('enables editing', fakeAsync(() => {
     formComponent.editableStream.next(true);
     tick();

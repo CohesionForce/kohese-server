@@ -12,7 +12,7 @@ import { MockItemRepository } from '../../../../../mocks/services/MockItemReposi
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { MockItem } from '../../../../../mocks/data/MockItem';
 
 describe('Component: Children Table', ()=>{

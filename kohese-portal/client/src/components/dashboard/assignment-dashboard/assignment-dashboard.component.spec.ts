@@ -11,7 +11,7 @@ import { DashboardSelections } from '../dashboard-selector/dashboard-selector.co
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;
@@ -38,10 +38,10 @@ describe('Component: ', ()=>{
     assignmentDashboardComponent.assignmentListStream = assignmentListStream;
 
     assignmentDashboardFixture.detectChanges();
-    
+
   })
 
   it('instantiates the assignmentDashboard component', ()=>{
-    expect(assignmentDashboardComponent).toBeTruthy(); 
+    expect(assignmentDashboardComponent).toBeTruthy();
   })
 })

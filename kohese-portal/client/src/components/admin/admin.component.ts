@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs';
@@ -28,7 +28,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.treeConfigSub = 
+    this.treeConfigSub =
       this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
         this.sessions = this.sessionService.getSessions();
         this.users = this.sessionService.getUsers();
@@ -39,8 +39,8 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.treeConfigSub.unsubscribe();
   }
 
-  // TODO - Update to use forms module instead of this insanity 
-  
+  // TODO - Update to use forms module instead of this insanity
+
   addUser() {
     this.usernameInput = '';
     this.descriptionInput = '';
@@ -80,7 +80,7 @@ export class AdminComponent implements OnInit, OnDestroy {
         if (this.passwordInput !== '') {
           this.selectedUserProxy.item.password = this.passwordInput;
         }
-        
+
         this.itemRepository.upsertItem(this.selectedUserProxy);
       } else {
         let item: any = {
@@ -92,7 +92,7 @@ export class AdminComponent implements OnInit, OnDestroy {
         if (this.passwordInput !== '') {
           item.password = this.passwordInput;
         }
-        
+
         this.itemRepository.buildItem('KoheseUser', item)
           .then(()=>{
             this.users = this.sessionService.getUsers();

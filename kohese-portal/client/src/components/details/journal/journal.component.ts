@@ -7,6 +7,7 @@ import { SessionService } from '../../../services/user/session.service';
 import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
+import { SelectedProxyInfo } from '../../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'journal',
@@ -54,14 +55,14 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   }
   public addAsIssue: boolean = false;
   private observationFilterText: string = '';
-  
+
   private repositoryStatusSubscription: Subscription;
-  
+
   constructor(private itemRepository: ItemRepository,
     private sessionService: SessionService,
     private _dialogService: DialogService) {
   }
-  
+
   ngOnInit(): void {
     let now: Date = new Date();
     this.dateObserved = now.getFullYear() + '-' + ((now.getMonth() + 1) < 10 ?
@@ -71,7 +72,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
       now.getHours()) + ':' + (now.getMinutes() < 10 ? '0' + now.getMinutes() :
       now.getMinutes()) + ':' + (now.getSeconds() < 10 ?
       '0' + now.getSeconds() : now.getSeconds());
-    
+
     this.repositoryStatusSubscription = this.itemRepository.
       getRepoStatusSubject().subscribe((statusObject: any) => {
       if (RepoStates.SYNCHRONIZATION_SUCCEEDED === statusObject.state) {
@@ -82,48 +83,48 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
         console.log(this.sessionService.getSessionUser().getValue());
       }
     });
-    
+
     this.refresh();
-    
+
     this.initialized = true;
   }
-  
+
   ngOnDestroy(): void {
     this.repositoryStatusSubscription.unsubscribe();
   }
-  
+
   ngOnChanges(changes: SimpleChanges): void {
     if (this.initialized) {
       this.itemProxy = changes['itemProxy'].currentValue;
       this.refresh();
     }
   }
-  
+
   refresh(): void {
     this.journalTargetId = this.itemProxy.item.id;
     this.journalEntries = [];
     this.addObservations(this.itemProxy);
     this.filterObservations(this.observationFilterText);
     this.sort(this.selectedSortStrategy);
-    
+
     let type: string = this.itemProxy.kind;
     if ((type === 'Task') || (type === 'Action')) {
       this._observingActivity = this.itemProxy;
       this._observingActivityName = this.itemProxy.item.name;
     }
   }
-  
+
   addObservations(proxy: ItemProxy): void {
     let referringContexts: Array<ItemProxy> = [];
     let referringTypes: any = proxy.relations['referencedBy'];
     for (let type in referringTypes) {
-      let referringTypeContexts: ItemProxy = referringTypes[type]['context'];
+      let referringTypeContexts: Array<ItemProxy> = referringTypes[type]['context'];
       if (referringTypeContexts) {
         referringContexts.splice(referringContexts.length - 1, 0,
           ...referringTypeContexts);
       }
     }
-    
+
     for (let j: number = 0; j < referringContexts.length; j++) {
       let referringProxy: ItemProxy = referringContexts[j];
       if (('Observation' === referringProxy.kind) ||
@@ -133,7 +134,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
   }
-  
+
   addJournalEntry(): void {
     let whenObserved: Date;
     if (this.dateObserved) {
@@ -159,10 +160,10 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
       hour = d.getHours();
       minutes = d.getMinutes();
     }
-    
+
     whenObserved.setHours(hour);
     whenObserved.setMinutes(minutes);
-    
+
     let observation: any = {
       name: this._observationName,
       description: this.journalEntryContent,
@@ -185,7 +186,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
       this.refresh();
     });
   }
-  
+
   sort(strategy: string): void {
     this.selectedSortStrategy = strategy;
     let strategyKeys: Array<string> = Object.keys(this.SORT_STRATEGIES);
@@ -196,7 +197,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     let userSortField: string = 'observedBy';
     let typeBased: boolean = false;
     let issuesFirst: boolean = true;
-    
+
     let index: number = strategyKeys.indexOf(strategy);
     if (index > 3) {
       timeBased = false;
@@ -223,7 +224,7 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-    
+
     this.filteredEntries.sort((entryOne: ItemProxy, entryTwo: ItemProxy) => {
       let compareValue: number = 0;
       if (timeBased) {
@@ -245,11 +246,11 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
           entryTwo.item[userSortField] ? 1 : (entryOne.item[userSortField] <
           entryTwo.item[userSortField] ? -1 : 0));
       }
-      
+
       return compareValue;
     });
   }
-  
+
   filterObservations(filterText: string): void {
     this.observationFilterText = filterText;
     this.filteredEntries = [];
@@ -261,20 +262,21 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
   }
-  
+
   filterUsers(text: string): void {
     this._filteredUserProxies = this.userProxies.filter((proxy: ItemProxy) => {
       return (-1 !== proxy.item.name.indexOf(text));
     });
   }
-  
+
   public openObservingActivitySelectionDialog(): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
-      data: {}
-    }).updateSize('70%', '70%').afterClosed().subscribe((proxy: ItemProxy) => {
-      if (proxy) {
-        this._observingActivity = proxy;
-        this._observingActivityName = proxy.item.name;
+      data: {},
+      allowMultiSelect : false
+    }).updateSize('70%', '70%').afterClosed().subscribe((selected: SelectedProxyInfo) => {
+      if (selected.selectedProxy) {
+        this._observingActivity = selected.selectedProxy;
+        this._observingActivityName = selected.selectedProxy.item.name;
       }
     });
   }

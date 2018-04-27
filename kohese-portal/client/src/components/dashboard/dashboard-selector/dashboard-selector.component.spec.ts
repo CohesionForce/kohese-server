@@ -7,7 +7,7 @@ import { MaterialModule } from '../../../material.module'
 
 import { DashboardSelectorComponent } from './dashboard-selector.component';
 import { MockUserData } from '../../../../mocks/data/MockUser';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 describe('Component: Dashboard Selector', ()=>{
   let dashboardSelectorComponent: DashboardSelectorComponent;
@@ -30,10 +30,10 @@ describe('Component: Dashboard Selector', ()=>{
     dashboardSelectorComponent.user = new ItemProxy('KoheseUser', MockUserData());
 
     dashboardSelectorFixture.detectChanges();
-    
+
   })
 
   it('instantiates the dashboardSelector component', ()=>{
-    expect(dashboardSelectorComponent).toBeTruthy(); 
+    expect(dashboardSelectorComponent).toBeTruthy();
   })
 })

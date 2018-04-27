@@ -6,7 +6,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../../../material.module'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { MockItem } from '../../../../../mocks/data/MockItem';
 
 import { SessionService } from '../../../../services/user/session.service';
@@ -48,11 +48,11 @@ describe('Component: JournalEntry', ()=>{
     journalEntryComponent.itemProxy = new ItemProxy('Item', MockItem());
 
     journalEntryFixture.detectChanges();
-    
+
   })
 
   it('instantiates the Journal Entry component', ()=>{
-    expect(journalEntryComponent).toBeTruthy(); 
+    expect(journalEntryComponent).toBeTruthy();
   })
 
   describe('entry actions', ()=>{

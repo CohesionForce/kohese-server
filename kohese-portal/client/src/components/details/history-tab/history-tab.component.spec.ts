@@ -6,7 +6,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../../material.module'
 
 import { HistoryTabComponent} from './history-tab.component';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { MockItem } from '../../../../mocks/data/MockItem';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -39,10 +39,10 @@ describe('Component: History Tab', ()=>{
     historyComponent.proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem()));
 
     historyFixture.detectChanges();
-    
+
   })
 
   it('instantiates the history component', ()=>{
-    expect(historyComponent).toBeTruthy(); 
+    expect(historyComponent).toBeTruthy();
   })
 })

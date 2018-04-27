@@ -9,7 +9,7 @@ import { PipesModule } from '../../../pipes/pipes.module';
 
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 import { JournalComponent } from './journal.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -44,17 +44,17 @@ describe('Component: Journal', ()=>{
 
     journalFixture = TestBed.createComponent(JournalComponent);
     journalComponent = journalFixture.componentInstance;
-    
+
     journalComponent.itemProxy = new ItemProxy('Item', MockItem());
 
     journalFixture.detectChanges();
-    
+
   })
 
   it('instantiates the Journal component', ()=>{
-    expect(JournalComponent).toBeTruthy(); 
+    expect(JournalComponent).toBeTruthy();
   });
-  
+
   it('builds an Observation', fakeAsync(() => {
     journalComponent.observationName = 'Kurios Iesous';
     journalComponent.openObservingActivitySelectionDialog();

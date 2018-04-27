@@ -16,7 +16,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 export class ActionTableComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   @Input()
-  proxyStream: Observable<Array<ItemProxy>>
+  proxyStream: Observable<ItemProxy>
   actionProxies: Array<ItemProxy>;
   tableStream: MatTableDataSource<ItemProxy>;
   itemProxy: ItemProxy;

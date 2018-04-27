@@ -5,8 +5,8 @@ import 'rxjs/add/observable/of';
 import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
 import { MockDataModel } from '../data/MockDataModel';
-import * as ItemProxy from '../../../common/src/item-proxy';
-import * as KoheseModel from '../../../common/src/KoheseModel';
+import { ItemProxy, TreeConfiguration } from '../../../common/src/item-proxy';
+import { KoheseModel } from '../../../common/src/KoheseModel';
 import { Subject } from 'rxjs';
 import { RepoStates } from '../../src/services/item-repository/item-repository.service';
 
@@ -52,7 +52,7 @@ export class MockItemRepository {
   }
 
   getProxyFor(id: string) {
-    return ItemProxy.TreeConfiguration.getWorkingTree().getProxyFor(id);
+    return TreeConfiguration.getWorkingTree().getProxyFor(id);
   }
 
   getRecentProxies() {
@@ -102,7 +102,7 @@ export class MockItemRepository {
   }
 
   getTreeConfig(): Observable<any> {
-    return new BehaviorSubject<TreeConfiguration>(ItemProxy.TreeConfiguration.
+    return new BehaviorSubject<TreeConfiguration>(TreeConfiguration.
       getWorkingTree());
   }
 }

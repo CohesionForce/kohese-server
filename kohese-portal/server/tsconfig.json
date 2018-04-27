@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "es2015",
+    "allowJs": false,
+    "outDir": "../build/",
+    "module": "commonjs",
     "baseUrl": ".",
-    "paths": {
-      "common" : ["./common/models/"]
-    },
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
@@ -20,22 +20,20 @@
       "webpack",
       "underscore",
       "jasmine",
-      "jssha",
       "sharedworker"
     ],
     "typeRoots": [
       "./node_modules/@types"
-    ],
-    "lib": [
-      "es2016",
-      "dom"
     ]
   },
+  "include": [
+    "../common",
+    "../scripts",
+    "../server"
+  ],
   "exclude": [
-    "scripts",
-    "server",
-    "node_modules",
-    "dist",
-    "build"
+    "../node_modules",
+    "../dist",
+    "../build"
   ]
 }

@@ -9,7 +9,7 @@ import { SessionService } from '../../../services/user/session.service';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'repositories',
@@ -36,7 +36,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
     private _toastrService: ToastrService,
     private _sessionService: SessionService) {
     super(navigationService);
-    // TODO update this file to do the repo status sequence 
+    // TODO update this file to do the repo status sequence
     // leaving it out since it is currently in flux on another branch
   }
 

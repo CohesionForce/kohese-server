@@ -1,12 +1,14 @@
 import { MockViewData } from './MockViewData';
 import { MockDataModel } from './MockDataModel';
-import * as ItemProxy from '../../../common/src/item-proxy';
+import { ItemProxy } from '../../../common/src/item-proxy';
+import { KoheseModel } from '../../../common/src/KoheseModel';
+
 
 export function MockKoheseType () {
   return {
   acls : [],
   base : ['PersistedModel'],
-  dataModelProxy : new ItemProxy('KoheseModel', MockDataModel()),
+  dataModelProxy : new KoheseModel(MockDataModel()),
   description: "",
   icon: "fa fa-sticky-note",
   idInjection : true,

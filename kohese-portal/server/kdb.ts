@@ -2,22 +2,21 @@
  *
  */
 
-var path = require('path');
+let path = require('path');
 
 console.log('::: Begin KDB File Load');
 
-var kdbFS = require('./kdb-fs.js');
-var kdbRepo = require('./kdb-repo.js');
+var kdbFS = require('./kdb-fs');
+var kdbRepo = require('./kdb-repo');
 module.exports.kdbRepo = kdbRepo;
 
-var KDBCache = require ('./kdb-cache.js');
-
-var kdbModel = require('./kdb-model.js');
+var kdbModel = require('./kdb-model');
 
 var jsonExt = /\.json$/;
 
-var ItemProxy = require('../common/src/item-proxy.js');
-var KoheseModel = require('../common/src/KoheseModel.js');
+import { ItemProxy, TreeConfiguration } from '../common/src/item-proxy';
+import { KoheseModel } from '../common/src/KoheseModel';
+import { KDBCache } from './kdb-cache';
 
 module.exports.ItemProxy = ItemProxy;
 
@@ -67,7 +66,7 @@ function initialize(koheseKdbPath) {
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
   //TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
 
-  ItemProxy.getWorkingTree().getRootProxy().repoPath = path.join(koheseKDBDirPath, 'Root.json');
+  TreeConfiguration.getWorkingTree().getRootProxy().repoPath = path.join(koheseKDBDirPath, 'Root.json');
 
   // Check to see if a Root.json exists. If not, assume brand new kdb
   var create = false;
@@ -342,7 +341,7 @@ module.exports.removeModelAnalysis = removeModelAnalysis;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function checkAndCreateDir(dirName, ignoreJSONFiles) {
+function checkAndCreateDir(dirName, ignoreJSONFiles : boolean = false) {
   kdbFS.createDirIfMissing(dirName);
   if(ignoreJSONFiles){
     kdbFS.createGITIgnoreJSONIfMissing(dirName + '/.gitignore');
@@ -359,7 +358,11 @@ function mountRepository(mountData) {
     // Format: mountData = {id: , name: , parentId: , repoStoragePath: }
     // Attempt to mount the repository. If unable then make it apparent in the client.
     var repoCanBeMounted = true;
-    var repoRoot = {};
+    var repoRoot = {
+      parentId : undefined,
+      mounted: undefined,
+      name: undefined
+    };
 
     if(mountData.repoStoragePath) {
         console.log('::: Mounting repository: ' + mountData.name);
@@ -545,7 +548,7 @@ function openRepositories() {
 
   let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
   let kdbCache = new KDBCache(koheseKDBDirPath);
-  ItemProxy.TreeConfiguration.setItemCache(kdbCache);
+  TreeConfiguration.setItemCache(kdbCache);
 
   return kdbCache.updateCache().then(() => {
     console.log('::: Finished cache update: ' + kdbCache.repoPath);

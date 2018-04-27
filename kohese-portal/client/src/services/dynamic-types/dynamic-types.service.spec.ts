@@ -1,7 +1,7 @@
 import { DynamicTypesService } from './dynamic-types.service';
 import { RepoStates } from '../item-repository/item-repository.service';
-import * as ItemProxy from '../../../../common/src/item-proxy';
-import * as KoheseModel from '../../../../common/src/KoheseModel';
+import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../mocks/data/MockViewData';
 import { Observable } from 'rxjs/Observable';
@@ -25,10 +25,10 @@ describe('DynamicTypesService', () => {
         .returnValues(ItemProxy.getWorkingTree()
           .getProxyFor('Model-Definitions'), new ItemProxy('KoheseView',
                                                          MockViewData()));
-    
+
     itemRepositoryPlaceholder.getTreeConfig.and.returnValue(Observable.of(
-      ItemProxy.TreeConfiguration.getWorkingTree()));
-    
+      TreeConfiguration.getWorkingTree()));
+
     typeService = new DynamicTypesService(itemRepositoryPlaceholder);
   });
 

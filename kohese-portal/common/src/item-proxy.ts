@@ -3,29 +3,88 @@
  */
 
 'use strict'; //Required for use of 'class'
-var _ = require('underscore');
-var SHA = require('jssha');
-var uuidV1 = require('uuid/v1');
+import * as  _ from 'underscore';
+import * as jsSHA_Import from 'jssha';
+import * as uuidV1_Import from 'uuid/v1';
+import { Subject } from 'rxjs/Subject';
 
-var Rx = require('rxjs/Rx');
+//
+// Adjust for the differences in CommonJS and ES6 for jssha
+//
+let jsSHA;
+if (typeof(jsSHA_Import) === "object") {
+  jsSHA = (<any>jsSHA_Import).default;
+} else {
+  jsSHA = jsSHA_Import;
+}
+
+// Adjust for the differences in CommonJS and ES6 for uuid
+let uuidV1;
+if (typeof(uuidV1_Import) === "object") {
+  uuidV1 = uuidV1_Import.default;
+} else {
+  uuidV1 = uuidV1_Import;
+}
 
 let treeConfigMap = {};
 let workingTree;
 let stagedTree;
 
 // Forward declare KoheseModel while waiting for registration to occur
-let KoheseModel;
+let KoheseModelDefn;
+
+class TreeHashEntry {
+  public kind : string;
+  public oid : string;
+  public childTreeHashes : {};
+  public treeHash : string;
+  public parentId? : string;
+}
+
+class RelationIdMap {
+  public references : {};
+  public referencedBy : {};
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
 //////////////////////////////////////////////////////////////////////////
 
-class ItemProxy {
+export class ItemProxy {
+
+  public model;
+  public state;
+  public item;
+  public treeConfig;
+  public kind;
+  public references;
+  public relations;
+  public internal : boolean = false;
+
+  public oid;
+  public deferTreeHash;
+  public treeHash;
+  public treeHashEntry;
+
+  public parentProxy;
+  public children;
+  public descendantCount : number;
+
+  public analysis;
+
+  // Needed for information calculated on the server
+  public repoPath;
+
+  // Needed for information calculated on the client
+  public dirty : boolean = false;
+  public status;
+  public history;
+  public type; // Used to store KoheseType.
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  constructor(kind, withItem, treeConfig) {
+  constructor(kind, withItem, treeConfig?) {
     if (!treeConfig){
       // console.log('$$$ Using working tree');
       treeConfig = workingTree;
@@ -158,7 +217,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static registerKoheseModelClass(KoheseModelClass) {
-    KoheseModel = KoheseModelClass;
+    KoheseModelDefn = KoheseModelClass;
 
     for (let treeId in treeConfigMap){
       let treeConfig = treeConfigMap[treeId];
@@ -211,9 +270,44 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getRelationsByAttribute() {
+    let relationMap = {};
+    for(let refTypeKey in this.relations){
+      relationMap[refTypeKey] = {};
+      for(let kindKey in this.relations[refTypeKey])
+      {
+        relationMap[refTypeKey] = {};
+
+        let relationsForKind = this.relations[refTypeKey][kindKey];
+        for(let relationKey in relationsForKind){
+          if (!relationMap[refTypeKey][relationKey]){
+            relationMap[refTypeKey][relationKey] = {};
+          }
+          let relationList = relationsForKind[relationKey];
+          if (Array.isArray(relationList)){
+            relationMap[refTypeKey][relationKey][kindKey] = [];
+            for(let index = 0; index < relationList.length; index++){
+              relationMap[refTypeKey][relationKey][kindKey].push(relationList[index]);
+            }
+          } else {
+            if (relationList){
+              relationMap[refTypeKey][relationKey][kindKey] = relationList;
+            } else {
+              delete relationMap[refTypeKey][relationKey];
+            }
+          }
+        }
+      }
+    }
+    return relationMap;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   updateReferences(){
     // console.log('$$$ Updating References for: ' + this.item.id);
-    let oldReferences = this.getRelationIdMap().references;
+    let oldReferences = this.getRelationIdMap().references || {};
     if (this.model && this.model.item && this.model.item.relationProperties){
       for(let relationPropertyIdx in this.model.item.relationProperties){
         let relationProperty = this.model.item.relationProperties[relationPropertyIdx];
@@ -456,7 +550,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static getWorkingTree() {
+  static getWorkingTree() : TreeConfiguration {
     // TODO remove all references
     return workingTree;
   }
@@ -467,8 +561,8 @@ class ItemProxy {
   setItemKind(kind){
     this.kind = kind;
 
-    if (KoheseModel){
-      this.model = KoheseModel.getModelProxyFor(kind);
+    if (KoheseModelDefn){
+      this.model = KoheseModelDefn.getModelProxyFor(kind);
       if (this.internal && !this.model.internal) {
         // Item was previously created in lost and found
         delete this.internal;
@@ -483,7 +577,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   checkPropertyOrder(){
     if (this.model && this.model.item && this.model.item.propertyStorageOrder) {
-      var newItem = {};
+      var newItem : any = {};
       var oldKeys = Object.keys(this.item);
       for (var keyIdx in this.model.item.propertyStorageOrder){
         var key = this.model.item.propertyStorageOrder[keyIdx];
@@ -518,8 +612,8 @@ class ItemProxy {
       valid : true
     };
 
-    if (KoheseModel) {
-      let modelProxy = KoheseModel.getModelProxyFor(kind);
+    if (KoheseModelDefn) {
+      let modelProxy = KoheseModelDefn.getModelProxyFor(kind);
       if(modelProxy && (modelProxy.kind === 'KoheseModel')){
         // if (modelProxy.constructor.name !== 'KoheseModel'){
         //   modelProxy.dumpProxy();
@@ -596,7 +690,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static gitDocumentOID(forDoc) {
-    var shaObj = new SHA('SHA-1', 'TEXT');
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
 
     var forText = JSON.stringify(forDoc, null, '  ');
 
@@ -620,7 +714,7 @@ class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static gitFileOID(forFile) {
-    var shaObj = new SHA('SHA-1', 'TEXT');
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
 
 
     var length = forFile.length;
@@ -648,7 +742,8 @@ class ItemProxy {
       return;
     }
 
-    var shaObj = new SHA('SHA-1', 'TEXT');
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
+
     var doc = this.strippedDocument();
     shaObj.update('blob ' + doc.length + '\0' + doc);
 
@@ -658,7 +753,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateTreeHash(deferredRollup) {
+  calculateTreeHash(deferredRollup : boolean = false) {
 
     // TODO: Should only have to do this when content is updated
     this.calculateOID();
@@ -669,10 +764,11 @@ class ItemProxy {
       return;
     }
 
-    var treeHashEntry = {
+    let treeHashEntry : TreeHashEntry = {
         kind: this.kind,
         oid: this.oid,
-        childTreeHashes: {}
+        childTreeHashes: {},
+        treeHash : undefined
     };
 
     for (var childIdx in this.children){
@@ -693,7 +789,7 @@ class ItemProxy {
       }
     }
 
-    var shaObj = new SHA('SHA-1', 'TEXT');
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
     shaObj.update(JSON.stringify(treeHashEntry));
     this.treeHash =  shaObj.getHash('HEX');
 
@@ -827,7 +923,7 @@ class ItemProxy {
    * Include Origin - Operate on the parent node
    *
    */
-  visitTree(flags, doBefore, doAfter){
+  visitTree(flags, doBefore, doAfter?){
 
     var includeOrigin = (flags && flags.hasOwnProperty('includeOrigin')) ? flags.includeOrigin : true;
     var excludeKind = (flags && flags.hasOwnProperty('excludeKind')) ? flags.excludeKind : [];
@@ -867,7 +963,7 @@ class ItemProxy {
    * Calls visit with flags.includeOrigin = false.
    *
    */
-  visitChildren(flags, doBefore, doAfter){
+  visitChildren(flags, doBefore, doAfter?){
 
     var childFlags = flags || {};
     childFlags.includeOrigin = false;
@@ -897,7 +993,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  dumpProxy(indent) {
+  dumpProxy(indent : string = undefined) {
     var thisIndent = '';
     var childIndent = '|-';
     if (indent) {
@@ -997,8 +1093,12 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getRelationIdMap(){
-    let relationIdMap = {};
+  getRelationIdMap() : RelationIdMap {
+    let relationIdMap : RelationIdMap = {
+      references : undefined,
+      referencedBy : undefined
+    };
+
     for(let refTypeKey in this.relations){
       relationIdMap[refTypeKey] = {};
       for(let kindKey in this.relations[refTypeKey])
@@ -1095,7 +1195,7 @@ class ItemProxy {
   removeChild(childProxy) {
     // console.log('::: IP: Removing child ' + proxy.item.name + ' from ' +
     // this.item.name);
-    this.children = _.reject(this.children, function(proxy) {
+    this.children = _.reject(this.children, function(proxy : ItemProxy) {
       return childProxy.item.id === proxy.item.id;
     });
 
@@ -1339,7 +1439,7 @@ class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  deleteItem(deleteDescendants) {
+  deleteItem(deleteDescendants : boolean = false) {
     var byId = this.item.id;
 
 //    console.log('::: Deleting proxy for ' + byId);
@@ -1416,7 +1516,22 @@ class ItemProxy {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-class TreeConfiguration {
+export class TreeConfiguration {
+
+  public treeId;
+  public proxyMap;
+  public idMap;
+  public repoMap;
+  public loading : boolean = true;
+  public proxyHasDeferredModelAssociation;
+  public changeSubject : Subject<any>;
+
+  public root;
+  public lostAndFound;
+  public rootModelProxy;
+  public rootViewModelProxy;
+
+  public static itemCache;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -1437,7 +1552,7 @@ class TreeConfiguration {
     this.loading = true;
     this.proxyHasDeferredModelAssociation = {};
 
-    this.changeSubject = new Rx.Subject();
+    this.changeSubject = new Subject<any>();
 
     this.root = new ItemProxy('Internal', {
       id: 'ROOT',
@@ -1471,7 +1586,7 @@ class TreeConfiguration {
   //
   //////////////////////////////////////////////////////////////////////////
   static setItemCache(itemCache) {
-    if (this.cache){
+    if (this.itemCache){
       console.log('*** Error: Unexpected replacement of cache');
     }
     this.itemCache = itemCache;
@@ -1571,7 +1686,7 @@ class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  reset(skipModels) {
+  reset(skipModels : boolean = false) {
 
     console.log('::: Resetting TreeConfiguration for: ' + this.treeId);
     let rootProxy = this.getRootProxy();
@@ -1597,8 +1712,8 @@ class TreeConfiguration {
       this.rootViewModelProxy.visitChildren(null, null, (childProxy) => {
         childProxy.deleteItem();
       });
-      if (KoheseModel){
-        KoheseModel.removeLoadedModels();
+      if (KoheseModelDefn){
+        KoheseModelDefn.removeLoadedModels();
       }
     }
 
@@ -1623,7 +1738,7 @@ class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getProxyFor(id) {
+  getProxyFor(id) : ItemProxy {
     // TODO Need to remove this returning of the ROOT when the string is empty
 	  if(id === '') {
 		  return this.root;
@@ -1691,7 +1806,8 @@ class TreeConfiguration {
           // var allChildIds = _.union(fromChildIdsSorted, toChildIdsSorted);
           var commonChildIds = _.intersection(fromChildIdsSorted, toChildIdsSorted);
 
-          var childMismatch = {};
+          var childMismatch : any = {};
+
           childMismatch.addedChildren = _.difference(toChildIdsSorted, fromChildIdsSorted);
           childMismatch.deletedChildren = _.difference(fromChildIdsSorted, toChildIdsSorted);
 
@@ -1840,9 +1956,3 @@ function copyAttributes(fromItem, toProxy) {
   }
   return modifications;
 }
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-module.exports = ItemProxy;
-module.exports.TreeConfiguration = TreeConfiguration;
