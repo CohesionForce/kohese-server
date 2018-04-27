@@ -15,7 +15,9 @@ export class MockDialogService {
       },
       'afterClosed': () => {
         if ('ProxySelectorDialogComponent' === componentReference.name) {
-          return Observable.of(ItemProxy.getWorkingTree().getRootProxy());
+          return Observable.of({
+            selectedProxy: ItemProxy.getWorkingTree().getRootProxy()
+          });
         }
       }
     };
