@@ -8,7 +8,8 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DetailsFormComponent } from '../details/details-form/details-form.component';
 import { ProxySelectorDialogComponent } from '../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
-import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -135,11 +136,11 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     }
     this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe((newConfig) => {
       this.treeConfig = newConfig;
-      
+
       if (this._itemProxyChangeSubscription) {
         this._itemProxyChangeSubscription.unsubscribe();
       }
-      
+
       this._itemProxyChangeSubscription = this.treeConfig.getChangeSubject()
         .subscribe((notification: any) => {
           if (notification.proxy) {

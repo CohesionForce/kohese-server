@@ -1,7 +1,8 @@
 console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
-import { ItemProxy, TreeConfiguration } from '../../common/src/item-proxy';
+import { ItemProxy } from '../../common/src/item-proxy';
+import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { ItemCache } from '../../common/src/item-cache';
 import { KoheseModel } from '../../common/src/KoheseModel';
 

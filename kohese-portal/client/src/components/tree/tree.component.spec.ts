@@ -19,7 +19,8 @@ import { TreeComponent } from './tree.component';
 import { TreeRow } from './tree-row.class';
 import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockItem } from '../../../mocks/data/MockItem';
-import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { Observable } from 'rxjs/Observable';
 

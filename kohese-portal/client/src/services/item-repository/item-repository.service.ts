@@ -8,10 +8,12 @@ import { ToastrService } from "ngx-toastr";
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
-import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from  '../../../../common/src/tree-configuration';
 import { ItemCache } from '../../../../common/src/item-cache';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { CacheManager } from '../../../cache-worker/CacheManager';
+
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';

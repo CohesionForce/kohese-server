@@ -8,7 +8,8 @@ var kdbFS = require('./kdb-fs.js');
 
 var nodegit = require('nodegit');
 
-import { ItemProxy, TreeConfiguration } from '../common/src/item-proxy';
+import { ItemProxy } from '../common/src/item-proxy';
+import { TreeConfiguration } from '../common/src/tree-configuration';
 import { ItemCache } from '../common/src/item-cache';
 
 var _ = require('underscore');

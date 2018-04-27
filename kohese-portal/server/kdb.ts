@@ -14,7 +14,8 @@ var kdbModel = require('./kdb-model');
 
 var jsonExt = /\.json$/;
 
-import { ItemProxy, TreeConfiguration } from '../common/src/item-proxy';
+import { ItemProxy } from '../common/src/item-proxy';
+import { TreeConfiguration } from '../common/src/tree-configuration';
 import { KoheseModel } from '../common/src/KoheseModel';
 import { KDBCache } from './kdb-cache';
 
