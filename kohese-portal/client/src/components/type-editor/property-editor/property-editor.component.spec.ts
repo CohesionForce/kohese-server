@@ -15,8 +15,8 @@ import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicT
 import { KoheseType } from '../../../classes/UDT/KoheseType.class'
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../../mocks/data/MockViewData';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
-import * as KoheseModel from '../../../../../common/src/KoheseModel';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { PipesModule } from '../../../pipes/pipes.module';
 
 describe('Component: Property Editor', ()=>{
@@ -48,7 +48,7 @@ describe('Component: Property Editor', ()=>{
     }));
     propertyEditorComponent.selectedPropertyId = 'name';
     propertyEditorFixture.detectChanges();
-    
+
   })
 
   it('instantiates the Property Editor component', ()=>{
@@ -117,4 +117,4 @@ describe('Component: Property Editor', ()=>{
     expect(propertyEditorComponent.areRelationsEqual(secondRelation,
       firstRelation)).toEqual(false);
   });
-})
+});

@@ -1,4 +1,4 @@
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 
 export class KoheseType {
   get dataModelProxy() {
@@ -14,7 +14,7 @@ export class KoheseType {
     return this._fields;
   }
 
-  public constructor(private _dataModelProxy: ItemProxy,
+  public constructor(private _dataModelProxy: KoheseModel,
     private _viewModelProxyMap: any) {
     this.compileFields();
   }
@@ -63,7 +63,7 @@ export class KoheseType {
   
   private compileFields(): void {
     let fieldGroups: Array<any> = [];
-    let modelProxy: ItemProxy = this._dataModelProxy;
+    let modelProxy: KoheseModel = this._dataModelProxy;
     
     do {
       let modelFields: any = {};
@@ -83,10 +83,10 @@ export class KoheseType {
         modelFields[fieldKey] = field;
       }
       fieldGroups.push(modelFields);
- 
+
       modelProxy = modelProxy.parentProxy;
     } while (modelProxy.item.base);
-    
+
     fieldGroups.reverse();
     for (let j: number = 0; j < fieldGroups.length; j++) {
       for (let fieldKey in fieldGroups[j]) {

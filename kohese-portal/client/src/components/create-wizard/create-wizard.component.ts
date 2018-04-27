@@ -15,6 +15,7 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { SelectedProxyInfo } from '../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'create-wizard',
@@ -29,7 +30,7 @@ export class CreateWizardComponent extends NavigatableComponent
   models: Array<ItemProxy>;
   types: Array<KoheseType> = [];
   recentProxies: Array<ItemProxy>;
-  selectedType: ItemProxy;
+  selectedType: KoheseType;
   selectedParent: ItemProxy;
   rootProxy: ItemProxy;
   errorMessage: string;
@@ -83,12 +84,12 @@ export class CreateWizardComponent extends NavigatableComponent
     }
   }
 
-  onParentSelected(newParent, stepper: MatStepper) {
-    console.log(newParent);
-    if (this.selectedParent === newParent) {
+  onParentSelected(newParent : SelectedProxyInfo, stepper: MatStepper) {
+    console.log(newParent.selectedProxy);
+    if (this.selectedParent === newParent.selectedProxy) {
       stepper.next();
     } else {
-      this.selectedParent = newParent;
+      this.selectedParent = newParent.selectedProxy;
       this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
     }
   }
@@ -137,7 +138,7 @@ export class CreateWizardComponent extends NavigatableComponent
         console.log('Build Item promise resolve')
         this.MatDialogRef.close();
       }, (error) => {
-        // TODO show error on review stepper 
+        // TODO show error on review stepper
         this.errorMessage = error;
         console.log('*** Failed to upsert: ' + this.selectedType.
           dataModelProxy.item.name);

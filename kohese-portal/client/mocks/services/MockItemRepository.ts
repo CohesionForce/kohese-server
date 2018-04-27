@@ -5,18 +5,14 @@ import 'rxjs/add/observable/of';
 import { MockItem, MockRoot } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
 import { MockDataModel } from '../data/MockDataModel';
-import * as ItemProxy from '../../../common/src/item-proxy';
-import * as KoheseModel from '../../../common/src/KoheseModel';
+import { ItemProxy, TreeConfiguration } from '../../../common/src/item-proxy';
+import { KoheseModel } from '../../../common/src/KoheseModel';
 import { Subject } from 'rxjs';
 import { RepoStates } from '../../src/services/item-repository/item-repository.service';
 
 export class MockItemRepository {
   mockRootProxy = ItemProxy.getWorkingTree().getRootProxy();
   state: any;
-  currentTreeConfigSubject: BehaviorSubject<any> = new BehaviorSubject<any>({
-
-  })
-
 
   constructor() {
 
@@ -56,7 +52,7 @@ export class MockItemRepository {
   }
 
   getProxyFor(id: string) {
-    return ItemProxy.getProxyFor(id);
+    return TreeConfiguration.getWorkingTree().getProxyFor(id);
   }
 
   getRecentProxies() {
@@ -106,17 +102,7 @@ export class MockItemRepository {
   }
 
   getTreeConfig(): Observable<any> {
-
-    return new BehaviorSubject<any>({
-      getProxyFor: () => {
-        return new ItemProxy('Item', MockItem());
-      },
-      getRootProxy: () => {
-        return this.getRootProxy();
-      },
-      getChangeSubject: () => {
-        return new BehaviorSubject<any>(undefined);
-      }
-    })
+    return new BehaviorSubject<TreeConfiguration>(TreeConfiguration.
+      getWorkingTree());
   }
 }

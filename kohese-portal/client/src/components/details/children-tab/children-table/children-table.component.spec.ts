@@ -1,4 +1,4 @@
-import { TestBed, ComponentFixture} from '@angular/core/testing';
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { MockItemRepository } from '../../../../../mocks/services/MockItemReposi
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { MockItem } from '../../../../../mocks/data/MockItem';
 
 describe('Component: Children Table', ()=>{
@@ -51,17 +51,21 @@ describe('Component: Children Table', ()=>{
     expect(childrenTableComponent).toBeTruthy();
   })
 
-  it('updates the children list when a new array comes in', ()=>{
-    expect(childrenTableComponent.childrenStream.getValue().length).toEqual(11);
+  it('updates the children list when a new array comes in', fakeAsync(()=>{
+    let initialNumberOfChildren: number = childrenTableComponent.children.
+      length;
     let item: any = MockItem();
+    delete item.id;
     /* Delete the parentId so that this Item will be added as a child of the
     root proxy */
     delete item.parentId;
     new ItemProxy('Item', item);
     childrenTableComponent.childrenStream.next(mockRepo.getRootProxy().
       children);
-    expect(childrenTableComponent.childrenStream.getValue().length).toEqual(12);
-  });
+    tick();
+    expect(childrenTableComponent.children.length).toEqual(
+      initialNumberOfChildren + 1);
+  }));
 
   it('changes the order of children in their parent', () => {
     childrenTableComponent.editableStream.next(true);

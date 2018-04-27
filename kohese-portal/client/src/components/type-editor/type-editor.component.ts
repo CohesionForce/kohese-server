@@ -4,7 +4,9 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy,
+  TreeConfiguration } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs';
@@ -17,7 +19,7 @@ import { Subscription } from 'rxjs';
 })
 export class TypeEditorComponent implements OnInit, OnDestroy {
   public types: any;
-  private _treeConfiguration: ItemProxy.TreeConfiguration;
+  private _treeConfiguration: TreeConfiguration;
   private _koheseTypeStream: BehaviorSubject<KoheseType> =
     new BehaviorSubject<KoheseType>(undefined);
   get koheseTypeStream() {
@@ -33,7 +35,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     private itemRepository: ItemRepository,
     private _changeDetectorRef: ChangeDetectorRef) {
   }
-  
+
   ngOnInit(): void {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update: any) => {
@@ -42,7 +44,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         case RepoStates.SYNCHRONIZATION_SUCCEEDED:
           this._treeConfigurationSubscription = this.itemRepository.
             getTreeConfig().subscribe(
-            (treeConfiguration: ItemProxy.TreeConfiguration) => {
+            (treeConfiguration: TreeConfiguration) => {
             this._treeConfiguration = treeConfiguration;
             this.types = this.typeService.getKoheseTypes();
             this._koheseTypeStream.next(this.types[Object.keys(this.
@@ -59,7 +61,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     }
     this.repoStatusSubscription.unsubscribe();
   }
-  
+
   add(): void {
     this.dialogService.openInputDialog('Add Type', '', this.dialogService.
       INPUT_TYPES.TEXT, 'Name').afterClosed().subscribe((name: string) => {
@@ -83,16 +85,16 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           parentId: 'view-item',
           viewProperties: {}
         });
-      
+
         Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
           then((proxies: Array<ItemProxy>) => {
-          this.typeService.buildKoheseType(proxies[0]);
+          this.typeService.buildKoheseType(proxies[0] as KoheseModel);
           this._changeDetectorRef.markForCheck();
         });
       }
     });
   }
-  
+
   save(): void {
     let koheseType: KoheseType = this._koheseTypeStream.getValue();
     this.itemRepository.upsertItem(koheseType.dataModelProxy).catch(
@@ -108,7 +110,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       console.log(error);
     });
   }
-  
+
   delete(): void {
     let koheseType: KoheseType = this._koheseTypeStream.getValue();
     this.dialogService.openYesNoDialog('Delete ' + koheseType.dataModelProxy.

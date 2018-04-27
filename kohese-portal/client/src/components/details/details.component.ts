@@ -6,7 +6,7 @@ import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 
-import * as ItemProxy from '../../../../common/src/item-proxy.js';
+import { ItemProxy } from '../../../../common/src/item-proxy.js';
 import { SessionService } from '../../services/user/session.service';
 
 import * as commonmark from 'commonmark';
@@ -71,7 +71,7 @@ export class DetailsComponent extends NavigatableComponent
 
   ngOnInit() {
 
-    this.proxyStream = new BehaviorSubject({});
+    this.proxyStream = new BehaviorSubject(undefined);
 
     /* Subscriptions */
     this.routeSub = this.route.params.subscribe(params => {
@@ -83,7 +83,7 @@ export class DetailsComponent extends NavigatableComponent
         this.treeConfigSub = this.currentTreeConfigSubscription = this.ItemRepository.getTreeConfig()
           .subscribe((newConfig) => {
             this.treeConfig = newConfig;
-            // Unsubscribe from old tree updates 
+            // Unsubscribe from old tree updates
             if (this.proxyUpdates) {
               this.proxyUpdates.unsubscribe();
               this.proxyUpdates = undefined;

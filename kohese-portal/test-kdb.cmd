@@ -1,1 +1,1 @@
-jasmine-node server/tests/integration/kdb-spec.js
+jasmine-node build/server/tests/integration/kdb-spec.js

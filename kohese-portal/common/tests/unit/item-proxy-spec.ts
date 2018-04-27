@@ -1,10 +1,9 @@
+import { ItemProxy, TreeConfiguration } from '../../../common/src/item-proxy';
+import { KoheseModel } from '../../../common/src/KoheseModel';
 describe('ItemProxy Test', function () {
 
-  var ItemProxy = require('../../../common/src/item-proxy.js');
-  var KoheseModel = require('../../../common/src/KoheseModel.js');
-
-  var root = ItemProxy.getWorkingTree().getRootProxy();
-  var lostAndFound = ItemProxy.getWorkingTree().getProxyFor('LOST+FOUND');
+  var root = TreeConfiguration.getWorkingTree().getRootProxy();
+  var lostAndFound = TreeConfiguration.getWorkingTree().getProxyFor('LOST+FOUND');
   // console.log(__dirname);
   // console.log('::: Starting Item Proxy Test');
   var dumpEnabled = false;
@@ -24,7 +23,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  function dump(message) {
+  function dump(message : string = undefined) {
     if (dumpEnabled) {
       if (message) {
         console.log('>>> ' + message);
@@ -43,7 +42,7 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  function dumpHashFor(proxy, message) {
+  function dumpHashFor(proxy : ItemProxy, message : string = undefined) {
     if (dumpEnabled) {
       console.log('::: Hash for ' + proxy.item.name);
       if (message) {
@@ -884,7 +883,7 @@ describe('ItemProxy Test', function () {
 
     defineTestModel();
 
-    function createNV(nodeId, parentId, kind) {
+    function createNV(nodeId, parentId, kind  : string = undefined) {
       var createKind = kind || 'Test';
       // eslint-disable-next-line no-unused-vars
       var proxy = new ItemProxy(createKind, {
@@ -1078,7 +1077,7 @@ describe('ItemProxy Test', function () {
       }
     };
 
-  var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
+  var thmCompare = TreeConfiguration.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
   if (!thmCompare.match) {
     console.log('Tree Map');
     console.log(treeHashMap);
@@ -1151,7 +1150,7 @@ it('Retrieve Delta Tree Hash Map', () => {
 
   var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
 
-  var thmCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
+  var thmCompare = TreeConfiguration.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
 
   expect(thmCompare).toEqual(expectedDeltaMap);
 });

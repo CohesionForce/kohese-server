@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, OnInit } from '@angular/core'
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import {NavigatableComponent} from '../../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { AssignmentCard } from '../AssignmentCard.class';
@@ -15,14 +15,14 @@ import { BehaviorSubject } from 'rxjs';
 export class DueAssignmentComponent extends AssignmentCard implements OnDestroy, OnInit {
 
   /* Data */
-  @Input() 
-  itemProxy : ItemProxy 
+  @Input()
+  itemProxy : ItemProxy
 
   constructor (navigationService : NavigationService,
-               itemRepository : ItemRepository, 
+               itemRepository : ItemRepository,
                changeRef : ChangeDetectorRef) {
     super (navigationService, itemRepository, changeRef);
-    
+
   }
 
   ngOnInit () {

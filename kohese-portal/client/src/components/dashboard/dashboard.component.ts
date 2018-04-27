@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
@@ -23,7 +23,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
   private itemList: Array<Object>;
   private repoStatusSubject : BehaviorSubject<any>;
 
-  // UI Switches 
+  // UI Switches
   dashboardTypes = {
     'assignments' : 0,
     'userPreferences' : 1
@@ -62,7 +62,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
         this.assignmentTypeStream.next(DashboardSelections.DUE_ASSIGNMENTS);
         break;
       case (DashboardSelections.USER_PREFERENCES) :
-        this.dashboardType = this.dashboardTypes.userPreferences; 
+        this.dashboardType = this.dashboardTypes.userPreferences;
         break;
     }
   }
@@ -75,6 +75,6 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
           this.currentUser.relations.referencedBy[referenceCategory].assignedTo[reference]
         )
     }
-    this.assignmentListStream.next(assignmentList);  
+    this.assignmentListStream.next(assignmentList);
   }
 }

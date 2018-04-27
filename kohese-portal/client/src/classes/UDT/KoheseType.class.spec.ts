@@ -2,8 +2,8 @@ import { MockDataModel, ItemSubclass } from '../../../mocks/data/MockDataModel';
 import { MockViewData,
   MockItemSubclassView } from '../../../mocks/data/MockViewData';
 import { KoheseType } from './KoheseType.class';
-import * as ItemProxy from '../../../../common/src/item-proxy';
-import * as KoheseModel from '../../../../common/src/KoheseModel';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 
 describe('Class: KoheseType', () => {
   let koheseType: KoheseType;

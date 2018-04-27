@@ -20,14 +20,15 @@ import { MockViewData } from '../../../mocks/data/MockViewData';
 import { ProxyFilter } from '../../classes/ProxyFilter.class';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { TreeRow } from './tree-row.class';
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('Component: TreeRow', () => {
   let fixture: ComponentFixture<TreeRowComponent>;
   let component: TreeRowComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [TreeRowComponent],
@@ -42,19 +43,19 @@ describe('Component: TreeRow', () => {
       ],
       imports: [ToastrModule.forRoot(), MaterialModule, PipesModule, BrowserAnimationsModule]
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(TreeRowComponent);
     component = fixture.componentInstance;
     component.treeRow = new TreeRow(new ItemProxy('Item', MockItem()));
-    component.treeRootStream = 
+    component.treeRootStream =
       new BehaviorSubject<ItemProxy>(ItemProxy.getWorkingTree().getRootProxy());
-    
+
     fixture.detectChanges();
   });
-  
+
   it('filters based on type', () => {
     let filter: ProxyFilter = new ProxyFilter();
-    filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
+    filter.kind = new KoheseType(new KoheseModel(MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()));
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(true);
@@ -62,11 +63,11 @@ describe('Component: TreeRow', () => {
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(false);
   });
-  
+
   it('filters based on the user assigned to an Action', () => {
     component.treeRow.itemProxy.kind = 'Action';
     let filter: ProxyFilter = new ProxyFilter();
-    filter.kind = new KoheseType(new ItemProxy('KoheseModel', MockDataModel()),
+    filter.kind = new KoheseType(new KoheseModel(MockDataModel()),
       new ItemProxy('KoheseView', MockViewData()));
     filter.kind.dataModelProxy.item.name = 'Action';
     filter.actionAssignee = 'admin';
@@ -78,7 +79,7 @@ describe('Component: TreeRow', () => {
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(false);
   });
-  
+
   it('filters based on whether there is a version control status',
     () => {
     let filter: ProxyFilter = new ProxyFilter();
@@ -91,7 +92,7 @@ describe('Component: TreeRow', () => {
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(true);
   });
-  
+
   it('filters based on whether there are unsaved changes', () => {
     let filter: ProxyFilter = new ProxyFilter();
     filter.dirty = true;
@@ -101,7 +102,7 @@ describe('Component: TreeRow', () => {
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(true);
   });
-  
+
   it('filters based on the content of string fields', () => {
     let filter: ProxyFilter = new ProxyFilter();
     filter.filterString = 'Joshua';
@@ -111,7 +112,7 @@ describe('Component: TreeRow', () => {
     component.treeRow.filter(filter);
     expect(component.treeRow.visible).toEqual(true);
   });
-  
+
   it('calculates the correct number of pixels by which to indent', () => {
     expect(component.getIndentationStyle()['padding-left']).toEqual('30px');
   });

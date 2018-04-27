@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { UserInput } from '../user-input.class';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { TreeComponent } from '../../tree/tree.component';
@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/startWith';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { ProxySelectorDialogComponent } from './proxy-selector-dialog/proxy-selector-dialog.component';
+import { SelectedProxyInfo } from './proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'k-proxy-selector',
@@ -115,18 +116,18 @@ export class KProxySelectorComponent extends UserInput
         allowMultiSelect: this.allowMultiSelect,
         selected: (this.selectedProxy) ? this.selectedProxy : this.selectedProxies
       }
-    }).updateSize('60%', '60%').afterClosed().subscribe((selected) => {
-      if (selected instanceof Array) {
+    }).updateSize('60%', '60%').afterClosed().subscribe((selected : SelectedProxyInfo) => {
+      if (selected.selectedProxies) {
+        this.selectedProxies = selected.selectedProxies;
         let selectedIds = [];
-        for (let i = 0; i < selected.length; i++) {
-          selectedIds.push({ id: selected[i].item.id });
+        for (let i = 0; i < this.selectedProxies.length; i++) {
+          selectedIds.push({ id: this.selectedProxies[i].item.id });
         }
-        this.selectedProxies = selected;
         this.formGroup.controls[this.fieldId].setValue(selectedIds);
         this.formGroup.controls[this.fieldId].markAsDirty();
-      } else if (selected) {
-        this.selectedProxy = selected;
-        this.formGroup.controls[this.fieldId].setValue({ id: selected.item.id });
+      } else if (selected.selectedProxy) {
+        this.selectedProxy = selected.selectedProxy;
+        this.formGroup.controls[this.fieldId].setValue({ id: this.selectedProxy.item.id });
         this.formGroup.controls[this.fieldId].markAsDirty();
         console.log(this.formGroup);
       }

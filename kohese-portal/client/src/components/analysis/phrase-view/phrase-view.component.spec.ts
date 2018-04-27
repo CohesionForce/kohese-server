@@ -7,7 +7,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../../material.module';
 import { PhraseViewComponent } from './phrase-view.component';
 import { BehaviorSubject } from 'rxjs';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
@@ -58,10 +58,10 @@ describe('Component: Phrase View', ()=>{
 
 
     phraseFixture.detectChanges();
-    
+
   })
 
   it('instantiates the phrase component', ()=>{
-    expect(phraseComponent).toBeTruthy(); 
+    expect(phraseComponent).toBeTruthy();
   })
 })

@@ -5,7 +5,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { CurrentUserService } from '../../../services/user/current-user.service';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({

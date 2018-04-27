@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, OnInit } from '@angular/core'
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { AssignmentCard } from '../AssignmentCard.class';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
@@ -13,12 +13,12 @@ import { ItemRepository } from '../../../../services/item-repository/item-reposi
 export class ActiveAssignmentComponent extends AssignmentCard implements OnInit ,OnDestroy {
 
   /* Data */
-  @Input() 
-  itemProxy : ItemProxy 
+  @Input()
+  itemProxy : ItemProxy
 
 
   constructor (navigationService : NavigationService,
-              itemRepository : ItemRepository, 
+              itemRepository : ItemRepository,
               changeRef : ChangeDetectorRef) {
     super (navigationService, itemRepository, changeRef);
 

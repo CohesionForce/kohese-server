@@ -30,7 +30,7 @@ export class DocumentViewComponent extends NavigatableComponent
 
   /* Data */
   itemProxy: ItemProxy;
-  itemLength: ItemProxy;
+  itemLength: number;
 
   filter: string;
   docRendered: string;
@@ -143,7 +143,7 @@ export class DocumentViewComponent extends NavigatableComponent
   }
 
   generateDoc(): void {
-    let subtreeAsList = this.itemProxy.getSubtreeAsList()
+    let subtreeAsList = this.itemProxy.getSubtreeAsList();
     this.itemLength = subtreeAsList.length;
 
     let docRendered = '';
