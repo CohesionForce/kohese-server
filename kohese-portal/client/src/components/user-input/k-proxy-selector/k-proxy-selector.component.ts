@@ -121,7 +121,7 @@ export class KProxySelectorComponent extends UserInput
         this.selectedProxies = selected.selectedProxies;
         let selectedIds = [];
         for (let i = 0; i < this.selectedProxies.length; i++) {
-          selectedIds.push({ id: selected[i].item.id });
+          selectedIds.push({ id: this.selectedProxies[i].item.id });
         }
         this.formGroup.controls[this.fieldId].setValue(selectedIds);
         this.formGroup.controls[this.fieldId].markAsDirty();
