@@ -4,9 +4,27 @@
 
 'use strict'; //Required for use of 'class'
 import * as  _ from 'underscore';
-import * as SHA from 'jssha';
-import * as uuidV1 from 'uuid/v1';
+import * as jsSHA_Import from 'jssha';
+import * as uuidV1_Import from 'uuid/v1';
 import { Subject } from 'rxjs/Subject';
+
+//
+// Adjust for the differences in CommonJS and ES6 for jssha
+//
+let jsSHA;
+if (typeof(jsSHA_Import) === "object") {
+  jsSHA = (<any>jsSHA_Import).default;
+} else {
+  jsSHA = jsSHA_Import;
+}
+
+// Adjust for the differences in CommonJS and ES6 for uuid
+let uuidV1;
+if (typeof(uuidV1_Import) === "object") {
+  uuidV1 = uuidV1_Import.default;
+} else {
+  uuidV1 = uuidV1_Import;
+}
 
 let treeConfigMap = {};
 let workingTree;
@@ -62,7 +80,6 @@ export class ItemProxy {
   public status;
   public history;
   public type; // Used to store KoheseType.
-
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -248,6 +265,41 @@ export class ItemProxy {
         }
       }
     }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getRelationsByAttribute() {
+    let relationMap = {};
+    for(let refTypeKey in this.relations){
+      relationMap[refTypeKey] = {};
+      for(let kindKey in this.relations[refTypeKey])
+      {
+        relationMap[refTypeKey] = {};
+
+        let relationsForKind = this.relations[refTypeKey][kindKey];
+        for(let relationKey in relationsForKind){
+          if (!relationMap[refTypeKey][relationKey]){
+            relationMap[refTypeKey][relationKey] = {};
+          }
+          let relationList = relationsForKind[relationKey];
+          if (Array.isArray(relationList)){
+            relationMap[refTypeKey][relationKey][kindKey] = [];
+            for(let index = 0; index < relationList.length; index++){
+              relationMap[refTypeKey][relationKey][kindKey].push(relationList[index]);
+            }
+          } else {
+            if (relationList){
+              relationMap[refTypeKey][relationKey][kindKey] = relationList;
+            } else {
+              delete relationMap[refTypeKey][relationKey];
+            }
+          }
+        }
+      }
+    }
+    return relationMap;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -638,7 +690,7 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static gitDocumentOID(forDoc) {
-    var shaObj = new SHA('SHA-1', 'TEXT');
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
 
     var forText = JSON.stringify(forDoc, null, '  ');
 
@@ -662,7 +714,7 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static gitFileOID(forFile) {
-    var shaObj = new SHA('SHA-1', 'TEXT');
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
 
 
     var length = forFile.length;
@@ -690,7 +742,8 @@ export class ItemProxy {
       return;
     }
 
-    var shaObj = new SHA('SHA-1', 'TEXT');
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
+
     var doc = this.strippedDocument();
     shaObj.update('blob ' + doc.length + '\0' + doc);
 
@@ -736,7 +789,7 @@ export class ItemProxy {
       }
     }
 
-    var shaObj = new SHA('SHA-1', 'TEXT');
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
     shaObj.update(JSON.stringify(treeHashEntry));
     this.treeHash =  shaObj.getHash('HEX');
 
