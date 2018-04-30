@@ -39,7 +39,7 @@ export class DynamicTypesService {
           case RepoStates.SYNCHRONIZATION_SUCCEEDED:
             this.treeConfigSubscription = this.ItemRepository.getTreeConfig().subscribe((newConfig) => {
               if (newConfig) {
-                this.treeConfig = newConfig;
+                this.treeConfig = newConfig.config;
 
                 let modelProxy: ItemProxy = this.treeConfig.getProxyFor('Model-Definitions');
                 let typeProxies: Array<KoheseModel> = modelProxy.getDescendants().

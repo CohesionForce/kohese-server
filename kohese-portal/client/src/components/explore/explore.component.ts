@@ -36,7 +36,7 @@ export class ExploreComponent extends NavigatableComponent
 
    this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
      if (this.routeId && newConfig) {
-       if (newConfig.getProxyFor(this.routeId)){
+       if (newConfig.config.getProxyFor(this.routeId)){
          this.proxySelected = true;
        } else {
          this.proxySelected = false;

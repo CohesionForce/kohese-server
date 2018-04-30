@@ -242,7 +242,7 @@ export class ItemCache {
           // eslint-disable-next-line no-unused-vars
           let treeProxy : ItemProxy = new ItemProxy(kind,  item, treeConfig);
         } else {
-          console.log('*** Could not find item for: ' + kind + ' - with oid - ' + treeHashEntry.treeId);
+          console.log('*** Could not find item for: ' + kind + ' - with item id - ' + treeId);
           console.log(treeHashEntry);
         }
     }

@@ -1,0 +1,16 @@
+{
+  "id": "view-project",
+  "name": "Project View Model",
+  "parentId": "view-item",
+  "modelName": "Project",
+  "icon": "fa fa-pie-chart",
+  "viewProperties": {
+    "projectItems": {
+      "inputType": "proxy-selector:{\"allowMultiSelect\":true,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "required": false,
+      "default": null,
+      "displayName": "Project Items"
+    }
+  },
+  "itemIds": []
+}

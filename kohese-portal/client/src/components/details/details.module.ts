@@ -19,6 +19,7 @@ import { ActionTableModule } from "../action-table/action-table.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
 import { UserInputModule } from '../user-input/user-input.module';
+import { DetailsDialogComponent } from "./details-dialog/details-dialog.component";
 
 
 @NgModule({
@@ -32,7 +33,11 @@ import { UserInputModule } from '../user-input/user-input.module';
     ProxySelectorTreeComponent,
     JournalComponent,
     JournalEntryComponent,
-    DetailsFormComponent
+    DetailsFormComponent,
+    DetailsDialogComponent
+  ],
+  entryComponents: [
+    DetailsDialogComponent
   ],
   imports : [
     CommonModule,
@@ -50,7 +55,8 @@ import { UserInputModule } from '../user-input/user-input.module';
     HistoryTabComponent,
     ChildrenTabComponent,
     DetailsFormComponent,
-    ProxySelectorTreeComponent
+    ProxySelectorTreeComponent,
+    DetailsDialogComponent
   ]
 })
 export class DetailsModule {}
