@@ -16,9 +16,13 @@ export class DynamicTypesService {
   treeConfigSubscription: Subscription;
 
   private readonly USER_INPUT_TYPES: any = {
-    'types': 'Text',
+    'text': 'Text',
+    'date': 'Date',
+    'select': 'Select',
+    'markdown': 'Markdown',
     'proxy-selector': 'Reference',
-    'date': 'Date'
+    'user-selector': 'User Name',
+    'state-editor': 'State Editor'
   };
 
   /* Observables */
@@ -43,7 +47,10 @@ export class DynamicTypesService {
                     return ((first.item.name > second.item.name) ?
                       1 : ((first.item.name < second.item.name) ? -1 : 0));
                   });
-                this.buildKoheseTypes(typeProxies);
+                for (let j: number = 0; j < typeProxies.length; j++) {
+                  this.buildKoheseType(typeProxies[j]);
+                }
+                
                 if (this.repoStatusSubscription) {
                   this.repoStatusSubscription.unsubscribe();
                 }
@@ -57,13 +64,28 @@ export class DynamicTypesService {
     return this.koheseTypes;
   }
 
-  buildKoheseTypes(typeProxies: Array<KoheseModel>): void {
-    for (var i: number = 0; i < typeProxies.length; i++) {
-      let currentModel: KoheseModel = typeProxies[i];
-      let viewProxy: ItemProxy = this.getViewProxyFor(currentModel);
-      let type: KoheseType = new KoheseType(currentModel, viewProxy);
-      this.koheseTypes[currentModel.item.name] = type;
-      currentModel.type = type;
+  public buildKoheseType(dataModelProxy: KoheseModel): void {
+    let viewModelProxyMap: any = {};
+    let modelProxy: KoheseModel = dataModelProxy;
+    do {
+      viewModelProxyMap[modelProxy.item.id] = this.getViewProxyFor(modelProxy);
+      modelProxy = modelProxy.parentProxy;
+    } while (modelProxy.item.base)
+    let type: KoheseType = new KoheseType(dataModelProxy, viewModelProxyMap);
+    dataModelProxy.type = type;
+      
+    /* Add the newly-built KoheseType to koheseTypes and sort koheseTypes
+    alphabetically */
+    this.koheseTypes[dataModelProxy.item.name] = type;
+    let koheseTypeNames: Array<string> = Object.keys(this.koheseTypes);
+    koheseTypeNames.sort();
+    let intermediateObject: any = {};
+    for (let j: number = 0; j < koheseTypeNames.length; j++) {
+      intermediateObject[koheseTypeNames[j]] = this.koheseTypes[koheseTypeNames[j]];
+      delete this.koheseTypes[koheseTypeNames[j]];
+    }
+    for (let koheseTypeName in intermediateObject) {
+      this.koheseTypes[koheseTypeName] = intermediateObject[koheseTypeName];
     }
   }
 

@@ -4,6 +4,7 @@
   "parentId": "Item",
   "base": "Item",
   "idInjection": true,
+  "isMetamodel": true,
   "invertItemOrder": true,
   "properties": {
     "password": {

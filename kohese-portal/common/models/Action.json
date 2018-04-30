@@ -100,7 +100,10 @@
       "type": [
         "Item"
       ],
-      "relation": true
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     },
     "assignedTo": {
       "type": "string",

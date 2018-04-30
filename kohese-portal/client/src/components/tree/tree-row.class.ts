@@ -70,7 +70,7 @@ export class TreeRow {
     } else if (proxyFilter.dirty && !proxy.dirty) {
       matches =  false;
     } else if (proxyFilter.kind) {
-      if (proxy.kind !== proxyFilter.kind.name) {
+      if (proxy.kind !== proxyFilter.kind.dataModelProxy.item.name) {
         matches = false;
       } else if (proxy.kind === 'Action') {
         if (proxyFilter.actionState && (proxy.item.actionState !==

@@ -6,19 +6,32 @@
   "icon": "fa fa-comment",
   "viewProperties": {
     "observedBy": {
-      "inputType": "user-selector:{}",
+      "inputType": {
+        "type": "user-selector",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "observedBy"
     },
     "observedOn": {
-      "inputType": "date:{}",
+      "inputType": {
+        "type": "date",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "observedOn"
     },
     "context": {
-      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {
+          "allowMultiSelect": false,
+          "type": "Item",
+          "useAdvancedSelector": false
+        }
+      },
       "required": true,
       "default": "ROOT",
       "displayName": "context"

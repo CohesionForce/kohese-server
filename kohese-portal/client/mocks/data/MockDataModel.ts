@@ -6,6 +6,7 @@ export function MockDataModel () {
   "base": "PersistedModel",
   "strict": "validate",
   "idInjection": true,
+  "isMetaModel": true,
   "invertItemOrder": true,
   "trackChanges": false,
   "properties": {
@@ -232,6 +233,7 @@ export function MockDataModel () {
 export function ItemSubclass() {
   return {
     "name": "ItemSubclass",
+    "parentId": "Item",
     "base": "Item",
     "strict": "validate",
     "idInjection": true,
