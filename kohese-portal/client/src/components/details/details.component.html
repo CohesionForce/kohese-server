@@ -34,7 +34,7 @@
     <div class="panel-body">
         <!-- Nav tabs -->
         <mat-tab-group id="details-tabs">
-            <mat-tab id="defaultTab" active="defaultTab.active" label="Document">
+            <mat-tab id="defaultTab" label="Document">
                 <button (click)="generateHTMLReport()" class="btn btn-primary">
                    Generate HTML Report
                </button>
@@ -61,7 +61,7 @@
                 <details-form #editor [proxyStream]="proxyStream" 
                   [editableStream]="editableStream"
                   (formGroupUpdated)="onFormGroupUpdated($event)"
-                  (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
+                  (nonFormFieldChanged)="onNonFormFieldChanged($event)">
                 </details-form>
             </mat-tab>
             <mat-tab>

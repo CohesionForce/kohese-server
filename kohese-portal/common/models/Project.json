@@ -1,0 +1,20 @@
+{
+  "id": "Project",
+  "name": "Project",
+  "parentId": "Item",
+  "base": "Item",
+  "idInjection": true,
+  "invertItemOrder": false,
+  "properties": {
+    "projectItems": {
+      "type": [
+        "Item"
+      ],
+      "relation": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

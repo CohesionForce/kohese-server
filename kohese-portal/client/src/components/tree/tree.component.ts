@@ -87,7 +87,7 @@ export class TreeComponent extends NavigatableComponent
                     this._itemProxySubscription = undefined;
                   }
 
-                  this.absoluteRoot = newConfig.getRootProxy();
+                  this.absoluteRoot = newConfig.config.getRootProxy();
                   this._treeRootStream = new BehaviorSubject<ItemProxy>(this.
                     absoluteRoot);
                   this.koheseTypes = this.typeService.getKoheseTypes();
@@ -98,7 +98,7 @@ export class TreeComponent extends NavigatableComponent
 
                   // Create tree row for the lost and found proxy
                   let lostAndFoundProxy = this.absoluteRoot.treeConfig.getLostAndFoundProxy();
-                  if(!this._rowMap.get(lostAndFoundProxy.item.id)){
+                  if (!this._rowMap.get(lostAndFoundProxy.item.id)) {
                     this.addTreeRow(lostAndFoundProxy);
                   }
 
@@ -107,7 +107,7 @@ export class TreeComponent extends NavigatableComponent
                       this.changeTreeRoot(proxy);
                     });
 
-                  this._itemProxySubscription = newConfig.
+                  this._itemProxySubscription = newConfig.config.
                     getChangeSubject().subscribe((notification: any) => {
                       this.calculateRows(notification);
                     })
@@ -142,7 +142,9 @@ export class TreeComponent extends NavigatableComponent
   }
 
   ngOnDestroy(): void {
-    this.routeParametersSubscription.unsubscribe();
+    if (this.routeParametersSubscription) {
+      this.routeParametersSubscription.unsubscribe();
+    }
     for (let j: number = 0; j < this._updateVisibleRowsSubscriptions.length;
       j++) {
       this._updateVisibleRowsSubscriptions[j].unsubscribe();

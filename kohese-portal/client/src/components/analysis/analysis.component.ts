@@ -58,7 +58,7 @@ export class AnalysisComponent extends NavigatableComponent
       this.itemProxyId = params['id'];
       this.treeConfigSub = this.ItemRepository.getTreeConfig().subscribe((newConfig) => {
         if (newConfig) {
-          this.treeConfig = newConfig;
+          this.treeConfig = newConfig.config;
           this.itemProxy = this.treeConfig.getProxyFor(this.itemProxyId);
           this.proxyStream = new BehaviorSubject(this.itemProxy);
           if (this.itemProxy) {

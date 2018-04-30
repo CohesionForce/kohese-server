@@ -24,7 +24,7 @@ export class AssignmentDashboardComponent extends NavigatableComponent
   assignmentListSub : Subscription;
 
   @Input()
-  assignmentTypeStream : Observable<DashboardSelections>;
+  dashboardSelectionStream : Observable<DashboardSelections>;
   assignmentType : DashboardSelections;
   assignmentTypeSub : Subscription;
 
@@ -38,7 +38,7 @@ export class AssignmentDashboardComponent extends NavigatableComponent
   }
 
   ngOnInit() {
-    this.assignmentTypeSub =this.assignmentTypeStream.subscribe((dashboardType)=>{
+    this.assignmentTypeSub =this.dashboardSelectionStream.subscribe((dashboardType)=>{
       this.assignmentType = dashboardType;
       this.sortedAssignmentList = this.sortAssignments(this.assignmentType, this.assignmentList);
       this.changeRef.markForCheck();

@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { ItemRepository, RepoStates } from "../../../services/item-repository/item-repository.service";
+import { ItemRepository, RepoStates, TreeConfigType } from "../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
 import { DialogService } from "../../../services/dialog/dialog.service";
 import { CommitBrowserComponent } from "../commit-browser/commit-browser.component";
@@ -39,7 +39,7 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
         if (newRecord) {
           this.selectedCommit = newRecord.commit;
           console.log(newRecord);
-          this.itemRepository.setTreeConfig(newRecord.commitId);
+          this.itemRepository.setTreeConfig(newRecord.commitId, TreeConfigType.HISTORICAL);
         }
       })
   }

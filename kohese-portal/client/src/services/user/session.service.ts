@@ -23,7 +23,7 @@ export class SessionService {
       if (decodedToken) {
         this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
           if (newConfig) {
-            this.treeConfig = newConfig;
+            this.treeConfig = newConfig.config;            
             let usersProxy: ItemProxy = this.treeConfig.getRootProxy().getChildByName('Users');
             this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
           } else {
