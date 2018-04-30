@@ -6,7 +6,7 @@
   "scripts": {
     "server": "node --max_old_space_size=2048 .",
     "build-all": "npm run build-server && npm run build-client",
-    "build-server": "(tsc --p server/tsconfig.json; echo \"TSC Return Value: $?\")",
+    "build-server": "tsc --p server/tsconfig.json",
     "build-client": "webpack --config webpack.config.dev.js",
     "build-client-prod": "webpack --config webpack.config.prod.js && npm run sw-config && npm run sw-copy",
     "start": "webpack-dev-server --port=4200",
@@ -96,7 +96,7 @@
     "@types/node": "^8.0.53",
     "@types/sharedworker": "0.0.27",
     "@types/underscore": "^1.8.5",
-    "@types/webpack": "^3.8.1",
+    "@types/webpack": "^3.8.12",
     "autoprefixer": "^7.2.3",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",

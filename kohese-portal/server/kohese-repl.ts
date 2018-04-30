@@ -68,7 +68,7 @@ function defineCommands(replConsole) {
     replConsole.defineCommand('getKDBPath', {
         help: 'Print the current KDB Path',
         action: function() {
-            var kdbPath = global.koheseKDB.ItemProxy.getWorkingTree().getRootProxy().repoPath;
+            var kdbPath = global['koheseKDB'].ItemProxy.getWorkingTree().getRootProxy().repoPath;
             this.outputStream.write(kdbPath + '\n');
             this.displayPrompt();
         }
@@ -78,7 +78,7 @@ function defineCommands(replConsole) {
         help: 'restarts the server in a terrible way',
         action: function() {
             var child = require('child_process');
-            var kdbPath = global.koheseKDB.ItemProxy.getWorkingTree().getRootProxy().repoPath;
+            var kdbPath = global['koheseKDB'].ItemProxy.getWorkingTree().getRootProxy().repoPath;
             kdbPath = kdbPath.replace(/\/Root.json$/,'');
             kdbPath = kdbPath.replace(/^kdb\//, '');
             child.spawn('gnome-terminal',

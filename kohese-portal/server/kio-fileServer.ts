@@ -6,7 +6,7 @@
 var kio = require('./koheseIO.js');
 var SocketIOFile = require('socket.io-file');
 
-global.app.on('newSession', function (socket) {
+global['app'].on('newSession', function (socket) {
 
   console.log('>>> KIO File Server: session %s connected from %s for %s',
       socket.id, socket.handshake.address, socket.koheseUser.username);

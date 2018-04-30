@@ -425,14 +425,19 @@ module.exports.fetch = fetch;
 //////////////////////////////////////////////////////////////////////////
 function merge(repositoryId, signature) {
   var repository = repoList[repositoryId];
-  return Promise.join(repository.getHeadCommit(), repository.getMasterCommit(), function (hc, mc) {
-    var index = nodegit.Merge.commits(repository, hc, mc, null);
+  return Promise.all([repository.getHeadCommit(), repository.
+    getMasterCommit()]).then(function (commits: Array<any>) {
+    let headCommit: any = commits[0];
+    let masterCommit: any = commits[1];
+    var index = nodegit.Merge.commits(repository, headCommit, masterCommit,
+      null);
     if (index.hasConflicts()) {
       // TODO Handle conflicts
     }
 
     return index.writeTreeTo(repository).then(function (treeId) {
-      return repository.createCommit('HEAD', signature, signature, 'Merge from master to HEAD.', treeId, [hc, mc]);
+      return repository.createCommit('HEAD', signature, signature,
+        'Merge from master to HEAD.', treeId, [headCommit, masterCommit]);
     });
   });
 }
@@ -500,7 +505,8 @@ function walkHistoryForFile(itemId, callback){
   var commitFiles = fs.readdirSync(INDEX_DIRECTORY);
   var relatedCommits = [];
   for (var j = 0; j < commitFiles.length; j++) {
-    var content = JSON.parse(fs.readFileSync(path.join(INDEX_DIRECTORY, commitFiles[j])));
+    var content = JSON.parse(fs.readFileSync(path.join(INDEX_DIRECTORY,
+      commitFiles[j]), ''));
     var entry = content.objects[itemId];
     if (entry) {
       relatedCommits.push({

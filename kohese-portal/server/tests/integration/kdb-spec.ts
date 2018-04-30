@@ -69,7 +69,7 @@ describe('KDB Test', function() {
       var timeBefore = new Date();
       var treeHashMap = kdb.ItemProxy.getWorkingTree().getAllTreeHashes();
       var timeAfter = new Date();
-      var deltaTime : number = timeAfter - timeBefore;
+      var deltaTime : number = timeAfter.getTime() - timeBefore.getTime();
       console.log('Time to getAllTH: ' + deltaTime);
 
       var fs = require('fs');
@@ -83,7 +83,8 @@ describe('KDB Test', function() {
       var timeBeforeGetDoc = new Date();
       let repoAsList = rootProxy.getSubtreeAsList();
       var timeAfterGetDoc = new Date();
-      var deltaTimeGetDoc : number = timeAfterGetDoc - timeBeforeGetDoc;
+      var deltaTimeGetDoc : number = timeAfterGetDoc.getTime() -
+        timeBeforeGetDoc.getTime();
       console.log('Item Count in Repo List:  ' + repoAsList.length);
       console.log('Time to get entire repo as doc: ' + deltaTimeGetDoc);
 
