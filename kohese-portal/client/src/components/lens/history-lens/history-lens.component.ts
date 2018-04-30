@@ -1,7 +1,8 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter } from "@angular/core";
 import { Subscription } from 'rxjs';
 
-import { ItemProxy, TreeConfiguration } from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemRepository, RepoStates, TreeConfigType } from "../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
 import { DialogService } from "../../../services/dialog/dialog.service";
@@ -38,7 +39,7 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
         if (newRecord) {
           this.selectedCommit = newRecord.commit;
           console.log(newRecord);
-          this.itemRepository.setTreeConfig(newRecord.commitId, TreeConfigType.HISTORICAL);       
+          this.itemRepository.setTreeConfig(newRecord.commitId, TreeConfigType.HISTORICAL);
         }
       })
   }

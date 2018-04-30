@@ -1,5 +1,6 @@
 'use strict'; //Required for use of 'class'
 import { ItemProxy }  from './item-proxy';
+import { TreeConfiguration } from './tree-configuration';
 import * as  _ from 'underscore';
 
 
@@ -162,7 +163,7 @@ export class KoheseModel extends ItemProxy {
       }
     }
 
-    ItemProxy.registerKoheseModelClass(KoheseModel);
+    TreeConfiguration.registerKoheseModelClass(KoheseModel);
   }
 
   //////////////////////////////////////////////////////////////////////////

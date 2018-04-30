@@ -1,4 +1,5 @@
-import { ItemProxy, TreeConfiguration } from '../../../common/src/item-proxy';
+import { ItemProxy } from '../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../common/src/KoheseModel';
 describe('ItemProxy Test', function () {
 

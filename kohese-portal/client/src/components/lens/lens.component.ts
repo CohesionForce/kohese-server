@@ -2,7 +2,8 @@ import { Component, Input, OnInit, OnDestroy } from "@angular/core";
 import { LensService, ApplicationLens } from "../../services/lens-service/lens.service";
 import { Subscription } from 'rxjs';
 
-import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository, RepoStates } from "../../services/item-repository/item-repository.service";
 
 @Component({

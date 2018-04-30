@@ -4,8 +4,8 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
-import { ItemProxy,
-  TreeConfiguration } from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -25,11 +25,11 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
   get koheseTypeStream() {
     return this._koheseTypeStream;
   }
-  
+
   /* Subscriptions */
   repoStatusSubscription : Subscription;
   private _treeConfigurationSubscription: Subscription;
-  
+
   constructor(public typeService: DynamicTypesService,
     private dialogService: DialogService,
     private itemRepository: ItemRepository,
