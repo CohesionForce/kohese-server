@@ -6,13 +6,14 @@ import { Subscription } from 'rxjs/Subscription';
 import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from './current-user.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { ItemRepository, RepoStates} from '../item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../item-repository/item-repository.service';
 
 @Injectable()
 export class SessionService {
   private sessions: SessionMap = {};
   private sessionUser: BehaviorSubject<ItemProxy> = new BehaviorSubject(undefined);
-  private treeConfig : any;
+  private treeConfig: any;
+  initialized: boolean = false;
 
   private itemRepositoryStatusSubscription: Subscription;
 
@@ -21,13 +22,17 @@ export class SessionService {
     private itemRepository: ItemRepository, private router: Router) {
     this.CurrentUserService.getCurrentUserSubject().subscribe((decodedToken) => {
       if (decodedToken) {
-        this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
+        console.log(this.initialized);
+        this.itemRepository.getTreeConfig().subscribe((newConfig) => {
           if (newConfig) {
-            this.treeConfig = newConfig.config;            
-            let usersProxy: ItemProxy = this.treeConfig.getRootProxy().getChildByName('Users');
-            this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
-          } else {
-            this.sessionUser.next(undefined);
+            if (!this.initialized) {
+              this.treeConfig = newConfig.config;
+              let usersProxy: ItemProxy = this.treeConfig.getRootProxy().getChildByName('Users');
+              this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
+            } else {
+              this.sessionUser.next(undefined);
+            }
+            this.initialized = true;
           }
         })
       } else {
@@ -37,6 +42,7 @@ export class SessionService {
         }
         this.router.navigate(['login']);
       }
+
     });
 
     this.socketService.getSocket().on('session/add', (session) => {
