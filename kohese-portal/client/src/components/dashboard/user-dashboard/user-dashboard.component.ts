@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'user-dashboard',
@@ -13,9 +13,9 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   @Input()
   user : any;
   constructor (private itemRepository : ItemRepository) {
-  
+
   }
-  
+
   ngOnInit () {
 
   }

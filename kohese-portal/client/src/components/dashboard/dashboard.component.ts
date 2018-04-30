@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
@@ -78,7 +78,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
           this.currentUser.relations.referencedBy[referenceCategory].assignedTo[reference]
         )
     }
-    this.assignmentListStream.next(assignmentList);  
+    this.assignmentListStream.next(assignmentList);
   }
 
   onProjectSelected(newProject : ProjectInfo) {

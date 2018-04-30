@@ -1,1 +1,1 @@
-jasmine-node server/tests/unit/kdb-repo-spec.js
+jasmine-node build/server/tests/unit/kdb-repo-spec.js

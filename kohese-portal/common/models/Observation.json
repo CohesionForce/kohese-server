@@ -18,7 +18,10 @@
       "type": [
         "object"
       ],
-      "relation": true,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      },
       "required": true
     }
   },

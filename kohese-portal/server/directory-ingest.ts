@@ -3,10 +3,10 @@
  *  Requires: pandoc globally, soffice globally (libreoffice)
  */
 
-var fs = require('fs');
+import * as fs from 'fs';
 var Path = require('path');
 var child = require('child_process');
-var ItemProxy = require('../common/src/item-proxy.js');
+import { ItemProxy } from '../common/src/item-proxy.js';
 
 var mdToKohese = require('./md-to-kohese.js');
 

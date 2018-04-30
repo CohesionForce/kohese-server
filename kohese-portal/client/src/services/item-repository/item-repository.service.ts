@@ -8,9 +8,9 @@ import { ToastrService } from "ngx-toastr";
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
-import * as ItemProxy from '../../../../common/src/item-proxy.js';
-import * as ItemCache from '../../../../common/src/item-cache.js';
-import * as KoheseModel from '../../../../common/src/KoheseModel.js';
+import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { ItemCache } from '../../../../common/src/item-cache';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { CacheManager } from '../../../cache-worker/CacheManager';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -287,16 +287,16 @@ export class ItemRepository {
           console.log('::: Processing Cache');
           let itemCache = new ItemCache();
           itemCache.setObjectMap(response.objectMap);
-          ItemProxy.TreeConfiguration.setItemCache(itemCache);
+          TreeConfiguration.setItemCache(itemCache);
 
-          let workingTree = ItemProxy.TreeConfiguration.getWorkingTree();
+          let workingTree = TreeConfiguration.getWorkingTree();
           let headCommit = itemCache.getRef('HEAD');
           console.log('### Head: ' + headCommit);
 
           // TODO Need to load the HEAD commit
           console.log('$$$ Loading HEAD Commit');
           itemCache.loadProxiesForCommit(headCommit, workingTree);
-          workingTree.loadingComplete();
+          workingTree.calculateAllTreeHashes();
 
           this.cacheFetched = true;
         }
@@ -356,7 +356,7 @@ export class ItemRepository {
           let syncRequired = true;
           if (repoProxy && repoProxy.treeHashEntry){
             // A previous fetch has occurried, check to see if there an opportunity to skip resync
-            let rTHMCompare = ItemProxy.TreeConfiguration.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
+            let rTHMCompare = TreeConfiguration.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
             if (rTHMCompare.match){
               syncRequired = false;
               // console.log('$$$ Sync not required ' + repoId);
@@ -431,7 +431,7 @@ export class ItemRepository {
           }
         }
 
-        var compareAfterRTH = ItemProxy.TreeConfiguration.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
+        var compareAfterRTH = TreeConfiguration.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
 
         syncSucceeded = compareAfterRTH.match;
 
@@ -442,7 +442,7 @@ export class ItemRepository {
           console.log('*** Repository sync failed');
           console.log(compareAfterRTH);
           console.log('$$$ Evaluating differences:');
-          let workingTree = ItemProxy.TreeConfiguration.getWorkingTree();
+          let workingTree = TreeConfiguration.getWorkingTree();
           for (let idx in compareAfterRTH.changedItems){
             let itemId = compareAfterRTH.changedItems[idx];
             let changedProxy = workingTree.getProxyFor(itemId);
@@ -479,7 +479,7 @@ export class ItemRepository {
         } else {
           // Final repo sync
           this.currentTreeConfigSubject.next({
-            config: ItemProxy.TreeConfiguration.getWorkingTree(),
+            config: TreeConfiguration.getWorkingTree(),
             configType : TreeConfigType.DEFAULT
           });
           this.repositoryStatus.next({
@@ -670,11 +670,10 @@ export class ItemRepository {
   }
 
   setTreeConfig(treeId : string, configType : TreeConfigType) : void{
-    let treeConfiguration: ItemProxy.TreeConfiguration = 
-      ItemProxy.TreeConfiguration.getTreeConfigFor(treeId);
+    let treeConfiguration = TreeConfiguration.getTreeConfigFor(treeId);
     if (!treeConfiguration) {
-      treeConfiguration = new ItemProxy.TreeConfiguration(treeId);
-      let itemCache = ItemProxy.TreeConfiguration.getItemCache();
+      treeConfiguration = new TreeConfiguration(treeId);
+      let itemCache = TreeConfiguration.getItemCache();
       itemCache.loadProxiesForCommit(treeId, treeConfiguration);
       treeConfiguration.loadingComplete();
     }

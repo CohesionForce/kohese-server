@@ -13,16 +13,16 @@
                       [selectable]="true" 
                       (click)="onTypeSelected(type, createStepper)"
                       (dblClick)="onTypeSelected(type, createStepper)">
-            {{ type.name}}
+            {{type.dataModelProxy.item.name}}
             </mat-chip>
           </mat-grid-tile>
         </mat-grid-list>
         <mat-card *ngIf="selectedType" class="right-content" style="display: inline-block; height:400px;">
           <mat-card-title class="panel-heading">
-            <span>{{selectedType.name}}</span>
+            <span>{{selectedType.dataModelProxy.item.name}}</span>
           </mat-card-title>
           <mat-card-content>
-            {{selectedType.description}}
+            {{selectedType.dataModelProxy.item.description}}
           </mat-card-content>
         </mat-card>
         </mat-card-content>

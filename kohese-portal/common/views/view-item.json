@@ -6,25 +6,45 @@
   "icon": "fa fa-sticky-note",
   "viewProperties": {
     "name": {
-      "inputType": "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required": true,
       "default": "",
       "displayName": "Name"
     },
     "description": {
-      "inputType": "markdown:{}",
+      "inputType": {
+        "type": "markdown",
+        "options": {}
+      },
       "required": false,
       "default": "",
       "displayName": "Description"
     },
     "tags": {
-      "inputType": "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required": false,
       "default": "",
       "displayName": "Tags"
     },
     "parentId": {
-      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {
+          "allowMultiSelect": false,
+          "type": "Item",
+          "useAdvancedSelector": false
+        }
+      },
       "required": true,
       "default": "ROOT",
       "displayName": "Parent"

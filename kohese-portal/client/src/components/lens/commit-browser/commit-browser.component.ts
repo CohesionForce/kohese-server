@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy, TreeConfiguration } from '../../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates } from "../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
 
@@ -37,7 +37,7 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update) => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.commitMap = ItemProxy.TreeConfiguration.getItemCache().getCommits();
+          this.commitMap = TreeConfiguration.getItemCache().getCommits();
           // Convert to array for sorting in the view
           for (let commitId in this.commitMap) {
             let commitView = {

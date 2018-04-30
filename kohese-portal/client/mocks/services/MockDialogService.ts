@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 
-import * as ItemProxy from '../../../common/src/item-proxy';
+import { ItemProxy } from '../../../common/src/item-proxy';
 
 export class MockDialogService {
   constructor () {
@@ -15,11 +15,13 @@ export class MockDialogService {
       },
       'afterClosed': () => {
         if ('ProxySelectorDialogComponent' === componentReference.name) {
-          return Observable.of(ItemProxy.getWorkingTree().getRootProxy());
+          return Observable.of({
+            selectedProxy: ItemProxy.getWorkingTree().getRootProxy()
+          });
         }
       }
     };
-    
+
     return dialogRefPlaceholder;
   }
 }

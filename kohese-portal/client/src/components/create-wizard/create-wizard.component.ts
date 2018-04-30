@@ -15,6 +15,7 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { SelectedProxyInfo } from '../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'create-wizard',
@@ -29,7 +30,7 @@ export class CreateWizardComponent extends NavigatableComponent
   models: Array<ItemProxy>;
   types: Array<KoheseType> = [];
   recentProxies: Array<ItemProxy>;
-  selectedType: ItemProxy;
+  selectedType: KoheseType;
   selectedParent: ItemProxy;
   rootProxy: ItemProxy;
   errorMessage: string;
@@ -83,37 +84,30 @@ export class CreateWizardComponent extends NavigatableComponent
     }
   }
 
-  onParentSelected(newParent, stepper: MatStepper) {
-    console.log(newParent);
-    if (this.selectedParent === newParent) {
+  onParentSelected(newParent : SelectedProxyInfo, stepper: MatStepper) {
+    console.log(newParent.selectedProxy);
+    if (this.selectedParent === newParent.selectedProxy) {
       stepper.next();
     } else {
-      this.selectedParent = newParent;
+      this.selectedParent = newParent.selectedProxy;
       this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
     }
   }
 
   private buildProxyPlaceholder(): any {
     let proxyPlaceholder: any = {
-      kind: this.selectedType.name,
+      kind: this.selectedType.dataModelProxy.item.name,
       item: {
         parentId: this.selectedParent.item.id
       },
       model: this.selectedType.dataModelProxy
     };
 
-    let modelProxy: ItemProxy = proxyPlaceholder.model;
-    while (modelProxy.item.base) {
-      let type: KoheseType = this.DynamicTypesService.
-        getKoheseTypes()[modelProxy.item.name];
-      for (let fieldName in type.dataModelFields) {
-        if (!proxyPlaceholder.item[fieldName]) {
-          proxyPlaceholder.item[fieldName] = type.dataModelFields[fieldName].
-            default;
-        }
+    for (let fieldName in this.selectedType.fields) {
+      if (!proxyPlaceholder.item[fieldName]) {
+        proxyPlaceholder.item[fieldName] = this.selectedType.fields[fieldName].
+          default;
       }
-
-      modelProxy = modelProxy.parentProxy;
     }
 
     return proxyPlaceholder;
@@ -132,21 +126,22 @@ export class CreateWizardComponent extends NavigatableComponent
     /* Set the value of each field that has an unspecified value to that
     field's default value */
     let fields: object = this.treeConfig.getProxyFor(this.selectedType.
-      name).item.properties;
+      dataModelProxy.item.name).item.properties;
     for (let fieldName in fields) {
       if (null === item[fieldName]) {
         item[fieldName] = fields[fieldName].default;
       }
     }
 
-    this.itemRepository.buildItem(this.selectedType.name, item)
-      .then(() => {
+    this.itemRepository.buildItem(this.selectedType.dataModelProxy.item.name,
+      item).then(() => {
         console.log('Build Item promise resolve')
         this.MatDialogRef.close();
       }, (error) => {
-        // TODO show error on review stepper 
+        // TODO show error on review stepper
         this.errorMessage = error;
-        console.log('*** Failed to upsert: ' + this.selectedType.name);
+        console.log('*** Failed to upsert: ' + this.selectedType.
+          dataModelProxy.item.name);
         console.log(error);
       });
 

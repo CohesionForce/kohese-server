@@ -11,8 +11,8 @@ export class StateService {
   public getTransitionCandidates(proxy: ItemProxy): any {
     let transitionCandidates: any = {};
     let type: KoheseType = this._typeService.getKoheseTypes()[proxy.kind];
-    for (let fieldName in type.dataModelFields) {
-      let fieldValue: any = type.dataModelFields[fieldName];
+    for (let fieldName in type.fields) {
+      let fieldValue: any = type.fields[fieldName];
       if ('StateMachine' === fieldValue.type) {
         transitionCandidates[fieldName] = [];
         for (let transitionKey in fieldValue.properties.transition) {

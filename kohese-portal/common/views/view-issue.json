@@ -6,43 +6,84 @@
   "icon": "fa fa-exclamation-circle",
   "viewProperties": {
     "issueState": {
-      "inputType": "k-select:{\"options\":[\"Observed\", \"In Analysis\", \"No Action\"]}",
+      "inputType": {
+        "type": "state-editor",
+        "options": {
+          "options": [
+            "Observed",
+            "In Analysis",
+            "No Action"
+          ]
+        }
+      },
       "required": false,
       "default": "Observed",
       "displayName": "issueState"
     },
     "observedOn": {
-      "inputType": "date:{}",
+      "inputType": {
+        "type": "date",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "observedOn"
     },
     "observedBy": {
-      "inputType": "user-selector:{}",
+      "inputType": {
+        "type": "user-selector",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "observedBy"
     },
     "analysisAction": {
-      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {
+          "allowMultiSelect": false,
+          "type": "Item",
+          "useAdvancedSelector": false
+        }
+      },
       "required": true,
       "default": null,
       "displayName": "analysisAction"
     },
     "context": {
-      "inputType": "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {
+          "allowMultiSelect": false,
+          "type": "Item",
+          "useAdvancedSelector": false
+        }
+      },
       "required": true,
       "default": null,
       "displayName": "context"
     },
     "resolutionActions": {
-      "inputType": "proxy-selector:{\"allowMultiSelect\":true,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {
+          "allowMultiSelect": true,
+          "type": "Item",
+          "useAdvancedSelector": false
+        }
+      },
       "required": true,
       "default": null,
       "displayName": "resolutionActions"
     },
     "response": {
-      "inputType": "text:{\"isMultiLine\":true}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": true
+        }
+      },
       "required": false,
       "default": "",
       "displayName": "response"

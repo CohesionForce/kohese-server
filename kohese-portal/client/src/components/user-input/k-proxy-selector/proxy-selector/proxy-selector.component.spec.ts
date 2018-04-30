@@ -6,7 +6,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../../../material.module';
 
 import { ProxySelectorComponent } from './proxy-selector.component';
-import * as ItemProxy from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { MockItem } from '../../../../../mocks/data/MockItem';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
@@ -38,17 +38,17 @@ describe('Component: Parent Selector', ()=>{
     proxySelectorComponent = proxySelectorFixture.componentInstance;
 
     proxySelectorFixture.detectChanges();
-    
+
   })
 
   it('instantiates the proxySelector component', ()=>{
-    expect(proxySelectorComponent).toBeTruthy(); 
+    expect(proxySelectorComponent).toBeTruthy();
   })
 
   describe('proxy selection', ()=>{
     let selectedProxyEvent;
     let selectedProxy;
-  
+
     beforeEach(()=>{
       selectedProxy = new ItemProxy('Item', MockItem());
       selectedProxyEvent = <MatAutocompleteSelectedEvent> {
@@ -57,7 +57,7 @@ describe('Component: Parent Selector', ()=>{
         }
       }
     })
-   
+
     it('should set the proxy when a proxy is selected by autocomplete', ()=>{
       proxySelectorComponent.onAutoCompleteSelected(selectedProxyEvent);
       expect(proxySelectorComponent.selectedProxy).toBe(selectedProxy);

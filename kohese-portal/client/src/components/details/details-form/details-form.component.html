@@ -2,39 +2,42 @@
   <ng-container *ngIf="(proxyStream | async)">
     <form [formGroup]="formGroup"
       novalidate class="form-group">
-      <ng-container *ngFor="let property of (properties | mapKey)">
-        <ng-container [ngSwitch]="properties[property].inputType.type">
-          <k-text *ngSwitchCase="'text'"
-            [formGroup]="formGroup" [fieldId]="property"
-            [fieldName]="properties[property].displayName"
-            [isMultiLine]="properties[property].inputType.options['isMultiLine']">
-          </k-text>
-          <k-proxy-selector *ngSwitchCase="'proxy-selector'"
-            [formGroup]="formGroup" [fieldId]="property"
-            [type]="properties[property].inputType.options['type']"
-            [fieldName]="properties[property].displayName"
-            [useAdvancedSelector]="properties[property].inputType.options['useAdvancedSelector']"
-            [allowMultiSelect]="properties[property].inputType.options['allowMultiSelect']"
-            [editableStream]="editableStream">
-          </k-proxy-selector>
-          <k-date *ngSwitchCase="'date'"
-            [formGroup]="formGroup" [fieldId]="property"
-            [fieldName]="properties[property].displayName">
-          </k-date>
-          <k-select *ngSwitchCase="'select'"
-            [formGroup]="formGroup" [fieldId]="property"
-            [fieldName]="properties[property].displayName"
-            [options]="properties[property].inputType.options['options']">
-          </k-select>
-          <k-user-selector *ngSwitchCase="'user-selector'"
-            [formGroup]="formGroup" [fieldId]="property"
-            [fieldName]="properties[property].displayName">
-          </k-user-selector>
-          <k-markdown *ngSwitchCase="'markdown'"
-            [formGroup]="formGroup" [fieldId]="property"
-            [fieldName]="properties[property].displayName"
-            [editableStream]="editableStream"></k-markdown>
-          <br/>
+      <ng-container *ngFor="let property of (type.fields | mapKey)">
+        <ng-container *ngIf="type.fields[property].views['form']">
+          <ng-container
+            [ngSwitch]="type.fields[property].views['form'].inputType.type">
+            <k-text *ngSwitchCase="'text'"
+              [formGroup]="formGroup" [fieldId]="property"
+              [fieldName]="type.fields[property].views['form'].displayName"
+              [isMultiLine]="type.fields[property].views['form'].inputType.options['isMultiLine']">
+            </k-text>
+            <k-proxy-selector *ngSwitchCase="'proxy-selector'"
+              [formGroup]="formGroup" [fieldId]="property"
+              [type]="type.fields[property].views['form'].inputType.options['type']"
+              [fieldName]="type.fields[property].views['form'].displayName"
+              [useAdvancedSelector]="type.fields[property].views['form'].inputType.options['useAdvancedSelector']"
+              [allowMultiSelect]="type.fields[property].views['form'].inputType.options['allowMultiSelect']"
+              [editableStream]="editableStream">
+            </k-proxy-selector>
+            <k-date *ngSwitchCase="'date'"
+              [formGroup]="formGroup" [fieldId]="property"
+              [fieldName]="type.fields[property].views['form'].displayName">
+            </k-date>
+            <k-select *ngSwitchCase="'select'"
+              [formGroup]="formGroup" [fieldId]="property"
+              [fieldName]="type.fields[property].views['form'].displayName"
+              [options]="type.fields[property].views['form'].inputType.options['options']">
+            </k-select>
+            <k-user-selector *ngSwitchCase="'user-selector'"
+              [formGroup]="formGroup" [fieldId]="property"
+              [fieldName]="type.fields[property].views['form'].displayName">
+            </k-user-selector>
+            <k-markdown *ngSwitchCase="'markdown'"
+              [formGroup]="formGroup" [fieldId]="property"
+              [fieldName]="type.fields[property].views['form'].displayName"
+              [editableStream]="editableStream"></k-markdown>
+            <br/>
+          </ng-container>
         </ng-container>
       </ng-container>
     </form>

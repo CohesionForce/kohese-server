@@ -30,10 +30,7 @@ export class ExploreComponent extends NavigatableComponent
    this.paramSubscription = this.router.params.subscribe(params => {
      console.log(params);
      if (params['id']) {
-      this.proxySelected = true;
       this.routeId = params['id'];
-     } else {
-       this.proxySelected = false;
      }
    });
 
