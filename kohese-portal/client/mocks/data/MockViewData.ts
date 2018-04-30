@@ -1,28 +1,50 @@
 export function MockViewData () {
   return {
-  "modelName": "Item ",
+  "modelName": "Item",
   "icon": "fa fa-sticky-note",
   "viewProperties": {
     "name": {
-      "inputType": "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required": true,
       "default": "",
       "displayName": "Name"
     },
     "description": {
-      "inputType": "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required": false,
       "default": "",
       "displayName": "Description"
     },
     "tags": {
-      "inputType" : "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required" : false,
       "default" : "",
       "displayName" : "Tags"
     },
     "parentId" : {
-      "inputType" : "proxy-selector:{\"allowMultiSelect\":false,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {
+          "allowMultiSelect": false,
+          "type": "Item",
+          "useAdvancedSelector": false
+        }
+      },
       "required" : true,
       "default" : "ROOT",
       "displayName" : "Parent"
@@ -36,4 +58,26 @@ export function MockViewData () {
   "modifiedOn": 1517006598071,
   "itemIds": []
   }
+}
+
+export function MockItemSubclassView() {
+  return {
+    "id": "view-itemsubclass",
+    "name": "ItemSubclass",
+    "modelName": "ItemSubclass",
+    "parentId": "view-item",
+    "icon": "fa fa-gavel",
+    "itemIds": [],
+    "viewProperties": {
+      "subclassProperty": {
+        "inputType": {
+          "type": "text",
+          "options": {
+            "isMultiLine": true
+          }
+        },
+        "displayName": "Subclass Property"
+      }
+    }
+  };
 }

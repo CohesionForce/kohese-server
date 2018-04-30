@@ -115,7 +115,7 @@ describe('Component: Tree', () => {
     let initialVisibleRows: Array<TreeRow> = component.visibleRows;
     component.treeRootStream.next(ItemProxy.getWorkingTree().getRootProxy().children[0]);
     tick();
-    expect(initialTreeRoot).not.toEqual(component.treeRootStream.getValue());
+    expect(initialTreeRoot).not.toBe(component.treeRootStream.getValue());
     expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
   }));
 

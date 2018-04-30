@@ -3,7 +3,11 @@
       <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
       <mat-cell *matCellDef="let action" 
                 (click)="navigate('Explore', {id:action.proxy.item.id})">
-        <span class="{{action.proxy.model.type?.icon}}" [ngStyle]="getRowIndent(action)"></span>
+        <ng-container *ngIf="action.proxy.model.type.viewModelProxy">
+          <span class="{{action.proxy.model.type.viewModelProxy.item.icon}}"
+            [ngStyle]="getRowIndent(action)">
+          </span>
+        </ng-container>
         {{action.proxy.item.name}}
       </mat-cell>
     </ng-container>

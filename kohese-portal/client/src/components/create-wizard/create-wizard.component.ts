@@ -96,25 +96,18 @@ export class CreateWizardComponent extends NavigatableComponent
 
   private buildProxyPlaceholder(): any {
     let proxyPlaceholder: any = {
-      kind: this.selectedType.name,
+      kind: this.selectedType.dataModelProxy.item.name,
       item: {
         parentId: this.selectedParent.item.id
       },
-      model: this.selectedType.synchronizeDataModel()
+      model: this.selectedType.dataModelProxy
     };
 
-    let modelProxy: ItemProxy = proxyPlaceholder.model;
-    while (modelProxy.item.base) {
-      let type: KoheseType = this.DynamicTypesService.
-        getKoheseTypes()[modelProxy.item.name];
-      for (let fieldName in type.dataModelFields) {
-        if (!proxyPlaceholder.item[fieldName]) {
-          proxyPlaceholder.item[fieldName] = type.dataModelFields[fieldName].
-            default;
-        }
+    for (let fieldName in this.selectedType.fields) {
+      if (!proxyPlaceholder.item[fieldName]) {
+        proxyPlaceholder.item[fieldName] = this.selectedType.fields[fieldName].
+          default;
       }
-
-      modelProxy = modelProxy.parentProxy;
     }
 
     return proxyPlaceholder;
@@ -133,21 +126,22 @@ export class CreateWizardComponent extends NavigatableComponent
     /* Set the value of each field that has an unspecified value to that
     field's default value */
     let fields: object = this.treeConfig.getProxyFor(this.selectedType.
-      name).item.properties;
+      dataModelProxy.item.name).item.properties;
     for (let fieldName in fields) {
       if (null === item[fieldName]) {
         item[fieldName] = fields[fieldName].default;
       }
     }
 
-    this.itemRepository.buildItem(this.selectedType.name, item)
-      .then(() => {
+    this.itemRepository.buildItem(this.selectedType.dataModelProxy.item.name,
+      item).then(() => {
         console.log('Build Item promise resolve')
         this.MatDialogRef.close();
       }, (error) => {
         // TODO show error on review stepper
         this.errorMessage = error;
-        console.log('*** Failed to upsert: ' + this.selectedType.name);
+        console.log('*** Failed to upsert: ' + this.selectedType.
+          dataModelProxy.item.name);
         console.log(error);
       });
 

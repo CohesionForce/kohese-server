@@ -6,61 +6,107 @@
   "icon": "fa fa-tasks",
   "viewProperties": {
     "taskState": {
-      "inputType": "k-select:{\"options\":[\"Proposed\", \"Accepted\", \"In Work\"]}",
+      "inputType": {
+        "type": "state-editor",
+        "options": {
+          "options": [
+            "Proposed",
+            "Accepted",
+            "In Work"
+          ]
+        }
+      },
       "required": false,
       "default": "Proposed",
       "displayName": "taskState"
     },
     "assignedTo": {
-      "inputType": "user-selector:{}",
+      "inputType": {
+        "type": "user-selector",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "assignedTo"
     },
     "estimatedStart": {
-      "inputType": "date:{}",
+      "inputType": {
+        "type": "date",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "estimatedStart"
     },
     "estimatedCompletion": {
-      "inputType": "date:{}",
+      "inputType": {
+        "type": "date",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
-      "inputType": "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required": false,
       "default": "",
       "displayName": "estimatedHoursEffort"
     },
     "actualStart": {
-      "inputType": "date:{}",
+      "inputType": {
+        "type": "date",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "actualStart"
     },
     "actualCompletion": {
-      "inputType": "date:{}",
+      "inputType": {
+        "type": "date",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "actualCompletion"
     },
     "remainingHoursEffort": {
-      "inputType": "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required": false,
       "default": "",
       "displayName": "remainingHoursEffort"
     },
     "actualHoursEffort": {
-      "inputType": "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required": false,
       "default": "",
       "displayName": "actualHoursEffort"
     },
     "predecessors": {
-      "inputType": "proxy-selector:{\"allowMultiSelect\":true,\"type\":\"Item\",\"useAdvancedSelector\":false}",
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {
+          "allowMultiSelect": true,
+          "type": "Item",
+          "useAdvancedSelector": false
+        }
+      },
       "required": false,
       "default": null,
       "displayName": "predecessors"

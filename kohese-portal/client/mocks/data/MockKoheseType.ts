@@ -5,25 +5,18 @@ import { KoheseModel } from '../../../common/src/KoheseModel';
 
 
 export function MockKoheseType () {
-  return {
-  acls : [],
-  base : ['PersistedModel'],
-  dataModelProxy : new KoheseModel(MockDataModel()),
-  description: "",
-  icon: "fa fa-sticky-note",
-  idInjection : true,
-  methods : [],
-  name : "Item",
-  properties: {
-
-  },
-  relations: {
-
-  },
-  strict: null,
-  trackChanges : null,
-  validations : [],
-  viewModelProxy : new ItemProxy('KoheseView', MockViewData()),
-  dataModelFields : MockDataModel().properties
+  let dataModelProxy: KoheseModel = new KoheseModel(MockDataModel());
+  let viewModelProxy: ItemProxy = new ItemProxy('KoheseView', MockViewData());
+  let properties: any = dataModelProxy.item.properties;
+  for (let propertyId in properties) {
+    let property: any = properties[propertyId];
+    property.views = {};
+    property.views['form'] = viewModelProxy.item.viewProperties[propertyId];
   }
+  
+  return {
+    dataModelProxy : dataModelProxy,
+    viewModelProxy : viewModelProxy,
+    fields: properties
+  };
 }

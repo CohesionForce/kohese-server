@@ -6,31 +6,56 @@
   "icon": "fa fa-gavel",
   "viewProperties": {
     "decisionState": {
-      "inputType": "k-select:{\"options\":[\"Proposed\", \"In Analysis\", \"In Review\"]}",
+      "inputType": {
+        "type": "state-editor",
+        "options": {
+          "options": [
+            "Proposed",
+            "In Analysis",
+            "In Review"
+          ]
+        }
+      },
       "required": true,
       "default": "Proposed",
       "displayName": "DecisionState"
     },
     "approvedBy": {
-      "inputType": "user-selector:{}",
+      "inputType": {
+        "type": "user-selector",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "approvedBy"
     },
     "approvedOn": {
-      "inputType": "date:{}",
+      "inputType": {
+        "type": "date",
+        "options": {}
+      },
       "required": false,
       "default": null,
       "displayName": "approvedOn"
     },
     "rationale": {
-      "inputType": "text:{\"isMultiLine\":false}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
       "required": false,
       "default": null,
       "displayName": "rationale"
     },
     "alternatives": {
-      "inputType": "text:{\"isMultiLine\":true}",
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": true
+        }
+      },
       "required": false,
       "default": null,
       "displayName": "alternatives"
