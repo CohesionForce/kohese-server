@@ -2,12 +2,12 @@ import { NavigatableComponent } from "../../classes/NavigationComponent.class";
 import { NavigationService } from "../../services/navigation/navigation.service";
 import { BehaviorSubject, Subscription } from "rxjs";
 
-import * as ItemProxy from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { FormGroup } from "@angular/forms";
 import { ItemRepository } from "../../services/item-repository/item-repository.service";
 
 /* This class centralizes the logic pertaining to how the details managers feed
-   information into the proxy detail subcomponents, it does not contain the logic 
+   information into the proxy detail subcomponents, it does not contain the logic
    that determines how the specific proxy info is discovered */
 
 export abstract class ProxyDetailsComponent extends NavigatableComponent {
@@ -21,7 +21,7 @@ export abstract class ProxyDetailsComponent extends NavigatableComponent {
   /* Observables */
   detailsFormSubject : BehaviorSubject<FormGroup> = new BehaviorSubject<FormGroup>(undefined);
   proxyStream : BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined);
-  editableStream : BehaviorSubject<boolean> = new BehaviorSubject<ItemProxy>(false);
+  editableStream : BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   /* Subscriptions */
   proxyUpdates : Subscription;

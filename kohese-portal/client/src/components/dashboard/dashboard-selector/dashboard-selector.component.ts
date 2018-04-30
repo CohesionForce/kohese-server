@@ -19,7 +19,7 @@ export enum DashboardTypes {
   ASSIGNMENT
 }
 
-// Specific non-overlapping menu configurations 
+// Specific non-overlapping menu configurations
 enum MenuTypes {
   PERSONAL,
   PROJECT
@@ -45,7 +45,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   MenuTypes: any = MenuTypes;
 
   @Output()
-  dashboardSelected: EventEmitter<DashboardSelectionInfo> = new EventEmitter();
+  dashboardSelected: EventEmitter<DashboardSelectionInfo> = new EventEmitter<DashboardSelectionInfo>();
   selectedDashboard: DashboardSelectionInfo;
   menuType : MenuTypes;
 
@@ -147,7 +147,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         console.error('Invalid Dashboard selection :');
         console.error(dashboard);
     }
-    
+
     this.dashboardSelected.emit(this.selectedDashboard);
   }
 }

@@ -679,7 +679,7 @@ export class ItemRepository {
     }
 
     this.currentTreeConfigSubject.next({
-      config :treeConfiguration, 
+      config :treeConfiguration,
       configType: configType
     });
   }

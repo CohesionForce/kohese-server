@@ -4,7 +4,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 
-import * as ItemProxy from '../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { BehaviorSubject } from 'rxjs';
 import { ProxyDetailsComponent } from '../ProxyDetails.Class';
 

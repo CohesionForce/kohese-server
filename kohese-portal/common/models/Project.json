@@ -4,7 +4,7 @@
   "parentId": "Item",
   "base": "Item",
   "idInjection": true,
-  "invertItemOrder": true,
+  "invertItemOrder": false,
   "properties": {
     "projectItems": {
       "type": [

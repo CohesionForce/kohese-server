@@ -63,7 +63,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
         this.selectedDashboard = dashboard;
         this.dashboardSelectionStream.next(this.selectedDashboard.dashboard);
         break;
-      default : 
+      default :
         this.selectedDashboard = dashboard;
         console.log('Unhandled Dashboard Selection');
         console.log(dashboard);
