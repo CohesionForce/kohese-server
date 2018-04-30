@@ -11,12 +11,13 @@ import { DashboardSelections } from '../dashboard-selector/dashboard-selector.co
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;
   let assignmentDashboardFixture : ComponentFixture<AssignmentDashboardComponent>;
-  let assignmentTypeStream = new BehaviorSubject<DashboardSelections>(DashboardSelections.ACTIVE_ASSIGNMENTS);
+  let dashboardSelectionStream = new BehaviorSubject<DashboardSelections>(DashboardSelections.ACTIVE_ASSIGNMENTS);
   let assignmentListStream = new BehaviorSubject<Array<ItemProxy>>(new MockItemRepository().getRootProxy().children)
 
   beforeEach(()=>{
@@ -34,7 +35,7 @@ describe('Component: ', ()=>{
 
     assignmentDashboardFixture = TestBed.createComponent(AssignmentDashboardComponent);
     assignmentDashboardComponent = assignmentDashboardFixture.componentInstance;
-    assignmentDashboardComponent.assignmentTypeStream = assignmentTypeStream;
+    assignmentDashboardComponent.dashboardSelectionStream = dashboardSelectionStream;
     assignmentDashboardComponent.assignmentListStream = assignmentListStream;
 
     assignmentDashboardFixture.detectChanges();

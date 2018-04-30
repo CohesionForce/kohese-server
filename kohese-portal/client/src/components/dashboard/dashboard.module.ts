@@ -15,6 +15,12 @@ import { DueAssignmentComponent } from "./assignment-dashboard/due-assignment/du
 import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-assignment/completed-assignment.component";
 import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/dependency-info.component';
 import { LensModule } from "../lens/lens.module";
+import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard.component";
+import { ProjectOverviewComponent } from "./project-dashboard/project-overview/project-overview.component";
+import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
+import { ActionTableModule } from "../action-table/action-table.module";
+import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
+import { TreeModule } from "angular-tree-component";
 
 @NgModule({
   declarations: [
@@ -25,10 +31,15 @@ import { LensModule } from "../lens/lens.module";
     ActiveAssignmentComponent,
     DueAssignmentComponent,
     CompletedAssignmentComponent,
-    DependencyInfoComponent
+    DependencyInfoComponent,
+    ProjectDashboardComponent,
+    ProjectOverviewComponent,
+    UserStatisticsComponent,
+    ProjectSelectorComponent
   ],
   entryComponents: [
-    KMarkdownComponent
+    KMarkdownComponent,
+    ProjectSelectorComponent
   ],
   imports : [
     CommonModule,
@@ -37,7 +48,8 @@ import { LensModule } from "../lens/lens.module";
     UserInputModule,
     PipesModule,
     UserInputModule,
-    LensModule
+    LensModule,
+    TreeModule
   ],
   exports : [
     DashboardComponent
@@ -45,6 +57,3 @@ import { LensModule } from "../lens/lens.module";
 
 })
 export class DashboardModule {}
-
-
-// TODO Implement

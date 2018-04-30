@@ -26,7 +26,7 @@ export class AnalysisService {
   constructor (private ItemRepository : ItemRepository) {
     this.treeConfigSubscription = this.ItemRepository.getTreeConfig().subscribe((newConfig)=>{
       if (newConfig) {
-        this.treeConfig = newConfig
+        this.treeConfig = newConfig.config
       }
     })
   }

@@ -4,12 +4,17 @@
                       (dashboardSelected)="dashboardSelected($event)"
   ></dashboard-selector>
   <div class="right-content" style="height : 100%">
-    <div *ngIf="dashboardType === dashboardTypes.assignments">
+    <div *ngIf="selectedDashboard.dashboardType === DashboardTypes.ASSIGNMENT">
       <assignment-dashboard [assignmentListStream]="assignmentListStream"
-                            [assignmentTypeStream]="assignmentTypeStream"></assignment-dashboard>
+                            [dashboardSelectionStream]="dashboardSelectionStream"></assignment-dashboard>
     </div>
-    <div *ngIf="dashboardType === dashboardTypes.userPreferences && currentUser">
+    <div *ngIf="selectedDashboard.dashboard === DashboardSelections.USER_PREFERENCES && currentUser">
       <user-dashboard [user]="currentUser"></user-dashboard>
+    </div>
+    <div *ngIf="selectedDashboard.dashboardType === DashboardTypes.PROJECT">
+      <project-dashboard [dashboardSelectionStream]="dashboardSelectionStream"
+                         (projectSelected)="onProjectSelected($event)"
+                         [savedProject]="selectedProject"></project-dashboard>
     </div>
   </div>
 </div>

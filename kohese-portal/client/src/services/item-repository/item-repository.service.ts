@@ -26,6 +26,16 @@ export enum RepoStates {
   SYNCHRONIZATION_SUCCEEDED
 };
 
+export enum TreeConfigType {
+  DEFAULT,
+  HISTORICAL
+}
+
+export interface TreeConfigInfo {
+  config : any,
+  configType : TreeConfigType
+}
+
 /**
  *
  */
@@ -41,7 +51,7 @@ export class ItemRepository {
   repositoryStatus : BehaviorSubject<any>;
   repoSyncStatus = {};
 
-  currentTreeConfigSubject : BehaviorSubject<any> = new BehaviorSubject<any>(undefined);
+  currentTreeConfigSubject : BehaviorSubject<TreeConfigInfo> = new BehaviorSubject<TreeConfigInfo>(undefined);
 
   constructor (private socketService: SocketService,
     private CurrentUserService: CurrentUserService,
@@ -468,7 +478,10 @@ export class ItemRepository {
           }
         } else {
           // Final repo sync
-          this.currentTreeConfigSubject.next(TreeConfiguration.getWorkingTree());
+          this.currentTreeConfigSubject.next({
+            config: TreeConfiguration.getWorkingTree(),
+            configType : TreeConfigType.DEFAULT
+          });
           this.repositoryStatus.next({
             state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
             message : 'Item Repository Ready'
@@ -656,9 +669,8 @@ export class ItemRepository {
     return this.currentTreeConfigSubject;
   }
 
-  setTreeConfig(treeId : string) : void{
-    let treeConfiguration: TreeConfiguration =
-      TreeConfiguration.getTreeConfigFor(treeId);
+  setTreeConfig(treeId : string, configType : TreeConfigType) : void{
+    let treeConfiguration = TreeConfiguration.getTreeConfigFor(treeId);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(treeId);
       let itemCache = TreeConfiguration.getItemCache();
@@ -666,6 +678,9 @@ export class ItemRepository {
       treeConfiguration.loadingComplete();
     }
 
-    this.currentTreeConfigSubject.next(treeConfiguration);
+    this.currentTreeConfigSubject.next({
+      config :treeConfiguration,
+      configType: configType
+    });
   }
 }
