@@ -32,7 +32,11 @@
       <mat-tab label="Details" class="dialog-content">
         <mat-card style="height:450px">
           <mat-card-content style="height: 100%; overflow: auto;">
-            <details-form [proxyStream]="proxyStream" [editableStream]="editableStream" (formGroupUpdated)="onFormGroupUpdated($event)" (nonFormFieldChanged)="onNonFormFieldChanges($event)"></details-form>
+            <details-form [proxyStream]="proxyStream"
+              [editableStream]="editableStream"
+              (formGroupUpdated)="onFormGroupUpdated($event)"
+              (nonFormFieldChanged)="onNonFormFieldChanged($event)">
+            </details-form>
           </mat-card-content>
         </mat-card>
       </mat-tab>

@@ -1,5 +1,6 @@
 import { DynamicTypesService } from './dynamic-types.service';
-import { RepoStates } from '../item-repository/item-repository.service';
+import { RepoStates,
+  TreeConfigType } from '../item-repository/item-repository.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
@@ -27,8 +28,10 @@ describe('DynamicTypesService', () => {
           .getProxyFor('Model-Definitions'), new ItemProxy('KoheseView',
                                                          MockViewData()));
 
-    itemRepositoryPlaceholder.getTreeConfig.and.returnValue(Observable.of(
-      TreeConfiguration.getWorkingTree()));
+    itemRepositoryPlaceholder.getTreeConfig.and.returnValue(Observable.of({
+      config: TreeConfiguration.getWorkingTree(),
+      configType: TreeConfigType.DEFAULT
+    }));
 
     typeService = new DynamicTypesService(itemRepositoryPlaceholder);
   });

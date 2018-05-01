@@ -10,8 +10,8 @@ import { MockNavigationService } from '../../../mocks/services/MockNavigationSer
 import { ActionTableComponent } from './action-table.component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { BehaviorSubject } from 'rxjs';
-import { ItemProxy,
-  TreeConfiguration } from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 
 import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
