@@ -1,6 +1,7 @@
 import { DynamicTypesService } from './dynamic-types.service';
 import { RepoStates } from '../item-repository/item-repository.service';
-import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../mocks/data/MockViewData';

@@ -1,4 +1,5 @@
-import { ItemProxy, TreeConfiguration } from '../../../common/src/item-proxy';
+import { ItemProxy } from '../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../common/src/tree-configuration';
 
 describe('KDB Test', function() {
 
@@ -83,8 +84,7 @@ describe('KDB Test', function() {
       var timeBeforeGetDoc = new Date();
       let repoAsList = rootProxy.getSubtreeAsList();
       var timeAfterGetDoc = new Date();
-      var deltaTimeGetDoc : number = timeAfterGetDoc.getTime() -
-        timeBeforeGetDoc.getTime();
+      var deltaTimeGetDoc : number = timeAfterGetDoc.getTime() - timeBeforeGetDoc.getTime();
       console.log('Item Count in Repo List:  ' + repoAsList.length);
       console.log('Time to get entire repo as doc: ' + deltaTimeGetDoc);
 

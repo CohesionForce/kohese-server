@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
-import { ItemProxy, TreeConfiguration } from '../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from "../item-repository/item-repository.service";
 import { Subscription } from "rxjs";
 

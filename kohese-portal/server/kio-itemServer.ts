@@ -1,10 +1,12 @@
+import { ItemProxy } from '../common/src/item-proxy';
+import { TreeConfiguration } from '../common/src/tree-configuration';
+
 var kio = require('./koheseIO.js');
 var kdb = require('./kdb.js');
 const kdbFs = require('./kdb-fs.js');
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('./analysis.js');
-import { ItemProxy, TreeConfiguration } from '../common/src/item-proxy';
 var serverAuthentication = require('./server-enableAuth.js');
 const Path = require('path');
 const importer = require('./directory-ingest.js');
