@@ -117,8 +117,9 @@ export class KoheseModel extends ItemProxy {
     var models = rootModelProxy.getDescendants();
 
     for(var index in models){
-      var modelProxy = models[index];
-      console.log('::: Processing Model Properties ' + modelProxy.item.name);
+      let modelProxy = models[index];
+      let kind = modelProxy.item.name;
+      console.log('::: Processing Model Properties ' + kind);
 
       let propertyOrder = _.clone(modelProxy.parentProxy.item.propertyOrder) || [];
       modelProxy.item.propertyOrder = propertyOrder.concat(Object.keys(modelProxy.item.properties));
@@ -141,7 +142,10 @@ export class KoheseModel extends ItemProxy {
 
       for (var property in modelProxy.item.properties){
         var propertySettings = modelProxy.item.properties[property];
-        modelProxy.item.classProperties[property] = propertySettings;
+        modelProxy.item.classProperties[property] = {
+          definedInKind: kind,
+          definition: propertySettings
+        };
         if (propertySettings.required){
           modelProxy.item.requiredProperties.push(property);
         }

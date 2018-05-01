@@ -8,6 +8,10 @@
   "properties": {
     "observedBy": {
       "type": "string",
+      "relation": {
+        "kind": "KoheseUser",
+        "foreignKey": "username"
+      },
       "required": true
     },
     "observedOn": {

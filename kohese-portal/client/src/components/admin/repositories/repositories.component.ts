@@ -43,7 +43,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
   public ngOnInit(): void {
     this.repositoryStatusSubscription = this.itemRepository.
       getRepoStatusSubject().subscribe((status: any) => {
-        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.status) {
+        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
           this.treeConfigSubscription =
             this.itemRepository.getTreeConfig().subscribe((newConfig) => {
               this.repositories = newConfig.config.getRepositories();

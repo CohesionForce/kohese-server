@@ -5,7 +5,7 @@ var morgan = require('morgan');
 
 var app = module.exports = express();
 
-global.app = app;
+global['app'] = app;
 
 app.use(morgan('short'));
 
@@ -24,7 +24,7 @@ if (require.main === module) {
 
   // Load the KDB
   var kdb = require('./kdb.js');
-  global.koheseKDB = kdb;
+  global['koheseKDB'] = kdb;
   kdb.initialize(baseRepoPath).then(function () {
     try {
 

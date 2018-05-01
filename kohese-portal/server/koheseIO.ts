@@ -32,7 +32,7 @@ function Server(httpServer, options){
           };
 
         // Provide notification to socket listeners that the user has authenticated
-        global.app.emit('newSession', socket);
+        global['app'].emit('newSession', socket);
 
         kio.server.emit('session/add',kio.sessions[socket.id]);
       });

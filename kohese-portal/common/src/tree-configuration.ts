@@ -52,8 +52,8 @@ export class TreeConfiguration {
 
     this.changeSubject = new Subject<any>();
 
-    console.log('$$$ Checking IP');
-    console.log(ItemProxy);
+    // console.log('$$$ Checking IP');
+    // console.log(ItemProxy);
     this.root = new ItemProxy('Internal', {
       id: 'ROOT',
       name : 'Root of Knowledge Tree'
