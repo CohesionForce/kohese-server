@@ -851,7 +851,26 @@ export class ItemProxy {
       ancestorProxy = ancestorProxy.parentProxy;
       depth++;
     }
-    return depth;
+    return -1;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  hasAncestor(theAncestor) {
+    var ancestorProxy = this.parentProxy;
+
+    if (this === theAncestor){
+      return true;
+    }
+
+    while (ancestorProxy){
+      if (ancestorProxy === theAncestor){
+        return true;
+      }
+      ancestorProxy = ancestorProxy.parentProxy;
+    }
+    return false;
   }
 
   //////////////////////////////////////////////////////////////////////////
