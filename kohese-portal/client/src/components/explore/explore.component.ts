@@ -29,7 +29,8 @@ export class ExploreComponent extends NavigatableComponent
   ngOnInit () {
    this.paramSubscription = this.router.params.subscribe(params => {
      console.log(params);
-     if (params['id']) {
+     this.proxySelected = !!params['id'];
+     if (this.proxySelected) {
       this.routeId = params['id'];
      }
    });
