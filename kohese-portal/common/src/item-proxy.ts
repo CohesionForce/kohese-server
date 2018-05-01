@@ -48,7 +48,7 @@ export class ItemProxy {
   public model;
   public state;
   public item;
-  public treeConfig;
+  public treeConfig : TreeConfiguration;
   public kind;
   public references;
   public relations;
@@ -96,7 +96,7 @@ export class ItemProxy {
       } else {
         forItem.id = uuidV1();
       }
-      
+
       itemId = forItem.id;
       console.log('::: Allocating new id: ' + itemId);
     } else {
@@ -245,7 +245,8 @@ export class ItemProxy {
       if (this.model.item.idProperties){
         for (let idIdx in this.model.item.idProperties){
           let idName = this.model.item.idProperties[idIdx];
-          this.treeConfig.addIdMap(this.kind, idName, this);
+          let idKind = this.model.item.classProperties[idName].definedInKind;
+          this.treeConfig.addIdMap(idKind, idName, this);
         }
       }
     }
@@ -295,7 +296,7 @@ export class ItemProxy {
     if (this.model && this.model.item && this.model.item.relationProperties){
       for(let relationPropertyIdx in this.model.item.relationProperties){
         let relationProperty = this.model.item.relationProperties[relationPropertyIdx];
-        let relationPropertyDefn = this.model.item.classProperties[relationProperty];
+        let relationPropertyDefn = this.model.item.classProperties[relationProperty].definition;
 
         let foreignKeyDefn;
         if (typeof relationPropertyDefn.relation === 'object'){
