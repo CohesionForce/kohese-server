@@ -1,7 +1,8 @@
 <div style="height: 100%; width: 100%;">
   <ng-container *ngIf="koheseType">
     <split direction="horizontal">
-      <split-area id="propertyListSplitArea" [size]="33">
+      <split-area id="propertyListSplitArea" [size]="33"
+        [visible]="showSplitPanes">
         <button mat-icon-button id="addButton" (click)="add()"
           [disabled]="koheseType.dataModelProxy.item.isMetaModel">
           <mat-icon class="fa fa-plus"></mat-icon>
@@ -24,9 +25,9 @@
           </mat-list-item>
         </mat-list>
       </split-area>
-      <split-area [size]="67">
+      <split-area [size]="67" [visible]="showSplitPanes">
         <split direction="vertical">
-          <split-area [size]="50" class="pad">
+          <split-area [size]="50" class="pad" [visible]="showSplitPanes">
             <ng-container
               *ngIf="koheseType.fields[selectedPropertyId]">
               <mat-form-field>
@@ -98,7 +99,7 @@
               </mat-form-field>
             </ng-container>
           </split-area>
-          <split-area [size]="50" class="pad">
+          <split-area [size]="50" class="pad" [visible]="showSplitPanes">
             <ng-container
               *ngIf="koheseType.fields[selectedPropertyId] && koheseType.fields[selectedPropertyId].views['form']">
               <mat-form-field>
