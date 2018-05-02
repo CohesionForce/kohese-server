@@ -3,7 +3,7 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { ProjectInfo } from '../../../../services/project-service/project.service';
 import { Subscription, Observable } from 'rxjs';
 
-import { ItemProxy} from '../../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MatTableDataSource } from '@angular/material';
@@ -17,23 +17,23 @@ import { DetailsDialogComponent } from '../../../details/details-dialog/details-
 })
 export class UserStatisticsComponent extends NavigatableComponent implements OnInit, OnDestroy {
 
-  @Input() 
-  projectStream : Observable<ProjectInfo>;
-  projectStreamSub : Subscription;
-  project : ProjectInfo;
+  @Input()
+  projectStream: Observable<ProjectInfo>;
+  projectStreamSub: Subscription;
+  project: ProjectInfo;
 
-  selectedUserMap : Map<string, ItemProxy> = new Map<string, ItemProxy>();
-  selectedAssignments : Array<any>;
-  tableStream : MatTableDataSource<ItemProxy>;
-  rowDef = ['kind','name','state','assignedTo']
+  selectedUserMap: Map<string, ItemProxy> = new Map<string, ItemProxy>();
+  selectedAssignments: Array<any>;
+  tableStream: MatTableDataSource<ItemProxy>;
+  rowDef = ['kind', 'name', 'state', 'assignedTo']
 
-  constructor(protected navigationService : NavigationService,
-              protected dialogService : DialogService) {
+  constructor(protected navigationService: NavigationService,
+    protected dialogService: DialogService) {
     super(navigationService)
-   }
+  }
 
   ngOnInit() {
-    this.projectStreamSub = this.projectStream.subscribe((newProject)=>{
+    this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
         this.deselectAll();
@@ -45,7 +45,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.projectStreamSub.unsubscribe();
   }
 
-  toggleUser(user : ItemProxy) {
+  toggleUser(user: ItemProxy) {
     // Determine if user needs to be added or removed from the selected list
     this.selectedAssignments = [];
     if (this.selectedUserMap.get(user.item.name)) {
@@ -56,7 +56,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.buildSelectedAssignments();
   }
 
-  selectAll () {
+  selectAll() {
     for (let idx in this.project.users) {
       let user = this.project.users[idx];
       this.selectedUserMap.set(user.item.name, user);
@@ -64,33 +64,45 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.buildSelectedAssignments();
   }
 
-  deselectAll () {
+  deselectAll() {
     this.selectedUserMap = new Map<string, ItemProxy>();
     this.buildSelectedAssignments();
   }
 
-  buildSelectedAssignments () {
+  buildSelectedAssignments() {
     this.selectedAssignments = [];
 
-    Array.from(this.selectedUserMap.values(), (user : ItemProxy) =>{
+    Array.from(this.selectedUserMap.values(), (user: ItemProxy) => {
       for (let kind in user.relations.referencedBy) {
         for (let assignmentIdx in user.relations.referencedBy[kind].assignedTo) {
-          this.selectedAssignments.push(
-            user.relations.referencedBy[kind].assignedTo[assignmentIdx]
-          )
+          let assignment = user.relations.referencedBy[kind].assignedTo[assignmentIdx];
+          let match = false;
+          for (let projectIdx in this.project.projectItems) {
+            match = assignment.hasAncestor(this.project.projectItems[projectIdx])
+            if (match) {
+              break;
+            }
+          }
+
+          if (match) {
+            this.selectedAssignments.push(
+              user.relations.referencedBy[kind].assignedTo[assignmentIdx]
+            )
+            continue;
+          }
         }
-      }      
+      }
     })
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
   }
 
   openProxyDetails(proxy: ItemProxy) {
     this.dialogService.openComponentDialog(DetailsDialogComponent, {
-      data : {
-        itemProxy : proxy
+      data: {
+        itemProxy: proxy
       }
     }).updateSize('80%', '80%')
-      .afterClosed().subscribe((results)=>{
+      .afterClosed().subscribe((results) => {
 
       });
   }

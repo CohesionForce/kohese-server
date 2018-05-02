@@ -63,7 +63,7 @@ describe('Component: Details', ()=>{
     () => {
     let fieldName: string = 'modifiedOn';
     let fieldValue: any = new Date().getTime();
-    detailsComponent.whenNonFormFieldChanges({
+    detailsComponent.onNonFormFieldChanged({
       fieldName: fieldName,
       fieldValue: fieldValue
     });

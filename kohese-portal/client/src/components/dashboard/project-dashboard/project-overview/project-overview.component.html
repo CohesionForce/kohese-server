@@ -11,7 +11,7 @@
   <div class="activity-list">
     <h4> Activity : </h4>
     <mat-list>
-      <mat-list-item *ngFor="let activity of activityList">
+      <mat-list-item *ngFor="let activity of activityList" (click)="openProxyDetails(activity)">
         <b>{{activity.item.name}} </b>  
         <span>&#160;</span>
         <span *ngIf="activity.item.modifiedOn === activity.item.createdOn"> created on</span>

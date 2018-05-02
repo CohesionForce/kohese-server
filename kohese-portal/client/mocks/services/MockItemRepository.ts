@@ -9,7 +9,8 @@ import { ItemProxy } from '../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../common/src/KoheseModel';
 import { Subject } from 'rxjs';
-import { RepoStates } from '../../src/services/item-repository/item-repository.service';
+import { RepoStates,
+  TreeConfigType } from '../../src/services/item-repository/item-repository.service';
 
 export class MockItemRepository {
   mockRootProxy = ItemProxy.getWorkingTree().getRootProxy();
@@ -103,7 +104,9 @@ export class MockItemRepository {
   }
 
   getTreeConfig(): Observable<any> {
-    return new BehaviorSubject<TreeConfiguration>(TreeConfiguration.
-      getWorkingTree());
+    return new BehaviorSubject<any>({
+      config: TreeConfiguration.getWorkingTree(),
+      configType: TreeConfigType.DEFAULT
+    });
   }
 }

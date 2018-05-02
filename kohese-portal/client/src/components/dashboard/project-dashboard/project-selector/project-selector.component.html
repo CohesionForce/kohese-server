@@ -18,7 +18,7 @@
         </mat-list>
       </div>
       <div class="project-preview" style="height: 100%; overflow: auto; width: 70%;">
-        <mat-card *ngIf="selectedProject && !multiSelect">
+        <mat-card *ngIf="selectedProject && !isMultiSelect">
           <mat-card-title class="panel-heading">
             <span>{{selectedProject.proxy.item.name}}</span>
           </mat-card-title>

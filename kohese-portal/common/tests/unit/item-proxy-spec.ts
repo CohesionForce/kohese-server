@@ -521,21 +521,21 @@ describe('ItemProxy Test', function () {
       parentId: 'd'
     });
     // eslint-disable-next-line no-unused-vars
-    var dz1 = new ItemProxy('Test', {
-      id: 'dz1',
-      name: 'DZ1',
+    var dz2 = new ItemProxy('Test', {
+      id: 'dz2',
+      name: 'DZ',
       parentId: 'd'
     });
     // eslint-disable-next-line no-unused-vars
-    var dz2 = new ItemProxy('Test', {
-      id: 'dz2',
-      name: 'DZ2',
+    var dz1 = new ItemProxy('Test', {
+      id: 'dz1',
+      name: 'DZ',
       parentId: 'd'
     });
     // eslint-disable-next-line no-unused-vars
     var dz3 = new ItemProxy('Test', {
       id: 'dz3',
-      name: 'DZ3',
+      name: 'DZ',
       parentId: 'd'
     });
     dump('Added da1, dz1-dz2');
@@ -587,7 +587,8 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   it('Get Ancestors', function () {
     // console.log('::: Getting AB ancestors');
-    var ab = ItemProxy.getWorkingTree().getProxyFor('ab');
+    let workingTree = TreeConfiguration.getWorkingTree();
+    var ab : ItemProxy = workingTree.getProxyFor('ab');
     var abAncestors = ab.getAncestorProxies();
     var expected = ['b', 'ROOT'];
     for (var ancestorIdx in abAncestors) {
@@ -596,6 +597,19 @@ describe('ItemProxy Test', function () {
 
       expect(ancestor.item.id).toBe(expected[ancestorIdx]);
     }
+    let b = workingTree.getProxyFor('b');
+    let rootProxy = workingTree.getRootProxy();
+    expect(ab.getDepthFromAncestor(ab)).toBe(0);
+    expect(ab.getDepthFromAncestor(b)).toBe(1);
+    expect(ab.getDepthFromAncestor(rootProxy)).toBe(2);
+    expect(ab.hasAncestor(ab)).toBe(true);
+    expect(ab.hasAncestor(b)).toBe(true);
+
+    let ac = workingTree.getProxyFor('ac');
+    expect(ab.getDepthFromAncestor(ac)).toBe(-1);
+    expect(ab.hasAncestor(ac)).toBe(false);
+
+
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -637,7 +651,7 @@ describe('ItemProxy Test', function () {
     dumpHashFor(proxy);
     ItemProxy.getWorkingTree().loadingComplete();
 
-    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('2b99e2dda5c6be0762532b093661a895e6fa4f09');
+    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('ec9bb8f030a5487c5a64401002b4cb067c81d1aa');
     expect(proxy.parentProxy.treeHashEntry.childTreeHashes['test-item-id'])
       .toEqual('53688a4a9207203c25da692d634bd58305ae1313');
     expect(proxy.treeHashEntry.treeHash).toEqual('53688a4a9207203c25da692d634bd58305ae1313');

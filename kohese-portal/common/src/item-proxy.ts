@@ -183,7 +183,7 @@ export class ItemProxy {
 
     if (!parent) {
       // Create the parent before it is found
-      parent = createMissingProxy(parentId, proxy.treeConfig);
+      parent = createMissingProxy('Item', 'id', parentId, proxy.treeConfig);
     }
 
     parent.addChild(proxy);
@@ -373,12 +373,13 @@ export class ItemProxy {
               if (foreignKeyDefn){
                 refProxy = this.treeConfig.getProxyByProperty(foreignKeyDefn.kind, foreignKeyDefn.foreignKey, refId);
                 if (!refProxy){
-                  console.log('*** Could not find proxy for: ' + refId);
+                  createMissingProxy(foreignKeyDefn.kind, foreignKeyDefn.foreignKey, refId, this.treeConfig);
+                  refProxy = this.treeConfig.getProxyFor(refId);
                 }
               } else {
                 refProxy = this.treeConfig.getProxyFor(refId);
                 if(!refProxy){
-                  createMissingProxy(refId, this.treeConfig);
+                  createMissingProxy('Item', 'id', refId, this.treeConfig);
                   refProxy = this.treeConfig.getProxyFor(refId);
                 }
               }
@@ -850,7 +851,26 @@ export class ItemProxy {
       ancestorProxy = ancestorProxy.parentProxy;
       depth++;
     }
-    return depth;
+    return -1;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  hasAncestor(theAncestor) {
+    var ancestorProxy = this.parentProxy;
+
+    if (this === theAncestor){
+      return true;
+    }
+
+    while (ancestorProxy){
+      if (ancestorProxy === theAncestor){
+        return true;
+      }
+      ancestorProxy = ancestorProxy.parentProxy;
+    }
+    return false;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1252,16 +1272,16 @@ export class ItemProxy {
               aIndex++;
             } else if (a.item.name < b.item.name) {
               bIndex++;
+            } else {
+              // Names are the same, so sort on the id
+              if (a.item.id > b.item.id) aIndex++;
+              if (a.item.id < b.item.id) bIndex++;
             }
           }
         }
 
-        if (a.item.name > b.item.name) return 1;
-        if (a.item.name < b.item.name) return -1;
-        if (a.item.name === b.item.name) {
-          if (a.item.id > b.item.id) return 1;
-          if (a.item.id < b.item.id) return -1;
-        }
+        if (aIndex > bIndex) return 1;
+        if (aIndex < bIndex) return -1;
         return 0;
       });
     }
@@ -1401,7 +1421,7 @@ export class ItemProxy {
       }
 
       if (!newParentProxy) {
-        newParentProxy = createMissingProxy(newParentId, this.treeConfig);
+        newParentProxy = createMissingProxy('Item', 'id', newParentId, this.treeConfig);
       }
 
       newParentProxy.addChild(this);
@@ -1477,7 +1497,7 @@ export class ItemProxy {
               proxy: this
             });
           }
-          createMissingProxy(byId, this.treeConfig);
+          createMissingProxy('Item', 'id', byId, this.treeConfig);
         }
       } else {
         if (attemptToDeleteRestrictedNode){
@@ -1505,10 +1525,10 @@ export class ItemProxy {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function createMissingProxy(forId, treeConfig) {
+function createMissingProxy(forKind, forKey, forId, treeConfig) {
   var lostProxy = new ItemProxy('Internal-Lost', {
     id : forId,
-    name : 'Lost Item: ' + forId,
+    name : 'Lost Item: ' + forKind + ' with ' + forKey + ' of ' + forId,
     description : 'Found node(s) referencing this node.',
     parentId : 'LOST+FOUND',
     loadPending: true
