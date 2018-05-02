@@ -19,6 +19,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
+import { LogService } from '../log/log.service';
+import { LogCategories } from '../../../../common/src/k-logger';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -59,12 +61,13 @@ export class ItemRepository {
     private CurrentUserService: CurrentUserService,
     private toastrService : ToastrService,
     private dialogService: DialogService,
-    private _versionControlService: VersionControlService) {
+    private _versionControlService: VersionControlService,
+    private logService : LogService) {
     this.initialize();
   }
 
   initialize () : void {
-    console.log('Item Repo init');
+    this.logService.log('Item Repo init', LogCategories.ITEM_REPOSITORY_INIT);
 
     this.repositoryStatus = new BehaviorSubject({
       state: RepoStates.DISCONNECTED,
@@ -72,27 +75,28 @@ export class ItemRepository {
     });
 
     ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
-      // console.log('+++ Received notification of change: ' + change.type);
-      // if(change.proxy){
-      //   console.log(change.kind);
-      //   console.log(change.proxy.item);
-      // }
+      
+      this.logService.log('+++ Received notification of change: ' + change.type, LogCategories.ALL_PROXY_CHANGES);
+      if(change.proxy){
+        this.logService.log(change.kind, LogCategories.ALL_PROXY_CHANGES);
+        this.logService.log(change.proxy.item, LogCategories.ALL_PROXY_CHANGES);
+      }
 
       switch (change.type){
         case 'loaded':
-          console.log('::: ItemProxy is loaded');
+          this.logService.log('::: ItemProxy is loaded', LogCategories.ITEM_PROXY_INIT);
           break;
         case 'loading':
-          console.log('::: ItemProxy is loading');
+          this.logService.log('::: ItemProxy is loading', LogCategories.ITEM_PROXY_INIT);
           break;
       }
     });
 
     this.CurrentUserService.getCurrentUserSubject()
       .subscribe((decodedToken) => {
-        console.log('Auth IR');
+        this.logService.info('Auth IR', LogCategories.ITEM_PROXY_INIT);
         if (decodedToken) {
-          console.log('::: IR: this.socketService already connected');
+          this.logService.log('::: IR: this.socketService already connected', LogCategories.ITEM_PROXY_INIT);
           this.registerKoheseIOListeners();
           this.fetchItems();
         }
@@ -121,7 +125,7 @@ export class ItemRepository {
 
       // Register the listeners for the Item kinds that are being tracked
       this.socketService.socket.on('Item/create', (notification) => {
-        console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
+        this.logService.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id, LogCategories.ITEM_CREATE_UPDATES);
         var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
         if (proxy) {
           proxy.updateItem(notification.kind, notification.item);
@@ -138,7 +142,7 @@ export class ItemRepository {
       });
 
       this.socketService.socket.on('Item/update', (notification) => {
-        console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
+        this.logService.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id, LogCategories.ITEM_UPDATES);
         var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
         if (proxy) {
           proxy.updateItem(notification.kind, notification.item);
@@ -155,17 +159,20 @@ export class ItemRepository {
       });
 
       this.socketService.socket.on('Item/delete', (notification) => {
-        console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
+        this.logService.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id, LogCategories.ITEM_DELETE_UPDATES);
         var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
         proxy.deleteItem();
       });
 
       this.socketService.socket.on('Item/BulkUpdate', (bulkUpdate) => {
-        console.log('::: Received Bulk Update');
+        this.logService.log('::: Received Bulk Update', LogCategories.BULK_UPDATES);
+        this.logService.log(bulkUpdate, LogCategories.BULK_UPDATES);
         this.processBulkUpdate(bulkUpdate);
       });
 
       this.socketService.socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
+        this.logService.log('::: Received VC status update', LogCategories.VERSION_CONTROL_UPDATES);
+        this.logService.log(gitStatusMap, LogCategories.VERSION_CONTROL_UPDATES);
         for (var id in gitStatusMap) {
           var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
           this.updateStatus(proxy, gitStatusMap[id]);
@@ -173,7 +180,7 @@ export class ItemRepository {
       });
 
       this.socketService.socket.on('connect_error', () => {
-        console.log('::: IR: Socket IO Connection Error');
+        this.logService.log('::: IR: Socket IO Connection Error', LogCategories.SOCKET_INFO);
         this.repositoryStatus.next({
           state: RepoStates.DISCONNECTED,
           message : 'Error connecting to repository'
@@ -182,15 +189,15 @@ export class ItemRepository {
 
       this.socketService.socket.on('reconnect', () => {
         if (this.CurrentUserService.getCurrentUserSubject().getValue()) {
-          console.log('::: IR: this.authenticationService already authenticated');
+          this.logService.log('::: IR: this.authenticationService already authenticated', LogCategories.SOCKET_INFO);
           this.fetchItems();
           this.toastrService.success('Reconnected!', 'Server Connection!');
         } else {
-          console.log('::: IR: Listening for this.authenticationService authentication');
+          this.logService.log('::: IR: Listening for this.authenticationService authentication', LogCategories.SOCKET_INFO);
           let subscription: Subscription = this.CurrentUserService.getCurrentUserSubject()
             .subscribe((decodedToken) => {
               if(decodedToken) {
-                console.log('::: IR: Socket Authenticated');
+                this.logService.log('::: IR: Socket Authenticated', LogCategories.SOCKET_INFO);
                 this.fetchItems();
                 this.toastrService.success('Reconnected!', 'Server Connection!');
                 subscription.unsubscribe();
@@ -202,9 +209,9 @@ export class ItemRepository {
     }
 
   processBulkUpdate(response){
-    console.log('::: Processing Bulk Update');
+    this.logService.log('::: Processing Bulk Update', LogCategories.BULK_UPDATES);
     for(let kind in response.cache) {
-      console.log('--- Processing ' + kind);
+      this.logService.log('--- Processing ' + kind, LogCategories.BULK_UPDATES);
       var kindList = response.cache[kind];
       for (var index in kindList) {
         let item = JSON.parse(kindList[index]);
@@ -215,10 +222,10 @@ export class ItemRepository {
           try {
             iProxy = new ItemProxy(kind, item);
           } catch(error){
-            console.log('*** Error processing item:');
-            console.log(kind);
-            console.log(item);
-            console.log(error);
+            this.logService.error('*** Error processing item:', LogCategories.BULK_UPDATES);
+            this.logService.error(kind, LogCategories.BULK_UPDATES);
+            this.logService.error(item, LogCategories.BULK_UPDATES);
+            this.logService.error(error, LogCategories.BULK_UPDATES);
           }
         }
       }
@@ -278,25 +285,25 @@ export class ItemRepository {
 
       CacheManager.sync((response) => {
         let afterFetch = Date.now();
-        console.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000);
+        this.logService.log('$$$ Fetch time: ' + (afterFetch - beforeFetch)/1000, LogCategories.PERFORMANCE);
 
         if(response.metaModel){
-          console.log('::: Processing MetaModel');
+          this.logService.log('::: Processing MetaModel', LogCategories.ITEM_PROXY_INIT);
           this.processBulkUpdate({cache: response.metaModel});
         }
 
         if(response.objectMap){
-          console.log('::: Processing Cache');
+          this.logService.log('::: Processing Cache', LogCategories.TREE_CONFIG_UPDATES);
           let itemCache = new ItemCache();
           itemCache.setObjectMap(response.objectMap);
           TreeConfiguration.setItemCache(itemCache);
 
           let workingTree = TreeConfiguration.getWorkingTree();
           let headCommit = itemCache.getRef('HEAD');
-          console.log('### Head: ' + headCommit);
+          this.logService.log('### Head: ' + headCommit, LogCategories.TREE_CONFIG_UPDATES);
 
           // TODO Need to load the HEAD commit
-          console.log('$$$ Loading HEAD Commit');
+          this.logService.log('$$$ Loading HEAD Commit', LogCategories.TREE_CONFIG_UPDATES);
           itemCache.loadProxiesForCommit(headCommit, workingTree);
           workingTree.calculateAllTreeHashes();
 
@@ -306,10 +313,10 @@ export class ItemRepository {
         this.processBulkUpdate(response.allItems);
 
         let processingComplete = Date.now();
-        console.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000);
+        this.logService.log('$$$ Processing time: ' + (processingComplete - afterFetch)/1000, LogCategories.PERFORMANCE);
         ItemProxy.getWorkingTree().loadingComplete();
         let treehashComplete = Date.now();
-        console.log('$$$ TreeHash time: ' + (treehashComplete - processingComplete)/1000);
+        this.logService.log('$$$ TreeHash time: ' + (treehashComplete - processingComplete)/1000, LogCategories.PERFORMANCE);
 
         // TODO Remove after cache is complete
         // Invoke fetch to peform a delta update
@@ -325,12 +332,12 @@ export class ItemRepository {
     if (fetchAllStoredValue){
       fetchAll = JSON.parse(fetchAllStoredValue);
     };
-    console.log('$$$ Fetch All: ' + fetchAll);
+    this.logService.log('$$$ Fetch All: ' + fetchAll, LogCategories.ITEM_REPOSITORY_INIT);
 
     if (fetchAll){
       this.fetchAllItems(null);
     } else {
-      console.log('::: Fetching Items');
+      this.logService.log('::: Fetching Items', LogCategories.ITEM_REPOSITORY_INIT);
       var beginFetching = Date.now();
       var origRepoTreeHashes = ItemProxy.getWorkingTree().getRepoTreeHashes();
 
@@ -339,16 +346,16 @@ export class ItemRepository {
         message: 'Starting Repository Sync'
       });
 
-      // console.log('$$$ Client Repo THM');
-      // console.log(origRepoTreeHashes);
+      // this.logService.log('$$$ Client Repo THM');
+      // this.logService.log(origRepoTreeHashes);
 
       this.socketService.socket.emit('Item/getRepoHashmap', {repoTreeHashes: origRepoTreeHashes}, (response) => {
         var gotResponse = Date.now();
-        // console.log('::: Response for getRepoHashmap');
-        // console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
+        // this.logService.log('::: Response for getRepoHashmap');
+        // this.logService.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
 
-        // console.log('$$$ Server Repo THM');
-        // console.log(response);
+        // this.logService.log('$$$ Server Repo THM');
+        // this.logService.log(response);
 
         let repoSyncPending = false;
 
@@ -361,7 +368,7 @@ export class ItemRepository {
             let rTHMCompare = TreeConfiguration.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
             if (rTHMCompare.match){
               syncRequired = false;
-              // console.log('$$$ Sync not required ' + repoId);
+              // this.logService.log('$$$ Sync not required ' + repoId);
               this.repoSyncStatus[repoId] = RepoStates.SYNCHRONIZATION_SUCCEEDED;
             }
           }
@@ -384,7 +391,7 @@ export class ItemRepository {
   }
 
   fetchAllItems(forRepoId) {
-    console.log('::: Requesting getAll: ' + forRepoId);
+    this.logService.log('::: Requesting getAll: ' + forRepoId, LogCategories.ITEM_REPOSITORY_INIT);
     var beginFetching = Date.now();
 
     let origRepoTreeHashes;
@@ -406,21 +413,21 @@ export class ItemRepository {
       forRepoId: forRepoId,
       repoTreeHashes: origRepoTreeHashes
     };
-    console.log(request);
+    this.logService.log(request, LogCategories.ITEM_REPOSITORY_INIT);
 
     this.socketService.socket.emit('Item/getAll', request, (response) => {
       var gotResponse = Date.now();
-      console.log('::: Response for getAll');
-      console.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
+      this.logService.log('::: Response for getAll', LogCategories.ITEM_REPOSITORY_INIT);
+      this.logService.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000, LogCategories.PERFORMANCE);
       var syncSucceeded = false;
       if(response.kdbMatches) {
-        console.log('::: KDB is already in sync');
+        this.logService.log('::: KDB is already in sync', LogCategories.ITEM_REPOSITORY_INIT);
         syncSucceeded = true;
       } else {
 
         this.processBulkUpdate(response);
 
-        console.log('::: Compare Repo Tree Hashes After Update');
+        this.logService.log('::: Compare Repo Tree Hashes After Update', LogCategories.ITEM_REPOSITORY_INIT);
         var updatedTreeHashes;
         if (!forRepoId){
           ItemProxy.getWorkingTree().loadingComplete();
@@ -438,18 +445,18 @@ export class ItemRepository {
         syncSucceeded = compareAfterRTH.match;
 
         var finishedTime = Date.now();
-        console.log('$$$ Processing time: ' + (finishedTime-gotResponse)/1000);
+        this.logService.log('$$$ Processing time: ' + (finishedTime-gotResponse)/1000, LogCategories.PERFORMANCE);
 
         if(!compareAfterRTH.match) {
-          console.log('*** Repository sync failed');
-          console.log(compareAfterRTH);
-          console.log('$$$ Evaluating differences:');
+          this.logService.error('*** Repository sync failed', LogCategories.ITEM_REPOSITORY_INIT);
+          this.logService.error(compareAfterRTH, LogCategories.ITEM_REPOSITORY_INIT);
+          this.logService.log('$$$ Evaluating differences:', LogCategories.ITEM_REPOSITORY_INIT);
           let workingTree = TreeConfiguration.getWorkingTree();
           for (let idx in compareAfterRTH.changedItems){
             let itemId = compareAfterRTH.changedItems[idx];
             let changedProxy = workingTree.getProxyFor(itemId);
-            console.log('$$$ Proxy for: ' + itemId);
-            console.log(changedProxy);
+            this.logService.log('$$$ Proxy for: ' + itemId, LogCategories.ITEM_REPOSITORY_INIT);
+            this.logService.log(changedProxy, LogCategories.ITEM_REPOSITORY_INIT);
           }
           this.repositoryStatus.next({
             state: RepoStates.SYNCHRONIZATION_FAILED,
@@ -469,7 +476,7 @@ export class ItemRepository {
 
           for(let repoId in this.repoSyncStatus){
             if(this.repoSyncStatus[repoId] != RepoStates.SYNCHRONIZATION_SUCCEEDED) {
-              console.log('$$$ Still waiting on repo sync: ' + repoId);
+              this.logService.log('$$$ Still waiting on repo sync: ' + repoId, LogCategories.ITEM_REPOSITORY_INIT);
               sendFinalSyncRequest = false;
             }
           }
@@ -496,18 +503,6 @@ export class ItemRepository {
     });
   }
 
-  copyAttributes (fromItem, toItem) {
-    // TBD: Need to remove
-    console.log('### Deprecated call to copyAttributes');
-
-    // Copy attributes proxy
-    for (var key in fromItem) {
-      if (key.charAt(0) !== '$' && !_.isEqual(fromItem[key], toItem[key])) {
-        toItem[key] = fromItem[key];
-      }
-    }
-  }
-
   fetchItem (proxy) {
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/findById', {id: proxy.item.id}, (response) => {
@@ -524,12 +519,12 @@ export class ItemRepository {
     return new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/upsert', {kind: kind, item: item}, (response) => {
         if (response.error) {
-          console.log('Error');
-          console.log(response);
+          this.logService.error('Error', LogCategories.ITEM_CREATE_UPDATES);
+          this.logService.error(response, LogCategories.ITEM_CREATE_UPDATES);
           reject(response.error);
         } else {
-          console.log('Create succeded');
-          console.log(response);
+          this.logService.log('Create succeded', LogCategories.ITEM_CREATE_UPDATES);
+          this.logService.log(response, LogCategories.ITEM_CREATE_UPDATES);
           let proxy;
           if (response.kind === 'KoheseModel'){
             proxy = new KoheseModel(response.item);
@@ -575,7 +570,7 @@ export class ItemRepository {
   }
 
   deleteItem (proxy, recursive) {
-    console.log('::: Preparing to deleteById ' + proxy.kind);
+    this.logService.log('::: Preparing to deleteById ' + proxy.kind, LogCategories.ITEM_DELETE_UPDATES);
 
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/deleteById', {kind: proxy.kind, id: proxy.item.id, recursive: recursive}, (response) => {
@@ -592,13 +587,13 @@ export class ItemRepository {
 
   generateHTMLReportFor (proxy) {
     this.socketService.socket.emit('Item/generateReport', {onId: proxy.item.id, format: 'html'}, (results) => {
-      console.log('::: Report results: ' + results.html);
+      this.logService.log('::: Report results: ' + results.html, LogCategories.DOCUMENT_GENERATION);
     });
   }
 
   generateDOCXReportFor (proxy) {
     this.socketService.socket.emit('Item/generateReport', {onId: proxy.item.id, format: 'docx'}, (results) => {
-      console.log('::: Report results: ' + results.docx);
+      this.logService.log('::: Report results: ' + results.docx, LogCategories.DOCUMENT_GENERATION);
     });
   }
 
@@ -621,23 +616,23 @@ export class ItemRepository {
         repo.repoStatus = {};
       }
       repo.repoStatus = results;
-      console.log('::: Status retrieved for: ' + repo.item.id + ' - ' + repo.item.name);
+      this.logService.log('::: Status retrieved for: ' + repo.item.id + ' - ' + repo.item.name, LogCategories.VERSION_CONTROL_UPDATES);
       for(var rIdx in repo.repoStatus) {
         var entry = repo.repoStatus[rIdx];
-        console.log('+++ ' + rIdx + ' - ' + entry.id + ' - ' + entry.status );
+        this.logService.log('+++ ' + rIdx + ' - ' + entry.id + ' - ' + entry.status , LogCategories.VERSION_CONTROL_UPDATES);
 
         var proxy = ItemProxy.getWorkingTree().getProxyFor(entry.id);
         if (proxy) {
           this.updateStatus(proxy, entry.status);
         } else {
-          console.log('!!! Item not found for entry: ' + rIdx + ' - ' + entry.id + ' - ' + entry.status );
+          this.logService.log('!!! Item not found for entry: ' + rIdx + ' - ' + entry.id + ' - ' + entry.status, LogCategories.VERSION_CONTROL_UPDATES );
         }
       }
     });
   }
 
   performAnalysis (forProxy) {
-    console.log('::: Performing analysis for ' + forProxy.item.id);
+    this.logService.log('::: Performing analysis for ' + forProxy.item.id, LogCategories.ANALYSIS_INFO);
 
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/performAnalysis', {kind: forProxy.kind, id:forProxy.item.id}, (response) => {
