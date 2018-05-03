@@ -1,28 +1,44 @@
 import { Injectable } from "@angular/core";
-import { KLogger, LogCategories } from "../../../../common/src/k-logger";
+import { KLogger } from "../../../../common/src/k-logger";
+
+export interface LogCategory {
+  description : string, 
+  id : string
+}
+
+export interface LogInformation {
+  component : string,
+  category : LogCategory,
+  id : string
+  message : string
+}
 
 @Injectable()
 export class LogService {
   logger: KLogger;
-  categories: any = LogCategories;
+  componentMap : {};
 
   constructor() {
-    this.logger = new KLogger()
-    LogCategories
-
+    this.logger = new KLogger();
   }
 
-  log(message: any, category: LogCategories) {
-    this.logger.log(message, category)
+  getComponentId(componentName: string): string {
+    return this.logger.getComponentId(componentName);
   }
 
-  info(message: any, category: LogCategories) {
-    this.logger.info(message, category)
+  getEventId(componentId: string, eventName: string): string {
+    return this.logger.getEventId(componentId, eventName);
   }
 
-  error(message: any, category : LogCategories) {
-    this.logger.error(message, category);
+  log(eventId : string, infoObject?: any) {
+    this.logger.log(eventId, infoObject)
   }
 
+  info(logInfo : LogInformation, infoObject?: any) {
+    this.logger.info(logInfo, infoObject)
+  }
 
+  error(logInfo : LogInformation, infoObject? : any) {
+    this.logger.error(logInfo, infoObject);
+  }
 }

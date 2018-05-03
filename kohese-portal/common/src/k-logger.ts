@@ -1,81 +1,156 @@
 import * as Bunyan from "bunyan";
 
-export enum LogCategories {
-  "ITEM_CREATE_UPDATES", //  Notification of Item Creation
-  "ITEM_UPDATES", // Notifications of Item upserts
-  "BULK_UPDATES", // Notification of large loads of items
-  "ITEM_DELETE_UPDATES", // Notification of Item Deletion
-  "ALL_PROXY_CHANGES", // Log of all proxy changes that come from change subject
-  "ITEM_REPOSITORY_INIT", // Initialization Logs for the Item Repository
-  "ITEM_REPOSITORY_UPDATES", // Updates to the state of the item repository
-  "ITEM_PROXY_INIT", // Initialization Logs for the Item Proxy Model
-  "VERSION_CONTROL_UPDATES", // Updates to the git status of items
-  "SOCKET_INFO", // Information about the websocket connection,
-  "PERFORMANCE", // Information about app performance,
-  "TREE_CONFIG_UPDATES", // Info about the client tree configuration,
-  "DOCUMENT_GENERATION", // Info about document generation requests
-  "ANALYSIS_INFO" // Info about document analysis
+// TODO: does this need to be more configurable?
+export enum LoggingLevel {
+  INFO,
+  WARN,
+  ERROR
+}
+
+export interface ComponentLogDefinition {
+  name : string;
+  description : string;
+}
+
+export interface LoggingEventDefinition {
+  name : string; // A simple message that can be provided
+  description : string;
+  severity? : LoggingLevel; // This concept can be integrated later or else it could be handled by LoggingCategory
+}
+
+export interface LoggingCategoryDefinition {
+  name : string;
+  description : string;
+}
+
+interface ComponentLogRecord {
+  id : string;
+  definition : ComponentLogDefinition;
+  loggingEventDefinitions : {}
+  automaticallyCreated? : boolean; // Needs to be added to the central repository
+}
+
+interface LoggingEventRecord {
+  id : string;
+  definition : ComponentLogDefinition;
+//  componentLogRecord : ComponentLogRecord;
+  enabled : boolean;
+  automaticallyCreated? : boolean; // Needs to be added to the central repository
+}
+
+interface LoggingCategoryRecord {
+  id : string;
+  definition : ComponentLogDefinition;
+  loggingEventDefinitions : {[loggingEventId : string] : LoggingEventRecord};
+  automaticallyCreated? : boolean; // Needs to be added to the central repository
 }
 
 export class KLogger {
   public logger: any;
-  private activeLogs: Map<LogCategories, boolean> = new Map<LogCategories, boolean>();
+
+  private static singleton : KLogger;
+
+  componentRegistry : { [nameString:string] : ComponentLogRecord };
+  loggingEventRegistry : { [nameString:string] : LoggingEventRecord };
+  loggingCategoryRegistry : { [nameString:string] : LoggingCategoryRecord };
+
   private showAllErrors: boolean = true;
 
-  constructor(options?: Map<LogCategories, boolean>) {
-    if (!options) {
-      options = new Map<LogCategories, boolean>();
-      options.set(LogCategories.ITEM_CREATE_UPDATES, true),
-      options.set(LogCategories.ITEM_UPDATES, true);
-      options.set(LogCategories.BULK_UPDATES, true);
-      options.set(LogCategories.ITEM_DELETE_UPDATES, true)
-      options.set(LogCategories.ALL_PROXY_CHANGES, false);
-      options.set(LogCategories.ITEM_REPOSITORY_INIT, true)
-      options.set(LogCategories.ITEM_REPOSITORY_UPDATES, true);
-      options.set(LogCategories.ITEM_PROXY_INIT, true);
-      options.set(LogCategories.VERSION_CONTROL_UPDATES, false);
-      options.set(LogCategories.SOCKET_INFO, false);
-      options.set(LogCategories.PERFORMANCE, true);
-      options.set(LogCategories.TREE_CONFIG_UPDATES, true);
-      options.set(LogCategories.DOCUMENT_GENERATION, false);
-      options.set(LogCategories.ANALYSIS_INFO, false);
-
+  constructor() {
+    if (!KLogger.singleton){
+      KLogger.singleton = this;
+      this.createLogger();
     }
-    this.createLogger(options);
+    return KLogger.singleton;
   }
 
-  createLogger(options) {
+  createLogger() {
     this.logger = Bunyan.createLogger({
       name: 'Default logger',
     })
-    this.activeLogs = options;
   }
 
-  log(message: any, category: LogCategories) {
-    if (this.activeLogs.get(category)) {
-      console.log(message);
-    } 
+  getComponentId(componentName: string): string {
+    let componentId = undefined;
+    let componentRecord : ComponentLogRecord = this.componentRegistry[componentName];
+
+    if (!componentRecord) {
+      // Component record was not found, create one and flag for registration
+      componentRecord = {
+        id : '<'+ componentName +'>',
+        definition : {
+          name:componentName,
+          description: "Component record for: " + componentName 
+        },
+        loggingEventDefinitions : {},
+        automaticallyCreated : true      
+      }
+      this.componentRegistry[componentName] = componentRecord;
+    }
+
+    return componentRecord.id;
   }
 
-  info(message: any, category: LogCategories) {
-    if (this.activeLogs.get(category)) {
-      this.logger.info(message);
-    } 
+  getEventId(componentId: string, eventName: string): string {
+    let eventId = undefined;
+    let loggingEventRecord : LoggingEventRecord = this.loggingEventRegistry[eventName];
+
+    if (!loggingEventRecord) {
+      // LoggingEvent record was not found, create one and flag for registration
+
+      loggingEventRecord = {
+        id : '['+ eventName +']',
+        definition : {
+          name: eventName,
+          description: "Event Logging record for: " + componentId + ' - ' + eventName
+        },
+        // loggingEventDefinitions : {},
+        enabled : true,  // Will need to be looked up in the future
+        automaticallyCreated : true      
+      }
+      this.loggingEventRegistry[eventName] = loggingEventRecord;
+    }
+
+    return loggingEventRecord.id;
   }
 
-  error(message: any, category: LogCategories) {
-    if (this.showAllErrors) {
-      console.error(message)
-    } else if (this.activeLogs.get(category)) {
-      console.error(message);
+  getCategoryId(categoryName: string) : string {
+    return "DONT_DO_THIS_YET";
+  }
+
+  associateCategoryToEvent(categoryId, eventId) : never {
+    throw "dont_do_this_yet";
+  }
+
+  log(eventId : string, infoObject?: any) {
+    console.log(eventId);
+    if (infoObject) {
+      console.log(infoObject);
+      console.log('//////')
     }
   }
 
-  setLogCategories(activeLogs: Map<LogCategories, boolean>) {
-    this.activeLogs = activeLogs
+  info(message: any, infoObject?: any) {
+    this.logger.info(message);
+    if (infoObject) {
+      console.log(infoObject);
+      console.log('//////')
+    }
   }
 
-  getLogCategories(): Map<LogCategories, boolean> {
-    return this.activeLogs;
+  error(message: any, infoObject?: any) {
+    console.error(message)
+    if (infoObject) {
+      console.log(infoObject);
+      console.log('//////')
+    }
+  }
+
+  setLogCategories() {
+
+  }
+
+  getLogCategories() {
+
   }
 }
