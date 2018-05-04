@@ -1,4 +1,6 @@
 import * as Bunyan from "bunyan";
+import { BehaviorSubject } from "rxjs";
+import { BREAKPOINTS } from "@angular/flex-layout";
 
 // TODO: does this need to be more configurable?
 export enum LoggingLevel {
@@ -8,56 +10,58 @@ export enum LoggingLevel {
 }
 
 export interface ComponentLogDefinition {
-  name : string;
-  description : string;
+  name: string;
+  description: string;
 }
 
 export interface LoggingEventDefinition {
-  name : string; // A simple message that can be provided
-  description : string;
-  severity? : LoggingLevel; // This concept can be integrated later or else it could be handled by LoggingCategory
+  name: string; // A simple message that can be provided
+  description: string;
+  severity?: LoggingLevel; // This concept can be integrated later or else it could be handled by LoggingCategory
 }
 
 export interface LoggingCategoryDefinition {
-  name : string;
-  description : string;
+  name: string;
+  description: string;
 }
 
 interface ComponentLogRecord {
-  id : string;
-  definition : ComponentLogDefinition;
-  loggingEventDefinitions : {}
-  automaticallyCreated? : boolean; // Needs to be added to the central repository
+  id: string;
+  definition: ComponentLogDefinition;
+  loggingEventDefinitions: {}
+  automaticallyCreated?: boolean; // Needs to be added to the central repository
 }
 
-interface LoggingEventRecord {
-  id : string;
-  definition : ComponentLogDefinition;
-//  componentLogRecord : ComponentLogRecord;
-  enabled : boolean;
-  automaticallyCreated? : boolean; // Needs to be added to the central repository
+export interface LoggingEventRecord {
+  id: string;
+  definition: ComponentLogDefinition;
+  //  componentLogRecord : ComponentLogRecord;
+  enabled: boolean;
+  automaticallyCreated?: boolean; // Needs to be added to the central repository
 }
 
 interface LoggingCategoryRecord {
-  id : string;
-  definition : ComponentLogDefinition;
-  loggingEventDefinitions : {[loggingEventId : string] : LoggingEventRecord};
-  automaticallyCreated? : boolean; // Needs to be added to the central repository
+  id: string;
+  definition: ComponentLogDefinition;
+  loggingEventDefinitions: { [loggingEventId: string]: LoggingEventRecord };
+  automaticallyCreated?: boolean; // Needs to be added to the central repository
 }
 
 export class KLogger {
   public logger: any;
 
-  private static singleton : KLogger;
+  private static singleton: KLogger;
 
-  componentRegistry : { [nameString:string] : ComponentLogRecord } = {};
-  loggingEventRegistry : { [nameString:string] : LoggingEventRecord } = {};
-  loggingCategoryRegistry : { [nameString:string] : LoggingCategoryRecord } = {};
+  componentRegistry: { [nameString: string]: ComponentLogRecord } = {};
+  loggingEventRegistry: { [nameString: string]: LoggingEventRecord } = {};
+  loggingCategoryRegistry: { [nameString: string]: LoggingCategoryRecord } = {};
+
+  loggingEventSubject: BehaviorSubject<{ [nameString: string]: LoggingEventRecord }> = new BehaviorSubject<{ [nameString: string]: LoggingEventRecord }>(undefined)
 
   private showAllErrors: boolean = true;
 
   constructor() {
-    if (!KLogger.singleton){
+    if (!KLogger.singleton) {
       KLogger.singleton = this;
       this.createLogger();
     }
@@ -72,18 +76,18 @@ export class KLogger {
 
   getComponentId(componentName: string): string {
     let componentId = undefined;
-    let componentRecord : ComponentLogRecord = this.componentRegistry[componentName];
+    let componentRecord: ComponentLogRecord = this.componentRegistry[componentName];
 
     if (!componentRecord) {
       // Component record was not found, create one and flag for registration
       componentRecord = {
-        id : '<'+ componentName +'>',
-        definition : {
-          name:componentName,
-          description: "Component record for: " + componentName 
+        id: '<' + componentName + '>',
+        definition: {
+          name: componentName,
+          description: "Component record for: " + componentName
         },
-        loggingEventDefinitions : {},
-        automaticallyCreated : true      
+        loggingEventDefinitions: {},
+        automaticallyCreated: true
       }
       this.componentRegistry[componentName] = componentRecord;
     }
@@ -93,36 +97,37 @@ export class KLogger {
 
   getEventId(componentId: string, eventName: string): string {
     let eventId = undefined;
-    let loggingEventRecord : LoggingEventRecord = this.loggingEventRegistry[eventName];
+    let loggingEventRecord: LoggingEventRecord = this.loggingEventRegistry[eventName];
 
     if (!loggingEventRecord) {
       // LoggingEvent record was not found, create one and flag for registration
 
       loggingEventRecord = {
-        id : '['+ eventName +']',
-        definition : {
+        id: '[' + eventName + ']',
+        definition: {
           name: eventName,
           description: "Event Logging record for: " + componentId + ' - ' + eventName
         },
         // loggingEventDefinitions : {},
-        enabled : true,  // Will need to be looked up in the future
-        automaticallyCreated : true      
+        enabled: true,  // Will need to be looked up in the future
+        automaticallyCreated: true
       }
       this.loggingEventRegistry[eventName] = loggingEventRecord;
+      this.loggingEventSubject.next(this.loggingEventRegistry)
     }
 
     return loggingEventRecord.id;
   }
 
-  getCategoryId(categoryName: string) : string {
+  getCategoryId(categoryName: string): string {
     return "DONT_DO_THIS_YET";
   }
 
-  associateCategoryToEvent(categoryId, eventId) : never {
+  associateCategoryToEvent(categoryId, eventId): never {
     throw "dont_do_this_yet";
   }
 
-  log(eventId : string, infoObject?: any) {
+  log(eventId: string, infoObject?: any) {
     console.log(eventId);
     if (infoObject) {
       console.log(infoObject);
@@ -146,11 +151,11 @@ export class KLogger {
     }
   }
 
-  setLogCategories() {
-
+  registerLogEvents() {
+    this.loggingEventSubject.next(this.loggingEventRegistry)
   }
 
-  getLogCategories() {
-
+  getLogEvents() {
+    return this.loggingEventSubject;
   }
 }

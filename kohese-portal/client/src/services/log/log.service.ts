@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
-import { KLogger } from "../../../../common/src/k-logger";
+import { KLogger, LoggingEventRecord } from "../../../../common/src/k-logger";
+import { Subscription } from "rxjs";
 
 export interface LogCategory {
   description : string, 
@@ -17,9 +18,15 @@ export interface LogInformation {
 export class LogService {
   logger: KLogger;
   componentMap : {};
+  logEvents : {[nameString:string] : LoggingEventRecord}
+  logEventsSub : Subscription
 
   constructor() {
     this.logger = new KLogger();
+    this.logEventsSub = this.logger.getLogEvents().subscribe((newLogEvents)=>{
+      this.logEvents = newLogEvents;
+      console.log(this.logEvents);
+    })
   }
 
   getComponentId(componentName: string): string {
@@ -40,5 +47,9 @@ export class LogService {
 
   error(logInfo : LogInformation, infoObject? : any) {
     this.logger.error(logInfo, infoObject);
+  }
+
+  getLogEvents() {
+    return this.logEvents;
   }
 }

@@ -60,3 +60,6 @@ import { LogService } from "./log/log.service";
   ]
 })
 export class ServicesModule {}
+
+// Log Events 
+import { InitializeLogs } from './item-repository/item-repository.registry'

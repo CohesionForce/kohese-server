@@ -1,0 +1,10 @@
+<mat-tab-group>
+  <mat-tab label="Logging">
+    <mat-selection-list>
+      <mat-list-option *ngFor="let logKey of logEvents | mapKey" matTooltip="{{logEvents[logKey].definition.description}}">
+        {{logEvents[logKey].definition.name}}
+      </mat-list-option>
+    </mat-selection-list>
+  </mat-tab>
+  <mat-tab label="Feature switch"></mat-tab>
+</mat-tab-group>
