@@ -454,15 +454,29 @@ function KIOItemServer(socket){
     console.log(request);
 
     var proxy = ItemProxy.getWorkingTree().getProxyFor(request.id);
-    proxy.deleteItem(request.recursive);
 
-    console.log('Deleted %s #%s#', request.kind, request.id);
+    if (proxy){
+      proxy.deleteItem(request.recursive);
 
-    sendResponse({
-      deleted: 'true',
-      kind: request.kind,
-      id: request.id
-    });
+      console.log('::: Deleted %s #%s#', request.kind, request.id);
+
+      sendResponse({
+        deleted: 'true',
+        kind: request.kind,
+        id: request.id
+      });
+
+    } else {
+
+      console.log('::: Item already Deleted %s #%s#', request.kind, request.id);
+
+      sendResponse({
+        deleted: 'true',
+        kind: request.kind,
+        id: request.id
+      });
+
+    }
 
   });
 
