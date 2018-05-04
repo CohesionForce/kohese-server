@@ -25,6 +25,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExploreModule } from './components/explore/explore.module';
+import { StateMachineEditorModule } from './components/state-machine-editor/state-machine-editor.module';
 import { TreeViewModule } from './components/tree/tree.module'
 
 import { ToastrModule } from 'ngx-toastr';
@@ -70,6 +71,7 @@ import { LensModule } from './components/lens/lens.module';
     DashboardModule,
     CompareItemsModule,
     ExploreModule,
+    StateMachineEditorModule,
     TreeViewModule,
     LensModule
   ],

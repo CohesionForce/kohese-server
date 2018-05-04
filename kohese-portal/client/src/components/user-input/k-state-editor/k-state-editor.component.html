@@ -5,11 +5,11 @@
       <label>{{fieldName}}: {{itemProxy.item[fieldName]}}</label>
       <br/>
       <button mat-raised-button class="state-button"
-        *ngFor="let candidate of transitionCandidates[fieldName]"
-        matTooltip="{{koheseType.fields[fieldName].properties.state[candidate.target].description}}"
+        *ngFor="let candidateId of (transitionCandidates[fieldName] | mapKey)"
+        matTooltip="{{koheseType.fields[fieldName].properties.state[transitionCandidates[fieldName][candidateId].target].description}}"
         [disabled]="disableTransitioning"
-        (click)="openTransitionDialog(fieldName, candidate.target)">
-        {{koheseType.fields[fieldName].properties.state[candidate.target].name}}
+        (click)="openTransitionDialog(fieldName, transitionCandidates[fieldName][candidateId].target)">
+        {{candidateId}}
       </button>
     </div>
   </ng-container>

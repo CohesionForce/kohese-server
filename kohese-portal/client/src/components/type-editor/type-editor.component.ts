@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
-import { DialogService } from '../../services/dialog/dialog.service';
+import { DialogService,
+  DialogComponent } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
@@ -63,8 +64,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
   }
 
   add(): void {
-    this.dialogService.openInputDialog('Add Type', '', this.dialogService.
-      INPUT_TYPES.TEXT, 'Name').afterClosed().subscribe((name: string) => {
+    this.dialogService.openInputDialog('Add Type', '', DialogComponent.
+      INPUT_TYPES.TEXT, 'Name', '').afterClosed().subscribe((name: string) => {
       if (name) {
         let dataModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
           buildItem('KoheseModel', {

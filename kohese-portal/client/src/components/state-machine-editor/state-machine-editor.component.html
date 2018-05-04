@@ -1,0 +1,125 @@
+<div style="height: 100%; width: 100%;">
+  <h2 mat-dialog-title style="height: 7%; width: 100%;">
+    State Machine Editor
+  </h2>
+  <div style="height: 83%; width: 100%; display: flex; flex-direction: column;">
+    <h3 style="text-align: center;">
+      Source State
+    </h3>
+    <div style="display: flex; flex-direction: row; align-items: center;">
+      <h3 style="writing-mode: tb-rl; transform: rotate(180deg)">
+        Target State
+      </h3>
+      <mat-table [dataSource]="tableDataSource" style="flex: 1 1 auto;">
+        <ng-container matColumnDef="{{LEFTMOST_COLUMN_ID}}">
+          <mat-header-cell *matHeaderCellDef matTooltip="Add a new state"
+            style="display: flex; justify-content: center;">
+            <button mat-icon-button (click)="addState()">
+              <mat-icon class="fa fa-plus"></mat-icon>
+            </button>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let stateId"
+            matTooltip="{{stateMachine.state[stateId].description}}">
+            <button mat-button [matMenuTriggerFor]="stateRowMenu">
+              {{stateId}}
+            </button>
+            <mat-menu #stateRowMenu [overlapTrigger]="false">
+              <button mat-menu-item (click)="editState(stateId, 'description')">
+                <mat-icon class="fa fa-edit"></mat-icon>
+                Edit Description...
+              </button>
+              <button mat-menu-item (click)="editState(stateId, 'name')">
+                Rename...
+              </button>
+              <button mat-menu-item (click)="deleteState(stateId)">
+                <mat-icon class="fa fa-trash"></mat-icon>
+                Delete
+              </button>
+            </mat-menu>
+          </mat-cell>
+        </ng-container>
+        <ng-container *ngFor="let columnStateId of stateIds">
+          <ng-container matColumnDef="{{columnStateId}}">
+            <mat-header-cell *matHeaderCellDef
+              matTooltip="{{stateMachine.state[columnStateId].description}}"
+              style="display: flex; justify-content: center;">
+              <button mat-button [matMenuTriggerFor]="stateColumnMenu">
+                {{columnStateId}}
+              </button>
+              <mat-menu #stateColumnMenu [overlapTrigger]="false">
+                <button mat-menu-item (click)="editState(columnStateId, 'description')">
+                  <mat-icon class="fa fa-edit"></mat-icon>
+                  Edit Description...
+                </button>
+                <button mat-menu-item (click)="editState(columnStateId, 'name')">
+                  Rename...
+                </button>
+                <button mat-menu-item (click)="deleteState(columnStateId)">
+                  <mat-icon class="fa fa-trash"></mat-icon>
+                  Delete
+                </button>
+              </mat-menu>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let rowStateId"
+              style="display: flex; justify-content: center;"
+              matTooltip="{{getTransitionId(columnStateId, rowStateId)}}">
+              <button mat-button [matMenuTriggerFor]="transitionMenu">
+                <ng-container *ngIf="getTransitionId(columnStateId, rowStateId)">
+                  <span>X</span>
+                </ng-container>
+                <ng-container *ngIf="!getTransitionId(columnStateId, rowStateId)">
+                  <span>&nbsp;</span>
+                </ng-container>
+              </button>
+              <mat-menu #transitionMenu [overlapTrigger]="false">
+                <ng-container *ngIf="!getTransitionId(columnStateId, rowStateId)">
+                  <button mat-menu-item (click)="addTransition(columnStateId, rowStateId)">
+                    <mat-icon class="fa fa-plus"></mat-icon>
+                    Add Transition...
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="getTransitionId(columnStateId, rowStateId)">
+                  <button mat-menu-item
+                    (click)="editTransition(getTransitionId(columnStateId, rowStateId), '')">
+                    Rename...
+                  </button>
+                  <button mat-menu-item
+                    (click)="editTransition(getTransitionId(columnStateId, rowStateId), 'source')">
+                    Change Source...
+                  </button>
+                  <button mat-menu-item
+                    (click)="editTransition(getTransitionId(columnStateId, rowStateId), 'target')">
+                    Change Target...
+                  </button>
+                  <button mat-menu-item [disabled]="true">
+                    Specify Conditions...
+                  </button>
+                  <button mat-menu-item
+                    (click)="deleteTransition(getTransitionId(columnStateId, rowStateId))">
+                    <mat-icon class="fa fa-trash"></mat-icon>
+                    Delete
+                  </button>
+                </ng-container>
+              </mat-menu>
+            </mat-cell>
+          </ng-container>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+        <mat-row *matRowDef="let rowStateId; columns: columns"></mat-row>
+      </mat-table>
+    </div>
+  </div>
+  <ng-container *ngIf="data">
+    <mat-dialog-actions
+      style="height: 10%; width: 100%; display: flex; flex-direction: column;">
+      <span class="flex-right-align">
+        <button mat-raised-button [mat-dialog-close]="stateMachine">
+          Apply
+        </button>
+        <button mat-raised-button [mat-dialog-close]="">
+          Cancel
+        </button>
+      </span>
+    </mat-dialog-actions>
+  </ng-container>
+</div>

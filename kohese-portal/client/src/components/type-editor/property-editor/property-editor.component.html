@@ -3,7 +3,7 @@
     <split direction="horizontal">
       <split-area id="propertyListSplitArea" [size]="33"
         [visible]="showSplitPanes">
-        <button mat-icon-button id="addButton" (click)="add()"
+        <button mat-icon-button class="flex-right-align" (click)="add()"
           [disabled]="koheseType.dataModelProxy.item.isMetaModel">
           <mat-icon class="fa fa-plus"></mat-icon>
         </button>
@@ -11,7 +11,7 @@
           <mat-list-item
             *ngFor="let propertyId of (koheseType.dataModelProxy.item.properties | mapKey)">
             {{propertyId}}
-            <span class="list-item-button-span">
+            <span class="flex-right-align">
               <button mat-icon-button
                 [ngClass]="{ 'highlight': (selectedPropertyId === propertyId) }"
                 (click)="selectedPropertyId = propertyId">
@@ -43,6 +43,14 @@
                 </mat-select>
               </mat-form-field>
               <br/>
+              <ng-container
+                *ngIf="'StateMachine' === koheseType.fields[selectedPropertyId].type">
+                <button mat-raised-button (click)="openStateMachineEditor()">
+                  Edit State Machine...
+                </button>
+                <br/>
+                <br/>
+              </ng-container>
               <mat-checkbox
                 [ngModel]="koheseType.fields[selectedPropertyId].id"
                 (ngModelChange)="updateProperty(['id'], $event)"

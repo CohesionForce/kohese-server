@@ -38,7 +38,7 @@
           }
         },
         "transition": {
-          "assignAnalysis": {
+          "Assign Analysis": {
             "source": "Observed",
             "target": "InAnalysis",
             "guard": {},
@@ -46,24 +46,24 @@
               "analysisAction"
             ]
           },
-          "noActionRequired": {
+          "No Action Required": {
             "source": "InAnalysis",
             "target": "NoAction",
             "guard": {}
           },
-          "duplicateOf": {
+          "Mark As Duplicate": {
             "source": "InAnalysis",
             "target": "Duplicate",
             "guard": {},
             "requires": "relatedIssues"
           },
-          "requiresAction": {
+          "Requires Action": {
             "source": "InAnalysis",
             "target": "RequiresAction",
             "guard": {},
             "requires": "resolutionActions"
           },
-          "resolve": {
+          "Resolve": {
             "source": "RequiresAction",
             "target": "Resolved",
             "guard": {

@@ -14,12 +14,12 @@ export class StateService {
     for (let fieldName in type.fields) {
       let fieldValue: any = type.fields[fieldName];
       if ('StateMachine' === fieldValue.type) {
-        transitionCandidates[fieldName] = [];
+        transitionCandidates[fieldName] = {};
         for (let transitionKey in fieldValue.properties.transition) {
           let transition: any = fieldValue.properties.
             transition[transitionKey];
           if (proxy.item[fieldName] === transition.source) {
-            transitionCandidates[fieldName].push(transition);
+            transitionCandidates[fieldName][transitionKey] = transition;
           }
         }
       }

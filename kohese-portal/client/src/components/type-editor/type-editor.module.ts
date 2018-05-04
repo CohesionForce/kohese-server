@@ -8,6 +8,7 @@ import { IconSelectorComponent } from './icon-selector/icon-selector.component';
 
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
+import { StateMachineEditorModule } from '../state-machine-editor/state-machine-editor.module';
 
 import { AngularSplitModule } from 'angular-split';
 
@@ -26,7 +27,8 @@ import { AngularSplitModule } from 'angular-split';
     FormsModule,
     MaterialModule,
     PipesModule,
-    AngularSplitModule
+    AngularSplitModule,
+    StateMachineEditorModule
   ]
 })
 export class TypeEditorModule {
