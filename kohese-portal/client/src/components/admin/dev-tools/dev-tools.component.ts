@@ -7,12 +7,24 @@ import { LogService } from '../../../services/log/log.service';
   styleUrls: ['./dev-tools.component.css']
 })
 export class DevToolsComponent implements OnInit {
-  logEvents : any;
+  logEvents: any;
+  selectedLogEvents: any;
 
-  constructor(private logService : LogService) { }
+  constructor(private logService: LogService) { }
 
   ngOnInit() {
-    this.logEvents = this.logService.getLogEvents()
+    this.logEvents = this.logService.getLogEvents();
+    this.logEvents = Object.keys(this.logEvents.map((key) => {
+      return [this.logEvents[key]]
+    })
+    )
+
+    this.logService.getLogEventsSubscription().subscribe((logEvents) => {
+      this.selectedLogEvents = logEvents;
+    })
   }
 
+  saveLogSelections() {
+    this.logService.saveLogEventsSubscription(this.selectedLogEvents);
+  }
 }

@@ -1,10 +1,15 @@
 <mat-tab-group>
   <mat-tab label="Logging">
-    <mat-selection-list>
-      <mat-list-option *ngFor="let logKey of logEvents | mapKey" matTooltip="{{logEvents[logKey].definition.description}}">
+    <mat-selection-list style="height: 700px; overflow: auto; width: 50%" [(ngModel)]="selectedLogEvents">
+      <mat-list-option *ngFor="let logKey of logEvents | mapKey" matTooltip="{{logEvents[logKey].definition.description}}" [value]="logEvents[logKey]">
         {{logEvents[logKey].definition.name}}
       </mat-list-option>
     </mat-selection-list>
+    <button mat-raised-button (click)="saveLogSelections(logEventList)">
+      Save Log Selections
+    </button>
   </mat-tab>
-  <mat-tab label="Feature switch"></mat-tab>
+  <mat-tab label="Feature switch">
+    Not yet implemented
+  </mat-tab>
 </mat-tab-group>

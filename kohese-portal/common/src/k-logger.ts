@@ -35,8 +35,6 @@ interface ComponentLogRecord {
 export interface LoggingEventRecord {
   id: string;
   definition: ComponentLogDefinition;
-  //  componentLogRecord : ComponentLogRecord;
-  enabled: boolean;
   automaticallyCreated?: boolean; // Needs to be added to the central repository
 }
 
@@ -57,12 +55,16 @@ export class KLogger {
   loggingCategoryRegistry: { [nameString: string]: LoggingCategoryRecord } = {};
 
   loggingEventSubject: BehaviorSubject<{ [nameString: string]: LoggingEventRecord }> = new BehaviorSubject<{ [nameString: string]: LoggingEventRecord }>(undefined)
-
+  subscribedLogEvents : any;
+  
   private showAllErrors: boolean = true;
 
-  constructor() {
+  constructor(logEventSubscription? : any) {
     if (!KLogger.singleton) {
       KLogger.singleton = this;
+      if (logEventSubscription) {
+        this.subscribedLogEvents = logEventSubscription;
+      }
       this.createLogger();
     }
     return KLogger.singleton;
@@ -109,7 +111,6 @@ export class KLogger {
           description: "Event Logging record for: " + componentId + ' - ' + eventName
         },
         // loggingEventDefinitions : {},
-        enabled: true,  // Will need to be looked up in the future
         automaticallyCreated: true
       }
       this.loggingEventRegistry[eventName] = loggingEventRecord;

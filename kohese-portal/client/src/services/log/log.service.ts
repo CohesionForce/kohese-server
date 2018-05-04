@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { KLogger, LoggingEventRecord } from "../../../../common/src/k-logger";
-import { Subscription } from "rxjs";
+import { Subscription, BehaviorSubject } from "rxjs";
 
 export interface LogCategory {
   description : string, 
@@ -20,9 +20,17 @@ export class LogService {
   componentMap : {};
   logEvents : {[nameString:string] : LoggingEventRecord}
   logEventsSub : Subscription
+  subscribedLogEvents : any;
+  subscribedLogEventsSubject : BehaviorSubject<any>;
 
   constructor() {
-    this.logger = new KLogger();
+    let subscriptionString = localStorage.getItem('subscribedLogEvents');
+    if (subscriptionString) {
+      this.subscribedLogEvents = JSON.parse(subscriptionString);
+    }
+    this.subscribedLogEventsSubject = new BehaviorSubject<any>(this.subscribedLogEvents);
+
+    this.logger = new KLogger(this.subscribedLogEvents);
     this.logEventsSub = this.logger.getLogEvents().subscribe((newLogEvents)=>{
       this.logEvents = newLogEvents;
       console.log(this.logEvents);
@@ -51,5 +59,13 @@ export class LogService {
 
   getLogEvents() {
     return this.logEvents;
+  }
+
+  saveLogEventsSubscription (selectedEvents : any ) {
+    localStorage.setItem('subscribedLogEvents', JSON.stringify(selectedEvents));
+  }
+
+  getLogEventsSubscription () {
+    return this.subscribedLogEventsSubject;
   }
 }
