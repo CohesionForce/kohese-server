@@ -50,9 +50,9 @@ export class KLogger {
 
   private static singleton : KLogger;
 
-  componentRegistry : { [nameString:string] : ComponentLogRecord };
-  loggingEventRegistry : { [nameString:string] : LoggingEventRecord };
-  loggingCategoryRegistry : { [nameString:string] : LoggingCategoryRecord };
+  componentRegistry : { [nameString:string] : ComponentLogRecord } = {};
+  loggingEventRegistry : { [nameString:string] : LoggingEventRecord } = {};
+  loggingCategoryRegistry : { [nameString:string] : LoggingCategoryRecord } = {};
 
   private showAllErrors: boolean = true;
 

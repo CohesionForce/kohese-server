@@ -85,7 +85,7 @@ export class ItemRepository {
 
     ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
 
-      this.logService.log(this.logEvents.receivedNofificationOfChangeEvent, { change: change });
+      this.logService.log(this.logEvents.receivedNofificationOfChange, { change: change });
 
       switch (change.type) {
         case 'loaded':
