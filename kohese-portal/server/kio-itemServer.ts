@@ -173,31 +173,22 @@ function KIOItemServer(socket){
     let itemCache = TreeConfiguration.getItemCache();
     let objectMap = itemCache.getObjectMap();
 
+    console.log('### Preparing BulkCacheUpdate');
+    for (let key in objectMap) {
+      console.log('### Sending BulkCacheUpdate for key: ' + key);
+      let bulkUpdateMessage = {};
+      bulkUpdateMessage[key] = objectMap[key];
+      socket.emit('Item/BulkCacheUpdate', bulkUpdateMessage);
+    }
+    console.log('### Sent BulkCacheUpdate');
+
     let response = {
       timestamp: {
         requestTime: request.timestamp.requestTime,
         requestReceiptTime: requestReceiptTime,
         responseTransmitTime: null
-      },
-      objectMap: objectMap
-      // {
-      //   commit: objectMap.commit,
-      //   tree: objectMap.tree
-      // }
+      }
     };
-
-    // let treeIdx = 0;
-    // let keyCount = 0;
-    // response.objectMap.treeSlice[0] = {};
-    // for (let key in objectMap.tree){
-    //   response.objectMap.treeSlice[treeIdx][key] = objectMap.tree[key];
-    //   keyCount++;
-    //   if(keyCount === 500){
-    //     keyCount = 0;
-    //     treeIdx++;
-    //     response.objectMap.treeSlice[treeIdx] = {};
-    //   }
-    // }
 
     response.timestamp.responseTransmitTime = Date.now();
 
