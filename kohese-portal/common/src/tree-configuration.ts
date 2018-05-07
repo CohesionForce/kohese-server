@@ -4,9 +4,9 @@ import { Subject } from 'rxjs';
 import * as  _ from 'underscore';
 
 
-let treeConfigMap = {};
-let workingTree;
-let stagedTree;
+let treeConfigMap : { [treeId:string] : TreeConfiguration } = {};
+let workingTree : TreeConfiguration;
+let stagedTree : TreeConfiguration;
 
 // Forward declare KoheseModel while waiting for registration to occur
 let KoheseModelDefn;

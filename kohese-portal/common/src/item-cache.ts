@@ -6,9 +6,23 @@
 
 import * as   _ from 'underscore';
 import { ItemProxy } from './item-proxy';
+import { TreeHashEntry } from './tree-hash';
+
 
 // TODO set back to false and/or remove disable check below
 const disableObjectFreeze = false;
+
+class KoheseCommit {
+  time: number;
+  author: string;
+  message: string;
+  parents?: Array<string>;
+  repoTreeRoots: { [ key : string ] : TreeHashEntry };
+}
+
+type KoheseTree = TreeHashEntry;
+
+type Blob = any;
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -29,9 +43,9 @@ export class ItemCache {
 
   public refs;
   public tags;
-  public kCommitMap;
-  public kTreeMap;
-  public blobMap;
+  public kCommitMap : { [ oid : string ]: KoheseCommit};
+  public kTreeMap : { [ oid : string ]: KoheseTree};
+  public blobMap : { [ oid : string ]: Blob};
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -132,7 +146,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  cacheCommit(oid, commit){
+  cacheCommit(oid : string, commit : KoheseCommit){
     Object.freeze(commit);
     this.kCommitMap[oid] = commit;
   }
@@ -140,7 +154,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getCommit(oid){
+  getCommit(oid : string){
     return this.kCommitMap[oid];
   }
 
