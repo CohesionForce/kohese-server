@@ -7,7 +7,7 @@ import * as  _ from 'underscore';
 import * as jsSHA_Import from 'jssha';
 import * as uuidV1_Import from 'uuid/v1';
 import { TreeConfiguration } from './tree-configuration';
-import { TreeHashEntry } from './tree-hash';
+import { TreeHashEntry, TreeHashMap } from './tree-hash';
 
 //
 // Adjust for the differences in CommonJS and ES6 for jssha
@@ -805,7 +805,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getTreeHashMap() {
+  getTreeHashMap() : TreeHashMap {
     var treeHashMap = {};
     this.visitTree({excludeKind : ['Repository', 'Internal']}, (proxy) => {
       treeHashMap [proxy.item.id] = proxy.treeHashEntry;

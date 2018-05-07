@@ -1,6 +1,6 @@
 import { ItemProxy } from '../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../common/src/tree-configuration'
-import { TreeHashEntry } from '../../../common/src/tree-hash';
+import { TreeHashEntry, TreeHashMap } from '../../../common/src/tree-hash';
 import { KoheseModel } from '../../../common/src/KoheseModel';
 describe('ItemProxy Test', function () {
 
@@ -1093,7 +1093,7 @@ describe('ItemProxy Test', function () {
       }
     };
 
-  var thmCompare = TreeConfiguration.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
+  var thmCompare = TreeHashMap.compare(expectedTreeHashMap, treeHashMap);
   if (!thmCompare.match) {
     console.log('Tree Map');
     console.log(treeHashMap);
@@ -1216,7 +1216,7 @@ it('Retrieve Delta Tree Hash Map', () => {
 
   var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
 
-  var thmCompare = TreeConfiguration.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
+  var thmCompare = TreeHashMap.compare(treeHashMapBefore, treeHashMapAfter);
 
 
   let ipStack = [ 'ROOT' ];

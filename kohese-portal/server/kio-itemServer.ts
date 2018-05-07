@@ -1,5 +1,6 @@
 import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
+import { TreeHashMap } from '../common/src/tree-hash';
 
 var kio = require('./koheseIO.js');
 var kdb = require('./kdb.js');
@@ -213,7 +214,7 @@ function KIOItemServer(socket){
 
     // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
 
-    // var thmCompare = TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+    // var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
 
     // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
 
@@ -282,7 +283,7 @@ function KIOItemServer(socket){
         // Send deltas to client
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
-        var thmCompare = TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+        var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
 //        console.log(thmCompare);
 
         response = {
