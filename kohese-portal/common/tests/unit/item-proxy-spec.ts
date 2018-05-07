@@ -1298,7 +1298,8 @@ it('Retrieve Delta Tree Hash Map', () => {
     console.log(err);
     console.log(err.stack);
   }
-  console.log(JSON.stringify(newCompare, null, '  '));
+  console.log('$$$ New compare match: ' + newCompare.match);
+  console.log(JSON.stringify(newCompare.summary, null, '  '));
 
   let expectedCompareResult = {
     'match': false,
@@ -1470,8 +1471,6 @@ it('Retrieve Delta Tree Hash Map', () => {
     }
   };
 
-  console.log('$$$ thm compare');
-  console.log(JSON.stringify(thmCompare,null, '  '));
   expect(newCompare).toEqual(expectedCompareResult);
   expect(thmCompare).toEqual(expectedDeltaMap);
 });
