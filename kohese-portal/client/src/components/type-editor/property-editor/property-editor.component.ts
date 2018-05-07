@@ -68,9 +68,16 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     return this._types;
   }
   
+  // Work-around for angular-split defect
   private _showSplitPanes: boolean = false;
   get showSplitPanes() {
     return this._showSplitPanes;
+  }
+  set showSplitPanes(showSplitPanes: boolean) {
+    setTimeout(() => {
+      this._showSplitPanes = true;
+      this._changeDetectorRef.markForCheck();
+    });
   }
   
   private _koheseTypeStreamSubscription: Subscription;
@@ -100,11 +107,6 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       this._koheseType = koheseType;
       this._changeDetectorRef.markForCheck();
     });
-    
-    setTimeout(() => {
-      this._showSplitPanes = true;
-      this._changeDetectorRef.markForCheck();
-    }, 1500);
   }
   
   public ngOnDestroy(): void {
