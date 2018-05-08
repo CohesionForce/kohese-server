@@ -1214,96 +1214,14 @@ it('Retrieve Delta Tree Hash Map', () => {
     }
   };
 
-  var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
-
-  var thmCompare = TreeHashMap.compare(treeHashMapBefore, treeHashMapAfter);
-
-
-  let ipStack = [ 'ROOT' ];
-  let newCompare = {
-    match: true,
-    summary: {
-      kindChanged: {},
-      contentChanged: {},
-      parentChanged: {},
-      itemAdded: {},
-      itemDeleted: {},
-    },
-    details: {}
-  };
-  console.log('$$$ Calling new diff');
-  try {
-    while (ipStack.length){
-      let diffId = ipStack.pop();
-      let diff = TreeHashEntry.diff(treeHashMapBefore[diffId], treeHashMapAfter[diffId]);
-      newCompare.details[diffId] = diff;
-
-      if (!diff.match){
-        newCompare.match = false;
-      }
-
-      if (diff.kindChanged){
-        newCompare.summary.kindChanged[diffId] = {
-          fromOID :diff.kindChanged.fromKind,
-          toOID: diff.kindChanged.toKind
-        };
-      }
-
-      if (diff.contentChanged){
-        newCompare.summary.contentChanged[diffId] = {
-          fromOID :diff.contentChanged.fromOID,
-          toOID: diff.contentChanged.toOID
-        };
-      }
-
-      if (diff.parentChanged){
-        newCompare.summary.parentChanged[diffId] = {
-          fromParentId :diff.parentChanged.fromId,
-          toParentId: diff.parentChanged.toId
-        };
-      }
-
-      if (diff.childrenAdded){
-        diff.childrenAdded.forEach((addedChild) => {
-          if (newCompare.summary.itemDeleted[addedChild.id]){
-            // Child was moved
-            delete newCompare.summary.itemDeleted[addedChild.id];
-            ipStack.push(addedChild.id);
-          } else {
-            // Child was added
-            newCompare.summary.itemAdded[addedChild.id] = addedChild.treeId;
-          }
-        });
-      }
-
-      if (diff.childrenDeleted){
-        diff.childrenDeleted.forEach((deletedChild) => {
-          if (newCompare.summary.itemAdded[deletedChild.id]){
-            // Child was moved
-            delete newCompare.summary.itemAdded[deletedChild.id];
-            ipStack.push(deletedChild.id);
-          } else {
-            newCompare.summary.itemDeleted[deletedChild.id] = deletedChild.treeId;
-          }
-        });
-      }
-
-      if (diff.childrenModified){
-        diff.childrenModified.forEach((modifiedChild) => {
-          ipStack.push(modifiedChild.id);
-        });
-      }
-    }
-  } catch (err){
-    console.log(err);
-    console.log(err.stack);
-  }
-  console.log('$$$ New compare match: ' + newCompare.match);
-  console.log(JSON.stringify(newCompare.summary, null, '  '));
-
   let expectedCompareResult = {
     'match': false,
     'summary': {
+      'roots': {
+        'added': [],
+        'deleted': [],
+        'common': ['ROOT']
+      },
       'kindChanged': {},
       'contentChanged': {
         'C': {
@@ -1381,17 +1299,6 @@ it('Retrieve Delta Tree Hash Map', () => {
           }
         ]
       },
-      'C': {
-        'match': false,
-        'treeHashChanged': {
-          'fromTreeId': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
-          'toTreeId': '51f07bc8e0eb82b241784709669f186aee2c3989'
-        },
-        'contentChanged': {
-          'fromOID': '3cfa883acec0a529b941b02a57f4187bece8263d',
-          'toOID': 'ba5a2c063c02084c658ab77309d6c25ce1e128e2'
-        }
-      },
       'A': {
         'match': false,
         'treeHashChanged': {
@@ -1467,9 +1374,25 @@ it('Retrieve Delta Tree Hash Map', () => {
           'fromId': 'A',
           'toId': 'AB'
         }
+      },
+      'C': {
+        'match': false,
+        'treeHashChanged': {
+          'fromTreeId': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
+          'toTreeId': '51f07bc8e0eb82b241784709669f186aee2c3989'
+        },
+        'contentChanged': {
+          'fromOID': '3cfa883acec0a529b941b02a57f4187bece8263d',
+          'toOID': 'ba5a2c063c02084c658ab77309d6c25ce1e128e2'
+        }
       }
     }
   };
+
+  var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
+
+  var thmCompare = TreeHashMap.compare(treeHashMapBefore, treeHashMapAfter);
+  let newCompare = TreeHashMap.diff(treeHashMapBefore, treeHashMapAfter);
 
   expect(newCompare).toEqual(expectedCompareResult);
   expect(thmCompare).toEqual(expectedDeltaMap);

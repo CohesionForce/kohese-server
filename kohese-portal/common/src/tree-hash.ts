@@ -6,7 +6,177 @@ export type ItemIdType = string;
 export class TreeHashMap {
   [id:string] : TreeHashEntry
 
-    //////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static diff(left : TreeHashMap, right : TreeHashMap){
+
+    let leftRoots : Array<ItemIdType> = [ Object.keys(left)[0] ];
+    for (let itemId in left){
+      let entry :TreeHashEntry = left[itemId];
+
+      switch (entry.kind){
+        case "Repository":
+        case "Internal":
+          leftRoots.push(itemId);
+      }
+    }
+
+    let rightRoots : Array<ItemIdType> = [ Object.keys(right)[0] ];
+    for (let itemId in right){
+      let entry :TreeHashEntry = right[itemId];
+
+      switch (entry.kind){
+        case "Repository":
+        case "Internal":
+        rightRoots.push(itemId);
+      }
+    }
+
+    leftRoots = _.uniq(leftRoots);
+    rightRoots = _.uniq(rightRoots);
+    let sortedLeftRoots = _.clone(leftRoots).sort();
+    let sortedRightRoots = _.clone(rightRoots).sort();
+    let addedRoots = _.difference(sortedRightRoots, sortedLeftRoots);
+    let deletedRoots = _.difference(sortedLeftRoots, sortedRightRoots);
+    let commonRoots = _.intersection(leftRoots, rightRoots);
+
+
+    let compareStack : Array<ItemIdType> = _.clone(commonRoots).reverse();
+
+    let result = {
+      match: true,
+      summary: {
+        roots: {
+          added: addedRoots,
+          deleted: deletedRoots,
+          common: commonRoots
+        },
+        kindChanged: {},
+        contentChanged: {},
+        parentChanged: {},
+        itemAdded: {},
+        itemDeleted: {},
+      },
+      details: {}
+    };
+
+    try {
+      while (compareStack.length){
+        let diffId = compareStack.pop();
+
+        let leftVersion = left[diffId];
+        let rightVersion = right[diffId];
+        let diff = TreeHashEntry.diff(leftVersion, rightVersion);
+
+        if (!diff.match){
+          result.details[diffId] = diff;
+          result.match = false;
+        }
+
+        if (diff.kindChanged){
+          result.summary.kindChanged[diffId] = {
+            fromOID :diff.kindChanged.fromKind,
+            toOID: diff.kindChanged.toKind
+          };
+        }
+
+        if (diff.contentChanged){
+          result.summary.contentChanged[diffId] = {
+            fromOID :diff.contentChanged.fromOID,
+            toOID: diff.contentChanged.toOID
+          };
+        }
+
+        if (diff.parentChanged){
+          result.summary.parentChanged[diffId] = {
+            fromParentId :diff.parentChanged.fromId,
+            toParentId: diff.parentChanged.toId
+          };
+        }
+
+        if (diff.childrenAdded){
+          let childrenThatMoved : Array<ItemIdType> = [];
+          diff.childrenAdded.forEach((addedChild) => {
+
+            // Recursively add deleted children that have not been moved
+            let childStack : Array<{id:ItemIdType, treeId:TreeHashValueType}> = [ addedChild ];
+            while (childStack.length > 0){
+
+              let addedEntry = childStack.pop();
+              let addedItem = right[addedEntry.id];
+
+              if (left[addedChild.id]){
+                // Child was moved, add it to the list to get a diff for
+                childrenThatMoved.push(addedEntry.id);
+              } else {
+                // Child was added
+                result.summary.itemAdded[addedEntry.id] = addedEntry.treeId;
+              }
+
+              // Now check it's children
+              let childIds = Object.keys(addedItem.childTreeHashes);
+              if (childIds.length > 0){
+                for(let idx in childIds){
+                  let childId = childIds[idx];
+                  childStack.push({id: childId, treeId: addedItem.childTreeHashes[childId]})
+                }
+              }
+            }
+          });
+
+          // Add any new children that have been moved to the compare stack
+          childrenThatMoved.reverse();
+          childrenThatMoved.forEach((childId) => {
+            compareStack.push(childId);
+          });
+        }
+
+        if (diff.childrenDeleted){
+          diff.childrenDeleted.forEach((deletedChild) => {
+
+            // Recursively add deleted children that have not been moved
+            let childStack : Array<{id:ItemIdType, treeId:TreeHashValueType}> = [ deletedChild ];
+            while (childStack.length > 0){
+
+              let deletedEntry = childStack.pop();
+              let deletedItem = left[deletedEntry.id];
+
+              if (right[deletedChild.id]){
+                // Child was moved, it will be added to diff list where it is added
+              } else {
+                result.summary.itemDeleted[deletedEntry.id] = deletedEntry.treeId;
+
+                // Now check it's children
+                let childIds = Object.keys(deletedItem.childTreeHashes);
+                if (childIds.length > 0){
+                  for(let idx in childIds){
+                    let childId = childIds[idx];
+                    childStack.push({id: childId, treeId: deletedItem.childTreeHashes[childId]})
+                  }
+                }
+              }
+            }
+          });
+        }
+
+        if (diff.childrenModified){
+          let childrenModified = _.clone(diff.childrenModified);
+          childrenModified.reverse();
+          childrenModified.forEach((modifiedChild) => {
+            compareStack.push(modifiedChild.id);
+          });
+        }
+      }
+    } catch (err){
+      console.log(err);
+      console.log(err.stack);
+    }
+
+    return result;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   static compare(fromTHMap : TreeHashMap, toTHMap : TreeHashMap){

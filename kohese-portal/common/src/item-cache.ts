@@ -6,7 +6,7 @@
 
 import * as   _ from 'underscore';
 import { ItemProxy } from './item-proxy';
-import { TreeHashEntry } from './tree-hash';
+import { TreeHashEntry, TreeHashMap, TreeHashValueType } from './tree-hash';
 
 
 // TODO set back to false and/or remove disable check below
@@ -165,6 +165,52 @@ export class ItemCache {
     Object.freeze(tree);
     this.kTreeMap[oid] = tree;
   }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getTreeHashMap(forCommit : string) : TreeHashMap {
+    var treeHashMap = {};
+
+    let commit = this.getCommit(forCommit);
+
+    let treeHashEntryStack : Array<{id:string, treeId:TreeHashValueType}> = [];
+    let reversedRootIds = Object.keys(commit.repoTreeRoots).reverse();
+    for (let repoIdx in reversedRootIds){
+      let repoId = reversedRootIds[repoIdx];
+      treeHashEntryStack.push({id:repoId, treeId:commit.repoTreeRoots[repoId].treeHash});
+    }
+
+    while (treeHashEntryStack.length > 0) {
+      let mapEntry = treeHashEntryStack.pop();
+      let treeHashEntry = this.getTree(mapEntry.treeId)
+
+      if (treeHashEntry) {
+        treeHashMap [mapEntry.id] = treeHashEntry;
+
+        let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
+        for (let childIdx in reversedChildIds){
+          let childId = reversedChildIds[childIdx];
+          let treeId = treeHashEntry.childTreeHashes[childId];
+          if (treeId !== "Repository-Mount")
+          switch (treeId){
+            case "Repository-Mount":
+            case "Internal":
+              // Ignore
+              break;
+            default:
+              treeHashEntryStack.push({id:childId, treeId: treeId});
+          }
+        }
+      } else {
+        console.log('!!! Can not find treeHashEntry for: ' + JSON.stringify(mapEntry));
+      }
+    }
+
+    return treeHashMap;
+  }
+
+
 
   //////////////////////////////////////////////////////////////////////////
   //
