@@ -37,7 +37,7 @@ export class DetailsFormComponent extends NavigatableComponent
   formGroupUpdated = new EventEmitter<FormGroup>();
 
   private initialized : boolean;
-  
+
   private _nonFormFieldMap: Map<string, any> = new Map<string, any>();
   get nonFormFieldMap() {
     return this._nonFormFieldMap;
@@ -93,13 +93,13 @@ export class DetailsFormComponent extends NavigatableComponent
         this.formGroupUpdated.emit(this.formGroup);
       }
     });
-    
+
     this._fieldFilterSubscription = this.fieldFilterStream.subscribe(
       (fieldFilter: Function) => {
       this.formGroup = this.createFormGroup();
       this.formGroupUpdated.emit(this.formGroup);
     });
-    
+
     this.initialized = true;
   }
 
@@ -142,7 +142,7 @@ export class DetailsFormComponent extends NavigatableComponent
       if (includeValidation && currentProperty.required) {
         propertyMap[propertyKey] = [defaultValue, Validators.required];
       } else {
-        propertyMap[propertyKey] = defaultValue;
+        propertyMap[propertyKey] = [defaultValue];
       }
     }
     return propertyMap;
