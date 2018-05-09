@@ -57,16 +57,31 @@ export class TreeHashMap {
         parentChanged: {},
         itemAdded: {},
         itemDeleted: {},
+        itemMissing: {
+          leftMissing: [],
+          rightMissing: []
+        }
       },
       details: {}
     };
 
-    try {
-      while (compareStack.length){
-        let diffId = compareStack.pop();
+    while (compareStack.length){
+      let diffId = compareStack.pop();
+      try {
 
         let leftVersion = left[diffId];
         let rightVersion = right[diffId];
+
+        if (!leftVersion){
+          result.summary.itemMissing.leftMissing.push(diffId);
+        }
+        if(!rightVersion){
+          result.summary.itemMissing.rightMissing.push(diffId);
+        }
+        if(!leftVersion || !rightVersion){
+          continue;
+        }
+
         let diff = TreeHashEntry.diff(leftVersion, rightVersion);
 
         if (!diff.match){
@@ -167,11 +182,11 @@ export class TreeHashMap {
             compareStack.push(modifiedChild.id);
           });
         }
+      } catch (err){
+        console.log('*** Error: ' + err + ' while processing ' + diffId);
+        console.log(err.stack);
       }
-    } catch (err){
-      console.log(err);
-      console.log(err.stack);
-    }
+        }
 
     return result;
   }
@@ -278,6 +293,16 @@ export class TreeHashEntry {
 
   static diff(left: TreeHashEntry, right: TreeHashEntry) : TreeHashEntryDifference {
     let diff : TreeHashEntryDifference = {match: _.isEqual(left,right)};
+
+    if (!left){
+      console.log('$$$ Left is undefined: ');
+      console.log(right);
+    }
+
+    if (!right){
+      console.log('$$$ Right is undefined: ');
+      console.log(left);
+    }
 
     if (!diff.match){
       // Determine the differences

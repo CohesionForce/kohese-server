@@ -3,6 +3,8 @@ import { ItemProxy } from "../common/src/item-proxy";
 import { ItemCache } from "../common/src/item-cache";
 import { TreeConfiguration } from "../common/src/tree-configuration";
 import { TreeHashMap } from "../common/src/tree-hash";
+import * as _ from "underscore";
+
 var kdb = require("../server/kdb.js");
 
 //Paths may be provided via arguments when starting via -kdb=PATH
@@ -27,6 +29,7 @@ if (!baseRepoPath) {
 try {
   // Load the KDB
   global["koheseKDB"] = kdb;
+  let HEAD_Commit_THM;
   kdb.initialize(baseRepoPath).then(function() {
     console.log("::: Finished cache update for: " + baseRepoPath);
 
@@ -67,6 +70,7 @@ try {
       );
       treeConfig.loadingComplete();
       currentTHM = itemCache.getTreeHashMap(headCommitId);
+      HEAD_Commit_THM = _.clone(currentTHM);
     } catch (err) {
       console.log("*** Error");
       console.log(err);
@@ -91,6 +95,9 @@ try {
     let newCompare = TreeHashMap.diff(prevTHM, currentTHM);
     console.log(JSON.stringify(newCompare, null, '  '));
 
+    console.log('$$$ Compare HEAD to Working');
+    let headToWorkingDiff = TreeHashMap.diff(HEAD_THM, WORKING_THM);
+    console.log(JSON.stringify(headToWorkingDiff.summary, null, '  '));
   });
 } catch (err) {
   console.log("*** Error");

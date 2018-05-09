@@ -1244,7 +1244,12 @@ it('Retrieve Delta Tree Hash Map', () => {
       },
       'itemDeleted': {
         'B': 'e57da6530dffc225601f4b58b6dd839aae6bca3d'
+      },
+      'itemMissing': {
+        'leftMissing': [],
+        'rightMissing': []
       }
+
     },
     'details': {
       'ROOT': {

@@ -4,7 +4,7 @@ import { TreeHashMap } from '../common/src/tree-hash';
 
 var kio = require('./koheseIO.js');
 var kdb = require('./kdb.js');
-const kdbFs = require('./kdb-fs.js');
+const kdbFS = require('./kdb-fs.js');
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('./analysis.js');
@@ -284,7 +284,13 @@ function KIOItemServer(socket){
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
         var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
-//        console.log(thmCompare);
+        let thmDiff = TreeHashMap.diff(request.repoTreeHashes, repoTreeHashes);
+        console.log('$$$ Diff Summary');
+        console.log(thmDiff.summary);
+        kdbFS.storeJSONDoc('./u.requestTHM.json', request.repoTreeHashes);
+        kdbFS.storeJSONDoc('./u.serverTHM.json', repoTreeHashes);
+        kdbFS.storeJSONDoc('./u.newDiff.json', thmDiff);
+        kdbFS.storeJSONDoc('./u.oldDiff.json', thmCompare);
 
         response = {
             repoTreeHashes: repoTreeHashes,
@@ -768,7 +774,7 @@ function KIOItemServer(socket){
         // Update content based on reverted files
         for (var j = 0; j < proxies.length; j++) {
           var proxy = proxies[j];
-          var item = kdbFs.loadJSONDoc(proxy.repoPath);
+          var item = kdbFS.loadJSONDoc(proxy.repoPath);
           if (proxy.kind === 'Repository') {
             item.parentId = proxy.item.parentId;
           }
