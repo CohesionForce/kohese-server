@@ -285,12 +285,12 @@ function KIOItemServer(socket){
 
         var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
         let thmDiff = TreeHashMap.diff(request.repoTreeHashes, repoTreeHashes);
-        console.log('$$$ Diff Summary');
-        console.log(thmDiff.summary);
-        kdbFS.storeJSONDoc('./u.requestTHM.json', request.repoTreeHashes);
-        kdbFS.storeJSONDoc('./u.serverTHM.json', repoTreeHashes);
-        kdbFS.storeJSONDoc('./u.newDiff.json', thmDiff);
-        kdbFS.storeJSONDoc('./u.oldDiff.json', thmCompare);
+        // console.log('$$$ Diff Summary');
+        // console.log(thmDiff.summary);
+        // kdbFS.storeJSONDoc('./u.requestTHM.json', request.repoTreeHashes);
+        // kdbFS.storeJSONDoc('./u.serverTHM.json', repoTreeHashes);
+        // kdbFS.storeJSONDoc('./u.newDiff.json', thmDiff);
+        // kdbFS.storeJSONDoc('./u.oldDiff.json', thmCompare);
 
         response = {
             repoTreeHashes: repoTreeHashes,
