@@ -621,7 +621,8 @@ export class ItemProxy {
           } else {
             throw ({
               error: 'Not-Valid',
-              validation: validation
+              validation: validation,
+              item: forItem
             });
 
           }
