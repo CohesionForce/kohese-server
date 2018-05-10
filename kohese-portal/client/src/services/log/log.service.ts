@@ -3,7 +3,7 @@ import { KLogger, LoggingEventRecord } from "../../../../common/src/k-logger";
 import { Subscription, BehaviorSubject } from "rxjs";
 
 export interface LogCategory {
-  description : string, 
+  description : string,
   id : string
 }
 
@@ -63,6 +63,8 @@ export class LogService {
 
   saveLogEventsSubscription (selectedEvents : any ) {
     localStorage.setItem('subscribedLogEvents', JSON.stringify(selectedEvents));
+    this.subscribedLogEvents = selectedEvents;
+    this.subscribedLogEventsSubject.next(selectedEvents);
   }
 
   getLogEventsSubscription () {
