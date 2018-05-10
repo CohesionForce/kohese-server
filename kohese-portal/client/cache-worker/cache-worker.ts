@@ -317,7 +317,7 @@ function getItemCache(){
 function processBulkCacheUpdate(bulkUpdate){
 
   for (let key in bulkUpdate){
-    console.log("::: Proessing BulkCacheUpdate for: " + key);
+    console.log("::: Processing BulkCacheUpdate for: " + key);
     serverCache.objectMap[key] = bulkUpdate[key];
   }
 
