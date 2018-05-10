@@ -9,7 +9,7 @@ import { KoheseModel } from '../../common/src/KoheseModel';
 let socket : SocketIOClient.Socket = SocketIoClient();
 let serverCache = {
   metaModel: undefined,
-  objectMap: undefined,
+  objectMap: {},
   allItems: undefined
 }
 let cacheFetched = false;
@@ -187,6 +187,11 @@ function registerKoheseIOListeners() {
     processBulkUpdate(bulkUpdate);
   });
 
+  socket.on('Item/BulkCacheUpdate', (bulkCacheUpdate) => {
+    console.log('::: Received Bulk Cache Update');
+    processBulkCacheUpdate(bulkCacheUpdate);
+  });
+
   socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
     for (var id in gitStatusMap) {
       var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
@@ -284,10 +289,9 @@ function getItemCache(){
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      console.log(Object.keys(response.objectMap));
-      serverCache.objectMap = response.objectMap;
+      console.log(Object.keys(serverCache.objectMap));
       let itemCache = new ItemCache();
-      itemCache.setObjectMap(response.objectMap)
+      itemCache.setObjectMap(serverCache.objectMap)
       TreeConfiguration.setItemCache(itemCache);
       let headCommit = itemCache.getRef('HEAD');
       console.log('### Head: ' + headCommit);
@@ -298,12 +302,25 @@ function getItemCache(){
       let workingTree = TreeConfiguration.getWorkingTree();
       itemCache.loadProxiesForCommit(headCommit, workingTree);
       workingTree.calculateAllTreeHashes();
+      console.log('$$$ Finished loading HEAD');
 
       getAll();
     });
   } else {
     console.log('$$$ Cache has already been fetched');
   }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function processBulkCacheUpdate(bulkUpdate){
+
+  for (let key in bulkUpdate){
+    console.log("::: Processing BulkCacheUpdate for: " + key);
+    serverCache.objectMap[key] = bulkUpdate[key];
+  }
+
 }
 
 //////////////////////////////////////////////////////////////////////////

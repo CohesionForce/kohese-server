@@ -2,11 +2,12 @@ import { ItemProxy } from './item-proxy';
 import { Subject } from 'rxjs';
 
 import * as  _ from 'underscore';
+import { TreeHashMap } from './tree-hash';
 
 
-let treeConfigMap = {};
-let workingTree;
-let stagedTree;
+let treeConfigMap : { [treeId:string] : TreeConfiguration } = {};
+let workingTree : TreeConfiguration;
+let stagedTree : TreeConfiguration;
 
 // Forward declare KoheseModel while waiting for registration to occur
 let KoheseModelDefn;
@@ -298,86 +299,6 @@ export class TreeConfiguration {
       let repoProxy = this.repoMap[repoId];
       repoProxy.calculateRepoTreeHashes();
     }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static compareTreeHashMap(fromTHMap, toTHMap){
-
-    var fromIds = Object.keys(fromTHMap).sort();
-    var toIds = Object.keys(toTHMap).sort();
-    // var allIds = _.union(fromIds, toIds);
-    var commonIds = _.intersection(fromIds, toIds);
-
-    var thmCompare = {
-      match: _.isEqual(fromTHMap, toTHMap),
-      addedItems: _.difference(toIds, fromIds),
-      changedItems: [],
-      deletedItems: _.difference(fromIds, toIds),
-      childMismatch: {}
-  };
-
-    commonIds.forEach((key) => {
-      var fromNode = fromTHMap[key];
-      var toNode = toTHMap[key];
-
-      if (!_.isEqual(fromNode.treeHash, toNode.treeHash)) {
-
-        if (fromNode.oid !== toNode.oid){
-          thmCompare.changedItems.push(key);
-        } else {
-          // Found structural difference at child level
-          var fromChildren = fromNode.childTreeHashes;
-          var toChildren = toNode.childTreeHashes;
-          var fromChildIds = Object.keys(fromChildren);
-          var toChildIds = Object.keys(toChildren);
-          var fromChildIdsSorted = Object.keys(fromChildren).sort();
-          var toChildIdsSorted = Object.keys(toChildren).sort();
-          // var allChildIds = _.union(fromChildIdsSorted, toChildIdsSorted);
-          var commonChildIds = _.intersection(fromChildIdsSorted, toChildIdsSorted);
-
-          var childMismatch : any = {};
-
-          childMismatch.addedChildren = _.difference(toChildIdsSorted, fromChildIdsSorted);
-          childMismatch.deletedChildren = _.difference(fromChildIdsSorted, toChildIdsSorted);
-
-
-          // Check for different tree hashes
-          var changedChildren = {};
-          commonChildIds.forEach((childId) => {
-            var fromOID = fromChildren[childId];
-            var toOID = toChildren[childId];
-
-            if (fromOID !== toOID){
-              changedChildren[childId] ={
-                  from: fromOID,
-                  to: toOID
-              };
-       }
-          });
-          childMismatch.changedChildren = changedChildren;
-
-          // Check for different order
-          var reorderedChildren = {};
-          for (var idx = 0; idx < fromChildIds.length; idx++){
-            if(fromChildIds[idx] !== toChildIds[idx]){
-              reorderedChildren[idx] = {
-                  from: fromChildIds[idx],
-                  to: toChildIds[idx]
-              };
-            }
-          }
-          childMismatch.reorderedChildren = reorderedChildren;
-
-          thmCompare.childMismatch[key] = childMismatch;
-        }
-      }
-
-    });
-
-    return thmCompare;
-
   }
 
   //////////////////////////////////////////////////////////////////////////
