@@ -192,7 +192,6 @@ export class ItemCache {
         for (let childIdx in reversedChildIds){
           let childId = reversedChildIds[childIdx];
           let treeId = treeHashEntry.childTreeHashes[childId];
-          if (treeId !== "Repository-Mount")
           switch (treeId){
             case "Repository-Mount":
             case "Internal":
