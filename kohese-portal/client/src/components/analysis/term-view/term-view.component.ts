@@ -21,7 +21,7 @@ import { FormControl } from '@angular/forms';
 export class TermViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
    /* UI Switches */
-   loadLimit: number = 100;
+   loadLimit: number = 1000;
    ascending: boolean = true;
    sortField: string = 'count';
    filters: Array<RegExp> = [];
@@ -32,6 +32,7 @@ export class TermViewComponent extends AnalysisViewComponent
    showPOS: boolean = false;
    selfFilter : boolean;
    filteredCount : number;
+   displayedCount : number;
    terms: Array<any>;
 
    /* Data */
@@ -39,7 +40,7 @@ export class TermViewComponent extends AnalysisViewComponent
    filterControl = new FormControl('');
 
    /* Observables */
-   @Input() 
+   @Input()
    proxyStream : Observable<ItemProxy>;
    @Input()
    public filterSubject: BehaviorSubject<AnalysisFilter>;
@@ -88,7 +89,7 @@ export class TermViewComponent extends AnalysisViewComponent
     this.filterSubjectSubscription.unsubscribe();
     this.proxyStreamSubscription.unsubscribe();
   }
-  
+
   sort(property: string): void {
     this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
     this.sortField = property;
@@ -106,23 +107,28 @@ export class TermViewComponent extends AnalysisViewComponent
       }
     })
   }
-  
+
   processTerms(): void {
+    let filteredList;
+
     if (!this.filterRegex) {
-      this.terms = this.dataProcessingService.sort(
-        this.itemProxy.analysis.extendedTokenSummaryList,
-        [this.sortField], this.ascending).slice(0, this.loadLimit);
+      filteredList = this.itemProxy.analysis.extendedTokenSummaryList;
     } else {
-      this.terms = this.dataProcessingService.sort(
-        this.dataProcessingService.filter(
+      filteredList = this.dataProcessingService.filter(
         this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
           if (!this.filterRegex.test(input.text)) {
             return false;
           }
           return true;
-        }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+        }]
+      );
     }
 
-    this.filteredCount = this.terms.length;
+    this.filteredCount = filteredList.length;
+
+    this.terms = this.dataProcessingService.sort(filteredList,[this.sortField],
+      this.ascending).slice(0, this.loadLimit);
+
+    this.displayedCount = this.terms.length;
   }
 }

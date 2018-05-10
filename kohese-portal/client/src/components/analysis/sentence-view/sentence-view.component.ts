@@ -22,7 +22,7 @@ import * as $ from 'jquery';
 export class SentenceViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
   /* UI Switches */
-  loadLimit: number = 100;
+  loadLimit: number = 1000;
   ascending: boolean = true;
   sortField: string = null;
   showItemsInDetails: boolean = true;
@@ -31,6 +31,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
   showTokensInDetails: boolean = false;
   syncFilter : boolean;
   filteredCount : number;
+  displayedCount : number;
   sentences: Array<any>;
   filterOptions : object;
   lastFilter : AnalysisFilter;
@@ -122,8 +123,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
   }
 
   processSentences(): void {
-    this.sentences = this.dataProcessingService.sort(
-      this.dataProcessingService.filter(this.itemProxy.analysis.extendedList,
+    let filteredList = this.dataProcessingService.filter(this.itemProxy.analysis.extendedList,
       [(listItem: any) => {
 
         let result =
@@ -137,8 +137,17 @@ export class SentenceViewComponent extends AnalysisViewComponent
           (this.filterRegex === null || this.filterRegex.test(listItem.text)));
 
         return result;
-      }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+      }]
+    );
 
-    this.filteredCount = this.sentences.length;
+    this.filteredCount = filteredList.length;
+
+    if (this.sortField){
+      filteredList = this.dataProcessingService.sort(filteredList, [this.sortField], this.ascending);
+    }
+
+    this.sentences = filteredList.slice(0, this.loadLimit);
+    this.displayedCount = this.sentences.length;
+
   }
 }
