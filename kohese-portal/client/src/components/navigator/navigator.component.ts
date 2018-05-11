@@ -91,7 +91,7 @@ export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
     
     // Unsubscribe?
     this._defaultTreeQueryList.changes.subscribe((queryList: QueryList<Tree>) => {
-      defaultTree: Tree = queryList.toArray()[0];
+      defaultTree = queryList.toArray()[0];
       if (defaultTree) {
         this.processTree(defaultTree);
         this._viewMap['Default'] = defaultTree;
