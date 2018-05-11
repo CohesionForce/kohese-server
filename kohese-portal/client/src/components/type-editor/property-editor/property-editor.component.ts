@@ -173,8 +173,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     }).updateSize('70%', '70%').afterClosed().subscribe(
       (returnedStateMachine: any) => {
       if (returnedStateMachine) {
-        this.updateProperty([this.selectedPropertyId, 'properties'],
-          returnedStateMachine);
+        this.updateProperty(['properties'], returnedStateMachine);
       }
     });
   }
