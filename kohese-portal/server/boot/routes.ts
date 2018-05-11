@@ -41,7 +41,7 @@ module.exports = function (app) {
             express.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
 
     app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
-    app.use('/reports', express.static(path.resolve(__dirname, '../../tmp_reports')));
+    app.use('/reports', express.static(path.resolve(__dirname, '../../../tmp_reports')));
 
     app.use(bodyParser.json());
 
