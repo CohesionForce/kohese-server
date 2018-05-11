@@ -1,0 +1,8 @@
+<div class="kt-body">
+  <virtual-scroll #tree [items]="visibleRows">
+    <tree-row *ngFor="let row of tree.viewPortItems"
+      [treeRow]="row" [treeRootStream]="rootSubject"
+      [selectedProxyIdStream]="selectedIdSubject">
+    </tree-row>
+  </virtual-scroll>
+</div>

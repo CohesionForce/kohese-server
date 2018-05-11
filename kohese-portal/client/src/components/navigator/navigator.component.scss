@@ -1,0 +1,23 @@
+@import '../../../app.component';
+
+.knowledge-tree-panel {
+  border-collapse: collapse;
+  position: relative;
+  height: calc(100% - 120px);
+  width: calc(100% - 20px);
+  padding-left : 20px;
+  overflow: auto;
+}
+
+.kt-head {
+  width: 100%;
+  font-weight: bold;
+  vertical-align: bottom;
+  border-bottom: 2px solid #ddd;
+}
+
+.kth-cell {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 0px;
+}

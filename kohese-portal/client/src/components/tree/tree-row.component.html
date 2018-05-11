@@ -6,18 +6,18 @@
   [ngStyle]="getIndentationStyle()">
   <i class="kt-icon fa"
     (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
-    [ngClass]="{ 'fa-caret-down': (treeRow.itemProxy.children.length > 0) && treeRow.expanded,
-    'fa-caret-right': (treeRow.itemProxy.children.length > 0) && !treeRow.expanded,
-    'no-children': !(treeRow.itemProxy.children.length > 0) }">
+    [ngClass]="{ 'fa-caret-down': (treeRow.getRowChildrenProxies().length > 0) && treeRow.expanded,
+    'fa-caret-right': (treeRow.getRowChildrenProxies().length > 0) && !treeRow.expanded,
+    'no-children': !(treeRow.getRowChildrenProxies().length > 0) }">
   </i>
   <ng-container
-    *ngIf="koheseType.viewModelProxy && koheseType.viewModelProxy.item.icon">
+    *ngIf="koheseType && koheseType.viewModelProxy && koheseType.viewModelProxy.item.icon">
     <mat-icon matTooltip="{{koheseType.viewModelProxy.item.modelName}}"
       class="kt-icon {{koheseType.viewModelProxy.item.icon}}">
     </mat-icon>
   </ng-container>
   <ng-container
-    *ngIf="!koheseType.viewModelProxy || !koheseType.viewModelProxy.item.icon">
+    *ngIf="!koheseType || !koheseType.viewModelProxy || !koheseType.viewModelProxy.item.icon">
     <span class="kt-icon no-icon"></span>
   </ng-container>
   <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -39,14 +39,16 @@
       src="assets/icons/versioncontrol/index-mod.ico"
       title="Staged - {{treeRow.itemProxy.status['Staged']}}"/>
     <!-- Default row actions -->
-    <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
+    <!-- ng-container *ngIf="'Version Control' !== (selectedViewStream | async)"-->
       <button mat-icon-button
         (click)="treeRootStream.next(treeRow.itemProxy); $event.stopPropagation()">
         <mat-icon class="fa fa-anchor"></mat-icon>
       </button>
-      <button mat-icon-button (click)="removeItem(); $event.stopPropagation()">
-        <mat-icon class="fa fa-times delete-button"></mat-icon>
-      </button>
+      <ng-container *ngIf="koheseType">
+        <button mat-icon-button (click)="removeItem(); $event.stopPropagation()">
+          <mat-icon class="fa fa-times delete-button"></mat-icon>
+        </button>
+      </ng-container>
       <button mat-icon-button [matMenuTriggerFor]="menu"
         (click)="$event.stopPropagation()">
         <mat-icon class="fa fa-bars"></mat-icon>
@@ -56,12 +58,12 @@
           Compare With...
         </button>
       </mat-menu>
-    </ng-container>
+    <!-- /ng-container-->
     <!-- Version Control row actions -->
-    <ng-container
-      *ngIf="('Version Control' === (selectedViewStream | async))">
+    <!-- ng-container
+      *ngIf="('Version Control' === (selectedViewStream | async))"-->
       <!-- Actions -->
-      <button mat-icon-button
+      <!-- button mat-icon-button
         *ngIf="((treeRow.itemProxy.status | mapKey).length > 0)"
         (click)="revertChanges(); $event.stopPropagation()">
         <mat-icon class="fa fa-undo kt-icon"></mat-icon>
@@ -74,6 +76,6 @@
         (click)="unstageChanges(); $event.stopPropagation()">
         <mat-icon class="fa fa-minus kt-icon"></mat-icon>
       </button>
-    </ng-container>
+    </ng-container-->
   </span>
 </div>

@@ -8,6 +8,13 @@ export class ProxyFilter {
   status: boolean = false; // This seems wrong
   filterString: string = '';
   textRegexHighlight: RegExp;
+  private _invalidRegex: boolean = false;
+  get invalidRegex() {
+    return this._invalidRegex;
+  }
+  set invalidRegex(invalidRegex: boolean) {
+    this._invalidRegex = invalidRegex;
+  }
 
   constructor() {
   }

@@ -1,0 +1,106 @@
+<div style="height: 100%;">
+  <div id="top-action-bar">
+    <!-- span>
+      Number of Items: {{root.descendantCount}}
+    </span -->
+    <div>
+      <!-- Start View Control -->
+      <mat-form-field>
+        <mat-select placeholder="View" [ngModel]="(selectedViewStream | async)"
+          (selectionChange)="viewSelectionChanged($event.value)">
+          <mat-option *ngFor="let view of (viewMap | mapKey)" [value]="view">
+            {{view}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <!-- Start Default Toolbar -->
+      <!-- Kind Selection -->
+      <mat-form-field>
+        <mat-select placeholder="Kind" [(value)]="proxyFilter.kind"
+          (selectionChange)="viewMap[selectedViewStream.getValue()].showRows()">
+          <mat-option>{{NO_KIND_SPECIFIED}}</mat-option>
+          <mat-option *ngFor="let type of (koheseTypes | mapKey)"
+            [value]="koheseTypes[type]">
+            {{type}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <!-- Action Filtering -->
+      <ng-container
+        *ngIf="(proxyFilter.kind && (proxyFilter.kind.dataModelProxy.item.name === 'Action'))">
+        <mat-form-field>
+          <mat-select placeholder="State" [(value)]="proxyFilter.actionState"
+            (selectionChange)="viewMap[selectedViewStream.getValue()].showRows()">
+            <mat-option *ngFor="let state of actionStates" [value]="state">
+              {{state}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select placeholder="Assignee" [(value)]="proxyFilter.actionAssignee"
+            (selectionChange)="viewMap[selectedViewStream.getValue()].showRows()">
+            <mat-option *ngFor="let user of userList" [value]="user.item.name">
+              {{user.item.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-container> <!-- End Action Filtering -->
+      <!-- String Filtering -->
+      <mat-form-field>
+        <input matInput type="text" [(ngModel)]="proxyFilter.filterString"
+          [ngStyle]="proxyFilter.invalidRegex && {'background-color':'pink'}"
+          placeholder="Filter" (input)="whenFilterStringChanges()"/>
+      </mat-form-field>
+      <!-- Version Control Filtering -->
+      <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
+        <mat-checkbox [(ngModel)]="proxyFilter.status"
+          (change)="viewMap[selectedViewStream.getValue()].showRows()">
+          Modified
+        </mat-checkbox>
+      </ng-container>
+      <mat-checkbox [(ngModel)]="proxyFilter.dirty"
+        (change)="viewMap[selectedViewStream.getValue()].showRows()">
+        Dirty
+      </mat-checkbox>
+    </div>
+    <button mat-raised-button
+      (click)="viewMap[selectedViewStream.getValue()].expandAll()"
+      class="btn btn-default btn-sm">
+      Expand All
+    </button>
+    <button mat-raised-button
+      (click)="viewMap[selectedViewStream.getValue()].collapseAll()"
+      class="btn btn-default btn-sm">
+      Collapse All
+    </button>
+    <button mat-raised-button class="btn btn-default btn-sm"
+      (click)="changeRoot(viewMap[selectedViewStream.getValue()].getRow(viewMap[selectedViewStream.getValue()].getRow(root.item.id).getRowParentProxy().item.id))"
+      [disabled]="!root || (root.item.id === 'ROOT')">
+      Up Level
+    </button>
+    <button mat-raised-button class="btn btn-default btn-sm"
+      (click)="changeRoot(viewMap[selectedViewStream.getValue()].getRow('ROOT'))"
+      [disabled]="!root || (root.item.id === 'ROOT')">
+      Reset Root
+    </button>
+    <button mat-icon-button (click)="toggleSelectionSynchronization()"
+      matTooltip="Toggle selection synchronization for the tree"
+      [ngClass]="{ 'highlight': synchronizeWithSelection }">
+      <mat-icon class="fa fa-exchange"></mat-icon>
+    </button>
+  </div>
+  <!-- Begin Knowledge Tree -->
+  <div class="knowledge-tree-panel">
+    <div class="kt-head kth-cell">
+      Name
+    </div>
+    <ng-container [ngSwitch]="(selectedViewStream | async)">
+      <ng-container *ngSwitchCase="'Default'">
+        <default-tree #defaultTree></default-tree>
+      </ng-container>
+      <ng-container *ngSwitchCase="'References'">
+        <reference-tree #referenceTree></reference-tree>
+      </ng-container>
+    </ng-container>
+  </div> <!-- End Knowledge Tree -->
+</div>

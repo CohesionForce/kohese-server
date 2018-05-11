@@ -4,7 +4,6 @@ import { UserInput } from '../user-input.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { TreeComponent } from '../../tree/tree.component';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/startWith';

@@ -39,8 +39,7 @@ export class TreeRowComponent extends NavigatableComponent
   set treeRootStream(treeRootStream: BehaviorSubject<ItemProxy>) {
     this._treeRootStream = treeRootStream;
   }
-  @Input()
-  public selectedViewStream: BehaviorSubject<string>;
+  
   @Input()
   public selectedProxyIdStream: BehaviorSubject<string>;
   public koheseType: any;
@@ -64,12 +63,6 @@ export class TreeRowComponent extends NavigatableComponent
   public ngOnInit(): void {
     this.koheseType = this.typeService.getKoheseTypes()[this._treeRow.
       itemProxy.kind];
-    if (!this.koheseType) {
-      this.koheseType = {
-        name: this._treeRow.itemProxy.kind,
-        icon: 'fa fa-sticky-note'
-      };
-    }
     
     this._updateDisplaySubscription = this._treeRow.updateDisplay.subscribe(
       (updateDisplay: boolean) => {
@@ -149,15 +142,8 @@ export class TreeRowComponent extends NavigatableComponent
   }
   
   public getIndentationStyle(): object {
-    let indentationAmount: number = 0;
-    let parentProxy: ItemProxy = this._treeRow.itemProxy.parentProxy;
-    while (parentProxy && (parentProxy !== this._treeRootStream.getValue())) {
-      indentationAmount += 15;
-      parentProxy = parentProxy.parentProxy;
-    }
-    
     return {
-      'padding-left': indentationAmount + 'px'
+      'padding-left': (this._treeRow.depth * 15) + 'px'
     };
   }
   
