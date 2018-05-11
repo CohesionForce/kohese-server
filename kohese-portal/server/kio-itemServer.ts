@@ -1,9 +1,10 @@
 import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
+import { TreeHashMap } from '../common/src/tree-hash';
 
 var kio = require('./koheseIO.js');
 var kdb = require('./kdb.js');
-const kdbFs = require('./kdb-fs.js');
+const kdbFS = require('./kdb-fs.js');
 var fs = require('fs');
 var child = require('child_process');
 var itemAnalysis = require('./analysis.js');
@@ -173,31 +174,22 @@ function KIOItemServer(socket){
     let itemCache = TreeConfiguration.getItemCache();
     let objectMap = itemCache.getObjectMap();
 
+    console.log('### Preparing BulkCacheUpdate');
+    for (let key in objectMap) {
+      console.log('### Sending BulkCacheUpdate for key: ' + key);
+      let bulkUpdateMessage = {};
+      bulkUpdateMessage[key] = objectMap[key];
+      socket.emit('Item/BulkCacheUpdate', bulkUpdateMessage);
+    }
+    console.log('### Sent BulkCacheUpdate');
+
     let response = {
       timestamp: {
         requestTime: request.timestamp.requestTime,
         requestReceiptTime: requestReceiptTime,
         responseTransmitTime: null
-      },
-      objectMap: objectMap
-      // {
-      //   commit: objectMap.commit,
-      //   tree: objectMap.tree
-      // }
+      }
     };
-
-    // let treeIdx = 0;
-    // let keyCount = 0;
-    // response.objectMap.treeSlice[0] = {};
-    // for (let key in objectMap.tree){
-    //   response.objectMap.treeSlice[treeIdx][key] = objectMap.tree[key];
-    //   keyCount++;
-    //   if(keyCount === 500){
-    //     keyCount = 0;
-    //     treeIdx++;
-    //     response.objectMap.treeSlice[treeIdx] = {};
-    //   }
-    // }
 
     response.timestamp.responseTransmitTime = Date.now();
 
@@ -222,7 +214,7 @@ function KIOItemServer(socket){
 
     // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
 
-    // var thmCompare = TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
+    // var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
 
     // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
 
@@ -291,8 +283,14 @@ function KIOItemServer(socket){
         // Send deltas to client
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
-        var thmCompare = TreeConfiguration.compareTreeHashMap(request.repoTreeHashes, repoTreeHashes);
-//        console.log(thmCompare);
+        var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
+        let thmDiff = TreeHashMap.diff(request.repoTreeHashes, repoTreeHashes);
+        // console.log('$$$ Diff Summary');
+        // console.log(thmDiff.summary);
+        // kdbFS.storeJSONDoc('./u.requestTHM.json', request.repoTreeHashes);
+        // kdbFS.storeJSONDoc('./u.serverTHM.json', repoTreeHashes);
+        // kdbFS.storeJSONDoc('./u.newDiff.json', thmDiff);
+        // kdbFS.storeJSONDoc('./u.oldDiff.json', thmCompare);
 
         response = {
             repoTreeHashes: repoTreeHashes,
@@ -454,15 +452,29 @@ function KIOItemServer(socket){
     console.log(request);
 
     var proxy = ItemProxy.getWorkingTree().getProxyFor(request.id);
-    proxy.deleteItem(request.recursive);
 
-    console.log('Deleted %s #%s#', request.kind, request.id);
+    if (proxy){
+      proxy.deleteItem(request.recursive);
 
-    sendResponse({
-      deleted: 'true',
-      kind: request.kind,
-      id: request.id
-    });
+      console.log('::: Deleted %s #%s#', request.kind, request.id);
+
+      sendResponse({
+        deleted: 'true',
+        kind: request.kind,
+        id: request.id
+      });
+
+    } else {
+
+      console.log('::: Item already Deleted %s #%s#', request.kind, request.id);
+
+      sendResponse({
+        deleted: 'true',
+        kind: request.kind,
+        id: request.id
+      });
+
+    }
 
   });
 
@@ -762,7 +774,7 @@ function KIOItemServer(socket){
         // Update content based on reverted files
         for (var j = 0; j < proxies.length; j++) {
           var proxy = proxies[j];
-          var item = kdbFs.loadJSONDoc(proxy.repoPath);
+          var item = kdbFS.loadJSONDoc(proxy.repoPath);
           if (proxy.kind === 'Repository') {
             item.parentId = proxy.item.parentId;
           }

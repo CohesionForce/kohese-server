@@ -1,7 +1,7 @@
 'use strict';
 
 //Paths may be provided via arguments when starting via -kdb=PATH
-var baseRepoPath;
+var baseRepoPath : string;
 for (var i = 2; i < process.argv.length; i++) {
   var arg = process.argv[i].split('=');
   if((arg[0] === '-kdb') && (arg[1] !== '')) {
@@ -22,7 +22,7 @@ if (!baseRepoPath){
 
 // Load the KDB
 var kdb = require('../server/kdb.js');
-global.koheseKDB = kdb;
+global['koheseKDB'] = kdb;
 kdb.initialize(baseRepoPath).then(function () {
   console.log('::: Finished cache update for: ' + baseRepoPath);
 });

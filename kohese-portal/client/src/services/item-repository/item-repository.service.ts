@@ -8,7 +8,8 @@ import { ToastrService } from "ngx-toastr";
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
-import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+import { TreeConfiguration } from  '../../../../common/src/tree-configuration';
+import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
@@ -369,8 +370,8 @@ export class ItemRepository {
           let syncRequired = true;
           if (repoProxy && repoProxy.treeHashEntry) {
             // A previous fetch has occurried, check to see if there an opportunity to skip resync
-            let rTHMCompare = TreeConfiguration.compareTreeHashMap(repoTreeHash, repoProxy.treeHashEntry);
-            if (rTHMCompare.match) {
+            let rTHMCompare = TreeHashEntry.diff(repoTreeHash, repoProxy.treeHashEntry);
+            if (rTHMCompare.match){
               syncRequired = false;
               // this.logService.log('$$$ Sync not required ' + repoId);
               this.repoSyncStatus[repoId] = RepoStates.SYNCHRONIZATION_SUCCEEDED;
@@ -446,7 +447,7 @@ export class ItemRepository {
           }
         }
 
-        var compareAfterRTH = TreeConfiguration.compareTreeHashMap(updatedTreeHashes, response.repoTreeHashes);
+        var compareAfterRTH = TreeHashMap.compare(updatedTreeHashes, response.repoTreeHashes);
 
         syncSucceeded = compareAfterRTH.match;
 

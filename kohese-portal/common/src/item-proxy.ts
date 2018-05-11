@@ -7,6 +7,7 @@ import * as  _ from 'underscore';
 import * as jsSHA_Import from 'jssha';
 import * as uuidV1_Import from 'uuid/v1';
 import { TreeConfiguration } from './tree-configuration';
+import { TreeHashEntry, TreeHashMap } from './tree-hash';
 
 //
 // Adjust for the differences in CommonJS and ES6 for jssha
@@ -24,14 +25,6 @@ if (typeof(uuidV1_Import) === "object") {
   uuidV1 = uuidV1_Import.default;
 } else {
   uuidV1 = uuidV1_Import;
-}
-
-class TreeHashEntry {
-  public kind : string;
-  public oid : string;
-  public childTreeHashes : {};
-  public treeHash : string;
-  public parentId? : string;
 }
 
 class RelationIdMap {
@@ -57,7 +50,7 @@ export class ItemProxy {
   public oid;
   public deferTreeHash;
   public treeHash;
-  public treeHashEntry;
+  public treeHashEntry : TreeHashEntry;
 
   public parentProxy;
   public children;
@@ -621,7 +614,8 @@ export class ItemProxy {
           } else {
             throw ({
               error: 'Not-Valid',
-              validation: validation
+              validation: validation,
+              item: forItem
             });
 
           }
@@ -812,7 +806,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getTreeHashMap() {
+  getTreeHashMap() : TreeHashMap {
     var treeHashMap = {};
     this.visitTree({excludeKind : ['Repository', 'Internal']}, (proxy) => {
       treeHashMap [proxy.item.id] = proxy.treeHashEntry;
