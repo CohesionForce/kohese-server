@@ -105,7 +105,7 @@ export class KLogger {
   }
 
   getEventId(componentId: string, eventName: string): string {
-    let loggingEventRecord: LoggingEventRecord = this.loggingEventRegistry[eventName];
+    let loggingEventRecord: LoggingEventRecord = this.logMap['[' + eventName + ']'];
     let id;
     if (loggingEventRecord) {
       id = loggingEventRecord.id;
@@ -141,14 +141,14 @@ export class KLogger {
   }
 
   log(eventId: string, infoObject?: any) {
-    if (this.logMap[eventId]) {
+    if (this.logMap[eventId].active) {
       console.log(eventId);
       if (infoObject) {
         console.log(infoObject);
         console.log('//////')
       }
     } else {
-      console.log('log fail');
+      // Log Not Active
     }
   }
 
