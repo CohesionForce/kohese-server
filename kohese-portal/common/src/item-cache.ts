@@ -6,9 +6,23 @@
 
 import * as   _ from 'underscore';
 import { ItemProxy } from './item-proxy';
+import { TreeHashEntry, TreeHashMap, TreeHashValueType } from './tree-hash';
+
 
 // TODO set back to false and/or remove disable check below
 const disableObjectFreeze = false;
+
+class KoheseCommit {
+  time: number;
+  author: string;
+  message: string;
+  parents?: Array<string>;
+  repoTreeRoots: { [ key : string ] : TreeHashEntry };
+}
+
+type KoheseTree = TreeHashEntry;
+
+type Blob = any;
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -29,9 +43,9 @@ export class ItemCache {
 
   public refs;
   public tags;
-  public kCommitMap;
-  public kTreeMap;
-  public blobMap;
+  public kCommitMap : { [ oid : string ]: KoheseCommit};
+  public kTreeMap : { [ oid : string ]: KoheseTree};
+  public blobMap : { [ oid : string ]: Blob};
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -132,7 +146,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  cacheCommit(oid, commit){
+  cacheCommit(oid : string, commit : KoheseCommit){
     Object.freeze(commit);
     this.kCommitMap[oid] = commit;
   }
@@ -140,7 +154,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getCommit(oid){
+  getCommit(oid : string){
     return this.kCommitMap[oid];
   }
 
@@ -151,6 +165,51 @@ export class ItemCache {
     Object.freeze(tree);
     this.kTreeMap[oid] = tree;
   }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getTreeHashMap(forCommit : string) : TreeHashMap {
+    var treeHashMap = {};
+
+    let commit = this.getCommit(forCommit);
+
+    let treeHashEntryStack : Array<{id:string, treeId:TreeHashValueType}> = [];
+    let reversedRootIds = Object.keys(commit.repoTreeRoots).reverse();
+    for (let repoIdx in reversedRootIds){
+      let repoId = reversedRootIds[repoIdx];
+      treeHashEntryStack.push({id:repoId, treeId:commit.repoTreeRoots[repoId].treeHash});
+    }
+
+    while (treeHashEntryStack.length > 0) {
+      let mapEntry = treeHashEntryStack.pop();
+      let treeHashEntry = this.getTree(mapEntry.treeId)
+
+      if (treeHashEntry) {
+        treeHashMap [mapEntry.id] = treeHashEntry;
+
+        let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
+        for (let childIdx in reversedChildIds){
+          let childId = reversedChildIds[childIdx];
+          let treeId = treeHashEntry.childTreeHashes[childId];
+          switch (treeId){
+            case "Repository-Mount":
+            case "Internal":
+              // Ignore
+              break;
+            default:
+              treeHashEntryStack.push({id:childId, treeId: treeId});
+          }
+        }
+      } else {
+        console.log('!!! Can not find treeHashEntry for: ' + JSON.stringify(mapEntry));
+      }
+    }
+
+    return treeHashMap;
+  }
+
+
 
   //////////////////////////////////////////////////////////////////////////
   //

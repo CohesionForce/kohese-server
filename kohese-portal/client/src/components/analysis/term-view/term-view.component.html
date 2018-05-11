@@ -1,6 +1,6 @@
 <div class="panel">
   <div class="panel-heading">
-    Term View - ({{filteredCount}}) Terms
+    Term View - (<span *ngIf="displayedCount < filteredCount"style="font-weight:normal;">{{displayedCount}}/</span>{{filteredCount}}) Terms
     <button mat-icon-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
       <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
     </button>
@@ -36,7 +36,7 @@
           [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
       </mat-form-field>
       <mat-form-field>
-        <input matInput type="text" placeholder="Limit" [(ngModel)]="loadLimit"/>
+        <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processTerms()"/>
       </mat-form-field>
       <button mat-raised-button (click)="submitFilter(filterControl.value)"
         class="btn btn-default fa fa-search">Submit
