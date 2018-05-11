@@ -4,7 +4,7 @@
 
 'use strict';
 var path = require('path');
-var kdbFS = require('./kdb-fs.js');
+var kdbFS = require('./kdb-fs');
 
 var nodegit = require('nodegit');
 
@@ -29,6 +29,7 @@ export class KDBCache extends ItemCache {
   public repoTreeDirectory;
   public blobDirectory;
   public blobMismatchDirectory;
+  public refsDirectory;
   public kCommitDirectory;
   public kTreeDirectory;
   public expandedRepoCommitDirectory;
@@ -53,6 +54,7 @@ export class KDBCache extends ItemCache {
     this.repoTreeDirectory = path.join(this.objectDirectory, 'repoTree');
     this.blobDirectory = path.join(this.objectDirectory, 'blob');
     this.blobMismatchDirectory = path.join(this.objectDirectory, 'mismatch_blob');
+    this.refsDirectory = path.join(this.objectDirectory, 'refs');
     this.kCommitDirectory = path.join(this.objectDirectory, 'kCommit');
     this.kTreeDirectory = path.join(this.objectDirectory, 'kTree');
     this.expandedRepoCommitDirectory = path.join(this.cacheDirectory, 'expanded-repo-commit');
@@ -65,6 +67,7 @@ export class KDBCache extends ItemCache {
     kdbFS.createDirIfMissing(this.repoTreeDirectory);
     kdbFS.createDirIfMissing(this.blobDirectory);
     kdbFS.createDirIfMissing(this.blobMismatchDirectory);
+    kdbFS.createDirIfMissing(this.refsDirectory);
     kdbFS.createDirIfMissing(this.kCommitDirectory);
     kdbFS.createDirIfMissing(this.kTreeDirectory);
     kdbFS.createDirIfMissing(this.expandedRepoCommitDirectory);
@@ -299,7 +302,7 @@ export class KDBCache extends ItemCache {
 
         let masterCommitId = masterCommit.id();
         revwalk.push(masterCommitId);
-        kdbCache.cacheRef('HEAD', masterCommitId.tostrS());
+        let refHEAD = masterCommitId.tostrS();
 
         // eslint-disable-next-line no-unused-vars
         return revwalk.getCommitsUntil(function (commit) {
@@ -307,6 +310,14 @@ export class KDBCache extends ItemCache {
         }).then(function (commits) {
           return kdbCache.indexCommit(repo, commits);
         }).then(function () {
+          try {
+            kdbCache.cacheRef('HEAD', refHEAD);
+            kdbFS.storeJSONDoc(kdbCache.refsDirectory + '/HEAD.json', refHEAD);
+          } catch (err) {
+            console.log('*** Error while writing HEAD reference');
+            console.log(err);
+          }
+
           let afterTime = Date.now();
           var deltaUpdateTime = afterTime-beforeTime;
           console.log('::: Update time for cached objects in ' + kdbCache.repoPath + ': ' + deltaUpdateTime/1000);

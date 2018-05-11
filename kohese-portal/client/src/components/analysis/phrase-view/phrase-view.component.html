@@ -1,5 +1,5 @@
 <div class="panel">
-  <div class="panel-heading">Phrase View - ({{filteredCount}}) Phrases
+  <div class="panel-heading">Phrase View - (<span *ngIf="displayedCount < filteredCount" style="font-weight:normal;">{{displayedCount}}/</span>{{filteredCount}}) Phrases
     <div class="pull-right">
       <button mat-icon-button>
         <mat-icon class="fa fa-link" style="vertical-align: top;"
@@ -35,7 +35,7 @@
         [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
     </mat-form-field>
     <mat-form-field>
-      <input matInput type="text" placeholder="Limit" [(ngModel)]="loadLimit"/>
+      <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processPhrases()"/>
     </mat-form-field>
     <button mat-raised-button (click)="submitFilter(filterControl.value)"
       class="btn btn-default fa fa-search">Submit

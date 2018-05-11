@@ -25,6 +25,24 @@
       {
         "type": "node",
         "request": "launch",
+        "name": "Launch Test Load Commits: kohese-kdb",
+        "program": "${workspaceFolder}/build/scripts/test-load-commits.js",
+        "args": [
+          "-kdb=kohese-kdb"
+        ]
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch Test Load Commits: testKDB",
+        "program": "${workspaceFolder}/build/scripts/test-load-commits.js",
+        "args": [
+          "-kdb=testKDB"
+        ]
+      },
+      {
+        "type": "node",
+        "request": "launch",
         "name": "(BROKEN) NPM Start",
         "runtimeExecutable": "npm",
         "runtimeArgs": [

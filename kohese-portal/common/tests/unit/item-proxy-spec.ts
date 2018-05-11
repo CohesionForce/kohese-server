@@ -1,5 +1,6 @@
 import { ItemProxy } from '../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../common/src/tree-configuration';
+import { TreeConfiguration } from '../../../common/src/tree-configuration'
+import { TreeHashEntry, TreeHashMap } from '../../../common/src/tree-hash';
 import { KoheseModel } from '../../../common/src/KoheseModel';
 describe('ItemProxy Test', function () {
 
@@ -1092,7 +1093,7 @@ describe('ItemProxy Test', function () {
       }
     };
 
-  var thmCompare = TreeConfiguration.compareTreeHashMap(expectedTreeHashMap, treeHashMap);
+  var thmCompare = TreeHashMap.compare(expectedTreeHashMap, treeHashMap);
   if (!thmCompare.match) {
     console.log('Tree Map');
     console.log(treeHashMap);
@@ -1132,16 +1133,66 @@ it('Retrieve Delta Tree Hash Map', () => {
     parentId: 'NV-TOP'
   });
 
+  let aa = ItemProxy.getWorkingTree().getProxyFor('AA');
+  var newAAItem = JSON.parse(JSON.stringify(aa.item));
+  newAAItem.parentId = 'AB';
+  aa.updateItem(aa.kind, newAAItem);
+
+
   var expectedDeltaMap = {
     match: false,
-    addedItems: ['D'],
-    changedItems: ['C'],
-    deletedItems: ['B'],
+    addedItems: [ 'D' ],
+    changedItems: [ 'AA', 'C' ],
+    deletedItems: [ 'B' ],
     childMismatch: {
+      'A': {
+        addedChildren: [],
+        deletedChildren: [
+          'AA'
+        ],
+        changedChildren: {
+          'AB': {
+            'from': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
+            'to': 'ddc3ea25293266ded6f267d7408bf37f6c19a3fe'
+          }
+        },
+        reorderedChildren: {
+          '0': {
+            'from': 'AA',
+            'to': 'AB'
+          },
+          '1': {
+            'from': 'AB',
+            'to': 'AC'
+          },
+          '2': {
+            'from': 'AC'
+          }
+        }
+      },
+      AB: {
+        addedChildren: ['AA'],
+        deletedChildren: [],
+        changedChildren: {},
+        reorderedChildren: {
+          0: {
+            from: 'ABA',
+            to: 'AA'
+          },
+          1: {
+            from: 'ABB',
+            to: 'ABA'
+          }
+        }
+      },
       'NV-TOP': {
         addedChildren: ['D'],
         deletedChildren: ['B'],
         changedChildren: {
+          A: {
+            from: 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
+            to: '7f5c4f5a5de6ac07235090cc4854f5c9db2ac9e3'
+          },
           C: {
             from: 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
             to: '51f07bc8e0eb82b241784709669f186aee2c3989'
@@ -1155,7 +1206,7 @@ it('Retrieve Delta Tree Hash Map', () => {
         changedChildren: {
           'NV-TOP': {
             from: 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
-            to: '9b63f5728719510e9e8a24eff75fae92a7b4b758'
+            to: 'd556c2a797d86d518686a8f2395b7bf6fa888f9e'
           }
         },
         reorderedChildren: {}
@@ -1163,10 +1214,192 @@ it('Retrieve Delta Tree Hash Map', () => {
     }
   };
 
+  let expectedCompareResult = {
+    'match': false,
+    'summary': {
+      'roots': {
+        'added': [],
+        'deleted': [],
+        'common': ['ROOT']
+      },
+      'kindChanged': {},
+      'contentChanged': {
+        'C': {
+          'fromOID': '3cfa883acec0a529b941b02a57f4187bece8263d',
+          'toOID': 'ba5a2c063c02084c658ab77309d6c25ce1e128e2'
+        },
+        'AA': {
+          'fromOID': '71cea569a1401108ea4ce2ebe40470ba536fc676',
+          'toOID': 'd9bd2c7ca658b470dc633e01eac973adb05ceb99'
+        }
+      },
+      'parentChanged': {
+        'AA': {
+          'fromParentId': 'A',
+          'toParentId': 'AB'
+        }
+      },
+      'itemAdded': {
+        'D': 'a292138764ab6ee895c6c9ba9699de22d224ba45'
+      },
+      'itemDeleted': {
+        'B': 'e57da6530dffc225601f4b58b6dd839aae6bca3d'
+      },
+      'itemMissing': {
+        'leftMissing': [],
+        'rightMissing': []
+      }
+
+    },
+    'details': {
+      'ROOT': {
+        'match': false,
+        'treeHashChanged': {
+          'fromTreeId': 'a791027001e18714f51b78ae87cc10ba70b2443a',
+          'toTreeId': 'a4d85bb5bd4c74736a6df74b5de88ffd8a686f6c'
+        },
+        'childrenModified': [
+          {
+            'id': 'NV-TOP',
+            'fromTreeId': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
+            'toTreeId': 'd556c2a797d86d518686a8f2395b7bf6fa888f9e'
+          }
+        ]
+      },
+      'NV-TOP': {
+        'match': false,
+        'treeHashChanged': {
+          'fromTreeId': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
+          'toTreeId': 'd556c2a797d86d518686a8f2395b7bf6fa888f9e'
+        },
+        'childrenAdded': [
+          {
+            'id': 'D',
+            'treeId': 'a292138764ab6ee895c6c9ba9699de22d224ba45'
+          }
+        ],
+        'childrenDeleted': [
+          {
+            'id': 'B',
+            'treeId': 'e57da6530dffc225601f4b58b6dd839aae6bca3d'
+          }
+        ],
+        'childrenModified': [
+          {
+            'id': 'A',
+            'fromTreeId': 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
+            'toTreeId': '7f5c4f5a5de6ac07235090cc4854f5c9db2ac9e3'
+          },
+          {
+            'id': 'C',
+            'fromTreeId': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
+            'toTreeId': '51f07bc8e0eb82b241784709669f186aee2c3989'
+          }
+        ],
+        'childrenReordered': [
+          {
+            'index': 1,
+            'fromId': 'B',
+            'toId': 'D'
+          }
+        ]
+      },
+      'A': {
+        'match': false,
+        'treeHashChanged': {
+          'fromTreeId': 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
+          'toTreeId': '7f5c4f5a5de6ac07235090cc4854f5c9db2ac9e3'
+        },
+        'childrenDeleted': [
+          {
+            'id': 'AA',
+            'treeId': '38d2301582967345cc6c30e5df19359b757db4fb'
+          }
+        ],
+        'childrenModified': [
+          {
+            'id': 'AB',
+            'fromTreeId': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
+            'toTreeId': 'ddc3ea25293266ded6f267d7408bf37f6c19a3fe'
+          }
+        ],
+        'childrenReordered': [
+          {
+            'index': 0,
+            'fromId': 'AA',
+            'toId': 'AB'
+          },
+          {
+            'index': 1,
+            'fromId': 'AB',
+            'toId': 'AC'
+          },
+          {
+            'index': 2,
+            'fromId': 'AC'
+          }
+        ]
+      },
+      'AB': {
+        'match': false,
+        'treeHashChanged': {
+          'fromTreeId': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
+          'toTreeId': 'ddc3ea25293266ded6f267d7408bf37f6c19a3fe'
+        },
+        'childrenAdded': [
+          {
+            'id': 'AA',
+            'treeId': '53e3d45ccdeda75d7eeb98c080d8401900ed2174'
+          }
+        ],
+        'childrenReordered': [
+          {
+            'index': 0,
+            'fromId': 'ABA',
+            'toId': 'AA'
+          },
+          {
+            'index': 1,
+            'fromId': 'ABB',
+            'toId': 'ABA'
+          }
+        ]
+      },
+      'AA': {
+        'match': false,
+        'treeHashChanged': {
+          'fromTreeId': '38d2301582967345cc6c30e5df19359b757db4fb',
+          'toTreeId': '53e3d45ccdeda75d7eeb98c080d8401900ed2174'
+        },
+        'contentChanged': {
+          'fromOID': '71cea569a1401108ea4ce2ebe40470ba536fc676',
+          'toOID': 'd9bd2c7ca658b470dc633e01eac973adb05ceb99'
+        },
+        'parentChanged': {
+          'fromId': 'A',
+          'toId': 'AB'
+        }
+      },
+      'C': {
+        'match': false,
+        'treeHashChanged': {
+          'fromTreeId': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
+          'toTreeId': '51f07bc8e0eb82b241784709669f186aee2c3989'
+        },
+        'contentChanged': {
+          'fromOID': '3cfa883acec0a529b941b02a57f4187bece8263d',
+          'toOID': 'ba5a2c063c02084c658ab77309d6c25ce1e128e2'
+        }
+      }
+    }
+  };
+
   var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
 
-  var thmCompare = TreeConfiguration.compareTreeHashMap(treeHashMapBefore, treeHashMapAfter);
+  var thmCompare = TreeHashMap.compare(treeHashMapBefore, treeHashMapAfter);
+  let newCompare = TreeHashMap.diff(treeHashMapBefore, treeHashMapAfter);
 
+  expect(newCompare).toEqual(expectedCompareResult);
   expect(thmCompare).toEqual(expectedDeltaMap);
 });
 

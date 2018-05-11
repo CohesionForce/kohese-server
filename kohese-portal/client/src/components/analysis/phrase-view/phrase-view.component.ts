@@ -27,13 +27,14 @@ import { FormControl } from '@angular/forms';
 export class PhraseViewComponent extends AnalysisViewComponent
   implements OnInit, OnDestroy {
   /* UI Switches */
-  loadLimit: number = 100;
+  loadLimit: number = 1000;
   ascending: boolean = true;
   sortField: string = 'count';
   filters: Array<RegExp> = [];
   showPOS: boolean = false;
   syncFilter: boolean;
   filteredCount: number;
+  displayedCount: number;
   phrases: Array<any> = [];
   filterOptions : object;
   filterControl : FormControl = new FormControl('');
@@ -58,7 +59,7 @@ export class PhraseViewComponent extends AnalysisViewComponent
 
   constructor(NavigationService: NavigationService,
     AnalysisService: AnalysisService,
-    private dataProcessingService: DataProcessingService, 
+    private dataProcessingService: DataProcessingService,
     private changeRef : ChangeDetectorRef) {
     super(NavigationService, AnalysisService);
   }
@@ -92,7 +93,7 @@ export class PhraseViewComponent extends AnalysisViewComponent
       }
     });
   }
-  
+
   toggleLink () {
     this.syncFilter = !this.syncFilter;
     if (this.syncFilter && this.lastFilter) {
@@ -132,21 +133,26 @@ export class PhraseViewComponent extends AnalysisViewComponent
   }
 
   processPhrases(): void {
+    let filteredList;
+
     if (!this.filterRegex) {
-      this.phrases = this.dataProcessingService.sort(
-        this.itemProxy.analysis.extendedChunkSummaryList,
-        [this.sortField], this.ascending).slice(0, this.loadLimit);
+      filteredList = this.itemProxy.analysis.extendedChunkSummaryList;
     } else {
-      this.phrases = this.dataProcessingService.sort(
-        this.dataProcessingService.filter(
+      filteredList = this.dataProcessingService.filter(
         this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
           if (!this.filterRegex.test(input.text)) {
             return false;
           }
           return true;
-        }]), [this.sortField], this.ascending).slice(0, this.loadLimit);
+        }]
+      );
     }
 
-    this.filteredCount = this.phrases.length;
+    this.filteredCount = filteredList.length;
+
+    this.phrases = this.dataProcessingService.sort(filteredList,
+      [this.sortField], this.ascending).slice(0, this.loadLimit);
+
+    this.displayedCount = this.phrases.length;
   }
 }
