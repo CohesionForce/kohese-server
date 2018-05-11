@@ -1,3 +1,5 @@
+import { Subject } from 'rxjs/Subject';
+import { LoggingEventRecord } from './k-logger';
 import * as Bunyan from "bunyan";
 import { BehaviorSubject } from "rxjs";
 import { BREAKPOINTS } from "@angular/flex-layout";
@@ -36,6 +38,7 @@ export interface LoggingEventRecord {
   id: string;
   definition: ComponentLogDefinition;
   automaticallyCreated?: boolean; // Needs to be added to the central repository
+  active : boolean;
 }
 
 interface LoggingCategoryRecord {
@@ -46,7 +49,7 @@ interface LoggingCategoryRecord {
 }
 
 export class KLogger {
-  public logger: any;
+  public bunyan: any;
 
   private static singleton: KLogger;
 
@@ -54,16 +57,20 @@ export class KLogger {
   loggingEventRegistry: { [nameString: string]: LoggingEventRecord } = {};
   loggingCategoryRegistry: { [nameString: string]: LoggingCategoryRecord } = {};
 
-  loggingEventSubject: BehaviorSubject<{ [nameString: string]: LoggingEventRecord }> = new BehaviorSubject<{ [nameString: string]: LoggingEventRecord }>(undefined)
-  subscribedLogEvents : any;
-  
+  loggingEventRegisteredSubject: Subject <LoggingEventRecord> = new Subject<LoggingEventRecord>()
+  logMap : any = {};
+
   private showAllErrors: boolean = true;
 
-  constructor(logEventSubscription? : any) {
+  constructor(logRegistry? : any) {
     if (!KLogger.singleton) {
       KLogger.singleton = this;
-      if (logEventSubscription) {
-        this.subscribedLogEvents = logEventSubscription;
+      if (logRegistry) {
+        for (let logEvent of logRegistry) {
+          this.logMap[logEvent.id] = logEvent;
+        }
+      } else {
+        console.log('Initializing Log Registry');
       }
       this.createLogger();
     }
@@ -71,7 +78,7 @@ export class KLogger {
   }
 
   createLogger() {
-    this.logger = Bunyan.createLogger({
+    this.bunyan = Bunyan.createLogger({
       name: 'Default logger',
     })
   }
@@ -98,26 +105,31 @@ export class KLogger {
   }
 
   getEventId(componentId: string, eventName: string): string {
-    let eventId = undefined;
     let loggingEventRecord: LoggingEventRecord = this.loggingEventRegistry[eventName];
-
-    if (!loggingEventRecord) {
-      // LoggingEvent record was not found, create one and flag for registration
-
-      loggingEventRecord = {
-        id: '[' + eventName + ']',
-        definition: {
-          name: eventName,
-          description: "Event Logging record for: " + componentId + ' - ' + eventName
-        },
-        // loggingEventDefinitions : {},
-        automaticallyCreated: true
-      }
-      this.loggingEventRegistry[eventName] = loggingEventRecord;
-      this.loggingEventSubject.next(this.loggingEventRegistry)
+    let id;
+    if (loggingEventRecord) {
+      id = loggingEventRecord.id;
     }
+    return id;
+   }
 
-    return loggingEventRecord.id;
+  generateEventRecord(componentId: string, eventName: string): LoggingEventRecord {
+    let loggingEventRecord : LoggingEventRecord;
+
+    loggingEventRecord = {
+      id: '[' + eventName + ']',
+      definition: {
+        name: eventName,
+        description: "Event Logging record for: " + componentId + ' - ' + eventName
+      },
+      // loggingEventDefinitions : {},
+      automaticallyCreated: true,
+      active : false
+    }
+    this.loggingEventRegistry[eventName] = loggingEventRecord;
+    this.loggingEventRegisteredSubject.next(loggingEventRecord)
+
+    return loggingEventRecord;
   }
 
   getCategoryId(categoryName: string): string {
@@ -129,34 +141,23 @@ export class KLogger {
   }
 
   log(eventId: string, infoObject?: any) {
-    console.log(eventId);
-    if (infoObject) {
-      console.log(infoObject);
-      console.log('//////')
+    if (this.logMap[eventId]) {
+      console.log(eventId);
+      if (infoObject) {
+        console.log(infoObject);
+        console.log('//////')
+      }
+    } else {
+      console.log('log fail');
     }
   }
 
-  info(message: any, infoObject?: any) {
-    this.logger.info(message);
-    if (infoObject) {
-      console.log(infoObject);
-      console.log('//////')
-    }
+  getLogRegisteredSubject() : Subject<LoggingEventRecord> {
+    return this.loggingEventRegisteredSubject;
   }
 
-  error(message: any, infoObject?: any) {
-    console.error(message)
-    if (infoObject) {
-      console.log(infoObject);
-      console.log('//////')
-    }
-  }
 
-  registerLogEvents() {
-    this.loggingEventSubject.next(this.loggingEventRegistry)
-  }
-
-  getLogEvents() {
-    return this.loggingEventSubject;
-  }
+  // getLogEvents() {
+  //   return this.loggingEventSubject;
+  // }
 }

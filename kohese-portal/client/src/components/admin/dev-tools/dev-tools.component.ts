@@ -1,3 +1,4 @@
+import { LoggingEventRecord } from './../../../../../common/src/k-logger';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { LogService } from '../../../services/log/log.service';
 
@@ -6,35 +7,24 @@ import { LogService } from '../../../services/log/log.service';
   templateUrl: './dev-tools.component.html',
   styleUrls: ['./dev-tools.component.scss']
 })
-export class DevToolsComponent implements OnInit, AfterViewInit {
-  logEvents = [];
-  selectedLogEvents: any;
+export class DevToolsComponent implements OnInit {
+  logRegistry : Array<LoggingEventRecord>;
+  selectedLogEvents = {};
 
   constructor(private logService: LogService) { }
 
   ngOnInit() {
-    let allLogEvents = this.logService.getLogEvents();
-    let logKeys = Object.keys(allLogEvents)
-    let logArray = [];
-    for (let key of logKeys) {
-      this.logEvents.push(allLogEvents[key])
-    }
+    this.logRegistry = this.logService.getLogEvents();
 
-    this.logService.getLogEventsSubscription().subscribe((logEvents) => {
-      this.selectedLogEvents = logEvents;
-      console.log(this.selectedLogEvents);
-    })
-  }
-
-  ngAfterViewInit () {
-    this.logService.getLogEventsSubscription().subscribe((logEvents) => {
-      this.selectedLogEvents = logEvents;
-      console.log(this.selectedLogEvents);
-    })
+    // Eventually add some subscriptions that will validate the save went through or listen for new log registries
   }
 
   saveLogSelections() {
     console.log(this.selectedLogEvents);
-    this.logService.saveLogEventsSubscription(this.selectedLogEvents);
+    this.logService.updateLogRegistry(this.logRegistry);
+  }
+
+  selectEvent(logEvent : any) {
+    logEvent.active = !logEvent.active;
   }
 }

@@ -1,11 +1,12 @@
 <mat-tab-group>
   <mat-tab label="Logging">
-    <mat-selection-list style="height: 700px; overflow: auto; width: 50%" [(ngModel)]="selectedLogEvents">
-      <mat-list-option *ngFor="let logEvent of logEvents" matTooltip="{{logEvent.definition.description}}" [value]="logEvent">
+    <mat-list style="height: 700px; overflow: auto; width: 50%">
+      <mat-list-item *ngFor="let logEvent of logRegistry" matTooltip="{{logEvent.definition.description}}" (click)="selectEvent(logEvent)">
         {{logEvent.definition.name}}
-      </mat-list-option>
-    </mat-selection-list>
-    <button mat-raised-button (click)="saveLogSelections(logEventList)">
+        <i *ngIf="logEvent.active" class="fa fa-check"></i>
+      </mat-list-item>
+    </mat-list>
+    <button mat-raised-button (click)="saveLogSelections()">
       Save Log Selections
     </button>
   </mat-tab>

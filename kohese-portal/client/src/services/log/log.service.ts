@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs/Subject';
 import { Injectable } from "@angular/core";
 import { KLogger, LoggingEventRecord } from "../../../../common/src/k-logger";
 import { Subscription, BehaviorSubject } from "rxjs";
@@ -18,22 +19,24 @@ export interface LogInformation {
 export class LogService {
   logger: KLogger;
   componentMap : {};
-  logEvents : {[nameString:string] : LoggingEventRecord}
-  logEventsSub : Subscription
-  subscribedLogEvents : any;
-  subscribedLogEventsSubject : BehaviorSubject<any>;
+  logRegistry : Array<LoggingEventRecord>;
+  logRegistrySubject : BehaviorSubject<any>;
+  logRegisteredSubscription : Subscription
 
   constructor() {
-    let subscriptionString = localStorage.getItem('subscribedLogEvents');
-    if (subscriptionString) {
-      this.subscribedLogEvents = JSON.parse(subscriptionString);
+    let logRegistryJSON = localStorage.getItem('logRegistry');
+    if (logRegistryJSON) {
+      this.logRegistry = JSON.parse(logRegistryJSON);
+    } else {
+      this.logRegistry = [];
     }
-    this.subscribedLogEventsSubject = new BehaviorSubject<any>(this.subscribedLogEvents);
+    this.logRegistrySubject = new BehaviorSubject<any>(this.logRegistry);
 
-    this.logger = new KLogger(this.subscribedLogEvents);
-    this.logEventsSub = this.logger.getLogEvents().subscribe((newLogEvents)=>{
-      this.logEvents = newLogEvents;
-      console.log(this.logEvents);
+    this.logger = new KLogger(this.logRegistry);
+
+    this.logRegisteredSubscription = this.logger.getLogRegisteredSubject().subscribe((newLogEvent : LoggingEventRecord)=>{
+      this.logRegistry.push(newLogEvent);
+      this.updateLogRegistry(this.logRegistry);
     })
   }
 
@@ -42,32 +45,27 @@ export class LogService {
   }
 
   getEventId(componentId: string, eventName: string): string {
-    return this.logger.getEventId(componentId, eventName);
+    let newEventRecord : LoggingEventRecord;
+    let eventId = this.logger.getEventId(componentId, eventName);
+    if (!eventId) {
+      newEventRecord = this.logger.generateEventRecord(componentId, eventName);
+      eventId = newEventRecord.id
+    }
+    return eventId;
   }
 
   log(eventId : string, infoObject?: any) {
     this.logger.log(eventId, infoObject)
   }
 
-  info(logInfo : LogInformation, infoObject?: any) {
-    this.logger.info(logInfo, infoObject)
-  }
-
-  error(logInfo : LogInformation, infoObject? : any) {
-    this.logger.error(logInfo, infoObject);
-  }
-
   getLogEvents() {
-    return this.logEvents;
+    return this.logRegistry;
   }
 
-  saveLogEventsSubscription (selectedEvents : any ) {
-    localStorage.setItem('subscribedLogEvents', JSON.stringify(selectedEvents));
-    this.subscribedLogEvents = selectedEvents;
-    this.subscribedLogEventsSubject.next(selectedEvents);
-  }
-
-  getLogEventsSubscription () {
-    return this.subscribedLogEventsSubject;
+  // Should only really be called from the dev tools for now
+  updateLogRegistry (logRegistry : Array<LoggingEventRecord> ) {
+    localStorage.setItem('logRegistry', JSON.stringify(logRegistry));
+    this.logRegistry = logRegistry;
+    this.logRegistrySubject.next(logRegistry);
   }
 }

@@ -225,7 +225,7 @@ export class ItemRepository {
           try {
             iProxy = new ItemProxy(kind, item);
           } catch (error) {
-            this.logService.error(this.logEvents.bulkError, {
+            this.logService.log(this.logEvents.bulkError, {
               kind : kind,
               item : item,
               error : error
@@ -524,9 +524,9 @@ export class ItemRepository {
   buildItem(kind: string, item: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/upsert', { kind: kind, item: item }, (response) => {
-        if (response.error) {
+        if (response.log) {
           this.logService.log(this.logEvents.createError, {error : response})
-          reject(response.error);
+          reject(response.log);
         } else {
           this.logService.log(this.logEvents.createSucceeded, {response : response});
           let proxy;
@@ -550,8 +550,8 @@ export class ItemRepository {
         kind: proxy.kind,
         item: proxy.item
       }, (response: any) => {
-        if (response.error) {
-          reject(response.error);
+        if (response.log) {
+          reject(response.log);
         } else {
           if (!proxy.updateItem) {
             // TODO Need to figure out why this is here
@@ -578,8 +578,8 @@ export class ItemRepository {
 
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/deleteById', { kind: proxy.kind, id: proxy.item.id, recursive: recursive }, (response) => {
-        if (response.error) {
-          reject(response.error);
+        if (response.log) {
+          reject(response.log);
         } else {
           resolve(response);
         }
@@ -640,8 +640,8 @@ export class ItemRepository {
 
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/performAnalysis', { kind: forProxy.kind, id: forProxy.item.id }, (response) => {
-        if (response.error) {
-          reject(response.error);
+        if (response.log) {
+          reject(response.log);
         } else {
           resolve(response);
         }
