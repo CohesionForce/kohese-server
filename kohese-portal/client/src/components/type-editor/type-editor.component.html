@@ -30,12 +30,14 @@
       </span>
     </div>
     <div style="height: 93%; width: 100%;">
-      <mat-tab-group class="pad" style="height: 100%; width: 100%;">
+      <mat-tab-group class="pad" style="height: 100%; width: 100%;"
+        (selectedIndexChange)="$event ? propertyEditorComponent.showSplitPanes = true : ''">
         <mat-tab label="Overview">
           <type-overview [koheseTypeStream]="koheseTypeStream"></type-overview>
         </mat-tab>
         <mat-tab label="Properties">
-          <property-editor [koheseTypeStream]="koheseTypeStream">
+          <property-editor #propertyEditorComponent
+            [koheseTypeStream]="koheseTypeStream">
           </property-editor>
         </mat-tab>
       </mat-tab-group>

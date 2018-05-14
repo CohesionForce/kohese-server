@@ -3,8 +3,10 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { DialogService } from '../../../services/dialog/dialog.service';
+import { DialogService,
+  DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { UserInput } from '../../user-input/user-input.class';
 
@@ -66,9 +68,16 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     return this._types;
   }
   
+  // Work-around for angular-split defect
   private _showSplitPanes: boolean = false;
   get showSplitPanes() {
     return this._showSplitPanes;
+  }
+  set showSplitPanes(showSplitPanes: boolean) {
+    setTimeout(() => {
+      this._showSplitPanes = true;
+      this._changeDetectorRef.markForCheck();
+    });
   }
   
   private _koheseTypeStreamSubscription: Subscription;
@@ -98,11 +107,6 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       this._koheseType = koheseType;
       this._changeDetectorRef.markForCheck();
     });
-    
-    setTimeout(() => {
-      this._showSplitPanes = true;
-      this._changeDetectorRef.markForCheck();
-    }, 1500);
   }
   
   public ngOnDestroy(): void {
@@ -110,8 +114,8 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
   }
   
   add(): void {
-    this.dialogService.openInputDialog('Add Property', '', this.dialogService.
-      INPUT_TYPES.TEXT, 'Name').afterClosed().subscribe((name: string) => {
+    this.dialogService.openInputDialog('Add Property', '', DialogComponent.
+      INPUT_TYPES.TEXT, 'Name', '').afterClosed().subscribe((name: string) => {
       if (name) {
         this._koheseType.addProperty(name);
         this._changeDetectorRef.markForCheck();
@@ -148,6 +152,30 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     }
     
     return type;
+  }
+  
+  public openStateMachineEditor(): void {
+    let stateMachine: any = this._koheseType.fields[this.selectedPropertyId].
+      properties;
+    if (stateMachine) {
+      stateMachine = JSON.parse(JSON.stringify(stateMachine));
+    } else {
+      stateMachine = {
+        state: {},
+        transition: {}
+      };
+    }
+    
+    this.dialogService.openComponentDialog(StateMachineEditorComponent, {
+      data: {
+        stateMachine: stateMachine
+      }
+    }).updateSize('70%', '70%').afterClosed().subscribe(
+      (returnedStateMachine: any) => {
+      if (returnedStateMachine) {
+        this.updateProperty(['properties'], returnedStateMachine);
+      }
+    });
   }
   
   public areTypesSame(option: any, selection: any): boolean {

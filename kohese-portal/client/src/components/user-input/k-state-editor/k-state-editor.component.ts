@@ -23,7 +23,7 @@ export class KStateEditorComponent extends UserInput implements OnInit,
   get koheseType() {
     return this._koheseType;
   }
-  private _transitionCandidates: Array<any>;
+  private _transitionCandidates: any;
   get transitionCandidates() {
     return this._transitionCandidates;
   }

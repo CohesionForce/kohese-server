@@ -46,7 +46,7 @@
           }
         },
         "transition": {
-          "assignAnalysis": {
+          "Assign Analysis": {
             "source": "Proposed",
             "target": "InAnalysis",
             "guard": {},
@@ -54,34 +54,34 @@
               "assignment:Analyzer"
             ]
           },
-          "reviewForApproval": {
+          "Review For Approval": {
             "source": "InAnalysis",
             "target": "InReview",
             "guard": {}
           },
-          "approve": {
+          "Approve": {
             "source": "InReview",
             "target": "Approved",
             "guard": {},
             "requires": ""
           },
-          "defer": {
+          "Defer": {
             "source": "InReview",
             "target": "Deferred",
             "guard": {},
             "requires": []
           },
-          "disapprove": {
+          "Disapprove": {
             "source": "InReview",
             "target": "Disapproved",
             "guard": {}
           },
-          "publish": {
+          "Publish": {
             "source": "Approved",
             "target": "Published",
             "guard": {}
           },
-          "appeal": {
+          "Appeal": {
             "source": "Disapproved",
             "target": "InAppeal",
             "guard": {}

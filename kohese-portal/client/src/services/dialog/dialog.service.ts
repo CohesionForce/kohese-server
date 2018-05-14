@@ -5,13 +5,6 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class DialogService {
-  public readonly INPUT_TYPES: any = {
-    TEXT: 'text',
-    DATE: 'date',
-    TIME: 'time'
-  };
-  public inputtedValue: string;
-  
   constructor(private dialog: MatDialog) {
   }
 
@@ -37,13 +30,35 @@ export class DialogService {
     }).afterClosed();
   }
   
-  openInputDialog(title: string, text: string, type: string, fieldName: string): MatDialogRef<DialogComponent> {
+  openInputDialog(title: string, text: string, type: string, fieldName: string,
+    initialValue: string): MatDialogRef<DialogComponent> {
+    if (!initialValue) {
+      initialValue = '';
+    }
     return this.dialog.open(DialogComponent, {
       data: {
         title: title,
         text: text,
         inputType: type,
-        fieldName: fieldName
+        fieldName: fieldName,
+        value: initialValue
+      }
+    });
+  }
+  
+  public openSelectDialog(title: string, text: string, label: string,
+    initialValue: string, options: Array<string>):
+    MatDialogRef<DialogComponent> {
+    if (!initialValue) {
+      initialValue = '';
+    }
+    return this.dialog.open(DialogComponent, {
+      data: {
+        title: title,
+        text: text,
+        fieldName: label,
+        value: initialValue,
+        options: options
       }
     });
   }
@@ -58,6 +73,17 @@ export class DialogService {
   styleUrls: ['./dialog.component.scss']
 })
 export class DialogComponent {
+  public static readonly INPUT_TYPES: any = {
+    TEXT: 'text',
+    MULTILINE_TEXT: 'multilineText',
+    DATE: 'date',
+    TIME: 'time'
+  };
+  
+  get INPUT_TYPES() {
+    return DialogComponent.INPUT_TYPES;
+  }
+  
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
   }
 }

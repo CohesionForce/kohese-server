@@ -34,7 +34,7 @@
           }
         },
         "transition": {
-          "assign": {
+          "Assign": {
             "source": "Proposed",
             "target": "Assigned",
             "guard": {},
@@ -42,18 +42,18 @@
               "assignment:Assignee"
             ]
           },
-          "beginWork": {
+          "Begin Work": {
             "source": "Assigned",
             "target": "InWork",
             "guard": {},
             "requires": ""
           },
-          "reassign": {
+          "Reassign": {
             "source": "Assigned",
             "target": "PendingReassign",
             "guard": {}
           },
-          "complete": {
+          "Complete": {
             "source": "InWork",
             "target": "Completed",
             "guard": {},
