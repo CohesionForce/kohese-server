@@ -525,9 +525,9 @@ export class ItemRepository {
   buildItem(kind: string, item: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/upsert', { kind: kind, item: item }, (response) => {
-        if (response.log) {
+        if (response.error) {
           this.logService.log(this.logEvents.createError, {error : response})
-          reject(response.log);
+          reject(response.error);
         } else {
           this.logService.log(this.logEvents.createSucceeded, {response : response});
           let proxy;
@@ -551,8 +551,8 @@ export class ItemRepository {
         kind: proxy.kind,
         item: proxy.item
       }, (response: any) => {
-        if (response.log) {
-          reject(response.log);
+        if (response.error) {
+          reject(response.error);
         } else {
           if (!proxy.updateItem) {
             // TODO Need to figure out why this is here
@@ -579,8 +579,8 @@ export class ItemRepository {
 
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/deleteById', { kind: proxy.kind, id: proxy.item.id, recursive: recursive }, (response) => {
-        if (response.log) {
-          reject(response.log);
+        if (response.error) {
+          reject(response.error);
         } else {
           resolve(response);
         }
@@ -641,8 +641,8 @@ export class ItemRepository {
 
     var promise = new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/performAnalysis', { kind: forProxy.kind, id: forProxy.item.id }, (response) => {
-        if (response.log) {
-          reject(response.log);
+        if (response.error) {
+          reject(response.error);
         } else {
           resolve(response);
         }
