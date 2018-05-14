@@ -1,3 +1,4 @@
+import { CurrentUserService } from './../../services/user/current-user.service';
 import { Component, OnInit } from '@angular/core';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
@@ -38,16 +39,20 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
 
   constructor(protected navigationService : NavigationService,
               private itemRepository : ItemRepository,
-              private sessionService: SessionService) {
+              private currentUserService : CurrentUserService) {
     super(navigationService);
                }
 
   ngOnInit() {
-    this.sessionService.getSessionUser().subscribe((userProxy) => {
-      if (userProxy) {
-        this.currentUser = userProxy;
-        this.username = userProxy.item.name;
-        this.buildAssignmentList();
+    this.currentUserService.getCurrentUserSubject().subscribe((userInfo) => {
+      if (userInfo) {
+        this.username = userInfo.username;
+        this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
+          if (newConfig) {
+          this.currentUser = newConfig.config.getProxyByProperty('KoheseUser', 'username', this.username);
+          this.buildAssignmentList();
+          }
+        })
       }
     });
   }

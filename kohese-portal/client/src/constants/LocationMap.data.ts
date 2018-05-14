@@ -56,6 +56,12 @@ export var LocationMap = {
     'title' : 'Type Editor',
     'params' : [],
     'route' : '/typeeditor'
+  },
+  'Dev-Tools' : {
+    'type' : 'single',
+    'title' : 'Dev Tools',
+    'params' : [],
+    'route' : '/devtools'
   }
 }
 

@@ -22,6 +22,7 @@ import { StateService } from './state/state.service';
 import { LensService } from './lens-service/lens.service';
 import { MaterialModule } from "../material.module";
 import { ProjectService } from "./project-service/project.service";
+import { LogService } from "./log/log.service";
 
 @NgModule({
   declarations: [
@@ -54,7 +55,11 @@ import { ProjectService } from "./project-service/project.service";
     ImportService,
     StateService,
     LensService,
-    ProjectService
+    ProjectService,
+    LogService
   ]
 })
 export class ServicesModule {}
+
+// Log Events 
+import { InitializeLogs } from './item-repository/item-repository.registry'
