@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../material.module';
+import { PipesModule } from '../../../pipes/pipes.module';
 import { StateService } from '../../../services/state/state.service';
 import { MockStateService } from '../../../../mocks/services/MockStateService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
@@ -18,7 +19,11 @@ describe('k-state-editor', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [KStateEditorComponent],
-      imports: [CommonModule, MaterialModule],
+      imports: [
+        CommonModule,
+        MaterialModule,
+        PipesModule
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [{
           provide: StateService,

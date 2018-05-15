@@ -4,6 +4,7 @@ import { MaterialModule } from "../../material.module";
 
 import { AdminComponent} from './admin.component';
 import { RepositoriesComponent } from './repositories/repositories.component'
+import { DevToolsComponent} from './dev-tools/dev-tools.component';
 
 import { ServicesModule } from '../../services/services.module';
 import { UserModule } from '../../services/user/user.module'
@@ -14,7 +15,8 @@ import { LensModule } from "../lens/lens.module";
 @NgModule({
   declarations: [
     AdminComponent,
-    RepositoriesComponent
+    RepositoriesComponent,
+    DevToolsComponent
   ],
   entryComponents: [
   ],
@@ -30,7 +32,8 @@ import { LensModule } from "../lens/lens.module";
   ],
   exports : [
     AdminComponent,
-    RepositoriesComponent
+    RepositoriesComponent,
+    DevToolsComponent
   ]
 })
 export class AdminModule {}

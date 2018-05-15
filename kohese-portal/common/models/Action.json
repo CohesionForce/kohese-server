@@ -46,7 +46,7 @@
           }
         },
         "transition": {
-          "assign": {
+          "Assign": {
             "source": "Proposed",
             "target": "Assigned",
             "guard": {},
@@ -54,41 +54,41 @@
               "assignment:Assignee"
             ]
           },
-          "request-reassign": {
+          "Request Reassign": {
             "source": "Assigned",
             "target": "PendingReassign",
             "guard": {}
           },
-          "redisposition": {
+          "Redisposition": {
             "source": "Assigned",
             "target": "PendingRedisposition",
             "guard": {},
             "requires": ""
           },
-          "beginWork": {
+          "Begin Work": {
             "source": "Assigned",
             "target": "InWork",
             "guard": {},
             "requires": []
           },
-          "requestVerification": {
+          "Request Verification": {
             "source": "InWork",
             "target": "InVerification",
             "guard": {},
             "requires": []
           },
-          "reassign": {
+          "Reassign": {
             "source": "PendingReassign",
             "target": "Assigned",
             "guard": {},
             "requires": []
           },
-          "verify": {
+          "Verify": {
             "source": "InVerification",
             "target": "Verified",
             "guard": {}
           },
-          "close": {
+          "Close": {
             "source": "Verified",
             "target": "Closed",
             "guard": {}

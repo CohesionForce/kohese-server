@@ -85,6 +85,10 @@ table {
   margin-left: auto;
 }
 
+.selected-border {
+  border: 3px solid $primaryColor + 100;
+}
+
 // Define 3 theme colors
 
 // $kohese-theme-primary: mat-palette($mat-green, 700, 300, 900);
