@@ -63,43 +63,20 @@
         Dirty
       </mat-checkbox>
     </div>
-    <button mat-raised-button
-      (click)="viewMap[selectedViewStream.getValue()].expandAll()"
-      class="btn btn-default btn-sm">
-      Expand All
-    </button>
-    <button mat-raised-button
-      (click)="viewMap[selectedViewStream.getValue()].collapseAll()"
-      class="btn btn-default btn-sm">
-      Collapse All
-    </button>
-    <button mat-raised-button class="btn btn-default btn-sm"
-      (click)="changeRoot(viewMap[selectedViewStream.getValue()].getRow(viewMap[selectedViewStream.getValue()].getRow(root.item.id).getRowParentProxy().item.id))"
-      [disabled]="!root || (root.item.id === 'ROOT')">
-      Up Level
-    </button>
-    <button mat-raised-button class="btn btn-default btn-sm"
-      (click)="changeRoot(viewMap[selectedViewStream.getValue()].getRow('ROOT'))"
-      [disabled]="!root || (root.item.id === 'ROOT')">
-      Reset Root
-    </button>
-    <button mat-icon-button (click)="toggleSelectionSynchronization()"
-      matTooltip="Toggle selection synchronization for the tree"
-      [ngClass]="{ 'highlight': synchronizeWithSelection }">
-      <mat-icon class="fa fa-exchange"></mat-icon>
-    </button>
   </div>
   <!-- Begin Knowledge Tree -->
   <div class="knowledge-tree-panel">
-    <div class="kt-head kth-cell">
-      Name
-    </div>
     <ng-container [ngSwitch]="(selectedViewStream | async)">
       <ng-container *ngSwitchCase="'Default'">
-        <default-tree #defaultTree></default-tree>
+        <default-tree #defaultTree [selectedViewSubject]="selectedViewStream">
+        </default-tree>
       </ng-container>
       <ng-container *ngSwitchCase="'References'">
         <reference-tree #referenceTree></reference-tree>
+      </ng-container>
+      <ng-container *ngSwitchCase="'Version Control'">
+        <default-tree #defaultTree [selectedViewSubject]="selectedViewStream">
+        </default-tree>
       </ng-container>
     </ng-container>
   </div> <!-- End Knowledge Tree -->

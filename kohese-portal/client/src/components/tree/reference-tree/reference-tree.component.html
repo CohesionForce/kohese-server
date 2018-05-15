@@ -1,8 +1,22 @@
-<div class="kt-body">
-  <virtual-scroll #tree [items]="visibleRows">
-    <tree-row *ngFor="let row of tree.viewPortItems"
-      [treeRow]="row" [treeRootStream]="rootSubject"
-      [selectedProxyIdStream]="selectedIdSubject">
+<div style="height: 100%; width: 100%;">
+  <div class="kt-head kth-cell">
+    Root
+  </div>
+  <ng-container *ngIf="rootRow">
+    <tree-row [treeRow]="rootRow" [treeRootStream]="rootSubject"
+      [selectedProxyIdStream]="selectedIdSubject" [menuActions]="rootActions">
     </tree-row>
-  </virtual-scroll>
+  </ng-container>
+  <br/>
+  <div class="kt-head kth-cell">
+    Name
+  </div>
+  <div class="kt-body">
+    <virtual-scroll #tree [items]="visibleRows">
+      <tree-row *ngFor="let row of tree.viewPortItems"
+        [treeRow]="row" [treeRootStream]="rootSubject"
+        [selectedProxyIdStream]="selectedIdSubject">
+      </tree-row>
+    </virtual-scroll>
+  </div>
 </div>

@@ -21,20 +21,7 @@ import { ProxyFilter } from '../../classes/ProxyFilter.class';
   //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
-  /* UI Toggles */
-  private _synchronizeWithSelection: boolean = true;
-  get synchronizeWithSelection() {
-    return this._synchronizeWithSelection;
-  }
-
   /* Data */
-  private _root: ItemProxy;
-  get root() {
-    return this._root;
-  }
-  
-  private _rootSubjects: Array<BehaviorSubject<ItemProxy>> = [];
-  
   @ViewChildren('defaultTree')
   private _defaultTreeQueryList: QueryList<Tree>;
   @ViewChildren('referenceTree')
@@ -53,7 +40,7 @@ export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
   
   public selectedViewStream: BehaviorSubject<string> =
     new BehaviorSubject<string>('Default');
-  private _koheseTypes: object;
+  private _koheseTypes: object = {};
   get koheseTypes() {
     return this._koheseTypes;
   }
@@ -64,10 +51,9 @@ export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
   public readonly NO_KIND_SPECIFIED: string = '---';
 
   /* Subscriptions */
-  currentTreeConfigSubscription: Subscription;
-  private _rootSubscriptions: Array<Subscription> = [];
+  private currentTreeConfigSubscription: Subscription;
 
-  constructor(private typeService: DynamicTypesService,
+  public constructor(private typeService: DynamicTypesService,
     private ItemRepository: ItemRepository,
     private SessionService: SessionService,
     private _changeDetector: ChangeDetectorRef) {
@@ -110,24 +96,9 @@ export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   
   public ngOnDestroy(): void {
-    for (let j: number = 0; j < this._rootSubscriptions.length; j++) {
-      this._rootSubscriptions[j].unsubscribe();
-    }
-    
     this.currentTreeConfigSubscription.unsubscribe();
   }
   
-  public changeRoot(root: ItemProxy): void {
-    this._root = root;
-    for (let j: number = 0; j < this._rootSubjects.length; j++) {
-      if (this._root !== this._rootSubjects[j].getValue()) {
-        this._rootSubjects[j].next(this._root);
-      }
-    }
-    
-    this._changeDetector.markForCheck();
-  }
-
   public viewSelectionChanged(viewSelected: string): void {
     switch (viewSelected) {
       case 'Version Control':
@@ -145,39 +116,27 @@ export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   
   private processTree(tree: Tree): void {
-    if (this._synchronizeWithSelection) {
-        tree.showSelection();
-      }
-      
-      this._rootSubjects.push(tree.rootSubject);
-      this._rootSubscriptions.push(tree.rootSubject.subscribe((root:
-        ItemProxy) => {
-        if (root !== this._root) {
-          this.changeRoot(root);
-        }
-      }));
-      
-      tree.preRowProcessingActivity = (row: TreeRow) => {
-        let show: boolean = true;
-        row.matchesFilter = this.doesRowMatchFilter(row, tree, this.
-          proxyFilter, false);
-        show = row.matchesFilter;
-        if (!show) {
-          let rowChildrenProxies: Array<ItemProxy> = row.
-            getRowChildrenProxies();
-          for (let j: number = 0; j < rowChildrenProxies.length; j++) {
-            if (this.doesRowMatchFilter(tree.getRow(rowChildrenProxies[j].
-              item.id), tree, this.proxyFilter, true)) {
-              show = true;
-              break;
-            }
+    tree.preRowProcessingActivity = (row: TreeRow) => {
+      let show: boolean = true;
+      row.matchesFilter = this.doesRowMatchFilter(row, tree, this.
+        proxyFilter, false);
+      show = row.matchesFilter;
+      if (!show) {
+        let rowChildrenProxies: Array<ItemProxy> = row.
+          getRowChildrenProxies();
+        for (let j: number = 0; j < rowChildrenProxies.length; j++) {
+          if (this.doesRowMatchFilter(tree.getRow(rowChildrenProxies[j].
+            item.id), tree, this.proxyFilter, true)) {
+            show = true;
+            break;
           }
         }
+      }
     
-        if (show !== row.visible) {
-          row.visible = show;
-        }
-      };
+      if (show !== row.visible) {
+        row.visible = show;
+      }
+    };
   }
   
   private doesRowMatchFilter(row: TreeRow, tree: Tree, filter: ProxyFilter,
@@ -251,17 +210,5 @@ export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
       this._viewMap[this.selectedViewStream.getValue()].showRows();
       this._filterDelayIdentifier = undefined;
     }, 1000);
-  }
-
-  public toggleSelectionSynchronization(): void {
-    this._synchronizeWithSelection = !this._synchronizeWithSelection;
-    if (this._synchronizeWithSelection) {
-      for (let viewName in this._viewMap) {
-        let view: any = this._viewMap[viewName];
-        if (view instanceof Tree) {
-          view.showSelection();
-        }
-      }
-    }
   }
 }

@@ -1,5 +1,18 @@
 @import '../../../app.component';
 
+.kt-head {
+  width: 100%;
+  font-weight: bold;
+  vertical-align: bottom;
+  border-bottom: 2px solid #ddd;
+}
+
+.kth-cell {
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 0px 0px;
+}
+
 virtual-scroll {
   height: 100%;
   width: 100%;

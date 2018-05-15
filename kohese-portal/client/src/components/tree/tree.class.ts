@@ -16,10 +16,15 @@ export class Tree {
     return this._visibleRows;
   }
   
-  private _rootSubject: BehaviorSubject<ItemProxy> =
+  protected _rootSubject: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
   get rootSubject() {
     return this._rootSubject;
+  }
+  
+  private _rootRow: TreeRow;
+  get rootRow() {
+    return this._rootRow;
   }
   
   private _selectedIdSubject: BehaviorSubject<string> =
@@ -35,12 +40,9 @@ export class Tree {
   private _updateVisibleRowsSubscriptions: Array<Subscription> = [];
   
   public constructor(protected _route: ActivatedRoute) {
-    this._rootSubscription = this._rootSubject.subscribe((proxy: ItemProxy) => {
-      console.log('Jesus Christ is LORD!');
-      if (proxy) {
-        this.rootChanged(proxy);
-        this.showRows();
-      }
+    this._rootSubscription = this._rootSubject.subscribe((proxy:
+      ItemProxy) => {
+      this.changeRoot(proxy);
     });
     
     this._route.params.subscribe((parameters: Params) => {
@@ -100,6 +102,18 @@ export class Tree {
     return this._rowMap.get(id);
   }
   
+  public changeRoot(root: ItemProxy): void {
+    if (root) {
+      if (root !== this._rootSubject.getValue()) {
+        this._rootSubject.next(root);
+      }
+      this.rootChanged();
+      this._rootRow = this._rowMap.get(root.item.id);
+      this._rootRow.depth = 0;
+      this.showRows();
+    }
+  }
+  
   protected deleteRow(id: string): void {
     let row: TreeRow = this._rowMap.get(id);
     this._rows.splice(this._rows.indexOf(row), 1);
@@ -110,14 +124,15 @@ export class Tree {
     this._visibleRows = [];
     this.preTreeTraversalActivity();
     
-    let root: TreeRow = this._rowMap.get(this._rootSubject.getValue().item.id);
-    let rootRowChildrenProxies: Array<ItemProxy> = root.getRowChildrenProxies();
+    let rootRowChildrenProxies: Array<ItemProxy> = this._rootRow.
+      getRowChildrenProxies();
     for (let j: number = 0; j < rootRowChildrenProxies.length; j++) {
       this.processRow(this._rowMap.get(rootRowChildrenProxies[j].item.id));
     }
     
     this.postTreeTraversalActivity();
     
+    this._rootRow.updateDisplay.next(true);
     for (let j: number = 0; j < this._visibleRows.length; j++) {
       this._visibleRows[j].updateDisplay.next(true);
     }
@@ -125,26 +140,34 @@ export class Tree {
   
   private processRow(row: TreeRow): void {
     this.preRowProcessingActivity(row);
+    
+    let root: ItemProxy = this._rootSubject.getValue();
+    let rowParentProxy: ItemProxy = row.getRowParentProxy();
+    let depth: number = 0;
+    if (row !== this._rootRow) {
+      while (rowParentProxy) {
+        if (rowParentProxy === root) {
+          break;
+        }
+        depth++;
+        rowParentProxy = this._rowMap.get(rowParentProxy.item.id).
+          getRowParentProxy();
+      }
+    }
+    row.depth = depth;
+    
     if (row.visible) {
-      let rowParentProxy: ItemProxy = row.getRowParentProxy();
+      rowParentProxy = row.getRowParentProxy();
       let addRow: boolean = !rowParentProxy;
       if (rowParentProxy) {
         let parentRow: TreeRow = this._rowMap.get(rowParentProxy.item.id);
         /* The parent TreeRow's expansion should be checked after the root is
         compared to parentRow's ItemProxy */
-        addRow = ((rowParentProxy === this._rootSubject.getValue()) ||
-          parentRow.expanded);
+        addRow = ((rowParentProxy === root) || parentRow.expanded);
       }
       
       if (addRow) {
         this._visibleRows.push(row);
-        
-        let depth: number = 0;
-        while (rowParentProxy) {
-          depth++;
-          rowParentProxy = this._rowMap.get(rowParentProxy.item.id).getRowParentProxy();
-        }
-        row.depth = depth;
         
         if (row.expanded) {
           let rowChildrenProxies: Array<ItemProxy> = row.
@@ -174,7 +197,7 @@ export class Tree {
     // Subclasses may override this function
   }
   
-  public rootChanged(root: ItemProxy): void {
+  public rootChanged(): void {
     // Subclasses may override this function
   }
   
@@ -194,11 +217,8 @@ export class Tree {
         }
       }
     };
-    let rowChildrenProxies: Array<ItemProxy> = this._rowMap.get(this._rootSubject.getValue().item.id).
-      getRowChildrenProxies();
-    for (let j: number = 0; j < rowChildrenProxies.length; j++) {
-      expandFunction(this._rowMap.get(rowChildrenProxies[j].item.id));
-    }
+    
+    expandFunction(this._rootRow);
 
     this.showRows();
   }
@@ -213,11 +233,8 @@ export class Tree {
         }
       }
     };
-    let rowChildrenProxies: Array<ItemProxy> = this._rowMap.get(this._rootSubject.getValue().item.id).
-      getRowChildrenProxies();
-    for (let j: number = 0; j < rowChildrenProxies.length; j++) {
-      collapseFunction(this._rowMap.get(rowChildrenProxies[j].item.id));
-    }
+    
+    collapseFunction(this._rootRow);
 
     this.showRows();
   }

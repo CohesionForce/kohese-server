@@ -8,6 +8,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row.class';
+import { MenuAction } from '../tree-row.component';
 
 @Component({
   selector: 'reference-tree',
@@ -17,6 +18,23 @@ import { TreeRow } from '../tree-row.class';
 })
 export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   private _selectedTreeConfiguration: TreeConfiguration;
+  private _rootMenuActions: Array<MenuAction> = [
+    new MenuAction('Expand Descendants', 'Expands all descendants',
+    'fa fa-caret-down', (row: TreeRow) => {
+      return (row.getRowChildrenProxies().length > 0);
+    }, (row: TreeRow) => {
+      this.expandAll();
+    }),
+    new MenuAction('Collapse Descendants', 'Collapses all descendants',
+    'fa fa-caret-right', (row: TreeRow) => {
+      return (row.getRowChildrenProxies().length > 0);
+    }, (row: TreeRow) => {
+      this.collapseAll();
+    })
+  ];
+  get rootMenuActions() {
+    return this._rootMenuActions;
+  }
   
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
@@ -31,26 +49,26 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
         this._selectedTreeConfiguration = treeConfigurationObject.config;
-        this.rootSubject.next(this._selectedTreeConfiguration.getRootProxy());
         
         if (this._treeConfigurationSubscription) {
           this._treeConfigurationSubscription.unsubscribe();
         }
         this._treeConfigurationSubscription = this._selectedTreeConfiguration.
           getChangeSubject().subscribe((notification: any) => {
-          if (notification.proxy && (this.rootSubject.getValue().item.
+          if (notification.proxy && (this._rootSubject.getValue().item.
             id === notification.proxy.item.id)) {
             this.buildRows();
           }
         });
         
+        this._rootSubject.next(this._selectedTreeConfiguration.getRootProxy());
+        
         this._route.params.subscribe((parameters: Params) => {
-          this.rootSubject.next(this._selectedTreeConfiguration.getProxyFor(
+          this._rootSubject.next(this._selectedTreeConfiguration.getProxyFor(
             parameters['id']));
-          this.buildRows();
         });
         
-        this.buildRows();
+        this.showSelection();
       }
     });
   }
@@ -66,7 +84,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   private buildRows(): void {
     this.clear();
     
-    let root: ItemProxy = this.rootSubject.getValue();
+    let root: ItemProxy = this._rootSubject.getValue();
     let rootRow: TreeRow = this.buildRow(root);
     rootRow.getRowParentProxy = () => {
       return undefined;
@@ -115,7 +133,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
             };
             row.getRowChildrenProxies = () => {
               let rowChildrenProxies: Array<ItemProxy> = [];
-              let references: any = root.relations[referenceType][type][propertyId];
+              let references: any = root.relations[referenceType][type][
+                propertyId];
               if (references) {
                 if (!Array.isArray(references)) {
                   references = [references];
@@ -140,8 +159,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
             }
             
             for (let j: number = 0; j < reference.length; j++) {
-              let row: TreeRow = this.buildRow(this._selectedTreeConfiguration.getProxyFor(
-                reference[j].item.id));
+              let row: TreeRow = this.buildRow(this._selectedTreeConfiguration.
+                getProxyFor(reference[j].item.id));
               row.getRowParentProxy = () => {
                 return this.getRow(propertyId).itemProxy;
               };
@@ -153,11 +172,13 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       }
     }
-    
-    this.showRows();
   }
   
-  public rootChanged(root: ItemProxy): void {
+  public postTreeTraversalActivity(): void {
+    this._changeDetectorRef.markForCheck();
+  }
+  
+  public rootChanged(): void {
     this.buildRows();
   }
 }
