@@ -1,3 +1,4 @@
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { NgModule } from "@angular/core/";
 
 import { CommonModule } from "@angular/common";
@@ -49,7 +50,8 @@ import { TreeModule } from "angular-tree-component";
     PipesModule,
     UserInputModule,
     LensModule,
-    TreeModule
+    TreeModule,
+    VirtualScrollModule
   ],
   exports : [
     DashboardComponent

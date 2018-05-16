@@ -56,6 +56,10 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
     })
   }
 
+  console (log) {
+    console.log(log);
+  }
+
   ngOnDestroy() {
     this.projectStreamSub.unsubscribe();
   }
