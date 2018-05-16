@@ -53,6 +53,9 @@ export class ProjectService {
           this.proxyChangeSubscription = changeSubject.subscribe((notification) => {
             if (notification) {
               // TODO Update the Project info in the generated list
+              if (notification.proxy.kind === 'Project') {
+                this.generateProjectInfo(this.currentConfig.getAllItemProxies());
+              }
             }
           })
 
