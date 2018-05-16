@@ -4,7 +4,8 @@
   </div>
   <ng-container *ngIf="rootRow">
     <tree-row [treeRow]="rootRow" [treeRootStream]="rootSubject"
-      [selectedProxyIdStream]="selectedIdSubject" [menuActions]="rootActions">
+      [selectedProxyIdStream]="selectedIdSubject"
+      [menuActions]="rootMenuActions">
     </tree-row>
   </ng-container>
   <br/>

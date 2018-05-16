@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeRow } from './tree-row.class';
+import { MenuAction } from './tree-row.component';
 
 export class Tree {
   private _rowMap: Map<string, TreeRow> = new Map<string, TreeRow>();
@@ -27,6 +28,24 @@ export class Tree {
     return this._rootRow;
   }
   
+  private _rootMenuActions: Array<MenuAction> = [
+    new MenuAction('Expand Descendants', 'Expands all descendants',
+    'fa fa-caret-down', (row: TreeRow) => {
+      return (row.getRowChildrenProxies().length > 0);
+    }, (row: TreeRow) => {
+      this.expandAll();
+    }),
+    new MenuAction('Collapse Descendants', 'Collapses all descendants',
+    'fa fa-caret-right', (row: TreeRow) => {
+      return (row.getRowChildrenProxies().length > 0);
+    }, (row: TreeRow) => {
+      this.collapseAll();
+    })
+  ];
+  get rootMenuActions() {
+    return this._rootMenuActions;
+  }
+  
   private _selectedIdSubject: BehaviorSubject<string> =
     new BehaviorSubject<string>('');
   get selectedIdSubject() {
@@ -37,12 +56,16 @@ export class Tree {
   private _virtualScrollComponent: VirtualScrollComponent;
   
   private _rootSubscription: Subscription;
-  private _updateVisibleRowsSubscriptions: Array<Subscription> = [];
+  private _updateVisibleRowsSubscriptionMap: any = {};
   
   public constructor(protected _route: ActivatedRoute) {
-    this._rootSubscription = this._rootSubject.subscribe((proxy:
-      ItemProxy) => {
-      this.changeRoot(proxy);
+    this._rootSubscription = this._rootSubject.subscribe((root: ItemProxy) => {
+      if (root) {
+        this.rootChanged();
+        this._rootRow = this._rowMap.get(root.item.id);
+        this._rootRow.depth = 0;
+        this.showRows();
+      }
     });
     
     this._route.params.subscribe((parameters: Params) => {
@@ -52,11 +75,7 @@ export class Tree {
   }
   
   protected prepareForDismantling(): void {
-    for (let j: number = 0; j < this._updateVisibleRowsSubscriptions.length;
-      j++) {
-      this._updateVisibleRowsSubscriptions[j].unsubscribe();
-    }
-    
+    this.clear();
     this._rootSubscription.unsubscribe();
   }
   
@@ -64,12 +83,12 @@ export class Tree {
     let row: TreeRow = new TreeRow(proxy);
     this._rowMap.set(proxy.item.id, row);
     this._rows.push(row);
-    this._updateVisibleRowsSubscriptions.push(row.updateVisibleRows.
-      subscribe((updateVisibleRows: boolean) => {
+    this._updateVisibleRowsSubscriptionMap[proxy.item.id] = row.
+      updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
       if (updateVisibleRows) {
         this.showRows();
       }
-    }));
+    });
     
     return row;
   }
@@ -88,12 +107,12 @@ export class Tree {
     }
     this._rows.splice(parentRowIndex + parentRowIndexOffset + 1, 0,
       row);
-    this._updateVisibleRowsSubscriptions.push(row.updateVisibleRows.
-      subscribe((updateVisibleRows: boolean) => {
+    this._updateVisibleRowsSubscriptionMap[proxy.item.id] = row.
+      updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
       if (updateVisibleRows) {
         this.showRows();
       }
-    }));
+    });
     
     return row;
   }
@@ -102,19 +121,8 @@ export class Tree {
     return this._rowMap.get(id);
   }
   
-  public changeRoot(root: ItemProxy): void {
-    if (root) {
-      if (root !== this._rootSubject.getValue()) {
-        this._rootSubject.next(root);
-      }
-      this.rootChanged();
-      this._rootRow = this._rowMap.get(root.item.id);
-      this._rootRow.depth = 0;
-      this.showRows();
-    }
-  }
-  
   protected deleteRow(id: string): void {
+    delete this._updateVisibleRowsSubscriptionMap[id];
     let row: TreeRow = this._rowMap.get(id);
     this._rows.splice(this._rows.indexOf(row), 1);
     this._rowMap.delete(id);
@@ -202,6 +210,9 @@ export class Tree {
   }
   
   protected clear(): void {
+    for (let id in this._updateVisibleRowsSubscriptionMap) {
+      delete this._updateVisibleRowsSubscriptionMap[id];
+    }
     this._visibleRows = [];
     this._rows.length = 0;
     this._rowMap.clear();

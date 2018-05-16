@@ -18,24 +18,7 @@ import { MenuAction } from '../tree-row.component';
 })
 export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   private _selectedTreeConfiguration: TreeConfiguration;
-  private _rootMenuActions: Array<MenuAction> = [
-    new MenuAction('Expand Descendants', 'Expands all descendants',
-    'fa fa-caret-down', (row: TreeRow) => {
-      return (row.getRowChildrenProxies().length > 0);
-    }, (row: TreeRow) => {
-      this.expandAll();
-    }),
-    new MenuAction('Collapse Descendants', 'Collapses all descendants',
-    'fa fa-caret-right', (row: TreeRow) => {
-      return (row.getRowChildrenProxies().length > 0);
-    }, (row: TreeRow) => {
-      this.collapseAll();
-    })
-  ];
-  get rootMenuActions() {
-    return this._rootMenuActions;
-  }
-  
+
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
   

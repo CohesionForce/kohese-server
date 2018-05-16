@@ -7,13 +7,13 @@
       <mat-icon class="fa fa-exchange"></mat-icon>
     </button>
     <button mat-icon-button
-      (click)="changeRoot(getRow(rootRow.getRowParentProxy().item.id).itemProxy)"
+      (click)="rootSubject.next(getRow(rootRow.getRowParentProxy().item.id).itemProxy)"
       [disabled]="!rootSubject.getValue() || (rootSubject.getValue() === absoluteRoot)"
       matTooltip="Changes the root to be the current root's parent">
       <mat-icon class="fa fa-level-up"></mat-icon>
     </button>
     <button mat-icon-button
-      (click)="changeRoot(absoluteRoot)"
+      (click)="rootSubject.next(absoluteRoot)"
       [disabled]="!rootSubject.getValue() || (rootSubject.getValue() === absoluteRoot)"
       matTooltip="Changes the root to be the absolute root">
       <mat-icon class="fa fa-undo"></mat-icon>

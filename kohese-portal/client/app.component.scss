@@ -86,7 +86,7 @@ table {
 }
 
 .selected-border {
-  border: 3px solid $primaryColor + 100;
+  border: 3px solid $primaryColor + 100 !important;
 }
 
 // Define 3 theme colors

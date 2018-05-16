@@ -26,24 +26,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return this._absoluteRoot;
   }
   
-  private _rootMenuActions: Array<MenuAction> = [
-    new MenuAction('Expand Descendants', 'Expands all descendants',
-    'fa fa-caret-down', (row: TreeRow) => {
-      return (row.getRowChildrenProxies().length > 0);
-    }, (row: TreeRow) => {
-      this.expandAll();
-    }),
-    new MenuAction('Collapse Descendants', 'Collapses all descendants',
-    'fa fa-caret-right', (row: TreeRow) => {
-      return (row.getRowChildrenProxies().length > 0);
-    }, (row: TreeRow) => {
-      this.collapseAll();
-    })
-  ];
-  get rootMenuActions() {
-    return this._rootMenuActions;
-  }
-  
   private _rowActions: Array<RowAction> = [
     new RowAction('Delete', 'Deletes this Item',
     'fa fa-times delete-button', (row: TreeRow) => {
