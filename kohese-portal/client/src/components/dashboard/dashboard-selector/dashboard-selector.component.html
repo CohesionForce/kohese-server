@@ -8,11 +8,11 @@
       <mat-spinner [diameter]="50"></mat-spinner>
     </span>
   </h4>
-  <h4 (click)="selectDashType(DashboardTypes.ASSIGNMENT)" 
+  <h4 (click)="selectDashType(DashboardTypes.ASSIGNMENT)"
       [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PERSONAL}">
     My Dashboard
   </h4>
-  <h4 (click)="selectDashType(DashboardTypes.PROJECT)" 
+  <h4 (click)="selectDashType(DashboardTypes.PROJECT)"
       [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PROJECT}">
     Project Dashboard</h4>
   <hr>
@@ -21,26 +21,30 @@
     <div *ngIf="menuType === MenuTypes.PERSONAL">
       <h5 class="dashListHeader"> Assignments</h5>
       <div>
-        <h6 class="dashListItem" 
-            (click)="selectDashboard(DashboardSelections.ACTIVE_ASSIGNMENTS)" 
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === 
+        <h6 class="dashListItem"
+            (click)="selectDashboard(DashboardSelections.ACTIVE_ASSIGNMENTS)"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                         DashboardSelections.ACTIVE_ASSIGNMENTS}"> Active </h6>
-        <h6 class="dashListItem" 
-            (click)="selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)" 
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === 
+        <h6 class="dashListItem"
+            (click)="selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                         DashboardSelections.DUE_ASSIGNMENTS}"> Due</h6>
-        <h6 class="dashListItem" 
-            (click)="selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)" 
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === 
+        <h6 class="dashListItem"
+            (click)="selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
+                        DashboardSelections.OPEN_ASSIGNMENTS}"> Open</h6>
+        <h6 class="dashListItem"
+            (click)="selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                       DashboardSelections.COMPLETED_ASSIGNMENTS}">Completed</h6>
       </div>
       <mat-divider></mat-divider>
       <div *ngIf="user">
         <h5 class="dashListHeader"> User</h5>
         <div>
-          <h6 class="dashListItem" 
-              (click)="selectDashboard(DashboardSelections.USER_PREFERENCES)" 
-              [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === 
+          <h6 class="dashListItem"
+              (click)="selectDashboard(DashboardSelections.USER_PREFERENCES)"
+              [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                             DashboardSelections.USER_PREFERENCES}">Preferences</h6>
         </div>
       </div>
@@ -49,13 +53,13 @@
   <div *ngIf="menuType === MenuTypes.PROJECT">
       <h5 class="dashListHeader"> Project</h5>
       <div>
-        <h6 class="dashListItem" 
-            (click)="selectDashboard(DashboardSelections.PROJECT_OVERVIEW)" 
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === 
+        <h6 class="dashListItem"
+            (click)="selectDashboard(DashboardSelections.PROJECT_OVERVIEW)"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                             DashboardSelections.PROJECT_OVERVIEW}"> Overview</h6>
-        <h6 class="dashListItem" 
-            (click)="selectDashboard(DashboardSelections.USER_STATISTICS)" 
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === 
+        <h6 class="dashListItem"
+            (click)="selectDashboard(DashboardSelections.USER_STATISTICS)"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                             DashboardSelections.USER_STATISTICS}">User Statistics</h6>
       </div>
       <mat-divider></mat-divider>

@@ -63,6 +63,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
       case (DashboardSelections.ACTIVE_ASSIGNMENTS) :
       case (DashboardSelections.COMPLETED_ASSIGNMENTS) :
       case (DashboardSelections.DUE_ASSIGNMENTS) :
+      case (DashboardSelections.OPEN_ASSIGNMENTS) :
       case (DashboardSelections.PROJECT_OVERVIEW) :
       case (DashboardSelections.USER_STATISTICS) :
         this.selectedDashboard = dashboard;
