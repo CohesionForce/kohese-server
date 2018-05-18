@@ -7,12 +7,6 @@
       <mat-icon class="fa fa-exchange"></mat-icon>
     </button>
     <button mat-icon-button
-      (click)="rootSubject.next(getRow(rootRow.getRowParentProxy().item.id).itemProxy)"
-      [disabled]="!rootSubject.getValue() || (rootSubject.getValue() === absoluteRoot)"
-      matTooltip="Changes the root to be the current root's parent">
-      <mat-icon class="fa fa-level-up"></mat-icon>
-    </button>
-    <button mat-icon-button
       (click)="rootSubject.next(absoluteRoot)"
       [disabled]="!rootSubject.getValue() || (rootSubject.getValue() === absoluteRoot)"
       matTooltip="Changes the root to be the absolute root">
@@ -26,7 +20,7 @@
     <ng-container *ngIf="rootRow">
       <tree-row [treeRow]="rootRow" [treeRootStream]="rootSubject"
         [selectedProxyIdStream]="selectedIdSubject"
-        [menuActions]="rootMenuActions">
+        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
       </tree-row>
     </ng-container>
   </div>

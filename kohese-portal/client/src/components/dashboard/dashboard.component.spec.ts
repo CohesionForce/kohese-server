@@ -10,10 +10,12 @@ import { DashboardComponent} from './dashboard.component';
 import { SessionService } from '../../services/user/session.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { CurrentUserService } from '../../services/user/current-user.service';
 
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
+import { MockCurrentUserService } from '../../../mocks/services/MockCurrentUserService';
 import { LensModule } from '../lens/lens.module';
 
 describe('Component: Dashboard', ()=>{
@@ -32,12 +34,13 @@ describe('Component: Dashboard', ()=>{
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: SessionService, useClass: MockSessionService},
+        {provide: CurrentUserService, useClass: MockCurrentUserService}
       ]
     }).compileComponents();
 
     dashboardFixture = TestBed.createComponent(DashboardComponent);
     dashboardComponent = dashboardFixture.componentInstance;
-
+    
     dashboardFixture.detectChanges();
     
   })

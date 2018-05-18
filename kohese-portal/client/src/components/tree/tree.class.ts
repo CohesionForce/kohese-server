@@ -58,7 +58,7 @@ export class Tree {
   private _rootSubscription: Subscription;
   private _updateVisibleRowsSubscriptionMap: any = {};
   
-  public constructor(protected _route: ActivatedRoute) {
+  protected constructor(protected _route: ActivatedRoute) {
     this._rootSubscription = this._rootSubject.subscribe((root: ItemProxy) => {
       if (root) {
         this.rootChanged();
@@ -250,7 +250,7 @@ export class Tree {
     this.showRows();
   }
   
-  public showSelection(): void {
+  protected showSelection(): void {
     let id: string = this._selectedIdSubject.getValue();
     if (id) {
       let selectedRow: TreeRow = this._rowMap.get(id);

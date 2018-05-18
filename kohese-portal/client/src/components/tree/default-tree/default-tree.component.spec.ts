@@ -1,63 +1,54 @@
-import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, ComponentFixture, fakeAsync,
+  tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { VirtualScrollModule } from 'angular2-virtual-scroll';
-
-import { MaterialModule } from '../../material.module';
-import { PipesModule } from '../../pipes/pipes.module';
-import { NavigationService } from '../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../mocks/services/MockDynamicTypesService';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
-import { SessionService } from '../../services/user/session.service';
-import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { ActivatedRoute } from '@angular/router';
-import { TreeComponent } from './tree.component';
-import { TreeRow } from './tree-row.class';
-import { MockDataModel } from '../../../mocks/data/MockDataModel';
-import { MockItem } from '../../../mocks/data/MockItem';
-import { ItemProxy } from '../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../common/src/tree-configuration';
-import { KoheseModel } from '../../../../common/src/KoheseModel';
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
+import { ToastrModule } from 'ngx-toastr';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 
-describe('Component: Tree', () => {
-  let fixture: ComponentFixture<TreeComponent>;
-  let component: TreeComponent;
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { VersionControlService } from '../../../services/version-control/version-control.service';
+import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
+import { DefaultTreeComponent } from './default-tree.component';
+import { TreeRow } from '../tree-row.class';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
+import { MockItem } from '../../../../mocks/data/MockItem';
+import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 
+describe('Component: default-tree', () => {
+  let component: DefaultTreeComponent;
+  
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TreeComponent],
-      providers: [
-        { provide: NavigationService, useClass: MockNavigationService },
-        { provide: DynamicTypesService, useClass: MockDynamicTypesService },
-        { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: SessionService, useClass: MockSessionService },
-        { provide: ActivatedRoute, useValue: {
-            params: Observable.of({
-                id: ''
-              })
-          } }
+      declarations: [DefaultTreeComponent],
+      imports: [
+        VirtualScrollModule,
+        ToastrModule.forRoot()
       ],
-      imports: [FormsModule, BrowserAnimationsModule, VirtualScrollModule,
-        MaterialModule, PipesModule],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        { provide: ActivatedRoute, useValue: { params: Observable.of('') } },
+        { provide: ItemRepository, useClass: MockItemRepository },
+        { provide: DialogService, useClass: MockDialogService }, {
+          provide: VersionControlService,
+          useClass: MockVersionControlService
+        }
+      ]
     }).compileComponents();
-
-    fixture = TestBed.createComponent(TreeComponent);
+    
+    let fixture: ComponentFixture<DefaultTreeComponent> = TestBed.
+      createComponent(DefaultTreeComponent);
     component = fixture.componentInstance;
+    
     fixture.detectChanges();
   });
-
-  it('filters when the selected view changes', () => {
-    expect(component.proxyFilter.status).toEqual(false);
-    component.viewSelectionChanged('Version Control');
-    expect(component.proxyFilter.status).toEqual(true);
-  });
-
+  
   it('builds a TreeRow for a new Item', fakeAsync(() => {
     new KoheseModel(MockDataModel());
     KoheseModel.modelDefinitionLoadingComplete();
@@ -70,7 +61,7 @@ describe('Component: Tree', () => {
         break;
       }
     }
-    ItemProxy.getWorkingTree().getChangeSubject().next({
+    TreeConfiguration.getWorkingTree().getChangeSubject().next({
       type: 'create',
       kind: 'Item',
       id: item.id,
@@ -86,12 +77,16 @@ describe('Component: Tree', () => {
     }
     expect(newRowIndex).toEqual(6);
   }));
-
+  
+  it('retrieves the TreeRow for an ID', () => {
+    expect(component.getRow('Kurios Iesous')).toBeDefined();
+  });
+  
   it('removes the TreeRow for a deleted Item', fakeAsync(() => {
     let numberOfVisibleRows: number = component.visibleRows.length;
-    let proxy: ItemProxy = ItemProxy.getWorkingTree().getProxyFor('test-uuid6');
+    let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor('test-uuid6');
     proxy.deleteItem();
-    ItemProxy.getWorkingTree().getChangeSubject().next({
+    TreeConfiguration.getWorkingTree().getChangeSubject().next({
       type: 'delete',
       kind: 'Item',
       id: proxy.item.id,
@@ -100,7 +95,7 @@ describe('Component: Tree', () => {
     tick();
     expect(component.visibleRows.length).toEqual(numberOfVisibleRows - 1);
   }));
-
+  
   it('expands and collapses all TreeRows', () => {
     let numberOfInitiallyVisibleRows: number = component.visibleRows.length;
     component.expandAll();
@@ -109,18 +104,19 @@ describe('Component: Tree', () => {
     component.collapseAll();
     expect(component.visibleRows.length).toEqual(numberOfInitiallyVisibleRows);
   });
-
+  
   it('correctly responds to the tree root changing', fakeAsync(() => {
-    let initialTreeRoot: ItemProxy = component.treeRootStream.getValue();
+    let initialTreeRoot: ItemProxy = component.rootSubject.getValue();
     let initialVisibleRows: Array<TreeRow> = component.visibleRows;
-    component.treeRootStream.next(ItemProxy.getWorkingTree().getRootProxy().children[0]);
+    component.rootSubject.next(TreeConfiguration.getWorkingTree().
+      getRootProxy().children[0]);
     tick();
-    expect(initialTreeRoot).not.toBe(component.treeRootStream.getValue());
+    expect(initialTreeRoot).not.toBe(component.rootSubject.getValue());
     expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
   }));
-
+  
   it('synchronizes with selection', fakeAsync(() => {
-    component.selectedProxyIdStream.next('Item');
+    component.selectedIdSubject.next('Item');
     tick();
 
     let index: number = -1;
@@ -146,13 +142,13 @@ describe('Component: Tree', () => {
     }
     expect(index).not.toEqual(-1);
   }));
-
-  it('does not produce an error when the value of selectedProxyIdStream is ' +
+  
+  it('does not produce an error when the value of selectedIdSubject is ' +
     'invalid', fakeAsync(() => {
     let id: string = '-1';
     expect(TreeConfiguration.getWorkingTree().getProxyFor(id)).not.
       toBeDefined();
-    component.selectedProxyIdStream.next(id);
+    component.selectedIdSubject.next(id);
     tick();
     /* Since the selection is to be synchronized by default, call the
     toggleSelectionSynchronization function twice to trigger showing the

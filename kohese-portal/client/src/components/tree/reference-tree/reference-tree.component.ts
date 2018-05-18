@@ -132,6 +132,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
             
               return rowChildrenProxies;
             };
+            row.expanded = true;
           }
           
           let reference: any = root.relations[referenceType][type][

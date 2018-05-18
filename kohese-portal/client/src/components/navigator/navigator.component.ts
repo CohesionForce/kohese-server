@@ -75,7 +75,6 @@ export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
     this._viewMap['Default'] = defaultTree;
     this._viewMap['Version Control'] = this._viewMap['Default'];
     
-    // Unsubscribe?
     this._defaultTreeQueryList.changes.subscribe((queryList: QueryList<Tree>) => {
       defaultTree = queryList.toArray()[0];
       if (defaultTree) {
@@ -85,7 +84,6 @@ export class NavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     
-    // Unsubscribe?
     this._referenceTreeQueryList.changes.subscribe((queryList: QueryList<Tree>) => {
       let referenceTree: Tree = queryList.toArray()[0];
       if (referenceTree) {

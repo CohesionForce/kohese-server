@@ -30,11 +30,15 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     new RowAction('Delete', 'Deletes this Item',
     'fa fa-times delete-button', (row: TreeRow) => {
       return !row.itemProxy.internal;
-    }, (row: TreeRow) => {
+      }, (row: TreeRow) => {
       this._dialogService.openCustomTextDialog('Confirm Deletion',
         'Are you sure you want to delete ' + row.itemProxy.item.name + '?', [
         'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
         if (result) {
+          if (row.itemProxy === this._rootSubject.getValue()) {
+            this._rootSubject.next(row.getRowParentProxy());
+          }
+          
           this._itemRepository.deleteItem(row.itemProxy, (2 === result));
         }
       });
@@ -44,7 +48,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
       'fa fa-undo', (row: TreeRow) => {
       return (Object.keys(row.itemProxy.status).length > 0);
-    }, (row: TreeRow) => {
+      }, (row: TreeRow) => {
       this._dialogService.openYesNoDialog('Undo Changes', 'Are you sure ' +
         'that you want to undo all changes to this Item since the last ' +
         'commit?').subscribe((result: any) => {
@@ -64,7 +68,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     new RowAction('Stage', 'Stages changes to this Item', 'fa fa-plus',
       (row: TreeRow) => {
       return row.itemProxy.status['Unstaged'];
-    }, (row: TreeRow) => {
+      }, (row: TreeRow) => {
       this._versionControlService.stageItems([row.itemProxy]).subscribe(
         (statusMap: any) => {
         if (statusMap.error) {
@@ -77,7 +81,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     new RowAction('Unstage', 'Un-stages changes to this Item', 'fa fa-minus',
       (row: TreeRow) => {
       return row.itemProxy.status['Staged'];
-    }, (row: TreeRow) => {
+      }, (row: TreeRow) => {
       this._versionControlService.unstageItems([row.itemProxy]).
         subscribe((statusMap: any) => {
         if (statusMap.error) {
@@ -93,6 +97,28 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       return this._rowActions;
     } else {
       return this._versionControlRowActions;
+    }
+  }
+  
+  private _rootRowActions: Array<RowAction> = [
+    new RowAction('Set Parent As Root', 'Set this row\'s parent as the root',
+      'fa fa-level-up', (row: TreeRow) => {
+      return (this._rootSubject.getValue() && (this._rootSubject.getValue() !==
+        this._absoluteRoot));
+      }, (row: TreeRow) => {
+      this._rootSubject.next(this.getRow(row.getRowParentProxy().item.id).
+        itemProxy);
+    })
+  ];
+  private _rootDefaultRowActions: Array<RowAction> = this._rootRowActions.
+    slice(0);
+  private _rootVersionControlRowActions: Array<RowAction> = this.
+    _rootRowActions.slice(0);
+  get rootRowActions() {
+    if ('Default' === this._selectedViewSubject.getValue()) {
+      return this._rootDefaultRowActions;
+    } else {
+      return this._rootVersionControlRowActions;
     }
   }
   
@@ -119,6 +145,9 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   }
   
   public ngOnInit(): void {
+    this._rootDefaultRowActions.push(...this._rowActions);
+    this._rootVersionControlRowActions.push(...this._rowActions);
+    
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
@@ -139,7 +168,27 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         }
         this._treeConfigurationSubscription = treeConfigurationObject.config.
           getChangeSubject().subscribe((notification: any) => {
-          this.calculateRows(notification);
+          switch (notification.type) {
+            case 'create': {
+                this.insertRow(notification.proxy);
+                this.showRows();
+              }
+              break;
+            case 'delete': {
+                this.deleteRow(notification.id);
+                this.showRows();
+              }
+              break;
+            case 'loaded': {
+                this._absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
+                  ItemProxy) => {
+                  this.buildRow(proxy);
+                });
+                this.showRows();
+                this.showSelection();
+              }
+              break;
+          }
         });
         
         this._rootSubject.next(this._absoluteRoot);
@@ -167,30 +216,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this._synchronizeWithSelection = !this._synchronizeWithSelection;
     if (this._synchronizeWithSelection) {
       this.showSelection();
-    }
-  }
-  
-  private calculateRows(notification: any): void {
-    switch (notification.type) {
-      case 'create': {
-          this.insertRow(notification.proxy);
-          this.showRows();
-        }
-        break;
-      case 'delete': {
-          this.deleteRow(notification.id);
-          this.showRows();
-        }
-        break;
-      case 'loaded': {
-          this._absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
-            ItemProxy) => {
-            this.buildRow(proxy);
-          });
-          this.showRows();
-          this.showSelection();
-        }
-        break;
     }
   }
   

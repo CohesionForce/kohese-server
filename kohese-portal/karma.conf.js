@@ -1,4 +1,14 @@
 module.exports = function (config) {
+  const Path = require('path');
+  const ALIASES = require('rxjs/_esm5/path-mapping')();
+  const EMPTY_WEBPACK_SHIM_PATH = Path.join(process.cwd(),
+    'empty-webpack-shim.js');
+  ALIASES['fs'] = EMPTY_WEBPACK_SHIM_PATH;
+  ALIASES['mv'] = EMPTY_WEBPACK_SHIM_PATH;
+  ALIASES['source-map-support'] = EMPTY_WEBPACK_SHIM_PATH;
+  ALIASES['safe-json-stringify'] = EMPTY_WEBPACK_SHIM_PATH;
+  ALIASES['dtrace-provider'] = EMPTY_WEBPACK_SHIM_PATH;
+  
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular/cli'],
@@ -25,6 +35,11 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: ['Chrome'],
-    singleRun: false
+    singleRun: false,
+    webpack: {
+      resolve: {
+        alias: ALIASES
+      }
+    }
   });
 };
