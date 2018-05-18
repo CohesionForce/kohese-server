@@ -18,6 +18,7 @@ import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/
 import { LensModule } from "../lens/lens.module";
 import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard.component";
 import { ProjectOverviewComponent } from "./project-dashboard/project-overview/project-overview.component";
+import { StatusDashboardComponent } from './project-dashboard/status-dashboard/status-dashboard.component';
 import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
 import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
@@ -36,7 +37,8 @@ import { TreeModule } from "angular-tree-component";
     ProjectDashboardComponent,
     ProjectOverviewComponent,
     UserStatisticsComponent,
-    ProjectSelectorComponent
+    ProjectSelectorComponent,
+    StatusDashboardComponent
   ],
   entryComponents: [
     KMarkdownComponent,
