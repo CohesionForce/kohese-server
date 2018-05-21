@@ -1,0 +1,62 @@
+<div style="height: 100%; width: 100%;">
+  <h2 mat-dialog-title style="height: 7%; width: 100%;">
+    Filter
+  </h2>
+  <div style="height: 83%; width: 100%;">
+    <mat-form-field>
+      <mat-select placeholder="Type" [value]="filter.types" multiple
+        (selectionChange)="typeSelectionsChanged($event.value)">
+        <mat-option *ngFor="let type of (typeMap | mapKey)"
+          [value]="type">
+          {{type}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <ng-container *ngIf="filter.types.length > 0">
+      <mat-form-field>
+        <mat-select placeholder="Property" [(value)]="filter.properties"
+          multiple>
+          <ng-container *ngFor="let type of filter.types">
+            <mat-option
+              *ngFor="let propertyId of (type.dataModelProxy.item.properties | mapKey)"
+              [value]="propertyId">
+              {{propertyId}}
+            </mat-option>
+          </ng-container>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
+    <br/>
+    <mat-form-field>
+      <input matInput type="text" placeholder="Content"
+        [(ngModel)]="filter.content"/>
+    </mat-form-field>
+    <mat-checkbox [(ngModel)]="filter.matchesEntireContent">
+      Matches Entire Content
+    </mat-checkbox>
+    <mat-checkbox [(ngModel)]="filter.negateContent">
+      Negate
+    </mat-checkbox>
+    <br/>
+    <mat-checkbox [(ngModel)]="filter.hasUnsavedChanges">
+      Has Unsaved Changes
+    </mat-checkbox>
+    <br/>
+    <mat-checkbox [(ngModel)]="filter.hasUncommittedChanges">
+      Has Uncommitted Changes
+    </mat-checkbox>
+  </div>
+  <ng-container *ngIf="data">
+    <mat-dialog-actions
+      style="height: 10%; width: 100%; display: flex; flex-direction: column;">
+      <span class="flex-right-align">
+        <button mat-raised-button [mat-dialog-close]="filter">
+          Apply
+        </button>
+        <button mat-raised-button [mat-dialog-close]="">
+          Cancel
+        </button>
+      </span>
+    </mat-dialog-actions>
+  </ng-container>
+</div>

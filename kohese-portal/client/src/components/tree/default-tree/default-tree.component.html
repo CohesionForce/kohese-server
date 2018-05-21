@@ -10,7 +10,7 @@
       (click)="rootSubject.next(absoluteRoot)"
       [disabled]="!rootSubject.getValue() || (rootSubject.getValue() === absoluteRoot)"
       matTooltip="Changes the root to be the absolute root">
-      <mat-icon class="fa fa-undo"></mat-icon>
+      <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
     </button>
   </div>
   <div style="height: 12%; width: 100%;">
@@ -20,20 +20,20 @@
     <ng-container *ngIf="rootRow">
       <tree-row [treeRow]="rootRow" [treeRootStream]="rootSubject"
         [selectedProxyIdStream]="selectedIdSubject"
-        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
+        [rowActions]="rootRowActions" [menuActions]="menuActions">
       </tree-row>
     </ng-container>
   </div>
   <div style="height: 81%; width: 100%;">
     <div class="kt-head kth-cell">
-      Name
+      Descendants
     </div>
     <div class="kt-body">
       <virtual-scroll #tree [items]="visibleRows">
         <tree-row *ngFor="let row of tree.viewPortItems"
           [treeRow]="row" [treeRootStream]="rootSubject"
           [selectedProxyIdStream]="selectedIdSubject"
-          [rowActions]="rowActions">
+          [rowActions]="rowActions" [menuActions]="menuActions">
         </tree-row>
       </virtual-scroll>
     </div>

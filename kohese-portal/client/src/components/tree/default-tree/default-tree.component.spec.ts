@@ -96,15 +96,6 @@ describe('Component: default-tree', () => {
     expect(component.visibleRows.length).toEqual(numberOfVisibleRows - 1);
   }));
   
-  it('expands and collapses all TreeRows', () => {
-    let numberOfInitiallyVisibleRows: number = component.visibleRows.length;
-    component.expandAll();
-    expect(component.visibleRows.length).toBeGreaterThan(
-      numberOfInitiallyVisibleRows);
-    component.collapseAll();
-    expect(component.visibleRows.length).toEqual(numberOfInitiallyVisibleRows);
-  });
-  
   it('correctly responds to the tree root changing', fakeAsync(() => {
     let initialTreeRoot: ItemProxy = component.rootSubject.getValue();
     let initialVisibleRows: Array<TreeRow> = component.visibleRows;

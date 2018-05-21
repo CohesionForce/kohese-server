@@ -28,22 +28,22 @@ export class Tree {
     return this._rootRow;
   }
   
-  private _rootMenuActions: Array<MenuAction> = [
+  private _menuActions: Array<MenuAction> = [
     new MenuAction('Expand Descendants', 'Expands all descendants',
     'fa fa-caret-down', (row: TreeRow) => {
       return (row.getRowChildrenProxies().length > 0);
     }, (row: TreeRow) => {
-      this.expandAll();
+      this.expandDescendants(row);
     }),
     new MenuAction('Collapse Descendants', 'Collapses all descendants',
     'fa fa-caret-right', (row: TreeRow) => {
       return (row.getRowChildrenProxies().length > 0);
     }, (row: TreeRow) => {
-      this.collapseAll();
+      this.collapseDescendants(row);
     })
   ];
-  get rootMenuActions() {
-    return this._rootMenuActions;
+  get menuActions() {
+    return this._menuActions;
   }
   
   private _selectedIdSubject: BehaviorSubject<string> =
@@ -218,34 +218,34 @@ export class Tree {
     this._rowMap.clear();
   }
   
-  public expandAll(): void {
-    let expandFunction: (row: TreeRow) => void = (row: TreeRow) => {
-      if (row.visible) {
-        row.expanded = true;
-        let rowChildrenProxies: Array<ItemProxy> = row.getRowChildrenProxies();
+  private expandDescendants(row: TreeRow): void {
+    let expandFunction: (r: TreeRow) => void = (r: TreeRow) => {
+      if (r.visible) {
+        r.expanded = true;
+        let rowChildrenProxies: Array<ItemProxy> = r.getRowChildrenProxies();
         for (let j: number = 0; j < rowChildrenProxies.length; j++) {
           expandFunction(this._rowMap.get(rowChildrenProxies[j].item.id));
         }
       }
     };
     
-    expandFunction(this._rootRow);
+    expandFunction(row);
 
     this.showRows();
   }
   
-  public collapseAll(): void {
-    let collapseFunction: (row: TreeRow) => void = (row: TreeRow) => {
-      if (row.visible) {
-        row.expanded = false;
-        let rowChildrenProxies: Array<ItemProxy> = row.getRowChildrenProxies();
+  private collapseDescendants(row: TreeRow): void {
+    let collapseFunction: (r: TreeRow) => void = (r: TreeRow) => {
+      if (r.visible) {
+        r.expanded = false;
+        let rowChildrenProxies: Array<ItemProxy> = r.getRowChildrenProxies();
         for (let j: number = 0; j < rowChildrenProxies.length; j++) {
           collapseFunction(this._rowMap.get(rowChildrenProxies[j].item.id));
         }
       }
     };
     
-    collapseFunction(this._rootRow);
+    collapseFunction(row);
 
     this.showRows();
   }

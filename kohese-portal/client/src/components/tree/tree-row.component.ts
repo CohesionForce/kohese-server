@@ -8,7 +8,8 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TreeRow } from './tree-row.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { CompareItemsComponent } from '../compare-items/compare-items.component';
+import { CompareItemsComponent,
+  VersionDesignator } from '../compare-items/compare-items.component';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -60,6 +61,10 @@ export class TreeRowComponent extends NavigatableComponent
   @Input()
   public selectedProxyIdStream: BehaviorSubject<string>;
   public koheseType: any;
+  
+  get VersionDesignator() {
+    return VersionDesignator;
+  }
   
   private _updateDisplaySubscription: Subscription;
   private _itemProxyChangeSubscription: Subscription;
@@ -118,12 +123,20 @@ export class TreeRowComponent extends NavigatableComponent
     };
   }
   
-  public openComparisonDialog(): void {
+  public openComparisonDialog(changeVersionDesignator: VersionDesignator):
+    void {
+    let compareItemsDialogParameters: any = {
+      baseProxy: this._treeRow.itemProxy,
+      editable: true
+    };
+    
+    if (null != changeVersionDesignator) {
+      compareItemsDialogParameters['changeProxy'] = this._treeRow.itemProxy;
+      compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
+    }
+    
     this.dialogService.openComponentDialog(CompareItemsComponent, {
-      data : {
-        baseProxy: this._treeRow.itemProxy,
-        editable: true
-      }
+      data: compareItemsDialogParameters
     }).updateSize('90%', '90%');
   }
 }

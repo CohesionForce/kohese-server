@@ -57,9 +57,22 @@
       <mat-icon class="fa fa-bars"></mat-icon>
     </button>
     <mat-menu #menu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item (click)="openComparisonDialog()">
-        Compare With...
+      <button mat-menu-item [matMenuTriggerFor]="compareMenu">
+        Compare
       </button>
+      <mat-menu #compareMenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item [disabled]="!treeRow.itemProxy.status['Staged']"
+          (click)="openComparisonDialog(VersionDesignator.STAGED_VERSION)">
+          Against Staged Version
+        </button>
+        <button mat-menu-item
+          (click)="openComparisonDialog(VersionDesignator.LAST_COMMITTED_VERSION)">
+          Against Last Committed Version
+        </button>
+        <button mat-menu-item (click)="openComparisonDialog(undefined)">
+          Against... 
+        </button>
+      </mat-menu>
       <button mat-menu-item *ngFor="let action of menuActions"
         (click)="action.perform(treeRow)" matTooltip="{{action.description}}"
         [disabled]="!action.enable(treeRow)">

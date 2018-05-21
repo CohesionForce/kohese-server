@@ -18,7 +18,7 @@ export class TreeRow {
     this._visible = visible;
   }
   
-  private _matchesFilter: boolean = true;
+  private _matchesFilter: boolean = false;
   get matchesFilter() {
     return this._matchesFilter;
   }

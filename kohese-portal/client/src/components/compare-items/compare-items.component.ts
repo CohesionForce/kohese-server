@@ -113,7 +113,6 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
 
   treeConfig: any;
   treeConfigSub: Subscription;
-  historySubscription : Subscription;
 
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
@@ -127,6 +126,33 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       let baseProxy: ItemProxy = this._dialogParameters['baseProxy'];
       if (baseProxy) {
         this.whenSelectedBaseChanges(baseProxy);
+      }
+      
+      let changeProxy: ItemProxy = this._dialogParameters['changeProxy'];
+      if (changeProxy) {
+        this.whenSelectedChangeChanges(changeProxy);
+        let changeVersion: VersionDesignator = this._dialogParameters[
+          'changeVersion'];
+        if (changeVersion) {
+          let versionId: string;
+          if ((changeVersion as VersionDesignator) === VersionDesignator.
+            STAGED_VERSION) {
+            versionId = this._changeVersions['Staged'];
+          } else if ((changeVersion as VersionDesignator) ===
+            VersionDesignator.LAST_COMMITTED_VERSION) {
+            for (let j: number = 0; j < this._changeVersions.length; j++) {
+              let version: any = this._changeVersions[j];
+              if (version.date) {
+                versionId = version.commit;
+                break;
+              }
+            }
+          } 
+          
+          if (versionId) {
+            this.whenSelectedChangeVersionChanges(versionId);
+          }
+        }
       }
 
       if (this._dialogParameters['editable']) {
@@ -165,38 +191,32 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     if (this._itemProxyChangeSubscription) {
       this._itemProxyChangeSubscription.unsubscribe();
     }
-    if (this.historySubscription) {
-      this.historySubscription.unsubscribe();
-    }
+    
     this.treeConfigSub.unsubscribe();
 
   }
 
   public whenSelectedBaseChanges(baseProxy: ItemProxy): void {
-    if (this.historySubscription) {
-      this.historySubscription.unsubscribe();
-    }
-    this.historySubscription =
-      this._itemRepository.getHistoryFor(baseProxy).subscribe(
+    this._itemRepository.getHistoryFor(baseProxy).subscribe(
       (history: Array<any>) => {
-        this._baseVersions = history;
-        if (!baseProxy.status['Unstaged'] && (this._baseVersions.length > 0)) {
-          /* If there are no unstaged changes to the selected Item, change the
-          commit ID of the most recent commit that included that Item to
-          'Unstaged' to operate on the working tree version of that Item. */
-          this._baseVersions[0].commit = 'Unstaged';
-        }
-        let uncommittedVersions: Array<any> = [];
-        for (let statusName in baseProxy.status) {
-          uncommittedVersions.push({
-            commit: statusName,
-            message: statusName
-          });
-        }
-        this._baseVersions.splice(0, 0, ...uncommittedVersions);
-        this._selectedBaseStream.next(baseProxy);
-        this.whenSelectedBaseVersionChanges('Unstaged');
-      });
+      this._baseVersions = history;
+      if (!baseProxy.status['Unstaged'] && (this._baseVersions.length > 0)) {
+        /* If there are no unstaged changes to the selected Item, change the
+        commit ID of the most recent commit that included that Item to
+        'Unstaged' to operate on the working tree version of that Item. */
+        this._baseVersions[0].commit = 'Unstaged';
+      }
+      let uncommittedVersions: Array<any> = [];
+      for (let statusName in baseProxy.status) {
+        uncommittedVersions.push({
+          commit: statusName,
+          message: statusName
+        });
+      }
+      this._baseVersions.splice(0, 0, ...uncommittedVersions);
+      this._selectedBaseStream.next(baseProxy);
+      this.whenSelectedBaseVersionChanges('Unstaged');
+    });
   }
 
   public whenSelectedBaseVersionChanges(versionIdentifier: string): void {
@@ -219,31 +239,27 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   }
 
   public whenSelectedChangeChanges(changeProxy: ItemProxy): void {
-    if (this.historySubscription) {
-      this.historySubscription.unsubscribe();
-    }
-    this.historySubscription =
-      this._itemRepository.getHistoryFor(changeProxy).subscribe(
+    this._itemRepository.getHistoryFor(changeProxy).subscribe(
       (history: Array<any>) => {
-        this._changeVersions = history;
-        if (!changeProxy.status['Unstaged'] && (this._changeVersions.
-          length > 0)) {
-          /* If there are no unstaged changes to the selected Item, change the
-          commit ID of the most recent commit that included that Item to
-          'Unstaged' to operate on the working tree version of that Item. */
-          this._changeVersions[0].commit = 'Unstaged';
-        }
-        let uncommittedVersions: Array<any> = [];
-        for (let statusName in changeProxy.status) {
-          uncommittedVersions.push({
-            commit: statusName,
-            message: statusName
-          });
-        }
-        this._changeVersions.splice(0, 0, ...uncommittedVersions);
-        this._selectedChangeStream.next(changeProxy);
-        this.whenSelectedChangeVersionChanges('Unstaged');
-      });
+      this._changeVersions = history;
+      if (!changeProxy.status['Unstaged'] && (this._changeVersions.
+        length > 0)) {
+        /* If there are no unstaged changes to the selected Item, change the
+        commit ID of the most recent commit that included that Item to
+        'Unstaged' to operate on the working tree version of that Item. */
+        this._changeVersions[0].commit = 'Unstaged';
+      }
+      let uncommittedVersions: Array<any> = [];
+      for (let statusName in changeProxy.status) {
+        uncommittedVersions.push({
+          commit: statusName,
+          message: statusName
+        });
+      }
+      this._changeVersions.splice(0, 0, ...uncommittedVersions);
+      this._selectedChangeStream.next(changeProxy);
+      this.whenSelectedChangeVersionChanges('Unstaged');
+    });
   }
 
   public whenSelectedChangeVersionChanges(versionIdentifier: string): void {
@@ -490,4 +506,9 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
       }
     });
   }
+}
+
+export enum VersionDesignator {
+  STAGED_VERSION,
+  LAST_COMMITTED_VERSION
 }

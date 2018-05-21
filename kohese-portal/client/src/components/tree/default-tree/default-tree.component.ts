@@ -26,24 +26,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return this._absoluteRoot;
   }
   
-  private _rowActions: Array<RowAction> = [
-    new RowAction('Delete', 'Deletes this Item',
-    'fa fa-times delete-button', (row: TreeRow) => {
-      return !row.itemProxy.internal;
-      }, (row: TreeRow) => {
-      this._dialogService.openCustomTextDialog('Confirm Deletion',
-        'Are you sure you want to delete ' + row.itemProxy.item.name + '?', [
-        'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
-        if (result) {
-          if (row.itemProxy === this._rootSubject.getValue()) {
-            this._rootSubject.next(row.getRowParentProxy());
-          }
-          
-          this._itemRepository.deleteItem(row.itemProxy, (2 === result));
-        }
-      });
-    })
-  ];
   private _versionControlRowActions: Array<RowAction> = [
     new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
       'fa fa-undo', (row: TreeRow) => {
@@ -93,10 +75,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     })
   ];
   get rowActions() {
-    if ('Default' === this._selectedViewSubject.getValue()) {
-      return this._rowActions;
-    } else {
+    if ('Version Control' === this._selectedViewSubject.getValue()) {
       return this._versionControlRowActions;
+    } else {
+      return [];
     }
   }
   
@@ -110,13 +92,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         itemProxy);
     })
   ];
-  private _rootDefaultRowActions: Array<RowAction> = this._rootRowActions.
-    slice(0);
   private _rootVersionControlRowActions: Array<RowAction> = this.
     _rootRowActions.slice(0);
   get rootRowActions() {
     if ('Default' === this._selectedViewSubject.getValue()) {
-      return this._rootDefaultRowActions;
+      return this._rootRowActions;
     } else {
       return this._rootVersionControlRowActions;
     }
@@ -145,8 +125,23 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   }
   
   public ngOnInit(): void {
-    this._rootDefaultRowActions.push(...this._rowActions);
-    this._rootVersionControlRowActions.push(...this._rowActions);
+    this._rootVersionControlRowActions.push(...this._versionControlRowActions);
+    this.menuActions.push(new MenuAction('Delete', 'Deletes this Item',
+      'fa fa-times delete-button', (row: TreeRow) => {
+      return !row.itemProxy.internal;
+      }, (row: TreeRow) => {
+      this._dialogService.openCustomTextDialog('Confirm Deletion',
+        'Are you sure you want to delete ' + row.itemProxy.item.name + '?', [
+        'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
+        if (result) {
+          if (row.itemProxy === this._rootSubject.getValue()) {
+            this._rootSubject.next(row.getRowParentProxy());
+          }
+          
+          this._itemRepository.deleteItem(row.itemProxy, (2 === result));
+        }
+      });
+    }));
     
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {

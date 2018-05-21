@@ -4,21 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
-import { FilterModule } from '../filter/filter.module';
-import { TreeViewModule } from '../tree/tree.module';
-import { NavigatorComponent } from './navigator.component';
+import { FilterComponent } from './filter.component';
 
 @NgModule({
-  declarations: [NavigatorComponent],
+  declarations: [FilterComponent],
+  entryComponents: [FilterComponent],
   imports: [
     CommonModule,
     FormsModule,
     MaterialModule,
-    PipesModule,
-    FilterModule,
-    TreeViewModule
-  ],
-  exports: [NavigatorComponent]
+    PipesModule
+  ]
 })
-export class NavigatorModule {
+export class FilterModule {
 }
