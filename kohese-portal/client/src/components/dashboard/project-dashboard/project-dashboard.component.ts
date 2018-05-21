@@ -57,7 +57,7 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
           this.proxyChangeSubscription = newConfig.config.getChangeSubject().subscribe ((notification) => {
             if (notification) {
               // TODO Update the Project info in the generated list
-              if (notification.proxy.item.id === this.project.proxy.item.id) {
+              if (this.project && notification.proxy.item.id === this.project.proxy.item.id) {
                 setTimeout(()=>{
                   this.projectService
                 }, 1000)
