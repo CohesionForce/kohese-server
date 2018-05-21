@@ -9,7 +9,6 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { ProjectSelectorComponent } from './project-selector/project-selector.component'
 import { ProjectInfo } from '../../../services/project-service/project.service';
 import { TreeConfigType, ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { timeout } from 'rxjs/operator/timeout';
 
 @Component({
   selector: 'project-dashboard',
