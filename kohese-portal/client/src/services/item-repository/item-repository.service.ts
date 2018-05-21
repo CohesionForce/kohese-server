@@ -452,7 +452,7 @@ export class ItemRepository {
         syncSucceeded = compareAfterRTH.match;
 
         var finishedTime = Date.now();
-        this.logService.log(this.logEvents.compareTreeHashTime ,{ time : (finishedTime - gotResponse) / 1000});
+        this.logService.log(this.logEvents.compareTreeHashProcessingTime ,{ time : (finishedTime - gotResponse) / 1000});
 
         if (!compareAfterRTH.match) {
           this.logService.log(this.logEvents.repoSyncFailed, {compareAfterRTH : compareAfterRTH});
@@ -529,7 +529,7 @@ export class ItemRepository {
           this.logService.log(this.logEvents.createError, {error : response})
           reject(response.error);
         } else {
-          this.logService.log(this.logEvents.createSucceeded, {response : response});
+          this.logService.log(this.logEvents.createSuccess, {response : response});
           let proxy;
           if (response.kind === 'KoheseModel') {
             proxy = new KoheseModel(response.item);

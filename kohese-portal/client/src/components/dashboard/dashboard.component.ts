@@ -1,5 +1,6 @@
+import { Subscription } from 'rxjs';
 import { CurrentUserService } from './../../services/user/current-user.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -18,7 +19,7 @@ import { ProjectInfo } from '../../services/project-service/project.service';
   styleUrls : ['./dashboard.component.scss']
 })
 
-export class DashboardComponent extends NavigatableComponent implements OnInit {
+export class DashboardComponent extends NavigatableComponent implements OnInit, OnDestroy {
   currentUser : ItemProxy;
   username : string;
   assignmentListStream : BehaviorSubject<Array<ItemProxy>> = new BehaviorSubject<Array<ItemProxy>>([]);
@@ -37,6 +38,9 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
 
   dashboardSelectionStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(undefined);
 
+  treeConfigSubscription : Subscription;
+  changeSubjectSubscription : Subscription;
+
   constructor(protected navigationService : NavigationService,
               private itemRepository : ItemRepository,
               private currentUserService : CurrentUserService) {
@@ -47,15 +51,29 @@ export class DashboardComponent extends NavigatableComponent implements OnInit {
     this.currentUserService.getCurrentUserSubject().subscribe((userInfo) => {
       if (userInfo) {
         this.username = userInfo.username;
-        this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
+        this.treeConfigSubscription =
+          this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
           if (newConfig) {
+          console.log('New Config');
           this.currentUser = newConfig.config.getProxyByProperty('KoheseUser', 'username', this.username);
+          this.changeSubjectSubscription = newConfig.config.getChangeSubject().subscribe((change)=>{
+            console.log(change);
+          })
           this.buildAssignmentList();
           }
         })
       }
     });
   }
+
+  ngOnDestroy () {
+    if (this.treeConfigSubscription) {
+      this.treeConfigSubscription.unsubscribe()
+      }
+    if (this.changeSubjectSubscription) {
+      this.changeSubjectSubscription.unsubscribe();
+    }
+    }
 
   dashboardSelected(dashboard : DashboardSelectionInfo) {
     let assignment
