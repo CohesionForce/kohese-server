@@ -1,3 +1,9 @@
+<span style="font-size : large;">
+    User Statistics
+</span>
+<mat-checkbox [(ngModel)]="useStates" class="pull-right" style="padding-right : 20px" (change)="buildSelectedAssignments()">
+  State Filter
+</mat-checkbox>
 <div *ngIf="project" style="width: 100%">
   <div class="left-content">
     Select :
@@ -36,7 +42,18 @@
       </mat-row>
     </mat-table>
   </div>
-  <div class="right-conent">
-    Hello world
+  <div class="right-content" style="overflow: auto;" *ngIf="useStates">
+    <div *ngFor="let type of supportedTypes">
+      <h5 style="border-bottom : 1px darkgrey solid; padding-top : 10px">{{type}}</h5>
+      <div *ngFor="let stateType of stateInfo[type] | mapKey">
+        <h6>{{stateType}}</h6>
+        <mat-list>
+          <mat-list-item class="state-item" *ngFor="let state of stateInfo[type][stateType].states" (click)="toggleState(type, stateType, state)"
+            [ngClass]="{'selected-state' : selectedStatesMap.get(stateType + state)}">
+            {{state}}
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </div>
   </div>
 </div>

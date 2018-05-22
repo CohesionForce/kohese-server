@@ -1,3 +1,5 @@
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { NgModule } from "@angular/core/";
 
@@ -23,6 +25,7 @@ import { UserStatisticsComponent } from "./project-dashboard/user-statistics/use
 import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 import { TreeModule } from "angular-tree-component";
+import { StateFilterService } from './state-filter.service';
 
 @NgModule({
   declarations: [
@@ -40,6 +43,9 @@ import { TreeModule } from "angular-tree-component";
     ProjectSelectorComponent,
     StatusDashboardComponent
   ],
+  providers : [
+    StateFilterService
+  ],
   entryComponents: [
     KMarkdownComponent,
     ProjectSelectorComponent
@@ -53,7 +59,9 @@ import { TreeModule } from "angular-tree-component";
     UserInputModule,
     LensModule,
     TreeModule,
-    VirtualScrollModule
+    VirtualScrollModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   exports : [
     DashboardComponent

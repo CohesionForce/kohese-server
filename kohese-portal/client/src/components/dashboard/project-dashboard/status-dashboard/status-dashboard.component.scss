@@ -4,6 +4,10 @@
     cursor: pointer;
   }
 }
+.selected-state {
+  background-color : rgba(106, 168, 106, 0.795);
+  color : whitesmoke;
+}
 
 .left-content {
   overflow: auto !important;
@@ -18,7 +22,3 @@
   display: inline-block;
 }
 
-.selected-state {
-  background-color : rgba(106, 168, 106, 0.795);
-  color : whitesmoke;
-}

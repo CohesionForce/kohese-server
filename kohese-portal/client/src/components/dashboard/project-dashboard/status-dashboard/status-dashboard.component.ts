@@ -1,3 +1,4 @@
+import { StateInfo, StateFilterService } from '../../state-filter.service';
 import { DetailsDialogComponent } from './../../../details/details-dialog/details-dialog.component';
 import { DialogService } from './../../../../services/dialog/dialog.service';
 import { MatTableDataSource } from '@angular/material';
@@ -32,7 +33,7 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
 
   constructor(private typeService : DynamicTypesService,
               private dialogService : DialogService,
-              private stateService : StateService) { }
+              private stateFilterService : StateFilterService) { }
 
   ngOnInit() {
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
@@ -40,7 +41,7 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
         this.project = newProject;
         console.log(this.project);
 
-        this.stateInfo = this.stateService.getStateInfoFor(this.supportedTypes);
+        this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
 
         // Get list of states to filter on
         this.buildSelectedStates();
@@ -56,17 +57,14 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
 
   toggleState(type : string, stateType : string, state : string) {
     if (this.selectedStatesMap.get(stateType + state)) {
-      console.log('State deselect');
       this.selectedStatesMap.delete(stateType + state);
     } else {
-      console.log('State select');
       this.selectedStatesMap.set(stateType + state, {
         type : type,
         stateType : stateType,
         state : state
       })
     }
-    console.log(this.selectedStatesMap);
     this.buildSelectedStates();
   }
 
@@ -104,8 +102,4 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
   }
 }
 
-interface StateInfo {
-  type : string,
-  stateType : string,
-  state : string
-}
+

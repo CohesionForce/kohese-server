@@ -16,9 +16,21 @@
   height: 700px !important;
   width: 20%;
   display: inline-block;
+  border-left : black 1px solid;
+  padding-left : 10px;
 }
 
 .selected-user {
+  background-color : rgba(106, 168, 106, 0.795);
+  color : whitesmoke;
+}
+
+.state-item {
+  &:hover {
+    cursor: pointer;
+  }
+}
+.selected-state {
   background-color : rgba(106, 168, 106, 0.795);
   color : whitesmoke;
 }
