@@ -15,6 +15,7 @@ import { UserDashboardComponent } from './user-dashboard/user-dashboard.componen
 import { PipesModule } from "../../pipes/pipes.module";
 import { ActiveAssignmentComponent } from "./assignment-dashboard/active-assignment/active-assignment.component";
 import { DueAssignmentComponent } from "./assignment-dashboard/due-assignment/due-assignment.component";
+import { OpenAssignmentComponent } from "./assignment-dashboard/open-assignment/open-assignment.component";
 import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-assignment/completed-assignment.component";
 import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/dependency-info.component';
 import { LensModule } from "../lens/lens.module";
@@ -41,7 +42,8 @@ import { StateFilterService } from './state-filter.service';
     ProjectOverviewComponent,
     UserStatisticsComponent,
     ProjectSelectorComponent,
-    StatusDashboardComponent
+    StatusDashboardComponent,
+    OpenAssignmentComponent
   ],
   providers : [
     StateFilterService

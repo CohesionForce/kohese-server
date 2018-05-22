@@ -30,6 +30,10 @@
             [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                         DashboardSelections.DUE_ASSIGNMENTS}"> Due</h6>
         <h6 class="dashListItem"
+            (click)="selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
+                        DashboardSelections.OPEN_ASSIGNMENTS}"> Open</h6>
+        <h6 class="dashListItem"
             (click)="selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)"
             [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                       DashboardSelections.COMPLETED_ASSIGNMENTS}">Completed</h6>

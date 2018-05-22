@@ -6,6 +6,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 export enum DashboardSelections {
   ACTIVE_ASSIGNMENTS,
   DUE_ASSIGNMENTS,
+  OPEN_ASSIGNMENTS,
   COMPLETED_ASSIGNMENTS,
   USER_PREFERENCES,
   PROJECT_OVERVIEW,
@@ -104,9 +105,17 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         this.menuType = MenuTypes.PERSONAL;
         break;
 
-      case (DashboardSelections.DUE_ASSIGNMENTS):
+        case (DashboardSelections.DUE_ASSIGNMENTS):
         this.selectedDashboard = {
           dashboard: DashboardSelections.DUE_ASSIGNMENTS,
+          dashboardType: DashboardTypes.ASSIGNMENT
+        };
+        this.menuType = MenuTypes.PERSONAL;
+        break;
+
+        case (DashboardSelections.OPEN_ASSIGNMENTS):
+        this.selectedDashboard = {
+          dashboard: DashboardSelections.OPEN_ASSIGNMENTS,
           dashboardType: DashboardTypes.ASSIGNMENT
         };
         this.menuType = MenuTypes.PERSONAL;
