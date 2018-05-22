@@ -10,7 +10,7 @@
       </mat-list-item>
     </mat-list>
   </div>
-  <div class="right-content" style="overflow: auto">
+  <div class="middle-content" style="overflow: auto">
     <mat-table *ngIf="selectedAssignments" [dataSource]="tableStream">
       <ng-container matColumnDef="kind">
         <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
@@ -35,5 +35,8 @@
       <mat-row (click)="openProxyDetails(proxy)" *matRowDef="let proxy; columns: rowDef">
       </mat-row>
     </mat-table>
+  </div>
+  <div class="right-conent">
+    Hello world
   </div>
 </div>

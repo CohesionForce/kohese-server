@@ -8,6 +8,7 @@ import { ProjectInfo } from './../../../../services/project-service/project.serv
 import { Subscription } from 'rxjs';
 import { Input } from '@angular/core';
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { StateService } from '../../../../services/state/state.service';
 
 @Component({
   selector: 'status-dashboard',
@@ -25,12 +26,13 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
   initialized : boolean = false;
 
   selectedStatesMap: Map<string, StateInfo> = new Map<string, StateInfo>();
-  selectedStates : Array<any> = [];
+  matchingObjects : Array<any> = [];
   tableStream: MatTableDataSource<ItemProxy>;
   rowDef = ['kind', 'name', 'state', 'assignedTo']
 
   constructor(private typeService : DynamicTypesService,
-              private dialogService : DialogService) { }
+              private dialogService : DialogService,
+              private stateService : StateService) { }
 
   ngOnInit() {
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
@@ -38,26 +40,13 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
         this.project = newProject;
         console.log(this.project);
 
+        this.stateInfo = this.stateService.getStateInfoFor(this.supportedTypes);
+
         // Get list of states to filter on
-        let types = this.typeService.getKoheseTypes();
-        for (let type of this.supportedTypes) {
-          this.stateInfo[type] = {};
-          let typeDef = types[type].dataModelProxy;
-          let stateProperties = typeDef.item.stateProperties;
-          for (let stateKind of stateProperties) {
-            this.stateInfo[type][stateKind] = {
-              states : []
-            }
-            let states = types[type].fields[stateKind].properties.state;
-            for (let state in states) {
-              this.stateInfo[type][stateKind].states.push(state);
-            }
-          }
-          this.buildSelectedStates();
-          console.log(this.stateInfo);
+        this.buildSelectedStates();
         }
         this.initialized = true;
-      }
+
     })
   }
 
@@ -82,14 +71,14 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
   }
 
   buildSelectedStates () {
-      this.selectedStates = [];
+      this.matchingObjects = [];
 
       for (let proxy of this.project.projectItems) {
         let newItems = proxy.getDescendants();
-        this.selectedStates = this.selectedStates.concat(proxy.getDescendants())
+        this.matchingObjects = this.matchingObjects.concat(proxy.getDescendants())
       }
 
-      this.selectedStates = this.selectedStates.filter((proxy)=>{
+      this.matchingObjects = this.matchingObjects.filter((proxy)=>{
         for (let stateKind of proxy.model.item.stateProperties) {
           let string = stateKind + proxy.item[stateKind];
           if (this.selectedStatesMap.get(string)){
@@ -100,29 +89,7 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
         }
         return false;
       })
-
-      // Array.from(this.selectedStatesMap.values(), (user: ItemProxy) => {
-      //   for (let kind in user.relations.referencedBy) {
-      //     for (let assignmentIdx in user.relations.referencedBy[kind].assignedTo) {
-      //       let assignment = user.relations.referencedBy[kind].assignedTo[assignmentIdx];
-      //       let match = false;
-      //       for (let projectIdx in this.project.projectItems) {
-      //         match = assignment.hasAncestor(this.project.projectItems[projectIdx])
-      //         if (match) {
-      //           break;
-      //         }
-      //       }
-
-      //       if (match) {
-      //         this.selectedAssignments.push(
-      //           user.relations.referencedBy[kind].assignedTo[assignmentIdx]
-      //         )
-      //         continue;
-      //       }
-      //     }
-      //   }
-      // })
-      this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedStates);
+      this.tableStream = new MatTableDataSource<ItemProxy>(this.matchingObjects);
   }
 
   openProxyDetails(proxy: ItemProxy) {

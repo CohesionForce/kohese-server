@@ -14,7 +14,7 @@
   </div>
 </div>
 <div class="right-content">
-  <mat-table *ngIf="selectedStates" [dataSource]="tableStream">
+  <mat-table *ngIf="matchingObjects" [dataSource]="tableStream">
     <ng-container matColumnDef="kind">
       <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
       <mat-cell *matCellDef="let assignment"> {{assignment.kind}}</mat-cell>
