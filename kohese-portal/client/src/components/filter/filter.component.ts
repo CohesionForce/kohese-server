@@ -9,6 +9,7 @@ import { Filter } from './filter.class';
 @Component({
   selector: 'filter',
   templateUrl: './filter.component.html',
+  styleUrls: ['./filter.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterComponent implements OnInit {
@@ -36,6 +37,10 @@ export class FilterComponent implements OnInit {
       this._filter = this._data.filter;
     }
     
+    if (!this._filter) {
+      this._filter = new Filter();
+    }
+    
     this._typeMap = this._dynamicTypesService.getKoheseTypes();
   }
   
@@ -50,5 +55,10 @@ export class FilterComponent implements OnInit {
     }
     
     this._changeDetectorRef.markForCheck();
+  }
+  
+  public compareTypeOptionAndSelection(option: string, selection: KoheseType):
+    boolean {
+    return (this._typeMap[option] === selection);
   }
 }

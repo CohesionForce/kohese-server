@@ -12,6 +12,20 @@
       matTooltip="Changes the root to be the absolute root">
       <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
     </button>
+    <button mat-icon-button [matMenuTriggerFor]="filterMenu"
+      [ngClass]="{ 'highlight': filterSubject.getValue() }">
+      <mat-icon class="fa fa-filter"></mat-icon>
+    </button>
+    <mat-menu #filterMenu="matMenu" [overlapTrigger]="false">
+      <button mat-menu-item (click)="openFilterDialog()">
+        <mat-icon class="fa fa-filter"></mat-icon>
+        Edit Filter
+      </button>
+      <button mat-menu-item (click)="filterSubject.next(undefined)">
+        <mat-icon class="fa fa-times"></mat-icon>
+        Remove Filter
+      </button>
+    </mat-menu>
   </div>
   <div style="height: 12%; width: 100%;">
     <div class="kt-head kth-cell">

@@ -33,16 +33,6 @@ Created by Josh P
     overflow: auto;
     left: 0;
     width: 100%;
-
-    #top-action-bar {
-      padding: 1px;
-      width: 100%;
-      height: $topActionBarHeight;
-      .button-selected {
-        background-color: $buttonAccentColor;
-        color: white;
-      }
-    }
   }
 
   .bottom-content {

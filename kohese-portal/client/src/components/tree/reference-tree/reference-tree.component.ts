@@ -3,6 +3,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -23,8 +24,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   private _treeConfigurationSubscription: Subscription;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _itemRepository: ItemRepository, route: ActivatedRoute) {
-    super(route);
+    private _itemRepository: ItemRepository, route: ActivatedRoute,
+    dialogService: DialogService) {
+    super(route, dialogService);
   }
   
   public ngOnInit(): void {

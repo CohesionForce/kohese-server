@@ -4,9 +4,12 @@ import { VirtualScrollComponent } from 'angular2-virtual-scroll';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
+import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeRow } from './tree-row.class';
 import { MenuAction } from './tree-row.component';
+import { Filter } from '../filter/filter.class';
+import { FilterComponent } from '../filter/filter.component';
 
 export class Tree {
   private _rowMap: Map<string, TreeRow> = new Map<string, TreeRow>();
@@ -52,13 +55,21 @@ export class Tree {
     return this._selectedIdSubject;
   }
   
+  private _filterSubject: BehaviorSubject<Filter> =
+    new BehaviorSubject<Filter>(undefined);
+  get filterSubject() {
+    return this._filterSubject;
+  }
+  
   @ViewChild(VirtualScrollComponent)
   private _virtualScrollComponent: VirtualScrollComponent;
   
   private _rootSubscription: Subscription;
+  private _filterSubscription: Subscription;
   private _updateVisibleRowsSubscriptionMap: any = {};
   
-  protected constructor(protected _route: ActivatedRoute) {
+  protected constructor(protected _route: ActivatedRoute,
+    protected _dialogService: DialogService) {
     this._rootSubscription = this._rootSubject.subscribe((root: ItemProxy) => {
       if (root) {
         this.rootChanged();
@@ -72,10 +83,16 @@ export class Tree {
       this._selectedIdSubject.next(parameters['id']);
       this.showSelection();
     });
+    
+    this._filterSubscription = this._filterSubject.subscribe((filter:
+      Filter) => {
+      this.refresh();
+    });
   }
   
   protected prepareForDismantling(): void {
     this.clear();
+    this._filterSubscription.unsubscribe();
     this._rootSubscription.unsubscribe();
   }
   
@@ -121,6 +138,24 @@ export class Tree {
     return this._rowMap.get(id);
   }
   
+  public refresh(): void {
+    this._rootSubject.next(this._rootSubject.getValue());
+  }
+  
+  public openFilterDialog(): void {
+    this._dialogService.openComponentDialog(FilterComponent, {
+      data: {
+        filter: this._filterSubject.getValue()
+      }
+    }).updateSize('70%', '70%').afterClosed().subscribe((filter: Filter) => {
+      if (filter) {
+        this._filterSubject.next(filter);
+      } else {
+        this._filterSubject.next(undefined);
+      }
+    });
+  }
+  
   protected deleteRow(id: string): void {
     delete this._updateVisibleRowsSubscriptionMap[id];
     let row: TreeRow = this._rowMap.get(id);
@@ -128,7 +163,7 @@ export class Tree {
     this._rowMap.delete(id);
   }
   
-  public showRows(): void {
+  private showRows(): void {
     this._visibleRows = [];
     this.preTreeTraversalActivity();
     
@@ -148,6 +183,40 @@ export class Tree {
   
   private processRow(row: TreeRow): void {
     this.preRowProcessingActivity(row);
+    
+    let filter: Filter = this._filterSubject.getValue();
+    let show: boolean = !!filter;
+    if (show) {
+      row.matchesFilter = (-1 !== filter.filter([row.itemProxy]).indexOf(row.
+        itemProxy));
+      show = row.matchesFilter;
+      if (!row.matchesFilter) {
+        let recursiveFilteringFunction: (r: TreeRow) => void = (r: TreeRow) => {
+          let rowChildrenProxies: Array<ItemProxy> = r.getRowChildrenProxies();
+          for (let j: number = 0; j < rowChildrenProxies.length; j++) {
+            let matches: boolean = (-1 !== filter.filter([rowChildrenProxies[
+              j]]).indexOf(rowChildrenProxies[j]));
+            if (!matches) {
+              recursiveFilteringFunction(this._rowMap.get(rowChildrenProxies[j].
+                item.id));
+            }
+            
+            if (matches) {
+              show = true;
+              break;
+            }
+          }
+        };
+        recursiveFilteringFunction(row);
+      }
+    } else {
+      row.matchesFilter = false;
+      show = true;
+    }
+    
+    if (show !== row.visible) {
+      row.visible = show;
+    }
     
     let root: ItemProxy = this._rootSubject.getValue();
     let rowParentProxy: ItemProxy = row.getRowParentProxy();

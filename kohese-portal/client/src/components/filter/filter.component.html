@@ -5,7 +5,8 @@
   <div style="height: 83%; width: 100%;">
     <mat-form-field>
       <mat-select placeholder="Type" [value]="filter.types" multiple
-        (selectionChange)="typeSelectionsChanged($event.value)">
+        (selectionChange)="typeSelectionsChanged($event.value)"
+        [compareWith]="compareTypeOptionAndSelection">
         <mat-option *ngFor="let type of (typeMap | mapKey)"
           [value]="type">
           {{type}}

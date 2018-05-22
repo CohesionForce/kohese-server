@@ -1,8 +1,13 @@
 <div style="height: 100%; width: 100%;">
   <div style="height: 7%; width: 100%; display: flex; flex-direction: row;">
-    <button mat-icon-button [matMenuTriggerFor]="filterMenu"
-      [ngClass]="{ 'highlight': filterSubject.getValue() }"
+    <button mat-icon-button (click)="rootSubject.next(absoluteRoot)"
+      [disabled]="!rootSubject.getValue() || (rootSubject.getValue() === absoluteRoot)"
+      matTooltip="Changes the root to be the absolute root"
       class="flex-right-align">
+      <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="filterMenu"
+      [ngClass]="{ 'highlight': filterSubject.getValue() }">
       <mat-icon class="fa fa-filter"></mat-icon>
     </button>
     <mat-menu #filterMenu="matMenu" [overlapTrigger]="false">
@@ -23,7 +28,7 @@
     <ng-container *ngIf="rootRow">
       <tree-row [treeRow]="rootRow" [treeRootStream]="rootSubject"
         [selectedProxyIdStream]="selectedIdSubject"
-        [menuActions]="menuActions">
+        [rowActions]="rootRowActions" [menuActions]="menuActions">
       </tree-row>
     </ng-container>
   </div>
@@ -35,7 +40,8 @@
       <virtual-scroll #tree [items]="visibleRows">
         <tree-row *ngFor="let row of tree.viewPortItems"
           [treeRow]="row" [treeRootStream]="rootSubject"
-          [selectedProxyIdStream]="selectedIdSubject">
+          [selectedProxyIdStream]="selectedIdSubject"
+          [rowActions]="rowActions" [menuActions]="menuActions">
         </tree-row>
       </virtual-scroll>
     </div>

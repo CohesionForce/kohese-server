@@ -69,13 +69,14 @@ export class Filter {
       if (this._hasUncommittedChanges && (Object.keys(proxy.status).length === 0)) {
         matches = false;
       } else if (this._hasUnsavedChanges && !proxy.dirty) {
-        matches =  false;
-      }
-      
-      if (-1 === this._types.indexOf(proxy.model.type)) {
         matches = false;
       }
-    
+      
+      if ((this._types.length > 0) && (-1 === this._types.indexOf(proxy.model.
+        type))) {
+        matches = false;
+      }
+      
       if (matches && this._content) {
         matches = false;
         let filterExpression: RegExp;
@@ -101,15 +102,24 @@ export class Filter {
         }
         
         for (let k: number = 0; k < propertiesToCheck.length; k++) {
-          if (proxy.item[propertiesToCheck[k]].match(filterExpression)) {
-            matches = true;
-            break;
+          let propertyAsString: string = proxy.item[propertiesToCheck[k]].
+            toString();
+          if (this._negateContent) {
+            if (!propertyAsString.match(filterExpression)) {
+              matches = true;
+              break;
+            }
+          } else {
+            if (propertyAsString.match(filterExpression)) {
+              matches = true;
+              break;
+            }
           }
         }
-        
-        if (matches) {
-          matchingProxies.push(proxy);
-        }
+      }
+      
+      if (matches) {
+        matchingProxies.push(proxy);
       }
     }
     

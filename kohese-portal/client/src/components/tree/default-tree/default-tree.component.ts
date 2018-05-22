@@ -4,11 +4,9 @@ import { Component, ChangeDetectionStrategy,
 import { ActivatedRoute, Params } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { ToastrService } from 'ngx-toastr';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row.class';
@@ -26,62 +24,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return this._absoluteRoot;
   }
   
-  private _versionControlRowActions: Array<RowAction> = [
-    new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
-      'fa fa-undo', (row: TreeRow) => {
-      return (Object.keys(row.itemProxy.status).length > 0);
-      }, (row: TreeRow) => {
-      this._dialogService.openYesNoDialog('Undo Changes', 'Are you sure ' +
-        'that you want to undo all changes to this Item since the last ' +
-        'commit?').subscribe((result: any) => {
-        if (result) {
-          this._versionControlService.revertItems([row.itemProxy]).
-            subscribe((statusMap: any) => {
-            if (statusMap.error) {
-              this._toastrService.error('Revert Failed', 'Version Control');
-            } else {
-              this._toastrService.success('Revert Succeeded',
-                'Version Control');
-            }
-          });
-        }
-      });
-    }),
-    new RowAction('Stage', 'Stages changes to this Item', 'fa fa-plus',
-      (row: TreeRow) => {
-      return row.itemProxy.status['Unstaged'];
-      }, (row: TreeRow) => {
-      this._versionControlService.stageItems([row.itemProxy]).subscribe(
-        (statusMap: any) => {
-        if (statusMap.error) {
-          this._toastrService.error('Stage Failed', 'Version Control');
-        } else {
-          this._toastrService.success('Stage Succeeded', 'Version Control');
-        }
-      });
-    }),
-    new RowAction('Unstage', 'Un-stages changes to this Item', 'fa fa-minus',
-      (row: TreeRow) => {
-      return row.itemProxy.status['Staged'];
-      }, (row: TreeRow) => {
-      this._versionControlService.unstageItems([row.itemProxy]).
-        subscribe((statusMap: any) => {
-        if (statusMap.error) {
-          this._toastrService.error('Unstage Failed', 'Version Control');
-        } else {
-          this._toastrService.success('Unstage Succeeded', 'Version Control');
-        }
-      });
-    })
-  ];
-  get rowActions() {
-    if ('Version Control' === this._selectedViewSubject.getValue()) {
-      return this._versionControlRowActions;
-    } else {
-      return [];
-    }
-  }
-  
   private _rootRowActions: Array<RowAction> = [
     new RowAction('Set Parent As Root', 'Set this row\'s parent as the root',
       'fa fa-level-up', (row: TreeRow) => {
@@ -92,14 +34,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         itemProxy);
     })
   ];
-  private _rootVersionControlRowActions: Array<RowAction> = this.
-    _rootRowActions.slice(0);
   get rootRowActions() {
-    if ('Default' === this._selectedViewSubject.getValue()) {
-      return this._rootRowActions;
-    } else {
-      return this._rootVersionControlRowActions;
-    }
+    return this._rootRowActions;
   }
   
   private _synchronizeWithSelection: boolean = true;
@@ -107,25 +43,16 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return this._synchronizeWithSelection;
   }
   
-  private _selectedViewSubject: BehaviorSubject<string>;
-  @Input('selectedViewSubject')
-  set selectedViewSubject(selectedViewSubject: BehaviorSubject<string>) {
-    this._selectedViewSubject = selectedViewSubject;
-  }
-  
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     route: ActivatedRoute, private _itemRepository: ItemRepository,
-    private _dialogService: DialogService,
-    private _versionControlService: VersionControlService,
-    private _toastrService: ToastrService) {
-    super(route);
+    dialogService: DialogService) {
+    super(route, dialogService);
   }
   
   public ngOnInit(): void {
-    this._rootVersionControlRowActions.push(...this._versionControlRowActions);
     this.menuActions.push(new MenuAction('Delete', 'Deletes this Item',
       'fa fa-times delete-button', (row: TreeRow) => {
       return !row.itemProxy.internal;
@@ -166,12 +93,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           switch (notification.type) {
             case 'create': {
                 this.insertRow(notification.proxy);
-                this.showRows();
+                this.refresh();
               }
               break;
             case 'delete': {
                 this.deleteRow(notification.id);
-                this.showRows();
+                this.refresh();
               }
               break;
             case 'loaded': {
@@ -179,7 +106,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
                   ItemProxy) => {
                   this.buildRow(proxy);
                 });
-                this.showRows();
+                this.refresh();
                 this.showSelection();
               }
               break;
