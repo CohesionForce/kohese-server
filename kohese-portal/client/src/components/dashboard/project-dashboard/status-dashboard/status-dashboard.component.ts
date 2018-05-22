@@ -92,8 +92,13 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
       this.selectedStates = this.selectedStates.filter((proxy)=>{
         for (let stateKind of proxy.model.item.stateProperties) {
           let string = stateKind + proxy.item[stateKind];
-          return this.selectedStatesMap.get(string);
+          if (this.selectedStatesMap.get(string)){
+            return true
+          } else {
+            continue;
+          }
         }
+        return false;
       })
 
       // Array.from(this.selectedStatesMap.values(), (user: ItemProxy) => {
