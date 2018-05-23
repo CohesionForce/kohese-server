@@ -19,7 +19,7 @@ describe('ItemProxy Test', function () {
     ItemProxy.getWorkingTree().reset();
     ItemProxy.getWorkingTree().loadingComplete();
 
-    expect(ItemProxy.getWorkingTree().getRootProxy().treeHashEntry.treeHash).toEqual('3ac03ab7a2505469c1be68a8462dbd9908fced5a');
+    expect(ItemProxy.getWorkingTree().getRootProxy().treeHashEntry.treeHash).toEqual('f6e29af7a636ac840dc8d9fee05c83647d2179f9');
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -61,6 +61,56 @@ describe('ItemProxy Test', function () {
   //////////////////////////////////////////////////////////////////////////
   function defineTestModel() {
     var modelDefMap = {
+      Internal: {
+        'id': 'Internal',
+        'name': 'Internal',
+        'parentId': 'Model-Definitions',
+        'isInternal': true,
+        'properties': {
+          'id': {
+            'type': 'string',
+            'id': true,
+            'defaultFn': 'guid'
+          },
+          'name': {
+            'type': 'string',
+            'required': true
+          },
+          'parentId': {
+            'type': 'string',
+            'default': ''
+          }
+        },
+        'validations': [],
+        'relations': {},
+        'acls': [],
+        'methods': []
+      },
+      'Internal-Lost': {
+        'id': 'Internal-Lost',
+        'name': 'Internal-Lost',
+        'parentId': 'Model-Definitions',
+        'isInternal': true,
+        'properties': {
+          'id': {
+            'type': 'string',
+            'id': true,
+            'defaultFn': 'guid'
+          },
+          'name': {
+            'type': 'string',
+            'required': true
+          },
+          'parentId': {
+            'type': 'string',
+            'default': ''
+          }
+        },
+        'validations': [],
+        'relations': {},
+        'acls': [],
+        'methods': []
+      },
       Test: {
         'id': 'Test',
         'name': 'Test',
@@ -983,20 +1033,36 @@ describe('ItemProxy Test', function () {
         'kind': 'Internal',
         'oid': 'ba14baabb49cca43770ca92b36388169a2df5f6c',
         'childTreeHashes': {
-          'Model-Definitions': '0ef9fc4be73ed5eb89096160b8d6ab62e248b75b',
+          'Model-Definitions': 'Internal',
           'NV-TOP': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
-          'View-Model-Definitions': '5226d1580a592d72b9e6b360e768b90d5d814ae0'
+          'View-Model-Definitions': 'Internal'
         },
-        'treeHash': 'a791027001e18714f51b78ae87cc10ba70b2443a'
+        'treeHash': '7e840de1f00cfab5cbd80bcfe1cb28f652e9281a'
       },
       'Model-Definitions': {
-        'kind': 'Internal-Model',
+        'kind': 'Internal',
         'oid': '8109f6a5dfeea6ede032fa99d6cd1b79ef589503',
         'childTreeHashes': {
+          'Internal': '86a37e79340dfff23a1a4343311fe1b6be25069f',
+          'Internal-Lost': '2b4ecdd03862514fd881ca363ae1be6d1ba08773',
           'Test': '67af553ac64e266aebebeb36dbcc799b350146a8',
           'Test-Exclude': '26094ef81e18c6c30d1049d3d765d8ef9b3ed45e'
         },
-        'treeHash': '0ef9fc4be73ed5eb89096160b8d6ab62e248b75b'
+        'treeHash': '42a0dde18f068ee66dd15dd4f9875e69ec66da22'
+      },
+      'Internal': {
+        'kind': 'KoheseModel',
+        'oid': '41bfcee6e05f90bf24291ffef2a425a342f7357f',
+        'childTreeHashes': {},
+        'treeHash': '86a37e79340dfff23a1a4343311fe1b6be25069f',
+        'parentId': 'Model-Definitions'
+      },
+      'Internal-Lost': {
+        'kind': 'KoheseModel',
+        'oid': 'fd7ebb59134298047ffad3bdc491246c8a8978e5',
+        'childTreeHashes': {},
+        'treeHash': '2b4ecdd03862514fd881ca363ae1be6d1ba08773',
+        'parentId': 'Model-Definitions'
       },
       'Test': {
         'kind': 'KoheseModel',
@@ -1084,21 +1150,15 @@ describe('ItemProxy Test', function () {
         'childTreeHashes': {},
         'treeHash': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
         'parentId': 'NV-TOP'
-      },
-      'View-Model-Definitions': {
-        'kind': 'Internal-View-Model',
-        'oid': '7927f787b40a11b5fb9bf0e929884a344fa2b9ff',
-        'childTreeHashes': {},
-        'treeHash': '5226d1580a592d72b9e6b360e768b90d5d814ae0'
       }
     };
 
-  var thmCompare = TreeHashMap.compare(expectedTreeHashMap, treeHashMap);
-  if (!thmCompare.match) {
-    console.log('Tree Map');
+  var thmDiff = TreeHashMap.diff(expectedTreeHashMap, treeHashMap);
+  if (!thmDiff.match) {
+    console.log('*** Tree Map');
     console.log(treeHashMap);
-    console.log('Tree Hash Map Compare');
-    console.log(JSON.stringify(thmCompare, null, '  '));
+    console.log('Tree Hash Map Diff');
+    console.log(JSON.stringify(thmDiff, null, '  '));
   }
 
   // let kdbFS = require('../../../server/kdb-fs.js');
@@ -1214,23 +1274,26 @@ it('Retrieve Delta Tree Hash Map', () => {
     }
   };
 
-  let expectedCompareResult = {
+  let expectedDiffResult = {
     'match': false,
     'summary': {
       'roots': {
         'added': [],
         'deleted': [],
-        'common': ['ROOT']
+        'common': [
+          'ROOT',
+          'Model-Definitions'
+        ]
       },
       'kindChanged': {},
       'contentChanged': {
-        'C': {
-          'fromOID': '3cfa883acec0a529b941b02a57f4187bece8263d',
-          'toOID': 'ba5a2c063c02084c658ab77309d6c25ce1e128e2'
-        },
         'AA': {
           'fromOID': '71cea569a1401108ea4ce2ebe40470ba536fc676',
           'toOID': 'd9bd2c7ca658b470dc633e01eac973adb05ceb99'
+        },
+        'C': {
+          'fromOID': '3cfa883acec0a529b941b02a57f4187bece8263d',
+          'toOID': 'ba5a2c063c02084c658ab77309d6c25ce1e128e2'
         }
       },
       'parentChanged': {
@@ -1255,8 +1318,8 @@ it('Retrieve Delta Tree Hash Map', () => {
       'ROOT': {
         'match': false,
         'treeHashChanged': {
-          'fromTreeId': 'a791027001e18714f51b78ae87cc10ba70b2443a',
-          'toTreeId': 'a4d85bb5bd4c74736a6df74b5de88ffd8a686f6c'
+          'fromTreeId': '7e840de1f00cfab5cbd80bcfe1cb28f652e9281a',
+          'toTreeId': 'a6fcdbfb3ff1ee289947268793bb231c37cfbc8a'
         },
         'childrenModified': [
           {
@@ -1397,9 +1460,14 @@ it('Retrieve Delta Tree Hash Map', () => {
   var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
 
   var thmCompare = TreeHashMap.compare(treeHashMapBefore, treeHashMapAfter);
-  let newCompare = TreeHashMap.diff(treeHashMapBefore, treeHashMapAfter);
+  let thmDiff = TreeHashMap.diff(treeHashMapBefore, treeHashMapAfter);
 
-  expect(newCompare).toEqual(expectedCompareResult);
+  // let kdbFS = require('../../../server/kdb-fs.js');
+  // kdbFS.storeJSONDoc('t.expected-diff.json', expectedDiffResult);
+  // kdbFS.storeJSONDoc('t.thm-diff.json', thmDiff);
+
+
+  expect(thmDiff).toEqual(expectedDiffResult);
   expect(thmCompare).toEqual(expectedDeltaMap);
 });
 
