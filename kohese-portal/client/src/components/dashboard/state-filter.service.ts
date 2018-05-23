@@ -20,8 +20,11 @@ export class StateFilterService {
           states : []
         }
         let states = types[type].fields[stateKind].properties.state;
+        console.log('!!!');
+        console.log(states);
         for (let state in states) {
-          stateInfo[type][stateKind].states.push(state);
+          console.log(state);
+          stateInfo[type][stateKind].states.push(states[state].name);
         }
       }
     }
