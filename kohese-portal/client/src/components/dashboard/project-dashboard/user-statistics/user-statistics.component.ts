@@ -9,6 +9,7 @@ import { NavigationService } from '../../../../services/navigation/navigation.se
 import { MatTableDataSource } from '@angular/material';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from '../../../details/details-dialog/details-dialog.component';
+import { StateInfo, StateFilterService } from '../../state-filter.service';
 
 @Component({
   selector: 'user-statistics',
@@ -27,8 +28,14 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   tableStream: MatTableDataSource<ItemProxy>;
   rowDef = ['kind', 'name', 'state', 'assignedTo']
 
+  useStates : boolean = false;
+  supportedTypes = ['Action', 'Task', 'Decision']
+  stateInfo : {} = {};
+  selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
+
   constructor(protected navigationService: NavigationService,
-    protected dialogService: DialogService) {
+    protected dialogService: DialogService,
+    private stateFilterService : StateFilterService) {
     super(navigationService)
   }
 
@@ -37,6 +44,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       if (newProject) {
         this.project = newProject;
         this.deselectAll();
+        this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
       }
     })
   }
@@ -52,6 +60,19 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       this.selectedUserMap.delete(user.item.name)
     } else {
       this.selectedUserMap.set(user.item.name, user);
+    }
+    this.buildSelectedAssignments();
+  }
+
+  toggleState(type : string, stateType : string, state : string) {
+    if (this.selectedStatesMap.get(stateType + state)) {
+      this.selectedStatesMap.delete(stateType + state);
+    } else {
+      this.selectedStatesMap.set(stateType + state, {
+        type : type,
+        stateType : stateType,
+        state : state
+      })
     }
     this.buildSelectedAssignments();
   }
@@ -93,6 +114,21 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         }
       }
     })
+
+    if (this.useStates) {
+      this.selectedAssignments = this.selectedAssignments.filter((proxy)=>{
+        for (let stateKind of proxy.model.item.stateProperties) {
+          let string = stateKind + proxy.item[stateKind];
+          if (this.selectedStatesMap.get(string)){
+            return true
+          } else {
+            continue;
+          }
+        }
+        return false;
+      })
+    }
+
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
   }
 
@@ -106,7 +142,4 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
 
       });
   }
-
-
-
 }

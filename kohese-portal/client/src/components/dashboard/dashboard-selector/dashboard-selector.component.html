@@ -61,6 +61,10 @@
             (click)="selectDashboard(DashboardSelections.USER_STATISTICS)"
             [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                             DashboardSelections.USER_STATISTICS}">User Statistics</h6>
+        <h6 class="dashListItem"
+            (click)="selectDashboard(DashboardSelections.PROJECT_STATUS)"
+            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
+                            DashboardSelections.PROJECT_STATUS}">Project Status</h6>
       </div>
       <mat-divider></mat-divider>
   </div>

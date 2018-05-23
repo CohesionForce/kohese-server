@@ -76,22 +76,8 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
     }
 
   dashboardSelected(dashboard : DashboardSelectionInfo) {
-    let assignment
-    switch (dashboard.dashboard) {
-      case (DashboardSelections.ACTIVE_ASSIGNMENTS) :
-      case (DashboardSelections.COMPLETED_ASSIGNMENTS) :
-      case (DashboardSelections.DUE_ASSIGNMENTS) :
-      case (DashboardSelections.OPEN_ASSIGNMENTS) :
-      case (DashboardSelections.PROJECT_OVERVIEW) :
-      case (DashboardSelections.USER_STATISTICS) :
-        this.selectedDashboard = dashboard;
-        this.dashboardSelectionStream.next(this.selectedDashboard.dashboard);
-        break;
-      default :
-        this.selectedDashboard = dashboard;
-        console.log('Unhandled Dashboard Selection');
-        console.log(dashboard);
-    }
+    this.selectedDashboard = dashboard;
+    this.dashboardSelectionStream.next(this.selectedDashboard.dashboard);
   }
 
   buildAssignmentList () {

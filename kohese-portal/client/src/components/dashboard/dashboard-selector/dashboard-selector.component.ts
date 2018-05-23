@@ -10,7 +10,8 @@ export enum DashboardSelections {
   COMPLETED_ASSIGNMENTS,
   USER_PREFERENCES,
   PROJECT_OVERVIEW,
-  USER_STATISTICS
+  USER_STATISTICS,
+  PROJECT_STATUS
 }
 
 // Used to determine greater sub-type of dashboards
@@ -151,7 +152,13 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         };
         this.menuType = MenuTypes.PROJECT;
         break;
-
+      case (DashboardSelections.PROJECT_STATUS):
+        this.selectedDashboard = {
+          dashboard: DashboardSelections.PROJECT_STATUS,
+          dashboardType: DashboardTypes.PROJECT
+        };
+        this.menuType = MenuTypes.PROJECT;
+        break;
       default:
         console.error('Invalid Dashboard selection :');
         console.error(dashboard);

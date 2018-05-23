@@ -1,3 +1,5 @@
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { NgModule } from "@angular/core/";
 
@@ -19,10 +21,12 @@ import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/
 import { LensModule } from "../lens/lens.module";
 import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard.component";
 import { ProjectOverviewComponent } from "./project-dashboard/project-overview/project-overview.component";
+import { StatusDashboardComponent } from './project-dashboard/status-dashboard/status-dashboard.component';
 import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
 import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 import { TreeModule } from "angular-tree-component";
+import { StateFilterService } from './state-filter.service';
 
 @NgModule({
   declarations: [
@@ -38,7 +42,11 @@ import { TreeModule } from "angular-tree-component";
     ProjectOverviewComponent,
     UserStatisticsComponent,
     ProjectSelectorComponent,
+    StatusDashboardComponent,
     OpenAssignmentComponent
+  ],
+  providers : [
+    StateFilterService
   ],
   entryComponents: [
     KMarkdownComponent,
@@ -53,7 +61,9 @@ import { TreeModule } from "angular-tree-component";
     UserInputModule,
     LensModule,
     TreeModule,
-    VirtualScrollModule
+    VirtualScrollModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   exports : [
     DashboardComponent

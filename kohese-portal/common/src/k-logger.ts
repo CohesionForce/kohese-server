@@ -141,7 +141,6 @@ export class KLogger {
   }
 
   log(eventId: string, infoObject?: any) {
-    console.log(eventId);
     if (this.logMap[eventId].active) {
       console.log(eventId);
       if (infoObject) {

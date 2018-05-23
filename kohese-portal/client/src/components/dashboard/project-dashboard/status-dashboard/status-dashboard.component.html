@@ -1,0 +1,41 @@
+<h4 *ngIf="initialized">Project Status</h4>
+<div class="left-content">
+  <div *ngFor="let type of supportedTypes">
+    <h5 style="border-bottom : 1px darkgrey solid; padding-top : 10px">{{type}}</h5>
+    <div *ngFor="let stateType of stateInfo[type] | mapKey">
+      <h6>{{stateType}}</h6>
+      <mat-list>
+        <mat-list-item class="state-item" *ngFor="let state of stateInfo[type][stateType].states" (click)="toggleState(type, stateType, state)"
+          [ngClass]="{'selected-state' : selectedStatesMap.get(stateType + state)}">
+          {{state}}
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+</div>
+<div class="right-content">
+  <mat-table *ngIf="matchingObjects" [dataSource]="tableStream">
+    <ng-container matColumnDef="kind">
+      <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
+      <mat-cell *matCellDef="let assignment"> {{assignment.kind}}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+      <mat-cell *matCellDef="let assignment"> {{assignment.item.name}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="state">
+      <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
+      <mat-cell *matCellDef="let assignment">{{assignment.state}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="assignedTo">
+      <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
+      <mat-cell *matCellDef="let assignment"> {{assignment.item.assignedTo}}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
+    <mat-row (click)="openProxyDetails(proxy)" *matRowDef="let proxy; columns: rowDef">
+    </mat-row>
+  </mat-table>
+</div>

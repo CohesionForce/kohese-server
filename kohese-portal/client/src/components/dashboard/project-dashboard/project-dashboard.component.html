@@ -6,9 +6,13 @@
 <div *ngIf="project" style="padding: 20px;">
   <h1>{{ project.proxy.item.name }}
     <button mat-raised-button (click)="openProjectSelection()"> Change Project</button>
+    <button mat-raised-button (click)="editProject()"> Edit Project</button>
   </h1>
+
 </div>
 <project-overview *ngIf="dashboardSelection === DashboardSelections.PROJECT_OVERVIEW"
                   [projectStream]="projectStream"></project-overview>
 <user-statistics *ngIf="dashboardSelection === DashboardSelections.USER_STATISTICS"
                   [projectStream]="projectStream"></user-statistics>
+<status-dashboard *ngIf="dashboardSelection === DashboardSelections.PROJECT_STATUS"
+                  [projectStream]="projectStream"></status-dashboard>
