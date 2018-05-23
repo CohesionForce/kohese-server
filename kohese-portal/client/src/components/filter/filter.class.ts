@@ -90,7 +90,7 @@ export class Filter {
           filterExpression = new RegExp(this._content, 'i');
         }
         
-        let propertiesToCheck: Array<string>;
+        let propertiesToCheck: Array<string> = [];
         if (this._properties.length > 0) {
           for (let k: number = 0; k < this._properties.length; k++) {
             if (proxy.item[this._properties[k]]) {
@@ -98,7 +98,7 @@ export class Filter {
             }
           }
         } else {
-          propertiesToCheck = Object.keys(proxy.item);
+          propertiesToCheck.push(...Object.keys(proxy.item));
         }
         
         for (let k: number = 0; k < propertiesToCheck.length; k++) {

@@ -3,16 +3,14 @@ import { TestBed, ComponentFixture, fakeAsync,
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
-import { ToastrModule } from 'ngx-toastr';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 
+import { MaterialModule } from '../../../material.module';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { VersionControlService } from '../../../services/version-control/version-control.service';
-import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
 import { DefaultTreeComponent } from './default-tree.component';
 import { TreeRow } from '../tree-row.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -29,16 +27,13 @@ describe('Component: default-tree', () => {
       declarations: [DefaultTreeComponent],
       imports: [
         VirtualScrollModule,
-        ToastrModule.forRoot()
+        MaterialModule
       ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ActivatedRoute, useValue: { params: Observable.of('') } },
         { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: DialogService, useClass: MockDialogService }, {
-          provide: VersionControlService,
-          useClass: MockVersionControlService
-        }
+        { provide: DialogService, useClass: MockDialogService }
       ]
     }).compileComponents();
     

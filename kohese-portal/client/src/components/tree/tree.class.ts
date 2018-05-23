@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeRow } from './tree-row.class';
-import { MenuAction } from './tree-row.component';
+import { RowAction, MenuAction } from './tree-row.component';
 import { Filter } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
@@ -29,6 +29,34 @@ export class Tree {
   private _rootRow: TreeRow;
   get rootRow() {
     return this._rootRow;
+  }
+  
+  private _rootRowActions: Array<RowAction> = [
+    new RowAction('Expand Descendants', 'Expands all descendants',
+    'fa fa-caret-down', (row: TreeRow) => {
+      return (row.getRowChildrenProxies().length > 0);
+    }, (row: TreeRow) => {
+      this.expandDescendants(row);
+    }),
+    new RowAction('Collapse Descendants', 'Collapses all descendants',
+    'fa fa-caret-right', (row: TreeRow) => {
+      return (row.getRowChildrenProxies().length > 0);
+    }, (row: TreeRow) => {
+      this.collapseDescendants(row);
+    })
+  ];
+  get rootRowActions() {
+    return this._rootRowActions;
+  }
+  
+  private _rootMenuActions: Array<MenuAction> = [];
+  get rootMenuActions() {
+    return this._rootMenuActions;
+  }
+  
+  private _rowActions: Array<RowAction> = [];
+  get rowActions() {
+    return this._rowActions;
   }
   
   private _menuActions: Array<MenuAction> = [
@@ -140,6 +168,9 @@ export class Tree {
   
   public refresh(): void {
     this._rootSubject.next(this._rootSubject.getValue());
+    if (this._virtualScrollComponent) {
+      this._virtualScrollComponent.refresh(true);
+    }
   }
   
   public openFilterDialog(): void {
@@ -150,8 +181,6 @@ export class Tree {
     }).updateSize('70%', '70%').afterClosed().subscribe((filter: Filter) => {
       if (filter) {
         this._filterSubject.next(filter);
-      } else {
-        this._filterSubject.next(undefined);
       }
     });
   }

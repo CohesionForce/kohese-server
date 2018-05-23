@@ -24,20 +24,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return this._absoluteRoot;
   }
   
-  private _rootRowActions: Array<RowAction> = [
-    new RowAction('Set Parent As Root', 'Set this row\'s parent as the root',
-      'fa fa-level-up', (row: TreeRow) => {
-      return (this._rootSubject.getValue() && (this._rootSubject.getValue() !==
-        this._absoluteRoot));
-      }, (row: TreeRow) => {
-      this._rootSubject.next(this.getRow(row.getRowParentProxy().item.id).
-        itemProxy);
-    })
-  ];
-  get rootRowActions() {
-    return this._rootRowActions;
-  }
-  
   private _synchronizeWithSelection: boolean = true;
   get synchronizeWithSelection() {
     return this._synchronizeWithSelection;
@@ -53,8 +39,17 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   }
   
   public ngOnInit(): void {
-    this.menuActions.push(new MenuAction('Delete', 'Deletes this Item',
-      'fa fa-times delete-button', (row: TreeRow) => {
+    this.rootRowActions.push(new RowAction('Set Parent As Root',
+      'Set this row\'s parent as the root', 'fa fa-level-up', (row:
+      TreeRow) => {
+      return (this._rootSubject.getValue() && (this._rootSubject.getValue() !==
+        this._absoluteRoot));
+      }, (row: TreeRow) => {
+      this._rootSubject.next(row.itemProxy.parentProxy);
+    }));
+    
+    let deleteMenuAction: MenuAction = new MenuAction('Delete',
+      'Deletes this Item', 'fa fa-times delete-button', (row: TreeRow) => {
       return !row.itemProxy.internal;
       }, (row: TreeRow) => {
       this._dialogService.openCustomTextDialog('Confirm Deletion',
@@ -68,7 +63,9 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           this._itemRepository.deleteItem(row.itemProxy, (2 === result));
         }
       });
-    }));
+    });
+    this.rootMenuActions.push(deleteMenuAction);
+    this.menuActions.push(deleteMenuAction);
     
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {

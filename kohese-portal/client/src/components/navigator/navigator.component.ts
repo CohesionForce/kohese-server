@@ -9,4 +9,10 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 export class NavigatorComponent {
   public constructor() {
   }
+  
+  public refresh(index: number, ...tabComponents: Array<any>): void {
+    setTimeout(() => {
+      tabComponents[index].refresh();
+    });
+  }
 }

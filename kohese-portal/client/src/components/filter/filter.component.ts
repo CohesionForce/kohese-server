@@ -59,6 +59,6 @@ export class FilterComponent implements OnInit {
   
   public compareTypeOptionAndSelection(option: string, selection: KoheseType):
     boolean {
-    return (this._typeMap[option] === selection);
+    return (option === selection.dataModelProxy.item.name);
   }
 }

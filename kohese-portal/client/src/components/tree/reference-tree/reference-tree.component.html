@@ -23,7 +23,7 @@
     <ng-container *ngIf="rootRow">
       <tree-row [treeRow]="rootRow" [treeRootStream]="rootSubject"
         [selectedProxyIdStream]="selectedIdSubject"
-        [menuActions]="menuActions">
+        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
       </tree-row>
     </ng-container>
   </div>
@@ -35,7 +35,8 @@
       <virtual-scroll #tree [items]="visibleRows">
         <tree-row *ngFor="let row of tree.viewPortItems"
           [treeRow]="row" [treeRootStream]="rootSubject"
-          [selectedProxyIdStream]="selectedIdSubject">
+          [selectedProxyIdStream]="selectedIdSubject"
+          [rowActions]="rowActions" [menuActions]="menuActions">
         </tree-row>
       </virtual-scroll>
     </div>
