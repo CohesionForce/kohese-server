@@ -1,6 +1,6 @@
 <div class="kt-item" id="{{treeRow.itemProxy.item.id}}"
   matTooltip="{{treeRow.itemProxy.item.name}}"
-  (click)="treeRow.itemProxy.internal ? '' : navigate('Explore', {id: treeRow.itemProxy.item.id})"
+  (click)="navigate('Explore', {id: treeRow.itemProxy.item.id})"
   [ngClass]="{ 'selected-border': (treeRow.itemProxy.item.id === selectedProxyIdStream.getValue()),
   'highlight-row': ((treeRow.itemProxy !== treeRootStream.getValue()) && treeRow.visible && treeRow.matchesFilter) }"
   [ngStyle]="getIndentationStyle()">
