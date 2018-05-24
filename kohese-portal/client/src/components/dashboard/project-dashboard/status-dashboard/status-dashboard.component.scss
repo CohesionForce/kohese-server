@@ -1,0 +1,24 @@
+
+.state-item {
+  &:hover {
+    cursor: pointer;
+  }
+}
+.selected-state {
+  background-color : rgba(106, 168, 106, 0.795);
+  color : whitesmoke;
+}
+
+.left-content {
+  overflow: auto !important;
+  height: 700px !important;
+  width: 20%;
+  display: inline-block;
+}
+.right-content {
+  overflow: auto !important;
+  height: 700px !important;
+  width: 70%;
+  display: inline-block;
+}
+

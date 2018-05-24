@@ -1,0 +1,15 @@
+{
+  "id": "Internal-Lost",
+  "name": "Internal-Lost",
+  "parentId": "Item",
+  "base": "Item",
+  "idInjection": false,
+  "isMetaModel": true,
+  "isInternal": true,
+  "invertItemOrder": false,
+  "properties": {},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

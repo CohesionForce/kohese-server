@@ -7,7 +7,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 export class StateService {
   public constructor(private _typeService: DynamicTypesService) {
   }
-  
+
   public getTransitionCandidates(proxy: ItemProxy): any {
     let transitionCandidates: any = {};
     let type: KoheseType = this._typeService.getKoheseTypes()[proxy.kind];
@@ -24,7 +24,7 @@ export class StateService {
         }
       }
     }
-    
+
     return transitionCandidates;
   }
 }

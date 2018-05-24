@@ -64,16 +64,15 @@ export class AssignmentDashboardComponent extends NavigatableComponent
         sortedArray = assignmentList.sort((a , b) => {
           if (a.item.modifiedOn >= b.item.modifiedOn) {
             return 1;
-          } else
+          } else {
             return -1;
+          }
         })
       break;
       /////////////////
       case (DashboardSelections.DUE_ASSIGNMENTS) :
         sortedArray = assignmentList.filter((assignment)=>{
-          if (assignment.item.estimatedCompletion && !assignment.item.actualCompletion) {
-            return true;
-          }
+          return (!this.isCompleted(assignment) && assignment.item.estimatedCompletion)
         }).sort((a, b)=>{
           if (a.item.estimatedCompletion <= b.item.estimatedCompletion) {
             return -1;
@@ -83,16 +82,26 @@ export class AssignmentDashboardComponent extends NavigatableComponent
         })
         break;
       /////////////////
+      case (DashboardSelections.OPEN_ASSIGNMENTS) :
+        sortedArray = assignmentList.filter((assignment)=>{
+          return (!this.isCompleted(assignment))
+        }).sort((a, b)=>{
+          if (a.item.modifiedOn >= b.item.modifiedOn) {
+            return 1;
+          } else {
+            return -1;
+          }
+        })
+        break;
+      /////////////////
       case (DashboardSelections.COMPLETED_ASSIGNMENTS) :
         sortedArray = assignmentList.filter((assignment)=>{
-          if (assignment.item.actualCompletion) {
-            return true;
-          }
+         return (this.isCompleted(assignment))
         }).sort((a, b)=>{
-          if (a.item.actualCompletion >= b.item.actualCompletion) {
-            return -1;
-          } else {
+          if (a.item.modifiedOn >= b.item.modifiedOn) {
             return 1;
+          } else {
+            return -1;
           }
         })
         break;
@@ -103,5 +112,20 @@ export class AssignmentDashboardComponent extends NavigatableComponent
 
     }
     return sortedArray;
+  }
+
+  isCompleted(assignment : ItemProxy) : boolean {
+    if (assignment.kind === 'Task') {
+      if (assignment.item.taskState === 'Completed') {
+        return true;
+      }
+    }
+    if (assignment.kind === 'Action') {
+      if (assignment.item.actionState === 'Verified' ||
+          assignment.item.actionState === 'Closed') {
+          return true
+        }
+    }
+    return false;
   }
 }

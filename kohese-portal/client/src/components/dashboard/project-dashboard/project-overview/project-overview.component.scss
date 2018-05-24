@@ -15,3 +15,17 @@
   height : 600px;
   overflow : auto !important;
 }
+
+virtual-scroll {
+  height: 90%;
+  width : 100%;
+}
+
+.activity-row {
+  height : 50px;
+  width : 100%;
+  border-bottom : 1px solid gray;
+  &:hover {
+    cursor: pointer;
+  }
+}
