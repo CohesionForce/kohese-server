@@ -85,13 +85,6 @@ export class TreeRowComponent extends NavigatableComponent
     this.koheseType = this.typeService.getKoheseTypes()[this._treeRow.
       itemProxy.kind];
     
-    this._updateDisplaySubscription = this._treeRow.updateDisplay.subscribe(
-      (updateDisplay: boolean) => {
-      if (updateDisplay) {
-        this._changeDetector.markForCheck();
-      }
-    });
-    
     this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
       this.treeConfig = newConfig.config;
       this._itemProxyChangeSubscription = this.treeConfig.getChangeSubject()
@@ -102,6 +95,13 @@ export class TreeRowComponent extends NavigatableComponent
             }
           }
       });
+    });
+    
+    this._updateDisplaySubscription = this._treeRow.updateDisplay.subscribe(
+      (updateDisplay: boolean) => {
+      if (updateDisplay) {
+        this._changeDetector.markForCheck();
+      }
     });
     
     this._rootSubscription = this.treeRootStream.subscribe((root:

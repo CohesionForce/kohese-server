@@ -7,7 +7,6 @@ import { NavigatorComponent } from './navigator.component';
 
 describe('Component: navigator', () => {
   let component: NavigatorComponent;
-  let row: TreeRow;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

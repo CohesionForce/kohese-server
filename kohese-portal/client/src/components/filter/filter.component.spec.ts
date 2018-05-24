@@ -8,7 +8,7 @@ import { PipesModule } from '../../pipes/pipes.module';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { MockDynamicTypesService } from '../../../mocks/services/MockDynamicTypesService';
 import { FilterComponent } from './filter.component';
-import { Filter } from './Filter.class';
+import { Filter } from './filter.class';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 
 describe('Component: filter', () => {

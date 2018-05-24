@@ -14,9 +14,13 @@ import { MockDialogService } from '../../../../mocks/services/MockDialogService'
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
 import { VersionControlTreeComponent } from './version-control-tree.component';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { TreeRow } from '../tree-row.class';
 
 describe('Component: version-control-tree', () => {
   let component: VersionControlTreeComponent;
+  let descendantProxy: ItemProxy;
   
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,10 +46,18 @@ describe('Component: version-control-tree', () => {
       createComponent(VersionControlTreeComponent);
     component = fixture.componentInstance;
     
+    descendantProxy = TreeConfiguration.getWorkingTree().getRootProxy().
+      children[0];
+    descendantProxy.status['Status'] = 'Status';
+    
     fixture.detectChanges();
   });
   
   it('initializes', () => {
-    expect(component.getRow('ROOT')).toBeDefined();
+    let rootRow: TreeRow = component.getRow('ROOT');
+    expect(rootRow).toBeDefined();
+    expect(component.getRow(descendantProxy.item.id)).toBeDefined();
+    expect(rootRow.getRowChildrenProxies().indexOf(descendantProxy)).not.
+      toEqual(-1);
   });
 });
