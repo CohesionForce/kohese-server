@@ -74,9 +74,11 @@ export class TreeHashMap {
 
         if (!leftVersion){
           result.summary.itemMissing.leftMissing.push(diffId);
+          result.match = false;
         }
         if(!rightVersion){
           result.summary.itemMissing.rightMissing.push(diffId);
+          result.match = false;
         }
         if(!leftVersion || !rightVersion){
           continue;

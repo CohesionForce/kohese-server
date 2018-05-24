@@ -68,15 +68,18 @@ export class TreeConfiguration {
     }, this);
     this.repoMap['LOST+FOUND'] = this.lostAndFound;
 
-    this.rootModelProxy = new ItemProxy('Internal-Model', {
+    this.rootModelProxy = new ItemProxy('Internal', {
       id: 'Model-Definitions',
       name: 'Model Definitions'
     }, this);
+    this.root.addChild(this.rootModelProxy);
 
-    this.rootViewModelProxy = new ItemProxy('Internal-View-Model', {
+    this.rootViewModelProxy = new ItemProxy('Internal', {
       id: 'View-Model-Definitions',
       name: 'View Model Definitions'
     }, this);
+    this.root.addChild(this.rootViewModelProxy);
+
 
     treeConfigMap[treeId] = this;
 
@@ -307,7 +310,9 @@ export class TreeConfiguration {
   getAllTreeHashes() {
     var proxyTreeHashes = {};
     this.root.visitTree(null,(proxy) => {
-      proxyTreeHashes[proxy.item.id] = proxy.treeHashEntry;
+      if (proxy.treeHashEntry){
+        proxyTreeHashes[proxy.item.id] = proxy.treeHashEntry;
+      }
     });
 
     return proxyTreeHashes;

@@ -542,7 +542,7 @@ export class ItemProxy {
 
     if (TreeConfiguration.koheseModelDefn){
       this.model = TreeConfiguration.koheseModelDefn.getModelProxyFor(kind);
-      if (this.internal && !this.model.internal) {
+      if (this.internal && this.model && !this.model.internal) {
         // Item was previously created in lost and found
         delete this.internal;
       }

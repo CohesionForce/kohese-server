@@ -50,7 +50,7 @@
                 <document-view [proxyStream]="proxyStream"
                                [incrementalLoad]="true"></document-view>
             </mat-tab>
-            <mat-tab label="Details" *ngIf="!itemProxy.model.internal">
+            <mat-tab label="Details">
                 <ng-template mat-tab-label>
                    Details
                    <span *ngIf="detailsFormGroup?.dirty">
@@ -58,7 +58,7 @@
                       title = "Dirty item" />
                   </span>
                 </ng-template>
-                <details-form #editor [proxyStream]="proxyStream" 
+                <details-form #editor [proxyStream]="proxyStream"
                   [editableStream]="editableStream"
                   (formGroupUpdated)="onFormGroupUpdated($event)"
                   (nonFormFieldChanged)="onNonFormFieldChanged($event)">

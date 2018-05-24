@@ -5,10 +5,6 @@ import * as  _ from 'underscore';
 
 
 let modelMap = {
-  'Internal': { internal: true, kind: 'Internal' },
-  'Internal-Lost': { internal: true, kind: 'Internal' },
-  'Internal-Model': { internal: true, kind: 'Internal' },
-  'Internal-View-Model': { internal: true, kind: 'Internal' }
 };
 
 export class KoheseModel extends ItemProxy {
@@ -21,7 +17,6 @@ export class KoheseModel extends ItemProxy {
     let itemId = forItem.id;
 
     console.log('::: Loading KoheseModel: ' + forItem.name);
-
 
     if (!forItem.id){
       forItem.id = forItem.name;
@@ -40,6 +35,10 @@ export class KoheseModel extends ItemProxy {
     }
 
     super('KoheseModel', forItem);
+
+    if (withItem.isInternal){
+      this.internal = true;
+    }
 
     if (!modelMap[itemId]) {
       modelMap[itemId] = this;

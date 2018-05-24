@@ -1,0 +1,54 @@
+{
+  "id": "view-internal",
+  "name": "Internal View Model",
+  "parentId": "View-Model-Definitions",
+  "modelName": "Internal",
+  "icon": "fa fa-wrench",
+  "viewProperties": {
+    "name": {
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
+      "required": true,
+      "default": "",
+      "displayName": "Name"
+    },
+    "description": {
+      "inputType": {
+        "type": "markdown",
+        "options": {}
+      },
+      "required": false,
+      "default": "",
+      "displayName": "Description"
+    },
+    "tags": {
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
+      "required": false,
+      "default": "",
+      "displayName": "Tags"
+    },
+    "parentId": {
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {
+          "allowMultiSelect": false,
+          "type": "Item",
+          "useAdvancedSelector": false
+        }
+      },
+      "required": true,
+      "default": "ROOT",
+      "displayName": "Parent"
+    }
+  },
+  "itemIds": []
+}
