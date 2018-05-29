@@ -9,7 +9,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ExploreComponent } from "./explore.component";
 
-import { TreeViewModule } from "../tree/tree.module";
+import { NavigatorModule } from "../navigator/navigator.module";
 import { LensModule } from '../lens/lens.module'
 import { DetailsModule } from "../details/details.module";
 import { PipesModule } from "../../pipes/pipes.module";
@@ -29,7 +29,7 @@ import { PipesModule } from "../../pipes/pipes.module";
     FormsModule,
     ReactiveFormsModule,
     AngularSplitModule,
-    TreeViewModule,
+    NavigatorModule,
     DetailsModule,
     PipesModule,
     LensModule

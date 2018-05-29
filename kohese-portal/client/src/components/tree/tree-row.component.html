@@ -1,23 +1,23 @@
 <div class="kt-item" id="{{treeRow.itemProxy.item.id}}"
   matTooltip="{{treeRow.itemProxy.item.name}}"
   (click)="navigate('Explore', {id: treeRow.itemProxy.item.id})"
-  [ngClass]="{ 'selected-border': (treeRow.itemProxy.item.id === (selectedProxyIdStream | async)),
-  'highlight-row': (treeRow.visible && treeRow.matchesFilter) }"
+  [ngClass]="{ 'selected-border': (treeRow.itemProxy.item.id === selectedProxyIdStream.getValue()),
+  'highlight-row': ((treeRow.itemProxy !== treeRootStream.getValue()) && treeRow.visible && treeRow.matchesFilter) }"
   [ngStyle]="getIndentationStyle()">
   <i class="kt-icon fa"
     (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
-    [ngClass]="{ 'fa-caret-down': (treeRow.itemProxy.children.length > 0) && treeRow.expanded,
-    'fa-caret-right': (treeRow.itemProxy.children.length > 0) && !treeRow.expanded,
-    'no-children': !(treeRow.itemProxy.children.length > 0) }">
+    [ngClass]="{ 'fa-caret-down': ((treeRow.itemProxy !== treeRootStream.getValue()) && (treeRow.getRowChildrenProxies().length > 0) && treeRow.expanded),
+    'fa-caret-right': ((treeRow.itemProxy !== treeRootStream.getValue()) && (treeRow.getRowChildrenProxies().length > 0) && !treeRow.expanded),
+    'no-children': ((treeRow.itemProxy === treeRootStream.getValue()) || (0 === treeRow.getRowChildrenProxies().length)) }">
   </i>
   <ng-container
-    *ngIf="koheseType.viewModelProxy && koheseType.viewModelProxy.item.icon">
+    *ngIf="koheseType && koheseType.viewModelProxy && koheseType.viewModelProxy.item.icon">
     <mat-icon matTooltip="{{koheseType.viewModelProxy.item.modelName}}"
       class="kt-icon {{koheseType.viewModelProxy.item.icon}}">
     </mat-icon>
   </ng-container>
   <ng-container
-    *ngIf="!koheseType.viewModelProxy || !koheseType.viewModelProxy.item.icon">
+    *ngIf="!(koheseType && koheseType.viewModelProxy && koheseType.viewModelProxy.item.icon)">
     <span class="kt-icon no-icon"></span>
   </ng-container>
   <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -38,42 +38,47 @@
     <img *ngIf="treeRow.itemProxy.status['Staged']"
       src="assets/icons/versioncontrol/index-mod.ico"
       title="Staged - {{treeRow.itemProxy.status['Staged']}}"/>
-    <!-- Default row actions -->
-    <ng-container *ngIf="'Version Control' !== (selectedViewStream | async)">
+    <ng-container *ngIf="(treeRow.itemProxy !== treeRootStream.getValue())">
       <button mat-icon-button
         (click)="treeRootStream.next(treeRow.itemProxy); $event.stopPropagation()">
         <mat-icon class="fa fa-anchor"></mat-icon>
       </button>
-      <button mat-icon-button (click)="removeItem(); $event.stopPropagation()">
-        <mat-icon class="fa fa-times delete-button"></mat-icon>
+    </ng-container>
+    <ng-container *ngFor="let action of rowActions">
+      <ng-container *ngIf="action.show(treeRow)">
+        <button mat-icon-button matTooltip="{{action.description}}"
+          (click)="action.perform(treeRow); $event.stopPropagation()">
+          <mat-icon class="kt-icon {{action.icon}}"></mat-icon>
+        </button> 
+      </ng-container>
+    </ng-container>
+    <button mat-icon-button [matMenuTriggerFor]="menu"
+      (click)="$event.stopPropagation()">
+      <mat-icon class="fa fa-bars"></mat-icon>
+    </button>
+    <mat-menu #menu="matMenu" [overlapTrigger]="false">
+      <button mat-menu-item [matMenuTriggerFor]="compareMenu">
+        Compare
       </button>
-      <button mat-icon-button [matMenuTriggerFor]="menu"
-        (click)="$event.stopPropagation()">
-        <mat-icon class="fa fa-bars"></mat-icon>
-      </button>
-      <mat-menu #menu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item (click)="openComparisonDialog()">
-          Compare With...
+      <mat-menu #compareMenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item [disabled]="!treeRow.itemProxy.status['Staged']"
+          (click)="openComparisonDialog(VersionDesignator.STAGED_VERSION)">
+          Against Staged Version
+        </button>
+        <button mat-menu-item
+          (click)="openComparisonDialog(VersionDesignator.LAST_COMMITTED_VERSION)">
+          Against Last Committed Version
+        </button>
+        <button mat-menu-item (click)="openComparisonDialog(undefined)">
+          Against... 
         </button>
       </mat-menu>
-    </ng-container>
-    <!-- Version Control row actions -->
-    <ng-container
-      *ngIf="('Version Control' === (selectedViewStream | async))">
-      <!-- Actions -->
-      <button mat-icon-button
-        *ngIf="((treeRow.itemProxy.status | mapKey).length > 0)"
-        (click)="revertChanges(); $event.stopPropagation()">
-        <mat-icon class="fa fa-undo kt-icon"></mat-icon>
+      <button mat-menu-item *ngFor="let action of menuActions"
+        (click)="action.perform(treeRow)" matTooltip="{{action.description}}"
+        [disabled]="!action.enable(treeRow)">
+        <mat-icon class="{{action.icon}}"></mat-icon>
+        {{action.name}}
       </button>
-      <button mat-icon-button *ngIf="treeRow.itemProxy.status['Unstaged']"
-        (click)="stageChanges(); $event.stopPropagation()">
-        <mat-icon class="fa fa-plus kt-icon"></mat-icon>
-      </button>
-      <button mat-icon-button *ngIf="treeRow.itemProxy.status['Staged']"
-        (click)="unstageChanges(); $event.stopPropagation()">
-        <mat-icon class="fa fa-minus kt-icon"></mat-icon>
-      </button>
-    </ng-container>
+    </mat-menu>
   </span>
 </div>

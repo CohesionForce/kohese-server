@@ -1,16 +1,15 @@
 import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { VersionControlService } from '../../services/version-control/version-control.service';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TreeRow } from './tree-row.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { CompareItemsComponent } from '../compare-items/compare-items.component';
+import { CompareItemsComponent,
+  VersionDesignator } from '../compare-items/compare-items.component';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -31,6 +30,25 @@ export class TreeRowComponent extends NavigatableComponent
   set treeRow(treeRow: TreeRow) {
     this._treeRow = treeRow;
   }
+  
+  private _rowActions: Array<Action> = [];
+  get rowActions() {
+    return this._rowActions;
+  }
+  @Input('rowActions')
+  set rowActions(rowActions: Array<Action>) {
+    this._rowActions = rowActions;
+  }
+  
+  private _menuActions: Array<Action> = [];
+  get menuActions() {
+    return this._menuActions;
+  }
+  @Input('menuActions')
+  set menuActions(menuActions: Array<Action>) {
+    this._menuActions = menuActions;
+  }
+  
   private _treeRootStream: BehaviorSubject<ItemProxy>;
   get treeRootStream() {
     return this._treeRootStream;
@@ -39,14 +57,18 @@ export class TreeRowComponent extends NavigatableComponent
   set treeRootStream(treeRootStream: BehaviorSubject<ItemProxy>) {
     this._treeRootStream = treeRootStream;
   }
-  @Input()
-  public selectedViewStream: BehaviorSubject<string>;
+  
   @Input()
   public selectedProxyIdStream: BehaviorSubject<string>;
   public koheseType: any;
   
+  get VersionDesignator() {
+    return VersionDesignator;
+  }
+  
   private _updateDisplaySubscription: Subscription;
   private _itemProxyChangeSubscription: Subscription;
+  private _rootSubscription: Subscription;
 
   treeConfig : any;
   treeConfigSubscription : Subscription;
@@ -55,28 +77,13 @@ export class TreeRowComponent extends NavigatableComponent
     private dialogService: DialogService,
     private typeService: DynamicTypesService,
     private itemRepository: ItemRepository,
-    private versionControlService: VersionControlService,
-    private _changeDetector: ChangeDetectorRef,
-    private _toastrService: ToastrService) {
+    private _changeDetector: ChangeDetectorRef) {
     super(_navigationService);
   }
 
   public ngOnInit(): void {
     this.koheseType = this.typeService.getKoheseTypes()[this._treeRow.
       itemProxy.kind];
-    if (!this.koheseType) {
-      this.koheseType = {
-        name: this._treeRow.itemProxy.kind,
-        icon: 'fa fa-sticky-note'
-      };
-    }
-    
-    this._updateDisplaySubscription = this._treeRow.updateDisplay.subscribe(
-      (updateDisplay: boolean) => {
-      if (updateDisplay) {
-        this._changeDetector.markForCheck();
-      }
-    });
     
     this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
       this.treeConfig = newConfig.config;
@@ -88,85 +95,70 @@ export class TreeRowComponent extends NavigatableComponent
             }
           }
       });
-    })
+    });
+    
+    this._updateDisplaySubscription = this._treeRow.updateDisplay.subscribe(
+      (updateDisplay: boolean) => {
+      if (updateDisplay) {
+        this._changeDetector.markForCheck();
+      }
+    });
+    
+    this._rootSubscription = this.treeRootStream.subscribe((root:
+      ItemProxy) => {
+      this._changeDetector.markForCheck();
+    });
   }
   
   public ngOnDestroy(): void {
+    this._rootSubscription.unsubscribe();
     this._itemProxyChangeSubscription.unsubscribe();
     this._updateDisplaySubscription.unsubscribe();
     this.treeConfigSubscription.unsubscribe();
   }
 
-  public removeItem(): void {
-    this.dialogService.openCustomTextDialog('Confirm Deletion',
-      'Are you sure you want to delete ' + this._treeRow.itemProxy.item.name +
-      '?', ['Cancel', 'Delete', 'Delete Recursively']).
-      subscribe((result: any) => {
-      if (result) {
-        this.itemRepository.deleteItem(this._treeRow.itemProxy,
-          (2 === result));
-      }
-    });
-  }
-  
-  public revertChanges(): void {
-    this.dialogService.openYesNoDialog('Undo Changes', 'Are you sure that you '
-      + 'want to undo all changes to this item since the previous commit?').
-      subscribe((result: any) => {
-      if (result) {
-        this.versionControlService.revertItems([this._treeRow.itemProxy]).
-          subscribe((statusMap: any) => {
-          if (statusMap.error) {
-            this._toastrService.error('Revert Failed', 'Version Control');
-          } else {
-            this._toastrService.success('Revert Succeeded', 'Version Control');
-          }
-        });
-      }
-    });
-  }
-  
-  public stageChanges(): void {
-    this.versionControlService.stageItems([this._treeRow.itemProxy]).subscribe(
-      (statusMap: any) => {
-      if (statusMap.error) {
-        this._toastrService.error('Stage Failed', 'Version Control');
-      } else {
-        this._toastrService.success('Stage Succeeded', 'Version Control');
-      }
-    });
-  }
-  
-  public unstageChanges(): void {
-    this.versionControlService.unstageItems([this._treeRow.itemProxy]).
-      subscribe((statusMap: any) => {
-      if (statusMap.error) {
-        this._toastrService.error('Unstage Failed', 'Version Control');
-      } else {
-        this._toastrService.success('Unstage Succeeded', 'Version Control');
-      }
-    });
-  }
-  
   public getIndentationStyle(): object {
-    let indentationAmount: number = 0;
-    let parentProxy: ItemProxy = this._treeRow.itemProxy.parentProxy;
-    while (parentProxy && (parentProxy !== this._treeRootStream.getValue())) {
-      indentationAmount += 15;
-      parentProxy = parentProxy.parentProxy;
-    }
-    
     return {
-      'padding-left': indentationAmount + 'px'
+      'padding-left': (this._treeRow.depth * 15) + 'px'
     };
   }
   
-  public openComparisonDialog(): void {
+  public openComparisonDialog(changeVersionDesignator: VersionDesignator):
+    void {
+    let compareItemsDialogParameters: any = {
+      baseProxy: this._treeRow.itemProxy,
+      editable: true
+    };
+    
+    if (null != changeVersionDesignator) {
+      compareItemsDialogParameters['changeProxy'] = this._treeRow.itemProxy;
+      compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
+    }
+    
     this.dialogService.openComponentDialog(CompareItemsComponent, {
-      data : {
-        baseProxy: this._treeRow.itemProxy,
-        editable: true
-      }
+      data: compareItemsDialogParameters
     }).updateSize('90%', '90%');
+  }
+}
+
+class Action {
+  public constructor(public name: string, public description: string,
+    public icon: string, public perform: (row: TreeRow) => void) {
+  }
+}
+
+export class RowAction extends Action {
+  public constructor(name: string, description: string, icon: string,
+    public show: (row: TreeRow) => boolean, perform: (row:
+    TreeRow) => void) {
+    super(name, description, icon, perform);
+  }
+}
+
+export class MenuAction extends Action {
+  public constructor(name: string, description: string, icon: string,
+    public enable: (row: TreeRow) => boolean, perform: (row:
+    TreeRow) => void) {
+    super(name, description, icon, perform);
   }
 }

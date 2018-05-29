@@ -28,6 +28,14 @@ const baseHref = "";
 const deployUrl = "";
 const projectRoot = './client'
 const maximumInlineSize = 10;
+const ALIASES = rxPaths();
+const EMPTY_WEBPACK_SHIM_PATH = path.join(projectRoot,
+  'empty-webpack-shim.js');
+ALIASES['fs'] = EMPTY_WEBPACK_SHIM_PATH;
+ALIASES['mv'] = EMPTY_WEBPACK_SHIM_PATH;
+ALIASES['source-map-support'] = EMPTY_WEBPACK_SHIM_PATH;
+ALIASES['safe-json-stringify'] = EMPTY_WEBPACK_SHIM_PATH;
+ALIASES['dtrace-provider'] = EMPTY_WEBPACK_SHIM_PATH;
 const postcssPlugins = function (loader) {
         // safe settings based on: https://github.com/ben-eb/cssnano/issues/358#issuecomment-283696193
         const importantCommentRe = /@preserve|@licen[cs]e|[@#]\s*source(?:Mapping)?URL|^!/i;
@@ -135,7 +143,7 @@ module.exports = {
       "./node_modules"
     ],
     "symlinks": true,
-    "alias": rxPaths(),
+    "alias": ALIASES,
     "mainFields": [
       "browser",
       "module",
@@ -147,7 +155,7 @@ module.exports = {
       "./node_modules",
       "./node_modules"
     ],
-    "alias": rxPaths()
+    "alias": ALIASES
   },
   "entry": {
     "main": [

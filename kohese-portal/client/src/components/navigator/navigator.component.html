@@ -1,0 +1,14 @@
+<div style="height: 100%; width: 100%;">
+  <mat-tab-group style="height: 100%; width: 100%;"
+    (selectedIndexChange)="refresh($event, defaultTree, referenceTree, versionControlTree)">
+    <mat-tab label="Default">
+      <default-tree #defaultTree></default-tree>
+    </mat-tab>
+    <mat-tab label="References">
+      <reference-tree #referenceTree></reference-tree>
+    </mat-tab>
+    <mat-tab label="Version Control">
+      <version-control-tree #versionControlTree></version-control-tree>
+    </mat-tab>
+  </mat-tab-group>
+</div>

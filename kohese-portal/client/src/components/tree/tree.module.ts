@@ -8,15 +8,19 @@ import { ServicesModule } from '../../services/services.module';
 import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule } from "@angular/forms";
 
-import { TreeComponent } from './tree.component';
 import { TreeRowComponent } from './tree-row.component';
+import { DefaultTreeComponent } from './default-tree/default-tree.component';
+import { ReferenceTreeComponent } from './reference-tree/reference-tree.component';
+import { VersionControlTreeComponent } from './version-control-tree/version-control-tree.component';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { PipesModule } from "../../pipes/pipes.module";
 
 @NgModule({
   declarations: [
-    TreeComponent,
-    TreeRowComponent
+    TreeRowComponent,
+    DefaultTreeComponent,
+    ReferenceTreeComponent,
+    VersionControlTreeComponent
   ],
   entryComponents: [
   ],
@@ -31,8 +35,9 @@ import { PipesModule } from "../../pipes/pipes.module";
     PipesModule
   ],
   exports : [
-    TreeComponent,
-    TreeRowComponent
+    DefaultTreeComponent,
+    ReferenceTreeComponent,
+    VersionControlTreeComponent
   ]
 })
 export class TreeViewModule {}
