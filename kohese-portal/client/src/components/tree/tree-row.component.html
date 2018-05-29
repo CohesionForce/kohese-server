@@ -1,46 +1,32 @@
-<div class="kt-item" id="{{treeRow.itemProxy.item.id}}"
-  matTooltip="{{treeRow.itemProxy.item.name}}"
-  (click)="navigate('Explore', {id: treeRow.itemProxy.item.id})"
-  [ngClass]="{ 'selected-border': (treeRow.itemProxy.item.id === selectedProxyIdStream.getValue()),
-  'highlight-row': ((treeRow.itemProxy !== treeRootStream.getValue()) && treeRow.visible && treeRow.matchesFilter) }"
+<div class="kt-item" matTooltip="{{treeRow.text}}"
+  (click)="treeRow.rowSelected()"
+  [ngClass]="{ 'selected-border': treeRow.isRowSelected(),
+  'highlight-row': (treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) }"
   [ngStyle]="getIndentationStyle()">
   <i class="kt-icon fa"
     (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
-    [ngClass]="{ 'fa-caret-down': ((treeRow.itemProxy !== treeRootStream.getValue()) && (treeRow.getRowChildrenProxies().length > 0) && treeRow.expanded),
-    'fa-caret-right': ((treeRow.itemProxy !== treeRootStream.getValue()) && (treeRow.getRowChildrenProxies().length > 0) && !treeRow.expanded),
-    'no-children': ((treeRow.itemProxy === treeRootStream.getValue()) || (0 === treeRow.getRowChildrenProxies().length)) }">
+    [ngClass]="{ 'fa-caret-down': (treeRow.hasChildren && treeRow.expanded),
+    'fa-caret-right': (treeRow.hasChildren && !treeRow.expanded),
+    'no-children': !treeRow.hasChildren }">
   </i>
-  <ng-container
-    *ngIf="koheseType && koheseType.viewModelProxy && koheseType.viewModelProxy.item.icon">
-    <mat-icon matTooltip="{{koheseType.viewModelProxy.item.modelName}}"
-      class="kt-icon {{koheseType.viewModelProxy.item.icon}}">
-    </mat-icon>
+  <ng-container *ngIf="treeRow.icon">
+    <mat-icon class="kt-icon {{treeRow.icon}}"></mat-icon>
   </ng-container>
-  <ng-container
-    *ngIf="!(koheseType && koheseType.viewModelProxy && koheseType.viewModelProxy.item.icon)">
+  <ng-container *ngIf="!treeRow.icon">
     <span class="kt-icon no-icon"></span>
   </ng-container>
   <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-    {{treeRow.itemProxy.item.name}}
-    <ng-container *ngIf="treeRow.itemProxy.item.tags">
-      {{treeRow.itemProxy.item.tags}}
-    </ng-container>
+    {{treeRow.text}}
   </span>
-  <!-- Conditional Icons for Item status -->
-  <ng-container *ngIf="treeRow.itemProxy.dirty">
-    <img src="assets/icons/versioncontrol/dirty.ico" title="Dirty item"/>
+  <ng-container *ngFor="let image of images">
+    <ng-container *ngIf="image.display(treeRow)">
+      <img src="image.path" title="image.text"/>
+    </ng-container>
   </ng-container>
   <span id="rightSpan">
-    <!-- VC Status Icons -->
-    <img *ngIf="treeRow.itemProxy.status['Unstaged']"
-      src="assets/icons/versioncontrol/unstaged.ico"
-      title="Unstaged - {{treeRow.itemProxy.status['Unstaged']}}"/>
-    <img *ngIf="treeRow.itemProxy.status['Staged']"
-      src="assets/icons/versioncontrol/index-mod.ico"
-      title="Staged - {{treeRow.itemProxy.status['Staged']}}"/>
-    <ng-container *ngIf="(treeRow.itemProxy !== treeRootStream.getValue())">
+    <ng-container *ngIf="!treeRow.isRowRoot()">
       <button mat-icon-button
-        (click)="treeRootStream.next(treeRow.itemProxy); $event.stopPropagation()">
+        (click)="treeRow.setRowAsRoot(); $event.stopPropagation()">
         <mat-icon class="fa fa-anchor"></mat-icon>
       </button>
     </ng-container>
@@ -65,7 +51,7 @@
           (click)="openComparisonDialog(VersionDesignator.STAGED_VERSION)">
           Against Staged Version
         </button>
-        <button mat-menu-item
+        <button mat-menu-item [disabled]="false"
           (click)="openComparisonDialog(VersionDesignator.LAST_COMMITTED_VERSION)">
           Against Last Committed Version
         </button>

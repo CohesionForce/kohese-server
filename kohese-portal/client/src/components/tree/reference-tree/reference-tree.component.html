@@ -20,10 +20,9 @@
     <div class="kt-head kth-cell">
       Root
     </div>
-    <ng-container *ngIf="rootRow">
-      <tree-row [treeRow]="rootRow" [treeRootStream]="rootSubject"
-        [selectedProxyIdStream]="selectedIdSubject"
-        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
+    <ng-container *ngIf="rootSubject.getValue()">
+      <tree-row [treeRow]="rootSubject.getValue()"
+      [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
       </tree-row>
     </ng-container>
   </div>
@@ -34,9 +33,8 @@
     <div class="kt-body">
       <virtual-scroll #tree [items]="visibleRows">
         <tree-row *ngFor="let row of tree.viewPortItems"
-          [treeRow]="row" [treeRootStream]="rootSubject"
-          [selectedProxyIdStream]="selectedIdSubject"
-          [rowActions]="rowActions" [menuActions]="menuActions">
+          [treeRow]="row" [rowActions]="rowActions"
+          [menuActions]="menuActions">
         </tree-row>
       </virtual-scroll>
     </div>
