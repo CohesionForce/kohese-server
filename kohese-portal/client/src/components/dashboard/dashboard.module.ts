@@ -27,6 +27,8 @@ import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 import { TreeModule } from "angular-tree-component";
 import { StateFilterService } from './state-filter.service';
+import { StateBarChartComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-bar-chart.component';
+
 
 @NgModule({
   declarations: [
@@ -43,7 +45,8 @@ import { StateFilterService } from './state-filter.service';
     UserStatisticsComponent,
     ProjectSelectorComponent,
     StatusDashboardComponent,
-    OpenAssignmentComponent
+    OpenAssignmentComponent,
+    StateBarChartComponent
   ],
   providers : [
     StateFilterService
