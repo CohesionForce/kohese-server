@@ -191,9 +191,13 @@ export class StateBarChartComponent implements OnInit {
     .append( 'rect' )
     .attr('fill', (d) => this.kindScale(d.kind))
     .attr('x', (d,i) => this.xScale(this.getStateKey(d)))
-    .attr('y', (d) => this.chartHeight - this.yScale(d.count))
+    .attr('y', (d) =>  this.yScale(d.count))
     .attr('width', this.xScale.bandwidth())
-    .attr('height', (d) => this.yScale(d.count))
+    .attr('height', (d) => {
+      console.log(d);
+      console.log(this.yScale(d.count))
+      return this.yScale(0) - this.yScale(d.count)
+    })
     .on('mouseover', function(d) {
       d3.select(this).transition('hover').attr('fill', d.chart.lightenDarkenColor(d.chart.kindScale(d.kind), 70))
     })
@@ -201,6 +205,7 @@ export class StateBarChartComponent implements OnInit {
       d3.select(this).transition('hoverOut').attr('fill', d.chart.kindScale(d.kind));
     })
     .on('click', function(d,i) {
+      console.log(d);
     })
 
     this.legend = d3.select(this.chartContainer.nativeElement)
@@ -274,7 +279,7 @@ export class StateBarChartComponent implements OnInit {
 }
 
   getStateKey(stateInfo) {
-    return stateInfo.kind + ':' + stateInfo.stateName
+    return stateInfo.stateKind + ':' + stateInfo.stateName
   }
 
 }
