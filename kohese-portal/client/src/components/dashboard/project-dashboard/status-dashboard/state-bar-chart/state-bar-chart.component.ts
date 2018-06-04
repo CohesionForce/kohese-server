@@ -19,7 +19,8 @@ interface StateGraphInfo {
     stateName: string,
     stateKind : string,
     kind : string,
-    count: number
+    count: number,
+    chart : StateBarChartComponent;
   }
 
 @Component({
@@ -32,6 +33,7 @@ export class StateBarChartComponent implements OnInit {
     read: ElementRef
   }) chartContainer;
   svg;
+  legend;
 
   @Input()
   projectStream: Observable < ProjectInfo > ;
@@ -41,16 +43,18 @@ export class StateBarChartComponent implements OnInit {
   stateInfo;
   stateGraphInfo : Array<StateGraphInfo>;
   supportedTypes = ['Action', 'Task', 'Decision', 'Issue'];
+  selectedType = this.supportedTypes[0];
   infoMap;
 
   // D3 Elements
   xScale;
   yScale;
+  kindScale;
   xAxis;
   yAxis;
   chartWidth  = 1000;
   chartHeight = 400; // Eventually replace these with calls to get available area
-  barPadding = 50;
+  barPadding = 150;
 
   constructor(private stateFilterService : StateFilterService) {}
 
@@ -70,6 +74,10 @@ export class StateBarChartComponent implements OnInit {
         }
       }
     })
+  }
+
+  selectType(type) {
+    this.selectedType = type;
   }
 
   buildStateGraphInfo() : Array<StateGraphInfo> {
@@ -104,7 +112,8 @@ export class StateBarChartComponent implements OnInit {
             kind : kind,
             stateName : state,
             stateKind : stateKind,
-            key : keyId++
+            key : keyId++,
+            chart : this
           }
         }
       }
@@ -158,7 +167,15 @@ export class StateBarChartComponent implements OnInit {
         'transform',
         'translate(0,' + (this.chartHeight) + ')'
       )
-      .call(this.xAxis);
+      .call(this.xAxis)
+      .selectAll("text")
+          .style("text-anchor", "end")
+          .attr("dx", "-.8em")
+          .attr("dy", ".15em")
+          .attr("transform", function(d) {
+              return "rotate(-65)"
+              });
+
     this.yAxis = d3.axisLeft(this.yScale);
     this.svg.append('g')
       .attr('class', 'y-axis')
@@ -172,33 +189,23 @@ export class StateBarChartComponent implements OnInit {
     .data(this.stateGraphInfo, this.key)
     .enter()
     .append( 'rect' )
-    .attr('fill', 'green')
-    .attr('x', (d,i) => this.xScale(i.toString()))
+    .attr('fill', (d) => this.kindScale(d.kind))
+    .attr('x', (d,i) => this.xScale(this.getStateKey(d)))
     .attr('y', (d) => this.chartHeight - this.yScale(d.count))
     .attr('width', this.xScale.bandwidth())
     .attr('height', (d) => this.yScale(d.count))
-    .on('mouseover', function() {
-      d3.select(this).transition('hover').attr('fill', 'lightgreen')
+    .on('mouseover', function(d) {
+      d3.select(this).transition('hover').attr('fill', d.chart.lightenDarkenColor(d.chart.kindScale(d.kind), 70))
     })
-    .on('mouseout', function() {
-      d3.select(this).transition('hoverOut').attr('fill', 'green');
+    .on('mouseout', function(d) {
+      d3.select(this).transition('hoverOut').attr('fill', d.chart.kindScale(d.kind));
     })
     .on('click', function(d,i) {
-      console.log('hello');
-      console.log(d);
     })
 
-    this.svg
-      .append('g')
-      .attr('class', 'labels')
-      .style("transform", "rotate(280deg)")
-      .selectAll('text')
-      .data(this.stateGraphInfo, this.key)
-      .enter()
-      .append('text')
-      .text((d) =>  d.stateName)
-      .attr('x', (d,i) => this.xScale(i))
-      .attr('y', (d) => this.chartHeight + 50);
+    this.legend = d3.select(this.chartContainer.nativeElement)
+      .append('svg')
+
   }
 
   consolelog(d) {
@@ -215,11 +222,12 @@ export class StateBarChartComponent implements OnInit {
 
   setScales () {
     let rangeArray : Array<string> = [];
-    d3.range(this.stateGraphInfo.length).forEach((num, i) => {
-      console.log(num, i)
-      rangeArray[i] = num.toString()
-    });
+    for (let state of this.buildStateGraphInfo()) {
+      rangeArray.push(this.getStateKey(state));
+    }
     console.log(rangeArray);
+
+    this.kindScale = d3.scaleOrdinal(d3.schemeCategory10);
 
     this.xScale = d3.scaleBand()
     .domain(rangeArray)
@@ -230,11 +238,43 @@ export class StateBarChartComponent implements OnInit {
 
     this.yScale = d3.scaleLinear()
     .domain([0, d3.max(this.stateGraphInfo, (d) => d.count)])
-    .range([0, this.chartHeight]);
+    .range([this.chartHeight, 0]);
   }
 
   key (d) {
     return d.key;
+  }
+
+  // Move to service
+  lightenDarkenColor(col,amt) {
+    var usePound = false;
+    if ( col[0] == "#" ) {
+        col = col.slice(1);
+        usePound = true;
+    }
+
+    var num = parseInt(col,16);
+
+    var r = (num >> 16) + amt;
+
+    if ( r > 255 ) r = 255;
+    else if  (r < 0) r = 0;
+
+    var b = ((num >> 8) & 0x00FF) + amt;
+
+    if ( b > 255 ) b = 255;
+    else if  (b < 0) b = 0;
+
+    var g = (num & 0x0000FF) + amt;
+
+    if ( g > 255 ) g = 255;
+    else if  ( g < 0 ) g = 0;
+
+    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+}
+
+  getStateKey(stateInfo) {
+    return stateInfo.kind + ':' + stateInfo.stateName
   }
 
 }

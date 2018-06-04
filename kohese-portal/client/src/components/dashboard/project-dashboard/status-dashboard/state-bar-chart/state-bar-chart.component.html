@@ -1,3 +1,10 @@
-<div #chart>
+<div class="left-content">
+  <mat-list>
+    <mat-list-item class="state-item" *ngFor="let type of supportedTypes" (click)="selectType(type)" [ngClass]="{'selected-type' : selectedType === type }">
+      {{type}}
+    </mat-list-item>
+  </mat-list>
+</div>
+<div #chart class="right-content">
 
 </div>
