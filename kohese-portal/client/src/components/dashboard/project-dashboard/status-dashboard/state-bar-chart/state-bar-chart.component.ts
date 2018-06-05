@@ -212,7 +212,7 @@ export class StateBarChartComponent implements OnInit {
       d3.select(this).transition('hoverOut').attr('fill', d.chart.kindScale(d.kind));
     })
     .on('click', function(d,i) {
-      d.chart.openImportDialog();
+      d.chart.openStateSummaryDialog(d);
     })
 
     this.legend = d3.select(this.chartContainer.nativeElement)
@@ -224,9 +224,11 @@ export class StateBarChartComponent implements OnInit {
     console.log(d);
   }
 
-  openImportDialog(): void {
+  openStateSummaryDialog(stateGraphInfo): void {
     this.dialogService.openComponentDialog(StateSummaryDialogComponent, {
-      data: {}
+      data: {
+        stateInfo : stateGraphInfo
+      }
     }).updateSize('80%', '80%');
   }
 
