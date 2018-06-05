@@ -1,3 +1,6 @@
+import { StateSummaryDialogComponent } from './state-summary-dialog/state-summary-dialog.component';
+import { DialogService } from './../../../../../services/dialog/dialog.service';
+import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { StateFilterService } from './../../../state-filter.service';
 import { Subscription } from 'rxjs';
 import {
@@ -21,6 +24,7 @@ interface StateGraphInfo {
     kind : string,
     count: number,
     chart : StateBarChartComponent;
+    proxies : Array<ItemProxy>;
   }
 
 @Component({
@@ -56,7 +60,8 @@ export class StateBarChartComponent implements OnInit {
   chartHeight = 400; // Eventually replace these with calls to get available area
   barPadding = 150;
 
-  constructor(private stateFilterService : StateFilterService) {}
+  constructor(private stateFilterService : StateFilterService,
+              private dialogService : DialogService) {}
 
   ngOnInit() {
     // Add the svg canvas
@@ -113,7 +118,8 @@ export class StateBarChartComponent implements OnInit {
             stateName : state,
             stateKind : stateKind,
             key : keyId++,
-            chart : this
+            chart : this,
+            proxies : []
           }
         }
       }
@@ -124,6 +130,7 @@ export class StateBarChartComponent implements OnInit {
         if (proxy.item[stateKind]) {
           try {
           this.infoMap[proxy.kind][stateKind][proxy.item[stateKind]].count++
+          this.infoMap[proxy.kind][stateKind][proxy.item[stateKind]].proxies.push(proxy);
         } catch {
           unsupportedList.push(proxy);
         }
@@ -205,7 +212,7 @@ export class StateBarChartComponent implements OnInit {
       d3.select(this).transition('hoverOut').attr('fill', d.chart.kindScale(d.kind));
     })
     .on('click', function(d,i) {
-      console.log(d);
+      d.chart.openImportDialog();
     })
 
     this.legend = d3.select(this.chartContainer.nativeElement)
@@ -215,6 +222,12 @@ export class StateBarChartComponent implements OnInit {
 
   consolelog(d) {
     console.log(d);
+  }
+
+  openImportDialog(): void {
+    this.dialogService.openComponentDialog(StateSummaryDialogComponent, {
+      data: {}
+    }).updateSize('80%', '80%');
   }
 
   updateGraph() {

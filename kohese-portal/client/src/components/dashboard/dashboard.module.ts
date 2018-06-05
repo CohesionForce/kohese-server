@@ -1,3 +1,5 @@
+import { StateSummaryDialogComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-summary-dialog/state-summary-dialog.component';
+import { StateBarChartComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-bar-chart.component';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
@@ -27,8 +29,6 @@ import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 import { TreeModule } from "angular-tree-component";
 import { StateFilterService } from './state-filter.service';
-import { StateBarChartComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-bar-chart.component';
-
 
 @NgModule({
   declarations: [
@@ -46,14 +46,17 @@ import { StateBarChartComponent } from './project-dashboard/status-dashboard/sta
     ProjectSelectorComponent,
     StatusDashboardComponent,
     OpenAssignmentComponent,
-    StateBarChartComponent
+    StateBarChartComponent,
+    StateSummaryDialogComponent
   ],
   providers : [
     StateFilterService
   ],
   entryComponents: [
     KMarkdownComponent,
-    ProjectSelectorComponent
+    ProjectSelectorComponent,
+    StateSummaryDialogComponent
+
   ],
   imports : [
     CommonModule,
