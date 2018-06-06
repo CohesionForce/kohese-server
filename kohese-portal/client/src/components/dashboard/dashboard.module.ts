@@ -30,6 +30,7 @@ import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 import { TreeModule } from "angular-tree-component";
 import { StateFilterService } from './state-filter.service';
+import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy-card.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,7 @@ import { StateFilterService } from './state-filter.service';
     OpenAssignmentComponent,
     StateBarChartComponent,
     StateSummaryDialogComponent,
-    // StatefulProxyCard
+    StatefulProxyCardComponent
   ],
   providers : [
     StateFilterService

@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProxyDashCardComponent } from './proxy-dash-card.component';
+import { ProxyDashCardComponent } from './stateful-proxy-card.component';
 
 describe('ProxyDashCardComponent', () => {
   let component: ProxyDashCardComponent;

@@ -424,4 +424,9 @@
 
 .dialog-container {
   overflow: hidden;
+  height: 100%;
+}
+
+/deep/ datatable-body {
+  height: 100;
 }

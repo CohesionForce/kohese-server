@@ -1,0 +1,25 @@
+<div class="flex-container" *ngIf="proxy">
+  <div class="left-content" [ngStyle]="{'background-color' : highlightColor}">
+  </div>
+  <mat-card [ngClass]="{'uneditable' : !editable, 'editable': editable}" class="right-content">
+    <div class="top-content" [ngStyle]="{'background-color' : highlightColor}">
+    <button mat-icon-button class="fa fa-search" (click)="openProxyDialog()" style="position: inherit"></button>
+    <button mat-icon-button class="fa fa-edit" *ngIf="!editable" (click)="toggleEdit(editable)"></button>
+    <button mat-icon-button class="fa fa-times" *ngIf="editable" (click)="toggleEdit(editable)"></button>
+    <button mat-icon-button class="fa fa-save" *ngIf="editable" (click)="upsertItem()"></button>
+  </div>
+    <mat-card-title>
+      {{proxy.item.name}}
+    </mat-card-title>
+    <mat-card-content>
+      <div style="display: inline-block">
+        <h4>Time Estimates</h4>
+        Estimated Start : {{proxy.item.estimatedStart | date}}
+        <br> Estimated Completion : {{ proxy.item.estimatedCompletion | date }}
+        <br> Estimated Hours Effort : {{ proxy.item.estimatedHoursEffort }}
+        <br>
+        <k-state-editor [itemProxy]="proxy" [disableTransitioning]="!editable" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
