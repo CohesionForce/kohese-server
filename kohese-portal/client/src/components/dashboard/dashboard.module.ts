@@ -48,7 +48,8 @@ import { StateFilterService } from './state-filter.service';
     StatusDashboardComponent,
     OpenAssignmentComponent,
     StateBarChartComponent,
-    StateSummaryDialogComponent
+    StateSummaryDialogComponent,
+    // StatefulProxyCard
   ],
   providers : [
     StateFilterService

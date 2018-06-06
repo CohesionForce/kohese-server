@@ -408,3 +408,20 @@
     transform: translateX(-50%) scale(0, 1);
   }
 }
+
+.selector {
+  padding-left : 10px;
+}
+
+.title {
+  padding : 10px 5px 0 10px;
+  color : white;
+  font-size: x-large;
+  height: 50px;
+  vertical-align: auto;
+  margin-bottom: 10px;
+}
+
+.dialog-container {
+  overflow: hidden;
+}

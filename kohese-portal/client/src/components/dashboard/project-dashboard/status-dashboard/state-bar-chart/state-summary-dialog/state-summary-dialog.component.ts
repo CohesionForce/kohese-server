@@ -12,11 +12,13 @@ export class StateSummaryDialogComponent implements OnInit {
   @Input()
   stateInfo : any;
   @ViewChild('proxyTable') table;
+  color;
 
   proxies : Array<ItemProxy>;
 
   constructor(@Inject(MAT_DIALOG_DATA) private data: any) {
     this.stateInfo = data.stateInfo;
+    this.color = data.kindColor;
   }
 
   ngOnInit() {

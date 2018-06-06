@@ -5,12 +5,15 @@
 .dashListItem {
   color : silver;
   padding-left : 20px;
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .selectedDashListItem {
   color : black;
   background-color : silver;
-  
+
 }
 
 .user-dash {

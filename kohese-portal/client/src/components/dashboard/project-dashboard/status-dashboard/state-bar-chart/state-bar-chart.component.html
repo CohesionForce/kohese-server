@@ -1,3 +1,20 @@
-<div #chart class="right-content">
+<div #chart class="left-content">
 
+</div>
+<div class="right-content" *ngIf="activeGraphInfo">
+  <div *ngIf="activeGraphInfo.length > 1">
+    <h1 style="background-color: black; color: white">{{selectedState}}</h1>
+    <h5>Total Count : {{totalCount}}</h5>
+
+  </div>
+
+  <div *ngFor="let graphInfo of activeGraphInfo">
+    <h1 [ngStyle]="{'background-color' : kindScale(graphInfo.kind)}" style="color: white">{{graphInfo.kind}}</h1>
+    <h2> {{graphInfo.stateName}}
+      <button mat-icon-button class="fa fa-search" (click)="openStateSummaryDialog(graphInfo)"></button>
+    </h2>
+    <h5> {{graphInfo.description}}</h5>
+    <div>
+      <strong>Count : </strong> {{graphInfo.proxies.length}}</div>
+  </div>
 </div>

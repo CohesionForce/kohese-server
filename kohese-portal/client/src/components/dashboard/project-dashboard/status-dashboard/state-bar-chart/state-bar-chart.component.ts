@@ -23,8 +23,9 @@ interface StateGraphInfo {
     stateKind : string,
     kind : string,
     count: number,
-    chart : StateBarChartComponent;
-    proxies : Array<ItemProxy>;
+    chart : StateBarChartComponent,
+    proxies : Array<ItemProxy>,
+    description : string
   }
 
 @Component({
@@ -45,10 +46,13 @@ export class StateBarChartComponent implements OnInit {
   project : ProjectInfo;
 
   stateInfo;
+  totalCount;
   stateGraphInfo : Array<StateGraphInfo>;
   supportedTypes = ['Action', 'Task', 'Decision', 'Issue'];
   selectedType = this.supportedTypes[0];
+  selectedState : string;
   infoMap;
+  activeGraphInfo : Array<StateGraphInfo> = [];
 
   // D3 Elements
   xScale;
@@ -56,7 +60,7 @@ export class StateBarChartComponent implements OnInit {
   kindScale;
   xAxis;
   yAxis;
-  chartWidth  = 1000;
+  chartWidth  = 1200;
   chartHeight = 400; // Eventually replace these with calls to get available area
   barPadding = 150;
 
@@ -111,15 +115,17 @@ export class StateBarChartComponent implements OnInit {
       this.infoMap[kind] = {}
       for (let stateKind in this.stateInfo[kind]) {
         this.infoMap[kind][stateKind] = {};
-        for (let state of this.stateInfo[kind][stateKind].states) {
-          this.infoMap[kind][stateKind][state] = {
+        let stateKindInfo = this.stateInfo[kind][stateKind]
+        for (let i = 0; i < stateKindInfo.states.length; i++) {
+          this.infoMap[kind][stateKind][stateKindInfo.states[i]] = {
             count : 0,
             kind : kind,
-            stateName : state,
+            stateName : stateKindInfo.states[i],
             stateKind : stateKind,
             key : keyId++,
             chart : this,
-            proxies : []
+            proxies : [],
+            description : stateKindInfo.descriptions[i]
           }
         }
       }
@@ -161,10 +167,13 @@ export class StateBarChartComponent implements OnInit {
   }
 
   initGraph() {
+    let vm = this;
+
     this.svg = d3.select(this.chartContainer.nativeElement)
     .append('svg')
     .attr('height', this.chartHeight + this.barPadding)
-    .attr('width', this.chartWidth);
+    .attr('width', this.chartWidth)
+    .style('transform', 'translateX(-100px)');
     this.setScales();
 
     this.xAxis = d3.axisBottom(this.xScale);
@@ -181,7 +190,16 @@ export class StateBarChartComponent implements OnInit {
           .attr("dy", ".15em")
           .attr("transform", function(d) {
               return "rotate(-65)"
-              });
+            })
+          .on('mouseover', function(d) {
+            vm.activeGraphInfo = vm.findValidTypes(d);
+            vm.selectedState = d.split(':')[0];
+            let totalCount = 0;
+            vm.activeGraphInfo.forEach((d)=> {
+              totalCount += d.count;
+            })
+            vm.totalCount = totalCount;
+          });
 
     this.yAxis = d3.axisLeft(this.yScale);
     this.svg.append('g')
@@ -201,11 +219,11 @@ export class StateBarChartComponent implements OnInit {
     .attr('y', (d) =>  this.yScale(d.count))
     .attr('width', this.xScale.bandwidth())
     .attr('height', (d) => {
-      console.log(d);
-      console.log(this.yScale(d.count))
       return this.yScale(0) - this.yScale(d.count)
     })
     .on('mouseover', function(d) {
+      d.chart.activeGraphInfo = [d];
+      d.selectedState = d.stateKind;
       d3.select(this).transition('hover').attr('fill', d.chart.lightenDarkenColor(d.chart.kindScale(d.kind), 70))
     })
     .on('mouseout', function(d) {
@@ -215,19 +233,26 @@ export class StateBarChartComponent implements OnInit {
       d.chart.openStateSummaryDialog(d);
     })
 
-    this.legend = d3.select(this.chartContainer.nativeElement)
-      .append('svg')
-
   }
 
-  consolelog(d) {
-    console.log(d);
+  findValidTypes(stateKey : string) : Array<StateGraphInfo>{
+    let selectedInfo : Array<StateGraphInfo> = [];
+    // Takes in the stateKey used in the xScale for this chart
+    let splitKey = stateKey.split(':');
+    for (let graphInfo of this.stateGraphInfo) {
+      if (splitKey[0] === graphInfo.stateKind &&
+          splitKey[1] === graphInfo.stateName ) {
+            selectedInfo.push(graphInfo);
+          }
+    }
+    return selectedInfo;
   }
 
   openStateSummaryDialog(stateGraphInfo): void {
     this.dialogService.openComponentDialog(StateSummaryDialogComponent, {
       data: {
-        stateInfo : stateGraphInfo
+        stateInfo : stateGraphInfo,
+        kindColor : this.kindScale(stateGraphInfo.kind)
       }
     }).updateSize('80%', '80%');
   }
@@ -245,7 +270,6 @@ export class StateBarChartComponent implements OnInit {
     for (let state of this.buildStateGraphInfo()) {
       rangeArray.push(this.getStateKey(state));
     }
-    console.log(rangeArray);
 
     this.kindScale = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -253,8 +277,6 @@ export class StateBarChartComponent implements OnInit {
     .domain(rangeArray)
     .rangeRound([this.barPadding, this.chartWidth - this.barPadding])
     .paddingInner(0.05);
-
-    console.log(d3.max(this.stateGraphInfo, (d) => d.count));
 
     this.yScale = d3.scaleLinear()
     .domain([0, d3.max(this.stateGraphInfo, (d) => d.count)])
@@ -266,26 +288,26 @@ export class StateBarChartComponent implements OnInit {
   }
 
   // Move to service
-  lightenDarkenColor(col,amt) {
+  lightenDarkenColor(color,amount) {
     var usePound = false;
-    if ( col[0] == "#" ) {
-        col = col.slice(1);
+    if ( color[0] == "#" ) {
+        color = color.slice(1);
         usePound = true;
     }
 
-    var num = parseInt(col,16);
+    var num = parseInt(color,16);
 
-    var r = (num >> 16) + amt;
+    var r = (num >> 16) + amount;
 
     if ( r > 255 ) r = 255;
     else if  (r < 0) r = 0;
 
-    var b = ((num >> 8) & 0x00FF) + amt;
+    var b = ((num >> 8) & 0x00FF) + amount;
 
     if ( b > 255 ) b = 255;
     else if  (b < 0) b = 0;
 
-    var g = (num & 0x0000FF) + amt;
+    var g = (num & 0x0000FF) + amount;
 
     if ( g > 255 ) g = 255;
     else if  ( g < 0 ) g = 0;
