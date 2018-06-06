@@ -31,7 +31,7 @@ interface StateGraphInfo {
 @Component({
   selector: 'state-bar-chart',
   templateUrl: './state-bar-chart.component.html',
-  styleUrls: ['./state-bar-chart.component.css']
+  styleUrls: ['./state-bar-chart.component.scss']
 })
 export class StateBarChartComponent implements OnInit {
   @ViewChild('chart', {

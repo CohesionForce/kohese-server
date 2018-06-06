@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'stateful-proxy-card',
   templateUrl: './stateful-proxy-card.component.html',
-  styleUrls: ['./stateful-proxy-card.component.css'],
+  styleUrls: ['./stateful-proxy-card.component.scss'],
   changeDetection : ChangeDetectionStrategy.OnPush
 })
 export class StatefulProxyCardComponent implements OnInit {
