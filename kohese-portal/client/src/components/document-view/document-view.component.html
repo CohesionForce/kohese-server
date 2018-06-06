@@ -1,21 +1,15 @@
-<div class="panel right-zone"
-     [ngClass]="{'details-doc' : incrementalLoad}">
+<div class="panel right-zone" [ngClass]="{'details-doc' : incrementalLoad}">
   <div class="panel-heading">Document View
     <span class="pull-right">({{itemsLoaded}}/{{itemLength}}) </span>
   </div>
   <div class="body-container">
     <div class="panel-body doc-view" #docView>
-        <div  
-            data-infinite-scroll
-            [infiniteScrollDistance]="2"
-            [infiniteScrollThrottle]="50"
-            (scrolled)="onScroll()"
-            [scrollWindow]="false"
-            [fromRoot]="true"
-            [immediateCheck]="true"
-            [infiniteScrollContainer]="'.doc-view'"
-            [innerHTML]="docRendered"
-            ></div>
+      <div data-infinite-scroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()" [scrollWindow]="false"
+        [fromRoot]="true" [immediateCheck]="true" [infiniteScrollContainer]="'.doc-view'">
+        <div class="document-row" #row *ngFor="let docInfo of loadedProxies" [innerHTML]="docInfo.rendered">
+        </div>
+
+      </div>
     </div>
   </div>
 </div>

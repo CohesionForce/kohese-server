@@ -14,6 +14,13 @@ import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class.js';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Router, NavigationEnd } from '@angular/router';
 
+interface DocumentInfo {
+  proxy : ItemProxy;
+  rendered : string;
+  active : boolean;
+  hovered : boolean;
+}
+
 @Component({
   selector: 'document-view',
   templateUrl: './document-view.component.html',
@@ -39,6 +46,7 @@ export class DocumentViewComponent extends NavigatableComponent
   filterRegexHighlighted: RegExp;
   invalidFilterRegex: boolean;
   itemsLoaded: number = 0;
+  loadedProxies : Array<DocumentInfo> = [];
 
   /* Utils */
   docReader: Parser;
@@ -161,18 +169,26 @@ export class DocumentViewComponent extends NavigatableComponent
 
     for (let i = 0; (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
       let listItem = subtreeAsList[i];
+      let rendered = ''
 
       if (listItem.depth > 0) {
         // Show the header for any node that is not the root of the document
-        docRendered += '<h' + listItem.depth + '>' + listItem.proxy.item.name + '</h' + listItem.depth + '>';
+
+        rendered = '<h' + listItem.depth + '>' + listItem.proxy.item.name + '</h' + listItem.depth + '>';
       }
       if (listItem.proxy.item.description) {
         // Show the description if it exists
         let nodeParsed = this.docReader.parse(listItem.proxy.item.description);
-        docRendered += this.docWriter.render(nodeParsed);
+        rendered += this.docWriter.render(nodeParsed);
+
       }
+      this.loadedProxies.push({
+        proxy : listItem.proxy,
+        rendered : rendered,
+        active : false,
+        hovered : false
+      })
     }
-    this.docRendered = docRendered;
   }
 
   onScroll() {
