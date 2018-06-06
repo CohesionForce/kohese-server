@@ -128,6 +128,10 @@ export abstract class Tree {
     row.setRowAsRoot = () => {
       this._rootSubject.next(row);
     };
+    row.hasChildren = () => {
+      return ((row !== this._rootSubject.getValue()) && (this.getChildren(row).
+        length > 0));
+    };
     this._rowMap.set(this.getId(row), row);
     this._rows.push(row);
     this._updateVisibleRowsSubscriptionMap[this.getId(row)] = row.
@@ -136,11 +140,6 @@ export abstract class Tree {
         this.showRows();
       }
     });
-    
-    let parent: TreeRow = this.getParent(row);
-    if (parent) {
-      parent.hasChildren = true;
-    }
     
     return row;
   }
@@ -159,41 +158,38 @@ export abstract class Tree {
     row.setRowAsRoot = () => {
       this._rootSubject.next(row);
     };
+    row.hasChildren = () => {
+      return ((row !== this._rootSubject.getValue()) && (this.getChildren(row).
+        length > 0));
+    };
     this._rowMap.set(this.getId(row), row);
     
     let parentRow: TreeRow = this.getParent(row);
     let childrenRows: Array<TreeRow> = this.getChildren(parentRow);
-    let parentRowIndex: number = this._rows.indexOf(parentRow);
-    let parentRowIndexOffset: number = childrenRows.indexOf(row.
+    let rowIndex: number = childrenRows.indexOf(row.
       object);
-    while (true) {
-      if (parentRowIndexOffset === (childrenRows.length - 1)) {
+    let insertionIndex: number = undefined;
+    while (undefined === insertionIndex) {
+      if (rowIndex === (childrenRows.length - 1)) {
         let previousParent: TreeRow = parentRow;
         parentRow = this.getParent(parentRow);
-        childrenRows = this.getChildren(parentRow);
-        parentRowIndexOffset = childrenRows.indexOf(previousParent);
         if (!parentRow) {
-          parentRowIndexOffset = (this._rows.length - 1);
-          break;
+          insertionIndex = (this._rows.length - 1);
+        } else {
+          childrenRows = this.getChildren(parentRow);
+          rowIndex = childrenRows.indexOf(previousParent);
         }
       } else {
-        parentRowIndexOffset = this._rows.indexOf(childrenRows[parentRowIndexOffset + 1]);
-        break;
+        insertionIndex = this._rows.indexOf(childrenRows[rowIndex + 1]);
       }
     }
-    this._rows.splice(parentRowIndex + parentRowIndexOffset + 1, 0,
-      row);
+    this._rows.splice(insertionIndex + 1, 0, row);
     this._updateVisibleRowsSubscriptionMap[this.getId(row)] = row.
       updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
       if (updateVisibleRows) {
         this.showRows();
       }
     });
-    
-    let parent: TreeRow = this.getParent(row);
-    if (parent) {
-      parent.hasChildren = true;
-    }
     
     return row;
   }
@@ -226,11 +222,6 @@ export abstract class Tree {
     let row: TreeRow = this._rowMap.get(id);
     this._rows.splice(this._rows.indexOf(row), 1);
     this._rowMap.delete(id);
-    
-    let parent: TreeRow = this.getParent(row);
-    if (parent && (0 === this.getChildren(parent).length)) {
-      parent.hasChildren = false;
-    }
   }
   
   private showRows(): void {

@@ -6,10 +6,13 @@ import { ToastrService } from 'ngx-toastr';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import { CompareItemsComponent,
+  VersionDesignator } from '../../compare-items/compare-items.component';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row.class';
 import { Image, RowAction, MenuAction } from '../tree-row.component';
@@ -46,7 +49,8 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     ActivatedRoute, private _itemRepository: ItemRepository, dialogService:
     DialogService, private _navigationService: NavigationService,
     private _versionControlService: VersionControlService,
-    private _toastrService: ToastrService) {
+    private _toastrService: ToastrService, private _dynamicTypesService:
+    DynamicTypesService) {
     super(route, dialogService);
   }
   
@@ -110,6 +114,41 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       this._rootSubject.next(this.getParent(row));
     }));
     this.rowActions.splice(0, 0, ...versionControlRowActions);
+    
+    let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
+      'Against Staged Version', 'Compare this Item against the staged ' +
+      'version of this Item', 'fa fa-exchange', (row: TreeRow) => {
+      return (row.object as ItemProxy).status['Staged'];
+      }, (row: TreeRow) => {
+      this.openComparisonDialog(row, VersionDesignator.STAGED_VERSION);
+    });
+    this.rootMenuActions.push(stagedVersionComparisonAction);
+    this.menuActions.push(stagedVersionComparisonAction);
+    
+    let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
+      'Compare Against Last Committed Version', 'Compares this Item against ' +
+      'the last committed version of this Item', 'fa fa-exchange', (row:
+      TreeRow) => {
+      if ((row.object as ItemProxy).history) {
+        return ((row.object as ItemProxy).history.length > 0);
+      } else {
+        this._itemRepository.getHistoryFor(row.object as ItemProxy);
+        return false;
+      }
+      }, (row: TreeRow) => {
+      this.openComparisonDialog(row, VersionDesignator.LAST_COMMITTED_VERSION);
+    });
+    this.rootMenuActions.push(lastCommittedVersionComparisonAction);
+    this.menuActions.push(lastCommittedVersionComparisonAction);
+    
+    let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
+      'Compare this Item against another Item', 'fa fa-exchange', (row: TreeRow) => {
+      return true;
+      }, (row: TreeRow) => {
+      this.openComparisonDialog(row, undefined);
+    });
+    this.rootMenuActions.push(itemComparisonAction);
+    this.menuActions.push(itemComparisonAction);
     
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
@@ -176,7 +215,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     let children: Array<TreeRow> = [];
     let proxy: ItemProxy = (row.object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
-      children.push(this.getRow(proxy.children[j].item.id));
+      let childRow: TreeRow = this.getRow(proxy.children[j].item.id);
+      if (childRow) {
+        children.push(childRow);
+      }
     }
     
     return children;
@@ -206,5 +248,22 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     }
     
     return iconString;
+  }
+  
+  private openComparisonDialog(row: TreeRow, changeVersionDesignator:
+    VersionDesignator): void {
+    let compareItemsDialogParameters: any = {
+      baseProxy: row.object,
+      editable: true
+    };
+    
+    if (null != changeVersionDesignator) {
+      compareItemsDialogParameters['changeProxy'] = row.object;
+      compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
+    }
+    
+    this._dialogService.openComponentDialog(CompareItemsComponent, {
+      data: compareItemsDialogParameters
+    }).updateSize('90%', '90%');
   }
 }

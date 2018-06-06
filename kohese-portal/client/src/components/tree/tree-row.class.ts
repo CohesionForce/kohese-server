@@ -19,14 +19,6 @@ export class TreeRow {
     this._icon = icon;
   }
   
-  private _hasChildren: boolean = false;
-  get hasChildren() {
-    return this._hasChildren;
-  }
-  set hasChildren(hasChildren: boolean) {
-    this._hasChildren = hasChildren;
-  }
-  
   private _expanded: boolean = false;
   get expanded() {
     return this._expanded;
@@ -85,6 +77,11 @@ export class TreeRow {
   
   public setRowAsRoot(): void {
     // May be implemented externally
+  }
+  
+  public hasChildren(): boolean {
+    // May be implemented externally
+    return false;
   }
   
   public refresh(): void {

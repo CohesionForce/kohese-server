@@ -1,10 +1,7 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 
-import { DialogService } from '../../services/dialog/dialog.service';
 import { TreeRow } from './tree-row.class';
-import { CompareItemsComponent,
-  VersionDesignator } from '../compare-items/compare-items.component';
 
 @Component({
   selector: 'tree-row',
@@ -49,12 +46,7 @@ export class TreeRowComponent implements OnInit {
     this._menuActions = menuActions;
   }
   
-  get VersionDesignator() {
-    return VersionDesignator;
-  }
-  
-  public constructor(private dialogService: DialogService,
-    private _changeDetector: ChangeDetectorRef) {
+  public constructor(private _changeDetector: ChangeDetectorRef) {
   }
 
   public ngOnInit(): void {
@@ -67,23 +59,6 @@ export class TreeRowComponent implements OnInit {
     return {
       'padding-left': (this._treeRow.depth * 15) + 'px'
     };
-  }
-  
-  public openComparisonDialog(changeVersionDesignator: VersionDesignator):
-    void {
-    let compareItemsDialogParameters: any = {
-      baseProxy: this._treeRow.object,
-      editable: true
-    };
-    
-    if (null != changeVersionDesignator) {
-      compareItemsDialogParameters['changeProxy'] = this._treeRow.object;
-      compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
-    }
-    
-    this.dialogService.openComponentDialog(CompareItemsComponent, {
-      data: compareItemsDialogParameters
-    }).updateSize('90%', '90%');
   }
 }
 
