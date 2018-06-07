@@ -20,6 +20,10 @@
             "name": "Assigned",
             "description": "A task that is Assigned."
           },
+          "Accepted": {
+            "name": "Accepted",
+            "description": ""
+          },
           "InWork": {
             "name": "In Work",
             "description": "A task that is In Work."
@@ -42,8 +46,18 @@
               "assignment:Assignee"
             ]
           },
-          "Begin Work": {
+          "Accept": {
             "source": "Assigned",
+            "target": "Accepted",
+            "guard": {}
+          },
+          "Request Reassign After Accepted": {
+            "source": "Accepted",
+            "target": "PendingReassign",
+            "guard": {}
+          },
+          "Begin Work": {
+            "source": "Accepted",
             "target": "InWork",
             "guard": {},
             "requires": ""
