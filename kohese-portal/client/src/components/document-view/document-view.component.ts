@@ -288,4 +288,11 @@ implements OnInit, OnDestroy {
         // Probably need to do something here to spin off an update
       });
   }
+
+  insertRow(newProxy : ItemProxy, row: any, location: string) {
+    row[location] = false;
+    setTimeout(()=>{
+      this.generateDoc();
+    }, 500)
+  }
 }
