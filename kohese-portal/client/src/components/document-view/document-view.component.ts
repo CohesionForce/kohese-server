@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef } from '@angular/core';
+import { ItemRepository } from './../../services/item-repository/item-repository.service';
+import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef, trigger, state, style, animate, transition } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 import { Observable } from 'rxjs';
 
@@ -27,6 +28,27 @@ interface DocumentInfo {
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: [
     './document-view.component.scss'
+  ],
+  animations : [
+    trigger('showMenuState', [
+      state('show', style({
+        'transform' : 'translate(50px)'
+      })),
+      state('hide', style({
+        'transform' : 'translate(0)'
+      })),
+      transition('show => hide', animate(500)),
+      transition('hide => show', animate(1000))
+    ]),
+    trigger('menuFade', [
+      state('show', style({
+        opacity: 1
+      })),
+      state('hide', style({
+        opacity: 0
+      })),
+      transition('hide => show', animate(1000))
+    ])
   ]
 })
 
@@ -38,6 +60,7 @@ export class DocumentViewComponent extends NavigatableComponent
   /* Data */
   itemProxy: ItemProxy;
   itemLength: number;
+  selectedRow : number;
 
   filter: string;
   docRendered: string;
@@ -67,7 +90,8 @@ export class DocumentViewComponent extends NavigatableComponent
 
   constructor(NavigationService: NavigationService,
     private changeRef: ChangeDetectorRef,
-    private router: Router) {
+    private router: Router,
+    private itemRepository : ItemRepository) {
     super(NavigationService)
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true });
@@ -151,6 +175,7 @@ export class DocumentViewComponent extends NavigatableComponent
   }
 
   generateDoc(): void {
+    this.loadedProxies = [];
     let subtreeAsList = this.itemProxy.getSubtreeAsList();
     this.itemLength = subtreeAsList.length;
 
@@ -194,6 +219,17 @@ export class DocumentViewComponent extends NavigatableComponent
   onScroll() {
     this.generateDoc();
     this.changeRef.markForCheck();
+  }
+
+  upsertItem (proxy : ItemProxy, row : any, docInfo : DocumentInfo) {
+    console.log(proxy, row, docInfo);
+    this.itemRepository.upsertItem(proxy).then((newProxy)=>{
+      console.log(newProxy);
+      row.editable = false;
+      docInfo.proxy = newProxy;
+      this.changeRef.markForCheck();
+      console.log(proxy, row, docInfo);
+    })
   }
 
   onFilterChange() {

@@ -14,4 +14,40 @@
 .document-row {
   padding-left : 10px;
   border-bottom : 1px gray solid;
+  border-left : 1px black solid;
+  width: calc(100% - 100px);
+  display: inline-block;
+  background-color : rgb(245, 235, 235);
+}
+
+.side-button {
+  padding-bottom : 10px;
+}
+
+:host {
+  background-color: black;
+}
+
+.hovered-row {
+  min-height: 240px;
+  border: 2px green solid;
+}
+
+.hovered-body {
+  background-color : white;
+  min-height: 240px;
+  vertical-align: top;
+}
+
+.hovered-actions {
+  background-color : green;
+  color : white;
+}
+
+.row-actions {
+  height: 100%;
+}
+
+textarea {
+  width : 100%;
 }
