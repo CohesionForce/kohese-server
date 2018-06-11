@@ -11,7 +11,7 @@
             <div class="button-group" *ngIf="row.rowState === 'show'">
               <button mat-icon-button class="fa fa-angle-double-up" mat-tooltip="Previous Item"></button>
               <button mat-icon-button class="fa fa-plus side-button"> <i class="fa fa-chevron-up"></i></button>
-              <button mat-icon-button class="fa fa-search side-button"></button>
+              <button mat-icon-button class="fa fa-clipboard side-button" (click)="showProxyDetails(docInfo.proxy)"></button>
               <button mat-icon-button *ngIf="!row.editable" class="fa fa-edit side-button" (click)="row.editable = true"></button>
               <button mat-icon-button *ngIf="row.editable" class="fa fa-save side-button" (click)="upsertItem(docInfo.proxy, row, docInfo);"></button>
               <button mat-icon-button *ngIf="row.editable" class="fa fa-times side-button" (click)="row.editable = false;"></button>
