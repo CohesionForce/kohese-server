@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'creation-row',
   templateUrl: './creation-row.component.html',
-  styleUrls: ['./creation-row.component.css']
+  styleUrls: ['./creation-row.component.scss']
 })
 export class CreationRowComponent implements OnInit {
   @Input()
