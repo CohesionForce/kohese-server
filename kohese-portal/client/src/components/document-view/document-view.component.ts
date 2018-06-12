@@ -86,6 +86,8 @@ implements OnInit, OnDestroy {
   proxyStream: Observable < ItemProxy >
     @Input()
   incrementalLoad: boolean;
+  @Input()
+  fullscreen = false;
 
   /* Subscriptions */
   filterSubscription: Subscription;
@@ -295,5 +297,9 @@ implements OnInit, OnDestroy {
     setTimeout(()=>{
       this.generateDoc();
     }, 500)
+  }
+
+  openDocumentTree() {
+    console.log('treeeee');
   }
 }

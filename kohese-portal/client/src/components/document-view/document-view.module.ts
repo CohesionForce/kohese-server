@@ -1,3 +1,4 @@
+import { FullscreenDocumentComponent } from './fullscreen-document/fullscreen-document.component';
 import { CreationRowComponent } from './creation-row/creation-row.component';
 import { MaterialModule } from './../../material.module';
 import { BrowserModule } from '@angular/platform-browser';
@@ -11,7 +12,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 @NgModule({
   declarations: [
     DocumentViewComponent,
-    CreationRowComponent
+    CreationRowComponent,
+    FullscreenDocumentComponent
   ],
   imports : [
     CommonModule,
