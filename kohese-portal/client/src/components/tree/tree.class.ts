@@ -27,16 +27,22 @@ export abstract class Tree {
   
   private _rootRowActions: Array<RowAction> = [
     new RowAction('Expand Descendants', 'Expands all descendants',
-    'fa fa-caret-down', (row: TreeRow) => {
+      'fa fa-caret-down', (row: TreeRow) => {
       return (this.getChildren(row).length > 0);
-    }, (row: TreeRow) => {
+      }, (row: TreeRow) => {
       this.expandDescendants(row);
     }),
     new RowAction('Collapse Descendants', 'Collapses all descendants',
-    'fa fa-caret-right', (row: TreeRow) => {
+      'fa fa-caret-right', (row: TreeRow) => {
       return (this.getChildren(row).length > 0);
-    }, (row: TreeRow) => {
+      }, (row: TreeRow) => {
       this.collapseDescendants(row);
+    }),
+    new RowAction('Set Parent As Root', 'Set this row\'s parent as the root',
+      'fa fa-level-up', (row: TreeRow) => {
+      return !!this.getParent(row);
+      }, (row: TreeRow) => {
+      this._rootSubject.next(this.getParent(row));
     })
   ];
   get rootRowActions() {
@@ -134,6 +140,13 @@ export abstract class Tree {
     };
     this._rowMap.set(this.getId(row), row);
     this._rows.push(row);
+    
+    let parentRow: TreeRow = this.getParent(row);
+    if (parentRow) {
+      row.path.push(...parentRow.path);
+    }
+    row.path.push(this.getId(row));
+    
     this._updateVisibleRowsSubscriptionMap[this.getId(row)] = row.
       updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
       if (updateVisibleRows) {
@@ -165,6 +178,9 @@ export abstract class Tree {
     this._rowMap.set(this.getId(row), row);
     
     let parentRow: TreeRow = this.getParent(row);
+    row.path.push(...parentRow.path);
+    row.path.push(this.getId(row));
+    
     let childrenRows: Array<TreeRow> = this.getChildren(parentRow);
     let rowIndex: number = childrenRows.indexOf(row.
       object);
@@ -184,6 +200,7 @@ export abstract class Tree {
       }
     }
     this._rows.splice(insertionIndex + 1, 0, row);
+    
     this._updateVisibleRowsSubscriptionMap[this.getId(row)] = row.
       updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
       if (updateVisibleRows) {

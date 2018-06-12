@@ -60,15 +60,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   }
   
   public ngOnInit(): void {
-    this.rootRowActions.push(new RowAction('Set Parent As Root',
-      'Set this row\'s parent as the root', 'fa fa-level-up', (row:
-      TreeRow) => {
-      return (this._rootSubject.getValue() && (this._rootSubject.getValue().
-        object !== this._absoluteRoot));
-      }, (row: TreeRow) => {
-      this._rootSubject.next(this.getParent(row));
-    }));
-    
     let deleteMenuAction: MenuAction = new MenuAction('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (row: TreeRow) => {
       return !(row.object as ItemProxy).internal;

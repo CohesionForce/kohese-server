@@ -51,6 +51,11 @@ export class TreeRow {
     this._depth = depth;
   }
   
+  private _path: Array<string> = [];
+  get path() {
+    return this._path;
+  }
+  
   private _updateVisibleRows: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   get updateVisibleRows() {

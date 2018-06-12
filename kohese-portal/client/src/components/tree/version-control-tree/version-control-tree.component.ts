@@ -105,14 +105,6 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       })
     ];
     this.rootRowActions.splice(0, 0, ...versionControlRowActions);
-    this.rootRowActions.push(new RowAction('Set Parent As Root',
-      'Set this row\'s parent as the root', 'fa fa-level-up', (row:
-      TreeRow) => {
-      return (this._rootSubject.getValue() && (this._rootSubject.getValue().object !==
-        this._absoluteRoot));
-      }, (row: TreeRow) => {
-      this._rootSubject.next(this.getParent(row));
-    }));
     this.rowActions.splice(0, 0, ...versionControlRowActions);
     
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
@@ -160,7 +152,14 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         }
         this._treeConfigurationSubscription = treeConfigurationObject.config.
           getChangeSubject().subscribe((notification: any) => {
-          this.buildRows(this._rootSubject.getValue().object);
+          if (notification.proxy) {
+            let row: TreeRow = this.getRow(notification.proxy.item.id);
+            if (row) {
+              row.refresh();
+            } else {
+              this.refresh();
+            }
+          }
         });
         
         this._rootSubject.next(this.buildRow(this._absoluteRoot));
@@ -181,6 +180,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     this.clear();
     
     let rootRow: TreeRow = this.buildRow(root);
+    rootRow.expanded = true;
     root.visitTree({ includeOrigin: false }, undefined, (proxy: ItemProxy) => {
       let build: boolean = (Object.keys(proxy.status).length > 0);
       if (!build) {
@@ -193,7 +193,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       }
       
       if (build) {
-        let row: TreeRow = this.buildRow(proxy);
+        this.buildRow(proxy);
       }
     });
   }
