@@ -22,8 +22,15 @@ export class StateFilterService {
         }
         let states = types[type].fields[stateKind].properties.state;
         for (let state in states) {
-          stateInfo[type][stateKind].states.push(states[state].name);
-          stateInfo[type][stateKind].descriptions.push(states[state].description)
+          stateInfo[type][stateKind].states.push(state);
+          stateInfo[type][stateKind].descriptions.push(states[state].description);
+
+          // TODO:  Remove this section when the data has been fixed
+          // Handle situation when the state name is used instead of the state id
+          if(state !== states[state].name){
+            stateInfo[type][stateKind].states.push(states[state].name);
+            stateInfo[type][stateKind].descriptions.push(states[state].description);
+          }
         }
       }
     }
