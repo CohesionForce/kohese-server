@@ -18,8 +18,11 @@
         <br> Estimated Completion : {{ proxy.item.estimatedCompletion | date }}
         <br> Estimated Hours Effort : {{ proxy.item.estimatedHoursEffort }}
         <br>
-        <k-state-editor [itemProxy]="proxy" [disableTransitioning]="!editable" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
       </div>
+      <div style="display: inline-block">
+          <h5 *ngIf="proxy.item.assignedTo">Assigned to : {{proxy.item.assignedTo}} </h5>
+      </div>
+        <k-state-editor [itemProxy]="proxy" [disableTransitioning]="!editable" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
     </mat-card-content>
   </mat-card>
 </div>
