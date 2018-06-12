@@ -17,14 +17,13 @@ export class StateFilterService {
       let stateProperties = typeDef.item.stateProperties;
       for (let stateKind of stateProperties) {
         stateInfo[type][stateKind] = {
-          states : []
+          states : [],
+          descriptions : []
         }
         let states = types[type].fields[stateKind].properties.state;
-        console.log('!!!');
-        console.log(states);
         for (let state in states) {
-          console.log(state);
           stateInfo[type][stateKind].states.push(states[state].name);
+          stateInfo[type][stateKind].descriptions.push(states[state].description)
         }
       }
     }

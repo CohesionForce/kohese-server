@@ -57,7 +57,7 @@ function loadKoheseModelsAndViews() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function initialize(koheseKdbPath) {
+function initialize(koheseKdbPath, indexAndExit) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
@@ -101,13 +101,13 @@ function initialize(koheseKdbPath) {
 
       loadKoheseModelsAndViews();
 
-      return openRepositories();
+      return openRepositories(indexAndExit);
     });
   } else {
 
     loadKoheseModelsAndViews();
 
-    return openRepositories();
+    return openRepositories(indexAndExit);
   }
 }
 module.exports.initialize = initialize;
@@ -538,7 +538,7 @@ function updateMountFile() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function openRepositories() {
+function openRepositories(indexAndExit) {
 	// Check and process mounts.json
 	// TODO Check for file existence prior to loading
 	try {
@@ -553,6 +553,10 @@ function openRepositories() {
 
   return kdbCache.updateCache().then(() => {
     console.log('::: Finished cache update: ' + kdbCache.repoPath);
+
+    if (indexAndExit){
+        return Promise.resolve(true);
+    }
 
   	// Create/validate root repo structure
 	  console.log('>>> Validating Root Repository Structure');
