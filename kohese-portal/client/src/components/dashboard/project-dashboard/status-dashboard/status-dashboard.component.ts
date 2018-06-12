@@ -73,6 +73,7 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
 
       for (let proxy of this.project.projectItems) {
         let newItems = proxy.getDescendants();
+        this.matchingObjects = this.matchingObjects.concat(proxy);
         this.matchingObjects = this.matchingObjects.concat(proxy.getDescendants())
       }
 

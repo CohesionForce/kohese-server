@@ -97,6 +97,7 @@ export class StateBarChartComponent implements OnInit {
     let emptyStates = [];
     for (let projectItem of this.project.projectItems) {
       let newItems = projectItem.getDescendants();
+      projectProxies = projectProxies.concat(projectItem);
       projectProxies = projectProxies.concat(newItems);
     }
 
