@@ -20,6 +20,10 @@
             "name": "Assigned",
             "description": "An action that is Assigned."
           },
+          "Accepted": {
+            "name": "Accepted",
+            "description": ""
+          },
           "PendingReassign": {
             "name": "Pending Reassign",
             "description": "An action that is Pending Reassign."
@@ -65,11 +69,25 @@
             "guard": {},
             "requires": ""
           },
-          "Begin Work": {
+          "Accept": {
             "source": "Assigned",
+            "target": "Accepted",
+            "guard": {}
+          },
+          "Request Reassign After Accepted": {
+            "source": "Accepted",
+            "target": "PendingReassign",
+            "guard": {}
+          },
+          "Redisposition After Accepted": {
+            "source": "Accepted",
+            "target": "PendingRedisposition",
+            "guard": {}
+          },
+          "Begin Work": {
+            "source": "Accepted",
             "target": "InWork",
-            "guard": {},
-            "requires": []
+            "guard": {}
           },
           "Request Verification": {
             "source": "InWork",
@@ -96,7 +114,7 @@
         }
       }
     },
-    "predecessors" : {
+    "predecessors": {
       "type": [
         "Item"
       ],

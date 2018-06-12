@@ -1,7 +1,10 @@
+import { StateSummaryDialogComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-summary-dialog/state-summary-dialog.component';
+import { StateBarChartComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-bar-chart.component';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { NgModule } from "@angular/core/";
+import { NgxDatatableModule } from '@swimlane/ngx-datatable'
 
 import { CommonModule } from "@angular/common";
 import { KMarkdownComponent } from "../user-input/k-markdown/k-markdown.component";
@@ -27,6 +30,7 @@ import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 import { TreeModule } from "angular-tree-component";
 import { StateFilterService } from './state-filter.service';
+import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy-card.component';
 
 @NgModule({
   declarations: [
@@ -43,14 +47,19 @@ import { StateFilterService } from './state-filter.service';
     UserStatisticsComponent,
     ProjectSelectorComponent,
     StatusDashboardComponent,
-    OpenAssignmentComponent
+    OpenAssignmentComponent,
+    StateBarChartComponent,
+    StateSummaryDialogComponent,
+    StatefulProxyCardComponent
   ],
   providers : [
     StateFilterService
   ],
   entryComponents: [
     KMarkdownComponent,
-    ProjectSelectorComponent
+    ProjectSelectorComponent,
+    StateSummaryDialogComponent
+
   ],
   imports : [
     CommonModule,
@@ -63,7 +72,8 @@ import { StateFilterService } from './state-filter.service';
     TreeModule,
     VirtualScrollModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgxDatatableModule
   ],
   exports : [
     DashboardComponent

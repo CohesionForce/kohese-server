@@ -1,0 +1,26 @@
+
+.flex-container {
+  display : flex;
+}
+
+.left-content {
+  width : 2.5%;
+  color : whitesmoke;
+}
+.top-content {
+  width : 100%;
+  color : whitesmoke;
+  height : 40px;
+  transform: translate(-29px, -24px);
+}
+
+.right-content {
+  flex : 2;
+}
+
+.uneditable {
+  background-color : lightgray
+}
+.editable {
+  background-color : whitesmoke;
+}
