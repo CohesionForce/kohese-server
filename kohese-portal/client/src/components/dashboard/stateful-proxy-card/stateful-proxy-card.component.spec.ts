@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProxyDashCardComponent } from './stateful-proxy-card.component';
+import { StatefulProxyCardComponent } from './stateful-proxy-card.component';
 
-describe('ProxyDashCardComponent', () => {
-  let component: ProxyDashCardComponent;
-  let fixture: ComponentFixture<ProxyDashCardComponent>;
+describe('StatefulProxyCardComponent', () => {
+  let component: StatefulProxyCardComponent;
+  let fixture: ComponentFixture<StatefulProxyCardComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ProxyDashCardComponent ]
+      declarations: [ StatefulProxyCardComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProxyDashCardComponent);
+    fixture = TestBed.createComponent(StatefulProxyCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
