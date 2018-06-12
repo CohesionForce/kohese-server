@@ -173,7 +173,7 @@ implements OnInit, OnDestroy {
         }
       } else if (this.itemsLoaded < subTree.length) {
         // Case 3 : Load based on defined increment
-        newLoad = currentLoad + 12;
+        newLoad = currentLoad + 20;
       }
     }
 
@@ -181,16 +181,16 @@ implements OnInit, OnDestroy {
   }
 
   generateDoc(): void {
-    this.loadedProxies = [];
     let subtreeAsList = this.itemProxy.getSubtreeAsList();
     this.itemLength = subtreeAsList.length;
-
-    let docRendered = '';
 
     if (this.itemsLoaded >= subtreeAsList.length) {
       this.itemsLoaded = subtreeAsList.length
       return;
     }
+
+    this.loadedProxies = [];
+    let docRendered = '';
 
     this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
 
