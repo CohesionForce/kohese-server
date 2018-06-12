@@ -291,6 +291,7 @@ implements OnInit, OnDestroy {
 
   insertRow(newProxy : ItemProxy, row: any, location: string) {
     row[location] = false;
+    this.changeRef.markForCheck();
     setTimeout(()=>{
       this.generateDoc();
     }, 500)
