@@ -35,7 +35,7 @@
             <div class="document-row" *ngIf="row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}">
               <textarea matInput [(ngModel)]="docInfo.proxy.item.name"></textarea>
               <hr/>
-              <textarea matInput matTextareaAutosize #description [(ngModel)]="docInfo.proxy.item.description" oninput='this.style.height = "";this.style.height = this.scrollHeight + 3 + "px"'></textarea>
+              <textarea matInput matTextareaAutosize #description [(ngModel)]="docInfo.proxy.item.description"></textarea>
             </div>
           </div>
           <creation-row [referenceProxy]="docInfo.proxy" [relation]="'child'" *ngIf="row.addBottom" class="document-row" (itemCreated)="insertRow($event, row, 'addBottom')"></creation-row>
