@@ -339,7 +339,7 @@ export class KDBCache extends ItemCache {
       return;
     }
 
-    if (this.getRepoCommit(commit.id())){
+    if (this.getCommit(commit.id())){
       // console.log('::: Already indexed commit ' + commit.id());
       return this.indexCommit(repository, commits);
     } else {
@@ -424,8 +424,13 @@ export class KDBCache extends ItemCache {
         kdbCache.addCachedObject('blob', oid, blob.content());
         return Promise.resolve(oid);
     }).catch(function (err) {
-      console.log('*** Error retreiving: ' + oid);
+      console.log('*** Error retreiving blob from underlying repo: ' + oid);
       console.log(err.stack);
+      kdbCache.addCachedObject('blob', oid, {
+        error: "Can Not Retrieve Item From Underlying Repo",
+        oid: oid
+      });
+      return Promise.resolve(oid);
     });
   }
 
@@ -503,7 +508,12 @@ export class KDBCache extends ItemCache {
   loadProxiesForRepoRootDir(treeData, treeConfig){
     var contents = treeData.contents;
 
-    if(contents.hasOwnProperty('store')) {
+    if (!contents) {
+      console.log('*** Contents not found for directory.  Examine previous errors');
+      return;
+    }
+
+    if (contents.hasOwnProperty('store')) {
       console.log('::: Found store dir for ' + treeData.oid);
     }
 
