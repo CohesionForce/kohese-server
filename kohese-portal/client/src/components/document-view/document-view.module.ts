@@ -1,3 +1,4 @@
+import { TreeViewModule } from './../tree/tree.module';
 import { FullscreenDocumentComponent } from './fullscreen-document/fullscreen-document.component';
 import { CreationRowComponent } from './creation-row/creation-row.component';
 import { MaterialModule } from './../../material.module';
@@ -22,7 +23,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
     BrowserModule,
     MaterialModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TreeViewModule
   ],
   exports : [
     DocumentViewComponent
