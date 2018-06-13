@@ -1,8 +1,24 @@
-import { ItemProxy } from '../../../../common/src/item-proxy';
-
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 export class TreeRow {
+  get object() {
+    return this._object;
+  }
+  
+  get text() {
+    return this._text;
+  }
+  set text(text: string) {
+    this._text = text;
+  }
+  
+  get icon() {
+    return this._icon;
+  }
+  set icon(icon: string) {
+    this._icon = icon;
+  }
+  
   private _expanded: boolean = false;
   get expanded() {
     return this._expanded;
@@ -10,6 +26,7 @@ export class TreeRow {
   set expanded(expanded: boolean) {
     this._expanded = expanded;
   }
+  
   private _visible: boolean = true;
   get visible() {
     return this._visible;
@@ -26,20 +43,6 @@ export class TreeRow {
     this._matchesFilter = matchesFilter;
   }
   
-  get itemProxy() {
-    return this._itemProxy;
-  }
-  private _updateDisplay: BehaviorSubject<boolean> =
-    new BehaviorSubject<boolean>(false);
-  get updateDisplay() {
-    return this._updateDisplay;
-  }
-  private _updateVisibleRows: BehaviorSubject<boolean> =
-    new BehaviorSubject<boolean>(false);
-  get updateVisibleRows() {
-    return this._updateVisibleRows;
-  }
-  
   private _depth: number = 0;
   get depth() {
     return this._depth;
@@ -48,13 +51,45 @@ export class TreeRow {
     this._depth = depth;
   }
   
-  public constructor(private _itemProxy: ItemProxy) {
+  private _path: Array<string> = [];
+  get path() {
+    return this._path;
   }
   
-  public getRowParentProxy(): ItemProxy {
-    return this._itemProxy.parentProxy;
+  private _updateVisibleRows: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(false);
+  get updateVisibleRows() {
+    return this._updateVisibleRows;
   }
-  public getRowChildrenProxies(): Array<ItemProxy> {
-    return this._itemProxy.children;
+  
+  public constructor(protected _object: any, private _text: string,
+    private _icon: string) {
+  }
+  
+  public isRowSelected(): boolean {
+    // May be implemented externally
+    return false;
+  }
+  
+  public rowSelected(): void {
+    // May be implemented externally
+  }
+  
+  public isRowRoot(): boolean {
+    // May be implemented externally
+    return false;
+  }
+  
+  public setRowAsRoot(): void {
+    // May be implemented externally
+  }
+  
+  public hasChildren(): boolean {
+    // May be implemented externally
+    return false;
+  }
+  
+  public refresh(): void {
+    // May be implemented externally
   }
 }
