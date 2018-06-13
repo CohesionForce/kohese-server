@@ -17,6 +17,7 @@ export class DetailsDialogComponent extends ProxyDetailsComponent implements OnI
   itemProxy: ItemProxy;
   proxyStream: BehaviorSubject<ItemProxy>;
   editableStream : BehaviorSubject<boolean>
+  hideDocument : boolean;
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
     protected navigationService: NavigationService,
@@ -26,6 +27,7 @@ export class DetailsDialogComponent extends ProxyDetailsComponent implements OnI
     super(navigationService, itemRepository);
     this.itemProxy = data.itemProxy
     this.proxyStream = new BehaviorSubject<ItemProxy>(this.itemProxy);
+    this.hideDocument = data.hideDocument
   }
 
   ngOnInit() {

@@ -10,6 +10,7 @@ import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeEditorComponent } from './components/type-editor/type-editor.component';
 import { DevToolsComponent } from './components/admin/dev-tools/dev-tools.component';
+import { FullscreenDocumentComponent } from './components/document-view/fullscreen-document/fullscreen-document.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -21,7 +22,8 @@ const routes: Routes = [
   // { path: 'explore/:id', component: ExploreComponent},
   { path: 'analysis', component: AnalysisComponent },
   { path: 'typeeditor', component: TypeEditorComponent},
-  { path: 'devtools', component: DevToolsComponent}
+  { path: 'devtools', component: DevToolsComponent},
+  { path: 'document', component: FullscreenDocumentComponent}
 ]
 
 @NgModule({
