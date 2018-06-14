@@ -1,3 +1,5 @@
+import { ChangeDetectorRef } from '@angular/core';
+import { KoheseType } from './../../../classes/UDT/KoheseType.class';
 import { Observable } from 'rxjs/Observable';
 import { Input } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -13,7 +15,7 @@ import { Tree } from '../tree.class';
 @Component({
   selector: 'document-tree',
   templateUrl: './document-tree.component.html',
-  styleUrls: ['./document-tree.component.scss']
+  styleUrls: ['./document-tree.component.scss', '../tree.component.scss']
 })
 export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   treeConfigSubscription : Subscription;
@@ -24,10 +26,12 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   documentRoot : ItemProxy;
   documentRootId : string;
+  images = [];
 
   constructor(router: ActivatedRoute,
               dialogService : DialogService,
-              private itemRepository : ItemRepository
+              private itemRepository : ItemRepository,
+              private changeRef : ChangeDetectorRef
               ) {
                 super(router, dialogService);
               }
@@ -47,7 +51,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   let sharedAction : MenuAction = new MenuAction('Menu Action', 'I am in a menu', 'fa fa-comment',
     (row) => {
-      if (row.itemProxy.kind === 'Item') {
+      if (true) {
         return true
       }},()=>{console.log('Hello world')})
 
@@ -93,13 +97,10 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
       this._rootSubject.next(this.getRow(this.documentRootId));
 
-      // this._route.params.subscribe((parameters) => {
-      //   if () {
-      //     this.showSelection();
-      //   }
-      // });
-
       this.showSelection();
+      setTimeout(()=>{
+        console.log(this.visibleRows)
+      }, 500)
     }
   });
 }
@@ -119,6 +120,53 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       this.showSelection();
     }
   }
+
+
+  public getId(row: TreeRow): string {
+    return (row.object as ItemProxy).item.id;
+  }
+
+  public getParent(row: TreeRow): TreeRow {
+    let parent: TreeRow = undefined;
+    if ((row.object as ItemProxy).parentProxy) {
+      parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
+    }
+
+    return parent;
+  }
+
+  public getChildren(row: TreeRow): Array<TreeRow> {
+    let children: Array<TreeRow> = [];
+    let proxy: ItemProxy = (row.object as ItemProxy);
+    for (let j: number = 0; j < proxy.children.length; j++) {
+      children.push(this.getRow(proxy.children[j].item.id));
+    }
+
+    return children;
+  }
+
+  public postTreeTraversalActivity(): void {
+    this.changeRef.markForCheck();
+  }
+
+  public rowSelected(row: TreeRow): void {
+    console.log('row selected');
+  }
+
+  public getText(object: any): string {
+    return (object as ItemProxy).item.name;
+  }
+
+  public getIcon(object: any): string {
+    let iconString: string = '';
+    let koheseType: KoheseType = (object as ItemProxy).model.type;
+    if (koheseType && koheseType.viewModelProxy) {
+      iconString = koheseType.viewModelProxy.item.icon;
+    }
+
+    return iconString;
+  }
+
 
 }
 

@@ -1,14 +1,18 @@
 .doc-view {
   height : 100%;
-  overflow : scroll;
+  overflow : auto;
 }
 
 .body-container {
-  height : calc(100% - 40px);
+  height : calc(100% - 50px);
 }
 
 .details-doc {
   height: calc(100% - 53px);
+}
+
+.right-zone {
+  height: 100%;
 }
 
 .document-row {
@@ -25,7 +29,7 @@
 }
 
 :host {
-  background-color: black;
+  height: 100%;
 }
 
 .hovered-row {
