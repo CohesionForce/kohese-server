@@ -1,2 +1,2 @@
-<document-tree class="left-content" style="width: 30%; display: inline-block"></document-tree>
-<document-view class="right-content" [proxyStream]="proxyStream" [fullscreen]="true" [incrementalLoad]="false" style="width: 60%; display: inline-block"></document-view>
+<document-tree class="left-content" (rootSelected)="setRoot($event);" style="width: 30%; display: inline-block"></document-tree>
+<document-view class="right-content" [proxyStream]="proxyStream" [fullscreen]="true" [incrementalLoad]="false" style="width: 65%; display: inline-block"></document-view>
