@@ -1,6 +1,7 @@
+import { DocumentRowComponent } from './document-row/document-row.component';
 import { TreeViewModule } from './../tree/tree.module';
 import { FullscreenDocumentComponent } from './fullscreen-document/fullscreen-document.component';
-import { CreationRowComponent } from './creation-row/creation-row.component';
+import { CreationRowComponent } from './document-row/creation-row/creation-row.component';
 import { MaterialModule } from './../../material.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -14,6 +15,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
   declarations: [
     DocumentViewComponent,
     CreationRowComponent,
+    DocumentRowComponent,
     FullscreenDocumentComponent
   ],
   imports : [

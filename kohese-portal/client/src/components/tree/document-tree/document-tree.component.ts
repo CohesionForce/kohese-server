@@ -31,6 +31,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   @Output()
   rootSelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
+  @Output()
+  onSelect : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
 
   constructor(router: ActivatedRoute,
               dialogService : DialogService,
@@ -155,7 +157,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   public rowSelected(row: TreeRow): void {
-    console.log(row);
+    this.onSelect.emit(row.object);
   }
 
   public getText(object: any): string {
