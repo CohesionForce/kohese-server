@@ -1,3 +1,4 @@
+import { EventEmitter, Output } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { KoheseType } from './../../../classes/UDT/KoheseType.class';
 import { Observable } from 'rxjs/Observable';
@@ -27,6 +28,9 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   documentRoot : ItemProxy;
   documentRootId : string;
   images = [];
+
+  @Output()
+  rootSelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
 
   constructor(router: ActivatedRoute,
               dialogService : DialogService,
@@ -96,6 +100,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       });
 
       this._rootSubject.next(this.getRow(this.documentRootId));
+      this.rootSelected.emit(this.documentRoot);
 
       this.showSelection();
       setTimeout(()=>{
@@ -167,7 +172,11 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     return iconString;
   }
 
-
+  setRowAsRoot(row : TreeRow) {
+    this.rootSubject.next(this.getRow(row.object.item.id));
+    this.rootSelected.emit(row.object);
+    console.log('over');
+  }
 }
 
 /*

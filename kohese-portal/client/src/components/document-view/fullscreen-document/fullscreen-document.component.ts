@@ -33,4 +33,8 @@ export class FullscreenDocumentComponent implements OnInit {
     })
   }
 
+  setRoot(newRoot: ItemProxy) {
+    this.proxyStream.next(newRoot)
+  }
+
 }

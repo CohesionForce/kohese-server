@@ -7,7 +7,7 @@
       <mat-icon class="fa fa-exchange"></mat-icon>
     </button>
     <button mat-icon-button
-      (click)="rootSubject.next(getRow(documentRoot.item.id))"
+      (click)="setRowAsRoot(getRow(documentRoot.item.id))"
       [disabled]="!rootSubject.getValue() || (rootSubject.getValue().object === documentRoot)"
       matTooltip="Changes the root to be the document root">
       <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
