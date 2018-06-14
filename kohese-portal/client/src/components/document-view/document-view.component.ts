@@ -133,7 +133,7 @@ implements OnInit, OnDestroy {
     if (this.selectedProxyStream) {
       this.selectedProxySubscription = this.selectedProxyStream.subscribe((newSelection) => {
         if (newSelection) {
-          this.rowMap[newSelection.item.id].nativeElement.scrollIntoView({ behavior: "smooth"});
+          this.rowMap[newSelection.item.id].nativeElement.scrollIntoView();
         }
       })
     }
