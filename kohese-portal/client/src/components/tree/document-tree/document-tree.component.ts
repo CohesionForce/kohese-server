@@ -150,7 +150,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   public rowSelected(row: TreeRow): void {
-    console.log('row selected');
+    console.log(row);
   }
 
   public getText(object: any): string {
