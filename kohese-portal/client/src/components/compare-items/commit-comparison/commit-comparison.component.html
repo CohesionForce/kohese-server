@@ -22,23 +22,38 @@
     </mat-select>
   </mat-form-field>
   <br/>
+  <h5 style="height: 7%; width: 100%;">
+    Changes
+  </h5>
   <virtual-scroll #differenceList [items]="differences">
-    <ng-container *ngFor="let difference of differenceList.viewPortItems">
-      <button mat-raised-button [matMenuTriggerFor]="differenceMenu"
-        style="width: 100%; text-align: left;">
-        <mat-icon class="{{difference.iconString}}"></mat-icon>
-        {{difference.item.name}}
-      </button>
-      <br/>
-    </ng-container>
-    <mat-menu #differenceMenu="matMenu" [overlapTrigger]="false">
+    <!-- mat-menu #differenceMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent let-difference="difference">
         <button mat-menu-item (click)="openComparisonDialog(difference)">
           <mat-icon class="fa fa-exchange"></mat-icon>
           Compare Versions
         </button>
       </ng-template>
-    </mat-menu>
+    </mat-menu-->
+    <ng-container *ngFor="let difference of differenceList.viewPortItems">
+      <button mat-raised-button (click)="openComparisonDialog(difference)"
+        style="width: 100%; text-align: left;">
+        {{difference.item.name}}
+        <ng-container
+          *ngFor="let differenceType of difference.differenceTypes">
+          <mat-icon
+            class="{{DifferenceTypeOperations.getIconClass(differenceType)}}"
+            matTooltip="{{DifferenceTypeOperations.toString(differenceType)}}">
+          </mat-icon>
+        </ng-container>
+      </button>
+      <!-- button mat-raised-button [matMenuTriggerFor]="differenceMenu"
+        [matMenuTriggerData]="{ difference: difference }"
+        style="width: 100%; text-align: left;">
+        <mat-icon class="{{difference.iconString}}"></mat-icon>
+        {{difference.item.name}}
+      </button-->
+      <br/>
+    </ng-container>
   </virtual-scroll>
   <ng-container *ngIf="data">
     <mat-dialog-actions

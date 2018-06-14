@@ -5,20 +5,6 @@ export class TreeRow {
     return this._object;
   }
   
-  get text() {
-    return this._text;
-  }
-  set text(text: string) {
-    this._text = text;
-  }
-  
-  get icon() {
-    return this._icon;
-  }
-  set icon(icon: string) {
-    this._icon = icon;
-  }
-  
   private _expanded: boolean = false;
   get expanded() {
     return this._expanded;
@@ -62,8 +48,17 @@ export class TreeRow {
     return this._updateVisibleRows;
   }
   
-  public constructor(protected _object: any, private _text: string,
-    private _icon: string) {
+  public constructor(protected _object: any) {
+  }
+  
+  public getText(): string {
+    // May be implemented externally
+    return this._object.toString();
+  }
+  
+  public getIcon(): string {
+    // May be implemented externally
+    return '';
   }
   
   public isRowSelected(): boolean {

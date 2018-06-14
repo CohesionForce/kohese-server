@@ -34,7 +34,7 @@
       <virtual-scroll #tree [items]="visibleRows">
         <tree-row *ngFor="let row of tree.viewPortItems"
           [treeRow]="row" [rowActions]="rowActions"
-          [menuActions]="menuActions">
+          [menuActions]="menuActions" [images]="images">
         </tree-row>
       </virtual-scroll>
     </div>

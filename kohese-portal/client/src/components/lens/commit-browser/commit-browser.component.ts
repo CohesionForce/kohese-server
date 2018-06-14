@@ -1,10 +1,23 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
+import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemRepository, RepoStates } from "../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
+
+interface CommitViewItem {
+  commitId: string
+  commit: {
+    author: string,
+    message: string,
+    parents: Array<string>,
+    repoTreeRoots: {},
+    time: number
+  }
+  parents: Array<any>;
+}
 
 @Component({
   selector: 'commit-browser',
@@ -12,30 +25,61 @@ import { MatDialogRef } from "@angular/material";
   styleUrls: ['./commit-browser.component.scss']
 })
 export class CommitBrowserComponent implements OnInit, OnDestroy {
-  private _selectedCommit: any;
-  get selectedCommit() {
-    return this._selectedCommit;
-  }
-  
   repoStatusSubscription: Subscription;
+  commitList: Array<CommitViewItem> = [];
+  selectedCommit: CommitViewItem;
+  commitMap: any;
 
   constructor(private itemRepository: ItemRepository,
-    private matDialogRef: MatDialogRef<CommitBrowserComponent>) {
+    private matDialogRef: MatDialogRef<CommitBrowserComponent>,
+    private _navigationService: NavigationService) {
   }
 
   ngOnInit() {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update) => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
+          this.commitMap = TreeConfiguration.getItemCache().getCommits();
+          // Convert to array for sorting in the view
+          for (let commitId in this.commitMap) {
+            let commitView = {
+              commitId: commitId,
+              commit: this.commitMap[commitId],
+              parents: []
+            }
+            commitView.parents = []
+            for (let parent in this.commitMap[commitId].parents) {
+              commitView.parents.push(this.commitMap[parent])
+            }
+
+            this.commitList.push(commitView)
+          }
+          // Sort into reverse chronological order
+          this.commitList.sort((a, b) => {
+            if (a.commit.time > b.commit.time) {
+              return -1;
+            } else if (a.commit.time === b.commit.time) {
+              return 0;
+            } else {
+              return 1;
+            }
+          })
         }
-      });
+      })
+
+
   }
 
-  public rowSelected(object: any) {
-    if (object.id) {
-      this._selectedCommit = TreeConfiguration.getItemCache().getCommits()[
-        object.id];
+  onCommitSelected(newCommit, commitIdx) {
+    let newCommitView: CommitViewItem = {
+      commit: newCommit,
+      commitId: commitIdx,
+      parents: []
     }
+    for (let parent of this.commitMap[commitIdx].parents) {
+      newCommitView.parents.push(this.commitMap[parent])
+    }
+    this.selectedCommit = newCommitView;
   }
 
   ngOnDestroy() {
@@ -49,7 +93,12 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
   confirm() {
     this.matDialogRef.close(this.selectedCommit)
   }
-
-
+  
+  public navigateToSelectedCommit(): void {
+    this._navigationService.navigate('Versions', {
+      id: this.selectedCommit.commitId
+    });
+    this.cancel();
+  }
 }
 

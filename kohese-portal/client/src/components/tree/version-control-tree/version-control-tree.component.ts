@@ -31,11 +31,13 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   }
   
   private _images: Array<Image> = [
-    new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', (row: TreeRow) => {
-    return !!(row.object as ItemProxy).status['Unstaged'];
+    new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
+      (row: TreeRow) => {
+      return !!(row.object as ItemProxy).status['Unstaged'];
     }),
-    new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', (row: TreeRow) => {
-    return !!(row.object as ItemProxy).status['Staged'];
+    new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
+      (row: TreeRow) => {
+      return !!(row.object as ItemProxy).status['Staged'];
     })
   ];
   get images() {
