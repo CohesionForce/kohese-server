@@ -1,6 +1,9 @@
 import { Component, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 
+import { Commit } from '../tree/commit-tree/commit-tree.component';
+import { Difference } from '../compare-items/commit-comparison/commit-comparison.component';
+
 @Component({
   selector: 'versions',
   templateUrl: './versions.component.html',
@@ -20,6 +23,13 @@ export class VersionsComponent {
   }
   
   public getSelectionType(): string {
-    return typeof this._selectedVersionObject;
+    let type: string = '';
+    if (this._selectedVersionObject instanceof Commit) {
+      type = 'Commit';
+    } else if (this._selectedVersionObject instanceof Difference) {
+      type = 'Difference';
+    }
+    
+    return type;
   }
 }

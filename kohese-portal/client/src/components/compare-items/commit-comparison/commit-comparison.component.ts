@@ -129,8 +129,14 @@ export class CommitComparisonComponent {
           oid = comparisonEntry.treeHashChanged.fromTreeId;
           commitId = baseCommitId;
         }
-        let difference: Difference = new Difference(cache.getBlob(cache.
-          getTree(oid).oid), commitId);
+        let item: any = cache.getBlob(cache.getTree(oid).oid);
+        if (!item) {
+          item = {
+            id: id,
+            name: 'Missing Item Version: ' + id
+          };
+        }
+        let difference: Difference = new Difference(item, commitId);
         
         if (comparisonEntry.contentChanged) {
           difference.differenceTypes.push(DifferenceType.CONTENT_CHANGED);
@@ -221,12 +227,6 @@ export class Difference {
   }
   
   public constructor(private _item: any, private _commitId: string) {
-    if (!this._item) {
-      this._item = {
-        id: 'Jesus Christ is LORD!',
-        name: 'Jesus Christ is LORD!'
-      };
-    }
   }
 }
 

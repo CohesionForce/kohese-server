@@ -292,7 +292,7 @@ class Repository {
   }
 }
 
-class Commit {
+export class Commit {
   get id() {
     return this._id;
   }

@@ -7,14 +7,13 @@
       <ng-container *ngIf="selectedVersionObject">
         <div style="height: 100%; width: 100%;">
           <ng-container [ngSwitch]="getSelectionType()">
-            <ng-container *ngSwitchCase="'Repository'">
-            </ng-container>
             <ng-container *ngSwitchCase="'Commit'">
               <h1>
                 {{selectedVersionObject.koheseCommit.message}}
               </h1>
               <h2>
                 {{selectedVersionObject.koheseCommit.author}}
+                <br/>
                 {{selectedVersionObject.koheseCommit.time | date:'medium'}}
               </h2>
             </ng-container>

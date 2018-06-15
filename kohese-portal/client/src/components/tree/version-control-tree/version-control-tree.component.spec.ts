@@ -11,8 +11,12 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { VersionControlTreeComponent } from './version-control-tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -35,10 +39,12 @@ describe('Component: version-control-tree', () => {
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: ActivatedRoute, useValue: { params: Observable.of('') } },
         { provide: DialogService, useClass: MockDialogService },
+        { provide: NavigationService, useClass: MockNavigationService },
         {
           provide: VersionControlService,
           useClass: MockVersionControlService
-        }
+        },
+        { provide: DynamicTypesService, useClass: MockDynamicTypesService }
       ]
     }).compileComponents();
     
@@ -57,7 +63,14 @@ describe('Component: version-control-tree', () => {
     let rootRow: TreeRow = component.getRow('ROOT');
     expect(rootRow).toBeDefined();
     expect(component.getRow(descendantProxy.item.id)).toBeDefined();
-    expect(rootRow.getRowChildrenProxies().indexOf(descendantProxy)).not.
-      toEqual(-1);
+    let childIndex: number = -1;
+    let children: Array<TreeRow> = component.getChildren(rootRow);
+    for (let j: number = 0; j < children.length; j++) {
+      if (descendantProxy === children[j].object) {
+        childIndex = j;
+        break;
+      }
+    }
+    expect(childIndex).not.toEqual(-1);
   });
 });
