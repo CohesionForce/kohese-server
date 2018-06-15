@@ -1,8 +1,7 @@
-import { EventEmitter, Output } from '@angular/core';
+import { EventEmitter, Output, Input } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { KoheseType } from './../../../classes/UDT/KoheseType.class';
 import { Observable } from 'rxjs/Observable';
-import { Input } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TreeRow } from './../tree-row.class';
 import { RowAction, MenuAction } from './../tree-row.component';
@@ -33,6 +32,9 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   rootSelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
   @Output()
   onSelect : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
+  @Input()
+  selectedProxyStream : Observable<ItemProxy>;
+  selectedProxyStreamSubscription : Subscription;
 
   constructor(router: ActivatedRoute,
               dialogService : DialogService,
@@ -110,6 +112,16 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       }, 500)
     }
   });
+
+  this.selectedProxyStreamSubscription = this.selectedProxyStream.subscribe((newSelection) => {
+    console.log(this.sync);
+    if(this.sync && newSelection) {
+      this._selectedIdSubject.next(newSelection.item.id)
+      console.log(newSelection, this);
+
+      this.showSelection();
+    }
+  })
 }
 
   ngOnDestroy () {

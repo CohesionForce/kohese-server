@@ -12,6 +12,7 @@ import { Component, OnInit } from '@angular/core';
 export class FullscreenDocumentComponent implements OnInit {
   proxyStream : BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined)
   selectedProxyStream : BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined)
+  documentProxyStream : BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined)
   paramSubscription : Subscription;
   treeConfigSubscription : Subscription;
   documentRootId : string;

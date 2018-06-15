@@ -2,7 +2,7 @@ import { TreeConfiguration } from './../../../../common/src/tree-configuration';
 import { DialogService } from './../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from './../details/details-dialog/details-dialog.component';
 import { ItemRepository } from './../../services/item-repository/item-repository.service';
-import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef, trigger, state, style, animate, transition, ViewChildren } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef, trigger, state, style, animate, transition, ViewChildren, Output, EventEmitter } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 import { Observable } from 'rxjs';
 
@@ -95,6 +95,9 @@ implements OnInit, OnDestroy {
   fullscreen = false;
   @Input()
   selectedProxyStream : Observable<ItemProxy>;
+  @Output()
+  proxySelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
+
 
   /* Subscriptions */
   filterSubscription: Subscription;
@@ -274,5 +277,10 @@ implements OnInit, OnDestroy {
         this.invalidFilterRegex = false;
       }
     }
+  }
+
+  selectRow(row: any, proxy : ItemProxy) {
+    row.rowState = 'show';
+    this.proxySelected.emit(proxy)
   }
 }
