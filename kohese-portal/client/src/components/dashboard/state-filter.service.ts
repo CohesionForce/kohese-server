@@ -17,14 +17,20 @@ export class StateFilterService {
       let stateProperties = typeDef.item.stateProperties;
       for (let stateKind of stateProperties) {
         stateInfo[type][stateKind] = {
-          states : []
+          states : [],
+          descriptions : []
         }
         let states = types[type].fields[stateKind].properties.state;
-        console.log('!!!');
-        console.log(states);
         for (let state in states) {
-          console.log(state);
-          stateInfo[type][stateKind].states.push(states[state].name);
+          stateInfo[type][stateKind].states.push(state);
+          stateInfo[type][stateKind].descriptions.push(states[state].description);
+
+          // TODO:  Remove this section when the data has been fixed
+          // Handle situation when the state name is used instead of the state id
+          if(state !== states[state].name){
+            stateInfo[type][stateKind].states.push(states[state].name);
+            stateInfo[type][stateKind].descriptions.push(states[state].description);
+          }
         }
       }
     }

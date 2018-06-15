@@ -1,0 +1,19 @@
+.right-content {
+  overflow: auto !important;
+  height: 700px !important;
+  width: 20%;
+  display: inline-block;
+}
+
+.left-content {
+  overflow: hidden;
+  height: 700px !important;
+  width: 70%;
+  display: inline-block;
+}
+
+.selected-type {
+  background-color : rgba(106, 168, 106, 0.795);
+  color : whitesmoke;
+}
+

@@ -68,6 +68,12 @@ export var LocationMap = {
     'title' : 'Dev Tools',
     'params' : [],
     'route' : '/devtools'
+  },
+  'Document' : {
+    'type' : 'multi',
+    'title' : 'Document',
+    'params' : ['id'],
+    'route' : 'document'
   }
 }
 

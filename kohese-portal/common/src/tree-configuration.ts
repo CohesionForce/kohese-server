@@ -73,12 +73,14 @@ export class TreeConfiguration {
       name: 'Model Definitions'
     }, this);
     this.root.addChild(this.rootModelProxy);
+    this.repoMap['Model-Definitions'] = this.rootModelProxy;
 
     this.rootViewModelProxy = new ItemProxy('Internal', {
       id: 'View-Model-Definitions',
       name: 'View Model Definitions'
     }, this);
     this.root.addChild(this.rootViewModelProxy);
+    this.repoMap['View-Model-Definitions'] = this.rootViewModelProxy;
 
 
     treeConfigMap[treeId] = this;

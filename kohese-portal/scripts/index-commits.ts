@@ -23,6 +23,7 @@ if (!baseRepoPath){
 // Load the KDB
 var kdb = require('../server/kdb.js');
 global['koheseKDB'] = kdb;
-kdb.initialize(baseRepoPath).then(function () {
+let indexAndExit = true;
+kdb.initialize(baseRepoPath, indexAndExit).then(function () {
   console.log('::: Finished cache update for: ' + baseRepoPath);
 });
