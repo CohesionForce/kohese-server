@@ -1,6 +1,6 @@
-import { ItemRepository } from './../../../services/item-repository/item-repository.service';
+import { ItemRepository } from './../../../../services/item-repository/item-repository.service';
 import { Input, EventEmitter } from '@angular/core';
-import { ItemProxy } from './../../../../../common/src/item-proxy';
+import { ItemProxy } from './../../../../../../common/src/item-proxy';
 import { Component, OnInit } from '@angular/core';
 
 @Component({

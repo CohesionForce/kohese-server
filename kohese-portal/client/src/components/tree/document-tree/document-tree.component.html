@@ -1,9 +1,15 @@
 <div style="height: 100%; width: 100%;">
   <div style="height: 7%; width: 100%; display: flex; flex-direction: row;">
-    <button mat-icon-button (click)="rootSubject.next(getRow(absoluteRoot.item.id))"
-      [disabled]="!rootSubject.getValue() || (rootSubject.getValue().object === absoluteRoot)"
-      matTooltip="Changes the root to be the absolute root"
+    <button mat-icon-button (click)="toggleDocumentSync()"
+      matTooltip="Toggle selection synchronization for the tree"
+      [ngClass]="{ 'highlight': sync }"
       class="flex-right-align">
+      <mat-icon class="fa fa-exchange"></mat-icon>
+    </button>
+    <button mat-icon-button
+      (click)="setRowAsRoot(getRow(documentRoot.item.id))"
+      [disabled]="!rootSubject.getValue() || (rootSubject.getValue().object === documentRoot)"
+      matTooltip="Changes the root to be the document root">
       <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="filterMenu"

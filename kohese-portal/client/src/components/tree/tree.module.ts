@@ -12,15 +12,19 @@ import { TreeRowComponent } from './tree-row.component';
 import { DefaultTreeComponent } from './default-tree/default-tree.component';
 import { ReferenceTreeComponent } from './reference-tree/reference-tree.component';
 import { VersionControlTreeComponent } from './version-control-tree/version-control-tree.component';
+import { CommitTreeComponent } from './commit-tree/commit-tree.component';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { PipesModule } from "../../pipes/pipes.module";
+import { DocumentTreeComponent } from "./document-tree/document-tree.component";
 
 @NgModule({
   declarations: [
     TreeRowComponent,
     DefaultTreeComponent,
     ReferenceTreeComponent,
-    VersionControlTreeComponent
+    VersionControlTreeComponent,
+    CommitTreeComponent,
+    DocumentTreeComponent
   ],
   entryComponents: [
   ],
@@ -37,7 +41,9 @@ import { PipesModule } from "../../pipes/pipes.module";
   exports : [
     DefaultTreeComponent,
     ReferenceTreeComponent,
-    VersionControlTreeComponent
+    VersionControlTreeComponent,
+    CommitTreeComponent,
+    DocumentTreeComponent
   ]
 })
 export class TreeViewModule {}
