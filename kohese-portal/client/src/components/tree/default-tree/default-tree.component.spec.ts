@@ -36,7 +36,7 @@ describe('Component: default-tree', () => {
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: { params: new BehaviorSubject<string>('') }
+          useValue: { params: new BehaviorSubject<any>({ id: ''}) }
         },
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: DialogService, useClass: MockDialogService },
@@ -104,17 +104,14 @@ describe('Component: default-tree', () => {
   it('correctly responds to the tree root changing', fakeAsync(() => {
     let initialTreeRoot: TreeRow = component.rootSubject.getValue();
     let initialVisibleRows: Array<TreeRow> = component.visibleRows;
-    component.rootSubject.next(TreeConfiguration.getWorkingTree().
-      getRootProxy().children[0]);
+    component.rootSubject.next(component.getRow(TreeConfiguration.
+      getWorkingTree().getRootProxy().children[0].item.id));
     tick();
     expect(initialTreeRoot).not.toBe(component.rootSubject.getValue());
     expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
   }));
   
   it('synchronizes with selection', fakeAsync(() => {
-    TestBed.get(ActivatedRoute).params.next('Item');
-    tick();
-
     let index: number = -1;
     for (let j: number = 0; j < component.visibleRows.length; j++) {
       if ('Item' === (component.visibleRows[j].object as ItemProxy).item.id) {
@@ -123,12 +120,9 @@ describe('Component: default-tree', () => {
       }
     }
     expect(index).toEqual(-1);
-
-    /* Since the selection is to be synchronized by default, call the
-    toggleSelectionSynchronization function twice to trigger showing the
-    selected Item */
-    component.toggleSelectionSynchronization();
-    component.toggleSelectionSynchronization();
+    
+    TestBed.get(ActivatedRoute).params.next({ id: 'Item' });
+    tick();
 
     for (let j: number = 0; j < component.visibleRows.length; j++) {
       if ('Item' === (component.visibleRows[j].object as ItemProxy).item.id) {
@@ -144,7 +138,7 @@ describe('Component: default-tree', () => {
     let id: string = '-1';
     expect(TreeConfiguration.getWorkingTree().getProxyFor(id)).not.
       toBeDefined();
-    TestBed.get(ActivatedRoute).params.next(id);
+    TestBed.get(ActivatedRoute).params.next({ id: id });
     tick();
     /* Since the selection is to be synchronized by default, call the
     toggleSelectionSynchronization function twice to trigger showing the

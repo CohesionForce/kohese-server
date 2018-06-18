@@ -429,20 +429,20 @@ export abstract class Tree {
     if (id) {
       let selectedRow: TreeRow = this._rowMap.get(id);
       if (selectedRow) {
-        let rowParentProxy: TreeRow = this.getParent(selectedRow);
-        if (rowParentProxy) {
-          let parentId: string = this.getId(rowParentProxy);
+        let parentRow: TreeRow = this.getParent(selectedRow);
+        if (parentRow) {
+          let parentId: string = this.getId(parentRow);
           let rootId: string = this.getId(this._rootSubject.getValue());
           while (parentId !== rootId) {
-            let parentRow: TreeRow = this._rowMap.get(parentId);
-            if (!parentRow) {
+            let row: TreeRow = this._rowMap.get(parentId);
+            if (!row) {
               break;
             }
 
-            parentRow.expanded = true;
-            rowParentProxy = this.getParent(parentRow);
-            if (rowParentProxy) {
-              parentId = this.getId(rowParentProxy);
+            row.expanded = true;
+            parentRow = this.getParent(row);
+            if (parentRow) {
+              parentId = this.getId(parentRow);
             } else {
               break;
             }

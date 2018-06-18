@@ -29,7 +29,7 @@ describe('Component: reference-tree', () => {
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: ActivatedRoute, useValue: { params: Observable.of('') } },
+        { provide: ActivatedRoute, useValue: { params: Observable.of({ id: '' }) } },
         { provide: DialogService, useClass: MockDialogService },
         { provide: NavigationService, useClass: MockNavigationService },
         { provide: DynamicTypesService, useClass: MockDynamicTypesService }
@@ -45,7 +45,7 @@ describe('Component: reference-tree', () => {
   
   it('initializes', () => {
     expect(component.getRow('ROOT')).toBeDefined();
-    expect(component.getRow('references')).toBeDefined();
-    expect(component.getRow('referencedBy')).toBeDefined();
+    expect(component.getRow('ROOT,references')).toBeDefined();
+    expect(component.getRow('ROOT,referencedBy')).toBeDefined();
   });
 });
