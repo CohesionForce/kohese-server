@@ -258,6 +258,68 @@ export class ItemCache {
 
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////
+  //// Cache analysis methods
+  //////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  detectMissingData(selectedCommitId?) {
+
+    let cache = this;
+    let blobEvaluated = {};
+    let treeEvaluated = {};
+
+    function evaluateBlob (itemId, kind, oid) {
+      if (!blobEvaluated[oid]){
+        // console.log('::: Evaluating blob for ' + itemId);
+        if (!cache.getBlob(oid)){
+          console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
+        }
+        blobEvaluated[oid] = true;
+      }
+    }
+
+    function evaluateTreeEntry (itemId, tree) {
+      if (!treeEvaluated[tree.treeHash]){
+        // console.log('::: Evaluating tree for ' + itemId);
+        evaluateBlob(itemId, tree.kind, tree.oid);
+        for (let childId in tree.childTreeHashes) {
+          let childTreeHash = tree.childTreeHashes[childId];
+          switch (childTreeHash){
+            case 'Repository-Mount':
+            case 'Internal':
+              break;
+            default:
+              let childTree = cache.getTree(childTreeHash);
+              if (childTree) {
+                evaluateTreeEntry(childId, childTree);
+              } else {
+                console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
+              }
+          }
+        }
+        treeEvaluated[tree.treeHash] = true;
+      }
+    }
+
+    for (let commitId in this.kCommitMap) {
+      if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
+        let commit = this.kCommitMap[commitId];
+        console.log('::: Evaluating commit:  ' + commitId);
+        // console.log(JSON.stringify(commit, null, '  '));
+
+        for (let rootId in commit.repoTreeRoots){
+          let root = commit.repoTreeRoots[rootId];
+          evaluateTreeEntry(rootId, root);
+        }
+      }
+    };
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
   //// Proxy loading methods
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,9 @@
 'use strict';
+import { ItemProxy } from "../common/src/item-proxy";
+import { ItemCache } from "../common/src/item-cache";
+import { TreeConfiguration } from "../common/src/tree-configuration";
+import { TreeHashMap } from "../common/src/tree-hash";
+
 
 //Paths may be provided via arguments when starting via -kdb=PATH
 var baseRepoPath : string;
@@ -26,4 +31,14 @@ global['koheseKDB'] = kdb;
 let indexAndExit = true;
 kdb.initialize(baseRepoPath, indexAndExit).then(function () {
   console.log('::: Finished cache update for: ' + baseRepoPath);
+  let itemCache : ItemCache = TreeConfiguration.getItemCache();
+
+  console.log('::: Detecting missing data in cache');
+  try {
+    itemCache.detectMissingData();
+  } catch (err){
+    console.log('*** Error: ' + err);
+    console.log(err.stack);
+  }
+
 });
