@@ -132,8 +132,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     
     let rootRow: TreeRow = this.buildRow(root);
     rootRow.expanded = true;
-    let rootProxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor((
-      <Reference> rootRow.object).path[0]);
+    let rootProxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(
+      root.path[0]);
     
     for (let referenceType in rootProxy.relations) {
       if (!this.getRow(referenceType)) {
@@ -172,7 +172,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   
   public getParent(row: TreeRow): TreeRow {
     let parentPath: Array<string> = (row.object as Reference).path.slice(0);
-    parentPath.length = parentPath.length - 1;
+    parentPath.length = ((4 === parentPath.length) ? (parentPath.length - 2) :
+      (parentPath.length - 1));
     return this.getRow(parentPath.join());
   }
   
