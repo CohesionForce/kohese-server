@@ -1445,7 +1445,7 @@ export class ItemProxy {
   deleteItem(deleteDescendants : boolean = false) {
     var byId = this.item.id;
 
-//    console.log('::: Deleting proxy for ' + byId);
+    // console.log('::: Deleting proxy for ' + byId);
 
     var attemptToDeleteRestrictedNode = (
         (this.item.id === this.treeConfig.lostAndFound.item.id) ||
@@ -1465,9 +1465,9 @@ export class ItemProxy {
         childProxy.deleteItem(deleteDescendants);
       });
       if (attemptToDeleteRestrictedNode){
-//        console.log('::: -> Not removing ' + this.item.name);
+        // console.log('::: -> Not removing restricted node:' + this.item.name);
       } else {
-//        console.log('::: -> Removing all references');
+        // console.log('::: -> Removing all references');
         if(!this.treeConfig.loading){
           this.treeConfig.changeSubject.next({
             type: 'delete',
@@ -1482,7 +1482,7 @@ export class ItemProxy {
       // Remove this item and leave any children under Lost+Found
       if (this.children.length !== 0) {
         if (!attemptToDeleteRestrictedNode){
-//          console.log('::: -> Node still has children');
+          // console.log('::: -> Node still has children');
           if(!this.treeConfig.loading){
             this.treeConfig.changeSubject.next({
               type: 'delete',
@@ -1495,9 +1495,9 @@ export class ItemProxy {
         }
       } else {
         if (attemptToDeleteRestrictedNode){
-//          console.log('::: -> Not removing ' + this.item.name);
+          // console.log('::: -> Not removing ' + this.item.name);
         } else {
-//          console.log('::: -> Removing all references');
+          // console.log('::: -> Removing all references');
           if(!this.treeConfig.loading){
             this.treeConfig.changeSubject.next({
               type: 'delete',
