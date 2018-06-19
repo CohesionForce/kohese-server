@@ -28,6 +28,7 @@ import { ExploreModule } from './components/explore/explore.module';
 import { NavigatorModule } from './components/navigator/navigator.module';
 import { StateMachineEditorModule } from './components/state-machine-editor/state-machine-editor.module';
 import { TreeViewModule } from './components/tree/tree.module'
+import { VersionsModule } from './components/versions/versions.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
@@ -75,6 +76,7 @@ import { LensModule } from './components/lens/lens.module';
     NavigatorModule,
     StateMachineEditorModule,
     TreeViewModule,
+    VersionsModule,
     LensModule
   ],
   bootstrap: [AppComponent]

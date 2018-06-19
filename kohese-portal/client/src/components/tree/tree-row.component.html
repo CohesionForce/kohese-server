@@ -1,4 +1,4 @@
-<div class="kt-item" matTooltip="{{treeRow.text}}"
+<div class="kt-item" matTooltip="{{treeRow.getText()}}"
   (click)="treeRow.rowSelected()"
   [ngClass]="{ 'selected-border': treeRow.isRowSelected(),
   'highlight-row': (treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) }"
@@ -9,18 +9,26 @@
     'fa-caret-right': (treeRow.hasChildren() && !treeRow.expanded),
     'no-children': !treeRow.hasChildren() }">
   </i>
-  <ng-container *ngIf="treeRow.icon">
-    <mat-icon class="kt-icon {{treeRow.icon}}"></mat-icon>
+  <ng-container *ngIf="treeRow.getIcon()">
+    <mat-icon class="kt-icon {{treeRow.getIcon()}}"></mat-icon>
   </ng-container>
-  <ng-container *ngIf="!treeRow.icon">
+  <ng-container *ngIf="!treeRow.getIcon()">
     <span class="kt-icon no-icon"></span>
   </ng-container>
   <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-    {{treeRow.text}}
+    {{treeRow.getText()}}
   </span>
   <ng-container *ngFor="let image of images">
     <ng-container *ngIf="image.display(treeRow)">
-      <img src="{{image.path}}" title="{{image.text}}"/>
+      <ng-container *ngIf="image.displayAsIcon">
+        <mat-icon class="{{image.path}}" matTooltip="{{image.text}}"
+          style="padding: 0px 3px;">
+        </mat-icon>
+      </ng-container>
+      <ng-container *ngIf="!image.displayAsIcon">
+        <img src="{{image.path}}" title="{{image.text}}"
+          style="padding: 0px 3px;"/>
+      </ng-container>
     </ng-container>
   </ng-container>
   <span id="rightSpan">

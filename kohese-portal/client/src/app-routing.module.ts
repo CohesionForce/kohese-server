@@ -5,6 +5,7 @@ import { AnalysisModule } from './components/analysis/analysis.module'
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { LoginComponent } from './components/login/login.component';
+import { VersionsComponent } from './components/versions/versions.component';
 import { RepositoriesComponent } from './components/admin//repositories/repositories.component';
 import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'admin', component: AdminComponent },
   { path: 'dashboard', component: DashboardComponent},
   { path: 'login', component: LoginComponent},
+  { path: 'versions', component: VersionsComponent },
   { path: 'repositories', component: RepositoriesComponent },
   { path: 'explore', component: ExploreComponent},
   // { path: 'explore/:id', component: ExploreComponent},

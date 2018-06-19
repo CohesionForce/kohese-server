@@ -12,7 +12,7 @@ import { TreeHashEntry, TreeHashMap, TreeHashValueType } from './tree-hash';
 // TODO set back to false and/or remove disable check below
 const disableObjectFreeze = false;
 
-class KoheseCommit {
+export class KoheseCommit {
   time: number;
   author: string;
   message: string;

@@ -1,15 +1,32 @@
 <div style="display: flex; height: 90%">
-  <commit-tree
-    (rowSelected)="rowSelected($event)">
-  </commit-tree>
-  <div style="flex: 1;">
+  <mat-list style="flex : 1; height: 100%; overflow: auto;">
+    <mat-list-item *ngFor="let commitRecord of commitList"
+                  (click)="onCommitSelected(commitRecord.commit, commitRecord.commitId)">
+      {{commitRecord.commit.message}} - {{commitRecord.commit.time | date :'medium'}}
+    </mat-list-item>
+  </mat-list>
+  <div style="flex : 1;">
     <h1>Selected Commit:</h1>
     <div *ngIf=!selectedCommit>No Commit Selected</div>
-    <div *ngIf="selectedCommit">
-      <h3>Author: {{selectedCommit.author}}</h3>
-      <h3>Message: {{selectedCommit.message}}</h3>
-      <h3>Time: {{selectedCommit.time | date :'medium'}}</h3>
-    </div>  
+    <div *ngIf="selectedCommit" style="display: flex; flex-direction: column;">
+      <h3>Author: {{selectedCommit.commit.author}}</h3>
+      <h3>Message: {{selectedCommit.commit.message}}</h3>
+      <h3>Time: {{selectedCommit.commit.time | date :'medium'}}</h3>
+      <h3>Parents: </h3>
+      <div style="height: 100%; overflow:auto;">
+        <mat-list>
+          <mat-list-item *ngFor="let parent of selectedCommit.parents">
+            {{parent.message}} - {{parent.time | date :'medium'}}
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <button mat-icon-button class="flex-right-align"
+        (click)="navigateToSelectedCommit()">
+        <mat-icon class="fa fa-arrow-right"
+          matTooltip="Navigate to this commit">
+        </mat-icon>
+      </button>
+    </div>
   </div>
 </div>
 <mat-dialog-actions>

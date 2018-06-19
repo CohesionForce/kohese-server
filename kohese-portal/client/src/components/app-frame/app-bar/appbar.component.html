@@ -19,10 +19,14 @@
         <mat-icon class="fa fa-user fa-fw"></mat-icon>
         <span>{{userName}}</span>
       </button>
-      <mat-menu #userMenu="matMenu">
+      <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
         <button mat-menu-item (click)="navigate('Admin', {})">
           <mat-icon class="fa fa-user-plus"></mat-icon>
           <span>Users</span>
+        </button>
+        <button mat-menu-item (click)="navigate('Versions', {})">
+          <mat-icon class=""></mat-icon>
+          Versions
         </button>
         <button mat-menu-item (click)="navigate('Repositories', {})">
           <mat-icon class="fa fa-git-square"></mat-icon>

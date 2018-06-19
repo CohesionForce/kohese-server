@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject } from '@angular/core';
+  Inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
+import { VirtualScrollComponent } from 'angular2-virtual-scroll';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -49,6 +50,13 @@ export class CommitComparisonComponent {
     return this._data;
   }
   
+  get DifferenceTypeOperations() {
+    return DifferenceTypeOperations;
+  }
+  
+  @ViewChild(VirtualScrollComponent)
+  private _virtualScrollComponent: VirtualScrollComponent;
+  
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     private _changeDetectorRef: ChangeDetectorRef, private _dialogService:
     DialogService) {
@@ -65,11 +73,13 @@ export class CommitComparisonComponent {
           commit: commitMap[oid]
         });
       }
-      sortedCommitArray.sort((oneCommitObject: any, anotherCommitObject: any) => {
+      sortedCommitArray.sort((oneCommitObject: any, anotherCommitObject:
+        any) => {
         return anotherCommitObject.commit.time - oneCommitObject.commit.time;
       });
       for (let j: number = 0; j < sortedCommitArray.length; j++) {
-        this._commitMap[sortedCommitArray[j].oid] = sortedCommitArray[j].commit;
+        this._commitMap[sortedCommitArray[j].oid] = sortedCommitArray[j].
+          commit;
       }
       
       if (this._data['baseCommitId']) {
@@ -86,57 +96,11 @@ export class CommitComparisonComponent {
   
   public compareCommits(): void {
     this._differences.length = 0;
-    let cache: ItemCache = TreeConfiguration.getItemCache();
-    let comparison: any = TreeHashMap.diff(cache.getTreeHashMap(
-      this._baseCommitId), cache.getTreeHashMap(this._changeCommitId));
-    if (!comparison.match) {
-      for (let id in comparison.details) {
-        let difference: TreeHashEntryDifference = comparison.details[id];
-        if (difference.childrenAdded) {
-          for (let j: number = 0; j < difference.childrenAdded.length;
-            j++) {
-            let treeId: string = difference.childrenAdded[j].treeId;
-            /* TODO Remove this condition once the appropriate cache changes
-            have been made */
-            if (('Repository-Mount' !== treeId) && ('Internal' !== treeId)) {
-              this._differences.push({
-                item: cache.getBlob(cache.getTree(treeId).oid),
-                iconString: 'fa fa-plus'
-              });
-            }
-          }
-        }
-            
-        if (difference.childrenModified) {
-          for (let j: number = 0; j < difference.childrenModified.length;
-            j++) {
-            let treeId: string = difference.childrenModified[j].toTreeId;
-            /* TODO Remove this condition once the appropriate cache
-            changes have been made */
-            if (('Repository-Mount' !== treeId) && ('Internal' !== treeId)) {
-              this._differences.push({
-                item: cache.getBlob(cache.getTree(treeId).oid),
-                iconString: 'fa fa-pencil'
-              });
-            }
-          }
-        }
-          
-        if (difference.childrenDeleted) {
-          for (let j: number = 0; j < difference.childrenDeleted.length;
-            j++) {
-            let treeId: string = difference.childrenDeleted[j].treeId;
-            /* TODO Remove this condition once the appropriate cache
-            changes have been made */
-            if (('Repository-Mount' !== treeId) && ('Internal' !== treeId)) {
-              this._differences.push({
-                item: cache.getBlob(cache.getTree(treeId).oid),
-                iconString: 'fa fa-minus'
-              });
-            }
-          }
-        }
-      }
+    this._differences.push(...CommitComparisonComponent.compareCommits(this.
+      _baseCommitId, this._changeCommitId));
+      
+    if (this._virtualScrollComponent) {
+      this._virtualScrollComponent.refresh(true);
     }
   }
   
@@ -148,5 +112,185 @@ export class CommitComparisonComponent {
         editable: false
       }
     }).updateSize('90%', '90%');
+  }
+  
+  public static compareCommits(baseCommitId: string, changeCommitId: string):
+    Array<Difference> {
+    let differences: Array<Difference> = [];
+    let cache: ItemCache = TreeConfiguration.getItemCache();
+    let comparison: any = TreeHashMap.diff(cache.getTreeHashMap(baseCommitId),
+      cache.getTreeHashMap(changeCommitId));
+    if (!comparison.match) {
+      for (let id in comparison.details) {
+        let comparisonEntry: TreeHashEntryDifference = comparison.details[id];
+        let oid: string = comparisonEntry.treeHashChanged.toTreeId;
+        let commitId: string = changeCommitId;
+        if (!oid) {
+          oid = comparisonEntry.treeHashChanged.fromTreeId;
+          commitId = baseCommitId;
+        }
+        let item: any = cache.getBlob(cache.getTree(oid).oid);
+        if (!item) {
+          item = {
+            id: id,
+            name: 'Missing Item Version: ' + id
+          };
+        }
+        let difference: Difference = new Difference(item, commitId);
+        
+        if (comparisonEntry.contentChanged) {
+          difference.differenceTypes.push(DifferenceType.CONTENT_CHANGED);
+        }
+        
+        if (comparisonEntry.kindChanged) {
+          difference.differenceTypes.push(DifferenceType.TYPE_CHANGED);
+        }
+        
+        if (comparisonEntry.parentChanged) {
+          difference.differenceTypes.push(DifferenceType.PARENT_CHANGED);
+        }
+        
+        if (comparisonEntry.childrenAdded) {
+          difference.differenceTypes.push(DifferenceType.CHILD_ADDED);
+        }
+        
+        if (comparisonEntry.childrenModified) {
+          difference.differenceTypes.push(DifferenceType.CHILD_MODIFIED);
+        }
+        
+        if (comparisonEntry.childrenDeleted) {
+          difference.differenceTypes.push(DifferenceType.CHILD_REMOVED);
+        }
+        
+        if (comparisonEntry.childrenReordered) {
+          difference.differenceTypes.push(DifferenceType.CHILDREN_REORDERED);
+        }
+        
+        differences.push(difference);
+      }
+    }
+    
+    for (let j: number = 0; j < differences.length; j++) {
+      let difference: Difference = differences[j];
+      let path: Array<string> = [];
+      let parentId: string = difference.item.parentId;
+      while (parentId) {
+        let k: number = 0;
+        while (k < differences.length) {
+          let commitDifference: Difference = differences[k];
+          if (commitDifference.item.id === parentId) {
+            path.push(commitDifference.item.name);
+            parentId = commitDifference.item.parentId;
+            break;
+          }
+          k++;
+        }
+        
+        if (k === differences.length) {
+          break;
+        }
+      }
+      
+      path.reverse();
+      difference.path = path.join(' \u2192 ');
+    }
+    
+    differences.sort((oneDifference: Difference, anotherDifference:
+      Difference) => {
+      return oneDifference.item.name - anotherDifference.item.name;
+    });
+      
+    return differences;
+  }
+}
+
+export class Difference {
+  get item() {
+    return this._item;
+  }
+  
+  get commitId() {
+    return this._commitId;
+  }
+  
+  private _path: string;
+  get path() {
+    return this._path;
+  }
+  set path(path: string) {
+    this._path = path;
+  }
+  
+  private _differenceTypes: Array<DifferenceType> = [];
+  get differenceTypes() {
+    return this._differenceTypes;
+  }
+  
+  public constructor(private _item: any, private _commitId: string) {
+  }
+}
+
+export enum DifferenceType {
+  CONTENT_CHANGED, TYPE_CHANGED, PARENT_CHANGED, CHILD_ADDED, CHILD_MODIFIED,
+    CHILD_REMOVED, CHILDREN_REORDERED
+}
+
+export class DifferenceTypeOperations {
+  public static toString(differenceType: DifferenceType): string {
+    let stringRepresentation: string = '';
+    switch (differenceType) {
+      case DifferenceType.CONTENT_CHANGED:
+        stringRepresentation = 'Content Changed';
+        break;
+      case DifferenceType.TYPE_CHANGED:
+        stringRepresentation = 'Type Changed';
+        break;
+      case DifferenceType.PARENT_CHANGED:
+        stringRepresentation = 'Parent Changed';
+        break;
+      case DifferenceType.CHILD_ADDED:
+        stringRepresentation = 'Child Added';
+        break;
+      case DifferenceType.CHILD_MODIFIED:
+        stringRepresentation = 'Child Modified';
+        break;
+      case DifferenceType.CHILD_REMOVED:
+        stringRepresentation = 'Child Removed';
+        break;
+      case DifferenceType.CHILDREN_REORDERED:
+        stringRepresentation = 'Children Reordered';
+        break;
+    }
+    
+    return stringRepresentation;
+  }
+  
+  public static getIconClass(differenceType: DifferenceType): string {
+    let iconClass: string = '';
+    switch (differenceType) {
+      case DifferenceType.CONTENT_CHANGED:
+        iconClass = 'fa fa-pencil';
+        break;
+      case DifferenceType.TYPE_CHANGED:
+        iconClass = 'fa fa-sitemap';
+        break;
+      case DifferenceType.PARENT_CHANGED:
+        iconClass = 'fa fa-arrow-up';
+        break;
+      case DifferenceType.CHILD_ADDED:
+        iconClass = 'fa fa-plus';
+        break;
+      case DifferenceType.CHILD_MODIFIED:
+        iconClass = 'fa fa-arrow-down';
+        break;
+      case DifferenceType.CHILD_REMOVED:
+        iconClass = 'fa fa-minus';
+        break;
+      case DifferenceType.CHILDREN_REORDERED:
+        iconClass = 'fa fa-exchange';
+        break;
+    }
+    
+    return iconClass;
   }
 }

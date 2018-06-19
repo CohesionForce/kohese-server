@@ -78,7 +78,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     this.menuActions.push(lastCommittedVersionComparisonAction);
     
     let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
-      'Compare this Item against another Item', 'fa fa-exchange', (row: TreeRow) => {
+      'Compare this Item against another Item', 'fa fa-exchange', (row:
+      TreeRow) => {
       return true;
       }, (row: TreeRow) => {
       this.openComparisonDialog(row, undefined);
@@ -96,9 +97,11 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
         }
         this._treeConfigurationSubscription = this._selectedTreeConfiguration.
           getChangeSubject().subscribe((notification: any) => {
-          let reference: Reference = (this._rootSubject.getValue().object as Reference);
-          if (notification.proxy && (reference.path[reference.path.length - 1] === notification.proxy.item.id)) {
-            this.buildRows();
+          let reference: Reference = (<Reference> this._rootSubject.getValue().
+            object);
+          if (notification.proxy && (reference.path[reference.path.length -
+            1] === notification.proxy.item.id)) {
+            this.buildRows(reference);
           }
         });
         
@@ -106,8 +109,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           _selectedTreeConfiguration.getRootProxy().item.id])));
         
         this._route.params.subscribe((parameters: Params) => {
-          this._rootSubject.next(this.buildRow(new Reference([this._selectedTreeConfiguration.getProxyFor(
-            parameters['id']).item.id])));
+          this._rootSubject.next(this.buildRow(new Reference([this.
+            _selectedTreeConfiguration.getProxyFor(parameters['id']).item.
+            id])));
         });
         
         this.showSelection();
@@ -123,27 +127,29 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     this._itemRepositorySubscription.unsubscribe();
   }
   
-  private buildRows(): void {
+  private buildRows(root: Reference): void {
     this.clear();
     
-    let rootRow: TreeRow = this._rootSubject.getValue();
+    let rootRow: TreeRow = this.buildRow(root);
     rootRow.expanded = true;
-    let root: ItemProxy = this._selectedTreeConfiguration.getProxyFor((<Reference> rootRow.
-      object).path[0]);
+    let rootProxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(
+      root.path[0]);
     
-    for (let referenceType in root.relations) {
+    for (let referenceType in rootProxy.relations) {
       if (!this.getRow(referenceType)) {
-        let row: TreeRow = this.buildRow(new Reference([root.item.id, referenceType]));
+        let row: TreeRow = this.buildRow(new Reference([rootProxy.item.id,
+          referenceType]));
         row.expanded = true;
       }
-      for (let type in root.relations[referenceType]) {
-        for (let propertyId in root.relations[referenceType][type]) {
+      for (let type in rootProxy.relations[referenceType]) {
+        for (let propertyId in rootProxy.relations[referenceType][type]) {
           if (!this.getRow(propertyId)) {
-            let row: TreeRow = this.buildRow(new Reference([root.item.id, referenceType, type, propertyId]));
+            let row: TreeRow = this.buildRow(new Reference([rootProxy.item.id,
+              referenceType, type, propertyId]));
             row.expanded = true;
           }
           
-          let reference: any = root.relations[referenceType][type][
+          let reference: any = rootProxy.relations[referenceType][type][
             propertyId];
           if (reference) {
             if (!Array.isArray(reference)) {
@@ -151,8 +157,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
             }
             
             for (let j: number = 0; j < reference.length; j++) {
-              let row: TreeRow = this.buildRow(new Reference([root.item.id, referenceType, type, propertyId,
-                reference[j].item.id]));
+              let row: TreeRow = this.buildRow(new Reference([rootProxy.item.
+                id, referenceType, type, propertyId, reference[j].item.id]));
             }
           }
         }
@@ -166,20 +172,21 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   
   public getParent(row: TreeRow): TreeRow {
     let parentPath: Array<string> = (row.object as Reference).path.slice(0);
-    parentPath.length = parentPath.length - 1;
+    parentPath.length = ((4 === parentPath.length) ? (parentPath.length - 2) :
+      (parentPath.length - 1));
     return this.getRow(parentPath.join());
   }
   
   public getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     let path: Array<string> = (row.object as Reference).path;
-    let root: ItemProxy = this._selectedTreeConfiguration.getProxyFor((this.
-      _rootSubject.getValue().object as Reference).path[0]);
+    let rootProxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor((
+      this._rootSubject.getValue().object as Reference).path[0]);
     if (path.length > 1) {
       path = path.slice(1);
       if (path.length > 2) {
         if (3 === path.length) {
-          let references: any = root.relations[path[0]][path[1]][path[2]];
+          let references: any = rootProxy.relations[path[0]][path[1]][path[2]];
           if (references) {
             if (!Array.isArray(references)) {
               references = [references];
@@ -189,20 +196,22 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           }
           
           for (let j: number = 0; j < references.length; j++) {
-            children.push(this.getRow([root.item.id, path[0], path[1], path[2],
-              references[j].item.id].join()));
+            children.push(this.getRow([rootProxy.item.id, path[0], path[1],
+              path[2], references[j].item.id].join()));
           }
         }
       } else {
-        for (let type in root.relations[path[0]]) {
-          for (let propertyId in root.relations[path[0]][type]) {
-            children.push(this.getRow([root.item.id, path[0], type, propertyId].join()));
+        for (let type in rootProxy.relations[path[0]]) {
+          for (let propertyId in rootProxy.relations[path[0]][type]) {
+            children.push(this.getRow([rootProxy.item.id, path[0], type,
+              propertyId].join()));
           }
         }
       }
     } else {
-      for (let referenceCategory in root.relations) {
-        children.push(this.getRow([root.item.id, referenceCategory].join()));
+      for (let referenceCategory in rootProxy.relations) {
+        children.push(this.getRow([rootProxy.item.id, referenceCategory].
+          join()));
       }
     }
     
@@ -214,12 +223,13 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   }
   
   public rootChanged(): void {
-    this.buildRows();
+    this.buildRows(this._rootSubject.getValue().object as Reference);
   }
   
   public rowSelected(row: TreeRow): void {
     let path: Array<string> = (row.object as Reference).path;
-    let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[path.length - 1]);
+    let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
+      path.length - 1]);
     if (proxy) {
       this._navigationService.navigate('Explore', { id: proxy.item.id });
     }
@@ -229,7 +239,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     let path: Array<string> = (object as Reference).path;
     let lastSegment: string = path[path.length - 1];
     let text = lastSegment;
-    let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(lastSegment);
+    let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(
+      lastSegment);
     if (proxy) {
       text = proxy.item.name;
     }
@@ -241,7 +252,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     let iconString: string = 'fa fa-wrench';
     let path: Array<string> = (object as Reference).path;
     let lastSegment: string = path[path.length - 1];
-    let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(lastSegment);
+    let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(
+      lastSegment);
     if (proxy) {
       let koheseType: KoheseType = proxy.model.type;
       if (koheseType && koheseType.viewModelProxy) {

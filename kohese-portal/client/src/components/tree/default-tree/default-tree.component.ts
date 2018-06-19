@@ -35,14 +35,17 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   }
   
   private _images: Array<Image> = [
-    new Image('assets/icons/versioncontrol/dirty.ico', 'Unsaved Changes', (row: TreeRow) => {
-    return (row.object as ItemProxy).dirty;
+    new Image('assets/icons/versioncontrol/dirty.ico', 'Unsaved Changes',
+      false, (row: TreeRow) => {
+      return (row.object as ItemProxy).dirty;
     }),
-    new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', (row: TreeRow) => {
-    return !!(row.object as ItemProxy).status['Unstaged'];
+    new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
+      (row: TreeRow) => {
+      return !!(row.object as ItemProxy).status['Unstaged'];
     }),
-    new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', (row: TreeRow) => {
-    return !!(row.object as ItemProxy).status['Staged'];
+    new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
+      (row: TreeRow) => {
+      return !!(row.object as ItemProxy).status['Staged'];
     })
   ];
   get images() {

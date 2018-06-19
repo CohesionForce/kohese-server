@@ -23,6 +23,7 @@ module.exports = function (app) {
       /^\/admin.*/,
       /^\/dashboard.*/,
       /^\/login/,
+      /^\/versions.*/,
       /^\/repositories.*/,
       /^\/explore.*/,
       /^\/analysis.*/,

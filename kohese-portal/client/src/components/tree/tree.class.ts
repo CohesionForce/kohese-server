@@ -121,12 +121,20 @@ export abstract class Tree {
   }
 
   protected buildRow(object: any): TreeRow {
-    let row: TreeRow = new TreeRow(object, this.getText(object), this.getIcon(object));
+    let row: TreeRow = new TreeRow(object);
+    row.getText = () => {
+      return this.getText(row.object);
+    };
+    row.getIcon = () => {
+      return this.getIcon(row.object);
+    };
     row.isRowSelected = () => {
       return (this.getId(row) === this._selectedIdSubject.getValue());
     };
     row.rowSelected = () => {
       this.rowSelected(row);
+      this._selectedIdSubject.next(this.getId(row));
+      this.showSelection();
     };
     row.isRowRoot = () => {
       return (row === this._rootSubject.getValue());
@@ -158,12 +166,20 @@ export abstract class Tree {
   }
 
   protected insertRow(object: any): TreeRow {
-    let row: TreeRow = new TreeRow(object, this.getText(object), this.getIcon(object));
+    let row: TreeRow = new TreeRow(object);
+    row.getText = () => {
+      return this.getText(row.object);
+    };
+    row.getIcon = () => {
+      return this.getIcon(row.object);
+    };
     row.isRowSelected = () => {
       return (this.getId(row) === this._selectedIdSubject.getValue());
     };
     row.rowSelected = () => {
       this.rowSelected(row);
+      this._selectedIdSubject.next(this.getId(row));
+      this.showSelection();
     };
     row.isRowRoot = () => {
       return (row === this._rootSubject.getValue());
@@ -417,20 +433,20 @@ export abstract class Tree {
     if (id) {
       let selectedRow: TreeRow = this._rowMap.get(id);
       if (selectedRow) {
-        let rowParentProxy: TreeRow = this.getParent(selectedRow);
-        if (rowParentProxy) {
-          let parentId: string = this.getId(rowParentProxy);
+        let parentRow: TreeRow = this.getParent(selectedRow);
+        if (parentRow) {
+          let parentId: string = this.getId(parentRow);
           let rootId: string = this.getId(this._rootSubject.getValue());
           while (parentId !== rootId) {
-            let parentRow: TreeRow = this._rowMap.get(parentId);
-            if (!parentRow) {
+            let row: TreeRow = this._rowMap.get(parentId);
+            if (!row) {
               break;
             }
 
-            parentRow.expanded = true;
-            rowParentProxy = this.getParent(parentRow);
-            if (rowParentProxy) {
-              parentId = this.getId(rowParentProxy);
+            row.expanded = true;
+            parentRow = this.getParent(row);
+            if (parentRow) {
+              parentId = this.getId(parentRow);
             } else {
               break;
             }

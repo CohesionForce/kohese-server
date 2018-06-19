@@ -33,6 +33,12 @@ export var LocationMap = {
     'params': {},
     'route': '/admin'
   },
+  'Versions': {
+    'type': 'dual',
+    'title': 'Versions',
+    'params': ['id'],
+    'route': '/versions'
+  },
   'Repositories': {
     'type': 'single',
     'title': 'Repositories',
