@@ -35,7 +35,7 @@ kdb.initialize(baseRepoPath, indexAndExit).then(function () {
 
   console.log('::: Detecting missing data in cache');
   try {
-    itemCache.detectMissingData();
+    itemCache.detectMissingCommitData();
   } catch (err){
     console.log('*** Error: ' + err);
     console.log(err.stack);
