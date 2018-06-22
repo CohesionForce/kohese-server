@@ -252,6 +252,12 @@ export class KDBCache extends ItemCache {
             this.cacheTree(treeHashEntry.treeHash, treeHashEntry);
             kdbFS.storeJSONDoc(this.kTreeDirectory + path.sep + treeHashEntry.treeHash + '.json', treeHashEntry);
           }
+
+          if(!this.getBlob(treeHashEntry.oid)){
+            console.log('$$$ Mismatch oid for item id: ' + proxy.item.id + '  (oid not found in cache): ' + treeHashEntry.oid);
+            this.cacheBlob(treeHashEntry.oid, proxy.item);
+            kdbFS.storeJSONDoc(this.blobMismatchDirectory + path.sep + treeHashEntry.oid + '.json', proxy.cloneItemAndStripDerived());
+          }
         });
 
         // Store kCommits
