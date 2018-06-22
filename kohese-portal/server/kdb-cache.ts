@@ -135,6 +135,13 @@ export class KDBCache extends ItemCache {
     try {
       // Try to convert the blob to a JSON object
       blobObject = JSON.parse(object);
+
+      // Strip stored null values
+      for (let key in blobObject){
+        if (blobObject[key] === null){
+          delete blobObject[key];
+        }
+      }
     } catch (err) {
       // If error, then it must be a binary file
       blobObject = {
@@ -254,7 +261,7 @@ export class KDBCache extends ItemCache {
         this.cacheCommit(oid, kCommit);
         kdbFS.storeJSONDoc(this.kCommitDirectory + path.sep + oid + '.json', kCommit);
 
-        treeConfig.reset();
+        treeConfig.deleteConfig();
 
         break;
       case 'repoTree':
@@ -266,6 +273,11 @@ export class KDBCache extends ItemCache {
         let koid = ItemProxy.gitDocumentOID(convertedBlob);
         if (koid !== oid){
           console.log('$$$ Mismatch oid:' + koid + ' = ' + oid);
+          if (convertedBlob.binary) {
+            kdbFS.storeBinaryFile(this.blobMismatchDirectory + path.sep + koid, convertedBlob.binary);
+          } else {
+            kdbFS.storeJSONDoc(this.blobMismatchDirectory + path.sep + koid + '.json', convertedBlob);
+          }
         }
         this.cacheBlob(oid, convertedBlob);
         if (convertedBlob.binary) {

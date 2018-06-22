@@ -12,7 +12,7 @@
     },
     "mounted": {
       "type": "boolean",
-      "required": false
+      "derived": true
     }
   },
   "validations": [],
