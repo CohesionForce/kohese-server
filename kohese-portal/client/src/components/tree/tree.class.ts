@@ -97,7 +97,6 @@ export abstract class Tree {
     protected _dialogService: DialogService) {
     this._rootSubscription = this._rootSubject.subscribe((root: TreeRow) => {
       if (root) {
-        this.rootChanged();
         root.depth = 0;
         this.showRows();
       }
@@ -372,10 +371,6 @@ export abstract class Tree {
   }
   
   public postTreeTraversalActivity(): void {
-    // Subclasses may override this function
-  }
-  
-  public rootChanged(): void {
     // Subclasses may override this function
   }
   

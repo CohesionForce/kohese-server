@@ -1,5 +1,9 @@
-<span style="font-weight: bold; font-size: large">History</span>
-<span *ngIf="selectedCommit" > 
-    :: Selected : {{selectedCommit.message}} | {{selectedCommit.date | date}} 
+<div style="height: 100%; width: 100%;">
+  <span style="font-weight: bold; font-size: large">History</span>
+  <span *ngIf="selectedCommit"> 
+    Version: {{selectedCommit.message}} | {{selectedCommit.time | date}} 
   </span>
-<button mat-raised-button (click)="openCommitBrowser()" class="pull-right">Select Version...</button>
+  <button mat-raised-button (click)="openCommitBrowser()" class="pull-right">
+    Select Version...
+  </button>
+</div>

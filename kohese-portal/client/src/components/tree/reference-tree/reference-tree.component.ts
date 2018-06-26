@@ -99,19 +99,23 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           getChangeSubject().subscribe((notification: any) => {
           let reference: Reference = (<Reference> this._rootSubject.getValue().
             object);
-          if (notification.proxy && (reference.path[reference.path.length -
-            1] === notification.proxy.item.id)) {
+          if (notification.proxy && ((reference.path[reference.path.length -
+            1] === notification.proxy.item.id) || this.isRootReferencedBy(
+            notification.proxy))) {
             this.buildRows(reference);
           }
         });
         
-        this._rootSubject.next(this.buildRow(new Reference([this.
-          _selectedTreeConfiguration.getRootProxy().item.id])));
+        let root: Reference = new Reference([this._selectedTreeConfiguration.
+          getRootProxy().item.id]);
+        this.buildRows(root);
+        this._rootSubject.next(this.getRow(root.path.join()));
         
         this._route.params.subscribe((parameters: Params) => {
-          this._rootSubject.next(this.buildRow(new Reference([this.
-            _selectedTreeConfiguration.getProxyFor(parameters['id']).item.
-            id])));
+          root = new Reference([this._selectedTreeConfiguration.
+            getProxyFor(parameters['id']).item.id]);
+          this.buildRows(root);
+          this._rootSubject.next(this.getRow(root.path.join()));
         });
         
         this.showSelection();
@@ -222,10 +226,6 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
-  public rootChanged(): void {
-    this.buildRows(this._rootSubject.getValue().object as Reference);
-  }
-  
   public rowSelected(row: TreeRow): void {
     let path: Array<string> = (row.object as Reference).path;
     let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
@@ -282,6 +282,29 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     this._dialogService.openComponentDialog(CompareItemsComponent, {
       data: compareItemsDialogParameters
     }).updateSize('90%', '90%');
+  }
+  
+  private isRootReferencedBy(proxy: ItemProxy): boolean {
+    let root: ItemProxy = this._selectedTreeConfiguration.getProxyFor((this.
+      _rootSubject.getValue().object as Reference).path[0]);
+    for (let type in root.relations['referencedBy']) {
+      for (let propertyId in root.relations['referencedBy'][type]) {
+        let reference: any = root.relations['referencedBy'][type][propertyId];
+        if (reference) {
+          if (!Array.isArray(reference)) {
+            reference = [reference];
+          }
+          
+          for (let j: number = 0; j < reference.length; j++) {
+            if (reference[j] === proxy) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    
+    return false;
   }
 }
 

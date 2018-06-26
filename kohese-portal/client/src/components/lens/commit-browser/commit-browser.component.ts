@@ -4,7 +4,8 @@ import { Subscription } from 'rxjs';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { ItemRepository, RepoStates } from "../../../services/item-repository/item-repository.service";
+import { ItemRepository, RepoStates,
+  TreeConfigType } from "../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
 
 interface CommitViewItem {
@@ -91,7 +92,9 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
   }
 
   confirm() {
-    this.matDialogRef.close(this.selectedCommit)
+    this.itemRepository.setTreeConfig(this.selectedCommit.commitId,
+      TreeConfigType.HISTORICAL);
+    this.matDialogRef.close(this.selectedCommit);
   }
   
   public navigateToSelectedCommit(): void {

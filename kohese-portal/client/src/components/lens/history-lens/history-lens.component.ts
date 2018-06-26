@@ -1,10 +1,8 @@
-import { Component, Input, OnInit, OnDestroy, EventEmitter } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
-import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { ItemRepository, RepoStates, TreeConfigType } from "../../../services/item-repository/item-repository.service";
-import { MatDialogRef } from "@angular/material";
+import { ItemRepository } from "../../../services/item-repository/item-repository.service";
 import { DialogService } from "../../../services/dialog/dialog.service";
 import { CommitBrowserComponent } from "../commit-browser/commit-browser.component";
 
@@ -14,37 +12,36 @@ import { CommitBrowserComponent } from "../commit-browser/commit-browser.compone
   styleUrls : ['./history-lens.component.scss']
 })
 export class HistoryLensComponent implements OnInit, OnDestroy {
-
-  repoStatusSubscription : Subscription;
-  commitList : Array<any>;
-  selectedCommit : any;
-  commitSelected : EventEmitter<any> = new EventEmitter<any>();
+  private _selectedCommit: any;
+  get selectedCommit() {
+    return this._selectedCommit;
+  }
+  
+  private _treeConfigurationSubscription: Subscription;
 
   constructor (private itemRepository : ItemRepository,
                private dialogService : DialogService) {
   }
 
   ngOnInit () {
-    this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
-      .subscribe((update)=>{
-        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.commitList = TreeConfiguration.getItemCache().getCommits();
-        }
-    })
+    this._treeConfigurationSubscription = this.itemRepository.
+      getTreeConfig().subscribe((treeConfigurationObject: any) => {
+      if (treeConfigurationObject) {
+        this._selectedCommit = TreeConfiguration.getItemCache().getCommits()[
+          treeConfigurationObject.config.treeId];
+      } else {
+        this._selectedCommit = undefined;
+      }
+    });
+  }
+  
+  public ngOnDestroy(): void {
+    this._treeConfigurationSubscription.unsubscribe();
   }
 
   openCommitBrowser () {
-    this.dialogService.openComponentDialog(CommitBrowserComponent, {})
-      .updateSize('70%', '70%').afterClosed().subscribe((newRecord)=>{
-        if (newRecord) {
-          this.selectedCommit = newRecord.commit;
-          console.log(newRecord);
-          this.itemRepository.setTreeConfig(newRecord.commitId, TreeConfigType.HISTORICAL);
-        }
-      })
-  }
-
-  ngOnDestroy () {
-    this.repoStatusSubscription.unsubscribe();
+    this.dialogService.openComponentDialog(CommitBrowserComponent, {
+      data: {}
+    }).updateSize('70%', '70%');
   }
 }
