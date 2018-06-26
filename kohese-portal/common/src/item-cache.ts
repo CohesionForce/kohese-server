@@ -161,6 +161,13 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getTrees(){
+    return this.kTreeMap;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   cacheTree(oid, tree){
     Object.freeze(tree);
     this.kTreeMap[oid] = tree;
@@ -258,6 +265,122 @@ export class ItemCache {
 
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////
+  //// Cache analysis methods
+  //////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  detectMissingCommitData(selectedCommitId?) {
+
+    let cache = this;
+    let blobEvaluated = {};
+    let treeEvaluated = {};
+
+    function evaluateBlob (itemId, kind, oid) {
+      if (!blobEvaluated[oid]){
+        // console.log('::: Evaluating blob for ' + itemId);
+        if (!cache.getBlob(oid)){
+          console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
+        }
+        blobEvaluated[oid] = true;
+      }
+    }
+
+    function evaluateTreeEntry (itemId, tree) {
+      if (!treeEvaluated[tree.treeHash]){
+        // console.log('::: Evaluating tree for ' + itemId);
+        evaluateBlob(itemId, tree.kind, tree.oid);
+        for (let childId in tree.childTreeHashes) {
+          let childTreeHash = tree.childTreeHashes[childId];
+          switch (childTreeHash){
+            case 'Repository-Mount':
+            case 'Internal':
+              break;
+            default:
+              let childTree = cache.getTree(childTreeHash);
+              if (childTree) {
+                evaluateTreeEntry(childId, childTree);
+              } else {
+                console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
+              }
+          }
+        }
+        treeEvaluated[tree.treeHash] = true;
+      }
+    }
+
+    for (let commitId in this.kCommitMap) {
+      if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
+        let commit = this.kCommitMap[commitId];
+        console.log('::: Evaluating commit:  ' + commitId);
+        // console.log(JSON.stringify(commit, null, '  '));
+
+        for (let rootId in commit.repoTreeRoots){
+          let root = commit.repoTreeRoots[rootId];
+          // console.log('::: Evaluating root:  ' + rootId);
+          evaluateTreeEntry(rootId, root);
+        }
+      }
+    };
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  detectMissingTreeData(selectedTreeId?) {
+
+    let cache = this;
+    let blobEvaluated = {};
+    let treeEvaluated = {};
+
+    function evaluateBlob (itemId, kind, oid) {
+      if (!blobEvaluated[oid]){
+        // console.log('::: Evaluating blob for ' + itemId);
+        if (!cache.getBlob(oid)){
+          console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
+        }
+        blobEvaluated[oid] = true;
+      }
+    }
+
+    function evaluateTreeEntry (itemId, tree) {
+      if (!treeEvaluated[tree.treeHash]){
+        // console.log('::: Evaluating tree for ' + itemId);
+        evaluateBlob(itemId, tree.kind, tree.oid);
+        for (let childId in tree.childTreeHashes) {
+          let childTreeHash = tree.childTreeHashes[childId];
+          switch (childTreeHash){
+            case 'Repository-Mount':
+            case 'Internal':
+              break;
+            default:
+              let childTree = cache.getTree(childTreeHash);
+              if (childTree) {
+                evaluateTreeEntry(childId, childTree);
+              } else {
+                console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
+              }
+          }
+        }
+        treeEvaluated[tree.treeHash] = true;
+      }
+    }
+
+    for (let treeId in this.kTreeMap) {
+      if (!selectedTreeId || (selectedTreeId && (treeId === selectedTreeId))){
+        let tree = this.kTreeMap[treeId];
+        console.log('::: Evaluating tree:  ' + treeId);
+        // console.log(JSON.stringify(commit, null, '  '));
+
+        evaluateTreeEntry(treeId, tree);
+      }
+    };
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
   //// Proxy loading methods
   //////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////
@@ -301,7 +424,7 @@ export class ItemCache {
           // eslint-disable-next-line no-unused-vars
           let treeProxy : ItemProxy = new ItemProxy(kind,  item, treeConfig);
         } else {
-          console.log('*** Could not find item for: ' + kind + ' - with item id - ' + treeId);
+          console.log('*** Could not find item for: ' + kind + ' - with item id - ' + treeId + ' - oid - ' + treeHashEntry.oid);
           console.log(treeHashEntry);
         }
     }

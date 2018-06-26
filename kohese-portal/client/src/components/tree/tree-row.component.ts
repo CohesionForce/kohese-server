@@ -1,3 +1,4 @@
+import { EventEmitter, Output } from '@angular/core';
 import { Component, OnInit, Input, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 
@@ -10,6 +11,7 @@ import { TreeRow } from './tree-row.class';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreeRowComponent implements OnInit {
+
   private _treeRow: TreeRow;
   get treeRow() {
     return this._treeRow;
@@ -18,7 +20,7 @@ export class TreeRowComponent implements OnInit {
   set treeRow(treeRow: TreeRow) {
     this._treeRow = treeRow;
   }
-  
+
   private _images: Array<Image> = [];
   get images() {
     return this._images;
@@ -27,7 +29,7 @@ export class TreeRowComponent implements OnInit {
   set images(images: Array<Image>) {
     this._images = images;
   }
-  
+
   private _rowActions: Array<Action> = [];
   get rowActions() {
     return this._rowActions;
@@ -36,7 +38,7 @@ export class TreeRowComponent implements OnInit {
   set rowActions(rowActions: Array<Action>) {
     this._rowActions = rowActions;
   }
-  
+
   private _menuActions: Array<Action> = [];
   get menuActions() {
     return this._menuActions;
@@ -45,7 +47,7 @@ export class TreeRowComponent implements OnInit {
   set menuActions(menuActions: Array<Action>) {
     this._menuActions = menuActions;
   }
-  
+
   public constructor(private _changeDetector: ChangeDetectorRef) {
   }
 
@@ -54,7 +56,7 @@ export class TreeRowComponent implements OnInit {
       this._changeDetector.markForCheck();
     };
   }
-  
+
   public getIndentationStyle(): object {
     return {
       'padding-left': (this._treeRow.depth * 15) + 'px'

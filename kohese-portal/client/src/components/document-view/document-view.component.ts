@@ -1,7 +1,8 @@
+import { TreeConfiguration } from './../../../../common/src/tree-configuration';
 import { DialogService } from './../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from './../details/details-dialog/details-dialog.component';
 import { ItemRepository } from './../../services/item-repository/item-repository.service';
-import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef, trigger, state, style, animate, transition } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef, trigger, state, style, animate, transition, ViewChildren, Output, EventEmitter } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 import { Observable } from 'rxjs';
 
@@ -17,7 +18,7 @@ import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class.js';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Router, NavigationEnd } from '@angular/router';
 
-interface DocumentInfo {
+export interface DocumentInfo {
   proxy: ItemProxy;
   rendered: string;
   active: boolean;
@@ -64,6 +65,7 @@ implements OnInit, OnDestroy {
   itemProxy: ItemProxy;
   itemLength: number;
   selectedRow: number;
+  rowMap = {};
 
   filter: string;
   docRendered: string;
@@ -78,20 +80,29 @@ implements OnInit, OnDestroy {
   docReader: Parser;
   docWriter: HtmlRenderer
   initialized: boolean;
+  treeConfig : TreeConfiguration;
+  treeConfigSubscription : Subscription;
+
 
   /* Observables */
   @Input()
   filterSubject: BehaviorSubject < AnalysisFilter > ;
   @Input()
   proxyStream: Observable < ItemProxy >
-    @Input()
+  @Input()
   incrementalLoad: boolean;
   @Input()
   fullscreen = false;
+  @Input()
+  selectedProxyStream : Observable<ItemProxy>;
+  @Output()
+  proxySelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
+
 
   /* Subscriptions */
   filterSubscription: Subscription;
   proxyStreamSubscription: Subscription;
+  selectedProxySubscription : Subscription;
 
   constructor(NavigationService: NavigationService,
     private changeRef: ChangeDetectorRef,
@@ -119,9 +130,17 @@ implements OnInit, OnDestroy {
       if (!(event instanceof NavigationEnd)) {
         return;
       }
-      console.log(this.docView);
       this.docView.nativeElement.scrollTop = 0;
     })
+
+    if (this.selectedProxyStream) {
+      this.selectedProxySubscription = this.selectedProxyStream.subscribe((newSelection) => {
+        if (newSelection) {
+          this.rowMap[newSelection.item.id].nativeElement.scrollIntoView();
+        }
+      })
+    }
+
 
     this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
       if (newProxy) {
@@ -231,25 +250,6 @@ implements OnInit, OnDestroy {
     this.changeRef.markForCheck();
   }
 
-  upsertItem(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
-    this.itemRepository.upsertItem(proxy).then((newProxy) => {
-      let rendered = '';
-      row.editable = false;
-      docInfo.proxy = newProxy;
-      if (docInfo.depth > 0) {
-        // Show the header for any node that is not the root of the document
-
-        rendered = '<h' + docInfo.depth + '>' + docInfo.proxy.item.name + '</h' + docInfo.depth + '>';
-      }
-      if (docInfo.proxy.item.description) {
-        // Show the description if it exists
-        let nodeParsed = this.docReader.parse(docInfo.proxy.item.description);
-        rendered += this.docWriter.render(nodeParsed);
-      }
-      docInfo.rendered = rendered;
-      this.changeRef.markForCheck();
-    })
-  }
 
   onFilterChange() {
     console.log('>>> Filter string changed to: ' + this.filter);
@@ -279,27 +279,8 @@ implements OnInit, OnDestroy {
     }
   }
 
-  showProxyDetails(proxy: ItemProxy) {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
-        data: {
-          itemProxy: proxy,
-          hideDocument : true
-        }
-      }).updateSize('80%', '80%')
-      .afterClosed().subscribe((results) => {
-        // Probably need to do something here to spin off an update
-      });
-  }
-
-  insertRow(newProxy : ItemProxy, row: any, location: string) {
-    row[location] = false;
-    this.changeRef.markForCheck();
-    setTimeout(()=>{
-      this.generateDoc();
-    }, 500)
-  }
-
-  openDocumentTree() {
-    console.log('treeeee');
+  selectRow(row: any, proxy : ItemProxy) {
+    row.rowState = 'show';
+    this.proxySelected.emit(proxy)
   }
 }

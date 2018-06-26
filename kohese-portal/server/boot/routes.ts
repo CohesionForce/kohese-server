@@ -28,7 +28,8 @@ module.exports = function (app) {
       /^\/explore.*/,
       /^\/analysis.*/,
       /^\/typeeditor.*/,
-      /^\/devtools.*/
+      /^\/devtools.*/,
+      /^\/document.*/
     ];
 
     app.use(ngRoutes, function (req, res) {

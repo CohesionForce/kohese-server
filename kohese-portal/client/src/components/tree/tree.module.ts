@@ -15,6 +15,7 @@ import { VersionControlTreeComponent } from './version-control-tree/version-cont
 import { CommitTreeComponent } from './commit-tree/commit-tree.component';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { PipesModule } from "../../pipes/pipes.module";
+import { DocumentTreeComponent } from "./document-tree/document-tree.component";
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { PipesModule } from "../../pipes/pipes.module";
     DefaultTreeComponent,
     ReferenceTreeComponent,
     VersionControlTreeComponent,
-    CommitTreeComponent
+    CommitTreeComponent,
+    DocumentTreeComponent
   ],
   entryComponents: [
   ],
@@ -40,7 +42,8 @@ import { PipesModule } from "../../pipes/pipes.module";
     DefaultTreeComponent,
     ReferenceTreeComponent,
     VersionControlTreeComponent,
-    CommitTreeComponent
+    CommitTreeComponent,
+    DocumentTreeComponent
   ]
 })
 export class TreeViewModule {}

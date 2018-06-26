@@ -1150,6 +1150,12 @@ describe('ItemProxy Test', function () {
         'childTreeHashes': {},
         'treeHash': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
         'parentId': 'NV-TOP'
+      },
+      "View-Model-Definitions": {
+        "kind": "Internal",
+        "oid": "7927f787b40a11b5fb9bf0e929884a344fa2b9ff",
+        "childTreeHashes": {},
+        "treeHash": "c5f483433c9220df9c8cd0e613b680a831e3aaa4"
       }
     };
 
@@ -1282,7 +1288,8 @@ it('Retrieve Delta Tree Hash Map', () => {
         'deleted': [],
         'common': [
           'ROOT',
-          'Model-Definitions'
+          'Model-Definitions',
+          'View-Model-Definitions'
         ]
       },
       'kindChanged': {},
