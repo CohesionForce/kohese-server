@@ -71,8 +71,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         'Are you sure you want to delete ' + (row.object as ItemProxy).item.name + '?', [
         'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
         if (result) {
-          if (row === this._rootSubject.getValue()) {
-            this._rootSubject.next(this.getParent(row));
+          if (row === this.rootSubject.getValue()) {
+            this.rootSubject.next(this.getParent(row));
           }
           
           this._itemRepository.deleteItem((row.object as ItemProxy), (2 === result));
@@ -164,7 +164,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
         
-        this._rootSubject.next(this.getRow(this._absoluteRoot.item.id));
+        this.rootSubject.next(this.getRow(this._absoluteRoot.item.id));
         
         this._route.params.subscribe((parameters: Params) => {
           if (this._synchronizeWithSelection) {
@@ -192,11 +192,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     }
   }
   
-  public getId(row: TreeRow): string {
+  protected getId(row: TreeRow): string {
     return (row.object as ItemProxy).item.id;
   }
   
-  public getParent(row: TreeRow): TreeRow {
+  protected getParent(row: TreeRow): TreeRow {
     let parent: TreeRow = undefined;
     if ((row.object as ItemProxy).parentProxy) {
       parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
@@ -205,7 +205,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return parent;
   }
   
-  public getChildren(row: TreeRow): Array<TreeRow> {
+  protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     let proxy: ItemProxy = (row.object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
@@ -215,19 +215,19 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return children;
   }
   
-  public postTreeTraversalActivity(): void {
+  protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
   
-  public rowSelected(row: TreeRow): void {
+  protected rowSelected(row: TreeRow): void {
     this._navigationService.navigate('Explore', { id: this.getId(row) });
   }
   
-  public getText(object: any): string {
+  protected getText(object: any): string {
     return (object as ItemProxy).item.name;
   }
   
-  public getIcon(object: any): string {
+  protected getIcon(object: any): string {
     let iconString: string = '';
     let koheseType: KoheseType = (object as ItemProxy).model.type;
     if (koheseType && koheseType.viewModelProxy) {

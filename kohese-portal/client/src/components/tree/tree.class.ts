@@ -19,7 +19,7 @@ export abstract class Tree {
     return this._visibleRows;
   }
   
-  protected _rootSubject: BehaviorSubject<TreeRow> =
+  private _rootSubject: BehaviorSubject<TreeRow> =
     new BehaviorSubject<TreeRow>(undefined);
   get rootSubject() {
     return this._rootSubject;
@@ -348,33 +348,33 @@ export abstract class Tree {
     this.postRowProcessingActivity(row);
   }
   
-  public abstract getId(row: TreeRow): string;
+  protected abstract getId(row: TreeRow): string;
   
-  public abstract getParent(row: TreeRow): TreeRow;
+  protected abstract getParent(row: TreeRow): TreeRow;
   
-  public abstract getChildren(row: TreeRow): Array<TreeRow>;
+  protected abstract getChildren(row: TreeRow): Array<TreeRow>;
   
-  public abstract getText(object: any): string;
+  protected abstract getText(object: any): string;
   
-  public abstract getIcon(object: any): string;
+  protected abstract getIcon(object: any): string;
   
-  public preTreeTraversalActivity(): void {
+  protected preTreeTraversalActivity(): void {
     // Subclasses may override this function
   }
   
-  public preRowProcessingActivity(row: TreeRow): void {
+  protected preRowProcessingActivity(row: TreeRow): void {
     // Subclasses may override this function
   }
   
-  public postRowProcessingActivity(row: TreeRow): void {
+  protected postRowProcessingActivity(row: TreeRow): void {
     // Subclasses may override this function
   }
   
-  public postTreeTraversalActivity(): void {
+  protected postTreeTraversalActivity(): void {
     // Subclasses may override this function
   }
   
-  public rowSelected(row: TreeRow): void {
+  protected rowSelected(row: TreeRow): void {
     // Subclasses may override this function
   }
   

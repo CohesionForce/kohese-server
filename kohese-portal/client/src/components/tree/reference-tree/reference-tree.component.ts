@@ -97,7 +97,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
         }
         this._treeConfigurationSubscription = this._selectedTreeConfiguration.
           getChangeSubject().subscribe((notification: any) => {
-          let reference: Reference = (<Reference> this._rootSubject.getValue().
+          let reference: Reference = (<Reference> this.rootSubject.getValue().
             object);
           if (notification.proxy && ((reference.path[reference.path.length -
             1] === notification.proxy.item.id) || this.isRootReferencedBy(
@@ -109,13 +109,13 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
         let root: Reference = new Reference([this._selectedTreeConfiguration.
           getRootProxy().item.id]);
         this.buildRows(root);
-        this._rootSubject.next(this.getRow(root.path.join()));
+        this.rootSubject.next(this.getRow(root.path.join()));
         
         this._route.params.subscribe((parameters: Params) => {
           root = new Reference([this._selectedTreeConfiguration.
             getProxyFor(parameters['id']).item.id]);
           this.buildRows(root);
-          this._rootSubject.next(this.getRow(root.path.join()));
+          this.rootSubject.next(this.getRow(root.path.join()));
         });
         
         this.showSelection();
@@ -170,22 +170,22 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     }
   }
   
-  public getId(row: TreeRow): string {
+  protected getId(row: TreeRow): string {
     return (row.object as Reference).path.join();
   }
   
-  public getParent(row: TreeRow): TreeRow {
+  protected getParent(row: TreeRow): TreeRow {
     let parentPath: Array<string> = (row.object as Reference).path.slice(0);
     parentPath.length = ((4 === parentPath.length) ? (parentPath.length - 2) :
       (parentPath.length - 1));
     return this.getRow(parentPath.join());
   }
   
-  public getChildren(row: TreeRow): Array<TreeRow> {
+  protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     let path: Array<string> = (row.object as Reference).path;
     let rootProxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor((
-      this._rootSubject.getValue().object as Reference).path[0]);
+      this.rootSubject.getValue().object as Reference).path[0]);
     if (path.length > 1) {
       path = path.slice(1);
       if (path.length > 2) {
@@ -222,11 +222,11 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     return children;
   }
   
-  public postTreeTraversalActivity(): void {
+  protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
   
-  public rowSelected(row: TreeRow): void {
+  protected rowSelected(row: TreeRow): void {
     let path: Array<string> = (row.object as Reference).path;
     let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
       path.length - 1]);
@@ -235,7 +235,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     }
   }
   
-  public getText(object: any): string {
+  protected getText(object: any): string {
     let path: Array<string> = (object as Reference).path;
     let lastSegment: string = path[path.length - 1];
     let text = lastSegment;
@@ -248,7 +248,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     return text;
   }
   
-  public getIcon(object: any): string {
+  protected getIcon(object: any): string {
     let iconString: string = 'fa fa-wrench';
     let path: Array<string> = (object as Reference).path;
     let lastSegment: string = path[path.length - 1];
@@ -286,7 +286,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   
   private isRootReferencedBy(proxy: ItemProxy): boolean {
     let root: ItemProxy = this._selectedTreeConfiguration.getProxyFor((this.
-      _rootSubject.getValue().object as Reference).path[0]);
+      rootSubject.getValue().object as Reference).path[0]);
     for (let type in root.relations['referencedBy']) {
       for (let propertyId in root.relations['referencedBy'][type]) {
         let reference: any = root.relations['referencedBy'][type][propertyId];

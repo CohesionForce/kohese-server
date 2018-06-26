@@ -160,10 +160,10 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     }
     
-    this._rootSubject.next(rootRow);
+    this.rootSubject.next(rootRow);
   }
   
-  public getId(row: TreeRow): string {
+  protected getId(row: TreeRow): string {
     let id: string = '';
     if (row.object instanceof Repository) {
       id = (row.object as Repository).proxy.item.id;
@@ -177,7 +177,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     return id;
   }
   
-  public getParent(row: TreeRow): TreeRow {
+  protected getParent(row: TreeRow): TreeRow {
     if (row.object instanceof Commit) {
       return this.getRow(this._repositoryProxy.item.id);
     } else if (row.object instanceof Difference) {
@@ -185,7 +185,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     }
   }
   
-  public getChildren(row: TreeRow): Array<TreeRow> {
+  protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     if (row.object instanceof Repository) {
       let commits: Array<Commit> = (row.object as Repository).commits;
@@ -203,7 +203,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     return children;
   }
   
-  public getText(object: any): string {
+  protected getText(object: any): string {
     let text: string = '';
     if (object instanceof Repository) {
       text = (object as Repository).proxy.item.name;
@@ -216,7 +216,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     return text;
   }
   
-  public getIcon(object: any): string {
+  protected getIcon(object: any): string {
     let iconString: string = '';
     if (object instanceof Repository) {
       iconString = 'fa fa-database';
@@ -228,14 +228,14 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     return iconString;
   }
   
-  public rowSelected(row: TreeRow): void {
+  protected rowSelected(row: TreeRow): void {
     this.rowSelectedEmitter.emit(row.object);
     this._navigationService.navigate('Versions', {
       id: this.getId(row)
     });
   }
   
-  public postTreeTraversalActivity(): void {
+  protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
   
