@@ -27,18 +27,17 @@ if (!baseRepoPath) {
 //////////////////////////////////////////////////////////////////////////
 // Test Cases
 //////////////////////////////////////////////////////////////////////////
-function diffHeadAndPrev() {
+function diffCommitAndPrev(refCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
 
-    let headCommitId = itemCache.getRef('HEAD');
-    let headCommit = itemCache.getCommit(headCommitId);
-    let prevCommitId = headCommit.parents[0];
+    let refCommit = itemCache.getCommit(refCommitId);
+    let prevCommitId = refCommit.parents[0];
 
-    console.log('::: Head: ' + headCommitId);
-    console.log('::: Prev: ' + prevCommitId);
+    console.log('::: Ref Commit: ' + refCommitId);
+    console.log('::: Prev Commit: ' + prevCommitId);
 
-    compareCommits(prevCommitId, headCommitId);
+    compareCommits(prevCommitId, refCommitId);
 
 } catch (err) {
     console.log("*** Error");
@@ -46,6 +45,22 @@ function diffHeadAndPrev() {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
+function diffHeadAndPrev() {
+  try {
+
+    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+
+    let headCommitId = itemCache.getRef('HEAD');
+    diffCommitAndPrev(headCommitId);
+
+} catch (err) {
+    console.log("*** Error");
+    console.log(err);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
 function compareCommits(earlierCommit, laterCommit){
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -62,6 +77,7 @@ function compareCommits(earlierCommit, laterCommit){
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
 function compareDiff_c282fb(){
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -79,6 +95,7 @@ function compareDiff_c282fb(){
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
 function evaluateAllCommits() {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -90,6 +107,7 @@ function evaluateAllCommits() {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
 function evaluateEachTree() {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -106,6 +124,7 @@ function evaluateEachTree() {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
 function evaluateEachCommit() {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -122,6 +141,20 @@ function evaluateEachCommit() {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
+function diffEachCommit() {
+  try {
+    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+
+    let currentCommit = itemCache.getRef('HEAD');
+} catch (err) {
+    console.log("*** Error");
+    console.log(err);
+
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
 function evaluateCommit(selectedCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -172,6 +205,7 @@ function copyAttributes(fromItem, toProxy) {
   return modifications;
 }
 
+//////////////////////////////////////////////////////////////////////////
 function evaluateBlob(oid) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -221,6 +255,7 @@ function evaluateBlob(oid) {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
 function loadCommit(selectedCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -250,6 +285,7 @@ function loadCommit(selectedCommitId) {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
 function loadConfigForEachCommit() {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
@@ -315,10 +351,10 @@ try {
     // Note:  This one is missing added items from details
     // compareCommits('1b7aabf0a845269a078ff6ad2da9a5683c6728da', '17e608d0f28e2c8c690c24a8a5f78253b817a3de');
 
-    evaluateAllCommits();
+    // evaluateAllCommits();
     // evaluateEachCommit();
     // evaluateEachTree();
-    // diffHeadAndPrev();
+    diffHeadAndPrev();
 
   });
 
