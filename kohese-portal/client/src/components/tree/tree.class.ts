@@ -18,8 +18,8 @@ export abstract class Tree {
   get visibleRows() {
     return this._visibleRows;
   }
-
-  protected _rootSubject: BehaviorSubject<TreeRow> =
+  
+  private _rootSubject: BehaviorSubject<TreeRow> =
     new BehaviorSubject<TreeRow>(undefined);
   get rootSubject() {
     return this._rootSubject;
@@ -97,7 +97,6 @@ export abstract class Tree {
     protected _dialogService: DialogService) {
     this._rootSubscription = this._rootSubject.subscribe((root: TreeRow) => {
       if (root) {
-        this.rootChanged();
         root.depth = 0;
         this.showRows();
       }
@@ -348,42 +347,38 @@ export abstract class Tree {
     }
     this.postRowProcessingActivity(row);
   }
-
-  public abstract getId(row: TreeRow): string;
-
-  public abstract getParent(row: TreeRow): TreeRow;
-
-  public abstract getChildren(row: TreeRow): Array<TreeRow>;
-
-  public abstract getText(object: any): string;
-
-  public abstract getIcon(object: any): string;
-
-  public setRowAsRoot(row: TreeRow) {
+  
+  protected abstract getId(row: TreeRow): string;
+  
+  protected abstract getParent(row: TreeRow): TreeRow;
+  
+  protected abstract getChildren(row: TreeRow): Array<TreeRow>;
+  
+  protected abstract getText(object: any): string;
+  
+  protected abstract getIcon(object: any): string;
+  
+  protected preTreeTraversalActivity(): void {
+    // Subclasses may override this function
+  }
+  
+  protected preRowProcessingActivity(row: TreeRow): void {
+    // Subclasses may override this function
+  }
+  
+  protected postRowProcessingActivity(row: TreeRow): void {
+    // Subclasses may override this function
+  }
+  
+  protected postTreeTraversalActivity(): void {
+    // Subclasses may override this function
+  }
+  
+  protected setRowAsRoot(row: TreeRow) {
     this._rootSubject.next(row);
   }
-
-  public preTreeTraversalActivity(): void {
-    // Subclasses may override this function
-  }
-
-  public preRowProcessingActivity(row: TreeRow): void {
-    // Subclasses may override this function
-  }
-
-  public postRowProcessingActivity(row: TreeRow): void {
-    // Subclasses may override this function
-  }
-
-  public postTreeTraversalActivity(): void {
-    // Subclasses may override this function
-  }
-
-  public rootChanged(): void {
-    // Subclasses may override this function
-  }
-
-  public rowSelected(row: TreeRow): void {
+  
+  protected rowSelected(row: TreeRow): void {
     // Subclasses may override this function
   }
 
