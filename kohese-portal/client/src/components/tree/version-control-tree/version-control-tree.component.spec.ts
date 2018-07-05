@@ -63,14 +63,5 @@ describe('Component: version-control-tree', () => {
     let rootRow: TreeRow = component.getRow('ROOT');
     expect(rootRow).toBeDefined();
     expect(component.getRow(descendantProxy.item.id)).toBeDefined();
-    let childIndex: number = -1;
-    let children: Array<TreeRow> = component.getChildren(rootRow);
-    for (let j: number = 0; j < children.length; j++) {
-      if (descendantProxy === children[j].object) {
-        childIndex = j;
-        break;
-      }
-    }
-    expect(childIndex).not.toEqual(-1);
   });
 });

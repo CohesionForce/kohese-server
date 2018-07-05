@@ -103,7 +103,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       });
 
-      this._rootSubject.next(this.getRow(this.documentRootId));
+      this.rootSubject.next(this.getRow(this.documentRootId));
       this.rootSelected.emit(this.documentRoot);
 
       this.showSelection();
@@ -141,11 +141,11 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
 
-  public getId(row: TreeRow): string {
+  protected getId(row: TreeRow): string {
     return (row.object as ItemProxy).item.id;
   }
 
-  public getParent(row: TreeRow): TreeRow {
+  protected getParent(row: TreeRow): TreeRow {
     let parent: TreeRow = undefined;
     if ((row.object as ItemProxy).parentProxy) {
       parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
@@ -154,7 +154,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     return parent;
   }
 
-  public getChildren(row: TreeRow): Array<TreeRow> {
+  protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     let proxy: ItemProxy = (row.object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
@@ -164,19 +164,19 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     return children;
   }
 
-  public postTreeTraversalActivity(): void {
+  protected postTreeTraversalActivity(): void {
     this.changeRef.markForCheck();
   }
 
-  public rowSelected(row: TreeRow): void {
+  protected rowSelected(row: TreeRow): void {
     this.onSelect.emit(row.object);
   }
 
-  public getText(object: any): string {
+  protected getText(object: any): string {
     return (object as ItemProxy).item.name;
   }
 
-  public getIcon(object: any): string {
+  protected getIcon(object: any): string {
     let iconString: string = '';
     let koheseType: KoheseType = (object as ItemProxy).model.type;
     if (koheseType && koheseType.viewModelProxy) {
@@ -186,7 +186,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     return iconString;
   }
 
-  setRowAsRoot(row : TreeRow) {
+  public setRowAsRoot(row : TreeRow) {
     this.rootSubject.next(this.getRow(row.object.item.id));
     this.rootSelected.emit(row.object);
     console.log('over');

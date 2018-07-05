@@ -1,7 +1,7 @@
 <div class="kt-item" matTooltip="{{treeRow.getText()}}"
   (click)="treeRow.rowSelected()"
   [ngClass]="{ 'selected-border': treeRow.isRowSelected(),
-  'highlight-row': (treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) }"
+  'highlight-row': (!treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) }"
   [ngStyle]="getIndentationStyle()">
   <i class="kt-icon fa"
     (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
@@ -46,17 +46,19 @@
         </button>
       </ng-container>
     </ng-container>
-    <button mat-icon-button [matMenuTriggerFor]="menu"
-      (click)="$event.stopPropagation()">
-      <mat-icon class="fa fa-bars"></mat-icon>
-    </button>
-    <mat-menu #menu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item *ngFor="let action of menuActions"
-        (click)="action.perform(treeRow)" matTooltip="{{action.description}}"
-        [disabled]="!action.enable(treeRow)">
-        <mat-icon class="{{action.icon}}"></mat-icon>
-        {{action.name}}
+    <ng-container *ngIf="menuActions.length > 0">
+      <button mat-icon-button [matMenuTriggerFor]="menu"
+        (click)="$event.stopPropagation()">
+        <mat-icon class="fa fa-bars"></mat-icon>
       </button>
-    </mat-menu>
+      <mat-menu #menu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item *ngFor="let action of menuActions"
+          (click)="action.perform(treeRow)" matTooltip="{{action.description}}"
+         [disabled]="!action.enable(treeRow)">
+          <mat-icon class="{{action.icon}}"></mat-icon>
+          {{action.name}}
+        </button>
+      </mat-menu>
+    </ng-container>
   </span>
 </div>

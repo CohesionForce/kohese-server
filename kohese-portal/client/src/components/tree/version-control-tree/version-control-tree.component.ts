@@ -164,7 +164,8 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           }
         });
         
-        this._rootSubject.next(this.buildRow(this._absoluteRoot));
+        this.buildRows(this._absoluteRoot);
+        this.rootSubject.next(this.getRow(this._absoluteRoot.item.id));
         this.showSelection();
       }
     });
@@ -200,11 +201,11 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     });
   }
   
-  public getId(row: TreeRow): string {
+  protected getId(row: TreeRow): string {
     return (row.object as ItemProxy).item.id;
   }
   
-  public getParent(row: TreeRow): TreeRow {
+  protected getParent(row: TreeRow): TreeRow {
     let parent: TreeRow = undefined;
     if ((row.object as ItemProxy).parentProxy) {
       parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
@@ -213,7 +214,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     return parent;
   }
   
-  public getChildren(row: TreeRow): Array<TreeRow> {
+  protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     let proxy: ItemProxy = (row.object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
@@ -226,23 +227,19 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     return children;
   }
   
-  public postTreeTraversalActivity(): void {
+  protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
   
-  public rootChanged(): void {
-    this.buildRows(this._rootSubject.getValue().object);
-  }
-  
-  public rowSelected(row: TreeRow): void {
+  protected rowSelected(row: TreeRow): void {
     this._navigationService.navigate('Explore', { id: this.getId(row) });
   }
   
-  public getText(object: any): string {
+  protected getText(object: any): string {
     return (object as ItemProxy).item.name;
   }
   
-  public getIcon(object: any): string {
+  protected getIcon(object: any): string {
     let iconString: string = '';
     let koheseType: KoheseType = (object as ItemProxy).model.type;
     if (koheseType && koheseType.viewModelProxy) {
