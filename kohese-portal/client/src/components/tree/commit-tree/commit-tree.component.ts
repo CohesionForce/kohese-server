@@ -91,7 +91,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   
   public ngOnInit(): void {
     this.rowActions.push(new RowAction('Use As History Lens', 'Uses this ' +
-      'commit as the history lens', 'fa fa-search', (row: TreeRow) => {
+      'commit as the history lens', 'fa fa-eye', (row: TreeRow) => {
       return (row.object instanceof Commit); 
       }, (row: TreeRow) => {
       this._lensService.setLens(ApplicationLens.HISTORY);

@@ -85,6 +85,8 @@ export abstract class Tree {
   get filterSubject() {
     return this._filterSubject;
   }
+  
+  private _filterDelayIdentifier: any;
 
   @ViewChild(VirtualScrollComponent)
   private _virtualScrollComponent: VirtualScrollComponent;
@@ -247,6 +249,23 @@ export abstract class Tree {
         this._filterSubject.next(filter);
       }
     });
+  }
+  
+  public searchStringChanged(searchString: string): void {
+    if (this._filterDelayIdentifier) {
+      clearTimeout(this._filterDelayIdentifier);
+    }
+
+    this._filterDelayIdentifier = setTimeout(() => {
+      let filter: Filter = this._filterSubject.getValue();
+      if (!filter) {
+        filter = new Filter();
+      }
+      filter.content = searchString;
+      
+      this._filterSubject.next(filter);
+      this._filterDelayIdentifier = undefined;
+    }, 1000);
   }
 
   protected deleteRow(id: string): void {
