@@ -1,5 +1,6 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { Observable } from 'rxjs/Observable';
@@ -30,6 +31,7 @@ describe('Component: version-control-tree', () => {
     TestBed.configureTestingModule({
       declarations: [VersionControlTreeComponent],
       imports: [
+        BrowserAnimationsModule,
         VirtualScrollModule,
         ToastrModule.forRoot(),
         MaterialModule
