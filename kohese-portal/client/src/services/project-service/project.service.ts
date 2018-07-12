@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from "../item-repository/item-repository.service";
-import { Subscription } from "rxjs";
+import { Subscription, Subject } from "rxjs";
 
 export interface ProjectInfo {
   proxy: ItemProxy,
@@ -54,7 +54,7 @@ export class ProjectService {
             if (notification) {
               // TODO Update the Project info in the generated list
               if (notification.proxy.kind === 'Project') {
-                this.generateProjectInfo(this.currentConfig.getAllItemProxies());
+                this.projects = this.generateProjectInfo(this.currentConfig.getAllItemProxies());
               }
             }
           })
@@ -143,7 +143,10 @@ export class ProjectService {
       let users = [];
       let currentProject = treeList[projectIdx];
       // Get referenced project items
-      let projectItems = currentProject.relations.references.Project.projectItems;
+      let projectItems = [];
+      if (currentProject.relations.references.Project) {
+        projectItems = currentProject.relations.references.Project.projectItems;
+      }
       for (let projectItemIdx in projectItems) {
         let currentProjectItem: ItemProxy = projectItems[projectItemIdx];
         let projectItemSubTree: Array<any> = currentProjectItem.getSubtreeAsList();
