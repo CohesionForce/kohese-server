@@ -161,6 +161,14 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getItemCache', function(request, sendResponse){
+
+    function sendBulkCacheUpdate(key, value){
+      console.log('### Sending BulkCacheUpdate for key: ' + key);
+      let bulkUpdateMessage = {};
+      bulkUpdateMessage[key] = value;
+      socket.emit('Item/BulkCacheUpdate', bulkUpdateMessage);
+    }
+
     let username = 'Unknown';
     let requestReceiptTime = Date.now();
     if (socket.koheseUser){
@@ -174,14 +182,19 @@ function KIOItemServer(socket){
     let itemCache = TreeConfiguration.getItemCache();
     let objectMap = itemCache.getObjectMap();
 
-    console.log('### Preparing BulkCacheUpdate');
-    for (let key in objectMap) {
-      console.log('### Sending BulkCacheUpdate for key: ' + key);
-      let bulkUpdateMessage = {};
-      bulkUpdateMessage[key] = objectMap[key];
-      socket.emit('Item/BulkCacheUpdate', bulkUpdateMessage);
+    console.log('### Preparing BulkCacheUpdate Messages');
+
+    sendBulkCacheUpdate('metadata', objectMap['metadata']);
+    sendBulkCacheUpdate('refs', objectMap['refs']);
+    sendBulkCacheUpdate('tags', objectMap['tags']);
+    sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
+    for (let key in objectMap.kTreeMapChunks) {
+      sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
     }
-    console.log('### Sent BulkCacheUpdate');
+    for (let key in objectMap.blobMapChunks) {
+      sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
+    }
+    console.log('### Sent BulkCacheUpdate Messages');
 
     let response = {
       timestamp: {

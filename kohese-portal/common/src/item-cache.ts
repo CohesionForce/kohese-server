@@ -11,6 +11,7 @@ import { TreeHashEntry, TreeHashMap, TreeHashValueType } from './tree-hash';
 
 // TODO set back to false and/or remove disable check below
 const disableObjectFreeze = false;
+const chunkSize : number = 1000;
 
 export class KoheseCommit {
   time: number;
@@ -40,18 +41,33 @@ type Blob = any;
 //////////////////////////////////////////////////////////////////////////
 
 export class ItemCache {
+  private metadata : {
+    numRefs: number,
+    numTags: number,
+    numCommits: number,
+    numTrees: number,
+    numBlobs: number
+  }
+  private refs;
+  private tags;
+  private kCommitMap : { [ oid : string ]: KoheseCommit};
+  private kTreeMap : { [ oid : string ]: KoheseTree};
+  private blobMap : { [ oid : string ]: Blob};
 
-  public refs;
-  public tags;
-  public kCommitMap : { [ oid : string ]: KoheseCommit};
-  public kTreeMap : { [ oid : string ]: KoheseTree};
-  public blobMap : { [ oid : string ]: Blob};
+  private objectMap;
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   constructor() {
 
+    this.metadata = {
+      numRefs: 0,
+      numTags: 0,
+      numCommits: 0,
+      numTrees: 0,
+      numBlobs: 0,
+    }
     this.refs = {};
     this.tags = {};
     this.kCommitMap = {};
@@ -63,34 +79,102 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  splitObject (object) {
+    let numKeys = _.size(object);
+    let numChunks = Math.ceil(numKeys/chunkSize);
+
+    console.log('::: Splitting Object with ' + numKeys + ' keys into ' + numChunks + ' chunks...');
+    let sObject = { 0 : {}};
+    let chunkIdx = 0;
+    let keyIndex = 0;
+    for (let key in object){
+      sObject[chunkIdx][key] = object[key];
+      keyIndex++;
+      if ((keyIndex % chunkSize) === 0) {
+        chunkIdx++;
+        sObject[chunkIdx] = {};
+      }
+    }
+
+    return sObject;
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   getObjectMap(){
-    return {
-      refs : this.refs,
-      tags : this.tags,
-      kCommitMap: this.kCommitMap,
-      kTreeMap: this.kTreeMap,
-      blobMap: this.blobMap
-    };
+    if (!this.objectMap){
+      this.objectMap = {
+        metadata : {
+          numRefs: _.size(this.refs),
+          numTags: _.size(this.tags),
+          numCommits: _.size(this.kCommitMap),
+          numTrees: _.size(this.kTreeMap),
+          numBlobs: _.size(this.blobMap)
+        },
+        refs : this.refs,
+        tags : this.tags,
+        kCommitMap : this.kCommitMap,
+        kTreeMapChunks: this.splitObject(this.kTreeMap),
+        blobMapChunks: this.splitObject(this.blobMap)
+      }
+    }
+    return this.objectMap;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   setObjectMap(objectMap){
+    let metadata = objectMap.metadata;
+
     if (objectMap.refs){
       this.refs = objectMap.refs;
+      this.metadata.numRefs = _.size(this.refs);
+      if(this.metadata.numRefs !== objectMap.metadata.numRefs){
+        console.log('*** Number of refs do not match: ' + _.size(this.refs));
+      }
     }
+
     if (objectMap.tags){
       this.tags = objectMap.tags;
+      this.metadata.numTags = _.size(this.tags);
+      if(this.metadata.numTags !== objectMap.metadata.numTags){
+        console.log('*** Number of tags do not match: ' + _.size(this.tags));
+      }
     }
+
     if (objectMap.kCommitMap){
       this.kCommitMap = objectMap.kCommitMap;
+      this.metadata.numCommits = _.size(this.kCommitMap);
+      if(this.metadata.numCommits !== objectMap.metadata.numCommits){
+        console.log('*** Number of commits do not match: ' + _.size(this.kCommitMap));
+      }
     }
+
     if (objectMap.kTreeMap){
       this.kTreeMap = objectMap.kTreeMap;
+      this.metadata.numTrees = _.size(this.kTreeMap);
+      if(this.metadata.numTrees !== objectMap.metadata.numTrees){
+        console.log('*** Number of trees do not match: ' + _.size(this.kTreeMap));
+      }
     }
+
     if (objectMap.blobMap){
       this.blobMap = objectMap.blobMap;
+      this.metadata.numBlobs = _.size(this.blobMap);
+      if(this.metadata.numBlobs !== objectMap.metadata.numBlobs){
+        console.log('*** Number of blobs do not match: ' + _.size(this.blobMap));
+      }
+    }
+
+    if (!_.isEqual(this.metadata, objectMap.metadata)){
+      console.log('*** Cache metadata does not match: ');
+      console.log('*** Server Cache Metadata:')
+      console.log(objectMap.metadata);
+      console.log('*** Client Cache Metadata:')
+      console.log(this.metadata);
     }
   }
 
