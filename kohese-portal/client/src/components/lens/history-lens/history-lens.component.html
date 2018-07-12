@@ -1,7 +1,7 @@
 <div style="height: 100%; width: 100%;">
   <span style="font-weight: bold; font-size: large">History</span>
   <span *ngIf="selectedCommit"> 
-    Version: {{selectedCommit.message}} | {{selectedCommit.time | date}} 
+    Version: {{selectedCommit.message}} | {{selectedCommit.time | date:'medium'}} 
   </span>
   <button mat-raised-button (click)="openCommitBrowser()" class="pull-right">
     Select Version...
