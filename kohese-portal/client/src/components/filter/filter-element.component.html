@@ -1,0 +1,59 @@
+<div style="height: 100%; width: 100%;" [ngStyle]="getIndentationStyle()">
+  <mat-checkbox (change)="elementSelected.emit(element)"></mat-checkbox>
+  <span style="height: 100%; width: 100%; border: 1px solid black;">
+    <ng-container [ngSwitch]="elementType">
+      <ng-container *ngSwitchCase="'FilterCriterion'">
+        <mat-form-field>
+          <mat-select placeholder="Condition"
+            [(ngModel)]="element.condition">
+            <mat-optgroup *ngFor="let conditionGroup of (CONDITIONS | mapKey)"
+              [label]="conditionGroup">
+              <mat-option
+                *ngFor="let condition of (CONDITIONS[conditionGroup] | mapKey)"
+                [value]="condition">
+                {{CONDITIONS[conditionGroup][condition]}}
+              </mat-option>
+            </mat-optgroup>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="text" placeholder="Value"
+            [(ngModel)]="element.value"/>
+        </mat-form-field>
+        <mat-checkbox [(ngModel)]="element.negate">
+          Negate
+        </mat-checkbox>
+      </ng-container>
+      <ng-container *ngSwitchCase="'FilterCriteriaConnection'">
+        <mat-form-field>
+          <mat-select placeholder="Type" [value]="element.type">
+            <mat-option [value]="FilterCriteriaConnectionType.AND">
+              AND
+            </mat-option>
+            <mat-option [value]="FilterCriteriaConnectionType.OR">
+              OR
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <ng-container *ngIf="inTargetingMode">
+          <button mat-icon-button (click)="targetSelected.emit(element)">
+            <mat-icon class="fa fa-crosshairs"></mat-icon>
+          </button>
+        </ng-container>
+        <br/>
+        <ng-container *ngFor="let criterion of element.criteria">
+          <filter-element [element]="criterion"
+            (elementSelected)="elementSelected.emit($event)">
+          </filter-element>
+        </ng-container>
+        <ng-container *ngFor="let connection of element.connections">
+          <filter-element [element]="connection"
+            [inTargetingMode]="inTargetingMode"
+            (targetSelected)="targetSelected.emit($event)"
+            (elementSelected)="elementSelected.emit($event)">
+          </filter-element>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </span>
+</div>

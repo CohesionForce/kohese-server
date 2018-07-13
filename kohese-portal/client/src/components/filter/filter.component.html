@@ -3,59 +3,60 @@
     Filter
   </h2>
   <div style="height: 83%; width: 100%;">
-    <mat-form-field>
-      <mat-select placeholder="Type" [value]="filter.types" multiple
-        (selectionChange)="typeSelectionsChanged($event.value)"
-        [compareWith]="compareTypeOptionAndSelection">
-        <mat-option *ngFor="let type of (typeMap | mapKey)"
-          [value]="type">
-          {{type}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <ng-container *ngIf="filter.types.length > 0">
-      <mat-form-field>
-        <mat-select placeholder="Property" [(value)]="filter.properties"
-          multiple>
-          <ng-container *ngFor="let type of filter.types">
-            <mat-option
-              *ngFor="let propertyId of (type.dataModelProxy.item.properties | mapKey)"
-              [value]="propertyId">
-              {{propertyId}}
-            </mat-option>
-          </ng-container>
-        </mat-select>
-      </mat-form-field>
-    </ng-container>
-    <br/>
-    <mat-form-field>
-      <input matInput type="text" placeholder="Content"
-        [(ngModel)]="filter.content"/>
-    </mat-form-field>
-    <mat-checkbox [(ngModel)]="filter.matchesEntireContent">
-      Matches Entire Content
-    </mat-checkbox>
-    <mat-checkbox [(ngModel)]="filter.negateContent">
-      Negate
-    </mat-checkbox>
-    <br/>
-    <mat-checkbox [(ngModel)]="filter.hasUnsavedChanges">
-      Has Unsaved Changes
-    </mat-checkbox>
-    <br/>
-    <mat-checkbox [(ngModel)]="filter.hasUncommittedChanges">
-      Has Uncommitted Changes
-    </mat-checkbox>
+    <div style="height: 10%; width: 100%; display: flex; flex-direction: row;">
+      <button mat-icon-button [matMenuTriggerFor]="addMenu"
+        class="flex-right-align"
+        [disabled]="(0 === selectedElements.length) || !areSelectedElementsConnections()">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+      <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item (click)="addCriterionToSelectedConnections()">
+          <mat-icon class="fa fa-plus"></mat-icon>
+          Add Criterion
+        </button>
+        <button mat-menu-item (click)="addConnectionToSelectedConnections()">
+          <mat-icon class="fa fa-plus"></mat-icon>
+          Add Connection
+        </button>
+      </mat-menu>
+      <ng-container *ngIf="!inTargetingMode">
+        <button mat-icon-button [disabled]="0 === selectedElements.length"
+          (click)="enterCopyTargetingMode()">
+          <mat-icon class="fa fa-copy"></mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="0 === selectedElements.length"
+          (click)="enterMoveTargetingMode()">
+          <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
+        </button>
+      </ng-container>
+      <ng-container *ngIf="inTargetingMode">
+        <button mat-icon-button (click)="exitTargetingMode()">
+          <mat-icon class="fa fa-times"></mat-icon>
+        </button>
+      </ng-container>
+      <button mat-icon-button [disabled]="0 === selectedElements.length"
+        (click)="deleteSelectedElements()">
+        <mat-icon class="fa fa-trash"></mat-icon>
+      </button>
+    </div>
+    <div style="height: 90%; width: 100%;">
+      <filter-element [element]="filter.rootElement"
+        [inTargetingMode]="inTargetingMode"
+        (targetSelected)="targetSelected($event)"
+        (elementSelected)="modifySelection($event)">
+      </filter-element>
+    </div>
   </div>
   <ng-container *ngIf="data">
     <mat-dialog-actions
-      style="height: 10%; width: 100%; display: flex; flex-direction: column;">
+      style="height: 10%; width: 100%; display: flex; flex-direction: row;">
       <span class="flex-right-align">
-        <button mat-raised-button [mat-dialog-close]="filter">
-          Apply
-        </button>
         <button mat-raised-button [mat-dialog-close]="">
           Cancel
+        </button>
+        <button mat-raised-button [disabled]="true"
+          [mat-dialog-close]="filter">
+          Apply
         </button>
       </span>
     </mat-dialog-actions>

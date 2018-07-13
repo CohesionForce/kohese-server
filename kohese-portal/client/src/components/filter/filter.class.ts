@@ -2,6 +2,17 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
 export class Filter {
+  private _rootElement: FilterCriteriaConnection =
+    new FilterCriteriaConnection(FilterCriteriaConnectionType.OR, 0);
+  get rootElement() {
+    return this._rootElement;
+  }
+  
+  private _elements: Array<FilterElement> = [];
+  get elements() {
+    return this._elements;
+  }
+  
   private _types: Array<KoheseType> = [];
   get types() {
     return this._types;
@@ -61,68 +72,174 @@ export class Filter {
   public constructor() {
   }
   
-  public filter(proxies: Array<ItemProxy>): Array<ItemProxy> {
-    let matchingProxies: Array<ItemProxy> = [];
-    for (let j: number = 0; j < proxies.length; j++) {
-      let proxy: ItemProxy = proxies[j];
+  public filter(objects: Array<any>): Array<any> {
+    let matchingObjects: Array<any> = [];
+    for (let j: number = 0; j < objects.length; j++) {
+      let object: any = objects[j];
       let matches: boolean = true;
-      if (this._hasUncommittedChanges && (Object.keys(proxy.status).length === 0)) {
-        matches = false;
-      } else if (this._hasUnsavedChanges && !proxy.dirty) {
-        matches = false;
-      }
-      
-      if ((this._types.length > 0) && (-1 === this._types.indexOf(proxy.model.
-        type))) {
-        matches = false;
-      }
-      
-      if (matches && this._content) {
-        matches = false;
-        let filterExpression: RegExp;
-        let filterIsRegex: Array<string> = this._content.match(new RegExp(
-          '^\/(.*)\/([gimy]*)$'));
-        if (filterIsRegex) {
-          filterExpression = new RegExp(filterIsRegex[1], filterIsRegex[2]);
+      for (let k: number = 0; k < this._elements.length; k++) {
+        let element: FilterElement = this._elements[k];
+        if (element instanceof FilterCriterion) {
+          matches = (element as FilterCriterion).evaluate(object);
         } else {
-          let cleanedPhrase: string = this._content.replace(
-            /[.*+?^${}()|[\]\\]/g, '\\$&');
-          filterExpression = new RegExp(this._content, 'i');
-        }
-        
-        let propertiesToCheck: Array<string> = [];
-        if (this._properties.length > 0) {
-          for (let k: number = 0; k < this._properties.length; k++) {
-            if (proxy.item[this._properties[k]]) {
-              propertiesToCheck.push(this._properties[k]);
-            }
-          }
-        } else {
-          propertiesToCheck.push(...Object.keys(proxy.item));
-        }
-        
-        for (let k: number = 0; k < propertiesToCheck.length; k++) {
-          let propertyAsString: string = proxy.item[propertiesToCheck[k]].
-            toString();
-          if (this._negateContent) {
-            if (!propertyAsString.match(filterExpression)) {
-              matches = true;
-              break;
-            }
-          } else {
-            if (propertyAsString.match(filterExpression)) {
-              matches = true;
-              break;
-            }
+          if ((!matches && (element as FilterCriteriaConnection).type === FilterCriteriaConnectionType.AND) ||
+            (matches && (element as FilterCriteriaConnection).type === FilterCriteriaConnectionType.OR)) {
+            break;
           }
         }
       }
       
       if (matches) {
-        matchingProxies.push(proxy);
+        matchingObjects.push(object);
       }
     }
     
-    return matchingProxies;
+    return matchingObjects;
   }
+}
+
+export class FilterElement {
+  get depth() {
+    return this._depth;
+  }
+  set depth(depth: number) {
+    this._depth = depth;
+  }
+  
+  protected constructor(private _depth: number) {
+  }
+}
+
+export class FilterCriterion extends FilterElement {
+  public static readonly CONDITIONS: any = {
+    Object: {
+      'TYPE_EQUALS': 'type equals',
+      'SUBCLASS_OF': 'subclass of',
+      'HAS_PROPERTY': 'has property'
+    },
+    Property: {
+      'LESS_THAN': '<',
+      'LESS_THAN_OR_EQUAL_TO': '<=',
+      'EQUALS': '=',
+      'CONTAINS': 'contains',
+      'ENDS_WITH': 'ends with',
+      'BEGINS_WITH': 'begins with',
+      'GREATER_THAN_OR_EQUAL_TO': '>=',
+      'GREATER_THAN': '>'
+    }
+  };
+  
+  get negate() {
+    return this._negate;
+  }
+  set negate(negate: boolean) {
+    this._negate = negate;
+  }
+  
+  get condition() {
+    return this._condition;
+  }
+  set condition(condition: string) {
+    this._condition = condition;
+  }
+  
+  get value() {
+    return this._value;
+  }
+  set value(value: string) {
+    this._value = value;
+  }
+  
+  public constructor(private _negate: boolean, private _condition: string,
+    private _value: string, depth: number) {
+    super(depth);
+  }
+  
+  public static getDefaultTrueCriterion(depth: number): FilterCriterion {
+    return new FilterCriterion(false, FilterCriterion.CONDITIONS.Property.
+      BEGINS_WITH, '', depth);
+  }
+  
+  public static getDefaultFalseCriterion(depth: number): FilterCriterion {
+    return new FilterCriterion(true, FilterCriterion.CONDITIONS.Property.
+      BEGINS_WITH, '', depth);
+  }
+  
+  public evaluate(candidate: any): boolean {
+    let result: boolean = true;
+    switch (this._condition) {
+      case FilterCriterion.CONDITIONS.Property.LESS_THAN:
+        result = (+candidate.toString() < +this._value);
+        break;
+      case FilterCriterion.CONDITIONS.Property.LESS_THAN_OR_EQUAL_TO:
+        result = (+candidate.toString() <= +this._value);
+        break;
+      case FilterCriterion.CONDITIONS.Property.EQUALS:
+        result = (candidate.toString() === this._value);
+        break;
+      case FilterCriterion.CONDITIONS.Property.CONTAINS:
+        result = (candidate.toString().contains(this._value));
+        break;
+      case FilterCriterion.CONDITIONS.Property.ENDS_WITH:
+        result = (candidate.toString().endsWith(this._value));
+        break;
+      case FilterCriterion.CONDITIONS.Property.BEGINS_WITH:
+        result = (candidate.toString().startsWith(this._value));
+        break;
+      case FilterCriterion.CONDITIONS.Property.GREATER_THAN_OR_EQUAL_TO:
+        result = (+candidate.toString() >= +this._value);
+        break;
+      case FilterCriterion.CONDITIONS.Property.GREATER_THAN:
+        result = (+candidate.toString() > +this._value);
+        break;
+      case FilterCriterion.CONDITIONS.Object.TYPE_EQUALS:
+        let typeString: string = Object.prototype.toString.call(candidate);
+        result = (this._value === typeString.substring(8, typeString.length -
+          1));
+        break;
+      case FilterCriterion.CONDITIONS.Object.SUBCLASS_OF:
+        let anObject: any = candidate;
+        let toStringFunction: Function = Object.prototype.toString;
+        while (Object.getPrototypeOf(anObject) !== Object.prototype) {
+          let typeString: string = Object.prototype.toString.call(anObject);
+          result = (this._value === typeString.substring(8, typeString.length -
+            1));
+          if (result) {
+            break;
+          }
+          anObject = Object.getPrototypeOf(anObject);
+        }
+        break;
+      case FilterCriterion.CONDITIONS.Object.HAS_PROPERTY:
+        result = (null != candidate[this._value]);
+        break;
+    }
+    
+    if (this._negate) {
+      result = !result;
+    }
+    
+    return result;
+  }
+}
+
+export class FilterCriteriaConnection extends FilterElement {
+  private _connections: Array<FilterCriteriaConnection> = [];
+  get connections() {
+    return this._connections;
+  }
+  
+  private _criteria: Array<FilterCriterion> = [];
+  get criteria() {
+    return this._criteria;
+  }
+  
+  public constructor(public type: FilterCriteriaConnectionType,
+    depth: number) {
+    super(depth);
+  }
+}
+
+export enum FilterCriteriaConnectionType {
+  AND, OR
 }

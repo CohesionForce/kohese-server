@@ -224,7 +224,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   }
   
   protected getText(object: any): string {
-    return (object as ItemProxy).item.name;
+    let item: any = (object as ItemProxy).item;
+    let text: string = item.name;
+    if (item.tags) {
+      text = text + ' ' + item.tags;
+    }
+    
+    return text;
   }
   
   protected getIcon(object: any): string {
