@@ -735,14 +735,14 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   calculateTreeHash(deferredRollup : boolean = false) {
 
-    // TODO: Should only have to do this when content is updated
-    this.calculateOID();
-
     // Don't calculateTreeHash during initial load
     if (!this.item || (this.treeConfig.loading && !deferredRollup)){
       this.deferTreeHash = true;
       return;
     }
+
+    // TODO: Should only have to do this when content is updated
+    this.calculateOID();
 
     let treeHashEntry : TreeHashEntry = {
         kind: this.kind,
@@ -798,7 +798,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   calculateRepoTreeHashes() {
     const deferredRollup = true;
-    this.visitTree({excludeKind : ['Repository', 'Internal']}, null, (proxy) => {
+    this.visitTree({excludeKind : ['Repository', 'Internal']}, null, (proxy : ItemProxy) => {
       proxy.calculateTreeHash(deferredRollup);
     });
   }

@@ -65,6 +65,9 @@ export class ItemRepository {
 
   currentTreeConfigSubject: BehaviorSubject<TreeConfigInfo> = new BehaviorSubject<TreeConfigInfo>(undefined);
 
+  cacheFetched: boolean = false;
+
+  //////////////////////////////////////////////////////////////////////////
   constructor(private socketService: SocketService,
     private CurrentUserService: CurrentUserService,
     private toastrService: ToastrService,
@@ -76,6 +79,7 @@ export class ItemRepository {
     this.initialize();
   }
 
+  //////////////////////////////////////////////////////////////////////////
   initialize(): void {
     this.logService.log(this.logEvents.itemRepoInit);
 
@@ -114,18 +118,22 @@ export class ItemRepository {
 
   // End Item Proxy Wrapper
 
+  //////////////////////////////////////////////////////////////////////////
   getRepoStatusSubject(): BehaviorSubject<any> {
     return this.repositoryStatus;
   }
 
+  //////////////////////////////////////////////////////////////////////////
   registerRecentProxy(itemProxy: ItemProxy) {
     this.recentProxies.push(itemProxy);
   }
 
+  //////////////////////////////////////////////////////////////////////////
   getRecentProxies(): Array<ItemProxy> {
     return this.recentProxies;
   }
 
+  //////////////////////////////////////////////////////////////////////////
   registerKoheseIOListeners(): void {
     CacheManager.authenticate();
 
@@ -212,6 +220,41 @@ export class ItemRepository {
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  createFeatureSwitch(featureName, defaultValue){
+
+    let storedValue = localStorage.getItem(featureName)
+
+    if (!storedValue) {
+      this.setFeatureSwitch(featureName, defaultValue);
+    };
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  setFeatureSwitch(featureName, value){
+
+    localStorage.setItem(featureName, JSON.stringify(value));
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  loadFeatureSwitch(featureName, defaultValue){
+
+    let switchResult = defaultValue;
+
+    let storedValue = localStorage.getItem(featureName)
+
+    if (storedValue) {
+      switchResult = JSON.parse(storedValue);
+    } else {
+      this.createFeatureSwitch(featureName, defaultValue);
+    };
+
+    return switchResult
+  }
+
+  //////////////////////////////////////////////////////////////////////////
   processBulkUpdate(response) {
     this.logService.log(this.logEvents.processBulkUpdate);
     for (let kind in response.cache) {
@@ -274,8 +317,7 @@ export class ItemRepository {
     }
   }
 
-  cacheFetched: boolean = false;
-
+  //////////////////////////////////////////////////////////////////////////
   fetchItems() {
 
     // this.cacheFetched = true;
@@ -310,34 +352,38 @@ export class ItemRepository {
           // TODO Need to load the HEAD commit
           this.logService.log(this.logEvents.loadHeadCommit);
           itemCache.loadProxiesForCommit(headCommit, workingTree);
-          workingTree.calculateAllTreeHashes();
 
           this.cacheFetched = true;
         }
 
+        let beginBulkProcessing = Date.now();
+        console.log('$$$ Metamodel and cache processing time: ' + (beginBulkProcessing-afterFetch)/1000);
         this.processBulkUpdate(response.allItems);
 
         let processingComplete = Date.now();
-        this.logService.log(this.logEvents.bulkUpdateProcessingTime, {processTime : (processingComplete - afterFetch) / 1000});
-        ItemProxy.getWorkingTree().loadingComplete();
+        this.logService.log(this.logEvents.bulkUpdateProcessingTime, {processTime : (processingComplete - beginBulkProcessing) / 1000});
+        let skipCalc = this.loadFeatureSwitch('IR-skip-calc', false);
+        ItemProxy.getWorkingTree().loadingComplete(skipCalc);
         let treehashComplete = Date.now();
         this.logService.log(this.logEvents.treeHashProcessingTime, {processTime : (treehashComplete - processingComplete) / 1000});
 
         // TODO Remove after cache is complete
         // Invoke fetch to peform a delta update
-        this.fetchItems();
+        if(!skipCalc){
+          this.fetchItems();
+        } else {
+          console.log('$$$ Bypassing secondary sync');
+          this.notifyRepoIsSynchronized();
+
+          // console.log('$$$ Calculating tree hashes');
+          // TreeConfiguration.getWorkingTree().calculateAllTreeHashes();
+          // console.log('$$$ Tree hashes calculated');
+        }
       });
       return;
     }
 
-    // Load feature switch
-    let ifaKey = 'IR-fetch-all';
-    let fetchAllStoredValue = localStorage.getItem(ifaKey)
-    let fetchAll = true;
-    if (fetchAllStoredValue) {
-      fetchAll = JSON.parse(fetchAllStoredValue);
-    };
-    this.logService.log(this.logEvents.fetchAll);
+    let fetchAll = this.loadFeatureSwitch('IR-fetch-all', true);
 
     if (fetchAll) {
       this.fetchAllItems(null);
@@ -395,6 +441,7 @@ export class ItemRepository {
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////
   fetchAllItems(forRepoId) {
     this.logService.log(this.logEvents.getAll);
     var beginFetching = Date.now();
@@ -494,20 +541,25 @@ export class ItemRepository {
           }
         } else {
           // Final repo sync
-          this.currentTreeConfigSubject.next({
-            config: TreeConfiguration.getWorkingTree(),
-            configType: TreeConfigType.DEFAULT
-          });
-          this.repositoryStatus.next({
-            state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
-            message: 'Item Repository Ready'
-          });
-
-          var rootProxy = ItemProxy.getWorkingTree().getRootProxy();
-          this.getStatusFor(rootProxy);
+          this.notifyRepoIsSynchronized();
         }
       }
     });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  private notifyRepoIsSynchronized(){
+    this.currentTreeConfigSubject.next({
+      config: TreeConfiguration.getWorkingTree(),
+      configType: TreeConfigType.DEFAULT
+    });
+    this.repositoryStatus.next({
+      state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
+      message: 'Item Repository Ready'
+    });
+
+    var rootProxy = ItemProxy.getWorkingTree().getRootProxy();
+    this.getStatusFor(rootProxy);
   }
 
   fetchItem(proxy) {
@@ -522,6 +574,7 @@ export class ItemRepository {
     return promise;
   }
 
+  //////////////////////////////////////////////////////////////////////////
   buildItem(kind: string, item: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.socketService.socket.emit('Item/upsert', { kind: kind, item: item }, (response) => {
@@ -544,6 +597,7 @@ export class ItemRepository {
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////
   upsertItem(proxy: ItemProxy): Promise<ItemProxy> {
     return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void),
       reject: ((value: any) => void)) => {
@@ -574,6 +628,7 @@ export class ItemRepository {
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////
   deleteItem(proxy, recursive) {
     this.logService.log(this.logEvents.deletingItem, {item : proxy , recursive : recursive});
 
@@ -590,18 +645,21 @@ export class ItemRepository {
     return promise;
   }
 
+  //////////////////////////////////////////////////////////////////////////
   generateHTMLReportFor(proxy) {
     this.socketService.socket.emit('Item/generateReport', { onId: proxy.item.id, format: 'html' }, (results) => {
       this.logService.log(this.logEvents.generateHTMLReport, {response : results});
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////
   generateDOCXReportFor(proxy) {
     this.socketService.socket.emit('Item/generateReport', { onId: proxy.item.id, format: 'docx' }, (results) => {
       this.logService.log(this.logEvents.generateDOCXReport, {response : results});
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////
   public getHistoryFor(proxy: ItemProxy): Observable<Array<any>> {
     let emitReturningObservable: (message: string, data: any) => Observable<any> =
       Observable.bindCallback(this.socketService.getSocket().emit.bind(this.
@@ -615,6 +673,7 @@ export class ItemRepository {
       });
   }
 
+  //////////////////////////////////////////////////////////////////////////
   getStatusFor(repo) {
     this.socketService.socket.emit('Item/getStatus', { repoId: repo.item.id }, (results) => {
       if (!repo.repoStatus) {
@@ -636,6 +695,7 @@ export class ItemRepository {
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////
   performAnalysis(forProxy) {
     this.logService.log(this.logEvents.performingAnalysis, {proxy : forProxy});
 
@@ -652,6 +712,7 @@ export class ItemRepository {
     return promise;
   }
 
+  //////////////////////////////////////////////////////////////////////////
   private updateStatus(proxy: ItemProxy, statuses: Array<string>): void {
     if (statuses.length > 0) {
       proxy.status = this._versionControlService.translateStatus(statuses);
@@ -667,10 +728,12 @@ export class ItemRepository {
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////
   getTreeConfig(): Observable<any> {
     return this.currentTreeConfigSubject;
   }
 
+  //////////////////////////////////////////////////////////////////////////
   setTreeConfig(treeId: string, configType: TreeConfigType): void {
     let treeConfiguration = TreeConfiguration.getTreeConfigFor(treeId);
     if (!treeConfiguration) {
