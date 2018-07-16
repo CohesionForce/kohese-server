@@ -1,11 +1,7 @@
-<div style="height: 7%; width: 100%; display: flex; flex-direction: row;">
-  <!--button mat-icon-button [matMenuTriggerFor]="filterMenu"
-    [ngClass]="{ 'highlight': filterSubject.getValue() }"
-    class="flex-right-align">
-    <mat-icon class="fa fa-filter"></mat-icon>
-  </button>
-  <mat-menu #filterMenu="matMenu" [overlapTrigger]="false">
-    <button mat-menu-item (click)="openFilterDialog()">
+  <div class="top-bar">
+    <!--button mat-icon-button [matMenuTriggerFor]="filterMenu"
+      [ngClass]="{ 'highlight': filterSubject.getValue() }"
+      class="flex-right-align">
       <mat-icon class="fa fa-filter"></mat-icon>
       Edit Filter
     </button>
@@ -15,19 +11,17 @@
     </button>
   </mat-menu-->
 </div>
-<div style="height: 12%; width: 100%;">
-  <div class="kt-head kth-cell">
-    Root
-  </div>
-  <ng-container *ngIf="rootSubject.getValue()">
-    <tree-row [treeRow]="rootSubject.getValue()"
-    [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
-    </tree-row>
-  </ng-container>
-</div>
-<div style="height: 81%; width: 100%;">
-  <div class="kt-head kth-cell">
-    Descendants
+  <div style="height: 12%; width: 100%;">
+    <div class="kt-head kth-cell">
+      Root
+    </div>
+    <ng-container *ngIf="rootSubject.getValue()">
+      <div class="kt-body">
+        <tree-row [treeRow]="rootSubject.getValue()"
+          [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
+        </tree-row>
+      </div>
+    </ng-container>
   </div>
   <div class="kt-body">
     <virtual-scroll #tree [items]="visibleRows">
@@ -37,4 +31,3 @@
       </tree-row>
     </virtual-scroll>
   </div>
-</div>

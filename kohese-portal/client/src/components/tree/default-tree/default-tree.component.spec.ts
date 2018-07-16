@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture, fakeAsync,
   tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -19,6 +20,7 @@ import { TreeRow } from '../tree-row.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../../common/src/KoheseModel';
+import { Filter } from '../../filter/filter.class';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 
@@ -29,6 +31,7 @@ describe('Component: default-tree', () => {
     TestBed.configureTestingModule({
       declarations: [DefaultTreeComponent],
       imports: [
+        BrowserAnimationsModule,
         VirtualScrollModule,
         MaterialModule
       ],
@@ -148,4 +151,15 @@ describe('Component: default-tree', () => {
 
     expect(true).toEqual(true);
   }));
+  
+  it('filters when a search string is provided', (done: Function) => {
+    expect(component.filterSubject.getValue()).not.toBeDefined();
+    component.searchStringChanged('Search String');
+    setTimeout(() => {
+      let filter: Filter = component.filterSubject.getValue();
+      expect(filter).toBeDefined();
+      expect(filter.content).toEqual('Search String');
+      done();
+    }, 1000);
+  });
 });
