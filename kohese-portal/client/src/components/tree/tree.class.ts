@@ -5,8 +5,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
 import { DialogService } from '../../services/dialog/dialog.service';
-import { TreeRow } from './tree-row.class';
-import { RowAction, MenuAction } from './tree-row.component';
+import { TreeRow } from './tree-row/tree-row.class';
+import { RowAction, MenuAction } from './tree-row/tree-row.component';
 import { Filter } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
@@ -18,7 +18,7 @@ export abstract class Tree {
   get visibleRows() {
     return this._visibleRows;
   }
-  
+
   private _rootSubject: BehaviorSubject<TreeRow> =
     new BehaviorSubject<TreeRow>(undefined);
   get rootSubject() {
@@ -347,37 +347,37 @@ export abstract class Tree {
     }
     this.postRowProcessingActivity(row);
   }
-  
+
   protected abstract getId(row: TreeRow): string;
-  
+
   protected abstract getParent(row: TreeRow): TreeRow;
-  
+
   protected abstract getChildren(row: TreeRow): Array<TreeRow>;
-  
+
   protected abstract getText(object: any): string;
-  
+
   protected abstract getIcon(object: any): string;
-  
+
   protected preTreeTraversalActivity(): void {
     // Subclasses may override this function
   }
-  
+
   protected preRowProcessingActivity(row: TreeRow): void {
     // Subclasses may override this function
   }
-  
+
   protected postRowProcessingActivity(row: TreeRow): void {
     // Subclasses may override this function
   }
-  
+
   protected postTreeTraversalActivity(): void {
     // Subclasses may override this function
   }
-  
+
   protected setRowAsRoot(row: TreeRow) {
     this._rootSubject.next(row);
   }
-  
+
   protected rowSelected(row: TreeRow): void {
     // Subclasses may override this function
   }

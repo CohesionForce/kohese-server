@@ -1,27 +1,5 @@
-@import '../../../app.component';
+@import '../../../../app.component';
 
-.kt-head {
-  width: 100%;
-  font-weight: bold;
-  vertical-align: bottom;
-  border-bottom: 2px solid #ddd;
-}
-
-.kth-cell {
-  display: inline-block;
-  vertical-align: top;
-  padding: 5px 0px 0px;
-}
-
-virtual-scroll {
-  height: 100%;
-  width: 100%;
-}
-
-.kt-icon {
-  cursor: pointer;
-  padding : 5px;
-}
 
 .kt-item {
   display: flex;
@@ -44,19 +22,11 @@ virtual-scroll {
   }
 }
 
-#rightSpan {
-  margin-left: auto;
-  flex: 0 0 auto;
-}
 
 .kt-item:hover {
   background-color: #e5e5e5;
 }
 
-.kt-body {
-  height: calc(100% - 31px);
-  overflow: auto;
-}
 
 .no-children {
   padding-left: 15px !important;
@@ -88,8 +58,14 @@ virtual-scroll {
   color: $secondaryColor + 100;
 }
 
-:host {
-  height: calc(100% - 50px);
-  width: 100%;
-  display: inline-block
+#rightSpan {
+  margin-left: auto;
+  flex: 0 0 auto;
 }
+
+.kt-icon {
+  cursor: pointer;
+  padding : 5px;
+}
+
+

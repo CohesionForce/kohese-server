@@ -14,8 +14,8 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/compare-items.component';
 import { Tree } from '../tree.class';
-import { TreeRow } from '../tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row.component';
+import { TreeRow } from '../tree-row/tree-row.class';
+import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
 
 @Component({
   selector: 'default-tree',
@@ -28,12 +28,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   get absoluteRoot() {
     return this._absoluteRoot;
   }
-  
+
   private _synchronizeWithSelection: boolean = true;
   get synchronizeWithSelection() {
     return this._synchronizeWithSelection;
   }
-  
+
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/dirty.ico', 'Unsaved Changes',
       false, (row: TreeRow) => {
@@ -51,17 +51,17 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   get images() {
     return this._images;
   }
-  
+
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     route: ActivatedRoute, private _itemRepository: ItemRepository,
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
     super(route, dialogService);
   }
-  
+
   public ngOnInit(): void {
     let deleteMenuAction: MenuAction = new MenuAction('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (row: TreeRow) => {
@@ -74,14 +74,14 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           if (row === this.rootSubject.getValue()) {
             this.rootSubject.next(this.getParent(row));
           }
-          
+
           this._itemRepository.deleteItem((row.object as ItemProxy), (2 === result));
         }
       });
     });
     this.rootMenuActions.push(deleteMenuAction);
     this.menuActions.push(deleteMenuAction);
-    
+
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (row: TreeRow) => {
@@ -91,7 +91,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
-    
+
     let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (row:
@@ -107,7 +107,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
-    
+
     let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
       'Compare this Item against another Item', 'fa fa-exchange', (row: TreeRow) => {
       return true;
@@ -116,7 +116,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.push(itemComparisonAction);
     this.menuActions.push(itemComparisonAction);
-    
+
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
@@ -125,13 +125,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           ItemProxy) => {
           this.buildRow(proxy);
         });
-        
+
         let lostAndFoundProxy: ItemProxy = treeConfigurationObject.config.
           getLostAndFoundProxy();
         if (!this.getRow(lostAndFoundProxy.item.id)) {
           this.buildRow(lostAndFoundProxy);
         }
-        
+
         if (this._treeConfigurationSubscription) {
           this._treeConfigurationSubscription.unsubscribe();
         }
@@ -163,20 +163,20 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
               }
           }
         });
-        
+
         this.rootSubject.next(this.getRow(this._absoluteRoot.item.id));
-        
+
         this._route.params.subscribe((parameters: Params) => {
           if (this._synchronizeWithSelection) {
             this.showSelection();
           }
         });
-        
+
         this.showSelection();
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this.prepareForDismantling();
     if (this._treeConfigurationSubscription) {
@@ -184,71 +184,71 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     }
     this._itemRepositorySubscription.unsubscribe();
   }
-  
+
   public toggleSelectionSynchronization(): void {
     this._synchronizeWithSelection = !this._synchronizeWithSelection;
     if (this._synchronizeWithSelection) {
       this.showSelection();
     }
   }
-  
+
   protected getId(row: TreeRow): string {
     return (row.object as ItemProxy).item.id;
   }
-  
+
   protected getParent(row: TreeRow): TreeRow {
     let parent: TreeRow = undefined;
     if ((row.object as ItemProxy).parentProxy) {
       parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
     }
-    
+
     return parent;
   }
-  
+
   protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     let proxy: ItemProxy = (row.object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
       children.push(this.getRow(proxy.children[j].item.id));
     }
-    
+
     return children;
   }
-  
+
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   protected rowSelected(row: TreeRow): void {
     this._navigationService.navigate('Explore', { id: this.getId(row) });
   }
-  
+
   protected getText(object: any): string {
     return (object as ItemProxy).item.name;
   }
-  
+
   protected getIcon(object: any): string {
     let iconString: string = '';
     let koheseType: KoheseType = (object as ItemProxy).model.type;
     if (koheseType && koheseType.viewModelProxy) {
       iconString = koheseType.viewModelProxy.item.icon;
     }
-    
+
     return iconString;
   }
-  
+
   private openComparisonDialog(row: TreeRow, changeVersionDesignator:
     VersionDesignator): void {
     let compareItemsDialogParameters: any = {
       baseProxy: row.object,
       editable: true
     };
-    
+
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] = row.object;
       compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
     }
-    
+
     this._dialogService.openComponentDialog(CompareItemsComponent, {
       data: compareItemsDialogParameters
     }).updateSize('90%', '90%');
