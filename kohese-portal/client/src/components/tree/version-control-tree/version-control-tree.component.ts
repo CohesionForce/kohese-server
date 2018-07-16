@@ -14,8 +14,8 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/compare-items.component';
 import { Tree } from '../tree.class';
-import { TreeRow } from '../tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row.component';
+import { TreeRow } from '../tree-row/tree-row.class';
+import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
 
 @Component({
   selector: 'version-control-tree',
@@ -29,7 +29,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   get absoluteRoot() {
     return this._absoluteRoot;
   }
-  
+
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
       (row: TreeRow) => {
@@ -43,10 +43,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   get images() {
     return this._images;
   }
-  
+
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef, route:
     ActivatedRoute, private _itemRepository: ItemRepository, dialogService:
     DialogService, private _navigationService: NavigationService,
@@ -55,7 +55,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     DynamicTypesService) {
     super(route, dialogService);
   }
-  
+
   public ngOnInit(): void {
     let versionControlRowActions: Array<RowAction> = [
       new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
@@ -108,7 +108,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     ];
     this.rootRowActions.splice(0, 0, ...versionControlRowActions);
     this.rowActions.splice(0, 0, ...versionControlRowActions);
-    
+
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (row: TreeRow) => {
@@ -118,7 +118,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     });
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
-    
+
     let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (row:
@@ -134,7 +134,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     });
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
-    
+
     let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
       'Compare this Item against another Item', 'fa fa-exchange', (row: TreeRow) => {
       return true;
@@ -143,12 +143,12 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     });
     this.rootMenuActions.push(itemComparisonAction);
     this.menuActions.push(itemComparisonAction);
-    
+
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
         this._absoluteRoot = treeConfigurationObject.config.getRootProxy();
-        
+
         if (this._treeConfigurationSubscription) {
           this._treeConfigurationSubscription.unsubscribe();
         }
@@ -163,14 +163,14 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
             }
           }
         });
-        
+
         this.buildRows(this._absoluteRoot);
         this.rootSubject.next(this.getRow(this._absoluteRoot.item.id));
         this.showSelection();
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this.prepareForDismantling();
     if (this._treeConfigurationSubscription) {
@@ -178,10 +178,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     }
     this._itemRepositorySubscription.unsubscribe();
   }
-  
+
   private buildRows(root: ItemProxy): void {
     this.clear();
-    
+
     let rootRow: TreeRow = this.buildRow(root);
     rootRow.expanded = true;
     root.visitTree({ includeOrigin: false }, undefined, (proxy: ItemProxy) => {
@@ -194,26 +194,26 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           }
         }
       }
-      
+
       if (build) {
         this.buildRow(proxy);
       }
     });
   }
-  
+
   protected getId(row: TreeRow): string {
     return (row.object as ItemProxy).item.id;
   }
-  
+
   protected getParent(row: TreeRow): TreeRow {
     let parent: TreeRow = undefined;
     if ((row.object as ItemProxy).parentProxy) {
       parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
     }
-    
+
     return parent;
   }
-  
+
   protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     let proxy: ItemProxy = (row.object as ItemProxy);
@@ -223,44 +223,44 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         children.push(childRow);
       }
     }
-    
+
     return children;
   }
-  
+
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   protected rowSelected(row: TreeRow): void {
     this._navigationService.navigate('Explore', { id: this.getId(row) });
   }
-  
+
   protected getText(object: any): string {
     return (object as ItemProxy).item.name;
   }
-  
+
   protected getIcon(object: any): string {
     let iconString: string = '';
     let koheseType: KoheseType = (object as ItemProxy).model.type;
     if (koheseType && koheseType.viewModelProxy) {
       iconString = koheseType.viewModelProxy.item.icon;
     }
-    
+
     return iconString;
   }
-  
+
   private openComparisonDialog(row: TreeRow, changeVersionDesignator:
     VersionDesignator): void {
     let compareItemsDialogParameters: any = {
       baseProxy: row.object,
       editable: true
     };
-    
+
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] = row.object;
       compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
     }
-    
+
     this._dialogService.openComponentDialog(CompareItemsComponent, {
       data: compareItemsDialogParameters
     }).updateSize('90%', '90%');

@@ -10,8 +10,8 @@ import { ItemRepository,
 import { LensService, ApplicationLens } from '../../../services/lens-service/lens.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { Tree } from '../tree.class';
-import { TreeRow } from '../tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row.component';
+import { TreeRow } from '../tree-row/tree-row.class';
+import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemCache, KoheseCommit } from '../../../../../common/src/item-cache';
@@ -31,7 +31,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   private _repositoryProxy: ItemProxy;
   @Output('rowSelected')
   public rowSelectedEmitter: EventEmitter<any> = new EventEmitter<any>();
-  
+
   private _images: Array<Image> = [
     new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
       CONTENT_CHANGED), DifferenceTypeOperations.toString(DifferenceType.
@@ -79,55 +79,55 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   get images() {
     return this._images;
   }
-  
+
   private _itemRepositorySubscription: Subscription;
-  
+
   public constructor(route: ActivatedRoute, dialogService: DialogService,
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
     ItemRepository, private _lensService: LensService,
     private _navigationService: NavigationService) {
     super(route, dialogService);
   }
-  
+
   public ngOnInit(): void {
     this.rowActions.push(new RowAction('Use As History Lens', 'Uses this ' +
       'commit as the history lens', 'fa fa-eye', (row: TreeRow) => {
-      return (row.object instanceof Commit); 
+      return (row.object instanceof Commit);
       }, (row: TreeRow) => {
       this._lensService.setLens(ApplicationLens.HISTORY);
       this._itemRepository.setTreeConfig((row.object as Commit).id,
         TreeConfigType.HISTORICAL);
     }));
-    
+
     this.menuActions.push(new MenuAction('Compare Against...', '',
       'fa fa-exchange', (row: TreeRow) => {
       return true;
       }, (row: TreeRow) => {
       this.openComparisonDialog(row.object);
     }));
-    
+
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
         this._repositoryProxy = treeConfigurationObject.config.getRootProxy();
         this.buildRows();
-        
+
         this._route.params.subscribe((parameters: Params) => {
           this.showSelection();
         });
-        
+
         this.showSelection();
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this._itemRepositorySubscription.unsubscribe();
   }
-  
+
   private buildRows(): void {
     this.clear();
-    
+
     let cache: ItemCache = TreeConfiguration.getItemCache();
     let commitMap: any = cache.getCommits();
     let sortedCommitArray: Array<any> = [];
@@ -154,15 +154,15 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         differences.push(...CommitComparisonComponent.compareCommits(
           commitObject.commit.parents[0], commitObject.oid));
       }
-      
+
       for (let j: number = 0; j < differences.length; j++) {
         this.buildRow(differences[j]);
       }
     }
-    
+
     this.rootSubject.next(rootRow);
   }
-  
+
   protected getId(row: TreeRow): string {
     let id: string = '';
     if (row.object instanceof Repository) {
@@ -173,10 +173,10 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       let difference: Difference = (row.object as Difference);
       id = difference.commitId + '_' + difference.item.id;
     }
-    
+
     return id;
   }
-  
+
   protected getParent(row: TreeRow): TreeRow {
     if (row.object instanceof Commit) {
       return this.getRow(this._repositoryProxy.item.id);
@@ -184,7 +184,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       return this.getRow((row.object as Difference).commitId);
     }
   }
-  
+
   protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     if (row.object instanceof Repository) {
@@ -199,10 +199,10 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
           j].item.id));
       }
     }
-    
+
     return children;
   }
-  
+
   protected getText(object: any): string {
     let text: string = '';
     if (object instanceof Repository) {
@@ -212,10 +212,10 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     } else if (object instanceof Difference) {
       text = (object as Difference).item.name;
     }
-    
+
     return text;
   }
-  
+
   protected getIcon(object: any): string {
     let iconString: string = '';
     if (object instanceof Repository) {
@@ -224,21 +224,21 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       iconString = 'fa fa-stamp';
     } else if (object instanceof Difference) {
     }
-    
+
     return iconString;
   }
-  
+
   protected rowSelected(row: TreeRow): void {
     this.rowSelectedEmitter.emit(row.object);
     this._navigationService.navigate('Versions', {
       id: this.getId(row)
     });
   }
-  
+
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   private openComparisonDialog(baseObject: any): void {
     if (baseObject instanceof Commit) {
       let previousCommitId: string;
@@ -251,7 +251,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
           break;
         }
       }
-      
+
       this._dialogService.openComponentDialog(CommitComparisonComponent, {
         data: {
           repositoryProxy: this._repositoryProxy,
@@ -266,7 +266,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       } else if (baseObject instanceof Difference) {
         //baseProxy = (baseObject instanceof Difference).item;
       }
-      
+
       this._dialogService.openComponentDialog(CompareItemsComponent, {
         data: {
           //baseProxy: ,
@@ -282,11 +282,11 @@ class Repository {
   get proxy() {
     return this._proxy;
   }
-  
+
   get commits() {
     return this._commits;
   }
-  
+
   public constructor(private _proxy: ItemProxy, private _commits:
     Array<Commit>) {
   }
@@ -296,15 +296,15 @@ export class Commit {
   get id() {
     return this._id;
   }
-  
+
   get koheseCommit() {
     return this._koheseCommit;
   }
-  
+
   get differences() {
     return this._differences;
   }
-  
+
   public constructor(private _id: string, private _koheseCommit: KoheseCommit,
     private _differences: Array<Difference>) {
   }
