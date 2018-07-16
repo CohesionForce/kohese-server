@@ -3,7 +3,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { MaterialModule } from '../../../material.module';
 import { TreeRowComponent } from './tree-row.component';
 import { TreeRow } from './tree-row.class';
-import { ItemProxy } from 'common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
 describe('Component: tree-row', () => {
