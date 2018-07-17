@@ -322,6 +322,17 @@ function loadConfigForEachCommit() {
 }
 
 //////////////////////////////////////////////////////////////////////////
+function exportObjectCache() {
+  let itemCache : ItemCache = TreeConfiguration.getItemCache();
+  console.log('::: Export Object Cache');
+  let objectMap = itemCache.getObjectMap();
+
+  let fs = require('fs');
+  fs.writeFileSync('./test.objectCache.json', JSON.stringify(objectMap, null, '  '));
+
+}
+
+//////////////////////////////////////////////////////////////////////////
 // Main Processing
 //////////////////////////////////////////////////////////////////////////
 
@@ -355,6 +366,7 @@ try {
     // evaluateEachCommit();
     // evaluateEachTree();
     diffHeadAndPrev();
+    exportObjectCache();
 
   });
 
