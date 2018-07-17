@@ -13,8 +13,8 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/compare-items.component';
 import { Tree } from '../tree.class';
-import { TreeRow } from '../tree-row.class';
-import { MenuAction } from '../tree-row.component';
+import { TreeRow } from '../tree-row/tree-row.class';
+import { MenuAction } from '../tree-row/tree-row.component';
 
 @Component({
   selector: 'reference-tree',
@@ -27,14 +27,14 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
 
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository, route: ActivatedRoute,
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
     super(route, dialogService);
   }
-  
+
   public ngOnInit(): void {
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
@@ -46,14 +46,14 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       if (proxy) {
         enable = proxy.status['Staged'];
       }
-      
+
       return enable;
       }, (row: TreeRow) => {
       this.openComparisonDialog(row, VersionDesignator.STAGED_VERSION);
     });
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
-    
+
     let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (row:
@@ -69,14 +69,14 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           this._itemRepository.getHistoryFor(proxy);
         }
       }
-      
+
       return enable;
       }, (row: TreeRow) => {
       this.openComparisonDialog(row, VersionDesignator.LAST_COMMITTED_VERSION);
     });
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
-    
+
     let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
       'Compare this Item against another Item', 'fa fa-exchange', (row:
       TreeRow) => {
@@ -86,12 +86,12 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.push(itemComparisonAction);
     this.menuActions.push(itemComparisonAction);
-    
+
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
         this._selectedTreeConfiguration = treeConfigurationObject.config;
-        
+
         if (this._treeConfigurationSubscription) {
           this._treeConfigurationSubscription.unsubscribe();
         }
@@ -105,24 +105,24 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
             this.buildRows(reference);
           }
         });
-        
+
         let root: Reference = new Reference([this._selectedTreeConfiguration.
           getRootProxy().item.id]);
         this.buildRows(root);
         this.rootSubject.next(this.getRow(root.path.join()));
-        
+
         this._route.params.subscribe((parameters: Params) => {
           root = new Reference([this._selectedTreeConfiguration.
             getProxyFor(parameters['id']).item.id]);
           this.buildRows(root);
           this.rootSubject.next(this.getRow(root.path.join()));
         });
-        
+
         this.showSelection();
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this.prepareForDismantling();
     if (this._treeConfigurationSubscription) {
@@ -130,15 +130,15 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     }
     this._itemRepositorySubscription.unsubscribe();
   }
-  
+
   private buildRows(root: Reference): void {
     this.clear();
-    
+
     let rootRow: TreeRow = this.buildRow(root);
     rootRow.expanded = true;
     let rootProxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(
       root.path[0]);
-    
+
     for (let referenceType in rootProxy.relations) {
       if (!this.getRow(referenceType)) {
         let row: TreeRow = this.buildRow(new Reference([rootProxy.item.id,
@@ -152,14 +152,14 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
               referenceType, type, propertyId]));
             row.expanded = true;
           }
-          
+
           let reference: any = rootProxy.relations[referenceType][type][
             propertyId];
           if (reference) {
             if (!Array.isArray(reference)) {
               reference = [reference];
             }
-            
+
             for (let j: number = 0; j < reference.length; j++) {
               let row: TreeRow = this.buildRow(new Reference([rootProxy.item.
                 id, referenceType, type, propertyId, reference[j].item.id]));
@@ -169,18 +169,18 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   protected getId(row: TreeRow): string {
     return (row.object as Reference).path.join();
   }
-  
+
   protected getParent(row: TreeRow): TreeRow {
     let parentPath: Array<string> = (row.object as Reference).path.slice(0);
     parentPath.length = ((4 === parentPath.length) ? (parentPath.length - 2) :
       (parentPath.length - 1));
     return this.getRow(parentPath.join());
   }
-  
+
   protected getChildren(row: TreeRow): Array<TreeRow> {
     let children: Array<TreeRow> = [];
     let path: Array<string> = (row.object as Reference).path;
@@ -198,7 +198,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           } else {
             references = [];
           }
-          
+
           for (let j: number = 0; j < references.length; j++) {
             children.push(this.getRow([rootProxy.item.id, path[0], path[1],
               path[2], references[j].item.id].join()));
@@ -218,14 +218,14 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           join()));
       }
     }
-    
+
     return children;
   }
-  
+
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   protected rowSelected(row: TreeRow): void {
     let path: Array<string> = (row.object as Reference).path;
     let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
@@ -234,7 +234,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       this._navigationService.navigate('Explore', { id: proxy.item.id });
     }
   }
-  
+
   protected getText(object: any): string {
     let path: Array<string> = (object as Reference).path;
     let lastSegment: string = path[path.length - 1];
@@ -244,10 +244,10 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     if (proxy) {
       text = proxy.item.name;
     }
-    
+
     return text;
   }
-  
+
   protected getIcon(object: any): string {
     let iconString: string = 'fa fa-wrench';
     let path: Array<string> = (object as Reference).path;
@@ -260,10 +260,10 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
         iconString = koheseType.viewModelProxy.item.icon;
       }
     }
-    
+
     return iconString;
   }
-  
+
   private openComparisonDialog(row: TreeRow, changeVersionDesignator:
     VersionDesignator): void {
     let path: Array<string> = (row.object as Reference).path;
@@ -272,18 +272,18 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
         1]),
       editable: true
     };
-    
+
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] =
         compareItemsDialogParameters.baseProxy;
       compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
     }
-    
+
     this._dialogService.openComponentDialog(CompareItemsComponent, {
       data: compareItemsDialogParameters
     }).updateSize('90%', '90%');
   }
-  
+
   private isRootReferencedBy(proxy: ItemProxy): boolean {
     let root: ItemProxy = this._selectedTreeConfiguration.getProxyFor((this.
       rootSubject.getValue().object as Reference).path[0]);
@@ -294,7 +294,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           if (!Array.isArray(reference)) {
             reference = [reference];
           }
-          
+
           for (let j: number = 0; j < reference.length; j++) {
             if (reference[j] === proxy) {
               return true;
@@ -303,7 +303,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     return false;
   }
 }
