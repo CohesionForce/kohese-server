@@ -22,7 +22,6 @@
       "jasmine",
       "jssha",
       "sharedworker",
-      "bunyan"
     ],
     "typeRoots": [
       "./node_modules/@types"
