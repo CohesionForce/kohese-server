@@ -157,8 +157,23 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           if (notification.proxy) {
             let row: TreeRow = this.getRow(notification.proxy.item.id);
             if (row) {
-              row.refresh();
+              // Row already exists, so update it
+              if (this.proxyHasVCStatus(notification.proxy)){
+                row.refresh();
+              } else {
+                // Row does not represent a modified item
+                if (this.getChildren(row).length){
+                  // This row would still be displayed as an ancestor
+                  row.refresh();
+                } else {
+                  // Row has no descendants and needs to be removed
+                  this.removeRowAndAncestors(notification.proxy);
+                  this.refresh();
+                }
+              }
             } else {
+              // Need to add a new row
+              this.addRowAndAncestors(notification.proxy);
               this.refresh();
             }
           }
@@ -166,6 +181,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
 
         this.buildRows(this._absoluteRoot);
         this.rootSubject.next(this.getRow(this._absoluteRoot.item.id));
+        this.refresh();
         this.showSelection();
       }
     });
@@ -179,25 +195,49 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     this._itemRepositorySubscription.unsubscribe();
   }
 
+  private proxyHasVCStatus (proxy: ItemProxy): boolean {
+    return (Object.keys(proxy.status).length > 0);
+  }
+
+  private addRowAndAncestors(proxy: ItemProxy): void {
+    if (this.proxyHasVCStatus(proxy)) {
+      this.buildRow(proxy);
+
+      // Build the ancestors if necessary
+      let ancestor = proxy.parentProxy;
+      while (!this.getRow(ancestor.item.id)){
+        this.buildRow(ancestor);
+        ancestor = ancestor.parentProxy;
+      }
+    }
+  }
+
+  private removeRowAndAncestors(proxy: ItemProxy){
+    let currentRow = this.getRow(proxy.item.id);
+    if (currentRow){
+      if (!(this.proxyHasVCStatus(proxy) || this.getChildren(currentRow).length)){
+        // Delete the row and any applicable ancestors
+        this.deleteRow(proxy.item.id);
+
+        let ancestor = proxy.parentProxy;
+        let ancestorRow = this.getRow(ancestor.item.id);
+        while ((ancestor !== this._absoluteRoot) && !(this.proxyHasVCStatus(ancestor) || this.getChildren(ancestorRow).length)){
+          this.deleteRow(ancestor.item.id);
+          ancestor = ancestor.parentProxy;
+          ancestorRow = this.getRow(ancestor.item.id);
+        }
+      }
+    }
+
+  }
+
   private buildRows(root: ItemProxy): void {
     this.clear();
 
     let rootRow: TreeRow = this.buildRow(root);
     rootRow.expanded = true;
-    root.visitTree({ includeOrigin: false }, undefined, (proxy: ItemProxy) => {
-      let build: boolean = (Object.keys(proxy.status).length > 0);
-      if (!build) {
-        for (let j: number = 0; j < proxy.children.length; j++) {
-          if (this.getRow(proxy.children[j].item.id)) {
-            build = true;
-            break;
-          }
-        }
-      }
-
-      if (build) {
-        this.buildRow(proxy);
-      }
+    root.visitTree({ includeOrigin: false }, (proxy: ItemProxy) => {
+      this.addRowAndAncestors(proxy);
     });
   }
 

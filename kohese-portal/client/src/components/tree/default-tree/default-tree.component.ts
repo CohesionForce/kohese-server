@@ -172,6 +172,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
 
+        this.refresh();
         this.showSelection();
       }
     });

@@ -10,6 +10,8 @@ export class CacheManager {
 
   static callbackMap = {};
 
+  static objectMap = {};
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -29,7 +31,23 @@ export class CacheManager {
       requestId = this.nextRequestId++;
       this.callbackMap[requestId] = callback;
     }
+    this.callbackMap['bulkCacheUpdate'] = this.processBulkCacheUpdate;
     cacheWorker.port.postMessage({type: 'sync', requestId: requestId});
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static processBulkCacheUpdate(bulkUpdate){
+
+    for (let key in bulkUpdate){
+      console.log("::: Received BulkCacheUpdate for: " + key);
+      if(!this.objectMap[key]){
+        this.objectMap[key] = {};
+      }
+      Object.assign(this.objectMap[key], bulkUpdate[key]);
+    }
+
   }
 }
 
@@ -63,19 +81,28 @@ cacheWorker.port.onmessage = function (event){
 
   console.log('::: Message received from cache worker: ' + message.type);
 
+  switch (message.type){
+    case 'newClient':
+      console.log('$$$ New client tab connected');
+      console.log(message);
+      break;
+    case 'bulkCacheUpdate':
+      console.log('$$$ bCU');
+      CacheManager.processBulkCacheUpdate(message.chunk);
+      break;
+  }
+
   if (message.hasOwnProperty('requestId')){
     let callback = CacheManager.callbackMap[message.requestId];
     if (callback){
       console.log('::: Invoking callback');
       delete CacheManager.callbackMap[message.requestId];
-      callback(message.response);
+      let response = message.response;
+      if (message.type === 'sync'){
+        response.objectMap = CacheManager.objectMap;
+      }
+      callback(response);
     }
   }
 
-  switch (message.type){
-    case 'newClient':
-      console.log('$$$ New client tab connected');
-      console.log(message);
-
-  }
 }
