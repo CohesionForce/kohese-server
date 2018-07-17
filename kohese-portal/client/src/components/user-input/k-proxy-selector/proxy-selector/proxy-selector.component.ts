@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ItemRepository, RepoStates } from '../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
@@ -9,8 +9,10 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'proxy-selector',
   templateUrl: './proxy-selector.component.html',
-  styleUrls: ['./proxy-selector.component.scss']
+  styleUrls: ['./proxy-selector.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class ProxySelectorComponent implements OnInit {
 
   /* Data */
@@ -43,12 +45,14 @@ export class ProxySelectorComponent implements OnInit {
         if (newConfig) {
           this.treeConfig = newConfig.config;
           this.rootProxy = this.treeConfig.getRootProxy();
+
           this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
             map((text: string) => {
               return this.rootProxy.getDescendants().filter((proxy) => {
                 return (-1 !== proxy.item.name.indexOf(text));
               });
             });
+
           this.recentProxies = this.itemRepository.getRecentProxies();
           this.recentProxies = this.recentProxies.slice().reverse();
           this.repoInitialized = true;
