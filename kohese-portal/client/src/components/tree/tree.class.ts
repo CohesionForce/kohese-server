@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { TreeRow } from './tree-row.class';
 import { RowAction, MenuAction } from './tree-row.component';
-import { Filter } from '../filter/filter.class';
+import { Filter, PropertyFilterCriterion } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
 export abstract class Tree {
@@ -103,7 +103,6 @@ export abstract class Tree {
   private _virtualScrollComponent: VirtualScrollComponent;
 
   private _rootSubscription: Subscription;
-  private _filterSubscription: Subscription;
   private _updateVisibleRowsSubscriptionMap: any = {};
 
   protected constructor(protected _route: ActivatedRoute,
@@ -123,16 +122,10 @@ export abstract class Tree {
         this.showFocus();
       }
     });
-
-    this._filterSubscription = this._filterSubject.subscribe((filter:
-      Filter) => {
-      this.refresh();
-    });
   }
 
   protected prepareForDismantling(): void {
     this.clear();
-    this._filterSubscription.unsubscribe();
     this._rootSubscription.unsubscribe();
   }
 
@@ -224,6 +217,7 @@ export abstract class Tree {
     }).updateSize('90%', '90%').afterClosed().subscribe((filter: Filter) => {
       if (filter) {
         this._filterSubject.next(filter);
+        this.refresh();
       }
     });
   }
@@ -234,15 +228,29 @@ export abstract class Tree {
     }
 
     this._filterDelayIdentifier = setTimeout(() => {
-      let filter: Filter = this._filterSubject.getValue();
-      if (!filter) {
-        filter = new Filter();
+      if (searchString) {
+        let previousFilter: Filter = this._filterSubject.getValue();
+        let filter: Filter = new Filter();
+        if (previousFilter) {
+          filter.rootElement.connections.push(...previousFilter.rootElement.connections);
+          filter.rootElement.criteria.push(...previousFilter.rootElement.criteria);
+        }
+        filter.rootElement.criteria.push(new PropertyFilterCriterion('',
+          PropertyFilterCriterion.CONDITIONS.CONTAINS, searchString));
+        
+        this._filterSubject.next(filter);
+        this.refresh();
+        this._filterSubject.next(previousFilter);
+      } else {
+        this.refresh();
       }
-      filter.content = searchString;
-      
-      this._filterSubject.next(filter);
       this._filterDelayIdentifier = undefined;
     }, 1000);
+  }
+  
+  public removeFilter(): void {
+    this._filterSubject.next(undefined);
+    this.refresh();
   }
 
   protected deleteRow(id: string): void {
