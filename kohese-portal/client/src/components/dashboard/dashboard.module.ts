@@ -31,6 +31,8 @@ import { ProjectSelectorComponent } from "./project-dashboard/project-selector/p
 import { TreeModule } from "angular-tree-component";
 import { StateFilterService } from './state-filter.service';
 import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy-card.component';
+import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
+import { ReportGeneratorModule } from '../report-generator/report-generator.module';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,8 @@ import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy
     OpenAssignmentComponent,
     StateBarChartComponent,
     StateSummaryDialogComponent,
-    StatefulProxyCardComponent
+    StatefulProxyCardComponent,
+    ReportDashboardComponent
   ],
   providers : [
     StateFilterService
@@ -73,7 +76,8 @@ import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy
     VirtualScrollModule,
     FormsModule,
     ReactiveFormsModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    ReportGeneratorModule
   ],
   exports : [
     DashboardComponent

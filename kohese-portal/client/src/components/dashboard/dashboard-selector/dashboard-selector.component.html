@@ -15,6 +15,9 @@
   <h4 (click)="selectDashType(DashboardTypes.PROJECT)"
       [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PROJECT}">
     Project Dashboard</h4>
+  <h4 (click)="selectDashType(DashboardTypes.REPORT)"
+      [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.REPORT}">
+    Reports</h4>
   <hr>
   <div>
     <mat-divider style="border-color: white"></mat-divider>
@@ -67,5 +70,14 @@
                             DashboardSelections.PROJECT_STATUS}">Project Status</h6>
       </div>
       <mat-divider></mat-divider>
+  </div>
+  <div *ngIf="menuType === MenuTypes.REPORT">
+    <h5 class="dashListHeader"> Reports</h5>
+    <div>
+      <h6 class="dashListItem"
+      (click)="selectDashboard(DashboardSelections.REPORT_GENERATION)"
+      [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
+                      DashboardSelections.REPORT_GENERATION}"> Overview</h6>
+    </div>
   </div>
 </div>
