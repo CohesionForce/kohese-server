@@ -1,8 +1,5 @@
 import { Subject } from 'rxjs/Subject';
 import { LoggingEventRecord } from './k-logger';
-import * as Bunyan from "bunyan";
-import { BehaviorSubject } from "rxjs";
-import { BREAKPOINTS } from "@angular/flex-layout";
 
 // TODO: does this need to be more configurable?
 export enum LoggingLevel {
@@ -49,7 +46,6 @@ interface LoggingCategoryRecord {
 }
 
 export class KLogger {
-  public bunyan: any;
 
   private static singleton: KLogger;
 
@@ -72,15 +68,8 @@ export class KLogger {
       } else {
         console.log('Initializing Log Registry');
       }
-      this.createLogger();
     }
     return KLogger.singleton;
-  }
-
-  createLogger() {
-    this.bunyan = Bunyan.createLogger({
-      name: 'Default logger',
-    })
   }
 
   getComponentId(componentName: string): string {

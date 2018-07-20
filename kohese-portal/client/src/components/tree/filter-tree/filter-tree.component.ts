@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { Tree } from '../tree.class';
-import { RowAction } from '../tree-row.component';
+import { RowAction } from '../tree-row/tree-row.component';
 import { Filter, FilterElement, FilterCriterion, TypeFilterCriterion,
   PropertyFilterCriterion, FilterCriteriaConnection,
   FilterCriteriaConnectionType } from '../../filter/filter.class';

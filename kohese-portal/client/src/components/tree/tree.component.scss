@@ -1,4 +1,4 @@
-@import '../../../app.component';
+@import '../../app.component';
 
 .top-bar {
   height: 7%;
@@ -25,39 +25,10 @@ virtual-scroll {
   width: 100%;
 }
 
-.kt-icon {
-  cursor: pointer;
-  padding : 5px;
-}
-
-.kt-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 40px;
-  width: 100%;
-  font-weight: bold;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  min-height: 20px;
-  line-height: 20px;
-  border-bottom: 2px solid #ddd;
-
-  .fa-times {
-    &:hover {
-      cursor: pointer;
-    }
-  }
-}
 
 #rightSpan {
   margin-left: auto;
   flex: 0 0 auto;
-}
-
-.kt-item:hover {
-  background-color: #e5e5e5;
 }
 
 .kt-body {
@@ -65,32 +36,8 @@ virtual-scroll {
   overflow: auto;
 }
 
-.no-children {
-  padding-left: 15px !important;
-}
-
-.no-icon {
-  padding-left: 17px !important;
-}
-
-.trim-info {
-  max-width: 25em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  position: relative;
-}
-
-.trim-info-visible {
-  max-width: 25em;
-  white-space: pre-wrap;
-  position: relative;
-}
-
-.highlight-row {
-  background-color: #FFFFCC;
-}
-
-.delete-button {
-  color: $secondaryColor + 100;
+:host {
+  height: 100%;
+  width: 100%;
+  display: inline-block;
 }

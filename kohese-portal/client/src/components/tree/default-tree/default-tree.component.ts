@@ -14,8 +14,8 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/compare-items.component';
 import { Tree } from '../tree.class';
-import { TreeRow } from '../tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row.component';
+import { TreeRow } from '../tree-row/tree-row.class';
+import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
 
 @Component({
   selector: 'default-tree',
@@ -28,12 +28,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   get absoluteRoot() {
     return this._absoluteRoot;
   }
-  
+
   private _synchronizeWithSelection: boolean = true;
   get synchronizeWithSelection() {
     return this._synchronizeWithSelection;
   }
-  
+
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/dirty.ico', 'Unsaved Changes',
       false, (object: any) => {
@@ -51,17 +51,17 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   get images() {
     return this._images;
   }
-  
+
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     route: ActivatedRoute, private _itemRepository: ItemRepository,
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
     super(route, dialogService, false);
   }
-  
+
   public ngOnInit(): void {
     let deleteMenuAction: MenuAction = new MenuAction('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
@@ -81,7 +81,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.push(deleteMenuAction);
     this.menuActions.push(deleteMenuAction);
-    
+
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
@@ -92,7 +92,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
-    
+
     let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
@@ -109,7 +109,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
-    
+
     let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
       'Compare this Item against another Item', 'fa fa-exchange', (object:
       any) => {
@@ -119,7 +119,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.push(itemComparisonAction);
     this.menuActions.push(itemComparisonAction);
-    
+
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
@@ -128,13 +128,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           ItemProxy) => {
           this.buildRow(proxy);
         });
-        
+
         let lostAndFoundProxy: ItemProxy = treeConfigurationObject.config.
           getLostAndFoundProxy();
         if (!this.getRow(lostAndFoundProxy.item.id)) {
           this.buildRow(lostAndFoundProxy);
         }
-        
+
         if (this._treeConfigurationSubscription) {
           this._treeConfigurationSubscription.unsubscribe();
         }
@@ -175,11 +175,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
         
+        this.refresh();
         this.showFocus();
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this.prepareForDismantling();
     if (this._treeConfigurationSubscription) {
@@ -187,7 +188,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     }
     this._itemRepositorySubscription.unsubscribe();
   }
-  
+
   public toggleSelectionSynchronization(): void {
     this._synchronizeWithSelection = !this._synchronizeWithSelection;
     if (this._synchronizeWithSelection) {
@@ -204,7 +205,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     if ((object as ItemProxy).parentProxy) {
       parent = (object as ItemProxy).parentProxy;
     }
-    
+
     return parent;
   }
   
@@ -214,18 +215,20 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     for (let j: number = 0; j < proxy.children.length; j++) {
       children.push(proxy.children[j]);
     }
-    
+
     return children;
   }
-  
+
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
   
   protected rowFocused(row: TreeRow): void {
-    this._navigationService.navigate('Explore', { id: this.getId(row) });
+    this._navigationService.navigate('Explore', {
+      id: this.getId(row.object)
+    });
   }
-  
+
   protected getText(object: any): string {
     let item: any = (object as ItemProxy).item;
     let text: string = item.name;
@@ -235,14 +238,14 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     
     return text;
   }
-  
+
   protected getIcon(object: any): string {
     let iconString: string = '';
     let koheseType: KoheseType = (object as ItemProxy).model.type;
     if (koheseType && koheseType.viewModelProxy) {
       iconString = koheseType.viewModelProxy.item.icon;
     }
-    
+
     return iconString;
   }
   
@@ -256,12 +259,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       baseProxy: proxy,
       editable: true
     };
-    
+
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] = proxy;
       compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
     }
-    
+
     this._dialogService.openComponentDialog(CompareItemsComponent, {
       data: compareItemsDialogParameters
     }).updateSize('90%', '90%');

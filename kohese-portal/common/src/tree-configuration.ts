@@ -219,9 +219,11 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadingComplete() {
+  loadingComplete(skipCalc: boolean = false) {
     this.loading = false;
-    this.calculateAllTreeHashes();
+    if (!skipCalc){
+      this.calculateAllTreeHashes();
+    }
     this.changeSubject.next({
       type: 'loaded'
     });

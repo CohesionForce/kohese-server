@@ -9,9 +9,9 @@ import { KoheseModel } from '../../common/src/KoheseModel';
 let socket : SocketIOClient.Socket = SocketIoClient();
 let serverCache = {
   metaModel: undefined,
-  objectMap: {},
   allItems: undefined
 }
+let objectMap : any = {};
 let cacheFetched = false;
 
 enum RepoStates {
@@ -69,12 +69,31 @@ let repoSyncCallback = [];
         break;
       case 'getItemCache':
       console.log('$$$ getItemCache');
-      // fetchItemCache();
+        // fetchItemCache();
         break;
       case 'sync':
-      console.log('$$$ sync');
-      syncWithServer(
-        (response) => {
+        console.log('$$$ sync');
+        syncWithServer(
+          (response) => {
+            function sendBulkCacheUpdate(key, value){
+              let bulkUpdateMessage = {};
+              bulkUpdateMessage[key] = value;
+              port.postMessage({type: 'bulkCacheUpdate', chunk: bulkUpdateMessage});
+            }
+
+            // Send Cache Chunks
+            sendBulkCacheUpdate('metadata', objectMap['metadata']);
+            sendBulkCacheUpdate('refs', objectMap['refs']);
+            sendBulkCacheUpdate('tags', objectMap['tags']);
+            sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
+            for (let key in objectMap.kTreeMapChunks) {
+              sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
+            }
+            for (let key in objectMap.blobMapChunks) {
+              sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
+            }
+
+            // Send Final response
             port.postMessage({type: 'sync', requestId: request.requestId, response: response});
           }
         );
@@ -289,9 +308,9 @@ function getItemCache(){
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      console.log(Object.keys(serverCache.objectMap));
+      console.log(Object.keys(objectMap));
       let itemCache = new ItemCache();
-      itemCache.setObjectMap(serverCache.objectMap)
+      itemCache.setObjectMap(objectMap);
       TreeConfiguration.setItemCache(itemCache);
       let headCommit = itemCache.getRef('HEAD');
       console.log('### Head: ' + headCommit);
@@ -300,11 +319,21 @@ function getItemCache(){
       // TODO Need to load the HEAD commit
       console.log('$$$ Loading HEAD Commit');
       let workingTree = TreeConfiguration.getWorkingTree();
+      let before = Date.now();
       itemCache.loadProxiesForCommit(headCommit, workingTree);
+      let after = Date.now();
+      console.log('$$$ Load took: ' + (after-before)/1000);
+      before = Date.now();
       workingTree.calculateAllTreeHashes();
+      after = Date.now();
+      console.log('$$$ Calc took: ' + (after-before)/1000);
+
       console.log('$$$ Finished loading HEAD');
 
       getAll();
+
+      // Transfer the Cache while waiting for response
+      objectMap = itemCache.getObjectMap();
     });
   } else {
     console.log('$$$ Cache has already been fetched');
@@ -318,7 +347,10 @@ function processBulkCacheUpdate(bulkUpdate){
 
   for (let key in bulkUpdate){
     console.log("::: Processing BulkCacheUpdate for: " + key);
-    serverCache.objectMap[key] = bulkUpdate[key];
+    if(!objectMap[key]){
+      objectMap[key] = {};
+    }
+    Object.assign(objectMap[key], bulkUpdate[key]);
   }
 
 }
@@ -383,6 +415,8 @@ function getAll(){
   repoState = RepoStates.SYNCHRONIZING;
 
   let origRepoTreeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
+  let thTime = Date.now();
+  console.log('$$$ Get Tree Hash Time: ' + (thTime - requestTime)/1000);
 
   socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes},
     (response) => {
@@ -391,7 +425,11 @@ function getAll(){
 
       // Update local ItemProxy
       processBulkUpdate(response);
+      let bulkUpdateTime = Date.now();
+      console.log('$$$ Bulk update took: ' + (bulkUpdateTime-responseReceiptTime)/1000);
       ItemProxy.getWorkingTree().loadingComplete();
+      let loadingComplete = Date.now();
+      console.log('$$$ Load Complete took: ' + (loadingComplete - bulkUpdateTime)/1000);
       let processingCompleteTime = Date.now();
       console.log('::: Processing completed at ' + (processingCompleteTime-responseReceiptTime)/1000);
 
@@ -410,7 +448,7 @@ function syncWithServer(callback){
   console.log('$$$ Sync with server');
 
   // Determine if repo is already synched
-  if (serverCache.objectMap && serverCache.allItems){
+  if (objectMap && serverCache.allItems){
     console.log('$$$ syncWithServer: Sending cached items');
     callback(serverCache);
     return;

@@ -1,5 +1,5 @@
 <div id="proxySelectorContainer">
-  <mat-tab-group *ngIf="repoInitialized">
+  <mat-tab-group *ngIf="repoInitialized" (selectedTabChange)="onTabSelected($event)">
     <mat-tab label="Recent">
       <div *ngFor="let proxy of recentProxies">
         <span *ngIf="!selectedMap.get(proxy.item.id)"
@@ -14,11 +14,11 @@
       </div>
     </mat-tab>
     <mat-tab label="Tree">
-      <tree-root [nodes]="rootProxy.children" options="treeOptions">
+      <tree-root [nodes]="rootProxy.children" options="treeOptions" *ngIf="treeInitialized">
         <ng-template #treeNodeTemplate let-node let-index="index">
           <td (click)="selectProxy(node.data)" *ngIf="!selectedMap.get(node.data.item.id)"
             matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
-          <td *ngIf="selectedMap.get(node.data.item.id)" (click)="removeSelection(node.data)"> 
+          <td *ngIf="selectedMap.get(node.data.item.id)" (click)="removeSelection(node.data)">
             {{node.data.item.name}} <i class="fa fa-check"></i>
           </td>
         </ng-template>
@@ -47,7 +47,7 @@
   </mat-card>
   <div *ngIf="multiSelect">
     <h4>Selections:</h4>
-    <div *ngFor="let selection of selectedProxies">  
+    <div *ngFor="let selection of selectedProxies">
       <span>
         {{selection.item.name | truncate : 30}}
         <span style="margin-left: auto;">

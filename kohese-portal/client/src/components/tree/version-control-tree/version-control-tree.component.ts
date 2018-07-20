@@ -14,8 +14,8 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/compare-items.component';
 import { Tree } from '../tree.class';
-import { TreeRow } from '../tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row.component';
+import { TreeRow } from '../tree-row/tree-row.class';
+import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
 
 @Component({
   selector: 'version-control-tree',
@@ -29,7 +29,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   get absoluteRoot() {
     return this._absoluteRoot;
   }
-  
+
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
       (object: any) => {
@@ -43,10 +43,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   get images() {
     return this._images;
   }
-  
+
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef, route:
     ActivatedRoute, private _itemRepository: ItemRepository, dialogService:
     DialogService, private _navigationService: NavigationService,
@@ -55,7 +55,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     DynamicTypesService) {
     super(route, dialogService, false);
   }
-  
+
   public ngOnInit(): void {
     let versionControlRowActions: Array<RowAction> = [
       new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
@@ -108,7 +108,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     ];
     this.rootRowActions.splice(0, 0, ...versionControlRowActions);
     this.rowActions.splice(0, 0, ...versionControlRowActions);
-    
+
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
@@ -119,7 +119,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     });
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
-    
+
     let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
@@ -136,7 +136,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     });
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
-    
+
     let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
       'Compare this Item against another Item', 'fa fa-exchange', (object:
       any) => {
@@ -146,12 +146,12 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     });
     this.rootMenuActions.push(itemComparisonAction);
     this.menuActions.push(itemComparisonAction);
-    
+
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
         this._absoluteRoot = treeConfigurationObject.config.getRootProxy();
-        
+
         if (this._treeConfigurationSubscription) {
           this._treeConfigurationSubscription.unsubscribe();
         }
@@ -160,20 +160,36 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           if (notification.proxy) {
             let row: TreeRow = this.getRow(notification.proxy.item.id);
             if (row) {
-              row.refresh();
+              // Row already exists, so update it
+              if (this.proxyHasVCStatus(notification.proxy)){
+                row.refresh();
+              } else {
+                // Row does not represent a modified item
+                if (this.getChildren(row).length){
+                  // This row would still be displayed as an ancestor
+                  row.refresh();
+                } else {
+                  // Row has no descendants and needs to be removed
+                  this.removeRowAndAncestors(notification.proxy);
+                  this.refresh();
+                }
+              }
             } else {
+              // Need to add a new row
+              this.addRowAndAncestors(notification.proxy);
               this.refresh();
             }
           }
         });
-        
+
         this.buildRows(this._absoluteRoot);
         this.rootSubject.next(this._absoluteRoot);
+        this.refresh();
         this.showFocus();
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this.prepareForDismantling();
     if (this._treeConfigurationSubscription) {
@@ -181,26 +197,50 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     }
     this._itemRepositorySubscription.unsubscribe();
   }
-  
-  private buildRows(root: ItemProxy): void {
-    this.clear();
-    
-    let rootRow: TreeRow = this.buildRow(root);
-    rootRow.expanded = true;
-    root.visitTree({ includeOrigin: false }, undefined, (proxy: ItemProxy) => {
-      let build: boolean = (Object.keys(proxy.status).length > 0);
-      if (!build) {
-        for (let j: number = 0; j < proxy.children.length; j++) {
-          if (this.getRow(proxy.children[j].item.id)) {
-            build = true;
-            break;
-          }
+
+  private proxyHasVCStatus (proxy: ItemProxy): boolean {
+    return (Object.keys(proxy.status).length > 0);
+  }
+
+  private addRowAndAncestors(proxy: ItemProxy): void {
+    if (this.proxyHasVCStatus(proxy)) {
+      this.buildRow(proxy);
+
+      // Build the ancestors if necessary
+      let ancestor = proxy.parentProxy;
+      while (!this.getRow(ancestor.item.id)){
+        this.buildRow(ancestor);
+        ancestor = ancestor.parentProxy;
+      }
+    }
+  }
+
+  private removeRowAndAncestors(proxy: ItemProxy){
+    let currentRow = this.getRow(proxy.item.id);
+    if (currentRow){
+      if (!(this.proxyHasVCStatus(proxy) || this.getChildren(currentRow).length)){
+        // Delete the row and any applicable ancestors
+        this.deleteRow(proxy.item.id);
+
+        let ancestor = proxy.parentProxy;
+        let ancestorRow = this.getRow(ancestor.item.id);
+        while ((ancestor !== this._absoluteRoot) && !(this.proxyHasVCStatus(ancestor) || this.getChildren(ancestorRow).length)){
+          this.deleteRow(ancestor.item.id);
+          ancestor = ancestor.parentProxy;
+          ancestorRow = this.getRow(ancestor.item.id);
         }
       }
-      
-      if (build) {
-        this.buildRow(proxy);
-      }
+    }
+
+  }
+
+  private buildRows(root: ItemProxy): void {
+    this.clear();
+
+    let rootRow: TreeRow = this.buildRow(root);
+    rootRow.expanded = true;
+    root.visitTree({ includeOrigin: false }, (proxy: ItemProxy) => {
+      this.addRowAndAncestors(proxy);
     });
   }
   
@@ -213,7 +253,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     if ((object as ItemProxy).parentProxy) {
       parent = (object as ItemProxy).parentProxy;
     }
-    
+
     return parent;
   }
   
@@ -226,29 +266,31 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         children.push(child);
       }
     }
-    
+
     return children;
   }
-  
+
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
   
   protected rowFocused(row: TreeRow): void {
-    this._navigationService.navigate('Explore', { id: this.getId(row) });
+    this._navigationService.navigate('Explore', {
+      id: this.getId(row.object)
+    });
   }
-  
+
   protected getText(object: any): string {
     return (object as ItemProxy).item.name;
   }
-  
+
   protected getIcon(object: any): string {
     let iconString: string = '';
     let koheseType: KoheseType = (object as ItemProxy).model.type;
     if (koheseType && koheseType.viewModelProxy) {
       iconString = koheseType.viewModelProxy.item.icon;
     }
-    
+
     return iconString;
   }
   
@@ -262,12 +304,12 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       baseProxy: proxy,
       editable: true
     };
-    
+
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] = proxy;
       compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
     }
-    
+
     this._dialogService.openComponentDialog(CompareItemsComponent, {
       data: compareItemsDialogParameters
     }).updateSize('90%', '90%');

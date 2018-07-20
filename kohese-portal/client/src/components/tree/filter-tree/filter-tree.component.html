@@ -1,92 +1,90 @@
-<div style="height: 100%; width: 100%;">
-  <div class="top-bar">
-    <button mat-icon-button [matMenuTriggerFor]="addMenu"
-      class="flex-right-align"
-      [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedElementsConnections()">
+<div class="top-bar">
+  <button mat-icon-button [matMenuTriggerFor]="addMenu"
+    class="flex-right-align"
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedElementsConnections()">
+    <mat-icon class="fa fa-plus"></mat-icon>
+  </button>
+  <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
+    <button mat-menu-item
+      (click)="addCriterionToSelectedConnections('TypeFilterCriterion')"
+      matTooltip="Add a type criterion to the selected connections">
       <mat-icon class="fa fa-plus"></mat-icon>
+      Add Type Criterion
     </button>
-    <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item
-        (click)="addCriterionToSelectedConnections('TypeFilterCriterion')"
-        matTooltip="Add a type criterion to the selected connections">
-        <mat-icon class="fa fa-plus"></mat-icon>
-        Add Type Criterion
-      </button>
-      <button mat-menu-item
-        (click)="addCriterionToSelectedConnections('PropertyFilterCriterion')"
-        matTooltip="Add a property criterion to the selected connections">
-        <mat-icon class="fa fa-plus"></mat-icon>
-        Add Property Criterion
-      </button>
-      <button mat-menu-item
-        (click)="addConnectionToSelectedConnections(FilterCriteriaConnectionType.AND)"
-        matTooltip="Add an AND connection to the selected connections">
-        <mat-icon class="fa fa-plus"></mat-icon>
-        Add AND Connection
-      </button>
-      <button mat-menu-item
-        (click)="addConnectionToSelectedConnections(FilterCriteriaConnectionType.OR)"
-        matTooltip="Add an OR connection to the selected connections">
-        <mat-icon class="fa fa-plus"></mat-icon>
-        Add OR Connection
-      </button>
-    </mat-menu>
-    <ng-container *ngIf="!inTargetingMode">
-      <button mat-icon-button
-        [disabled]="(0 === (selectedObjectsSubject | async).length)"
-        (click)="enterCopyTargetingMode()"
-        matTooltip="Copy the selected elements">
-        <mat-icon class="fa fa-copy"></mat-icon>
-      </button>
-      <button mat-icon-button
-        [disabled]="(0 === (selectedObjectsSubject | async).length)"
-        (click)="enterMoveTargetingMode()"
-        matTooltip="Move the selected elements">
-        <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
-      </button>
-    </ng-container>
-    <ng-container *ngIf="inTargetingMode">
-      <button mat-icon-button (click)="exitTargetingMode()"
-        matTooltip="Exit targeting mode">
-        <mat-icon class="fa fa-times"></mat-icon>
-      </button>
-    </ng-container>
+    <button mat-menu-item
+      (click)="addCriterionToSelectedConnections('PropertyFilterCriterion')"
+      matTooltip="Add a property criterion to the selected connections">
+      <mat-icon class="fa fa-plus"></mat-icon>
+      Add Property Criterion
+    </button>
+    <button mat-menu-item
+      (click)="addConnectionToSelectedConnections(FilterCriteriaConnectionType.AND)"
+      matTooltip="Add an AND connection to the selected connections">
+      <mat-icon class="fa fa-plus"></mat-icon>
+      Add AND Connection
+    </button>
+    <button mat-menu-item
+      (click)="addConnectionToSelectedConnections(FilterCriteriaConnectionType.OR)"
+      matTooltip="Add an OR connection to the selected connections">
+      <mat-icon class="fa fa-plus"></mat-icon>
+      Add OR Connection
+    </button>
+  </mat-menu>
+  <ng-container *ngIf="!inTargetingMode">
     <button mat-icon-button
       [disabled]="(0 === (selectedObjectsSubject | async).length)"
-      (click)="deleteSelectedElements()"
-      matTooltip="Delete the selected elements">
-      <mat-icon class="fa fa-trash"></mat-icon>
+      (click)="enterCopyTargetingMode()"
+      matTooltip="Copy the selected elements">
+      <mat-icon class="fa fa-copy"></mat-icon>
     </button>
     <button mat-icon-button
-      [disabled]="(rootSubject | async) === (targetFilterSubject | async)?.rootElement"
-      (click)="rootSubject.next(targetFilterSubject.getValue()?.rootElement)"
-      matTooltip="Changes the root to be the filter root">
-      <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
+      [disabled]="(0 === (selectedObjectsSubject | async).length)"
+      (click)="enterMoveTargetingMode()"
+      matTooltip="Move the selected elements">
+      <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
     </button>
+  </ng-container>
+  <ng-container *ngIf="inTargetingMode">
+    <button mat-icon-button (click)="exitTargetingMode()"
+      matTooltip="Exit targeting mode">
+      <mat-icon class="fa fa-times"></mat-icon>
+    </button>
+  </ng-container>
+  <button mat-icon-button
+    [disabled]="(0 === (selectedObjectsSubject | async).length)"
+    (click)="deleteSelectedElements()"
+    matTooltip="Delete the selected elements">
+    <mat-icon class="fa fa-trash"></mat-icon>
+  </button>
+  <button mat-icon-button
+    [disabled]="(rootSubject | async) === (targetFilterSubject | async)?.rootElement"
+    (click)="rootSubject.next(targetFilterSubject.getValue()?.rootElement)"
+    matTooltip="Changes the root to be the filter root">
+    <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
+  </button>
+</div>
+<div style="height: 12%; width: 100%;">
+  <div class="kt-head kth-cell">
+    Root
   </div>
-  <div style="height: 12%; width: 100%;">
-    <div class="kt-head kth-cell">
-      Root
-    </div>
-    <ng-container *ngIf="rootSubject.getValue()">
-      <div class="kt-body">
-        <tree-row [treeRow]="getRootRow()"
-          [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
-        </tree-row>
-      </div>
-    </ng-container>
-  </div>
-  <div style="height: 81%; width: 100%;">
-    <div class="kt-head kth-cell">
-      Descendants
-    </div>
+  <ng-container *ngIf="rootSubject.getValue()">
     <div class="kt-body">
-      <virtual-scroll #tree [items]="visibleRows">
-        <tree-row *ngFor="let row of tree.viewPortItems"
-          [treeRow]="row" [rowActions]="rowActions"
-          [menuActions]="menuActions" [images]="images">
-        </tree-row>
-      </virtual-scroll>
+      <tree-row [treeRow]="getRootRow()"
+        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
+      </tree-row>
     </div>
+  </ng-container>
+</div>
+<div style="height: 81%; width: 100%;">
+  <div class="kt-head kth-cell">
+    Descendants
+  </div>
+  <div class="kt-body">
+    <virtual-scroll #tree [items]="visibleRows">
+      <tree-row *ngFor="let row of tree.viewPortItems"
+        [treeRow]="row" [rowActions]="rowActions"
+        [menuActions]="menuActions" [images]="images">
+      </tree-row>
+    </virtual-scroll>
   </div>
 </div>

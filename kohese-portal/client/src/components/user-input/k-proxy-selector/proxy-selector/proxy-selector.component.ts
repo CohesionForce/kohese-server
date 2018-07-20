@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ItemRepository, RepoStates } from '../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
@@ -9,8 +9,10 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'proxy-selector',
   templateUrl: './proxy-selector.component.html',
-  styleUrls: ['./proxy-selector.component.scss']
+  styleUrls: ['./proxy-selector.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class ProxySelectorComponent implements OnInit {
 
   /* Data */
@@ -27,6 +29,8 @@ export class ProxySelectorComponent implements OnInit {
   proxySelected: EventEmitter<SelectedProxyInfo> = new EventEmitter();
   repoInitialized: boolean = false;
   proxySearchControl: FormControl;
+  proxySearchInitialized : boolean;
+  treeInitialized : boolean;
   filteredProxies: any;
   recentProxies: Array<ItemProxy>;
 
@@ -43,12 +47,6 @@ export class ProxySelectorComponent implements OnInit {
         if (newConfig) {
           this.treeConfig = newConfig.config;
           this.rootProxy = this.treeConfig.getRootProxy();
-          this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
-            map((text: string) => {
-              return this.rootProxy.children.filter((proxy) => {
-                return (-1 !== proxy.item.name.indexOf(text));
-              });
-            });
           this.recentProxies = this.itemRepository.getRecentProxies();
           this.recentProxies = this.recentProxies.slice().reverse();
           this.repoInitialized = true;
@@ -65,6 +63,19 @@ export class ProxySelectorComponent implements OnInit {
           }
         }
       })
+  }
+
+  initProxySearch() {
+    if (!this.proxySearchInitialized) {
+      this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
+        map((text: string) => {
+          return this.rootProxy.getDescendants().filter((proxy) => {
+            return (-1 !== proxy.item.name.indexOf(text));
+          });
+      });
+    }
+    this.proxySearchInitialized = true;
+
   }
 
   selectProxy(selection: ItemProxy) {
@@ -97,6 +108,16 @@ export class ProxySelectorComponent implements OnInit {
     this.selectedProxy = selectedProxyEvent.option.value;
     this.proxySelected.next(selectedProxyEvent.option.value);
     this.proxySearchControl.setValue(selectedProxyEvent.option.value.item.name);
+  }
+
+  onTabSelected(tabEvent) {
+    switch(tabEvent.index) {
+      case 1:
+        this.treeInitialized = true;
+        break;
+      case 2:
+        this.initProxySearch();
+    }
   }
 
   removeSelection(selection: ItemProxy) {

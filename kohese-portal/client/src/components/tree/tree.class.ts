@@ -5,8 +5,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
 import { DialogService } from '../../services/dialog/dialog.service';
-import { TreeRow } from './tree-row.class';
-import { RowAction, MenuAction } from './tree-row.component';
+import { TreeRow } from './tree-row/tree-row.class';
+import { RowAction, MenuAction } from './tree-row/tree-row.component';
 import { Filter, PropertyFilterCriterion } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
@@ -357,21 +357,21 @@ export abstract class Tree {
   protected abstract getChildren(object: any): Array<any>;
   
   protected abstract getText(object: any): string;
-  
+
   protected abstract getIcon(object: any): string;
-  
+
   protected preTreeTraversalActivity(): void {
     // Subclasses may override this function
   }
-  
+
   protected preRowProcessingActivity(row: TreeRow): void {
     // Subclasses may override this function
   }
-  
+
   protected postRowProcessingActivity(row: TreeRow): void {
     // Subclasses may override this function
   }
-  
+
   protected postTreeTraversalActivity(): void {
     // Subclasses may override this function
   }

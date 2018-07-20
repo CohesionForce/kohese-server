@@ -1,53 +1,46 @@
-<div style="height: 100%; width: 100%;">
-  <div class="top-bar">
-    <mat-form-field>
-      <input matInput #searchInput type="text" placeholder="Search"
-        [ngModel]="filterSubject.getValue()?.content"
-        (input)="searchStringChanged(searchInput.value)"/>
-    </mat-form-field>
-    <button mat-icon-button (click)="openFilterDialog()"
-      [ngClass]="{ 'highlight': filterSubject.getValue() }"
-      matTooltip="Edit filter">
-      <mat-icon class="fa fa-filter"></mat-icon>
-    </button>
-    <button mat-icon-button [disabled]="!(filterSubject | async)"
-      (click)="removeFilter()" matTooltip="Remove filter">
-      <mat-icon class="fa fa-eraser"></mat-icon>
-    </button>
-    <button mat-icon-button (click)="toggleDocumentSync()"
-      matTooltip="Toggle selection synchronization for the tree"
-      [ngClass]="{ 'highlight': sync }"
-      class="flex-right-align">
-      <mat-icon class="fa fa-exchange"></mat-icon>
-    </button>
-    <button mat-icon-button
-      (click)="setRowAsRoot(documentRoot)"
-      [disabled]="(rootSubject | async) === documentRoot"
-      matTooltip="Changes the root to be the document root">
-      <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
-    </button>
+<div class="top-bar">
+  <mat-form-field>
+    <input matInput #searchInput type="text" placeholder="Search"
+      [ngModel]="filterSubject.getValue()?.content"
+      (input)="searchStringChanged(searchInput.value)"/>
+  </mat-form-field>
+  <button mat-icon-button (click)="openFilterDialog()"
+    [ngClass]="{ 'highlight': filterSubject.getValue() }"
+    matTooltip="Edit filter">
+    <mat-icon class="fa fa-filter"></mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!(filterSubject | async)"
+    (click)="removeFilter()" matTooltip="Remove filter">
+    <mat-icon class="fa fa-eraser"></mat-icon>
+  </button>
+  <button mat-icon-button (click)="toggleDocumentSync()"
+    matTooltip="Toggle selection synchronization for the tree"
+    [ngClass]="{ 'highlight': sync }"
+    class="flex-right-align">
+    <mat-icon class="fa fa-exchange"></mat-icon>
+  </button>
+  <button mat-icon-button
+    (click)="setRowAsRoot(documentRoot)"
+    [disabled]="(rootSubject | async) === documentRoot"
+    matTooltip="Changes the root to be the document root">
+    <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
+  </button>
+</div>
+<div style="height: 12%; width: 100%;">
+  <div class="kt-head kth-cell">
+    Root
   </div>
-  <div style="height: 12%; width: 100%;">
-    <div class="kt-head kth-cell">
-      Root
-    </div>
-    <ng-container *ngIf="rootSubject.getValue()">
-      <tree-row [treeRow]="getRootRow()" [images]="images"
-        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
-      </tree-row>
-    </ng-container>
-  </div>
-  <div style="height: 81%; width: 100%;">
-    <div class="kt-head kth-cell">
-      Descendants
-    </div>
-    <div class="kt-body">
-      <virtual-scroll #tree [items]="visibleRows">
-        <tree-row *ngFor="let row of tree.viewPortItems"
-          [treeRow]="row" [rowActions]="rowActions"
-          [images]="images" [menuActions]="menuActions">
-        </tree-row>
-      </virtual-scroll>
-    </div>
-  </div>
+  <ng-container *ngIf="rootSubject.getValue()">
+    <tree-row [treeRow]="getRootRow()" [images]="images"
+      [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
+    </tree-row>
+  </ng-container>
+</div>
+<div class="kt-body">
+  <virtual-scroll #tree [items]="visibleRows">
+    <tree-row *ngFor="let row of tree.viewPortItems"
+      [treeRow]="row" [rowActions]="rowActions"
+      [images]="images" [menuActions]="menuActions">
+    </tree-row>
+  </virtual-scroll>
 </div>

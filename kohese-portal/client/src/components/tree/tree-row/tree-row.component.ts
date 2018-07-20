@@ -6,7 +6,7 @@ import { TreeRow } from './tree-row.class';
 @Component({
   selector: 'tree-row',
   templateUrl: './tree-row.component.html',
-  styleUrls: ['./tree.component.scss'],
+  styleUrls: ['./tree-row.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreeRowComponent implements OnInit {
