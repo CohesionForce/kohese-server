@@ -16,7 +16,7 @@
     <div>
       <mat-form-field>
         <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName">
-          <mat-option *ngFor="let filterCriteria of analysisPOSFilterCriteriaList" [value]="filterCriteria">
+          <mat-option *ngFor="let filterCriteria of termPOSFilterCriteriaList" [value]="filterCriteria">
             {{filterCriteria}}
           </mat-option>
         </mat-select>
