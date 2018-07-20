@@ -36,16 +36,16 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/dirty.ico', 'Unsaved Changes',
-      false, (row: TreeRow) => {
-      return (row.object as ItemProxy).dirty;
+      false, (object: any) => {
+      return (object as ItemProxy).dirty;
     }),
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
-      (row: TreeRow) => {
-      return !!(row.object as ItemProxy).status['Unstaged'];
+      (object: any) => {
+      return !!(object as ItemProxy).status['Unstaged'];
     }),
     new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
-      (row: TreeRow) => {
-      return !!(row.object as ItemProxy).status['Staged'];
+      (object: any) => {
+      return !!(object as ItemProxy).status['Staged'];
     })
   ];
   get images() {
@@ -59,23 +59,23 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     route: ActivatedRoute, private _itemRepository: ItemRepository,
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
-    super(route, dialogService);
+    super(route, dialogService, false);
   }
   
   public ngOnInit(): void {
     let deleteMenuAction: MenuAction = new MenuAction('Delete',
-      'Deletes this Item', 'fa fa-times delete-button', (row: TreeRow) => {
-      return !(row.object as ItemProxy).internal;
-      }, (row: TreeRow) => {
+      'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
+      return !(object as ItemProxy).internal;
+      }, (object: any) => {
       this._dialogService.openCustomTextDialog('Confirm Deletion',
-        'Are you sure you want to delete ' + (row.object as ItemProxy).item.name + '?', [
+        'Are you sure you want to delete ' + (object as ItemProxy).item.name + '?', [
         'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
         if (result) {
-          if (row === this.rootSubject.getValue()) {
-            this.rootSubject.next(this.getParent(row));
+          if (object === this.rootSubject.getValue()) {
+            this.rootSubject.next(this.getParent(object));
           }
           
-          this._itemRepository.deleteItem((row.object as ItemProxy), (2 === result));
+          this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
         }
       });
     });
@@ -84,35 +84,38 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
-      'version of this Item', 'fa fa-exchange', (row: TreeRow) => {
-      return (row.object as ItemProxy).status['Staged'];
-      }, (row: TreeRow) => {
-      this.openComparisonDialog(row, VersionDesignator.STAGED_VERSION);
+      'version of this Item', 'fa fa-exchange', (object: any) => {
+      return (object as ItemProxy).status['Staged'];
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), VersionDesignator.
+        STAGED_VERSION);
     });
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
     
     let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
-      'the last committed version of this Item', 'fa fa-exchange', (row:
-      TreeRow) => {
-      if ((row.object as ItemProxy).history) {
-        return ((row.object as ItemProxy).history.length > 0);
+      'the last committed version of this Item', 'fa fa-exchange', (object:
+      any) => {
+      if ((object as ItemProxy).history) {
+        return ((object as ItemProxy).history.length > 0);
       } else {
-        this._itemRepository.getHistoryFor(row.object as ItemProxy);
+        this._itemRepository.getHistoryFor(object as ItemProxy);
         return false;
       }
-      }, (row: TreeRow) => {
-      this.openComparisonDialog(row, VersionDesignator.LAST_COMMITTED_VERSION);
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), VersionDesignator.
+        LAST_COMMITTED_VERSION);
     });
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
     
     let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
-      'Compare this Item against another Item', 'fa fa-exchange', (row: TreeRow) => {
+      'Compare this Item against another Item', 'fa fa-exchange', (object:
+      any) => {
       return true;
-      }, (row: TreeRow) => {
-      this.openComparisonDialog(row, undefined);
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), undefined);
     });
     this.rootMenuActions.push(itemComparisonAction);
     this.menuActions.push(itemComparisonAction);
@@ -139,7 +142,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           getChangeSubject().subscribe((notification: any) => {
           switch (notification.type) {
             case 'create': {
-                this.insertRow(notification.proxy);
+                this.buildRow(notification.proxy);
                 this.refresh();
               }
               break;
@@ -154,7 +157,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
                   this.buildRow(proxy);
                 });
                 this.refresh();
-                this.showSelection();
+                this.showFocus();
               }
               break;
             default:
@@ -164,15 +167,15 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
         
-        this.rootSubject.next(this.getRow(this._absoluteRoot.item.id));
+        this.rootSubject.next(this._absoluteRoot);
         
         this._route.params.subscribe((parameters: Params) => {
           if (this._synchronizeWithSelection) {
-            this.showSelection();
+            this.showFocus();
           }
         });
         
-        this.showSelection();
+        this.showFocus();
       }
     });
   }
@@ -188,28 +191,28 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   public toggleSelectionSynchronization(): void {
     this._synchronizeWithSelection = !this._synchronizeWithSelection;
     if (this._synchronizeWithSelection) {
-      this.showSelection();
+      this.showFocus();
     }
   }
   
-  protected getId(row: TreeRow): string {
-    return (row.object as ItemProxy).item.id;
+  protected getId(object: any): any {
+    return (object as ItemProxy).item.id;
   }
   
-  protected getParent(row: TreeRow): TreeRow {
-    let parent: TreeRow = undefined;
-    if ((row.object as ItemProxy).parentProxy) {
-      parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
+  protected getParent(object: any): any {
+    let parent: ItemProxy = undefined;
+    if ((object as ItemProxy).parentProxy) {
+      parent = (object as ItemProxy).parentProxy;
     }
     
     return parent;
   }
   
-  protected getChildren(row: TreeRow): Array<TreeRow> {
-    let children: Array<TreeRow> = [];
-    let proxy: ItemProxy = (row.object as ItemProxy);
+  protected getChildren(object: any): Array<any> {
+    let children: Array<any> = [];
+    let proxy: ItemProxy = (object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
-      children.push(this.getRow(proxy.children[j].item.id));
+      children.push(proxy.children[j]);
     }
     
     return children;
@@ -219,7 +222,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
-  protected rowSelected(row: TreeRow): void {
+  protected rowFocused(row: TreeRow): void {
     this._navigationService.navigate('Explore', { id: this.getId(row) });
   }
   
@@ -243,15 +246,19 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return iconString;
   }
   
-  private openComparisonDialog(row: TreeRow, changeVersionDesignator:
+  protected filter(object: any): boolean {
+    return super.filter((object as ItemProxy).item);
+  }
+  
+  private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:
     VersionDesignator): void {
     let compareItemsDialogParameters: any = {
-      baseProxy: row.object,
+      baseProxy: proxy,
       editable: true
     };
     
     if (null != changeVersionDesignator) {
-      compareItemsDialogParameters['changeProxy'] = row.object;
+      compareItemsDialogParameters['changeProxy'] = proxy;
       compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
     }
     

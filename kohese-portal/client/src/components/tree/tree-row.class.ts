@@ -61,6 +61,15 @@ export class TreeRow {
     return '';
   }
   
+  public isRowFocused(): boolean {
+    // May be implemented externally
+    return false;
+  }
+  
+  public rowFocused(): void {
+    // May be implemented externally
+  }
+  
   public isRowSelected(): boolean {
     // May be implemented externally
     return false;
@@ -80,6 +89,11 @@ export class TreeRow {
   }
   
   public hasChildren(): boolean {
+    // May be implemented externally
+    return false;
+  }
+  
+  public isMultiselectEnabled(): boolean {
     // May be implemented externally
     return false;
   }

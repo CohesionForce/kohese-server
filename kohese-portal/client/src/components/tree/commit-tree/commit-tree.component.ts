@@ -35,45 +35,45 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   private _images: Array<Image> = [
     new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
       CONTENT_CHANGED), DifferenceTypeOperations.toString(DifferenceType.
-      CONTENT_CHANGED), true, (row: TreeRow) => {
-      return ((row.object instanceof Difference) && (-1 !== (<Difference> row.
-        object).differenceTypes.indexOf(DifferenceType.CONTENT_CHANGED)));
+      CONTENT_CHANGED), true, (object: any) => {
+      return ((object instanceof Difference) && (-1 !== (<Difference> object).
+        differenceTypes.indexOf(DifferenceType.CONTENT_CHANGED)));
     }),
     new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
       TYPE_CHANGED), DifferenceTypeOperations.toString(DifferenceType.
-      TYPE_CHANGED), true, (row: TreeRow) => {
-      return ((row.object instanceof Difference) && (-1 !== (<Difference> row.
-        object).differenceTypes.indexOf(DifferenceType.TYPE_CHANGED)));
+      TYPE_CHANGED), true, (object: any) => {
+      return ((object instanceof Difference) && (-1 !== (<Difference> object).
+        differenceTypes.indexOf(DifferenceType.TYPE_CHANGED)));
     }),
     new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
       PARENT_CHANGED), DifferenceTypeOperations.toString(DifferenceType.
-      PARENT_CHANGED), true, (row: TreeRow) => {
-      return ((row.object instanceof Difference) && (-1 !== (<Difference> row.
-        object).differenceTypes.indexOf(DifferenceType.PARENT_CHANGED)));
+      PARENT_CHANGED), true, (object: any) => {
+      return ((object instanceof Difference) && (-1 !== (<Difference> object).
+        differenceTypes.indexOf(DifferenceType.PARENT_CHANGED)));
     }),
     new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
       CHILD_ADDED), DifferenceTypeOperations.toString(DifferenceType.
-      CHILD_ADDED), true, (row: TreeRow) => {
-      return ((row.object instanceof Difference) && (-1 !== (<Difference> row.
-        object).differenceTypes.indexOf(DifferenceType.CHILD_ADDED)));
+      CHILD_ADDED), true, (object: any) => {
+      return ((object instanceof Difference) && (-1 !== (<Difference> object).
+        differenceTypes.indexOf(DifferenceType.CHILD_ADDED)));
     }),
     new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
       CHILD_MODIFIED), DifferenceTypeOperations.toString(DifferenceType.
-      CHILD_MODIFIED), true, (row: TreeRow) => {
-      return ((row.object instanceof Difference) && (-1 !== (<Difference> row.
-        object).differenceTypes.indexOf(DifferenceType.CHILD_MODIFIED)));
+      CHILD_MODIFIED), true, (object: any) => {
+      return ((object instanceof Difference) && (-1 !== (<Difference> object).
+        differenceTypes.indexOf(DifferenceType.CHILD_MODIFIED)));
     }),
     new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
       CHILD_REMOVED), DifferenceTypeOperations.toString(DifferenceType.
-      CHILD_REMOVED), true, (row: TreeRow) => {
-      return ((row.object instanceof Difference) && (-1 !== (<Difference> row.
-        object).differenceTypes.indexOf(DifferenceType.CHILD_REMOVED)));
+      CHILD_REMOVED), true, (object: any) => {
+      return ((object instanceof Difference) && (-1 !== (<Difference> object).
+        differenceTypes.indexOf(DifferenceType.CHILD_REMOVED)));
     }),
     new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
       CHILDREN_REORDERED), DifferenceTypeOperations.toString(DifferenceType.
-      CHILDREN_REORDERED), true, (row: TreeRow) => {
-      return ((row.object instanceof Difference) && (-1 !== (<Difference> row.
-        object).differenceTypes.indexOf(DifferenceType.CHILDREN_REORDERED)));
+      CHILDREN_REORDERED), true, (object: any) => {
+      return ((object instanceof Difference) && (-1 !== (<Difference> object).
+        differenceTypes.indexOf(DifferenceType.CHILDREN_REORDERED)));
     })
   ];
   get images() {
@@ -86,24 +86,24 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
     ItemRepository, private _lensService: LensService,
     private _navigationService: NavigationService) {
-    super(route, dialogService);
+    super(route, dialogService, false);
   }
   
   public ngOnInit(): void {
     this.rowActions.push(new RowAction('Use As History Lens', 'Uses this ' +
-      'commit as the history lens', 'fa fa-eye', (row: TreeRow) => {
-      return (row.object instanceof Commit); 
-      }, (row: TreeRow) => {
+      'commit as the history lens', 'fa fa-eye', (object: any) => {
+      return (object instanceof Commit); 
+      }, (object: any) => {
       this._lensService.setLens(ApplicationLens.HISTORY);
-      this._itemRepository.setTreeConfig((row.object as Commit).id,
+      this._itemRepository.setTreeConfig((object as Commit).id,
         TreeConfigType.HISTORICAL);
     }));
     
     this.menuActions.push(new MenuAction('Compare Against...', '',
-      'fa fa-exchange', (row: TreeRow) => {
+      'fa fa-exchange', (object: any) => {
       return true;
-      }, (row: TreeRow) => {
-      this.openComparisonDialog(row.object);
+      }, (object: any) => {
+      this.openComparisonDialog(object);
     }));
     
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
@@ -113,10 +113,10 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         this.buildRows();
         
         this._route.params.subscribe((parameters: Params) => {
-          this.showSelection();
+          this.showFocus();
         });
         
-        this.showSelection();
+        this.showFocus();
       }
     });
   }
@@ -160,43 +160,44 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     }
     
-    this.rootSubject.next(rootRow);
+    this.rootSubject.next(rootRow.object);
   }
   
-  protected getId(row: TreeRow): string {
+  protected getId(object: any): any {
     let id: string = '';
-    if (row.object instanceof Repository) {
-      id = (row.object as Repository).proxy.item.id;
-    } else if (row.object instanceof Commit) {
-      id = (row.object as Commit).id;
-    } else if (row.object instanceof Difference) {
-      let difference: Difference = (row.object as Difference);
+    if (object instanceof Repository) {
+      id = (object as Repository).proxy.item.id;
+    } else if (object instanceof Commit) {
+      id = (object as Commit).id;
+    } else if (object instanceof Difference) {
+      let difference: Difference = (object as Difference);
       id = difference.commitId + '_' + difference.item.id;
     }
     
     return id;
   }
   
-  protected getParent(row: TreeRow): TreeRow {
-    if (row.object instanceof Commit) {
-      return this.getRow(this._repositoryProxy.item.id);
-    } else if (row.object instanceof Difference) {
-      return this.getRow((row.object as Difference).commitId);
+  protected getParent(object: any): any {
+    if (object instanceof Commit) {
+      return this.getRow(this._repositoryProxy.item.id).object;
+    } else if (object instanceof Difference) {
+      return this.getRow((object as Difference).commitId).object;
+    } else {
+      return undefined;
     }
   }
   
-  protected getChildren(row: TreeRow): Array<TreeRow> {
-    let children: Array<TreeRow> = [];
-    if (row.object instanceof Repository) {
-      let commits: Array<Commit> = (row.object as Repository).commits;
+  protected getChildren(object: any): Array<any> {
+    let children: Array<any> = [];
+    if (object instanceof Repository) {
+      let commits: Array<Commit> = (object as Repository).commits;
       for (let j: number = 0; j < commits.length; j++) {
-        children.push(this.getRow(commits[j].id));
+        children.push(commits[j]);
       }
-    } else if (row.object instanceof Commit) {
-      let differences: Array<Difference> = (row.object as Commit).differences;
+    } else if (object instanceof Commit) {
+      let differences: Array<Difference> = (object as Commit).differences;
       for (let j: number = 0; j < differences.length; j++) {
-        children.push(this.getRow(differences[j].commitId + '_' + differences[
-          j].item.id));
+        children.push(differences[j]);
       }
     }
     
@@ -222,13 +223,12 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       iconString = 'fa fa-database';
     } else if (object instanceof Commit) {
       iconString = 'fa fa-stamp';
-    } else if (object instanceof Difference) {
     }
     
     return iconString;
   }
   
-  protected rowSelected(row: TreeRow): void {
+  protected rowFocused(row: TreeRow): void {
     this.rowSelectedEmitter.emit(row.object);
     this._navigationService.navigate('Versions', {
       id: this.getId(row)

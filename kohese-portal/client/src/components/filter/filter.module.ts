@@ -4,20 +4,20 @@ import { FormsModule } from '@angular/forms';
 
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
+import { TreeViewModule } from '../tree/tree.module';
 import { FilterComponent } from './filter.component';
-import { FilterElementComponent } from './filter-element.component';
 
 @NgModule({
   declarations: [
-    FilterComponent,
-    FilterElementComponent
+    FilterComponent
   ],
   entryComponents: [FilterComponent],
   imports: [
     CommonModule,
     FormsModule,
     MaterialModule,
-    PipesModule
+    PipesModule,
+    TreeViewModule
   ]
 })
 export class FilterModule {

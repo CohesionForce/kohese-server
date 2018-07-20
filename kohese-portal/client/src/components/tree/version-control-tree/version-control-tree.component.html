@@ -14,8 +14,8 @@
       (click)="filterSubject.next(undefined)" matTooltip="Remove filter">
       <mat-icon class="fa fa-eraser"></mat-icon>
     </button>
-    <button mat-icon-button (click)="rootSubject.next(getRow(absoluteRoot.item.id))"
-      [disabled]="!rootSubject.getValue() || (rootSubject.getValue().object === absoluteRoot)"
+    <button mat-icon-button (click)="rootSubject.next(absoluteRoot)"
+      [disabled]="(rootSubject | async) === absoluteRoot"
       matTooltip="Changes the root to be the absolute root"
       class="flex-right-align">
       <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
@@ -27,7 +27,7 @@
     </div>
     <ng-container *ngIf="rootSubject.getValue()">
       <div class="kt-body">
-        <tree-row [treeRow]="rootSubject.getValue()" [images]="images"
+        <tree-row [treeRow]="getRootRow()" [images]="images"
           [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
         </tree-row>
       </div>

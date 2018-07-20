@@ -22,7 +22,7 @@
     </div>
     <ng-container *ngIf="rootSubject.getValue()">
       <div class="kt-body">
-        <tree-row [treeRow]="rootSubject.getValue()"
+        <tree-row [treeRow]="getRootRow()"
           [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
         </tree-row>
       </div>

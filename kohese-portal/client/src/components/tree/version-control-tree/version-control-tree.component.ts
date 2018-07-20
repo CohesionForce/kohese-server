@@ -32,12 +32,12 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
-      (row: TreeRow) => {
-      return !!(row.object as ItemProxy).status['Unstaged'];
+      (object: any) => {
+      return !!(object as ItemProxy).status['Unstaged'];
     }),
     new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
-      (row: TreeRow) => {
-      return !!(row.object as ItemProxy).status['Staged'];
+      (object: any) => {
+      return !!(object as ItemProxy).status['Staged'];
     })
   ];
   get images() {
@@ -53,20 +53,20 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     private _versionControlService: VersionControlService,
     private _toastrService: ToastrService, private _dynamicTypesService:
     DynamicTypesService) {
-    super(route, dialogService);
+    super(route, dialogService, false);
   }
   
   public ngOnInit(): void {
     let versionControlRowActions: Array<RowAction> = [
       new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
-        'fa fa-undo', (row: TreeRow) => {
-        return (Object.keys((row.object as ItemProxy).status).length > 0);
-        }, (row: TreeRow) => {
+        'fa fa-undo', (object: any) => {
+        return (Object.keys((object as ItemProxy).status).length > 0);
+        }, (object: any) => {
         this._dialogService.openYesNoDialog('Undo Changes', 'Are you sure ' +
           'that you want to undo all changes to this Item since the last ' +
           'commit?').subscribe((result: any) => {
           if (result) {
-            this._versionControlService.revertItems([(row.object as ItemProxy)]).
+            this._versionControlService.revertItems([(object as ItemProxy)]).
               subscribe((statusMap: any) => {
               if (statusMap.error) {
                 this._toastrService.error('Revert Failed', 'Version Control');
@@ -79,10 +79,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         });
       }),
       new RowAction('Stage', 'Stages changes to this Item', 'fa fa-plus',
-        (row: TreeRow) => {
-        return (row.object as ItemProxy).status['Unstaged'];
-        }, (row: TreeRow) => {
-        this._versionControlService.stageItems([(row.object as ItemProxy)]).subscribe(
+        (object: any) => {
+        return (object as ItemProxy).status['Unstaged'];
+        }, (object: any) => {
+        this._versionControlService.stageItems([(object as ItemProxy)]).subscribe(
           (statusMap: any) => {
           if (statusMap.error) {
             this._toastrService.error('Stage Failed', 'Version Control');
@@ -92,10 +92,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         });
       }),
       new RowAction('Unstage', 'Un-stages changes to this Item', 'fa fa-minus',
-        (row: TreeRow) => {
-        return (row.object as ItemProxy).status['Staged'];
-        }, (row: TreeRow) => {
-        this._versionControlService.unstageItems([(row.object as ItemProxy)]).
+        (object: any) => {
+        return (object as ItemProxy).status['Staged'];
+        }, (object: any) => {
+        this._versionControlService.unstageItems([(object as ItemProxy)]).
           subscribe((statusMap: any) => {
           if (statusMap.error) {
             this._toastrService.error('Unstage Failed', 'Version Control');
@@ -111,35 +111,38 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
-      'version of this Item', 'fa fa-exchange', (row: TreeRow) => {
-      return (row.object as ItemProxy).status['Staged'];
-      }, (row: TreeRow) => {
-      this.openComparisonDialog(row, VersionDesignator.STAGED_VERSION);
+      'version of this Item', 'fa fa-exchange', (object: any) => {
+      return (object as ItemProxy).status['Staged'];
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), VersionDesignator.
+        STAGED_VERSION);
     });
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
     
     let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
-      'the last committed version of this Item', 'fa fa-exchange', (row:
-      TreeRow) => {
-      if ((row.object as ItemProxy).history) {
-        return ((row.object as ItemProxy).history.length > 0);
+      'the last committed version of this Item', 'fa fa-exchange', (object:
+      any) => {
+      if ((object as ItemProxy).history) {
+        return ((object as ItemProxy).history.length > 0);
       } else {
-        this._itemRepository.getHistoryFor(row.object as ItemProxy);
+        this._itemRepository.getHistoryFor(object as ItemProxy);
         return false;
       }
-      }, (row: TreeRow) => {
-      this.openComparisonDialog(row, VersionDesignator.LAST_COMMITTED_VERSION);
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), VersionDesignator.
+        LAST_COMMITTED_VERSION);
     });
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
     
     let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
-      'Compare this Item against another Item', 'fa fa-exchange', (row: TreeRow) => {
+      'Compare this Item against another Item', 'fa fa-exchange', (object:
+      any) => {
       return true;
-      }, (row: TreeRow) => {
-      this.openComparisonDialog(row, undefined);
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), undefined);
     });
     this.rootMenuActions.push(itemComparisonAction);
     this.menuActions.push(itemComparisonAction);
@@ -165,8 +168,8 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         });
         
         this.buildRows(this._absoluteRoot);
-        this.rootSubject.next(this.getRow(this._absoluteRoot.item.id));
-        this.showSelection();
+        this.rootSubject.next(this._absoluteRoot);
+        this.showFocus();
       }
     });
   }
@@ -201,26 +204,26 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     });
   }
   
-  protected getId(row: TreeRow): string {
-    return (row.object as ItemProxy).item.id;
+  protected getId(object: any): any {
+    return (object as ItemProxy).item.id;
   }
   
-  protected getParent(row: TreeRow): TreeRow {
-    let parent: TreeRow = undefined;
-    if ((row.object as ItemProxy).parentProxy) {
-      parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
+  protected getParent(object: any): any {
+    let parent: ItemProxy = undefined;
+    if ((object as ItemProxy).parentProxy) {
+      parent = (object as ItemProxy).parentProxy;
     }
     
     return parent;
   }
   
-  protected getChildren(row: TreeRow): Array<TreeRow> {
-    let children: Array<TreeRow> = [];
-    let proxy: ItemProxy = (row.object as ItemProxy);
+  protected getChildren(object: any): Array<any> {
+    let children: Array<ItemProxy> = [];
+    let proxy: ItemProxy = (object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
-      let childRow: TreeRow = this.getRow(proxy.children[j].item.id);
-      if (childRow) {
-        children.push(childRow);
+      let child: ItemProxy = proxy.children[j];
+      if (this.getRow(child.item.id)) {
+        children.push(child);
       }
     }
     
@@ -231,7 +234,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     this._changeDetectorRef.markForCheck();
   }
   
-  protected rowSelected(row: TreeRow): void {
+  protected rowFocused(row: TreeRow): void {
     this._navigationService.navigate('Explore', { id: this.getId(row) });
   }
   
@@ -249,15 +252,19 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     return iconString;
   }
   
-  private openComparisonDialog(row: TreeRow, changeVersionDesignator:
+  protected filter(object: any): boolean {
+    return super.filter((object as ItemProxy).item);
+  }
+  
+  private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:
     VersionDesignator): void {
     let compareItemsDialogParameters: any = {
-      baseProxy: row.object,
+      baseProxy: proxy,
       editable: true
     };
     
     if (null != changeVersionDesignator) {
-      compareItemsDialogParameters['changeProxy'] = row.object;
+      compareItemsDialogParameters['changeProxy'] = proxy;
       compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
     }
     

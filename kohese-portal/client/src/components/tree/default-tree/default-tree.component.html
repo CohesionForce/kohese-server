@@ -21,8 +21,8 @@
       <mat-icon class="fa fa-exchange"></mat-icon>
     </button>
     <button mat-icon-button
-      (click)="rootSubject.next(getRow(absoluteRoot.item.id))"
-      [disabled]="!rootSubject.getValue() || (rootSubject.getValue().object === absoluteRoot)"
+      (click)="rootSubject.next(absoluteRoot)"
+      [disabled]="(rootSubject | async) === absoluteRoot"
       matTooltip="Changes the root to be the absolute root">
       <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
     </button>
@@ -33,7 +33,7 @@
     </div>
     <ng-container *ngIf="rootSubject.getValue()">
       <div class="kt-body">
-        <tree-row [treeRow]="rootSubject.getValue()" [images]="images"
+        <tree-row [treeRow]="getRootRow()" [images]="images"
           [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
         </tree-row>
       </div>

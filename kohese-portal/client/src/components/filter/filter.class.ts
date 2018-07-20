@@ -3,7 +3,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 
 export class Filter {
   private _rootElement: FilterCriteriaConnection =
-    new FilterCriteriaConnection(FilterCriteriaConnectionType.OR, 0);
+    new FilterCriteriaConnection(FilterCriteriaConnectionType.AND);
   get rootElement() {
     return this._rootElement;
   }
@@ -76,70 +76,52 @@ export class Filter {
     let matchingObjects: Array<any> = [];
     for (let j: number = 0; j < objects.length; j++) {
       let object: any = objects[j];
-      let matches: boolean = true;
-      for (let k: number = 0; k < this._elements.length; k++) {
-        let element: FilterElement = this._elements[k];
-        if (element instanceof FilterCriterion) {
-          matches = (element as FilterCriterion).evaluate(object);
-        } else {
-          if ((!matches && (element as FilterCriteriaConnection).type === FilterCriteriaConnectionType.AND) ||
-            (matches && (element as FilterCriteriaConnection).type === FilterCriteriaConnectionType.OR)) {
-            break;
-          }
-        }
-      }
-      
-      if (matches) {
+      if (this.evaluateConnection(this._rootElement, object)) {
         matchingObjects.push(object);
       }
     }
     
     return matchingObjects;
   }
+  
+  private evaluateConnection(connection: FilterCriteriaConnection, object:
+    any): boolean {
+    for (let j: number = 0; j < connection.criteria.length; j++) {
+      if (connection.criteria[j].evaluate(object)) {
+        if (FilterCriteriaConnectionType.OR === connection.type) {
+          return true;
+        }
+      } else if (FilterCriteriaConnectionType.AND === connection.type) {
+        return false;
+      }
+    }
+    
+    for (let j: number = 0; j < connection.connections.length; j++) {
+      let connectionMatches: boolean = this.evaluateConnection(connection.
+        connections[j], object);
+      if (connectionMatches) {
+        if (FilterCriteriaConnectionType.OR === connection.type) {
+          return true;
+        }
+      } else if (FilterCriteriaConnectionType.AND === connection.type) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
 }
 
 export class FilterElement {
-  get depth() {
-    return this._depth;
-  }
-  set depth(depth: number) {
-    this._depth = depth;
-  }
-  
-  protected constructor(private _depth: number) {
+  protected constructor() {
   }
 }
 
-export class FilterCriterion extends FilterElement {
-  public static readonly CONDITIONS: any = {
-    Object: {
-      'TYPE_EQUALS': 'type equals',
-      'SUBCLASS_OF': 'subclass of',
-      'HAS_PROPERTY': 'has property'
-    },
-    Property: {
-      'LESS_THAN': '<',
-      'LESS_THAN_OR_EQUAL_TO': '<=',
-      'EQUALS': '=',
-      'CONTAINS': 'contains',
-      'ENDS_WITH': 'ends with',
-      'BEGINS_WITH': 'begins with',
-      'GREATER_THAN_OR_EQUAL_TO': '>=',
-      'GREATER_THAN': '>'
-    }
-  };
-  
-  get negate() {
-    return this._negate;
-  }
-  set negate(negate: boolean) {
-    this._negate = negate;
-  }
-  
+export abstract class FilterCriterion extends FilterElement {
   get condition() {
     return this._condition;
   }
-  set condition(condition: string) {
+  set condition(condition: any) {
     this._condition = condition;
   }
   
@@ -148,78 +130,192 @@ export class FilterCriterion extends FilterElement {
   }
   set value(value: string) {
     this._value = value;
+    this.convertValueToRegularExpression();
   }
   
-  public constructor(private _negate: boolean, private _condition: string,
-    private _value: string, depth: number) {
-    super(depth);
+  private _negate: boolean = false;
+  get negate() {
+    return this._negate;
+  }
+  set negate(negate: boolean) {
+    this._negate = negate;
   }
   
-  public static getDefaultTrueCriterion(depth: number): FilterCriterion {
-    return new FilterCriterion(false, FilterCriterion.CONDITIONS.Property.
-      BEGINS_WITH, '', depth);
+  private _ignoreCase: boolean = true;
+  get ignoreCase() {
+    return this._ignoreCase;
+  }
+  set ignoreCase(ignoreCase: boolean) {
+    this._ignoreCase = ignoreCase;
   }
   
-  public static getDefaultFalseCriterion(depth: number): FilterCriterion {
-    return new FilterCriterion(true, FilterCriterion.CONDITIONS.Property.
-      BEGINS_WITH, '', depth);
+  protected matcher: RegExp;
+  
+  public constructor(private _condition: any, private _value: string) {
+    super();
+  }
+  
+  private convertValueToRegularExpression(): void {
+    let filterIsRegex: Array<string> = this._value.match(new RegExp(
+      '^\/(.*)\/([gimy]*)$'));
+    if (filterIsRegex) {
+      this.matcher = new RegExp(filterIsRegex[1], filterIsRegex[2]);
+    } else {
+      let flags: string = '';
+      if (this._ignoreCase) {
+        flags += 'i';
+      }
+      
+      this.matcher = new RegExp(this._value, flags);
+    }
+  }
+  
+  public abstract evaluate(candidate: any): boolean;
+  
+  public abstract toString(): string;
+}
+
+enum TypeFilterCriterionCondition {
+  EQUALS = 'equal', SUBCLASS_OF = 'subclass', HAS_PROPERTY = 'have property'
+}
+
+export class TypeFilterCriterion extends FilterCriterion {
+  public static readonly CONDITIONS: any = TypeFilterCriterionCondition;
+  
+  public constructor(condition: string, value: string) {
+    super(condition, value);
   }
   
   public evaluate(candidate: any): boolean {
     let result: boolean = true;
-    switch (this._condition) {
-      case FilterCriterion.CONDITIONS.Property.LESS_THAN:
-        result = (+candidate.toString() < +this._value);
-        break;
-      case FilterCriterion.CONDITIONS.Property.LESS_THAN_OR_EQUAL_TO:
-        result = (+candidate.toString() <= +this._value);
-        break;
-      case FilterCriterion.CONDITIONS.Property.EQUALS:
-        result = (candidate.toString() === this._value);
-        break;
-      case FilterCriterion.CONDITIONS.Property.CONTAINS:
-        result = (candidate.toString().contains(this._value));
-        break;
-      case FilterCriterion.CONDITIONS.Property.ENDS_WITH:
-        result = (candidate.toString().endsWith(this._value));
-        break;
-      case FilterCriterion.CONDITIONS.Property.BEGINS_WITH:
-        result = (candidate.toString().startsWith(this._value));
-        break;
-      case FilterCriterion.CONDITIONS.Property.GREATER_THAN_OR_EQUAL_TO:
-        result = (+candidate.toString() >= +this._value);
-        break;
-      case FilterCriterion.CONDITIONS.Property.GREATER_THAN:
-        result = (+candidate.toString() > +this._value);
-        break;
-      case FilterCriterion.CONDITIONS.Object.TYPE_EQUALS:
+    switch (this.condition) {
+      case TypeFilterCriterionCondition.EQUALS:
         let typeString: string = Object.prototype.toString.call(candidate);
-        result = (this._value === typeString.substring(8, typeString.length -
-          1));
+        //result = (this.value === typeString.substring(8, typeString.length -
+        //  1));
+        result = this.matcher.test(typeString.substring(8, typeString.length - 1));
         break;
-      case FilterCriterion.CONDITIONS.Object.SUBCLASS_OF:
+      case TypeFilterCriterionCondition.SUBCLASS_OF:
         let anObject: any = candidate;
         let toStringFunction: Function = Object.prototype.toString;
         while (Object.getPrototypeOf(anObject) !== Object.prototype) {
           let typeString: string = Object.prototype.toString.call(anObject);
-          result = (this._value === typeString.substring(8, typeString.length -
-            1));
+          //result = (this.value === typeString.substring(8, typeString.length -
+          //  1));
+          result = this.matcher.test(typeString.substring(8, typeString.length - 1));
           if (result) {
             break;
           }
           anObject = Object.getPrototypeOf(anObject);
         }
         break;
-      case FilterCriterion.CONDITIONS.Object.HAS_PROPERTY:
-        result = (null != candidate[this._value]);
+      case TypeFilterCriterionCondition.HAS_PROPERTY:
+        result = (null != candidate[this.value]);
         break;
     }
     
-    if (this._negate) {
+    if (this.negate) {
       result = !result;
     }
     
     return result;
+  }
+  
+  public toString(): string {
+    return 'The type ' + (this.negate ? 'does not ' : 'does ') + this.
+      condition + ' ' + this.value;
+  }
+}
+
+enum PropertyFilterCriterionCondition {
+  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equal',
+    CONTAINS = 'contain', ENDS_WITH = 'end with', BEGINS_WITH = 'begin with',
+    MATCHES_REGULAR_EXPRESSION = 'match regular expression',
+    GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>'
+}
+
+export class PropertyFilterCriterion extends FilterCriterion {
+  public static readonly CONDITIONS: any = PropertyFilterCriterionCondition;
+  
+  get propertyName() {
+    return this._propertyName;
+  }
+  set propertyName(propertyName: string) {
+    this._propertyName = propertyName;
+  }
+  
+  public constructor(private _propertyName: string, condition: string, value:
+    string) {
+    super(condition, value);
+  }
+  
+  public getFilterablePropertyNames(): Array<string> {
+    return [];
+  }
+  
+  public evaluate(candidate: any): boolean {
+    let result: boolean = true;
+    for (let propertyName in candidate) {
+      if (this._propertyName && (this._propertyName !== propertyName)) {
+        continue;
+      }
+      
+      switch (this.condition) {
+        case PropertyFilterCriterionCondition.LESS_THAN:
+          result = (+candidate[propertyName].toString() < +this.value);
+          break;
+        case PropertyFilterCriterionCondition.LESS_THAN_OR_EQUAL_TO:
+          result = (+candidate[propertyName].toString() <= +this.value);
+          break;
+        case PropertyFilterCriterionCondition.EQUALS: {
+            let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
+              source + '$', this.matcher.flags);
+            result = conditionMatcher.test(candidate[propertyName].toString());
+          }
+          break;
+        case PropertyFilterCriterionCondition.CONTAINS:
+          result = this.matcher.test(candidate[propertyName].toString());
+          break;
+        case PropertyFilterCriterionCondition.ENDS_WITH: {
+            let conditionMatcher: RegExp = new RegExp(this.matcher.source +
+              '$', this.matcher.flags);
+            result = conditionMatcher.test(candidate[propertyName].toString());
+          }
+          break;
+        case PropertyFilterCriterionCondition.BEGINS_WITH: {
+            let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
+              source, this.matcher.flags);
+            result = conditionMatcher.test(candidate[propertyName].toString());
+          }
+          break;
+        case PropertyFilterCriterionCondition.MATCHES_REGULAR_EXPRESSION:
+          result = this.matcher.test(candidate[propertyName].toString());
+          break;
+        case PropertyFilterCriterionCondition.GREATER_THAN_OR_EQUAL_TO:
+          result = (+candidate[propertyName].toString() >= +this.value);
+          break;
+        case PropertyFilterCriterionCondition.GREATER_THAN:
+          result = (+candidate[propertyName].toString() > +this.value);
+          break;
+      }
+      
+      if (result) {
+        break;
+      }
+    }
+    
+    if (this.negate) {
+      result = !result;
+    }
+    
+    return result;
+  }
+  
+  public toString(): string {
+    return (this._propertyName ? this._propertyName : 'A property ') + (this.
+      negate ? 'does not ' : 'does ') + (this.ignoreCase ?
+      'case-insensitively ' : 'case-sensitively ') + this.condition + ' ' +
+      this.value;
   }
 }
 
@@ -234,9 +330,16 @@ export class FilterCriteriaConnection extends FilterElement {
     return this._criteria;
   }
   
-  public constructor(public type: FilterCriteriaConnectionType,
-    depth: number) {
-    super(depth);
+  public constructor(public type: FilterCriteriaConnectionType) {
+    super();
+  }
+  
+  public toString(): string {
+    if (this.type === FilterCriteriaConnectionType.AND) {
+      return 'AND';
+    } else {
+      return 'OR';
+    }
   }
 }
 

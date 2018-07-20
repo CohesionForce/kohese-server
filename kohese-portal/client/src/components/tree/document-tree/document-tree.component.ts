@@ -41,7 +41,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
               private itemRepository : ItemRepository,
               private changeRef : ChangeDetectorRef
               ) {
-                super(router, dialogService);
+                super(router, dialogService, false);
               }
 
   ngOnInit() {
@@ -52,16 +52,20 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     });
 
     console.log(this.documentRoot)
-  this.rootRowActions.push(new RowAction('Test action',
-    'I am an action', 'fa fa-times', (row : TreeRow) => {
+    this.rootRowActions.push(new RowAction('Test action',
+      'I am an action', 'fa fa-times', (object: any) => {
       return true;
-    }, ()=>{return true}));
+      }, (object: any) => {
+      return true;
+    }));
 
-  let sharedAction : MenuAction = new MenuAction('Menu Action', 'I am in a menu', 'fa fa-comment',
-    (row) => {
+    let sharedAction : MenuAction = new MenuAction('Menu Action', 'I am in a menu', 'fa fa-comment',
+      (object: any) => {
       if (true) {
-        return true
-      }},()=>{console.log('Hello world')})
+      return true;
+      }}, (object: any) => {
+      console.log('Hello world');
+    });
 
   this.rootMenuActions.push(sharedAction);
   this.menuActions.push(sharedAction);
@@ -82,7 +86,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         getChangeSubject().subscribe((notification: any) => {
         switch (notification.type) {
           case 'create': {
-              this.insertRow(notification.proxy);
+              this.buildRow(notification.proxy);
               this.refresh();
             }
             break;
@@ -97,16 +101,16 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
                 this.buildRow(proxy);
               });
               this.refresh();
-              this.showSelection();
+              this.showFocus();
             }
             break;
         }
       });
 
-      this.rootSubject.next(this.getRow(this.documentRootId));
+      this.rootSubject.next(this.documentRootId);
       this.rootSelected.emit(this.documentRoot);
 
-      this.showSelection();
+      this.showFocus();
       setTimeout(()=>{
         console.log(this.visibleRows)
       }, 500)
@@ -116,10 +120,10 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   this.selectedProxyStreamSubscription = this.selectedProxyStream.subscribe((newSelection) => {
     console.log(this.sync);
     if(this.sync && newSelection) {
-      this._selectedIdSubject.next(newSelection.item.id)
+      this.focusedObjectSubject.next(newSelection);
       console.log(newSelection, this);
 
-      this.showSelection();
+      this.showFocus();
     }
   })
 }
@@ -136,29 +140,29 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   toggleDocumentSync(): void {
     this.sync = !this.sync;
     if (this.sync) {
-      this.showSelection();
+      this.showFocus();
     }
   }
 
 
-  protected getId(row: TreeRow): string {
-    return (row.object as ItemProxy).item.id;
+  protected getId(object: any): any {
+    return (object as ItemProxy).item.id;
   }
 
-  protected getParent(row: TreeRow): TreeRow {
-    let parent: TreeRow = undefined;
-    if ((row.object as ItemProxy).parentProxy) {
-      parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
+  protected getParent(object: any): any {
+    let parent: ItemProxy = undefined;
+    if ((object as ItemProxy).parentProxy) {
+      parent = (object as ItemProxy).parentProxy;
     }
 
     return parent;
   }
 
-  protected getChildren(row: TreeRow): Array<TreeRow> {
-    let children: Array<TreeRow> = [];
-    let proxy: ItemProxy = (row.object as ItemProxy);
+  protected getChildren(object: any): Array<any> {
+    let children: Array<ItemProxy> = [];
+    let proxy: ItemProxy = (object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
-      children.push(this.getRow(proxy.children[j].item.id));
+      children.push(proxy.children[j]);
     }
 
     return children;
@@ -168,7 +172,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     this.changeRef.markForCheck();
   }
 
-  protected rowSelected(row: TreeRow): void {
+  protected rowFocused(row: TreeRow): void {
     this.onSelect.emit(row.object);
   }
 
@@ -186,9 +190,9 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     return iconString;
   }
 
-  public setRowAsRoot(row : TreeRow) {
-    this.rootSubject.next(this.getRow(row.object.item.id));
-    this.rootSelected.emit(row.object);
+  public setRowAsRoot(proxy: ItemProxy) {
+    this.rootSubject.next(proxy);
+    this.rootSelected.emit(proxy);
     console.log('over');
   }
 }

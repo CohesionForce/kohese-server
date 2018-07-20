@@ -1,4 +1,3 @@
-import { EventEmitter, Output } from '@angular/core';
 import { Component, OnInit, Input, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 
@@ -11,7 +10,6 @@ import { TreeRow } from './tree-row.class';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreeRowComponent implements OnInit {
-
   private _treeRow: TreeRow;
   get treeRow() {
     return this._treeRow;
@@ -66,28 +64,26 @@ export class TreeRowComponent implements OnInit {
 
 export class Image {
   public constructor(public path: string, public text: string,
-    public displayAsIcon: boolean, public display: (row: TreeRow) => boolean) {
+    public displayAsIcon: boolean, public display: (object: any) => boolean) {
   }
 }
 
 class Action {
   public constructor(public name: string, public description: string,
-    public icon: string, public perform: (row: TreeRow) => void) {
+    public icon: string, public perform: (object: any) => void) {
   }
 }
 
 export class RowAction extends Action {
   public constructor(name: string, description: string, icon: string,
-    public show: (row: TreeRow) => boolean, perform: (row:
-    TreeRow) => void) {
+    public show: (object: any) => boolean, perform: (object: any) => void) {
     super(name, description, icon, perform);
   }
 }
 
 export class MenuAction extends Action {
   public constructor(name: string, description: string, icon: string,
-    public enable: (row: TreeRow) => boolean, perform: (row:
-    TreeRow) => void) {
+    public enable: (object: any) => boolean, perform: (object: any) => void) {
     super(name, description, icon, perform);
   }
 }

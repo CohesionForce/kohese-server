@@ -11,38 +11,37 @@ import { Filter } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
 export abstract class Tree {
-  private _rowMap: Map<string, TreeRow> = new Map<string, TreeRow>();
-  private _rows: Array<TreeRow> = [];
+  private _rowMap: Map<any, TreeRow> = new Map<any, TreeRow>();
 
   private _visibleRows: Array<TreeRow> = [];
   get visibleRows() {
     return this._visibleRows;
   }
   
-  private _rootSubject: BehaviorSubject<TreeRow> =
-    new BehaviorSubject<TreeRow>(undefined);
+  private _rootSubject: BehaviorSubject<any> =
+    new BehaviorSubject<any>(undefined);
   get rootSubject() {
     return this._rootSubject;
   }
 
   private _rootRowActions: Array<RowAction> = [
     new RowAction('Expand Descendants', 'Expands all descendants',
-      'fa fa-caret-down', (row: TreeRow) => {
-      return (this.getChildren(row).length > 0);
-      }, (row: TreeRow) => {
-      this.expandDescendants(row);
+      'fa fa-caret-down', (object: any) => {
+      return (this.getChildren(object).length > 0);
+      }, (object: any) => {
+      this.expandDescendants(this._rowMap.get(this.getId(object)));
     }),
     new RowAction('Collapse Descendants', 'Collapses all descendants',
-      'fa fa-caret-right', (row: TreeRow) => {
-      return (this.getChildren(row).length > 0);
-      }, (row: TreeRow) => {
-      this.collapseDescendants(row);
+      'fa fa-caret-right', (object: any) => {
+      return (this.getChildren(object).length > 0);
+      }, (object: any) => {
+      this.collapseDescendants(this._rowMap.get(this.getId(object)));
     }),
-    new RowAction('Set Parent As Root', 'Set this row\'s parent as the root',
-      'fa fa-level-up', (row: TreeRow) => {
-      return !!this.getParent(row);
-      }, (row: TreeRow) => {
-      this.setRowAsRoot(this.getParent(row));
+    new RowAction('Set Parent As Root', 'Set the parent of this row\'s ' +
+      'object as the root', 'fa fa-level-up', (object: any) => {
+      return !!this.getParent(object);
+      }, (object: any) => {
+      this.setRoot(this.getParent(object));
     })
   ];
   get rootRowActions() {
@@ -61,24 +60,29 @@ export abstract class Tree {
 
   private _menuActions: Array<MenuAction> = [
     new MenuAction('Expand Descendants', 'Expands all descendants',
-    'fa fa-caret-down', (row: TreeRow) => {
-      return (this.getChildren(row).length > 0);
-    }, (row: TreeRow) => {
-      this.expandDescendants(row);
+      'fa fa-caret-down', (object: any) => {
+      return (this.getChildren(object).length > 0);
+      }, (object: any) => {
+      this.expandDescendants(this._rowMap.get(this.getId(object)));
     }),
     new MenuAction('Collapse Descendants', 'Collapses all descendants',
-    'fa fa-caret-right', (row: TreeRow) => {
-      return (this.getChildren(row).length > 0);
-    }, (row: TreeRow) => {
-      this.collapseDescendants(row);
+      'fa fa-caret-right', (object: any) => {
+      return (this.getChildren(object).length > 0);
+      }, (object: any) => {
+      this.collapseDescendants(this._rowMap.get(this.getId(object)));
     })
   ];
   get menuActions() {
     return this._menuActions;
   }
 
-  protected _selectedIdSubject: BehaviorSubject<string> =
-    new BehaviorSubject<string>('');
+  protected focusedObjectSubject: BehaviorSubject<any> =
+    new BehaviorSubject<any>(undefined);
+  private _selectedObjectsSubject: BehaviorSubject<Array<any>> =
+    new BehaviorSubject<Array<any>>([]);
+  get selectedObjectsSubject() {
+    return this._selectedObjectsSubject;
+  }
 
   private _filterSubject: BehaviorSubject<Filter> =
     new BehaviorSubject<Filter>(undefined);
@@ -87,7 +91,14 @@ export abstract class Tree {
   }
   
   private _filterDelayIdentifier: any;
-
+  
+  get multiselectEnabled() {
+    return this._multiselectEnabled;
+  }
+  set multiselectEnabled(multiselectEnabled: boolean) {
+    this._multiselectEnabled = multiselectEnabled;
+  }
+  
   @ViewChild(VirtualScrollComponent)
   private _virtualScrollComponent: VirtualScrollComponent;
 
@@ -96,17 +107,21 @@ export abstract class Tree {
   private _updateVisibleRowsSubscriptionMap: any = {};
 
   protected constructor(protected _route: ActivatedRoute,
-    protected _dialogService: DialogService) {
-    this._rootSubscription = this._rootSubject.subscribe((root: TreeRow) => {
+    protected _dialogService: DialogService, private _multiselectEnabled:
+    boolean) {
+    this._rootSubscription = this._rootSubject.subscribe((root: any) => {
       if (root) {
-        root.depth = 0;
+        this._rowMap.get(this.getId(root)).depth = 0;
         this.showRows();
       }
     });
 
     this._route.params.subscribe((parameters: Params) => {
-      this._selectedIdSubject.next(parameters['id']);
-      this.showSelection();
+      let focusedRow: TreeRow = this._rowMap.get(parameters['id']);
+      if (focusedRow) {
+        this.focusedObjectSubject.next(focusedRow.object);
+        this.showFocus();
+      }
     });
 
     this._filterSubscription = this._filterSubject.subscribe((filter:
@@ -124,101 +139,59 @@ export abstract class Tree {
   protected buildRow(object: any): TreeRow {
     let row: TreeRow = new TreeRow(object);
     row.getText = () => {
-      return this.getText(row.object);
+      return this.getText(object);
     };
     row.getIcon = () => {
-      return this.getIcon(row.object);
+      return this.getIcon(object);
+    };
+    row.isRowFocused = () => {
+      return (object === this.focusedObjectSubject.getValue());
+    };
+    row.rowFocused = () => {
+      this.rowFocused(row);
+      this.focusedObjectSubject.next(object);
+      this.showFocus();
     };
     row.isRowSelected = () => {
-      return (this.getId(row) === this._selectedIdSubject.getValue());
+      return (-1 !== this._selectedObjectsSubject.getValue().indexOf(object));
     };
     row.rowSelected = () => {
-      this.rowSelected(row);
-      this._selectedIdSubject.next(this.getId(row));
-      this.showSelection();
-    };
-    row.isRowRoot = () => {
-      return (row === this._rootSubject.getValue());
-    };
-    row.setRowAsRoot = () => {
-      this.setRowAsRoot(row);
-    };
-    row.hasChildren = () => {
-      return ((row !== this._rootSubject.getValue()) && (this.getChildren(row).
-        length > 0));
-    };
-    this._rowMap.set(this.getId(row), row);
-    this._rows.push(row);
-
-    let parentRow: TreeRow = this.getParent(row);
-    if (parentRow) {
-      row.path.push(...parentRow.path);
-    }
-    row.path.push(this.getId(row));
-
-    this._updateVisibleRowsSubscriptionMap[this.getId(row)] = row.
-      updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
-      if (updateVisibleRows) {
-        this.showRows();
-      }
-    });
-
-    return row;
-  }
-
-  protected insertRow(object: any): TreeRow {
-    let row: TreeRow = new TreeRow(object);
-    row.getText = () => {
-      return this.getText(row.object);
-    };
-    row.getIcon = () => {
-      return this.getIcon(row.object);
-    };
-    row.isRowSelected = () => {
-      return (this.getId(row) === this._selectedIdSubject.getValue());
-    };
-    row.rowSelected = () => {
-      this.rowSelected(row);
-      this._selectedIdSubject.next(this.getId(row));
-      this.showSelection();
-    };
-    row.isRowRoot = () => {
-      return (row === this._rootSubject.getValue());
-    };
-    row.setRowAsRoot = () => {
-      this.setRowAsRoot(row);
-    };
-    row.hasChildren = () => {
-      return ((row !== this._rootSubject.getValue()) && (this.getChildren(row).
-        length > 0));
-    };
-    this._rowMap.set(this.getId(row), row);
-
-    let parentRow: TreeRow = this.getParent(row);
-    row.path.push(...parentRow.path);
-    row.path.push(this.getId(row));
-
-    let childrenRows: Array<TreeRow> = this.getChildren(parentRow);
-    let rowIndex: number = childrenRows.indexOf(row.
-      object);
-    let insertionIndex: number = undefined;
-    while (undefined === insertionIndex) {
-      if (rowIndex === (childrenRows.length - 1)) {
-        let previousParent: TreeRow = parentRow;
-        parentRow = this.getParent(parentRow);
-        if (!parentRow) {
-          insertionIndex = (this._rows.length - 1);
-        } else {
-          childrenRows = this.getChildren(parentRow);
-          rowIndex = childrenRows.indexOf(previousParent);
-        }
+      let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
+      let index: number = selectedObjects.indexOf(object);
+      if (-1 === index) {
+        selectedObjects.push(object);
       } else {
-        insertionIndex = this._rows.indexOf(childrenRows[rowIndex + 1]);
+        selectedObjects.splice(index, 1);
+      }
+      
+      this._selectedObjectsSubject.next(selectedObjects);
+    };
+    row.isRowRoot = () => {
+      return (object === this._rootSubject.getValue());
+    };
+    row.setRowAsRoot = () => {
+      this.setRoot(object);
+    };
+    row.hasChildren = () => {
+      return ((object !== this._rootSubject.getValue()) && (this.getChildren(
+        object).length > 0));
+    };
+    row.isMultiselectEnabled = () => {
+      return this._multiselectEnabled;
+    };
+    let id: any = this.getId(object);
+    this._rowMap.set(id, row);
+
+    let parent: any = this.getParent(object);
+    if (parent) {
+      let parentRow: TreeRow = this._rowMap.get(this.getId(parent));
+      if (parentRow) {
+        row.path.push(...parentRow.path);
       }
     }
-    this._rows.splice(insertionIndex + 1, 0, row);
+    row.path.push(id);
 
-    this._updateVisibleRowsSubscriptionMap[this.getId(row)] = row.
+    this._updateVisibleRowsSubscriptionMap[id] = row.
       updateVisibleRows.subscribe((updateVisibleRows: boolean) => {
       if (updateVisibleRows) {
         this.showRows();
@@ -228,8 +201,12 @@ export abstract class Tree {
     return row;
   }
 
-  public getRow(id: string): TreeRow {
+  protected getRow(id: any): TreeRow {
     return this._rowMap.get(id);
+  }
+  
+  public getRootRow(): TreeRow {
+    return this.getRow(this.getId(this._rootSubject.getValue()));
   }
 
   public refresh(): void {
@@ -244,7 +221,7 @@ export abstract class Tree {
       data: {
         filter: this._filterSubject.getValue()
       }
-    }).updateSize('70%', '70%').afterClosed().subscribe((filter: Filter) => {
+    }).updateSize('90%', '90%').afterClosed().subscribe((filter: Filter) => {
       if (filter) {
         this._filterSubject.next(filter);
       }
@@ -271,7 +248,6 @@ export abstract class Tree {
   protected deleteRow(id: string): void {
     delete this._updateVisibleRowsSubscriptionMap[id];
     let row: TreeRow = this._rowMap.get(id);
-    this._rows.splice(this._rows.indexOf(row), 1);
     this._rowMap.delete(id);
   }
 
@@ -279,15 +255,15 @@ export abstract class Tree {
     this._visibleRows = [];
     this.preTreeTraversalActivity();
 
-    let rootRow: TreeRow = this._rootSubject.getValue();
-    let rootRowChildrenProxies: Array<TreeRow> = this.getChildren(rootRow);
-    for (let j: number = 0; j < rootRowChildrenProxies.length; j++) {
-      this.processRow(rootRowChildrenProxies[j]);
+    let root: any = this._rootSubject.getValue();
+    let rootChildren: Array<any> = this.getChildren(root);
+    for (let j: number = 0; j < rootChildren.length; j++) {
+      this.processRow(this._rowMap.get(this.getId(rootChildren[j])));
     }
 
     this.postTreeTraversalActivity();
 
-    rootRow.refresh();
+    this._rowMap.get(this.getId(root)).refresh();
     for (let j: number = 0; j < this._visibleRows.length; j++) {
       this._visibleRows[j].refresh();
     }
@@ -299,17 +275,16 @@ export abstract class Tree {
     let filter: Filter = this._filterSubject.getValue();
     let show: boolean = !!filter;
     if (show) {
-      row.matchesFilter = (-1 !== filter.filter([row.object]).indexOf(row.
-        object));
+      row.matchesFilter = this.filter(row.object);
       show = row.matchesFilter;
       if (!row.matchesFilter) {
-        let recursiveFilteringFunction: (r: TreeRow) => void = (r: TreeRow) => {
-          let rowChildrenProxies: Array<TreeRow> = this.getChildren(r);
-          for (let j: number = 0; j < rowChildrenProxies.length; j++) {
-            let matches: boolean = (-1 !== filter.filter([rowChildrenProxies[
-              j].object]).indexOf(rowChildrenProxies[j].object));
+        let recursiveFilteringFunction: (object: any) => void = (object:
+          any) => {
+          let children: Array<any> = this.getChildren(object);
+          for (let j: number = 0; j < children.length; j++) {
+            let matches: boolean = this.filter(children[j]);
             if (!matches) {
-              recursiveFilteringFunction(rowChildrenProxies[j]);
+              recursiveFilteringFunction(children[j]);
             }
 
             if (matches) {
@@ -318,7 +293,7 @@ export abstract class Tree {
             }
           }
         };
-        recursiveFilteringFunction(row);
+        recursiveFilteringFunction(row.object);
       }
     } else {
       row.matchesFilter = false;
@@ -329,37 +304,37 @@ export abstract class Tree {
       row.visible = show;
     }
 
-    let root: TreeRow = this._rootSubject.getValue();
-    let rowParentProxy: TreeRow = this.getParent(row);
+    let root: any = this._rootSubject.getValue();
+    let parent: any = this.getParent(row.object);
     let depth: number = 0;
-    if (row !== root) {
-      while (rowParentProxy) {
-        if (rowParentProxy === root) {
+    if (row.object !== root) {
+      while (parent) {
+        if (parent === root) {
           break;
         }
         depth++;
-        rowParentProxy = this.getParent(rowParentProxy);
+        parent = this.getParent(parent);
       }
     }
     row.depth = depth;
 
     if (row.visible) {
-      rowParentProxy = this.getParent(row);
-      let addRow: boolean = !rowParentProxy;
-      if (rowParentProxy) {
-        let parentRow: TreeRow = rowParentProxy;
+      parent = this.getParent(row.object);
+      let addRow: boolean = !parent;
+      if (parent) {
+        let parentRow: TreeRow = this._rowMap.get(this.getId(parent));
         /* The parent TreeRow's expansion should be checked after the root is
         compared to parentRow */
-        addRow = ((rowParentProxy === root) || parentRow.expanded);
+        addRow = ((parent === root) || (parentRow && parentRow.expanded));
       }
 
       if (addRow) {
         this._visibleRows.push(row);
 
         if (row.expanded) {
-          let rowChildrenProxies: Array<TreeRow> = this.getChildren(row);
-          for (let j: number = 0; j < rowChildrenProxies.length; j++) {
-            this.processRow(rowChildrenProxies[j]);
+          let children: Array<any> = this.getChildren(row.object);
+          for (let j: number = 0; j < children.length; j++) {
+            this.processRow(this._rowMap.get(this.getId(children[j])));
           }
         }
       }
@@ -367,11 +342,11 @@ export abstract class Tree {
     this.postRowProcessingActivity(row);
   }
   
-  protected abstract getId(row: TreeRow): string;
+  protected abstract getId(object: any): any;
   
-  protected abstract getParent(row: TreeRow): TreeRow;
+  protected abstract getParent(object: any): any;
   
-  protected abstract getChildren(row: TreeRow): Array<TreeRow>;
+  protected abstract getChildren(object: any): Array<any>;
   
   protected abstract getText(object: any): string;
   
@@ -393,12 +368,17 @@ export abstract class Tree {
     // Subclasses may override this function
   }
   
-  protected setRowAsRoot(row: TreeRow) {
-    this._rootSubject.next(row);
+  protected setRoot(object: any) {
+    this._rootSubject.next(object);
   }
   
-  protected rowSelected(row: TreeRow): void {
+  protected rowFocused(row: TreeRow): void {
     // Subclasses may override this function
+  }
+  
+  protected filter(object: any): boolean {
+    return (-1 !== this._filterSubject.getValue().filter([object]).indexOf(
+      object));
   }
 
   protected clear(): void {
@@ -406,7 +386,6 @@ export abstract class Tree {
       delete this._updateVisibleRowsSubscriptionMap[id];
     }
     this._visibleRows = [];
-    this._rows.length = 0;
     this._rowMap.clear();
   }
 
@@ -414,9 +393,9 @@ export abstract class Tree {
     let expandFunction: (r: TreeRow) => void = (r: TreeRow) => {
       if (r.visible) {
         r.expanded = true;
-        let rowChildrenProxies: Array<TreeRow> = this.getChildren(r);
-        for (let j: number = 0; j < rowChildrenProxies.length; j++) {
-          expandFunction(rowChildrenProxies[j]);
+        let children: Array<any> = this.getChildren(r.object);
+        for (let j: number = 0; j < children.length; j++) {
+          expandFunction(this._rowMap.get(this.getId(children[j])));
         }
       }
     };
@@ -430,9 +409,9 @@ export abstract class Tree {
     let collapseFunction: (r: TreeRow) => void = (r: TreeRow) => {
       if (r.visible) {
         r.expanded = false;
-        let rowChildrenProxies: Array<TreeRow> = this.getChildren(r);
-        for (let j: number = 0; j < rowChildrenProxies.length; j++) {
-          collapseFunction(rowChildrenProxies[j]);
+        let children: Array<any> = this.getChildren(r.object);
+        for (let j: number = 0; j < children.length; j++) {
+          collapseFunction(this._rowMap.get(this.getId(children[j])));
         }
       }
     };
@@ -442,14 +421,15 @@ export abstract class Tree {
     this.showRows();
   }
 
-  protected showSelection(): void {
-    let id: string = this._selectedIdSubject.getValue();
-    if (id) {
+  protected showFocus(): void {
+    let focusedObject: any = this.focusedObjectSubject.getValue();
+    if (focusedObject) {
+      let id: string = this.getId(focusedObject);
       let selectedRow: TreeRow = this._rowMap.get(id);
       if (selectedRow) {
-        let parentRow: TreeRow = this.getParent(selectedRow);
-        if (parentRow) {
-          let parentId: string = this.getId(parentRow);
+        let parent: any = this.getParent(focusedObject);
+        if (parent) {
+          let parentId: string = this.getId(parent);
           let rootId: string = this.getId(this._rootSubject.getValue());
           while (parentId !== rootId) {
             let row: TreeRow = this._rowMap.get(parentId);
@@ -458,9 +438,9 @@ export abstract class Tree {
             }
 
             row.expanded = true;
-            parentRow = this.getParent(row);
-            if (parentRow) {
-              parentId = this.getId(parentRow);
+            parent = this.getParent(row.object);
+            if (parent) {
+              parentId = this.getId(parent);
             } else {
               break;
             }
