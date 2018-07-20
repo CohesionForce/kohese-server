@@ -1,0 +1,30 @@
+<div id="header">
+  <span id="title"> Report Definitions </span>
+  <button mat-button (click)="addReport()">Add Report</button>
+</div>
+<div id="report-container">
+  <mat-list>
+    <mat-list-item *ngFor="let report of reportDefs" class="report-item" (click)="selectedReport = report">
+      {{report.reportName}}
+      <hr/>
+    </mat-list-item>
+  </mat-list>
+</div>
+<div id="definition-editor" *ngIf="selectedReport">
+  <h2>{{selectedReport.reportName}}</h2>
+  <label>Report name: </label>
+  <input mat-input [(ngModel)]="selectedReport.reportName" />
+  <div id="type-selector">
+    <h4>Included Types</h4>
+    <mat-list id="type-list">
+    <mat-list-item *ngFor="let type of typeInfo | mapKey">
+      <mat-slide-toggle [checked]="selectedReport.typeFormats.get(type)" (toggleChange)="toggleType(selectedReport, typeInfo[type])"></mat-slide-toggle>
+      <span class="type-info" (click)="selectedType = typeInfo[type]">{{typeInfo[type].dataModelProxy.item.name}}</span>
+      <hr/>
+    </mat-list-item>
+  </mat-list>
+  <div id="type-specification" *ngIf="selectedType">
+      {{selectedType.dataModelProxy.item.name}}
+    </div>
+  </div>
+</div>

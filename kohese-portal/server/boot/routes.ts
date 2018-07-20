@@ -29,7 +29,8 @@ module.exports = function (app) {
       /^\/analysis.*/,
       /^\/typeeditor.*/,
       /^\/devtools.*/,
-      /^\/document.*/
+      /^\/document.*/,
+      /^\/report-gen.*/
     ];
 
     app.use(ngRoutes, function (req, res) {
