@@ -32,13 +32,13 @@
   </mat-menu>
   <ng-container *ngIf="!inTargetingMode">
     <button mat-icon-button
-      [disabled]="(0 === (selectedObjectsSubject | async).length)"
+      [disabled]="(0 === (selectedObjectsSubject | async).length) || (-1 !== (selectedObjectsSubject | async).indexOf(rootSubject | async))"
       (click)="enterCopyTargetingMode()"
       matTooltip="Copy the selected elements">
       <mat-icon class="fa fa-copy"></mat-icon>
     </button>
     <button mat-icon-button
-      [disabled]="(0 === (selectedObjectsSubject | async).length)"
+      [disabled]="(0 === (selectedObjectsSubject | async).length) || (-1 !== (selectedObjectsSubject | async).indexOf(rootSubject | async))"
       (click)="enterMoveTargetingMode()"
       matTooltip="Move the selected elements">
       <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>

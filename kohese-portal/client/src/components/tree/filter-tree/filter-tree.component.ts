@@ -129,7 +129,8 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     this.rowActions.push(new RowAction('Target', 'Target this connection ' +
       'for the current action', 'fa fa-crosshairs', (object: any) => {
       return ((object instanceof FilterCriteriaConnection) &&
-        (this._inTargetingMode));
+        (this._inTargetingMode) && (this._isTargetingForCopy || (-1 === this.
+        selectedObjectsSubject.getValue().indexOf(object))));
       }, (object: any) => {
       let connection: FilterCriteriaConnection =
         (object as FilterCriteriaConnection);
@@ -137,25 +138,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       for (let j: number = 0; j < selectedObjects.length; j++) {
         let selectedElement: FilterElement = selectedObjects[j];
         if (this._isTargetingForCopy) {
-          if (selectedElement instanceof TypeFilterCriterion) {
-            let original: TypeFilterCriterion =
-              (selectedElement as TypeFilterCriterion);
-            let copy: TypeFilterCriterion = new TypeFilterCriterion(original.
-              condition, original.value);
-            selectedElement = Object.assign(copy, original);
-          } else if (selectedElement instanceof PropertyFilterCriterion) {
-            let original: PropertyFilterCriterion =
-              (selectedElement as PropertyFilterCriterion);
-            let copy: PropertyFilterCriterion = new PropertyFilterCriterion(
-              original.propertyName, original.condition, original.value);
-            selectedElement = Object.assign(copy, original);
-          } else {
-            let original: FilterCriteriaConnection =
-              (selectedElement as FilterCriteriaConnection);
-            let copy: FilterCriteriaConnection = new FilterCriteriaConnection(
-              original.type);
-            selectedElement = Object.assign(copy, original);
-          }
+          selectedElement = this.copy(selectedElement);
         } else {
           let parent: FilterCriteriaConnection = this.getParent(
             selectedElement);
@@ -178,7 +161,11 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
         }
         
         if (this._isTargetingForCopy) {
-          this.buildRow(selectedElement);
+          if (selectedElement instanceof FilterCriteriaConnection) {
+            this.buildRows(selectedElement);
+          } else {
+            this.buildRow(selectedElement);
+          }
         }
         
         this.getRow(this.getId(connection)).expanded = true;
@@ -195,19 +182,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       this.clear();
       
       if (filter) {
-        let elementStack: Array<FilterCriteriaConnection> = [filter.
-          rootElement];
-        while (elementStack.length > 0) {
-          let connection: FilterCriteriaConnection = elementStack.pop();
-          this.buildRow(connection);
-          
-          for (let j: number = 0; j < connection.criteria.length; j++) {
-            this.buildRow(connection.criteria[j]);
-          }
-          
-          elementStack.push(...connection.connections);
-        }
-        
+        this.buildRows(filter.rootElement);
         this.rootSubject.next(filter.rootElement);
       }
     });
@@ -400,5 +375,51 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     }
     
     return areConnections;
+  }
+  
+  private buildRows(startingConnection: FilterCriteriaConnection): void {
+    let elementStack: Array<FilterCriteriaConnection> = [startingConnection];
+    while (elementStack.length > 0) {
+      let connection: FilterCriteriaConnection = elementStack.pop();
+      this.buildRow(connection);
+      
+      for (let j: number = 0; j < connection.criteria.length; j++) {
+        this.buildRow(connection.criteria[j]);
+      }
+      
+      elementStack.push(...connection.connections);
+    }
+  }
+  
+  private copy(element: FilterElement): FilterElement {
+    let copiedElement: FilterElement;
+    if (element instanceof TypeFilterCriterion) {
+      let original: TypeFilterCriterion =
+        (element as TypeFilterCriterion);
+      copiedElement = new TypeFilterCriterion(original.
+        condition, original.value);
+      copiedElement = Object.assign(copiedElement, original);
+    } else if (element instanceof PropertyFilterCriterion) {
+      let original: PropertyFilterCriterion =
+        (element as PropertyFilterCriterion);
+      copiedElement = new PropertyFilterCriterion(
+        original.propertyName, original.condition, original.value);
+      copiedElement = Object.assign(copiedElement, original);
+    } else {
+      let original: FilterCriteriaConnection =
+        (element as FilterCriteriaConnection);
+      copiedElement = new FilterCriteriaConnection(
+        original.type);
+      for (let j: number = 0; j < original.connections.length; j++) {
+        (copiedElement as FilterCriteriaConnection).connections.push(this.copy(
+          original.connections[j]) as FilterCriteriaConnection);
+      }
+      for (let j: number = 0; j < original.criteria.length; j++) {
+        (copiedElement as FilterCriteriaConnection).criteria.push(this.copy(
+          original.criteria[j]) as FilterCriterion);
+      }
+    }
+    
+    return copiedElement;
   }
 }
