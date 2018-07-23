@@ -44,8 +44,6 @@ describe('Component: reference-tree', () => {
   });
   
   it('initializes', () => {
-    expect(component.getRow('ROOT')).toBeDefined();
-    expect(component.getRow('ROOT,references')).toBeDefined();
-    expect(component.getRow('ROOT,referencedBy')).toBeDefined();
+    expect(component.getRootRow()).toBeDefined();
   });
 });

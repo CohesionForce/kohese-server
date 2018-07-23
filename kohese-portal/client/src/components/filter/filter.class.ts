@@ -87,7 +87,7 @@ export abstract class FilterCriterion extends FilterElement {
   
   protected matcher: RegExp;
   
-  public constructor(private _condition: any, private _value: string) {
+  protected constructor(private _condition: any, private _value: string) {
     super();
     this.convertValueToRegularExpression();
   }
@@ -127,26 +127,22 @@ export class TypeFilterCriterion extends FilterCriterion {
     let result: boolean = true;
     switch (this.condition) {
       case TypeFilterCriterionCondition.EQUALS: {
-          let typeString: string = Object.prototype.toString.call(candidate);
           let conditionMatcher: RegExp = new RegExp('^' + this.matcher.source +
             '$', this.matcher.flags);
-          result = conditionMatcher.test(typeString.substring(8, typeString.
-            length - 1));
+          result = conditionMatcher.test(Object.getPrototypeOf(candidate).
+            constructor.name);
         }
         break;
       case TypeFilterCriterionCondition.SUBCLASS_OF: {
-          let anObject: any = candidate;
-          let toStringFunction: Function = Object.prototype.toString;
+          let prototype: any = Object.getPrototypeOf(candidate);
           let conditionMatcher: RegExp = new RegExp('^' + this.matcher.source +
             '$', this.matcher.flags);
-          while (Object.getPrototypeOf(anObject) !== Object.prototype) {
-            let typeString: string = Object.prototype.toString.call(anObject);
-            result = conditionMatcher.test(typeString.substring(8, typeString.
-              length - 1));
+          while (prototype !== Object.prototype) {
+            result = conditionMatcher.test(prototype.constructor.name);
             if (result) {
               break;
             }
-            anObject = Object.getPrototypeOf(anObject);
+            prototype = Object.getPrototypeOf(prototype);
           }
         }
         break;
@@ -171,8 +167,9 @@ export class TypeFilterCriterion extends FilterCriterion {
 
 enum PropertyFilterCriterionCondition {
   LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equal',
-    CONTAINS = 'contain', ENDS_WITH = 'end with', BEGINS_WITH = 'begin with',
+    CONTAINS = 'contain',
     MATCHES_REGULAR_EXPRESSION = 'match regular expression',
+    ENDS_WITH = 'end with', BEGINS_WITH = 'begin with',
     GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>'
 }
 

@@ -21,7 +21,7 @@ import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicT
 import { VersionControlTreeComponent } from './version-control-tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { TreeRow } from '../tree-row.class';
+import { TreeRow } from '../tree-row/tree-row.class';
 
 describe('Component: version-control-tree', () => {
   let component: VersionControlTreeComponent;
@@ -62,8 +62,14 @@ describe('Component: version-control-tree', () => {
   });
   
   it('initializes', () => {
-    let rootRow: TreeRow = component.getRow('ROOT');
-    expect(rootRow).toBeDefined();
-    expect(component.getRow(descendantProxy.item.id)).toBeDefined();
+    expect(component.getRootRow()).toBeDefined();
+    let descendantIndex: number = -1;
+    for (let j: number = 0; j < component.visibleRows.length; j++) {
+      if (component.visibleRows[j].object === descendantProxy) {
+        descendantIndex = j;
+        break;
+      }
+    }
+    expect(descendantIndex).not.toEqual(-1);
   });
 });

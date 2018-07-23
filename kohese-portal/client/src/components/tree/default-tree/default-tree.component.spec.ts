@@ -16,7 +16,7 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { DefaultTreeComponent } from './default-tree.component';
-import { TreeRow } from '../tree-row.class';
+import { TreeRow } from '../tree-row/tree-row.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../../common/src/KoheseModel';
@@ -82,12 +82,8 @@ describe('Component: default-tree', () => {
         break;
       }
     }
-    expect(newRowIndex).toEqual(6);
+    expect(newRowIndex).toEqual(5);
   }));
-  
-  it('retrieves the TreeRow for an ID', () => {
-    expect(component.getRow('Kurios Iesous')).toBeDefined();
-  });
   
   it('removes the TreeRow for a deleted Item', fakeAsync(() => {
     let numberOfVisibleRows: number = component.visibleRows.length;
@@ -105,10 +101,10 @@ describe('Component: default-tree', () => {
   }));
   
   it('correctly responds to the tree root changing', fakeAsync(() => {
-    let initialTreeRoot: TreeRow = component.rootSubject.getValue();
+    let initialTreeRoot: any = component.rootSubject.getValue();
     let initialVisibleRows: Array<TreeRow> = component.visibleRows;
-    component.rootSubject.next(component.getRow(TreeConfiguration.
-      getWorkingTree().getRootProxy().children[0].item.id));
+    component.rootSubject.next(TreeConfiguration.getWorkingTree().
+      getRootProxy().children[0]);
     tick();
     expect(initialTreeRoot).not.toBe(component.rootSubject.getValue());
     expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
@@ -157,8 +153,7 @@ describe('Component: default-tree', () => {
     component.searchStringChanged('Search String');
     setTimeout(() => {
       let filter: Filter = component.filterSubject.getValue();
-      expect(filter).toBeDefined();
-      expect(filter.content).toEqual('Search String');
+      expect(filter).not.toBeDefined();
       done();
     }, 1000);
   });
