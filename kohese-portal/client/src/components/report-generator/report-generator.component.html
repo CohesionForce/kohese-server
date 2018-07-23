@@ -15,16 +15,33 @@
   <label>Report name: </label>
   <input mat-input [(ngModel)]="selectedReport.reportName" />
   <div id="type-selector">
+    <button mat-button (click)="enableAllTypes(selectedReport)">All</button>
+    <button mat-button (click)="disableAllTypes(selectedReport)">None</button>
     <h4>Included Types</h4>
     <mat-list id="type-list">
-    <mat-list-item *ngFor="let type of typeInfo | mapKey">
-      <mat-slide-toggle [checked]="selectedReport.typeFormats.get(type)" (toggleChange)="toggleType(selectedReport, typeInfo[type])"></mat-slide-toggle>
-      <span class="type-info" (click)="selectedType = typeInfo[type]">{{typeInfo[type].dataModelProxy.item.name}}</span>
+      <mat-list-item [ngClass]="{'selected-type' : selectedType === typeInfo[type]}" *ngFor="let type of typeInfo | mapKey">
+        <mat-slide-toggle [checked]="selectedReport.typeFormats[type].active" (change)="toggleType(selectedReport, typeInfo[type])"></mat-slide-toggle>
+        <span class="type-info" (click)="selectedType = typeInfo[type]">{{typeInfo[type].dataModelProxy.item.name}}</span>
+        <hr/>
+      </mat-list-item>
+    </mat-list>
+    <div id="type-specification" *ngIf="selectedType">
+      <span style="font-size: larger; font-weight: bold">{{selectedType.dataModelProxy.item.name}}</span>
+      <span *ngIf="selectedReport.typeFormats[selectedType.dataModelProxy.item.name].active">(Active
+        <i style="color: green; font-size: small" class="fa fa-circle"></i>)</span>
+      <span *ngIf="!selectedReport.typeFormats[selectedType.dataModelProxy.item.name].active">(Inactive
+        <i style="color: red; font-size: small" class="fa fa-circle"></i>)</span>
       <hr/>
-    </mat-list-item>
-  </mat-list>
-  <div id="type-specification" *ngIf="selectedType">
-      {{selectedType.dataModelProxy.item.name}}
+      <span style="font-size : large;">Properties</span>
+      <button mat-button (click)="enableAllProperties(selectedReport.typeFormats[selectedType.dataModelProxy.item.name])">Enable All</button>
+      <button mat-button (click)="disableAllProperties(selectedReport.typeFormats[selectedType.dataModelProxy.item.name])">Disable All</button>
+      <mat-list id="property-list">
+        <mat-list-item *ngFor="let property of selectedType.fields  | mapKey">
+          <mat-slide-toggle [checked]="selectedReport.typeFormats[selectedType.dataModelProxy.item.name].properties[property].active" (change)="toggleProperty(selectedReport.typeFormats[selectedType.dataModelProxy.item.name].properties[property])"></mat-slide-toggle>
+          <span class="type-info"> {{property}}</span>
+          <hr/>
+        </mat-list-item>
+      </mat-list>
     </div>
   </div>
 </div>

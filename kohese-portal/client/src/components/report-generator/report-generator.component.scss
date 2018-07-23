@@ -13,7 +13,7 @@
 }
 
 #definition-editor {
-  width: 75%;
+  width: 70%;
   display: inline-block;
   position : absolute;
   padding-left : 10px;
@@ -42,14 +42,18 @@
 
 #type-selector {
   height : 90%;
+  border : 1px solid black;
 }
 
 .selected-type {
-  border : 1px solid green;
+  border : 2px solid green;
 }
 
 #type-specification {
   width : 75%;
   display : inline-block;
   position : absolute;
+  border : 1px solid black;
+  height: 80%;
+  overflow: auto;
 }
