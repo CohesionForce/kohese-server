@@ -68,12 +68,21 @@ export class ReportGeneratorComponent implements OnInit {
       };
       }
 
-    this.reportDefs.push({
-      reportName : 'New report',
+    this.itemRepository.buildItem('ReportDefinition', {
+      name : 'New Report',
       entryPoints : [],
       typeFormats : typeFormats,
-      dirty : false
+    }).then((newReport) => {
+      this.reportDefs.push({
+        name : newReport.item.name,
+        entryPoints : newReport.item.entryPoints,
+        typeFormats : newReport.item.typeFormats,
+        dirty : false,
+        proxy : newReport
+      })
     })
+
+
 
     this.changeRef.markForCheck();
   }
@@ -167,16 +176,23 @@ export class ReportGeneratorComponent implements OnInit {
   }
 
   saveReport() {
-    this.selectedReport.dirty = false;
+    this.selectedReport.proxy.item.name = this.selectedReport.name;
+    this.selectedReport.proxy.item.entryPoints = this.selectedReport.entryPoints;
+    this.selectedReport.proxy.item.typeFormats = this.selectedReport.typeFormats;
+    this.itemRepository.upsertItem(this.selectedReport.proxy).then((newProxy)=>{
+      this.selectedReport.dirty = false;
+      this.changeRef.markForCheck();
+    });
   }
 
 }
 
 
 export interface ReportDefinition {
-  reportName : string
+  name : string
   entryPoints : Array<ItemProxy>;
   typeFormats : { [type: string] : TypeFormat };
+  proxy : ItemProxy;
   dirty : boolean;
 }
 

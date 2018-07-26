@@ -6,17 +6,16 @@
   "idInjection": false,
   "invertItemOrder": false,
   "properties": {
-    "reportName": {
-      "type": [
-        "string"
-      ],
-      "required" : true
-    },
     "entryPoints" : {
       "type": [
         "Item"
       ],
       "relation": true
+    },
+    "typeFormats" : {
+      "type": [
+        "object"
+      ]
     }
   },
   "validations": [],
