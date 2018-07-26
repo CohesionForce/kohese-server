@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { TreeRow } from './tree-row/tree-row.class';
 import { RowAction, MenuAction } from './tree-row/tree-row.component';
-import { Filter, PropertyFilterCriterion } from '../filter/filter.class';
+import { Filter, FilterCriterion } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
 export abstract class Tree {
@@ -235,8 +235,9 @@ export abstract class Tree {
           filter.rootElement.connections.push(...previousFilter.rootElement.connections);
           filter.rootElement.criteria.push(...previousFilter.rootElement.criteria);
         }
-        filter.rootElement.criteria.push(new PropertyFilterCriterion('',
-          PropertyFilterCriterion.CONDITIONS.CONTAINS, searchString));
+        filter.rootElement.criteria.push(new FilterCriterion(filter.
+          filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS,
+          searchString));
         
         this._filterSubject.next(filter);
         this.refresh();

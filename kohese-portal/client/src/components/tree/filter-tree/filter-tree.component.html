@@ -6,16 +6,10 @@
   </button>
   <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
     <button mat-menu-item
-      (click)="addCriterionToSelectedConnections('TypeFilterCriterion')"
-      matTooltip="Add a type criterion to the selected connections">
+      (click)="addCriterionToSelectedConnections()"
+      matTooltip="Add a criterion to the selected connections">
       <mat-icon class="fa fa-plus"></mat-icon>
-      Add Type Criterion
-    </button>
-    <button mat-menu-item
-      (click)="addCriterionToSelectedConnections('PropertyFilterCriterion')"
-      matTooltip="Add a property criterion to the selected connections">
-      <mat-icon class="fa fa-plus"></mat-icon>
-      Add Property Criterion
+      Add Criterion
     </button>
     <button mat-menu-item
       (click)="addConnectionToSelectedConnections(FilterCriteriaConnectionType.AND)"
@@ -51,7 +45,7 @@
     </button>
   </ng-container>
   <button mat-icon-button
-    [disabled]="(0 === (selectedObjectsSubject | async).length)"
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || (-1 !== (selectedObjectsSubject | async).indexOf(rootSubject | async))"
     (click)="deleteSelectedElements()"
     matTooltip="Delete the selected elements">
     <mat-icon class="fa fa-trash"></mat-icon>

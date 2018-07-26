@@ -1,3 +1,14 @@
+export enum ValueInputType {
+  STRING, NUMBER, SELECT
+}
+
+export class FilterableProperty {
+  public constructor(public displayText: string, public propertyPath:
+    Array<string>, public valueInputType: ValueInputType, public values:
+    Array<string>) {
+  }
+}
+
 export class Filter {
   private _rootElement: FilterCriteriaConnection =
     new FilterCriteriaConnection(FilterCriteriaConnectionType.AND);
@@ -5,7 +16,14 @@ export class Filter {
     return this._rootElement;
   }
   
+  private _filterableProperties: Array<FilterableProperty> = [];
+  get filterableProperties() {
+    return this._filterableProperties;
+  }
+  
   public constructor() {
+    this._filterableProperties.push(new FilterableProperty('Any property', [],
+      ValueInputType.STRING, []));
   }
   
   public filter(objects: Array<any>): Array<any> {
@@ -53,7 +71,24 @@ export class FilterElement {
   }
 }
 
-export abstract class FilterCriterion extends FilterElement {
+enum FilterCriterionCondition {
+  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equal',
+    CONTAINS = 'contain',
+    MATCHES_REGULAR_EXPRESSION = 'match regular expression',
+    ENDS_WITH = 'end with', BEGINS_WITH = 'begin with',
+    GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>'
+}
+
+export class FilterCriterion extends FilterElement {
+  public static readonly CONDITIONS: any = FilterCriterionCondition;
+  
+  get property() {
+    return this._property;
+  }
+  set property(property: FilterableProperty) {
+    this._property = property;
+  }
+  
   get condition() {
     return this._condition;
   }
@@ -87,7 +122,8 @@ export abstract class FilterCriterion extends FilterElement {
   
   protected matcher: RegExp;
   
-  protected constructor(private _condition: any, private _value: string) {
+  public constructor(private _property: FilterableProperty, private _condition:
+    any, private _value: string) {
     super();
     this.convertValueToRegularExpression();
   }
@@ -107,154 +143,82 @@ export abstract class FilterCriterion extends FilterElement {
     }
   }
   
-  public abstract evaluate(candidate: any): boolean;
-  
-  public abstract toString(): string;
-}
-
-enum TypeFilterCriterionCondition {
-  EQUALS = 'equal', SUBCLASS_OF = 'subclass', HAS_PROPERTY = 'have property'
-}
-
-export class TypeFilterCriterion extends FilterCriterion {
-  public static readonly CONDITIONS: any = TypeFilterCriterionCondition;
-  
-  public constructor(condition: string, value: string) {
-    super(condition, value);
-  }
-  
   public evaluate(candidate: any): boolean {
     let result: boolean = true;
+    if (this._property.values.length > 0) {
+      let propertyPath: Array<string> = this._property.propertyPath.slice(0);
+      let property: any = candidate;
+      for (let j: number = 0; j < propertyPath.length - 1; j++) {
+        property = property[propertyPath[j]];
+      }
+      let propertyValue: string = String(property[propertyPath[propertyPath.
+        length - 1]]);
+      result = this.doesValueMatch(propertyValue);
+    } else {
+      for (let propertyName in candidate) {
+        result = this.doesValueMatch(String(candidate[propertyName]));
+        
+        if (result) {
+          break;
+        }
+      }
+    }
+    
+    if (this.negate) {
+      result = !result;
+    }
+    
+    return result;
+  }
+  
+  public toString(): string {
+    return this._property.displayText + ' ' + (this.negate ? 'does not ' :
+      'does ') + (this.ignoreCase ? 'case-insensitively ' :
+      'case-sensitively ') + this.condition + ' ' + this.value;
+  }
+  
+  private doesValueMatch(propertyValue: string): boolean {
+    let matches: boolean = false;
     switch (this.condition) {
-      case TypeFilterCriterionCondition.EQUALS: {
-          let conditionMatcher: RegExp = new RegExp('^' + this.matcher.source +
-            '$', this.matcher.flags);
-          result = conditionMatcher.test(Object.getPrototypeOf(candidate).
-            constructor.name);
+      case FilterCriterionCondition.LESS_THAN:
+        matches = (+propertyValue < +this.value);
+        break;
+      case FilterCriterionCondition.LESS_THAN_OR_EQUAL_TO:
+        matches = (+propertyValue <= +this.value);
+        break;
+      case FilterCriterionCondition.EQUALS: {
+          let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
+            source + '$', this.matcher.flags);
+          matches = conditionMatcher.test(propertyValue);
         }
         break;
-      case TypeFilterCriterionCondition.SUBCLASS_OF: {
-          let prototype: any = Object.getPrototypeOf(candidate);
-          let conditionMatcher: RegExp = new RegExp('^' + this.matcher.source +
+      case FilterCriterionCondition.CONTAINS:
+        matches = this.matcher.test(propertyValue);
+        break;
+      case FilterCriterionCondition.ENDS_WITH: {
+          let conditionMatcher: RegExp = new RegExp(this.matcher.source +
             '$', this.matcher.flags);
-          while (prototype !== Object.prototype) {
-            result = conditionMatcher.test(prototype.constructor.name);
-            if (result) {
-              break;
-            }
-            prototype = Object.getPrototypeOf(prototype);
-          }
+          matches = conditionMatcher.test(propertyValue);
         }
         break;
-      case TypeFilterCriterionCondition.HAS_PROPERTY:
-        result = (null != candidate[this.value]);
+      case FilterCriterionCondition.BEGINS_WITH: {
+          let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
+            source, this.matcher.flags);
+          matches = conditionMatcher.test(propertyValue);
+        }
+        break;
+      case FilterCriterionCondition.MATCHES_REGULAR_EXPRESSION:
+        matches = this.matcher.test(propertyValue);
+        break;
+      case FilterCriterionCondition.GREATER_THAN_OR_EQUAL_TO:
+        matches = (+propertyValue >= +this.value);
+        break;
+      case FilterCriterionCondition.GREATER_THAN:
+        matches = (+propertyValue > +this.value);
         break;
     }
     
-    if (this.negate) {
-      result = !result;
-    }
-    
-    return result;
-  }
-  
-  public toString(): string {
-    return 'The type ' + (this.negate ? 'does not ' : 'does ') + (this.
-      ignoreCase ? 'case-insensitively ' : 'case-sensitively ') + this.
-      condition + ' ' + this.value;
-  }
-}
-
-enum PropertyFilterCriterionCondition {
-  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equal',
-    CONTAINS = 'contain',
-    MATCHES_REGULAR_EXPRESSION = 'match regular expression',
-    ENDS_WITH = 'end with', BEGINS_WITH = 'begin with',
-    GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>'
-}
-
-export class PropertyFilterCriterion extends FilterCriterion {
-  public static readonly CONDITIONS: any = PropertyFilterCriterionCondition;
-  
-  get propertyName() {
-    return this._propertyName;
-  }
-  set propertyName(propertyName: string) {
-    this._propertyName = propertyName;
-  }
-  
-  public constructor(private _propertyName: string, condition: string, value:
-    string) {
-    super(condition, value);
-  }
-  
-  public getFilterablePropertyNames(): Array<string> {
-    return [];
-  }
-  
-  public evaluate(candidate: any): boolean {
-    let result: boolean = true;
-    for (let propertyName in candidate) {
-      if (this._propertyName && (this._propertyName !== propertyName)) {
-        continue;
-      }
-      
-      switch (this.condition) {
-        case PropertyFilterCriterionCondition.LESS_THAN:
-          result = (+candidate[propertyName].toString() < +this.value);
-          break;
-        case PropertyFilterCriterionCondition.LESS_THAN_OR_EQUAL_TO:
-          result = (+candidate[propertyName].toString() <= +this.value);
-          break;
-        case PropertyFilterCriterionCondition.EQUALS: {
-            let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
-              source + '$', this.matcher.flags);
-            result = conditionMatcher.test(candidate[propertyName].toString());
-          }
-          break;
-        case PropertyFilterCriterionCondition.CONTAINS:
-          result = this.matcher.test(candidate[propertyName].toString());
-          break;
-        case PropertyFilterCriterionCondition.ENDS_WITH: {
-            let conditionMatcher: RegExp = new RegExp(this.matcher.source +
-              '$', this.matcher.flags);
-            result = conditionMatcher.test(candidate[propertyName].toString());
-          }
-          break;
-        case PropertyFilterCriterionCondition.BEGINS_WITH: {
-            let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
-              source, this.matcher.flags);
-            result = conditionMatcher.test(candidate[propertyName].toString());
-          }
-          break;
-        case PropertyFilterCriterionCondition.MATCHES_REGULAR_EXPRESSION:
-          result = this.matcher.test(candidate[propertyName].toString());
-          break;
-        case PropertyFilterCriterionCondition.GREATER_THAN_OR_EQUAL_TO:
-          result = (+candidate[propertyName].toString() >= +this.value);
-          break;
-        case PropertyFilterCriterionCondition.GREATER_THAN:
-          result = (+candidate[propertyName].toString() > +this.value);
-          break;
-      }
-      
-      if (result) {
-        break;
-      }
-    }
-    
-    if (this.negate) {
-      result = !result;
-    }
-    
-    return result;
-  }
-  
-  public toString(): string {
-    return (this._propertyName ? this._propertyName : 'A property ') + (this.
-      negate ? 'does not ' : 'does ') + (this.ignoreCase ?
-      'case-insensitively ' : 'case-sensitively ') + this.condition + ' ' +
-      this.value;
+    return matches;
   }
 }
 

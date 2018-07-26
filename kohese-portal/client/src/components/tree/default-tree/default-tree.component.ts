@@ -16,6 +16,7 @@ import { CompareItemsComponent,
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
 @Component({
   selector: 'default-tree',
@@ -249,8 +250,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return iconString;
   }
   
-  protected filter(object: any): boolean {
-    return super.filter((object as ItemProxy).item);
+  public openFilterDialog(): void {
+    if (!this.filterSubject.getValue()) {
+      this.filterSubject.next(new ItemProxyFilter(this._dynamicTypesService,
+        this._itemRepository));
+    }
+    
+    super.openFilterDialog();
   }
   
   private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:

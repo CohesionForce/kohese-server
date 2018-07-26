@@ -8,9 +8,9 @@ import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { Tree } from '../tree.class';
 import { RowAction } from '../tree-row/tree-row.component';
-import { Filter, FilterElement, FilterCriterion, TypeFilterCriterion,
-  PropertyFilterCriterion, FilterCriteriaConnection,
-  FilterCriteriaConnectionType } from '../../filter/filter.class';
+import { Filter, FilterElement, FilterCriterion, FilterCriteriaConnection,
+  FilterCriteriaConnectionType,
+  FilterableProperty } from '../../filter/filter.class';
 
 @Component({
   selector: 'filter-tree',
@@ -49,15 +49,23 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.rowActions.push(new RowAction('Change Property', 'Change this ' +
       'criterion\'s target property', 'fa fa-mouse-pointer', (object: any) => {
-      return (object instanceof PropertyFilterCriterion);
+      return (object instanceof FilterCriterion);
       }, (object: any) => {
+      let filterableProperties: Array<FilterableProperty> = this.
+        _targetFilterSubject.getValue().filterableProperties;
       this._dialogService.openSelectDialog('Criterion Property', '',
-        'Property', (object as PropertyFilterCriterion).propertyName,
-        (object as PropertyFilterCriterion).getFilterablePropertyNames()).
-        afterClosed().subscribe((selection: any) => {
+        'Property', (object as FilterCriterion).property.displayText,
+        filterableProperties.map((filterableProperty: FilterableProperty) => {
+          return filterableProperty.displayText;
+        })).afterClosed().subscribe((selection: any) => {
         if (selection) {
-          (object as PropertyFilterCriterion).propertyName = selection;
-          this.getRow(this.getId(object)).refresh();
+          for (let j: number = 0; j < filterableProperties.length; j++) {
+            if (filterableProperties[j].displayText === selection) {
+              (object as FilterCriterion).property = filterableProperties[j];
+              this.getRow(this.getId(object)).refresh();
+              break;
+            }
+          }
         }
       });
     }));
@@ -66,16 +74,10 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       return (object instanceof FilterCriterion);
       }, (object: any) => {
       let criterion: FilterCriterion = (object as FilterCriterion);
-      let conditions: any;
-      if (criterion instanceof TypeFilterCriterion) {
-        conditions = TypeFilterCriterion.CONDITIONS;
-      } else if (criterion instanceof PropertyFilterCriterion) {
-        conditions = PropertyFilterCriterion.CONDITIONS;
-      }
       this._dialogService.openSelectDialog('Criterion Condition', '',
-        'Condition', criterion.condition, Object.keys(conditions).map((key:
-        any) => {
-        return conditions[key];
+        'Condition', criterion.condition, Object.keys(FilterCriterion.
+        CONDITIONS).map((key: any) => {
+        return FilterCriterion.CONDITIONS[key];
         })).afterClosed().subscribe((selection: any) => {
         if (selection) {
           criterion.condition = selection;
@@ -87,15 +89,27 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       'criterion\'s value', 'fa fa-pencil', (object: any) => {
       return (object instanceof FilterCriterion);
       }, (object: any) => {
-      this._dialogService.openInputDialog('Criterion Value', '',
-        DialogComponent.INPUT_TYPES.TEXT, 'Value',
-        (object as FilterCriterion).value).afterClosed().subscribe((value:
-        any) => {
-        if (value) {
-          (object as FilterCriterion).value = value;
-          this.getRow(this.getId(object)).refresh();
-        }
-      });
+      let criterion: FilterCriterion = (object as FilterCriterion);
+      if (criterion.property.values.length > 0) {
+        this._dialogService.openSelectDialog('Criterion Value', '',
+          'Value', (object as FilterCriterion).value, criterion.property.
+          values).afterClosed().subscribe((selection: any) => {
+          if (selection) {
+            (object as FilterCriterion).value = selection;
+            this.getRow(this.getId(object)).refresh();
+          }
+        });
+      } else {
+        this._dialogService.openInputDialog('Criterion Value', '',
+          DialogComponent.INPUT_TYPES.TEXT, 'Value',
+          (object as FilterCriterion).value).afterClosed().subscribe((value:
+          any) => {
+          if (value) {
+            (object as FilterCriterion).value = value;
+            this.getRow(this.getId(object)).refresh();
+          }
+        });
+      }
     }));
     this.rowActions.push(new RowAction('Negate', 'Negate this criterion',
       'fa fa-exclamation', (object: any) => {
@@ -244,20 +258,14 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
-  public addCriterionToSelectedConnections(criterionType: string): void {
+  public addCriterionToSelectedConnections(): void {
     let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let connection: FilterCriteriaConnection =
         (selectedObjects[j] as FilterCriteriaConnection);
-      let criterion: FilterCriterion;
-      if (criterionType === 'TypeFilterCriterion') {
-        criterion = new TypeFilterCriterion(TypeFilterCriterion.CONDITIONS.
-          SUBCLASS_OF, '');
-      } else {
-        criterion = new PropertyFilterCriterion('', PropertyFilterCriterion.
-          CONDITIONS.BEGINS_WITH, '');
-      }
-      
+      let criterion: FilterCriterion = new FilterCriterion(this.
+        _targetFilterSubject.getValue().filterableProperties[0],
+        FilterCriterion.CONDITIONS.CONTAINS, '');
       connection.criteria.push(criterion);
       this.buildRow(criterion);
       this.getRow(this.getId(connection)).expanded = true;
@@ -393,17 +401,10 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
   
   private copy(element: FilterElement): FilterElement {
     let copiedElement: FilterElement;
-    if (element instanceof TypeFilterCriterion) {
-      let original: TypeFilterCriterion =
-        (element as TypeFilterCriterion);
-      copiedElement = new TypeFilterCriterion(original.
-        condition, original.value);
-      copiedElement = Object.assign(copiedElement, original);
-    } else if (element instanceof PropertyFilterCriterion) {
-      let original: PropertyFilterCriterion =
-        (element as PropertyFilterCriterion);
-      copiedElement = new PropertyFilterCriterion(
-        original.propertyName, original.condition, original.value);
+    if (element instanceof FilterCriterion) {
+      let original: FilterCriterion = (element as FilterCriterion);
+      copiedElement = new FilterCriterion(
+        original.property, original.condition, original.value);
       copiedElement = Object.assign(copiedElement, original);
     } else {
       let original: FilterCriteriaConnection =

@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import { MaterialModule } from '../../material.module';
 import { FilterComponent } from './filter.component';
-import { Filter, TypeFilterCriterion } from './filter.class';
+import { Filter, FilterCriterion } from './filter.class';
 
 describe('Component: filter', () => {
   let component: FilterComponent;
@@ -33,8 +33,9 @@ describe('Component: filter', () => {
   
   it('determines if a criterion is defined', () => {
     expect(component.isCriterionDefined()).toEqual(false);
-    component.filterSubject.getValue().rootElement.criteria.push(
-      new TypeFilterCriterion(TypeFilterCriterion.CONDITIONS.SUBCLASS_OF,
+    let filter: Filter = component.filterSubject.getValue();
+    filter.rootElement.criteria.push(new FilterCriterion(filter.
+      filterableProperties[0], FilterCriterion.CONDITIONS.BEGINS_WITH,
       'Kurios Iesous'));
     expect(component.isCriterionDefined()).toEqual(true);
   });

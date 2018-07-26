@@ -7,10 +7,12 @@ import { TreeRow } from '../tree-row/tree-row.class';
 import { RowAction, MenuAction } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Tree } from '../tree.class';
+import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
 @Component({
   selector: 'document-tree',
@@ -36,13 +38,12 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   selectedProxyStream : Observable<ItemProxy>;
   selectedProxyStreamSubscription : Subscription;
 
-  constructor(router: ActivatedRoute,
-              dialogService : DialogService,
-              private itemRepository : ItemRepository,
-              private changeRef : ChangeDetectorRef
-              ) {
-                super(router, dialogService, false);
-              }
+  constructor(router: ActivatedRoute, dialogService : DialogService,
+    private _dynamicTypesService: DynamicTypesService,
+    private itemRepository : ItemRepository,
+    private changeRef : ChangeDetectorRef) {
+    super(router, dialogService, false);
+  }
 
   ngOnInit() {
     this.paramSubscription = this._route.params.subscribe(params => {
@@ -188,6 +189,15 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     }
 
     return iconString;
+  }
+  
+  public openFilterDialog(): void {
+    if (!this.filterSubject.getValue()) {
+      this.filterSubject.next(new ItemProxyFilter(this._dynamicTypesService,
+        this.itemRepository));
+    }
+    
+    super.openFilterDialog();
   }
 
   public setRowAsRoot(proxy: ItemProxy) {
