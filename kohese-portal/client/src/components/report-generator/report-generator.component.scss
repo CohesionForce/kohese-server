@@ -53,7 +53,64 @@
   width : 75%;
   display : inline-block;
   position : absolute;
-  border : 1px solid black;
+  border-left : 1px solid black;
   height: 80%;
   overflow: auto;
+}
+
+#property-list {
+  display: inline-block;
+}
+
+#order-selector {
+  width : 45%;
+  display: inline-block;
+  height : 60%;
+  overflow: auto;
+  position: fixed;
+  border-left: .5px solid lightslategray;
+  padding: 10px;
+  padding-top : 0px;
+}
+
+#property-toggle {
+  width : 45%;
+  display: inline-block;
+  height : 80%;
+  overflow: auto;
+}
+
+#type-header {
+  position : sticky;
+  top : 0;
+  background-color: white;
+  z-index: 10;
+  border: 1px solid lightgray;
+}
+
+.enable-button {
+  background-color : forestgreen;
+  color : white;
+  font-weight: bold;
+}
+
+.disable-button {
+  background-color : indianred;
+  color: white;
+  font-weight: bold;
+}
+
+.order-button {
+  cursor: pointer;
+}
+
+.order-title {
+  font-size : large;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index : 10;
+  width : 100%;
+  height : 40px;
+  padding-top : 10px;
 }

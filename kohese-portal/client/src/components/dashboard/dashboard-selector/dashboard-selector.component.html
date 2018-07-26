@@ -8,15 +8,18 @@
       <mat-spinner [diameter]="50"></mat-spinner>
     </span>
   </h4>
-  <h4 (click)="selectDashType(DashboardTypes.ASSIGNMENT)"
+  <h4 class="dashboard-section"
+      (click)="selectDashType(DashboardTypes.ASSIGNMENT)"
       [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PERSONAL}">
     My Dashboard
   </h4>
   <h4 (click)="selectDashType(DashboardTypes.PROJECT)"
-      [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PROJECT}">
+      [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PROJECT}"
+      class="dashboard-section">
     Project Dashboard</h4>
   <h4 (click)="selectDashType(DashboardTypes.REPORT)"
-      [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.REPORT}">
+      [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.REPORT}"
+      class="dashboard-section">
     Reports</h4>
   <hr>
   <div>

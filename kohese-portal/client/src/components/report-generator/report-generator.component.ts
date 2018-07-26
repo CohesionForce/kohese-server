@@ -1,3 +1,4 @@
+import { DialogService } from './../../services/dialog/dialog.service';
 import { Subscription } from 'rxjs';
 import { ItemRepository, RepoStates } from './../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from './../../services/dynamic-types/dynamic-types.service';
@@ -19,11 +20,16 @@ export class ReportGeneratorComponent implements OnInit {
   reportDefs : Array<ReportDefinition> = [];
   selectedReport : ReportDefinition;
   selectedType;
+  selectedTypeFormat;
+  repoLoaded : boolean = false;
 
   repositoryStatusSubscription : Subscription;
   treeConfigSubscription : Subscription;
 
-  constructor(private typeService : DynamicTypesService, private itemRepository : ItemRepository, private  changeRef : ChangeDetectorRef) {
+  constructor(private typeService : DynamicTypesService,
+              private itemRepository : ItemRepository,
+              private changeRef : ChangeDetectorRef,
+              private dialogService : DialogService) {
 
   }
 
@@ -34,7 +40,8 @@ export class ReportGeneratorComponent implements OnInit {
           this.treeConfigSubscription =
             this.itemRepository.getTreeConfig().subscribe((newConfig) => {
               this.typeInfo = this.typeService.getKoheseTypes();
-              console.log(this.typeInfo);
+              this.repoLoaded = true;
+              this.changeRef.markForCheck();
             })
         }
       });
@@ -56,15 +63,18 @@ export class ReportGeneratorComponent implements OnInit {
       typeFormats[type] = {
         type : type,
         properties : properties,
-        active : false
+        active : false,
+        orderedProperties : []
       };
       }
 
     this.reportDefs.push({
       reportName : 'New report',
       entryPoints : [],
-      typeFormats : typeFormats
+      typeFormats : typeFormats,
+      dirty : false
     })
+
     this.changeRef.markForCheck();
   }
 
@@ -76,65 +86,105 @@ export class ReportGeneratorComponent implements OnInit {
       reportDef.typeFormats[typeInfo.dataModelProxy.item.name] = {
         type : typeInfo.dataModelProxy.item.name,
         properties : {},
-        active : true
+        active : true,
+        orderedProperties : []
       };
     } else if (typeFormat.active) {
       typeFormat.active = false;
     } else {
       typeFormat.active = true;
     }
+    this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
 
-  toggleProperty(property) {
-    property.active = !property.active
+  toggleProperty(type : string, property: string) {
+    let typeFormat = this.selectedReport.typeFormats[type];
+    let propertyFormat = typeFormat.properties[property];
+    if (propertyFormat.active) {
+      let index = typeFormat.orderedProperties.indexOf(property);
+      typeFormat.orderedProperties.splice(index, 1);
+      propertyFormat.active = false;
+    } else {
+      typeFormat.orderedProperties.push(property);
+      propertyFormat.active = true;
+    }
+    console.log(this.selectedType);
+    this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
-  }
-
-  console(obj){
-    console.log(obj);
   }
 
   enableAllTypes(selectedReport : ReportDefinition){
     for (let type in this.typeInfo) {
-      selectedReport.typeFormats[type].active = true
+      if (!selectedReport.typeFormats[type].active) {
+        selectedReport.typeFormats[type].active = true;
+      }
     }
+    this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
 
   disableAllTypes(selectedReport : ReportDefinition) {
     for(let type in selectedReport.typeFormats) {
       selectedReport.typeFormats[type].active = false;
+
     }
+    this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
 
-  enableAllProperties(selectedType : TypeFormat) {
-    for (let property in selectedType.properties) {
-      selectedType.properties[property].active = true;
+  enableAllProperties() {
+    for (let property in this.selectedTypeFormat.properties) {
+      if (!this.selectedTypeFormat.properties[property].active) {
+      this.selectedTypeFormat.properties[property].active = true;
+      this.selectedTypeFormat.orderedProperties.push(property);
+      }
     }
+    console.log(this.selectedType);
+    this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
 
-  disableAllProperties(selectedType : TypeFormat) {
-    for (let property in selectedType.properties) {
-      selectedType.properties[property].active = false;
+  disableAllProperties() {
+    for (let property in this.selectedTypeFormat.properties) {
+      this.selectedTypeFormat.properties[property].active = false;
     }
+    this.selectedTypeFormat.orderedProperties = [];
+    this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
+
+  openPreview() {
+    this.dialogService.openConfirmDialog('Under Construction', 'Preview not yet implemented');
+  }
+
+  swapPosition(orderedProperties : Array<string> , direction : string, value : string) {
+      let startingIndex = orderedProperties.indexOf(value);
+      let toIndex = (direction === "up") ? startingIndex - 1 : startingIndex + 1;
+
+      orderedProperties.splice(toIndex, 0, orderedProperties.splice(startingIndex, 1)[0]);
+      this.changeRef.markForCheck();
+  }
+
+  saveReport() {
+    this.selectedReport.dirty = false;
+  }
+
 }
+
 
 export interface ReportDefinition {
   reportName : string
   entryPoints : Array<ItemProxy>;
   typeFormats : { [type: string] : TypeFormat };
-
+  dirty : boolean;
 }
 
 interface TypeFormat {
   active : boolean;
   type : string;
   properties : { [property : string] : PropertyFormat}
+  orderedProperties : Array<string>
 }
 
 interface PropertyFormat {
