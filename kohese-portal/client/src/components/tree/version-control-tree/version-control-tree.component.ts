@@ -295,6 +295,13 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     return iconString;
   }
   
+  protected filter(object: any): boolean {
+    let proxy: ItemProxy = (object as ItemProxy);
+    let item: any = proxy.item;
+    item['kind'] = proxy.kind;
+    return super.filter(item); 
+  }
+  
   public openFilterDialog(): void {
     if (!this.filterSubject.getValue()) {
       this.filterSubject.next(new ItemProxyFilter(this._dynamicTypesService,

@@ -23,7 +23,7 @@ export class ItemProxyFilter extends Filter {
                 break;
             }
             this.filterableProperties.push(new FilterableProperty(
-              propertyNames[k], ['item', propertyNames[k]], valueInputType,
+              propertyNames[k], [propertyNames[k]], valueInputType,
               []));
           }
         }
