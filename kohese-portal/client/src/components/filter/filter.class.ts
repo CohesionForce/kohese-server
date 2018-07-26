@@ -25,7 +25,7 @@ export class Filter {
     this._filterableProperties.push(new FilterableProperty('Any property', [],
       ValueInputType.STRING, []));
   }
-  
+
   public filter(objects: Array<any>): Array<any> {
     let matchingObjects: Array<any> = [];
     for (let j: number = 0; j < objects.length; j++) {
@@ -34,10 +34,10 @@ export class Filter {
         matchingObjects.push(object);
       }
     }
-    
+
     return matchingObjects;
   }
-  
+
   private evaluateConnection(connection: FilterCriteriaConnection, object:
     any): boolean {
     for (let j: number = 0; j < connection.criteria.length; j++) {
@@ -49,7 +49,7 @@ export class Filter {
         return false;
       }
     }
-    
+
     for (let j: number = 0; j < connection.connections.length; j++) {
       let connectionMatches: boolean = this.evaluateConnection(connection.
         connections[j], object);
@@ -61,8 +61,14 @@ export class Filter {
         return false;
       }
     }
-    
-    return true;
+
+    if (FilterCriteriaConnectionType.AND === connection.type){
+      // Return true because none of the "AND" cases failed
+      return true;
+    } else {
+      // Return false because none of the "OR" cases passed
+      return false;
+    }
   }
 }
 
@@ -95,7 +101,7 @@ export class FilterCriterion extends FilterElement {
   set condition(condition: any) {
     this._condition = condition;
   }
-  
+
   get value() {
     return this._value;
   }
@@ -103,7 +109,7 @@ export class FilterCriterion extends FilterElement {
     this._value = value;
     this.convertValueToRegularExpression();
   }
-  
+
   private _negate: boolean = false;
   get negate() {
     return this._negate;
@@ -111,7 +117,7 @@ export class FilterCriterion extends FilterElement {
   set negate(negate: boolean) {
     this._negate = negate;
   }
-  
+
   private _ignoreCase: boolean = true;
   get ignoreCase() {
     return this._ignoreCase;
@@ -119,7 +125,7 @@ export class FilterCriterion extends FilterElement {
   set ignoreCase(ignoreCase: boolean) {
     this._ignoreCase = ignoreCase;
   }
-  
+
   protected matcher: RegExp;
   
   public constructor(private _property: FilterableProperty, private _condition:
@@ -127,7 +133,7 @@ export class FilterCriterion extends FilterElement {
     super();
     this.convertValueToRegularExpression();
   }
-  
+
   private convertValueToRegularExpression(): void {
     let filterIsRegex: Array<string> = this._value.match(new RegExp(
       '^\/(.*)\/([gimy]*)$'));
@@ -138,7 +144,7 @@ export class FilterCriterion extends FilterElement {
       if (this._ignoreCase) {
         flags += 'i';
       }
-      
+
       this.matcher = new RegExp(this._value, flags);
     }
   }
@@ -163,14 +169,14 @@ export class FilterCriterion extends FilterElement {
         }
       }
     }
-    
+
     if (this.negate) {
       result = !result;
     }
-    
+
     return result;
   }
-  
+
   public toString(): string {
     return this._property.displayText + ' ' + (this.negate ? 'does not ' :
       'does ') + (this.ignoreCase ? 'case-insensitively ' :
@@ -227,16 +233,16 @@ export class FilterCriteriaConnection extends FilterElement {
   get connections() {
     return this._connections;
   }
-  
+
   private _criteria: Array<FilterCriterion> = [];
   get criteria() {
     return this._criteria;
   }
-  
+
   public constructor(public type: FilterCriteriaConnectionType) {
     super();
   }
-  
+
   public toString(): string {
     if (this.type === FilterCriteriaConnectionType.AND) {
       return 'AND';
