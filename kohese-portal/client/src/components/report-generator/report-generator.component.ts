@@ -181,6 +181,21 @@ export class ReportGeneratorComponent implements OnInit {
       this.changeRef.markForCheck();
     });
   }
+
+  deleteReport() {
+    this.dialogService.openConfirmDialog('Delete this report', 'Are you sure you wish to delete this report definition?')
+    .subscribe((confirm) => {
+      if (confirm) {
+        this.itemRepository.deleteItem(this.selectedReport, false)
+          .then((results) => {
+            let index = this.reportDefs.indexOf(this.selectedReport);
+            this.reportDefs.splice(index, 1);
+            this.selectedReport = undefined;
+            this.changeRef.markForCheck();
+          })
+      }
+    })
+  }
 }
 
 export interface TypeFormat {

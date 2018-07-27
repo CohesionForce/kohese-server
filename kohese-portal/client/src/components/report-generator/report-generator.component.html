@@ -17,6 +17,9 @@
     <button mat-button (click)="saveReport()">
       <i class="fa fa-save"></i> Save
     </button>
+    <button mat-button class="disable-button" (click)="deleteReport()">
+      <i class="fa fa-trash"></i> Delete
+    </button>
   </h2>
   <label>Report name: </label>
   <input mat-input [(ngModel)]="selectedReport.item.name" />
