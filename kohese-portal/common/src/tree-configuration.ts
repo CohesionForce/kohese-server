@@ -22,11 +22,12 @@ export class TreeConfiguration {
   public idMap;
   public repoMap;
   public loading : boolean = true;
+  public treehashCalculated : boolean = false;
   public proxyHasDeferredModelAssociation;
   public changeSubject : Subject<any>;
 
-  public root;
-  public lostAndFound;
+  public root : ItemProxy;
+  public lostAndFound : ItemProxy;
   public rootModelProxy;
   public rootViewModelProxy;
 
@@ -169,7 +170,7 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getRootProxy() {
+  getRootProxy() : ItemProxy {
     return this.root;
   }
 
@@ -219,11 +220,9 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadingComplete(skipCalc: boolean = false) {
+  loadingComplete(deferCalc: boolean = false) {
     this.loading = false;
-    if (!skipCalc){
-      this.calculateAllTreeHashes();
-    }
+    this.calculateAllTreeHashes(deferCalc);
     this.changeSubject.next({
       type: 'loaded'
     });
@@ -308,10 +307,24 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateAllTreeHashes() {
-    for (let repoId in this.repoMap){
-      let repoProxy = this.repoMap[repoId];
-      repoProxy.calculateRepoTreeHashes();
+  calculateAllTreeHashes(deferCalc : boolean = false) {
+    const isRepoOnly = false;
+    let treeHashCalculations : Array<Promise<number>> = [];
+    if (isRepoOnly){
+      for (let repoId in this.repoMap){
+        let repoProxy : ItemProxy = this.repoMap[repoId];
+        treeHashCalculations.push(repoProxy.calculateTreeHashes(deferCalc, isRepoOnly));
+      }
+    } else {
+      treeHashCalculations.push(this.getRootProxy().calculateTreeHashes(deferCalc, isRepoOnly));
+    }
+
+    if (deferCalc){
+      Promise.all(treeHashCalculations).then(() => {
+        this.treehashCalculated = true;
+      });
+    } else {
+      this.treehashCalculated = true;
     }
   }
 
@@ -319,6 +332,12 @@ export class TreeConfiguration {
   //
   //////////////////////////////////////////////////////////////////////////
   getAllTreeHashes() {
+
+    if (!this.treehashCalculated){
+      // TreeHashes have not been calculated yet
+      this.calculateAllTreeHashes();
+    }
+
     var proxyTreeHashes = {};
     this.root.visitTree(null,(proxy) => {
       if (proxy.treeHashEntry){

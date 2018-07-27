@@ -489,7 +489,7 @@ export class ItemRepository {
         } else {
           let repoProxy = ItemProxy.getWorkingTree().getProxyFor(forRepoId);
           if (repoProxy) {
-            repoProxy.calculateRepoTreeHashes();
+            repoProxy.calculateTreeHashes(false, true);
             updatedTreeHashes = repoProxy.getTreeHashMap();
           }
         }
