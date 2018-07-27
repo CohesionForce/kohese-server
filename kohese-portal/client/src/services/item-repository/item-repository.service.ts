@@ -362,14 +362,14 @@ export class ItemRepository {
 
         let processingComplete = Date.now();
         this.logService.log(this.logEvents.bulkUpdateProcessingTime, {processTime : (processingComplete - beginBulkProcessing) / 1000});
-        let skipCalc = this.loadFeatureSwitch('IR-skip-calc', false);
-        ItemProxy.getWorkingTree().loadingComplete(skipCalc);
+        let deferCalc = this.loadFeatureSwitch('IR-skip-calc', true);
+        ItemProxy.getWorkingTree().loadingComplete(deferCalc);
         let treehashComplete = Date.now();
         this.logService.log(this.logEvents.treeHashProcessingTime, {processTime : (treehashComplete - processingComplete) / 1000});
 
         // TODO Remove after cache is complete
         // Invoke fetch to peform a delta update
-        if(!skipCalc){
+        if(!deferCalc){
           this.fetchItems();
         } else {
           console.log('$$$ Bypassing secondary sync');
