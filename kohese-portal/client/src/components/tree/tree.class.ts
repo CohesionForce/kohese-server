@@ -23,6 +23,14 @@ export abstract class Tree {
   get rootSubject() {
     return this._rootSubject;
   }
+  
+  private _showRootWithDescendants: boolean = false;
+  get showRootWithDescendants() {
+    return this._showRootWithDescendants;
+  }
+  set showRootWithDescendants(showRootWithDescendants: boolean) {
+    this._showRootWithDescendants = showRootWithDescendants;
+  }
 
   private _rootRowActions: Array<RowAction> = [
     new RowAction('Expand Descendants', 'Expands all descendants',
@@ -166,8 +174,9 @@ export abstract class Tree {
       this.setRoot(object);
     };
     row.hasChildren = () => {
-      return ((object !== this._rootSubject.getValue()) && (this.getChildren(
-        object).length > 0));
+      return ((this.getChildren(object).length > 0) && (this.
+        _showRootWithDescendants || (object !== this._rootSubject.
+        getValue())));
     };
     row.isMultiselectEnabled = () => {
       return this._multiselectEnabled;
@@ -265,14 +274,19 @@ export abstract class Tree {
     this.preTreeTraversalActivity();
 
     let root: any = this._rootSubject.getValue();
-    let rootChildren: Array<any> = this.getChildren(root);
-    for (let j: number = 0; j < rootChildren.length; j++) {
-      this.processRow(this._rowMap.get(this.getId(rootChildren[j])));
+    let rootRow: TreeRow = this._rowMap.get(this.getId(root));
+    if (this._showRootWithDescendants) {
+      this.processRow(rootRow);
+    } else {
+      let rootChildren: Array<any> = this.getChildren(root);
+      for (let j: number = 0; j < rootChildren.length; j++) {
+        this.processRow(this._rowMap.get(this.getId(rootChildren[j])));
+      }
     }
 
     this.postTreeTraversalActivity();
 
-    this._rowMap.get(this.getId(root)).refresh();
+    rootRow.refresh();
     for (let j: number = 0; j < this._visibleRows.length; j++) {
       this._visibleRows[j].refresh();
     }
@@ -318,10 +332,18 @@ export abstract class Tree {
     let depth: number = 0;
     if (row.object !== root) {
       while (parent) {
+        if (this._showRootWithDescendants) {
+          depth++;
+        }
+        
         if (parent === root) {
           break;
         }
-        depth++;
+        
+        if (!this._showRootWithDescendants) {
+          depth++;
+        }
+        
         parent = this.getParent(parent);
       }
     }

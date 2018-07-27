@@ -27,13 +27,13 @@
   <ng-container *ngIf="!inTargetingMode">
     <button mat-icon-button
       [disabled]="(0 === (selectedObjectsSubject | async).length) || (-1 !== (selectedObjectsSubject | async).indexOf(rootSubject | async))"
-      (click)="enterCopyTargetingMode()"
+      (click)="enterCopyTargetingMode(undefined)"
       matTooltip="Copy the selected elements">
       <mat-icon class="fa fa-copy"></mat-icon>
     </button>
     <button mat-icon-button
       [disabled]="(0 === (selectedObjectsSubject | async).length) || (-1 !== (selectedObjectsSubject | async).indexOf(rootSubject | async))"
-      (click)="enterMoveTargetingMode()"
+      (click)="enterMoveTargetingMode(undefined)"
       matTooltip="Move the selected elements">
       <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
     </button>
@@ -50,35 +50,19 @@
     matTooltip="Delete the selected elements">
     <mat-icon class="fa fa-trash"></mat-icon>
   </button>
-  <button mat-icon-button
+  <!--button mat-icon-button
     [disabled]="(rootSubject | async) === (targetFilterSubject | async)?.rootElement"
     (click)="rootSubject.next(targetFilterSubject.getValue()?.rootElement)"
     matTooltip="Changes the root to be the filter root">
     <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
-  </button>
+  </button-->
 </div>
-<div style="height: 12%; width: 100%;">
-  <div class="kt-head kth-cell">
-    Root
-  </div>
-  <ng-container *ngIf="rootSubject.getValue()">
-    <div class="kt-body">
-      <tree-row [treeRow]="getRootRow()"
-        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
-      </tree-row>
-    </div>
-  </ng-container>
-</div>
-<div style="height: 81%; width: 100%;">
-  <div class="kt-head kth-cell">
-    Descendants
-  </div>
-  <div class="kt-body">
-    <virtual-scroll #tree [items]="visibleRows">
-      <tree-row *ngFor="let row of tree.viewPortItems"
-        [treeRow]="row" [rowActions]="rowActions"
-        [menuActions]="menuActions" [images]="images">
-      </tree-row>
-    </virtual-scroll>
-  </div>
+<div class="kt-body" style="height: 93%; width: 100%;">
+  <virtual-scroll #tree [items]="visibleRows">
+    <filter-tree-row *ngFor="let row of tree.viewPortItems"
+      [treeRow]="row" [rowActions]="rowActions"
+      [filterSubject]="targetFilterSubject"
+      (addElement)="addElementToConnection($event.type, $event.connection)">
+    </filter-tree-row>
+  </virtual-scroll>
 </div>

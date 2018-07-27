@@ -46,12 +46,12 @@ export class TreeRowComponent implements OnInit {
     this._menuActions = menuActions;
   }
 
-  public constructor(private _changeDetector: ChangeDetectorRef) {
+  public constructor(protected changeDetector: ChangeDetectorRef) {
   }
 
   public ngOnInit(): void {
     this._treeRow.refresh = () => {
-      this._changeDetector.markForCheck();
+      this.changeDetector.markForCheck();
     };
   }
 

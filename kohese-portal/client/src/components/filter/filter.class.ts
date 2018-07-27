@@ -78,10 +78,10 @@ export class FilterElement {
 }
 
 enum FilterCriterionCondition {
-  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equal',
-    CONTAINS = 'contain',
-    MATCHES_REGULAR_EXPRESSION = 'match regular expression',
-    ENDS_WITH = 'end with', BEGINS_WITH = 'begin with',
+  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equals',
+    CONTAINS = 'contains',
+    MATCHES_REGULAR_EXPRESSION = 'matches regular expression',
+    ENDS_WITH = 'ends with', BEGINS_WITH = 'begins with',
     GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>'
 }
 

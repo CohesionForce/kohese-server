@@ -7,10 +7,16 @@ import { Subscription } from 'rxjs/Subscription';
 import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { Tree } from '../tree.class';
+import { TreeRow } from '../tree-row/tree-row.class';
 import { RowAction } from '../tree-row/tree-row.component';
 import { Filter, FilterElement, FilterCriterion, FilterCriteriaConnection,
   FilterCriteriaConnectionType,
   FilterableProperty } from '../../filter/filter.class';
+
+class AddRowObject {
+  public constructor(public connection: FilterCriteriaConnection) {
+  }
+}
 
 @Component({
   selector: 'filter-tree',
@@ -33,92 +39,25 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     return this._inTargetingMode;
   }
 
+  private _moveOrCopyElement: FilterElement = undefined;
   private _isTargetingForCopy: boolean = false;
 
   get FilterCriteriaConnectionType() {
     return FilterCriteriaConnectionType;
   }
-
+  
+  private _addRowObjectMap: Map<FilterCriteriaConnection, AddRowObject> =
+    new Map<FilterCriteriaConnection, AddRowObject>();
+    
   private _targetFilterSubscription: Subscription;
 
   public constructor(route: ActivatedRoute, _dialogService: DialogService,
     private _changeDetectorRef: ChangeDetectorRef) {
     super(route, _dialogService, true);
+    this.showRootWithDescendants = true;
   }
 
   public ngOnInit(): void {
-    this.rowActions.push(new RowAction('Change Property', 'Change this ' +
-      'criterion\'s target property', 'fa fa-mouse-pointer', (object: any) => {
-      return (object instanceof FilterCriterion);
-      }, (object: any) => {
-      let filterableProperties: Array<FilterableProperty> = this.
-        _targetFilterSubject.getValue().filterableProperties;
-      this._dialogService.openSelectDialog('Criterion Property', '',
-        'Property', (object as FilterCriterion).property.displayText,
-        filterableProperties.map((filterableProperty: FilterableProperty) => {
-          return filterableProperty.displayText;
-        })).afterClosed().subscribe((selection: any) => {
-        if (selection) {
-          for (let j: number = 0; j < filterableProperties.length; j++) {
-            if (filterableProperties[j].displayText === selection) {
-              (object as FilterCriterion).property = filterableProperties[j];
-              this.getRow(this.getId(object)).refresh();
-              break;
-            }
-          }
-        }
-      });
-    }));
-    this.rowActions.push(new RowAction('Change Condition', 'Change this ' +
-      'criterion\'s condition', 'fa fa-question', (object: any) => {
-      return (object instanceof FilterCriterion);
-      }, (object: any) => {
-      let criterion: FilterCriterion = (object as FilterCriterion);
-      this._dialogService.openSelectDialog('Criterion Condition', '',
-        'Condition', criterion.condition, Object.keys(FilterCriterion.
-        CONDITIONS).map((key: any) => {
-        return FilterCriterion.CONDITIONS[key];
-        })).afterClosed().subscribe((selection: any) => {
-        if (selection) {
-          criterion.condition = selection;
-          this.getRow(this.getId(object)).refresh();
-        }
-      });
-    }));
-    this.rowActions.push(new RowAction('Change Value', 'Change this ' +
-      'criterion\'s value', 'fa fa-pencil', (object: any) => {
-      return (object instanceof FilterCriterion);
-      }, (object: any) => {
-      let criterion: FilterCriterion = (object as FilterCriterion);
-      if (criterion.property.values.length > 0) {
-        this._dialogService.openSelectDialog('Criterion Value', '',
-          'Value', (object as FilterCriterion).value, criterion.property.
-          values).afterClosed().subscribe((selection: any) => {
-          if (selection) {
-            (object as FilterCriterion).value = selection;
-            this.getRow(this.getId(object)).refresh();
-          }
-        });
-      } else {
-        this._dialogService.openInputDialog('Criterion Value', '',
-          DialogComponent.INPUT_TYPES.TEXT, 'Value',
-          (object as FilterCriterion).value).afterClosed().subscribe((value:
-          any) => {
-          if (value) {
-            (object as FilterCriterion).value = value;
-            this.getRow(this.getId(object)).refresh();
-          }
-        });
-      }
-    }));
-    this.rowActions.push(new RowAction('Negate', 'Negate this criterion',
-      'fa fa-exclamation', (object: any) => {
-        return (object instanceof FilterCriterion);
-      }, (object: any) => {
-        let criterion: FilterCriterion = (object as FilterCriterion);
-        criterion.negate = !criterion.negate;
-        this.getRow(this.getId(criterion)).refresh();
-    }));
     this.rowActions.push(new RowAction('Swap Case Ignoring', 'Swap case ' +
       'ignoring', 'fa fa-exchange', (object: any) => {
       return (object instanceof FilterCriterion);
@@ -140,6 +79,20 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       }
       this.getRow(this.getId(connection)).refresh();
     }));
+    this.rowActions.push(new RowAction('Copy', 'Copy this element',
+      'fa fa-copy', (object: any) => {
+      return (!(object instanceof AddRowObject) && !this._inTargetingMode &&
+        (object !== this.rootSubject.getValue()));
+      }, (object: any) => {
+      this.enterCopyTargetingMode(object);
+    }));
+    this.rowActions.push(new RowAction('Move', 'Move this element',
+      'fa fa-arrow-circle-o-right', (object: any) => {
+      return (!(object instanceof AddRowObject) && !this._inTargetingMode &&
+        (object !== this.rootSubject.getValue()));
+      }, (object: any) => {
+      this.enterMoveTargetingMode(object);
+    }));
     this.rowActions.push(new RowAction('Target', 'Target this connection ' +
       'for the current action', 'fa fa-crosshairs', (object: any) => {
       return ((object instanceof FilterCriteriaConnection) &&
@@ -148,44 +101,37 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       }, (object: any) => {
       let connection: FilterCriteriaConnection =
         (object as FilterCriteriaConnection);
-      let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
-      for (let j: number = 0; j < selectedObjects.length; j++) {
-        let selectedElement: FilterElement = selectedObjects[j];
-        if (this._isTargetingForCopy) {
-          selectedElement = this.copy(selectedElement);
-        } else {
-          let parent: FilterCriteriaConnection = this.getParent(
-            selectedElement);
-          if (parent) {
-            if (selectedElement instanceof FilterCriterion) {
-              parent.criteria.splice(parent.criteria.indexOf((
-                selectedElement as FilterCriterion)), 1);
-            } else {
-              parent.connections.splice(parent.connections.indexOf(
-                (selectedElement as FilterCriteriaConnection)), 1);
-            }
-          }
+      if (this._moveOrCopyElement) {
+        this.connectionTargeted(connection, this._moveOrCopyElement);
+      } else {
+        let selectedObjects: Array<any> = this.selectedObjectsSubject.
+          getValue();
+        for (let j: number = 0; j < selectedObjects.length; j++) {
+          this.connectionTargeted(connection, selectedObjects[j]);
         }
-
-        if (selectedElement instanceof FilterCriterion) {
-          connection.criteria.push(selectedElement as FilterCriterion);
-        } else {
-          connection.connections.push(
-            selectedElement as FilterCriteriaConnection);
-        }
-
-        if (this._isTargetingForCopy) {
-          if (selectedElement instanceof FilterCriteriaConnection) {
-            this.buildRows(selectedElement);
-          } else {
-            this.buildRow(selectedElement);
-          }
-        }
-
-        this.getRow(this.getId(connection)).expanded = true;
       }
 
       this._inTargetingMode = false;
+      this.refresh();
+    }));
+    this.rowActions.push(new RowAction('Delete', 'Delete this element',
+      'fa fa-trash', (object: any) => {
+      return (!(object instanceof AddRowObject) && (object !== this.
+        rootSubject.getValue()));
+      }, (object: any) => {
+      if (object instanceof FilterCriteriaConnection) {
+        this._dialogService.openYesNoDialog('Delete Elements Recursively',
+          'Deleting this connection should delete all descendants of this ' +
+          'connection also. Are you sure that you want to proceed?').subscribe(
+          (response: any) => {
+          if (response) {
+            this.deleteElement(object as FilterElement);
+          }
+        });
+      } else {
+        this.deleteElement(object as FilterElement);
+      }
+      
       this.refresh();
     }));
 
@@ -212,23 +158,33 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   protected getParent(object: any): any {
-    let elementStack: Array<FilterCriteriaConnection> = [this.
-      _targetFilterSubject.getValue().rootElement];
-    while (elementStack.length > 0) {
-      let connection: FilterCriteriaConnection = elementStack.pop();
-      if (object instanceof FilterCriterion) {
-        for (let j: number = 0; j < connection.criteria.length; j++) {
-          if (object === connection.criteria[j]) {
-            return connection;
+    if (object instanceof AddRowObject) {
+      return (object as AddRowObject).connection;
+    } else {
+      let root: FilterCriteriaConnection = this._targetFilterSubject.getValue().
+        rootElement;
+      if (object === root) {
+        return undefined;
+      } else {
+        let elementStack: Array<FilterCriteriaConnection> = [root];
+        while (elementStack.length > 0) {
+          let connection: FilterCriteriaConnection = elementStack.pop();
+        
+          if (object instanceof FilterCriterion) {
+            for (let j: number = 0; j < connection.criteria.length; j++) {
+              if (object === connection.criteria[j]) {
+                return connection;
+              }
+            }
           }
-        }
-      }
 
-      for (let j: number = 0; j < connection.connections.length; j++) {
-        if (object === connection.connections[j]) {
-          return connection;
-        } else {
-          elementStack.push(connection.connections[j]);
+          for (let j: number = 0; j < connection.connections.length; j++) {
+            if (object === connection.connections[j]) {
+              return connection;
+            } else {
+              elementStack.push(connection.connections[j]);
+            }
+          }
         }
       }
     }
@@ -241,6 +197,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
         (object as FilterCriteriaConnection);
       children.push(...connection.connections);
       children.push(...connection.criteria);
+      children.push(this._addRowObjectMap.get(connection));
     }
 
     return children;
@@ -258,20 +215,38 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
+  public addElementToConnection(type: string, connection:
+    FilterCriteriaConnection): void {
+    let element: FilterElement;
+    if (type === 'FilterCriteriaConnection') {
+      element = new FilterCriteriaConnection(FilterCriteriaConnectionType.AND);
+      connection.connections.push(element as FilterCriteriaConnection);
+      let addRowObject: AddRowObject = new AddRowObject(
+        element as FilterCriteriaConnection);
+      this._addRowObjectMap.set(element as FilterCriteriaConnection,
+        addRowObject);
+      this.buildRow(addRowObject);
+    } else {
+      element = new FilterCriterion(this._targetFilterSubject.getValue().
+        filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
+      connection.criteria.push(element as FilterCriterion);
+    }
+    
+    this.buildRow(element);
+    if (type === 'FilterCriteriaConnection') {
+      this.getRow(this.getId(element)).expanded = true;
+    }
+    this.getRow(this.getId(connection)).expanded = true;
+    this.refresh();
+  }
+  
   public addCriterionToSelectedConnections(): void {
     let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let connection: FilterCriteriaConnection =
         (selectedObjects[j] as FilterCriteriaConnection);
-      let criterion: FilterCriterion = new FilterCriterion(this.
-        _targetFilterSubject.getValue().filterableProperties[0],
-        FilterCriterion.CONDITIONS.CONTAINS, '');
-      connection.criteria.push(criterion);
-      this.buildRow(criterion);
-      this.getRow(this.getId(connection)).expanded = true;
+      this.addElementToConnection('FilterCriterion', connection);
     }
-
-    this.refresh();
   }
 
   public addConnectionToSelectedConnections(type:
@@ -280,74 +255,71 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let connection: FilterCriteriaConnection =
         (selectedObjects[j] as FilterCriteriaConnection);
-      let newConnection: FilterCriteriaConnection =
-        new FilterCriteriaConnection(type);
-      connection.connections.push(newConnection);
-      this.buildRow(newConnection);
-      this.getRow(this.getId(connection)).expanded = true;
+      this.addElementToConnection('FilterCriteriaConnection', connection);
     }
-
-    this.refresh();
   }
 
   public deleteSelectedElements(): void {
-    let proceed: boolean = true;
+    let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
     if (!this.areSelectedElementsCriteria()) {
       this._dialogService.openYesNoDialog('Delete Elements Recursively',
         'One or more connections are selected. Deleting connections should ' +
         'delete all descendants of those connections also. Are you sure ' +
         'that you want to proceed?').subscribe((response: any) => {
         if (response) {
-          this._deleteSelectedElements();
+          for (let j: number = 0; j < selectedObjects.length; j++) {
+            this.deleteElement(selectedObjects[j] as FilterElement);
+          }
         }
       });
     } else {
-      this._deleteSelectedElements();
-    }
-  }
-
-  private _deleteSelectedElements(): void {
-    let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
-    for (let j: number = 0; j < selectedObjects.length; j++) {
-      let selectedElement: FilterElement = selectedObjects[j];
-      let elementStack: Array<FilterCriteriaConnection> = [this.
-        _targetFilterSubject.getValue().rootElement];
-      searchLoop: while (elementStack.length > 0) {
-        let connection: FilterCriteriaConnection = elementStack.pop();
-        for (let j: number = 0; j < connection.criteria.length; j++) {
-          if (selectedElement === connection.criteria[j]) {
-            this.deleteRow(this.getId(connection.criteria[j]));
-            connection.criteria.splice(j, 1);
-            break searchLoop;
-          }
-        }
-
-        for (let j: number = 0; j < connection.connections.length; j++) {
-          if (selectedElement === connection.connections[j]) {
-            this.deleteRow(this.getId(connection.connections[j]));
-            connection.connections.splice(j, 1);
-            break searchLoop;
-          } else {
-            elementStack.push(connection.connections[j]);
-          }
-        }
+      for (let j: number = 0; j < selectedObjects.length; j++) {
+        this.deleteElement(selectedObjects[j] as FilterElement);
       }
     }
-
+    
     selectedObjects.length = 0;
     this.selectedObjectsSubject.next(selectedObjects);
     this.refresh();
   }
 
-  public enterCopyTargetingMode(): void {
+  private deleteElement(element: FilterElement): void {
+    let elementStack: Array<FilterCriteriaConnection> = [this.
+      _targetFilterSubject.getValue().rootElement];
+    searchLoop: while (elementStack.length > 0) {
+      let connection: FilterCriteriaConnection = elementStack.pop();
+      for (let j: number = 0; j < connection.criteria.length; j++) {
+        if (element === connection.criteria[j]) {
+          this.deleteRow(this.getId(connection.criteria[j]));
+          connection.criteria.splice(j, 1);
+          break searchLoop;
+        }
+      }
+
+      for (let j: number = 0; j < connection.connections.length; j++) {
+        if (element === connection.connections[j]) {
+          this.deleteRow(this.getId(connection.connections[j]));
+          connection.connections.splice(j, 1);
+          this._addRowObjectMap.delete(connection.connections[j]);
+          break searchLoop;
+        } else {
+          elementStack.push(connection.connections[j]);
+        }
+      }
+    }
+  }
+
+  public enterCopyTargetingMode(moveOrCopyElement: FilterElement): void {
     this._isTargetingForCopy = true;
+    this._moveOrCopyElement = moveOrCopyElement;
     this._inTargetingMode = true;
 
     this.refresh();
   }
 
-  public enterMoveTargetingMode(): void {
+  public enterMoveTargetingMode(moveOrCopyElement: FilterElement): void {
     this._isTargetingForCopy = false;
+    this._moveOrCopyElement = moveOrCopyElement;
     this._inTargetingMode = true;
 
     this.refresh();
@@ -389,14 +361,53 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     let elementStack: Array<FilterCriteriaConnection> = [startingConnection];
     while (elementStack.length > 0) {
       let connection: FilterCriteriaConnection = elementStack.pop();
-      this.buildRow(connection);
+      let row: TreeRow = this.buildRow(connection);
 
       for (let j: number = 0; j < connection.criteria.length; j++) {
         this.buildRow(connection.criteria[j]);
       }
+      
+      let addRowObject: AddRowObject = new AddRowObject(connection);
+      this._addRowObjectMap.set(connection, addRowObject);
+      row.expanded = true;
+      this.buildRow(addRowObject);
 
       elementStack.push(...connection.connections);
     }
+  }
+  
+  private connectionTargeted(connection: FilterCriteriaConnection, element:
+    FilterElement): void {
+    if (this._isTargetingForCopy) {
+      element = this.copy(element);
+    } else {
+      let parent: FilterCriteriaConnection = this.getParent(element);
+      if (parent) {
+        if (element instanceof FilterCriterion) {
+          parent.criteria.splice(parent.criteria.indexOf((
+            element as FilterCriterion)), 1);
+        } else {
+          parent.connections.splice(parent.connections.indexOf(
+            (element as FilterCriteriaConnection)), 1);
+        }
+      }
+    }
+
+    if (element instanceof FilterCriterion) {
+      connection.criteria.push(element as FilterCriterion);
+    } else {
+      connection.connections.push(element as FilterCriteriaConnection);
+    }
+
+    if (this._isTargetingForCopy) {
+      if (element instanceof FilterCriteriaConnection) {
+        this.buildRows(element);
+      } else {
+        this.buildRow(element);
+      }
+    }
+
+    this.getRow(this.getId(connection)).expanded = true;
   }
 
   private copy(element: FilterElement): FilterElement {
