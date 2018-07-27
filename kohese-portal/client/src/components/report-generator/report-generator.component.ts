@@ -5,6 +5,7 @@ import { DynamicTypesService } from './../../services/dynamic-types/dynamic-type
 import { ItemProxy } from './../../../../common/src/item-proxy';
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { select } from 'd3';
+import { ReportService } from '../../services/reports/report.service';
 
 @Component({
   selector: 'report-generator',
@@ -17,19 +18,21 @@ import { select } from 'd3';
 
 export class ReportGeneratorComponent implements OnInit {
   typeInfo = {};
-  reportDefs : Array<ReportDefinition> = [];
-  selectedReport : ReportDefinition;
+  reportDefs : Array<ItemProxy> = [];
+  selectedReport : ItemProxy;
   selectedType;
   selectedTypeFormat;
   repoLoaded : boolean = false;
 
   repositoryStatusSubscription : Subscription;
   treeConfigSubscription : Subscription;
+  reportDefSubscription : Subscription;
 
   constructor(private typeService : DynamicTypesService,
               private itemRepository : ItemRepository,
               private changeRef : ChangeDetectorRef,
-              private dialogService : DialogService) {
+              private dialogService : DialogService,
+              private reportService : ReportService) {
 
   }
 
@@ -45,6 +48,10 @@ export class ReportGeneratorComponent implements OnInit {
             })
         }
       });
+
+    this.reportDefSubscription = this.reportService.getReportSubscription().subscribe((reports)=>{
+      this.reportDefs = reports;
+    })
   }
 
   addReport() {
@@ -73,26 +80,20 @@ export class ReportGeneratorComponent implements OnInit {
       entryPoints : [],
       typeFormats : typeFormats,
     }).then((newReport) => {
-      this.reportDefs.push({
-        name : newReport.item.name,
-        entryPoints : newReport.item.entryPoints,
-        typeFormats : newReport.item.typeFormats,
-        dirty : false,
-        proxy : newReport
-      })
+      this.reportDefs.push(newReport);
+      this.changeRef.markForCheck();
     })
 
 
 
-    this.changeRef.markForCheck();
   }
 
-  toggleType(reportDef : ReportDefinition, typeInfo : any) {
+  toggleType(reportDef : ItemProxy, typeInfo : any) {
     let typeName = typeInfo.dataModelProxy.item.name;
-    let typeFormat = reportDef.typeFormats[typeName];
+    let typeFormat = reportDef.item.typeFormats[typeName];
 
     if(!typeFormat) {
-      reportDef.typeFormats[typeInfo.dataModelProxy.item.name] = {
+      reportDef.item.typeFormats[typeInfo.dataModelProxy.item.name] = {
         type : typeInfo.dataModelProxy.item.name,
         properties : {},
         active : true,
@@ -108,7 +109,7 @@ export class ReportGeneratorComponent implements OnInit {
   }
 
   toggleProperty(type : string, property: string) {
-    let typeFormat = this.selectedReport.typeFormats[type];
+    let typeFormat = this.selectedReport.item.typeFormats[type];
     let propertyFormat = typeFormat.properties[property];
     if (propertyFormat.active) {
       let index = typeFormat.orderedProperties.indexOf(property);
@@ -123,19 +124,19 @@ export class ReportGeneratorComponent implements OnInit {
     this.changeRef.markForCheck();
   }
 
-  enableAllTypes(selectedReport : ReportDefinition){
+  enableAllTypes(selectedReport : ItemProxy){
     for (let type in this.typeInfo) {
-      if (!selectedReport.typeFormats[type].active) {
-        selectedReport.typeFormats[type].active = true;
+      if (!selectedReport.item.typeFormats[type].active) {
+        selectedReport.item.typeFormats[type].active = true;
       }
     }
     this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
 
-  disableAllTypes(selectedReport : ReportDefinition) {
-    for(let type in selectedReport.typeFormats) {
-      selectedReport.typeFormats[type].active = false;
+  disableAllTypes(selectedReport : ItemProxy) {
+    for(let type in selectedReport.item.typeFormats) {
+      selectedReport.item.typeFormats[type].active = false;
 
     }
     this.selectedReport.dirty = true;
@@ -149,7 +150,6 @@ export class ReportGeneratorComponent implements OnInit {
       this.selectedTypeFormat.orderedProperties.push(property);
       }
     }
-    console.log(this.selectedType);
     this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
@@ -176,34 +176,21 @@ export class ReportGeneratorComponent implements OnInit {
   }
 
   saveReport() {
-    this.selectedReport.proxy.item.name = this.selectedReport.name;
-    this.selectedReport.proxy.item.entryPoints = this.selectedReport.entryPoints;
-    this.selectedReport.proxy.item.typeFormats = this.selectedReport.typeFormats;
-    this.itemRepository.upsertItem(this.selectedReport.proxy).then((newProxy)=>{
+    this.itemRepository.upsertItem(this.selectedReport).then((newProxy)=>{
       this.selectedReport.dirty = false;
       this.changeRef.markForCheck();
     });
   }
-
 }
 
-
-export interface ReportDefinition {
-  name : string
-  entryPoints : Array<ItemProxy>;
-  typeFormats : { [type: string] : TypeFormat };
-  proxy : ItemProxy;
-  dirty : boolean;
-}
-
-interface TypeFormat {
+export interface TypeFormat {
   active : boolean;
   type : string;
   properties : { [property : string] : PropertyFormat}
   orderedProperties : Array<string>
 }
 
-interface PropertyFormat {
+export interface PropertyFormat {
   active : boolean;
   name : string
 }

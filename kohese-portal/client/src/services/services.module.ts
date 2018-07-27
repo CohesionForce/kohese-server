@@ -1,3 +1,4 @@
+import { ReportService } from './reports/report.service';
 /* Core */
 import { NgModule } from "@angular/core/";
 import { CommonModule } from '@angular/common';
@@ -23,6 +24,10 @@ import { LensService } from './lens-service/lens.service';
 import { MaterialModule } from "../material.module";
 import { ProjectService } from "./project-service/project.service";
 import { LogService } from "./log/log.service";
+
+
+// Log Events
+import { InitializeLogs } from './item-repository/item-repository.registry'
 
 @NgModule({
   declarations: [
@@ -56,10 +61,9 @@ import { LogService } from "./log/log.service";
     StateService,
     LensService,
     ProjectService,
-    LogService
+    LogService,
+    ReportService
   ]
 })
 export class ServicesModule {}
 
-// Log Events 
-import { InitializeLogs } from './item-repository/item-repository.registry'

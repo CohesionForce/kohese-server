@@ -5,13 +5,13 @@
 <div id="report-container">
   <mat-list>
     <mat-list-item *ngFor="let report of reportDefs" class="report-item" (click)="selectedReport = report">
-      {{report.name}}  <img *ngIf="report.dirty" src="../../../assets/icons/versioncontrol/dirty.ico">
+      {{report.item.name}}  <img *ngIf="report.dirty" src="../../../assets/icons/versioncontrol/dirty.ico">
       <hr/>
     </mat-list-item>
   </mat-list>
 </div>
 <div id="definition-editor" *ngIf="selectedReport">
-  <h2>{{selectedReport.name}} <img *ngIf="selectedReport.dirty" src="../../../assets/icons/versioncontrol/dirty.ico">
+  <h2>{{selectedReport.item.name}} <img *ngIf="selectedReport.dirty" src="../../../assets/icons/versioncontrol/dirty.ico">
     <button mat-button (click)="openPreview(selectedReport);">
       <i class="fa fa-search"></i> Preview</button>
     <button mat-button (click)="saveReport()">
@@ -19,7 +19,7 @@
     </button>
   </h2>
   <label>Report name: </label>
-  <input mat-input [(ngModel)]="selectedReport.namen" />
+  <input mat-input [(ngModel)]="selectedReport.item.name" />
   <div id="type-selector">
     <div style="font-size: larger">
       Included Types
@@ -28,8 +28,8 @@
     </div>
     <mat-list id="type-list">
       <mat-list-item [ngClass]="{'selected-type' : selectedType === typeInfo[type]}" *ngFor="let type of typeInfo | mapKey" style="width: 100%;">
-        <mat-slide-toggle [checked]="selectedReport.typeFormats[type].active" (change)="toggleType(selectedReport, typeInfo[type])"></mat-slide-toggle>
-        <span class="type-info" (click)="selectedType = typeInfo[type]; selectedTypeFormat = selectedReport.typeFormats[type];">{{typeInfo[type].dataModelProxy.item.name}}</span>
+        <mat-slide-toggle [checked]="selectedReport.item.typeFormats[type].active" (change)="toggleType(selectedReport, typeInfo[type])"></mat-slide-toggle>
+        <span class="type-info" (click)="selectedType = typeInfo[type]; selectedTypeFormat = selectedReport.item.typeFormats[type];">{{typeInfo[type].dataModelProxy.item.name}}</span>
         <hr/>
       </mat-list-item>
     </mat-list>
@@ -37,9 +37,9 @@
     <div id="type-specification" *ngIf="selectedType">
       <div id="type-header">
         <span style="font-size: larger; font-weight: bold">{{selectedType.dataModelProxy.item.name}}</span>
-        <span *ngIf="selectedReport.typeFormats[selectedType.dataModelProxy.item.name].active">(Active
+        <span *ngIf="selectedReport.item.typeFormats[selectedType.dataModelProxy.item.name].active">(Active
           <i style="color: green; font-size: small" class="fa fa-circle"></i>)</span>
-        <span *ngIf="!selectedReport.typeFormats[selectedType.dataModelProxy.item.name].active">(Inactive
+        <span *ngIf="!selectedReport.item.typeFormats[selectedType.dataModelProxy.item.name].active">(Inactive
           <i style="color: red; font-size: small" class="fa fa-circle"></i>)</span>
         <hr/>
         <span style="font-size : large;" id="property-list">Properties</span>
@@ -50,7 +50,7 @@
       <div id="property-toggle">
         <mat-list>
           <mat-list-item *ngFor="let property of selectedType.fields  | mapKey">
-            <mat-slide-toggle [checked]="selectedReport.typeFormats[selectedType.dataModelProxy.item.name].properties[property].active"
+            <mat-slide-toggle [checked]="selectedReport.item.typeFormats[selectedType.dataModelProxy.item.name].properties[property].active"
               (change)="toggleProperty(selectedType.dataModelProxy.item.name, property)"></mat-slide-toggle>
             <span class="type-info"> {{property}}</span>
             <hr/>
