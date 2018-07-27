@@ -362,7 +362,7 @@ export class ItemRepository {
 
         let processingComplete = Date.now();
         this.logService.log(this.logEvents.bulkUpdateProcessingTime, {processTime : (processingComplete - beginBulkProcessing) / 1000});
-        let deferCalc = this.loadFeatureSwitch('IR-skip-calc', true);
+        let deferCalc = this.loadFeatureSwitch('IR-defer-calc', true);
         ItemProxy.getWorkingTree().loadingComplete(deferCalc);
         let treehashComplete = Date.now();
         this.logService.log(this.logEvents.treeHashProcessingTime, {processTime : (treehashComplete - processingComplete) / 1000});
