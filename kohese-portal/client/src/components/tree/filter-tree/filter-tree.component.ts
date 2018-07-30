@@ -218,8 +218,14 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
   public addElementToConnection(type: string, connection:
     FilterCriteriaConnection): void {
     let element: FilterElement;
-    if (type === 'FilterCriteriaConnection') {
-      element = new FilterCriteriaConnection(FilterCriteriaConnectionType.AND);
+    if (type.startsWith('FilterCriteriaConnection')) {
+      let connectionType: FilterCriteriaConnectionType;
+      if (type.split(':')[1] === 'AND') {
+        connectionType = FilterCriteriaConnectionType.AND;
+      } else {
+        connectionType = FilterCriteriaConnectionType.OR;
+      }
+      element = new FilterCriteriaConnection(connectionType);
       connection.connections.push(element as FilterCriteriaConnection);
       let addRowObject: AddRowObject = new AddRowObject(
         element as FilterCriteriaConnection);
@@ -233,7 +239,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     }
     
     this.buildRow(element);
-    if (type === 'FilterCriteriaConnection') {
+    if (element instanceof FilterCriteriaConnection) {
       this.getRow(this.getId(element)).expanded = true;
     }
     this.getRow(this.getId(connection)).expanded = true;
@@ -270,17 +276,21 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
           for (let j: number = 0; j < selectedObjects.length; j++) {
             this.deleteElement(selectedObjects[j] as FilterElement);
           }
+          
+          selectedObjects.length = 0;
+          this.selectedObjectsSubject.next(selectedObjects);
+          this.refresh();
         }
       });
     } else {
       for (let j: number = 0; j < selectedObjects.length; j++) {
         this.deleteElement(selectedObjects[j] as FilterElement);
       }
+      
+      selectedObjects.length = 0;
+      this.selectedObjectsSubject.next(selectedObjects);
+      this.refresh();
     }
-    
-    selectedObjects.length = 0;
-    this.selectedObjectsSubject.next(selectedObjects);
-    this.refresh();
   }
 
   private deleteElement(element: FilterElement): void {

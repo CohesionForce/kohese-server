@@ -11,6 +11,8 @@ export class ItemProxyFilter extends Filter {
       if (treeConfigurationObject) {
         let typeNames: Array<string> = Object.keys(this._dynamicTypesService.
           getKoheseTypes()).sort();
+        let intermediateFilterablePropertyArray: Array<FilterableProperty> =
+          [];
         for (let j: number = 0; j < typeNames.length; j++) {
           let properties: any = treeConfigurationObject.config.getProxyFor(
             typeNames[j]).item.properties;
@@ -22,20 +24,21 @@ export class ItemProxyFilter extends Filter {
                 valueInputType = ValueInputType.NUMBER;
                 break;
             }
-            this.filterableProperties.push(new FilterableProperty(
-              propertyNames[k], [propertyNames[k]], valueInputType,
-              []));
+            intermediateFilterablePropertyArray.push(new FilterableProperty(
+              propertyNames[k], [propertyNames[k]], valueInputType, []));
           }
         }
         
-        this.filterableProperties.push(new FilterableProperty('kind', ['kind'],
-          ValueInputType.SELECT, typeNames));
+        intermediateFilterablePropertyArray.push(new FilterableProperty('kind',
+          ['kind'], ValueInputType.SELECT, typeNames));
         
-        this.filterableProperties.sort((oneProperty: FilterableProperty,
-          anotherProperty: FilterableProperty) => {
+        intermediateFilterablePropertyArray.sort((oneProperty:
+          FilterableProperty, anotherProperty: FilterableProperty) => {
           return (oneProperty.displayText > anotherProperty.displayText ? 1 :
             (oneProperty.displayText < anotherProperty.displayText ? -1 : 0));
         });
+        
+        this.filterableProperties.push(...intermediateFilterablePropertyArray);
       }
     });
   }

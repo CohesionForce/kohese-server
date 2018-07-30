@@ -48,10 +48,10 @@ export class FilterTreeRowComponent extends TreeRowComponent {
     super(changeDetectorRef);
   }
   
-  public getIndentationStyle(): object {
-    return {
-      'padding-left': (this.treeRow.depth * 30) + 'px' 
-    };
+  public getIndentationArray(): Array<any> {
+    let indentationArray: Array<any> = [];
+    indentationArray.length = this.treeRow.depth;
+    return indentationArray;
   }
   
   public getType(): string {
@@ -61,10 +61,10 @@ export class FilterTreeRowComponent extends TreeRowComponent {
       'AddRowObject'));
   }
   
-  public addConnection(): void {
+  public addConnection(type: string): void {
     // The type of this.treeRow.object should be AddRowObject
-    this.addElement.emit(new AddElementEvent('FilterCriteriaConnection', this.
-      treeRow.object.connection));
+    this.addElement.emit(new AddElementEvent('FilterCriteriaConnection:' +
+      type, this.treeRow.object.connection));
   }
   
   public addCriterion(): void {

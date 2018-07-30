@@ -1,4 +1,8 @@
-<div class="kt-item" style="height: 70px;" [ngStyle]="getIndentationStyle()">
+<div class="kt-item" style="height: 70px;">
+  <ng-container *ngFor="let indentation of getIndentationArray()">
+    <span style="height: 100%; width: 30px; border-left: 1px solid black;">
+    </span>
+  </ng-container>
   <i class="kt-icon fa"
     (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
     [ngClass]="{ 'fa-caret-down': (treeRow.hasChildren() && treeRow.expanded),
@@ -32,7 +36,7 @@
           [(ngModel)]="treeRow.object.condition">
           <mat-option
             *ngFor="let condition of (FilterCriterion.CONDITIONS | mapKey)"
-            [value]="condition">
+            [value]="FilterCriterion.CONDITIONS[condition]">
             {{FilterCriterion.CONDITIONS[condition]}}
           </mat-option>
         </mat-select>
@@ -64,9 +68,13 @@
           <mat-icon class="fa fa-plus"></mat-icon>
           Add Criterion
         </button>
-        <button mat-menu-item (click)="addConnection()">
+        <button mat-menu-item (click)="addConnection('AND')">
           <mat-icon class="fa fa-plus"></mat-icon>
-          Add Connection
+          Add AND Connection
+        </button>
+        <button mat-menu-item (click)="addConnection('OR')">
+          <mat-icon class="fa fa-plus"></mat-icon>
+          Add OR Connection
         </button>
       </mat-menu>
     </ng-container>
