@@ -9,13 +9,14 @@ export class ItemProxyFilter extends Filter {
     this._itemRepository.getTreeConfig().subscribe((treeConfigurationObject:
       any) => {
       if (treeConfigurationObject) {
-        let typeNames: Array<string> = Object.keys(this._dynamicTypesService.
-          getKoheseTypes()).sort();
+        let koheseTypeMap: object = this._dynamicTypesService.getKoheseTypes();
+        let typeNames: Array<string> = Object.keys(koheseTypeMap).sort();
         let intermediateFilterablePropertyArray: Array<FilterableProperty> =
           [];
         for (let j: number = 0; j < typeNames.length; j++) {
           let properties: any = treeConfigurationObject.config.getProxyFor(
-            typeNames[j]).item.properties;
+            koheseTypeMap[typeNames[j]].dataModelProxy.item.id).item.
+            properties;
           let propertyNames: Array<string> = Object.keys(properties);
           for (let k: number = 0; k < propertyNames.length; k++) {
             let valueInputType: ValueInputType = ValueInputType.STRING;

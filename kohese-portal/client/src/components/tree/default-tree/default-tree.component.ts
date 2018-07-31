@@ -3,6 +3,8 @@ import { Component, ChangeDetectionStrategy,
   Input } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs/Subscription';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -16,6 +18,7 @@ import { CompareItemsComponent,
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
 @Component({
@@ -34,6 +37,14 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   get synchronizeWithSelection() {
     return this._synchronizeWithSelection;
   }
+  
+  private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
+    filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
+  get searchCriterion() {
+    return this._searchCriterion;
+  }
+  
+  private _filterDelayIdentifier: any;
 
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/dirty.ico', 'Unsaved Changes',
@@ -257,13 +268,50 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     return super.filter(item); 
   }
   
-  public openFilterDialog(): void {
+  public openFilterDialog(): Observable<any> {
     if (!this.filterSubject.getValue()) {
       this.filterSubject.next(new ItemProxyFilter(this._dynamicTypesService,
         this._itemRepository));
     }
     
-    super.openFilterDialog();
+    return super.openFilterDialog().do((filter: Filter) => {
+      if (filter && !filter.isElementPresent(this._searchCriterion)) {
+        this._searchCriterion.value = '';
+      }
+    });
+  }
+  
+  public removeFilter(): void {
+    this._searchCriterion.value = '';
+    super.removeFilter();
+  }
+  
+  public searchStringChanged(searchString: string): void {
+    if (this._filterDelayIdentifier) {
+      clearTimeout(this._filterDelayIdentifier);
+    }
+
+    this._filterDelayIdentifier = setTimeout(() => {
+      let advancedFilter: Filter = this.filterSubject.getValue();
+      if (searchString) {
+        if (!advancedFilter) {
+          advancedFilter = new ItemProxyFilter(this._dynamicTypesService, this.
+            _itemRepository);
+        }
+        
+        if (!advancedFilter.isElementPresent(this._searchCriterion)) {
+          advancedFilter.rootElement.criteria.push(this._searchCriterion);
+          this.filterSubject.next(advancedFilter);
+        }
+      } else {
+        advancedFilter.removeElement(this._searchCriterion);
+        this.filterSubject.next(advancedFilter);
+      }
+      
+      this.refresh();
+      
+      this._filterDelayIdentifier = undefined;
+    }, 1000);
   }
   
   private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:

@@ -37,6 +37,59 @@ export class Filter {
 
     return matchingObjects;
   }
+  
+  public isElementPresent(element: FilterElement): boolean {
+    let connectionStack: Array<FilterCriteriaConnection> = [this._rootElement];
+    while (connectionStack.length > 0) {
+      let connection: FilterCriteriaConnection = connectionStack.pop();
+      if (element instanceof FilterCriterion) {
+        for (let j: number = 0; j < connection.criteria.length; j++) {
+          if (element === connection.criteria[j]) {
+            return true;
+          }
+        }
+      } else {
+        for (let j: number = 0; j < connection.connections.length; j++) {
+          if (element === connection.connections[j]) {
+            return true;
+          } else {
+            connectionStack.push(connection.connections[j]);
+          }
+        }
+      }
+    }
+    
+    return false;
+  }
+  
+  public removeElement(element: FilterElement): boolean {
+    let removed: boolean = false;
+    let connectionStack: Array<FilterCriteriaConnection> = [this._rootElement];
+    searchLoop: while (connectionStack.length > 0) {
+      let connection: FilterCriteriaConnection = connectionStack.pop();
+      if (element instanceof FilterCriterion) {
+        for (let j: number = 0; j < connection.criteria.length; j++) {
+          if (element === connection.criteria[j]) {
+            connection.criteria.splice(j, 1);
+            removed = true;
+            break searchLoop;
+          }
+        }
+      } else {
+        for (let j: number = 0; j < connection.connections.length; j++) {
+          if (element === connection.connections[j]) {
+            connection.connections.splice(j, 1);
+            removed = true;
+            break searchLoop;
+          } else {
+            connectionStack.push(connection.connections[j]);
+          }
+        }
+      }
+    }
+    
+    return removed;
+  }
 
   private evaluateConnection(connection: FilterCriteriaConnection, object:
     any): boolean {

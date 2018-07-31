@@ -2,6 +2,8 @@ import { ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { VirtualScrollComponent } from 'angular2-virtual-scroll';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs/Subscription';
 
 import { DialogService } from '../../services/dialog/dialog.service';
@@ -97,8 +99,6 @@ export abstract class Tree {
   get filterSubject() {
     return this._filterSubject;
   }
-  
-  private _filterDelayIdentifier: any;
   
   get multiselectEnabled() {
     return this._multiselectEnabled;
@@ -218,44 +218,17 @@ export abstract class Tree {
     }
   }
 
-  public openFilterDialog(): void {
-    this._dialogService.openComponentDialog(FilterComponent, {
+  public openFilterDialog(): Observable<any> {
+    return this._dialogService.openComponentDialog(FilterComponent, {
       data: {
         filter: this._filterSubject.getValue()
       }
-    }).updateSize('90%', '90%').afterClosed().subscribe((filter: Filter) => {
+    }).updateSize('90%', '90%').afterClosed().do((filter: Filter) => {
       if (filter) {
         this._filterSubject.next(filter);
         this.refresh();
       }
     });
-  }
-  
-  public searchStringChanged(searchString: string): void {
-    if (this._filterDelayIdentifier) {
-      clearTimeout(this._filterDelayIdentifier);
-    }
-
-    this._filterDelayIdentifier = setTimeout(() => {
-      if (searchString) {
-        let previousFilter: Filter = this._filterSubject.getValue();
-        let filter: Filter = new Filter();
-        if (previousFilter) {
-          filter.rootElement.connections.push(...previousFilter.rootElement.connections);
-          filter.rootElement.criteria.push(...previousFilter.rootElement.criteria);
-        }
-        filter.rootElement.criteria.push(new FilterCriterion(filter.
-          filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS,
-          searchString));
-        
-        this._filterSubject.next(filter);
-        this.refresh();
-        this._filterSubject.next(previousFilter);
-      } else {
-        this.refresh();
-      }
-      this._filterDelayIdentifier = undefined;
-    }, 1000);
   }
   
   public removeFilter(): void {

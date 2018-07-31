@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs/Subscription';
 import { ToastrService } from 'ngx-toastr';
 
@@ -16,6 +18,7 @@ import { CompareItemsComponent,
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
 @Component({
@@ -30,6 +33,14 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   get absoluteRoot() {
     return this._absoluteRoot;
   }
+  
+  private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
+    filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
+  get searchCriterion() {
+    return this._searchCriterion;
+  }
+  
+  private _filterDelayIdentifier: any;
 
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
@@ -302,13 +313,50 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     return super.filter(item); 
   }
   
-  public openFilterDialog(): void {
+  public openFilterDialog(): Observable<any> {
     if (!this.filterSubject.getValue()) {
       this.filterSubject.next(new ItemProxyFilter(this._dynamicTypesService,
         this._itemRepository));
     }
     
-    super.openFilterDialog();
+    return super.openFilterDialog().do((filter: Filter) => {
+      if (filter && !filter.isElementPresent(this._searchCriterion)) {
+        this._searchCriterion.value = '';
+      }
+    });
+  }
+  
+  public removeFilter(): void {
+    this._searchCriterion.value = '';
+    super.removeFilter();
+  }
+  
+  public searchStringChanged(searchString: string): void {
+    if (this._filterDelayIdentifier) {
+      clearTimeout(this._filterDelayIdentifier);
+    }
+
+    this._filterDelayIdentifier = setTimeout(() => {
+      let advancedFilter: Filter = this.filterSubject.getValue();
+      if (searchString) {
+        if (!advancedFilter) {
+          advancedFilter = new ItemProxyFilter(this._dynamicTypesService, this.
+            _itemRepository);
+        }
+        
+        if (!advancedFilter.isElementPresent(this._searchCriterion)) {
+          advancedFilter.rootElement.criteria.push(this._searchCriterion);
+          this.filterSubject.next(advancedFilter);
+        }
+      } else {
+        advancedFilter.removeElement(this._searchCriterion);
+        this.filterSubject.next(advancedFilter);
+      }
+      
+      this.refresh();
+      
+      this._filterDelayIdentifier = undefined;
+    }, 1000);
   }
   
   private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:

@@ -153,7 +153,8 @@ describe('Component: default-tree', () => {
     component.searchStringChanged('Search String');
     setTimeout(() => {
       let filter: Filter = component.filterSubject.getValue();
-      expect(filter).not.toBeDefined();
+      expect(filter.rootElement.criteria[0]).toEqual(component.
+        searchCriterion);
       done();
     }, 1000);
   });

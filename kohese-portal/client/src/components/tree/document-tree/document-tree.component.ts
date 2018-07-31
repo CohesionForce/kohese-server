@@ -2,6 +2,7 @@ import { EventEmitter, Output, Input } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { RowAction, MenuAction } from '../tree-row/tree-row.component';
@@ -12,6 +13,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Tree } from '../tree.class';
+import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
 @Component({
@@ -28,6 +30,15 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   documentRoot : ItemProxy;
   documentRootId : string;
+  
+  private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
+    filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
+  get searchCriterion() {
+    return this._searchCriterion;
+  }
+  
+  private _filterDelayIdentifier: any;
+  
   images = [];
 
   @Output()
@@ -198,13 +209,50 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     return super.filter(item); 
   }
   
-  public openFilterDialog(): void {
+  public openFilterDialog(): Observable<any> {
     if (!this.filterSubject.getValue()) {
       this.filterSubject.next(new ItemProxyFilter(this._dynamicTypesService,
         this.itemRepository));
     }
     
-    super.openFilterDialog();
+    return super.openFilterDialog().do((filter: Filter) => {
+      if (filter && !filter.isElementPresent(this._searchCriterion)) {
+        this._searchCriterion.value = '';
+      }
+    });
+  }
+  
+  public removeFilter(): void {
+    this._searchCriterion.value = '';
+    super.removeFilter();
+  }
+  
+  public searchStringChanged(searchString: string): void {
+    if (this._filterDelayIdentifier) {
+      clearTimeout(this._filterDelayIdentifier);
+    }
+
+    this._filterDelayIdentifier = setTimeout(() => {
+      let advancedFilter: Filter = this.filterSubject.getValue();
+      if (searchString) {
+        if (!advancedFilter) {
+          advancedFilter = new ItemProxyFilter(this._dynamicTypesService, this.
+            itemRepository);
+        }
+        
+        if (!advancedFilter.isElementPresent(this._searchCriterion)) {
+          advancedFilter.rootElement.criteria.push(this._searchCriterion);
+          this.filterSubject.next(advancedFilter);
+        }
+      } else {
+        advancedFilter.removeElement(this._searchCriterion);
+        this.filterSubject.next(advancedFilter);
+      }
+      
+      this.refresh();
+      
+      this._filterDelayIdentifier = undefined;
+    }, 1000);
   }
 
   public setRowAsRoot(proxy: ItemProxy) {

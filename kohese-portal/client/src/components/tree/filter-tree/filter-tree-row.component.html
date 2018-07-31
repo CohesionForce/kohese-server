@@ -57,6 +57,10 @@
             [(ngModel)]="treeRow.object.value"/>
         </mat-form-field>
       </ng-container>
+      <mat-checkbox [(ngModel)]="treeRow.object.ignoreCase"
+        style="padding-right: 7px;">
+        Ignore Case
+      </mat-checkbox>
       <mat-checkbox [(ngModel)]="treeRow.object.negate">Negate</mat-checkbox>
     </ng-container>
     <ng-container *ngSwitchCase="'AddRowObject'">
