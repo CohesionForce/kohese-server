@@ -1,3 +1,4 @@
+import { FormatEditorComponent } from './format-editor/format-editor.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +18,8 @@ import { AngularSplitModule } from 'angular-split';
     TypeEditorComponent,
     TypeOverviewComponent,
     PropertyEditorComponent,
-    IconSelectorComponent
+    IconSelectorComponent,
+    FormatEditorComponent
   ],
   entryComponents: [
     IconSelectorComponent
