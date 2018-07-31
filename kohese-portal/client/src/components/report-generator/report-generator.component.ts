@@ -62,6 +62,7 @@ export class ReportGeneratorComponent implements OnInit {
 
       for (let field in this.typeInfo[type].fields) {
         properties[field] = {
+          hideLabel: false,
           active : false,
           name : field
         }
@@ -207,5 +208,6 @@ export interface TypeFormat {
 
 export interface PropertyFormat {
   active : boolean;
+  hideLabel : boolean;
   name : string
 }

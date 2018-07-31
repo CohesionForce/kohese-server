@@ -16,6 +16,10 @@
     "viewProperties": {
       "type": "object",
       "required": true
+    },
+    "documentDefinitions" : {
+      "type": "object",
+      "required": true
     }
   },
   "validations": [],

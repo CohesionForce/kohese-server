@@ -13,7 +13,7 @@
 }
 
 #definition-editor {
-  width: 70%;
+  width: 60%;
   display: inline-block;
   position : absolute;
   padding-left : 10px;
@@ -63,7 +63,7 @@
 }
 
 #order-selector {
-  width : 45%;
+  width : 30%;
   display: inline-block;
   height : 60%;
   overflow: auto;
@@ -102,6 +102,10 @@
 
 .order-button {
   cursor: pointer;
+}
+
+.order-buttons {
+  display : inline-block;
 }
 
 .order-title {

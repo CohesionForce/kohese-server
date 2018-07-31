@@ -5,13 +5,15 @@
 <div id="report-container">
   <mat-list>
     <mat-list-item *ngFor="let report of reportDefs" class="report-item" (click)="selectedReport = report">
-      {{report.item.name}}  <img *ngIf="report.dirty" src="../../../assets/icons/versioncontrol/dirty.ico">
+      {{report.item.name}}
+      <img *ngIf="report.dirty" src="../../../assets/icons/versioncontrol/dirty.ico">
       <hr/>
     </mat-list-item>
   </mat-list>
 </div>
 <div id="definition-editor" *ngIf="selectedReport">
-  <h2>{{selectedReport.item.name}} <img *ngIf="selectedReport.dirty" src="../../../assets/icons/versioncontrol/dirty.ico">
+  <h2>{{selectedReport.item.name}}
+    <img *ngIf="selectedReport.dirty" src="../../../assets/icons/versioncontrol/dirty.ico">
     <button mat-button (click)="openPreview(selectedReport);">
       <i class="fa fa-search"></i> Preview</button>
     <button mat-button (click)="saveReport()">
@@ -63,20 +65,17 @@
 
       <div id="order-selector">
         <div class="order-title">Report Order</div>
-        <mat-list id="order-list">
-          <mat-list-item *ngFor="let orderedProperty of selectedTypeFormat.orderedProperties">
+        <div id="order-list">
+          <div *ngFor="let orderedProperty of selectedTypeFormat.orderedProperties">
             <div class="order-buttons">
               <i (click)="swapPosition(selectedTypeFormat.orderedProperties, 'up', orderedProperty)" class="fa fa-caret-up order-button"></i>
               <br/>
               <i (click)="swapPosition(selectedTypeFormat.orderedProperties, 'down', orderedProperty)" class="fa fa-caret-down order-button"></i>
             </div>
-            <div class="prop-info">
               {{orderedProperty}}
-            </div>
-          </mat-list-item>
-        </mat-list>
+          </div>
+        </div>
       </div>
-
     </div>
   </div>
 </div>
