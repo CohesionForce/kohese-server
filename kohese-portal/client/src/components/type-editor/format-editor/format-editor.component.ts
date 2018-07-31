@@ -24,6 +24,15 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   selectedPropertyId: string;
   types = [];
 
+  formatDefs : Array<any> = [
+    {
+      name : 'Name & Description',
+      format : {
+
+      }
+    }
+  ]
+
   constructor(private typeService : DynamicTypesService, private changeRef : ChangeDetectorRef) {
 
   }
@@ -46,10 +55,27 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
       (koheseType: KoheseType) => {
       this.currentType = koheseType;
       this.changeRef.markForCheck();
+      console.log(this.currentType);
     });
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.koheseTypeStreamSubscription.unsubscribe();
   }
+
+  addDefinition () {
+    this.formatDefs.push({
+      name : 'New definition ' + this.formatDefs.length,
+      format : {}
+    })
+  }
+
+  saveFormat () {
+    console.log('Save Format');
+  }
+
+  openPreview () {
+    console.log ('Open Preview');
+  }
+
 }

@@ -1,1 +1,38 @@
-Hello world
+<div id="header">
+  <span id="title"> Format Definitions </span>
+  <button mat-button (click)="addDefinition()">Add Report</button>
+</div>
+<div id="format-container">
+  <mat-list>
+    <mat-list-item *ngFor="let format of formatDefs" class="format-item" (click)="selectedFormat = format">
+      {{format.name}}
+      <img *ngIf="format.dirty" src="../../../../assets/icons/versioncontrol/dirty.ico">
+      <hr/>
+    </mat-list-item>
+  </mat-list>
+</div>
+<div id="definition-editor" *ngIf="selectedFormat">
+  <h2>{{selectedFormat.name}}
+    <img *ngIf="selectedFormat.dirty" src="../../../../assets/icons/versioncontrol/dirty.ico">
+    <button mat-button (click)="openPreview(selectedFormat);">
+      <i class="fa fa-search"></i> Preview</button>
+    <button mat-button (click)="saveFormat()">
+      <i class="fa fa-save"></i> Save
+    </button>
+    <button mat-button class="disable-button" (click)="deleteFormat()">
+      <i class="fa fa-trash"></i> Delete
+    </button>
+  </h2>
+  <label>Format name: </label>
+  <input mat-input [(ngModel)]="selectedFormat.name" />
+  <div id="format-specification" *ngIf="selectedFormat">
+    <div id="type-header">
+      <span style="font-size: larger; font-weight: bold">{{selectedFormat.name}} Format</span>
+      <hr/>
+      <span style="font-size : large;" id="property-list">Properties</span>
+    </div>
+
+    <div id="property-toggle">
+    </div>
+  </div>
+</div>
