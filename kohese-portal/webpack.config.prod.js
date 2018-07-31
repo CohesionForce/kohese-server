@@ -571,12 +571,6 @@ module.exports = {
     new BaseHrefWebpackPlugin({}),
     new CommonsChunkPlugin({
       "name": [
-        "inline"
-      ],
-      "minChunks": null
-    }),
-    new CommonsChunkPlugin({
-      "name": [
         "main"
       ],
       "minChunks": 2,

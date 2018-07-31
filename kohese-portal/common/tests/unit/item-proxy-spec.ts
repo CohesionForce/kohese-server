@@ -983,14 +983,14 @@ describe('ItemProxy Test', function () {
       order.push('After ' + proxy.item.id);
     }
 
-    // Breadth First (Top Down)
+    // Preorder (Top Down)
     order = [];
     topProxy.visitTree(null, before, null);
     expect(order).toEqual(
       ['Before NV-TOP', 'Before A', 'Before AA', 'Before AB', 'Before ABA', 'Before ABB',
         'Before AC', 'Before B', 'Before C']);
 
-    // Depth First (Bottom Up)
+    // Postorder (Bottom Up)
     order = [];
     topProxy.visitTree(null, null, after);
     expect(order).toEqual(
@@ -1019,6 +1019,86 @@ describe('ItemProxy Test', function () {
     expect(order).toEqual(
       ['Before NV-TOP', 'Before A', 'Before AA', 'After AA', 'Before AC', 'After AC', 'After A',
         'Before B', 'After B', 'Before C', 'After C', 'After NV-TOP']);
+
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  it('should do depth first iterate', () => {
+
+    resetItemRepository();
+
+    defineTestModel();
+
+    function createNV(nodeId, parentId, kind  : string = undefined) {
+      var createKind = kind || 'Test';
+      // eslint-disable-next-line no-unused-vars
+      var proxy = new ItemProxy(createKind, {
+        id: nodeId,
+        name: 'Node Visitor ' + nodeId,
+        parentId: parentId
+      });
+    }
+
+    var topProxy = new ItemProxy('Test', {
+      id: 'NV-TOP',
+      name: 'NV Top'
+    });
+
+    createNV('A', 'NV-TOP');
+    createNV('AA', 'A');
+    createNV('AB', 'A', 'Test-Exclude');
+    createNV('ABA', 'AB');
+    createNV('ABB', 'AB');
+    createNV('AC', 'A');
+    createNV('B', 'NV-TOP');
+    createNV('C', 'NV-TOP');
+
+    var order = [];
+
+    function before(proxy) {
+      order.push('Before ' + proxy.item.id);
+    }
+
+    function after(proxy) {
+      order.push('After ' + proxy.item.id);
+    }
+
+    // NOTE:  Can not use "for of" for iteration since typescript does not support transciption of
+    //        this type of iterator to ES5
+
+    // Preorder (Top Down)
+    order = [];
+    let iter : Iterator<ItemProxy> = topProxy.iterateTree(null);
+    let proxy : ItemProxy;
+    while(proxy = iter.next().value){
+      before(proxy);
+    }
+    expect(order).toEqual(
+      ['Before NV-TOP', 'Before A', 'Before AA', 'Before AB', 'Before ABA', 'Before ABB',
+        'Before AC', 'Before B', 'Before C']);
+
+    // Postorder (Bottom Up)
+    order = [];
+    iter = topProxy.iterateTree({postorder: true});
+    proxy = undefined;
+    while(proxy = iter.next().value){
+      after(proxy);
+    }
+    expect(order).toEqual(
+      ['After AA', 'After ABA', 'After ABB', 'After AB', 'After AC', 'After A', 'After B',
+        'After C', 'After NV-TOP']);
+
+    // Exclude Sub-Tree
+    order = [];
+    iter = topProxy.iterateTree({excludeKind: ['Test-Exclude']});
+    proxy = undefined;
+    while(proxy = iter.next().value){
+      before(proxy);
+    }
+    expect(order).toEqual(
+      ['Before NV-TOP', 'Before A', 'Before AA', 'Before AC', 'Before B', 'Before C']);
 
   });
 
