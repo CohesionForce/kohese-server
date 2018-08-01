@@ -8,6 +8,21 @@ import { DialogService,
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 
+export interface FormatDefinition {
+  name : string,
+  format : Array<FormatContainer>
+}
+
+ export interface FormatContainer {
+  type : string,
+  contents : Array<PropertyDefinition>
+}
+
+export interface PropertyDefinition {
+  propertyName : string
+  // Will grow as we get to the property part
+}
+
 @Component({
   selector: 'format-editor',
   templateUrl: './format-editor.component.html',
@@ -24,12 +39,16 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   selectedPropertyId: string;
   types = [];
 
-  formatDefs : Array<any> = [
+  formatDefs : Array<FormatDefinition> = [
     {
       name : 'Name & Description',
-      format : {
-
-      }
+      format : [{
+          type : 'list',
+          contents : [
+            { propertyName : 'name'},
+            { propertyName : 'description'}
+        ]}
+      ]
     }
   ]
 
@@ -66,7 +85,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   addDefinition () {
     this.formatDefs.push({
       name : 'New definition ' + this.formatDefs.length,
-      format : {}
+      format : []
     })
   }
 
@@ -76,6 +95,10 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
 
   openPreview () {
     console.log ('Open Preview');
+  }
+
+  deleteFormat () {
+
   }
 
 }

@@ -1,3 +1,5 @@
+import { FormatModule } from './format-editor/format.module';
+import { FormatGuiComponent } from './format-editor/format-gui/format-gui.component';
 import { FormatEditorComponent } from './format-editor/format-editor.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -18,8 +20,7 @@ import { AngularSplitModule } from 'angular-split';
     TypeEditorComponent,
     TypeOverviewComponent,
     PropertyEditorComponent,
-    IconSelectorComponent,
-    FormatEditorComponent
+    IconSelectorComponent
   ],
   entryComponents: [
     IconSelectorComponent
@@ -30,7 +31,8 @@ import { AngularSplitModule } from 'angular-split';
     MaterialModule,
     PipesModule,
     AngularSplitModule,
-    StateMachineEditorModule
+    StateMachineEditorModule,
+    FormatModule
   ]
 })
 export class TypeEditorModule {

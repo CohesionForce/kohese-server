@@ -17,8 +17,12 @@
       "type": "object",
       "required": true
     },
-    "documentDefinitions" : {
+    "formatDefinitions" : {
       "type": "object",
+      "required": true
+    },
+    "defaultFormat" : {
+      "type": "string",
       "required": true
     }
   },

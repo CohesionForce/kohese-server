@@ -12,7 +12,10 @@
   </mat-list>
 </div>
 <div id="definition-editor" *ngIf="selectedFormat">
-  <h2>{{selectedFormat.name}}
+  <h2>
+    <span *ngIf="!editName">
+        {{selectedFormat.name}}
+    </span>
     <img *ngIf="selectedFormat.dirty" src="../../../../assets/icons/versioncontrol/dirty.ico">
     <button mat-button (click)="openPreview(selectedFormat);">
       <i class="fa fa-search"></i> Preview</button>
@@ -29,9 +32,9 @@
     <div id="type-header">
       <span style="font-size: larger; font-weight: bold">{{selectedFormat.name}} Format</span>
       <hr/>
-      <span style="font-size : large;" id="property-list">Properties</span>
     </div>
-
+      <format-gui [koheseTypeStream]="koheseTypeStream">
+      </format-gui>
     <div id="property-toggle">
     </div>
   </div>
