@@ -10,15 +10,18 @@ export class AnalysisViewComponent extends NavigatableComponent {
   protected filterString: string;
   protected filterRegex: RegExp;
   filterRegexHighlighted: RegExp;
-  invalidFilterRegex: boolean 
-  analysisPOSFilterCriteriaList: Array<any>;
+  invalidFilterRegex: boolean
+  termPOSFilterCriteriaList: Array<any>;
+  phrasePOSFilterCriteriaList: Array<any>;
   analysisPOSFilterName: string = 'Standard';
 
   constructor(NavigationService : NavigationService,
               protected AnalysisService : AnalysisService) {
     super(NavigationService);
 
-    this.analysisPOSFilterCriteriaList = Object.keys(AnalysisService.posFilterCriteria);
+    this.termPOSFilterCriteriaList = Object.keys(AnalysisService.termFilterCriteria);
+    this.phrasePOSFilterCriteriaList = Object.keys(AnalysisService.phraseFilterCriteria);
+
   }
 
   onFilterChange () : void {
@@ -47,19 +50,6 @@ export class AnalysisViewComponent extends NavigatableComponent {
         this.invalidFilterRegex = false;
       }
     }
-  }
-
-  filterPhrases (summary) : boolean {
-    var MatchesStringFilter;
-    var MatchesPOS = this.AnalysisService.filterPOS(summary,
-      this.AnalysisService.posFilterCriteria[this.analysisPOSFilterName])
-    if (MatchesPOS) {
-      MatchesStringFilter =
-            this.filterRegex === null
-            || this.filterRegex.test(summary.text);
-    }
-
-    return MatchesPOS && MatchesStringFilter
   }
 }
 

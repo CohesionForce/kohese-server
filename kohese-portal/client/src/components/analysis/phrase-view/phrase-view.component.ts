@@ -133,20 +133,24 @@ export class PhraseViewComponent extends AnalysisViewComponent
   }
 
   processPhrases(): void {
-    let filteredList;
-
-    if (!this.filterRegex) {
-      filteredList = this.itemProxy.analysis.extendedChunkSummaryList;
-    } else {
-      filteredList = this.dataProcessingService.filter(
-        this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
-          if (!this.filterRegex.test(input.text)) {
-            return false;
+    let filteredList = this.dataProcessingService.filter(
+      this.itemProxy.analysis.extendedChunkSummaryList, [(input: any) => {
+        let matchesPOS = this.AnalysisService.filterPOS(input,
+          this.AnalysisService.phraseFilterCriteria[this.analysisPOSFilterName]);
+        if (matchesPOS){
+          if (this.filterRegex) {
+            if (!this.filterRegex.test(input.text)) {
+              return false;
+            }
+            return true;
+          } else {
+            return true;
           }
-          return true;
-        }]
-      );
-    }
+        } else {
+          return false;
+        }
+      }]
+    );
 
     this.filteredCount = filteredList.length;
 

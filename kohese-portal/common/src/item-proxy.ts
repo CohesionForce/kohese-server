@@ -796,11 +796,52 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateRepoTreeHashes() {
-    const deferredRollup = true;
-    this.visitTree({excludeKind : ['Repository', 'Internal']}, null, (proxy : ItemProxy) => {
-      proxy.calculateTreeHash(deferredRollup);
+  calculateTreeHashes(deferCalc : boolean = false, repoOnly : boolean = true) : Promise<number> {
+
+    let iterationCount = 0;
+    let resultPromise = new Promise<number>((resolve, reject) => {
+      const deferredRollup = true;
+      const yieldAtIteration = 100;
+
+      let flags = {
+        postorder: true
+      };
+
+      if (repoOnly) {
+        flags['excludeKind'] = ['Repository', 'Internal'];
+      }
+
+      function performTreeHashCalculations() {
+        // console.log('$$$ Beginning TreeHash calculation at: ' + iterationCount);
+        let proxy : ItemProxy;
+        let thisIteration;
+        while (thisIteration = iterator.next()){
+          iterationCount++;
+          if (thisIteration.done){
+            resolve(iterationCount);
+            return;
+          }
+          proxy = thisIteration.value;
+          proxy.calculateTreeHash(deferredRollup);
+          if (deferCalc && (iterationCount % yieldAtIteration === 0)) {
+            setTimeout(performTreeHashCalculations, 100);
+            return;
+          }
+        }
+
+
+      }
+
+      let iterator = this.iterateTree(flags);
+
+      if (deferCalc){
+        setTimeout(performTreeHashCalculations, 500);
+      } else {
+        performTreeHashCalculations();
+      }
     });
+
+    return resultPromise;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -915,9 +956,10 @@ export class ItemProxy {
    *     excludeKind - Kind followed by boolean
    *   }
    *
-   * Depth First - only supply before function
+   * Depth First -
    *
-   * Breadth First - Visits Top Nodes First
+   * Preorder - only supply before function
+   * Postorder - only supply after function
    *
    * Include Origin - Operate on the parent node
    *
@@ -986,6 +1028,72 @@ export class ItemProxy {
         proxyStack.push(descendant.children[childIdx]);
       }
       descendant = proxyStack.pop();
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  /*
+   * Flags -
+   *   {
+   *     includeOrigin - defaults to true
+   *     excludeKind - Kind followed by boolean
+   *     postorder - yield value after children
+   *   }
+   *
+   * Depth First -
+   *
+   * Preorder - set postorder to false (default)
+   * Postorder - set postorder to true
+   *
+   * Include Origin - Operate on the parent node
+   *
+   */
+  *iterateTree(flags){
+
+    let includeOrigin = (flags && flags.hasOwnProperty('includeOrigin')) ? flags.includeOrigin : true;
+    let excludeKind = (flags && flags.hasOwnProperty('excludeKind')) ? flags.excludeKind : [];
+    let postorder = (flags && flags.hasOwnProperty('postorder')) ? flags.postorder : false;
+    let preorder = !postorder;
+
+    let excludeChildKind = {};
+
+    excludeKind.forEach((kind)=>{
+      excludeChildKind[kind] = true;
+      });
+
+    function* visitChild(proxy){
+      if (!excludeChildKind[proxy.kind]){
+
+        if (preorder){
+          yield proxy;
+        }
+
+        for ( var childIdx in proxy.children) {
+          var childProxy = proxy.children[childIdx];
+          yield* visitChild(childProxy);
+        }
+
+        if (postorder){
+          yield proxy;
+        }
+      }
+    }
+
+    // Before Origin
+    if (includeOrigin && preorder){
+      yield this;
+    }
+
+    for ( var childIdx in this.children) {
+      var childProxy = this.children[childIdx];
+      yield* visitChild(childProxy);
+    }
+
+    // After for Origin
+    if (includeOrigin && postorder){
+      yield this;
     }
   }
 

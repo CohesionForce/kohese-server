@@ -109,22 +109,26 @@ export class TermViewComponent extends AnalysisViewComponent
   }
 
   processTerms(): void {
-    let filteredList;
-
-    if (!this.filterRegex) {
-      filteredList = this.itemProxy.analysis.extendedTokenSummaryList;
-    } else {
-      filteredList = this.dataProcessingService.filter(
-        this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
-          if (!this.filterRegex.test(input.text)) {
-            return false;
+    let filteredList = this.dataProcessingService.filter(
+      this.itemProxy.analysis.extendedTokenSummaryList, [(input: any) => {
+        let matchesPOS = this.AnalysisService.filterPOS(input,
+          this.AnalysisService.termFilterCriteria[this.analysisPOSFilterName]);
+        if (matchesPOS){
+          if (this.filterRegex) {
+            if (!this.filterRegex.test(input.text)) {
+              return false;
+            }
+            return true;
+          } else {
+            return true;
           }
-          return true;
-        }]
-      );
-    }
+        } else {
+          return false;
+        }
+      }]
+    );
 
-    this.filteredCount = filteredList.length;
+  this.filteredCount = filteredList.length;
 
     this.terms = this.dataProcessingService.sort(filteredList,[this.sortField],
       this.ascending).slice(0, this.loadLimit);

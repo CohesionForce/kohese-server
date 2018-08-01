@@ -145,7 +145,7 @@ function processAuthToken(port, request){
 
     });
     socket.on('connect_error', () => {
-      console.log('::: IR: Socket IO Connection Error');
+      console.log('*** CW: Socket IO Connection Error');
       authenticated = false;
     });
   }
