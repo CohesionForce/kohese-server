@@ -1,11 +1,13 @@
 <div class="property-containers">
   <div *ngFor="let container of format.containers">
-    {{container.kind}}
-    <div [ngSwitch]="container.kind">
+    <div [ngSwitch]="container.kind" class="container">
       <list-container *ngSwitchCase="'list'"></list-container>
       <column-container *ngSwitchCase="'column'"></column-container>
       <table-container *ngSwitchCase="'table'"></table-container>
     </div>
+    <mat-divider></mat-divider>
   </div>
-  <div (click)="addContainer()"> Add Container</div>
+  <div class="container new-container" style="text-align: center;" (click)="addContainer()">
+    <i class="fa fa-plus fa-5x"  ></i>
+  </div>
 </div>

@@ -33,11 +33,13 @@ export class FormatGuiComponent implements OnInit, OnDestroy {
     this.dialogService.openComponentDialog(ContainerSelectorComponent, {})
       .afterClosed()
       .subscribe((result) => {
-        this.format.containers.push({
-          kind : result,
-          contents : []
-        })
-        this.changeRef.markForCheck();
+        if (result) {
+          this.format.containers.push({
+            kind : result,
+            contents : []
+          })
+          this.changeRef.markForCheck();
+        }
       })
   }
 }
