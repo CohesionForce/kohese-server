@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 
 @Component({
   selector: 'login',
@@ -13,7 +14,8 @@ export class LoginComponent implements OnInit {
   loginSubmitted : boolean = false;
 
   constructor(private authenticationService: AuthenticationService,
-    private navigationService: NavigationService) {
+    private navigationService: NavigationService, private _dialogService:
+    DialogService) {
   }
   
   ngOnInit(): void {
@@ -28,8 +30,10 @@ export class LoginComponent implements OnInit {
     }).subscribe((decodedToken: string) => {
       this.navigationService.navigate('Dashboard', {});
       this.loginSubmitted = false;
-    }, (err) => {
-      console.log(err);
+    }, (err: any) => {
+      this._dialogService.openInformationDialog('Login Failed',
+        'The supplied credentials may be insufficient for granting access ' +
+        'or the server may be unavailable.');
     });
   }
 }
