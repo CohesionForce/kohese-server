@@ -1,4 +1,4 @@
-import { PropertyFormat } from "../../../report-generator/report-generator.component";
+import { PropertyFormat } from "../../../../report-generator/report-generator.component";
 
 
 export abstract class PropertyContainer {

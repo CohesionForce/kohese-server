@@ -10,11 +10,11 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 
 export interface FormatDefinition {
   name : string,
-  format : Array<FormatContainer>
+  containers : Array<FormatContainer>
 }
 
  export interface FormatContainer {
-  type : string,
+  kind : string,
   contents : Array<PropertyDefinition>
 }
 
@@ -37,13 +37,14 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   currentType: KoheseType;
   idProperties: any = {};
   selectedPropertyId: string;
+  selectedFormat : FormatDefinition
   types = [];
 
   formatDefs : Array<FormatDefinition> = [
     {
       name : 'Name & Description',
-      format : [{
-          type : 'list',
+      containers : [{
+          kind : "list",
           contents : [
             { propertyName : 'name'},
             { propertyName : 'description'}
@@ -85,7 +86,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   addDefinition () {
     this.formatDefs.push({
       name : 'New definition ' + this.formatDefs.length,
-      format : []
+      containers : []
     })
   }
 

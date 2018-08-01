@@ -1,9 +1,11 @@
+import { ContainerSelectorComponent } from './container-selector/container-selector.component';
 import { DialogService } from './../../../../services/dialog/dialog.service';
 import { KoheseType } from './../../../../classes/UDT/KoheseType.class';
 import { Subscription } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { FormatDefinition } from '../format-editor.component';
 
 @Component({
   selector: 'format-gui',
@@ -14,28 +16,28 @@ import { Observable } from 'rxjs/Observable';
 export class FormatGuiComponent implements OnInit, OnDestroy {
 
   @Input()
-  koheseTypeStream: Observable<KoheseType>;
-  koheseTypeStreamSubscription : Subscription;
-  currentType: KoheseType;
+  format : FormatDefinition
 
   constructor(private dialogService : DialogService, private changeRef : ChangeDetectorRef) {
 
   }
 
   ngOnInit(): void {
-    this.koheseTypeStreamSubscription = this.koheseTypeStream.subscribe(
-      (koheseType: KoheseType) => {
-      this.currentType = koheseType;
-      this.changeRef.markForCheck();
-      console.log(this.currentType);
-    });
+
   }
 
   ngOnDestroy(): void {
-    this.koheseTypeStreamSubscription.unsubscribe();
   }
 
   addContainer () {
-
+    this.dialogService.openComponentDialog(ContainerSelectorComponent, {})
+      .afterClosed()
+      .subscribe((result) => {
+        this.format.containers.push({
+          kind : result,
+          contents : []
+        })
+        this.changeRef.markForCheck();
+      })
   }
 }

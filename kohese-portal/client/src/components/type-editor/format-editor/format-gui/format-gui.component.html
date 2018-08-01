@@ -1,1 +1,11 @@
-Hello format gui
+<div class="property-containers">
+  <div *ngFor="let container of format.containers">
+    {{container.kind}}
+    <div [ngSwitch]="container.kind">
+      <list-container *ngSwitchCase="'list'"></list-container>
+      <column-container *ngSwitchCase="'column'"></column-container>
+      <table-container *ngSwitchCase="'table'"></table-container>
+    </div>
+  </div>
+  <div (click)="addContainer()"> Add Container</div>
+</div>
