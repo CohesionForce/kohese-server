@@ -71,7 +71,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     route: ActivatedRoute, private _itemRepository: ItemRepository,
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
-    super(route, dialogService, false);
+    super(route, dialogService);
   }
 
   public ngOnInit(): void {
@@ -265,6 +265,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
     item['kind'] = proxy.kind;
+    item['status'] = proxy.status;
     return super.filter(item); 
   }
   

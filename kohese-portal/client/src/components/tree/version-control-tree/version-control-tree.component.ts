@@ -10,7 +10,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { VersionControlService } from '../../../services/version-control/version-control.service';
+import { VersionControlService,
+  VersionControlState } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
@@ -41,6 +42,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   }
   
   private _filterDelayIdentifier: any;
+  
+  get VersionControlState() {
+    return VersionControlState;
+  }
 
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
@@ -65,7 +70,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     private _versionControlService: VersionControlService,
     private _toastrService: ToastrService, private _dynamicTypesService:
     DynamicTypesService) {
-    super(route, dialogService, false);
+    super(route, dialogService);
   }
 
   public ngOnInit(): void {
@@ -310,7 +315,12 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
     item['kind'] = proxy.kind;
+    item['status'] = proxy.status;
     return super.filter(item); 
+  }
+  
+  protected isMultiselectEnabled(object: any): boolean {
+    return (Object.keys((object as ItemProxy).status).length > 0);
   }
   
   public openFilterDialog(): Observable<any> {
@@ -357,6 +367,56 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       
       this._filterDelayIdentifier = undefined;
     }, 1000);
+  }
+  
+  public areSelectedProxiesInState(state: VersionControlState): boolean {
+    let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
+    for (let j: number = 0; j < selectedObjects.length; j++) {
+      if (state) {
+        if (!(selectedObjects[j] as ItemProxy).status[state]) {
+          return false;
+        }
+      } else if (0 === Object.keys((selectedObjects[j] as ItemProxy).status).
+        length) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
+  public stageSelectedChanges(): void {
+    this._versionControlService.stageItems(this.selectedObjectsSubject.
+      getValue() as Array<ItemProxy>).subscribe((statusMap: any) => {
+      if (statusMap.error) {
+        this._toastrService.error('Stage Failed', 'Version Control');
+      } else {
+        this._toastrService.success('Stage Succeeded', 'Version Control');
+      }
+    });
+  }
+  
+  public unstageSelectedChanges(): void {
+    this._versionControlService.unstageItems(this.selectedObjectsSubject.
+      getValue() as Array<ItemProxy>).subscribe((statusMap: any) => {
+      if (statusMap.error) {
+        this._toastrService.error('Unstage Failed', 'Version Control');
+      } else {
+        this._toastrService.success('Unstage Succeeded',
+          'Version Control');
+      }
+    });
+  }
+  
+  public revertSelectedChanges(): void {
+    this._versionControlService.revertItems(this.selectedObjectsSubject.
+      getValue() as Array<ItemProxy>).subscribe((statusMap: any) => {
+      if (statusMap.error) {
+        this._toastrService.error('Revert Failed', 'Version Control');
+      } else {
+        this._toastrService.success('Revert Succeeded', 'Version Control');
+      }
+    });
   }
   
   private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:

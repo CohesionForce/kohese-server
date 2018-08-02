@@ -19,6 +19,32 @@
     class="flex-right-align">
     <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
   </button>
+  <button mat-icon-button (click)="selectAll()"
+    matTooltip="Select all Items that match the current filter">
+    <mat-icon class="fa fa-check-square-o"></mat-icon>
+  </button>
+  <button mat-icon-button (click)="deselectAll()"
+    matTooltip="Deselect all Items">
+    <mat-icon class="fa fa-square-o"></mat-icon>
+  </button>
+  <button mat-icon-button
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState(VersionControlState.UNSTAGED)"
+    (click)="stageSelectedChanges()"
+    matTooltip="Stage changes to the selected Items">
+    <mat-icon class="fa fa-plus"></mat-icon>
+  </button>
+  <button mat-icon-button
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState(VersionControlState.STAGED)"
+    (click)="unstageSelectedChanges()"
+    matTooltip="Un-stage changes to the selected Items">
+    <mat-icon class="fa fa-minus"></mat-icon>
+  </button>
+  <button mat-icon-button
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState(undefined)"
+    (click)="revertSelectedChanges()"
+    matTooltip="Undo all uncommitted changes to the selected Items">
+    <mat-icon class="fa fa-undo"></mat-icon>
+  </button>
 </div>
 <div style="height: 12%; width: 100%;">
   <div class="kt-head kth-cell">

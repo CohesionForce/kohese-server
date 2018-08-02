@@ -100,13 +100,6 @@ export abstract class Tree {
     return this._filterSubject;
   }
   
-  get multiselectEnabled() {
-    return this._multiselectEnabled;
-  }
-  set multiselectEnabled(multiselectEnabled: boolean) {
-    this._multiselectEnabled = multiselectEnabled;
-  }
-  
   @ViewChild(VirtualScrollComponent)
   private _virtualScrollComponent: VirtualScrollComponent;
 
@@ -114,8 +107,7 @@ export abstract class Tree {
   private _updateVisibleRowsSubscriptionMap: any = {};
 
   protected constructor(protected _route: ActivatedRoute,
-    protected _dialogService: DialogService, private _multiselectEnabled:
-    boolean) {
+    protected _dialogService: DialogService) {
     this._rootSubscription = this._rootSubject.subscribe((root: any) => {
       if (root) {
         this._rowMap.get(this.getId(root)).depth = 0;
@@ -179,7 +171,7 @@ export abstract class Tree {
         getValue())));
     };
     row.isMultiselectEnabled = () => {
-      return this._multiselectEnabled;
+      return this.isMultiselectEnabled(object);
     };
     let id: any = this.getId(object);
     this._rowMap.set(id, row);
@@ -233,6 +225,48 @@ export abstract class Tree {
   
   public removeFilter(): void {
     this._filterSubject.next(undefined);
+    this.refresh();
+  }
+  
+  public setExpansion(object: any, expand: boolean): void {
+    this._rowMap.get(this.getId(object)).expanded = expand;
+  }
+  
+  public selectAll(): void {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
+    selectedObjects.length = 0;
+    let rowArray: Array<TreeRow> = Array.from(this._rowMap.values());
+    let expandedObjects: Array<any> = [];
+    for (let j: number = 0; j < rowArray.length; j++) {
+      if (rowArray[j].expanded) {
+        expandedObjects.push(rowArray[j].object);
+      } else {
+        rowArray[j].expanded = true;
+      }
+    }
+    
+    this.refresh();
+    
+    let filter: Filter = this._filterSubject.getValue();
+    for (let j: number = 0; j < rowArray.length; j++) {
+      if (this.isMultiselectEnabled(rowArray[j].object) && (!filter ||
+        rowArray[j].matchesFilter)) {
+        selectedObjects.push(rowArray[j].object);
+      }
+      
+      if (-1 === expandedObjects.indexOf(rowArray[j].object)) {
+        rowArray[j].expanded = false;
+      }
+    }
+    
+    this._selectedObjectsSubject.next(selectedObjects);
+    this.refresh();
+  }
+  
+  public deselectAll(): void {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
+    selectedObjects.length = 0;
+    this._selectedObjectsSubject.next(selectedObjects);
     this.refresh();
   }
 
@@ -383,6 +417,10 @@ export abstract class Tree {
   protected filter(object: any): boolean {
     return (-1 !== this._filterSubject.getValue().filter([object]).indexOf(
       object));
+  }
+  
+  protected isMultiselectEnabled(object: any): boolean {
+    return false;
   }
 
   protected clear(): void {
