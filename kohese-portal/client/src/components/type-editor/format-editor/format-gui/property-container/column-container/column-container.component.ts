@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { FormatContainer } from './../../../format-editor.component';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'column-container',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./column-container.component.css']
 })
 export class ColumnContainerComponent implements OnInit {
+  @Input()
+  container : FormatContainer;
 
   constructor() { }
 

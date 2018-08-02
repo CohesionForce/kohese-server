@@ -1,3 +1,4 @@
+import { PropertyRowComponent } from './format-gui/property-container/property-row/property-row.component';
 import { ContainerSelectorComponent } from './format-gui/container-selector/container-selector.component';
 import { FormatEditorComponent } from './format-editor.component';
 import { PipesModule } from './../../../pipes/pipes.module';
@@ -17,7 +18,8 @@ import { ColumnContainerComponent } from './format-gui/property-container/column
     ContainerSelectorComponent,
     TableContainerComponent,
     ColumnContainerComponent,
-    ListContainerComponent
+    ListContainerComponent,
+    PropertyRowComponent
   ],
   entryComponents: [
     ContainerSelectorComponent
