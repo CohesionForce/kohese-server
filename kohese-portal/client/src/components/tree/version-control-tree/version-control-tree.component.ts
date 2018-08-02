@@ -10,8 +10,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { VersionControlService,
-  VersionControlState } from '../../../services/version-control/version-control.service';
+import { VersionControlService, VersionControlState,
+  VersionControlSubState } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
@@ -50,11 +50,11 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
       (object: any) => {
-      return !!(object as ItemProxy).status['Unstaged'];
+      return !!(object as ItemProxy).status[VersionControlState.UNSTAGED];
     }),
     new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
       (object: any) => {
-      return !!(object as ItemProxy).status['Staged'];
+      return !!(object as ItemProxy).status[VersionControlState.STAGED];
     })
   ];
   get images() {
@@ -97,7 +97,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       }),
       new RowAction('Stage', 'Stages changes to this Item', 'fa fa-plus',
         (object: any) => {
-        return (object as ItemProxy).status['Unstaged'];
+        return (object as ItemProxy).status[VersionControlState.UNSTAGED];
         }, (object: any) => {
         this._versionControlService.stageItems([(object as ItemProxy)]).subscribe(
           (statusMap: any) => {
@@ -110,7 +110,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       }),
       new RowAction('Unstage', 'Un-stages changes to this Item', 'fa fa-minus',
         (object: any) => {
-        return (object as ItemProxy).status['Staged'];
+        return (object as ItemProxy).status[VersionControlState.STAGED];
         }, (object: any) => {
         this._versionControlService.unstageItems([(object as ItemProxy)]).
           subscribe((statusMap: any) => {
@@ -129,7 +129,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
-      return (object as ItemProxy).status['Staged'];
+      return (object as ItemProxy).status[VersionControlState.STAGED];
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         STAGED_VERSION);
@@ -141,12 +141,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
       any) => {
-      if ((object as ItemProxy).history) {
-        return ((object as ItemProxy).history.length > 0);
-      } else {
-        this._itemRepository.getHistoryFor(object as ItemProxy);
-        return false;
-      }
+      let proxy: ItemProxy = (object as ItemProxy);
+      return !((proxy.status[VersionControlState.STAGED] ===
+        VersionControlSubState.NEW) || (proxy.status[VersionControlState.
+        UNSTAGED] === VersionControlSubState.NEW));
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         LAST_COMMITTED_VERSION);

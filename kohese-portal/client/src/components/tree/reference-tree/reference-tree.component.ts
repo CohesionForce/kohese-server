@@ -7,6 +7,8 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { VersionControlState,
+  VersionControlSubState } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -66,11 +68,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
         path.length - 1]);
       if (proxy) {
-        if (proxy.history) {
-          enable = (proxy.history.length > 0);
-        } else {
-          this._itemRepository.getHistoryFor(proxy);
-        }
+        enable = !((proxy.status[VersionControlState.STAGED] ===
+          VersionControlSubState.NEW) || (proxy.status[VersionControlState.
+          UNSTAGED] === VersionControlSubState.NEW));
       }
 
       return enable;
