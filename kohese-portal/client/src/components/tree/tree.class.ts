@@ -218,14 +218,14 @@ export abstract class Tree {
     }
   }
 
-  public openFilterDialog(): Observable<any> {
+  public openFilterDialog(inputFilter: Filter): Observable<any> {
     return this._dialogService.openComponentDialog(FilterComponent, {
       data: {
-        filter: this._filterSubject.getValue()
+        filter: inputFilter
       }
-    }).updateSize('90%', '90%').afterClosed().do((filter: Filter) => {
-      if (filter) {
-        this._filterSubject.next(filter);
+    }).updateSize('90%', '90%').afterClosed().do((resultingFilter: Filter) => {
+      if (resultingFilter) {
+        this._filterSubject.next(resultingFilter);
         this.refresh();
       }
     });
