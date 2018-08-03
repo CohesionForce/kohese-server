@@ -19,7 +19,8 @@ export interface FormatDefinition {
 }
 
 export interface PropertyDefinition {
-  propertyName : string
+  propertyName : string,
+  hideLabel : boolean
   // Will grow as we get to the property part
 }
 
@@ -46,8 +47,8 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
       containers : [{
           kind : "list",
           contents : [
-            { propertyName : 'name'},
-            { propertyName : 'description'}
+            { propertyName : 'name', hideLabel : false},
+            { propertyName : 'description', hideLabel: false}
         ]}
       ]
     }

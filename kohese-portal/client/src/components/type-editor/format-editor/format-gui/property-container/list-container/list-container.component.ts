@@ -20,7 +20,8 @@ export class ListContainerComponent implements OnInit {
 
   addRow() {
     this.container.contents.push({
-      propertyName : ''
+      propertyName : '',
+      hideLabel : false
     })
   }
 

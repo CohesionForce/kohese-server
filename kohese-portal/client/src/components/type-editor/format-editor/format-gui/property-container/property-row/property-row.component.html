@@ -1,5 +1,8 @@
-<mat-select placeholder="---" [(ngModel)]="property">
-  <mat-option *ngFor="let propertyName of kind.fields | mapKey" [value]="property">
+<div>
+  <mat-select placeholder="---" [(ngModel)]="property">
+    <mat-option *ngFor="let propertyName of kind.fields | mapKey" [value]="property">
       {{propertyName}}
-  </mat-option>
-</mat-select>
+    </mat-option>
+  </mat-select>
+</div>
+<mat-checkbox [(ngModel)]="property.hideLabel" color="secondary">Hide Label</mat-checkbox>
