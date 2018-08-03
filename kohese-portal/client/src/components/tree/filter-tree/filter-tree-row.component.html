@@ -1,0 +1,96 @@
+<div class="kt-item" style="height: 70px;">
+  <ng-container *ngFor="let indentation of getIndentationArray()">
+    <span style="height: 100%; width: 30px; border-left: 1px solid black;">
+    </span>
+  </ng-container>
+  <i class="kt-icon fa"
+    (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
+    [ngClass]="{ 'fa-caret-down': (treeRow.hasChildren() && treeRow.expanded),
+    'fa-caret-right': (treeRow.hasChildren() && !treeRow.expanded),
+    'no-children': !treeRow.hasChildren() }">
+  </i>
+  <ng-container
+    *ngIf="(treeRow.isMultiselectEnabled() && (getType() !== 'AddRowObject'))">
+    <mat-checkbox (change)="treeRow.rowSelected()"
+      (click)="$event.stopPropagation()"
+      style="padding-top: 7px; padding-right: 3px; padding-left: 3px;">
+    </mat-checkbox>
+  </ng-container>
+  <ng-container [ngSwitch]="getType()">
+    <ng-container *ngSwitchCase="'FilterCriteriaConnection'">
+      {{treeRow.object.toString()}}
+    </ng-container>
+    <ng-container *ngSwitchCase="'FilterCriterion'">
+      <mat-form-field style="padding-right: 7px;">
+        <mat-select placeholder="Property"
+          [(ngModel)]="treeRow.object.property">
+          <mat-option
+            *ngFor="let property of (filterSubject | async).filterableProperties"
+            [value]="property">
+            {{property.displayText}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="padding-right: 7px;">
+        <mat-select placeholder="Condition"
+          [(ngModel)]="treeRow.object.condition">
+          <mat-option
+            *ngFor="let condition of (FilterCriterion.CONDITIONS | mapKey)"
+            [value]="FilterCriterion.CONDITIONS[condition]">
+            {{FilterCriterion.CONDITIONS[condition]}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <ng-container *ngIf="treeRow.object.property.values.length > 0">
+        <mat-form-field style="padding-right: 7px;">
+          <mat-select placeholder="Value" [(ngModel)]="treeRow.object.value">
+            <mat-option *ngFor="let value of treeRow.object.property.values"
+              [value]="value">
+              {{value}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-container>
+      <ng-container *ngIf="0 === treeRow.object.property.values.length">
+        <mat-form-field style="padding-right: 7px;">
+          <input matInput type="text" placeholder="Value"
+            [(ngModel)]="treeRow.object.value"/>
+        </mat-form-field>
+      </ng-container>
+      <mat-checkbox [(ngModel)]="treeRow.object.ignoreCase"
+        style="padding-right: 7px;">
+        Ignore Case
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="treeRow.object.negate">Negate</mat-checkbox>
+    </ng-container>
+    <ng-container *ngSwitchCase="'AddRowObject'">
+      <button mat-icon-button [matMenuTriggerFor]="addMenu">
+        <mat-icon class="fa fa-plus" style="color: green;"></mat-icon>
+      </button>
+      <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item (click)="addCriterion()">
+          <mat-icon class="fa fa-plus"></mat-icon>
+          Add Criterion
+        </button>
+        <button mat-menu-item (click)="addConnection('AND')">
+          <mat-icon class="fa fa-plus"></mat-icon>
+          Add AND Connection
+        </button>
+        <button mat-menu-item (click)="addConnection('OR')">
+          <mat-icon class="fa fa-plus"></mat-icon>
+          Add OR Connection
+        </button>
+      </mat-menu>
+    </ng-container>
+  </ng-container>
+  <span class="flex-right-align">
+    <ng-container *ngFor="let action of rowActions">
+      <ng-container *ngIf="action.show(treeRow.object)">
+        <button mat-icon-button matTooltip="{{action.description}}"
+          (click)="action.perform(treeRow.object); $event.stopPropagation()">
+          <mat-icon class="kt-icon {{action.icon}}"></mat-icon>
+        </button>
+      </ng-container>
+    </ng-container>
+  </span>
+</div>

@@ -1,0 +1,68 @@
+<div class="top-bar">
+  <ng-container *ngIf="!inTargetingMode">
+    <button mat-icon-button [matMenuTriggerFor]="addMenu"
+      class="flex-right-align"
+      [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedElementsConnections()">
+      <mat-icon class="fa fa-plus"></mat-icon>
+    </button>
+    <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
+      <button mat-menu-item
+        (click)="addCriterionToSelectedConnections()"
+        matTooltip="Add a criterion to the selected connections">
+        <mat-icon class="fa fa-plus"></mat-icon>
+        Add Criterion
+      </button>
+      <button mat-menu-item
+        (click)="addConnectionToSelectedConnections('AND')"
+        matTooltip="Add an AND connection to the selected connections">
+        <mat-icon class="fa fa-plus"></mat-icon>
+        Add AND Connection
+      </button>
+      <button mat-menu-item
+        (click)="addConnectionToSelectedConnections('OR')"
+        matTooltip="Add an OR connection to the selected connections">
+        <mat-icon class="fa fa-plus"></mat-icon>
+        Add OR Connection
+      </button>
+    </mat-menu>
+    <button mat-icon-button
+      [disabled]="(0 === (selectedObjectsSubject | async).length) || (-1 !== (selectedObjectsSubject | async).indexOf(rootSubject | async))"
+      (click)="enterCopyTargetingMode(undefined)"
+      matTooltip="Copy the selected elements">
+      <mat-icon class="fa fa-copy"></mat-icon>
+    </button>
+    <button mat-icon-button
+      [disabled]="(0 === (selectedObjectsSubject | async).length) || (-1 !== (selectedObjectsSubject | async).indexOf(rootSubject | async))"
+      (click)="enterMoveTargetingMode(undefined)"
+      matTooltip="Move the selected elements">
+      <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
+    </button>
+    <button mat-icon-button
+      [disabled]="(0 === (selectedObjectsSubject | async).length) || (-1 !== (selectedObjectsSubject | async).indexOf(rootSubject | async))"
+      (click)="deleteSelectedElements()"
+      matTooltip="Delete the selected elements">
+      <mat-icon class="fa fa-trash"></mat-icon>
+    </button>
+  </ng-container>
+  <ng-container *ngIf="inTargetingMode">
+    <button mat-icon-button (click)="exitTargetingMode()"
+      matTooltip="Exit Targeting Mode" class="flex-right-align">
+      <mat-icon class="fa fa-times"></mat-icon>
+    </button>
+  </ng-container>
+  <!--button mat-icon-button
+    [disabled]="(rootSubject | async) === (targetFilterSubject | async)?.rootElement"
+    (click)="rootSubject.next(targetFilterSubject.getValue()?.rootElement)"
+    matTooltip="Changes the root to be the filter root">
+    <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
+  </button-->
+</div>
+<div class="kt-body" style="height: 93%; width: 100%;">
+  <virtual-scroll #tree [items]="visibleRows">
+    <filter-tree-row *ngFor="let row of tree.viewPortItems"
+      [treeRow]="row" [rowActions]="rowActions"
+      [filterSubject]="targetFilterSubject"
+      (addElement)="addElementToConnection($event.type, $event.connection)">
+    </filter-tree-row>
+  </virtual-scroll>
+</div>

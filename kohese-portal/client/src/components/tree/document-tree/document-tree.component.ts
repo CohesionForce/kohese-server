@@ -2,15 +2,19 @@ import { EventEmitter, Output, Input } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { RowAction, MenuAction } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Tree } from '../tree.class';
+import { Filter, FilterCriterion } from '../../filter/filter.class';
+import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
 @Component({
   selector: 'document-tree',
@@ -26,6 +30,15 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   documentRoot : ItemProxy;
   documentRootId : string;
+  
+  private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
+    filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
+  get searchCriterion() {
+    return this._searchCriterion;
+  }
+  
+  private _filterDelayIdentifier: any;
+  
   images = [];
 
   @Output()
@@ -36,13 +49,12 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   selectedProxyStream : Observable<ItemProxy>;
   selectedProxyStreamSubscription : Subscription;
 
-  constructor(router: ActivatedRoute,
-              dialogService : DialogService,
-              private itemRepository : ItemRepository,
-              private changeRef : ChangeDetectorRef
-              ) {
-                super(router, dialogService);
-              }
+  constructor(router: ActivatedRoute, dialogService : DialogService,
+    private _dynamicTypesService: DynamicTypesService,
+    private itemRepository : ItemRepository,
+    private changeRef : ChangeDetectorRef) {
+    super(router, dialogService, false);
+  }
 
   ngOnInit() {
     this.paramSubscription = this._route.params.subscribe(params => {
@@ -52,16 +64,20 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     });
 
     console.log(this.documentRoot)
-  this.rootRowActions.push(new RowAction('Test action',
-    'I am an action', 'fa fa-times', (row : TreeRow) => {
+    this.rootRowActions.push(new RowAction('Test action',
+      'I am an action', 'fa fa-times', (object: any) => {
       return true;
-    }, ()=>{return true}));
+      }, (object: any) => {
+      return true;
+    }));
 
-  let sharedAction : MenuAction = new MenuAction('Menu Action', 'I am in a menu', 'fa fa-comment',
-    (row) => {
+    let sharedAction : MenuAction = new MenuAction('Menu Action', 'I am in a menu', 'fa fa-comment',
+      (object: any) => {
       if (true) {
-        return true
-      }},()=>{console.log('Hello world')})
+      return true;
+      }}, (object: any) => {
+      console.log('Hello world');
+    });
 
   this.rootMenuActions.push(sharedAction);
   this.menuActions.push(sharedAction);
@@ -82,7 +98,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         getChangeSubject().subscribe((notification: any) => {
         switch (notification.type) {
           case 'create': {
-              this.insertRow(notification.proxy);
+              this.buildRow(notification.proxy);
               this.refresh();
             }
             break;
@@ -97,16 +113,16 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
                 this.buildRow(proxy);
               });
               this.refresh();
-              this.showSelection();
+              this.showFocus();
             }
             break;
         }
       });
 
-      this.rootSubject.next(this.getRow(this.documentRootId));
+      this.rootSubject.next(this.documentRoot);
       this.rootSelected.emit(this.documentRoot);
 
-      this.showSelection();
+      this.showFocus();
       setTimeout(()=>{
         console.log(this.visibleRows)
       }, 500)
@@ -116,10 +132,10 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   this.selectedProxyStreamSubscription = this.selectedProxyStream.subscribe((newSelection) => {
     console.log(this.sync);
     if(this.sync && newSelection) {
-      this._selectedIdSubject.next(newSelection.item.id)
+      this.focusedObjectSubject.next(newSelection);
       console.log(newSelection, this);
 
-      this.showSelection();
+      this.showFocus();
     }
   })
 }
@@ -136,29 +152,29 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   toggleDocumentSync(): void {
     this.sync = !this.sync;
     if (this.sync) {
-      this.showSelection();
+      this.showFocus();
     }
   }
 
 
-  protected getId(row: TreeRow): string {
-    return (row.object as ItemProxy).item.id;
+  protected getId(object: any): any {
+    return (object as ItemProxy).item.id;
   }
 
-  protected getParent(row: TreeRow): TreeRow {
-    let parent: TreeRow = undefined;
-    if ((row.object as ItemProxy).parentProxy) {
-      parent = this.getRow((row.object as ItemProxy).parentProxy.item.id);
+  protected getParent(object: any): any {
+    let parent: ItemProxy = undefined;
+    if ((object as ItemProxy).parentProxy) {
+      parent = (object as ItemProxy).parentProxy;
     }
 
     return parent;
   }
 
-  protected getChildren(row: TreeRow): Array<TreeRow> {
-    let children: Array<TreeRow> = [];
-    let proxy: ItemProxy = (row.object as ItemProxy);
+  protected getChildren(object: any): Array<any> {
+    let children: Array<ItemProxy> = [];
+    let proxy: ItemProxy = (object as ItemProxy);
     for (let j: number = 0; j < proxy.children.length; j++) {
-      children.push(this.getRow(proxy.children[j].item.id));
+      children.push(proxy.children[j]);
     }
 
     return children;
@@ -168,7 +184,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     this.changeRef.markForCheck();
   }
 
-  protected rowSelected(row: TreeRow): void {
+  protected rowFocused(row: TreeRow): void {
     this.onSelect.emit(row.object);
   }
 
@@ -185,10 +201,64 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return iconString;
   }
+  
+  protected filter(object: any): boolean {
+    let proxy: ItemProxy = (object as ItemProxy);
+    let item: any = proxy.item;
+    item['kind'] = proxy.kind;
+    return super.filter(item); 
+  }
+  
+  public openFilterDialog(filter: Filter): Observable<any> {
+    if (!filter) {
+      filter = new ItemProxyFilter(this._dynamicTypesService, this.
+        itemRepository);
+    }
+    
+    return super.openFilterDialog(filter).do((resultingFilter: Filter) => {
+      if (resultingFilter && !resultingFilter.isElementPresent(this.
+        _searchCriterion)) {
+        this._searchCriterion.value = '';
+      }
+    });
+  }
+  
+  public removeFilter(): void {
+    this._searchCriterion.value = '';
+    super.removeFilter();
+  }
+  
+  public searchStringChanged(searchString: string): void {
+    if (this._filterDelayIdentifier) {
+      clearTimeout(this._filterDelayIdentifier);
+    }
 
-  public setRowAsRoot(row : TreeRow) {
-    this.rootSubject.next(this.getRow(row.object.item.id));
-    this.rootSelected.emit(row.object);
+    this._filterDelayIdentifier = setTimeout(() => {
+      let advancedFilter: Filter = this.filterSubject.getValue();
+      if (searchString) {
+        if (!advancedFilter) {
+          advancedFilter = new ItemProxyFilter(this._dynamicTypesService, this.
+            itemRepository);
+        }
+        
+        if (!advancedFilter.isElementPresent(this._searchCriterion)) {
+          advancedFilter.rootElement.criteria.push(this._searchCriterion);
+          this.filterSubject.next(advancedFilter);
+        }
+      } else {
+        advancedFilter.removeElement(this._searchCriterion);
+        this.filterSubject.next(advancedFilter);
+      }
+      
+      this.refresh();
+      
+      this._filterDelayIdentifier = undefined;
+    }, 1000);
+  }
+
+  public setRowAsRoot(proxy: ItemProxy) {
+    this.rootSubject.next(proxy);
+    this.rootSelected.emit(proxy);
     console.log('over');
   }
 }
