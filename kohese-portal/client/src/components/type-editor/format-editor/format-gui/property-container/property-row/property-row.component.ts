@@ -11,6 +11,7 @@ export class PropertyRowComponent implements OnInit {
   property : PropertyDefinition;
   @Input()
   kind;
+  console = console;
 
   constructor() { }
 

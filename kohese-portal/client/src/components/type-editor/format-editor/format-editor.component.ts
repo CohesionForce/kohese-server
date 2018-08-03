@@ -1,3 +1,4 @@
+import { ItemRepository } from './../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
@@ -41,20 +42,9 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   selectedFormat : FormatDefinition
   types = [];
 
-  formatDefs : Array<FormatDefinition> = [
-    {
-      name : 'Name & Description',
-      containers : [{
-          kind : "list",
-          contents : [
-            { propertyName : 'name', hideLabel : false},
-            { propertyName : 'description', hideLabel: false}
-        ]}
-      ]
-    }
-  ]
+  formatDefs : Array<FormatDefinition>;
 
-  constructor(private typeService : DynamicTypesService, private changeRef : ChangeDetectorRef) {
+  constructor(private typeService : DynamicTypesService, private changeRef : ChangeDetectorRef, private itemRepository : ItemRepository) {
 
   }
 
@@ -75,6 +65,12 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
     this.koheseTypeStreamSubscription = this.koheseTypeStream.subscribe(
       (koheseType: KoheseType) => {
       this.currentType = koheseType;
+      if (!koheseType.viewModelProxy.item.formatDefinitions) {
+        koheseType.viewModelProxy.item.formatDefinitions = [];
+        koheseType.viewModelProxy.item.defaultFormatIndex = 0;
+      }
+      this.formatDefs = koheseType.viewModelProxy.item.formatDefinitions;
+
       this.changeRef.markForCheck();
       console.log(this.currentType);
     });
@@ -92,7 +88,8 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   }
 
   saveFormat () {
-    console.log('Save Format');
+    console.log(this.currentType.viewModelProxy);
+    this.itemRepository.upsertItem(this.currentType.viewModelProxy).then((result) => { console.log(result)});
   }
 
   openPreview () {
