@@ -8,8 +8,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core/';
 import { FormatGuiComponent } from './format-gui/format-gui.component';
 import { TableContainerComponent } from './format-gui/property-container/table-container/table-container.component';
-import { ListContainerComponent } from './format-gui/property-container/list-container/list-container.component';
-import { ColumnContainerComponent } from './format-gui/property-container/column-container/column-container.component';
+import { ListContainerEditorComponent } from './format-gui/property-container/list-container-editor/list-container-editor.component';
+import { ColumnContainerEditorComponent } from './format-gui/property-container/column-container-editor/column-container-editor.component';
 
 @NgModule({
   declarations: [
@@ -17,8 +17,8 @@ import { ColumnContainerComponent } from './format-gui/property-container/column
     FormatGuiComponent,
     ContainerSelectorComponent,
     TableContainerComponent,
-    ColumnContainerComponent,
-    ListContainerComponent,
+    ColumnContainerEditorComponent,
+    ListContainerEditorComponent,
     PropertyRowComponent
   ],
   entryComponents: [

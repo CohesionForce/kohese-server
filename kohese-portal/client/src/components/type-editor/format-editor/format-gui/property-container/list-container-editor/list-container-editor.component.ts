@@ -3,11 +3,11 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormatContainer } from '../../../format-editor.component';
 
 @Component({
-  selector: 'list-container',
-  templateUrl: './list-container.component.html',
-  styleUrls: ['./list-container.component.css']
+  selector: 'list-container-editor',
+  templateUrl: './list-container-editor.component.html',
+  styleUrls: ['./list-container-editor.component.scss']
 })
-export class ListContainerComponent implements OnInit {
+export class ListContainerEditorComponent implements OnInit {
   @Input()
   container : FormatContainer;
   @Input()

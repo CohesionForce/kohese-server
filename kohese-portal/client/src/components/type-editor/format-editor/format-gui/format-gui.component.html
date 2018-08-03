@@ -1,8 +1,8 @@
 <div class="property-containers">
   <div *ngFor="let container of format.containers">
     <div [ngSwitch]="container.kind" class="container">
-      <list-container [container]="container" *ngSwitchCase="'list'" [kind]="kind"></list-container>
-      <column-container [container]="container" *ngSwitchCase="'column'" [kind]="kind"></column-container>
+      <list-container-editor [container]="container" *ngSwitchCase="'list'" [kind]="kind"></list-container-editor>
+      <column-container-editor [container]="container" *ngSwitchCase="'column'" [kind]="kind"></column-container-editor>
       <table-container [container]="container" *ngSwitchCase="'table'" [kind]="kind"></table-container>
     </div>
     <mat-divider></mat-divider>
