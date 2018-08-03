@@ -321,14 +321,15 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     return (Object.keys((object as ItemProxy).status).length > 0);
   }
   
-  public openFilterDialog(): Observable<any> {
-    if (!this.filterSubject.getValue()) {
-      this.filterSubject.next(new ItemProxyFilter(this._dynamicTypesService,
-        this._itemRepository));
+  public openFilterDialog(filter: Filter): Observable<any> {
+    if (!filter) {
+      filter = new ItemProxyFilter(this._dynamicTypesService, this.
+        _itemRepository);
     }
     
-    return super.openFilterDialog().do((filter: Filter) => {
-      if (filter && !filter.isElementPresent(this._searchCriterion)) {
+    return super.openFilterDialog(filter).do((resultingFilter: Filter) => {
+      if (resultingFilter && !resultingFilter.isElementPresent(this.
+        _searchCriterion)) {
         this._searchCriterion.value = '';
       }
     });

@@ -4,7 +4,8 @@
       [(ngModel)]="searchCriterion.value"
       (input)="searchStringChanged(searchInput.value)"/>
   </mat-form-field>
-  <button mat-icon-button (click)="openFilterDialog().subscribe()"
+  <button mat-icon-button
+    (click)="openFilterDialog(filterSubject.getValue()).subscribe()"
     [ngClass]="{ 'highlight': filterSubject.getValue() }"
     matTooltip="Edit filter">
     <mat-icon class="fa fa-filter"></mat-icon>

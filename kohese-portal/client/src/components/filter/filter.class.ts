@@ -183,7 +183,7 @@ export class FilterCriterion extends FilterElement {
   protected matcher: RegExp;
   
   public constructor(private _property: FilterableProperty, private _condition:
-    any, private _value: string) {
+    FilterCriterionCondition, private _value: string) {
     super();
     this.convertValueToRegularExpression();
   }
@@ -205,7 +205,7 @@ export class FilterCriterion extends FilterElement {
   
   public evaluate(candidate: any): boolean {
     let result: boolean = true;
-    if (this._property.values.length > 0) {
+    if (this._property.propertyPath.length > 0) {
       let propertyPath: Array<string> = this._property.propertyPath.slice(0);
       let property: any = candidate;
       for (let j: number = 0; j < propertyPath.length - 1; j++) {
@@ -230,7 +230,7 @@ export class FilterCriterion extends FilterElement {
       }
     }
 
-    if (this.negate) {
+    if (this._negate) {
       result = !result;
     }
 
@@ -238,19 +238,19 @@ export class FilterCriterion extends FilterElement {
   }
 
   public toString(): string {
-    return this._property.displayText + ' ' + (this.negate ? 'does not ' :
-      'does ') + (this.ignoreCase ? 'case-insensitively ' :
-      'case-sensitively ') + this.condition + ' ' + this.value;
+    return this._property.displayText + ' ' + (this._negate ? 'does not ' :
+      'does ') + (this._ignoreCase ? 'case-insensitively ' :
+      'case-sensitively ') + this._condition + ' ' + this._value;
   }
   
   private doesValueMatch(propertyValue: string): boolean {
     let matches: boolean = false;
-    switch (this.condition) {
+    switch (this._condition) {
       case FilterCriterionCondition.LESS_THAN:
-        matches = (+propertyValue < +this.value);
+        matches = (+propertyValue < +this._value);
         break;
       case FilterCriterionCondition.LESS_THAN_OR_EQUAL_TO:
-        matches = (+propertyValue <= +this.value);
+        matches = (+propertyValue <= +this._value);
         break;
       case FilterCriterionCondition.EQUALS: {
           let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
@@ -277,10 +277,10 @@ export class FilterCriterion extends FilterElement {
         matches = this.matcher.test(propertyValue);
         break;
       case FilterCriterionCondition.GREATER_THAN_OR_EQUAL_TO:
-        matches = (+propertyValue >= +this.value);
+        matches = (+propertyValue >= +this._value);
         break;
       case FilterCriterionCondition.GREATER_THAN:
-        matches = (+propertyValue > +this.value);
+        matches = (+propertyValue > +this._value);
         break;
     }
     
