@@ -1,4 +1,4 @@
 
-<property-row *ngFor="let content of container.contents" [property]="content">
+<property-row *ngFor="let content of container.contents" [property]="content" [kind]="kind">
 </property-row>
 <button mat-button class="add-button" (click)="addRow();"><i class="fa fa-plus"></i> Add Row</button>

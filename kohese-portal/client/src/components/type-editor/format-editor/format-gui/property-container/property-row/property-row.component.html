@@ -1,5 +1,5 @@
-<mat-select placeholder="---">
-  <mat-option *ngFor="let property of kind.fields">
-      {property}
+<mat-select placeholder="---" [(ngModel)]="property">
+  <mat-option *ngFor="let propertyName of kind.fields | mapKey" [value]="property">
+      {{propertyName}}
   </mat-option>
 </mat-select>

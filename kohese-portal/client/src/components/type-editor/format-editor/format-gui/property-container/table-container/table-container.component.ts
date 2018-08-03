@@ -1,3 +1,4 @@
+import { KoheseType } from './../../../../../../classes/UDT/KoheseType.class';
 import { FormatContainer } from './../../../format-editor.component';
 import { Component, OnInit, Input } from '@angular/core';
 
@@ -9,6 +10,8 @@ import { Component, OnInit, Input } from '@angular/core';
 export class TableContainerComponent implements OnInit {
   @Input()
   container : FormatContainer;
+  @Input()
+  kind : KoheseType
 
   constructor() { }
 

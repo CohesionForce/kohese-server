@@ -9,10 +9,13 @@ import { PropertyDefinition } from '../../../format-editor.component';
 export class PropertyRowComponent implements OnInit {
   @Input()
   property : PropertyDefinition;
+  @Input()
+  kind;
 
   constructor() { }
 
   ngOnInit() {
+    console.log(this.property)
   }
 
 }

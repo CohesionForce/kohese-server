@@ -17,6 +17,8 @@ export class FormatGuiComponent implements OnInit, OnDestroy {
 
   @Input()
   format : FormatDefinition
+  @Input()
+  kind : KoheseType
 
   constructor(private dialogService : DialogService, private changeRef : ChangeDetectorRef) {
 
