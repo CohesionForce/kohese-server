@@ -84,7 +84,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   addDefinition () {
     let id = this.createUUID();
     this.formatDefs[id] = ({
-      name : 'New definition ' + this.formatDefs.length,
+      name : 'New definition ',
       containers : [],
       id : id
     })
@@ -102,8 +102,14 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
     console.log ('Open Preview');
   }
 
-  deleteFormat () {
+  setDefault (id) {
+    this.currentType.viewModelProxy.item.defaultFormatKey = id;
+    this.changeRef.markForCheck();
+  }
 
+  deleteFormat (id) {
+    delete this.formatDefs[id];
+    this.changeRef.markForCheck();
   }
 
   createUUID() : string {
