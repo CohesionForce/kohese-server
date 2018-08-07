@@ -1,4 +1,19 @@
-<div style="height: 7%; width: 100%; display: flex; flex-direction: row;">
+<div class="top-bar">
+  <mat-form-field>
+    <input matInput #searchInput type="text" placeholder="Search"
+      [(ngModel)]="searchCriterion.value"
+      (input)="searchStringChanged(searchInput.value)"/>
+  </mat-form-field>
+  <button mat-icon-button
+    (click)="openFilterDialog(filterSubject.getValue()).subscribe()"
+    [ngClass]="{ 'highlight': filterSubject.getValue() }"
+    matTooltip="Edit filter">
+    <mat-icon class="fa fa-filter"></mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!(filterSubject | async)"
+    (click)="removeFilter()" matTooltip="Remove filter">
+    <mat-icon class="fa fa-eraser"></mat-icon>
+  </button>
   <button mat-icon-button (click)="toggleDocumentSync()"
     matTooltip="Toggle selection synchronization for the tree"
     [ngClass]="{ 'highlight': sync }"
@@ -6,46 +21,27 @@
     <mat-icon class="fa fa-exchange"></mat-icon>
   </button>
   <button mat-icon-button
-    (click)="setRowAsRoot(getRow(documentRoot.item.id))"
-    [disabled]="!rootSubject.getValue() || (rootSubject.getValue().object === documentRoot)"
+    (click)="setRowAsRoot(documentRoot)"
+    [disabled]="(rootSubject | async) === documentRoot"
     matTooltip="Changes the root to be the document root">
     <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
   </button>
-  <button mat-icon-button [matMenuTriggerFor]="filterMenu"
-    [ngClass]="{ 'highlight': filterSubject.getValue() }">
-    <mat-icon class="fa fa-filter"></mat-icon>
-  </button>
-  <mat-menu #filterMenu="matMenu" [overlapTrigger]="false">
-    <button mat-menu-item (click)="openFilterDialog()">
-      <mat-icon class="fa fa-filter"></mat-icon>
-      Edit Filter
-    </button>
-    <button mat-menu-item (click)="filterSubject.next(undefined)">
-      <mat-icon class="fa fa-times"></mat-icon>
-      Remove Filter
-    </button>
-  </mat-menu>
 </div>
 <div style="height: 12%; width: 100%;">
   <div class="kt-head kth-cell">
     Root
   </div>
   <ng-container *ngIf="rootSubject.getValue()">
-    <tree-row [treeRow]="rootSubject.getValue()" [images]="images"
+    <tree-row [treeRow]="getRootRow()" [images]="images"
       [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
     </tree-row>
   </ng-container>
 </div>
-<div style="height: 81%; width: 100%;">
-  <div class="kt-head kth-cell">
-    Descendants
-  </div>
-  <div class="kt-body">
-    <virtual-scroll #tree [items]="visibleRows">
-      <tree-row *ngFor="let row of tree.viewPortItems"
-        [treeRow]="row" [rowActions]="rowActions"
-        [images]="images" [menuActions]="menuActions">
-      </tree-row>
-    </virtual-scroll>
-  </div>
+<div class="kt-body">
+  <virtual-scroll #tree [items]="visibleRows">
+    <tree-row *ngFor="let row of tree.viewPortItems"
+      [treeRow]="row" [rowActions]="rowActions"
+      [images]="images" [menuActions]="menuActions">
+    </tree-row>
+  </virtual-scroll>
 </div>

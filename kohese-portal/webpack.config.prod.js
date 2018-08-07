@@ -12,6 +12,43 @@ const postcssUrl = require('postcss-url');
 const cssnano = require('cssnano');
 const postcssImports = require('postcss-import');
 
+let uglifySettings = {
+  "test": /\.js$/i,
+  "extractComments": false,
+  "sourceMap": false,
+  "cache": false,
+  "parallel": false,
+  "uglifyOptions": {
+    "output": {
+      "ascii_only": true,
+      "comments": false,
+      "webkit": true
+    },
+    "ecma": 5,
+    "warnings": false,
+    "ie8": false,
+    "mangle": {
+      "safari10": true
+    },
+    "compress": {
+      "typeofs": false,
+      "pure_getters": true,
+      "passes": 3
+    }
+  }
+};
+
+//////////////////////////////////////////////////////
+// Note: Uglification of production code can be disabled
+//       by setting DISABLE_KOHESE_UGLIFY to "true"
+//////////////////////////////////////////////////////
+if (process.env.DISABLE_KOHESE_UGLIFY){
+  if (JSON.parse(process.env.DISABLE_KOHESE_UGLIFY)){
+    console.log('!!! Warning: Kohese Code Uglification is disabled');
+    uglifySettings.exclude = uglifySettings.test;
+  }
+}
+
 const { NoEmitOnErrorsPlugin, EnvironmentPlugin, HashedModuleIdsPlugin } = require('webpack');
 const { ScriptsWebpackPlugin, BaseHrefWebpackPlugin, SuppressExtractedTextChunksWebpackPlugin } = require('@angular/cli/plugins/webpack');
 const { CommonsChunkPlugin, ModuleConcatenationPlugin } = require('webpack').optimize;
@@ -612,31 +649,7 @@ module.exports = {
       "pattern": /^(MIT|ISC|BSD.*)$/
     }),
     new PurifyPlugin(),
-    new UglifyJsPlugin({
-      "test": /\.js$/i,
-      "extractComments": false,
-      "sourceMap": false,
-      "cache": false,
-      "parallel": false,
-      "uglifyOptions": {
-        "output": {
-          "ascii_only": true,
-          "comments": false,
-          "webkit": true
-        },
-        "ecma": 5,
-        "warnings": false,
-        "ie8": false,
-        "mangle": {
-          "safari10": true
-        },
-        "compress": {
-          "typeofs": false,
-          "pure_getters": true,
-          "passes": 3
-        }
-      }
-    }),
+    new UglifyJsPlugin(uglifySettings),
     new AngularCompilerPlugin({
       "mainPath": "bootstrap.ts",
       "platform": 0,

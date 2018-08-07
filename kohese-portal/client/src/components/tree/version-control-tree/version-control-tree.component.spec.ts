@@ -3,9 +3,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
 import { ToastrModule } from 'ngx-toastr';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { MaterialModule } from '../../../material.module';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -21,7 +20,8 @@ import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicT
 import { VersionControlTreeComponent } from './version-control-tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { TreeRow } from '../tree-row.class';
+import { TreeRow } from '../tree-row/tree-row.class';
+import { Filter } from '../../filter/filter.class';
 
 describe('Component: version-control-tree', () => {
   let component: VersionControlTreeComponent;
@@ -38,9 +38,10 @@ describe('Component: version-control-tree', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
-        { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: ActivatedRoute, useValue: { params: Observable.of('') } },
-        { provide: DialogService, useClass: MockDialogService },
+        { provide: ItemRepository, useClass: MockItemRepository }, {
+          provide: ActivatedRoute,
+          useValue: { params: new BehaviorSubject<any>({ id: ''}) }
+        }, { provide: DialogService, useClass: MockDialogService },
         { provide: NavigationService, useClass: MockNavigationService },
         {
           provide: VersionControlService,
@@ -62,8 +63,25 @@ describe('Component: version-control-tree', () => {
   });
   
   it('initializes', () => {
-    let rootRow: TreeRow = component.getRow('ROOT');
-    expect(rootRow).toBeDefined();
-    expect(component.getRow(descendantProxy.item.id)).toBeDefined();
+    expect(component.getRootRow()).toBeDefined();
+    let descendantIndex: number = -1;
+    for (let j: number = 0; j < component.visibleRows.length; j++) {
+      if (component.visibleRows[j].object === descendantProxy) {
+        descendantIndex = j;
+        break;
+      }
+    }
+    expect(descendantIndex).not.toEqual(-1);
+  });
+  
+  it('filters after a search string is entered', (done: Function) => {
+    expect(component.filterSubject.getValue()).not.toBeDefined();
+    component.searchStringChanged('Search String');
+    setTimeout(() => {
+      let filter: Filter = component.filterSubject.getValue();
+      expect(filter.rootElement.criteria[0]).toEqual(component.
+        searchCriterion);
+      done();
+    }, 1000);
   });
 });

@@ -1,23 +1,19 @@
 <div class="top-bar">
   <mat-form-field>
     <input matInput #searchInput type="text" placeholder="Search"
-      [ngModel]="filterSubject.getValue()?.content"
+      [(ngModel)]="searchCriterion.value"
       (input)="searchStringChanged(searchInput.value)"/>
   </mat-form-field>
-  <button mat-icon-button [matMenuTriggerFor]="filterMenu"
-    [ngClass]="{ 'highlight': filterSubject.getValue() }">
+  <button mat-icon-button
+    (click)="openFilterDialog(filterSubject.getValue()).subscribe()"
+    [ngClass]="{ 'highlight': filterSubject.getValue() }"
+    matTooltip="Edit filter">
     <mat-icon class="fa fa-filter"></mat-icon>
   </button>
-  <mat-menu #filterMenu="matMenu" [overlapTrigger]="false">
-    <button mat-menu-item (click)="openFilterDialog()">
-      <mat-icon class="fa fa-filter"></mat-icon>
-      Edit Filter
-    </button>
-    <button mat-menu-item (click)="filterSubject.next(undefined)">
-      <mat-icon class="fa fa-eraser"></mat-icon>
-      Remove Filter
-    </button>
-  </mat-menu>
+  <button mat-icon-button [disabled]="!(filterSubject | async)"
+    (click)="removeFilter()" matTooltip="Remove filter">
+    <mat-icon class="fa fa-eraser"></mat-icon>
+  </button>
   <button mat-icon-button (click)="toggleSelectionSynchronization()"
     matTooltip="Toggle selection synchronization for the tree"
     [ngClass]="{ 'highlight': synchronizeWithSelection }"
@@ -25,8 +21,8 @@
     <mat-icon class="fa fa-exchange"></mat-icon>
   </button>
   <button mat-icon-button
-    (click)="rootSubject.next(getRow(absoluteRoot.item.id))"
-    [disabled]="!rootSubject.getValue() || (rootSubject.getValue().object === absoluteRoot)"
+    (click)="rootSubject.next(absoluteRoot)"
+    [disabled]="(rootSubject | async) === absoluteRoot"
     matTooltip="Changes the root to be the absolute root">
     <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
   </button>
@@ -37,7 +33,7 @@
   </div>
   <ng-container *ngIf="rootSubject.getValue()">
     <div class="kt-body">
-      <tree-row [treeRow]="rootSubject.getValue()" [images]="images"
+      <tree-row [treeRow]="getRootRow()" [images]="images"
         [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
       </tree-row>
     </div>

@@ -13,6 +13,8 @@ import { DefaultTreeComponent } from './default-tree/default-tree.component';
 import { ReferenceTreeComponent } from './reference-tree/reference-tree.component';
 import { VersionControlTreeComponent } from './version-control-tree/version-control-tree.component';
 import { CommitTreeComponent } from './commit-tree/commit-tree.component';
+import { FilterTreeComponent } from './filter-tree/filter-tree.component';
+import { FilterTreeRowComponent } from './filter-tree/filter-tree-row.component';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { PipesModule } from "../../pipes/pipes.module";
 import { DocumentTreeComponent } from "./document-tree/document-tree.component";
@@ -24,7 +26,9 @@ import { DocumentTreeComponent } from "./document-tree/document-tree.component";
     ReferenceTreeComponent,
     VersionControlTreeComponent,
     CommitTreeComponent,
-    DocumentTreeComponent
+    DocumentTreeComponent,
+    FilterTreeComponent,
+    FilterTreeRowComponent
   ],
   entryComponents: [
   ],
@@ -43,7 +47,8 @@ import { DocumentTreeComponent } from "./document-tree/document-tree.component";
     ReferenceTreeComponent,
     VersionControlTreeComponent,
     CommitTreeComponent,
-    DocumentTreeComponent
+    DocumentTreeComponent,
+    FilterTreeComponent
   ]
 })
 export class TreeViewModule {}

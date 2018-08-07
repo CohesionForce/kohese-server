@@ -1,4 +1,4 @@
-@import '../../../app.component';
+@import '../../app.component';
 
 .top-bar {
   height: 7%;
@@ -37,7 +37,7 @@ virtual-scroll {
 }
 
 :host {
-  height: calc(100% - 50px);
+  height: 100%;
   width: 100%;
-  display: inline-block
+  display: inline-block;
 }
