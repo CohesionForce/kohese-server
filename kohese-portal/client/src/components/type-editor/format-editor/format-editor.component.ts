@@ -11,7 +11,8 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 
 export interface FormatDefinition {
   name : string,
-  containers : Array<FormatContainer>
+  containers : Array<FormatContainer>,
+  id : string
 }
 
  export interface FormatContainer {
@@ -66,8 +67,8 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
       (koheseType: KoheseType) => {
       this.currentType = koheseType;
       if (!koheseType.viewModelProxy.item.formatDefinitions) {
-        koheseType.viewModelProxy.item.formatDefinitions = [];
-        koheseType.viewModelProxy.item.defaultFormatIndex = 0;
+        koheseType.viewModelProxy.item.formatDefinitions = {};
+        koheseType.viewModelProxy.item.defaultFormatIndex = undefined;
       }
       this.formatDefs = koheseType.viewModelProxy.item.formatDefinitions;
 
@@ -81,10 +82,15 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   }
 
   addDefinition () {
-    this.formatDefs.push({
+    let id = this.createUUID();
+    this.formatDefs[id] = ({
       name : 'New definition ' + this.formatDefs.length,
-      containers : []
+      containers : [],
+      id : id
     })
+    if (!this.currentType.viewModelProxy.item.defaultFormatKey) {
+      this.currentType.viewModelProxy.item.defaultFormatKey = id;
+    }
   }
 
   saveFormat () {
@@ -99,5 +105,15 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   deleteFormat () {
 
   }
+
+  createUUID() : string {
+    let dt = new Date().getTime();
+    let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+}
 
 }

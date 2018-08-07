@@ -18,11 +18,11 @@
       "required": true
     },
     "formatDefinitions" : {
-      "type": ["object"],
+      "type": "object",
       "required": true
     },
-    "defaultFormatIndex" : {
-      "type": "number",
+    "defaultFormatKey" : {
+      "type": "string",
       "required": true
     }
   },

@@ -4,8 +4,8 @@
 </div>
 <div id="format-container">
   <mat-list>
-    <mat-list-item *ngFor="let format of formatDefs" class="format-item" (click)="selectedFormat = format">
-      {{format.name}}
+    <mat-list-item *ngFor="let format of formatDefs | mapKey" class="format-item" (click)="selectedFormat = formatDefs[format]">
+      {{formatDefs[format].name}}
       <img *ngIf="format.dirty" src="../../../../assets/icons/versioncontrol/dirty.ico">
       <hr/>
     </mat-list-item>

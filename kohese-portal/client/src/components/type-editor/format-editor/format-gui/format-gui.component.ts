@@ -25,7 +25,7 @@ export class FormatGuiComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
+    console.log(this.format);
   }
 
   ngOnDestroy(): void {
