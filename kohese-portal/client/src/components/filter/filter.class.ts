@@ -178,6 +178,7 @@ export class FilterCriterion extends FilterElement {
   }
   set ignoreCase(ignoreCase: boolean) {
     this._ignoreCase = ignoreCase;
+    this.convertValueToRegularExpression();
   }
 
   protected matcher: RegExp;

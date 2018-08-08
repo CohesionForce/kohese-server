@@ -354,6 +354,8 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         }
         
         if (!advancedFilter.isElementPresent(this._searchCriterion)) {
+          this._searchCriterion.property = advancedFilter.filterableProperties[
+            0];
           advancedFilter.rootElement.criteria.push(this._searchCriterion);
           this.filterSubject.next(advancedFilter);
         }
