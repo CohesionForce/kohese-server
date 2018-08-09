@@ -16,6 +16,7 @@ export class ListContainerEditorComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log(this.container.contents);
   }
 
   addRow() {

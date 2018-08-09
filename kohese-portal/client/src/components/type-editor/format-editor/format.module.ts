@@ -1,3 +1,4 @@
+import { HeaderContainerComponent } from './format-gui/property-container/header-container/header-container.component';
 import { PropertyRowComponent } from './format-gui/property-container/property-row/property-row.component';
 import { ContainerSelectorComponent } from './format-gui/container-selector/container-selector.component';
 import { FormatEditorComponent } from './format-editor.component';
@@ -19,7 +20,8 @@ import { ColumnContainerEditorComponent } from './format-gui/property-container/
     TableContainerComponent,
     ColumnContainerEditorComponent,
     ListContainerEditorComponent,
-    PropertyRowComponent
+    PropertyRowComponent,
+    HeaderContainerComponent
   ],
   entryComponents: [
     ContainerSelectorComponent

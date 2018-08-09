@@ -11,6 +11,7 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 
 export interface FormatDefinition {
   name : string,
+  header : FormatContainer
   containers : Array<FormatContainer>,
   id : string
 }
@@ -85,6 +86,13 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
     let id = this.createUUID();
     this.formatDefs[id] = ({
       name : 'New definition ',
+      header : {
+        kind : 'header',
+        contents : [{
+          propertyName : 'name',
+          hideLabel : true
+        }]
+      },
       containers : [],
       id : id
     })
