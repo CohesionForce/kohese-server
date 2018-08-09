@@ -1,15 +1,16 @@
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { VersionControlState } from '../../services/version-control/version-control.service';
 import { Filter, ValueInputType, FilterableProperty } from './filter.class';
 
 export class ItemProxyFilter extends Filter {
-  public constructor(private _dynamicTypesService: DynamicTypesService,
-    private _itemRepository: ItemRepository) {
+  public constructor(protected dynamicTypesService: DynamicTypesService,
+    protected itemRepository: ItemRepository) {
     super();
-    this._itemRepository.getTreeConfig().subscribe((treeConfigurationObject:
+    this.itemRepository.getTreeConfig().subscribe((treeConfigurationObject:
       any) => {
       if (treeConfigurationObject) {
-        let koheseTypeMap: object = this._dynamicTypesService.getKoheseTypes();
+        let koheseTypeMap: object = this.dynamicTypesService.getKoheseTypes();
         let typeNames: Array<string> = Object.keys(koheseTypeMap).sort();
         let intermediateFilterablePropertyArray: Array<FilterableProperty> =
           [];
@@ -32,6 +33,13 @@ export class ItemProxyFilter extends Filter {
         
         intermediateFilterablePropertyArray.push(new FilterableProperty('kind',
           ['kind'], ValueInputType.SELECT, typeNames));
+        
+        intermediateFilterablePropertyArray.push(new FilterableProperty(
+          'status', ['status', FilterableProperty.PROPERTIES], ValueInputType.
+          SELECT, Object.keys(VersionControlState).map((enumerationKey:
+          VersionControlState) => {
+          return VersionControlState[enumerationKey];
+          })));
         
         intermediateFilterablePropertyArray.sort((oneProperty:
           FilterableProperty, anotherProperty: FilterableProperty) => {

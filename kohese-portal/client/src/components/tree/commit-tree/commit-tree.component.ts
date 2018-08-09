@@ -86,7 +86,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
     ItemRepository, private _lensService: LensService,
     private _navigationService: NavigationService) {
-    super(route, dialogService, false);
+    super(route, dialogService);
   }
 
   public ngOnInit(): void {

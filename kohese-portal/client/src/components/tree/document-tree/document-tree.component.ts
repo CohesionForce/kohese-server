@@ -53,7 +53,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     private _dynamicTypesService: DynamicTypesService,
     private itemRepository : ItemRepository,
     private changeRef : ChangeDetectorRef) {
-    super(router, dialogService, false);
+    super(router, dialogService);
   }
 
   ngOnInit() {
@@ -206,6 +206,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
     item['kind'] = proxy.kind;
+    item['status'] = proxy.status;
     return super.filter(item); 
   }
   
@@ -242,6 +243,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         }
         
         if (!advancedFilter.isElementPresent(this._searchCriterion)) {
+          this._searchCriterion.property = advancedFilter.filterableProperties[
+            0];
           advancedFilter.rootElement.criteria.push(this._searchCriterion);
           this.filterSubject.next(advancedFilter);
         }

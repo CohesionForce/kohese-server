@@ -3,6 +3,8 @@ export enum ValueInputType {
 }
 
 export class FilterableProperty {
+  public static readonly PROPERTIES: string = '<PROPERTIES>';
+  
   public constructor(public displayText: string, public propertyPath:
     Array<string>, public valueInputType: ValueInputType, public values:
     Array<string>) {
@@ -131,9 +133,8 @@ export class FilterElement {
 }
 
 enum FilterCriterionCondition {
-  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equals',
-    CONTAINS = 'contains',
-    MATCHES_REGULAR_EXPRESSION = 'matches regular expression',
+  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equals', CONTAINS =
+    'contains', MATCHES_REGULAR_EXPRESSION = 'matches regular expression',
     ENDS_WITH = 'ends with', BEGINS_WITH = 'begins with',
     GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>'
 }
@@ -177,6 +178,7 @@ export class FilterCriterion extends FilterElement {
   }
   set ignoreCase(ignoreCase: boolean) {
     this._ignoreCase = ignoreCase;
+    this.convertValueToRegularExpression();
   }
 
   protected matcher: RegExp;
@@ -210,9 +212,15 @@ export class FilterCriterion extends FilterElement {
       for (let j: number = 0; j < propertyPath.length - 1; j++) {
         property = property[propertyPath[j]];
       }
-      let propertyValue: string = String(property[propertyPath[propertyPath.
-        length - 1]]);
-      result = this.doesValueMatch(propertyValue);
+      
+      let lastPropertyPathSegment: string = propertyPath[propertyPath.length -
+        1];
+      if (lastPropertyPathSegment === FilterableProperty.PROPERTIES) {
+        result = (-1 !== Object.keys(property).indexOf(this.value));
+      } else {
+        result = this.doesValueMatch(String(property[
+          lastPropertyPathSegment]));
+      }
     } else {
       for (let propertyName in candidate) {
         result = this.doesValueMatch(String(candidate[propertyName]));
