@@ -1,33 +1,62 @@
-<div style="height: 7%; width: 100%; display: flex; flex-direction: row;">
-  <button mat-icon-button (click)="rootSubject.next(getRow(absoluteRoot.item.id))"
-    [disabled]="!rootSubject.getValue() || (rootSubject.getValue().object === absoluteRoot)"
+<div class="top-bar">
+  <mat-form-field>
+    <input matInput #searchInput type="text" placeholder="Search"
+      [(ngModel)]="searchCriterion.value"
+      (input)="searchStringChanged(searchInput.value)"/>
+  </mat-form-field>
+  <button mat-icon-button
+    (click)="openFilterDialog(filterSubject.getValue()).subscribe()"
+    [ngClass]="{ 'highlight': filterSubject.getValue() }"
+    matTooltip="Edit filter">
+    <mat-icon class="fa fa-filter"></mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!(filterSubject | async)"
+    (click)="removeFilter()" matTooltip="Remove filter">
+    <mat-icon class="fa fa-eraser"></mat-icon>
+  </button>
+  <button mat-icon-button (click)="rootSubject.next(absoluteRoot)"
+    [disabled]="(rootSubject | async) === absoluteRoot"
     matTooltip="Changes the root to be the absolute root"
     class="flex-right-align">
     <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
   </button>
-  <button mat-icon-button [matMenuTriggerFor]="filterMenu"
-    [ngClass]="{ 'highlight': filterSubject.getValue() }">
-    <mat-icon class="fa fa-filter"></mat-icon>
+  <button mat-icon-button (click)="selectAll()"
+    matTooltip="Select all Items that match the current filter">
+    <mat-icon class="fa fa-check-square-o"></mat-icon>
   </button>
-  <mat-menu #filterMenu="matMenu" [overlapTrigger]="false">
-    <button mat-menu-item (click)="openFilterDialog()">
-      <mat-icon class="fa fa-filter"></mat-icon>
-      Edit Filter
-    </button>
-    <button mat-menu-item (click)="filterSubject.next(undefined)">
-      <mat-icon class="fa fa-times"></mat-icon>
-      Remove Filter
-    </button>
-  </mat-menu>
+  <button mat-icon-button (click)="deselectAll()"
+    matTooltip="Deselect all Items">
+    <mat-icon class="fa fa-square-o"></mat-icon>
+  </button>
+  <button mat-icon-button
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState(VersionControlState.UNSTAGED)"
+    (click)="stageSelectedChanges()"
+    matTooltip="Stage changes to the selected Items">
+    <mat-icon class="fa fa-plus"></mat-icon>
+  </button>
+  <button mat-icon-button
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState(VersionControlState.STAGED)"
+    (click)="unstageSelectedChanges()"
+    matTooltip="Un-stage changes to the selected Items">
+    <mat-icon class="fa fa-minus"></mat-icon>
+  </button>
+  <button mat-icon-button
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState(undefined)"
+    (click)="revertSelectedChanges()"
+    matTooltip="Undo all uncommitted changes to the selected Items">
+    <mat-icon class="fa fa-undo"></mat-icon>
+  </button>
 </div>
 <div style="height: 12%; width: 100%;">
   <div class="kt-head kth-cell">
     Root
   </div>
   <ng-container *ngIf="rootSubject.getValue()">
-    <tree-row [treeRow]="rootSubject.getValue()" [images]="images"
-      [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
-    </tree-row>
+    <div class="kt-body">
+      <tree-row [treeRow]="getRootRow()" [images]="images"
+        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
+      </tree-row>
+    </div>
   </ng-container>
 </div>
 <div style="height: 81%; width: 100%;">

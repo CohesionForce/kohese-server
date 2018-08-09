@@ -114,7 +114,7 @@ export class DetailsFormComponent extends NavigatableComponent
       let changedInputs: Array<string> = Object.keys(changes);
 
       if (changes['type']) {
-        this.type = this.DynamicTypeService.getKoheseTypes()[changes['type'].currentValue]
+        this.type = changes['type'].currentValue;
       }
     }
   }

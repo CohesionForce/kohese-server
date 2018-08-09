@@ -1,128 +1,318 @@
-import { KoheseType } from '../../classes/UDT/KoheseType.class';
-import { ItemProxy } from '../../../../common/src/item-proxy';
+export enum ValueInputType {
+  STRING, NUMBER, SELECT
+}
+
+export class FilterableProperty {
+  public static readonly PROPERTIES: string = '<PROPERTIES>';
+  
+  public constructor(public displayText: string, public propertyPath:
+    Array<string>, public valueInputType: ValueInputType, public values:
+    Array<string>) {
+  }
+}
 
 export class Filter {
-  private _types: Array<KoheseType> = [];
-  get types() {
-    return this._types;
-  }
-  set types(types: Array<KoheseType>) {
-    this._types = types;
+  private _rootElement: FilterCriteriaConnection =
+    new FilterCriteriaConnection(FilterCriteriaConnectionType.AND);
+  get rootElement() {
+    return this._rootElement;
   }
   
-  private _properties: Array<string> = [];
-  get properties() {
-    return this._properties;
-  }
-  set properties(properties: Array<string>) {
-    this._properties = properties;
-  }
-  
-  private _content: string = '';
-  get content() {
-    return this._content;
-  }
-  set content(content: string) {
-    this._content = content;
-  }
-  
-  private _negateContent: boolean = false;
-  get negateContent() {
-    return this._negateContent;
-  }
-  set negateContent(negateContent: boolean) {
-    this._negateContent = negateContent;
-  }
-  
-  private _matchesEntireContent: boolean = false;
-  get matchesEntireContent() {
-    return this._matchesEntireContent;
-  }
-  set matchesEntireContent(matchesEntireContent: boolean) {
-    this._matchesEntireContent = matchesEntireContent;
-  }
-  
-  private _hasUnsavedChanges: boolean = false;
-  get hasUnsavedChanges() {
-    return this._hasUnsavedChanges;
-  }
-  set hasUnsavedChanges(hasUnsavedChanges: boolean) {
-    this._hasUnsavedChanges = hasUnsavedChanges;
-  }
-  
-  private _hasUncommittedChanges: boolean = false;
-  get hasUncommittedChanges() {
-    return this._hasUncommittedChanges;
-  }
-  set hasUncommittedChanges(hasUncommittedChanges: boolean) {
-    this._hasUncommittedChanges = hasUncommittedChanges;
+  private _filterableProperties: Array<FilterableProperty> = [];
+  get filterableProperties() {
+    return this._filterableProperties;
   }
   
   public constructor() {
+    this._filterableProperties.push(new FilterableProperty('Any property', [],
+      ValueInputType.STRING, []));
+  }
+
+  public filter(objects: Array<any>): Array<any> {
+    let matchingObjects: Array<any> = [];
+    for (let j: number = 0; j < objects.length; j++) {
+      let object: any = objects[j];
+      if (this.evaluateConnection(this._rootElement, object)) {
+        matchingObjects.push(object);
+      }
+    }
+
+    return matchingObjects;
   }
   
-  public filter(proxies: Array<ItemProxy>): Array<ItemProxy> {
-    let matchingProxies: Array<ItemProxy> = [];
-    for (let j: number = 0; j < proxies.length; j++) {
-      let proxy: ItemProxy = proxies[j];
-      let matches: boolean = true;
-      if (this._hasUncommittedChanges && (Object.keys(proxy.status).length === 0)) {
-        matches = false;
-      } else if (this._hasUnsavedChanges && !proxy.dirty) {
-        matches = false;
-      }
-      
-      if ((this._types.length > 0) && (-1 === this._types.indexOf(proxy.model.
-        type))) {
-        matches = false;
-      }
-      
-      if (matches && this._content) {
-        matches = false;
-        let filterExpression: RegExp;
-        let filterIsRegex: Array<string> = this._content.match(new RegExp(
-          '^\/(.*)\/([gimy]*)$'));
-        if (filterIsRegex) {
-          filterExpression = new RegExp(filterIsRegex[1], filterIsRegex[2]);
-        } else {
-          let cleanedPhrase: string = this._content.replace(
-            /[.*+?^${}()|[\]\\]/g, '\\$&');
-          filterExpression = new RegExp(this._content, 'i');
-        }
-        
-        let propertiesToCheck: Array<string> = [];
-        if (this._properties.length > 0) {
-          for (let k: number = 0; k < this._properties.length; k++) {
-            if (proxy.item[this._properties[k]]) {
-              propertiesToCheck.push(this._properties[k]);
-            }
+  public isElementPresent(element: FilterElement): boolean {
+    let connectionStack: Array<FilterCriteriaConnection> = [this._rootElement];
+    while (connectionStack.length > 0) {
+      let connection: FilterCriteriaConnection = connectionStack.pop();
+      if (element instanceof FilterCriterion) {
+        for (let j: number = 0; j < connection.criteria.length; j++) {
+          if (element === connection.criteria[j]) {
+            return true;
           }
-        } else {
-          propertiesToCheck.push(...Object.keys(proxy.item));
         }
-        
-        for (let k: number = 0; k < propertiesToCheck.length; k++) {
-          let propertyAsString: string = proxy.item[propertiesToCheck[k]].
-            toString();
-          if (this._negateContent) {
-            if (!propertyAsString.match(filterExpression)) {
-              matches = true;
-              break;
-            }
+      } else {
+        for (let j: number = 0; j < connection.connections.length; j++) {
+          if (element === connection.connections[j]) {
+            return true;
           } else {
-            if (propertyAsString.match(filterExpression)) {
-              matches = true;
-              break;
-            }
+            connectionStack.push(connection.connections[j]);
           }
         }
-      }
-      
-      if (matches) {
-        matchingProxies.push(proxy);
       }
     }
     
-    return matchingProxies;
+    return false;
   }
+  
+  public removeElement(element: FilterElement): boolean {
+    let removed: boolean = false;
+    let connectionStack: Array<FilterCriteriaConnection> = [this._rootElement];
+    searchLoop: while (connectionStack.length > 0) {
+      let connection: FilterCriteriaConnection = connectionStack.pop();
+      if (element instanceof FilterCriterion) {
+        for (let j: number = 0; j < connection.criteria.length; j++) {
+          if (element === connection.criteria[j]) {
+            connection.criteria.splice(j, 1);
+            removed = true;
+            break searchLoop;
+          }
+        }
+      } else {
+        for (let j: number = 0; j < connection.connections.length; j++) {
+          if (element === connection.connections[j]) {
+            connection.connections.splice(j, 1);
+            removed = true;
+            break searchLoop;
+          } else {
+            connectionStack.push(connection.connections[j]);
+          }
+        }
+      }
+    }
+    
+    return removed;
+  }
+
+  private evaluateConnection(connection: FilterCriteriaConnection, object:
+    any): boolean {
+    for (let j: number = 0; j < connection.criteria.length; j++) {
+      if (connection.criteria[j].evaluate(object)) {
+        if (FilterCriteriaConnectionType.OR === connection.type) {
+          return true;
+        }
+      } else if (FilterCriteriaConnectionType.AND === connection.type) {
+        return false;
+      }
+    }
+
+    for (let j: number = 0; j < connection.connections.length; j++) {
+      let connectionMatches: boolean = this.evaluateConnection(connection.
+        connections[j], object);
+      if (connectionMatches) {
+        if (FilterCriteriaConnectionType.OR === connection.type) {
+          return true;
+        }
+      } else if (FilterCriteriaConnectionType.AND === connection.type) {
+        return false;
+      }
+    }
+
+    if (FilterCriteriaConnectionType.AND === connection.type){
+      // Return true because none of the "AND" cases failed
+      return true;
+    } else {
+      // Return false because none of the "OR" cases passed
+      return false;
+    }
+  }
+}
+
+export class FilterElement {
+  protected constructor() {
+  }
+}
+
+enum FilterCriterionCondition {
+  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equals', CONTAINS =
+    'contains', MATCHES_REGULAR_EXPRESSION = 'matches regular expression',
+    ENDS_WITH = 'ends with', BEGINS_WITH = 'begins with',
+    GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>'
+}
+
+export class FilterCriterion extends FilterElement {
+  public static readonly CONDITIONS: any = FilterCriterionCondition;
+  
+  get property() {
+    return this._property;
+  }
+  set property(property: FilterableProperty) {
+    this._property = property;
+  }
+  
+  get condition() {
+    return this._condition;
+  }
+  set condition(condition: any) {
+    this._condition = condition;
+  }
+
+  get value() {
+    return this._value;
+  }
+  set value(value: string) {
+    this._value = value;
+    this.convertValueToRegularExpression();
+  }
+
+  private _negate: boolean = false;
+  get negate() {
+    return this._negate;
+  }
+  set negate(negate: boolean) {
+    this._negate = negate;
+  }
+
+  private _ignoreCase: boolean = true;
+  get ignoreCase() {
+    return this._ignoreCase;
+  }
+  set ignoreCase(ignoreCase: boolean) {
+    this._ignoreCase = ignoreCase;
+    this.convertValueToRegularExpression();
+  }
+
+  protected matcher: RegExp;
+  
+  public constructor(private _property: FilterableProperty, private _condition:
+    FilterCriterionCondition, private _value: string) {
+    super();
+    this.convertValueToRegularExpression();
+  }
+
+  private convertValueToRegularExpression(): void {
+    let filterIsRegex: Array<string> = this._value.match(new RegExp(
+      '^\/(.*)\/([gimy]*)$'));
+    if (filterIsRegex) {
+      this.matcher = new RegExp(filterIsRegex[1], filterIsRegex[2]);
+    } else {
+      let flags: string = '';
+      if (this._ignoreCase) {
+        flags += 'i';
+      }
+
+      this.matcher = new RegExp(this._value, flags);
+    }
+  }
+  
+  public evaluate(candidate: any): boolean {
+    let result: boolean = true;
+    if (this._property.propertyPath.length > 0) {
+      let propertyPath: Array<string> = this._property.propertyPath.slice(0);
+      let property: any = candidate;
+      for (let j: number = 0; j < propertyPath.length - 1; j++) {
+        property = property[propertyPath[j]];
+      }
+      
+      let lastPropertyPathSegment: string = propertyPath[propertyPath.length -
+        1];
+      if (lastPropertyPathSegment === FilterableProperty.PROPERTIES) {
+        result = (-1 !== Object.keys(property).indexOf(this.value));
+      } else {
+        result = this.doesValueMatch(String(property[
+          lastPropertyPathSegment]));
+      }
+    } else {
+      for (let propertyName in candidate) {
+        result = this.doesValueMatch(String(candidate[propertyName]));
+        
+        if (result) {
+          break;
+        }
+      }
+    }
+
+    if (this._negate) {
+      result = !result;
+    }
+
+    return result;
+  }
+
+  public toString(): string {
+    return this._property.displayText + ' ' + (this._negate ? 'does not ' :
+      'does ') + (this._ignoreCase ? 'case-insensitively ' :
+      'case-sensitively ') + this._condition + ' ' + this._value;
+  }
+  
+  private doesValueMatch(propertyValue: string): boolean {
+    let matches: boolean = false;
+    switch (this._condition) {
+      case FilterCriterionCondition.LESS_THAN:
+        matches = (+propertyValue < +this._value);
+        break;
+      case FilterCriterionCondition.LESS_THAN_OR_EQUAL_TO:
+        matches = (+propertyValue <= +this._value);
+        break;
+      case FilterCriterionCondition.EQUALS: {
+          let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
+            source + '$', this.matcher.flags);
+          matches = conditionMatcher.test(propertyValue);
+        }
+        break;
+      case FilterCriterionCondition.CONTAINS:
+        matches = this.matcher.test(propertyValue);
+        break;
+      case FilterCriterionCondition.ENDS_WITH: {
+          let conditionMatcher: RegExp = new RegExp(this.matcher.source +
+            '$', this.matcher.flags);
+          matches = conditionMatcher.test(propertyValue);
+        }
+        break;
+      case FilterCriterionCondition.BEGINS_WITH: {
+          let conditionMatcher: RegExp = new RegExp('^' + this.matcher.
+            source, this.matcher.flags);
+          matches = conditionMatcher.test(propertyValue);
+        }
+        break;
+      case FilterCriterionCondition.MATCHES_REGULAR_EXPRESSION:
+        matches = this.matcher.test(propertyValue);
+        break;
+      case FilterCriterionCondition.GREATER_THAN_OR_EQUAL_TO:
+        matches = (+propertyValue >= +this._value);
+        break;
+      case FilterCriterionCondition.GREATER_THAN:
+        matches = (+propertyValue > +this._value);
+        break;
+    }
+    
+    return matches;
+  }
+}
+
+export class FilterCriteriaConnection extends FilterElement {
+  private _connections: Array<FilterCriteriaConnection> = [];
+  get connections() {
+    return this._connections;
+  }
+
+  private _criteria: Array<FilterCriterion> = [];
+  get criteria() {
+    return this._criteria;
+  }
+
+  public constructor(public type: FilterCriteriaConnectionType) {
+    super();
+  }
+
+  public toString(): string {
+    if (this.type === FilterCriteriaConnectionType.AND) {
+      return 'AND';
+    } else {
+      return 'OR';
+    }
+  }
+}
+
+export enum FilterCriteriaConnectionType {
+  AND, OR
 }

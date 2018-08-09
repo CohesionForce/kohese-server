@@ -1,6 +1,6 @@
 <div class="kt-item" matTooltip="{{treeRow.getText()}}"
-  (click)="treeRow.rowSelected()"
-  [ngClass]="{ 'selected-border': treeRow.isRowSelected(),
+  (click)="treeRow.rowFocused()"
+  [ngClass]="{ 'selected-border': treeRow.isRowFocused(),
   'highlight-row': (!treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) }"
   [ngStyle]="getIndentationStyle()">
   <i class="kt-icon fa"
@@ -9,6 +9,12 @@
     'fa-caret-right': (treeRow.hasChildren() && !treeRow.expanded),
     'no-children': !treeRow.hasChildren() }">
   </i>
+  <ng-container *ngIf="treeRow.isMultiselectEnabled()">
+    <mat-checkbox [checked]="treeRow.isRowSelected()"
+      (change)="treeRow.rowSelected()" (click)="$event.stopPropagation()"
+      style="padding-top: 7px;">
+    </mat-checkbox>
+  </ng-container>
   <ng-container *ngIf="treeRow.getIcon()">
     <mat-icon class="kt-icon {{treeRow.getIcon()}}"></mat-icon>
   </ng-container>
@@ -19,7 +25,7 @@
     {{treeRow.getText()}}
   </span>
   <ng-container *ngFor="let image of images">
-    <ng-container *ngIf="image.display(treeRow)">
+    <ng-container *ngIf="image.display(treeRow.object)">
       <ng-container *ngIf="image.displayAsIcon">
         <mat-icon class="{{image.path}}" matTooltip="{{image.text}}"
           style="padding: 0px 3px;">
@@ -39,9 +45,9 @@
       </button>
     </ng-container>
     <ng-container *ngFor="let action of rowActions">
-      <ng-container *ngIf="action.show(treeRow)">
+      <ng-container *ngIf="action.show(treeRow.object)">
         <button mat-icon-button matTooltip="{{action.description}}"
-          (click)="action.perform(treeRow); $event.stopPropagation()">
+          (click)="action.perform(treeRow.object); $event.stopPropagation()">
           <mat-icon class="kt-icon {{action.icon}}"></mat-icon>
         </button>
       </ng-container>
@@ -53,8 +59,8 @@
       </button>
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
         <button mat-menu-item *ngFor="let action of menuActions"
-          (click)="action.perform(treeRow)" matTooltip="{{action.description}}"
-         [disabled]="!action.enable(treeRow)">
+          (click)="action.perform(treeRow.object)" matTooltip="{{action.description}}"
+         [disabled]="!action.enable(treeRow.object)">
           <mat-icon class="{{action.icon}}"></mat-icon>
           {{action.name}}
         </button>

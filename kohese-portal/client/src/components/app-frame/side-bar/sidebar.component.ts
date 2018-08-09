@@ -28,12 +28,10 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.currentUserSubscription = this.currentUserService.getCurrentUserSubject().subscribe((userInfo)=>{
-      console.log(userInfo);
-      if(userInfo) {
-        this.authenticated = true;
-      }
-    })
+    this.currentUserSubscription = this.currentUserService.
+      getCurrentUserSubject().subscribe((userInfo: any)=>{
+      this.authenticated = !!userInfo;
+    });
     this.lensSubscription = this.lensService.getLensSubject().subscribe((newLens)=>{
       this.currentLens = newLens;
     })
