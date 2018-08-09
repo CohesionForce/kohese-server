@@ -110,6 +110,9 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   deleteFormat (id) {
     delete this.formatDefs[id];
     this.changeRef.markForCheck();
+    if (id === this.selectedFormat.id) {
+      this.selectedFormat = undefined;
+    }
   }
 
   createUUID() : string {

@@ -63,6 +63,8 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
       let rendered = '';
       row.editable = false;
       docInfo.proxy = newProxy;
+
+      // TODO : Update to new render methodology re: Format Def
       if (docInfo.depth > 0) {
         // Show the header for any node that is not the root of the document
 
