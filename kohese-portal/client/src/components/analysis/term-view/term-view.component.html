@@ -15,7 +15,7 @@
   <div class="panel-body">
     <div>
       <mat-form-field>
-        <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName">
+        <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processTerms()">
           <mat-option *ngFor="let filterCriteria of termPOSFilterCriteriaList" [value]="filterCriteria">
             {{filterCriteria}}
           </mat-option>
