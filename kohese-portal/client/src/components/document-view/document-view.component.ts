@@ -158,7 +158,7 @@ implements OnInit, OnDestroy {
 
               for (let type in types) {
                 let vm = types[type].viewModelProxy;
-                if (vm && vm.item.formatDefinitions) {
+                if (vm && vm.item.formatDefinitions && vm.item.defaultFormatKey) {
                   this.formatDefs[type] = vm.item.formatDefinitions[vm.item.defaultFormatKey]
                 } else {
                   console.log('Format not defined for ' + type);

@@ -1,5 +1,5 @@
 import { KoheseType } from './../../../../../../classes/UDT/KoheseType.class';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormatContainer } from '../../../format-editor.component';
 
 @Component({
@@ -12,6 +12,8 @@ export class ListContainerEditorComponent implements OnInit {
   container : FormatContainer;
   @Input()
   kind : KoheseType
+  @Output()
+  deleted : EventEmitter<any> = new EventEmitter()
 
   constructor() { }
 
@@ -24,6 +26,10 @@ export class ListContainerEditorComponent implements OnInit {
       propertyName : '',
       hideLabel : false
     })
+  }
+
+  removeContainer(row) {
+    this.deleted.emit(this.container);
   }
 
 }
