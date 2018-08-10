@@ -19,7 +19,7 @@ import { TreeHashMap, TreeHashEntry,
   TreeHashEntryDifference } from '../../../../../common/src/tree-hash';
 import { CommitComparisonComponent, Difference, DifferenceType,
   DifferenceTypeOperations } from '../../compare-items/commit-comparison/commit-comparison.component';
-import { CompareItemsComponent } from '../../compare-items/compare-items.component';
+import { CompareItemsComponent } from '../../compare-items/item-comparison/compare-items.component';
 
 @Component({
   selector: 'commit-tree',

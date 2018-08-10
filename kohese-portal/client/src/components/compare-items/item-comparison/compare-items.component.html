@@ -1,0 +1,36 @@
+<span style="height: 45px; width: 100%; display: flex; flex-direction: row;">
+  <button mat-icon-button (click)="swapSides()" class="flex-right-align"
+    matTooltip="Swap sides">
+    <mat-icon class="fa fa-exchange"></mat-icon>
+  </button>
+  <mat-checkbox (change)="toggleShowingDifferencesOnly()"
+    style="padding-top: 10px;">
+    Show Differences Only
+  </mat-checkbox>
+</span>
+<div style="height: calc(100% - 109px); width: 100%;">
+  <split direction="horizontal">
+    <split-area [size]="50">
+      <comparison-side #leftComparisonSide [isBaseVersion]="true"
+        [editable]="'true' === dialogParameters['editable']"
+        [showDifferencesOnlySubject]="showDifferencesOnlySubject"
+        (scrolled)="rightComparisonSide.scroll($event)">
+      </comparison-side>
+    </split-area>
+    <split-area [size]="50">
+      <comparison-side #rightComparisonSide [isBaseVersion]="false"
+        [editable]="'true' === dialogParameters['editable']"
+        [showDifferencesOnlySubject]="showDifferencesOnlySubject"
+        (scrolled)="leftComparisonSide.scroll($event)">
+      </comparison-side>
+    </split-area>
+  </split>
+</div>
+<ng-container *ngIf="dialogParameters">
+  <mat-dialog-actions style="height: 64px; width: 100%; display: flex;
+    flex-direction: row;">
+    <button mat-raised-button [mat-dialog-close]="0" class="flex-right-align">
+      Close
+    </button>
+  </mat-dialog-actions>
+</ng-container>
