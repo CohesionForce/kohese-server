@@ -60,7 +60,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
                 length;
               if (numberOfStates > 0) {
                 versionId = baseVersions[numberOfStates].commit;
-              } else if (baseVersions.length > 0) {
+              } else if (baseVersions.length > 1) {
                 versionId = baseVersions[1].commit;
               }
             } 

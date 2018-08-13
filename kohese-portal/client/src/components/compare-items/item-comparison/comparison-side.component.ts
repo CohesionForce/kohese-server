@@ -224,7 +224,10 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
       if (ComparisonSideComponent._UUID_REGULAR_EXPRESSION.test(value)) {
         let proxy: ItemProxy = TreeConfiguration.getTreeConfigFor(
           this._selectedVersion).getProxyFor(value);
-        value = 'Reference to ' + proxy.item.name + ' (' + proxy.item.id + ')';
+        if (proxy) {
+          value = 'Reference to ' + proxy.item.name + ' (' + proxy.item.id +
+            ')';
+        }
       }
     }
     
