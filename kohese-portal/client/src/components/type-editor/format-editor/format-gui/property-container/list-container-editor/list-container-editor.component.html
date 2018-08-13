@@ -13,7 +13,7 @@
   </span>
 </div>
 <div class="container-body">
-  <property-row *ngFor="let content of container.contents" [property]="content" [kind]="kind">
+  <property-row *ngFor="let content of container.contents" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
   </property-row>
   <button mat-button class="add-button" (click)="addRow();">
     <i class="fa fa-plus"></i> Add Row</button>

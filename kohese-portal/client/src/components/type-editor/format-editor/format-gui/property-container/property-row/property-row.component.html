@@ -7,5 +7,5 @@
     </mat-select>
   </div>
   <mat-checkbox [(ngModel)]="property.hideLabel">Hide Label</mat-checkbox>
-  <button mat-button class="remove-button">Delete Row</button>
+  <button *ngIf="!disableDelete" mat-button class="remove-button" (click)="deleteRow()">Delete Row</button>
 </div>

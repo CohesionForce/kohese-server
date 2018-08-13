@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { PropertyDefinition } from '../../../format-editor.component';
+import { PropertyDefinition } from './../../../format-editor.component';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'property-row',
@@ -12,6 +12,11 @@ export class PropertyRowComponent implements OnInit {
   @Input()
   kind;
   console = console;
+  @Input()
+  disableDelete : boolean = false;
+
+  @Output()
+  deleted : EventEmitter<PropertyDefinition> = new EventEmitter();
 
   constructor() { }
 
@@ -19,4 +24,7 @@ export class PropertyRowComponent implements OnInit {
     console.log(this.property)
   }
 
+  deleteRow() {
+    this.deleted.emit(this.property);
+  }
 }

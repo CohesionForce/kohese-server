@@ -32,4 +32,10 @@ export class ListContainerEditorComponent implements OnInit {
     this.deleted.emit(this.container);
   }
 
+  deleteProperty(row) {
+    let idx = this.container.contents.indexOf(row);
+    this.container.contents.splice(idx, 1);
+    console.log(this.container.contents);
+  }
+
 }
