@@ -44,4 +44,9 @@ export class FormatGuiComponent implements OnInit, OnDestroy {
         }
       })
   }
+
+  deleteContainer (container) {
+    let idx = this.format.containers.indexOf(container)
+    this.format.containers.splice(idx, 1);
+  }
 }

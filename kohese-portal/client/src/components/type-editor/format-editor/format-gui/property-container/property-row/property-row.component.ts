@@ -4,7 +4,7 @@ import { PropertyDefinition } from '../../../format-editor.component';
 @Component({
   selector: 'property-row',
   templateUrl: './property-row.component.html',
-  styleUrls: ['./property-row.component.css']
+  styleUrls: ['./property-row.component.scss']
 })
 export class PropertyRowComponent implements OnInit {
   @Input()

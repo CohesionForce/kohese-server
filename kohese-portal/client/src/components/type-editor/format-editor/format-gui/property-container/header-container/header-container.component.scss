@@ -4,7 +4,13 @@
   color : white;
   background-color : maroon;
   border-top-left-radius: 10px;
-  width: 100px;
+  border-top-right-radius : 10px;
+  width: 100%;
+
+}
+
+.action-menu {
+  padding-right : 5px;
 }
 
 .header-body {
