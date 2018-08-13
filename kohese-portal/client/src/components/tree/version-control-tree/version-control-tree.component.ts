@@ -74,6 +74,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   }
 
   public ngOnInit(): void {
+    this._searchCriterion.external = true;
     let versionControlRowActions: Array<RowAction> = [
       new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
         'fa fa-undo', (object: any) => {

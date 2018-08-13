@@ -77,6 +77,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
+    this._searchCriterion.external = true;
     let deleteMenuAction: MenuAction = new MenuAction('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
       return !(object as ItemProxy).internal;

@@ -57,6 +57,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this._searchCriterion.external = true;
     this.paramSubscription = this._route.params.subscribe(params => {
       if (params['id']) {
        this.documentRootId = params['id'];
