@@ -1,13 +1,13 @@
-import { FormatDefinition } from './../type-editor/format-editor/format-editor.component';
-import { TreeConfiguration } from './../../../../common/src/tree-configuration';
-import { DialogService } from './../../services/dialog/dialog.service';
-import { DetailsDialogComponent } from './../details/details-dialog/details-dialog.component';
-import { ItemRepository, RepoStates } from './../../services/item-repository/item-repository.service';
+import { FormatDefinition } from '../type-editor/format-editor/format-editor.component';
+import { TreeConfiguration } from 'common/src/tree-configuration';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { DetailsDialogComponent } from '../details/details-dialog/details-dialog.component';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef, trigger, state, style, animate, transition, ViewChildren, Output, EventEmitter } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 import { Observable } from 'rxjs';
 
-import { ItemProxy } from '../../../../common/src/item-proxy.js';
+import { ItemProxy } from 'common/src/item-proxy';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -15,7 +15,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import * as commonmark from 'commonmark';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class.js';
+import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Router, NavigationEnd } from '@angular/router';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
@@ -23,7 +23,6 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 export interface DocumentInfo {
   proxy: ItemProxy;
   containers : Array<any>;
-  rendered: string;
   active: boolean;
   hovered: boolean;
   depth: number;
@@ -251,27 +250,26 @@ implements OnInit, OnDestroy {
     for (let i = 0;
       (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
       let listItem = subtreeAsList[i];
-      let rendered = ''
       let containers;
       let format = this.formatDefs[listItem.proxy.kind];
       if (format) {
         containers = format.containers;
+      } else {
+        format = {
+          header : {
+            kind: "header",
+            contents : [
+              {propertyName : 'name', hideLabel: true}
+            ]
+          },
+          containers: []
+        };
+        containers = format.containers;
       }
-      if (listItem.depth > 0) {
-        // Show the header for any node that is not the root of the document
 
-        rendered = '<h' + listItem.depth + '>' + listItem.p + '</h' + listItem.depth + '>';
-      }
-      if (listItem.proxy.item.description) {
-        // Show the description if it exists
-        let nodeParsed = this.docReader.parse(listItem.proxy.item.description);
-        rendered += this.docWriter.render(nodeParsed);
-
-      }
       this.loadedProxies.push({
         proxy: listItem.proxy,
         containers : containers,
-        rendered: rendered,
         active: false,
         hovered: false,
         depth: listItem.depth

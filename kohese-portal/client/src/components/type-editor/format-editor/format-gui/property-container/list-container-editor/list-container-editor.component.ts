@@ -1,4 +1,4 @@
-import { KoheseType } from './../../../../../../classes/UDT/KoheseType.class';
+import { KoheseType } from '../../../../../../classes/UDT/KoheseType.class';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormatContainer } from '../../../format-editor.component';
 

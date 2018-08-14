@@ -6,7 +6,7 @@ import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { RowAction, MenuAction } from '../tree-row/tree-row.component';
-import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { ItemProxy } from 'common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

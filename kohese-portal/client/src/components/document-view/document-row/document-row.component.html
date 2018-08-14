@@ -21,13 +21,19 @@
         </button>
       </div>
     </div>
-    <div class="document-row" *ngIf="!row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}" [innerHTML]="docInfo.rendered">
+    <div class="document-row">
+      <header-container></header-container>
+      <div *ngFor="let container of docInfo.containers">
+        <div [ngSwitch]="container.kind">
+          <list-container *ngSwitchCase="list" [editable]="row.editable" [contents]="container.contents"></list-container>
+        </div>
+      </div>
     </div>
-    <div class="document-row" *ngIf="row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}">
+    <!-- <div class="document-row" *ngIf="row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}">
       <textarea matInput [(ngModel)]="docInfo.proxy.item.name"></textarea>
       <hr/>
       <textarea matInput matTextareaAutosize #description [(ngModel)]="docInfo.proxy.item.description"></textarea>
-    </div>
+    </div> -->
   </div>
   <creation-row [referenceProxy]="docInfo.proxy" [relation]="'child'" *ngIf="row.addBottom" class="document-row" (itemCreated)="insertRow($event, row, 'addBottom')"></creation-row>
 </div>

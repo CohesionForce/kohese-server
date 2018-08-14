@@ -1,5 +1,3 @@
-import { PropertyDefinition } from './../../../format-editor.component';
-import { Input } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -8,15 +6,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./header-container.component.scss']
 })
 export class HeaderContainerComponent implements OnInit {
-  @Input()
-  header : PropertyDefinition;
-  @Input()
-  kind;
 
   constructor() { }
 
   ngOnInit() {
-    console.log(this.header);
   }
 
 }

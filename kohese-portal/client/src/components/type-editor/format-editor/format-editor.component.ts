@@ -1,4 +1,4 @@
-import { ItemRepository } from './../../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';

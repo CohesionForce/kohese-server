@@ -5,9 +5,9 @@ import { DialogService,
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
-import { ItemProxy } from '../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../common/src/tree-configuration';
-import { KoheseModel } from '../../../../common/src/KoheseModel';
+import { ItemProxy } from 'common/src/item-proxy';
+import { TreeConfiguration } from 'common/src/tree-configuration';
+import { KoheseModel } from 'common/src/KoheseModel';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs';

@@ -1,6 +1,6 @@
 import { ContainerSelectorComponent } from './container-selector/container-selector.component';
-import { DialogService } from './../../../../services/dialog/dialog.service';
-import { KoheseType } from './../../../../classes/UDT/KoheseType.class';
+import { DialogService } from '../../../../services/dialog/dialog.service';
+import { KoheseType } from '../../../../classes/UDT/KoheseType.class';
 import { Subscription } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
