@@ -1,3 +1,4 @@
+import { HeaderContainerEditorComponent } from './format-gui/property-container/header-container/header-container-editor.component';
 import { PropertyRowComponent } from './format-gui/property-container/property-row/property-row.component';
 import { ContainerSelectorComponent } from './format-gui/container-selector/container-selector.component';
 import { FormatEditorComponent } from './format-editor.component';

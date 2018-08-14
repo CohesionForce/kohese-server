@@ -1,4 +1,4 @@
-import { HeaderContainerComponent } from '../type-editor/format-editor/format-gui/property-container/header-container/header-container-editor.component';
+import { HeaderContainerComponent } from './document-row/format-containers/header-container/header-container.component';
 import { ListContainerComponent } from './document-row/format-containers/list-container/list-container.component';
 import { DocumentRowComponent } from './document-row/document-row.component';
 import { TreeViewModule } from '../tree/tree.module';
@@ -35,7 +35,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
   exports : [
     DocumentViewComponent,
     ListContainerComponent,
-    HeaderContainerComponent
   ]
 })
 export class DocumentViewModule {}

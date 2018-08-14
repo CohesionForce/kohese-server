@@ -1,5 +1,5 @@
 import { FormatDefinition } from '../type-editor/format-editor/format-editor.component';
-import { TreeConfiguration } from 'common/src/tree-configuration';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from '../details/details-dialog/details-dialog.component';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
@@ -7,7 +7,7 @@ import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Chan
 import { Parser, HtmlRenderer } from 'commonmark';
 import { Observable } from 'rxjs';
 
-import { ItemProxy } from 'common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 
 import { NavigationService } from '../../services/navigation/navigation.service';

@@ -6,7 +6,7 @@ import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { RowAction, MenuAction } from '../tree-row/tree-row.component';
-import { ItemProxy } from 'common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -30,15 +30,15 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   documentRoot : ItemProxy;
   documentRootId : string;
-  
+
   private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
     filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
   get searchCriterion() {
     return this._searchCriterion;
   }
-  
+
   private _filterDelayIdentifier: any;
-  
+
   images = [];
 
   @Output()
@@ -201,20 +201,20 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return iconString;
   }
-  
+
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
     item['kind'] = proxy.kind;
-    return super.filter(item); 
+    return super.filter(item);
   }
-  
+
   public openFilterDialog(filter: Filter): Observable<any> {
     if (!filter) {
       filter = new ItemProxyFilter(this._dynamicTypesService, this.
         itemRepository);
     }
-    
+
     return super.openFilterDialog(filter).do((resultingFilter: Filter) => {
       if (resultingFilter && !resultingFilter.isElementPresent(this.
         _searchCriterion)) {
@@ -222,12 +222,12 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public removeFilter(): void {
     this._searchCriterion.value = '';
     super.removeFilter();
   }
-  
+
   public searchStringChanged(searchString: string): void {
     if (this._filterDelayIdentifier) {
       clearTimeout(this._filterDelayIdentifier);
@@ -240,7 +240,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
           advancedFilter = new ItemProxyFilter(this._dynamicTypesService, this.
             itemRepository);
         }
-        
+
         if (!advancedFilter.isElementPresent(this._searchCriterion)) {
           advancedFilter.rootElement.criteria.push(this._searchCriterion);
           this.filterSubject.next(advancedFilter);
@@ -249,9 +249,9 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         advancedFilter.removeElement(this._searchCriterion);
         this.filterSubject.next(advancedFilter);
       }
-      
+
       this.refresh();
-      
+
       this._filterDelayIdentifier = undefined;
     }, 1000);
   }

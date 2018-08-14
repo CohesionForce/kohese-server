@@ -9,7 +9,7 @@ import {
 } from '../../details/details-dialog/details-dialog.component';
 import {
   ItemProxy
-} from 'common/src/item-proxy';
+} from '../../../../../common/src/item-proxy';
 import {
   ChangeDetectorRef,
   EventEmitter,

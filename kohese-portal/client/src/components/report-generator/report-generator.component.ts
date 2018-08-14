@@ -2,7 +2,7 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { Subscription } from 'rxjs';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { ItemProxy } from 'common/src/item-proxy';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { select } from 'd3';
 import { ReportService } from '../../services/reports/report.service';
