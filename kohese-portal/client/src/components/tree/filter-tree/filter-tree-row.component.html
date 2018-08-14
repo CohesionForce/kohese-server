@@ -61,7 +61,14 @@
           Ignore Case
         </mat-checkbox>
       </ng-container>
-      <mat-checkbox [(ngModel)]="treeRow.object.negate">Negate</mat-checkbox>
+      <mat-checkbox [(ngModel)]="treeRow.object.negate"
+        style="padding-right: 7px;">
+        Negate
+      </mat-checkbox>
+      <ng-container *ngIf="treeRow.object.external">
+        <mat-icon class="fa fa-star" matTooltip="External criterion">
+        </mat-icon>
+      </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="'AddRowObject'">
       <button mat-icon-button [matMenuTriggerFor]="addMenu">

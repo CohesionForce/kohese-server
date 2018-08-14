@@ -180,6 +180,14 @@ export class FilterCriterion extends FilterElement {
     this._ignoreCase = ignoreCase;
     this.convertValueToRegularExpression();
   }
+  
+  private _external: boolean = false;
+  get external() {
+    return this._external;
+  }
+  set external(external: boolean) {
+    this._external = external;
+  }
 
   protected matcher: RegExp;
   
