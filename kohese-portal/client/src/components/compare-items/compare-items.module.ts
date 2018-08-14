@@ -8,13 +8,15 @@ import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { UserInputModule } from '../user-input/user-input.module';
 import { DetailsModule } from '../details/details.module';
-import { CompareItemsComponent } from './compare-items.component';
+import { CompareItemsComponent } from './item-comparison/compare-items.component';
 import { CommitComparisonComponent } from './commit-comparison/commit-comparison.component';
+import { ComparisonSideComponent } from './item-comparison/comparison-side.component';
 
 @NgModule({
   declarations: [
     CompareItemsComponent,
-    CommitComparisonComponent
+    CommitComparisonComponent,
+    ComparisonSideComponent
   ],
   entryComponents: [
     CompareItemsComponent,

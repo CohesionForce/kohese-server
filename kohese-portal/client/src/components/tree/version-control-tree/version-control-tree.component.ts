@@ -15,7 +15,7 @@ import { VersionControlService, VersionControlState,
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
-  VersionDesignator } from '../../compare-items/compare-items.component';
+  VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
@@ -429,7 +429,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
 
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] = proxy;
-      compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
+      compareItemsDialogParameters['baseVersion'] = changeVersionDesignator;
     }
 
     this._dialogService.openComponentDialog(CompareItemsComponent, {

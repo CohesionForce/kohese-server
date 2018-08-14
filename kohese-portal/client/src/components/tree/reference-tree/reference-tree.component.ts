@@ -13,7 +13,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { CompareItemsComponent,
-  VersionDesignator } from '../../compare-items/compare-items.component';
+  VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { MenuAction } from '../tree-row/tree-row.component';
@@ -284,7 +284,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] =
         compareItemsDialogParameters.baseProxy;
-      compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
+      compareItemsDialogParameters['baseVersion'] = changeVersionDesignator;
     }
 
     this._dialogService.openComponentDialog(CompareItemsComponent, {
