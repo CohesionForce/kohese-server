@@ -8,6 +8,10 @@ import { MaterialModule } from '../../material.module'
 import { DocumentViewComponent } from './document-view.component';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { BehaviorSubject } from 'rxjs';
 import { MockItem, MockDocument } from '../../../mocks/data/MockItem';
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -32,7 +36,9 @@ describe('Component: Document View', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide: NavigationService, useClass: MockNavigationService}
+        {provide: NavigationService, useClass: MockNavigationService},
+        {provide: ItemRepository, useClass: MockItemRepository},
+        {provide: DialogService, useClass: MockDialogService}
       ]
     }).compileComponents();
 
@@ -86,7 +92,7 @@ describe('Component: Document View', ()=>{
     documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
     documentViewComponent.incrementalLoad = true;
     documentViewFixture.detectChanges();
-    expect(documentViewComponent.itemsLoaded).toBe(12);
+    expect(documentViewComponent.itemsLoaded).toBe(20);
   })
 
   it('stops loading at the character limit', ()=>{
