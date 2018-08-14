@@ -117,6 +117,13 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
 
   deleteFormat (id) {
     delete this.formatDefs[id];
+    if(this.currentType.viewModelProxy.item.defaultFormatKey = id) {
+      delete this.currentType.viewModelProxy.item.defaultFormatKey;
+      for (let formatId in this.formatDefs) {
+        this.currentType.viewModelProxy.item.defaultFormatKey = formatId;
+        break;
+      }
+    }
     this.changeRef.markForCheck();
     if (id === this.selectedFormat.id) {
       this.selectedFormat = undefined;

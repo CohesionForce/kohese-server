@@ -260,7 +260,7 @@ implements OnInit, OnDestroy {
       if (listItem.depth > 0) {
         // Show the header for any node that is not the root of the document
 
-        rendered = '<h' + listItem.depth + '>' + listItem.proxy.item.name + '</h' + listItem.depth + '>';
+        rendered = '<h' + listItem.depth + '>' + listItem.p + '</h' + listItem.depth + '>';
       }
       if (listItem.proxy.item.description) {
         // Show the description if it exists
