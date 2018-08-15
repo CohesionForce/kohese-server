@@ -1,4 +1,5 @@
 
+<label *ngIf="!header.contents[0].hideLabel">{{header.contents[0].propertyName}}</label>
 <div *ngIf="!editable"><div [innerHTML]="rendered"></div></div>
 <div *ngIf="editable">
   <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[this.header.contents[0].propertyName]"></textarea>

@@ -1,5 +1,5 @@
 <div *ngFor="let property of contents">
-  <label style="font-weight: bold;">{{property.propertyName}} : </label>
+  <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
   <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
   <div *ngIf="editable">
     <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[property.propertyName]"></textarea>

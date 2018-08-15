@@ -17,10 +17,11 @@
       [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PROJECT}"
       class="dashboard-section">
     Project Dashboard</h4>
-  <h4 (click)="selectDashType(DashboardTypes.REPORT)"
+  <!-- Toggled off while reports are being worked on -->
+    <!-- <h4 (click)="selectDashType(DashboardTypes.REPORT)"
       [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.REPORT}"
       class="dashboard-section">
-    Reports</h4>
+    Reports</h4> -->
   <hr>
   <div>
     <mat-divider style="border-color: white"></mat-divider>
