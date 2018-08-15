@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs';
 import {
   DialogService
 } from '../../../services/dialog/dialog.service';
@@ -41,6 +42,7 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
 
   docReader: Parser;
   docWriter: HtmlRenderer;
+  upsertComplete : Subject<any> = new Subject();
 
   constructor(private changeRef: ChangeDetectorRef,
               private itemRepository: ItemRepository,
@@ -62,6 +64,7 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     this.itemRepository.upsertItem(proxy).then((newProxy) => {
       row.editable = false;
       docInfo.proxy = newProxy;
+      this.upsertComplete.next();
       this.changeRef.markForCheck();
     })
   }
