@@ -22,7 +22,7 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 
 export interface DocumentInfo {
   proxy: ItemProxy;
-  containers : Array<any>;
+  format : Array<any>;
   active: boolean;
   hovered: boolean;
   depth: number;
@@ -250,11 +250,8 @@ implements OnInit, OnDestroy {
     for (let i = 0;
       (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
       let listItem = subtreeAsList[i];
-      let containers;
       let format = this.formatDefs[listItem.proxy.kind];
-      if (format) {
-        containers = format.containers;
-      } else {
+      if (!format) {
         format = {
           header : {
             kind: "header",
@@ -263,13 +260,12 @@ implements OnInit, OnDestroy {
             ]
           },
           containers: []
-        };
-        containers = format.containers;
+        }
       }
 
       this.loadedProxies.push({
         proxy: listItem.proxy,
-        containers : containers,
+        format : format,
         active: false,
         hovered: false,
         depth: listItem.depth

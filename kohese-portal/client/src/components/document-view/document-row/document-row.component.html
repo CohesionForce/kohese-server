@@ -22,10 +22,10 @@
       </div>
     </div>
     <div class="document-row">
-      <header-container></header-container>
-      <div *ngFor="let container of docInfo.containers">
+      <header-container [proxy]="docInfo.proxy" [header]="docInfo.format.header" [depth]="docInfo.depth" ></header-container>
+      <div *ngFor="let container of docInfo.format.containers">
         <div [ngSwitch]="container.kind">
-          <list-container *ngSwitchCase="list" [editable]="row.editable" [contents]="container.contents"></list-container>
+          <list-container *ngSwitchCase="'list'" [proxy]="docInfo.proxy" [editable]="row.editable" [contents]="container.contents"></list-container>
         </div>
       </div>
     </div>

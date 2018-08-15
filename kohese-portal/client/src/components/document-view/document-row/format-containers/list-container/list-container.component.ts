@@ -12,6 +12,8 @@ export class ListContainerComponent implements OnInit {
   editable : boolean = false;
   @Input()
   contents : Array<PropertyFormat>;
+  @Input()
+  proxy
 
   constructor() { }
 
@@ -20,3 +22,17 @@ export class ListContainerComponent implements OnInit {
   }
 
 }
+
+/*
+
+ export interface FormatContainer {
+  kind : string,
+  contents : Array<PropertyDefinition>
+}
+
+export interface PropertyDefinition {
+  propertyName : string,
+  hideLabel : boolean
+  // Will grow as we get to the property part
+}
+*/

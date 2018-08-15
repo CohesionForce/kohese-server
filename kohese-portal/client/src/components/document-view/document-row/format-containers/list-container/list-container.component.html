@@ -1,3 +1,4 @@
-<p>
-  list-container works!
-</p>
+<div *ngFor="let property of contents">
+  <label style="font-weight: bold;">{{property.propertyName}} : </label>
+  {{proxy.item[property.propertyName]}}
+</div>
