@@ -56,12 +56,19 @@
           <input matInput type="text" placeholder="Value"
             [(ngModel)]="treeRow.object.value"/>
         </mat-form-field>
+        <mat-checkbox [(ngModel)]="treeRow.object.ignoreCase"
+          style="padding-right: 7px;">
+          Ignore Case
+        </mat-checkbox>
       </ng-container>
-      <mat-checkbox [(ngModel)]="treeRow.object.ignoreCase"
+      <mat-checkbox [(ngModel)]="treeRow.object.negate"
         style="padding-right: 7px;">
-        Ignore Case
+        Negate
       </mat-checkbox>
-      <mat-checkbox [(ngModel)]="treeRow.object.negate">Negate</mat-checkbox>
+      <ng-container *ngIf="treeRow.object.external">
+        <mat-icon class="fa fa-star" matTooltip="External criterion">
+        </mat-icon>
+      </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="'AddRowObject'">
       <button mat-icon-button [matMenuTriggerFor]="addMenu">

@@ -49,7 +49,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
 
   public constructor(route: ActivatedRoute, _dialogService: DialogService,
     private _changeDetectorRef: ChangeDetectorRef) {
-    super(route, _dialogService, true);
+    super(route, _dialogService);
     this.showRootWithDescendants = true;
   }
 
@@ -212,6 +212,10 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
+  protected isMultiselectEnabled(object: any): boolean {
+    return true;
+  }
+  
   public addElementToConnection(type: string, connection:
     FilterCriteriaConnection): void {
     let element: FilterElement;
@@ -274,9 +278,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
             this.deleteElement(selectedObjects[j] as FilterElement);
           }
           
-          selectedObjects.length = 0;
-          this.selectedObjectsSubject.next(selectedObjects);
-          this.refresh();
+          this.deselectAll();
         }
       });
     } else {
@@ -284,9 +286,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
         this.deleteElement(selectedObjects[j] as FilterElement);
       }
       
-      selectedObjects.length = 0;
-      this.selectedObjectsSubject.next(selectedObjects);
-      this.refresh();
+      this.deselectAll();
     }
   }
 

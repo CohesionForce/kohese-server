@@ -13,7 +13,8 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
-import { VersionControlService } from '../../../services/version-control/version-control.service';
+import { VersionControlService, VersionControlState,
+  VersionControlSubState } from '../../../services/version-control/version-control.service';
 import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
@@ -57,7 +58,8 @@ describe('Component: version-control-tree', () => {
     
     descendantProxy = TreeConfiguration.getWorkingTree().getRootProxy().
       children[0];
-    descendantProxy.status['Status'] = 'Status';
+    descendantProxy.status[VersionControlState.CURRENT] =
+      VersionControlSubState.NEW;
     
     fixture.detectChanges();
   });
@@ -83,5 +85,28 @@ describe('Component: version-control-tree', () => {
         searchCriterion);
       done();
     }, 1000);
+  });
+  
+  it('determines if all selected ItemProxies are in a state', () => {
+    let selectedObjects: Array<any> = component.selectedObjectsSubject.
+      getValue();
+    selectedObjects.push(descendantProxy);
+    component.selectedObjectsSubject.next(selectedObjects);
+    expect(component.areSelectedProxiesInState(undefined)).toEqual(true);
+    expect(component.areSelectedProxiesInState(VersionControlState.CURRENT)).
+      toEqual(true);
+    expect(component.areSelectedProxiesInState(VersionControlState.UNSTAGED)).
+      toEqual(false);
+  });
+  
+  it('selects all ItemProxies that are in at least one state', () => {
+    component.selectAll();
+    expect(component.selectedObjectsSubject.getValue().indexOf(
+      descendantProxy)).not.toEqual(-1);
+  });
+  
+  it('deselects all ItemProxies', () => {
+    component.deselectAll();
+    expect(component.selectedObjectsSubject.getValue().length).toEqual(0);
   });
 });

@@ -11,10 +11,12 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { VersionControlState,
+  VersionControlSubState } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
-  VersionDesignator } from '../../compare-items/compare-items.component';
+  VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
@@ -71,10 +73,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     route: ActivatedRoute, private _itemRepository: ItemRepository,
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
-    super(route, dialogService, false);
+    super(route, dialogService);
   }
 
   public ngOnInit(): void {
+    this._searchCriterion.external = true;
     let deleteMenuAction: MenuAction = new MenuAction('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
       return !(object as ItemProxy).internal;
@@ -109,12 +112,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
       any) => {
-      if ((object as ItemProxy).history) {
-        return ((object as ItemProxy).history.length > 0);
-      } else {
-        this._itemRepository.getHistoryFor(object as ItemProxy);
-        return false;
-      }
+      let proxy: ItemProxy = (object as ItemProxy);
+      return !((proxy.status[VersionControlState.STAGED] ===
+        VersionControlSubState.NEW) || (proxy.status[VersionControlState.
+        UNSTAGED] === VersionControlSubState.NEW));
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         LAST_COMMITTED_VERSION);
@@ -265,6 +266,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
     item['kind'] = proxy.kind;
+    item['status'] = proxy.status;
     return super.filter(item); 
   }
   
@@ -301,6 +303,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         }
         
         if (!advancedFilter.isElementPresent(this._searchCriterion)) {
+          this._searchCriterion.property = advancedFilter.filterableProperties[
+            0];
           advancedFilter.rootElement.criteria.push(this._searchCriterion);
           this.filterSubject.next(advancedFilter);
         }
@@ -324,7 +328,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] = proxy;
-      compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
+      compareItemsDialogParameters['baseVersion'] = changeVersionDesignator;
     }
 
     this._dialogService.openComponentDialog(CompareItemsComponent, {

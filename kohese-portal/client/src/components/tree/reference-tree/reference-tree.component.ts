@@ -7,11 +7,13 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { VersionControlState,
+  VersionControlSubState } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { CompareItemsComponent,
-  VersionDesignator } from '../../compare-items/compare-items.component';
+  VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { MenuAction } from '../tree-row/tree-row.component';
@@ -34,7 +36,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     private _itemRepository: ItemRepository, route: ActivatedRoute,
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
-    super(route, dialogService, false);
+    super(route, dialogService);
   }
 
   public ngOnInit(): void {
@@ -66,11 +68,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
         path.length - 1]);
       if (proxy) {
-        if (proxy.history) {
-          enable = (proxy.history.length > 0);
-        } else {
-          this._itemRepository.getHistoryFor(proxy);
-        }
+        enable = !((proxy.status[VersionControlState.STAGED] ===
+          VersionControlSubState.NEW) || (proxy.status[VersionControlState.
+          UNSTAGED] === VersionControlSubState.NEW));
       }
 
       return enable;
@@ -284,7 +284,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     if (null != changeVersionDesignator) {
       compareItemsDialogParameters['changeProxy'] =
         compareItemsDialogParameters.baseProxy;
-      compareItemsDialogParameters['changeVersion'] = changeVersionDesignator;
+      compareItemsDialogParameters['baseVersion'] = changeVersionDesignator;
     }
 
     this._dialogService.openComponentDialog(CompareItemsComponent, {

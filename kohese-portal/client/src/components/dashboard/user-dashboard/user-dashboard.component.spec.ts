@@ -13,7 +13,7 @@ import { MockUserData } from '../../../../mocks/data/MockUser'
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 
-describe('Component: ', ()=>{
+describe('Component: UserDashboardComponent', ()=>{
   let userDashboardComponent: UserDashboardComponent;
   let userDashboardFixture : ComponentFixture<UserDashboardComponent>;
 

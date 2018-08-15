@@ -10,8 +10,9 @@
     'no-children': !treeRow.hasChildren() }">
   </i>
   <ng-container *ngIf="treeRow.isMultiselectEnabled()">
-    <mat-checkbox (change)="treeRow.rowSelected()"
-      (click)="$event.stopPropagation()" style="padding-top: 7px;">
+    <mat-checkbox [checked]="treeRow.isRowSelected()"
+      (change)="treeRow.rowSelected()" (click)="$event.stopPropagation()"
+      style="padding-top: 7px;">
     </mat-checkbox>
   </ng-container>
   <ng-container *ngIf="treeRow.getIcon()">

@@ -9,7 +9,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { ItemCache } from '../../../../../common/src/item-cache';
 import { TreeHashMap,
   TreeHashEntryDifference } from '../../../../../common/src/tree-hash';
-import { CompareItemsComponent } from '../compare-items.component';
+import { CompareItemsComponent } from '../item-comparison/compare-items.component';
 
 @Component({
   selector: 'commit-comparison',

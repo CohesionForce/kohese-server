@@ -19,7 +19,7 @@ import { TreeHashMap, TreeHashEntry,
   TreeHashEntryDifference } from '../../../../../common/src/tree-hash';
 import { CommitComparisonComponent, Difference, DifferenceType,
   DifferenceTypeOperations } from '../../compare-items/commit-comparison/commit-comparison.component';
-import { CompareItemsComponent } from '../../compare-items/compare-items.component';
+import { CompareItemsComponent } from '../../compare-items/item-comparison/compare-items.component';
 
 @Component({
   selector: 'commit-tree',
@@ -86,7 +86,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
     ItemRepository, private _lensService: LensService,
     private _navigationService: NavigationService) {
-    super(route, dialogService, false);
+    super(route, dialogService);
   }
 
   public ngOnInit(): void {

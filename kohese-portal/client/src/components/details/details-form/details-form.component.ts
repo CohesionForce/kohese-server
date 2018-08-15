@@ -113,7 +113,7 @@ export class DetailsFormComponent extends NavigatableComponent
       let changedInputs: Array<string> = Object.keys(changes);
 
       if (changes['type']) {
-        this.type = this.DynamicTypeService.getKoheseTypes()[changes['type'].currentValue]
+        this.type = changes['type'].currentValue;
       }
     }
   }
@@ -134,14 +134,16 @@ export class DetailsFormComponent extends NavigatableComponent
   buildPropertyMap(includeValidation: boolean): any {
     let propertyMap: any = {};
     for (let propertyKey in this.type.fields) {
-      let currentProperty: any = this.type.fields[propertyKey];
-      let defaultValue: any = (this.proxyStream.getValue() ?
-        this.proxyStream.getValue().item[propertyKey] : currentProperty.
-          default);
-      if (includeValidation && currentProperty.required) {
-        propertyMap[propertyKey] = [defaultValue, Validators.required];
-      } else {
-        propertyMap[propertyKey] = [defaultValue];
+      if (this.fieldFilterStream.getValue()(propertyKey)) {
+        let currentProperty: any = this.type.fields[propertyKey];
+        let defaultValue: any = (this.proxyStream.getValue() ?
+          this.proxyStream.getValue().item[propertyKey] : currentProperty.
+            default);
+        if (includeValidation && currentProperty.required) {
+          propertyMap[propertyKey] = [defaultValue, Validators.required];
+        } else {
+          propertyMap[propertyKey] = [defaultValue];
+        }
       }
     }
     return propertyMap;
