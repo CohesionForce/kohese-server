@@ -24,7 +24,8 @@ export class ListContainerEditorComponent implements OnInit {
   addRow() {
     this.container.contents.push({
       propertyName : '',
-      hideLabel : false
+      hideLabel : false,
+      labelOrientation: 'Top'
     })
   }
 

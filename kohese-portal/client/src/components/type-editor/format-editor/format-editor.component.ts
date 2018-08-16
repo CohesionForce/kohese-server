@@ -1,11 +1,10 @@
+import { FormatPreviewComponent } from './format-preview/format-preview.component';
+import { DialogService } from './../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-
-import { DialogService,
-  DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 
@@ -23,7 +22,9 @@ export interface FormatDefinition {
 
 export interface PropertyDefinition {
   propertyName : string,
-  hideLabel : boolean
+  hideLabel : boolean,
+  customLabel? : string
+  labelOrientation: string
   // Will grow as we get to the property part
 }
 
@@ -46,7 +47,10 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
 
   formatDefs : Array<FormatDefinition>;
 
-  constructor(private typeService : DynamicTypesService, private changeRef : ChangeDetectorRef, private itemRepository : ItemRepository) {
+  constructor(private typeService : DynamicTypesService,
+     private changeRef : ChangeDetectorRef,
+     private itemRepository : ItemRepository,
+     private dialogService : DialogService) {
 
   }
 
@@ -90,7 +94,8 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
         kind : 'header',
         contents : [{
           propertyName : 'name',
-          hideLabel : true
+          hideLabel : true,
+          labelOrientation : 'Top'
         }]
       },
       containers : [],
@@ -107,7 +112,11 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   }
 
   openPreview () {
-    console.log ('Open Preview');
+    this.dialogService.openComponentDialog(FormatPreviewComponent, {
+      data : {
+        format : this.selectedFormat
+      }
+    });
   }
 
   setDefault (id) {

@@ -6,6 +6,33 @@
       </mat-option>
     </mat-select>
   </div>
-  <mat-checkbox [(ngModel)]="property.hideLabel">Hide Label</mat-checkbox>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Options
+      </mat-panel-title>
+      <mat-panel-description>
+        Modify the format on this property
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Labels
+        </mat-panel-title>
+        <mat-panel-description>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <mat-checkbox [(ngModel)]="property.hideLabel">Hide Label</mat-checkbox>
+      <br/>
+      <label>Custom label : </label><input mat-input [(ngModel)]="property.customLabel">
+      <br/>
+      <label>Orientation : </label>
+      <mat-select style="width : 200px;" [(ngModel)]="property.labelOrientation" >
+          <mat-option [value]="'Top'">Top</mat-option>
+          <mat-option [value]="'Left'">Left</mat-option>
+      </mat-select>
+    </mat-expansion-panel>
+  </mat-expansion-panel>
   <button *ngIf="!disableDelete" mat-button class="remove-button" (click)="deleteRow()">Delete Row</button>
 </div>
