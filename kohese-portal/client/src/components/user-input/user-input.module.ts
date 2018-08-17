@@ -17,11 +17,13 @@ import { ProxySelectorComponent } from './k-proxy-selector/proxy-selector/proxy-
 import { TreeModule } from 'angular-tree-component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
+import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/kd-proxy-selector.component';
 
 @NgModule({
   declarations: [
     KTextComponent,
     KProxySelectorComponent,
+    KdProxySelectorComponent,
     KUserSelectorComponent,
     KDateComponent,
     KSelectComponent,
@@ -48,7 +50,8 @@ import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-
     KSelectComponent,
     KStateEditorComponent,
     KMarkdownComponent,
-    ProxySelectorComponent
+    ProxySelectorComponent,
+    KdProxySelectorComponent
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,

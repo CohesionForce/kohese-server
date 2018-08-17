@@ -1,7 +1,21 @@
 <div *ngFor="let property of contents">
-  <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
-  <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
-  <div *ngIf="editable">
-    <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[property.propertyName]"></textarea>
+  <div *ngIf="['text','markdown', 'user-selector','date'].includes(property.kind)">
+    <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
+    <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
+    <div *ngIf="editable">
+      <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[property.propertyName]"></textarea>
+    </div>
+  </div>
+  <div *ngIf="property.kind === 'proxy-selector'">
+      <kd-proxy-selector></kd-proxy-selector>
+  </div>
+  <div *ngIf="property.kind === 'state-machine'">
+    State Machine not implemented
+  </div>
+  <div *ngIf="property.kind === 'select'">
+    Select not implemented
+  </div>
+  <div *ngIf="property.kind === 'read-only'">
+    Read only not implemented
   </div>
 </div>

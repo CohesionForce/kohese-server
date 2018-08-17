@@ -34,7 +34,6 @@ export class HeaderContainerComponent implements OnInit, OnDestroy {
       this.render();
       this.property = this.header.contents[0];
     })
-    console.log(this.property);
   }
 
   ngOnDestroy() {

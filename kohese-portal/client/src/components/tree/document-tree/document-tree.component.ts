@@ -64,7 +64,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     });
 
-    console.log(this.documentRoot)
     this.rootRowActions.push(new RowAction('Test action',
       'I am an action', 'fa fa-times', (object: any) => {
       return true;
@@ -125,17 +124,13 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
       this.showFocus();
       setTimeout(()=>{
-        console.log(this.visibleRows)
       }, 500)
     }
   });
 
   this.selectedProxyStreamSubscription = this.selectedProxyStream.subscribe((newSelection) => {
-    console.log(this.sync);
     if(this.sync && newSelection) {
       this.focusedObjectSubject.next(newSelection);
-      console.log(newSelection, this);
-
       this.showFocus();
     }
   })
@@ -263,7 +258,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   public setRowAsRoot(proxy: ItemProxy) {
     this.rootSubject.next(proxy);
     this.rootSelected.emit(proxy);
-    console.log('over');
   }
 }
 

@@ -1,3 +1,4 @@
+import { UserInputModule } from './../user-input/user-input.module';
 import { HeaderContainerComponent } from './document-row/format-containers/header-container/header-container.component';
 import { ListContainerComponent } from './document-row/format-containers/list-container/list-container.component';
 import { DocumentRowComponent } from './document-row/document-row.component';
@@ -30,7 +31,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
     MaterialModule,
     FormsModule,
     ReactiveFormsModule,
-    TreeViewModule
+    TreeViewModule,
+    UserInputModule
   ],
   exports : [
     DocumentViewComponent,

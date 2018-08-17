@@ -27,4 +27,14 @@ export class PropertyRowComponent implements OnInit {
   deleteRow() {
     this.deleted.emit(this.property);
   }
+
+  updateKind(propertyName) {
+    let viewProperty = this.kind.fields[propertyName.value].views.form;
+    if (viewProperty) {
+      this.property.kind = viewProperty.inputType.type
+    } else {
+      this.property.kind = 'read-only'
+    }
+    console.log(this.property.kind);
+  }
 }

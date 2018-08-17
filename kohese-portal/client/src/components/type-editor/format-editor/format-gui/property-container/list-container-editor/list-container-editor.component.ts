@@ -25,7 +25,8 @@ export class ListContainerEditorComponent implements OnInit {
     this.container.contents.push({
       propertyName : '',
       hideLabel : false,
-      labelOrientation: 'Top'
+      labelOrientation: 'Top',
+      kind :  ''
     })
   }
 

@@ -1,6 +1,6 @@
 <div class="property-row">
   <div class="selector">
-    <mat-select placeholder="---" [(ngModel)]="property.propertyName">
+    <mat-select placeholder="---" [(ngModel)]="property.propertyName" (change)="updateKind($event)">
       <mat-option *ngFor="let propertyName of kind.fields | mapKey" [value]="propertyName">
         {{propertyName}}
       </mat-option>
@@ -15,6 +15,7 @@
         Modify the format on this property
       </mat-panel-description>
     </mat-expansion-panel-header>
+
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
@@ -28,11 +29,22 @@
       <label>Custom label : </label><input mat-input [(ngModel)]="property.customLabel">
       <br/>
       <label>Orientation : </label>
-      <mat-select style="width : 200px;" [(ngModel)]="property.labelOrientation" >
+      <mat-select style="width : 200px;" [(ngModel)]="property.labelOrientation">
           <mat-option [value]="'Top'">Top</mat-option>
           <mat-option [value]="'Left'">Left</mat-option>
       </mat-select>
     </mat-expansion-panel>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Content
+          </mat-panel-title>
+          <mat-panel-description>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <mat-checkbox [(ngModel)]="property.hideEmpty">Hide if empty</mat-checkbox>
+      </mat-expansion-panel>
   </mat-expansion-panel>
   <button *ngIf="!disableDelete" mat-button class="remove-button" (click)="deleteRow()">Delete Row</button>
 </div>

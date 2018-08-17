@@ -9,9 +9,9 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 
 export interface FormatDefinition {
-  name : string,
+  name : string
   header : FormatContainer
-  containers : Array<FormatContainer>,
+  containers : Array<FormatContainer>
   id : string
 }
 
@@ -21,10 +21,11 @@ export interface FormatDefinition {
 }
 
 export interface PropertyDefinition {
-  propertyName : string,
-  hideLabel : boolean,
+  propertyName : string
+  hideLabel : boolean
   customLabel? : string
   labelOrientation: string
+  kind : string
   // Will grow as we get to the property part
 }
 
@@ -95,7 +96,8 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
         contents : [{
           propertyName : 'name',
           hideLabel : true,
-          labelOrientation : 'Top'
+          labelOrientation : 'Top',
+          kind : 'text'
         }]
       },
       containers : [],
