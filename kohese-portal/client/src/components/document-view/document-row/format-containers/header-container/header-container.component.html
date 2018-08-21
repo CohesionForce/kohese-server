@@ -1,7 +1,7 @@
 
 <label *ngIf="!property.hideLabel">
-  <span *ngIf="!customLabel">{{property.propertyName}}</span>
-  <span *ngIf="customLabel">{{property.customLabel}}</span>
+  <span *ngIf="!property.customLabel">{{property.propertyName}}</span>
+  <span *ngIf="property.customLabel">{{property.customLabel}}</span>
   </label>
 <!-- {{property | json}} -->
 <div *ngIf="!editable"><div [innerHTML]="rendered"></div></div>

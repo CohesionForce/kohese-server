@@ -132,7 +132,7 @@ export class ItemCache {
     if (objectMap.refs){
       this.refs = objectMap.refs;
       this.metadata.numRefs = _.size(this.refs);
-      if(objectMap.metadata && this.metadata.numRefs !== objectMap.metadata.numRefs){
+      if(this.metadata.numRefs !== objectMap.metadata.numRefs){
         console.log('*** Number of refs do not match: ' + _.size(this.refs));
       }
     }
