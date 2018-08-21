@@ -7,7 +7,7 @@
 var repl = require('repl');
 var net = require('net');
 var util = require('util');
-var kio = require('./koheseIO.js');
+var kio = require('./koheseIO');
 
 console.log('::: Starting Remote REPL Interface');
 var replServer = net.createServer(function(socket) {

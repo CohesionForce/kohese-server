@@ -1,7 +1,7 @@
 
   var _und = require('underscore');
   var request = require('request');
-  var kdb = require('./kdb.js');
+  var kdb = require('./kdb');
 
   var lookup = {
       CC: 'Coordinating Conjuction',

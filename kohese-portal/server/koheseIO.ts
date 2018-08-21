@@ -14,7 +14,7 @@ function Server(httpServer, options){
     return kio.server;
   }
 
-  var decodeAuthToken = require('./boot/routes.js').decodeAuthToken;
+  var decodeAuthToken = require('./boot/routes').decodeAuthToken;
 
   kio.server.on('connection', function (socket) {
       console.log('>>> session %s connected from %s', socket.id, socket.handshake.address);

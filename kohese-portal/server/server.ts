@@ -23,13 +23,13 @@ if (require.main === module) {
   }
 
   // Load the KDB
-  var kdb = require('./kdb.js');
+  var kdb = require('./kdb');
   global['koheseKDB'] = kdb;
   kdb.initialize(baseRepoPath).then(function () {
     try {
 
       // Establish routes
-      var routes = require('./boot/routes.js');
+      var routes = require('./boot/routes');
       routes(app);
 
       // Setup the KoheseUser relations
@@ -43,13 +43,13 @@ if (require.main === module) {
       });
 
       console.log('::: Starting Kohese IO');
-      var kio = require('./koheseIO.js');
+      var kio = require('./koheseIO');
       // eslint-disable-next-line no-unused-vars
       var kioServer = kio.Server(appServer);
       // eslint-disable-next-line no-unused-vars
-      var itemServer = require('./kio-itemServer.js');
+      var itemServer = require('./kio-itemServer');
       // eslint-disable-next-line no-unused-vars
-      var fileServer = require('./kio-fileServer.js');
+      var fileServer = require('./kio-fileServer');
 
       console.log('::: KoheseIO Started');
       app.emit('koheseIO-started');
@@ -59,7 +59,7 @@ if (require.main === module) {
       for (var i = 2; i < process.argv.length; i++) {
           if(process.argv[i] === 'repl') {
             // eslint-disable-next-line no-unused-vars
-            var koheseREPL = require('./kohese-repl.js');
+            var koheseREPL = require('./kohese-repl');
             break;
           }
       }
