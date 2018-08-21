@@ -45,6 +45,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   selectedPropertyId: string;
   selectedFormat : FormatDefinition
   types = [];
+  modelUndefined : boolean = false;
 
   formatDefs : Array<FormatDefinition>;
 
@@ -72,6 +73,12 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
     this.koheseTypeStreamSubscription = this.koheseTypeStream.subscribe(
       (koheseType: KoheseType) => {
       this.currentType = koheseType;
+      if (!koheseType.viewModelProxy) {
+        this.modelUndefined = true;
+        this.changeRef.markForCheck();
+        return;
+      }
+      this.modelUndefined = false;
       if (!koheseType.viewModelProxy.item.formatDefinitions) {
         koheseType.viewModelProxy.item.formatDefinitions = {};
         koheseType.viewModelProxy.item.defaultFormatIndex = undefined;

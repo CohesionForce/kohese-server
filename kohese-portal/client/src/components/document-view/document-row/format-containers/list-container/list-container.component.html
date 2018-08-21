@@ -1,6 +1,7 @@
 <div *ngFor="let property of contents">
   <div *ngIf="['text','markdown', 'user-selector','date'].includes(property.kind)">
-    <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
+    <label *ngIf="!property.hideLabel && !property.customLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
+    <label *ngIf="!property.hideLabel && property.customeLabel" style="font-weight: bold;">{{property.customLabel}} : </label>
     <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
     <div *ngIf="editable">
       <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[property.propertyName]"></textarea>
