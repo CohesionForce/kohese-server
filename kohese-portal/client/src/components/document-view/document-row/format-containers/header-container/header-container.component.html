@@ -3,8 +3,8 @@
   <span *ngIf="!customLabel">{{property.propertyName}}</span>
   <span *ngIf="customLabel">{{property.customLabel}}</span>
   </label>
-{{property | json}}
+<!-- {{property | json}} -->
 <div *ngIf="!editable"><div [innerHTML]="rendered"></div></div>
 <div *ngIf="editable">
-  <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[this.header.contents[0].propertyName]"></textarea>
+  <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[header.contents[0].propertyName]"></textarea>
 </div>
