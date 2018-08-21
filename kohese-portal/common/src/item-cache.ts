@@ -399,12 +399,16 @@ export class ItemCache {
       if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
         let commit = this.kCommitMap[commitId];
         console.log('::: Evaluating commit:  ' + commitId);
-        // console.log(JSON.stringify(commit, null, '  '));
+        console.log(JSON.stringify(commit, null, '  '));
+        console.log(Object.keys(commit.repoTreeRoots));
 
         for (let rootId in commit.repoTreeRoots){
           let root = commit.repoTreeRoots[rootId];
-          // console.log('::: Evaluating root:  ' + rootId);
-          evaluateTreeEntry(rootId, root);
+          console.log('::: Evaluating root:  ' + rootId);
+          console.log(JSON.stringify(root, null, '  '));
+          // if(root !== undefined){
+            evaluateTreeEntry(rootId, root);
+          // }
         }
       }
     };
