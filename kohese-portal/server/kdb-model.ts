@@ -1,8 +1,8 @@
 /**
- * 
+ *
  */
 
-var kdbFS = require('./kdb-fs.js');
+var kdbFS = require('./kdb-fs');
 var jsonExt = /\.json$/;
 var modelDef = {};
 module.exports.modelDef = modelDef;

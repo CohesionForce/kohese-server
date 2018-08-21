@@ -5,8 +5,8 @@
  */
 import * as fs from 'fs';
 var commonmark = require('commonmark');
-var renderFunc = require('./md-to-kohese-helper.js');
-import { ItemProxy } from '../common/src/item-proxy.js';
+var renderFunc = require('./md-to-kohese-helper');
+import { ItemProxy } from '../common/src/item-proxy';
 
 function mdToKohese(koheseUserName, filePath, rootItem) {
   var text;
