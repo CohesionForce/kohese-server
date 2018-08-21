@@ -7,15 +7,20 @@
     </div>
   </div>
   <div *ngIf="property.kind === 'proxy-selector'">
-      <kd-proxy-selector></kd-proxy-selector>
+      <kd-proxy-selector [property]="property" [editable]="editable" [proxy]="proxy"></kd-proxy-selector>
   </div>
   <div *ngIf="property.kind === 'state-machine'">
     State Machine not implemented
   </div>
   <div *ngIf="property.kind === 'select'">
     Select not implemented
+    <!-- <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label> -->
   </div>
   <div *ngIf="property.kind === 'read-only'">
-    Read only not implemented
+    <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
+    <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
+    <div *ngIf="editable">
+      {{property.propertyName}} not available for editing
+    </div>
   </div>
 </div>
