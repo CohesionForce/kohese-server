@@ -28,7 +28,7 @@
   </div>
   <div id="definition-editor" *ngIf="selectedFormat">
     <h2>
-      <input mat-input [(ngModel)]="selectedFormat.name" />
+      <input matInput [(ngModel)]="selectedFormat.name" />
       <img *ngIf="selectedFormat.dirty" src="../../../../assets/icons/versioncontrol/dirty.ico">
       <button mat-button (click)="openPreview(selectedFormat);">
         <i class="fa fa-search"></i> Preview</button>
