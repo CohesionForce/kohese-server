@@ -385,22 +385,28 @@ function KIOItemServer(socket){
 
     let requestTime = Date.now();
 
-    // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
-    kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
+    let proxy = ItemProxy.getWorkingTree().getProxyFor(request.onId);
 
-      if (history) {
-        let responseTime = Date.now();
-        console.log('+++ History for ' + request.onId);
-        console.log(history);
-        console.log('$$$ History response time: ' + (responseTime - requestTime)/1000);
-        sendResponse(history);
-      } else {
-        console.log('*** History error for ' + request.onId);
-        sendResponse({error: 'history error'});
-      }
-    });
+    if (!proxy.history) {
+      // Note:  This call is synchronous
+      kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
+        if (history){
+          proxy.history = history;
+        }
+      });
+    }
 
-  });
+    if (proxy.history) {
+      let responseTime = Date.now();
+      console.log('+++ History for ' + request.onId);
+      console.log(proxy.history);
+      console.log('$$$ History response time: ' + (responseTime - requestTime)/1000);
+      sendResponse(proxy.history);
+    } else {
+      console.log('*** History error for ' + request.onId);
+      sendResponse({error: 'history error'});
+    }
+});
 
   //////////////////////////////////////////////////////////////////////////
   //
