@@ -1,3 +1,4 @@
+import { ColumnContainerComponent } from './document-row/format-containers/column-container/column-container.component';
 import { UserInputModule } from './../user-input/user-input.module';
 import { HeaderContainerComponent } from './document-row/format-containers/header-container/header-container.component';
 import { ListContainerComponent } from './document-row/format-containers/list-container/list-container.component';
@@ -21,7 +22,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
     DocumentRowComponent,
     FullscreenDocumentComponent,
     ListContainerComponent,
-    HeaderContainerComponent
+    HeaderContainerComponent,
+    ColumnContainerComponent
   ],
   imports : [
     CommonModule,
