@@ -329,6 +329,13 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getBlobs(){
+    return this.blobMap;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   numberOfCommits(){
     return _.size(this.kCommitMap);
   }
@@ -404,11 +411,7 @@ export class ItemCache {
         for (let rootId in commit.repoTreeRoots){
           let root = commit.repoTreeRoots[rootId];
           // console.log('::: Evaluating root:  ' + rootId);
-          if(root !== undefined){
-            evaluateTreeEntry(rootId, root);
-          } else {
-            console.log('!!! Ignoring undefined root ' + rootId + ' for commit ' + commitId);
-          }
+          evaluateTreeEntry(rootId, root);
         }
       }
     };
