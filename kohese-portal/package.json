@@ -6,8 +6,9 @@
   "scripts": {
     "server": "node --max_old_space_size=2048 .",
     "build-all": "npm run build-server && npm run build-client",
+    "build-all-prod": "npm run build-server && npm run build-client-prod",
     "build-server": "tsc --p server/tsconfig.json",
-    "build-client": "webpack --config webpack.config.dev.js",
+    "build-client": "webpack --config webpack.config.dev.js && npm run sw-config && npm run sw-copy",
     "build-client-prod": "webpack --config webpack.config.prod.js && npm run sw-config && npm run sw-copy",
     "start": "webpack-dev-server --port=4200",
     "test": "karma start --log-level error ./karma.conf.js",
