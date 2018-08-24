@@ -387,7 +387,7 @@ function KIOItemServer(socket){
 
     let proxy = ItemProxy.getWorkingTree().getProxyFor(request.onId);
 
-    if (!proxy.history) {
+    if (proxy && !proxy.history) {
       // Note:  This call is synchronous
       kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
         if (history){
@@ -396,7 +396,7 @@ function KIOItemServer(socket){
       });
     }
 
-    if (proxy.history) {
+    if (proxy && proxy.history) {
       let responseTime = Date.now();
       console.log('+++ History for ' + request.onId);
       console.log(proxy.history);
