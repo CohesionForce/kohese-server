@@ -7,6 +7,7 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
 import { Observable } from 'rxjs/Observable';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import * as uuidV1 from 'uuid/v1';
 
 export interface FormatDefinition {
   name : string
@@ -95,7 +96,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   }
 
   addDefinition () {
-    let id = this.createUUID();
+    let id = uuidV1();
     this.formatDefs[id] = ({
       name : 'New definition ',
       header : {
@@ -148,14 +149,6 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  createUUID() : string {
-    let dt = new Date().getTime();
-    let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (dt + Math.random()*16)%16 | 0;
-        dt = Math.floor(dt/16);
-        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-    });
-    return uuid;
-}
+
 
 }

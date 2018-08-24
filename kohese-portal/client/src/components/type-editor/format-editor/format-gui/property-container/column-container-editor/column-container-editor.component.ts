@@ -63,7 +63,7 @@ export class ColumnContainerEditorComponent implements OnInit {
   }
 
 
-  removeContainer(row) {
+  removeContainer() {
     this.deleted.emit(this.container);
   }
 
