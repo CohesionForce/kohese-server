@@ -8,7 +8,7 @@ import { DialogService } from '../../../../services/dialog/dialog.service';
 @Component({
   selector: 'kd-markdown',
   templateUrl: './kd-markdown.component.html',
-  styleUrls: ['./kd-markdown.component.css']
+  styleUrls: ['./kd-markdown.component.scss']
 })
 export class KdMarkdownComponent implements OnInit {
   @Input()
