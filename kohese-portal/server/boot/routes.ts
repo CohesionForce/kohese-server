@@ -13,7 +13,7 @@ module.exports = function (app) {
     var serveFavicon = require('serve-favicon');
     var fs = require('fs');
 
-    var serverAuthentication = require('../server-enableAuth.js');
+    var serverAuthentication = require('../server-enableAuth');
 
     var clientBundlePath = path.resolve(__dirname, '../../client/bundle');
 

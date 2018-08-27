@@ -6,9 +6,9 @@
 import * as fs from 'fs';
 var Path = require('path');
 var child = require('child_process');
-import { ItemProxy } from '../common/src/item-proxy.js';
+import { ItemProxy } from '../common/src/item-proxy';
 
-var mdToKohese = require('./md-to-kohese.js');
+var mdToKohese = require('./md-to-kohese');
 
 var basePath;
 var tempDirPath;

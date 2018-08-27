@@ -2,15 +2,15 @@ import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
 
-var kio = require('./koheseIO.js');
-var kdb = require('./kdb.js');
-const kdbFS = require('./kdb-fs.js');
+var kio = require('./koheseIO');
+var kdb = require('./kdb');
+const kdbFS = require('./kdb-fs');
 var fs = require('fs');
 var child = require('child_process');
-var itemAnalysis = require('./analysis.js');
-var serverAuthentication = require('./server-enableAuth.js');
+var itemAnalysis = require('./analysis');
+var serverAuthentication = require('./server-enableAuth');
 const Path = require('path');
-const importer = require('./directory-ingest.js');
+const importer = require('./directory-ingest');
 var _ = require('underscore');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -383,20 +383,30 @@ function KIOItemServer(socket){
   socket.on('Item/getHistory', function(request, sendResponse){
     console.log('::: Getting history for ' + request.onId);
 
-    // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
-    kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
+    let requestTime = Date.now();
 
-      if (history) {
-        console.log('+++ History for ' + request.onId);
-        console.log(history);
-        sendResponse(history);
-      } else {
-        console.log('*** History error for ' + request.onId);
-        sendResponse({error: 'history error'});
-      }
-    });
+    let proxy = ItemProxy.getWorkingTree().getProxyFor(request.onId);
 
-  });
+    if (proxy && !proxy.history) {
+      // Note:  This call is synchronous
+      kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
+        if (history){
+          proxy.history = history;
+        }
+      });
+    }
+
+    if (proxy && proxy.history) {
+      let responseTime = Date.now();
+      console.log('+++ History for ' + request.onId);
+      console.log(proxy.history);
+      console.log('$$$ History response time: ' + (responseTime - requestTime)/1000);
+      sendResponse(proxy.history);
+    } else {
+      console.log('*** History error for ' + request.onId);
+      sendResponse({error: 'history error'});
+    }
+});
 
   //////////////////////////////////////////////////////////////////////////
   //

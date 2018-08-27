@@ -1,6 +1,6 @@
 const SocketMock = require('../../../node_modules/socket.io-mock/dist/index.min.js'); //temp
 const EventEmitter = require('events');
-var kdb = require('../../../server/kdb.js');
+var kdb = require('../../../server/kdb');
 
 global.app = new EventEmitter();
 
@@ -14,47 +14,47 @@ describe('Test KIO', ()=> {
     });
 
     it('Demo KIO Server Test', (done) => {
-      var kio = require('../../../server/koheseIO.js');
+      var kio = require('../../../server/koheseIO');
       console.log('KIO Started');
 
       // Mock initialization by setting kio.server to mock interface
       kio.server = new EventEmitter();
-      
+
       // Mock the client socket
       var socket = new EventEmitter();
-      
+
       // Initialize additional socket parameters
-      
+
       socket.id = 'Session-01';
       socket.handshake = {address: '1.2.3.4'};
       socket.koheseUser = {username: 'TestUser'};
 
       // Initialize KIO Item Server
       console.log('::: Initialize kio Item Server');
-      var itemServer = require('../../../server/kio-itemServer.js');
+      var itemServer = require('../../../server/kio-itemServer');
       global.app.emit('newSession', socket);
-            
+
       // Request items be staged
       var itemId = '748b7880-b509-11e7-ba1e-cbd891de1f92';
       var request = {
           proxyIds: undefined
       };
-      
+
       var eventOrder = [];
-      
+
       function receivedEvent (event) {
         console.log('--- Received event: ' + event);
         eventOrder.push(event);
         if (eventOrder.length === 2){
           console.log('::: Checking order');
           expect(eventOrder).toBe(['statusUpdated', 'response']);
-          done();          
+          done();
         }
       }
 
       var expectedStatusMap = {};
       expectedStatusMap[itemId] = ['INDEX_MODIFIED'];
-      
+
       var expectedResponse = {};
       expectedResponse[itemId] = true;
 

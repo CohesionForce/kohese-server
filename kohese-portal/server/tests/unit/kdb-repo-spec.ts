@@ -1,4 +1,4 @@
-const KdbRepo = require('./../../kdb-repo.js');
+const KdbRepo = require('./../../kdb-repo');
 const Fs = require('fs');
 const Path = require('path');
 
@@ -23,12 +23,12 @@ describe('Test KDB Repository: ', function () {
       }
     });
   }
-  
+
   it('performs Repository initialization', function (done) {
     if (!Fs.existsSync(repositoryPath)) {
       Fs.mkdirSync(repositoryPath);
     }
-    
+
     KdbRepo.initializeRepository(repositoryId, repositoryPath).then(function () {
       expect(Fs.readdirSync(repositoryPath).indexOf('.git')).not.toEqual(-1);
       done();
@@ -46,7 +46,7 @@ describe('Test KDB Repository: ', function () {
       done();
     });
   });
-  
+
   it('adds to the index', function (done) {
     KdbRepo.add(repositoryId, testFile).then(function (addStatus) {
       expect(addStatus).toBeTruthy();
@@ -61,10 +61,10 @@ describe('Test KDB Repository: ', function () {
     var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
     statusPromise.then((status) => {
       expect(status).toEqual(['INDEX_NEW']);
-      done();      
+      done();
     });
   });
-  
+
   it('commits', function (done) {
     KdbRepo.commit([repositoryId], 'name', 'e-mail', 'initial commit').then(function (commitIdMap) {
       expect(commitIdMap[repositoryId].filesCommitted).toEqual([testFile]);
@@ -121,7 +121,7 @@ describe('Test KDB Repository: ', function () {
       fail();
     });
   });
-  
+
   it('resets', function (done) {
     Fs.writeFileSync(repositoryPath + Path.sep + testFile, baseContent +
       additionalContent);
@@ -138,7 +138,7 @@ describe('Test KDB Repository: ', function () {
       fail();
     });
   });
-  
+
   it('does not checkout a tracked file that has been added to the index', function (done) {
     KdbRepo.add(repositoryId, testFile).then(function (addStatus) {
       if (addStatus) {
@@ -157,7 +157,7 @@ describe('Test KDB Repository: ', function () {
       }
     });
   });
-  
+
   it('reverts an indexed and further modified file to the indexed state', function (done) {
     var originalContent = Fs.readFileSync(repositoryPath + Path.sep + testFile,
         {encoding: 'utf8', flag: 'r'});
@@ -165,7 +165,7 @@ describe('Test KDB Repository: ', function () {
     var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
     statusPromise.then((status) => {
       expect(status).toEqual(['INDEX_MODIFIED']);
-      
+
       Fs.writeFileSync(repositoryPath + Path.sep + testFile, originalContent + furtherContent);
       statusPromise = KdbRepo.getItemStatus(repositoryId, testFile);
       statusPromise.then((status) => {
@@ -209,7 +209,7 @@ describe('Test KDB Repository: ', function () {
       fail();
     });
   });
-  
+
   it('deletes an untracked file when it is reverted', function (done) {
     Fs.writeFileSync(repositoryPath + Path.sep + testFile2, baseContent);
     var statusPromise = KdbRepo.getItemStatus(repositoryId, testFile2);

@@ -26,7 +26,7 @@ if (!baseRepoPath){
 //////////////////////////////////////////////////////////////////////////
 
 // Load the KDB
-var kdb = require('../server/kdb.js');
+var kdb = require('../server/kdb');
 global['koheseKDB'] = kdb;
 let indexAndExit = true;
 kdb.initialize(baseRepoPath, indexAndExit).then(function () {

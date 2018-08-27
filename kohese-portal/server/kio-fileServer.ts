@@ -3,7 +3,7 @@
  */
 
 // eslint-disable-next-line no-unused-vars
-var kio = require('./koheseIO.js');
+var kio = require('./koheseIO');
 var SocketIOFile = require('socket.io-file');
 
 global['app'].on('newSession', function (socket) {
