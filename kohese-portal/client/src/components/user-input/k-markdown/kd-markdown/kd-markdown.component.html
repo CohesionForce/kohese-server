@@ -1,0 +1,22 @@
+<label *ngIf="!property.hideLabel" style="font-weight : bold;">{{property.propertyName}}</label>
+<div *ngIf="container === 'list'">
+  <div class="variable-data" *ngIf="editable">
+    Description :
+    <button mat-icon-button class="fa fa-question-circle" matTooltip="Markdown cheat sheet" (click)="showCheatSheet()"></button>
+    <textarea style="background-color : white;" matInput [(ngModel)]="proxy.item[property.propertyName]" matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="25">
+    </textarea>
+  </div>
+  <div class="binding-container">
+    Markdown :
+    <markdown class="variable-binding" [data]="proxy.item[property.propertyName]">
+    </markdown>
+  </div>
+</div>
+<div *ngIf="!(container === 'list')">
+  <div *ngIf="editable">
+    Markdown fields available for editing in this format.
+  </div>
+  <br/>
+  <markdown class="variable-binding" [data]="proxy.item[property.propertyName]">
+  </markdown>
+</div>
