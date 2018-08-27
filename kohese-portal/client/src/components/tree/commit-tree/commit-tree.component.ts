@@ -116,6 +116,8 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
           this.showFocus();
         });
         
+        this.initialize();
+        
         this.showFocus();
       }
     });

@@ -201,6 +201,9 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         this.buildRows(this._absoluteRoot);
         this.rootSubject.next(this._absoluteRoot);
         this.refresh();
+        
+        this.initialize();
+        
         this.showFocus();
       }
     });
