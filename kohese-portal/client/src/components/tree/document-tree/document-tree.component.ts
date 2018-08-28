@@ -122,6 +122,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
       this.rootSubject.next(this.documentRoot);
       this.rootSelected.emit(this.documentRoot);
+      
+      this.initialize();
 
       this.showFocus();
       setTimeout(()=>{
