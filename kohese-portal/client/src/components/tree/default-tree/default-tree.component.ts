@@ -182,13 +182,16 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         
         this.rootSubject.next(this._absoluteRoot);
         
+        this.refresh();
+        
+        this.initialize();
+        
         this._route.params.subscribe((parameters: Params) => {
           if (this._synchronizeWithSelection) {
             this.showFocus();
           }
         });
         
-        this.refresh();
         this.showFocus();
       }
     });

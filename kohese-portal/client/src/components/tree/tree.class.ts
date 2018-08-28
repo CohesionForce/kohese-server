@@ -114,7 +114,9 @@ export abstract class Tree {
         this.showRows();
       }
     });
-
+  }
+  
+  protected initialize(): void {
     this._route.params.subscribe((parameters: Params) => {
       let focusedRow: TreeRow = this._rowMap.get(parameters['id']);
       if (focusedRow) {
