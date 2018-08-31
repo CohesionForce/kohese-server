@@ -1,3 +1,4 @@
+import { DocumentViewModule } from './../../document-view/document-view.module';
 import { FormatPreviewComponent } from './format-preview/format-preview.component';
 import { HeaderContainerEditorComponent } from './format-gui/property-container/header-container/header-container-editor.component';
 import { PropertyRowComponent } from './format-gui/property-container/property-row/property-row.component';
@@ -38,6 +39,7 @@ import { ColumnContainerEditorComponent } from './format-gui/property-container/
     FormsModule,
     MaterialModule,
     PipesModule,
+    DocumentViewModule
   ]
 })
 export class FormatModule {

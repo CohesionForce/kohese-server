@@ -124,9 +124,11 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   openPreview () {
     this.dialogService.openComponentDialog(FormatPreviewComponent, {
       data : {
-        format : this.selectedFormat
+        format : this.selectedFormat,
+        type : this.currentType
       }
-    });
+    })
+    .updateSize('70%','%70');
   }
 
   setDefault (id) {

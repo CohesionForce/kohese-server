@@ -4,7 +4,7 @@ import { FormatContainer } from '../../../format-editor.component';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 export interface ColumnContainer extends FormatContainer {
-  numColumns : Number
+  numColumns : number
   columns : Array<ColumnDefinition>
 }
 

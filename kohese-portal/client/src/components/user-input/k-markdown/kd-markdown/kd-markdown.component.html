@@ -14,7 +14,7 @@
 </div>
 <div *ngIf="!(container === 'list')">
   <div *ngIf="editable">
-    Markdown fields available for editing in this format.
+    Markdown fields not available for editing in this format.
   </div>
   <br/>
   <markdown class="variable-binding" [data]="proxy.item[property.propertyName]">

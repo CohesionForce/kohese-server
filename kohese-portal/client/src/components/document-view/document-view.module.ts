@@ -39,6 +39,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
   exports : [
     DocumentViewComponent,
     ListContainerComponent,
+    DocumentRowComponent
   ]
 })
 export class DocumentViewModule {}
