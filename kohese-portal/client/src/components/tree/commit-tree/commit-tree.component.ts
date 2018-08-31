@@ -9,6 +9,7 @@ import { ItemRepository,
   TreeConfigType } from '../../../services/item-repository/item-repository.service';
 import { LensService, ApplicationLens } from '../../../services/lens-service/lens.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
@@ -17,8 +18,10 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { ItemCache, KoheseCommit } from '../../../../../common/src/item-cache';
 import { TreeHashMap, TreeHashEntry,
   TreeHashEntryDifference } from '../../../../../common/src/tree-hash';
-import { CommitComparisonComponent, Difference, DifferenceType,
-  DifferenceTypeOperations } from '../../compare-items/commit-comparison/commit-comparison.component';
+import { Comparison, ChangeType } from '../../compare-items/comparison.class';
+import { ItemProxyComparison } from '../../compare-items/item-proxy-comparison.class';
+import { Compare } from '../../compare-items/compare.class';
+import { CommitComparisonComponent } from '../../compare-items/commit-comparison/commit-comparison.component';
 import { CompareItemsComponent } from '../../compare-items/item-comparison/compare-items.component';
 
 @Component({
@@ -33,49 +36,42 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   public rowSelectedEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   private _images: Array<Image> = [
-    new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
-      CONTENT_CHANGED), DifferenceTypeOperations.toString(DifferenceType.
-      CONTENT_CHANGED), true, (object: any) => {
-      return ((object instanceof Difference) && (-1 !== (<Difference> object).
-        differenceTypes.indexOf(DifferenceType.CONTENT_CHANGED)));
-    }),
-    new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
-      TYPE_CHANGED), DifferenceTypeOperations.toString(DifferenceType.
-      TYPE_CHANGED), true, (object: any) => {
-      return ((object instanceof Difference) && (-1 !== (<Difference> object).
-        differenceTypes.indexOf(DifferenceType.TYPE_CHANGED)));
-    }),
-    new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
-      PARENT_CHANGED), DifferenceTypeOperations.toString(DifferenceType.
-      PARENT_CHANGED), true, (object: any) => {
-      return ((object instanceof Difference) && (-1 !== (<Difference> object).
-        differenceTypes.indexOf(DifferenceType.PARENT_CHANGED)));
-    }),
-    new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
-      CHILD_ADDED), DifferenceTypeOperations.toString(DifferenceType.
-      CHILD_ADDED), true, (object: any) => {
-      return ((object instanceof Difference) && (-1 !== (<Difference> object).
-        differenceTypes.indexOf(DifferenceType.CHILD_ADDED)));
-    }),
-    new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
-      CHILD_MODIFIED), DifferenceTypeOperations.toString(DifferenceType.
-      CHILD_MODIFIED), true, (object: any) => {
-      return ((object instanceof Difference) && (-1 !== (<Difference> object).
-        differenceTypes.indexOf(DifferenceType.CHILD_MODIFIED)));
-    }),
-    new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
-      CHILD_REMOVED), DifferenceTypeOperations.toString(DifferenceType.
-      CHILD_REMOVED), true, (object: any) => {
-      return ((object instanceof Difference) && (-1 !== (<Difference> object).
-        differenceTypes.indexOf(DifferenceType.CHILD_REMOVED)));
-    }),
-    new Image(DifferenceTypeOperations.getIconClass(DifferenceType.
-      CHILDREN_REORDERED), DifferenceTypeOperations.toString(DifferenceType.
-      CHILDREN_REORDERED), true, (object: any) => {
-      return ((object instanceof Difference) && (-1 !== (<Difference> object).
-        differenceTypes.indexOf(DifferenceType.CHILDREN_REORDERED)));
-    })
-  ];
+    new Image(Comparison.getChangeIconString(ChangeType.CONTENT_CHANGED),
+      ChangeType.CONTENT_CHANGED, true, (object: any) => {
+      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
+        changeTypes.indexOf(ChangeType.CONTENT_CHANGED)));
+      }),
+    new Image(Comparison.getChangeIconString(ChangeType.TYPE_CHANGED),
+      ChangeType.TYPE_CHANGED, true, (object: any) => {
+      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
+        changeTypes.indexOf(ChangeType.TYPE_CHANGED)));
+      }),
+    new Image(Comparison.getChangeIconString(ChangeType.PARENT_CHANGED),
+      ChangeType.PARENT_CHANGED, true, (object: any) => {
+      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
+        changeTypes.indexOf(ChangeType.PARENT_CHANGED)));
+      }),
+    new Image(Comparison.getChangeIconString(ChangeType.CHILD_ADDED),
+      ChangeType.CHILD_ADDED, true, (object: any) => {
+      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
+        changeTypes.indexOf(ChangeType.CHILD_ADDED)));
+      }),
+    new Image(Comparison.getChangeIconString(ChangeType.CHILD_MODIFIED),
+      ChangeType.CHILD_MODIFIED, true, (object: any) => {
+      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
+        changeTypes.indexOf(ChangeType.CHILD_MODIFIED)));
+      }),
+    new Image(Comparison.getChangeIconString(ChangeType.CHILD_REMOVED),
+      ChangeType.CHILD_REMOVED, true, (object: any) => {
+      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
+        changeTypes.indexOf(ChangeType.CHILD_REMOVED)));
+      }),
+    new Image(Comparison.getChangeIconString(ChangeType.CHILDREN_REORDERED),
+      ChangeType.CHILDREN_REORDERED, true, (object: any) => {
+      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
+        changeTypes.indexOf(ChangeType.CHILDREN_REORDERED)));
+      })
+    ];
   get images() {
     return this._images;
   }
@@ -85,7 +81,8 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   public constructor(route: ActivatedRoute, dialogService: DialogService,
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
     ItemRepository, private _lensService: LensService,
-    private _navigationService: NavigationService) {
+    private _navigationService: NavigationService,
+    private _dynamicTypesService: DynamicTypesService) {
     super(route, dialogService);
   }
 
@@ -148,17 +145,17 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       commits));
     for (let j: number = 0; j < sortedCommitArray.length; j++) {
       let commitObject: any = sortedCommitArray[j];
-      let differences: Array<Difference> = [];
+      let comparisons: Array<Comparison> = [];
       let commitRow: TreeRow = this.buildRow(new Commit(commitObject.oid,
-        commitObject.commit, differences));
+        commitObject.commit, comparisons));
       commits.push(commitRow.object);
       if (commitObject.commit.parents && commitObject.commit.parents[0]) {
-        differences.push(...CommitComparisonComponent.compareCommits(
-          commitObject.commit.parents[0], commitObject.oid));
+        comparisons.push(...Compare.compareCommits(commitObject.commit.parents[
+          0], commitObject.oid, this._dynamicTypesService));
       }
 
-      for (let j: number = 0; j < differences.length; j++) {
-        this.buildRow(differences[j]);
+      for (let j: number = 0; j < comparisons.length; j++) {
+        this.buildRow(comparisons[j]);
       }
     }
     
@@ -171,9 +168,16 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       id = (object as Repository).proxy.item.id;
     } else if (object instanceof Commit) {
       id = (object as Commit).id;
-    } else if (object instanceof Difference) {
-      let difference: Difference = (object as Difference);
-      id = difference.commitId + '_' + difference.item.id;
+    } else if (object instanceof Comparison) {
+      let comparison: ItemProxyComparison = (object as ItemProxyComparison);
+      let repository: Repository = (<Repository> this.getRow(this.
+        _repositoryProxy.item.id).object);
+      for (let j: number = 0; j < repository.commits.length; j++) {
+        if (-1 !== repository.commits[j].comparisons.indexOf(comparison)) {
+          id = repository.commits[j].id + '_' + comparison.changeObject.id;
+          break;
+        }
+      }
     }
 
     return id;
@@ -182,11 +186,18 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   protected getParent(object: any): any {
     if (object instanceof Commit) {
       return this.getRow(this._repositoryProxy.item.id).object;
-    } else if (object instanceof Difference) {
-      return this.getRow((object as Difference).commitId).object;
-    } else {
-      return undefined;
+    } else if (object instanceof Comparison) {
+      let repository: Repository = (<Repository> this.getRow(this.
+        _repositoryProxy.item.id).object);
+      for (let j: number = 0; j < repository.commits.length; j++) {
+        if (-1 !== repository.commits[j].comparisons.indexOf(
+          object as Comparison)) {
+          return this.getRow(this.getId(repository.commits[j])).object;
+        }
+      }
     }
+    
+    return undefined;
   }
   
   protected getChildren(object: any): Array<any> {
@@ -197,9 +208,9 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         children.push(commits[j]);
       }
     } else if (object instanceof Commit) {
-      let differences: Array<Difference> = (object as Commit).differences;
-      for (let j: number = 0; j < differences.length; j++) {
-        children.push(differences[j]);
+      let comparisons: Array<Comparison> = (object as Commit).comparisons;
+      for (let j: number = 0; j < comparisons.length; j++) {
+        children.push(comparisons[j]);
       }
     }
 
@@ -212,8 +223,8 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       text = (object as Repository).proxy.item.name;
     } else if (object instanceof Commit) {
       text = (object as Commit).koheseCommit.message;
-    } else if (object instanceof Difference) {
-      text = (object as Difference).item.name;
+    } else if (object instanceof Comparison) {
+      text = (object as Comparison).changeObject.name;
     }
 
     return text;
@@ -262,19 +273,20 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       }).updateSize('50%', '80%');
     } else {
-      let baseProxy: ItemProxy;
+      let compareParameters: any = {
+        editable: false
+      };
+      
       if (baseObject instanceof Repository) {
-        baseProxy = (baseObject as Repository).proxy;
-      } else if (baseObject instanceof Difference) {
-        //baseProxy = (baseObject instanceof Difference).item;
+        compareParameters['baseProxy'] = (baseObject as Repository).proxy;
+      } else if (baseObject instanceof Comparison) {
+        let comparison: Comparison = (baseObject as Comparison);
+        //compareParameters['baseProxy'] = comparison.baseObject;
+        //compareParameters['changeProxy'] = comparison.changeObject;
       }
 
       this._dialogService.openComponentDialog(CompareItemsComponent, {
-        data: {
-          //baseProxy: ,
-          changeProxy: baseProxy,
-          editable: false
-        }
+        data: compareParameters
       });
     }
   }
@@ -303,11 +315,11 @@ export class Commit {
     return this._koheseCommit;
   }
 
-  get differences() {
-    return this._differences;
+  get comparisons() {
+    return this._comparisons;
   }
 
   public constructor(private _id: string, private _koheseCommit: KoheseCommit,
-    private _differences: Array<Difference>) {
+    private _comparisons: Array<Comparison>) {
   }
 }

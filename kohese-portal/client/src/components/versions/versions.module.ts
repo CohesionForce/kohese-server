@@ -4,6 +4,7 @@ import { AngularSplitModule } from 'angular-split';
 
 import { LensModule } from '../lens/lens.module';
 import { TreeViewModule } from '../tree/tree.module';
+import { CompareItemsModule } from '../compare-items/compare-items.module';
 import { VersionsComponent } from './versions.component';
 
 @NgModule({
@@ -12,7 +13,8 @@ import { VersionsComponent } from './versions.component';
     CommonModule,
     AngularSplitModule,
     LensModule,
-    TreeViewModule
+    TreeViewModule,
+    CompareItemsModule
   ]
 })
 export class VersionsModule {

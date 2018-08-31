@@ -11,6 +11,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemCache } from '../../../../../common/src/item-cache';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import { Comparison } from '../comparison.class';
 import { DetailsFormComponent } from '../../details/details-form/details-form.component';
 import { SelectedProxyInfo } from '../../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
@@ -46,6 +47,15 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     new BehaviorSubject<ItemProxy>(undefined);
   get selectedObjectSubject() {
     return this._selectedObjectSubject;
+  }
+  
+  private _sideChangeable: boolean = true;
+  get sideChangeable() {
+    return this._sideChangeable;
+  }
+  @Input('sideChangeable')
+  set sideChangeable(sideChangeable: boolean) {
+    this._sideChangeable = sideChangeable;
   }
   
   private _type: KoheseType;
@@ -103,9 +113,6 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
   
   private _treeConfigurationSubscription: Subscription;
   private _changeSubjectSubscription: Subscription;
-  
-  private static readonly _UUID_REGULAR_EXPRESSION: RegExp =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository, private _dialogService:
@@ -221,7 +228,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
       }
       
       value = String(value);
-      if (ComparisonSideComponent._UUID_REGULAR_EXPRESSION.test(value)) {
+      if (Comparison.UUID_REGULAR_EXPRESSION.test(value)) {
         let proxy: ItemProxy = TreeConfiguration.getTreeConfigFor(
           this._selectedVersion).getProxyFor(value);
         if (proxy) {

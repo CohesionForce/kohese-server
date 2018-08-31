@@ -17,16 +17,30 @@
                 <br/>
                 {{selectedVersionObject.koheseCommit.time | date:'medium'}}
               </h2>
+              <change-summary [comparisonsSubject]="comparisonsSubject">
+              </change-summary>
             </ng-container>
-            <ng-container *ngSwitchCase="'Difference'">
+            <ng-container *ngSwitchCase="'Comparison'">
               <h1>
-                {{selectedVersionObject.item.name}}
+                {{selectedVersionObject.changeObject.name}}
               </h1>
-              <ng-container *ngIf="selectedVersionObject.path">
-                <h3>
-                  Path: {{selectedVersionObject.path}}
-                </h3>
-              </ng-container>
+              <h3>
+                Path: {{selectedVersionObject.path}}
+              </h3>
+              <!-- split direction="horizontal">
+                <split-area [size]="50">
+                  <comparison-side [sideChangeable]="false"
+                    [isBaseVersion]="true"
+                    [showDifferencesOnlySubject]="showDifferencesOnly">
+                  </comparison-side>
+                </split-area>
+                <split-area [size]="50">
+                  <comparison-side [sideChangeable]="false"
+                    [isBaseVersion]="false"
+                    [showDifferencesOnlySubject]="showDifferencesOnly">
+                  </comparison-side>
+                </split-area>
+              </split-->
             </ng-container>
           </ng-container>
         </div>
