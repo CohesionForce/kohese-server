@@ -80,7 +80,7 @@ export class ChangeSummaryComponent {
     return hasChanges;
   }
   
-  public setColors(change: any): object {
+  public getChangeStyle(change: any): object {
     let style: object = {};
     if (change.added) {
       style = {

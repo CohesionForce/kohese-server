@@ -45,7 +45,7 @@
               <ng-container
                 *ngFor="let change of comparison.propertyComparisonMap.get(
                   property)">
-                <span [ngStyle]="setColors(change)">
+                <span [ngStyle]="getChangeStyle(change)">
                   {{change.value}}
                 </span>
               </ng-container>
