@@ -50,7 +50,7 @@ export class DynamicTypesService {
                 for (let j: number = 0; j < typeProxies.length; j++) {
                   this.buildKoheseType(typeProxies[j]);
                 }
-                
+
                 if (this.repoStatusSubscription) {
                   this.repoStatusSubscription.unsubscribe();
                 }
@@ -73,7 +73,7 @@ export class DynamicTypesService {
     } while (modelProxy.item.base)
     let type: KoheseType = new KoheseType(dataModelProxy, viewModelProxyMap);
     dataModelProxy.type = type;
-      
+
     /* Add the newly-built KoheseType to koheseTypes and sort koheseTypes
     alphabetically */
     this.koheseTypes[dataModelProxy.item.name] = type;

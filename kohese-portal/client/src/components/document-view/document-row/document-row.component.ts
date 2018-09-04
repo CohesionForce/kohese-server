@@ -1,15 +1,16 @@
+import { Subject } from 'rxjs';
 import {
   DialogService
-} from './../../../services/dialog/dialog.service';
+} from '../../../services/dialog/dialog.service';
 import {
   ItemRepository
-} from './../../../services/item-repository/item-repository.service';
+} from '../../../services/item-repository/item-repository.service';
 import {
   DetailsDialogComponent
-} from './../../details/details-dialog/details-dialog.component';
+} from '../../details/details-dialog/details-dialog.component';
 import {
   ItemProxy
-} from './../../../../../common/src/item-proxy';
+} from '../../../../../common/src/item-proxy';
 import {
   ChangeDetectorRef,
   EventEmitter,
@@ -37,10 +38,12 @@ import * as commonmark from 'commonmark';
 export class DocumentRowComponent implements OnInit, AfterViewInit {
   @Input() row;
   @Input() docInfo;
+  @Input() showActions : boolean = true;
   @Output() viewInitialized: EventEmitter < ElementRef > = new EventEmitter < ElementRef > ()
 
   docReader: Parser;
   docWriter: HtmlRenderer;
+  upsertComplete : Subject<any> = new Subject();
 
   constructor(private changeRef: ChangeDetectorRef,
               private itemRepository: ItemRepository,
@@ -60,20 +63,9 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
 
   upsertItem(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
     this.itemRepository.upsertItem(proxy).then((newProxy) => {
-      let rendered = '';
       row.editable = false;
       docInfo.proxy = newProxy;
-      if (docInfo.depth > 0) {
-        // Show the header for any node that is not the root of the document
-
-        rendered = '<h' + docInfo.depth + '>' + docInfo.proxy.item.name + '</h' + docInfo.depth + '>';
-      }
-      if (docInfo.proxy.item.description) {
-        // Show the description if it exists
-        let nodeParsed = this.docReader.parse(docInfo.proxy.item.description);
-        rendered += this.docWriter.render(nodeParsed);
-      }
-      docInfo.rendered = rendered;
+      this.upsertComplete.next();
       this.changeRef.markForCheck();
     })
   }

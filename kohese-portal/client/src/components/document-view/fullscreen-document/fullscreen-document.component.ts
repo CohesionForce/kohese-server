@@ -1,6 +1,6 @@
-import { ItemRepository } from './../../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ActivatedRoute } from '@angular/router';
-import { ItemProxy } from './../../../../../common/src/item-proxy';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 

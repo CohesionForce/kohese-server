@@ -1,7 +1,7 @@
 <div>
   <creation-row [referenceProxy]="docInfo.proxy" class="document-row" *ngIf="row.addTop" [relation]="'sibling'" (itemCreated)="insertRow($event, row, 'addTop')"></creation-row>
   <div [ngClass]="{'hovered-row': row.rowState === 'show'}" style="background-color: lightgray;">
-    <div style="width: 40px; display: inline-block" [ngClass]="{'hovered-actions' : row.rowState === 'show'}" class="row-actions">
+    <div style="width: 40px; display: inline-block" [ngClass]="{'hovered-actions' : row.rowState === 'show'}" *ngIf="showActions" class="row-actions">
       <div class="button-group" *ngIf="row.rowState === 'show'">
         <button mat-icon-button class="fa fa-plus side-button" (click)="row.addTop = true" *ngIf="!row.addTop">
           <i class="fa fa-chevron-up"></i>
@@ -21,13 +21,20 @@
         </button>
       </div>
     </div>
-    <div class="document-row" *ngIf="!row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}" [innerHTML]="docInfo.rendered">
+    <div class="document-row">
+      <header-container [upsertComplete]="upsertComplete" [editable]="row.editable" [proxy]="docInfo.proxy" [header]="docInfo.format.header" [depth]="docInfo.depth" ></header-container>
+      <div *ngFor="let container of docInfo.format.containers">
+        <div [ngSwitch]="container.kind">
+          <column-container *ngSwitchCase="'column'" [numColumns]="container.numColumns" [proxy]="docInfo.proxy" [editable]="row.editable" [columns]="container.columns"></column-container>
+          <list-container *ngSwitchCase="'list'" [proxy]="docInfo.proxy" [editable]="row.editable" [contents]="container.contents"></list-container>
+        </div>
+      </div>
     </div>
-    <div class="document-row" *ngIf="row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}">
+    <!-- <div class="document-row" *ngIf="row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}">
       <textarea matInput [(ngModel)]="docInfo.proxy.item.name"></textarea>
       <hr/>
       <textarea matInput matTextareaAutosize #description [(ngModel)]="docInfo.proxy.item.description"></textarea>
-    </div>
+    </div> -->
   </div>
   <creation-row [referenceProxy]="docInfo.proxy" [relation]="'child'" *ngIf="row.addBottom" class="document-row" (itemCreated)="insertRow($event, row, 'addBottom')"></creation-row>
 </div>

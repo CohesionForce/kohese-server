@@ -1,0 +1,9 @@
+
+<div mat-dialog-title class="preview-format-title">
+  <span style="font-size: large">Preview Format</span>
+</div>
+<button mat-button (click)="mockRow.editable = true" *ngIf="!mockRow.editable">Edit</button>
+<button mat-button (click)="mockRow.editable = false" *ngIf="mockRow.editable">Display</button>
+
+<document-row [row]="mockRow" [showActions]="false" style="height: 90%"[docInfo]="mockDocInfo">
+</document-row>

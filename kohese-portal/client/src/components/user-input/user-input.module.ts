@@ -1,3 +1,4 @@
+import { KdMarkdownComponent } from './k-markdown/kd-markdown/kd-markdown.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../material.module';
@@ -17,11 +18,13 @@ import { ProxySelectorComponent } from './k-proxy-selector/proxy-selector/proxy-
 import { TreeModule } from 'angular-tree-component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
+import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/kd-proxy-selector.component';
 
 @NgModule({
   declarations: [
     KTextComponent,
     KProxySelectorComponent,
+    KdProxySelectorComponent,
     KUserSelectorComponent,
     KDateComponent,
     KSelectComponent,
@@ -29,7 +32,8 @@ import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-
     KMarkdownComponent,
     MarkdownCheatSheetComponent,
     ProxySelectorComponent,
-    ProxySelectorDialogComponent
+    ProxySelectorDialogComponent,
+    KdMarkdownComponent
   ],
   imports: [
     CommonModule,
@@ -48,7 +52,9 @@ import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-
     KSelectComponent,
     KStateEditorComponent,
     KMarkdownComponent,
-    ProxySelectorComponent
+    ProxySelectorComponent,
+    KdProxySelectorComponent,
+    KdMarkdownComponent
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,

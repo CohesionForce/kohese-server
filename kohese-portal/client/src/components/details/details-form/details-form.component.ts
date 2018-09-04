@@ -4,7 +4,6 @@ import {
 } from '@angular/core';
 import {
   FormGroup, FormBuilder, Validators,
-  AbstractControl
 } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
