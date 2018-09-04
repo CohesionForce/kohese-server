@@ -37,11 +37,15 @@ export class KdProxySelectorComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (!this.proxy) {
+      console.log('log');
+    }
     if (this.proxy.item[this.property.propertyName]) {
-      for (let proxyIdStruct of this.proxy.item[this.property.propertyName]) {
-        console.log(proxyIdStruct);
-        this.references.push(ItemProxy.getWorkingTree().getProxyFor(proxyIdStruct.id));
-      }
+      // for (let proxyIdStruct of this.proxy.item[this.property.propertyName]) {
+      //   console.log(proxyIdStruct);
+      //   this.references.push(ItemProxy.getWorkingTree().getProxyFor(proxyIdStruct.id));
+      // }
+      this.references.push(ItemProxy.getWorkingTree().getProxyFor(this.proxy.item[this.property.propertyName]))
     } else {
       this.proxy.item[this.property.propertyName] = [];
     }

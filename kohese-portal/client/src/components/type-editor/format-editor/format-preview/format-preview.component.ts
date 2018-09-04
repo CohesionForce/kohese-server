@@ -54,7 +54,6 @@ export class FormatPreviewComponent implements OnInit {
     for(let container of this.format.containers) {
       for(let contents of container.contents) {
         this.mockProxy.item[contents.propertyName] = defaultValues[contents.kind];
-        console.log(this.mockProxy.item[contents.propertyName]);
       }
     }
   }
