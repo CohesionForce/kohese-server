@@ -11,16 +11,21 @@ import { DetailsModule } from '../details/details.module';
 import { CompareItemsComponent } from './item-comparison/compare-items.component';
 import { CommitComparisonComponent } from './commit-comparison/commit-comparison.component';
 import { ComparisonSideComponent } from './item-comparison/comparison-side.component';
+import { ChangeSummaryComponent } from './change-summary/change-summary.component';
 
 @NgModule({
   declarations: [
     CompareItemsComponent,
     CommitComparisonComponent,
-    ComparisonSideComponent
+    ComparisonSideComponent,
+    ChangeSummaryComponent
   ],
   entryComponents: [
     CompareItemsComponent,
     CommitComparisonComponent
+  ],
+  exports: [
+    ChangeSummaryComponent
   ],
   imports: [
     CommonModule,
