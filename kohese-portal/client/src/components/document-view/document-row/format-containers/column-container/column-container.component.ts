@@ -23,4 +23,9 @@ export class ColumnContainerComponent implements OnInit {
     console.log(this);
   }
 
+  stateChanged(stateName, value) {
+    this.proxy.item[stateName] = value;
+  }
+
+
 }

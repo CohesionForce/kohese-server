@@ -19,6 +19,7 @@ import { TreeModule } from 'angular-tree-component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/kd-proxy-selector.component';
+import { KdStateEditorComponent } from './k-state-editor/kd-state-editor/kd-state-editor.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     MarkdownCheatSheetComponent,
     ProxySelectorComponent,
     ProxySelectorDialogComponent,
-    KdMarkdownComponent
+    KdMarkdownComponent,
+    KdStateEditorComponent
   ],
   imports: [
     CommonModule,
@@ -54,7 +56,8 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     KMarkdownComponent,
     ProxySelectorComponent,
     KdProxySelectorComponent,
-    KdMarkdownComponent
+    KdMarkdownComponent,
+    KdStateEditorComponent
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,

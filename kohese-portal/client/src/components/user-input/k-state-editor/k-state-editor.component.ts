@@ -18,7 +18,7 @@ export class KStateEditorComponent extends UserInput implements OnInit,
   public itemProxy: ItemProxy;
   @Input()
   public disableTransitioning: boolean;
-  
+
   private _koheseType: KoheseType;
   get koheseType() {
     return this._koheseType;
@@ -31,44 +31,43 @@ export class KStateEditorComponent extends UserInput implements OnInit,
   get transitionCandidateFieldNames() {
     return this._transitionCandidateFieldNames;
   }
-  
+
   private _initialized: boolean = false;
-  
+
   @Output()
   public stateChanged: EventEmitter<any> = new EventEmitter<any>();
-  
+
   public constructor(private _stateService: StateService,
     private _typeService: DynamicTypesService,
     private _itemRepository: ItemRepository) {
     super();
   }
-  
+
   public ngOnInit(): void {
     this._koheseType = this._typeService.getKoheseTypes()[this.itemProxy.kind];
     this._transitionCandidates = this._stateService.
       getTransitionCandidates(this.itemProxy);
     this._transitionCandidateFieldNames = Object.keys(this.
       _transitionCandidates);
-      
+
     this._initialized = true;
   }
-  
+
   public ngOnChanges(changes: SimpleChanges): void {
     if (this._initialized) {
       if (changes['itemProxy']) {
         this.itemProxy = changes['itemProxy'].currentValue;
         this.ngOnInit();
       }
-      
+
       if (changes['disableTransitioning']) {
         this.disableTransitioning = changes['disableTransitioning'].
           currentValue;
       }
     }
   }
-  
-  public openTransitionDialog(fieldName: string, candidate: string): void {
-    //this.dialogService.openComponentDialog().afterClosed().subscribe(() => {
+
+  public transition(fieldName: string, candidate: string): void {
       this.stateChanged.emit({
         fieldName: fieldName,
         candidate: candidate
@@ -78,6 +77,5 @@ export class KStateEditorComponent extends UserInput implements OnInit,
         getTransitionCandidates(this.itemProxy);
       this._transitionCandidateFieldNames = Object.keys(this.
         _transitionCandidates);
-    //});
   }
 }

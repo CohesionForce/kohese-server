@@ -8,7 +8,7 @@
         *ngFor="let candidateId of (transitionCandidates[fieldName] | mapKey)"
         matTooltip="{{koheseType.fields[fieldName].properties.state[transitionCandidates[fieldName][candidateId].target].description}}"
         [disabled]="disableTransitioning"
-        (click)="transition(fieldName, transitionCandidates[fieldName][candidateId].target)">
+        (click)="openTransitionDialog(fieldName, transitionCandidates[fieldName][candidateId].target)">
         {{candidateId}}
       </button>
     </div>
