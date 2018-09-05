@@ -181,7 +181,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
                 row.refresh();
               } else {
                 // Row does not represent a modified item
-                if (this.getChildren(row).length){
+                if (this.getChildren(row.object).length){
                   // This row would still be displayed as an ancestor
                   row.refresh();
                 } else {
@@ -201,6 +201,9 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         this.buildRows(this._absoluteRoot);
         this.rootSubject.next(this._absoluteRoot);
         this.refresh();
+        
+        this.initialize();
+        
         this.showFocus();
       }
     });
@@ -232,15 +235,16 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   }
 
   private removeRowAndAncestors(proxy: ItemProxy){
-    let currentRow = this.getRow(proxy.item.id);
+    let currentRow: TreeRow = this.getRow(proxy.item.id);
     if (currentRow){
-      if (!(this.proxyHasVCStatus(proxy) || this.getChildren(currentRow).length)){
+      if (!(this.proxyHasVCStatus(proxy) || this.getChildren(proxy).length)){
         // Delete the row and any applicable ancestors
         this.deleteRow(proxy.item.id);
 
-        let ancestor = proxy.parentProxy;
-        let ancestorRow = this.getRow(ancestor.item.id);
-        while ((ancestor !== this._absoluteRoot) && !(this.proxyHasVCStatus(ancestor) || this.getChildren(ancestorRow).length)){
+        let ancestor: ItemProxy = proxy.parentProxy;
+        let ancestorRow: TreeRow = this.getRow(ancestor.item.id);
+        while ((ancestor !== this._absoluteRoot) && !(this.proxyHasVCStatus(
+          ancestor) || this.getChildren(ancestor).length)){
           this.deleteRow(ancestor.item.id);
           ancestor = ancestor.parentProxy;
           ancestorRow = this.getRow(ancestor.item.id);

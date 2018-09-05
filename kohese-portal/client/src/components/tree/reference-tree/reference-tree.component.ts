@@ -121,6 +121,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           this.rootSubject.next(root);
         });
         
+        this.initialize();
+        
         this.showFocus();
       }
     });
