@@ -16,6 +16,9 @@
                          (projectSelected)="onProjectSelected($event)"
                          [savedProject]="selectedProject"></project-dashboard>
     </div>
+    <div *ngIf="selectedDashboard.dashboardType === DashboardTypes.REPORT">
+      <report-dashboard [dashboardSelectionStream]="dashboardSelectionStream"></report-dashboard>
+    </div>
   </div>
 </div>
 

@@ -1,0 +1,13 @@
+<label *ngIf="!property.hideLabel" style="font-weight : bold;">{{property.propertyName}}</label>
+<div *ngIf="!editable">
+  <div *ngFor="let proxy of references ">
+   <a (click)="openDetails(proxy)" style="cursor:pointer;"> {{proxy.item.name}}</a>
+  </div>
+</div>
+<div *ngIf="editable">
+  Editing not implemented
+    <!-- <div *ngFor="let proxy of references ">
+        <div (click)="openDetails(proxy)" style="cursor:pointer;"> {{proxy.item.name}}</div>
+       </div>
+  <button mat-button style="background-color: navy; color : white;" (click)="openProxySelectionDialog()">Select</button> -->
+</div>

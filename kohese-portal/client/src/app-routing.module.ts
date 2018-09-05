@@ -12,6 +12,7 @@ import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeEditorComponent } from './components/type-editor/type-editor.component';
 import { DevToolsComponent } from './components/admin/dev-tools/dev-tools.component';
 import { FullscreenDocumentComponent } from './components/document-view/fullscreen-document/fullscreen-document.component';
+import { ReportGeneratorComponent } from './components/report-generator/report-generator.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -21,11 +22,11 @@ const routes: Routes = [
   { path: 'versions', component: VersionsComponent },
   { path: 'repositories', component: RepositoriesComponent },
   { path: 'explore', component: ExploreComponent},
-  // { path: 'explore/:id', component: ExploreComponent},
   { path: 'analysis', component: AnalysisComponent },
   { path: 'typeeditor', component: TypeEditorComponent},
   { path: 'devtools', component: DevToolsComponent},
-  { path: 'document', component: FullscreenDocumentComponent}
+  { path: 'document', component: FullscreenDocumentComponent},
+  { path: 'report-gen', component: ReportGeneratorComponent}
 ]
 
 @NgModule({

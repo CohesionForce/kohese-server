@@ -16,6 +16,14 @@
     "viewProperties": {
       "type": "object",
       "required": true
+    },
+    "formatDefinitions" : {
+      "type": "object",
+      "required": true
+    },
+    "defaultFormatKey" : {
+      "type": "string",
+      "required": true
     }
   },
   "validations": [],

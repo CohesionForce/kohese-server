@@ -1,12 +1,13 @@
-import { TreeConfiguration } from './../../../../common/src/tree-configuration';
-import { DialogService } from './../../services/dialog/dialog.service';
-import { DetailsDialogComponent } from './../details/details-dialog/details-dialog.component';
-import { ItemRepository } from './../../services/item-repository/item-repository.service';
+import { FormatDefinition } from '../type-editor/format-editor/format-editor.component';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { DetailsDialogComponent } from '../details/details-dialog/details-dialog.component';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef, trigger, state, style, animate, transition, ViewChildren, Output, EventEmitter } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
 import { Observable } from 'rxjs';
 
-import { ItemProxy } from '../../../../common/src/item-proxy.js';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -14,13 +15,14 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import * as commonmark from 'commonmark';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class.js';
+import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Router, NavigationEnd } from '@angular/router';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 
 export interface DocumentInfo {
   proxy: ItemProxy;
-  rendered: string;
+  format : Array<any>;
   active: boolean;
   hovered: boolean;
   depth: number;
@@ -75,6 +77,7 @@ implements OnInit, OnDestroy {
   invalidFilterRegex: boolean;
   itemsLoaded: number = 0;
   loadedProxies: Array < DocumentInfo > = [];
+  formatDefs : any = {};
 
   /* Utils */
   docReader: Parser;
@@ -82,6 +85,7 @@ implements OnInit, OnDestroy {
   initialized: boolean;
   treeConfig : TreeConfiguration;
   treeConfigSubscription : Subscription;
+  repoStatusSubscription : Subscription;
 
 
   /* Observables */
@@ -108,7 +112,8 @@ implements OnInit, OnDestroy {
     private changeRef: ChangeDetectorRef,
     private router: Router,
     private itemRepository: ItemRepository,
-    private dialogService: DialogService) {
+    private dialogService: DialogService,
+    private typeService : DynamicTypesService) {
     super(NavigationService)
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({
@@ -141,20 +146,43 @@ implements OnInit, OnDestroy {
       })
     }
 
+    this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
+    .subscribe((update: any) => {
+      switch (update.state) {
+        case RepoStates.KOHESEMODELS_SYNCHRONIZED:
+        case RepoStates.SYNCHRONIZATION_SUCCEEDED:
+          this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
+            if (newConfig) {
+              let types = this.typeService.getKoheseTypes();
 
-    this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
-      if (newProxy) {
-        this.itemProxy = newProxy;
-        this.itemsLoaded = 0;
-        // TODO - Determine if there is a way to cache and diff the new doc before
-        // regenerating
-        this.generateDoc();
-        this.changeRef.markForCheck();
-      } else {
-        this.itemProxy = undefined
+              for (let type in types) {
+                let vm = types[type].viewModelProxy;
+                if (vm && vm.item.formatDefinitions && vm.item.defaultFormatKey) {
+                  this.formatDefs[type] = vm.item.formatDefinitions[vm.item.defaultFormatKey]
+                } else {
+                  console.log('Format not defined for ' + type);
+                }
+              }
+              console.log(this.formatDefs);
+
+              this.treeConfig = newConfig.config;
+              this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
+                if (newProxy) {
+                  this.itemProxy = newProxy;
+                  this.itemsLoaded = 0;
+                  // TODO - Determine if there is a way to cache and diff the new doc before
+                  // regenerating
+                  this.generateDoc();
+                  this.changeRef.markForCheck();
+                } else {
+                  this.itemProxy = undefined
+                }
+              })
+              this.initialized = true
+            }
+          })
       }
     })
-    this.initialized = true
   }
 
   ngOnDestroy() {
@@ -222,22 +250,22 @@ implements OnInit, OnDestroy {
     for (let i = 0;
       (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
       let listItem = subtreeAsList[i];
-      let rendered = ''
-
-      if (listItem.depth > 0) {
-        // Show the header for any node that is not the root of the document
-
-        rendered = '<h' + listItem.depth + '>' + listItem.proxy.item.name + '</h' + listItem.depth + '>';
+      let format = this.formatDefs[listItem.proxy.kind];
+      if (!format) {
+        format = {
+          header : {
+            kind: "header",
+            contents : [
+              {propertyName : 'name', hideLabel: true}
+            ]
+          },
+          containers: []
+        }
       }
-      if (listItem.proxy.item.description) {
-        // Show the description if it exists
-        let nodeParsed = this.docReader.parse(listItem.proxy.item.description);
-        rendered += this.docWriter.render(nodeParsed);
 
-      }
       this.loadedProxies.push({
         proxy: listItem.proxy,
-        rendered: rendered,
+        format : format,
         active: false,
         hovered: false,
         depth: listItem.depth

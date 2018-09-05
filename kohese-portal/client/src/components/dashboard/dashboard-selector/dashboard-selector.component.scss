@@ -20,3 +20,9 @@
   background-color : #111e1e;
   color : whitesmoke !important;
 }
+
+.dashboard-section {
+  &:hover {
+    cursor: pointer;
+  }
+}

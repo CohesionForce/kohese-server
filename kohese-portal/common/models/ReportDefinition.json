@@ -1,0 +1,25 @@
+{
+  "id": "ReportDefinition",
+  "name": "ReportDefinition",
+  "parentId": "Item",
+  "base": "Item",
+  "idInjection": false,
+  "invertItemOrder": false,
+  "properties": {
+    "entryPoints" : {
+      "type": [
+        "Item"
+      ],
+      "relation": true
+    },
+    "typeFormats" : {
+      "type": [
+        "object"
+      ]
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

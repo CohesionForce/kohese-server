@@ -567,35 +567,38 @@ function KIOItemServer(socket){
 
   });
 
-  socket.on('VersionControl/stage', function (request, sendResponse) {
+  socket.on('VersionControl/stage', async function (request, sendResponse) {
     console.log('::: session %s: Received VersionControl/stage for %s for user %s at %s',
         socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     var idsArray = Array.from(request.proxyIds);
+    let errorMap: any = {};
     var proxies = [];
-    var promises = [];
     for (var i = 0; i < idsArray.length; i++) {
       console.log('--- Adding proxy for: ' + idsArray[i]);
       var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
 
-      promises.push(kdb.kdbRepo.add(repositoryInformation.repositoryProxy.item.id,
-          repositoryInformation.relativeFilePath));
-
+      try {
+        await kdb.kdbRepo.add(repositoryInformation.repositoryProxy.item.id,
+          repositoryInformation.relativeFilePath);
+      } catch (error) {
+        console.log(error.stack);
+        errorMap[String(idsArray[i])] = error;
+      }
     }
 
-    Promise.all(promises).then(function () {
-      console.log('::: session %s: Sending response for VersionControl/stage for user %s at %s',
-        socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('::: session %s: Sending response for VersionControl/stage for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    if (0 === Object.keys(errorMap).length) {
       updateStatus(proxies).then((statusMap) => {
         sendResponse(statusMap);
       });
-    }).catch(function (err) {
-      console.log(err.stack);
+    } else {
       sendResponse({
-        error: err
+        error: errorMap
       });
-    });
+    }
   });
 
   socket.on('VersionControl/commit', function (request, sendResponse) {

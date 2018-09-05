@@ -1,0 +1,56 @@
+<div *ngIf="!modelUndefined">
+  <div id="header">
+    <span id="title"> Format Definitions </span>
+    <button mat-button (click)="addDefinition()">Add Report</button>
+  </div>
+  <div id="format-container">
+    <mat-list>
+      <mat-list-item *ngFor="let format of formatDefs | mapKey" class="format-item" (click)="selectedFormat = formatDefs[format]">
+        <i class="fa fa-star" *ngIf="formatDefs[format].id === currentType.viewModelProxy.item.defaultFormatKey"></i>
+        {{formatDefs[format].name}}
+        <img *ngIf="format.dirty" src="../../../../assets/icons/versioncontrol/dirty.ico">
+        <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+          <mat-icon class="fa fa-bars"></mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" [overlapTrigger]="false">
+          <button mat-menu-item (click)="setDefault(formatDefs[format].id)" matTooltip="Set this format as the default renderer">
+            <mat-icon class="fa fa-star"></mat-icon>
+            Set Default
+          </button>
+          <button mat-menu-item (click)="deleteFormat(formatDefs[format].id)" matTooltip="Delete format">
+            <mat-icon class="fa fa-trash"></mat-icon>
+            Delete Format
+          </button>
+        </mat-menu>
+        <hr/>
+      </mat-list-item>
+    </mat-list>
+  </div>
+  <div id="definition-editor" *ngIf="selectedFormat">
+    <h2>
+      <input matInput [(ngModel)]="selectedFormat.name" />
+      <img *ngIf="selectedFormat.dirty" src="../../../../assets/icons/versioncontrol/dirty.ico">
+      <button mat-button (click)="openPreview(selectedFormat);">
+        <i class="fa fa-search"></i> Preview</button>
+      <button mat-button (click)="saveFormat()">
+        <i class="fa fa-save"></i> Save
+      </button>
+      <button mat-button class="disable-button" (click)="deleteFormat(selectedFormat.id)">
+        <i class="fa fa-trash"></i> Delete
+      </button>
+    </h2>
+    <div id="format-specification" *ngIf="selectedFormat">
+      <div id="type-header">
+        <span style="font-size: larger; font-weight: bold">{{selectedFormat.name}} Format</span>
+        <hr/>
+      </div>
+      <format-gui [format]="selectedFormat" [kind]="currentType">
+      </format-gui>
+      <div id="property-toggle">
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="modelUndefined">
+  <h1> View model is not defined </h1>
+</div>

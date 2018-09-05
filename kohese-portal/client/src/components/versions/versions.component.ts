@@ -1,18 +1,30 @@
 import { Component, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Commit } from '../tree/commit-tree/commit-tree.component';
-import { Difference } from '../compare-items/commit-comparison/commit-comparison.component';
+import { Comparison } from '../compare-items/comparison.class';
 
 @Component({
   selector: 'versions',
   templateUrl: './versions.component.html',
+  styleUrls: ['./versions.component.scss'],
   //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VersionsComponent {
   private _selectedVersionObject: any;
   get selectedVersionObject() {
     return this._selectedVersionObject;
+  }
+  
+  private _comparisonsSubject: BehaviorSubject<Array<Comparison>> =
+    new BehaviorSubject<Array<Comparison>>([]);
+  get comparisonsSubject() {
+    return this._comparisonsSubject;
+  }
+  
+  get showDifferencesOnly() {
+    return true;
   }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef) {
@@ -26,8 +38,9 @@ export class VersionsComponent {
     let type: string = '';
     if (this._selectedVersionObject instanceof Commit) {
       type = 'Commit';
-    } else if (this._selectedVersionObject instanceof Difference) {
-      type = 'Difference';
+      this._comparisonsSubject.next(this._selectedVersionObject.comparisons);
+    } else if (this._selectedVersionObject instanceof Comparison) {
+      type = 'Comparison';
     }
     
     return type;

@@ -22,8 +22,6 @@ export class KProxySelectorComponent extends UserInput
   public type: string;
   @Input()
   public allowMultiSelect: boolean;
-  @Input()
-  public useAdvancedSelector: boolean;
   public selectedProxies: Array<ItemProxy> = [];
   public selectedProxy: ItemProxy;
   @Input()
@@ -130,6 +128,7 @@ export class KProxySelectorComponent extends UserInput
         this.formGroup.controls[this.fieldId].markAsDirty();
         console.log(this.formGroup);
       }
+      console.log(selected , '2');
     })
   }
 }

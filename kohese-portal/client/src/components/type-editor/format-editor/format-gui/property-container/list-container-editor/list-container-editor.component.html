@@ -1,0 +1,20 @@
+<div class="list-header">
+  <span class="title">List</span>
+  <span class="pull-right action-menu">
+    <button mat-button id="actionMenu" [matMenuTriggerFor]="actionMenu">
+      <mat-icon class="fa fa-bars"></mat-icon>
+    </button>
+    <mat-menu #actionMenu="matMenu" [overlapTrigger]="false">
+      <button mat-menu-item (click)="removeContainer()">
+        <mat-icon class="fa fa-trash"></mat-icon>
+        <span>Delete Container</span>
+      </button>
+    </mat-menu>
+  </span>
+</div>
+<div class="container-body">
+  <property-row *ngFor="let content of container.contents" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
+  </property-row>
+  <button mat-button class="add-button" (click)="addRow();">
+    <i class="fa fa-plus"></i> Add Row</button>
+</div>

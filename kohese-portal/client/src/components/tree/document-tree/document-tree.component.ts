@@ -30,15 +30,15 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   documentRoot : ItemProxy;
   documentRootId : string;
-  
+
   private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
     filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
   get searchCriterion() {
     return this._searchCriterion;
   }
-  
+
   private _filterDelayIdentifier: any;
-  
+
   images = [];
 
   @Output()
@@ -64,7 +64,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     });
 
-    console.log(this.documentRoot)
     this.rootRowActions.push(new RowAction('Test action',
       'I am an action', 'fa fa-times', (object: any) => {
       return true;
@@ -127,17 +126,13 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
       this.showFocus();
       setTimeout(()=>{
-        console.log(this.visibleRows)
       }, 500)
     }
   });
 
   this.selectedProxyStreamSubscription = this.selectedProxyStream.subscribe((newSelection) => {
-    console.log(this.sync);
     if(this.sync && newSelection) {
       this.focusedObjectSubject.next(newSelection);
-      console.log(newSelection, this);
-
       this.showFocus();
     }
   })
@@ -204,21 +199,21 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return iconString;
   }
-  
+
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
     item['kind'] = proxy.kind;
     item['status'] = proxy.status;
-    return super.filter(item); 
+    return super.filter(item);
   }
-  
+
   public openFilterDialog(filter: Filter): Observable<any> {
     if (!filter) {
       filter = new ItemProxyFilter(this._dynamicTypesService, this.
         itemRepository);
     }
-    
+
     return super.openFilterDialog(filter).do((resultingFilter: Filter) => {
       if (resultingFilter && !resultingFilter.isElementPresent(this.
         _searchCriterion)) {
@@ -226,12 +221,12 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public removeFilter(): void {
     this._searchCriterion.value = '';
     super.removeFilter();
   }
-  
+
   public searchStringChanged(searchString: string): void {
     if (this._filterDelayIdentifier) {
       clearTimeout(this._filterDelayIdentifier);
@@ -244,7 +239,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
           advancedFilter = new ItemProxyFilter(this._dynamicTypesService, this.
             itemRepository);
         }
-        
+
         if (!advancedFilter.isElementPresent(this._searchCriterion)) {
           this._searchCriterion.property = advancedFilter.filterableProperties[
             0];
@@ -255,9 +250,9 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         advancedFilter.removeElement(this._searchCriterion);
         this.filterSubject.next(advancedFilter);
       }
-      
+
       this.refresh();
-      
+
       this._filterDelayIdentifier = undefined;
     }, 1000);
   }
@@ -265,7 +260,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   public setRowAsRoot(proxy: ItemProxy) {
     this.rootSubject.next(proxy);
     this.rootSelected.emit(proxy);
-    console.log('over');
   }
 }
 

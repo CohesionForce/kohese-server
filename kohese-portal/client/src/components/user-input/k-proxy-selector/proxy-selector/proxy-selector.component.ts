@@ -20,13 +20,13 @@ export class ProxySelectorComponent implements OnInit {
   multiSelect: boolean;
   @Input()
   selection: any;
+  @Output()
+  proxySelected: EventEmitter<SelectedProxyInfo> = new EventEmitter();
 
   rootProxy: ItemProxy;
   selectedProxy: ItemProxy;
   selectedProxies: Array<ItemProxy> = [];
   selectedMap: Map<string, ItemProxy> = new Map();
-  @Output()
-  proxySelected: EventEmitter<SelectedProxyInfo> = new EventEmitter();
   repoInitialized: boolean = false;
   proxySearchControl: FormControl;
   proxySearchInitialized : boolean;
