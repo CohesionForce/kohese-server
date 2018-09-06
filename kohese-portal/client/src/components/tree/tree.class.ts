@@ -250,12 +250,14 @@ export abstract class Tree {
     this.refresh();
     
     let filter: Filter = this._filterSubject.getValue();
-    for (let j: number = 0; j < rowArray.length; j++) {
-      if (this.isMultiselectEnabled(rowArray[j].object) && (!filter ||
-        rowArray[j].matchesFilter)) {
-        selectedObjects.push(rowArray[j].object);
+    for (let j: number = 0; j < this._visibleRows.length; j++) {
+      if (this.isMultiselectEnabled(this._visibleRows[j].object) && (!filter ||
+        this._visibleRows[j].matchesFilter)) {
+        selectedObjects.push(this._visibleRows[j].object);
       }
-      
+    }
+    
+    for (let j: number = 0; j < rowArray.length; j++) {
       if (-1 === expandedObjects.indexOf(rowArray[j].object)) {
         rowArray[j].expanded = false;
       }
