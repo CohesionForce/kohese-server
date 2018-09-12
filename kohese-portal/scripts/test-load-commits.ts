@@ -364,9 +364,9 @@ try {
 
     // evaluateAllCommits();
     // evaluateEachCommit();
-    // evaluateEachTree();
-    diffHeadAndPrev();
-    exportObjectCache();
+    evaluateEachTree();
+    // diffHeadAndPrev();
+    // exportObjectCache();
 
   });
 
