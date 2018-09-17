@@ -3,16 +3,6 @@
     Compare Commits
   </h2>
   <mat-form-field style="height: 7%; width: 100%;">
-    <mat-select placeholder="Base" [value]="baseCommitId"
-      (selectionChange)="baseCommitId = $event.value; compareCommits()">
-      <mat-option *ngFor="let commitId of (commitMap | mapKey)"
-        [value]="commitId">
-        {{commitMap[commitId].message}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <br/>
-  <mat-form-field style="height: 7%; width: 100%;">
     <mat-select placeholder="Change" [value]="changeCommitId"
       (selectionChange)="changeCommitId = $event.value; compareCommits()">
       <mat-option *ngFor="let commitId of (commitMap | mapKey)"
@@ -22,25 +12,19 @@
     </mat-select>
   </mat-form-field>
   <br/>
-  <h5 style="height: 7%; width: 100%;">
-    Changes
-  </h5>
-  <virtual-scroll #differenceList [items]="differences">
-    <ng-container *ngFor="let difference of differenceList.viewPortItems">
-      <button mat-raised-button (click)="openComparisonDialog(difference)"
-        style="width: 100%; text-align: left;">
-        {{difference.item.name}}
-        <ng-container
-          *ngFor="let differenceType of difference.differenceTypes">
-          <mat-icon
-            class="{{DifferenceTypeOperations.getIconClass(differenceType)}}"
-            matTooltip="{{DifferenceTypeOperations.toString(differenceType)}}">
-          </mat-icon>
-        </ng-container>
-      </button>
-      <br/>
-    </ng-container>
-  </virtual-scroll>
+  <mat-form-field style="height: 7%; width: 100%;">
+    <mat-select placeholder="Base" [value]="baseCommitId"
+      (selectionChange)="baseCommitId = $event.value; compareCommits()">
+      <mat-option *ngFor="let commitId of (commitMap | mapKey)"
+        [value]="commitId">
+        {{commitMap[commitId].message}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <br/>
+  <div style="height: 69%; width: 100%;">
+    <change-summary [comparisonsSubject]="comparisonsSubject"></change-summary>
+  </div>
   <ng-container *ngIf="data">
     <mat-dialog-actions
       style="height: 10%; width: 100%; display: flex; flex-direction: column;">
