@@ -13,8 +13,8 @@
   <div *ngIf="property.kind === 'proxy-selector'">
       <kd-proxy-selector [property]="property" [editable]="editable" [proxy]="proxy"></kd-proxy-selector>
   </div>
-  <div *ngIf="property.kind === 'state-machine'">
-    State Machine not implemented
+  <div *ngIf="property.kind === 'state-editor'">
+    <k-state-editor [itemProxy]="proxy" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
   </div>
   <div *ngIf="property.kind === 'select'">
     Select not implemented

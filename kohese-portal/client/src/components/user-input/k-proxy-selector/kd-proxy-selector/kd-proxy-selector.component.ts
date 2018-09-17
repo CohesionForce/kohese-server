@@ -63,31 +63,39 @@ export class KdProxySelectorComponent implements OnInit {
   }
 
   openProxySelectionDialog(): void {
-    let selectedProxies = this.proxy.item[this.property.propertyName].forEach((idStruct) => {
-      return ItemProxy.getWorkingTree().getProxyFor(idStruct.id);
-    })
+    let ids = this.proxy.item[this.property.propertyName];
+    let selected;
+    if (Array.isArray(ids)) {
+      selected = this.proxy.item[this.property.propertyName].forEach((idStruct) => {
+        return ItemProxy.getWorkingTree().getProxyFor(idStruct.id);
+      })
+    } else {
+      if (ids) {
+        selected = ItemProxy.getWorkingTree().getProxyFor(ids);
+      }
+    }
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
 
       data: {
         allowMultiSelect: true, // TODO : check how this can be tested
-        selected: selectedProxies
+        selected: selected
       }
-    }).updateSize('80%', '80%').afterClosed().subscribe((selected : SelectedProxyInfo) => {
-      if (selected.selectedProxies) {
+    }).updateSize('80%', '80%').afterClosed().subscribe((selectedReturn : SelectedProxyInfo) => {
+      if (selectedReturn.selectedProxies) {
         let proxyIds = [];
         this.references = [];
-         selected.selectedProxies.forEach((proxy)=>{
+         selectedReturn.selectedProxies.forEach((proxy)=>{
           this.references.push(proxy)
           proxyIds.push({id: proxy.item.id})
         })
         this.proxy.item[this.property.propertyName] = proxyIds;
         console.log('Proxies saved');
-      } else if (selected.selectedProxy) {
-        this.proxy.item[this.property.propertyName] = { id: selected.selectedProxy };
-        this.references = [selected.selectedProxy];
+      } else if (selectedReturn.selectedProxy) {
+        this.proxy.item[this.property.propertyName] = { id: selectedReturn.selectedProxy };
+        this.references = [selectedReturn.selectedProxy];
         console.log('proxy saved');
       }
-      console.log(selected, '1');
+      console.log(selectedReturn, '1');
     })
   }
 }

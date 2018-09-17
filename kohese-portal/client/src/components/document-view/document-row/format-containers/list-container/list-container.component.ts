@@ -20,5 +20,10 @@ export class ListContainerComponent implements OnInit {
   ngOnInit() {
   }
 
+  stateChanged(stateName, value) {
+    this.proxy.item[stateName] = value;
+  }
+
+
 }
 
