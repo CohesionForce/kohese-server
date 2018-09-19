@@ -21,11 +21,10 @@ export class ProxySelectorComponent implements OnInit {
   @Input()
   selection: any;
   @Output()
-  proxySelected: EventEmitter<SelectedProxyInfo> = new EventEmitter();
+  proxySelected: EventEmitter<any> = new EventEmitter();
 
   rootProxy: ItemProxy;
-  selectedProxy: ItemProxy;
-  selectedProxies: Array<ItemProxy> = [];
+  selected : any;
   selectedMap: Map<string, ItemProxy> = new Map();
   repoInitialized: boolean = false;
   proxySearchControl: FormControl;
@@ -52,14 +51,14 @@ export class ProxySelectorComponent implements OnInit {
           this.repoInitialized = true;
         }
         if (this.selection) {
-          if (this.selection instanceof Array) {
-            this.selectedProxies = this.selection;
-            for (let i = 0; i < this.selectedProxies.length; i++) {
-              let proxy = this.selectedProxies[i];
+          if (this.multiSelect) {
+            this.selected = this.selection;
+            for (let i = 0; i < this.selected.length; i++) {
+              let proxy = this.selected[i];
               this.selectedMap.set(proxy.item.id, proxy);
             }
           } else {
-            this.selectedProxy = this.selection.selectedProxy;
+            this.selected = this.selection;
           }
         }
       })
@@ -75,37 +74,36 @@ export class ProxySelectorComponent implements OnInit {
       });
     }
     this.proxySearchInitialized = true;
-
   }
 
   selectProxy(selection: ItemProxy) {
     if (this.multiSelect) {
       let matchesSelection: boolean = false;
-      for (let i = 0; i < this.selectedProxies.length; i++) {
-        let proxy = this.selectedProxies[i];
+      for (let i = 0; i < this.selected.length; i++) {
+        let proxy = this.selected[i];
         if (proxy === selection) {
           matchesSelection = true;
           break;
         }
       }
       if (!matchesSelection) {
-        this.selectedProxies.push(selection);
+        this.selected.push(selection);
         this.selectedMap.set(selection.item.id, selection);
         this.proxySelected.emit({
-          selectedProxies: this.selectedProxies}
+          selectedProxies: this.selected}
         );
       }
 
     } else {
-      this.selectedProxy = selection;
+      this.selected = selection;
       this.proxySelected.emit({
-        selectedProxy : this.selectedProxy
+        selected : this.selected
       })
     }
   }
 
   onAutoCompleteSelected(selectedProxyEvent: MatAutocompleteSelectedEvent) {
-    this.selectedProxy = selectedProxyEvent.option.value;
+    this.selected = selectedProxyEvent.option.value;
     this.proxySelected.next(selectedProxyEvent.option.value);
     this.proxySearchControl.setValue(selectedProxyEvent.option.value.item.name);
   }
@@ -121,18 +119,14 @@ export class ProxySelectorComponent implements OnInit {
   }
 
   removeSelection(selection: ItemProxy) {
-    for (let i = 0; i < this.selectedProxies.length; i++) {
-      let proxy = this.selectedProxies[i];
-      if (proxy === selection) {
-        this.selectedProxies.splice(i, 1);
-        this.selectedMap.delete(selection.item.id);
+    if (this.multiSelect) {
+      for (let i = 0; i < this.selected.length; i++) {
+        let proxy = this.selected[i];
+        if (proxy === selection) {
+          this.selected.splice(i, 1);
+          this.selectedMap.delete(selection.item.id);
+        }
       }
     }
   }
-}
-
-// TODO Need to ripple use of this interface through system or else revert to old Observable
-export interface SelectedProxyInfo {
-  selectedProxies? : Array<ItemProxy>,
-  selectedProxy? : ItemProxy
 }

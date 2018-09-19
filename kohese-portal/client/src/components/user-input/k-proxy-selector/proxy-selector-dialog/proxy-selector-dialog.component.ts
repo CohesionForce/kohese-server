@@ -4,7 +4,6 @@ import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import * as $ from 'jquery'
 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { SelectedProxyInfo } from '../proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'proxy-selector-dialog',
@@ -34,7 +33,7 @@ export class ProxySelectorDialogComponent implements OnInit, OnDestroy {
 
   }
 
-  onProxySelected (newSelection : SelectedProxyInfo) {
+  onProxySelected (newSelection : any) {
     this.selected = newSelection;
     console.log('onProxySelected - dialog')
   }

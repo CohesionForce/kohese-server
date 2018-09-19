@@ -60,8 +60,8 @@ describe('Component: Parent Selector', ()=>{
 
     it('should set the proxy when a proxy is selected by autocomplete', ()=>{
       proxySelectorComponent.onAutoCompleteSelected(selectedProxyEvent);
-      expect(proxySelectorComponent.selectedProxy).toBe(selectedProxy);
-      expect(proxySelectorComponent.proxySearchControl.value).toBe(proxySelectorComponent.selectedProxy.item.name);
+      expect(proxySelectorComponent.selected).toBe(selectedProxy);
+      expect(proxySelectorComponent.proxySearchControl.value).toBe(proxySelectorComponent.selected.item.name);
     })
   })
 })

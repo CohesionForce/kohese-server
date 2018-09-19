@@ -13,7 +13,6 @@ import { ItemCache } from '../../../../../common/src/item-cache';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { Comparison } from '../comparison.class';
 import { DetailsFormComponent } from '../../details/details-form/details-form.component';
-import { SelectedProxyInfo } from '../../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 
 class ScrollbarPositionPercentages {
@@ -36,19 +35,19 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
   set isBaseVersion(isBaseVersion: boolean) {
     this._isBaseVersion = isBaseVersion;
   }
-  
+
   private _propertyDifferenceMap: Map<string, Array<any>> =
     new Map<string, Array<any>>();
   get propertyDifferenceMap() {
     return this._propertyDifferenceMap;
   }
-  
+
   private _selectedObjectSubject: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
   get selectedObjectSubject() {
     return this._selectedObjectSubject;
   }
-  
+
   private _sideChangeable: boolean = true;
   get sideChangeable() {
     return this._sideChangeable;
@@ -57,17 +56,17 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
   set sideChangeable(sideChangeable: boolean) {
     this._sideChangeable = sideChangeable;
   }
-  
+
   private _type: KoheseType;
   get type() {
     return this._type;
   }
-  
+
   private _allowEditing: boolean = false;
   get allowEditing() {
     return this._allowEditing;
   }
-  
+
   private _editableSubject: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   get editableSubject() {
@@ -82,12 +81,12 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
   get selectedVersion() {
     return this._selectedVersion;
   }
-  
+
   private _versions: Array<any> = [];
   get versions() {
     return this._versions;
   }
-  
+
   private _showDifferencesOnlySubject: BehaviorSubject<boolean>;
   get showDifferencesOnlySubject() {
     return this._showDifferencesOnlySubject;
@@ -97,28 +96,28 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     BehaviorSubject<boolean>) {
     this._showDifferencesOnlySubject = showDifferencesOnlySubject;
   }
-  
+
   get Array() {
     return Array;
   }
-  
+
   @ViewChild('detailsForm')
   private _detailsFormComponent: DetailsFormComponent;
   private _element: any;
-  
+
   @Output()
   public scrolled: EventEmitter<ScrollbarPositionPercentages> =
     new EventEmitter<ScrollbarPositionPercentages>();
   private _scrollDelayIdentifier: any;
-  
+
   private _treeConfigurationSubscription: Subscription;
   private _changeSubjectSubscription: Subscription;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository, private _dialogService:
     DialogService) {
   }
-  
+
   public ngOnInit(): void {
     this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
       subscribe((treeConfigurationObject: any) => {
@@ -126,7 +125,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         if (this._changeSubjectSubscription) {
           this._changeSubjectSubscription.unsubscribe();
         }
-        
+
         this._changeSubjectSubscription = treeConfigurationObject.config.
           getChangeSubject().subscribe((notification: any) => {
           if (notification.proxy) {
@@ -143,15 +142,15 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
       }
       });
   }
-  
+
   public ngOnDestroy(): void {
     if (this._changeSubjectSubscription) {
       this._changeSubjectSubscription.unsubscribe();
     }
-    
+
     this._treeConfigurationSubscription.unsubscribe();
   }
-  
+
   public whenSelectedObjectChanges(object: ItemProxy): Observable<Array<any>> {
     return this._itemRepository.getHistoryFor(object).map((history:
       Array<any>) => {
@@ -171,11 +170,11 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
       }
       this._versions.splice(0, 0, ...uncommittedVersions);
       this.whenSelectedVersionChanges(object, 'Unstaged');
-      
+
       return this._versions;
     });
   }
-  
+
   public whenSelectedVersionChanges(object: any, versionIdentifier: string):
     void {
     this._selectedVersion = versionIdentifier;
@@ -198,25 +197,25 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         if (this._scrollDelayIdentifier) {
           clearTimeout(this._scrollDelayIdentifier);
         }
-        
+
         this._scrollDelayIdentifier = setTimeout(() => {
           let currentScrollTop: number = this._element.scrollTop;
           let percentHeightScrolled: number = currentScrollTop / (this.
             _element.scrollHeight - this._element.offsetHeight);
-  
+
           let currentScrollLeft: number = this._element.scrollLeft;
           let percentWidthScrolled: number = currentScrollLeft /
             (this._element.scrollWidth - this._element.offsetWidth);
-          
+
           this.scrolled.emit(new ScrollbarPositionPercentages(
             percentHeightScrolled, percentWidthScrolled));
-          
+
           this._scrollDelayIdentifier = undefined;
         }, 150);
       }
     }
   }
-  
+
   public getComparisonValue(propertyName: string):
     string {
     let selectedObject: any = this._selectedObjectSubject.getValue();
@@ -226,7 +225,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
       if (null == value) {
         value = '';
       }
-      
+
       value = String(value);
       if (Comparison.UUID_REGULAR_EXPRESSION.test(value)) {
         let proxy: ItemProxy = TreeConfiguration.getTreeConfigFor(
@@ -237,10 +236,10 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     return value;
   }
-  
+
   public scroll(scrollbarPositionPercentages: ScrollbarPositionPercentages):
     void {
     this._element.scrollTop = scrollbarPositionPercentages.vertical * (this.
@@ -248,7 +247,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     this._element.scrollLeft = scrollbarPositionPercentages.horizontal * (this.
       _element.scrollWidth - this._element.offsetWidth);
   }
-  
+
   public saveCurrentProxy(): void {
     let proxy: ItemProxy = this._selectedObjectSubject.getValue();
     let item: any = this._detailsFormComponent.formGroup.value;
@@ -266,7 +265,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
       this._editableSubject.next(false);
     });
   }
-  
+
   public toggleEditability(): void {
     let editable: boolean = !this._editableSubject.getValue();
     this._editableSubject.next(editable);
@@ -278,24 +277,24 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         });
     }
   }
-  
+
   public openProxySelectionDialog(): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {
         selected: this._selectedObjectSubject.getValue(),
         allowMultiSelect : false
       }
-    }).updateSize('70%', '70%').afterClosed().subscribe((selection: SelectedProxyInfo) => {
+    }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
       if (selection) {
-        this.whenSelectedObjectChanges(selection.selectedProxy).subscribe();
+        this.whenSelectedObjectChanges(selection).subscribe();
       }
     });
   }
-  
+
   public refresh(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public setColors(difference: any): object {
     let style: object = {};
     if (difference.added && !this._isBaseVersion) {
@@ -309,10 +308,10 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         'color': 'darkred'
       };
     }
-    
+
     return style;
   }
-  
+
   private getVersionProxy(versionIdentifier: string, itemId: string):
     ItemProxy {
     let treeConfiguration: TreeConfiguration =

@@ -7,7 +7,6 @@ import { SessionService } from '../../../services/user/session.service';
 import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { Subscription } from 'rxjs/Subscription';
-import { SelectedProxyInfo } from '../../user-input/k-proxy-selector/proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'journal',
@@ -273,10 +272,10 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {},
       allowMultiSelect : false
-    }).updateSize('70%', '70%').afterClosed().subscribe((selected: SelectedProxyInfo) => {
-      if (selected.selectedProxy) {
-        this._observingActivity = selected.selectedProxy;
-        this._observingActivityName = selected.selectedProxy.item.name;
+    }).updateSize('70%', '70%').afterClosed().subscribe((selected: any) => {
+      if (selected) {
+        this._observingActivity = selected;
+        this._observingActivityName = selected.item.name;
       }
     });
   }

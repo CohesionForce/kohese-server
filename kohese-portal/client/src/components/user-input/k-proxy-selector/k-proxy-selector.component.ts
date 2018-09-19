@@ -9,7 +9,6 @@ import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/startWith';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { ProxySelectorDialogComponent } from './proxy-selector-dialog/proxy-selector-dialog.component';
-import { SelectedProxyInfo } from './proxy-selector/proxy-selector.component';
 
 @Component({
   selector: 'k-proxy-selector',
@@ -22,8 +21,7 @@ export class KProxySelectorComponent extends UserInput
   public type: string;
   @Input()
   public allowMultiSelect: boolean;
-  public selectedProxies: Array<ItemProxy> = [];
-  public selectedProxy: ItemProxy;
+  public selected : any;
   @Input()
   editableStream: Observable<boolean>;
   editableStreamSub: Subscription;
@@ -71,64 +69,67 @@ export class KProxySelectorComponent extends UserInput
 
   initSelections() {
     let selected = this.formGroup.controls[this.fieldId].value;
-    if (selected instanceof Array) {
-      this.selectedProxies = [];
+    if (this.allowMultiSelect) {
+      if (!selected) {
+        this.selected = [];
+      }
       for (let i = 0; i < selected.length; i++) {
         if (selected[i].hasOwnProperty('id')) {
           // Must be a reference
-          this.selectedProxies.push(this.treeConfig.getProxyFor(selected[i].id))
+          this.selected.push(this.treeConfig.getProxyFor(selected[i].id))
         } else {
           // Must be an id field insteaad of a reference
-          this.selectedProxies.push(this.treeConfig.getProxyFor(selected[i]))
+          this.selected.push(this.treeConfig.getProxyFor(selected[i]))
         }
       }
     } else if (selected) {
       if (selected.hasOwnProperty('id')) {
         // Must be a reference
         // TODO - Update to handle non-editable historical records
-        this.selectedProxy = this.treeConfig.getProxyFor(selected.id);
+        this.selected = this.treeConfig.getProxyFor(selected.id);
       } else {
         // TODO - Update to handle non-editable historical records
         // Must be an id field insteaad of a reference
-        this.selectedProxy = this.treeConfig.getProxyFor(selected);
+        this.selected= this.treeConfig.getProxyFor(selected);
       }
-    } else if (!selected) {
-      this.selectedProxy = undefined;
-      this.selectedProxies = undefined;
     }
   }
 
   onProxySelected(selectedEvent: MatAutocompleteSelectedEvent) {
-    this.selectedProxy = this.treeConfig.getProxyFor(selectedEvent.option.value);
+    this.selected = this.treeConfig.getProxyFor(selectedEvent.option.value);
   }
 
 
   getSelectedProxies(): Array<ItemProxy> {
-    return this.selectedProxies;
+    return this.selected;
   }
 
   openProxySelectionDialog(): void {
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {
         allowMultiSelect: this.allowMultiSelect,
-        selected: (this.selectedProxy) ? this.selectedProxy : this.selectedProxies
+        selected: this.selected
       }
-    }).updateSize('60%', '60%').afterClosed().subscribe((selected : SelectedProxyInfo) => {
-      if (selected.selectedProxies) {
-        this.selectedProxies = selected.selectedProxies;
+    }).updateSize('60%', '60%').afterClosed().subscribe((selected : any) => {
+      if (this.allowMultiSelect) {
         let selectedIds = [];
-        for (let i = 0; i < this.selectedProxies.length; i++) {
-          selectedIds.push({ id: this.selectedProxies[i].item.id });
+        if (selected) {
+          this.selected = selected;
+          for (let i = 0; i < this.selected.length; i++) {
+            selectedIds.push({ id: this.selected[i].item.id });
+          }
         }
         this.formGroup.controls[this.fieldId].setValue(selectedIds);
         this.formGroup.controls[this.fieldId].markAsDirty();
-      } else if (selected.selectedProxy) {
-        this.selectedProxy = selected.selectedProxy;
-        this.formGroup.controls[this.fieldId].setValue({ id: this.selectedProxy.item.id });
+      } else {
+        this.selected = selected;
+        if (this.selected) {
+          this.formGroup.controls[this.fieldId].setValue({ id: this.selected.item.id });
+        } else {
+          this.formGroup.controls[this.fieldId].setValue(undefined);
+        }
         this.formGroup.controls[this.fieldId].markAsDirty();
-        console.log(this.formGroup);
       }
-      console.log(selected , '2');
     })
   }
 }
