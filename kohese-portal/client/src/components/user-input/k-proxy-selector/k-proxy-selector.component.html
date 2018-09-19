@@ -4,7 +4,7 @@
     <button mat-raised-button (click)="openProxySelectionDialog()"
                               [disabled]="!editable"> Select </button>
   </h4>
-    <span *ngIf="selectedProxy && !allowMultiSelect">
+    <span *ngIf="selected && selected != null && !allowMultiSelect">
       {{selected.item.name}}
     </span>
   <div *ngIf="allowMultiSelect">
