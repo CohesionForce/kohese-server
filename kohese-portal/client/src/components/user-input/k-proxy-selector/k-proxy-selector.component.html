@@ -5,13 +5,13 @@
                               [disabled]="!editable"> Select </button>
   </h4>
     <span *ngIf="selectedProxy && !allowMultiSelect">
-      {{selectedProxy.item.name}}
+      {{selected.item.name}}
     </span>
   <div *ngIf="allowMultiSelect">
     Selections :
     <hr>
     <mat-list>
-      <mat-list-item *ngFor="let selection of selectedProxies"
+      <mat-list-item *ngFor="let selection of selected"
             matTooltip="{{selection.item.description | truncate : 50}}">
         {{ selection.item.name }}
     </mat-list-item>

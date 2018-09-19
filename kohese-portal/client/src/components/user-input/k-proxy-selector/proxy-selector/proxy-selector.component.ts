@@ -77,6 +77,7 @@ export class ProxySelectorComponent implements OnInit {
   }
 
   selectProxy(selection: ItemProxy) {
+    console.log(selection);
     if (this.multiSelect) {
       let matchesSelection: boolean = false;
       for (let i = 0; i < this.selected.length; i++) {
@@ -89,16 +90,12 @@ export class ProxySelectorComponent implements OnInit {
       if (!matchesSelection) {
         this.selected.push(selection);
         this.selectedMap.set(selection.item.id, selection);
-        this.proxySelected.emit({
-          selectedProxies: this.selected}
-        );
+        this.proxySelected.emit(this.selected);
       }
 
     } else {
       this.selected = selection;
-      this.proxySelected.emit({
-        selected : this.selected
-      })
+      this.proxySelected.emit(this.selected)
     }
   }
 

@@ -69,10 +69,8 @@ export class KProxySelectorComponent extends UserInput
 
   initSelections() {
     let selected = this.formGroup.controls[this.fieldId].value;
+    this.selected = [];
     if (this.allowMultiSelect) {
-      if (!selected) {
-        this.selected = [];
-      }
       for (let i = 0; i < selected.length; i++) {
         if (selected[i].hasOwnProperty('id')) {
           // Must be a reference
