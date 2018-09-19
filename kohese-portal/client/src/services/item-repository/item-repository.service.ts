@@ -363,7 +363,7 @@ export class ItemRepository {
         let processingComplete = Date.now();
         this.logService.log(this.logEvents.bulkUpdateProcessingTime, {processTime : (processingComplete - beginBulkProcessing) / 1000});
         let deferCalc = this.loadFeatureSwitch('IR-defer-calc', true);
-        ItemProxy.getWorkingTree().loadingComplete(deferCalc);
+        let deferredCalcProxies : Array<Promise<number>> = ItemProxy.getWorkingTree().loadingComplete(deferCalc);
         let treehashComplete = Date.now();
         this.logService.log(this.logEvents.treeHashProcessingTime, {processTime : (treehashComplete - processingComplete) / 1000});
 
@@ -372,8 +372,13 @@ export class ItemRepository {
         if(!deferCalc){
           this.fetchItems();
         } else {
-          console.log('$$$ Bypassing secondary sync');
+          console.log('$$$ Deferring secondary sync');
           this.notifyRepoIsSynchronized();
+
+          Promise.all(deferredCalcProxies).then(() => {
+            console.log('$$$ IR: Deferred Calculations completed -> Requesting Secondary Sync');
+            this.fetchItems();
+          });
 
           // console.log('$$$ Calculating tree hashes');
           // TreeConfiguration.getWorkingTree().calculateAllTreeHashes();
@@ -549,6 +554,8 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   private notifyRepoIsSynchronized(){
+
+    console.log('$$$ Notify Repo Is Synched')
     this.currentTreeConfigSubject.next({
       config: TreeConfiguration.getWorkingTree(),
       configType: TreeConfigType.DEFAULT
