@@ -14,12 +14,13 @@ import { Comparison, Property } from '../comparison.class';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChangeSummaryComponent {
-  private _comparisonsSubject: BehaviorSubject<Array<Comparison>>;;
+  private _comparisonsSubject: BehaviorSubject<Array<Comparison>>;
   get comparisonsSubject() {
     return this._comparisonsSubject;
   }
   @Input('comparisonsSubject')
-  set comparisonsSubject(comparisonsSubject: BehaviorSubject<Array<Comparison>>) {
+  set comparisonsSubject(comparisonsSubject:
+    BehaviorSubject<Array<Comparison>>) {
     this._comparisonsSubject = comparisonsSubject;
   }
   

@@ -1,4 +1,4 @@
-import { PropertyDefinition } from '../../../format-editor.component';
+import { FormatContainer } from './../../../format-editor.component';
 import { Input } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 
@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderContainerEditorComponent implements OnInit {
   @Input()
-  header : PropertyDefinition;
+  header : FormatContainer;
   @Input()
   kind;
 

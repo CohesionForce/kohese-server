@@ -236,7 +236,6 @@ export abstract class Tree {
   
   public selectAll(): void {
     let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
-    selectedObjects.length = 0;
     let rowArray: Array<TreeRow> = Array.from(this._rowMap.values());
     let expandedObjects: Array<any> = [];
     for (let j: number = 0; j < rowArray.length; j++) {
@@ -250,12 +249,14 @@ export abstract class Tree {
     this.refresh();
     
     let filter: Filter = this._filterSubject.getValue();
-    for (let j: number = 0; j < rowArray.length; j++) {
-      if (this.isMultiselectEnabled(rowArray[j].object) && (!filter ||
-        rowArray[j].matchesFilter)) {
-        selectedObjects.push(rowArray[j].object);
+    for (let j: number = 0; j < this._visibleRows.length; j++) {
+      if (this.isMultiselectEnabled(this._visibleRows[j].object) && (!filter ||
+        this._visibleRows[j].matchesFilter)) {
+        selectedObjects.push(this._visibleRows[j].object);
       }
-      
+    }
+    
+    for (let j: number = 0; j < rowArray.length; j++) {
       if (-1 === expandedObjects.indexOf(rowArray[j].object)) {
         rowArray[j].expanded = false;
       }
@@ -267,7 +268,33 @@ export abstract class Tree {
   
   public deselectAll(): void {
     let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
-    selectedObjects.length = 0;
+    let rowArray: Array<TreeRow> = Array.from(this._rowMap.values());
+    let expandedObjects: Array<any> = [];
+    for (let j: number = 0; j < rowArray.length; j++) {
+      if (rowArray[j].expanded) {
+        expandedObjects.push(rowArray[j].object);
+      } else {
+        rowArray[j].expanded = true;
+      }
+    }
+    
+    this.refresh();
+    
+    let filter: Filter = this._filterSubject.getValue();
+    for (let j: number = 0; j < this._visibleRows.length; j++) {
+      if (this.isMultiselectEnabled(this._visibleRows[j].object) && (!filter ||
+        this._visibleRows[j].matchesFilter)) {
+        selectedObjects.splice(selectedObjects.indexOf(this._visibleRows[j].
+          object), 1);
+      }
+    }
+    
+    for (let j: number = 0; j < rowArray.length; j++) {
+      if (-1 === expandedObjects.indexOf(rowArray[j].object)) {
+        rowArray[j].expanded = false;
+      }
+    }
+    
     this._selectedObjectsSubject.next(selectedObjects);
     this.refresh();
   }

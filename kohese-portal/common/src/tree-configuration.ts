@@ -220,12 +220,13 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadingComplete(deferCalc: boolean = false) {
+  loadingComplete(deferCalc: boolean = false) : Array<Promise<number>> {
     this.loading = false;
-    this.calculateAllTreeHashes(deferCalc);
+    let deferredCalcPromises : Array<Promise<number>> = this.calculateAllTreeHashes(deferCalc);
     this.changeSubject.next({
       type: 'loaded'
     });
+    return deferredCalcPromises;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -307,7 +308,7 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateAllTreeHashes(deferCalc : boolean = false) {
+  calculateAllTreeHashes(deferCalc : boolean = false) : Array<Promise<number>>  {
     const isRepoOnly = false;
     let treeHashCalculations : Array<Promise<number>> = [];
     if (isRepoOnly){
@@ -322,10 +323,13 @@ export class TreeConfiguration {
     if (deferCalc){
       Promise.all(treeHashCalculations).then(() => {
         this.treehashCalculated = true;
+        console.log('$$$ TreeHash Calcuation Completed');
       });
     } else {
       this.treehashCalculated = true;
     }
+
+    return treeHashCalculations;
   }
 
   //////////////////////////////////////////////////////////////////////////
