@@ -19,20 +19,18 @@ export class ItemProxyComparison extends Comparison {
   protected getProperties(comparisonObject: any): Array<Property> {
     let properties: Array<Property> = [];
     
-    properties.push(new Property('kind', 'Kind'));
+    properties.push(new Property('kind', 'Kind', false));
     
     let koheseType: KoheseType = this._dynamicTypesService.getKoheseTypes()[
       comparisonObject.kind];
     if (koheseType) {
       for (let propertyId in koheseType.fields) {
-        if (koheseType.fields[propertyId].views['form']) {
-          properties.push(new Property(propertyId, koheseType.fields[
-            propertyId].views['form'].displayName));
-        }
+        properties.push(new Property(propertyId, propertyId, !!koheseType.
+          fields[propertyId].hidden));
       }
     }
     
-    properties.push(new Property('itemIds', 'Children'));
+    properties.push(new Property('itemIds', 'Children', false));
     
     return properties;
   }

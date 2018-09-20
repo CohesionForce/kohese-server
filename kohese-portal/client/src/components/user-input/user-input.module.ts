@@ -33,7 +33,7 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     MarkdownCheatSheetComponent,
     ProxySelectorComponent,
     ProxySelectorDialogComponent,
-    KdMarkdownComponent,
+    KdMarkdownComponent
   ],
   imports: [
     CommonModule,
@@ -54,7 +54,7 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     KMarkdownComponent,
     ProxySelectorComponent,
     KdProxySelectorComponent,
-    KdMarkdownComponent,
+    KdMarkdownComponent
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,
