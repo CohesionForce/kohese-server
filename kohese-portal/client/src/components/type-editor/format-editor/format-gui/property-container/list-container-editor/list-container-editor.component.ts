@@ -25,11 +25,12 @@ export class ListContainerEditorComponent implements OnInit {
       propertyName : '',
       hideLabel : false,
       labelOrientation: 'Top',
-      kind :  ''
+      kind :  '',
+      hideEmpty : false
     })
   }
 
-  removeContainer(row) {
+  removeContainer() {
     this.deleted.emit(this.container);
   }
 
