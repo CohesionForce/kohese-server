@@ -30,7 +30,9 @@ export class SessionService {
               let usersProxy: ItemProxy = this.treeConfig.getRootProxy().getChildByName('Users');
               this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
             } else {
-              this.sessionUser.next(undefined);
+              console.log('$$$ Skip setting session user to undefined');
+              // TODO Figure out why this was set to undefined
+              // this.sessionUser.next(undefined);
             }
             this.initialized = true;
           }
