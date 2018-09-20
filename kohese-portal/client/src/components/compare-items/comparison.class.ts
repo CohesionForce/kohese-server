@@ -1,7 +1,8 @@
 import * as JsDiff from 'diff';
 
 export class Property {
-  public constructor(public id: string, public name: string) {
+  public constructor(public id: string, public name: string, public hidden:
+    boolean) {
   }
 }
 
@@ -30,6 +31,11 @@ export class Comparison {
   private _changeTypes: Array<ChangeType> = [];
   get changeTypes() {
     return this._changeTypes;
+  }
+  
+  private _numberOfHiddenProperties: number;
+  get numberOfHiddenProperties() {
+    return this._numberOfHiddenProperties;
   }
   
   public static readonly UUID_REGULAR_EXPRESSION: RegExp =
@@ -65,7 +71,12 @@ export class Comparison {
     
     let properties: Array<Property> = Array.from(this._propertyComparisonMap.
       keys());
+    this._numberOfHiddenProperties = 0;
     for (let j: number = 0; j < properties.length; j++) {
+      if (properties[j].hidden) {
+        this._numberOfHiddenProperties++;
+      }
+      
       let baseValue: any = this.getPropertyValue(properties[j], this.
         _baseObject);
       if (null == baseValue) {
@@ -121,7 +132,7 @@ export class Comparison {
   protected getProperties(comparisonObject: any): Array<Property> {
     let properties: Array<Property> = [];
     for (let propertyId in comparisonObject) {
-      properties.push(new Property(propertyId, propertyId));
+      properties.push(new Property(propertyId, propertyId, false));
     }
     
     return properties;

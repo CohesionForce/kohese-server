@@ -9,7 +9,8 @@
   "properties": {
     "password": {
       "type": "string",
-      "required": true
+      "required": true,
+      "hidden": true
     },
     "email": {
       "type": "string",
