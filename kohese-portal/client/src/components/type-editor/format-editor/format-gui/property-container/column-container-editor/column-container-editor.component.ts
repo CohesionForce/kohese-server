@@ -58,7 +58,8 @@ export class ColumnContainerEditorComponent implements OnInit {
       propertyName : '',
       hideLabel : false,
       labelOrientation: 'Top',
-      kind :  ''
+      kind :  '',
+      hideEmpty : false
     })
   }
 
