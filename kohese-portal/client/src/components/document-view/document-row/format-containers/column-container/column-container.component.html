@@ -13,7 +13,7 @@
         </div>
         <div *ngIf="property.kind === 'proxy-selector'">
             <kd-proxy-selector [property]="property" [editable]="editable" [proxy]="proxy"
-                              [multiselect]="property.views['form'].inputType.options['allowMultiSelect']"></kd-proxy-selector>
+            [multiselect]="property.inputOptions.options.allowMultiSelect"></kd-proxy-selector>
         </div>
         <div *ngIf="property.kind === 'state-editor'">
             <k-state-editor [itemProxy]="proxy" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>

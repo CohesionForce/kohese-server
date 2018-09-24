@@ -68,9 +68,13 @@ export class KdProxySelectorComponent implements OnInit {
     let ids = this.proxy.item[this.property.propertyName];
     let selected;
     if (this.multiselect) {
-      selected = this.proxy.item[this.property.propertyName].forEach((idStruct) => {
-        return ItemProxy.getWorkingTree().getProxyFor(idStruct.id);
-      })
+      if (ids) {
+        selected = ids.forEach((idStruct) => {
+          return ItemProxy.getWorkingTree().getProxyFor(idStruct.id);
+        })
+      } else {
+        selected = [];
+      }
     } else {
       if (ids) {
         selected = ItemProxy.getWorkingTree().getProxyFor(ids);
