@@ -39,19 +39,20 @@ export class KdProxySelectorComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.proxy) {
-      console.log('log');
-    }
-    if (this.proxy.item[this.property.propertyName]) {
-      if (Array.isArray(this.proxy.item[this.property.propertyName])) {
+    let selected = this.proxy.item[this.property.propertyName];
+    if (selected) {
+      if (this.multiselect) {
         for (let proxyIdStruct of this.proxy.item[this.property.propertyName]) {
           this.references.push(ItemProxy.getWorkingTree().getProxyFor(proxyIdStruct.id));
         }
+      } else {
+        this.references.push(ItemProxy.getWorkingTree().getProxyFor(selected))
+      }
     } else {
-      this.references.push(ItemProxy.getWorkingTree().getProxyFor(this.proxy.item[this.property.propertyName]))
-    }
+      this.references = [];
     }
   }
+
 
   openDetails(proxy) {
     this.dialogService.openComponentDialog(DetailsDialogComponent, {
@@ -84,13 +85,13 @@ export class KdProxySelectorComponent implements OnInit {
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
 
       data: {
-        allowMultiSelect: true, // TODO : check how this can be tested
+        allowMultiSelect: this.multiselect,
         selected: selected
       }
     }).updateSize('80%', '80%').afterClosed().subscribe((selected : any) => {
+      this.references = [];
       if (this.multiselect) {
         let proxyIds = [];
-        this.references = [];
         if (selected) {
            selected.forEach((proxy)=>{
             this.references.push(proxy)
@@ -101,6 +102,7 @@ export class KdProxySelectorComponent implements OnInit {
       } else {
         if (selected) {
           this.proxy.item[this.property.propertyName] = { id: selected.item.id };
+          this.references.push(selected);
         } else {
           this.proxy.item[this.property.propertyName] = undefined;
         }
