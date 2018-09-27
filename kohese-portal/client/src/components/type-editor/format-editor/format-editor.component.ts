@@ -27,7 +27,8 @@ export interface PropertyDefinition {
   customLabel? : string
   labelOrientation: string
   hideEmpty : boolean
-  kind : string
+  kind : string,
+  inputOptions : any
   // Will grow as we get to the property part
 }
 
@@ -107,7 +108,8 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
           hideLabel : true,
           hideEmpty : false,
           labelOrientation : 'Top',
-          kind : 'text'
+          kind : 'text',
+          inputOptions : {}
         }]
       },
       containers : [],

@@ -59,7 +59,8 @@ export class ColumnContainerEditorComponent implements OnInit {
       hideLabel : false,
       labelOrientation: 'Top',
       kind :  '',
-      hideEmpty : false
+      hideEmpty : false,
+      inputOptions : {}
     })
   }
 

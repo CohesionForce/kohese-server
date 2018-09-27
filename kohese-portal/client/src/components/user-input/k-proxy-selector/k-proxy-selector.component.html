@@ -1,19 +1,19 @@
 <ng-container [formGroup]="formGroup">
   <div [ngClass]="{'multiSelect' : allowMultiSelect}">
-  <h4> {{fieldName}} : 
+  <h4> {{fieldName}} :
     <button mat-raised-button (click)="openProxySelectionDialog()"
                               [disabled]="!editable"> Select </button>
   </h4>
-    <span *ngIf="selectedProxy && !allowMultiSelect">
-      {{selectedProxy.item.name}}
+    <span *ngIf="selected && selected != null && !allowMultiSelect">
+      {{selected.item.name}}
     </span>
   <div *ngIf="allowMultiSelect">
-    Selections : 
+    Selections :
     <hr>
     <mat-list>
-      <mat-list-item *ngFor="let selection of selectedProxies" 
+      <mat-list-item *ngFor="let selection of selected"
             matTooltip="{{selection.item.description | truncate : 50}}">
-        {{ selection.item.name }}  
+        {{ selection.item.name }}
     </mat-list-item>
   </mat-list>
   </div>

@@ -1,4 +1,3 @@
-import { SelectedProxyInfo } from './../proxy-selector/proxy-selector.component';
 import { ProxySelectorDialogComponent } from './../proxy-selector-dialog/proxy-selector-dialog.component';
 import {
   DialogService
@@ -30,26 +29,30 @@ export class KdProxySelectorComponent implements OnInit {
   editable: boolean;
   @Input()
   proxy: ItemProxy
+  @Input()
   references: Array < ItemProxy > = [];
+  @Input()
+  multiselect : boolean;
 
   constructor(private dialogService: DialogService) {
 
   }
 
   ngOnInit() {
-    if (!this.proxy) {
-      console.log('log');
-    }
-    if (this.proxy.item[this.property.propertyName]) {
-      // for (let proxyIdStruct of this.proxy.item[this.property.propertyName]) {
-      //   console.log(proxyIdStruct);
-      //   this.references.push(ItemProxy.getWorkingTree().getProxyFor(proxyIdStruct.id));
-      // }
-      this.references.push(ItemProxy.getWorkingTree().getProxyFor(this.proxy.item[this.property.propertyName]))
+    let selected = this.proxy.item[this.property.propertyName];
+    if (selected) {
+      if (this.multiselect) {
+        for (let proxyIdStruct of this.proxy.item[this.property.propertyName]) {
+          this.references.push(ItemProxy.getWorkingTree().getProxyFor(proxyIdStruct.id));
+        }
+      } else {
+        this.references.push(ItemProxy.getWorkingTree().getProxyFor(selected))
+      }
     } else {
-      this.proxy.item[this.property.propertyName] = [];
+      this.references = [];
     }
   }
+
 
   openDetails(proxy) {
     this.dialogService.openComponentDialog(DetailsDialogComponent, {
@@ -65,37 +68,46 @@ export class KdProxySelectorComponent implements OnInit {
   openProxySelectionDialog(): void {
     let ids = this.proxy.item[this.property.propertyName];
     let selected;
-    if (Array.isArray(ids)) {
-      selected = this.proxy.item[this.property.propertyName].forEach((idStruct) => {
-        return ItemProxy.getWorkingTree().getProxyFor(idStruct.id);
-      })
+    if (this.multiselect) {
+      if (ids) {
+        selected = ids.forEach((idStruct) => {
+          return ItemProxy.getWorkingTree().getProxyFor(idStruct.id);
+        })
+      } else {
+        selected = [];
+      }
     } else {
       if (ids) {
         selected = ItemProxy.getWorkingTree().getProxyFor(ids);
       }
     }
+    console.log(this.property);
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
 
       data: {
-        allowMultiSelect: true, // TODO : check how this can be tested
+        allowMultiSelect: this.multiselect,
         selected: selected
       }
-    }).updateSize('80%', '80%').afterClosed().subscribe((selectedReturn : SelectedProxyInfo) => {
-      if (selectedReturn.selectedProxies) {
+    }).updateSize('80%', '80%').afterClosed().subscribe((selected : any) => {
+      this.references = [];
+      if (this.multiselect) {
         let proxyIds = [];
-        this.references = [];
-         selectedReturn.selectedProxies.forEach((proxy)=>{
-          this.references.push(proxy)
-          proxyIds.push({id: proxy.item.id})
-        })
+        if (selected) {
+           selected.forEach((proxy)=>{
+            this.references.push(proxy)
+            proxyIds.push({id: proxy.item.id})
+          })
+        }
         this.proxy.item[this.property.propertyName] = proxyIds;
-        console.log('Proxies saved');
-      } else if (selectedReturn.selectedProxy) {
-        this.proxy.item[this.property.propertyName] = { id: selectedReturn.selectedProxy };
-        this.references = [selectedReturn.selectedProxy];
+      } else {
+        if (selected) {
+          this.proxy.item[this.property.propertyName] = { id: selected.item.id };
+          this.references.push(selected);
+        } else {
+          this.proxy.item[this.property.propertyName] = undefined;
+        }
         console.log('proxy saved');
       }
-      console.log(selectedReturn, '1');
     })
   }
 }

@@ -12,7 +12,8 @@
           <kd-markdown [property]="property" [editable]="editable" [proxy]="proxy" [container]="'columns'"></kd-markdown>
         </div>
         <div *ngIf="property.kind === 'proxy-selector'">
-            <kd-proxy-selector [property]="property" [editable]="editable" [proxy]="proxy"></kd-proxy-selector>
+            <kd-proxy-selector [property]="property" [editable]="editable" [proxy]="proxy"
+            [multiselect]="property.inputOptions.options.allowMultiSelect"></kd-proxy-selector>
         </div>
         <div *ngIf="property.kind === 'state-editor'">
             <k-state-editor [itemProxy]="proxy" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>

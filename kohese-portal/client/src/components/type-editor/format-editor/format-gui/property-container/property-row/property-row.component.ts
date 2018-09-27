@@ -32,6 +32,8 @@ export class PropertyRowComponent implements OnInit {
     let viewProperty = this.kind.fields[propertyName.value].views.form;
     if (viewProperty) {
       this.property.kind = viewProperty.inputType.type
+      this.property.inputOptions = viewProperty.inputType;
+      console.log(viewProperty);
     } else {
       this.property.kind = 'read-only'
     }

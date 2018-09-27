@@ -37,17 +37,17 @@
       </mat-autocomplete>
     </mat-tab>
   </mat-tab-group>
-  <mat-card *ngIf="selectedProxy && !multiSelect">
+  <mat-card *ngIf="selected && !multiSelect">
     <mat-card-title class="panel-heading">
-      <span>{{selectedProxy.item.name}}</span>
+      <span>{{selected.item.name}}</span>
     </mat-card-title>
     <mat-card-content>
-      {{selectedProxy.item.description}}
+      {{selected.item.description}}
     </mat-card-content>
   </mat-card>
   <div *ngIf="multiSelect">
     <h4>Selections:</h4>
-    <div *ngFor="let selection of selectedProxies">
+    <div *ngFor="let selection of selected">
       <span>
         {{selection.item.name | truncate : 30}}
         <span style="margin-left: auto;">
