@@ -22,30 +22,29 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
   set koheseTypeStream(koheseTypeStream: Observable<KoheseType>) {
     this._koheseTypeStream = koheseTypeStream;
   }
-  
+
   private _koheseType: KoheseType;
   get koheseType() {
     return this._koheseType;
   }
-  
+
   private _idProperties: any = {};
   get idProperties() {
     return this._idProperties;
   }
-  
+
   public selectedPropertyId: string;
 
   get multivalued() {
-    return this._koheseType.fields[this.selectedPropertyId].type.
-      startsWith('[');
+    return Array.isArray(this._koheseType.fields[this.selectedPropertyId].type);
   }
   set multivalued(multivalued: boolean) {
     let property: any = this._koheseType.fields[this.selectedPropertyId];
-    let type: string = property.type;
+    let type: any = property.type;
     if (multivalued) {
-      type = '[ ' + type + ' ]';
+      type = [type];
     } else {
-      type = type.substring(2, type.length - 2);
+      type = type[0];
     }
 
     property.type = type;
@@ -67,7 +66,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
   get types() {
     return this._types;
   }
-  
+
   // Work-around for angular-split defect
   private _showSplitPanes: boolean = false;
   get showSplitPanes() {
@@ -79,14 +78,14 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       this._changeDetectorRef.markForCheck();
     });
   }
-  
+
   private _koheseTypeStreamSubscription: Subscription;
-  
+
   constructor(private typeService: DynamicTypesService,
     private dialogService: DialogService,
     private _changeDetectorRef: ChangeDetectorRef) {
   }
-  
+
   ngOnInit(): void {
     let koheseTypes: any = this.typeService.getKoheseTypes();
     for (let type in koheseTypes) {
@@ -96,7 +95,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
           if (!this._idProperties[type]) {
             this._idProperties[type] = [];
           }
-          
+
           this._idProperties[type].push(propertyName);
         }
       }
@@ -108,11 +107,11 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       this._changeDetectorRef.markForCheck();
     });
   }
-  
+
   public ngOnDestroy(): void {
     this._koheseTypeStreamSubscription.unsubscribe();
   }
-  
+
   add(): void {
     this.dialogService.openInputDialog('Add Property', '', DialogComponent.
       INPUT_TYPES.TEXT, 'Name', '').afterClosed().subscribe((name: string) => {
@@ -122,7 +121,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   delete(propertyId: string): void {
     this.dialogService.openYesNoDialog('Delete ' + propertyId,
       'Are you sure that you want to delete ' + propertyId + '?').
@@ -133,7 +132,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public updateProperty(propertyIdSequence: Array<string>, value: any): void {
     let property: any = this._koheseType.fields[this.selectedPropertyId];
     let subProperty: any = property;
@@ -144,16 +143,15 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     this._koheseType.updateProperty(this.selectedPropertyId, property);
     this._changeDetectorRef.markForCheck();
   }
-  
-  public convertTypeString(type: string): string {
-    if (this._koheseType.fields[this.selectedPropertyId].type.startsWith(
-      '[')) {
-      type = '[ ' + type + ' ]';
+
+  public convertTypeString(type: any): string {
+    if (Array.isArray(this._koheseType.fields[this.selectedPropertyId].type)){
+      type = [type];
     }
-    
+
     return type;
   }
-  
+
   public openStateMachineEditor(): void {
     let stateMachine: any = this._koheseType.fields[this.selectedPropertyId].
       properties;
@@ -165,7 +163,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
         transition: {}
       };
     }
-    
+
     this.dialogService.openComponentDialog(StateMachineEditorComponent, {
       data: {
         stateMachine: stateMachine
@@ -177,18 +175,18 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public areTypesSame(option: any, selection: any): boolean {
-    let selectionType: string;
-    if (selection.startsWith('[')) {
-      selectionType = selection.substring(2, selection.length - 2);
+    let selectionType: any;
+    if (Array.isArray(selection)) {
+      selectionType = selection[0];
     } else {
       selectionType = selection;
     }
-    
+
     return (option === selectionType);
   }
-  
+
   public changeRelationness(checked: boolean): void {
     let property: any = this._koheseType.fields[this.selectedPropertyId];
     if (checked) {
@@ -202,7 +200,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     this._koheseType.updateProperty(this.selectedPropertyId, property);
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public areRelationsEqual(option: any, selection: any): boolean {
     return ((option.kind === selection.kind) && (option.foreignKey ===
       selection.foreignKey));

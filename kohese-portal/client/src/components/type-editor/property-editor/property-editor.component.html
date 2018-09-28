@@ -35,7 +35,7 @@
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-                <hr/>
+                <hr />
                 <div class="value-container">
                   <mat-form-field>
                     <textarea matInput placeholder="Default Value" rows="3" cols="80" [ngModel]="koheseType.fields[selectedPropertyId].default"
@@ -111,6 +111,19 @@
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
+                <hr />
+                <div class="table-definition">
+                  <mat-checkbox [disabled]="!(koheseType.fields[selectedPropertyId].views['form'].inputType.type === 'proxy-selector' && multivalued)"
+                    class="field-option" [ngModel]="koheseType.fields[selectedPropertyId].views['form'].inputType.options.asTable"
+                    (ngModelChange)="updateProperty(['views', 'form','inputType', 'options', 'asTable'], $event)">
+                    As Table
+                  </mat-checkbox>
+                  <span class="table-tooltip" *ngIf="!(koheseType.fields[selectedPropertyId].views['form'].inputType.type === 'proxy-selector' && multivalued)">
+                    (Tables only available on multivalued references)
+                  </span>
+                  <table-editor *ngIf="koheseType.fields[selectedPropertyId].views['form'].inputType.options.asTable">
+                  </table-editor>
+                </div>
                 <br />
               </div>
             </ng-container>
