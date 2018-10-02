@@ -1,7 +1,6 @@
-import { Subject } from 'rxjs/Subject';
+import { Subject ,  Subscription, BehaviorSubject } from 'rxjs';
 import { Injectable } from "@angular/core";
 import { KLogger, LoggingEventRecord } from "../../../../common/src/k-logger";
-import { Subscription, BehaviorSubject } from "rxjs";
 
 export interface LogCategory {
   description : string,

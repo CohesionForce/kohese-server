@@ -5,10 +5,8 @@ import { NavigationService } from '../../../../services/navigation/navigation.se
 
 import { ItemProxy } from '../../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
 import { MatTableDataSource } from '@angular/material'
-import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector : 'children-table',

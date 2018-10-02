@@ -1,10 +1,9 @@
+
+import {tap} from 'rxjs/operators';
 import { ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { VirtualScrollComponent } from 'angular2-virtual-scroll';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
 
 import { DialogService } from '../../services/dialog/dialog.service';
 import { TreeRow } from './tree-row/tree-row.class';
@@ -217,12 +216,12 @@ export abstract class Tree {
       data: {
         filter: inputFilter
       }
-    }).updateSize('90%', '90%').afterClosed().do((resultingFilter: Filter) => {
+    }).updateSize('90%', '90%').afterClosed().pipe(tap((resultingFilter: Filter) => {
       if (resultingFilter) {
         this._filterSubject.next(resultingFilter);
         this.refresh();
       }
-    });
+    }));
   }
   
   public removeFilter(): void {

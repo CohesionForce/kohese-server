@@ -1,3 +1,7 @@
+
+import {
+      map} from 'rxjs/operators
+      map';
 import { Injectable } from '@angular/core';
 
 import * as _ from 'underscore';
@@ -15,11 +19,8 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { CacheManager } from '../../../cache-worker/CacheManager';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import { Subject ,  BehaviorSubject ,  Subscription ,  Observable } from 'rxjs';
+
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
 
@@ -671,13 +672,13 @@ export class ItemRepository {
     let emitReturningObservable: (message: string, data: any) => Observable<any> =
       Observable.bindCallback(this.socketService.getSocket().emit.bind(this.
         socketService.getSocket()));
-    return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).
+    return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).pipe(
       map((response: any) => {
         proxy.history = response.history;
         /* Return a copy of the history so that subscribers may modify the
         returned history, if desired. */
         return JSON.parse(JSON.stringify(proxy.history));
-      });
+      }));
   }
 
   //////////////////////////////////////////////////////////////////////////

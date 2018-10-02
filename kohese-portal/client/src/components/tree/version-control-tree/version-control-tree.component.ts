@@ -1,9 +1,9 @@
+
+import {tap} from 'rxjs/operators';
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable ,  Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -332,12 +332,12 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
         _itemRepository);
     }
     
-    return super.openFilterDialog(filter).do((resultingFilter: Filter) => {
+    return super.openFilterDialog(filter).pipe(tap((resultingFilter: Filter) => {
       if (resultingFilter && !resultingFilter.isElementPresent(this.
         _searchCriterion)) {
         this._searchCriterion.value = '';
       }
-    });
+    }));
   }
   
   public removeFilter(): void {

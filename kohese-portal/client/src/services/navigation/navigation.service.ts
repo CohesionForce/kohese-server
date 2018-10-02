@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { NavigationUpdate } from './NavigationUpdate.class';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { LocationMap } from '../../constants/LocationMap.data'

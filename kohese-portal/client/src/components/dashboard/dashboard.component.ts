@@ -1,4 +1,4 @@
-import { Subscription } from 'rxjs';
+import { Subscription ,  BehaviorSubject } from 'rxjs';
 import { CurrentUserService } from './../../services/user/current-user.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -8,7 +8,6 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { DashboardSelections, DashboardSelectionInfo, DashboardTypes } from './dashboard-selector/dashboard-selector.component';
 import { ProjectInfo } from '../../services/project-service/project.service';

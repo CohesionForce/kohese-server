@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, Optional, Inject,
   ChangeDetectorRef, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 import { Filter, FilterCriteriaConnection } from './filter.class';
 

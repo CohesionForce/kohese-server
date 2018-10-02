@@ -1,3 +1,7 @@
+
+import {
+        map, startWith} from 'rxjs/operators
+        map';
 import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ItemRepository, RepoStates } from '../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
@@ -66,12 +70,12 @@ export class ProxySelectorComponent implements OnInit {
 
   initProxySearch() {
     if (!this.proxySearchInitialized) {
-      this.filteredProxies = this.proxySearchControl.valueChanges.startWith('').
+      this.filteredProxies = this.proxySearchControl.valueChanges.pipe(startWith(''),
         map((text: string) => {
           return this.rootProxy.getDescendants().filter((proxy) => {
             return (-1 !== proxy.item.name.indexOf(text));
           });
-      });
+      }),);
     }
     this.proxySearchInitialized = true;
   }

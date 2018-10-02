@@ -2,10 +2,9 @@ import { StateSummaryDialogComponent } from './state-summary-dialog/state-summar
 import { DialogService } from './../../../../../services/dialog/dialog.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { StateFilterService } from './../../../state-filter.service';
-import { Subscription } from 'rxjs';
-import {
+import { Subscription , 
   Observable
-} from 'rxjs/Observable';
+} from 'rxjs';
 import {
   Component,
   OnInit,

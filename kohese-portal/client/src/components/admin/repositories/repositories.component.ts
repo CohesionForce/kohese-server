@@ -6,8 +6,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable ,  Subscription } from 'rxjs';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 

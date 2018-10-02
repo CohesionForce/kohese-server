@@ -1,9 +1,9 @@
+
+import {tap} from 'rxjs/operators';
 import { EventEmitter, Output, Input } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
-import { Subscription } from 'rxjs';
+import { Observable ,  Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { RowAction, MenuAction } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -214,12 +214,12 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         itemRepository);
     }
 
-    return super.openFilterDialog(filter).do((resultingFilter: Filter) => {
+    return super.openFilterDialog(filter).pipe(tap((resultingFilter: Filter) => {
       if (resultingFilter && !resultingFilter.isElementPresent(this.
         _searchCriterion)) {
         this._searchCriterion.value = '';
       }
-    });
+    }));
   }
 
   public removeFilter(): void {

@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';

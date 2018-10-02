@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { SocketService } from '../socket/socket.service';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/bindCallback';
+import { Observable } from 'rxjs';
+
 
 export enum VersionControlState {
   CURRENT = 'Current', IGNORED = 'Ignored', CONFLICT = 'Conflict', STAGED =
