@@ -1,17 +1,25 @@
 console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
+import * as LevelUp from 'levelup';
+import * as LevelJs from 'level-js';
+import * as SubLevelDown from 'subleveldown';
+
 import { ItemProxy } from '../../common/src/item-proxy';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
-import { ItemCache } from '../../common/src/item-cache';
 import { KoheseModel } from '../../common/src/KoheseModel';
+import { ItemCache } from '../../common/src/item-cache';
+
+enum HistorySublevel {
+  METADATA = 'metadata', REFS = 'refs', TAGS = 'tags',
+    K_COMMITS = 'kCommitMap', K_TREES = 'kTreeMap', BLOBS = 'blobMap'
+}
 
 let socket : SocketIOClient.Socket = SocketIoClient();
 let serverCache = {
   metaModel: undefined,
   allItems: undefined
 }
-let objectMap : any = {};
 let cacheFetched = false;
 
 enum RepoStates {
@@ -29,6 +37,8 @@ let clientMap = {};
 
 let repoSyncCallback = [];
 
+let historySublevelMap: Map<string, any> = new Map<string, any>();
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
@@ -40,11 +50,19 @@ let repoSyncCallback = [];
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-(<any>self).onconnect = (connectEvent) => {
+(<any>self).onconnect = (connectEvent: any) => {
   var port = connectEvent.ports[0];
 
   console.log('::: Received new connection');
   console.log(connectEvent);
+  
+  let historySublevels: Array<string> = Object.keys(HistorySublevel);
+  let historyDatabase: any = LevelUp(LevelJs('history'));
+  for (let j: number = 0; j < historySublevels.length; j++) {
+    historySublevelMap.set(HistorySublevel[historySublevels[j]], SubLevelDown(
+      historyDatabase, HistorySublevel[historySublevels[j]],
+      { valueEncoding: 'json' }));
+  }
 
   let clientId = Date.now();
 
@@ -59,7 +77,7 @@ let repoSyncCallback = [];
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  port.onmessage = function(event) {
+  port.onmessage = (event: any) => {
     let request = event.data;
 
     // Determine which message handler to invoke
@@ -74,23 +92,38 @@ let repoSyncCallback = [];
       case 'sync':
         console.log('$$$ sync');
         syncWithServer(
-          (response) => {
-            function sendBulkCacheUpdate(key, value){
-              let bulkUpdateMessage = {};
-              bulkUpdateMessage[key] = value;
-              port.postMessage({type: 'bulkCacheUpdate', chunk: bulkUpdateMessage});
-            }
-
-            // Send Cache Chunks
-            sendBulkCacheUpdate('metadata', objectMap['metadata']);
-            sendBulkCacheUpdate('refs', objectMap['refs']);
-            sendBulkCacheUpdate('tags', objectMap['tags']);
-            sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
-            for (let key in objectMap.kTreeMapChunks) {
-              sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
-            }
-            for (let key in objectMap.blobMapChunks) {
-              sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
+          async (response) => {
+            let historySublevels: Array<string> = Object.keys(HistorySublevel);
+            for (let j: number = 0; j < historySublevels.length; j++) {
+              let content: any = {};
+              content[HistorySublevel[historySublevels[j]]] = {};
+              let iterator: any = historySublevelMap.get(HistorySublevel[
+                historySublevels[j]]).iterator();
+              let entry: any = await new Promise<any>((resolve: (entry: any) => void, reject:
+                (error: any) => void) => {
+                iterator.next((nullValue: any, key: string, value: any) => {
+                  resolve({
+                    key: key,
+                    value: value
+                  });
+                });
+              });
+              while (entry.key) {
+                content[HistorySublevel[historySublevels[j]]][entry.key] = entry.value;
+                entry = await new Promise<any>((resolve: (entry: any) => void, reject:
+                  (error: any) => void) => {
+                  iterator.next((nullValue: any, key: string, value: any) => {
+                    resolve({
+                      key: key,
+                      value: value
+                    });
+                  });
+                });
+              }
+              port.postMessage({
+                type: 'bulkCacheUpdate',
+                chunk: content
+              });
             }
 
             // Send Final response
@@ -299,7 +332,7 @@ function getItemCache(){
         requestTime: requestTime
       }
     },
-    (response) => {
+    async (response) => {
       var responseReceiptTime = Date.now();
       let timestamp = response.timestamp;
       timestamp.responseReceiptTime = responseReceiptTime;
@@ -308,9 +341,49 @@ function getItemCache(){
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      console.log(Object.keys(objectMap));
-      let itemCache = new ItemCache();
-      itemCache.setObjectMap(objectMap);
+      let itemCache: ItemCache = new ItemCache();
+      let historySublevels: Array<string> = Object.keys(HistorySublevel);
+      for (let j: number = 0; j < historySublevels.length; j++) {
+        let iterator: any = historySublevelMap.get(HistorySublevel[
+          historySublevels[j]]).iterator();
+        let entry: any = await new Promise<any>((resolve: (entry: any) => void, reject:
+          (error: any) => void) => {
+          iterator.next((nullValue: any, key: string, value: any) => {
+            resolve({
+              key: key,
+              value: value
+            });
+          });
+        });
+        while (entry.key) {
+          switch (HistorySublevel[historySublevels[j]]) {
+            case HistorySublevel.REFS:
+              itemCache.cacheRef(entry.key, entry.value);
+              break;
+            case HistorySublevel.TAGS:
+              itemCache.cacheTag(entry.key, entry.value);
+              break;
+            case HistorySublevel.K_COMMITS:
+              itemCache.cacheCommit(entry.key, entry.value);
+              break;
+            case HistorySublevel.K_TREES:
+              itemCache.cacheTree(entry.key, entry.value);
+              break;
+            case HistorySublevel.BLOBS:
+              itemCache.cacheBlob(entry.key, entry.value);
+              break;
+          }
+          entry = await new Promise<any>((resolve: (entry: any) => void, reject:
+            (error: any) => void) => {
+            iterator.next((nullValue: any, key: string, value: any) => {
+              resolve({
+                key: key,
+                value: value
+              });
+            });
+          });
+        }
+      }
       TreeConfiguration.setItemCache(itemCache);
       let headCommit = itemCache.getRef('HEAD');
       console.log('### Head: ' + headCommit);
@@ -331,9 +404,6 @@ function getItemCache(){
       console.log('$$$ Finished loading HEAD');
 
       getAll();
-
-      // Transfer the Cache while waiting for response
-      objectMap = itemCache.getObjectMap();
     });
   } else {
     console.log('$$$ Cache has already been fetched');
@@ -347,10 +417,25 @@ function processBulkCacheUpdate(bulkUpdate){
 
   for (let key in bulkUpdate){
     console.log("::: Processing BulkCacheUpdate for: " + key);
-    if(!objectMap[key]){
-      objectMap[key] = {};
+    let entries: Array<any> = [];
+    for (let propertyName in bulkUpdate[key]) {
+      entries.push({
+        type: 'put',
+        key: propertyName,
+        value: bulkUpdate[key][propertyName]
+      });
     }
-    Object.assign(objectMap[key], bulkUpdate[key]);
+    
+    let sublevel: any;
+    if (key === 'kTreeMapChunks') {
+      sublevel = historySublevelMap.get(HistorySublevel.K_TREES);
+    } else if (key === 'blobMapChunks') {
+      sublevel = historySublevelMap.get(HistorySublevel.BLOBS);
+    } else {
+      sublevel = historySublevelMap.get(key);
+    }
+    
+    sublevel.batch(entries);
   }
 
 }
@@ -448,7 +533,7 @@ function syncWithServer(callback){
   console.log('$$$ Sync with server');
 
   // Determine if repo is already synched
-  if (objectMap && serverCache.allItems){
+  if (serverCache.allItems){
     console.log('$$$ syncWithServer: Sending cached items');
     callback(serverCache);
     return;
