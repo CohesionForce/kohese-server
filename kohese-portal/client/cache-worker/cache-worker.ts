@@ -10,7 +10,7 @@ import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
 import { ItemCache } from '../../common/src/item-cache';
 
-enum HistorySublevel {
+enum CacheSublevel {
   METADATA = 'metadata', REFS = 'refs', TAGS = 'tags',
     K_COMMITS = 'kCommitMap', K_TREES = 'kTreeMap', BLOBS = 'blobMap'
 }
@@ -37,7 +37,8 @@ let clientMap = {};
 
 let repoSyncCallback = [];
 
-let historySublevelMap: Map<string, any> = new Map<string, any>();
+let initialized: boolean = false;
+let sublevelMap: Map<string, any> = new Map<string, any>();
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -56,12 +57,16 @@ let historySublevelMap: Map<string, any> = new Map<string, any>();
   console.log('::: Received new connection');
   console.log(connectEvent);
   
-  let historySublevels: Array<string> = Object.keys(HistorySublevel);
-  let historyDatabase: any = LevelUp(LevelJs('history'));
-  for (let j: number = 0; j < historySublevels.length; j++) {
-    historySublevelMap.set(HistorySublevel[historySublevels[j]], SubLevelDown(
-      historyDatabase, HistorySublevel[historySublevels[j]],
-      { valueEncoding: 'json' }));
+  if (!initialized) {
+    let historySublevels: Array<string> = Object.keys(CacheSublevel);
+    let historyDatabase: any = LevelUp(LevelJs('history'));
+    for (let j: number = 0; j < historySublevels.length; j++) {
+      sublevelMap.set(CacheSublevel[historySublevels[j]], SubLevelDown(
+        historyDatabase, CacheSublevel[historySublevels[j]],
+        { valueEncoding: 'json' }));
+    }
+    
+    initialized = true;
   }
 
   let clientId = Date.now();
@@ -93,14 +98,14 @@ let historySublevelMap: Map<string, any> = new Map<string, any>();
         console.log('$$$ sync');
         syncWithServer(
           async (response) => {
-            let historySublevels: Array<string> = Object.keys(HistorySublevel);
+            let historySublevels: Array<string> = Object.keys(CacheSublevel);
             for (let j: number = 0; j < historySublevels.length; j++) {
               let content: any = {};
-              content[HistorySublevel[historySublevels[j]]] = {};
-              let iterator: any = historySublevelMap.get(HistorySublevel[
+              content[CacheSublevel[historySublevels[j]]] = {};
+              let iterator: any = sublevelMap.get(CacheSublevel[
                 historySublevels[j]]).iterator();
-              let entry: any = await new Promise<any>((resolve: (entry: any) => void, reject:
-                (error: any) => void) => {
+              let entry: any = await new Promise<any>((resolve: (entry:
+                any) => void, reject: (error: any) => void) => {
                 iterator.next((nullValue: any, key: string, value: any) => {
                   resolve({
                     key: key,
@@ -109,9 +114,10 @@ let historySublevelMap: Map<string, any> = new Map<string, any>();
                 });
               });
               while (entry.key) {
-                content[HistorySublevel[historySublevels[j]]][entry.key] = entry.value;
-                entry = await new Promise<any>((resolve: (entry: any) => void, reject:
-                  (error: any) => void) => {
+                content[CacheSublevel[historySublevels[j]]][entry.key] = entry.
+                  value;
+                entry = await new Promise<any>((resolve: (entry: any) => void,
+                  reject: (error: any) => void) => {
                   iterator.next((nullValue: any, key: string, value: any) => {
                     resolve({
                       key: key,
@@ -322,14 +328,23 @@ function getMetamodel(){
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getItemCache(){
+async function getItemCache(){
   if (!cacheFetched){
     console.log('$$$ Get Item Cache');
     let requestTime = Date.now();
 
+    let latestHistoryHash: string;
+    try {
+      latestHistoryHash = await sublevelMap.get(CacheSublevel.REFS).
+        get('HEAD');
+    } catch (error) {
+      latestHistoryHash = '';
+    }
+    
     socket.emit('Item/getItemCache', {
       timestamp: {
-        requestTime: requestTime
+        requestTime: requestTime,
+        latestHistoryHash: latestHistoryHash
       }
     },
     async (response) => {
@@ -342,12 +357,12 @@ function getItemCache(){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
       let itemCache: ItemCache = new ItemCache();
-      let historySublevels: Array<string> = Object.keys(HistorySublevel);
+      let historySublevels: Array<string> = Object.keys(CacheSublevel);
       for (let j: number = 0; j < historySublevels.length; j++) {
-        let iterator: any = historySublevelMap.get(HistorySublevel[
+        let iterator: any = sublevelMap.get(CacheSublevel[
           historySublevels[j]]).iterator();
-        let entry: any = await new Promise<any>((resolve: (entry: any) => void, reject:
-          (error: any) => void) => {
+        let entry: any = await new Promise<any>((resolve: (entry: any) => void,
+          reject: (error: any) => void) => {
           iterator.next((nullValue: any, key: string, value: any) => {
             resolve({
               key: key,
@@ -356,25 +371,25 @@ function getItemCache(){
           });
         });
         while (entry.key) {
-          switch (HistorySublevel[historySublevels[j]]) {
-            case HistorySublevel.REFS:
+          switch (CacheSublevel[historySublevels[j]]) {
+            case CacheSublevel.REFS:
               itemCache.cacheRef(entry.key, entry.value);
               break;
-            case HistorySublevel.TAGS:
+            case CacheSublevel.TAGS:
               itemCache.cacheTag(entry.key, entry.value);
               break;
-            case HistorySublevel.K_COMMITS:
+            case CacheSublevel.K_COMMITS:
               itemCache.cacheCommit(entry.key, entry.value);
               break;
-            case HistorySublevel.K_TREES:
+            case CacheSublevel.K_TREES:
               itemCache.cacheTree(entry.key, entry.value);
               break;
-            case HistorySublevel.BLOBS:
+            case CacheSublevel.BLOBS:
               itemCache.cacheBlob(entry.key, entry.value);
               break;
           }
-          entry = await new Promise<any>((resolve: (entry: any) => void, reject:
-            (error: any) => void) => {
+          entry = await new Promise<any>((resolve: (entry: any) => void,
+            reject: (error: any) => void) => {
             iterator.next((nullValue: any, key: string, value: any) => {
               resolve({
                 key: key,
@@ -428,11 +443,11 @@ function processBulkCacheUpdate(bulkUpdate){
     
     let sublevel: any;
     if (key === 'kTreeMapChunks') {
-      sublevel = historySublevelMap.get(HistorySublevel.K_TREES);
+      sublevel = sublevelMap.get(CacheSublevel.K_TREES);
     } else if (key === 'blobMapChunks') {
-      sublevel = historySublevelMap.get(HistorySublevel.BLOBS);
+      sublevel = sublevelMap.get(CacheSublevel.BLOBS);
     } else {
-      sublevel = historySublevelMap.get(key);
+      sublevel = sublevelMap.get(key);
     }
     
     sublevel.batch(entries);
@@ -532,9 +547,7 @@ function getAll(){
 function syncWithServer(callback){
   console.log('$$$ Sync with server');
 
-  // Determine if repo is already synched
-  if (serverCache.allItems){
-    console.log('$$$ syncWithServer: Sending cached items');
+  if (serverCache.allItems) {
     callback(serverCache);
     return;
   }
