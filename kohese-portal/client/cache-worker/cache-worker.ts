@@ -11,7 +11,7 @@ import { KoheseModel } from '../../common/src/KoheseModel';
 import { ItemCache } from '../../common/src/item-cache';
 
 enum CacheSublevel {
-  METADATA = 'metadata', REFS = 'refs', TAGS = 'tags',
+  METADATA = 'metadata', REFS = 'refMap', TAGS = 'tagMap',
     K_COMMITS = 'kCommitMap', K_TREES = 'kTreeMap', BLOBS = 'blobMap'
 }
 
@@ -56,7 +56,7 @@ let sublevelMap: Map<string, any> = new Map<string, any>();
 
   console.log('::: Received new connection');
   console.log(connectEvent);
-  
+
   if (!initialized) {
     let historySublevels: Array<string> = Object.keys(CacheSublevel);
     let historyDatabase: any = LevelUp(LevelJs('history'));
@@ -65,7 +65,7 @@ let sublevelMap: Map<string, any> = new Map<string, any>();
         historyDatabase, CacheSublevel[historySublevels[j]],
         { valueEncoding: 'json' }));
     }
-    
+
     initialized = true;
   }
 
@@ -333,19 +333,20 @@ async function getItemCache(){
     console.log('$$$ Get Item Cache');
     let requestTime = Date.now();
 
-    let latestHistoryHash: string;
+    let headCommit: string;
     try {
-      latestHistoryHash = await sublevelMap.get(CacheSublevel.REFS).
+      headCommit = await sublevelMap.get(CacheSublevel.REFS).
         get('HEAD');
     } catch (error) {
-      latestHistoryHash = '';
+      headCommit = '';
     }
-    
+
+    console.log('$$$ Latest HEAD in client cache: ' + headCommit);
     socket.emit('Item/getItemCache', {
       timestamp: {
-        requestTime: requestTime,
-        latestHistoryHash: latestHistoryHash
-      }
+        requestTime: requestTime
+      },
+      headCommit: headCommit
     },
     async (response) => {
       var responseReceiptTime = Date.now();
@@ -440,7 +441,7 @@ function processBulkCacheUpdate(bulkUpdate){
         value: bulkUpdate[key][propertyName]
       });
     }
-    
+
     let sublevel: any;
     if (key === 'kTreeMapChunks') {
       sublevel = sublevelMap.get(CacheSublevel.K_TREES);
@@ -449,7 +450,8 @@ function processBulkCacheUpdate(bulkUpdate){
     } else {
       sublevel = sublevelMap.get(key);
     }
-    
+
+    console.log('$$$ Adding ' + entries.length + ' entries to ' + key);
     sublevel.batch(entries);
   }
 
