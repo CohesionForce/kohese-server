@@ -11,8 +11,21 @@ import { KoheseModel } from '../../common/src/KoheseModel';
 import { ItemCache } from '../../common/src/item-cache';
 
 enum CacheSublevel {
-  METADATA = 'metadata', REFS = 'refMap', TAGS = 'tagMap',
-    K_COMMITS = 'kCommitMap', K_TREES = 'kTreeMap', BLOBS = 'blobMap'
+  METADATA = 'metadata',
+  REF = 'ref',
+  TAG = 'tag',
+  K_COMMIT = 'kCommit',
+  K_TREE = 'kTree',
+  BLOB = 'blob'
+}
+
+const CacheBulkTransferKeyToSublevelMap = {
+  'metadata': CacheSublevel.METADATA,
+  'refMap': CacheSublevel.REF,
+  'tagMap': CacheSublevel.TAG,
+  'kCommitMap': CacheSublevel.K_COMMIT,
+  'kTreeMap': CacheSublevel.K_TREE,
+  'blobMap': CacheSublevel.BLOB,
 }
 
 let socket : SocketIOClient.Socket = SocketIoClient();
@@ -59,7 +72,7 @@ let sublevelMap: Map<string, any> = new Map<string, any>();
 
   if (!initialized) {
     let historySublevels: Array<string> = Object.keys(CacheSublevel);
-    let historyDatabase: any = LevelUp(LevelJs('history'));
+    let historyDatabase: any = LevelUp(LevelJs('item-cache'));
     for (let j: number = 0; j < historySublevels.length; j++) {
       sublevelMap.set(CacheSublevel[historySublevels[j]], SubLevelDown(
         historyDatabase, CacheSublevel[historySublevels[j]],
@@ -322,7 +335,7 @@ async function getItemCache(){
 
     let headCommit: string;
     try {
-      headCommit = await sublevelMap.get(CacheSublevel.REFS).
+      headCommit = await sublevelMap.get(CacheSublevel.REF).
         get('HEAD');
     } catch (error) {
       headCommit = '';
@@ -361,19 +374,19 @@ async function getItemCache(){
         });
         while (entry.key) {
           switch (CacheSublevel[historySublevels[j]]) {
-            case CacheSublevel.REFS:
+            case CacheSublevel.REF:
               itemCache.cacheRef(entry.key, entry.value);
               break;
-            case CacheSublevel.TAGS:
+            case CacheSublevel.TAG:
               itemCache.cacheTag(entry.key, entry.value);
               break;
-            case CacheSublevel.K_COMMITS:
+            case CacheSublevel.K_COMMIT:
               itemCache.cacheCommit(entry.key, entry.value);
               break;
-            case CacheSublevel.K_TREES:
+            case CacheSublevel.K_TREE:
               itemCache.cacheTree(entry.key, entry.value);
               break;
-            case CacheSublevel.BLOBS:
+            case CacheSublevel.BLOB:
               itemCache.cacheBlob(entry.key, entry.value);
               break;
           }
@@ -433,16 +446,10 @@ function processBulkCacheUpdate(bulkUpdate){
       });
     }
 
-    let sublevel: any;
-    if (key === 'kTreeMapChunks') {
-      sublevel = sublevelMap.get(CacheSublevel.K_TREES);
-    } else if (key === 'blobMapChunks') {
-      sublevel = sublevelMap.get(CacheSublevel.BLOBS);
-    } else {
-      sublevel = sublevelMap.get(key);
-    }
+    let sublevelKey : CacheSublevel = CacheBulkTransferKeyToSublevelMap[key];
+    let sublevel = sublevelMap.get(sublevelKey);
 
-    console.log('$$$ Adding ' + entries.length + ' entries to ' + key);
+    console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelKey + ' for ' + key);
     sublevel.batch(entries);
   }
 
