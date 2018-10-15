@@ -96,40 +96,27 @@ let sublevelMap: Map<string, any> = new Map<string, any>();
         break;
       case 'sync':
         console.log('$$$ sync');
+
         syncWithServer(
-          async (response) => {
-            let historySublevels: Array<string> = Object.keys(CacheSublevel);
-            for (let j: number = 0; j < historySublevels.length; j++) {
-              let content: any = {};
-              content[CacheSublevel[historySublevels[j]]] = {};
-              let iterator: any = sublevelMap.get(CacheSublevel[
-                historySublevels[j]]).iterator();
-              let entry: any = await new Promise<any>((resolve: (entry:
-                any) => void, reject: (error: any) => void) => {
-                iterator.next((nullValue: any, key: string, value: any) => {
-                  resolve({
-                    key: key,
-                    value: value
-                  });
-                });
-              });
-              while (entry.key) {
-                content[CacheSublevel[historySublevels[j]]][entry.key] = entry.
-                  value;
-                entry = await new Promise<any>((resolve: (entry: any) => void,
-                  reject: (error: any) => void) => {
-                  iterator.next((nullValue: any, key: string, value: any) => {
-                    resolve({
-                      key: key,
-                      value: value
-                    });
-                  });
-                });
-              }
-              port.postMessage({
-                type: 'bulkCacheUpdate',
-                chunk: content
-              });
+          (response) => {
+            let itemCache:ItemCache = TreeConfiguration.getItemCache();
+            let objectMap = itemCache.getObjectMap();
+            function sendBulkCacheUpdate(key, value){
+              let bulkUpdateMessage = {};
+              bulkUpdateMessage[key] = value;
+              port.postMessage({type: 'bulkCacheUpdate', chunk: bulkUpdateMessage});
+            }
+
+            // Send Cache Chunks
+            sendBulkCacheUpdate('metadata', objectMap['metadata']);
+            sendBulkCacheUpdate('refMap', objectMap['refMap']);
+            sendBulkCacheUpdate('tagMap', objectMap['tagMap']);
+            sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
+            for (let key in objectMap.kTreeMapChunks) {
+              sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
+            }
+            for (let key in objectMap.blobMapChunks) {
+              sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
             }
 
             // Send Final response
@@ -359,6 +346,7 @@ async function getItemCache(){
       }
       let itemCache: ItemCache = new ItemCache();
       let historySublevels: Array<string> = Object.keys(CacheSublevel);
+      let beforeLoadCache = Date.now();
       for (let j: number = 0; j < historySublevels.length; j++) {
         let iterator: any = sublevelMap.get(CacheSublevel[
           historySublevels[j]]).iterator();
@@ -400,6 +388,9 @@ async function getItemCache(){
           });
         }
       }
+
+      let afterLoadCache = Date.now();
+      console.log('$$$ Load time from Level Cache: ' + (afterLoadCache - beforeLoadCache)/1000);
       TreeConfiguration.setItemCache(itemCache);
       let headCommit = itemCache.getRef('HEAD');
       console.log('### Head: ' + headCommit);
