@@ -48,8 +48,8 @@ export class ItemCache {
     numTrees: number,
     numBlobs: number
   }
-  private refs;
-  private tags;
+  private refMap;
+  private tagMap;
   private kCommitMap : { [ oid : string ]: KoheseCommit};
   private kTreeMap : { [ oid : string ]: KoheseTree};
   private blobMap : { [ oid : string ]: Blob};
@@ -68,8 +68,8 @@ export class ItemCache {
       numTrees: 0,
       numBlobs: 0,
     }
-    this.refs = {};
-    this.tags = {};
+    this.refMap = {};
+    this.tagMap = {};
     this.kCommitMap = {};
     this.kTreeMap = {};
     this.blobMap = {};
@@ -107,14 +107,14 @@ export class ItemCache {
     if (!this.objectMap){
       this.objectMap = {
         metadata : {
-          numRefs: _.size(this.refs),
-          numTags: _.size(this.tags),
+          numRefs: _.size(this.refMap),
+          numTags: _.size(this.tagMap),
           numCommits: _.size(this.kCommitMap),
           numTrees: _.size(this.kTreeMap),
           numBlobs: _.size(this.blobMap)
         },
-        refs : this.refs,
-        tags : this.tags,
+        refMap : this.refMap,
+        tagMap : this.tagMap,
         kCommitMap : this.kCommitMap,
         kTreeMapChunks: this.splitObject(this.kTreeMap),
         blobMapChunks: this.splitObject(this.blobMap)
@@ -129,19 +129,19 @@ export class ItemCache {
   setObjectMap(objectMap){
     let metadata = objectMap.metadata;
 
-    if (objectMap.refs){
-      this.refs = objectMap.refs;
-      this.metadata.numRefs = _.size(this.refs);
+    if (objectMap.refMap){
+      this.refMap = objectMap.refMap;
+      this.metadata.numRefs = _.size(this.refMap);
       if(this.metadata.numRefs !== objectMap.metadata.numRefs){
-        console.log('*** Number of refs do not match: ' + _.size(this.refs));
+        console.log('*** Number of refs do not match: ' + _.size(this.refMap));
       }
     }
 
-    if (objectMap.tags){
-      this.tags = objectMap.tags;
-      this.metadata.numTags = _.size(this.tags);
+    if (objectMap.tagMap){
+      this.tagMap = objectMap.tagMap;
+      this.metadata.numTags = _.size(this.tagMap);
       if(this.metadata.numTags !== objectMap.metadata.numTags){
-        console.log('*** Number of tags do not match: ' + _.size(this.tags));
+        console.log('*** Number of tags do not match: ' + _.size(this.tagMap));
       }
     }
 
@@ -182,42 +182,42 @@ export class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   getRefs(){
-    return this.refs;
+    return this.refMap;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   cacheRef(ref, oid){
-    this.refs[ref] = oid;
+    this.refMap[ref] = oid;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   getRef(ref){
-    return this.refs[ref];
+    return this.refMap[ref];
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   getTags(){
-    return this.tags;
+    return this.tagMap;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   cacheTag(tag, oid){
-    this.tags[tag] = oid;
+    this.tagMap[tag] = oid;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   getTag(tag){
-    return this.tags[tag];
+    return this.tagMap[tag];
   }
 
   //////////////////////////////////////////////////////////////////////////
