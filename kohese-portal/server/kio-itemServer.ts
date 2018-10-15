@@ -180,21 +180,25 @@ function KIOItemServer(socket){
     consoleLogObject('$$$ Request', request);
 
     let itemCache = TreeConfiguration.getItemCache();
-    let objectMap = itemCache.getObjectMap();
+    let headCommit = itemCache.getRef('HEAD');
 
-    console.log('### Preparing BulkCacheUpdate Messages');
-
-    sendBulkCacheUpdate('metadata', objectMap['metadata']);
-    sendBulkCacheUpdate('refs', objectMap['refs']);
-    sendBulkCacheUpdate('tags', objectMap['tags']);
-    sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
-    for (let key in objectMap.kTreeMapChunks) {
-      sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
+    if (headCommit !== request.headCommit){
+      console.log('### Preparing BulkCacheUpdate Messages: ' + request.headCommit + ' -> ' + headCommit);
+      let objectMap = itemCache.getObjectMap();
+      sendBulkCacheUpdate('metadata', objectMap['metadata']);
+      sendBulkCacheUpdate('refMap', objectMap['refMap']);
+      sendBulkCacheUpdate('tagMap', objectMap['tagMap']);
+      sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
+      for (let key in objectMap.kTreeMapChunks) {
+        sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
+      }
+      for (let key in objectMap.blobMapChunks) {
+        sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
+      }
+      console.log('### Sent BulkCacheUpdate Messages');
+    } else {
+      console.log('### Item Cache is already in sync');
     }
-    for (let key in objectMap.blobMapChunks) {
-      sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
-    }
-    console.log('### Sent BulkCacheUpdate Messages');
 
     let response = {
       timestamp: {

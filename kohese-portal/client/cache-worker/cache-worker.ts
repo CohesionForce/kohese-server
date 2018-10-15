@@ -1,17 +1,38 @@
 console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
+import * as LevelUp from 'levelup';
+import * as LevelJs from 'level-js';
+import * as SubLevelDown from 'subleveldown';
+
 import { ItemProxy } from '../../common/src/item-proxy';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
-import { ItemCache } from '../../common/src/item-cache';
 import { KoheseModel } from '../../common/src/KoheseModel';
+import { ItemCache } from '../../common/src/item-cache';
+
+enum CacheSublevel {
+  METADATA = 'metadata',
+  REF = 'ref',
+  TAG = 'tag',
+  K_COMMIT = 'kCommit',
+  K_TREE = 'kTree',
+  BLOB = 'blob'
+}
+
+const CacheBulkTransferKeyToSublevelMap = {
+  'metadata': CacheSublevel.METADATA,
+  'refMap': CacheSublevel.REF,
+  'tagMap': CacheSublevel.TAG,
+  'kCommitMap': CacheSublevel.K_COMMIT,
+  'kTreeMap': CacheSublevel.K_TREE,
+  'blobMap': CacheSublevel.BLOB,
+}
 
 let socket : SocketIOClient.Socket = SocketIoClient();
 let serverCache = {
   metaModel: undefined,
   allItems: undefined
 }
-let objectMap : any = {};
 let cacheFetched = false;
 
 enum RepoStates {
@@ -29,6 +50,9 @@ let clientMap = {};
 
 let repoSyncCallback = [];
 
+let initialized: boolean = false;
+let sublevelMap: Map<string, any> = new Map<string, any>();
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
@@ -40,11 +64,23 @@ let repoSyncCallback = [];
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-(<any>self).onconnect = (connectEvent) => {
+(<any>self).onconnect = (connectEvent: any) => {
   var port = connectEvent.ports[0];
 
   console.log('::: Received new connection');
   console.log(connectEvent);
+
+  if (!initialized) {
+    let historySublevels: Array<string> = Object.keys(CacheSublevel);
+    let historyDatabase: any = LevelUp(LevelJs('item-cache'));
+    for (let j: number = 0; j < historySublevels.length; j++) {
+      sublevelMap.set(CacheSublevel[historySublevels[j]], SubLevelDown(
+        historyDatabase, CacheSublevel[historySublevels[j]],
+        { valueEncoding: 'json' }));
+    }
+
+    initialized = true;
+  }
 
   let clientId = Date.now();
 
@@ -59,7 +95,7 @@ let repoSyncCallback = [];
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  port.onmessage = function(event) {
+  port.onmessage = (event: any) => {
     let request = event.data;
 
     // Determine which message handler to invoke
@@ -73,8 +109,11 @@ let repoSyncCallback = [];
         break;
       case 'sync':
         console.log('$$$ sync');
+
         syncWithServer(
           (response) => {
+            let itemCache:ItemCache = TreeConfiguration.getItemCache();
+            let objectMap = itemCache.getObjectMap();
             function sendBulkCacheUpdate(key, value){
               let bulkUpdateMessage = {};
               bulkUpdateMessage[key] = value;
@@ -83,8 +122,8 @@ let repoSyncCallback = [];
 
             // Send Cache Chunks
             sendBulkCacheUpdate('metadata', objectMap['metadata']);
-            sendBulkCacheUpdate('refs', objectMap['refs']);
-            sendBulkCacheUpdate('tags', objectMap['tags']);
+            sendBulkCacheUpdate('refMap', objectMap['refMap']);
+            sendBulkCacheUpdate('tagMap', objectMap['tagMap']);
             sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
             for (let key in objectMap.kTreeMapChunks) {
               sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
@@ -289,17 +328,27 @@ function getMetamodel(){
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getItemCache(){
+async function getItemCache(){
   if (!cacheFetched){
     console.log('$$$ Get Item Cache');
     let requestTime = Date.now();
 
+    let headCommit: string;
+    try {
+      headCommit = await sublevelMap.get(CacheSublevel.REF).
+        get('HEAD');
+    } catch (error) {
+      headCommit = '';
+    }
+
+    console.log('$$$ Latest HEAD in client cache: ' + headCommit);
     socket.emit('Item/getItemCache', {
       timestamp: {
         requestTime: requestTime
-      }
+      },
+      headCommit: headCommit
     },
-    (response) => {
+    async (response) => {
       var responseReceiptTime = Date.now();
       let timestamp = response.timestamp;
       timestamp.responseReceiptTime = responseReceiptTime;
@@ -308,9 +357,53 @@ function getItemCache(){
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      console.log(Object.keys(objectMap));
-      let itemCache = new ItemCache();
-      itemCache.setObjectMap(objectMap);
+      let itemCache: ItemCache = new ItemCache();
+      let historySublevels: Array<string> = Object.keys(CacheSublevel);
+      let beforeLoadCache = Date.now();
+      for (let j: number = 0; j < historySublevels.length; j++) {
+        let iterator: any = sublevelMap.get(CacheSublevel[
+          historySublevels[j]]).iterator();
+        let entry: any = await new Promise<any>((resolve: (entry: any) => void,
+          reject: (error: any) => void) => {
+          iterator.next((nullValue: any, key: string, value: any) => {
+            resolve({
+              key: key,
+              value: value
+            });
+          });
+        });
+        while (entry.key) {
+          switch (CacheSublevel[historySublevels[j]]) {
+            case CacheSublevel.REF:
+              itemCache.cacheRef(entry.key, entry.value);
+              break;
+            case CacheSublevel.TAG:
+              itemCache.cacheTag(entry.key, entry.value);
+              break;
+            case CacheSublevel.K_COMMIT:
+              itemCache.cacheCommit(entry.key, entry.value);
+              break;
+            case CacheSublevel.K_TREE:
+              itemCache.cacheTree(entry.key, entry.value);
+              break;
+            case CacheSublevel.BLOB:
+              itemCache.cacheBlob(entry.key, entry.value);
+              break;
+          }
+          entry = await new Promise<any>((resolve: (entry: any) => void,
+            reject: (error: any) => void) => {
+            iterator.next((nullValue: any, key: string, value: any) => {
+              resolve({
+                key: key,
+                value: value
+              });
+            });
+          });
+        }
+      }
+
+      let afterLoadCache = Date.now();
+      console.log('$$$ Load time from Level Cache: ' + (afterLoadCache - beforeLoadCache)/1000);
       TreeConfiguration.setItemCache(itemCache);
       let headCommit = itemCache.getRef('HEAD');
       console.log('### Head: ' + headCommit);
@@ -331,9 +424,6 @@ function getItemCache(){
       console.log('$$$ Finished loading HEAD');
 
       getAll();
-
-      // Transfer the Cache while waiting for response
-      objectMap = itemCache.getObjectMap();
     });
   } else {
     console.log('$$$ Cache has already been fetched');
@@ -347,10 +437,20 @@ function processBulkCacheUpdate(bulkUpdate){
 
   for (let key in bulkUpdate){
     console.log("::: Processing BulkCacheUpdate for: " + key);
-    if(!objectMap[key]){
-      objectMap[key] = {};
+    let entries: Array<any> = [];
+    for (let propertyName in bulkUpdate[key]) {
+      entries.push({
+        type: 'put',
+        key: propertyName,
+        value: bulkUpdate[key][propertyName]
+      });
     }
-    Object.assign(objectMap[key], bulkUpdate[key]);
+
+    let sublevelKey : CacheSublevel = CacheBulkTransferKeyToSublevelMap[key];
+    let sublevel = sublevelMap.get(sublevelKey);
+
+    console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelKey + ' for ' + key);
+    sublevel.batch(entries);
   }
 
 }
@@ -447,9 +547,7 @@ function getAll(){
 function syncWithServer(callback){
   console.log('$$$ Sync with server');
 
-  // Determine if repo is already synched
-  if (objectMap && serverCache.allItems){
-    console.log('$$$ syncWithServer: Sending cached items');
+  if (serverCache.allItems) {
     callback(serverCache);
     return;
   }
