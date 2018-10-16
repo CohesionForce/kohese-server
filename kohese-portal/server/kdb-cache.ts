@@ -162,9 +162,14 @@ export class KDBCache extends ItemCache {
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(jsonExt, '');
       try {
-        var object = kdbFS.loadBinaryFile(this.blobDirectory + '/' + oidFile);
-        var blob = this.convertBlob(object);
-        this.cacheBlob(oid, blob);
+        if (oid === oidFile){
+          var object = kdbFS.loadBinaryFile(this.blobDirectory + '/' + oidFile);
+          var blob = this.convertBlob(object);
+          this.cacheBlob(oid, blob);
+        } else {
+          var object = kdbFS.loadJSONDoc(this.blobDirectory + '/' + oidFile);
+          this.cacheBlob(oid, object);
+        }
       } catch (err) {
         console.log('*** Could not load cached blob:  ' + oid);
         console.log(err);
@@ -177,11 +182,16 @@ export class KDBCache extends ItemCache {
     oidFiles.forEach((oidFile) => {
       var oid = oidFile.replace(jsonExt, '');
       try {
-        var object = kdbFS.loadBinaryFile(this.blobMismatchDirectory + '/' + oidFile);
-        var blob = this.convertBlob(object);
-        this.cacheBlob(oid, blob);
+        if (oid === oidFile){
+          var object = kdbFS.loadBinaryFile(this.blobMismatchDirectory + '/' + oidFile);
+          var blob = this.convertBlob(object);
+          this.cacheBlob(oid, blob);
+        } else {
+          var object = kdbFS.loadJSONDoc(this.blobMismatchDirectory + '/' + oidFile);
+          this.cacheBlob(oid, object);
+        }
       } catch (err) {
-        console.log('*** Could not load cached blob:  ' + oid);
+        console.log('*** Could not load cached mismatched blob:  ' + oid);
         console.log(err);
       }
     });

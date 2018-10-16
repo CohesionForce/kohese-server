@@ -5,6 +5,7 @@
   "license": "EPL-1.0",
   "scripts": {
     "server": "node --max_old_space_size=2048 .",
+    "index": "node build/scripts/index-commits.js -kdb=kohese-kdb",
     "build-all": "npm run build-server && npm run build-client",
     "build-all-prod": "npm run build-server && npm run build-client-prod",
     "build-server": "tsc --p server/tsconfig.json",
@@ -62,6 +63,9 @@
     "jsonwebtoken": "^5.0.5",
     "jssha": "^2.3.1",
     "karma-coverage-istanbul-reporter": "^1.4.1",
+    "level": "^4.0.0",
+    "level-js": "^3.0.0",
+    "levelup": "^3.1.1",
     "morgan": "^1.7.0",
     "ng2-dragula": "^1.5.0",
     "ng2-file-upload": "^1.3.0",
@@ -80,6 +84,7 @@
     "socket.io-client": "^2.0.3",
     "socket.io-file": "^2.0.14",
     "socket.io-file-client": "^2.0.121",
+    "subleveldown": "^3.0.1",
     "underscore": "^1.8.3",
     "uuid": "^3.1.0",
     "zone.js": "^0.8.18"
