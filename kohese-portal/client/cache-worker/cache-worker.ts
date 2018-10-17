@@ -8,7 +8,7 @@ import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
 
 import { ItemCache } from '../../common/src/item-cache';
-import { LevelCache, CacheSublevel } from '../../common/src/level-cache';
+import { LevelCache } from '../../common/src/level-cache';
 
 let socket : SocketIOClient.Socket = SocketIoClient();
 let serverCache = {

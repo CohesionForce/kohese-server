@@ -2,30 +2,54 @@ import { ItemProxy } from './item-proxy';
 import { TreeConfiguration } from './tree-configuration';
 import { ItemCache } from './item-cache';
 
-import * as LevelUp from 'levelup';
-import * as SubLevelDown from 'subleveldown';
+import * as LevelUp_Import from 'levelup';
+import * as SubLevelDown_Import from 'subleveldown';
 
-export enum CacheSublevel {
-  METADATA = 'metadata',
-  REF = 'ref',
-  TAG = 'tag',
-  K_COMMIT = 'kCommit',
-  K_TREE = 'kTree',
-  BLOB = 'blob'
+//
+// Adjust for the differences in CommonJS and ES6
+//
+let LevelUp;
+if (typeof(LevelUp_Import) === "object") {
+  LevelUp = (<any>LevelUp_Import).default;
+} else {
+  LevelUp = LevelUp_Import;
+}
+
+//
+// Adjust for the differences in CommonJS and ES6
+//
+let SubLevelDown;
+if (typeof(SubLevelDown_Import) === "object") {
+  SubLevelDown = (<any>SubLevelDown_Import).default;
+} else {
+  SubLevelDown = SubLevelDown_Import;
 }
 
 const CacheBulkTransferKeyToSublevelMap = {
-  'metadata': CacheSublevel.METADATA,
-  'refMap': CacheSublevel.REF,
-  'tagMap': CacheSublevel.TAG,
-  'kCommitMap': CacheSublevel.K_COMMIT,
-  'kTreeMap': CacheSublevel.K_TREE,
-  'blobMap': CacheSublevel.BLOB,
+  'metadata': 'metadata',
+  'refMap': 'ref',
+  'tagMap': 'tag',
+  'kCommitMap': 'kCommit',
+  'kTreeMap': 'kTree',
+  'blobMap': 'blob',
 }
+
+type GetMapMethod = (this : ItemCache) => any;
+type SetValueMethod = (this : ItemCache, key:string, value: any) => any;
+type GetValueMethod = (this : ItemCache, key:string) => any;
+
+type SublevelRegistration = {
+  sublevelName : string,
+  sublevel : any,
+  getMapMethod : GetMapMethod,
+  setValueMethod: SetValueMethod,
+  getValueMethod: GetValueMethod
+};
 
 export class LevelCache extends ItemCache {
 
-  private sublevelMap: Map<string, any> = new Map<string, any>();
+  private cacheDB;
+  private registrationMap: Map<string, SublevelRegistration> = new Map<string, SublevelRegistration>();
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -33,47 +57,88 @@ export class LevelCache extends ItemCache {
   constructor(levelDown) {
     super();
 
-    let historyDatabase: any = LevelUp(levelDown);
-    let historySublevels: Array<string> = Object.keys(CacheSublevel);
+    this.cacheDB = LevelUp(levelDown);
 
-    for (let j: number = 0; j < historySublevels.length; j++) {
-      this.sublevelMap.set(CacheSublevel[historySublevels[j]], SubLevelDown(
-        historyDatabase, CacheSublevel[historySublevels[j]],
-        { valueEncoding: 'json' }));
-    }
+    this.registerSublevel(
+      'metadata',
+      this.getAllMetaData,
+      this.cacheMetaData,
+      this.getMetaData,
+    );
+
+    this.registerSublevel(
+      'ref',
+      this.getRefs,
+      this.cacheRef,
+      this.getRef,
+    );
+
+    this.registerSublevel(
+      'tag',
+      this.getTags,
+      this.cacheTag,
+      this.getTag
+    );
+
+    this.registerSublevel(
+      'kCommit',
+      this.getCommits,
+      this.cacheCommit,
+      this.getCommit
+    );
+
+    this.registerSublevel(
+      'kTree',
+      this.getTrees,
+      this.cacheTree,
+      this.getTree
+    );
+
+    this.registerSublevel(
+      'blob',
+      this.getBlobs,
+      this.cacheBlob,
+      this.getBlob
+    );
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  public async retrieveValue (sublevelKey : CacheSublevel, key) {
-    return await this.sublevelMap.get(sublevelKey).get(key);
+  registerSublevel(sublevelName: string, getMapMethod: GetMapMethod,
+    cacheMethod: SetValueMethod, getValueMethod: GetValueMethod) {
+    console.log('$$$ Registering sublevel: ' + sublevelName);
+
+    let sublevel = SubLevelDown(this.cacheDB, sublevelName, { valueEncoding: 'json' });
+
+    let registration : SublevelRegistration = {
+      sublevelName : sublevelName,
+      sublevel : sublevel,
+      getMapMethod : getMapMethod,
+      setValueMethod: cacheMethod,
+      getValueMethod: getValueMethod
+    };
+
+    this.registrationMap.set(sublevelName, registration);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  private cacheKeyValuePair(sublevelKey : CacheSublevel, key, value) {
-    switch (sublevelKey) {
-      case CacheSublevel.METADATA:
-        // TODO:  Need to process metadata and compare with loaded content
-        console.log('!!! Ignoring MetaData: ' + key + ' = ' + value);
-        break;
-      case CacheSublevel.REF:
-        this.cacheRef(key, value);
-        break;
-      case CacheSublevel.TAG:
-        this.cacheTag(key, value);
-        break;
-      case CacheSublevel.K_COMMIT:
-        this.cacheCommit(key, value);
-        break;
-      case CacheSublevel.K_TREE:
-        this.cacheTree(key, value);
-        break;
-      case CacheSublevel.BLOB:
-        this.cacheBlob(key, value);
-        break;
+  public async retrieveValue (sublevelName, key) {
+    return await this.registrationMap.get(sublevelName).sublevel.get(key);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private cacheKeyValuePair(sublevelName, key, value) {
+    let registration = this.registrationMap.get(sublevelName);
+    if (registration) {
+      // console.log('$$$ Set Value for: ' + sublevelName + ' - ' + key);
+      registration.setValueMethod.call(this, key, value);
+    } else {
+      console.log('*** Sublevel Registration not found for: ' + sublevelName);
     }
   }
 
@@ -84,11 +149,13 @@ export class LevelCache extends ItemCache {
 
     let beforeLoadCache = Date.now();
 
-    let historySublevels: Array<string> = Object.keys(CacheSublevel);
+    let sublevelNames = Array.from(this.registrationMap.keys());
+    for (let sublevelName of sublevelNames){
+      console.log('::: Loading cache for sublevel: ' + sublevelName);
+      let sublevel = this.registrationMap.get(sublevelName).sublevel;
 
-    for (let j: number = 0; j < historySublevels.length; j++) {
-      let iterator: any = this.sublevelMap.get(CacheSublevel[
-        historySublevels[j]]).iterator();
+      let iterator: any = sublevel.iterator();
+
       let entry: any = await new Promise<any>((resolve: (entry: any) => void,
         reject: (error: any) => void) => {
         iterator.next((nullValue: any, key: string, value: any) => {
@@ -99,8 +166,7 @@ export class LevelCache extends ItemCache {
         });
       });
       while (entry.key) {
-        let sublevelKey = CacheSublevel[historySublevels[j]];
-        this.cacheKeyValuePair(sublevelKey,entry.key, entry.value);
+        this.cacheKeyValuePair(sublevelName, entry.key, entry.value);
         entry = await new Promise<any>((resolve: (entry: any) => void,
           reject: (error: any) => void) => {
           iterator.next((nullValue: any, key: string, value: any) => {
@@ -121,12 +187,36 @@ export class LevelCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  async saveSublevel(sublevelName){
+    console.log('::: Saving Sublevel: ' + sublevelName);
+    try {
+      let registration = this.registrationMap.get(sublevelName);
+      let sublevel = registration.sublevel;
+      let map = registration.getMapMethod.call(this);
+      let entries = [];
+
+      console.log('::: Creating Batch for Sublevel: ' + sublevelName);
+      Object.keys(map).forEach((key) => {
+        entries.push({type: 'put', key: key, value: map[key]})
+      });
+
+      console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelName);
+      await sublevel.batch(entries);
+    } catch (err) {
+      console.log('*** Error: ' + err);
+      console.log(err.stack);
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   processBulkCacheUpdate(bulkUpdate){
 
     for (let bulkUpdateKey in bulkUpdate){
       console.log("::: Processing BulkCacheUpdate for: " + bulkUpdateKey);
       let entries: Array<any> = [];
-      let sublevelKey : CacheSublevel = CacheBulkTransferKeyToSublevelMap[bulkUpdateKey];
+      let sublevelName = CacheBulkTransferKeyToSublevelMap[bulkUpdateKey];
 
       for (let key in bulkUpdate[bulkUpdateKey]) {
         let value = bulkUpdate[bulkUpdateKey][key];
@@ -135,12 +225,12 @@ export class LevelCache extends ItemCache {
           key: key,
           value: value
         });
-        this.cacheKeyValuePair(sublevelKey, key, value);
+        this.cacheKeyValuePair(sublevelName, key, value);
       }
 
-      let sublevel = this.sublevelMap.get(sublevelKey);
+      let sublevel = this.registrationMap.get(sublevelName).sublevel;
 
-      console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelKey + ' for ' + bulkUpdateKey);
+      console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelName + ' for ' + bulkUpdateKey);
       sublevel.batch(entries);
     }
 
