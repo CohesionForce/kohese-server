@@ -16,7 +16,7 @@ export class HeaderContainerEditorComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.header);
+    console.log(this, 'header');
   }
 
 }

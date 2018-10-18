@@ -20,7 +20,6 @@ export class ColumnContainerComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this);
   }
 
   stateChanged(stateName, value) {

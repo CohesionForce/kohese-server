@@ -18,7 +18,7 @@ export class ListContainerComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this);
+
   }
 
   stateChanged(stateName, value) {

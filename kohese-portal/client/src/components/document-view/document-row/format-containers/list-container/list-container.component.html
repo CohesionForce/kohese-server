@@ -27,4 +27,8 @@
       {{property.propertyName}} not available for editing
     </div>
   </div>
+  <div *ngIf="property.kind === 'table'">
+    <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
+    <k-table></k-table>
+  </div>
 </div>

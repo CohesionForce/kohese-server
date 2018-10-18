@@ -1,3 +1,4 @@
+import { KTableComponent } from './k-table/k-table.component';
 import { KdMarkdownComponent } from './k-markdown/kd-markdown/kd-markdown.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -33,7 +34,8 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     MarkdownCheatSheetComponent,
     ProxySelectorComponent,
     ProxySelectorDialogComponent,
-    KdMarkdownComponent
+    KdMarkdownComponent,
+    KTableComponent
   ],
   imports: [
     CommonModule,
@@ -54,7 +56,8 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     KMarkdownComponent,
     ProxySelectorComponent,
     KdProxySelectorComponent,
-    KdMarkdownComponent
+    KdMarkdownComponent,
+    KTableComponent
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,

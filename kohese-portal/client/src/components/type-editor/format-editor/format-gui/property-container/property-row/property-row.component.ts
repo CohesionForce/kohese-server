@@ -14,6 +14,8 @@ export class PropertyRowComponent implements OnInit {
   console = console;
   @Input()
   disableDelete : boolean = false;
+  @Input()
+  container;
 
   @Output()
   deleted : EventEmitter<PropertyDefinition> = new EventEmitter();
@@ -21,7 +23,9 @@ export class PropertyRowComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.property)
+    if(!this.container) {
+      console.log('no container', this)
+    }
   }
 
   deleteRow() {
@@ -31,7 +35,11 @@ export class PropertyRowComponent implements OnInit {
   updateKind(propertyName) {
     let viewProperty = this.kind.fields[propertyName.value].views.form;
     if (viewProperty) {
-      this.property.kind = viewProperty.inputType.type
+      if (viewProperty.inputType.options.asTable) {
+        this.property.kind = 'table'
+      } else {
+        this.property.kind = viewProperty.inputType.type
+      }
       this.property.inputOptions = viewProperty.inputType;
       console.log(viewProperty);
     } else {

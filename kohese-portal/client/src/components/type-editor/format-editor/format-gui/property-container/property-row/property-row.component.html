@@ -1,7 +1,7 @@
 <div class="property-row">
   <div class="selector">
     <mat-select placeholder="---" [(ngModel)]="property.propertyName" (change)="updateKind($event)">
-      <mat-option *ngFor="let propertyName of kind.fields | mapKey" [value]="propertyName">
+      <mat-option *ngFor="let propertyName of kind.fields | mapKey | validProperty:{property : property,container:container}" [value]="propertyName">
         {{propertyName}}
       </mat-option>
     </mat-select>
