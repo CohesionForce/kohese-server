@@ -1,10 +1,11 @@
 <span style="font-size : large;">
     User Statistics
 </span>
+<button mat-button style="background-color: darkblue; color : white;"(click)="openExportDialog()">Export Text</button>
 <mat-checkbox [(ngModel)]="useStates" class="pull-right" style="padding-right : 20px" (change)="buildSelectedAssignments()">
   State Filter
 </mat-checkbox>
-<div *ngIf="project" style="width: 100%">
+<div *ngIf="project" style="width: 100%; padding : 5px;">
   <div class="left-content">
     Select :
     <button mat-raised-button (click)="selectAll()">All</button>

@@ -1,3 +1,4 @@
+import { ExportDialogComponent } from './export-dialog/export-dialog.component';
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 
 import { ProjectInfo } from '../../../../services/project-service/project.service';
@@ -141,5 +142,16 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       .afterClosed().subscribe((results) => {
 
       });
+  }
+
+  openExportDialog() {
+    this.dialogService.openComponentDialog(ExportDialogComponent, {
+      data: {
+        exportedProxies : this.selectedAssignments
+      }
+    }).updateSize('80%', '80%')
+      .afterClosed().subscribe((results) => {
+
+      })
   }
 }
