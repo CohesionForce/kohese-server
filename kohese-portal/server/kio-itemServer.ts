@@ -337,6 +337,9 @@ function KIOItemServer(socket){
     sendResponse(response);
     let responseTransmitTime = Date.now();
     console.log('::: Sent getAll response for repo: ' + request.forRepoId);
+    for(let key in response){
+      console.log(' --> ' + key + ': ' + _.size(response[key]));
+    }
     console.log('$$$ Elapsed time: ' + (responseTransmitTime - requestTime)/1000);
   });
 

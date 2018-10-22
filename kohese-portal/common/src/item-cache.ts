@@ -41,18 +41,12 @@ type Blob = any;
 //////////////////////////////////////////////////////////////////////////
 
 export class ItemCache {
-  private metadata : {
-    numRefs: number,
-    numTags: number,
-    numCommits: number,
-    numTrees: number,
-    numBlobs: number
-  }
-  private refMap;
-  private tagMap;
-  private kCommitMap : { [ oid : string ]: KoheseCommit};
-  private kTreeMap : { [ oid : string ]: KoheseTree};
-  private blobMap : { [ oid : string ]: Blob};
+  private metadata = new Map<string, number>();
+  private refMap = new Map<string, any>();
+  private tagMap = new Map<string, any>();
+  private kCommitMap = new Map<string, KoheseCommit>();
+  private kTreeMap  = new Map<string, KoheseTree>();
+  private blobMap  = new Map<string, Blob>();
 
   private objectMap;
 
@@ -61,19 +55,24 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   constructor() {
 
-    this.metadata = {
-      numRefs: 0,
-      numTags: 0,
-      numCommits: 0,
-      numTrees: 0,
-      numBlobs: 0,
-    }
-    this.refMap = {};
-    this.tagMap = {};
-    this.kCommitMap = {};
-    this.kTreeMap = {};
-    this.blobMap = {};
+    this.metadata['numRefs'] = 0;
+    this.metadata['numTags'] = 0;
+    this.metadata['numCommits'] = 0;
+    this.metadata['numTrees'] = 0;
+    this.metadata['numBlobs'] = 0;
 
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  mapToObject (map) {
+    let object = {};
+    for (let key in map){
+      object[key] = map[key];
+    }
+
+    return object;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -84,21 +83,20 @@ export class ItemCache {
     let numChunks = Math.ceil(numKeys/chunkSize);
 
     console.log('::: Splitting Object with ' + numKeys + ' keys into ' + numChunks + ' chunks...');
-    let sObject = { 0 : {}};
+    let newObject = { 0 : {}};
     let chunkIdx = 0;
     let keyIndex = 0;
     for (let key in object){
-      sObject[chunkIdx][key] = object[key];
+      newObject[chunkIdx][key] = object[key];
       keyIndex++;
       if ((keyIndex % chunkSize) === 0) {
         chunkIdx++;
-        sObject[chunkIdx] = {};
+        newObject[chunkIdx] = {};
       }
     }
 
-    return sObject;
+    return newObject;
   }
-
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -113,9 +111,9 @@ export class ItemCache {
           numTrees: _.size(this.kTreeMap),
           numBlobs: _.size(this.blobMap)
         },
-        refMap : this.refMap,
-        tagMap : this.tagMap,
-        kCommitMap : this.kCommitMap,
+        refMap : this.mapToObject(this.refMap),
+        tagMap : this.mapToObject(this.tagMap),
+        kCommitMap : this.mapToObject(this.kCommitMap),
         kTreeMapChunks: this.splitObject(this.kTreeMap),
         blobMapChunks: this.splitObject(this.blobMap)
       }
@@ -131,40 +129,40 @@ export class ItemCache {
 
     if (objectMap.refMap){
       this.refMap = objectMap.refMap;
-      this.metadata.numRefs = _.size(this.refMap);
-      if(this.metadata.numRefs !== objectMap.metadata.numRefs){
+      this.metadata['numRefs'] = _.size(this.refMap);
+      if(this.metadata['numRefs'] !== objectMap.metadata.numRefs){
         console.log('*** Number of refs do not match: ' + _.size(this.refMap));
       }
     }
 
     if (objectMap.tagMap){
       this.tagMap = objectMap.tagMap;
-      this.metadata.numTags = _.size(this.tagMap);
-      if(this.metadata.numTags !== objectMap.metadata.numTags){
+      this.metadata['numTags'] = _.size(this.tagMap);
+      if(this.metadata['numTags'] !== objectMap.metadata.numTags){
         console.log('*** Number of tags do not match: ' + _.size(this.tagMap));
       }
     }
 
     if (objectMap.kCommitMap){
       this.kCommitMap = objectMap.kCommitMap;
-      this.metadata.numCommits = _.size(this.kCommitMap);
-      if(this.metadata.numCommits !== objectMap.metadata.numCommits){
+      this.metadata['numCommits'] = _.size(this.kCommitMap);
+      if(this.metadata['numCommits'] !== objectMap.metadata.numCommits){
         console.log('*** Number of commits do not match: ' + _.size(this.kCommitMap));
       }
     }
 
     if (objectMap.kTreeMap){
       this.kTreeMap = objectMap.kTreeMap;
-      this.metadata.numTrees = _.size(this.kTreeMap);
-      if(this.metadata.numTrees !== objectMap.metadata.numTrees){
+      this.metadata['numTrees'] = _.size(this.kTreeMap);
+      if(this.metadata['numTrees'] !== objectMap.metadata.numTrees){
         console.log('*** Number of trees do not match: ' + _.size(this.kTreeMap));
       }
     }
 
     if (objectMap.blobMap){
       this.blobMap = objectMap.blobMap;
-      this.metadata.numBlobs = _.size(this.blobMap);
-      if(this.metadata.numBlobs !== objectMap.metadata.numBlobs){
+      this.metadata['numBlobs'] = _.size(this.blobMap);
+      if(this.metadata['numBlobs'] !== objectMap.metadata.numBlobs){
         console.log('*** Number of blobs do not match: ' + _.size(this.blobMap));
       }
     }
@@ -181,7 +179,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getAllMetaData(){
+  getAllMetaData() : Map<string, number> {
     return this.metadata;
   }
 
@@ -438,8 +436,7 @@ export class ItemCache {
     for (let commitId in this.kCommitMap) {
       if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
         let commit = this.kCommitMap[commitId];
-        console.log('::: Evaluating commit:  ' + commitId);
-        // console.log(JSON.stringify(commit, null, '  '));
+        // console.log('::: Evaluating commit:  ' + commitId);
 
         for (let rootId in commit.repoTreeRoots){
           let root = commit.repoTreeRoots[rootId];

@@ -34,8 +34,8 @@ const CacheBulkTransferKeyToSublevelMap = {
   'blobMap': 'blob',
 }
 
-type GetMapMethod = (this : ItemCache) => any;
-type SetValueMethod = (this : ItemCache, key:string, value: any) => any;
+type GetMapMethod = (this : ItemCache) => Map<string, any>;
+type SetValueMethod = (this : ItemCache, key:string, value: any) => void;
 type GetValueMethod = (this : ItemCache, key:string) => any;
 
 type SublevelRegistration = {
@@ -125,8 +125,16 @@ export class LevelCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  public async retrieveValue (sublevelName, key) {
-    return await this.registrationMap.get(sublevelName).sublevel.get(key);
+  async retrieveValue (sublevelName, key) : Promise<any> {
+    let registration : SublevelRegistration = this.registrationMap.get(sublevelName);
+    let value = registration.getValueMethod.call(this, key);
+    if (value !== undefined) {
+      // console.log('$$$ Returning already loaded value: ' + key);
+      return Promise.resolve(value);
+    } else {
+      // console.log('$$$ Waiting for value to load: ' + key);
+      return registration.sublevel.get(key);
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////

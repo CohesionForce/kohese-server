@@ -57,7 +57,7 @@ function loadKoheseModelsAndViews() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function initialize(koheseKdbPath, indexAndExit) {
+async function initialize (koheseKdbPath, indexAndExit) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 

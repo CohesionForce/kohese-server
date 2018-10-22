@@ -59,8 +59,8 @@ export class KDBCache extends LevelCache {
     let levelDown = LevelDown(dbDirectory);
     super(levelDown);
 
-    this.repoCommitMap = {};
-    this.repoTreeMap = {};
+    this.repoCommitMap = new Map<string, any>();
+    this.repoTreeMap = new Map<string, any>();
 
     this.registerSublevel(
       'rCommit',
@@ -405,6 +405,18 @@ export class KDBCache extends LevelCache {
   async updateCache() {
     // Load Cached Objects From Prior Runs
     var beforeTime = Date.now();
+
+    console.log('@@@ Loading HEAD');
+    let headTest1 = this.retrieveValue('ref', 'HEAD');
+    console.log('@@@ HEAD: 1 - ' + headTest1);
+    console.log(headTest1 instanceof Promise);
+    let headTest2 = await headTest1;
+    console.log('@@@ HEAD: 2 - ' + headTest2);
+    console.log(headTest2 instanceof Promise);
+    let headTest3 = await headTest2;
+    console.log('@@@ HEAD: 3 - ' + headTest3);
+    console.log(headTest3 instanceof Promise);
+
     await this.loadCachedObjects();
     var afterTime = Date.now();
     var deltaLoadTime = afterTime-beforeTime;
