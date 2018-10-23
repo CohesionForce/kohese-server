@@ -1,0 +1,11 @@
+<h4>Activity Feed: </h4>
+<virtual-scroll #activityFeed [items]="activityList">
+  <div *ngFor="let activity of activityFeed.viewPortItems" class="activity-row" (click)="openProxyDetails(activity)">
+    <b>{{activity.item.name}} </b>
+    <span>&#160;</span>
+    <span *ngIf="activity.item.modifiedOn === activity.item.createdOn"> created on</span>
+    <span *ngIf="activity.item.modifiedOn !== activity.item.createdOn"> modified on </span>
+    <span>&#160;</span>
+    {{activity.item.modifiedOn | date: 'long'}} by {{activity.item.modifiedBy}}
+  </div>
+</virtual-scroll>

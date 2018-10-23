@@ -1,3 +1,4 @@
+import { ActivityFeedComponent } from './activity-feed/activity-feed.component';
 import { StateSummaryDialogComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-summary-dialog/state-summary-dialog.component';
 import { StateBarChartComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-bar-chart.component';
 import { FormsModule } from '@angular/forms';
@@ -50,7 +51,8 @@ import { ReportGeneratorModule } from '../report-generator/report-generator.modu
     StateBarChartComponent,
     StateSummaryDialogComponent,
     StatefulProxyCardComponent,
-    ReportDashboardComponent
+    ReportDashboardComponent,
+    ActivityFeedComponent
   ],
   providers : [
     StateFilterService
