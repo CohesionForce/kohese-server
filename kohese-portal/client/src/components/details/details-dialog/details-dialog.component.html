@@ -54,6 +54,14 @@
             </mat-card-content>
           </mat-card>
         </mat-tab>
+      <mat-tab label="History" select="getHistory()">
+          <history-tab [proxyStream]="proxyStream"></history-tab>
+      </mat-tab>
+      <mat-tab label="Action Table"
+        *ngIf="itemProxy.children">
+        <action-table [proxyStream]="proxyStream"
+                   [editableStream]="editableStream"></action-table>
+   </mat-tab>
     </mat-tab-group>
   </mat-dialog-content>
   <mat-dialog-actions>
