@@ -16,6 +16,13 @@ export class ActivityFeedComponent implements OnInit {
 
   ngOnInit() {
     console.log(this);
+    this.activityList.sort((a, b) => {
+      if (a.item.modifiedOn > b.item.modifiedOn) {
+        return -1
+      } else if (a.item.modifiedOn <= b.item.modifiedOn) {
+        return 1;
+      }
+    })
   }
 
   openProxyDetails(proxy: ItemProxy) {
