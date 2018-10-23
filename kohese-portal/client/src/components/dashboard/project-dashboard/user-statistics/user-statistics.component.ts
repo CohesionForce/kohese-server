@@ -162,7 +162,6 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
                       "State: " + item.state + "\n" +
                       "Assigned To: " + item.item.assignedTo + "\n\n"
       }
-      console.log(htmlString);
       e.clipboardData.setData('text/html', (htmlString));
       e.clipboardData.setData('text/plain', (textString));
       e.preventDefault();
