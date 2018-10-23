@@ -32,6 +32,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   supportedTypes = ['Action', 'Task', 'Decision']
   stateInfo : {} = {};
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
+  origin : string;
 
   constructor(protected navigationService: NavigationService,
     protected dialogService: DialogService,
@@ -40,6 +41,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   }
 
   ngOnInit() {
+    this.origin = location.origin + '/explore;id='
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
@@ -141,5 +143,30 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       .afterClosed().subscribe((results) => {
 
       });
+  }
+
+  copyToClipboard(items) {
+    document.addEventListener('copy', (e: ClipboardEvent) => {
+      console.log(items, e);
+      let htmlString = "";
+      let textString = "";
+      for (let item of items) {
+        htmlString += "Id: " + '<a href="' + this.origin + item.item.id + '">' + item.item.id + '</a><br/>' +
+                      "Name: " + item.item.name  + "<br/>" +
+                      "Kind: " + item.kind + "<br/>" +
+                      "State: " + item.state + "<br/>" +
+                      "Assigned To: " + item.item.assignedTo + "<br/><br/>"
+        textString += "Id: " + item.item.id + '\n' +
+                      "Name: " + item.item.name  + "\n" +
+                      "Kind: " + item.kind + "\n" +
+                      "State: " + item.state + "\n" +
+                      "Assigned To: " + item.item.assignedTo + "\n\n"
+      }
+      e.clipboardData.setData('text/html', (htmlString));
+      e.clipboardData.setData('text/plain', (textString));
+      e.preventDefault();
+      document.removeEventListener('copy', null);
+    });
+    document.execCommand('copy');
   }
 }
