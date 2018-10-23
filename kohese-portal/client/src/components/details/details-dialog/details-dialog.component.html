@@ -47,21 +47,28 @@
           </mat-card-content>
         </mat-card>
       </mat-tab>
-      <mat-tab label="Journal" class="dialog-contnet">
-          <mat-card style="height:450px">
-            <mat-card-content style="height: 100%; overflow: auto;">
-              <journal [itemProxy]="itemProxy"></journal>
-            </mat-card-content>
-          </mat-card>
-        </mat-tab>
       <mat-tab label="History" select="getHistory()">
-          <history-tab [proxyStream]="proxyStream"></history-tab>
+        <mat-card style="height:450px">
+          <mat-card-content style="height: 100%; overflow: auto;">
+            <history-tab [proxyStream]="proxyStream"></history-tab>
+          </mat-card-content>
+        </mat-card>
       </mat-tab>
-      <mat-tab label="Action Table"
-        *ngIf="itemProxy.children">
-        <action-table [proxyStream]="proxyStream"
-                   [editableStream]="editableStream"></action-table>
-   </mat-tab>
+      <mat-tab label="Journal" class="dialog-contnet">
+        <mat-card style="height:450px">
+          <mat-card-content style="height: 100%; overflow: auto;">
+            <journal [itemProxy]="itemProxy"></journal>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+      <mat-tab label="Action Table" *ngIf="itemProxy.children">
+        <mat-card style="height:450px">
+          <mat-card-content style="height: 100%; overflow: auto;">
+            <action-table [proxyStream]="proxyStream"
+                       [editableStream]="editableStream"></action-table>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
     </mat-tab-group>
   </mat-dialog-content>
   <mat-dialog-actions>
