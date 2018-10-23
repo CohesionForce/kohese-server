@@ -1,38 +1,21 @@
 console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
-import * as LevelUp from 'levelup';
 import * as LevelJs from 'level-js';
-import * as SubLevelDown from 'subleveldown';
 
 import { ItemProxy } from '../../common/src/item-proxy';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
+
 import { ItemCache } from '../../common/src/item-cache';
-
-enum CacheSublevel {
-  METADATA = 'metadata',
-  REF = 'ref',
-  TAG = 'tag',
-  K_COMMIT = 'kCommit',
-  K_TREE = 'kTree',
-  BLOB = 'blob'
-}
-
-const CacheBulkTransferKeyToSublevelMap = {
-  'metadata': CacheSublevel.METADATA,
-  'refMap': CacheSublevel.REF,
-  'tagMap': CacheSublevel.TAG,
-  'kCommitMap': CacheSublevel.K_COMMIT,
-  'kTreeMap': CacheSublevel.K_TREE,
-  'blobMap': CacheSublevel.BLOB,
-}
+import { LevelCache } from '../../common/src/level-cache';
 
 let socket : SocketIOClient.Socket = SocketIoClient();
 let serverCache = {
   metaModel: undefined,
   allItems: undefined
 }
+
 let cacheFetched = false;
 
 enum RepoStates {
@@ -51,7 +34,8 @@ let clientMap = {};
 let repoSyncCallback = [];
 
 let initialized: boolean = false;
-let sublevelMap: Map<string, any> = new Map<string, any>();
+
+let levelCache: LevelCache;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -71,13 +55,8 @@ let sublevelMap: Map<string, any> = new Map<string, any>();
   console.log(connectEvent);
 
   if (!initialized) {
-    let historySublevels: Array<string> = Object.keys(CacheSublevel);
-    let historyDatabase: any = LevelUp(LevelJs('item-cache'));
-    for (let j: number = 0; j < historySublevels.length; j++) {
-      sublevelMap.set(CacheSublevel[historySublevels[j]], SubLevelDown(
-        historyDatabase, CacheSublevel[historySublevels[j]],
-        { valueEncoding: 'json' }));
-    }
+    let levelDown = LevelJs('item-cache');
+    levelCache = new LevelCache(levelDown);
 
     initialized = true;
   }
@@ -247,7 +226,7 @@ function registerKoheseIOListeners() {
 
   socket.on('Item/BulkCacheUpdate', (bulkCacheUpdate) => {
     console.log('::: Received Bulk Cache Update');
-    processBulkCacheUpdate(bulkCacheUpdate);
+    levelCache.processBulkCacheUpdate(bulkCacheUpdate);
   });
 
   socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
@@ -333,15 +312,14 @@ async function getItemCache(){
     console.log('$$$ Get Item Cache');
     let requestTime = Date.now();
 
-    let headCommit: string;
-    try {
-      headCommit = await sublevelMap.get(CacheSublevel.REF).
-        get('HEAD');
-    } catch (error) {
-      headCommit = '';
-    }
+    console.log('$$$ Requesting levelCache load');
+    await levelCache.loadCachedObjects();
+    console.log('$$$ Returning from levelCache load');
+
+    let headCommit: string = levelCache.getRef('HEAD');
 
     console.log('$$$ Latest HEAD in client cache: ' + headCommit);
+
     socket.emit('Item/getItemCache', {
       timestamp: {
         requestTime: requestTime
@@ -357,55 +335,9 @@ async function getItemCache(){
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      let itemCache: ItemCache = new ItemCache();
-      let historySublevels: Array<string> = Object.keys(CacheSublevel);
-      let beforeLoadCache = Date.now();
-      for (let j: number = 0; j < historySublevels.length; j++) {
-        let iterator: any = sublevelMap.get(CacheSublevel[
-          historySublevels[j]]).iterator();
-        let entry: any = await new Promise<any>((resolve: (entry: any) => void,
-          reject: (error: any) => void) => {
-          iterator.next((nullValue: any, key: string, value: any) => {
-            resolve({
-              key: key,
-              value: value
-            });
-          });
-        });
-        while (entry.key) {
-          switch (CacheSublevel[historySublevels[j]]) {
-            case CacheSublevel.REF:
-              itemCache.cacheRef(entry.key, entry.value);
-              break;
-            case CacheSublevel.TAG:
-              itemCache.cacheTag(entry.key, entry.value);
-              break;
-            case CacheSublevel.K_COMMIT:
-              itemCache.cacheCommit(entry.key, entry.value);
-              break;
-            case CacheSublevel.K_TREE:
-              itemCache.cacheTree(entry.key, entry.value);
-              break;
-            case CacheSublevel.BLOB:
-              itemCache.cacheBlob(entry.key, entry.value);
-              break;
-          }
-          entry = await new Promise<any>((resolve: (entry: any) => void,
-            reject: (error: any) => void) => {
-            iterator.next((nullValue: any, key: string, value: any) => {
-              resolve({
-                key: key,
-                value: value
-              });
-            });
-          });
-        }
-      }
 
-      let afterLoadCache = Date.now();
-      console.log('$$$ Load time from Level Cache: ' + (afterLoadCache - beforeLoadCache)/1000);
-      TreeConfiguration.setItemCache(itemCache);
-      let headCommit = itemCache.getRef('HEAD');
+      TreeConfiguration.setItemCache(levelCache);
+      let headCommit = levelCache.getRef('HEAD');
       console.log('### Head: ' + headCommit);
       cacheFetched = true;
 
@@ -413,7 +345,7 @@ async function getItemCache(){
       console.log('$$$ Loading HEAD Commit');
       let workingTree = TreeConfiguration.getWorkingTree();
       let before = Date.now();
-      itemCache.loadProxiesForCommit(headCommit, workingTree);
+      levelCache.loadProxiesForCommit(headCommit, workingTree);
       let after = Date.now();
       console.log('$$$ Load took: ' + (after-before)/1000);
       before = Date.now();
@@ -428,31 +360,6 @@ async function getItemCache(){
   } else {
     console.log('$$$ Cache has already been fetched');
   }
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function processBulkCacheUpdate(bulkUpdate){
-
-  for (let key in bulkUpdate){
-    console.log("::: Processing BulkCacheUpdate for: " + key);
-    let entries: Array<any> = [];
-    for (let propertyName in bulkUpdate[key]) {
-      entries.push({
-        type: 'put',
-        key: propertyName,
-        value: bulkUpdate[key][propertyName]
-      });
-    }
-
-    let sublevelKey : CacheSublevel = CacheBulkTransferKeyToSublevelMap[key];
-    let sublevel = sublevelMap.get(sublevelKey);
-
-    console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelKey + ' for ' + key);
-    sublevel.batch(entries);
-  }
-
 }
 
 //////////////////////////////////////////////////////////////////////////
