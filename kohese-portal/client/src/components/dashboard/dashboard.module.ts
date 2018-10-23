@@ -53,7 +53,7 @@ import { ReportGeneratorModule } from '../report-generator/report-generator.modu
     StateBarChartComponent,
     StateSummaryDialogComponent,
     StatefulProxyCardComponent,
-    ReportDashboardComponent
+    ReportDashboardComponent,
   ],
   providers : [
     StateFilterService
@@ -61,8 +61,7 @@ import { ReportGeneratorModule } from '../report-generator/report-generator.modu
   entryComponents: [
     KMarkdownComponent,
     ProjectSelectorComponent,
-    StateSummaryDialogComponent
-
+    StateSummaryDialogComponent,
   ],
   imports : [
     CommonModule,
