@@ -1,7 +1,7 @@
 <span style="font-size : large;">
     User Statistics
 </span>
-<button mat-button style="background-color: darkblue; color : white;"(click)="openExportDialog()">Export Text</button>
+<button mat-button style="background-color: darkblue; color : white;"(click)="copyToClipboard(selectedAssignments)">Export HTML</button>
 <mat-checkbox [(ngModel)]="useStates" class="pull-right" style="padding-right : 20px" (change)="buildSelectedAssignments()">
   State Filter
 </mat-checkbox>

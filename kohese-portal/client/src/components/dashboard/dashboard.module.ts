@@ -33,7 +33,6 @@ import { StateFilterService } from './state-filter.service';
 import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy-card.component';
 import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
 import { ReportGeneratorModule } from '../report-generator/report-generator.module';
-import { ExportDialogComponent } from './project-dashboard/user-statistics/export-dialog/export-dialog.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +54,6 @@ import { ExportDialogComponent } from './project-dashboard/user-statistics/expor
     StateSummaryDialogComponent,
     StatefulProxyCardComponent,
     ReportDashboardComponent,
-    ExportDialogComponent
   ],
   providers : [
     StateFilterService
@@ -64,8 +62,6 @@ import { ExportDialogComponent } from './project-dashboard/user-statistics/expor
     KMarkdownComponent,
     ProjectSelectorComponent,
     StateSummaryDialogComponent,
-    ExportDialogComponent
-
   ],
   imports : [
     CommonModule,

@@ -1,4 +1,3 @@
-import { ExportDialogComponent } from './export-dialog/export-dialog.component';
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 
 import { ProjectInfo } from '../../../../services/project-service/project.service';
@@ -33,6 +32,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   supportedTypes = ['Action', 'Task', 'Decision']
   stateInfo : {} = {};
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
+  origin : string;
 
   constructor(protected navigationService: NavigationService,
     protected dialogService: DialogService,
@@ -41,6 +41,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   }
 
   ngOnInit() {
+    this.origin = location.origin + '/explore;id='
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
@@ -144,14 +145,23 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       });
   }
 
-  openExportDialog() {
-    this.dialogService.openComponentDialog(ExportDialogComponent, {
-      data: {
-        exportedProxies : this.selectedAssignments
+  copyToClipboard(items) {
+    document.addEventListener('copy', (e: ClipboardEvent) => {
+      console.log(items, e);
+      let string = "";
+      for (let item of items) {
+        let newString = "Id: " + '<a href="' + this.origin + item.item.id + '">' + item.item.id + '</a><br/>' +
+                        "Name: " + item.item.name  + "<br/>" +
+                        "Kind: " + item.kind + "<br/>" +
+                        "State: " + item.state + "<br/>" +
+                        "Assigned To: " + item.item.assignedTo + "<br/><br/>"
+        string += newString;
       }
-    }).updateSize('80%', '80%')
-      .afterClosed().subscribe((results) => {
-
-      })
+      console.log(string);
+      e.clipboardData.setData('text/html', (string));
+      e.preventDefault();
+      document.removeEventListener('copy', null);
+    });
+    document.execCommand('copy');
   }
 }
