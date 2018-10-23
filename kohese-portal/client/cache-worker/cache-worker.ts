@@ -1,32 +1,14 @@
 console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
-import * as LevelUp from 'levelup';
 import * as LevelJs from 'level-js';
-import * as SubLevelDown from 'subleveldown';
 
 import { ItemProxy } from '../../common/src/item-proxy';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
+
 import { ItemCache } from '../../common/src/item-cache';
-
-enum CacheSublevel {
-  METADATA = 'metadata',
-  REF = 'ref',
-  TAG = 'tag',
-  K_COMMIT = 'kCommit',
-  K_TREE = 'kTree',
-  BLOB = 'blob'
-}
-
-const CacheBulkTransferKeyToSublevelMap = {
-  'metadata': CacheSublevel.METADATA,
-  'refMap': CacheSublevel.REF,
-  'tagMap': CacheSublevel.TAG,
-  'kCommitMap': CacheSublevel.K_COMMIT,
-  'kTreeMap': CacheSublevel.K_TREE,
-  'blobMap': CacheSublevel.BLOB,
-}
+import { LevelCache } from '../../common/src/level-cache';
 
 let socket: SocketIOClient.Socket;
 
@@ -36,7 +18,9 @@ let clientMap = {};
 
 let initialized: boolean = false;
 let sublevelMap: Map<string, any> = new Map<string, any>();
-let cache: ItemCache;
+let _cache: LevelCache;
+let _fundamentalItemsObject: any;
+let _itemUpdatesObject: any;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -56,16 +40,8 @@ let cache: ItemCache;
   console.log(connectEvent);
 
   if (!initialized) {
-    cache = new ItemCache();
-    TreeConfiguration.setItemCache(cache);
-    let historySublevels: Array<string> = Object.keys(CacheSublevel);
-    let historyDatabase: any = LevelUp(LevelJs('item-cache'));
-    for (let j: number = 0; j < historySublevels.length; j++) {
-      sublevelMap.set(CacheSublevel[historySublevels[j]], SubLevelDown(
-        historyDatabase, CacheSublevel[historySublevels[j]],
-        { valueEncoding: 'json' }));
-    }
-
+    _cache = new LevelCache(LevelJs('item-cache'));
+    TreeConfiguration.setItemCache(_cache);
     initialized = true;
   }
 
@@ -88,72 +64,85 @@ let cache: ItemCache;
             socket = undefined;
           });
           socket.connect();
-          socket.on('authenticated', async () => {
-            registerKoheseIOListeners();
-            
-            let synchronizeModelsValue: any = await synchronizeModels();
-            port.postMessage({
-              message: 'modelsRetrieved',
-              data: synchronizeModelsValue
+          await new Promise<void>((resolve: () => void, reject:
+            () => void) => {
+            socket.on('authenticated', async () => {
+              registerKoheseIOListeners();
+              
+              _fundamentalItemsObject = await synchronizeModels();
+              await populateCache();
+              _cache.loadProxiesForCommit(_cache.getRef('HEAD'),
+                TreeConfiguration.getWorkingTree());
+              _itemUpdatesObject = await updateCache(TreeConfiguration.
+                getWorkingTree().getAllTreeHashes());
+              resolve();
             });
-            await populateCache();
-            cache.loadProxiesForCommit(cache.getRef('HEAD'), TreeConfiguration.
-              getWorkingTree());
-            let updateCacheValue: any = await updateCache(TreeConfiguration.
-              getWorkingTree().getAllTreeHashes());
-            let objectMap: any = cache.getObjectMap();
-            port.postMessage({ message: 'cacheUpdate', data: {
-              key: 'metadata',
-              value: objectMap.metadata
-            } });
-            port.postMessage({ message: 'cacheUpdate', data: {
-              key: 'ref',
-              value: objectMap.refMap
-            } });
-            port.postMessage({ message: 'cacheUpdate', data: {
-              key: 'tag',
-              value: objectMap.tagMap
-            } });
-            port.postMessage({ message: 'cacheUpdate', data: {
-              key: 'commit',
-              value: objectMap.kCommitMap
-            } });
-            for (let chunkKey in objectMap.kTreeMapChunks) {
-              port.postMessage({ message: 'cacheUpdate', data: {
-                key: 'tree',
-                value: objectMap.kTreeMapChunks[chunkKey]
-              } });
-            }
-            for (let chunkKey in objectMap.blobMapChunks) {
-              port.postMessage({ message: 'cacheUpdate', data: {
-                key: 'blob',
-                value: objectMap.blobMapChunks[chunkKey]
-              } });
-            }
-            
-            port.postMessage({
-              message: 'initialized',
-              data: updateCacheValue
+            socket.emit('authenticate', {
+              token: request.data
             });
-          });
-          socket.emit('authenticate', {
-            token: request.data
           });
         }
+        
+        port.postMessage({ id: request.id });
         break;
-      case 'synchronizeModels':
-        port.postMessage({ id: request.id, data: await synchronizeModels() });
-        break;
-      case 'populateCache':
+      case 'getFundamentalItems':
+        if (request.data.refresh) {
+          _fundamentalItemsObject = await synchronizeModels();
+        }
+        
         port.postMessage({
           id: request.id,
-          data: await populateCache()
+          data: _fundamentalItemsObject
         });
         break;
-      case 'updateCache':
+      case 'getCache':
+        if (request.data.refresh) {
+          await populateCache();
+         _cache.loadProxiesForCommit(_cache.getRef('HEAD'), TreeConfiguration.
+             getWorkingTree());
+        }
+        
+        let objectMap: any = _cache.getObjectMap();
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'metadata',
+          value: objectMap.metadata
+        } });
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'ref',
+          value: objectMap.refMap
+        } });
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'tag',
+          value: objectMap.tagMap
+        } });
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'commit',
+          value: objectMap.kCommitMap
+        } });
+        for (let chunkKey in objectMap.kTreeMapChunks) {
+          port.postMessage({ message: 'cachePiece', data: {
+            key: 'tree',
+            value: objectMap.kTreeMapChunks[chunkKey]
+          } });
+        }
+        for (let chunkKey in objectMap.blobMapChunks) {
+          port.postMessage({ message: 'cachePiece', data: {
+            key: 'blob',
+            value: objectMap.blobMapChunks[chunkKey]
+          } });
+        }
+        
+        port.postMessage({ id: request.id });
+        break;
+      case 'getItemUpdates':
+        if (request.data.refresh) {
+          _itemUpdatesObject = await updateCache(TreeConfiguration.
+            getWorkingTree().getAllTreeHashes());
+        }
+        
         port.postMessage({
           id: request.id,
-          data: await updateCache(request.data.treeHashes)
+          data: _itemUpdatesObject
         });
         break;
       default:
@@ -230,7 +219,7 @@ function registerKoheseIOListeners() {
 
   socket.on('Item/BulkCacheUpdate', (bulkCacheUpdate) => {
     console.log('::: Received Bulk Cache Update');
-    processBulkCacheUpdate(bulkCacheUpdate);
+    _cache.processBulkCacheUpdate(bulkCacheUpdate);
   });
 
   socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
@@ -303,10 +292,10 @@ async function populateCache(): Promise<any> {
   console.log('$$$ Get Item Cache');
   let requestTime = Date.now();
 
+  await _cache.loadCachedObjects();
   let headCommit: string;
   try {
-    headCommit = await sublevelMap.get(CacheSublevel.REF).
-      get('HEAD');
+    headCommit = _cache.getRef('HEAD');
   } catch (error) {
     headCommit = '';
   }
@@ -329,80 +318,10 @@ async function populateCache(): Promise<any> {
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      let historySublevels: Array<string> = Object.keys(CacheSublevel);
-      let beforeLoadCache = Date.now();
-      for (let j: number = 0; j < historySublevels.length; j++) {
-        let iterator: any = sublevelMap.get(CacheSublevel[
-          historySublevels[j]]).iterator();
-        let entry: any = await new Promise<any>((resolve: (entry: any) => void,
-          reject: (error: any) => void) => {
-          iterator.next((nullValue: any, key: string, value: any) => {
-            resolve({
-              key: key,
-              value: value
-            });
-          });
-        });
-        while (entry.key) {
-          switch (CacheSublevel[historySublevels[j]]) {
-            case CacheSublevel.REF:
-              cache.cacheRef(entry.key, entry.value);
-              break;
-            case CacheSublevel.TAG:
-              cache.cacheTag(entry.key, entry.value);
-              break;
-            case CacheSublevel.K_COMMIT:
-              cache.cacheCommit(entry.key, entry.value);
-              break;
-            case CacheSublevel.K_TREE:
-              cache.cacheTree(entry.key, entry.value);
-              break;
-            case CacheSublevel.BLOB:
-              cache.cacheBlob(entry.key, entry.value);
-              break;
-          }
-          entry = await new Promise<any>((resolve: (entry: any) => void,
-            reject: (error: any) => void) => {
-            iterator.next((nullValue: any, key: string, value: any) => {
-              resolve({
-                key: key,
-                value: value
-              });
-            });
-          });
-        }
-      }
-      let afterLoadCache = Date.now();
-      console.log('$$$ Load time from Level Cache: ' + (afterLoadCache - beforeLoadCache)/1000);
       
-      resolve(cache.getObjectMap());
+      resolve(_cache.getObjectMap());
     });
   });
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function processBulkCacheUpdate(bulkUpdate){
-
-  for (let key in bulkUpdate){
-    console.log("::: Processing BulkCacheUpdate for: " + key);
-    let entries: Array<any> = [];
-    for (let propertyName in bulkUpdate[key]) {
-      entries.push({
-        type: 'put',
-        key: propertyName,
-        value: bulkUpdate[key][propertyName]
-      });
-    }
-
-    let sublevelKey : CacheSublevel = CacheBulkTransferKeyToSublevelMap[key];
-    let sublevel = sublevelMap.get(sublevelKey);
-
-    console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelKey + ' for ' + key);
-    sublevel.batch(entries);
-  }
-
 }
 
 //////////////////////////////////////////////////////////////////////////

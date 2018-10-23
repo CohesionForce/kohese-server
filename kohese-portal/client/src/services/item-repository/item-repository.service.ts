@@ -74,6 +74,29 @@ export class ItemRepository {
     private dialogService: DialogService,
     private _versionControlService: VersionControlService,
     private logService: LogService) {
+    this.logEvents = InitializeLogs(logService)
+    this.logService.log(this.logEvents.itemRepoInit);
+
+    this.repositoryStatus = new BehaviorSubject({
+      state: RepoStates.DISCONNECTED,
+      message: 'Initializing Item Repository'
+    });
+  
+    ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
+      this.logService.log(this.logEvents.receivedNofificationOfChange, { change: change });
+  
+      switch (change.type) {
+        case 'loaded':
+          this.logService.log(this.logEvents.itemProxyLoaded);
+          break;
+        case 'loading':
+          this.logService.log(this.logEvents.itemProxyLoading);
+          break;
+      }
+    });
+    
+    this.recentProxies = [];
+    
     let scripts: any = document.scripts;
     let cacheWorkerBundle: string;
     scriptLoop: for (let scriptIdx in scripts) {
@@ -92,18 +115,12 @@ export class ItemRepository {
     }
     console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
     this._worker = new SharedWorker(cacheWorkerBundle);
-    this._worker.port.postMessage({
-      type: 'connect',
-      data: localStorage.getItem('auth-token')
-    });
     this._worker.port.addEventListener('message', (messageEvent: any) => {
       let data: any = messageEvent.data;
-      if (data.message === 'modelsRetrieved') {
-        this.processBulkUpdate(data.data);
-      } else if (data.message === 'cacheUpdate') {
+      if (data.message === 'cachePiece') {
         let updateData: any = data.data;
         switch (updateData.key) {
-          case 'metadata': 
+          case 'metadata':
             for (let key in updateData.value) {
               //this._cache.cacheMetadata(key, updateData.value[key]);
             }
@@ -134,57 +151,15 @@ export class ItemRepository {
             }
             break;
         }
-      } else if (data.message === 'initialized') {
-        let workingTree: TreeConfiguration = TreeConfiguration.
-          getWorkingTree();
-        this._cache.loadProxiesForCommit(this._cache.getRef('HEAD'),
-          workingTree);
-        this.processBulkUpdate(data.data);
-        workingTree.loadingComplete(false);
-        this.currentTreeConfigSubject.next({
-          config: workingTree,
-          configType: TreeConfigType.DEFAULT
-        });
-        this.repositoryStatus.next({
-          state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
-          message: 'Item Repository Ready'
-        });
-    
-        this.getStatusFor(workingTree.getRootProxy());
       }
     });
     TreeConfiguration.setItemCache(this._cache);
     this._worker.port.start();
     
-    this.logEvents = InitializeLogs(logService)
-    this.initialize();
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  initialize(): void {
-    this.logService.log(this.logEvents.itemRepoInit);
-
-    this.repositoryStatus = new BehaviorSubject({
-      state: RepoStates.DISCONNECTED,
-      message: 'Initializing Item Repository'
-    });
-
-    ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
-
-      this.logService.log(this.logEvents.receivedNofificationOfChange, { change: change });
-
-      switch (change.type) {
-        case 'loaded':
-          this.logService.log(this.logEvents.itemProxyLoaded);
-          break;
-        case 'loading':
-          this.logService.log(this.logEvents.itemProxyLoading);
-          break;
-      }
-    });
-
-    this.CurrentUserService.getCurrentUserSubject()
-      .subscribe((decodedToken) => {
+    this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
+      true).then(() => {
+      this.CurrentUserService.getCurrentUserSubject()
+        .subscribe(async (decodedToken) => {
         this.logService.log(this.logEvents.itemRepositoryAuthenticated);
         if (decodedToken) {
           this.logService.log(this.logEvents.socketAlreadyConnected);
@@ -193,12 +168,30 @@ export class ItemRepository {
             state: RepoStates.SYNCHRONIZING,
             message: 'Starting Repository Sync'
           });
+          this.processBulkUpdate((await this.sendMessageToWorker(
+            'getFundamentalItems', { refresh: false }, true)).data);
+          await this.sendMessageToWorker('getCache', { refresh: false }, true);
+          let workingTree: TreeConfiguration = TreeConfiguration.
+            getWorkingTree();
+          this._cache.loadProxiesForCommit(this._cache.getRef('HEAD'),
+            workingTree);
+          this.processBulkUpdate((await this.sendMessageToWorker(
+            'getItemUpdates', { refresh: false }, true)).data);
+          workingTree.loadingComplete(false);
+          this.currentTreeConfigSubject.next({
+            config: workingTree,
+            configType: TreeConfigType.DEFAULT
+          });
+          this.repositoryStatus.next({
+            state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
+            message: 'Item Repository Ready'
+          });
+      
+          this.getStatusFor(workingTree.getRootProxy());
         }
       });
-
-    this.recentProxies = [];
+    });
   }
-
 
   // End Item Proxy Wrapper
 
@@ -288,9 +281,11 @@ export class ItemRepository {
           state: RepoStates.SYNCHRONIZING,
           message: 'Starting Repository Sync'
         });
-        this.processBulkUpdate(await this.sendMessageToWorker('updateCache', {
+        this.processBulkUpdate(await this.sendMessageToWorker(
+          'getItemUpdates', {
+          refresh: true,
           treeHashes: TreeConfiguration.getWorkingTree().getAllTreeHashes()
-        }));
+        }, true));
         this.toastrService.success('Reconnected!', 'Server Connection!');
       } else {
         this.logService.log(this.logEvents.socketAuthenticating);
@@ -303,10 +298,11 @@ export class ItemRepository {
                 message: 'Starting Repository Sync'
               });
               this.processBulkUpdate(await this.sendMessageToWorker(
-                'updateCache', {
+                'getItemUpdates', {
+                  refresh: true,
                   treeHashes: TreeConfiguration.getWorkingTree().
                     getAllTreeHashes()
-              }));
+              }, true));
               this.toastrService.success('Reconnected!', 'Server Connection!');
               subscription.unsubscribe();
             }
@@ -413,25 +409,32 @@ export class ItemRepository {
     }
   }
 
-  private sendMessageToWorker(message: string, data: any): Promise<any> {
+  private sendMessageToWorker(message: string, data: any, expectResponse:
+    boolean): Promise<any> {
     return new Promise<void>((resolve: (data: any) => void, reject:
       () => void) => {
       let id: number = Date.now();
-      let responseHandler: (messageEvent: any) => void = (messageEvent:
-        any) => {
-        let data: any = messageEvent.data;
-        if (data.id === id) {
-          resolve(data);
-          this._worker.port.removeEventListener('message', responseHandler);
-        }
-      };
-      this._worker.port.addEventListener('message', responseHandler);
+      if (expectResponse) {
+        let responseHandler: (messageEvent: any) => void = (messageEvent:
+          any) => {
+          let data: any = messageEvent.data;
+          if (data.id === id) {
+            resolve(data);
+            this._worker.port.removeEventListener('message',
+              responseHandler);
+          }
+        };
+        this._worker.port.addEventListener('message', responseHandler);
+      }
       this._worker.port.postMessage({
         type: message,
         id: id,
         data: data
       });
       this._worker.port.start();
+      if (!expectResponse) {
+        resolve(undefined);
+      }
     });
   }
 
