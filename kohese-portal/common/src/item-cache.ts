@@ -116,8 +116,8 @@ export class ItemCache {
         refMap : this.refMap,
         tagMap : this.tagMap,
         kCommitMap : this.kCommitMap,
-        kTreeMap: this.kTreeMap,
-        blobMap: this.blobMap
+        kTreeMapChunks: this.splitObject(this.kTreeMap),
+        blobMapChunks: this.splitObject(this.blobMap)
       }
     }
     return this.objectMap;

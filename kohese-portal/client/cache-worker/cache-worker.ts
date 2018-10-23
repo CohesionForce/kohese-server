@@ -36,6 +36,7 @@ let clientMap = {};
 
 let initialized: boolean = false;
 let sublevelMap: Map<string, any> = new Map<string, any>();
+let cache: ItemCache;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -55,6 +56,8 @@ let sublevelMap: Map<string, any> = new Map<string, any>();
   console.log(connectEvent);
 
   if (!initialized) {
+    cache = new ItemCache();
+    TreeConfiguration.setItemCache(cache);
     let historySublevels: Array<string> = Object.keys(CacheSublevel);
     let historyDatabase: any = LevelUp(LevelJs('item-cache'));
     for (let j: number = 0; j < historySublevels.length; j++) {
@@ -85,15 +88,56 @@ let sublevelMap: Map<string, any> = new Map<string, any>();
             socket = undefined;
           });
           socket.connect();
-          socket.on('authenticated', function () {
+          socket.on('authenticated', async () => {
             registerKoheseIOListeners();
+            
+            let synchronizeModelsValue: any = await synchronizeModels();
+            port.postMessage({
+              message: 'modelsRetrieved',
+              data: synchronizeModelsValue
+            });
+            await populateCache();
+            cache.loadProxiesForCommit(cache.getRef('HEAD'), TreeConfiguration.
+              getWorkingTree());
+            let updateCacheValue: any = await updateCache(TreeConfiguration.
+              getWorkingTree().getAllTreeHashes());
+            let objectMap: any = cache.getObjectMap();
+            port.postMessage({ message: 'cacheUpdate', data: {
+              key: 'metadata',
+              value: objectMap.metadata
+            } });
+            port.postMessage({ message: 'cacheUpdate', data: {
+              key: 'ref',
+              value: objectMap.refMap
+            } });
+            port.postMessage({ message: 'cacheUpdate', data: {
+              key: 'tag',
+              value: objectMap.tagMap
+            } });
+            port.postMessage({ message: 'cacheUpdate', data: {
+              key: 'commit',
+              value: objectMap.kCommitMap
+            } });
+            for (let chunkKey in objectMap.kTreeMapChunks) {
+              port.postMessage({ message: 'cacheUpdate', data: {
+                key: 'tree',
+                value: objectMap.kTreeMapChunks[chunkKey]
+              } });
+            }
+            for (let chunkKey in objectMap.blobMapChunks) {
+              port.postMessage({ message: 'cacheUpdate', data: {
+                key: 'blob',
+                value: objectMap.blobMapChunks[chunkKey]
+              } });
+            }
+            
+            port.postMessage({
+              message: 'initialized',
+              data: updateCacheValue
+            });
           });
           socket.emit('authenticate', {
             token: request.data
-          });
-          
-          socket.on('Item/BulkUpdate', (data: any) => {
-            port.postMessage({ message: 'update', data: data });
           });
         }
         break;
@@ -103,11 +147,14 @@ let sublevelMap: Map<string, any> = new Map<string, any>();
       case 'populateCache':
         port.postMessage({
           id: request.id,
-          data: await populateCache(new ItemCache())
+          data: await populateCache()
         });
         break;
       case 'updateCache':
-        port.postMessage({ id: request.id, data: await updateCache() });
+        port.postMessage({
+          id: request.id,
+          data: await updateCache(request.data.treeHashes)
+        });
         break;
       default:
         console.log('$$$ Received unexpected event:' + request.type);
@@ -168,6 +215,17 @@ function registerKoheseIOListeners() {
     console.log(notification.status);
     // this.updateStatus(proxy, notification.status);
     proxy.dirty = false;
+  });
+  
+  socket.on('Item/delete', (notification) => {
+    console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
+    proxy.deleteItem();
+  });
+
+  socket.on('Item/BulkUpdate', (bulkUpdate) => {
+    console.log('::: Received Bulk Update');
+    processBulkUpdate(bulkUpdate);
   });
 
   socket.on('Item/BulkCacheUpdate', (bulkCacheUpdate) => {
@@ -232,6 +290,7 @@ function synchronizeModels(): Promise<any> {
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
       
+      processBulkUpdate(response);
       resolve(response);
     });
   });
@@ -240,7 +299,7 @@ function synchronizeModels(): Promise<any> {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-async function populateCache(cache: ItemCache): Promise<any> {
+async function populateCache(): Promise<any> {
   console.log('$$$ Get Item Cache');
   let requestTime = Date.now();
 
@@ -349,19 +408,65 @@ function processBulkCacheUpdate(bulkUpdate){
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function updateCache(): Promise<any> {
-  let requestTime = Date.now();
-  let origRepoTreeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
-  let thTime = Date.now();
-  console.log('$$$ Get Tree Hash Time: ' + (thTime - requestTime)/1000);
+function processBulkUpdate(response){
+  for(let kind in response.cache) {
+    console.log('--- Processing ' + kind);
+    var kindList = response.cache[kind];
+    for (var index in kindList) {
+      let item = JSON.parse(kindList[index]);
+      let iProxy;
+      if (kind === 'KoheseModel'){
+        iProxy = new KoheseModel(item);
+      } else {
+        iProxy = new ItemProxy(kind, item);
+      }
+    }
+    if (kind === 'KoheseView'){
+      KoheseModel.modelDefinitionLoadingComplete();
+    }
+  }
 
+  if(response.addItems) {
+    response.addItems.forEach((addedItem) => {
+      let iProxy;
+      if (addedItem.kind === 'KoheseModel'){
+        iProxy = new KoheseModel(addedItem.item);
+
+      } else {
+        iProxy = new ItemProxy(addedItem.kind, addedItem.item);
+      }
+    });
+  }
+
+  if(response.changeItems) {
+    response.changeItems.forEach((changededItem) => {
+      let iProxy;
+      if (changededItem.kind === 'KoheseModel'){
+        iProxy = new KoheseModel(changededItem.item);
+      } else {
+        iProxy = new ItemProxy(changededItem.kind, changededItem.item);
+      }
+    });
+  }
+
+  if(response.deleteItems) {
+    response.deleteItems.forEach((deletedItemId) => {
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
+      proxy.deleteItem();
+    });
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function updateCache(treeHashes: any): Promise<any> {
   return new Promise<any>((resolve: (data: any) => void, reject:
     () => void) => {
-    socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes},
+    socket.emit('Item/getAll', { repoTreeHashes: treeHashes },
       (response) => {
-      var responseReceiptTime = Date.now();
-      console.log('::: Response for getAll took ' + (responseReceiptTime-requestTime)/1000);
-      
+      processBulkUpdate(response);
+      TreeConfiguration.getWorkingTree().loadingComplete();
       resolve(response);
     });
   });
