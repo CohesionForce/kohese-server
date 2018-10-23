@@ -148,17 +148,23 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   copyToClipboard(items) {
     document.addEventListener('copy', (e: ClipboardEvent) => {
       console.log(items, e);
-      let string = "";
+      let htmlString = "";
+      let textString = "";
       for (let item of items) {
-        let newString = "Id: " + '<a href="' + this.origin + item.item.id + '">' + item.item.id + '</a><br/>' +
-                        "Name: " + item.item.name  + "<br/>" +
-                        "Kind: " + item.kind + "<br/>" +
-                        "State: " + item.state + "<br/>" +
-                        "Assigned To: " + item.item.assignedTo + "<br/><br/>"
-        string += newString;
+        htmlString += "Id: " + '<a href="' + this.origin + item.item.id + '">' + item.item.id + '</a><br/>' +
+                      "Name: " + item.item.name  + "<br/>" +
+                      "Kind: " + item.kind + "<br/>" +
+                      "State: " + item.state + "<br/>" +
+                      "Assigned To: " + item.item.assignedTo + "<br/><br/>"
+        textString += "Id: " + item.item.id + '\n' +
+                      "Name: " + item.item.name  + "\n" +
+                      "Kind: " + item.kind + "\n" +
+                      "State: " + item.state + "\n" +
+                      "Assigned To: " + item.item.assignedTo + "\n\n"
       }
-      console.log(string);
-      e.clipboardData.setData('text/html', (string));
+      console.log(htmlString);
+      e.clipboardData.setData('text/html', (htmlString));
+      e.clipboardData.setData('text/plain', (textString));
       e.preventDefault();
       document.removeEventListener('copy', null);
     });
