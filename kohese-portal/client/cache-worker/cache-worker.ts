@@ -17,7 +17,6 @@ let authenticated : boolean = false;
 let clientMap = {};
 
 let initialized: boolean = false;
-let sublevelMap: Map<string, any> = new Map<string, any>();
 let _cache: LevelCache;
 let _fundamentalItemsObject: any;
 let _loadedCacheObjectMap: any;
@@ -77,6 +76,7 @@ let _itemUpdatesObject: any;
               _loadedCacheObjectMap = _cache.getObjectMap();
               _itemUpdatesObject = await updateCache(TreeConfiguration.
                 getWorkingTree().getAllTreeHashes());
+              TreeConfiguration.getWorkingTree().loadingComplete(false);
               resolve();
             });
             socket.emit('authenticate', {
@@ -138,8 +138,12 @@ let _itemUpdatesObject: any;
         break;
       case 'getItemUpdates':
         if (!_itemUpdatesObject || request.data.refresh) {
-          _itemUpdatesObject = await updateCache(TreeConfiguration.
-            getWorkingTree().getAllTreeHashes());
+          let treeHashes: any = request.data.treeHashes;
+          if (!treeHashes) {
+            treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
+          }
+          
+          _itemUpdatesObject = await updateCache(treeHashes);
         }
         
         port.postMessage({
@@ -387,7 +391,6 @@ function updateCache(treeHashes: any): Promise<any> {
     socket.emit('Item/getAll', { repoTreeHashes: treeHashes },
       (response) => {
       processBulkUpdate(response);
-      TreeConfiguration.getWorkingTree().loadingComplete();
       resolve(response);
     });
   });

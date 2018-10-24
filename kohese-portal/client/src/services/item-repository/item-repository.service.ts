@@ -122,7 +122,7 @@ export class ItemRepository {
         switch (updateData.key) {
           case 'metadata':
             for (let key in updateData.value) {
-              //this._cache.cacheMetadata(key, updateData.value[key]);
+              this._cache.cacheMetaData(key, updateData.value[key]);
             }
             break;
           case 'ref':
@@ -176,18 +176,44 @@ export class ItemRepository {
           this._cache.loadProxiesForCommit(this._cache.getRef('HEAD'),
             workingTree);
           this.processBulkUpdate((await this.sendMessageToWorker(
-            'getItemUpdates', { refresh: false }, true)).data);
-          workingTree.loadingComplete(false);
-          this.currentTreeConfigSubject.next({
-            config: workingTree,
-            configType: TreeConfigType.DEFAULT
-          });
-          this.repositoryStatus.next({
-            state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
-            message: 'Item Repository Ready'
-          });
-      
-          this.getStatusFor(workingTree.getRootProxy());
+            'getItemUpdates', {
+              refresh: false,
+              treeHashes: undefined
+          }, true)).data);
+          let calculateTreeHashesAsynchronously: boolean = this.
+            loadFeatureSwitch('IR-defer-calc', true);
+          if (calculateTreeHashesAsynchronously) {
+            this.currentTreeConfigSubject.next({
+              config: workingTree,
+              configType: TreeConfigType.DEFAULT
+            });
+            this.repositoryStatus.next({
+              state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
+              message: 'Item Repository Ready'
+            });
+        
+            this.getStatusFor(workingTree.getRootProxy());
+          }
+          
+          await Promise.all(workingTree.loadingComplete(
+            calculateTreeHashesAsynchronously));
+          this.processBulkUpdate((await this.sendMessageToWorker(
+            'getItemUpdates', {
+              refresh: false,
+              treeHashes: undefined
+          }, true)).data);
+          if (!calculateTreeHashesAsynchronously) {
+            this.currentTreeConfigSubject.next({
+              config: workingTree,
+              configType: TreeConfigType.DEFAULT
+            });
+            this.repositoryStatus.next({
+              state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
+              message: 'Item Repository Ready'
+            });
+        
+            this.getStatusFor(workingTree.getRootProxy());
+          }
         });
       }
     });
