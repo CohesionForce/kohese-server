@@ -20,6 +20,7 @@ let initialized: boolean = false;
 let sublevelMap: Map<string, any> = new Map<string, any>();
 let _cache: LevelCache;
 let _fundamentalItemsObject: any;
+let _loadedCacheObjectMap: any;
 let _itemUpdatesObject: any;
 
 //////////////////////////////////////////////////////////////////////////
@@ -73,6 +74,7 @@ let _itemUpdatesObject: any;
               await populateCache();
               _cache.loadProxiesForCommit(_cache.getRef('HEAD'),
                 TreeConfiguration.getWorkingTree());
+              _loadedCacheObjectMap = _cache.getObjectMap();
               _itemUpdatesObject = await updateCache(TreeConfiguration.
                 getWorkingTree().getAllTreeHashes());
               resolve();
@@ -86,7 +88,7 @@ let _itemUpdatesObject: any;
         port.postMessage({ id: request.id });
         break;
       case 'getFundamentalItems':
-        if (request.data.refresh) {
+        if (!_fundamentalItemsObject || request.data.refresh) {
           _fundamentalItemsObject = await synchronizeModels();
         }
         
@@ -96,46 +98,46 @@ let _itemUpdatesObject: any;
         });
         break;
       case 'getCache':
-        if (request.data.refresh) {
+        if (!_loadedCacheObjectMap || request.data.refresh) {
           await populateCache();
          _cache.loadProxiesForCommit(_cache.getRef('HEAD'), TreeConfiguration.
-             getWorkingTree());
+           getWorkingTree());
+         _loadedCacheObjectMap = _cache.getObjectMap();
         }
         
-        let objectMap: any = _cache.getObjectMap();
         port.postMessage({ message: 'cachePiece', data: {
           key: 'metadata',
-          value: objectMap.metadata
+          value: _loadedCacheObjectMap.metadata
         } });
         port.postMessage({ message: 'cachePiece', data: {
           key: 'ref',
-          value: objectMap.refMap
+          value: _loadedCacheObjectMap.refMap
         } });
         port.postMessage({ message: 'cachePiece', data: {
           key: 'tag',
-          value: objectMap.tagMap
+          value: _loadedCacheObjectMap.tagMap
         } });
         port.postMessage({ message: 'cachePiece', data: {
           key: 'commit',
-          value: objectMap.kCommitMap
+          value: _loadedCacheObjectMap.kCommitMap
         } });
-        for (let chunkKey in objectMap.kTreeMapChunks) {
+        for (let chunkKey in _loadedCacheObjectMap.kTreeMapChunks) {
           port.postMessage({ message: 'cachePiece', data: {
             key: 'tree',
-            value: objectMap.kTreeMapChunks[chunkKey]
+            value: _loadedCacheObjectMap.kTreeMapChunks[chunkKey]
           } });
         }
-        for (let chunkKey in objectMap.blobMapChunks) {
+        for (let chunkKey in _loadedCacheObjectMap.blobMapChunks) {
           port.postMessage({ message: 'cachePiece', data: {
             key: 'blob',
-            value: objectMap.blobMapChunks[chunkKey]
+            value: _loadedCacheObjectMap.blobMapChunks[chunkKey]
           } });
         }
         
         port.postMessage({ id: request.id });
         break;
       case 'getItemUpdates':
-        if (request.data.refresh) {
+        if (!_itemUpdatesObject || request.data.refresh) {
           _itemUpdatesObject = await updateCache(TreeConfiguration.
             getWorkingTree().getAllTreeHashes());
         }

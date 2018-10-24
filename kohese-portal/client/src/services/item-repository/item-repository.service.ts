@@ -156,13 +156,13 @@ export class ItemRepository {
     TreeConfiguration.setItemCache(this._cache);
     this._worker.port.start();
     
-    this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
-      true).then(() => {
-      this.CurrentUserService.getCurrentUserSubject()
-        .subscribe(async (decodedToken) => {
-        this.logService.log(this.logEvents.itemRepositoryAuthenticated);
-        if (decodedToken) {
-          this.logService.log(this.logEvents.socketAlreadyConnected);
+    this.CurrentUserService.getCurrentUserSubject()
+      .subscribe((decodedToken) => {
+      this.logService.log(this.logEvents.itemRepositoryAuthenticated);
+      if (decodedToken) {
+        this.logService.log(this.logEvents.socketAlreadyConnected);
+        this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
+          true).then(async () => {
           this.registerKoheseIOListeners();
           this.repositoryStatus.next({
             state: RepoStates.SYNCHRONIZING,
@@ -188,8 +188,8 @@ export class ItemRepository {
           });
       
           this.getStatusFor(workingTree.getRootProxy());
-        }
-      });
+        });
+      }
     });
   }
 
