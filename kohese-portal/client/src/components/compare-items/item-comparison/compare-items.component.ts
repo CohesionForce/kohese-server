@@ -56,8 +56,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
               versionId = baseVersions['Staged'];
             } else if ((baseVersion as VersionDesignator) ===
               VersionDesignator.LAST_COMMITTED_VERSION) {
-              let numberOfStates: number = Object.keys(baseProxy.status).
-                length;
+              let numberOfStates: number = baseProxy.status.length;
               if (numberOfStates > 0) {
                 versionId = baseVersions[numberOfStates].commit;
               } else if (baseVersions.length > 1) {
@@ -86,8 +85,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
               versionId = changeVersions['Staged'];
             } else if ((changeVersion as VersionDesignator) ===
               VersionDesignator.LAST_COMMITTED_VERSION) {
-              let numberOfStates: number = Object.keys(changeProxy.status).
-                length;
+              let numberOfStates: number = changeProxy.status.length;
               if (numberOfStates > 0) {
                 versionId = changeVersions[numberOfStates].commit;
               } else if (changeVersions.length > 0) {

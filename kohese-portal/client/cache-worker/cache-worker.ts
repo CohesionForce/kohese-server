@@ -61,22 +61,18 @@ let _itemUpdatesObject: any;
           socket = SocketIoClient();
           socket.on('connect_error', () => {
             console.log('*** Worker socket connection error');
-            socket = undefined;
+            port.postMessage({ message: 'connectionError' });
+          });
+          socket.on('reconnect', async () => {
+            await align();
+            port.postMessage({ message: 'reconnected' });
           });
           socket.connect();
           await new Promise<void>((resolve: () => void, reject:
             () => void) => {
             socket.on('authenticated', async () => {
               registerKoheseIOListeners();
-              
-              _fundamentalItemsObject = await synchronizeModels();
-              await populateCache();
-              _cache.loadProxiesForCommit(_cache.getRef('HEAD'),
-                TreeConfiguration.getWorkingTree());
-              _loadedCacheObjectMap = _cache.getObjectMap();
-              _itemUpdatesObject = await updateCache(TreeConfiguration.
-                getWorkingTree().getAllTreeHashes());
-              TreeConfiguration.getWorkingTree().loadingComplete(false);
+              await align();
               resolve();
             });
             socket.emit('authenticate', {
@@ -99,10 +95,7 @@ let _itemUpdatesObject: any;
         break;
       case 'getCache':
         if (!_loadedCacheObjectMap || request.data.refresh) {
-          await populateCache();
-         _cache.loadProxiesForCommit(_cache.getRef('HEAD'), TreeConfiguration.
-           getWorkingTree());
-         _loadedCacheObjectMap = _cache.getObjectMap();
+          _loadedCacheObjectMap = await populateCache();
         }
         
         port.postMessage({ message: 'cachePiece', data: {
@@ -168,54 +161,45 @@ let _itemUpdatesObject: any;
   port.start();
 }
 
+function align(): Promise<void> {
+  return new Promise<void>(async (resolve: () => void, reject: () => void) => {
+    _fundamentalItemsObject = await synchronizeModels();
+    _loadedCacheObjectMap = await populateCache();
+    _itemUpdatesObject = await updateCache(TreeConfiguration.getWorkingTree().
+      getAllTreeHashes());
+    TreeConfiguration.getWorkingTree().loadingComplete(false);
+    socket.emit('Item/getStatus', {
+      repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
+    }, (response: Array<any>) => {
+      for (let j: number = 0; j < response.length; j++) {
+        buildOrUpdateProxy({ id: response[j].id }, undefined, response[j].
+          status);
+      }
+    });
+    resolve();
+  });
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
 function registerKoheseIOListeners() {
-
   // Register the listeners for the Item kinds that are being tracked
   socket.on('Item/create', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
-    if (proxy) {
-      proxy.updateItem(notification.kind, notification.item);
-    } else {
-      if (notification.kind === 'KoheseModel'){
-        proxy = new KoheseModel(notification.item);
-      } else {
-        proxy = new ItemProxy(notification.kind, notification.item);
-      }
-    }
-
-    console.log('@@@ updateStatus: ');
-    console.log(notification.status);
-    // this.updateStatus(proxy, notification.status);
-    proxy.dirty = false;
+    buildOrUpdateProxy(notification.item, notification.kind, notification.
+      status);
   });
 
   socket.on('Item/update', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
-    if (proxy) {
-      proxy.updateItem(notification.kind, notification.item);
-    } else {
-      if (notification.kind === 'KoheseModel'){
-        proxy = new KoheseModel(notification.item);
-      } else {
-        proxy = new ItemProxy(notification.kind, notification.item);
-      }
-    }
-
-    console.log('@@@ updateStatus: ');
-    console.log(notification.status);
-    // this.updateStatus(proxy, notification.status);
-    proxy.dirty = false;
+    buildOrUpdateProxy(notification.item, notification.kind, notification.
+      status);
   });
   
   socket.on('Item/delete', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
-    proxy.deleteItem();
+    deleteItem(notification.id);
   });
 
   socket.on('Item/BulkUpdate', (bulkUpdate) => {
@@ -228,37 +212,54 @@ function registerKoheseIOListeners() {
     _cache.processBulkCacheUpdate(bulkCacheUpdate);
   });
 
-  socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
+  socket.on('VersionControl/statusUpdated', (gitStatusMap: any) => {
     for (var id in gitStatusMap) {
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
-
-      console.log('@@@ statusUpdate: ');
-      console.log(gitStatusMap);
-      // this.updateStatus(proxy, gitStatusMap[id]);
+      buildOrUpdateProxy({ id: id }, undefined, gitStatusMap[id]);
     }
   });
+}
 
-  socket.on('reconnect', () => {
-    // TODO Remove CurrentUserService
+function buildOrUpdateProxy(item: any, kind: string, status: Array<string>):
+  ItemProxy {
+  let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.
+    id);
+  if (kind) {
+    if (proxy) {
+      proxy.updateItem(kind, item);
+      proxy.dirty = false;
+    } else {
+      if (kind === 'KoheseModel') {
+        proxy = new KoheseModel(item);
+      } else {
+        proxy = new ItemProxy(kind, item);
+      }
+    }
+  }
 
-    // if (this.CurrentUserService.getCurrentUserSubject().getValue()) {
-    //   console.log('::: IR: this.authenticationService already authenticated');
-    //   this.fetchItems();
-    //   this.toastrService.success('Reconnected!', 'Server Connection!');
-    // } else {
-    //   console.log('::: IR: Listening for this.authenticationService authentication');
-    //   let subscription: Subscription = this.CurrentUserService.getCurrentUserSubject()
-    //     .subscribe((decodedToken) => {
-    //       if(decodedToken) {
-    //         console.log('::: IR: Socket Authenticated');
-    //         this.fetchItems();
-    //         this.toastrService.success('Reconnected!', 'Server Connection!');
-    //         subscription.unsubscribe();
-    //       }
+  if (proxy) {
+    proxy.status.length = 0;
+    proxy.status.push(...status);
+    
+    TreeConfiguration.getWorkingTree().getChangeSubject().next({
+      type: 'update',
+      proxy: proxy
+    });
+  }
+  
+  postToAllPorts('update', { item: item, kind: kind, status: status });
+  
+  return proxy;
+}
 
-    //   });
-    // }
-  });
+function deleteItem(id: string): void {
+  TreeConfiguration.getWorkingTree().getProxyFor(id).deleteItem();
+  postToAllPorts('deletion', id);
+}
+
+function postToAllPorts(message: string, data: any): void {
+  for (let key in clientMap) {
+    clientMap[key].postMessage({ message: message, data: data });
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -314,8 +315,7 @@ async function populateCache(): Promise<any> {
         requestTime: requestTime
       },
       headCommit: headCommit
-    },
-    async (response) => {
+    }, (response) => {
       var responseReceiptTime = Date.now();
       let timestamp = response.timestamp;
       timestamp.responseReceiptTime = responseReceiptTime;
@@ -325,6 +325,8 @@ async function populateCache(): Promise<any> {
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
       
+      _cache.loadProxiesForCommit(headCommit, TreeConfiguration.
+        getWorkingTree());
       resolve(_cache.getObjectMap());
     });
   });
@@ -333,52 +335,37 @@ async function populateCache(): Promise<any> {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function processBulkUpdate(response){
+function processBulkUpdate(response: any): void {
   for(let kind in response.cache) {
     console.log('--- Processing ' + kind);
-    var kindList = response.cache[kind];
-    for (var index in kindList) {
-      let item = JSON.parse(kindList[index]);
-      let iProxy;
-      if (kind === 'KoheseModel'){
-        iProxy = new KoheseModel(item);
-      } else {
-        iProxy = new ItemProxy(kind, item);
-      }
+    let kindList: any = response.cache[kind];
+    for (let id in kindList) {
+      buildOrUpdateProxy(JSON.parse(kindList[id]), kind, undefined);
     }
-    if (kind === 'KoheseView'){
+    
+    if (kind === 'KoheseView') {
       KoheseModel.modelDefinitionLoadingComplete();
     }
   }
 
-  if(response.addItems) {
-    response.addItems.forEach((addedItem) => {
-      let iProxy;
-      if (addedItem.kind === 'KoheseModel'){
-        iProxy = new KoheseModel(addedItem.item);
-
-      } else {
-        iProxy = new ItemProxy(addedItem.kind, addedItem.item);
-      }
-    });
+  if (response.addItems) {
+    for (let j: number = 0; j < response.addItems.length; j++) {
+      buildOrUpdateProxy(response.addItems[j].item, response.addItems[j].kind,
+        undefined);
+    }
   }
 
-  if(response.changeItems) {
-    response.changeItems.forEach((changededItem) => {
-      let iProxy;
-      if (changededItem.kind === 'KoheseModel'){
-        iProxy = new KoheseModel(changededItem.item);
-      } else {
-        iProxy = new ItemProxy(changededItem.kind, changededItem.item);
-      }
-    });
+  if (response.changeItems) {
+    for (let j: number = 0; j < response.changeItems.length; j++) {
+      buildOrUpdateProxy(response.changeItems[j].item, response.changeItems[j].
+        kind, undefined);
+    }
   }
 
-  if(response.deleteItems) {
-    response.deleteItems.forEach((deletedItemId) => {
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
-      proxy.deleteItem();
-    });
+  if (response.deleteItems) {
+    for (let j: number = 0; j < response.deleteItems.length; j++) {
+      deleteItem(response.deleteItems[j]);
+    }
   }
 }
 

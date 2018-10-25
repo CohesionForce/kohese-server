@@ -10,8 +10,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { VersionControlService, VersionControlState,
-  VersionControlSubState } from '../../../services/version-control/version-control.service';
+import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
@@ -43,18 +42,18 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   
   private _filterDelayIdentifier: any;
   
-  get VersionControlState() {
-    return VersionControlState;
-  }
-
   private _images: Array<Image> = [
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
       (object: any) => {
-      return !!(object as ItemProxy).status[VersionControlState.UNSTAGED];
+      return ((object as ItemProxy).status.filter((status: string) => {
+        return status.startsWith('WT');
+      }).length > 0);
     }),
     new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
       (object: any) => {
-      return !!(object as ItemProxy).status[VersionControlState.STAGED];
+      return ((object as ItemProxy).status.filter((status: string) => {
+        return status.startsWith('INDEX');
+      }).length > 0);
     })
   ];
   get images() {
@@ -78,7 +77,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     let versionControlRowActions: Array<RowAction> = [
       new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
         'fa fa-undo', (object: any) => {
-        return (Object.keys((object as ItemProxy).status).length > 0);
+        return ((object as ItemProxy).status.length > 0);
         }, (object: any) => {
         this._dialogService.openYesNoDialog('Undo Changes', 'Are you sure ' +
           'that you want to undo all changes to this Item since the last ' +
@@ -98,7 +97,9 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       }),
       new RowAction('Stage', 'Stages changes to this Item', 'fa fa-plus',
         (object: any) => {
-        return (object as ItemProxy).status[VersionControlState.UNSTAGED];
+        return ((object as ItemProxy).status.filter((status: string) => {
+          return status.startsWith('WT');
+        }).length > 0);
         }, (object: any) => {
         this._versionControlService.stageItems([(object as ItemProxy)]).subscribe(
           (statusMap: any) => {
@@ -111,7 +112,9 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       }),
       new RowAction('Unstage', 'Un-stages changes to this Item', 'fa fa-minus',
         (object: any) => {
-        return (object as ItemProxy).status[VersionControlState.STAGED];
+        return ((object as ItemProxy).status.filter((status: string) => {
+          return status.startsWith('INDEX');
+        }).length > 0);
         }, (object: any) => {
         this._versionControlService.unstageItems([(object as ItemProxy)]).
           subscribe((statusMap: any) => {
@@ -130,7 +133,9 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
-      return (object as ItemProxy).status[VersionControlState.STAGED];
+      return ((object as ItemProxy).status.filter((status: string) => {
+        return status.startsWith('INDEX');
+      }).length > 0);
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         STAGED_VERSION);
@@ -142,10 +147,9 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
       any) => {
-      let proxy: ItemProxy = (object as ItemProxy);
-      return !((proxy.status[VersionControlState.STAGED] ===
-        VersionControlSubState.NEW) || (proxy.status[VersionControlState.
-        UNSTAGED] === VersionControlSubState.NEW));
+      return ((object as ItemProxy).status.filter((status: string) => {
+        return status.endsWith('_NEW');
+      }).length === 0);
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         LAST_COMMITTED_VERSION);
@@ -218,7 +222,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   }
 
   private proxyHasVCStatus (proxy: ItemProxy): boolean {
-    return (Object.keys(proxy.status).length > 0);
+    return (proxy.status.length > 0);
   }
 
   private addRowAndAncestors(proxy: ItemProxy): void {
@@ -323,7 +327,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   }
   
   protected isMultiselectEnabled(object: any): boolean {
-    return (Object.keys((object as ItemProxy).status).length > 0);
+    return ((object as ItemProxy).status.length > 0);
   }
   
   public openFilterDialog(filter: Filter): Observable<any> {
@@ -375,15 +379,17 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     }, 1000);
   }
   
-  public areSelectedProxiesInState(state: VersionControlState): boolean {
+  public areSelectedProxiesInState(state: string): boolean {
     let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       if (state) {
-        if (!(selectedObjects[j] as ItemProxy).status[state]) {
+        if (0 === (selectedObjects[j] as ItemProxy).status.filter((status:
+          string) => {
+          return status.startsWith(state);
+        }).length) {
           return false;
         }
-      } else if (0 === Object.keys((selectedObjects[j] as ItemProxy).status).
-        length) {
+      } else if (0 === (selectedObjects[j] as ItemProxy).status.length) {
         return false;
       }
     }
