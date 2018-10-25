@@ -81,10 +81,10 @@ export class ItemRepository {
       state: RepoStates.DISCONNECTED,
       message: 'Initializing Item Repository'
     });
-  
+
     ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
       this.logService.log(this.logEvents.receivedNofificationOfChange, { change: change });
-  
+
       switch (change.type) {
         case 'loaded':
           this.logService.log(this.logEvents.itemProxyLoaded);
@@ -94,9 +94,9 @@ export class ItemRepository {
           break;
       }
     });
-    
+
     this.recentProxies = [];
-    
+
     let scripts: any = document.scripts;
     let cacheWorkerBundle: string;
     scriptLoop: for (let scriptIdx in scripts) {
@@ -155,19 +155,19 @@ export class ItemRepository {
     });
     TreeConfiguration.setItemCache(this._cache);
     this._worker.port.start();
-    
+
     this.CurrentUserService.getCurrentUserSubject()
       .subscribe((decodedToken) => {
       this.logService.log(this.logEvents.itemRepositoryAuthenticated);
       if (decodedToken) {
         this.logService.log(this.logEvents.socketAlreadyConnected);
+        this.registerKoheseIOListeners();
+        this.repositoryStatus.next({
+          state: RepoStates.SYNCHRONIZING,
+          message: 'Starting Repository Sync'
+        });
         this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
           true).then(async () => {
-          this.registerKoheseIOListeners();
-          this.repositoryStatus.next({
-            state: RepoStates.SYNCHRONIZING,
-            message: 'Starting Repository Sync'
-          });
           this.processBulkUpdate((await this.sendMessageToWorker(
             'getFundamentalItems', { refresh: false }, true)).data);
           await this.sendMessageToWorker('getCache', { refresh: false }, true);
@@ -191,10 +191,10 @@ export class ItemRepository {
               state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
               message: 'Item Repository Ready'
             });
-        
+
             this.getStatusFor(workingTree.getRootProxy());
           }
-          
+
           await Promise.all(workingTree.loadingComplete(
             calculateTreeHashesAsynchronously));
           this.processBulkUpdate((await this.sendMessageToWorker(
@@ -211,7 +211,7 @@ export class ItemRepository {
               state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
               message: 'Item Repository Ready'
             });
-        
+
             this.getStatusFor(workingTree.getRootProxy());
           }
         });
