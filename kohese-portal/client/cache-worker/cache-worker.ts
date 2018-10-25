@@ -68,15 +68,36 @@ let _itemUpdatesObject: any;
             () => void) => {
             socket.on('authenticated', async () => {
               registerKoheseIOListeners();
-              
+
+              let workingTree = TreeConfiguration.getWorkingTree();
+
+              let beforeSync = Date.now();
               _fundamentalItemsObject = await synchronizeModels();
-              await populateCache();
-              _cache.loadProxiesForCommit(_cache.getRef('HEAD'),
-                TreeConfiguration.getWorkingTree());
-              _loadedCacheObjectMap = _cache.getObjectMap();
-              _itemUpdatesObject = await updateCache(TreeConfiguration.
-                getWorkingTree().getAllTreeHashes());
-              TreeConfiguration.getWorkingTree().loadingComplete(false);
+              let afterSyncMetaModels = Date.now();
+              console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
+
+              _loadedCacheObjectMap = await populateCache();
+              let afterSyncCache = Date.now();
+              console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
+              // _loadedCacheObjectMap = _cache.getObjectMap();
+
+              _cache.loadProxiesForCommit(_cache.getRef('HEAD'), workingTree);
+              let afterLoadHead = Date.now();
+              console.log('^^^ Time to load HEAD: ' + (afterLoadHead - afterSyncCache) / 1000);
+
+              workingTree.calculateAllTreeHashes();
+              let afterCalcTreeHashes = Date.now();
+              console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadHead) / 1000);
+
+              _itemUpdatesObject = await updateCache(workingTree.getAllTreeHashes());
+              let afterGetAll = Date.now();
+              console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
+
+              workingTree.loadingComplete(false);
+              let afterLoading = Date.now();
+              console.log('^^^ Time to complete loading: ' + (afterLoading - afterGetAll) / 1000);
+              console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
+
               resolve();
             });
             socket.emit('authenticate', {
@@ -84,14 +105,14 @@ let _itemUpdatesObject: any;
             });
           });
         }
-        
+
         port.postMessage({ id: request.id });
         break;
       case 'getFundamentalItems':
         if (!_fundamentalItemsObject || request.data.refresh) {
           _fundamentalItemsObject = await synchronizeModels();
         }
-        
+
         port.postMessage({
           id: request.id,
           data: _fundamentalItemsObject
@@ -104,7 +125,7 @@ let _itemUpdatesObject: any;
            getWorkingTree());
          _loadedCacheObjectMap = _cache.getObjectMap();
         }
-        
+
         port.postMessage({ message: 'cachePiece', data: {
           key: 'metadata',
           value: _loadedCacheObjectMap.metadata
@@ -133,7 +154,7 @@ let _itemUpdatesObject: any;
             value: _loadedCacheObjectMap.blobMapChunks[chunkKey]
           } });
         }
-        
+
         port.postMessage({ id: request.id });
         break;
       case 'getItemUpdates':
@@ -142,10 +163,10 @@ let _itemUpdatesObject: any;
           if (!treeHashes) {
             treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
           }
-          
+
           _itemUpdatesObject = await updateCache(treeHashes);
         }
-        
+
         port.postMessage({
           id: request.id,
           data: _itemUpdatesObject
@@ -164,7 +185,7 @@ let _itemUpdatesObject: any;
     console.log('*** Received message error:');
     console.log(event);
   }
-  
+
   port.start();
 }
 
@@ -211,7 +232,7 @@ function registerKoheseIOListeners() {
     // this.updateStatus(proxy, notification.status);
     proxy.dirty = false;
   });
-  
+
   socket.on('Item/delete', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
     var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
@@ -284,7 +305,7 @@ function synchronizeModels(): Promise<any> {
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      
+
       processBulkUpdate(response);
       resolve(response);
     });
@@ -324,7 +345,7 @@ async function populateCache(): Promise<any> {
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      
+
       resolve(_cache.getObjectMap());
     });
   });
@@ -334,6 +355,7 @@ async function populateCache(): Promise<any> {
 //
 //////////////////////////////////////////////////////////////////////////
 function processBulkUpdate(response){
+  let before = Date.now();
   for(let kind in response.cache) {
     console.log('--- Processing ' + kind);
     var kindList = response.cache[kind];
@@ -380,6 +402,8 @@ function processBulkUpdate(response){
       proxy.deleteItem();
     });
   }
+  let after = Date.now();
+  console.log('^^^ BulkProcess took: ' + (after-before)/1000 );
 }
 
 //////////////////////////////////////////////////////////////////////////
