@@ -19,7 +19,9 @@ export class ReferencesTabComponent implements OnInit, OnDestroy {
   @Input()
   proxyStream: Observable<ItemProxy>;
   @Input()
-  routingStrategy : string; 
+  routingStrategy : string;
+  @Input()
+  editableStream : Observable<boolean>;
   itemProxy: ItemProxy
   referenceInfo: Array<ReferenceTableInfo> = [];
   referencedByInfo: Array<ReferenceTableInfo> = [];
