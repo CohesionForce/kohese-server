@@ -18,9 +18,12 @@ let clientMap = {};
 
 let initialized: boolean = false;
 let _cache: LevelCache;
-let _fundamentalItemsObject: any;
-let _loadedCacheObjectMap: any;
-let _itemUpdatesObject: any;
+let _connectionAuthenticatedPromise: Promise<any>;
+let _fundamentalItemsPromise: Promise<any>;
+let _loadedCachePromise: Promise<any>;
+let _itemUpdatesPromise: Promise<any>;
+
+let _lastClientId :number = 0;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -45,7 +48,7 @@ let _itemUpdatesObject: any;
     initialized = true;
   }
 
-  let clientId = Date.now();
+  let clientId = ++_lastClientId;
   clientMap[clientId] = port;
 
   //////////////////////////////////////////////////////////////////////////
@@ -53,6 +56,9 @@ let _itemUpdatesObject: any;
   //////////////////////////////////////////////////////////////////////////
   port.onmessage = async (event: any) => {
     let request = event.data;
+
+    let requestStartTime = Date.now();
+    console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
 
     // Determine which message handler to invoke
     switch(request.type){
@@ -64,22 +70,30 @@ let _itemUpdatesObject: any;
             socket = undefined;
           });
           socket.connect();
-          await new Promise<void>((resolve: () => void, reject:
+
+          _connectionAuthenticatedPromise = new Promise<void>((resolve: () => void, reject:
             () => void) => {
+
             socket.on('authenticated', async () => {
+
+              // Resolve the promise to allow all client tabs to proceed
+              resolve();
+
+              // Remaining initialization logic will proceed and provide incremental results to tabs
               registerKoheseIOListeners();
 
               let workingTree = TreeConfiguration.getWorkingTree();
 
               let beforeSync = Date.now();
-              _fundamentalItemsObject = await synchronizeModels();
+              _fundamentalItemsPromise = synchronizeModels();
+              await _fundamentalItemsPromise;
               let afterSyncMetaModels = Date.now();
               console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
 
-              _loadedCacheObjectMap = await populateCache();
+              _loadedCachePromise = populateCache();
+              await _loadedCachePromise;
               let afterSyncCache = Date.now();
               console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
-              // _loadedCacheObjectMap = _cache.getObjectMap();
 
               _cache.loadProxiesForCommit(_cache.getRef('HEAD'), workingTree);
               let afterLoadHead = Date.now();
@@ -89,7 +103,8 @@ let _itemUpdatesObject: any;
               let afterCalcTreeHashes = Date.now();
               console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadHead) / 1000);
 
-              _itemUpdatesObject = await updateCache(workingTree.getAllTreeHashes());
+              _itemUpdatesPromise = updateCache(workingTree.getAllTreeHashes());
+              await _itemUpdatesPromise;
               let afterGetAll = Date.now();
               console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
 
@@ -98,7 +113,6 @@ let _itemUpdatesObject: any;
               console.log('^^^ Time to complete loading: ' + (afterLoading - afterGetAll) / 1000);
               console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
 
-              resolve();
             });
             socket.emit('authenticate', {
               token: request.data
@@ -106,76 +120,84 @@ let _itemUpdatesObject: any;
           });
         }
 
+        await _connectionAuthenticatedPromise;
         port.postMessage({ id: request.id });
         break;
       case 'getFundamentalItems':
-        if (!_fundamentalItemsObject || request.data.refresh) {
-          _fundamentalItemsObject = await synchronizeModels();
+        if (!_fundamentalItemsPromise || request.data.refresh) {
+          _fundamentalItemsPromise = synchronizeModels();
         }
+
+        let fundamentalItems = await _fundamentalItemsPromise;
 
         port.postMessage({
           id: request.id,
-          data: _fundamentalItemsObject
+          data: fundamentalItems
         });
         break;
       case 'getCache':
-        if (!_loadedCacheObjectMap || request.data.refresh) {
-          await populateCache();
-         _cache.loadProxiesForCommit(_cache.getRef('HEAD'), TreeConfiguration.
-           getWorkingTree());
-         _loadedCacheObjectMap = _cache.getObjectMap();
+        if (!_loadedCachePromise || request.data.refresh) {
+          _loadedCachePromise = populateCache();
         }
+
+        let objectMap = await _loadedCachePromise;
 
         port.postMessage({ message: 'cachePiece', data: {
           key: 'metadata',
-          value: _loadedCacheObjectMap.metadata
+          value: objectMap.metadata
         } });
         port.postMessage({ message: 'cachePiece', data: {
           key: 'ref',
-          value: _loadedCacheObjectMap.refMap
+          value: objectMap.refMap
         } });
         port.postMessage({ message: 'cachePiece', data: {
           key: 'tag',
-          value: _loadedCacheObjectMap.tagMap
+          value: objectMap.tagMap
         } });
         port.postMessage({ message: 'cachePiece', data: {
           key: 'commit',
-          value: _loadedCacheObjectMap.kCommitMap
+          value: objectMap.kCommitMap
         } });
-        for (let chunkKey in _loadedCacheObjectMap.kTreeMapChunks) {
+        for (let chunkKey in objectMap.kTreeMapChunks) {
           port.postMessage({ message: 'cachePiece', data: {
             key: 'tree',
-            value: _loadedCacheObjectMap.kTreeMapChunks[chunkKey]
+            value: objectMap.kTreeMapChunks[chunkKey]
           } });
         }
-        for (let chunkKey in _loadedCacheObjectMap.blobMapChunks) {
+        for (let chunkKey in objectMap.blobMapChunks) {
           port.postMessage({ message: 'cachePiece', data: {
             key: 'blob',
-            value: _loadedCacheObjectMap.blobMapChunks[chunkKey]
+            value: objectMap.blobMapChunks[chunkKey]
           } });
         }
 
         port.postMessage({ id: request.id });
         break;
       case 'getItemUpdates':
-        if (!_itemUpdatesObject || request.data.refresh) {
+        if (!_itemUpdatesPromise || request.data.refresh) {
           let treeHashes: any = request.data.treeHashes;
           if (!treeHashes) {
             treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
           }
 
-          _itemUpdatesObject = await updateCache(treeHashes);
+          _itemUpdatesPromise = updateCache(treeHashes);
         }
+
+        let itemUpdates = await _itemUpdatesPromise;
 
         port.postMessage({
           id: request.id,
-          data: _itemUpdatesObject
+          data: itemUpdates
         });
         break;
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);
     }
+
+    let requestFinishTime = Date.now();
+    console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
+      + ' - ' + (requestFinishTime - requestStartTime)/1000 + 's');
   }
 
   //////////////////////////////////////////////////////////////////////////
