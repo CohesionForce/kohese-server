@@ -64,18 +64,8 @@
                   (nonFormFieldChanged)="onNonFormFieldChanged($event)">
                 </details-form>
             </mat-tab>
-            <mat-tab>
-              <ng-template mat-tab-label>
-                  Children ({{itemProxy.children.length}})
-                  <ng-container *ngIf="itemProxy.dirty">
-                    <img src="../../../assets/icons/versioncontrol/dirty.ico"
-                      title="Dirty item"/>
-                  </ng-container>
-              </ng-template>
-              <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
-            </mat-tab>
             <mat-tab label="References">
-                <references-tab [proxyStream]="proxyStream"></references-tab>
+                <references-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></references-tab>
             </mat-tab>
             <mat-tab label="History" select="getHistory()">
                 <history-tab [proxyStream]="proxyStream"></history-tab>
