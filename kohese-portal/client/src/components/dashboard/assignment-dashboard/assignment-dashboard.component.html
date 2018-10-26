@@ -1,17 +1,19 @@
-<div *ngFor="let assignment of sortedAssignmentList" style="padding : 10px;">
-  <span [ngSwitch]="assignmentType">
-    <span *ngSwitchCase="assignmentTypes.ACTIVE_ASSIGNMENTS">
-      <active-assignment [itemProxy]="assignment"></active-assignment>
+<div class="assignment-list">
+  <div *ngFor="let assignment of sortedAssignmentList" style="padding : 10px;">
+    <span [ngSwitch]="assignmentType">
+      <span *ngSwitchCase="assignmentTypes.DUE_ASSIGNMENTS">
+        <due-assignment [itemProxy]="assignment"></due-assignment>
+      </span>
+      <span *ngSwitchCase="assignmentTypes.OPEN_ASSIGNMENTS">
+        <open-assignment [itemProxy]="assignment"></open-assignment>
+      </span>
+      <span *ngSwitchCase="assignmentTypes.COMPLETED_ASSIGNMENTS">
+        <completed-assignment [itemProxy]="assignment"></completed-assignment>
+      </span>
     </span>
-    <span *ngSwitchCase="assignmentTypes.DUE_ASSIGNMENTS">
-      <due-assignment [itemProxy]="assignment"></due-assignment>
-    </span>
-    <span *ngSwitchCase="assignmentTypes.OPEN_ASSIGNMENTS">
-      <open-assignment [itemProxy]="assignment"></open-assignment>
-    </span>
-    <span *ngSwitchCase="assignmentTypes.COMPLETED_ASSIGNMENTS">
-      <completed-assignment [itemProxy]="assignment"></completed-assignment>
-    </span>
-  </span>
-  <hr>
+    <hr>
+  </div>
+</div>
+<div class="activity-feed" >
+  <activity-feed [activityList]="assignmentList"></activity-feed>
 </div>

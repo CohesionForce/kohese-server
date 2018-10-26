@@ -1,3 +1,4 @@
+import { ActivityFeedComponent } from './activity-feed/activity-feed.component';
 import { StateSummaryDialogComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-summary-dialog/state-summary-dialog.component';
 import { StateBarChartComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-bar-chart.component';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +17,6 @@ import { UserInputModule } from '../user-input/user-input.module';
 import { AssignmentDashboardComponent } from './assignment-dashboard/assignment-dashboard.component'
 import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
 import { PipesModule } from "../../pipes/pipes.module";
-import { ActiveAssignmentComponent } from "./assignment-dashboard/active-assignment/active-assignment.component";
 import { DueAssignmentComponent } from "./assignment-dashboard/due-assignment/due-assignment.component";
 import { OpenAssignmentComponent } from "./assignment-dashboard/open-assignment/open-assignment.component";
 import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-assignment/completed-assignment.component";
@@ -26,7 +26,6 @@ import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard
 import { ProjectOverviewComponent } from "./project-dashboard/project-overview/project-overview.component";
 import { StatusDashboardComponent } from './project-dashboard/status-dashboard/status-dashboard.component';
 import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
-import { ActionTableModule } from "../action-table/action-table.module";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 import { TreeModule } from "angular-tree-component";
 import { StateFilterService } from './state-filter.service';
@@ -40,7 +39,6 @@ import { ReportGeneratorModule } from '../report-generator/report-generator.modu
     DashboardSelectorComponent,
     AssignmentDashboardComponent,
     UserDashboardComponent,
-    ActiveAssignmentComponent,
     DueAssignmentComponent,
     CompletedAssignmentComponent,
     DependencyInfoComponent,
@@ -54,6 +52,7 @@ import { ReportGeneratorModule } from '../report-generator/report-generator.modu
     StateSummaryDialogComponent,
     StatefulProxyCardComponent,
     ReportDashboardComponent,
+    ActivityFeedComponent
   ],
   providers : [
     StateFilterService
