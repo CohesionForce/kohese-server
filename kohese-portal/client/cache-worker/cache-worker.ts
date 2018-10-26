@@ -174,16 +174,22 @@ let _lastClientId :number = 0;
         port.postMessage({ id: request.id });
         break;
       case 'getItemUpdates':
+        let updatesPromise = _itemUpdatesPromise;
         if (!_itemUpdatesPromise || request.data.refresh) {
+          console.log('^^^ Request refresh of itemUpdates');
           let treeHashes: any = request.data.treeHashes;
           if (!treeHashes) {
             treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
           }
 
-          _itemUpdatesPromise = updateCache(treeHashes);
+          updatesPromise = updateCache(treeHashes);
+          if (!request.data.refresh){
+            console.log('^^^ Updating _itemUpdatesPromise');
+            _itemUpdatesPromise = updatesPromise;
+          }
         }
 
-        let itemUpdates = await _itemUpdatesPromise;
+        let itemUpdates = await updatesPromise;
 
         port.postMessage({
           id: request.id,

@@ -199,8 +199,8 @@ export class ItemRepository {
             calculateTreeHashesAsynchronously));
           this.processBulkUpdate((await this.sendMessageToWorker(
             'getItemUpdates', {
-              refresh: false,
-              treeHashes: undefined
+              refresh: true,
+              treeHashes: workingTree.getAllTreeHashes()
           }, true)).data);
           if (!calculateTreeHashesAsynchronously) {
             this.currentTreeConfigSubject.next({
