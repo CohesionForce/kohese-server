@@ -7,7 +7,7 @@
     </div>
     <mat-card [ngClass]="{'uneditable' : !editable, 'editable': editable}" class="right-content">
     <mat-card-title>
-      {{assignment.item.name}} 
+      {{assignment.item.name}}
     </mat-card-title>
     <mat-card-content>
       <div style="display : inline-block">
@@ -22,10 +22,9 @@
                        [kind]="assignment.kind"></dependency-info>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-raised-button (click)="navigate('Explore', {id: assignment.item.id})">
+      <button mat-raised-button (click)="openProxyDetails(assignment)">
           Details <i class="fa fa-arrow-right"></i>
-        </button>    
+        </button>
     </mat-card-actions>
   </mat-card>
 </div>
-  
