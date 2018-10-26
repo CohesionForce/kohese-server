@@ -29,10 +29,6 @@
       <h5 class="dashListHeader"> Assignments</h5>
       <div>
         <h6 class="dashListItem"
-            (click)="selectDashboard(DashboardSelections.ACTIVE_ASSIGNMENTS)"
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
-                        DashboardSelections.ACTIVE_ASSIGNMENTS}"> Active </h6>
-        <h6 class="dashListItem"
             (click)="selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)"
             [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
                         DashboardSelections.DUE_ASSIGNMENTS}"> Due</h6>
