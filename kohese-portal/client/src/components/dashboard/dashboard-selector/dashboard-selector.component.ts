@@ -4,7 +4,6 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 // Used to determine specific component dashboard being loaded
 export enum DashboardSelections {
-  ACTIVE_ASSIGNMENTS,
   DUE_ASSIGNMENTS,
   OPEN_ASSIGNMENTS,
   COMPLETED_ASSIGNMENTS,
@@ -71,7 +70,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
     switch (type) {
       case (DashboardTypes.ASSIGNMENT):
         this.selectedDashboard = {
-          dashboard: DashboardSelections.ACTIVE_ASSIGNMENTS,
+          dashboard: DashboardSelections.OPEN_ASSIGNMENTS,
           dashboardType: DashboardTypes.ASSIGNMENT
         }
         this.menuType = MenuTypes.PERSONAL
@@ -107,15 +106,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   selectDashboard(dashboard: DashboardSelections) {
     console.log(dashboard);
     switch (dashboard) {
-
-      case (DashboardSelections.ACTIVE_ASSIGNMENTS):
-        this.selectedDashboard = {
-          dashboard: DashboardSelections.ACTIVE_ASSIGNMENTS,
-          dashboardType: DashboardTypes.ASSIGNMENT
-        };
-        this.menuType = MenuTypes.PERSONAL;
-        break;
-
         case (DashboardSelections.DUE_ASSIGNMENTS):
         this.selectedDashboard = {
           dashboard: DashboardSelections.DUE_ASSIGNMENTS,
