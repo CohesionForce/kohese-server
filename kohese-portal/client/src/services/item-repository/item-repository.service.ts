@@ -81,10 +81,10 @@ export class ItemRepository {
       state: RepoStates.DISCONNECTED,
       message: 'Initializing Item Repository'
     });
-  
+
     ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
       this.logService.log(this.logEvents.receivedNofificationOfChange, { change: change });
-  
+
       switch (change.type) {
         case 'loaded':
           this.logService.log(this.logEvents.itemProxyLoaded);
@@ -94,9 +94,9 @@ export class ItemRepository {
           break;
       }
     });
-    
+
     this.recentProxies = [];
-    
+
     let scripts: any = document.scripts;
     let cacheWorkerBundle: string;
     scriptLoop: for (let scriptIdx in scripts) {
@@ -174,7 +174,7 @@ export class ItemRepository {
     });
     TreeConfiguration.setItemCache(this._cache);
     this._worker.port.start();
-    
+
     this.CurrentUserService.getCurrentUserSubject()
       .subscribe((decodedToken) => {
       this.logService.log(this.logEvents.itemRepositoryAuthenticated);
@@ -187,7 +187,7 @@ export class ItemRepository {
       }
     });
   }
-  
+
   private align(): Promise<void> {
     return new Promise<void>(async (resolve: () => void, reject:
       () => void) => {
@@ -215,11 +215,11 @@ export class ItemRepository {
           message: 'Item Repository Ready'
         });
       }
-      
+
       await Promise.all(workingTree.loadingComplete(
         calculateTreeHashesAsynchronously));
       this.processBulkUpdate((await this.sendMessageToWorker('getItemUpdates',
-        { refresh: false, treeHashes: undefined }, true)).data);
+        { refresh: true,treeHashes: workingTree.getAllTreeHashes() }, true)).data);
       if (!calculateTreeHashesAsynchronously) {
         this.currentTreeConfigSubject.next({
           config: workingTree,
@@ -230,11 +230,11 @@ export class ItemRepository {
           message: 'Item Repository Ready'
         });
       }
-      
+
       resolve();
     });
   }
-  
+
   private buildOrUpdateProxy(item: any, kind: string, status: Array<string>):
     ItemProxy {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.
@@ -251,17 +251,17 @@ export class ItemRepository {
         }
       }
     }
-  
+
     if (status && proxy) {
       proxy.status.length = 0;
       proxy.status.push(...status);
-      
+
       TreeConfiguration.getWorkingTree().getChangeSubject().next({
         type: 'update',
         proxy: proxy
       });
     }
-      
+
     return proxy;
   }
 

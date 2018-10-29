@@ -54,10 +54,8 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
         this.treeConfigSubscription =
           this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
           if (newConfig) {
-          console.log('New Config');
           this.currentUser = newConfig.config.getProxyByProperty('KoheseUser', 'username', this.username);
           this.changeSubjectSubscription = newConfig.config.getChangeSubject().subscribe((change)=>{
-            console.log(change);
           })
           this.buildAssignmentList();
           }
