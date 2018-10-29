@@ -56,10 +56,10 @@ export class CommitComparisonComponent {
     if (this._data) {
       let commitMap = TreeConfiguration.getItemCache().getCommits();
       let sortedCommitArray: Array<any> = [];
-      for (let oid in commitMap) {
+      for (let oid of Array.from(commitMap.keys())) {
         sortedCommitArray.push({
           oid: oid,
-          commit: commitMap[oid]
+          commit: commitMap.get(oid)
         });
       }
       sortedCommitArray.sort((oneCommitObject: any, anotherCommitObject:
@@ -88,6 +88,8 @@ export class CommitComparisonComponent {
   public async compareCommits() : Promise<void> {
     let comparisons: Array<Comparison> = this._comparisonsSubject.getValue();
     comparisons.length = 0;
+
+    console.log('^^^ Comparison compareCommits called...')
 
     comparisons.push(...await Compare.compareCommits(this._baseCommitId, this.
       _changeCommitId, this._dynamicTypesService));

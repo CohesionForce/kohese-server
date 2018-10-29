@@ -40,12 +40,16 @@ export class Compare {
 
         let comparison: ItemProxyComparison = new ItemProxyComparison(baseItem,
           changeItem, dynamicTypesService);
+
+        // TODO: Why is an function pointer with an anonymous function being used here
         comparison.adjustPropertyValue = async (propertyValue: string, comparisonObject:
           any) => {
           let uuidValueProperty: boolean = Comparison.UUID_REGULAR_EXPRESSION.
             test(propertyValue);
           let treeHashMap: TreeHashMap = (comparisonObject === baseItem ?
             baseTreeHashMap : changeTreeHashMap);
+
+          // TODO: What is he intent of this section of code?
           if (uuidValueProperty) {
             if (treeHashMap[propertyValue]) {
               let item: any = await cache.getBlob(treeHashMap[propertyValue].oid);
