@@ -8,18 +8,18 @@ import { TreeHashMap,
   TreeHashEntryDifference } from '../../../../common/src/tree-hash';
 
 export class Compare {
-  public static compareCommits(baseCommitId: string, changeCommitId: string,
-    dynamicTypesService: DynamicTypesService): Array<Comparison> {
+  public static async compareCommits(baseCommitId: string, changeCommitId: string,
+    dynamicTypesService: DynamicTypesService): Promise<Array<Comparison>> {
     let comparisons: Array<ItemProxyComparison> = [];
     let cache: ItemCache = TreeConfiguration.getItemCache();
-    let baseTreeHashMap: TreeHashMap = cache.getTreeHashMap(baseCommitId);
-    let changeTreeHashMap: TreeHashMap = cache.getTreeHashMap(changeCommitId);
+    let baseTreeHashMap: TreeHashMap = await cache.getTreeHashMap(baseCommitId);
+    let changeTreeHashMap: TreeHashMap = await cache.getTreeHashMap(changeCommitId);
     let diff: any = TreeHashMap.diff(baseTreeHashMap, changeTreeHashMap);
     if (!diff.match) {
       for (let id in diff.details) {
         let diffEntry: TreeHashEntryDifference = diff.details[id];
-        let baseItem: any = cache.getBlob(cache.getTree(diffEntry.
-          treeHashChanged.fromTreeId).oid);
+        let fromTree = await cache.getTree(diffEntry.treeHashChanged.fromTreeId);
+        let baseItem = await cache.getBlob(fromTree.oid);
         if (!baseItem) {
           baseItem = {
             id: id,
@@ -27,9 +27,9 @@ export class Compare {
           };
         }
         baseItem.kind = baseTreeHashMap[id].kind;
-        
-        let changeItem: any = cache.getBlob(cache.getTree(diffEntry.
-          treeHashChanged.toTreeId).oid);
+
+        let toTree = await cache.getTree(diffEntry.treeHashChanged.toTreeId);
+        let changeItem = await cache.getBlob(toTree.oid);
         if (!changeItem) {
           changeItem = {
             id: id,
@@ -37,10 +37,10 @@ export class Compare {
           };
         }
         changeItem.kind = changeTreeHashMap[id].kind;
-        
+
         let comparison: ItemProxyComparison = new ItemProxyComparison(baseItem,
           changeItem, dynamicTypesService);
-        comparison.adjustPropertyValue = (propertyValue: string, comparisonObject:
+        comparison.adjustPropertyValue = async (propertyValue: string, comparisonObject:
           any) => {
           let uuidValueProperty: boolean = Comparison.UUID_REGULAR_EXPRESSION.
             test(propertyValue);
@@ -48,7 +48,7 @@ export class Compare {
             baseTreeHashMap : changeTreeHashMap);
           if (uuidValueProperty) {
             if (treeHashMap[propertyValue]) {
-              let item: any = cache.getBlob(treeHashMap[propertyValue].oid);
+              let item: any = await cache.getBlob(treeHashMap[propertyValue].oid);
               propertyValue = 'Reference to ' + (item ? item.name : 'Missing ' +
                 'Item Version: ' + propertyValue) + ' (' + propertyValue + ')';
             }
@@ -61,57 +61,57 @@ export class Compare {
                 break;
               }
             }
-            
+
             if (uuidValueProperty) {
               /*let propertyValueReplacement: Array<string> = [];
               for (let j: number = 0; j < elements.length; j++) {
                 if (treeHashMap[elements[j]]) {
-                  let item: any = cache.getBlob(treeHashMap[elements[j]].oid);
+                  let item: any = await cache.getBlob(treeHashMap[elements[j]].oid);
                   propertyValueReplacement.push('Reference to ' + (item ? item.
                     name : 'Missing Item Version: ' + propertyValue) + ' (' +
                     propertyValue + ')');
                 }
               }
-              
+
               propertyValue = propertyValueReplacement.join('\n');*/
             }
           }
-          
+
           return propertyValue;
           };
-        
+
         if (diffEntry.contentChanged) {
           comparison.changeTypes.push(ChangeType.CONTENT_CHANGED);
         }
-        
+
         if (diffEntry.kindChanged) {
           comparison.changeTypes.push(ChangeType.TYPE_CHANGED);
         }
-        
+
         if (diffEntry.parentChanged) {
           comparison.changeTypes.push(ChangeType.PARENT_CHANGED);
         }
-        
+
         if (diffEntry.childrenAdded) {
           comparison.changeTypes.push(ChangeType.CHILD_ADDED);
         }
-        
+
         if (diffEntry.childrenModified) {
           comparison.changeTypes.push(ChangeType.CHILD_MODIFIED);
         }
-        
+
         if (diffEntry.childrenDeleted) {
           comparison.changeTypes.push(ChangeType.CHILD_REMOVED);
         }
-        
+
         if (diffEntry.childrenReordered) {
           comparison.changeTypes.push(ChangeType.CHILDREN_REORDERED);
         }
-        
-        comparison.compare();
+
+        await comparison.compare();
         comparisons.push(comparison);
       }
-      
+
       for (let j: number = 0; j < comparisons.length; j++) {
         let comparison: ItemProxyComparison = comparisons[j];
         let path: Array<string> = [];
@@ -127,23 +127,23 @@ export class Compare {
             }
             k++;
           }
-          
+
           if (k === comparisons.length) {
             break;
           }
         }
-        
+
         path.reverse();
         comparison.path = path.join(' \u2192 ');
       }
     }
-    
+
     comparisons.sort((oneComparison: ItemProxyComparison, anotherComparison:
       ItemProxyComparison) => {
       return oneComparison.changeObject.name - anotherComparison.changeObject.
         name;
     });
-      
+
     return comparisons;
   }
 }

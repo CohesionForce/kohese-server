@@ -48,12 +48,21 @@ export class ItemCache {
   private kTreeMap  = new Map<string, KoheseTree>();
   private blobMap  = new Map<string, Blob>();
 
+  private mapMap = new Map<string, Map<string, any>>();
+
   private objectMap;
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  constructor() {
+  constructor(sublevel?) {
+
+    this.registerCacheMap('metadata', this.metadata);
+    this.registerCacheMap('ref', this.refMap);
+    this.registerCacheMap('tag', this.tagMap);
+    this.registerCacheMap('kCommit', this.kCommitMap);
+    this.registerCacheMap('kTree', this.kTreeMap);
+    this.registerCacheMap('blob', this.blobMap);
 
     this.metadata['numRefs'] = 0;
     this.metadata['numTags'] = 0;
@@ -66,11 +75,18 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  registerCacheMap(sublevelName : string, sublevelMap: Map<string,any>) {
+    this.mapMap.set(sublevelName, sublevelMap);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   mapToObject (map) {
     let object = {};
-    for (let key in map){
-      object[key] = map[key];
-    }
+    map.forEach((value, key) => {
+      object[key] = value;
+    });
 
     return object;
   }
@@ -105,17 +121,17 @@ export class ItemCache {
     if (!this.objectMap){
       this.objectMap = {
         metadata : {
-          numRefs: _.size(this.refMap),
-          numTags: _.size(this.tagMap),
-          numCommits: _.size(this.kCommitMap),
-          numTrees: _.size(this.kTreeMap),
-          numBlobs: _.size(this.blobMap)
+          numRefs: this.refMap.size,
+          numTags: this.tagMap.size,
+          numCommits: this.kCommitMap.size,
+          numTrees: this.kTreeMap.size,
+          numBlobs: this.blobMap.size
         },
         refMap : this.mapToObject(this.refMap),
         tagMap : this.mapToObject(this.tagMap),
         kCommitMap : this.mapToObject(this.kCommitMap),
-        kTreeMapChunks: this.splitObject(this.kTreeMap),
-        blobMapChunks: this.splitObject(this.blobMap)
+        kTreeMapChunks: this.splitObject(this.mapToObject(this.kTreeMap)),
+        blobMapChunks: this.splitObject(this.mapToObject(this.blobMap))
       }
     }
     return this.objectMap;
@@ -129,41 +145,41 @@ export class ItemCache {
 
     if (objectMap.refMap){
       this.refMap = objectMap.refMap;
-      this.metadata['numRefs'] = _.size(this.refMap);
+      this.metadata['numRefs'] = this.refMap.size;
       if(this.metadata['numRefs'] !== objectMap.metadata.numRefs){
-        console.log('*** Number of refs do not match: ' + _.size(this.refMap));
+        console.log('*** Number of refs do not match: ' + this.refMap.size);
       }
     }
 
     if (objectMap.tagMap){
       this.tagMap = objectMap.tagMap;
-      this.metadata['numTags'] = _.size(this.tagMap);
+      this.metadata['numTags'] = this.tagMap.size;
       if(this.metadata['numTags'] !== objectMap.metadata.numTags){
-        console.log('*** Number of tags do not match: ' + _.size(this.tagMap));
+        console.log('*** Number of tags do not match: ' + this.tagMap.size);
       }
     }
 
     if (objectMap.kCommitMap){
       this.kCommitMap = objectMap.kCommitMap;
-      this.metadata['numCommits'] = _.size(this.kCommitMap);
+      this.metadata['numCommits'] = this.kCommitMap.size;
       if(this.metadata['numCommits'] !== objectMap.metadata.numCommits){
-        console.log('*** Number of commits do not match: ' + _.size(this.kCommitMap));
+        console.log('*** Number of commits do not match: ' + this.kCommitMap.size);
       }
     }
 
     if (objectMap.kTreeMap){
       this.kTreeMap = objectMap.kTreeMap;
-      this.metadata['numTrees'] = _.size(this.kTreeMap);
+      this.metadata['numTrees'] = this.kTreeMap;
       if(this.metadata['numTrees'] !== objectMap.metadata.numTrees){
-        console.log('*** Number of trees do not match: ' + _.size(this.kTreeMap));
+        console.log('*** Number of trees do not match: ' + this.kTreeMap);
       }
     }
 
     if (objectMap.blobMap){
       this.blobMap = objectMap.blobMap;
-      this.metadata['numBlobs'] = _.size(this.blobMap);
+      this.metadata['numBlobs'] = this.blobMap.size;
       if(this.metadata['numBlobs'] !== objectMap.metadata.numBlobs){
-        console.log('*** Number of blobs do not match: ' + _.size(this.blobMap));
+        console.log('*** Number of blobs do not match: ' + this.blobMap.size);
       }
     }
 
@@ -179,6 +195,24 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  async retrieveValue (sublevelName, key) : Promise<any> {
+
+    try {
+      let map = this.mapMap.get(sublevelName);
+      let value = map.get(key);
+      return Promise.resolve(value);
+    } catch (err) {
+      console.log('*** Error: ' + err);
+      console.log('*** Attempting to retrieve: ' + sublevelName + ' - ' + key);
+      console.log(err.stack);
+      return Promise.resolve(undefined);
+    }
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   getAllMetaData() : Map<string, number> {
     return this.metadata;
   }
@@ -187,14 +221,14 @@ export class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   cacheMetaData(key, value){
-    this.metadata[key] = value;
+    this.metadata.set(key, value);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getMetaData(key){
-    return this.metadata[key];
+  async getMetaData(key){
+    return this.retrieveValue('metadata', key);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -208,14 +242,14 @@ export class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   cacheRef(ref, oid){
-    this.refMap[ref] = oid;
+    this.refMap.set(ref, oid);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getRef(ref){
-    return this.refMap[ref];
+  async getRef(ref){
+    return this.retrieveValue('ref', ref);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -229,14 +263,14 @@ export class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   cacheTag(tag, oid){
-    this.tagMap[tag] = oid;
+    this.tagMap.set(tag, oid);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getTag(tag){
-    return this.tagMap[tag];
+  async getTag(tag){
+    return this.retrieveValue('tag', tag);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -251,14 +285,14 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   cacheCommit(oid : string, commit : KoheseCommit){
     Object.freeze(commit);
-    this.kCommitMap[oid] = commit;
+    this.kCommitMap.set(oid, commit);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getCommit(oid : string){
-    return this.kCommitMap[oid];
+  async getCommit(oid : string){
+    return this.retrieveValue('kCommit', oid);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -273,16 +307,16 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   cacheTree(oid, tree){
     Object.freeze(tree);
-    this.kTreeMap[oid] = tree;
+    this.kTreeMap.set(oid, tree);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getTreeHashMap(forCommit : string) : TreeHashMap {
+  async getTreeHashMap(forCommit : string) : Promise<TreeHashMap> {
     var treeHashMap = {};
 
-    let commit = this.getCommit(forCommit);
+    let commit = await this.getCommit(forCommit);
 
     let treeHashEntryStack : Array<{id:string, treeId:TreeHashValueType}> = [];
     let reversedRootIds = Object.keys(commit.repoTreeRoots).reverse();
@@ -293,7 +327,7 @@ export class ItemCache {
 
     while (treeHashEntryStack.length > 0) {
       let mapEntry = treeHashEntryStack.pop();
-      let treeHashEntry = this.getTree(mapEntry.treeId)
+      let treeHashEntry = await this.getTree(mapEntry.treeId)
 
       if (treeHashEntry) {
         treeHashMap [mapEntry.id] = treeHashEntry;
@@ -322,8 +356,8 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getTree(oid){
-    return this.kTreeMap[oid];
+  async getTree(oid){
+    return this.retrieveValue('kTree', oid);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -333,14 +367,14 @@ export class ItemCache {
     if(!disableObjectFreeze){
       Object.freeze(blob);
     }
-    this.blobMap[oid] = blob;
+    this.blobMap.set(oid, blob);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getBlob(oid){
-    return this.blobMap[oid];
+  async getBlob(oid){
+    return this.retrieveValue('blob', oid);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -354,35 +388,35 @@ export class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   numberOfRefs(){
-    return _.size(this.refMap);
+    return this.refMap.size;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   numberOfTags(){
-    return _.size(this.tagMap);
+    return this.tagMap.size;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   numberOfCommits(){
-    return _.size(this.kCommitMap);
+    return this.kCommitMap.size;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   numberOfTrees(){
-    return _.size(this.kTreeMap);
+    return this.kTreeMap.size;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   numberOfBlobs(){
-    return _.size(this.blobMap);
+    return this.blobMap.size;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -394,26 +428,26 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  detectMissingCommitData(selectedCommitId?) {
+  async detectMissingCommitData(selectedCommitId?) {
 
     let cache = this;
     let blobEvaluated = {};
     let treeEvaluated = {};
 
-    function evaluateBlob (itemId, kind, oid) {
+    async function evaluateBlob (itemId, kind, oid) {
       if (!blobEvaluated[oid]){
         // console.log('::: Evaluating blob for ' + itemId);
-        if (!cache.getBlob(oid)){
+        if (!await cache.getBlob(oid)){
           console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
         }
         blobEvaluated[oid] = true;
       }
     }
 
-    function evaluateTreeEntry (itemId, tree) {
+    async function evaluateTreeEntry (itemId, tree) {
       if (!treeEvaluated[tree.treeHash]){
-        // console.log('::: Evaluating tree for ' + itemId);
-        evaluateBlob(itemId, tree.kind, tree.oid);
+        // console.log('::: Evaluating tree for ' + itemId + ' - ' + tree.treeHash);
+        await evaluateBlob(itemId, tree.kind, tree.oid);
         for (let childId in tree.childTreeHashes) {
           let childTreeHash = tree.childTreeHashes[childId];
           switch (childTreeHash){
@@ -421,9 +455,9 @@ export class ItemCache {
             case 'Internal':
               break;
             default:
-              let childTree = cache.getTree(childTreeHash);
+              let childTree = await cache.getTree(childTreeHash);
               if (childTree) {
-                evaluateTreeEntry(childId, childTree);
+                await evaluateTreeEntry(childId, childTree);
               } else {
                 console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
               }
@@ -433,15 +467,14 @@ export class ItemCache {
       }
     }
 
-    for (let commitId in this.kCommitMap) {
+    for (let [commitId, commit] of Array.from(this.kCommitMap.entries())) {
       if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
-        let commit = this.kCommitMap[commitId];
         // console.log('::: Evaluating commit:  ' + commitId);
 
         for (let rootId in commit.repoTreeRoots){
           let root = commit.repoTreeRoots[rootId];
           // console.log('::: Evaluating root:  ' + rootId);
-          evaluateTreeEntry(rootId, root);
+          await evaluateTreeEntry(rootId, root);
         }
       }
     };
@@ -450,26 +483,26 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  detectMissingTreeData(selectedTreeId?) {
+  async detectMissingTreeData(selectedTreeId?) {
 
     let cache = this;
     let blobEvaluated = {};
     let treeEvaluated = {};
 
-    function evaluateBlob (itemId, kind, oid) {
+    async function evaluateBlob (itemId, kind, oid) {
       if (!blobEvaluated[oid]){
         // console.log('::: Evaluating blob for ' + itemId);
-        if (!cache.getBlob(oid)){
+        if (!await cache.getBlob(oid)){
           console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
         }
         blobEvaluated[oid] = true;
       }
     }
 
-    function evaluateTreeEntry (itemId, tree) {
+    async function evaluateTreeEntry (itemId, tree) {
       if (!treeEvaluated[tree.treeHash]){
         // console.log('::: Evaluating tree for ' + itemId);
-        evaluateBlob(itemId, tree.kind, tree.oid);
+        await evaluateBlob(itemId, tree.kind, tree.oid);
         for (let childId in tree.childTreeHashes) {
           let childTreeHash = tree.childTreeHashes[childId];
           switch (childTreeHash){
@@ -477,9 +510,9 @@ export class ItemCache {
             case 'Internal':
               break;
             default:
-              let childTree = cache.getTree(childTreeHash);
+              let childTree = await cache.getTree(childTreeHash);
               if (childTree) {
-                evaluateTreeEntry(childId, childTree);
+                await evaluateTreeEntry(childId, childTree);
               } else {
                 console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
               }
@@ -495,7 +528,7 @@ export class ItemCache {
         console.log('::: Evaluating tree:  ' + treeId);
         // console.log(JSON.stringify(commit, null, '  '));
 
-        evaluateTreeEntry(treeId, tree);
+        await evaluateTreeEntry(treeId, tree);
       }
     };
   }
@@ -509,15 +542,15 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForCommit(commitId, treeConfig){
-    let commit = this.getCommit(commitId);
+  async loadProxiesForCommit(commitId, treeConfig){
+    let commit = await this.getCommit(commitId);
 
     console.log('$$$ Loading commit: ');
     console.log(JSON.stringify(commit, [ 'time', 'author', 'message', 'parents' ], '  '));
 
     for(let repoId in commit.repoTreeRoots){
       let repoTreeHashEntry = commit.repoTreeRoots[repoId];
-      this.loadProxiesForTree(repoId, repoTreeHashEntry, treeConfig);
+      await this.loadProxiesForTree(repoId, repoTreeHashEntry, treeConfig);
     }
 
     console.log('$$$ Loading complete');
@@ -527,7 +560,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForTree(treeId, treeHashEntry, treeConfig){
+  private async loadProxiesForTree(treeId, treeHashEntry, treeConfig){
     // console.log('$$$ Processing tree: ' + treeId);
     // console.log(treeHashEntry);
     let kind = treeHashEntry.kind;
@@ -540,7 +573,7 @@ export class ItemCache {
         // console.log('::: Only processing children for internal kind: ' + kind);
         break;
       default:
-        let item = this.getBlob(treeHashEntry.oid);
+        let item = await this.getBlob(treeHashEntry.oid);
         if (item){
           // eslint-disable-next-line no-unused-vars
           let treeProxy : ItemProxy = new ItemProxy(kind,  item, treeConfig);
@@ -555,8 +588,8 @@ export class ItemCache {
       let childTreeHash = treeHashEntry.childTreeHashes[childId];
       if ((childTreeHash !== 'Repository-Mount') &&
         (childTreeHash !== 'Internal')) {
-        let childTreeHashEntry = this.getTree(childTreeHash);
-        this.loadProxiesForTree(childId, childTreeHashEntry, treeConfig);
+        let childTreeHashEntry = await this.getTree(childTreeHash);
+        await this.loadProxiesForTree(childId, childTreeHashEntry, treeConfig);
       }
     }
   }

@@ -20,7 +20,7 @@ export class CommitComparisonComponent {
   get commitMap() {
     return this._commitMap;
   }
-  
+
   private _baseCommitId: string;
   get baseCommitId() {
     return this._baseCommitId;
@@ -28,7 +28,7 @@ export class CommitComparisonComponent {
   set baseCommitId(baseCommitId: string) {
     this._baseCommitId = baseCommitId;
   }
-  
+
   private _changeCommitId: string;
   get changeCommitId() {
     return this._changeCommitId;
@@ -36,22 +36,22 @@ export class CommitComparisonComponent {
   set changeCommitId(changeCommitId: string) {
     this._changeCommitId = changeCommitId;
   }
-  
+
   private _comparisonsSubject: BehaviorSubject<Array<Comparison>> =
     new BehaviorSubject<Array<Comparison>>([]);
   get comparisonsSubject() {
     return this._comparisonsSubject;
   }
-  
+
   get data() {
     return this._data;
   }
-  
+
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     private _changeDetectorRef: ChangeDetectorRef,
     private _dynamicTypesService: DynamicTypesService) {
   }
-  
+
   public ngOnInit(): void {
     if (this._data) {
       let commitMap = TreeConfiguration.getItemCache().getCommits();
@@ -70,23 +70,26 @@ export class CommitComparisonComponent {
         this._commitMap[sortedCommitArray[j].oid] = sortedCommitArray[j].
           commit;
       }
-      
+
       if (this._data['baseCommitId']) {
         this._baseCommitId = this._data['baseCommitId'];
       }
-      
+
       if (this._data['changeCommitId']) {
         this._changeCommitId = this._data['changeCommitId'];
       }
     }
-    
-    this.compareCommits();
+
+    this.compareCommits().then(() => {
+      console.log('^^^ Compare commits is finished');
+    });
   }
-  
-  public compareCommits(): void {
+
+  public async compareCommits() : Promise<void> {
     let comparisons: Array<Comparison> = this._comparisonsSubject.getValue();
     comparisons.length = 0;
-    comparisons.push(...Compare.compareCommits(this._baseCommitId, this.
+
+    comparisons.push(...await Compare.compareCommits(this._baseCommitId, this.
       _changeCommitId, this._dynamicTypesService));
     this._comparisonsSubject.next(comparisons);
   }

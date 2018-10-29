@@ -1,5 +1,3 @@
-import { ItemProxy } from './item-proxy';
-import { TreeConfiguration } from './tree-configuration';
 import { ItemCache } from './item-cache';
 
 import * as LevelUp_Import from 'levelup';
@@ -36,7 +34,7 @@ const CacheBulkTransferKeyToSublevelMap = {
 
 type GetMapMethod = (this : ItemCache) => Map<string, any>;
 type SetValueMethod = (this : ItemCache, key:string, value: any) => void;
-type GetValueMethod = (this : ItemCache, key:string) => any;
+type GetValueMethod = (this : ItemCache, key:string) => Promise<any>;
 
 type SublevelRegistration = {
   sublevelName : string,
@@ -126,14 +124,34 @@ export class LevelCache extends ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   async retrieveValue (sublevelName, key) : Promise<any> {
+    let beforeRetrieve = Date.now();
     let registration : SublevelRegistration = this.registrationMap.get(sublevelName);
-    let value = registration.getValueMethod.call(this, key);
+    let value = await super.retrieveValue(sublevelName, key);
+
+    let afterRetrieve = Date.now();
     if (value !== undefined) {
-      // console.log('$$$ Returning already loaded value: ' + key);
+      // console.log('@@@ Map Lookup: ' + key + ' - ' + (afterRetrieve - beforeRetrieve)  + ' ms');
       return Promise.resolve(value);
     } else {
       // console.log('$$$ Waiting for value to load: ' + key);
-      return registration.sublevel.get(key);
+      let levelPromise = registration.sublevel.get(key)
+
+      let result = new Promise((resolve) => {
+
+        levelPromise.then((value) => {
+          let afterLevelRetrieve = Date.now();
+          registration.setValueMethod.call(this, key, value);
+          resolve(value);
+          // console.log('@@@ Map Lookup (via Level): ' + key + ' - ' + (afterLevelRetrieve - afterRetrieve) + ' ms');
+        }).catch((err) => {
+          resolve(undefined);
+        });
+      });
+
+      await result;
+
+      return result;
+
     }
   }
 
@@ -204,8 +222,8 @@ export class LevelCache extends ItemCache {
       let entries = [];
 
       console.log('::: Creating Batch for Sublevel: ' + sublevelName);
-      Object.keys(map).forEach((key) => {
-        entries.push({type: 'put', key: key, value: map[key]})
+      map.forEach((value, key) => {
+        entries.push({type: 'put', key: key, value: value})
       });
 
       console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelName);

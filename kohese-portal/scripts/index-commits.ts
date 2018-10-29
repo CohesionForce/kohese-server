@@ -29,13 +29,13 @@ if (!baseRepoPath){
 var kdb = require('../server/kdb');
 global['koheseKDB'] = kdb;
 let indexAndExit = true;
-kdb.initialize(baseRepoPath, indexAndExit).then(function () {
+kdb.initialize(baseRepoPath, indexAndExit).then(async () =>  {
   console.log('::: Finished cache update for: ' + baseRepoPath);
   let itemCache : LevelCache = <LevelCache>TreeConfiguration.getItemCache();
 
   console.log('::: Checking for missing data in cache');
   try {
-    itemCache.detectMissingCommitData();
+    await itemCache.detectMissingCommitData();
   } catch (err){
     console.log('*** Error: ' + err);
     console.log(err.stack);
