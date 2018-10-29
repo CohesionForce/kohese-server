@@ -63,7 +63,7 @@ export class ItemProxy {
 
   // Needed for information calculated on the client
   public dirty : boolean = false;
-  public status;
+  public status: Array<string> = [];
   public history;
   public type; // Used to store KoheseType.
 
@@ -149,7 +149,6 @@ export class ItemProxy {
     copyAttributes(forItem, proxy);
 
     proxy.setItemKind(kind);
-    proxy.status = {};
 
     if (kind === 'Repository') {
       proxy.treeConfig.repoMap[itemId] = proxy;

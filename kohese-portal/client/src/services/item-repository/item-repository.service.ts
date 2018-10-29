@@ -127,6 +127,9 @@ export class ItemRepository {
             message: 'Disconnected'
           });
           break;
+        case 'verifyConnection':
+          this.sendMessageToWorker('connectionVerification', undefined, false);
+          break;
         case 'update':
           this.buildOrUpdateProxy(data.data.item, data.data.kind, data.data.
             status);
@@ -186,6 +189,11 @@ export class ItemRepository {
         });
       }
     });
+  }
+  
+  public async getSessionMap(): Promise<any> {
+    return (await this.sendMessageToWorker('getSessionMap', undefined, true)).
+      data;
   }
   
   private align(): Promise<void> {

@@ -6,15 +6,11 @@ import * as LevelJs from 'level-js';
 import { ItemProxy } from '../../common/src/item-proxy';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
-
-import { ItemCache } from '../../common/src/item-cache';
 import { LevelCache } from '../../common/src/level-cache';
 
 let socket: SocketIOClient.Socket;
-
-let authenticated : boolean = false;
-
 let clientMap = {};
+let _connectionVerificationSet: Set<number> = new Set<number>();
 
 let initialized: boolean = false;
 let _cache: LevelCache;
@@ -81,6 +77,7 @@ let _itemUpdatesObject: any;
           });
         }
         
+        socket.emit('connectionAdded', { id: socket.id });
         port.postMessage({ id: request.id });
         break;
       case 'getFundamentalItems':
@@ -144,6 +141,17 @@ let _itemUpdatesObject: any;
           data: _itemUpdatesObject
         });
         break;
+      case 'connectionVerification':
+        _connectionVerificationSet.add(clientId);
+        break;
+      case 'getSessionMap':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (sessionMap: any) => void, reject: () => void) => {
+          socket.emit('getSessionMap', {}, (sessionMap: any) => {
+            resolve(sessionMap);
+          });
+        }) });
+        break;
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);
@@ -159,6 +167,26 @@ let _itemUpdatesObject: any;
   }
   
   port.start();
+  
+  let connectionVerificationAttempts: number = 0;
+  let checkConnections: () => void = () => {
+    postToAllPorts('verifyConnection', undefined);
+    if (3 === connectionVerificationAttempts) {
+      for (let id in clientMap) {
+        if (!_connectionVerificationSet.has(+id)) {
+          delete clientMap[id];
+          socket.emit('connectionRemoved', { id: socket.id });
+        }
+      }
+      _connectionVerificationSet.clear();
+      connectionVerificationAttempts = 0;
+    }
+    connectionVerificationAttempts++;
+    setTimeout(() => {
+      checkConnections();
+    }, 7000);
+  };
+  checkConnections();
 }
 
 function align(): Promise<void> {
