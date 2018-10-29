@@ -1,42 +1,29 @@
 <span class="control-group">
-  <mat-checkbox [(ngModel)]="orderedChildren"
-    (change)="toggleOrderedChildren()"
-    [disabled]="!(editableStream | async)">
+  <mat-checkbox [(ngModel)]="orderedChildren" (change)="toggleOrderedChildren()" [disabled]="!(editableStream | async)">
     Ordered
   </mat-checkbox>
-    <button mat-raised-button
-    (click)="createChild()">
+  <button mat-raised-button (click)="createChild()">
     Create Child </button>
 </span>
-<span class="pull-right">
-  <input class="input-sm" type="text" [(ngModel)]="filterString" (input)="onFilterUpdate($event.target.value)"
-  placeholder="Filter" style="margin: 5px"/>
-</span>
-<mat-card>
-  <mat-card-title class="panel-heading">
-    <span>Children View - {{childView}}</span>
-    <span class="pull-right">
-      <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
-        <mat-icon class="fa fa-gear"></mat-icon>
+
+<h4 class="panel-heading">
+  <span>Children View - {{childView}}</span>
+  <span class="pull-right">
+    <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
+      <mat-icon class="fa fa-gear"></mat-icon>
+    </button>
+    <mat-menu #optionsMenu="matMenu">
+      <button mat-menu-item (click)="childView = 'tree'">
+        <mat-icon *ngIf="childView === 'tree'" class="fa fa-check"></mat-icon>
+        Show as Tree
       </button>
-      <mat-menu #optionsMenu="matMenu">
-        <button mat-menu-item (click)="childView = 'tree'">
-          <mat-icon *ngIf="childView === 'tree'" class="fa fa-check"></mat-icon>
-          Show as Tree
-        </button>
-        <button mat-menu-item (click)="childView = 'table'">
-            <i *ngIf="childView === 'table'" class="fa fa-check"></i>
-          Show as Table
-        </button>
-      </mat-menu>
-    </span>
-  </mat-card-title>
-  <mat-card-content>
-    <children-table [childrenStream]="childrenStream"
-                    [filterSubject]="filterSubject"
-                    [editableStream]="editableStream"
-                    *ngIf="childView === 'table'"></children-table>
-    <proxy-selector-tree [itemProxy]="itemProxy"
-                   *ngIf="childView === 'tree'"></proxy-selector-tree>
-  </mat-card-content>
-</mat-card>
+      <button mat-menu-item (click)="childView = 'table'">
+        <i *ngIf="childView === 'table'" class="fa fa-check"></i>
+        Show as Table
+      </button>
+    </mat-menu>
+  </span>
+</h4>
+<children-table [childrenStream]="childrenStream" [filterSubject]="filterSubject" [editableStream]="editableStream"
+  *ngIf="childView === 'table'"></children-table>
+<proxy-selector-tree [itemProxy]="itemProxy" *ngIf="childView === 'tree'"></proxy-selector-tree>

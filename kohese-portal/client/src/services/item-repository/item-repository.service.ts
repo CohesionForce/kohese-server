@@ -180,6 +180,10 @@ export class ItemRepository {
       this.logService.log(this.logEvents.itemRepositoryAuthenticated);
       if (decodedToken) {
         this.logService.log(this.logEvents.socketAlreadyConnected);
+        this.repositoryStatus.next({
+          state: RepoStates.SYNCHRONIZING,
+          message: 'Starting Repository Sync'
+        });
         this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
           true).then(async () => {
           this.align();

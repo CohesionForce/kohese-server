@@ -149,7 +149,7 @@ export class ItemProxy {
     copyAttributes(forItem, proxy);
 
     proxy.setItemKind(kind);
-    proxy.status = {};
+    proxy.status = [];
 
     if (kind === 'Repository') {
       proxy.treeConfig.repoMap[itemId] = proxy;
