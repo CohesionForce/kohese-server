@@ -45,13 +45,6 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
         }
         // Strip non-unique values
         this.activityList = Array.from(new Set(this.activityList));
-        this.activityList.sort((a, b) => {
-          if (a.item.modifiedOn > b.item.modifiedOn) {
-            return -1
-          } else if (a.item.modifiedOn <= b.item.modifiedOn) {
-            return 1;
-          }
-        })
       }
     })
   }
