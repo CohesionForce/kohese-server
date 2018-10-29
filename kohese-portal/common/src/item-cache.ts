@@ -64,11 +64,11 @@ export class ItemCache {
     this.registerCacheMap('kTree', this.kTreeMap);
     this.registerCacheMap('blob', this.blobMap);
 
-    this.metadata['numRefs'] = 0;
-    this.metadata['numTags'] = 0;
-    this.metadata['numCommits'] = 0;
-    this.metadata['numTrees'] = 0;
-    this.metadata['numBlobs'] = 0;
+    this.metadata.set('numRefs', 0);
+    this.metadata.set('numTags', 0);
+    this.metadata.set('numCommits', 0);
+    this.metadata.set('numTrees', 0);
+    this.metadata.set('numBlobs', 0);
 
   }
 
@@ -145,45 +145,45 @@ export class ItemCache {
 
     if (objectMap.refMap){
       this.refMap = objectMap.refMap;
-      this.metadata['numRefs'] = this.refMap.size;
-      if(this.metadata['numRefs'] !== objectMap.metadata.numRefs){
+      this.metadata.set('numRefs', this.refMap.size);
+      if(this.metadata.get('numRefs') !== objectMap.metadata.numRefs){
         console.log('*** Number of refs do not match: ' + this.refMap.size);
       }
     }
 
     if (objectMap.tagMap){
       this.tagMap = objectMap.tagMap;
-      this.metadata['numTags'] = this.tagMap.size;
-      if(this.metadata['numTags'] !== objectMap.metadata.numTags){
+      this.metadata.set('numTags', this.tagMap.size);
+      if(this.metadata.get('numTags') !== objectMap.metadata.numTags){
         console.log('*** Number of tags do not match: ' + this.tagMap.size);
       }
     }
 
     if (objectMap.kCommitMap){
       this.kCommitMap = objectMap.kCommitMap;
-      this.metadata['numCommits'] = this.kCommitMap.size;
-      if(this.metadata['numCommits'] !== objectMap.metadata.numCommits){
+      this.metadata.set('numCommits', this.kCommitMap.size);
+      if(this.metadata.get('numCommits') !== objectMap.metadata.numCommits){
         console.log('*** Number of commits do not match: ' + this.kCommitMap.size);
       }
     }
 
     if (objectMap.kTreeMap){
       this.kTreeMap = objectMap.kTreeMap;
-      this.metadata['numTrees'] = this.kTreeMap;
-      if(this.metadata['numTrees'] !== objectMap.metadata.numTrees){
+      this.metadata.set('numTrees', this.kTreeMap.size);
+      if(this.metadata.get('numTrees') !== objectMap.metadata.numTrees){
         console.log('*** Number of trees do not match: ' + this.kTreeMap);
       }
     }
 
     if (objectMap.blobMap){
       this.blobMap = objectMap.blobMap;
-      this.metadata['numBlobs'] = this.blobMap.size;
-      if(this.metadata['numBlobs'] !== objectMap.metadata.numBlobs){
+      this.metadata.set('numBlobs', this.blobMap.size);
+      if(this.metadata.get('numBlobs') !== objectMap.metadata.numBlobs){
         console.log('*** Number of blobs do not match: ' + this.blobMap.size);
       }
     }
 
-    if (!_.isEqual(this.metadata, objectMap.metadata)){
+    if (!_.isEqual(this.mapToObject(this.metadata), objectMap.metadata)){
       console.log('*** Cache metadata does not match: ');
       console.log('*** Server Cache Metadata:')
       console.log(objectMap.metadata);
@@ -524,7 +524,7 @@ export class ItemCache {
 
     for (let treeId in this.kTreeMap) {
       if (!selectedTreeId || (selectedTreeId && (treeId === selectedTreeId))){
-        let tree = this.kTreeMap[treeId];
+        let tree = this.kTreeMap.get(treeId);
         console.log('::: Evaluating tree:  ' + treeId);
         // console.log(JSON.stringify(commit, null, '  '));
 
