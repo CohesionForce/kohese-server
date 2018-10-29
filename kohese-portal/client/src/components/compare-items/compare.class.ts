@@ -17,9 +17,12 @@ export class Compare {
     let diff: any = TreeHashMap.diff(baseTreeHashMap, changeTreeHashMap);
     if (!diff.match) {
       for (let id in diff.details) {
+
+        // TODO: Need to determine how to do kind comparison without requiring clone of Blob
+
         let diffEntry: TreeHashEntryDifference = diff.details[id];
         let fromTree = await cache.getTree(diffEntry.treeHashChanged.fromTreeId);
-        let baseItem = await cache.getBlob(fromTree.oid);
+        let baseItem = JSON.parse(JSON.stringify(await cache.getBlob(fromTree.oid)));
         if (!baseItem) {
           baseItem = {
             id: id,
@@ -29,7 +32,7 @@ export class Compare {
         baseItem.kind = baseTreeHashMap[id].kind;
 
         let toTree = await cache.getTree(diffEntry.treeHashChanged.toTreeId);
-        let changeItem = await cache.getBlob(toTree.oid);
+        let changeItem = JSON.parse(JSON.stringify(await cache.getBlob(toTree.oid)));
         if (!changeItem) {
           changeItem = {
             id: id,
