@@ -4,7 +4,7 @@
     <button mat-button (click)="addDefinition()">Add Report</button>
   </div>
   <div id="format-container">
-    <mat-list>
+    <mat-list *ngIf="formatDefs">
       <mat-list-item *ngFor="let format of formatDefs | mapKey" class="format-item" (click)="selectedFormat = formatDefs[format]">
         <i class="fa fa-star" *ngIf="formatDefs[format].id === currentType.viewModelProxy.item.defaultFormatKey"></i>
         {{formatDefs[format].name}}

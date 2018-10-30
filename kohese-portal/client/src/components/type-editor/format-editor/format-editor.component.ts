@@ -76,7 +76,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
     this.koheseTypeStreamSubscription = this.koheseTypeStream.subscribe(
       (koheseType: KoheseType) => {
       this.currentType = koheseType;
-      if (!koheseType.viewModelProxy) {
+      if (!koheseType || !koheseType.viewModelProxy) {
         this.modelUndefined = true;
         this.changeRef.markForCheck();
         return;
