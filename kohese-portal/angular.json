@@ -3,10 +3,12 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "app": {
+    "kohese-portal": {
       "root": "",
       "sourceRoot": "client",
       "projectType": "application",
+      "prefix": "app",
+      "schematics": {},
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -14,23 +16,31 @@
             "outputPath": "build/client/bundle",
             "index": "client/index.html",
             "main": "client/bootstrap.ts",
-            "tsConfig": "client/tsconfig.app.json",
             "polyfills": "client/polyfills.ts",
+            "tsConfig": "client/tsconfig.app.json",
             "assets": [
+              "client/favicon.ico",
               "client/assets",
-              "client/favicon.ico"
+              "client/manifest.json"
             ],
             "styles": [
-              "client/css/index.css",
-              "node_modules/font-awesome/css/font-awesome.css",
-              "node_modules/ngx-toastr/toastr.css"
+              "./client/css/index.css",
+              "./node_modules/bootstrap/dist/css/bootstrap.css",
+              "./node_modules/font-awesome/css/font-awesome.css",
+              "./node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [
-              "node_modules/marked/lib/marked.js"
+              "./build/client/cache-worker/cache-bundle.js"
             ]
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "client/environments/environment.ts",
+                  "with": "client/environments/environment.prod.ts"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -40,94 +50,86 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "serviceWorker": true,
-              "ngswConfigPath": "src/ngsw-config.json",
-              "fileReplacements": [
-                {
-                  "replace": "client/environments/environment.ts",
-                  "with": "client/environments/environment.prod.ts"
-                }
-              ]
+              "serviceWorker": true
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "app:build"
+            "browserTarget": "kohese-portal:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "app:build:production"
+              "browserTarget": "kohese-portal:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "app:build"
+            "browserTarget": "kohese-portal:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "client/test.ts",
-            "karmaConfig": "./karma.conf.js",
             "polyfills": "client/polyfills.ts",
             "tsConfig": "client/tsconfig.spec.json",
-            "scripts": [
-              "node_modules/marked/lib/marked.js"
-            ],
+            "karmaConfig": "client/karma.conf.js",
             "styles": [
-              "client/css/index.css",
-              "node_modules/font-awesome/css/font-awesome.css",
-              "node_modules/ngx-toastr/toastr.css"
+              "client/styles.css"
             ],
+            "scripts": [],
             "assets": [
+              "client/favicon.ico",
               "client/assets",
-              "client/favicon.ico"
+              "client/manifest.json"
             ]
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [],
-            "exclude": []
+            "tsConfig": [
+              "client/tsconfig.app.json",
+              "client/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     },
-    "app-e2e": {
-      "root": "e2e",
-      "sourceRoot": "e2e",
+    "kohese-portal-e2e": {
+      "root": "e2e/",
       "projectType": "application",
       "architect": {
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "app:serve"
+            "protractorConfig": "e2e/protractor.conf.js",
+            "devServerTarget": "kohese-portal:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "kohese-portal:serve:production"
+            }
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [],
-            "exclude": []
+            "tsConfig": "e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     }
   },
-  "defaultProject": "app",
-  "schematics": {
-    "@schematics/angular:component": {
-      "prefix": "app",
-      "styleext": "css"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
-    }
-  }
+  "defaultProject": "kohese-portal"
 }

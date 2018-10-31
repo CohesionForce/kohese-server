@@ -1,9 +1,6 @@
 
-import {
-      map} from 'rxjs/operators
-      map';
+import { map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-
 import * as _ from 'underscore';
 
 import { SocketService } from '../socket/socket.service';
@@ -19,7 +16,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { CacheManager } from '../../../cache-worker/CacheManager';
 
-import { Subject ,  BehaviorSubject ,  Subscription ,  Observable } from 'rxjs';
+import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback } from 'rxjs';
 
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
@@ -670,7 +667,7 @@ export class ItemRepository {
   //////////////////////////////////////////////////////////////////////////
   public getHistoryFor(proxy: ItemProxy): Observable<Array<any>> {
     let emitReturningObservable: (message: string, data: any) => Observable<any> =
-      Observable.bindCallback(this.socketService.getSocket().emit.bind(this.
+      bindCallback(this.socketService.getSocket().emit.bind(this.
         socketService.getSocket()));
     return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).pipe(
       map((response: any) => {

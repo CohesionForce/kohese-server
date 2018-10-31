@@ -1,13 +1,10 @@
 
-import {
-        map, startWith} from 'rxjs/operators
-        map';
+import { map, startWith} from 'rxjs/operators';
 import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy } from '@angular/core';
-import { ItemRepository, RepoStates } from '../../../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
-import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -28,12 +25,12 @@ export class ProxySelectorComponent implements OnInit {
   proxySelected: EventEmitter<any> = new EventEmitter();
 
   rootProxy: ItemProxy;
-  selected : any;
+  selected: any;
   selectedMap: Map<string, ItemProxy> = new Map();
-  repoInitialized: boolean = false;
+  repoInitialized = false;
   proxySearchControl: FormControl;
-  proxySearchInitialized : boolean;
-  treeInitialized : boolean;
+  proxySearchInitialized: boolean;
+  treeInitialized: boolean;
   filteredProxies: any;
   recentProxies: Array<ItemProxy>;
 
