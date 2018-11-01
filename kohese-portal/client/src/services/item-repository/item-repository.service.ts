@@ -103,7 +103,7 @@ export class ItemRepository {
         for (let idx in script.attributes) {
           let attribute: any = script.attributes[idx];
           if (attribute.value) {
-            if (attribute.value.match(/^cache-worker/)) {
+            if (attribute.value.match(/^scripts/)) {
               cacheWorkerBundle = attribute.value;
               break scriptLoop;
             }
