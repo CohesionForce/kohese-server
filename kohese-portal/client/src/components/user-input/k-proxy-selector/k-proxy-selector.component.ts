@@ -70,13 +70,15 @@ export class KProxySelectorComponent extends UserInput
     let selected = this.formGroup.controls[this.fieldId].value;
     if (this.allowMultiSelect) {
       this.selected = [];
-      for (let i = 0; i < selected.length; i++) {
-        if (selected[i].hasOwnProperty('id')) {
-          // Must be a reference
-          this.selected.push(this.treeConfig.getProxyFor(selected[i].id))
-        } else {
-          // Must be an id field insteaad of a reference
-          this.selected.push(this.treeConfig.getProxyFor(selected[i]))
+      if (selected) {
+        for (let i = 0; i < selected.length; i++) {
+          if (selected[i].hasOwnProperty('id')) {
+            // Must be a reference
+            this.selected.push(this.treeConfig.getProxyFor(selected[i].id))
+          } else {
+            // Must be an id field insteaad of a reference
+            this.selected.push(this.treeConfig.getProxyFor(selected[i]))
+          }
         }
       }
     } else if (selected) {

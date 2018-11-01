@@ -17,7 +17,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;
   let assignmentDashboardFixture : ComponentFixture<AssignmentDashboardComponent>;
-  let dashboardSelectionStream = new BehaviorSubject<DashboardSelections>(DashboardSelections.ACTIVE_ASSIGNMENTS);
+  let dashboardSelectionStream = new BehaviorSubject<DashboardSelections>(DashboardSelections.OPEN_ASSIGNMENTS);
   let assignmentListStream = new BehaviorSubject<Array<ItemProxy>>(new MockItemRepository().getRootProxy().children)
 
   beforeEach(()=>{

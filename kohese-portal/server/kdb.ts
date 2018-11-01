@@ -538,7 +538,7 @@ function updateMountFile() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function openRepositories(indexAndExit) {
+async function openRepositories(indexAndExit) {
 	// Check and process mounts.json
 	// TODO Check for file existence prior to loading
 	try {
@@ -551,59 +551,60 @@ function openRepositories(indexAndExit) {
   let kdbCache = new KDBCache(koheseKDBDirPath);
   TreeConfiguration.setItemCache(kdbCache);
 
-  return kdbCache.updateCache().then(() => {
-    console.log('::: Finished cache update: ' + kdbCache.repoPath);
+  await kdbCache.updateCache();
 
-    if (indexAndExit){
-        return Promise.resolve(true);
+  console.log('::: Finished cache update: ' + kdbCache.repoPath);
+
+  if (indexAndExit){
+      return Promise.resolve(true);
+  }
+
+  // Create/validate root repo structure
+  console.log('>>> Validating Root Repository Structure');
+  validateRepositoryStructure(koheseKDBDirPath);
+
+  // Validate the repositories listed inside the mount file
+  console.log('>>> Mounting and Validating External Repos');
+  for(let id in mountList) {
+    if(!mountList[id].mounted && mountList[id].repoStoragePath) {
+        mountRepository({'id': id, name: mountList[id].name, parentId: '',
+                        repoStoragePath: mountList[id].repoStoragePath});
     }
+  }
+  console.log('>>> Done loading repositories');
 
-  	// Create/validate root repo structure
-	  console.log('>>> Validating Root Repository Structure');
-	  validateRepositoryStructure(koheseKDBDirPath);
+  //Load corresponding git repositories
+  var promises = [];
+  promises.push(kdbRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, koheseKDBDirPath));
 
-	  // Validate the repositories listed inside the mount file
-	  console.log('>>> Mounting and Validating External Repos');
-	  for(let id in mountList) {
-	    if(!mountList[id].mounted && mountList[id].repoStoragePath) {
-          mountRepository({'id': id, name: mountList[id].name, parentId: '',
-                          repoStoragePath: mountList[id].repoStoragePath});
-	    }
-	  }
-	  console.log('>>> Done loading repositories');
+  index(rootProxy, false);
 
-	  //Load corresponding git repositories
-	  var promises = [];
-    promises.push(kdbRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, koheseKDBDirPath));
+  // Initialize nodegit repo-open promises
+  for(let id in mountList) {
+    if(mountList[id].mounted && mountList[id].repoStoragePath) {
+      // eslint-disable-next-line no-unused-vars
+      var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+        //promises.push(kdbRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, proxy.repoPath));
+        // TODO Once Repositories are version controlled separately,
+        // index them here.
+    }
+  }
 
-    index(rootProxy, false);
+  rootProxy.repoPath = path.join(koheseKDBDirPath, 'Root.json');
+  console.log('--- Root descendant count: ' + rootProxy.descendantCount);
+  for(var childIdx in rootProxy.children){
+    var childProxy = rootProxy.children[childIdx];
+    console.log('--- Child descendant count of ' + childProxy.item.name + ': ' + childProxy.descendantCount);
+  }
 
-	  // Initialize nodegit repo-open promises
-	  for(let id in mountList) {
-	    if(mountList[id].mounted && mountList[id].repoStoragePath) {
-	      // eslint-disable-next-line no-unused-vars
-        var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
-	        //promises.push(kdbRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, proxy.repoPath));
-	        // TODO Once Repositories are version controlled separately,
-	        // index them here.
-	    }
-	  }
-
-	  rootProxy.repoPath = path.join(koheseKDBDirPath, 'Root.json');
-	  console.log('--- Root descendant count: ' + rootProxy.descendantCount);
-	  for(var childIdx in rootProxy.children){
-	    var childProxy = rootProxy.children[childIdx];
-	    console.log('--- Child descendant count of ' + childProxy.item.name + ': ' + childProxy.descendantCount);
-	  }
-
-	  return Promise.all(promises).then(() => {
-      // Need to wait for all repos to be loaded before continuing
-      console.log('::: End KDB File Load');
-      console.log(new Date());
-      ItemProxy.getWorkingTree().loadingComplete();
-      console.log(new Date());
-    });
+  return Promise.all(promises).then(() => {
+    // Need to wait for all repos to be loaded before continuing
+    console.log('::: End KDB File Load');
+    console.log(new Date());
+    ItemProxy.getWorkingTree().loadingComplete();
+    console.log(new Date());
   });
+
 }
 
 //////////////////////////////////////////////////////////////////////////

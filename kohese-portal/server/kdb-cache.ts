@@ -10,7 +10,19 @@ var nodegit = require('nodegit');
 
 import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
-import { ItemCache } from '../common/src/item-cache';
+import { LevelCache } from '../common/src/level-cache';
+import * as LevelDown_Import from 'leveldown';
+
+
+//
+// Adjust for the differences in CommonJS and ES6
+//
+let LevelDown;
+if (typeof(LevelDown_Import) === "object") {
+  LevelDown = (<any>LevelDown_Import).default;
+} else {
+  LevelDown = LevelDown_Import;
+}
 
 var _ = require('underscore');
 
@@ -18,18 +30,20 @@ var jsonExt = /\.json$/;
 
 const expandRepoCommits = true;
 
-export class KDBCache extends ItemCache {
+export class KDBCache extends LevelCache {
 
   public repoCommitMap;
   public repoTreeMap;
   public repoPath;
   public cacheDirectory;
+  public dbDirectory;
   public objectDirectory;
   public repoCommitDirectory;
   public repoTreeDirectory;
   public blobDirectory;
   public blobMismatchDirectory;
   public refsDirectory;
+  public tagDirectory;
   public kCommitDirectory;
   public kTreeDirectory;
   public expandedRepoCommitDirectory;
@@ -40,21 +54,40 @@ export class KDBCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   constructor(repoPath) {
 
-    super();
+    let cacheDirectory = path.join(repoPath, '.cache');
+    let dbDirectory = path.join(cacheDirectory, 'cacheDB');
+    let levelDown = LevelDown(dbDirectory);
+    super(levelDown);
 
     this.repoCommitMap = {};
     this.repoTreeMap = {};
 
+    this.registerSublevel(
+      'rCommit',
+      this.getRepoCommits,
+      this.cacheRepoCommit,
+      this.getRepoCommit
+    );
+
+    this.registerSublevel(
+      'rTree',
+      this.getRepoTrees,
+      this.cacheRepoTree,
+      this.getRepoTree
+    );
+
     this.repoPath = repoPath;
     console.log('::: Loading Cache for ' + repoPath);
 
-    this.cacheDirectory = path.join(repoPath, '.cache');
+    this.cacheDirectory = cacheDirectory;
+    this.dbDirectory = dbDirectory;
     this.objectDirectory = path.join(this.cacheDirectory, 'objects');
     this.repoCommitDirectory = path.join(this.objectDirectory, 'repoCommit');
     this.repoTreeDirectory = path.join(this.objectDirectory, 'repoTree');
     this.blobDirectory = path.join(this.objectDirectory, 'blob');
     this.blobMismatchDirectory = path.join(this.objectDirectory, 'mismatch_blob');
     this.refsDirectory = path.join(this.objectDirectory, 'refs');
+    this.tagDirectory = path.join(this.objectDirectory, 'tag');
     this.kCommitDirectory = path.join(this.objectDirectory, 'kCommit');
     this.kTreeDirectory = path.join(this.objectDirectory, 'kTree');
     this.expandedRepoCommitDirectory = path.join(this.cacheDirectory, 'expanded-repo-commit');
@@ -68,18 +101,18 @@ export class KDBCache extends ItemCache {
     kdbFS.createDirIfMissing(this.blobDirectory);
     kdbFS.createDirIfMissing(this.blobMismatchDirectory);
     kdbFS.createDirIfMissing(this.refsDirectory);
+    kdbFS.createDirIfMissing(this.tagDirectory);
     kdbFS.createDirIfMissing(this.kCommitDirectory);
     kdbFS.createDirIfMissing(this.kTreeDirectory);
     kdbFS.createDirIfMissing(this.expandedRepoCommitDirectory);
     kdbFS.createDirIfMissing(this.hashmapDirectory);
+  }
 
-
-    // Load Cached Objects From Prior Runs
-    var beforeTime = Date.now();
-    this.loadCachedObjects();
-    var afterTime = Date.now();
-    var deltaLoadTime = afterTime-beforeTime;
-    console.log('::: Load time for cached objects in ' + this.repoPath + ': ' + deltaLoadTime/1000);
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getRepoCommits(){
+    return this.repoCommitMap;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -95,6 +128,13 @@ export class KDBCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   getRepoCommit(oid){
     return this.repoCommitMap[oid];
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getRepoTrees(){
+    return this.repoTreeMap;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -154,70 +194,124 @@ export class KDBCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadCachedObjects() {
+  async loadCachedObjects() {
 
-    console.log('::: Loading cached objects');
-    var oidFiles = kdbFS.getRepositoryFileList(this.blobDirectory);
+    await super.loadCachedObjects();
+    let headRef = kdbFS.loadJSONDoc(this.refsDirectory + '/' + 'HEAD.json');
+    let headCommit = this.getRef('HEAD');
 
-    oidFiles.forEach((oidFile) => {
-      var oid = oidFile.replace(jsonExt, '');
-      try {
-        var object = kdbFS.loadBinaryFile(this.blobDirectory + '/' + oidFile);
-        var blob = this.convertBlob(object);
-        this.cacheBlob(oid, blob);
-      } catch (err) {
-        console.log('*** Could not load cached blob:  ' + oid);
-        console.log(err);
-      }
-    });
+    let storeCacheToLevel : boolean = false;
 
-    // Load any blobs that have alternate representations
-    oidFiles = kdbFS.getRepositoryFileList(this.blobMismatchDirectory);
+    if (headRef !== headCommit){
+      console.log('::: Need to load and store local disk cache');
 
-    oidFiles.forEach((oidFile) => {
-      var oid = oidFile.replace(jsonExt, '');
-      try {
-        var object = kdbFS.loadBinaryFile(this.blobMismatchDirectory + '/' + oidFile);
-        var blob = this.convertBlob(object);
-        this.cacheBlob(oid, blob);
-      } catch (err) {
-        console.log('*** Could not load cached blob:  ' + oid);
-        console.log(err);
-      }
-    });
-    console.log('::: Found ' + this.numberOfBlobs() + ' blobs');
+      console.log('::: Loading cached objects from directory');
+      var oidFiles = kdbFS.getRepositoryFileList(this.blobDirectory);
 
-    oidFiles = kdbFS.getRepositoryFileList(this.repoTreeDirectory, jsonExt);
-    oidFiles.forEach((oidFile) => {
-      var oid = oidFile.replace(jsonExt, '');
-      var object = kdbFS.loadJSONDoc(this.repoTreeDirectory + '/' + oidFile);
-      this.cacheRepoTree(oid, object);
-    });
-    console.log('::: Found ' + this.numberOfRepoTrees() + ' repo trees');
+      oidFiles.forEach((oidFile) => {
+        var oid = oidFile.replace(jsonExt, '');
+        try {
+          if (oid === oidFile){
+            var object = kdbFS.loadBinaryFile(this.blobDirectory + '/' + oidFile);
+            var blob = this.convertBlob(object);
+            this.cacheBlob(oid, blob);
+          } else {
+            var object = kdbFS.loadJSONDoc(this.blobDirectory + '/' + oidFile);
+            this.cacheBlob(oid, object);
+          }
+        } catch (err) {
+          console.log('*** Could not load cached blob:  ' + oid);
+          console.log(err);
+        }
+      });
 
-    oidFiles = kdbFS.getRepositoryFileList(this.repoCommitDirectory, jsonExt);
-    oidFiles.forEach((oidFile) => {
-      var oid = oidFile.replace(jsonExt, '');
-      var object = kdbFS.loadJSONDoc(this.repoCommitDirectory + '/' + oidFile);
-      this.cacheRepoCommit(oid, object);
-    });
-    console.log('::: Found ' + this.numberOfRepoCommits() + ' repo commits');
+      // Load any blobs that have alternate representations
+      oidFiles = kdbFS.getRepositoryFileList(this.blobMismatchDirectory);
 
-    oidFiles = kdbFS.getRepositoryFileList(this.kTreeDirectory, jsonExt);
-    oidFiles.forEach((oidFile) => {
-      var oid = oidFile.replace(jsonExt, '');
-      var object = kdbFS.loadJSONDoc(this.kTreeDirectory + '/' + oidFile);
-      this.cacheTree(oid, object);
-    });
-    console.log('::: Found ' + this.numberOfTrees() + ' kTrees');
+      oidFiles.forEach((oidFile) => {
+        var oid = oidFile.replace(jsonExt, '');
+        try {
+          if (oid === oidFile){
+            var object = kdbFS.loadBinaryFile(this.blobMismatchDirectory + '/' + oidFile);
+            var blob = this.convertBlob(object);
+            this.cacheBlob(oid, blob);
+          } else {
+            var object = kdbFS.loadJSONDoc(this.blobMismatchDirectory + '/' + oidFile);
+            this.cacheBlob(oid, object);
+          }
+        } catch (err) {
+          console.log('*** Could not load cached mismatched blob:  ' + oid);
+          console.log(err);
+        }
+      });
+      console.log('::: Found ' + this.numberOfBlobs() + ' blobs');
 
-    oidFiles = kdbFS.getRepositoryFileList(this.kCommitDirectory, jsonExt);
-    oidFiles.forEach((oidFile) => {
-      var oid = oidFile.replace(jsonExt, '');
-      var object = kdbFS.loadJSONDoc(this.kCommitDirectory + '/' + oidFile);
-      this.cacheCommit(oid, object);
-    });
-    console.log('::: Found ' + this.numberOfCommits() + ' kCommits');
+      oidFiles = kdbFS.getRepositoryFileList(this.repoTreeDirectory, jsonExt);
+      oidFiles.forEach((oidFile) => {
+        var oid = oidFile.replace(jsonExt, '');
+        var object = kdbFS.loadJSONDoc(this.repoTreeDirectory + '/' + oidFile);
+        this.cacheRepoTree(oid, object);
+      });
+      console.log('::: Found ' + this.numberOfRepoTrees() + ' repo trees');
+
+      oidFiles = kdbFS.getRepositoryFileList(this.repoCommitDirectory, jsonExt);
+      oidFiles.forEach((oidFile) => {
+        var oid = oidFile.replace(jsonExt, '');
+        var object = kdbFS.loadJSONDoc(this.repoCommitDirectory + '/' + oidFile);
+        this.cacheRepoCommit(oid, object);
+      });
+      console.log('::: Found ' + this.numberOfRepoCommits() + ' repo commits');
+
+      oidFiles = kdbFS.getRepositoryFileList(this.kTreeDirectory, jsonExt);
+      oidFiles.forEach((oidFile) => {
+        var oid = oidFile.replace(jsonExt, '');
+        var object = kdbFS.loadJSONDoc(this.kTreeDirectory + '/' + oidFile);
+        this.cacheTree(oid, object);
+      });
+      console.log('::: Found ' + this.numberOfTrees() + ' kTrees');
+
+      oidFiles = kdbFS.getRepositoryFileList(this.kCommitDirectory, jsonExt);
+      oidFiles.forEach((oidFile) => {
+        var oid = oidFile.replace(jsonExt, '');
+        var object = kdbFS.loadJSONDoc(this.kCommitDirectory + '/' + oidFile);
+        this.cacheCommit(oid, object);
+      });
+      console.log('::: Found ' + this.numberOfCommits() + ' kCommits');
+
+      oidFiles = kdbFS.getRepositoryFileList(this.tagDirectory, jsonExt);
+      oidFiles.forEach((oidFile) => {
+        var oid = oidFile.replace(jsonExt, '');
+        var object = kdbFS.loadJSONDoc(this.tagDirectory + '/' + oidFile);
+        this.cacheTag(oid, object);
+      });
+      console.log('::: Found ' + this.numberOfTags() + ' tags');
+
+      oidFiles = kdbFS.getRepositoryFileList(this.refsDirectory, jsonExt);
+      oidFiles.forEach((oidFile) => {
+        var oid = oidFile.replace(jsonExt, '');
+        var object = kdbFS.loadJSONDoc(this.refsDirectory + '/' + oidFile);
+        this.cacheRef(oid, object);
+      });
+      console.log('::: Found ' + this.numberOfRefs() + ' refs');
+
+      console.log('::: Storing cache data to level repository');
+      await this.saveSublevel('kCommit');
+      await this.saveSublevel('kTree');
+      await this.saveSublevel('blob');
+      await this.saveSublevel('tag');
+      await this.saveSublevel('rCommit');
+      await this.saveSublevel('rTree');
+      await this.saveSublevel('ref');
+      console.log('::: Finished storing cache data to level repository');
+    } else {
+      console.log('::: Found ' + this.numberOfBlobs() + ' blobs');
+      console.log('::: Found ' + this.numberOfRepoTrees() + ' repo trees');
+      console.log('::: Found ' + this.numberOfRepoCommits() + ' repo commits');
+      console.log('::: Found ' + this.numberOfTrees() + ' kTrees');
+      console.log('::: Found ' + this.numberOfCommits() + ' kCommits');
+      console.log('::: Found ' + this.numberOfTags() + ' tags');
+      console.log('::: Found ' + this.numberOfRefs() + ' refs');
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -308,8 +402,15 @@ export class KDBCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  updateCache() {
-    let beforeTime = Date.now();
+  async updateCache() {
+    // Load Cached Objects From Prior Runs
+    var beforeTime = Date.now();
+    await this.loadCachedObjects();
+    var afterTime = Date.now();
+    var deltaLoadTime = afterTime-beforeTime;
+    console.log('::: Load time for cached objects in ' + this.repoPath + ': ' + deltaLoadTime/1000);
+
+    beforeTime = Date.now();
 
     var kdbCache = this;
 
@@ -343,7 +444,6 @@ export class KDBCache extends ItemCache {
       });
     });
   }
-
 
   //////////////////////////////////////////////////////////////////////////
   //

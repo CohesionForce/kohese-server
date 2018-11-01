@@ -1,7 +1,6 @@
+import { DialogService } from './../../../../services/dialog/dialog.service';
 import { Component, Input, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, OnInit } from '@angular/core'
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
-import {NavigatableComponent} from '../../../../classes/NavigationComponent.class';
-import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { AssignmentCard } from '../AssignmentCard.class';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 
@@ -17,10 +16,10 @@ export class CompletedAssignmentComponent extends AssignmentCard implements OnIn
   @Input()
   itemProxy : ItemProxy
 
-  constructor (navigationService : NavigationService,
+  constructor (dialogService : DialogService,
               itemRepository : ItemRepository,
               changeRef : ChangeDetectorRef) {
-    super (navigationService, itemRepository, changeRef);
+    super (itemRepository,dialogService, changeRef);
     console.log(this);
   }
 
