@@ -89,7 +89,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.rowActions.push(new RowAction('Use As History Lens', 'Uses this ' +
       'commit as the history lens', 'fa fa-eye', (object: any) => {
-      return (object instanceof Commit); 
+      return (object instanceof Commit);
       }, (object: any) => {
       this._lensService.setLens(ApplicationLens.HISTORY);
       this._itemRepository.setTreeConfig((object as Commit).id,
@@ -107,15 +107,17 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
         this._repositoryProxy = treeConfigurationObject.config.getRootProxy();
-        this.buildRows();
+        let thisRef = this;
+        this.buildRows().then(() => {
+          console.log('^^^ buildRows complete');
+          thisRef._route.params.subscribe((parameters: Params) => {
+            thisRef.showFocus();
+          });
 
-        this._route.params.subscribe((parameters: Params) => {
-          this.showFocus();
+          thisRef.initialize();
+
+          thisRef.showFocus();
         });
-        
-        this.initialize();
-        
-        this.showFocus();
       }
     });
   }
@@ -124,16 +126,16 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     this._itemRepositorySubscription.unsubscribe();
   }
 
-  private buildRows(): void {
+  private async buildRows(): Promise<void> {
     this.clear();
 
     let cache: ItemCache = TreeConfiguration.getItemCache();
     let commitMap: any = cache.getCommits();
     let sortedCommitArray: Array<any> = [];
-    for (let oid in commitMap) {
+    for (let oid of Array.from(commitMap.keys())) {
       sortedCommitArray.push({
         oid: oid,
-        commit: commitMap[oid]
+        commit: commitMap.get(oid)
       });
     }
     sortedCommitArray.sort((oneCommitObject: any, anotherCommitObject:
@@ -150,7 +152,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         commitObject.commit, comparisons));
       commits.push(commitRow.object);
       if (commitObject.commit.parents && commitObject.commit.parents[0]) {
-        comparisons.push(...Compare.compareCommits(commitObject.commit.parents[
+        comparisons.push(...await Compare.compareCommits(commitObject.commit.parents[
           0], commitObject.oid, this._dynamicTypesService));
       }
 
@@ -158,10 +160,10 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         this.buildRow(comparisons[j]);
       }
     }
-    
+
     this.rootSubject.next(rootRow.object);
   }
-  
+
   protected getId(object: any): any {
     let id: string = '';
     if (object instanceof Repository) {
@@ -182,7 +184,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return id;
   }
-  
+
   protected getParent(object: any): any {
     if (object instanceof Commit) {
       return this.getRow(this._repositoryProxy.item.id).object;
@@ -196,10 +198,10 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     return undefined;
   }
-  
+
   protected getChildren(object: any): Array<any> {
     let children: Array<any> = [];
     if (object instanceof Repository) {
@@ -240,7 +242,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return iconString;
   }
-  
+
   protected rowFocused(row: TreeRow): void {
     this.rowSelectedEmitter.emit(row.object);
     this._navigationService.navigate('Versions', {
@@ -276,7 +278,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       let compareParameters: any = {
         editable: false
       };
-      
+
       if (baseObject instanceof Repository) {
         compareParameters['baseProxy'] = (baseObject as Repository).proxy;
       } else if (baseObject instanceof Comparison) {

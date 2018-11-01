@@ -175,8 +175,8 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public whenSelectedVersionChanges(object: any, versionIdentifier: string):
-    void {
+  public async whenSelectedVersionChanges(object: any, versionIdentifier: string):
+    Promise<void> {
     this._selectedVersion = versionIdentifier;
     this._allowEditing = (('Staged' === versionIdentifier) || (this.
       _versions[0].commit === versionIdentifier));
@@ -188,7 +188,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         this._propertyDifferenceMap.set(propertyName, []);
       }
     }
-    this._selectedObjectSubject.next(this.getVersionProxy(versionIdentifier,
+    this._selectedObjectSubject.next(await this.getVersionProxy(versionIdentifier,
       (object as ItemProxy).item.id));
     this._changeDetectorRef.detectChanges();
 
@@ -312,15 +312,15 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     return style;
   }
 
-  private getVersionProxy(versionIdentifier: string, itemId: string):
-    ItemProxy {
+  private async getVersionProxy(versionIdentifier: string, itemId: string):
+    Promise<ItemProxy> {
     let treeConfiguration: TreeConfiguration =
       TreeConfiguration.getTreeConfigFor(versionIdentifier);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(versionIdentifier);
       let itemCache: ItemCache = TreeConfiguration.getItemCache();
-      itemCache.loadProxiesForCommit(versionIdentifier, treeConfiguration);
-      treeConfiguration.loadingComplete();
+      await itemCache.loadProxiesForCommit(versionIdentifier, treeConfiguration);
+      treeConfiguration.loadingComplete(true);
     }
 
     return treeConfiguration.getProxyFor(itemId);

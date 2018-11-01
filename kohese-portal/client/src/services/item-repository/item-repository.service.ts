@@ -171,7 +171,7 @@ export class ItemRepository {
           await this.sendMessageToWorker('getCache', { refresh: false }, true);
           let workingTree: TreeConfiguration = TreeConfiguration.
             getWorkingTree();
-          this._cache.loadProxiesForCommit(this._cache.getRef('HEAD'),
+          await this._cache.loadProxiesForCommit(await this._cache.getRef('HEAD'),
             workingTree);
           this.processBulkUpdate((await this.sendMessageToWorker(
             'getItemUpdates', {
@@ -634,12 +634,12 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  setTreeConfig(treeId: string, configType: TreeConfigType): void {
+  async setTreeConfig(treeId: string, configType: TreeConfigType): Promise<void> {
     let treeConfiguration = TreeConfiguration.getTreeConfigFor(treeId);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(treeId);
       let itemCache = TreeConfiguration.getItemCache();
-      itemCache.loadProxiesForCommit(treeId, treeConfiguration);
+      await itemCache.loadProxiesForCommit(treeId, treeConfiguration);
       treeConfiguration.loadingComplete();
     }
 

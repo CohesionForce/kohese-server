@@ -1,6 +1,6 @@
 'use strict';
 import { ItemProxy } from "../common/src/item-proxy";
-import { ItemCache } from "../common/src/item-cache";
+import { LevelCache } from "../common/src/level-cache";
 import { TreeConfiguration } from "../common/src/tree-configuration";
 import { TreeHashMap } from "../common/src/tree-hash";
 
@@ -29,16 +29,17 @@ if (!baseRepoPath){
 var kdb = require('../server/kdb');
 global['koheseKDB'] = kdb;
 let indexAndExit = true;
-kdb.initialize(baseRepoPath, indexAndExit).then(function () {
+kdb.initialize(baseRepoPath, indexAndExit).then(async () =>  {
   console.log('::: Finished cache update for: ' + baseRepoPath);
-  let itemCache : ItemCache = TreeConfiguration.getItemCache();
+  let itemCache : LevelCache = <LevelCache>TreeConfiguration.getItemCache();
 
-  console.log('::: Detecting missing data in cache');
+  console.log('::: Checking for missing data in cache');
   try {
-    itemCache.detectMissingCommitData();
+    await itemCache.detectMissingCommitData();
   } catch (err){
     console.log('*** Error: ' + err);
     console.log(err.stack);
   }
+  console.log('::: Indexing complete');
 
 });
