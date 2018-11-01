@@ -16,7 +16,6 @@ export class LensComponent implements OnInit, OnDestroy {
   currentLens : ApplicationLens;
   lensSubscription : Subscription;
   repoStatusSubscription : Subscription;
-  commitList : Array<any>;
   selectedCommit : any;
 
   /* Const data */
@@ -34,7 +33,6 @@ export class LensComponent implements OnInit, OnDestroy {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update)=>{
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.commitList = TreeConfiguration.getItemCache().getCommits();
         }
     })
 

@@ -95,7 +95,7 @@ let _lastClientId :number = 0;
               let afterSyncCache = Date.now();
               console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
 
-              _cache.loadProxiesForCommit(_cache.getRef('HEAD'), workingTree);
+              await _cache.loadProxiesForCommit(await _cache.getRef('HEAD'), workingTree);
               let afterLoadHead = Date.now();
               console.log('^^^ Time to load HEAD: ' + (afterLoadHead - afterSyncCache) / 1000);
 
@@ -350,7 +350,7 @@ async function populateCache(): Promise<any> {
   await _cache.loadCachedObjects();
   let headCommit: string;
   try {
-    headCommit = _cache.getRef('HEAD');
+    headCommit = await _cache.getRef('HEAD');
   } catch (error) {
     headCommit = '';
   }

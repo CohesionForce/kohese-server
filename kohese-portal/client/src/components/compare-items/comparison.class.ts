@@ -17,40 +17,40 @@ export class Comparison {
   get baseObject() {
     return this._baseObject;
   }
-  
+
   get changeObject() {
     return this._changeObject;
   }
-  
+
   private _propertyComparisonMap: Map<Property, Array<any>> =
     new Map<Property, Array<any>>();
   get propertyComparisonMap() {
     return this._propertyComparisonMap;
   }
-  
+
   private _changeTypes: Array<ChangeType> = [];
   get changeTypes() {
     return this._changeTypes;
   }
-  
+
   private _numberOfHiddenProperties: number;
   get numberOfHiddenProperties() {
     return this._numberOfHiddenProperties;
   }
-  
+
   public static readonly UUID_REGULAR_EXPRESSION: RegExp =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  
+
   public constructor(private _baseObject: any, private _changeObject: any) {
   }
-  
-  public compare(): void {
+
+  public async compare(): Promise<void> {
     let baseObjectProperties: Array<Property> = this.getProperties(this.
       _baseObject);
     for (let j: number = 0; j < baseObjectProperties.length; j++) {
       this._propertyComparisonMap.set(baseObjectProperties[j], []);
     }
-    
+
     let changeObjectProperties: Array<Property> = this.getProperties(this.
       _changeObject);
     for (let j: number = 0; j < changeObjectProperties.length; j++) {
@@ -63,12 +63,12 @@ export class Comparison {
           break;
         }
       }
-      
+
       if (!present) {
         this._propertyComparisonMap.set(changeObjectProperties[j], []);
       }
     }
-    
+
     let properties: Array<Property> = Array.from(this._propertyComparisonMap.
       keys());
     this._numberOfHiddenProperties = 0;
@@ -76,30 +76,30 @@ export class Comparison {
       if (properties[j].hidden) {
         this._numberOfHiddenProperties++;
       }
-      
+
       let baseValue: any = this.getPropertyValue(properties[j], this.
         _baseObject);
       if (null == baseValue) {
         baseValue = '';
       }
-      
-      baseValue = this.adjustPropertyValue(String(baseValue), this.
+
+      baseValue = await this.adjustPropertyValue(String(baseValue), this.
         _baseObject);
-      
+
       let changeValue: any = this.getPropertyValue(properties[j], this.
         _changeObject);
       if (null == changeValue) {
         changeValue = '';
       }
-      
-      changeValue = this.adjustPropertyValue(String(changeValue), this.
+
+      changeValue = await this.adjustPropertyValue(String(changeValue), this.
         _changeObject);
-      
+
       this._propertyComparisonMap.get(properties[j]).push(...JsDiff.
         diffWords(baseValue, changeValue));
     }
   }
-  
+
   public static getChangeIconString(changeType: ChangeType): string {
     let iconClass: string = '';
     switch (changeType) {
@@ -125,25 +125,25 @@ export class Comparison {
         iconClass = 'fa fa-exchange';
         break;
     }
-    
+
     return iconClass;
   }
-  
+
   protected getProperties(comparisonObject: any): Array<Property> {
     let properties: Array<Property> = [];
     for (let propertyId in comparisonObject) {
       properties.push(new Property(propertyId, propertyId, false));
     }
-    
+
     return properties;
   }
-  
+
   protected getPropertyValue(property: Property, comparisonObject: any): any {
     return comparisonObject[property.id];
   }
-  
-  public adjustPropertyValue(propertyValue: string, comparisonObject: any):
-    string {
+
+  public async adjustPropertyValue(propertyValue: string, comparisonObject: any):
+    Promise<string> {
     return propertyValue;
   }
 }
