@@ -12,7 +12,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { Image, Action } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemCache, KoheseCommit } from '../../../../../common/src/item-cache';
@@ -87,7 +87,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.rowActions.push(new RowAction('Use As History Lens', 'Uses this ' +
+    this.rowActions.push(new Action('Use As History Lens', 'Uses this ' +
       'commit as the history lens', 'fa fa-eye', (object: any) => {
       return (object instanceof Commit); 
       }, (object: any) => {
@@ -96,7 +96,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         TreeConfigType.HISTORICAL);
     }));
 
-    this.menuActions.push(new MenuAction('Compare Against...', '',
+    this.menuActions.push(new Action('Compare Against...', '',
       'fa fa-exchange', (object: any) => {
       return true;
       }, (object: any) => {

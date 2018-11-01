@@ -5,14 +5,14 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { Action } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Tree } from '../tree.class';
+import { Tree, TargetPosition } from '../tree.class';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
@@ -54,6 +54,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     private itemRepository : ItemRepository,
     private changeRef : ChangeDetectorRef) {
     super(router, dialogService);
+    this.canMoveRows = true;
   }
 
   ngOnInit() {
@@ -63,24 +64,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
        this.documentRootId = params['id'];
       }
     });
-
-    this.rootRowActions.push(new RowAction('Test action',
-      'I am an action', 'fa fa-times', (object: any) => {
-      return true;
-      }, (object: any) => {
-      return true;
-    }));
-
-    let sharedAction : MenuAction = new MenuAction('Menu Action', 'I am in a menu', 'fa fa-comment',
-      (object: any) => {
-      if (true) {
-      return true;
-      }}, (object: any) => {
-      console.log('Hello world');
-    });
-
-  this.rootMenuActions.push(sharedAction);
-  this.menuActions.push(sharedAction);
 
   this.treeConfigSubscription = this.itemRepository.getTreeConfig()
     .subscribe((treeConfigurationObject: any) => {
@@ -206,6 +189,35 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     item['kind'] = proxy.kind;
     item['status'] = proxy.status;
     return super.filter(item);
+  }
+  
+  protected target(target: any, targetingObject: any, targetPosition:
+    TargetPosition): void {
+    let targetProxy: ItemProxy = (target as ItemProxy);
+    let targetingProxy: ItemProxy = (targetingObject as ItemProxy);
+    if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
+      TargetPosition.AFTER)) {
+      let parentProxy: ItemProxy = targetProxy.parentProxy;
+      parentProxy.makeChildrenManualOrdered();
+      targetingProxy.item.parentId = parentProxy.item.id;
+      targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+      parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
+        1);
+      let targetIndex: number = parentProxy.children.indexOf(targetProxy);
+      if (targetPosition === TargetPosition.BEFORE) {
+        parentProxy.children.splice(targetIndex, 0, targetingProxy);
+      } else {
+        parentProxy.children.splice(targetIndex + 1, 0, targetingProxy);
+      }
+      
+      parentProxy.updateChildrenManualOrder();
+      this.itemRepository.upsertItem(parentProxy);
+    } else {
+      targetingProxy.item.parentId = targetProxy.item.id;
+      targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+    }
+    
+    this.itemRepository.upsertItem(targetingProxy);
   }
 
   public openFilterDialog(filter: Filter): Observable<any> {

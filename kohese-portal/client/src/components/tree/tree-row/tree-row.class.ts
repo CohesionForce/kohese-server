@@ -84,10 +84,6 @@ export class TreeRow {
     return false;
   }
   
-  public setRowAsRoot(): void {
-    // May be implemented externally
-  }
-  
   public hasChildren(): boolean {
     // May be implemented externally
     return false;

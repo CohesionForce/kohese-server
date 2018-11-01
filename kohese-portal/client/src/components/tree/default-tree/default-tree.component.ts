@@ -17,9 +17,9 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
-import { Tree } from '../tree.class';
+import { Tree, TargetPosition } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { Image, Action } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
@@ -74,11 +74,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
     super(route, dialogService);
+    this.canMoveRows = true;
   }
 
   public ngOnInit(): void {
     this._searchCriterion.external = true;
-    let deleteMenuAction: MenuAction = new MenuAction('Delete',
+    
+    let deleteAction: Action = new Action('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
       return !(object as ItemProxy).internal;
       }, (object: any) => {
@@ -94,10 +96,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       });
     });
-    this.rootMenuActions.push(deleteMenuAction);
-    this.menuActions.push(deleteMenuAction);
+    this.rootMenuActions.push(deleteAction);
+    this.menuActions.push(deleteAction);
 
-    let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
+    let stagedVersionComparisonAction: Action = new Action('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
       return (object as ItemProxy).status['Staged'];
@@ -108,7 +110,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
 
-    let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
+    let lastCommittedVersionComparisonAction: Action = new Action(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
       any) => {
@@ -123,7 +125,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
 
-    let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
+    let itemComparisonAction: Action = new Action('Compare Against...',
       'Compare this Item against another Item', 'fa fa-exchange', (object:
       any) => {
       return true;
@@ -320,6 +322,35 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       
       this._filterDelayIdentifier = undefined;
     }, 1000);
+  }
+  
+  protected target(target: any, targetingObject: any, targetPosition:
+    TargetPosition): void {
+    let targetProxy: ItemProxy = (target as ItemProxy);
+    let targetingProxy: ItemProxy = (targetingObject as ItemProxy);
+    if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
+      TargetPosition.AFTER)) {
+      let parentProxy: ItemProxy = targetProxy.parentProxy;
+      parentProxy.makeChildrenManualOrdered();
+      targetingProxy.item.parentId = parentProxy.item.id;
+      targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+      parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
+        1);
+      let targetIndex: number = parentProxy.children.indexOf(targetProxy);
+      if (targetPosition === TargetPosition.BEFORE) {
+        parentProxy.children.splice(targetIndex, 0, targetingProxy);
+      } else {
+        parentProxy.children.splice(targetIndex + 1, 0, targetingProxy);
+      }
+      
+      parentProxy.updateChildrenManualOrder();
+      this._itemRepository.upsertItem(parentProxy);
+    } else {
+      targetingProxy.item.parentId = targetProxy.item.id;
+      targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+    }
+    
+    this._itemRepository.upsertItem(targetingProxy);
   }
   
   private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:

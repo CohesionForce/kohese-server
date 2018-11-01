@@ -18,7 +18,7 @@ import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { Image, Action } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
@@ -75,8 +75,8 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
 
   public ngOnInit(): void {
     this._searchCriterion.external = true;
-    let versionControlRowActions: Array<RowAction> = [
-      new RowAction('Revert', 'Undoes all uncommitted changes to this Item',
+    let versionControlRowActions: Array<Action> = [
+      new Action('Revert', 'Undoes all uncommitted changes to this Item',
         'fa fa-undo', (object: any) => {
         return (Object.keys((object as ItemProxy).status).length > 0);
         }, (object: any) => {
@@ -96,7 +96,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           }
         });
       }),
-      new RowAction('Stage', 'Stages changes to this Item', 'fa fa-plus',
+      new Action('Stage', 'Stages changes to this Item', 'fa fa-plus',
         (object: any) => {
         return (object as ItemProxy).status[VersionControlState.UNSTAGED];
         }, (object: any) => {
@@ -109,7 +109,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           }
         });
       }),
-      new RowAction('Unstage', 'Un-stages changes to this Item', 'fa fa-minus',
+      new Action('Unstage', 'Un-stages changes to this Item', 'fa fa-minus',
         (object: any) => {
         return (object as ItemProxy).status[VersionControlState.STAGED];
         }, (object: any) => {
@@ -127,7 +127,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     this.rootRowActions.splice(0, 0, ...versionControlRowActions);
     this.rowActions.splice(0, 0, ...versionControlRowActions);
 
-    let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
+    let stagedVersionComparisonAction: Action = new Action('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
       return (object as ItemProxy).status[VersionControlState.STAGED];
@@ -138,7 +138,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
 
-    let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
+    let lastCommittedVersionComparisonAction: Action = new Action(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
       any) => {
@@ -153,7 +153,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
 
-    let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
+    let itemComparisonAction: Action = new Action('Compare Against...',
       'Compare this Item against another Item', 'fa fa-exchange', (object:
       any) => {
       return true;
