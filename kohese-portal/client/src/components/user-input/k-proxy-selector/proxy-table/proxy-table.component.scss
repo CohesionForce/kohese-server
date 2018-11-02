@@ -6,24 +6,25 @@ table {
     height: 0;
   }
   
-  tr.example-element-row:not(.example-expanded-row):hover {
+  tr.example-item-row:not(.example-expanded-row):hover {
     background: #f5f5f5;
   }
   
-  tr.example-element-row:not(.example-expanded-row):active {
+  tr.example-item-row:not(.example-expanded-row):active {
     background: #efefef;
   }
   
-  .example-element-row td {
+  .example-item-row td {
     border-bottom-width: 0;
   }
   
-  .example-element-detail {
+  .example-item-detail {
     overflow: hidden;
     display: flex;
+    padding : 10px;
   }
   
-  .example-element-diagram {
+  .example-item-diagram {
     min-width: 80px;
     border: 2px solid black;
     padding: 8px;
@@ -32,16 +33,16 @@ table {
     height: 104px;
   }
   
-  .example-element-symbol {
+  .example-item-symbol {
     font-weight: bold;
     font-size: 40px;
     line-height: normal;
   }
   
-  .example-element-description {
+  .example-item-description {
     padding: 16px;
   }
   
-  .example-element-description-attribution {
+  .example-item-description-attribution {
     opacity: 0.5;
   }
