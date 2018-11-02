@@ -14,7 +14,7 @@ import { Filter, FilterCriterion } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
 export enum TargetPosition {
-  BEFORE, AFTER, UNDER
+  BEFORE = 'Before', AFTER = 'After', CHILD = 'Child'
 }
 
 export abstract class Tree {
@@ -62,7 +62,7 @@ export abstract class Tree {
     this.collapseDescendants(this._rowMap.get(this.getId(object)));
   });
   
-  private _targetBeforeAction: Action = new Action('Before',
+  private _targetBeforeAction: Action = new Action(TargetPosition.BEFORE,
     'Place the targeting object or objects under this object', 'fa ' +
     'fa-crosshairs', (object: any) => {
     return true;
@@ -76,9 +76,9 @@ export abstract class Tree {
 
     this.exitTargetingMode();
   });
-  private _targetAfterAction: Action = new Action('After', 'Place ' +
-    'the targeting object or objects after this object', 'fa fa-crosshairs',
-    (object: any) => {
+  private _targetAfterAction: Action = new Action(TargetPosition.AFTER,
+    'Place the targeting object or objects after this object', 'fa ' +
+    'fa-crosshairs', (object: any) => {
     return true;
     }, (object: any) => {
     let selectedObjects: Array<any> = this._selectedObjectsSubject.
@@ -90,16 +90,16 @@ export abstract class Tree {
 
     this.exitTargetingMode();
   });
-  private _targetUnderAction: Action = new Action('Under', 'Place ' +
-    'the targeting object or objects under this object', 'fa fa-crosshairs',
-    (object: any) => {
+  private _targetChildAction: Action = new Action(TargetPosition.CHILD,
+    'Place the targeting object or objects under this object', 'fa ' +
+    'fa-crosshairs', (object: any) => {
     return true;
     }, (object: any) => {
     let selectedObjects: Array<any> = this._selectedObjectsSubject.
       getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let targetingObject: any = selectedObjects[j];
-      this.target(object, targetingObject, TargetPosition.UNDER);
+      this.target(object, targetingObject, TargetPosition.CHILD);
     }
 
     this.exitTargetingMode();
@@ -113,7 +113,7 @@ export abstract class Tree {
       _selectedObjectsSubject.getValue().indexOf(object)) && !this.
       isAncestorSelected(object));
     }, [this._targetBeforeAction, this._targetAfterAction, this.
-    _targetUnderAction]);
+    _targetChildAction]);
   
   private _exitTargetingModeAction: Action = new Action('Exit ' +
     'Targeting Mode', 'Exit Targeting Mode', 'fa fa-times', (object: any) => {

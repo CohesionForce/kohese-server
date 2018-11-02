@@ -5,7 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/do';
 import { Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { Action } from '../tree-row/tree-row.component';
+import { DisplayableEntity, Action,
+  ActionGroup } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
@@ -59,6 +60,23 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._searchCriterion.external = true;
+    
+    for (let j: number = 0; j < this.rowActions.length; j++) {
+      let displayableEntity: DisplayableEntity = this.rowActions[j];
+      if (displayableEntity instanceof ActionGroup) {
+        for (let k: number = 0; k < (displayableEntity as ActionGroup).actions.
+          length; k++) {
+          let action: Action = (displayableEntity as ActionGroup).actions[k];
+          if ((action.text === TargetPosition.BEFORE) || (action.text ===
+            TargetPosition.AFTER)) {
+            action.canActivate = (object: any) => {
+              return (object as ItemProxy).childrenAreManuallyOrdered();
+            };
+          }
+        }
+      }
+    }
+    
     this.paramSubscription = this._route.params.subscribe(params => {
       if (params['id']) {
        this.documentRootId = params['id'];
@@ -198,7 +216,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
       TargetPosition.AFTER)) {
       let parentProxy: ItemProxy = targetProxy.parentProxy;
-      parentProxy.makeChildrenManualOrdered();
       targetingProxy.item.parentId = parentProxy.item.id;
       targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
       parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),

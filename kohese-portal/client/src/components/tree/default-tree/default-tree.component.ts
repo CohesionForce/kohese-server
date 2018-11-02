@@ -19,7 +19,8 @@ import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
 import { Tree, TargetPosition } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { Image, Action } from '../tree-row/tree-row.component';
+import { Image, DisplayableEntity, Action,
+  ActionGroup } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
@@ -79,6 +80,22 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this._searchCriterion.external = true;
+    
+    for (let j: number = 0; j < this.rowActions.length; j++) {
+      let displayableEntity: DisplayableEntity = this.rowActions[j];
+      if (displayableEntity instanceof ActionGroup) {
+        for (let k: number = 0; k < (displayableEntity as ActionGroup).actions.
+          length; k++) {
+          let action: Action = (displayableEntity as ActionGroup).actions[k];
+          if ((action.text === TargetPosition.BEFORE) || (action.text ===
+            TargetPosition.AFTER)) {
+            action.canActivate = (object: any) => {
+              return (object as ItemProxy).childrenAreManuallyOrdered();
+            };
+          }
+        }
+      }
+    }
     
     let deleteAction: Action = new Action('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
@@ -331,7 +348,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
       TargetPosition.AFTER)) {
       let parentProxy: ItemProxy = targetProxy.parentProxy;
-      parentProxy.makeChildrenManualOrdered();
       targetingProxy.item.parentId = parentProxy.item.id;
       targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
       parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
