@@ -552,12 +552,12 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  setTreeConfig(treeId: string, configType: TreeConfigType): void {
+  async setTreeConfig(treeId: string, configType: TreeConfigType): Promise<void> {
     let treeConfiguration = TreeConfiguration.getTreeConfigFor(treeId);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(treeId);
       let itemCache = TreeConfiguration.getItemCache();
-      itemCache.loadProxiesForCommit(treeId, treeConfiguration);
+      await itemCache.loadProxiesForCommit(treeId, treeConfiguration);
       treeConfiguration.loadingComplete();
     }
 

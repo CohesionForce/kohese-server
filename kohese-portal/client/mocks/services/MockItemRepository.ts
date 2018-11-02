@@ -99,7 +99,7 @@ export class MockItemRepository {
     proxy.item.id = id;
     return Promise.resolve(proxy);
   }
-  setTreeConfig() {
+  async setTreeConfig() {
 
   }
 

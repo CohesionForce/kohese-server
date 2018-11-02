@@ -82,7 +82,6 @@ let _lastClientId :number = 0;
               // Remaining initialization logic will proceed and provide incremental results to tabs
               registerKoheseIOListeners();
               sync();
-
             });
             socket.emit('authenticate', {
               token: request.data
@@ -416,7 +415,7 @@ async function populateCache(): Promise<any> {
   await _cache.loadCachedObjects();
   let headCommit: string;
   try {
-    headCommit = _cache.getRef('HEAD');
+    headCommit = await _cache.getRef('HEAD');
   } catch (error) {
     headCommit = '';
   }
