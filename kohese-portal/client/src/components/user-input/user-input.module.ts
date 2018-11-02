@@ -1,3 +1,4 @@
+import { ProxyTableComponent } from './k-proxy-selector/proxy-table/proxy-table.component';
 import { KTableComponent } from './k-table/k-table.component';
 import { KdMarkdownComponent } from './k-markdown/kd-markdown/kd-markdown.component';
 import { NgModule } from '@angular/core';
@@ -20,6 +21,7 @@ import { TreeModule } from 'angular-tree-component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/kd-proxy-selector.component';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,8 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     ProxySelectorComponent,
     ProxySelectorDialogComponent,
     KdMarkdownComponent,
-    KTableComponent
+    KTableComponent,
+    ProxyTableComponent
   ],
   imports: [
     CommonModule,
@@ -44,7 +47,9 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     MaterialModule,
     MarkdownModule.forChild(),
     TreeModule.forRoot(),
-    PipesModule
+    PipesModule,
+    BrowserAnimationsModule,
+    NoopAnimationsModule
   ],
   exports: [
     KTextComponent,
@@ -57,11 +62,13 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     ProxySelectorComponent,
     KdProxySelectorComponent,
     KdMarkdownComponent,
-    KTableComponent
+    KTableComponent,
+    ProxyTableComponent
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,
-    ProxySelectorDialogComponent
+    ProxySelectorDialogComponent,
+    ProxyTableComponent
   ]
 })
 export class UserInputModule {}

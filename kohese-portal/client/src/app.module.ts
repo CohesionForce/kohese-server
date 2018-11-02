@@ -23,7 +23,7 @@ import { AdminModule } from './components/admin/admin.module';
 import { CompareItemsModule } from './components/compare-items/compare-items.module';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ExploreModule } from './components/explore/explore.module';
 import { NavigatorModule } from './components/navigator/navigator.module';
 import { StateMachineEditorModule } from './components/state-machine-editor/state-machine-editor.module';
@@ -79,7 +79,8 @@ import { LensModule } from './components/lens/lens.module';
     TreeViewModule,
     VersionsModule,
     LensModule,
-    ReportGeneratorModule
+    ReportGeneratorModule,
+    NoopAnimationsModule
   ],
   bootstrap: [AppComponent]
 })
