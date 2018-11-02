@@ -63,7 +63,7 @@ import { LensModule } from './components/lens/lens.module';
     DocumentViewModule,
     ActionTableModule,
     TypeEditorModule,
-    TreeModule,
+    TreeModule.forRoot(),
     CreateWizardModule,
     AppFrameModule,
     AuthenticationModule,

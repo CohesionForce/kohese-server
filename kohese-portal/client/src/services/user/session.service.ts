@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
 import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from './current-user.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';

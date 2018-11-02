@@ -9,8 +9,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
 
 @Component({
   selector: 'type-editor',

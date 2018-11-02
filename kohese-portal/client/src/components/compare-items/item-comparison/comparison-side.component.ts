@@ -1,9 +1,9 @@
+
+import {map} from 'rxjs/operators';
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
   Input, ViewChild, Output, EventEmitter, OnInit,
   OnDestroy } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -152,7 +152,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
   }
 
   public whenSelectedObjectChanges(object: ItemProxy): Observable<Array<any>> {
-    return this._itemRepository.getHistoryFor(object).map((history:
+    return this._itemRepository.getHistoryFor(object).pipe(map((history:
       Array<any>) => {
       this._versions = history;
       if (!object.status['Unstaged'] && (this._versions.length > 0)) {
@@ -172,11 +172,11 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
       this.whenSelectedVersionChanges(object, 'Unstaged');
 
       return this._versions;
-    });
+    }));
   }
 
-  public whenSelectedVersionChanges(object: any, versionIdentifier: string):
-    void {
+  public async whenSelectedVersionChanges(object: any, versionIdentifier: string):
+    Promise<void> {
     this._selectedVersion = versionIdentifier;
     this._allowEditing = (('Staged' === versionIdentifier) || (this.
       _versions[0].commit === versionIdentifier));
@@ -188,7 +188,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         this._propertyDifferenceMap.set(propertyName, []);
       }
     }
-    this._selectedObjectSubject.next(this.getVersionProxy(versionIdentifier,
+    this._selectedObjectSubject.next(await this.getVersionProxy(versionIdentifier,
       (object as ItemProxy).item.id));
     this._changeDetectorRef.detectChanges();
 
@@ -312,15 +312,15 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     return style;
   }
 
-  private getVersionProxy(versionIdentifier: string, itemId: string):
-    ItemProxy {
+  private async getVersionProxy(versionIdentifier: string, itemId: string):
+    Promise<ItemProxy> {
     let treeConfiguration: TreeConfiguration =
       TreeConfiguration.getTreeConfigFor(versionIdentifier);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(versionIdentifier);
       let itemCache: ItemCache = TreeConfiguration.getItemCache();
-      itemCache.loadProxiesForCommit(versionIdentifier, treeConfiguration);
-      treeConfiguration.loadingComplete();
+      await itemCache.loadProxiesForCommit(versionIdentifier, treeConfiguration);
+      treeConfiguration.loadingComplete(true);
     }
 
     return treeConfiguration.getProxyFor(itemId);

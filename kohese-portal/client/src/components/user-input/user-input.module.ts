@@ -43,7 +43,7 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     ReactiveFormsModule,
     MaterialModule,
     MarkdownModule.forChild(),
-    TreeModule,
+    TreeModule.forRoot(),
     PipesModule
   ],
   exports: [

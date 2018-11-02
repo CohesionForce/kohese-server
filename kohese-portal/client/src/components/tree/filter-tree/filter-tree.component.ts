@@ -1,8 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   OnDestroy, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
 
 import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';

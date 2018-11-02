@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
 
+import { map} from 'rxjs/operators';
+import { Injectable } from '@angular/core';
 import * as _ from 'underscore';
 
 import { SocketService } from '../socket/socket.service';
@@ -14,11 +15,8 @@ import { ItemCache } from '../../../../common/src/item-cache';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback } from 'rxjs';
+
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
 
@@ -105,7 +103,7 @@ export class ItemRepository {
         for (let idx in script.attributes) {
           let attribute: any = script.attributes[idx];
           if (attribute.value) {
-            if (attribute.value.match(/^cache-worker/)) {
+            if (attribute.value.match(/^scripts/)) {
               cacheWorkerBundle = attribute.value;
               break scriptLoop;
             }
@@ -173,7 +171,7 @@ export class ItemRepository {
           await this.sendMessageToWorker('getCache', { refresh: false }, true);
           let workingTree: TreeConfiguration = TreeConfiguration.
             getWorkingTree();
-          this._cache.loadProxiesForCommit(this._cache.getRef('HEAD'),
+          await this._cache.loadProxiesForCommit(await this._cache.getRef('HEAD'),
             workingTree);
           this.processBulkUpdate((await this.sendMessageToWorker(
             'getItemUpdates', {
@@ -564,15 +562,15 @@ export class ItemRepository {
   //////////////////////////////////////////////////////////////////////////
   public getHistoryFor(proxy: ItemProxy): Observable<Array<any>> {
     let emitReturningObservable: (message: string, data: any) => Observable<any> =
-      Observable.bindCallback(this.socketService.getSocket().emit.bind(this.
+      bindCallback(this.socketService.getSocket().emit.bind(this.
         socketService.getSocket()));
-    return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).
+    return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).pipe(
       map((response: any) => {
         proxy.history = response.history;
         /* Return a copy of the history so that subscribers may modify the
         returned history, if desired. */
         return JSON.parse(JSON.stringify(proxy.history));
-      });
+      }));
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -636,12 +634,12 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  setTreeConfig(treeId: string, configType: TreeConfigType): void {
+  async setTreeConfig(treeId: string, configType: TreeConfigType): Promise<void> {
     let treeConfiguration = TreeConfiguration.getTreeConfigFor(treeId);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(treeId);
       let itemCache = TreeConfiguration.getItemCache();
-      itemCache.loadProxiesForCommit(treeId, treeConfiguration);
+      await itemCache.loadProxiesForCommit(treeId, treeConfiguration);
       treeConfiguration.loadingComplete();
     }
 

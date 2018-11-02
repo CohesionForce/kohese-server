@@ -160,7 +160,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getItemCache', function(request, sendResponse){
+  socket.on('Item/getItemCache', async function(request, sendResponse){
 
     function sendBulkCacheUpdate(key, value){
       console.log('### Sending BulkCacheUpdate for key: ' + key);
@@ -180,7 +180,7 @@ function KIOItemServer(socket){
     consoleLogObject('$$$ Request', request);
 
     let itemCache = TreeConfiguration.getItemCache();
-    let headCommit = itemCache.getRef('HEAD');
+    let headCommit = await itemCache.getRef('HEAD');
 
     if (headCommit !== request.headCommit){
       console.log('### Preparing BulkCacheUpdate Messages: ' + request.headCommit + ' -> ' + headCommit);
@@ -337,6 +337,9 @@ function KIOItemServer(socket){
     sendResponse(response);
     let responseTransmitTime = Date.now();
     console.log('::: Sent getAll response for repo: ' + request.forRepoId);
+    for(let key in response){
+      console.log(' --> ' + key + ': ' + _.size(response[key]));
+    }
     console.log('$$$ Elapsed time: ' + (responseTransmitTime - requestTime)/1000);
   });
 

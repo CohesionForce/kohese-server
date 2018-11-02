@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';

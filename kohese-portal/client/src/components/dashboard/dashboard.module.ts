@@ -70,7 +70,7 @@ import { ReportGeneratorModule } from '../report-generator/report-generator.modu
     PipesModule,
     UserInputModule,
     LensModule,
-    TreeModule,
+    TreeModule.forRoot(),
     VirtualScrollModule,
     FormsModule,
     ReactiveFormsModule,

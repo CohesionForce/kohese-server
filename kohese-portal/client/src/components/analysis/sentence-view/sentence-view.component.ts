@@ -1,13 +1,11 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
 
 import { AnalysisViewComponent, AnalysisFilter, AnalysisViews } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy'
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
 

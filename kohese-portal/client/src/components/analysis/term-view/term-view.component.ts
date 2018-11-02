@@ -5,11 +5,9 @@ import { NavigatableComponent } from '../../../classes/NavigationComponent.class
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy'
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Subscription ,  Observable } from 'rxjs';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
-import { Observable } from 'rxjs';
 
 import * as $ from 'jquery';
 import { FormControl } from '@angular/forms';
