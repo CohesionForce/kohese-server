@@ -21,6 +21,8 @@ let _itemUpdatesPromise: Promise<any>;
 
 let _lastClientId :number = 0;
 
+let _workingTree = TreeConfiguration.getWorkingTree();
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
@@ -268,27 +270,10 @@ async function sync(): Promise<void> {
     repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
   }, (response: Array<any>) => {
     for (let j: number = 0; j < response.length; j++) {
-      buildOrUpdateProxy({ id: response[j].id }, undefined, response[j].
-        status);
+      updateItemStatus(response[j].id, response[j].status);
     }
   });
 
-  // return new Promise<void>(async (resolve: () => void, reject: () => void) => {
-  //   _fundamentalItemsObject = await synchronizeModels();
-  //   _loadedCacheObjectMap = await populateCache();
-  //   _itemUpdatesObject = await updateCache(TreeConfiguration.getWorkingTree().
-  //     getAllTreeHashes());
-  //   TreeConfiguration.getWorkingTree().loadingComplete(false);
-  //   socket.emit('Item/getStatus', {
-  //     repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
-  //   }, (response: Array<any>) => {
-  //     for (let j: number = 0; j < response.length; j++) {
-  //       buildOrUpdateProxy({ id: response[j].id }, undefined, response[j].
-  //         status);
-  //     }
-  //   });
-  //   resolve();
-  // });
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -323,9 +308,9 @@ function registerKoheseIOListeners() {
     _cache.processBulkCacheUpdate(bulkCacheUpdate);
   });
 
-  socket.on('VersionControl/statusUpdated', (gitStatusMap: any) => {
-    for (var id in gitStatusMap) {
-      buildOrUpdateProxy({ id: id }, undefined, gitStatusMap[id]);
+  socket.on('VersionControl/statusUpdated', (statusMap: any) => {
+    for (var itemId in statusMap) {
+      updateItemStatus(itemId, statusMap[itemId]);
     }
   });
 }
@@ -333,10 +318,10 @@ function registerKoheseIOListeners() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function buildOrUpdateProxy(item: any, kind: string, status: Array<string>):
-  ItemProxy {
-  let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.
-    id);
+function buildOrUpdateProxy(item : any, kind : string, itemStatus : Array<string>) :   ItemProxy {
+
+  let proxy: ItemProxy = _workingTree.getProxyFor(item.id);
+
   if (kind) {
     if (proxy) {
       proxy.updateItem(kind, item);
@@ -350,9 +335,11 @@ function buildOrUpdateProxy(item: any, kind: string, status: Array<string>):
     }
   }
 
-  if (proxy && status) {
+  if (proxy && itemStatus) {
     proxy.status.length = 0;
-    proxy.status.push(...status);
+    proxy.status.push(...itemStatus);
+
+    // TODO: All change notifications need to be sent from ItemProxy
 
     TreeConfiguration.getWorkingTree().getChangeSubject().next({
       type: 'update',
@@ -360,16 +347,45 @@ function buildOrUpdateProxy(item: any, kind: string, status: Array<string>):
     });
   }
 
-  postToAllPorts('update', { item: item, kind: kind, status: status });
+  postToAllPorts('update', { item: item, kind: kind, status: itemStatus });
 
   return proxy;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function updateItemStatus (itemId : string, itemStatus : Array<string>) {
+
+  let proxy: ItemProxy = _workingTree.getProxyFor(itemId);
+
+  if (proxy && itemStatus) {
+    proxy.status.length = 0;
+    proxy.status.push(...itemStatus);
+
+    // TODO: All change notifications need to be sent from ItemProxy
+
+    TreeConfiguration.getWorkingTree().getChangeSubject().next({
+      type: 'update',
+      proxy: proxy
+    });
+  }
+
+  postToAllPorts('updateItemStatus', { itemId: itemId, status: itemStatus });
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function deleteItem(id: string): void {
   TreeConfiguration.getWorkingTree().getProxyFor(id).deleteItem();
   postToAllPorts('deletion', id);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function postToAllPorts(message: string, data: any): void {
   for (let key in clientMap) {
     clientMap[key].postMessage({ message: message, data: data });
