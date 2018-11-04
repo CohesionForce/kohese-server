@@ -194,52 +194,118 @@ export class ItemRepository {
       }
     });
   }
-  
+
   public async getSessionMap(): Promise<any> {
     return (await this.sendMessageToWorker('getSessionMap', undefined, true)).
       data;
   }
-  
+
   private align(): Promise<void> {
-    return new Promise<void>(async (resolve: () => void, reject:
-      () => void) => {
+    return new Promise<void>(async (resolve: () => void, reject: () => void) => {
       this.repositoryStatus.next({
         state: RepoStates.SYNCHRONIZING,
         message: 'Starting Repository Sync'
       });
-      this.processBulkUpdate((await this.sendMessageToWorker(
-        'getFundamentalItems', { refresh: false }, true)).data);
+
+      let fundamentalItemsResponse = await this.sendMessageToWorker(
+        'getFundamentalItems', { refresh: false }, true);
+      this.processBulkUpdate(fundamentalItemsResponse.data);
+
       await this.sendMessageToWorker('getCache', { refresh: false }, true);
+
       let workingTree: TreeConfiguration = TreeConfiguration.getWorkingTree();
-      this._cache.loadProxiesForCommit(this._cache.getRef('HEAD'),
-        workingTree);
-      this.processBulkUpdate((await this.sendMessageToWorker('getItemUpdates',
-        { refresh: false, treeHashes: undefined }, true)).data);
+      let headRef = await this._cache.getRef('HEAD');
+      await this._cache.loadProxiesForCommit(headRef, workingTree);
+
+      workingTree.calculateAllTreeHashes();
+      let treeHashes = workingTree.getAllTreeHashes();
+
+      let itemUpdatesResponse = await this.sendMessageToWorker(
+        'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
+      this.processBulkUpdate(itemUpdatesResponse.data);
+
       let calculateTreeHashesAsynchronously: boolean = this.loadFeatureSwitch(
         'IR-defer-calc', true);
+
       if (calculateTreeHashesAsynchronously) {
+
+        console.log('^^^ Calculating TreeHashes asynchronously');
+
+        // Send early notification to other components
         this.currentTreeConfigSubject.next({
           config: workingTree,
           configType: TreeConfigType.DEFAULT
         });
+
         this.repositoryStatus.next({
           state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
           message: 'Item Repository Ready'
         });
+
+        await Promise.all(workingTree.loadingComplete(calculateTreeHashesAsynchronously));
+
+        console.log('^^^ Completed calculating TreeHashes asynchronously');
+
+      } else {
+
+        console.log('^^^ Calculating TreeHashes synchronously');
+
+        // This call will block until complete since the TreeHash processing is not deferred
+        await Promise.all(workingTree.loadingComplete(false));
+
       }
 
-      await Promise.all(workingTree.loadingComplete(
-        calculateTreeHashesAsynchronously));
-      this.processBulkUpdate((await this.sendMessageToWorker('getItemUpdates',
-        { refresh: true,treeHashes: workingTree.getAllTreeHashes() }, true)).data);
-      if (!calculateTreeHashesAsynchronously) {
+      console.log('^^^ Requesting second sync');
+      let secondItemUpdateResponse = await this.sendMessageToWorker(
+        'getItemUpdates', { refresh: true, treeHashes: workingTree.getAllTreeHashes() }, true);
+
+      let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
+
+      if (syncIsComplete){
+        this.logService.log(this.logEvents.kdbSynced);
+      } else {
+        // Process the updates
+        this.processBulkUpdate(secondItemUpdateResponse.data);
+
+        this.logService.log(this.logEvents.compareHashAfterUpdate);
+
+        let updatedTreeHashes = workingTree.getAllTreeHashes();
+
+        let compareRTH = TreeHashMap.compare(updatedTreeHashes, secondItemUpdateResponse.data.repoTreeHashes);
+
+        syncIsComplete = compareRTH.match
+
+        if (!syncIsComplete) {
+          // Provide additional logging information for failure to sync
+          this.logService.log(this.logEvents.repoSyncFailed, {comparison : compareRTH});
+
+          for (let idx in compareRTH.changedItems) {
+            let itemId = compareRTH.changedItems[idx];
+            let changedProxy = workingTree.getProxyFor(itemId);
+            this.logService.log(this.logEvents.failedProxySync, {
+              id : itemId,
+              changedProxy : changedProxy
+            });
+          }
+        }
+      }
+
+      // Provide notification of final status
+
+      if (syncIsComplete) {
         this.currentTreeConfigSubject.next({
           config: workingTree,
           configType: TreeConfigType.DEFAULT
         });
+
         this.repositoryStatus.next({
           state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
           message: 'Item Repository Ready'
+        });
+      } else {
+        this.repositoryStatus.next({
+          state: RepoStates.SYNCHRONIZATION_FAILED,
+          message: 'Repository sync failed'
         });
       }
 

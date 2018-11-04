@@ -1473,6 +1473,11 @@ export class ItemProxy {
     var newKind = modelKind;
 
     if (newKind !== this.kind) {
+      if (this.kind === 'Internal-Lost'){
+        // Update is really the new item that was created due to order of arrival
+        let newItem = new ItemProxy(newKind, withItem);
+        return;
+      }
       console.log('::: Proxy kind changed from ' + this.kind + ' to ' + newKind);
       this.setItemKind(newKind);
     }

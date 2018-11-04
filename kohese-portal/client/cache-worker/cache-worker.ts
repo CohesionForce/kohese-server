@@ -88,7 +88,7 @@ let _lastClientId :number = 0;
             });
           });
         }
-        
+
         await _connectionAuthenticatedPromise;
         socket.emit('connectionAdded', { id: socket.id });
         port.postMessage({ id: request.id });
@@ -196,7 +196,7 @@ let _lastClientId :number = 0;
   }
 
   port.start();
-  
+
   let connectionVerificationAttempts: number = 0;
   let checkConnections: () => void = () => {
     postToAllPorts('verifyConnection', undefined);
@@ -241,7 +241,8 @@ async function sync(): Promise<void> {
     await _loadedCachePromise;
     let afterSyncCache = Date.now();
     console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
-    _cache.loadProxiesForCommit(_cache.getRef('HEAD'), workingTree);
+    let headRef = await _cache.getRef('HEAD');
+    await _cache.loadProxiesForCommit(headRef, workingTree);
     afterLoadHead = Date.now();
     console.log('^^^ Time to load HEAD: ' + (afterLoadHead - afterSyncCache) / 1000);
     workingTree.calculateAllTreeHashes();
