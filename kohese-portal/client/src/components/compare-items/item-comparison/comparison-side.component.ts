@@ -155,17 +155,30 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     return this._itemRepository.getHistoryFor(object).map((history:
       Array<any>) => {
       this._versions = history;
-      if (!object.status['Unstaged'] && (this._versions.length > 0)) {
+      if (0 === object.status.filter((status: string) => {
+        return status.startsWith('WT');
+      }).length && (this._versions.length > 0)) {
         /* If there are no unstaged changes to the selected Item, change the
         commit ID of the most recent commit that included that Item to
         'Unstaged' to operate on the working tree version of that Item. */
         this._versions[0].commit = 'Unstaged';
       }
       let uncommittedVersions: Array<any> = [];
-      for (let statusName in object.status) {
+      if (object.status.filter((status: string) => {
+        return status.startsWith('WT');
+      }).length > 0) {
         uncommittedVersions.push({
-          commit: statusName,
-          message: statusName
+          commit: 'Unstaged',
+          message: 'Unstaged'
+        });
+      }
+      
+      if (object.status.filter((status: string) => {
+        return status.startsWith('INDEX');
+      }).length > 0) {
+        uncommittedVersions.push({
+          commit: 'Staged',
+          message: 'Staged'
         });
       }
       this._versions.splice(0, 0, ...uncommittedVersions);

@@ -47,3 +47,7 @@ git log --diff-filter=D --summary -- <filename>
 git checkout <commit>~1 <filename>
 # or to git a specific version
 git checkout <commit before it was deleted> <filename>
+
+# to reset corrupted git index
+rm .git/index
+git reset

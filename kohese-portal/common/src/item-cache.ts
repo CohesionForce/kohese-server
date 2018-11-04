@@ -445,7 +445,10 @@ export class ItemCache {
     }
 
     async function evaluateTreeEntry (itemId, tree) {
-      if (!treeEvaluated[tree.treeHash]){
+      if (!tree){
+        console.log('*** Missing tree for ' + itemId);
+      }
+      if (tree && !treeEvaluated[tree.treeHash]){
         // console.log('::: Evaluating tree for ' + itemId + ' - ' + tree.treeHash);
         await evaluateBlob(itemId, tree.kind, tree.oid);
         for (let childId in tree.childTreeHashes) {
@@ -474,7 +477,11 @@ export class ItemCache {
         for (let rootId in commit.repoTreeRoots){
           let root = commit.repoTreeRoots[rootId];
           // console.log('::: Evaluating root:  ' + rootId);
-          await evaluateTreeEntry(rootId, root);
+          if (root){
+            await evaluateTreeEntry(rootId, root);
+          } else {
+            console.log('*** Missing tree hash for ' + rootId);
+          }
         }
       }
     };

@@ -126,14 +126,21 @@ export class LevelCache extends ItemCache {
   async retrieveValue (sublevelName, key) : Promise<any> {
     let beforeRetrieve = Date.now();
     let registration : SublevelRegistration = this.registrationMap.get(sublevelName);
+    if(!sublevelName){
+      console.log('*** Invalid sublevel map Lookup: ' + sublevelName + ' - ' + key);
+    }
     let value = await super.retrieveValue(sublevelName, key);
+
+    if (key === undefined){
+      console.log('@@@ Map Lookup: ' + sublevelName + ' - ' + key );
+    }
 
     let afterRetrieve = Date.now();
     if (value !== undefined) {
       // console.log('@@@ Map Lookup: ' + key + ' - ' + (afterRetrieve - beforeRetrieve)  + ' ms');
       return Promise.resolve(value);
     } else {
-      // console.log('$$$ Waiting for value to load: ' + key);
+      // console.log('$$$ Waiting for value to load: ' + sublevelName + ' - ' + key);
       let levelPromise = registration.sublevel.get(key)
 
       let result = new Promise((resolve) => {

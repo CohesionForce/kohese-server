@@ -63,7 +63,7 @@ export class ItemProxy {
 
   // Needed for information calculated on the client
   public dirty : boolean = false;
-  public status;
+  public status: Array<string> = [];
   public history;
   public type; // Used to store KoheseType.
 
@@ -149,7 +149,6 @@ export class ItemProxy {
     copyAttributes(forItem, proxy);
 
     proxy.setItemKind(kind);
-    proxy.status = {};
 
     if (kind === 'Repository') {
       proxy.treeConfig.repoMap[itemId] = proxy;
@@ -1474,6 +1473,11 @@ export class ItemProxy {
     var newKind = modelKind;
 
     if (newKind !== this.kind) {
+      if (this.kind === 'Internal-Lost'){
+        // Update is really the new item that was created due to order of arrival
+        let newItem = new ItemProxy(newKind, withItem);
+        return;
+      }
       console.log('::: Proxy kind changed from ' + this.kind + ' to ' + newKind);
       this.setItemKind(newKind);
     }

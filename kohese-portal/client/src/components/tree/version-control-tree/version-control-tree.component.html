@@ -29,13 +29,13 @@
     <mat-icon class="fa fa-square-o"></mat-icon>
   </button>
   <button mat-icon-button
-    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState(VersionControlState.UNSTAGED)"
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState('WT')"
     (click)="stageSelectedChanges()"
     matTooltip="Stage changes to the selected Items">
     <mat-icon class="fa fa-plus"></mat-icon>
   </button>
   <button mat-icon-button
-    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState(VersionControlState.STAGED)"
+    [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedProxiesInState('INDEX')"
     (click)="unstageSelectedChanges()"
     matTooltip="Un-stage changes to the selected Items">
     <mat-icon class="fa fa-minus"></mat-icon>

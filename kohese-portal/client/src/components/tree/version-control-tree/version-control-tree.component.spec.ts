@@ -13,8 +13,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
-import { VersionControlService, VersionControlState,
-  VersionControlSubState } from '../../../services/version-control/version-control.service';
+import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
@@ -58,8 +57,7 @@ describe('Component: version-control-tree', () => {
     
     descendantProxy = TreeConfiguration.getWorkingTree().getRootProxy().
       children[0];
-    descendantProxy.status[VersionControlState.CURRENT] =
-      VersionControlSubState.NEW;
+    descendantProxy.status.push('WT_NEW');
     
     fixture.detectChanges();
   });
@@ -93,9 +91,9 @@ describe('Component: version-control-tree', () => {
     selectedObjects.push(descendantProxy);
     component.selectedObjectsSubject.next(selectedObjects);
     expect(component.areSelectedProxiesInState(undefined)).toEqual(true);
-    expect(component.areSelectedProxiesInState(VersionControlState.CURRENT)).
+    expect(component.areSelectedProxiesInState('WT')).
       toEqual(true);
-    expect(component.areSelectedProxiesInState(VersionControlState.UNSTAGED)).
+    expect(component.areSelectedProxiesInState('INDEX')).
       toEqual(false);
   });
   
