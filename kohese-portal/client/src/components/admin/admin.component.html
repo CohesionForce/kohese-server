@@ -2,12 +2,23 @@
   <lens></lens>
   <div class="panel-heading">Admin</div>
   <div class="users-screen">
-    <div class="session-container">
-      <h2>Sessions:</h2>
-      <div *ngFor="let session of sessions | mapKey">
-        <div>{{sessions[session].username}} - {{sessions[session].address}} - {{sessions[session].sessionId}}</div>
+    <ng-container *ngIf="sessions">
+      <div class="session-container">
+        <h2>Sessions:</h2>
+        <div *ngFor="let session of (sessions | mapKey)">
+          {{sessions[session].username}} - {{sessions[session].address}}
+          <ng-container *ngIf="sessions[session].numberOfConnections">
+             - {{sessions[session].numberOfConnections}}
+             <ng-container *ngIf="1 === sessions[session].numberOfConnections">
+               Connection
+             </ng-container>
+             <ng-container *ngIf="sessions[session].numberOfConnections > 1">
+               Connections
+             </ng-container>
+          </ng-container>
         </div>
-    </div>
+      </div>
+    </ng-container>
     <div class="user-container">
       <div id="admin-user-list">
         <h2>Users:</h2>

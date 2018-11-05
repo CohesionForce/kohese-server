@@ -7,8 +7,6 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { VersionControlState,
-  VersionControlSubState } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -48,7 +46,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
         path.length - 1]);
       if (proxy) {
-        enable = proxy.status['Staged'];
+        enable = (proxy.status.filter((status: string) => {
+          return status.startsWith('INDEX');
+        }).length > 0);
       }
 
       return enable;
@@ -68,9 +68,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
         path.length - 1]);
       if (proxy) {
-        enable = !((proxy.status[VersionControlState.STAGED] ===
-          VersionControlSubState.NEW) || (proxy.status[VersionControlState.
-          UNSTAGED] === VersionControlSubState.NEW));
+        enable = (0 === proxy.status.filter((status: string) => {
+          return status.endsWith('_NEW');
+        }).length);
       }
 
       return enable;

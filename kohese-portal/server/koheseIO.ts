@@ -23,18 +23,26 @@ function Server(httpServer, options){
         socket.koheseUser = decodeAuthToken(request.token);
         console.log('>>>> session %s is user %s', socket.id, socket.koheseUser.username);
         socket.emit('authenticated');
-        socket.emit('session/list', kio.sessions);
-
+        
         kio.sessions[socket.id] = {
-            sessionId: socket.id,
-            address: socket.handshake.address,
-            username: socket.koheseUser.username
-          };
-
-        // Provide notification to socket listeners that the user has authenticated
+          sessionId: socket.id,
+          address: socket.handshake.address,
+          username: socket.koheseUser.username,
+          numberOfConnections: 0
+        };
         global['app'].emit('newSession', socket);
-
-        kio.server.emit('session/add',kio.sessions[socket.id]);
+        socket.on('connectionAdded', (data: any, sendResponse:
+          () => void) => {
+          kio.sessions[data.id].numberOfConnections++;
+        });
+        socket.on('connectionRemoved', (data: any, sendResponse:
+          () => void) => {
+          kio.sessions[data.id].numberOfConnections--;
+        });
+        socket.on('getSessionMap', (data: any, sendResponse: (data:
+          any) => void) => {
+          sendResponse(kio.sessions);
+        });
       });
       socket.on('disconnect', function () {
         var username = 'Unknown';
@@ -43,7 +51,6 @@ function Server(httpServer, options){
         }
         console.log('>>> session %s: user %s disconnected from %s', socket.id, username, socket.handshake.address);
         if(kio.sessions[socket.id]){
-          socket.broadcast.emit('session/remove',kio.sessions[socket.id]);
           delete kio.sessions[socket.id];
         }
       });

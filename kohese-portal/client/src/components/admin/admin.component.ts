@@ -29,9 +29,9 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.treeConfigSub =
-      this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
+      this.itemRepository.getTreeConfig().subscribe(async (newConfig)=>{
         if (newConfig) {
-        this.sessions = this.sessionService.getSessions();
+        this.sessions = await this.itemRepository.getSessionMap();
         this.users = this.sessionService.getUsers();
         }
     })

@@ -10,8 +10,6 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { VersionControlState,
-  VersionControlSubState } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
@@ -54,11 +52,15 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     }),
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
       (object: any) => {
-      return !!(object as ItemProxy).status['Unstaged'];
+      return ((object as ItemProxy).status.filter((status: string) => {
+        return status.startsWith('WT');
+      }).length > 0);
     }),
     new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
       (object: any) => {
-      return !!(object as ItemProxy).status['Staged'];
+      return ((object as ItemProxy).status.filter((status: string) => {
+        return status.startsWith('INDEX');
+      }).length > 0);
     })
   ];
   get images() {
@@ -99,7 +101,9 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
-      return (object as ItemProxy).status['Staged'];
+      return ((object as ItemProxy).status.filter((status: string) => {
+        return status.startsWith('INDEX');
+      }).length > 0);
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         STAGED_VERSION);
@@ -111,10 +115,9 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
       any) => {
-      let proxy: ItemProxy = (object as ItemProxy);
-      return !((proxy.status[VersionControlState.STAGED] ===
-        VersionControlSubState.NEW) || (proxy.status[VersionControlState.
-        UNSTAGED] === VersionControlSubState.NEW));
+      return ((object as ItemProxy).status.filter((status: string) => {
+        return status.endsWith('_NEW');
+      }).length === 0);
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         LAST_COMMITTED_VERSION);
