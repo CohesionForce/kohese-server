@@ -6,36 +6,22 @@ import * as LevelJs from 'level-js';
 import { ItemProxy } from '../../common/src/item-proxy';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
-
-import { ItemCache } from '../../common/src/item-cache';
 import { LevelCache } from '../../common/src/level-cache';
 
-let socket : SocketIOClient.Socket = SocketIoClient();
-let serverCache = {
-  metaModel: undefined,
-  allItems: undefined
-}
-
-let cacheFetched = false;
-
-enum RepoStates {
-  DISCONNECTED,
-  SYNCHRONIZING,
-  SYNCHRONIZATION_FAILED,
-  SYNCHRONIZATION_SUCCEEDED
-};
-
-let repoState : RepoStates = RepoStates.DISCONNECTED;
-
-let authenticated : boolean = false;
-
+let socket: SocketIOClient.Socket;
 let clientMap = {};
-
-let repoSyncCallback = [];
+let _connectionVerificationSet: Set<number> = new Set<number>();
 
 let initialized: boolean = false;
+let _cache: LevelCache;
+let _connectionAuthenticatedPromise: Promise<any>;
+let _fundamentalItemsPromise: Promise<any>;
+let _loadedCachePromise: Promise<any>;
+let _itemUpdatesPromise: Promise<any>;
 
-let levelCache: LevelCache;
+let _lastClientId :number = 0;
+
+let _workingTree = TreeConfiguration.getWorkingTree();
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -55,71 +41,160 @@ let levelCache: LevelCache;
   console.log(connectEvent);
 
   if (!initialized) {
-    let levelDown = LevelJs('item-cache');
-    levelCache = new LevelCache(levelDown);
-
+    _cache = new LevelCache(LevelJs('item-cache'));
+    TreeConfiguration.setItemCache(_cache);
     initialized = true;
   }
 
-  let clientId = Date.now();
-
-  // Notify all client tabs that a new client connected
-  postMessageToAllClients({type: 'newClient', clientId: clientId});
-
+  let clientId = ++_lastClientId;
   clientMap[clientId] = port;
-
-  console.log('$$$ Client List:');
-  console.log(clientMap);
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  port.onmessage = (event: any) => {
+  port.onmessage = async (event: any) => {
     let request = event.data;
+
+    let requestStartTime = Date.now();
+    console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
 
     // Determine which message handler to invoke
     switch(request.type){
-      case 'processAuthToken':
-        processAuthToken(port, request);
+      case 'connect':
+        if (!socket) {
+          socket = SocketIoClient();
+          socket.on('connect_error', () => {
+            console.log('*** Worker socket connection error');
+            port.postMessage({ message: 'connectionError' });
+          });
+          socket.on('reconnect', async () => {
+            await sync();
+            port.postMessage({ message: 'reconnected' });
+          });
+          socket.connect();
+
+          _connectionAuthenticatedPromise = new Promise<void>((resolve: () => void, reject:
+            () => void) => {
+
+            socket.on('authenticated', async () => {
+
+              // Resolve the promise to allow all client tabs to proceed
+              resolve();
+
+              // Remaining initialization logic will proceed and provide incremental results to tabs
+              registerKoheseIOListeners();
+              sync();
+            });
+            socket.emit('authenticate', {
+              token: request.data
+            });
+          });
+        }
+
+        await _connectionAuthenticatedPromise;
+        socket.emit('connectionAdded', { id: socket.id });
+        port.postMessage({ id: request.id });
         break;
-      case 'getItemCache':
-      console.log('$$$ getItemCache');
-        // fetchItemCache();
+      case 'getFundamentalItems':
+        if (!_fundamentalItemsPromise || request.data.refresh) {
+          _fundamentalItemsPromise = synchronizeModels();
+        }
+
+        let fundamentalItems = await _fundamentalItemsPromise;
+
+        port.postMessage({
+          id: request.id,
+          data: fundamentalItems
+        });
         break;
-      case 'sync':
-        console.log('$$$ sync');
+      case 'getCache':
+        if (!_loadedCachePromise || request.data.refresh) {
+          _loadedCachePromise = populateCache();
+        }
 
-        syncWithServer(
-          (response) => {
-            let itemCache:ItemCache = TreeConfiguration.getItemCache();
-            let objectMap = itemCache.getObjectMap();
-            function sendBulkCacheUpdate(key, value){
-              let bulkUpdateMessage = {};
-              bulkUpdateMessage[key] = value;
-              port.postMessage({type: 'bulkCacheUpdate', chunk: bulkUpdateMessage});
-            }
+        let objectMap = await _loadedCachePromise;
 
-            // Send Cache Chunks
-            sendBulkCacheUpdate('metadata', objectMap['metadata']);
-            sendBulkCacheUpdate('refMap', objectMap['refMap']);
-            sendBulkCacheUpdate('tagMap', objectMap['tagMap']);
-            sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
-            for (let key in objectMap.kTreeMapChunks) {
-              sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
-            }
-            for (let key in objectMap.blobMapChunks) {
-              sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
-            }
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'metadata',
+          value: objectMap.metadata
+        } });
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'ref',
+          value: objectMap.refMap
+        } });
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'tag',
+          value: objectMap.tagMap
+        } });
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'commit',
+          value: objectMap.kCommitMap
+        } });
+        for (let chunkKey in objectMap.kTreeMapChunks) {
+          port.postMessage({ message: 'cachePiece', data: {
+            key: 'tree',
+            value: objectMap.kTreeMapChunks[chunkKey]
+          } });
+        }
+        for (let chunkKey in objectMap.blobMapChunks) {
+          port.postMessage({ message: 'cachePiece', data: {
+            key: 'blob',
+            value: objectMap.blobMapChunks[chunkKey]
+          } });
+        }
 
-            // Send Final response
-            port.postMessage({type: 'sync', requestId: request.requestId, response: response});
+        port.postMessage({ id: request.id });
+        break;
+      case 'getItemUpdates':
+        let updatesPromise = _itemUpdatesPromise;
+        if (!_itemUpdatesPromise || request.data.refresh) {
+          console.log('^^^ Request refresh of itemUpdates');
+          let treeHashes: any = request.data.treeHashes;
+          if (!treeHashes) {
+            treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
           }
-        );
+
+          updatesPromise = updateCache(treeHashes);
+          if (!request.data.refresh){
+            console.log('^^^ Updating _itemUpdatesPromise');
+            _itemUpdatesPromise = updatesPromise;
+          }
+        }
+
+        let itemUpdates = await updatesPromise;
+
+        port.postMessage({
+          id: request.id,
+          data: itemUpdates
+        });
+        break;
+      case 'getStatus':
+        let statusCount = await getStatus();
+        port.postMessage({
+          id: request.id,
+          data: {statusCount: statusCount}
+        });
+
+        break;
+      case 'connectionVerification':
+        _connectionVerificationSet.add(clientId);
+        break;
+      case 'getSessionMap':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (sessionMap: any) => void, reject: () => void) => {
+          socket.emit('getSessionMap', {}, (sessionMap: any) => {
+            resolve(sessionMap);
+          });
+        }) });
         break;
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);
     }
+
+    let requestFinishTime = Date.now();
+    console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
+      + ' - ' + (requestFinishTime - requestStartTime)/1000 + 's');
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -128,95 +203,118 @@ let levelCache: LevelCache;
   port.onmessageerror = function(event) {
     console.log('*** Received message error:');
     console.log(event);
-}
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function postMessageToAllClients(message){
-  for(let clientId in clientMap){
-    let clientPort = clientMap[clientId];
-    clientPort.postMessage(message);
   }
+
+  port.start();
+
+  let connectionVerificationAttempts: number = 0;
+  let checkConnections: () => void = () => {
+    postToAllPorts('verifyConnection', undefined);
+
+    // TODO: Need to update lost connection logic
+
+    // if (3 === connectionVerificationAttempts) {
+    //   for (let id in clientMap) {
+    //     if (!_connectionVerificationSet.has(+id)) {
+    //       delete clientMap[id];
+    //       socket.emit('connectionRemoved', { id: socket.id });
+    //     }
+    //   }
+    //   _connectionVerificationSet.clear();
+    //   connectionVerificationAttempts = 0;
+    // }
+    // connectionVerificationAttempts++;
+    setTimeout(() => {
+      checkConnections();
+    }, 7000);
+  };
+  checkConnections();
 }
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function processAuthToken(port, request){
-  console.log('::: Processing Authorization Request');
-  if (authenticated){
-    console.log('::: Cache Worker is already authenticated');
+async function sync(): Promise<void> {
+
+  let workingTree = TreeConfiguration.getWorkingTree();
+  let beforeSync = Date.now();
+
+  if (!_fundamentalItemsPromise){
+    _fundamentalItemsPromise = synchronizeModels();
+    await _fundamentalItemsPromise;
+  }
+
+  let afterSyncMetaModels = Date.now();
+  console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
+
+  let afterLoadHead;
+  let afterCalcTreeHashes;
+  if (!_loadedCachePromise){
+    _loadedCachePromise = populateCache();
+    await _loadedCachePromise;
+    let afterSyncCache = Date.now();
+    console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
+    let headRef = await _cache.getRef('HEAD');
+    await _cache.loadProxiesForCommit(headRef, workingTree);
+    afterLoadHead = Date.now();
+    console.log('^^^ Time to load HEAD: ' + (afterLoadHead - afterSyncCache) / 1000);
+    workingTree.calculateAllTreeHashes();
+    afterCalcTreeHashes = Date.now();
   } else {
-    // Cache Worker is not authenticated yet, so open the socket
-    console.log(request);
-    socket.connect();
-    socket.emit('authenticate', {
-      token: request.authToken
-    });
-    socket.on('authenticated', function () {
-      console.log('::: Item Cache Worker is authenticated');
-      authenticated = true;
-
-      registerKoheseIOListeners();
-
-    });
-    socket.on('connect_error', () => {
-      console.log('*** CW: Socket IO Connection Error');
-      authenticated = false;
-    });
+    afterLoadHead = Date.now();
+    afterCalcTreeHashes = Date.now();
   }
+  console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadHead) / 1000);
+
+  // TODO: Need to deal with loss of data on refresh
+  _itemUpdatesPromise = updateCache(workingTree.getAllTreeHashes());
+  await _itemUpdatesPromise;
+  let afterGetAll = Date.now();
+  console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
+  workingTree.loadingComplete(false);
+  let afterLoading = Date.now();
+  console.log('^^^ Time to complete loading: ' + (afterLoading - afterGetAll) / 1000);
+  console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
+
+  // TODO: Need to handle refresh
+  await getStatus();
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+async function getStatus() : Promise<number> {
+  return new Promise((resolve : (statusCount:number) => void, reject) => {
+    socket.emit('Item/getStatus', {
+      repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
+    }, (response: Array<any>) => {
+      for (let j: number = 0; j < response.length; j++) {
+        updateItemStatus(response[j].id, response[j].status);
+      }
+      resolve(response.length);
+    });
+  });
+
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
 function registerKoheseIOListeners() {
-
   // Register the listeners for the Item kinds that are being tracked
   socket.on('Item/create', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
-    if (proxy) {
-      proxy.updateItem(notification.kind, notification.item);
-    } else {
-      if (notification.kind === 'KoheseModel'){
-        proxy = new KoheseModel(notification.item);
-      } else {
-        proxy = new ItemProxy(notification.kind, notification.item);
-      }
-    }
-
-    console.log('@@@ updateStatus: ');
-    console.log(notification.status);
-    // this.updateStatus(proxy, notification.status);
-    proxy.dirty = false;
+    buildOrUpdateProxy(notification.item, notification.kind, notification.
+      status);
   });
 
   socket.on('Item/update', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
-    if (proxy) {
-      proxy.updateItem(notification.kind, notification.item);
-    } else {
-      if (notification.kind === 'KoheseModel'){
-        proxy = new KoheseModel(notification.item);
-      } else {
-        proxy = new ItemProxy(notification.kind, notification.item);
-      }
-    }
-
-    console.log('@@@ updateStatus: ');
-    console.log(notification.status);
-    // this.updateStatus(proxy, notification.status);
-    proxy.dirty = false;
+    buildOrUpdateProxy(notification.item, notification.kind, notification.status);
   });
 
   socket.on('Item/delete', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
-    proxy.deleteItem();
+    deleteItem(notification.id);
   });
 
   socket.on('Item/BulkUpdate', (bulkUpdate) => {
@@ -226,58 +324,102 @@ function registerKoheseIOListeners() {
 
   socket.on('Item/BulkCacheUpdate', (bulkCacheUpdate) => {
     console.log('::: Received Bulk Cache Update');
-    levelCache.processBulkCacheUpdate(bulkCacheUpdate);
+    _cache.processBulkCacheUpdate(bulkCacheUpdate);
   });
 
-  socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
-    for (var id in gitStatusMap) {
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
-
-      console.log('@@@ statusUpdate: ');
-      console.log(gitStatusMap);
-      // this.updateStatus(proxy, gitStatusMap[id]);
+  socket.on('VersionControl/statusUpdated', (statusMap: any) => {
+    for (var itemId in statusMap) {
+      updateItemStatus(itemId, statusMap[itemId]);
     }
-  });
-
-  socket.on('connect_error', () => {
-    console.log('@@@ ::: IR: Socket IO Connection Error');
-    // this.repositoryStatus.next({
-    //   state: RepoStates.DISCONNECTED,
-    //   message : 'Error connecting to repository'
-    // })
-  });
-
-  socket.on('reconnect', () => {
-    // TODO Remove CurrentUserService
-
-    // if (this.CurrentUserService.getCurrentUserSubject().getValue()) {
-    //   console.log('::: IR: this.authenticationService already authenticated');
-    //   this.fetchItems();
-    //   this.toastrService.success('Reconnected!', 'Server Connection!');
-    // } else {
-    //   console.log('::: IR: Listening for this.authenticationService authentication');
-    //   let subscription: Subscription = this.CurrentUserService.getCurrentUserSubject()
-    //     .subscribe((decodedToken) => {
-    //       if(decodedToken) {
-    //         console.log('::: IR: Socket Authenticated');
-    //         this.fetchItems();
-    //         this.toastrService.success('Reconnected!', 'Server Connection!');
-    //         subscription.unsubscribe();
-    //       }
-
-    //   });
-    // }
   });
 }
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getMetamodel(){
-  if (!cacheFetched){
-    console.log('$$$ Get Metamodel');
-    let requestTime = Date.now();
+function buildOrUpdateProxy(item : any, kind : string, itemStatus : Array<string>) :   ItemProxy {
 
+  let proxy: ItemProxy = _workingTree.getProxyFor(item.id);
+
+  if (kind) {
+    if (proxy) {
+      proxy.updateItem(kind, item);
+      proxy.dirty = false;
+    } else {
+      if (kind === 'KoheseModel') {
+        proxy = new KoheseModel(item);
+      } else {
+        proxy = new ItemProxy(kind, item);
+      }
+    }
+  }
+
+  if (proxy && itemStatus) {
+    proxy.updateVCStatus(itemStatus);
+
+    // TODO: All change notifications need to be sent from ItemProxy
+
+    TreeConfiguration.getWorkingTree().getChangeSubject().next({
+      type: 'update',
+      proxy: proxy
+    });
+  }
+
+  postToAllPorts('update', { item: item, kind: kind, status: itemStatus });
+
+  return proxy;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function updateItemStatus (itemId : string, itemStatus : Array<string>) {
+
+  let proxy: ItemProxy = _workingTree.getProxyFor(itemId);
+
+  if (proxy && itemStatus) {
+    proxy.updateVCStatus(itemStatus);
+
+    // TODO: All change notifications need to be sent from ItemProxy
+
+    TreeConfiguration.getWorkingTree().getChangeSubject().next({
+      type: 'update',
+      proxy: proxy
+    });
+  }
+
+  postToAllPorts('updateItemStatus', { itemId: itemId, status: itemStatus });
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function deleteItem(id: string): void {
+  TreeConfiguration.getWorkingTree().getProxyFor(id).deleteItem();
+  postToAllPorts('deletion', id);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function postToAllPorts(message: string, data: any): void {
+  console.log('^^^ Posting message to all ports: ' + message);
+  for (let key in clientMap) {
+    console.log('^^^ Posting message to port: ' + message + ' - ' + key);
+    clientMap[key].postMessage({ message: message, data: data });
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function synchronizeModels(): Promise<any> {
+  console.log('$$$ Get Metamodel');
+  let requestTime = Date.now();
+
+  return new Promise<any>((resolve: (data: any) => void, reject:
+    () => void) => {
     socket.emit('Item/getMetamodel', {
       timestamp: {
         requestTime: requestTime
@@ -292,41 +434,37 @@ function getMetamodel(){
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-      serverCache.metaModel = response.cache;
 
-      console.log('$$$ Loading Metamodel');
       processBulkUpdate(response);
-
-      getItemCache();
+      resolve(response);
     });
-  } else {
-    console.log('$$$ Cache has already been fetched');
-  }
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-async function getItemCache(){
-  if (!cacheFetched){
-    console.log('$$$ Get Item Cache');
-    let requestTime = Date.now();
+async function populateCache(): Promise<any> {
+  console.log('$$$ Get Item Cache');
+  let requestTime = Date.now();
 
-    console.log('$$$ Requesting levelCache load');
-    await levelCache.loadCachedObjects();
-    console.log('$$$ Returning from levelCache load');
+  await _cache.loadCachedObjects();
+  let headCommit: string;
+  try {
+    headCommit = await _cache.getRef('HEAD');
+  } catch (error) {
+    headCommit = '';
+  }
 
-    let headCommit: string = levelCache.getRef('HEAD');
-
-    console.log('$$$ Latest HEAD in client cache: ' + headCommit);
-
+  console.log('$$$ Latest HEAD in client cache: ' + headCommit);
+  return new Promise<any>((resolve: (objectMap: any) => void, reject:
+    () => void) => {
     socket.emit('Item/getItemCache', {
       timestamp: {
         requestTime: requestTime
       },
       headCommit: headCommit
-    },
-    async (response) => {
+    }, (response) => {
       var responseReceiptTime = Date.now();
       let timestamp = response.timestamp;
       timestamp.responseReceiptTime = responseReceiptTime;
@@ -335,159 +473,61 @@ async function getItemCache(){
       for(let tsKey in timestamp){
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
       }
-
-      TreeConfiguration.setItemCache(levelCache);
-      let headCommit = levelCache.getRef('HEAD');
-      console.log('### Head: ' + headCommit);
-      cacheFetched = true;
-
-      // TODO Need to load the HEAD commit
-      console.log('$$$ Loading HEAD Commit');
-      let workingTree = TreeConfiguration.getWorkingTree();
-      let before = Date.now();
-      levelCache.loadProxiesForCommit(headCommit, workingTree);
-      let after = Date.now();
-      console.log('$$$ Load took: ' + (after-before)/1000);
-      before = Date.now();
-      workingTree.calculateAllTreeHashes();
-      after = Date.now();
-      console.log('$$$ Calc took: ' + (after-before)/1000);
-
-      console.log('$$$ Finished loading HEAD');
-
-      getAll();
+      resolve(_cache.getObjectMap());
     });
-  } else {
-    console.log('$$$ Cache has already been fetched');
-  }
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function processBulkUpdate(response){
+function processBulkUpdate(response: any): void {
+  let before = Date.now();
   for(let kind in response.cache) {
     console.log('--- Processing ' + kind);
-    var kindList = response.cache[kind];
-    for (var index in kindList) {
-      let item = JSON.parse(kindList[index]);
-      let iProxy;
-      if (kind === 'KoheseModel'){
-        iProxy = new KoheseModel(item);
-      } else {
-        iProxy = new ItemProxy(kind, item);
-      }
+    let kindList: any = response.cache[kind];
+    for (let id in kindList) {
+      buildOrUpdateProxy(JSON.parse(kindList[id]), kind, undefined);
     }
-    if (kind === 'KoheseView'){
+
+    if (kind === 'KoheseView') {
       KoheseModel.modelDefinitionLoadingComplete();
     }
   }
 
-  if(response.addItems) {
-    response.addItems.forEach((addedItem) => {
-      let iProxy;
-      if (addedItem.kind === 'KoheseModel'){
-        iProxy = new KoheseModel(addedItem.item);
-
-      } else {
-        iProxy = new ItemProxy(addedItem.kind, addedItem.item);
-      }
-    });
-  }
-
-  if(response.changeItems) {
-    response.changeItems.forEach((changededItem) => {
-      let iProxy;
-      if (changededItem.kind === 'KoheseModel'){
-        iProxy = new KoheseModel(changededItem.item);
-      } else {
-        iProxy = new ItemProxy(changededItem.kind, changededItem.item);
-      }
-    });
-  }
-
-  if(response.deleteItems) {
-    response.deleteItems.forEach((deletedItemId) => {
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
-      proxy.deleteItem();
-    });
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function getAll(){
-  let requestTime = Date.now();
-  repoState = RepoStates.SYNCHRONIZING;
-
-  let origRepoTreeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
-  let thTime = Date.now();
-  console.log('$$$ Get Tree Hash Time: ' + (thTime - requestTime)/1000);
-
-  socket.emit('Item/getAll', {repoTreeHashes: origRepoTreeHashes},
-    (response) => {
-      var responseReceiptTime = Date.now();
-      console.log('::: Response for getAll took ' + (responseReceiptTime-requestTime)/1000);
-
-      // Update local ItemProxy
-      processBulkUpdate(response);
-      let bulkUpdateTime = Date.now();
-      console.log('$$$ Bulk update took: ' + (bulkUpdateTime-responseReceiptTime)/1000);
-      ItemProxy.getWorkingTree().loadingComplete();
-      let loadingComplete = Date.now();
-      console.log('$$$ Load Complete took: ' + (loadingComplete - bulkUpdateTime)/1000);
-      let processingCompleteTime = Date.now();
-      console.log('::: Processing completed at ' + (processingCompleteTime-responseReceiptTime)/1000);
-
-      // TODO need to remove this storage of allItems response
-      serverCache.allItems = response;
-
-      syncCompleted();
+  if (response.addItems) {
+    for (let j: number = 0; j < response.addItems.length; j++) {
+      buildOrUpdateProxy(response.addItems[j].item, response.addItems[j].kind,
+        undefined);
     }
-  );
+  }
+
+  if (response.changeItems) {
+    for (let j: number = 0; j < response.changeItems.length; j++) {
+      buildOrUpdateProxy(response.changeItems[j].item, response.changeItems[j].
+        kind, undefined);
+    }
+  }
+
+  if (response.deleteItems) {
+    for (let j: number = 0; j < response.deleteItems.length; j++) {
+      deleteItem(response.deleteItems[j]);
+    }
+  }
+  let after = Date.now();
+  console.log('^^^ processBulkUpdate took: ' + (after-before)/1000 );
 }
 
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function syncWithServer(callback){
-  console.log('$$$ Sync with server');
-
-  if (serverCache.allItems) {
-    callback(serverCache);
-    return;
-  }
-
-  // Sync with server is pending/required
-  if(callback){
-    repoSyncCallback.push(callback);
-  }
-
-  switch (repoState){
-    case RepoStates.DISCONNECTED:
-    case RepoStates.SYNCHRONIZATION_FAILED:
-      console.log('::: Requesting Sync');
-      getMetamodel();
-      break;
-    case RepoStates.SYNCHRONIZING:
-      console.log('::: Already Syncronizing');
-      break;
-    case RepoStates.SYNCHRONIZATION_SUCCEEDED:
-      console.log('??? Sync Succeeded');
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function syncCompleted(){
-  repoState = RepoStates.SYNCHRONIZATION_SUCCEEDED;
-
-  // Deliver sync results to all pending clients
-  for(let cbIdx in repoSyncCallback){
-    let callback = repoSyncCallback[cbIdx];
-    callback(serverCache);
-  }
-  repoSyncCallback = [];
+function updateCache(treeHashes: any): Promise<any> {
+  return new Promise<any>((resolve: (data: any) => void, reject:
+    () => void) => {
+    socket.emit('Item/getAll', { repoTreeHashes: treeHashes },
+      (response) => {
+      processBulkUpdate(response);
+      resolve(response);
+    });
+  });
 }

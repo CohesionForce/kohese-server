@@ -1,5 +1,3 @@
-import { ItemProxy } from './item-proxy';
-import { TreeConfiguration } from './tree-configuration';
 import { ItemCache } from './item-cache';
 
 import * as LevelUp_Import from 'levelup';
@@ -34,9 +32,9 @@ const CacheBulkTransferKeyToSublevelMap = {
   'blobMap': 'blob',
 }
 
-type GetMapMethod = (this : ItemCache) => any;
-type SetValueMethod = (this : ItemCache, key:string, value: any) => any;
-type GetValueMethod = (this : ItemCache, key:string) => any;
+type GetMapMethod = (this : ItemCache) => Map<string, any>;
+type SetValueMethod = (this : ItemCache, key:string, value: any) => void;
+type GetValueMethod = (this : ItemCache, key:string) => Promise<any>;
 
 type SublevelRegistration = {
   sublevelName : string,
@@ -125,8 +123,43 @@ export class LevelCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  public async retrieveValue (sublevelName, key) {
-    return await this.registrationMap.get(sublevelName).sublevel.get(key);
+  async retrieveValue (sublevelName, key) : Promise<any> {
+    let beforeRetrieve = Date.now();
+    let registration : SublevelRegistration = this.registrationMap.get(sublevelName);
+    if(!sublevelName){
+      console.log('*** Invalid sublevel map Lookup: ' + sublevelName + ' - ' + key);
+    }
+    let value = await super.retrieveValue(sublevelName, key);
+
+    if (key === undefined){
+      console.log('@@@ Map Lookup: ' + sublevelName + ' - ' + key );
+    }
+
+    let afterRetrieve = Date.now();
+    if (value !== undefined) {
+      // console.log('@@@ Map Lookup: ' + key + ' - ' + (afterRetrieve - beforeRetrieve)  + ' ms');
+      return Promise.resolve(value);
+    } else {
+      // console.log('$$$ Waiting for value to load: ' + sublevelName + ' - ' + key);
+      let levelPromise = registration.sublevel.get(key)
+
+      let result = new Promise((resolve) => {
+
+        levelPromise.then((value) => {
+          let afterLevelRetrieve = Date.now();
+          registration.setValueMethod.call(this, key, value);
+          resolve(value);
+          // console.log('@@@ Map Lookup (via Level): ' + key + ' - ' + (afterLevelRetrieve - afterRetrieve) + ' ms');
+        }).catch((err) => {
+          resolve(undefined);
+        });
+      });
+
+      await result;
+
+      return result;
+
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -196,8 +229,8 @@ export class LevelCache extends ItemCache {
       let entries = [];
 
       console.log('::: Creating Batch for Sublevel: ' + sublevelName);
-      Object.keys(map).forEach((key) => {
-        entries.push({type: 'put', key: key, value: map[key]})
+      map.forEach((value, key) => {
+        entries.push({type: 'put', key: key, value: value})
       });
 
       console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelName);

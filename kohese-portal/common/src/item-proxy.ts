@@ -8,6 +8,7 @@ import * as jsSHA_Import from 'jssha';
 import * as uuidV1_Import from 'uuid/v1';
 import { TreeConfiguration } from './tree-configuration';
 import { TreeHashEntry, TreeHashMap } from './tree-hash';
+import { VersionStatus } from './version-status';
 
 //
 // Adjust for the differences in CommonJS and ES6 for jssha
@@ -63,7 +64,7 @@ export class ItemProxy {
 
   // Needed for information calculated on the client
   public dirty : boolean = false;
-  public status;
+  private _vcStatus : VersionStatus = new VersionStatus();
   public history;
   public type; // Used to store KoheseType.
 
@@ -149,7 +150,6 @@ export class ItemProxy {
     copyAttributes(forItem, proxy);
 
     proxy.setItemKind(kind);
-    proxy.status = {};
 
     if (kind === 'Repository') {
       proxy.treeConfig.repoMap[itemId] = proxy;
@@ -1465,6 +1465,27 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  updateVCStatus (itemStatus : Array<string>) {
+
+    this._vcStatus.updateStatus(itemStatus);
+
+    TreeConfiguration.getWorkingTree().getChangeSubject().next({
+      type: 'update',
+      proxy: this
+    });
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  get vcStatus () : VersionStatus  {
+    return this._vcStatus;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
 //    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
 
@@ -1474,6 +1495,11 @@ export class ItemProxy {
     var newKind = modelKind;
 
     if (newKind !== this.kind) {
+      if (this.kind === 'Internal-Lost'){
+        // Update is really the new item that was created due to order of arrival
+        let newItem = new ItemProxy(newKind, withItem);
+        return;
+      }
       console.log('::: Proxy kind changed from ' + this.kind + ' to ' + newKind);
       this.setItemKind(newKind);
     }

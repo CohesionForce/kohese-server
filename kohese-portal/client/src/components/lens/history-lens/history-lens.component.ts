@@ -16,7 +16,7 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
   get selectedCommit() {
     return this._selectedCommit;
   }
-  
+
   private _treeConfigurationSubscription: Subscription;
 
   constructor (private itemRepository : ItemRepository,
@@ -27,14 +27,14 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
     this._treeConfigurationSubscription = this.itemRepository.
       getTreeConfig().subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
-        this._selectedCommit = TreeConfiguration.getItemCache().getCommits()[
-          treeConfigurationObject.config.treeId];
+        this._selectedCommit = TreeConfiguration.getItemCache().getCommits()
+          .get(treeConfigurationObject.config.treeId);
       } else {
         this._selectedCommit = undefined;
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this._treeConfigurationSubscription.unsubscribe();
   }

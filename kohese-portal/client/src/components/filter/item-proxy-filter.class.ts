@@ -1,6 +1,5 @@
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { VersionControlState } from '../../services/version-control/version-control.service';
 import { Filter, ValueInputType, FilterableProperty } from './filter.class';
 
 export class ItemProxyFilter extends Filter {
@@ -36,10 +35,9 @@ export class ItemProxyFilter extends Filter {
         
         intermediateFilterablePropertyArray.push(new FilterableProperty(
           'status', ['status', FilterableProperty.PROPERTIES], ValueInputType.
-          SELECT, Object.keys(VersionControlState).map((enumerationKey:
-          VersionControlState) => {
-          return VersionControlState[enumerationKey];
-          })));
+          SELECT, ['CONFLICTED', 'CURRENT', 'IGNORED', 'INDEX_DELETED',
+          'INDEX_MODIFIED', 'INDEX_NEW', 'INDEX_RENAMED', 'WT_DELETED',
+          'WT_MODIFIED', 'WT_NEW', 'WT_RENAMED']));
         
         intermediateFilterablePropertyArray.sort((oneProperty:
           FilterableProperty, anotherProperty: FilterableProperty) => {

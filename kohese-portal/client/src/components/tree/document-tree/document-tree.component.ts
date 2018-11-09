@@ -60,7 +60,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._searchCriterion.external = true;
-    
+
     for (let j: number = 0; j < this.rowActions.length; j++) {
       let displayableEntity: DisplayableEntity = this.rowActions[j];
       if (displayableEntity instanceof ActionGroup) {
@@ -70,13 +70,13 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
           if ((action.text === TargetPosition.BEFORE) || (action.text ===
             TargetPosition.AFTER)) {
             action.canActivate = (object: any) => {
-              return (object as ItemProxy).childrenAreManuallyOrdered();
+              return (object as ItemProxy).parentProxy.childrenAreManuallyOrdered();
             };
           }
         }
       }
     }
-    
+
     this.paramSubscription = this._route.params.subscribe(params => {
       if (params['id']) {
        this.documentRootId = params['id'];
@@ -122,7 +122,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
       this.rootSubject.next(this.documentRoot);
       this.rootSelected.emit(this.documentRoot);
-      
+
       this.initialize();
 
       this.showFocus();
@@ -204,11 +204,11 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind;
-    item['status'] = proxy.status;
+    item['kind'] = proxy.kind; // TODO: Need to remove update of item
+    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
     return super.filter(item);
   }
-  
+
   protected target(target: any, targetingObject: any, targetPosition:
     TargetPosition): void {
     let targetProxy: ItemProxy = (target as ItemProxy);
@@ -226,14 +226,14 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       } else {
         parentProxy.children.splice(targetIndex + 1, 0, targetingProxy);
       }
-      
+
       parentProxy.updateChildrenManualOrder();
       this.itemRepository.upsertItem(parentProxy);
     } else {
       targetingProxy.item.parentId = targetProxy.item.id;
       targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
     }
-    
+
     this.itemRepository.upsertItem(targetingProxy);
   }
 

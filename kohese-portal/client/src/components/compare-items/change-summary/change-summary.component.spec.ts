@@ -8,39 +8,39 @@ import { Comparison } from '../comparison.class';
 
 describe('Component: change-summary', () => {
   let component: ChangeSummaryComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ChangeSummaryComponent],
       imports: [MaterialModule],
       providers: [{ provide: DialogService, useClass: MockDialogService }]
     }).compileComponents();
-    
+
     let fixture: ComponentFixture<ChangeSummaryComponent> = TestBed.
       createComponent(ChangeSummaryComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
-  
-  it('determines if a Comparison has changes', () => {
+
+  it('determines if a Comparison has changes', async () => {
     let comparisonWithChanges: Comparison = new Comparison({
       property: 'value'
       }, {
       property: 'Value'
     });
-    comparisonWithChanges.compare();
+    await comparisonWithChanges.compare();
     expect(component.hasChanges(comparisonWithChanges)).toEqual(true);
-    
+
     let comparisonWithoutChanges: Comparison = new Comparison({
       property: 'value'
       }, {
       property: 'value'
     });
-    comparisonWithChanges.compare();
+    await comparisonWithChanges.compare();
     expect(component.hasChanges(comparisonWithoutChanges)).toEqual(false);
   });
-  
+
   it('returns a style object based on the given change', () => {
     expect(component.getChangeStyle({ added: true })['background-color']).
       toEqual('lightgreen');

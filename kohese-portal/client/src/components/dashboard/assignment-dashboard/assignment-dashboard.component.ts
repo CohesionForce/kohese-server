@@ -60,16 +60,6 @@ export class AssignmentDashboardComponent extends NavigatableComponent
     let sortedArray = [];
     switch (sortStrategy) {
       /////////////////
-      case (DashboardSelections.ACTIVE_ASSIGNMENTS) :
-        sortedArray = assignmentList.sort((a , b) => {
-          if (a.item.modifiedOn >= b.item.modifiedOn) {
-            return 1;
-          } else {
-            return -1;
-          }
-        })
-      break;
-      /////////////////
       case (DashboardSelections.DUE_ASSIGNMENTS) :
         sortedArray = assignmentList.filter((assignment)=>{
           return (!this.isCompleted(assignment) && assignment.item.estimatedCompletion)

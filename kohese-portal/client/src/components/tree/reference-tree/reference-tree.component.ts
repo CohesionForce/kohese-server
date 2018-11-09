@@ -7,8 +7,6 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { VersionControlState,
-  VersionControlSubState } from '../../../services/version-control/version-control.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -29,9 +27,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
 
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
-  
+
   private static readonly PATH_SEGMENT_SEPARATOR: string = '\0';
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository, route: ActivatedRoute,
     dialogService: DialogService, private _navigationService:
@@ -48,7 +46,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
         path.length - 1]);
       if (proxy) {
-        enable = proxy.status['Staged'];
+        enable = (proxy.vcStatus.statusArray.filter((status: string) => {
+          return status.startsWith('INDEX');
+        }).length > 0);
       }
 
       return enable;
@@ -68,9 +68,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
         path.length - 1]);
       if (proxy) {
-        enable = !((proxy.status[VersionControlState.STAGED] ===
-          VersionControlSubState.NEW) || (proxy.status[VersionControlState.
-          UNSTAGED] === VersionControlSubState.NEW));
+        enable = (0 === proxy.vcStatus.statusArray.filter((status: string) => {
+          return status.endsWith('_NEW');
+        }).length);
       }
 
       return enable;
@@ -108,21 +108,21 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
             this.buildRows(path);
           }
         });
-        
+
         let root: Array<string> = [this._selectedTreeConfiguration.
           getRootProxy().item.id];
         this.buildRows(root);
         this.rootSubject.next(root);
-        
+
         this._route.params.subscribe((parameters: Params) => {
           root = [this._selectedTreeConfiguration.getProxyFor(parameters[
             'id']).item.id];
           this.buildRows(root);
           this.rootSubject.next(root);
         });
-        
+
         this.initialize();
-        
+
         this.showFocus();
       }
     });
@@ -135,7 +135,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     }
     this._itemRepositorySubscription.unsubscribe();
   }
-  
+
   private buildRows(root: Array<string>): void {
     this.clear();
 
@@ -143,7 +143,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
     rootRow.expanded = true;
     let rootProxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(
       root[0]);
-    
+
     for (let referenceType in rootProxy.relations) {
       let referenceTypePath: Array<string> = [rootProxy.item.id,
         referenceType];
@@ -176,12 +176,12 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   protected getId(object: any): any {
     return (object as Array<string>).join(ReferenceTreeComponent.
       PATH_SEGMENT_SEPARATOR);
   }
-  
+
   protected getParent(object: any): any {
     let parentPath: Array<string> = (object as Array<string>).slice(0);
     parentPath.length = ((4 === parentPath.length) ? (parentPath.length - 2) :
@@ -192,7 +192,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       return undefined;
     }
   }
-  
+
   protected getChildren(object: any): Array<any> {
     let children: Array<Array<string>> = [];
     let path: Array<string> = (object as Array<string>);
@@ -236,7 +236,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   protected rowFocused(row: TreeRow): void {
     let path: Array<string> = (row.object as Array<string>);
     let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
@@ -274,7 +274,7 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return iconString;
   }
-  
+
   private openComparisonDialog(path: Array<string>, changeVersionDesignator:
     VersionDesignator): void {
     let compareItemsDialogParameters: any = {

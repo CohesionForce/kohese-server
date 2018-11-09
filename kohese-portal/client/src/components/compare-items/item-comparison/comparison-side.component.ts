@@ -155,17 +155,30 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     return this._itemRepository.getHistoryFor(object).map((history:
       Array<any>) => {
       this._versions = history;
-      if (!object.status['Unstaged'] && (this._versions.length > 0)) {
+      if (0 === object.vcStatus.statusArray.filter((status: string) => {
+        return status.startsWith('WT');
+      }).length && (this._versions.length > 0)) {
         /* If there are no unstaged changes to the selected Item, change the
         commit ID of the most recent commit that included that Item to
         'Unstaged' to operate on the working tree version of that Item. */
         this._versions[0].commit = 'Unstaged';
       }
       let uncommittedVersions: Array<any> = [];
-      for (let statusName in object.status) {
+      if (object.vcStatus.statusArray.filter((status: string) => {
+        return status.startsWith('WT');
+      }).length > 0) {
         uncommittedVersions.push({
-          commit: statusName,
-          message: statusName
+          commit: 'Unstaged',
+          message: 'Unstaged'
+        });
+      }
+
+      if (object.vcStatus.statusArray.filter((status: string) => {
+        return status.startsWith('INDEX');
+      }).length > 0) {
+        uncommittedVersions.push({
+          commit: 'Staged',
+          message: 'Staged'
         });
       }
       this._versions.splice(0, 0, ...uncommittedVersions);
@@ -175,8 +188,8 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     });
   }
 
-  public whenSelectedVersionChanges(object: any, versionIdentifier: string):
-    void {
+  public async whenSelectedVersionChanges(object: any, versionIdentifier: string):
+    Promise<void> {
     this._selectedVersion = versionIdentifier;
     this._allowEditing = (('Staged' === versionIdentifier) || (this.
       _versions[0].commit === versionIdentifier));
@@ -188,7 +201,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         this._propertyDifferenceMap.set(propertyName, []);
       }
     }
-    this._selectedObjectSubject.next(this.getVersionProxy(versionIdentifier,
+    this._selectedObjectSubject.next(await this.getVersionProxy(versionIdentifier,
       (object as ItemProxy).item.id));
     this._changeDetectorRef.detectChanges();
 
@@ -312,15 +325,15 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     return style;
   }
 
-  private getVersionProxy(versionIdentifier: string, itemId: string):
-    ItemProxy {
+  private async getVersionProxy(versionIdentifier: string, itemId: string):
+    Promise<ItemProxy> {
     let treeConfiguration: TreeConfiguration =
       TreeConfiguration.getTreeConfigFor(versionIdentifier);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(versionIdentifier);
       let itemCache: ItemCache = TreeConfiguration.getItemCache();
-      itemCache.loadProxiesForCommit(versionIdentifier, treeConfiguration);
-      treeConfiguration.loadingComplete();
+      await itemCache.loadProxiesForCommit(versionIdentifier, treeConfiguration);
+      treeConfiguration.loadingComplete(true);
     }
 
     return treeConfiguration.getProxyFor(itemId);

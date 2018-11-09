@@ -38,19 +38,21 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
-      .subscribe((update) => {
+      .subscribe(async (update) => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
           this.commitMap = TreeConfiguration.getItemCache().getCommits();
+
           // Convert to array for sorting in the view
-          for (let commitId in this.commitMap) {
+          for (let commitId of <Array<string>>Array.from(this.commitMap.keys())) {
+            let commit = await this.commitMap.get(commitId)
             let commitView = {
               commitId: commitId,
-              commit: this.commitMap[commitId],
+              commit: commit,
               parents: []
             }
             commitView.parents = []
-            for (let parent in this.commitMap[commitId].parents) {
-              commitView.parents.push(this.commitMap[parent])
+            for (let parent in commit.parents) {
+              commitView.parents.push(this.commitMap.get(parent))
             }
 
             this.commitList.push(commitView)
@@ -77,8 +79,8 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
       commitId: commitIdx,
       parents: []
     }
-    for (let parent of this.commitMap[commitIdx].parents) {
-      newCommitView.parents.push(this.commitMap[parent])
+    for (let parent of this.commitMap.get(commitIdx).parents) {
+      newCommitView.parents.push(this.commitMap.get(parent))
     }
     this.selectedCommit = newCommitView;
   }
@@ -96,7 +98,7 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
       TreeConfigType.HISTORICAL);
     this.matDialogRef.close(this.selectedCommit);
   }
-  
+
   public navigateToSelectedCommit(): void {
     this._navigationService.navigate('Versions', {
       id: this.selectedCommit.commitId

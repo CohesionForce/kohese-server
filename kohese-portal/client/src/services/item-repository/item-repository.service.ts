@@ -13,7 +13,6 @@ import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
-import { CacheManager } from '../../../cache-worker/CacheManager';
 
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -65,7 +64,17 @@ export class ItemRepository {
 
   currentTreeConfigSubject: BehaviorSubject<TreeConfigInfo> = new BehaviorSubject<TreeConfigInfo>(undefined);
 
-  cacheFetched: boolean = false;
+  private _worker: SharedWorker.SharedWorker;
+  private _cache: ItemCache = new ItemCache();
+
+  private _suppressWorkerRequestAnnouncement = {
+    connectionVerification: true
+  };
+
+  private _suppressWorkerEventAnnouncement = {
+    verifyConnection: true
+  };
+
 
   //////////////////////////////////////////////////////////////////////////
   constructor(private socketService: SocketService,
@@ -74,13 +83,7 @@ export class ItemRepository {
     private dialogService: DialogService,
     private _versionControlService: VersionControlService,
     private logService: LogService) {
-
     this.logEvents = InitializeLogs(logService)
-    this.initialize();
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  initialize(): void {
     this.logService.log(this.logEvents.itemRepoInit);
 
     this.repositoryStatus = new BehaviorSubject({
@@ -89,7 +92,6 @@ export class ItemRepository {
     });
 
     ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
-
       this.logService.log(this.logEvents.receivedNofificationOfChange, { change: change });
 
       switch (change.type) {
@@ -102,21 +104,285 @@ export class ItemRepository {
       }
     });
 
+    this.recentProxies = [];
+
+    let scripts: any = document.scripts;
+    let cacheWorkerBundle: string;
+    scriptLoop: for (let scriptIdx in scripts) {
+      let script: any = scripts[scriptIdx];
+      if (script.attributes) {
+        for (let idx in script.attributes) {
+          let attribute: any = script.attributes[idx];
+          if (attribute.value) {
+            if (attribute.value.match(/^cache-worker/)) {
+              cacheWorkerBundle = attribute.value;
+              break scriptLoop;
+            }
+          }
+        }
+      }
+    }
+
+    console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
+    this._worker = new SharedWorker(cacheWorkerBundle);
+    this._worker.port.addEventListener('message', (messageEvent: any) => {
+
+      let msg: any = messageEvent.data;
+
+      if (!msg.message){
+
+        if (msg.id && msg.data) {
+          // Ignore response that is directed to another event listener
+          // console.log('^^^ Received response from worker in main listener for request: ' + msg.id);
+        } else {
+          console.log('*** Received unexpected response message');
+          console.log(messageEvent);
+        }
+        return;
+      }
+
+      let beforeProcessing = Date.now();
+      if (!this._suppressWorkerEventAnnouncement[msg.message]){
+        console.log('^^^ Received message from worker: ' + msg.message);
+      }
+
+      switch (msg.message) {
+        case 'reconnected':
+          this.align();
+          break;
+        case 'connectionError':
+
+          // TODO: Should only send the state changes once
+
+          this.repositoryStatus.next({
+            state: RepoStates.DISCONNECTED,
+            message: 'Disconnected'
+          });
+          break;
+        case 'verifyConnection':
+          this.sendMessageToWorker('connectionVerification', undefined, false);
+          break;
+        case 'update':
+          this.buildOrUpdateProxy(msg.data.item, msg.data.kind, msg.data.status);
+          break;
+        case 'updateItemStatus':
+          this.updateItemStatus(msg.data.itemId, msg.data.status);
+          break;
+        case 'deletion':
+          TreeConfiguration.getWorkingTree().getProxyFor(msg.data).
+            deleteItem();
+          break;
+        case 'cachePiece':
+          let cachePiece : any = msg.data;
+          this.processCachePiece(cachePiece);
+          break;
+        default:
+          console.log('*** Received unexpected message: ' + msg.message);
+          console.log(messageEvent);
+      }
+
+      if (!this._suppressWorkerEventAnnouncement[msg.message]){
+        let afterProcessing = Date.now();
+        console.log('^^^ Processed message from worker ' + msg.message + ' - '
+          + (afterProcessing-beforeProcessing)/1000);
+      }
+    });
+
+    TreeConfiguration.setItemCache(this._cache);
+    this._worker.port.start();
+
     this.CurrentUserService.getCurrentUserSubject()
       .subscribe((decodedToken) => {
-        this.logService.log(this.logEvents.itemRepositoryAuthenticated);
-        if (decodedToken) {
-          this.logService.log(this.logEvents.socketAlreadyConnected);
-          this.registerKoheseIOListeners();
-          this.fetchItems();
-        }
-      });
-
-    this.recentProxies = [];
+      this.logService.log(this.logEvents.itemRepositoryAuthenticated);
+      if (decodedToken) {
+        this.logService.log(this.logEvents.socketAlreadyConnected);
+        this.repositoryStatus.next({
+          state: RepoStates.SYNCHRONIZING,
+          message: 'Starting Repository Sync'
+        });
+        this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
+          true).then(async () => {
+          this.align();
+        });
+      }
+    });
   }
 
+  public async getSessionMap(): Promise<any> {
+    return (await this.sendMessageToWorker('getSessionMap', undefined, true)).
+      data;
+  }
 
-  // End Item Proxy Wrapper
+  private align(): Promise<void> {
+    return new Promise<void>(async (resolve: () => void, reject: () => void) => {
+      this.repositoryStatus.next({
+        state: RepoStates.SYNCHRONIZING,
+        message: 'Starting Repository Sync'
+      });
+
+      let fundamentalItemsResponse = await this.sendMessageToWorker(
+        'getFundamentalItems', { refresh: false }, true);
+      this.processBulkUpdate(fundamentalItemsResponse.data);
+
+      await this.sendMessageToWorker('getCache', { refresh: false }, true);
+
+      let workingTree: TreeConfiguration = TreeConfiguration.getWorkingTree();
+      let headRef = await this._cache.getRef('HEAD');
+      await this._cache.loadProxiesForCommit(headRef, workingTree);
+
+      workingTree.calculateAllTreeHashes();
+      let treeHashes = workingTree.getAllTreeHashes();
+
+      let itemUpdatesResponse = await this.sendMessageToWorker(
+        'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
+      this.processBulkUpdate(itemUpdatesResponse.data);
+
+      // Ensure status for all items is updated
+      let statusResponse = await this.sendMessageToWorker(
+        'getStatus', undefined, true);
+      console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
+
+      let calculateTreeHashesAsynchronously: boolean = this.loadFeatureSwitch(
+        'IR-defer-calc', true);
+
+      if (calculateTreeHashesAsynchronously) {
+
+        console.log('^^^ Calculating TreeHashes asynchronously');
+
+        // Send early notification to other components
+        this.currentTreeConfigSubject.next({
+          config: workingTree,
+          configType: TreeConfigType.DEFAULT
+        });
+
+        this.repositoryStatus.next({
+          state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
+          message: 'Item Repository Ready'
+        });
+
+        await Promise.all(workingTree.loadingComplete(calculateTreeHashesAsynchronously));
+
+        console.log('^^^ Completed calculating TreeHashes asynchronously');
+
+      } else {
+
+        console.log('^^^ Calculating TreeHashes synchronously');
+
+        // This call will block until complete since the TreeHash processing is not deferred
+        await Promise.all(workingTree.loadingComplete(false));
+
+      }
+
+      console.log('^^^ Requesting second sync');
+      let secondItemUpdateResponse = await this.sendMessageToWorker(
+        'getItemUpdates', { refresh: true, treeHashes: workingTree.getAllTreeHashes() }, true);
+
+      let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
+
+      if (syncIsComplete){
+        this.logService.log(this.logEvents.kdbSynced);
+      } else {
+        // Process the updates
+        this.processBulkUpdate(secondItemUpdateResponse.data);
+
+        this.logService.log(this.logEvents.compareHashAfterUpdate);
+
+        let updatedTreeHashes = workingTree.getAllTreeHashes();
+
+        let compareRTH = TreeHashMap.compare(updatedTreeHashes, secondItemUpdateResponse.data.repoTreeHashes);
+
+        syncIsComplete = compareRTH.match
+
+        if (!syncIsComplete) {
+          // Provide additional logging information for failure to sync
+          this.logService.log(this.logEvents.repoSyncFailed, {comparison : compareRTH});
+
+          for (let idx in compareRTH.changedItems) {
+            let itemId = compareRTH.changedItems[idx];
+            let changedProxy = workingTree.getProxyFor(itemId);
+            this.logService.log(this.logEvents.failedProxySync, {
+              id : itemId,
+              changedProxy : changedProxy
+            });
+          }
+        }
+      }
+
+      // Provide notification of final status
+
+      if (syncIsComplete) {
+        // Notify tree is ready to use
+        this.currentTreeConfigSubject.next({
+          config: workingTree,
+          configType: TreeConfigType.DEFAULT
+        });
+
+        this.repositoryStatus.next({
+          state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
+          message: 'Item Repository Ready'
+        });
+      } else {
+        this.repositoryStatus.next({
+          state: RepoStates.SYNCHRONIZATION_FAILED,
+          message: 'Repository sync failed'
+        });
+      }
+
+      resolve();
+    });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  private buildOrUpdateProxy(item: any, kind: string, itemStatus: Array<string>):
+    ItemProxy {
+    let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.
+      id);
+    if (kind) {
+      if (proxy) {
+        proxy.updateItem(kind, item);
+        proxy.dirty = false;
+      } else {
+        if (kind === 'KoheseModel') {
+          proxy = new KoheseModel(item);
+        } else {
+          proxy = new ItemProxy(kind, item);
+        }
+      }
+    }
+
+    if (proxy && itemStatus) {
+      proxy.updateVCStatus(itemStatus);
+
+      TreeConfiguration.getWorkingTree().getChangeSubject().next({
+        type: 'update',
+        proxy: proxy
+      });
+    }
+
+    return proxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  updateItemStatus (itemId : string, itemStatus : Array<string>) {
+
+    let workingTree = ItemProxy.getWorkingTree();
+    let proxy: ItemProxy = workingTree.getProxyFor(itemId);
+
+    if (proxy && itemStatus) {
+      console.log('^^^ Updating status for: ' + itemId + ' - ' + itemStatus);
+      proxy.updateVCStatus(itemStatus);
+
+      // TODO: All change notifications need to be sent from ItemProxy
+
+      TreeConfiguration.getWorkingTree().getChangeSubject().next({
+        type: 'update',
+        proxy: proxy
+      });
+    } else {
+      console.log('*** Could not find proxy to update status: ' + itemId + ' - ' + itemStatus);
+    }
+
+  }
 
   //////////////////////////////////////////////////////////////////////////
   getRepoStatusSubject(): BehaviorSubject<any> {
@@ -131,93 +397,6 @@ export class ItemRepository {
   //////////////////////////////////////////////////////////////////////////
   getRecentProxies(): Array<ItemProxy> {
     return this.recentProxies;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  registerKoheseIOListeners(): void {
-    CacheManager.authenticate();
-
-    // Register the listeners for the Item kinds that are being tracked
-    this.socketService.socket.on('Item/create', (notification) => {
-      this.logService.log(this.logEvents.itemCreated, {notification : notification});
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
-      if (proxy) {
-        proxy.updateItem(notification.kind, notification.item);
-      } else {
-        if (notification.kind === 'KoheseModel') {
-          proxy = new KoheseModel(notification.item);
-        } else {
-          proxy = new ItemProxy(notification.kind, notification.item);
-        }
-      }
-
-      this.updateStatus(proxy, notification.status);
-      proxy.dirty = false;
-    });
-
-    this.socketService.socket.on('Item/update', (notification) => {
-      this.logService.log(this.logEvents.itemUpdated, {notification : notification});
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.item.id);
-      if (proxy) {
-        proxy.updateItem(notification.kind, notification.item);
-      } else {
-        if (notification.kind === 'KoheseModel') {
-          proxy = new KoheseModel(notification.item);
-        } else {
-          proxy = new ItemProxy(notification.kind, notification.item);
-        }
-      }
-
-      this.updateStatus(proxy, notification.status);
-      proxy.dirty = false;
-    });
-
-    this.socketService.socket.on('Item/delete', (notification) => {
-      this.logService.log(this.logEvents.itemDeleted, {notification : notification});
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(notification.id);
-      proxy.deleteItem();
-    });
-
-    this.socketService.socket.on('Item/BulkUpdate', (bulkUpdate) => {
-      this.logService.log(this.logEvents.bulkUpdate, {update : bulkUpdate});
-      this.processBulkUpdate(bulkUpdate);
-    });
-
-    this.socketService.socket.on('VersionControl/statusUpdated', (gitStatusMap) => {
-      this.logService.log(this.logEvents.versionControlStatusUpdated, {gitStatus : gitStatusMap});
-      for (var id in gitStatusMap) {
-        var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
-        this.updateStatus(proxy, gitStatusMap[id]);
-      }
-    });
-
-    this.socketService.socket.on('connect_error', () => {
-      this.logService.log(this.logEvents.socketError);
-      this.repositoryStatus.next({
-        state: RepoStates.DISCONNECTED,
-        message: 'Error connecting to repository'
-      })
-    });
-
-    this.socketService.socket.on('reconnect', () => {
-      if (this.CurrentUserService.getCurrentUserSubject().getValue()) {
-        this.logService.log(this.logEvents.socketReconnect);
-        this.fetchItems();
-        this.toastrService.success('Reconnected!', 'Server Connection!');
-      } else {
-        this.logService.log(this.logEvents.socketAuthenticating);
-        let subscription: Subscription = this.CurrentUserService.getCurrentUserSubject()
-          .subscribe((decodedToken) => {
-            if (decodedToken) {
-              this.logService.log(this.logEvents.socketAuthenticated);
-              this.fetchItems();
-              this.toastrService.success('Reconnected!', 'Server Connection!');
-              subscription.unsubscribe();
-            }
-
-          });
-      }
-    });
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -252,6 +431,43 @@ export class ItemRepository {
     };
 
     return switchResult
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  processCachePiece(cachePiece) {
+
+    switch (cachePiece.key) {
+      case 'metadata':
+        for (let key in cachePiece.value) {
+          this._cache.cacheMetaData(key, cachePiece.value[key]);
+        }
+        break;
+      case 'ref':
+        for (let key in cachePiece.value) {
+          this._cache.cacheRef(key, cachePiece.value[key]);
+        }
+        break;
+      case 'tag':
+        for (let key in cachePiece.value) {
+          this._cache.cacheTag(key, cachePiece.value[key]);
+        }
+        break;
+      case 'commit':
+        for (let key in cachePiece.value) {
+          this._cache.cacheCommit(key, cachePiece.value[key]);
+        }
+        break;
+      case 'tree':
+        for (let key in cachePiece.value) {
+          this._cache.cacheTree(key, cachePiece.value[key]);
+        }
+        break;
+      case 'blob':
+        for (let key in cachePiece.value) {
+          this._cache.cacheBlob(key, cachePiece.value[key]);
+        }
+        break;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -317,256 +533,44 @@ export class ItemRepository {
     }
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  fetchItems() {
+  private sendMessageToWorker(message: string, data: any, expectResponse:
+    boolean): Promise<any> {
+    return new Promise<void>((resolve: (data: any) => void, reject:
+      () => void) => {
 
-    // this.cacheFetched = true;
-    // TODO Remove this
-    if (!this.cacheFetched) {
-      let beforeFetch = Date.now();
+      let requestTime = Date.now();
+      let id: number = requestTime;
 
-      this.repositoryStatus.next({
-        state: RepoStates.SYNCHRONIZING,
-        message: 'Starting Repository Sync'
-      });
-
-      CacheManager.sync((response) => {
-        let afterFetch = Date.now();
-        this.logService.log(this.logEvents.fetchTime ,{fetchTime : (afterFetch - beforeFetch) / 1000});
-
-        if (response.metaModel) {
-          this.logService.log(this.logEvents.processProxyMetaModel);
-          this.processBulkUpdate({ cache: response.metaModel });
-        }
-
-        if (response.objectMap) {
-          this.logService.log(this.logEvents.processCache);
-          let itemCache = new ItemCache();
-          itemCache.setObjectMap(response.objectMap);
-          TreeConfiguration.setItemCache(itemCache);
-
-          let workingTree = TreeConfiguration.getWorkingTree();
-          let headCommit = itemCache.getRef('HEAD');
-          this.logService.log(this.logEvents.retrieveHeadCommit, {headCommit : headCommit});
-
-          // TODO Need to load the HEAD commit
-          this.logService.log(this.logEvents.loadHeadCommit);
-          itemCache.loadProxiesForCommit(headCommit, workingTree);
-
-          this.cacheFetched = true;
-        }
-
-        let beginBulkProcessing = Date.now();
-        console.log('$$$ Metamodel and cache processing time: ' + (beginBulkProcessing-afterFetch)/1000);
-        this.processBulkUpdate(response.allItems);
-
-        let processingComplete = Date.now();
-        this.logService.log(this.logEvents.bulkUpdateProcessingTime, {processTime : (processingComplete - beginBulkProcessing) / 1000});
-        let deferCalc = this.loadFeatureSwitch('IR-defer-calc', true);
-        let deferredCalcProxies : Array<Promise<number>> = ItemProxy.getWorkingTree().loadingComplete(deferCalc);
-        let treehashComplete = Date.now();
-        this.logService.log(this.logEvents.treeHashProcessingTime, {processTime : (treehashComplete - processingComplete) / 1000});
-
-        // TODO Remove after cache is complete
-        // Invoke fetch to peform a delta update
-        if(!deferCalc){
-          this.fetchItems();
-        } else {
-          console.log('$$$ Deferring secondary sync');
-          this.notifyRepoIsSynchronized();
-
-          Promise.all(deferredCalcProxies).then(() => {
-            console.log('$$$ IR: Deferred Calculations completed -> Requesting Secondary Sync');
-            this.fetchItems();
-          });
-
-          // console.log('$$$ Calculating tree hashes');
-          // TreeConfiguration.getWorkingTree().calculateAllTreeHashes();
-          // console.log('$$$ Tree hashes calculated');
-        }
-      });
-      return;
-    }
-
-    let fetchAll = this.loadFeatureSwitch('IR-fetch-all', true);
-
-    if (fetchAll) {
-      this.fetchAllItems(null);
-    } else {
-      this.logService.log(this.logEvents.fetchingAll);
-      var beginFetching = Date.now();
-      var origRepoTreeHashes = ItemProxy.getWorkingTree().getRepoTreeHashes();
-
-      this.repositoryStatus.next({
-        state: RepoStates.SYNCHRONIZING,
-        message: 'Starting Repository Sync'
-      });
-
-      // this.logService.log('$$$ Client Repo THM');
-      // this.logService.log(origRepoTreeHashes);
-
-      this.socketService.socket.emit('Item/getRepoHashmap', { repoTreeHashes: origRepoTreeHashes }, (response) => {
-        var gotResponse = Date.now();
-        // this.logService.log('::: Response for getRepoHashmap');
-        // this.logService.log('$$$ Response time: ' + (gotResponse-beginFetching)/1000);
-
-        // this.logService.log('$$$ Server Repo THM');
-        // this.logService.log(response);
-
-        let repoSyncPending = false;
-
-        for (let repoId in response.repoTreeHashes) {
-          let repoTreeHash = response.repoTreeHashes[repoId];
-          let repoProxy = ItemProxy.getWorkingTree().getProxyFor(repoId);
-          let syncRequired = true;
-          if (repoProxy && repoProxy.treeHashEntry) {
-            // A previous fetch has occurried, check to see if there an opportunity to skip resync
-            let rTHMCompare = TreeHashEntry.diff(repoTreeHash, repoProxy.treeHashEntry);
-            if (rTHMCompare.match){
-              syncRequired = false;
-              // this.logService.log('$$$ Sync not required ' + repoId);
-              this.repoSyncStatus[repoId] = RepoStates.SYNCHRONIZATION_SUCCEEDED;
-            }
-          }
-
-          if (syncRequired) {
-            this.fetchAllItems(repoId);
-            this.repoSyncStatus[repoId] = RepoStates.SYNCHRONIZING;
-            repoSyncPending = true;
-          }
-        }
-
-        if (!repoSyncPending) {
-          this.repositoryStatus.next({
-            state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
-            message: 'Item Repository Ready'
-          });
-        }
-      });
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  fetchAllItems(forRepoId) {
-    this.logService.log(this.logEvents.getAll);
-    var beginFetching = Date.now();
-
-    let origRepoTreeHashes;
-    if (!forRepoId) {
-      origRepoTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes()
-    } else {
-      let repoProxy = ItemProxy.getWorkingTree().getProxyFor(forRepoId);
-      if (repoProxy) {
-        origRepoTreeHashes = repoProxy.getTreeHashMap();
-      }
-    }
-
-    this.repositoryStatus.next({
-      state: RepoStates.SYNCHRONIZING,
-      message: 'Starting Repository Sync'
-    });
-
-    let request = {
-      forRepoId: forRepoId,
-      repoTreeHashes: origRepoTreeHashes
-    };
-    this.logService.log(this.logEvents.repoSyncRequest, {request : request});
-
-    this.socketService.socket.emit('Item/getAll', request, (response) => {
-      var gotResponse = Date.now();
-      this.logService.log(this.logEvents.getAllResponse, {
-        response : response,
-        processingTime : (gotResponse - beginFetching) / 1000,
-      });
-      var syncSucceeded = false;
-      if (response.kdbMatches) {
-        this.logService.log(this.logEvents.kdbSynced);
-        syncSucceeded = true;
-      } else {
-
-        this.processBulkUpdate(response);
-
-        this.logService.log(this.logEvents.compareHashAfterUpdate);
-        var updatedTreeHashes;
-        if (!forRepoId) {
-          ItemProxy.getWorkingTree().loadingComplete();
-          updatedTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes();
-        } else {
-          let repoProxy = ItemProxy.getWorkingTree().getProxyFor(forRepoId);
-          if (repoProxy) {
-            repoProxy.calculateTreeHashes(false, true);
-            updatedTreeHashes = repoProxy.getTreeHashMap();
-          }
-        }
-
-        var compareAfterRTH = TreeHashMap.compare(updatedTreeHashes, response.repoTreeHashes);
-
-        syncSucceeded = compareAfterRTH.match;
-
-        var finishedTime = Date.now();
-        this.logService.log(this.logEvents.compareTreeHashProcessingTime ,{ time : (finishedTime - gotResponse) / 1000});
-
-        if (!compareAfterRTH.match) {
-          this.logService.log(this.logEvents.repoSyncFailed, {compareAfterRTH : compareAfterRTH});
-          let workingTree = TreeConfiguration.getWorkingTree();
-          for (let idx in compareAfterRTH.changedItems) {
-            let itemId = compareAfterRTH.changedItems[idx];
-            let changedProxy = workingTree.getProxyFor(itemId);
-            this.logService.log(this.logEvents.failedProxySync, {
-              id : itemId,
-              changedProxy : changedProxy
-            });
-          }
-          this.repositoryStatus.next({
-            state: RepoStates.SYNCHRONIZATION_FAILED,
-            message: 'Repository sync failed'
-          });
-          if (forRepoId) {
-            this.repoSyncStatus[forRepoId] = RepoStates.SYNCHRONIZATION_FAILED;
-          }
-        }
+      if (!this._suppressWorkerRequestAnnouncement[message]) {
+        console.log('^^^ Send message to worker: ' + message + ' - ' + id);
       }
 
-      if (syncSucceeded) {
-        if (forRepoId) {
-          this.repoSyncStatus[forRepoId] = RepoStates.SYNCHRONIZATION_SUCCEEDED;
+      if (expectResponse) {
+        let responseHandler: (messageEvent: any) => void = (messageEvent:
+          any) => {
+          let msg: any = messageEvent.data;
+          if (msg.id === id) {
+            let responseTime = Date.now();
+            console.log('^^^ Received response from worker for request: ' + message + ' - ' + msg.id + ' - ' +
+              (responseTime-requestTime)/1000);
+            resolve(msg);
+            this._worker.port.removeEventListener('message',
+              responseHandler);
 
-          let sendFinalSyncRequest = true;
-
-          for (let repoId in this.repoSyncStatus) {
-            if (this.repoSyncStatus[repoId] != RepoStates.SYNCHRONIZATION_SUCCEEDED) {
-              this.logService.log(this.logEvents.waitingOnRepoSync, {repoId : repoId});
-              sendFinalSyncRequest = false;
-            }
           }
-
-          if (sendFinalSyncRequest) {
-            // All of the incremental syncs have succeeded, need to check for any new deltas
-            this.fetchAllItems(null);
-          }
-        } else {
-          // Final repo sync
-          this.notifyRepoIsSynchronized();
-        }
+        };
+        this._worker.port.addEventListener('message', responseHandler);
+      }
+      this._worker.port.postMessage({
+        type: message,
+        id: id,
+        data: data
+      });
+      this._worker.port.start();
+      if (!expectResponse) {
+        resolve(undefined);
       }
     });
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  private notifyRepoIsSynchronized(){
-
-    console.log('$$$ Notify Repo Is Synched')
-    this.currentTreeConfigSubject.next({
-      config: TreeConfiguration.getWorkingTree(),
-      configType: TreeConfigType.DEFAULT
-    });
-    this.repositoryStatus.next({
-      state: RepoStates.SYNCHRONIZATION_SUCCEEDED,
-      message: 'Item Repository Ready'
-    });
-
-    var rootProxy = ItemProxy.getWorkingTree().getRootProxy();
-    this.getStatusFor(rootProxy);
   }
 
   fetchItem(proxy) {
@@ -681,28 +685,6 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  getStatusFor(repo) {
-    this.socketService.socket.emit('Item/getStatus', { repoId: repo.item.id }, (results) => {
-      if (!repo.repoStatus) {
-        repo.repoStatus = {};
-      }
-      repo.repoStatus = results;
-      this.logService.log(this.logEvents.retrieveVCStatus, {repo : repo});
-      for (var rIdx in repo.repoStatus) {
-        var entry = repo.repoStatus[rIdx];
-        this.logService.log(this.logEvents.retrieveVCStatus, {rIdx : rIdx, entry : entry});
-
-        var proxy = ItemProxy.getWorkingTree().getProxyFor(entry.id);
-        if (proxy) {
-          this.updateStatus(proxy, entry.status);
-        } else {
-          this.logService.log(this.logEvents.retrieveVCStatusFailed, {rIdx : rIdx, entry : entry});
-        }
-      }
-    });
-  }
-
-  //////////////////////////////////////////////////////////////////////////
   performAnalysis(forProxy) {
     this.logService.log(this.logEvents.performingAnalysis, {proxy : forProxy});
 
@@ -720,33 +702,17 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  private updateStatus(proxy: ItemProxy, statuses: Array<string>): void {
-    if (statuses.length > 0) {
-      proxy.status = this._versionControlService.translateStatus(statuses);
-    } else {
-      for (let fieldName in proxy.status) {
-        delete proxy.status[fieldName];
-      }
-    }
-
-    ItemProxy.getWorkingTree().getChangeSubject().next({
-      type: 'update',
-      proxy: proxy
-    });
-  }
-
-  //////////////////////////////////////////////////////////////////////////
   getTreeConfig(): Observable<any> {
     return this.currentTreeConfigSubject;
   }
 
   //////////////////////////////////////////////////////////////////////////
-  setTreeConfig(treeId: string, configType: TreeConfigType): void {
+  async setTreeConfig(treeId: string, configType: TreeConfigType): Promise<void> {
     let treeConfiguration = TreeConfiguration.getTreeConfigFor(treeId);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(treeId);
       let itemCache = TreeConfiguration.getItemCache();
-      itemCache.loadProxiesForCommit(treeId, treeConfiguration);
+      await itemCache.loadProxiesForCommit(treeId, treeConfiguration);
       treeConfiguration.loadingComplete();
     }
 

@@ -83,9 +83,4 @@ describe('Service: version-control', () => {
       done();
     });
   });
-
-  it('translates a version control status', () => {
-    expect(Object.keys(versionControlService.translateStatus(['CURRENT'])).
-      length).toEqual(1);
-  });
 });
