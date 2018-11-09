@@ -349,29 +349,19 @@ function KIOItemServer(socket){
   socket.on('Item/getStatus', function(request, sendResponse){
 
     var repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
-    console.log('::: Getting status for repo: ' + repoProxy.item.name);
+    console.log('::: Getting status for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId);
 
     kdb.kdbRepo.getStatus(request.repoId, function(status){
       if (status) {
         var idStatusArray = [];
         for (var j = 0; j < status.length; j++) {
-          var fileString = status[j].path;
-          if (fileString.endsWith('.json')) {
-            var id = Path.basename(fileString, '.json');
-            var foundId = true;
-            if (!UUID_REGEX.test(id)) {
-              id = Path.basename(Path.dirname(fileString));
-              if (!UUID_REGEX.test(id)) {
-                foundId = false;
-              }
-            }
+          let statusRecord = status[j];
 
-            if (foundId) {
-              idStatusArray.push({
-                id: id,
-                status: status[j].status
-              });
-            }
+          if (statusRecord.itemId){
+            idStatusArray.push({
+              id: statusRecord.itemId,
+              status: statusRecord.status
+            });
           }
         }
 
@@ -466,8 +456,13 @@ function KIOItemServer(socket){
       console.log('::: Sent Item/upsert response');
 
     } catch (err){
-      console.log('*** Error: ' + err);
-      console.log(err.stack);
+      if (err.error){
+        console.log('*** Error: ' + err.error);
+        console.log(err);
+      } else {
+        console.log('*** Error: ' + err);
+        console.log(err.stack);
+      }
       sendResponse({error: err});
       console.log('::: Sent Item/upsert error');
     }

@@ -121,7 +121,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
       this.rootSubject.next(this.documentRoot);
       this.rootSelected.emit(this.documentRoot);
-      
+
       this.initialize();
 
       this.showFocus();
@@ -203,8 +203,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind;
-    item['status'] = proxy.status;
+    item['kind'] = proxy.kind; // TODO: Need to remove update of item
+    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
     return super.filter(item);
   }
 

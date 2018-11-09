@@ -151,6 +151,9 @@ export class ItemRepository {
           this.align();
           break;
         case 'connectionError':
+
+          // TODO: Should only send the state changes once
+
           this.repositoryStatus.next({
             state: RepoStates.DISCONNECTED,
             message: 'Disconnected'
@@ -163,7 +166,7 @@ export class ItemRepository {
           this.buildOrUpdateProxy(msg.data.item, msg.data.kind, msg.data.status);
           break;
         case 'updateItemStatus':
-          this.updateItemStatus(msg.data.item, msg.data.status);
+          this.updateItemStatus(msg.data.itemId, msg.data.status);
           break;
         case 'deletion':
           TreeConfiguration.getWorkingTree().getProxyFor(msg.data).
@@ -234,6 +237,11 @@ export class ItemRepository {
         'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
       this.processBulkUpdate(itemUpdatesResponse.data);
 
+      // Ensure status for all items is updated
+      let statusResponse = await this.sendMessageToWorker(
+        'getStatus', undefined, true);
+      console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
+
       let calculateTreeHashesAsynchronously: boolean = this.loadFeatureSwitch(
         'IR-defer-calc', true);
 
@@ -303,6 +311,7 @@ export class ItemRepository {
       // Provide notification of final status
 
       if (syncIsComplete) {
+        // Notify tree is ready to use
         this.currentTreeConfigSubject.next({
           config: workingTree,
           configType: TreeConfigType.DEFAULT
@@ -324,7 +333,7 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  private buildOrUpdateProxy(item: any, kind: string, status: Array<string>):
+  private buildOrUpdateProxy(item: any, kind: string, itemStatus: Array<string>):
     ItemProxy {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.
       id);
@@ -341,9 +350,8 @@ export class ItemRepository {
       }
     }
 
-    if (status && proxy) {
-      proxy.status.length = 0;
-      proxy.status.push(...status);
+    if (proxy && itemStatus) {
+      proxy.updateVCStatus(itemStatus);
 
       TreeConfiguration.getWorkingTree().getChangeSubject().next({
         type: 'update',
@@ -361,8 +369,8 @@ export class ItemRepository {
     let proxy: ItemProxy = workingTree.getProxyFor(itemId);
 
     if (proxy && itemStatus) {
-      proxy.status.length = 0;
-      proxy.status.push(...itemStatus);
+      console.log('^^^ Updating status for: ' + itemId + ' - ' + itemStatus);
+      proxy.updateVCStatus(itemStatus);
 
       // TODO: All change notifications need to be sent from ItemProxy
 
@@ -370,6 +378,8 @@ export class ItemRepository {
         type: 'update',
         proxy: proxy
       });
+    } else {
+      console.log('*** Could not find proxy to update status: ' + itemId + ' - ' + itemStatus);
     }
 
   }

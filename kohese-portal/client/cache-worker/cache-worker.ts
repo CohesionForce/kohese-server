@@ -168,6 +168,14 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           data: itemUpdates
         });
         break;
+      case 'getStatus':
+        let statusCount = await getStatus();
+        port.postMessage({
+          id: request.id,
+          data: {statusCount: statusCount}
+        });
+
+        break;
       case 'connectionVerification':
         _connectionVerificationSet.add(clientId);
         break;
@@ -202,17 +210,20 @@ let _workingTree = TreeConfiguration.getWorkingTree();
   let connectionVerificationAttempts: number = 0;
   let checkConnections: () => void = () => {
     postToAllPorts('verifyConnection', undefined);
-    if (3 === connectionVerificationAttempts) {
-      for (let id in clientMap) {
-        if (!_connectionVerificationSet.has(+id)) {
-          delete clientMap[id];
-          socket.emit('connectionRemoved', { id: socket.id });
-        }
-      }
-      _connectionVerificationSet.clear();
-      connectionVerificationAttempts = 0;
-    }
-    connectionVerificationAttempts++;
+
+    // TODO: Need to update lost connection logic
+
+    // if (3 === connectionVerificationAttempts) {
+    //   for (let id in clientMap) {
+    //     if (!_connectionVerificationSet.has(+id)) {
+    //       delete clientMap[id];
+    //       socket.emit('connectionRemoved', { id: socket.id });
+    //     }
+    //   }
+    //   _connectionVerificationSet.clear();
+    //   connectionVerificationAttempts = 0;
+    // }
+    // connectionVerificationAttempts++;
     setTimeout(() => {
       checkConnections();
     }, 7000);
@@ -266,16 +277,25 @@ async function sync(): Promise<void> {
   console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
 
   // TODO: Need to handle refresh
-  socket.emit('Item/getStatus', {
-    repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
-  }, (response: Array<any>) => {
-    for (let j: number = 0; j < response.length; j++) {
-      updateItemStatus(response[j].id, response[j].status);
-    }
+  await getStatus();
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+async function getStatus() : Promise<number> {
+  return new Promise((resolve : (statusCount:number) => void, reject) => {
+    socket.emit('Item/getStatus', {
+      repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
+    }, (response: Array<any>) => {
+      for (let j: number = 0; j < response.length; j++) {
+        updateItemStatus(response[j].id, response[j].status);
+      }
+      resolve(response.length);
+    });
   });
 
 }
-
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
@@ -289,8 +309,7 @@ function registerKoheseIOListeners() {
 
   socket.on('Item/update', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
-    buildOrUpdateProxy(notification.item, notification.kind, notification.
-      status);
+    buildOrUpdateProxy(notification.item, notification.kind, notification.status);
   });
 
   socket.on('Item/delete', (notification) => {
@@ -336,8 +355,7 @@ function buildOrUpdateProxy(item : any, kind : string, itemStatus : Array<string
   }
 
   if (proxy && itemStatus) {
-    proxy.status.length = 0;
-    proxy.status.push(...itemStatus);
+    proxy.updateVCStatus(itemStatus);
 
     // TODO: All change notifications need to be sent from ItemProxy
 
@@ -360,8 +378,7 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
   let proxy: ItemProxy = _workingTree.getProxyFor(itemId);
 
   if (proxy && itemStatus) {
-    proxy.status.length = 0;
-    proxy.status.push(...itemStatus);
+    proxy.updateVCStatus(itemStatus);
 
     // TODO: All change notifications need to be sent from ItemProxy
 
@@ -387,7 +404,9 @@ function deleteItem(id: string): void {
 //
 //////////////////////////////////////////////////////////////////////////
 function postToAllPorts(message: string, data: any): void {
+  console.log('^^^ Posting message to all ports: ' + message);
   for (let key in clientMap) {
+    console.log('^^^ Posting message to port: ' + message + ' - ' + key);
     clientMap[key].postMessage({ message: message, data: data });
   }
 }

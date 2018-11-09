@@ -26,7 +26,7 @@ import { Filter } from '../../filter/filter.class';
 describe('Component: version-control-tree', () => {
   let component: VersionControlTreeComponent;
   let descendantProxy: ItemProxy;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [VersionControlTreeComponent],
@@ -50,18 +50,18 @@ describe('Component: version-control-tree', () => {
         { provide: DynamicTypesService, useClass: MockDynamicTypesService }
       ]
     }).compileComponents();
-    
+
     let fixture: ComponentFixture<VersionControlTreeComponent> = TestBed.
       createComponent(VersionControlTreeComponent);
     component = fixture.componentInstance;
-    
+
     descendantProxy = TreeConfiguration.getWorkingTree().getRootProxy().
       children[0];
-    descendantProxy.status.push('WT_NEW');
-    
+    descendantProxy.updateVCStatus(['WT_NEW']);
+
     fixture.detectChanges();
   });
-  
+
   it('initializes', () => {
     expect(component.getRootRow()).toBeDefined();
     let descendantIndex: number = -1;
@@ -73,7 +73,7 @@ describe('Component: version-control-tree', () => {
     }
     expect(descendantIndex).not.toEqual(-1);
   });
-  
+
   it('filters after a search string is entered', (done: Function) => {
     expect(component.filterSubject.getValue()).not.toBeDefined();
     component.searchStringChanged('Search String');
@@ -84,7 +84,7 @@ describe('Component: version-control-tree', () => {
       done();
     }, 1000);
   });
-  
+
   it('determines if all selected ItemProxies are in a state', () => {
     let selectedObjects: Array<any> = component.selectedObjectsSubject.
       getValue();
@@ -96,13 +96,13 @@ describe('Component: version-control-tree', () => {
     expect(component.areSelectedProxiesInState('INDEX')).
       toEqual(false);
   });
-  
+
   it('selects all ItemProxies that are in at least one state', () => {
     component.selectAll();
     expect(component.selectedObjectsSubject.getValue().indexOf(
       descendantProxy)).not.toEqual(-1);
   });
-  
+
   it('deselects all ItemProxies', () => {
     component.deselectAll();
     expect(component.selectedObjectsSubject.getValue().length).toEqual(0);
