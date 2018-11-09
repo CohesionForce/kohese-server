@@ -42,6 +42,7 @@ export class DetailsComponent extends ProxyDetailsComponent
   itemProxyId: string;
   itemProxyError: boolean;
   itemJson: string;
+  itemVCStatusJson: string;
   treeConfig: any;
   relationIdMap: any;
   itemDescriptionRendered: string;
@@ -104,6 +105,7 @@ export class DetailsComponent extends ProxyDetailsComponent
       this.itemRepository.registerRecentProxy(this.itemProxy);
       this.relationIdMap = this.itemProxy.getRelationIdMap();
       this.itemJson = this.itemProxy.document();
+      this.itemVCStatusJson = JSON.stringify(this.itemProxy.vcStatus, null, '  ');
       this.itemProxyError = false;
     } else {
       // TODO : Throw error modal to the UI

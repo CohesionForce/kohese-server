@@ -155,7 +155,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
     return this._itemRepository.getHistoryFor(object).map((history:
       Array<any>) => {
       this._versions = history;
-      if (0 === object.status.filter((status: string) => {
+      if (0 === object.vcStatus.statusArray.filter((status: string) => {
         return status.startsWith('WT');
       }).length && (this._versions.length > 0)) {
         /* If there are no unstaged changes to the selected Item, change the
@@ -164,7 +164,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
         this._versions[0].commit = 'Unstaged';
       }
       let uncommittedVersions: Array<any> = [];
-      if (object.status.filter((status: string) => {
+      if (object.vcStatus.statusArray.filter((status: string) => {
         return status.startsWith('WT');
       }).length > 0) {
         uncommittedVersions.push({
@@ -172,8 +172,8 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
           message: 'Unstaged'
         });
       }
-      
-      if (object.status.filter((status: string) => {
+
+      if (object.vcStatus.statusArray.filter((status: string) => {
         return status.startsWith('INDEX');
       }).length > 0) {
         uncommittedVersions.push({

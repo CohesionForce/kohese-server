@@ -6,6 +6,9 @@ let nodegit = require ('nodegit');
 import * as path from 'path';
 import * as fs from 'fs';
 
+let Path = require('path');
+
+
 let itemFileRegEx = /^.*\/([0-9a-f\-]*(\/Root)?)\.json$/;
 let repoFileSplitRegEx = /^(kdb\/kohese-kdb)\/(.*)$/;
 let repoList = {};
@@ -464,10 +467,34 @@ function getStatus (repositoryId, callback){
     var repoStatus = [];
 
     statuses.forEach(function(file) {
-      repoStatus.push({
-        path: file.path(),
+
+      let path = file.path();
+
+      let itemId = undefined;
+
+      if (path.endsWith('.json')) {
+        itemId = Path.basename(path, '.json');
+        if (!UUID_REGEX.test(itemId)) {
+          itemId = Path.basename(Path.dirname(path));
+          if (!UUID_REGEX.test(itemId)) {
+            // Not an itemId, so reset to undefined
+            itemId = undefined;
+          }
+        }
+      }
+
+      let fileStatus = {
+        itemId: itemId,
+        path: path,
         status: file.status()
-      });
+      };
+
+      if (!itemId){
+        delete fileStatus.itemId;
+      }
+
+      repoStatus.push(fileStatus);
+
     });
 
     callback(repoStatus);

@@ -37,13 +37,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   get synchronizeWithSelection() {
     return this._synchronizeWithSelection;
   }
-  
+
   private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
     filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
   get searchCriterion() {
     return this._searchCriterion;
   }
-  
+
   private _filterDelayIdentifier: any;
 
   private _images: Array<Image> = [
@@ -53,15 +53,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     }),
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
       (object: any) => {
-      return ((object as ItemProxy).status.filter((status: string) => {
-        return status.startsWith('WT');
-      }).length > 0);
+      return ((object as ItemProxy).vcStatus.isUnstaged());
     }),
     new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
       (object: any) => {
-      return ((object as ItemProxy).status.filter((status: string) => {
-        return status.startsWith('INDEX');
-      }).length > 0);
+      return ((object as ItemProxy).vcStatus.isStaged());
     })
   ];
   get images() {
@@ -91,7 +87,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           if (object === this.rootSubject.getValue()) {
             this.rootSubject.next(this.getParent(object));
           }
-          
+
           this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
         }
       });
@@ -102,9 +98,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
-      return ((object as ItemProxy).status.filter((status: string) => {
-        return status.startsWith('INDEX');
-      }).length > 0);
+      return ((object as ItemProxy).vcStatus.isStaged());
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         STAGED_VERSION);
@@ -116,9 +110,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
       any) => {
-      return ((object as ItemProxy).status.filter((status: string) => {
-        return status.endsWith('_NEW');
-      }).length === 0);
+      return (!(object as ItemProxy).vcStatus.isNew());
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         LAST_COMMITTED_VERSION);
@@ -182,19 +174,19 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
               }
           }
         });
-        
+
         this.rootSubject.next(this._absoluteRoot);
-        
+
         this.refresh();
-        
+
         this.initialize();
-        
+
         this._route.params.subscribe((parameters: Params) => {
           if (this._synchronizeWithSelection) {
             this.showFocus();
           }
         });
-        
+
         this.showFocus();
       }
     });
@@ -214,11 +206,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this.showFocus();
     }
   }
-  
+
   protected getId(object: any): any {
     return (object as ItemProxy).item.id;
   }
-  
+
   protected getParent(object: any): any {
     let parent: ItemProxy = undefined;
     if ((object as ItemProxy).parentProxy) {
@@ -227,7 +219,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return parent;
   }
-  
+
   protected getChildren(object: any): Array<any> {
     let children: Array<any> = [];
     let proxy: ItemProxy = (object as ItemProxy);
@@ -241,7 +233,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   protected rowFocused(row: TreeRow): void {
     this._navigationService.navigate('Explore', {
       id: this.getId(row.object)
@@ -254,7 +246,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     if (item.tags) {
       text = text + ' ' + item.tags;
     }
-    
+
     return text;
   }
 
@@ -267,21 +259,21 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return iconString;
   }
-  
+
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind;
-    item['status'] = proxy.status;
-    return super.filter(item); 
+    item['kind'] = proxy.kind;  // TODO: Need to remove update of item
+    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
+    return super.filter(item);
   }
-  
+
   public openFilterDialog(filter: Filter): Observable<any> {
     if (!filter) {
       filter = new ItemProxyFilter(this._dynamicTypesService, this.
         _itemRepository);
     }
-    
+
     return super.openFilterDialog(filter).do((resultingFilter: Filter) => {
       if (resultingFilter && !resultingFilter.isElementPresent(this.
         _searchCriterion)) {
@@ -289,12 +281,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public removeFilter(): void {
     this._searchCriterion.value = '';
     super.removeFilter();
   }
-  
+
   public searchStringChanged(searchString: string): void {
     if (this._filterDelayIdentifier) {
       clearTimeout(this._filterDelayIdentifier);
@@ -307,7 +299,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           advancedFilter = new ItemProxyFilter(this._dynamicTypesService, this.
             _itemRepository);
         }
-        
+
         if (!advancedFilter.isElementPresent(this._searchCriterion)) {
           this._searchCriterion.property = advancedFilter.filterableProperties[
             0];
@@ -318,13 +310,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         advancedFilter.removeElement(this._searchCriterion);
         this.filterSubject.next(advancedFilter);
       }
-      
+
       this.refresh();
-      
+
       this._filterDelayIdentifier = undefined;
     }, 1000);
   }
-  
+
   private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:
     VersionDesignator): void {
     let compareItemsDialogParameters: any = {
