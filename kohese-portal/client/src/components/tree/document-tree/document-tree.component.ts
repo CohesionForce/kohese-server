@@ -70,7 +70,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
           if ((action.text === TargetPosition.BEFORE) || (action.text ===
             TargetPosition.AFTER)) {
             action.canActivate = (object: any) => {
-              return (object as ItemProxy).parentProxy.childrenAreManuallyOrdered();
+              let parentProxy: ItemProxy = (object as ItemProxy).parentProxy;
+              return (parentProxy && parentProxy.childrenAreManuallyOrdered());
             };
           }
         }
@@ -216,8 +217,12 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
       TargetPosition.AFTER)) {
       let parentProxy: ItemProxy = targetProxy.parentProxy;
-      targetingProxy.item.parentId = parentProxy.item.id;
-      targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+      if (targetingProxy.item.parentId !== parentProxy.item.id) {
+        targetingProxy.item.parentId = parentProxy.item.id;
+        targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+        this.itemRepository.upsertItem(targetingProxy);
+      }
+      
       parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
         1);
       let targetIndex: number = parentProxy.children.indexOf(targetProxy);
@@ -232,9 +237,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     } else {
       targetingProxy.item.parentId = targetProxy.item.id;
       targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+      this.itemRepository.upsertItem(targetingProxy);
     }
-
-    this.itemRepository.upsertItem(targetingProxy);
   }
 
   public openFilterDialog(filter: Filter): Observable<any> {
