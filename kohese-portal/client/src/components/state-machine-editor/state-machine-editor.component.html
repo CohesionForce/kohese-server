@@ -20,7 +20,9 @@
           </mat-header-cell>
           <mat-cell *matCellDef="let stateId"
             matTooltip="{{stateMachine.state[stateId].description}}">
-            <button mat-button [matMenuTriggerFor]="stateRowMenu">
+            <button mat-button [matMenuTriggerFor]="stateRowMenu"
+              [ngStyle]="{ 'font-weight': (defaultState === stateId ? 'bold' :
+                'normal') }">
               {{stateId}}
             </button>
             <mat-menu #stateRowMenu [overlapTrigger]="false">
@@ -31,6 +33,11 @@
               <button mat-menu-item (click)="editState(stateId, 'name')">
                 Rename...
               </button>
+              <ng-container *ngIf="(defaultState !== stateId)">
+                <button mat-menu-item (click)="setDefaultState(stateId)">
+                  Set as Default
+                </button>
+              </ng-container>
               <button mat-menu-item (click)="deleteState(stateId)">
                 <mat-icon class="fa fa-trash"></mat-icon>
                 Delete
@@ -43,7 +50,9 @@
             <mat-header-cell *matHeaderCellDef
               matTooltip="{{stateMachine.state[columnStateId].description}}"
               style="display: flex; justify-content: center;">
-              <button mat-button [matMenuTriggerFor]="stateColumnMenu">
+              <button mat-button [matMenuTriggerFor]="stateColumnMenu"
+                [ngStyle]="{ 'font-weight': (defaultState === columnStateId ?
+                  'bold': 'normal') }">
                 {{columnStateId}}
               </button>
               <mat-menu #stateColumnMenu [overlapTrigger]="false">
@@ -113,7 +122,9 @@
     <mat-dialog-actions
       style="height: 10%; width: 100%; display: flex; flex-direction: column;">
       <span class="flex-right-align">
-        <button mat-raised-button [mat-dialog-close]="stateMachine">
+        <button mat-raised-button
+          [mat-dialog-close]="{ stateMachine: stateMachine,
+            defaultState: defaultState }">
           Apply
         </button>
         <button mat-raised-button [mat-dialog-close]="">

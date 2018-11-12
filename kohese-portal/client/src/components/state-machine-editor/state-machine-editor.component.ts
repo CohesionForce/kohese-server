@@ -21,6 +21,11 @@ export class StateMachineEditorComponent implements OnInit {
     return this._stateMachine;
   }
   
+  private _defaultState: string;
+  get defaultState() {
+    return this._defaultState;
+  }
+  
   private _stateIds: Array<string>;
   get stateIds() {
     return this._stateIds;
@@ -45,6 +50,7 @@ export class StateMachineEditorComponent implements OnInit {
   
   public ngOnInit(): void {
     this._stateMachine = this._data['stateMachine'];
+    this._defaultState = this._data['defaultState'];
     this._stateIds = Object.keys(this._stateMachine.state);
     this._tableDataSource = new MatTableDataSource<string>(this._stateIds);
   }
@@ -197,5 +203,10 @@ export class StateMachineEditorComponent implements OnInit {
     }
     
     return undefined;
+  }
+  
+  public setDefaultState(stateId: string): void {
+    this._defaultState = stateId;
+    this._changeDetectorRef.markForCheck();
   }
 }
