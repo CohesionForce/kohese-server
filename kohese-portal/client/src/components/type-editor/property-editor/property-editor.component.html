@@ -121,7 +121,8 @@
                   <span class="table-tooltip" *ngIf="!(koheseType.fields[selectedPropertyId].views['form'].inputType.type === 'proxy-selector' && multivalued)">
                     (Tables only available on multivalued references)
                   </span>
-                  <table-editor *ngIf="koheseType.fields[selectedPropertyId].views['form'].inputType.options.asTable">
+                  <table-editor *ngIf="koheseType.fields[selectedPropertyId].views['form'].inputType.options.asTable"
+                                [formDefinition]="koheseType.fields[selectedPropertyId].views['form']">
                   </table-editor>
                 </div>
                 <br />

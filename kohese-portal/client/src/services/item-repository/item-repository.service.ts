@@ -448,7 +448,9 @@ export class ItemRepository {
     if (response.deleteItems) {
       response.deleteItems.forEach((deletedItemId) => {
         var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
-        proxy.deleteItem();
+        if (proxy) {
+          proxy.deleteItem();
+        }
       });
     }
   }
