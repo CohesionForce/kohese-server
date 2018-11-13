@@ -23,7 +23,7 @@ export class PropertyRowComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if(!this.container) {
+    if (!this.container) {
       console.log('no container', this)
     }
   }
@@ -36,9 +36,9 @@ export class PropertyRowComponent implements OnInit {
     let viewProperty = this.kind.fields[propertyName.value].views.form;
     if (viewProperty) {
       if (viewProperty.inputType.options.asTable) {
-        this.property.kind = 'table'
+        this.property.kind = 'table';
       } else {
-        this.property.kind = viewProperty.inputType.type
+        this.property.kind = viewProperty.inputType.type;
       }
       this.property.inputOptions = viewProperty.inputType;
       console.log(viewProperty);

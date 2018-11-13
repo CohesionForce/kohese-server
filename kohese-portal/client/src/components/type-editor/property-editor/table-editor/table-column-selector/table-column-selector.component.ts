@@ -10,7 +10,7 @@ export class TableColumnSelectorComponent implements OnInit {
   selectedField: string;
 
   constructor(private dialogRef: MatDialogRef<TableColumnSelectorComponent>,
-              @Optional() @Inject(MAT_DIALOG_DATA) private data: any) { }
+              @Optional() @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {
     console.log(this);

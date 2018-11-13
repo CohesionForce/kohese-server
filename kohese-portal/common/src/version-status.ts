@@ -1,4 +1,3 @@
-import { SubscriptionLoggable } from "rxjs/testing/SubscriptionLoggable";
 
 /**
  *

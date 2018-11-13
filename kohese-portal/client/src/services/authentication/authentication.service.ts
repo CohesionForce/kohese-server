@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject } from 'rxjs';
 import { SocketService } from '../socket/socket.service';
-import { JwtHelper } from 'angular2-jwt';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { CurrentUserService } from '../user/current-user.service';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class AuthenticationService {
   private readonly TOKEN_KEY: string = 'auth-token';
   private readonly UNDEFINED_LOCAL_STORAGE_VALUE = 'undefined';
   private token: BehaviorSubject<string> = new BehaviorSubject(localStorage.getItem(this.TOKEN_KEY));
-  private jwtHelper: JwtHelper = new JwtHelper();
+  private jwtHelper: JwtHelperService = new JwtHelperService();
   
   constructor(private httpClient: HttpClient,
     private socketService: SocketService,

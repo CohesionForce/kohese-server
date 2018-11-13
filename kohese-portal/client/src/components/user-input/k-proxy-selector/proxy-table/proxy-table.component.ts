@@ -1,9 +1,9 @@
 import { ItemProxy } from './../../../../../../common/src/item-proxy';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
-  selector: 'app-proxy-table',
+  selector: 'proxy-table',
   templateUrl: './proxy-table.component.html',
   styleUrls: ['./proxy-table.component.scss'],
   animations : [
@@ -15,9 +15,10 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
   ]
 })
 export class ProxyTableComponent {
+    @Input()
+    columns: Array<string>;
 
     dataSource = [];
-    columnsToDisplay = ['name', 'kind', 'createdOn'];
     expandedItem: ItemProxy;
 
     toggleExpand(item) {

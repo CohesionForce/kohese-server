@@ -7,6 +7,7 @@ import { Subscription, Observable, BehaviorSubject } from 'rxjs';
 import { DialogService } from './../../../../services/dialog/dialog.service';
 import { Component, OnInit, ChangeDetectorRef, OnDestroy, Input } from '@angular/core';
 import { ProxyTableComponent } from '../../../user-input/k-proxy-selector/proxy-table/proxy-table.component';
+import { TablePreviewDialogComponent } from './table-preview-dialog/table-preview-dialog.component';
 
 @Component({
   selector: 'table-editor',
@@ -29,6 +30,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (!this.formDefinition.tableDef) {
       this.formDefinition.tableDef = {};
+      console.log('Init table def');
     }
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update: any) => {
@@ -68,8 +70,10 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   }
 
   openTablePreview() {
-      this.dialogService.openComponentDialog(ProxyTableComponent, {
-        data: {}
+      this.dialogService.openComponentDialog(TablePreviewDialogComponent, {
+        data: {
+          tableDef : this.formDefinition.tableDef
+        }
       }).updateSize('60%', '60%').afterClosed().subscribe((selected: any) => {
     });
     }

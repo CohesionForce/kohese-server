@@ -1,0 +1,10 @@
+<div class="preview-header">Table Preview
+  <span class="pull-right">
+   <button mat-raised-button (click)="openProxySelection()">Action</button>
+  </span>
+</div>
+<proxy-table [columns]="data.tableDef.columns"></proxy-table>
+<div *ngIf="previewProxy">
+  {{previewProxy.item.name}}
+</div>
+<button mat-raised-button (click)="close()">Close</button>
