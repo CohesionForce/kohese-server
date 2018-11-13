@@ -8,6 +8,7 @@ import * as jsSHA_Import from 'jssha';
 import * as uuidV1_Import from 'uuid/v1';
 import { TreeConfiguration } from './tree-configuration';
 import { TreeHashEntry, TreeHashMap } from './tree-hash';
+import { VersionStatus } from './version-status';
 
 //
 // Adjust for the differences in CommonJS and ES6 for jssha
@@ -63,7 +64,7 @@ export class ItemProxy {
 
   // Needed for information calculated on the client
   public dirty : boolean = false;
-  public status: Array<string> = [];
+  private _vcStatus : VersionStatus = new VersionStatus();
   public history;
   public type; // Used to store KoheseType.
 
@@ -1459,6 +1460,27 @@ export class ItemProxy {
       childIds.push(this.children[i].item.id);
     }
     return childIds;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  updateVCStatus (itemStatus : Array<string>) {
+
+    this._vcStatus.updateStatus(itemStatus);
+
+    TreeConfiguration.getWorkingTree().getChangeSubject().next({
+      type: 'update',
+      proxy: this
+    });
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  get vcStatus () : VersionStatus  {
+    return this._vcStatus;
   }
 
   //////////////////////////////////////////////////////////////////////////

@@ -65,6 +65,15 @@ export class ItemRepository {
   private _worker: SharedWorker.SharedWorker;
   private _cache: ItemCache = new ItemCache();
 
+  private _suppressWorkerRequestAnnouncement = {
+    connectionVerification: true
+  };
+
+  private _suppressWorkerEventAnnouncement = {
+    verifyConnection: true
+  };
+
+
   //////////////////////////////////////////////////////////////////////////
   constructor(private socketService: SocketService,
     private CurrentUserService: CurrentUserService,
@@ -111,15 +120,38 @@ export class ItemRepository {
         }
       }
     }
+
     console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
     this._worker = new SharedWorker(cacheWorkerBundle);
     this._worker.port.addEventListener('message', (messageEvent: any) => {
-      let data: any = messageEvent.data;
-      switch (data.message) {
+
+      let msg: any = messageEvent.data;
+
+      if (!msg.message){
+
+        if (msg.id && msg.data) {
+          // Ignore response that is directed to another event listener
+          // console.log('^^^ Received response from worker in main listener for request: ' + msg.id);
+        } else {
+          console.log('*** Received unexpected response message');
+          console.log(messageEvent);
+        }
+        return;
+      }
+
+      let beforeProcessing = Date.now();
+      if (!this._suppressWorkerEventAnnouncement[msg.message]){
+        console.log('^^^ Received message from worker: ' + msg.message);
+      }
+
+      switch (msg.message) {
         case 'reconnected':
           this.align();
           break;
         case 'connectionError':
+
+          // TODO: Should only send the state changes once
+
           this.repositoryStatus.next({
             state: RepoStates.DISCONNECTED,
             message: 'Disconnected'
@@ -129,50 +161,31 @@ export class ItemRepository {
           this.sendMessageToWorker('connectionVerification', undefined, false);
           break;
         case 'update':
-          this.buildOrUpdateProxy(data.data.item, data.data.kind, data.data.
-            status);
+          this.buildOrUpdateProxy(msg.data.item, msg.data.kind, msg.data.status);
+          break;
+        case 'updateItemStatus':
+          this.updateItemStatus(msg.data.itemId, msg.data.status);
           break;
         case 'deletion':
-          TreeConfiguration.getWorkingTree().getProxyFor(data.data).
+          TreeConfiguration.getWorkingTree().getProxyFor(msg.data).
             deleteItem();
           break;
         case 'cachePiece':
-          let updateData: any = data.data;
-          switch (updateData.key) {
-            case 'metadata':
-              for (let key in updateData.value) {
-                this._cache.cacheMetaData(key, updateData.value[key]);
-              }
-              break;
-            case 'ref':
-              for (let key in updateData.value) {
-                this._cache.cacheRef(key, updateData.value[key]);
-              }
-              break;
-            case 'tag':
-              for (let key in updateData.value) {
-                this._cache.cacheTag(key, updateData.value[key]);
-              }
-              break;
-            case 'commit':
-              for (let key in updateData.value) {
-                this._cache.cacheCommit(key, updateData.value[key]);
-              }
-              break;
-            case 'tree':
-              for (let key in updateData.value) {
-                this._cache.cacheTree(key, updateData.value[key]);
-              }
-              break;
-            case 'blob':
-              for (let key in updateData.value) {
-                this._cache.cacheBlob(key, updateData.value[key]);
-              }
-              break;
-          }
+          let cachePiece : any = msg.data;
+          this.processCachePiece(cachePiece);
           break;
+        default:
+          console.log('*** Received unexpected message: ' + msg.message);
+          console.log(messageEvent);
+      }
+
+      if (!this._suppressWorkerEventAnnouncement[msg.message]){
+        let afterProcessing = Date.now();
+        console.log('^^^ Processed message from worker ' + msg.message + ' - '
+          + (afterProcessing-beforeProcessing)/1000);
       }
     });
+
     TreeConfiguration.setItemCache(this._cache);
     this._worker.port.start();
 
@@ -221,6 +234,11 @@ export class ItemRepository {
       let itemUpdatesResponse = await this.sendMessageToWorker(
         'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
       this.processBulkUpdate(itemUpdatesResponse.data);
+
+      // Ensure status for all items is updated
+      let statusResponse = await this.sendMessageToWorker(
+        'getStatus', undefined, true);
+      console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
 
       let calculateTreeHashesAsynchronously: boolean = this.loadFeatureSwitch(
         'IR-defer-calc', true);
@@ -291,6 +309,7 @@ export class ItemRepository {
       // Provide notification of final status
 
       if (syncIsComplete) {
+        // Notify tree is ready to use
         this.currentTreeConfigSubject.next({
           config: workingTree,
           configType: TreeConfigType.DEFAULT
@@ -311,7 +330,8 @@ export class ItemRepository {
     });
   }
 
-  private buildOrUpdateProxy(item: any, kind: string, status: Array<string>):
+  //////////////////////////////////////////////////////////////////////////
+  private buildOrUpdateProxy(item: any, kind: string, itemStatus: Array<string>):
     ItemProxy {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.
       id);
@@ -328,9 +348,8 @@ export class ItemRepository {
       }
     }
 
-    if (status && proxy) {
-      proxy.status.length = 0;
-      proxy.status.push(...status);
+    if (proxy && itemStatus) {
+      proxy.updateVCStatus(itemStatus);
 
       TreeConfiguration.getWorkingTree().getChangeSubject().next({
         type: 'update',
@@ -339,6 +358,28 @@ export class ItemRepository {
     }
 
     return proxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  updateItemStatus (itemId : string, itemStatus : Array<string>) {
+
+    let workingTree = ItemProxy.getWorkingTree();
+    let proxy: ItemProxy = workingTree.getProxyFor(itemId);
+
+    if (proxy && itemStatus) {
+      console.log('^^^ Updating status for: ' + itemId + ' - ' + itemStatus);
+      proxy.updateVCStatus(itemStatus);
+
+      // TODO: All change notifications need to be sent from ItemProxy
+
+      TreeConfiguration.getWorkingTree().getChangeSubject().next({
+        type: 'update',
+        proxy: proxy
+      });
+    } else {
+      console.log('*** Could not find proxy to update status: ' + itemId + ' - ' + itemStatus);
+    }
+
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -388,6 +429,43 @@ export class ItemRepository {
     };
 
     return switchResult
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  processCachePiece(cachePiece) {
+
+    switch (cachePiece.key) {
+      case 'metadata':
+        for (let key in cachePiece.value) {
+          this._cache.cacheMetaData(key, cachePiece.value[key]);
+        }
+        break;
+      case 'ref':
+        for (let key in cachePiece.value) {
+          this._cache.cacheRef(key, cachePiece.value[key]);
+        }
+        break;
+      case 'tag':
+        for (let key in cachePiece.value) {
+          this._cache.cacheTag(key, cachePiece.value[key]);
+        }
+        break;
+      case 'commit':
+        for (let key in cachePiece.value) {
+          this._cache.cacheCommit(key, cachePiece.value[key]);
+        }
+        break;
+      case 'tree':
+        for (let key in cachePiece.value) {
+          this._cache.cacheTree(key, cachePiece.value[key]);
+        }
+        break;
+      case 'blob':
+        for (let key in cachePiece.value) {
+          this._cache.cacheBlob(key, cachePiece.value[key]);
+        }
+        break;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -459,15 +537,26 @@ export class ItemRepository {
     boolean): Promise<any> {
     return new Promise<void>((resolve: (data: any) => void, reject:
       () => void) => {
-      let id: number = Date.now();
+
+      let requestTime = Date.now();
+      let id: number = requestTime;
+
+      if (!this._suppressWorkerRequestAnnouncement[message]) {
+        console.log('^^^ Send message to worker: ' + message + ' - ' + id);
+      }
+
       if (expectResponse) {
         let responseHandler: (messageEvent: any) => void = (messageEvent:
           any) => {
-          let data: any = messageEvent.data;
-          if (data.id === id) {
-            resolve(data);
+          let msg: any = messageEvent.data;
+          if (msg.id === id) {
+            let responseTime = Date.now();
+            console.log('^^^ Received response from worker for request: ' + message + ' - ' + msg.id + ' - ' +
+              (responseTime-requestTime)/1000);
+            resolve(msg);
             this._worker.port.removeEventListener('message',
               responseHandler);
+
           }
         };
         this._worker.port.addEventListener('message', responseHandler);

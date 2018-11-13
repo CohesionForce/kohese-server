@@ -60,6 +60,10 @@ export class TreeRowComponent implements OnInit {
       'padding-left': (this._treeRow.depth * 15) + 'px'
     };
   }
+  
+  public isActionGroup(displayableEntity: DisplayableEntity): boolean {
+    return (displayableEntity instanceof ActionGroup);
+  }
 }
 
 export class Image {
@@ -68,22 +72,23 @@ export class Image {
   }
 }
 
-class Action {
-  public constructor(public name: string, public description: string,
-    public icon: string, public perform: (object: any) => void) {
+export class DisplayableEntity {
+  protected constructor(public text: string, public description: string,
+    public icon: string, public canActivate: (object: any) => boolean) {
   }
 }
 
-export class RowAction extends Action {
-  public constructor(name: string, description: string, icon: string,
-    public show: (object: any) => boolean, perform: (object: any) => void) {
-    super(name, description, icon, perform);
+export class Action extends DisplayableEntity {
+  public constructor(text: string, description: string, icon: string,
+    canActivate: (object: any) => boolean, public perform: (object:
+    any) => void) {
+    super(text, description, icon, canActivate);
   }
 }
 
-export class MenuAction extends Action {
-  public constructor(name: string, description: string, icon: string,
-    public enable: (object: any) => boolean, perform: (object: any) => void) {
-    super(name, description, icon, perform);
+export class ActionGroup extends DisplayableEntity {
+  public constructor(text: string, description: string, icon: string,
+    canActivate: (object: any) => boolean, public actions: Array<Action>) {
+    super(text, description, icon, canActivate);
   }
 }

@@ -7,9 +7,14 @@ import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
 
 import { DialogService } from '../../services/dialog/dialog.service';
 import { TreeRow } from './tree-row/tree-row.class';
-import { RowAction, MenuAction } from './tree-row/tree-row.component';
+import { DisplayableEntity, Action,
+  ActionGroup } from './tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
+
+export enum TargetPosition {
+  BEFORE = 'Before', AFTER = 'After', CHILD = 'Child'
+}
 
 export abstract class Tree {
   private _rowMap: Map<any, TreeRow> = new Map<any, TreeRow>();
@@ -32,53 +37,138 @@ export abstract class Tree {
   set showRootWithDescendants(showRootWithDescendants: boolean) {
     this._showRootWithDescendants = showRootWithDescendants;
   }
+  
+  private _canMoveRows: boolean = false;
+  get canMoveRows() {
+    return this._canMoveRows;
+  }
+  set canMoveRows(canMoveRows: boolean) {
+    this._canMoveRows = canMoveRows;
+  }
+  
+  private _expandDescendantsAction: Action = new Action('Expand Descendants',
+    'Expands all descendants', 'fa fa-caret-down', (object: any) => {
+    return (this.getChildren(object).length > 0);
+    }, (object: any) => {
+    this.expandDescendants(this._rowMap.get(this.getId(object)));
+  });
+  
+  private _collapseDescendantsAction: Action = new Action('Collapse ' +
+    'Descendants', 'Collapses all descendants', 'fa fa-caret-right', (object:
+    any) => {
+    return (this.getChildren(object).length > 0);
+    }, (object: any) => {
+    this.collapseDescendants(this._rowMap.get(this.getId(object)));
+  });
+  
+  private _targetBeforeAction: Action = new Action(TargetPosition.BEFORE,
+    'Place the targeting object or objects under this object', 'fa ' +
+    'fa-crosshairs', (object: any) => {
+    return true;
+    }, (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.
+      getValue();
+    for (let j: number = 0; j < selectedObjects.length; j++) {
+      let targetingObject: any = selectedObjects[j];
+      this.target(object, targetingObject, TargetPosition.BEFORE);
+    }
 
-  private _rootRowActions: Array<RowAction> = [
-    new RowAction('Expand Descendants', 'Expands all descendants',
-      'fa fa-caret-down', (object: any) => {
-      return (this.getChildren(object).length > 0);
-      }, (object: any) => {
-      this.expandDescendants(this._rowMap.get(this.getId(object)));
-    }),
-    new RowAction('Collapse Descendants', 'Collapses all descendants',
-      'fa fa-caret-right', (object: any) => {
-      return (this.getChildren(object).length > 0);
-      }, (object: any) => {
-      this.collapseDescendants(this._rowMap.get(this.getId(object)));
-    }),
-    new RowAction('Set Parent As Root', 'Set the parent of this row\'s ' +
+    this.exitTargetingMode();
+  });
+  private _targetAfterAction: Action = new Action(TargetPosition.AFTER,
+    'Place the targeting object or objects after this object', 'fa ' +
+    'fa-crosshairs', (object: any) => {
+    return true;
+    }, (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.
+      getValue();
+    for (let j: number = 0; j < selectedObjects.length; j++) {
+      let targetingObject: any = selectedObjects[j];
+      this.target(object, targetingObject, TargetPosition.AFTER);
+    }
+
+    this.exitTargetingMode();
+  });
+  private _targetChildAction: Action = new Action(TargetPosition.CHILD,
+    'Place the targeting object or objects under this object', 'fa ' +
+    'fa-crosshairs', (object: any) => {
+    return true;
+    }, (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.
+      getValue();
+    for (let j: number = 0; j < selectedObjects.length; j++) {
+      let targetingObject: any = selectedObjects[j];
+      this.target(object, targetingObject, TargetPosition.CHILD);
+    }
+
+    this.exitTargetingMode();
+  });
+  
+  private _targetActionGroup: ActionGroup = new ActionGroup('Target', 'Target ' +
+    'this object for the current action', 'fa fa-crosshairs', (object:
+    any) => {
+    return (this._inTargetingMode && (-1 === this._selectedObjectsSubject.
+      getValue().indexOf(this.rootSubject.getValue())) && (-1 === this.
+      _selectedObjectsSubject.getValue().indexOf(object)) && !this.
+      isAncestorSelected(object));
+    }, [this._targetBeforeAction, this._targetAfterAction, this.
+    _targetChildAction]);
+  
+  private _exitTargetingModeAction: Action = new Action('Exit ' +
+    'Targeting Mode', 'Exit Targeting Mode', 'fa fa-times', (object: any) => {
+    return this._inTargetingMode;
+    }, (object: any) => {
+    this.exitTargetingMode();
+  });
+
+  private _rootRowActions: Array<DisplayableEntity> = [
+    this._expandDescendantsAction,
+    this._collapseDescendantsAction,
+    new Action('Set Parent As Root', 'Set the parent of this row\'s ' +
       'object as the root', 'fa fa-level-up', (object: any) => {
       return !!this.getParent(object);
       }, (object: any) => {
       this.setRoot(this.getParent(object));
-    })
+    }),
+    this._targetActionGroup,
+    this._exitTargetingModeAction
   ];
   get rootRowActions() {
     return this._rootRowActions;
   }
 
-  private _rootMenuActions: Array<MenuAction> = [];
+  private _rootMenuActions: Array<DisplayableEntity> = [];
   get rootMenuActions() {
     return this._rootMenuActions;
   }
 
-  private _rowActions: Array<RowAction> = [];
+  private _rowActions: Array<DisplayableEntity> = [
+    new Action('Anchor', 'Set the object of this row as the root', 'fa ' +
+      'fa-anchor', (object: any) => {
+      return (object !== this._rootSubject.getValue() && !this.
+        _inTargetingMode);
+      }, (object: any) => {
+      this.setRoot(object);
+    }),
+    this._targetActionGroup,
+    this._exitTargetingModeAction
+  ];
   get rowActions() {
     return this._rowActions;
   }
 
-  private _menuActions: Array<MenuAction> = [
-    new MenuAction('Expand Descendants', 'Expands all descendants',
-      'fa fa-caret-down', (object: any) => {
-      return (this.getChildren(object).length > 0);
-      }, (object: any) => {
-      this.expandDescendants(this._rowMap.get(this.getId(object)));
-    }),
-    new MenuAction('Collapse Descendants', 'Collapses all descendants',
-      'fa fa-caret-right', (object: any) => {
-      return (this.getChildren(object).length > 0);
-      }, (object: any) => {
-      this.collapseDescendants(this._rowMap.get(this.getId(object)));
+  private _menuActions: Array<Action> = [
+    this._expandDescendantsAction,
+    this._collapseDescendantsAction,
+    new Action('Move', 'Move this object', 'fa fa-arrow-circle-o-right',
+      (object: any) => {
+      return this._canMoveRows && !this._inTargetingMode;
+    }, (object: any) => {
+      let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
+      selectedObjects.push(object);
+      this.selectedObjectsSubject.next(selectedObjects);
+      this._inTargetingMode = true;
+      this.refresh();
     })
   ];
   get menuActions() {
@@ -91,6 +181,11 @@ export abstract class Tree {
     new BehaviorSubject<Array<any>>([]);
   get selectedObjectsSubject() {
     return this._selectedObjectsSubject;
+  }
+  
+  private _inTargetingMode: boolean = false;
+  get inTargetingMode() {
+    return this._inTargetingMode;
   }
 
   private _filterSubject: BehaviorSubject<Filter> =
@@ -159,12 +254,22 @@ export abstract class Tree {
       }
 
       this._selectedObjectsSubject.next(selectedObjects);
+      
+      if (this._canMoveRows) {
+        let descendantTreeRowStack: Array<TreeRow> = [row];
+        while (descendantTreeRowStack.length > 0) {
+          let descendantRow: TreeRow = descendantTreeRowStack.pop();
+          descendantRow.refresh();
+          let children: Array<any> = this.getChildren(descendantRow.object);
+          for (let j: number = 0; j < children.length; j++) {
+            descendantTreeRowStack.push(this._rowMap.get(this.getId(children[
+              j])));
+          }
+        }
+      }
     };
     row.isRowRoot = () => {
       return (object === this._rootSubject.getValue());
-    };
-    row.setRowAsRoot = () => {
-      this.setRoot(object);
     };
     row.hasChildren = () => {
       return ((this.getChildren(object).length > 0) && (this.
@@ -448,9 +553,14 @@ export abstract class Tree {
   }
 
   protected isMultiselectEnabled(object: any): boolean {
-    return false;
+    return this._canMoveRows && this._inTargetingMode;
   }
-
+  
+  protected target(target: any, targetingObject: any, targetPosition:
+    TargetPosition): void {
+    // Subclasses may override this function
+  }
+  
   protected clear(): void {
     for (let id in this._updateVisibleRowsSubscriptionMap) {
       delete this._updateVisibleRowsSubscriptionMap[id];
@@ -523,5 +633,29 @@ export abstract class Tree {
         }
       }
     }
+  }
+  
+  private isAncestorSelected(object: any): boolean {
+    let isAncestorSelected: boolean = false;
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
+    let parent: any = this.getParent(object);
+    while (parent) {
+      if (-1 !== selectedObjects.indexOf(parent)) {
+        isAncestorSelected = true;
+        break;
+      }
+      
+      parent = this.getParent(parent);
+    }
+  
+    return isAncestorSelected;
+  }
+  
+  private exitTargetingMode(): void {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
+    selectedObjects.length = 0;
+    this._selectedObjectsSubject.next(selectedObjects);
+    this._inTargetingMode = false;
+    this.refresh();
   }
 }

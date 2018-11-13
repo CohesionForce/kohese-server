@@ -81,6 +81,7 @@
             </mat-tab>
             <mat-tab label="Raw Data">
                 <h4>Raw Data Tab</h4>
+                <h5>{{itemProxy.kind}}: {{itemProxy.item.name}} ({{itemProxy.item.id}})</h5>
                 <h5>Id: {{itemProxy.item.id}}</h5>
                 <h5>OID: {{itemProxy.oid}}</h5>
                 <h5>Tree Hash: {{itemProxy.treeHash}}</h5>
@@ -91,6 +92,8 @@
                 <pre>{{itemProxy.treeHashEntry | json}}</pre>
                 <h5>Relations:</h5>
                 <pre>{{relationIdMap | json}}</pre>
+                <h5>Version Status:</h5>
+                <pre>{{itemVCStatusJson}}</pre>
             </mat-tab>
         </mat-tab-group>
     </div>

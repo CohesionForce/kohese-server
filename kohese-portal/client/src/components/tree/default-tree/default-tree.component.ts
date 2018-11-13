@@ -14,9 +14,10 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
-import { Tree } from '../tree.class';
+import { Tree, TargetPosition } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { Image, RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { Image, DisplayableEntity, Action,
+  ActionGroup } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
@@ -36,13 +37,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   get synchronizeWithSelection() {
     return this._synchronizeWithSelection;
   }
-  
+
   private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
     filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
   get searchCriterion() {
     return this._searchCriterion;
   }
-  
+
   private _filterDelayIdentifier: any;
 
   private _images: Array<Image> = [
@@ -52,15 +53,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     }),
     new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
       (object: any) => {
-      return ((object as ItemProxy).status.filter((status: string) => {
-        return status.startsWith('WT');
-      }).length > 0);
+      return ((object as ItemProxy).vcStatus.isUnstaged());
     }),
     new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
       (object: any) => {
-      return ((object as ItemProxy).status.filter((status: string) => {
-        return status.startsWith('INDEX');
-      }).length > 0);
+      return ((object as ItemProxy).vcStatus.isStaged());
     })
   ];
   get images() {
@@ -75,11 +72,30 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     dialogService: DialogService, private _navigationService:
     NavigationService, private _dynamicTypesService: DynamicTypesService) {
     super(route, dialogService);
+    this.canMoveRows = true;
   }
 
   public ngOnInit(): void {
     this._searchCriterion.external = true;
-    let deleteMenuAction: MenuAction = new MenuAction('Delete',
+
+    for (let j: number = 0; j < this.rowActions.length; j++) {
+      let displayableEntity: DisplayableEntity = this.rowActions[j];
+      if (displayableEntity instanceof ActionGroup) {
+        for (let k: number = 0; k < (displayableEntity as ActionGroup).actions.
+          length; k++) {
+          let action: Action = (displayableEntity as ActionGroup).actions[k];
+          if ((action.text === TargetPosition.BEFORE) || (action.text ===
+            TargetPosition.AFTER)) {
+            action.canActivate = (object: any) => {
+              let parentProxy: ItemProxy = (object as ItemProxy).parentProxy;
+              return (parentProxy && parentProxy.childrenAreManuallyOrdered());
+            };
+          }
+        }
+      }
+    }
+
+    let deleteAction: Action = new Action('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
       return !(object as ItemProxy).internal;
       }, (object: any) => {
@@ -90,20 +106,18 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           if (object === this.rootSubject.getValue()) {
             this.rootSubject.next(this.getParent(object));
           }
-          
+
           this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
         }
       });
     });
-    this.rootMenuActions.push(deleteMenuAction);
-    this.menuActions.push(deleteMenuAction);
+    this.rootMenuActions.push(deleteAction);
+    this.menuActions.push(deleteAction);
 
-    let stagedVersionComparisonAction: MenuAction = new MenuAction('Compare ' +
+    let stagedVersionComparisonAction: Action = new Action('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +
       'version of this Item', 'fa fa-exchange', (object: any) => {
-      return ((object as ItemProxy).status.filter((status: string) => {
-        return status.startsWith('INDEX');
-      }).length > 0);
+      return ((object as ItemProxy).vcStatus.isStaged());
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         STAGED_VERSION);
@@ -111,13 +125,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this.rootMenuActions.push(stagedVersionComparisonAction);
     this.menuActions.push(stagedVersionComparisonAction);
 
-    let lastCommittedVersionComparisonAction: MenuAction = new MenuAction(
+    let lastCommittedVersionComparisonAction: Action = new Action(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
       'the last committed version of this Item', 'fa fa-exchange', (object:
       any) => {
-      return ((object as ItemProxy).status.filter((status: string) => {
-        return status.endsWith('_NEW');
-      }).length === 0);
+      return (!(object as ItemProxy).vcStatus.isNew());
       }, (object: any) => {
       this.openComparisonDialog((object as ItemProxy), VersionDesignator.
         LAST_COMMITTED_VERSION);
@@ -125,7 +137,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this.rootMenuActions.push(lastCommittedVersionComparisonAction);
     this.menuActions.push(lastCommittedVersionComparisonAction);
 
-    let itemComparisonAction: MenuAction = new MenuAction('Compare Against...',
+    let itemComparisonAction: Action = new Action('Compare Against...',
       'Compare this Item against another Item', 'fa fa-exchange', (object:
       any) => {
       return true;
@@ -181,19 +193,19 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
               }
           }
         });
-        
+
         this.rootSubject.next(this._absoluteRoot);
-        
+
         this.refresh();
-        
+
         this.initialize();
-        
+
         this._route.params.subscribe((parameters: Params) => {
           if (this._synchronizeWithSelection) {
             this.showFocus();
           }
         });
-        
+
         this.showFocus();
       }
     });
@@ -213,11 +225,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this.showFocus();
     }
   }
-  
+
   protected getId(object: any): any {
     return (object as ItemProxy).item.id;
   }
-  
+
   protected getParent(object: any): any {
     let parent: ItemProxy = undefined;
     if ((object as ItemProxy).parentProxy) {
@@ -226,7 +238,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return parent;
   }
-  
+
   protected getChildren(object: any): Array<any> {
     let children: Array<any> = [];
     let proxy: ItemProxy = (object as ItemProxy);
@@ -240,7 +252,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   protected rowFocused(row: TreeRow): void {
     this._navigationService.navigate('Explore', {
       id: this.getId(row.object)
@@ -253,7 +265,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     if (item.tags) {
       text = text + ' ' + item.tags;
     }
-    
+
     return text;
   }
 
@@ -266,15 +278,15 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return iconString;
   }
-  
+
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind;
-    item['status'] = proxy.status;
-    return super.filter(item); 
+    item['kind'] = proxy.kind;  // TODO: Need to remove update of item
+    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
+    return super.filter(item);
   }
-  
+
   public openFilterDialog(filter: Filter): Observable<any> {
     if (!filter) {
       filter = new ItemProxyFilter(this._dynamicTypesService, this.
@@ -288,12 +300,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     }));
   }
-  
+
   public removeFilter(): void {
     this._searchCriterion.value = '';
     super.removeFilter();
   }
-  
+
   public searchStringChanged(searchString: string): void {
     if (this._filterDelayIdentifier) {
       clearTimeout(this._filterDelayIdentifier);
@@ -306,7 +318,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           advancedFilter = new ItemProxyFilter(this._dynamicTypesService, this.
             _itemRepository);
         }
-        
+
         if (!advancedFilter.isElementPresent(this._searchCriterion)) {
           this._searchCriterion.property = advancedFilter.filterableProperties[
             0];
@@ -317,13 +329,44 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         advancedFilter.removeElement(this._searchCriterion);
         this.filterSubject.next(advancedFilter);
       }
-      
+
       this.refresh();
-      
+
       this._filterDelayIdentifier = undefined;
     }, 1000);
   }
-  
+
+  protected target(target: any, targetingObject: any, targetPosition:
+    TargetPosition): void {
+    let targetProxy: ItemProxy = (target as ItemProxy);
+    let targetingProxy: ItemProxy = (targetingObject as ItemProxy);
+    if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
+      TargetPosition.AFTER)) {
+      let parentProxy: ItemProxy = targetProxy.parentProxy;
+      if (targetingProxy.item.parentId !== parentProxy.item.id) {
+        targetingProxy.item.parentId = parentProxy.item.id;
+        targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+        this._itemRepository.upsertItem(targetingProxy);
+      }
+      
+      parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
+        1);
+      let targetIndex: number = parentProxy.children.indexOf(targetProxy);
+      if (targetPosition === TargetPosition.BEFORE) {
+        parentProxy.children.splice(targetIndex, 0, targetingProxy);
+      } else {
+        parentProxy.children.splice(targetIndex + 1, 0, targetingProxy);
+      }
+
+      parentProxy.updateChildrenManualOrder();
+      this._itemRepository.upsertItem(parentProxy);
+    } else {
+      targetingProxy.item.parentId = targetProxy.item.id;
+      targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+      this._itemRepository.upsertItem(targetingProxy);
+    }
+  }
+
   private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:
     VersionDesignator): void {
     let compareItemsDialogParameters: any = {
