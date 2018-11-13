@@ -43,7 +43,7 @@ describe('k-state-editor', () => {
   });
 
   it('changes the value of fields of type "StateMachine"', () => {
-    component.openTransitionDialog('actionState', 'Assigned');
+    component.transition('actionState', 'Assigned');
     expect(component.itemProxy.item['actionState']).toEqual('Assigned');
   });
 });

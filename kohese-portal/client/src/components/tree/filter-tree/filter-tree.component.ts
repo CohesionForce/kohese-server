@@ -8,7 +8,7 @@ import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { RowAction } from '../tree-row/tree-row.component';
+import { Action } from '../tree-row/tree-row.component';
 import { Filter, FilterElement, FilterCriterion, FilterCriteriaConnection,
   FilterCriteriaConnectionType,
   FilterableProperty } from '../../filter/filter.class';
@@ -34,9 +34,9 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     this._targetFilterSubject = targetFilterSubject;
   }
 
-  private _inTargetingMode: boolean = false;
-  get inTargetingMode() {
-    return this._inTargetingMode;
+  private _localInTargetingMode: boolean = false;
+  get localInTargetingMode() {
+    return this._localInTargetingMode;
   }
 
   private _moveOrCopyElement: FilterElement = undefined;
@@ -54,10 +54,10 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.rowActions.push(new RowAction('Change Type', 'Change this ' +
+    this.rowActions.push(new Action('Change Type', 'Change this ' +
       'connection\'s type', 'fa fa-exchange', (object: any) => {
       return ((object instanceof FilterCriteriaConnection) && !this.
-        _inTargetingMode);
+        _localInTargetingMode);
       }, (object: any) => {
       let connection: FilterCriteriaConnection =
         (object as FilterCriteriaConnection);
@@ -68,24 +68,24 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       }
       this.getRow(this.getId(connection)).refresh();
     }));
-    this.rowActions.push(new RowAction('Copy', 'Copy this element',
+    this.rowActions.push(new Action('Copy', 'Copy this element',
       'fa fa-copy', (object: any) => {
-      return (!(object instanceof AddRowObject) && !this._inTargetingMode &&
+      return (!(object instanceof AddRowObject) && !this._localInTargetingMode &&
         (object !== this.rootSubject.getValue()));
       }, (object: any) => {
       this.enterCopyTargetingMode(object);
     }));
-    this.rowActions.push(new RowAction('Move', 'Move this element',
+    this.rowActions.push(new Action('Move', 'Move this element',
       'fa fa-arrow-circle-o-right', (object: any) => {
-      return (!(object instanceof AddRowObject) && !this._inTargetingMode &&
+      return (!(object instanceof AddRowObject) && !this._localInTargetingMode &&
         (object !== this.rootSubject.getValue()));
       }, (object: any) => {
       this.enterMoveTargetingMode(object);
     }));
-    this.rowActions.push(new RowAction('Target', 'Target this connection ' +
+    this.rowActions.push(new Action('Target', 'Target this connection ' +
       'for the current action', 'fa fa-crosshairs', (object: any) => {
       return ((object instanceof FilterCriteriaConnection) &&
-        (this._inTargetingMode) && (-1 === this.selectedObjectsSubject.
+        (this._localInTargetingMode) && (-1 === this.selectedObjectsSubject.
         getValue().indexOf(this.rootSubject.getValue())) && (this.
         _isTargetingForCopy || (-1 === this.selectedObjectsSubject.getValue().
         indexOf(object))));
@@ -102,18 +102,18 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       }
 
-      this._inTargetingMode = false;
+      this._localInTargetingMode = false;
       this.refresh();
     }));
-    this.rowActions.push(new RowAction('Exit Targeting Mode', 'Exit ' +
+    this.rowActions.push(new Action('Exit Targeting Mode', 'Exit ' +
       'Targeting Mode', 'fa fa-times', (object: any) => {
-      return (!(object instanceof AddRowObject) && this._inTargetingMode);
+      return (!(object instanceof AddRowObject) && this._localInTargetingMode);
       }, (object: any) => {
-      this.exitTargetingMode();
+      this.localExitTargetingMode();
     }));
-    this.rowActions.push(new RowAction('Delete', 'Delete this element',
+    this.rowActions.push(new Action('Delete', 'Delete this element',
       'fa fa-trash', (object: any) => {
-      return (!(object instanceof AddRowObject) && !this._inTargetingMode && (
+      return (!(object instanceof AddRowObject) && !this._localInTargetingMode && (
         object !== this.rootSubject.getValue()));
       }, (object: any) => {
       if (object instanceof FilterCriteriaConnection) {
@@ -301,7 +301,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
   public enterCopyTargetingMode(moveOrCopyElement: FilterElement): void {
     this._isTargetingForCopy = true;
     this._moveOrCopyElement = moveOrCopyElement;
-    this._inTargetingMode = true;
+    this._localInTargetingMode = true;
 
     this.refresh();
   }
@@ -309,13 +309,13 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
   public enterMoveTargetingMode(moveOrCopyElement: FilterElement): void {
     this._isTargetingForCopy = false;
     this._moveOrCopyElement = moveOrCopyElement;
-    this._inTargetingMode = true;
+    this._localInTargetingMode = true;
 
     this.refresh();
   }
 
-  public exitTargetingMode(): void {
-    this._inTargetingMode = false;
+  public localExitTargetingMode(): void {
+    this._localInTargetingMode = false;
 
     this.refresh();
   }
