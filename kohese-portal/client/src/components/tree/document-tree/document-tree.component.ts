@@ -5,14 +5,15 @@ import { ChangeDetectorRef } from '@angular/core';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { Observable ,  Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { RowAction, MenuAction } from '../tree-row/tree-row.component';
+import { DisplayableEntity, Action,
+  ActionGroup } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Tree } from '../tree.class';
+import { Tree, TargetPosition } from '../tree.class';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 
@@ -54,33 +55,34 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     private itemRepository : ItemRepository,
     private changeRef : ChangeDetectorRef) {
     super(router, dialogService);
+    this.canMoveRows = true;
   }
 
   ngOnInit() {
     this._searchCriterion.external = true;
+
+    for (let j: number = 0; j < this.rowActions.length; j++) {
+      let displayableEntity: DisplayableEntity = this.rowActions[j];
+      if (displayableEntity instanceof ActionGroup) {
+        for (let k: number = 0; k < (displayableEntity as ActionGroup).actions.
+          length; k++) {
+          let action: Action = (displayableEntity as ActionGroup).actions[k];
+          if ((action.text === TargetPosition.BEFORE) || (action.text ===
+            TargetPosition.AFTER)) {
+            action.canActivate = (object: any) => {
+              let parentProxy: ItemProxy = (object as ItemProxy).parentProxy;
+              return (parentProxy && parentProxy.childrenAreManuallyOrdered());
+            };
+          }
+        }
+      }
+    }
+
     this.paramSubscription = this._route.params.subscribe(params => {
       if (params['id']) {
        this.documentRootId = params['id'];
       }
     });
-
-    this.rootRowActions.push(new RowAction('Test action',
-      'I am an action', 'fa fa-times', (object: any) => {
-      return true;
-      }, (object: any) => {
-      return true;
-    }));
-
-    let sharedAction : MenuAction = new MenuAction('Menu Action', 'I am in a menu', 'fa fa-comment',
-      (object: any) => {
-      if (true) {
-      return true;
-      }}, (object: any) => {
-      console.log('Hello world');
-    });
-
-  this.rootMenuActions.push(sharedAction);
-  this.menuActions.push(sharedAction);
 
   this.treeConfigSubscription = this.itemRepository.getTreeConfig()
     .subscribe((treeConfigurationObject: any) => {
@@ -121,7 +123,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
       this.rootSubject.next(this.documentRoot);
       this.rootSelected.emit(this.documentRoot);
-      
+
       this.initialize();
 
       this.showFocus();
@@ -203,9 +205,40 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind;
-    item['status'] = proxy.status;
+    item['kind'] = proxy.kind; // TODO: Need to remove update of item
+    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
     return super.filter(item);
+  }
+
+  protected target(target: any, targetingObject: any, targetPosition:
+    TargetPosition): void {
+    let targetProxy: ItemProxy = (target as ItemProxy);
+    let targetingProxy: ItemProxy = (targetingObject as ItemProxy);
+    if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
+      TargetPosition.AFTER)) {
+      let parentProxy: ItemProxy = targetProxy.parentProxy;
+      if (targetingProxy.item.parentId !== parentProxy.item.id) {
+        targetingProxy.item.parentId = parentProxy.item.id;
+        targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+        this.itemRepository.upsertItem(targetingProxy);
+      }
+      
+      parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
+        1);
+      let targetIndex: number = parentProxy.children.indexOf(targetProxy);
+      if (targetPosition === TargetPosition.BEFORE) {
+        parentProxy.children.splice(targetIndex, 0, targetingProxy);
+      } else {
+        parentProxy.children.splice(targetIndex + 1, 0, targetingProxy);
+      }
+
+      parentProxy.updateChildrenManualOrder();
+      this.itemRepository.upsertItem(parentProxy);
+    } else {
+      targetingProxy.item.parentId = targetProxy.item.id;
+      targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+      this.itemRepository.upsertItem(targetingProxy);
+    }
   }
 
   public openFilterDialog(filter: Filter): Observable<any> {

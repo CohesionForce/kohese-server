@@ -38,18 +38,33 @@
     </ng-container>
   </ng-container>
   <span id="rightSpan">
-    <ng-container *ngIf="!treeRow.isRowRoot()">
-      <button mat-icon-button
-        (click)="treeRow.setRowAsRoot(); $event.stopPropagation()">
-        <mat-icon class="fa fa-anchor"></mat-icon>
-      </button>
-    </ng-container>
-    <ng-container *ngFor="let action of rowActions">
-      <ng-container *ngIf="action.show(treeRow.object)">
-        <button mat-icon-button matTooltip="{{action.description}}"
-          (click)="action.perform(treeRow.object); $event.stopPropagation()">
-          <mat-icon class="kt-icon {{action.icon}}"></mat-icon>
-        </button>
+    <ng-container *ngFor="let displayableEntity of rowActions">
+      <ng-container *ngIf="displayableEntity.canActivate(treeRow.object)">
+        <ng-container *ngIf="isActionGroup(displayableEntity)">
+          <button mat-icon-button
+            [matMenuTriggerFor]="actionGroupMenu"
+            (click)="$event.stopPropagation()">
+            <mat-icon class="{{displayableEntity.icon}}"></mat-icon>
+          </button>
+          <mat-menu #actionGroupMenu="matMenu" [overlapTrigger]="false">
+            <ng-container *ngFor="let action of displayableEntity.actions">
+              <button mat-menu-item (click)="action.perform(treeRow.object)"
+                matTooltip="{{action.description}}"
+                [disabled]="!action.canActivate(treeRow.object)">
+                <mat-icon class="{{action.icon}}"></mat-icon>
+                {{action.text}}
+              </button>
+            </ng-container>
+          </mat-menu>
+        </ng-container>
+        <ng-container *ngIf="!isActionGroup(displayableEntity)">
+          <button mat-icon-button
+            matTooltip="{{displayableEntity.description}}"
+            (click)="displayableEntity.perform(treeRow.object); $event.
+              stopPropagation()">
+            <mat-icon class="kt-icon {{displayableEntity.icon}}"></mat-icon>
+          </button>
+        </ng-container>
       </ng-container>
     </ng-container>
     <ng-container *ngIf="menuActions.length > 0">
@@ -58,12 +73,32 @@
         <mat-icon class="fa fa-bars"></mat-icon>
       </button>
       <mat-menu #menu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item *ngFor="let action of menuActions"
-          (click)="action.perform(treeRow.object)" matTooltip="{{action.description}}"
-         [disabled]="!action.enable(treeRow.object)">
-          <mat-icon class="{{action.icon}}"></mat-icon>
-          {{action.name}}
-        </button>
+        <ng-container *ngFor="let displayableEntity of menuActions">
+          <ng-container *ngIf="isActionGroup(displayableEntity)">
+            <button mat-menu-item [matMenuTriggerFor]="actionGroupMenu">
+              <mat-icon class="{{displayableEntity.icon}}"></mat-icon>
+            </button>
+            <mat-menu #actionGroupMenu="matMenu" [overlapTrigger]="false">
+              <ng-container *ngFor="let action of displayableEntity.actions">
+                <button mat-menu-item (click)="action.perform(treeRow.object)"
+                  matTooltip="{{action.description}}"
+                  [disabled]="!action.canActivate(treeRow.object)">
+                  <mat-icon class="{{action.icon}}"></mat-icon>
+                  {{action.text}}
+                </button>
+              </ng-container>
+            </mat-menu>
+          </ng-container>
+          <ng-container *ngIf="!isActionGroup(displayableEntity)">
+            <button mat-menu-item
+              (click)="displayableEntity.perform(treeRow.object)"
+              matTooltip="{{displayableEntity.description}}"
+              [disabled]="!displayableEntity.canActivate(treeRow.object)">
+              <mat-icon class="{{displayableEntity.icon}}"></mat-icon>
+              {{displayableEntity.text}}
+            </button>
+          </ng-container>
+        </ng-container>
       </mat-menu>
     </ng-container>
   </span>

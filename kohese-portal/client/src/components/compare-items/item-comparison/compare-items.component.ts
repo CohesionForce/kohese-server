@@ -31,10 +31,10 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
   private _rightComparisonSide: ComparisonSideComponent;
   @ViewChild('leftComparisonSide')
   private _leftComparisonSide: ComparisonSideComponent;
-  
+
   private _rightSelectionSubscription: Subscription;
   private _leftSelectionSubscription: Subscription;
-  
+
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
     private _changeDetectorRef: ChangeDetectorRef) {
@@ -55,15 +55,14 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
               versionId = baseVersions['Staged'];
             } else if ((baseVersion as VersionDesignator) ===
               VersionDesignator.LAST_COMMITTED_VERSION) {
-              let numberOfStates: number = Object.keys(baseProxy.status).
-                length;
+              let numberOfStates: number = baseProxy.vcStatus.statusArray.length;
               if (numberOfStates > 0) {
                 versionId = baseVersions[numberOfStates].commit;
               } else if (baseVersions.length > 1) {
                 versionId = baseVersions[1].commit;
               }
-            } 
-            
+            }
+
             if (versionId) {
               this._leftComparisonSide.whenSelectedVersionChanges(baseProxy,
                 versionId);
@@ -71,7 +70,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
           }
           });
       }
-      
+
       let changeProxy: ItemProxy = this._dialogParameters['changeProxy'];
       if (changeProxy) {
         this._rightComparisonSide.whenSelectedObjectChanges(changeProxy).
@@ -85,15 +84,14 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
               versionId = changeVersions['Staged'];
             } else if ((changeVersion as VersionDesignator) ===
               VersionDesignator.LAST_COMMITTED_VERSION) {
-              let numberOfStates: number = Object.keys(changeProxy.status).
-                length;
+              let numberOfStates: number = changeProxy.vcStatus.statusArray.length;
               if (numberOfStates > 0) {
                 versionId = changeVersions[numberOfStates].commit;
               } else if (changeVersions.length > 0) {
                 versionId = changeVersions[1].commit;
               }
-            } 
-            
+            }
+
             if (versionId) {
               this._rightComparisonSide.whenSelectedVersionChanges(changeProxy,
                 versionId);
@@ -102,18 +100,18 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
           });
       }
     }
-    
+
     this._rightSelectionSubscription = this._rightComparisonSide.
       selectedObjectSubject.subscribe((object: any) => {
       this.compare();
       });
-      
+
     this._leftSelectionSubscription = this._leftComparisonSide.
       selectedObjectSubject.subscribe((object: any) => {
       this.compare();
       });
   }
-  
+
   public ngOnDestroy(): void {
     this._leftSelectionSubscription.unsubscribe();
     this._rightSelectionSubscription.unsubscribe();
@@ -139,20 +137,20 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     this._rightComparisonSide.refresh();
     this._leftComparisonSide.refresh();
   }
-  
+
   private compare(): void {
     let rightVersion: any = this._rightComparisonSide.selectedObjectSubject.
       getValue();
     let leftVersion: any = this._leftComparisonSide.selectedObjectSubject.
       getValue();
-    
+
     let propertyNames: Array<string> = [];
     let rightProperties: Array<string> = Array.from(this._rightComparisonSide.
       propertyDifferenceMap.keys());
     for (let j: number = 0; j < rightProperties.length; j++) {
       propertyNames.push(rightProperties[j]);
     }
-    
+
     let leftProperties: Array<string> = Array.from(this._leftComparisonSide.
       propertyDifferenceMap.keys());
     for (let j: number = 0; j < leftProperties.length; j++) {
@@ -160,29 +158,29 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
         propertyNames.push(leftProperties[j]);
       }
     }
-    
+
     for (let j: number = 0; j < propertyNames.length; j++) {
       let rightPropertyValue: any = this._rightComparisonSide.
         getComparisonValue(propertyNames[j]);
       let leftPropertyValue: any = this._leftComparisonSide.getComparisonValue(
         propertyNames[j]);
-      
+
       if (!rightVersion && leftVersion) {
         rightPropertyValue = leftPropertyValue;
       } else if (rightVersion && !leftVersion) {
         leftPropertyValue = rightPropertyValue;
       }
-      
+
       let comparison: Array<any> = JsDiff.diffWords(leftPropertyValue,
         rightPropertyValue);
-        
+
       let rightDifferenceArray: Array<any> = this._rightComparisonSide.
         propertyDifferenceMap.get(propertyNames[j]);
       if (rightDifferenceArray) {
         rightDifferenceArray.length = 0;
         rightDifferenceArray.push(...comparison);
       }
-      
+
       let leftDifferenceArray: Array<any> = this._leftComparisonSide.
         propertyDifferenceMap.get(propertyNames[j]);
       if (leftDifferenceArray) {
@@ -190,7 +188,7 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
         leftDifferenceArray.push(...comparison);
       }
     }
-      
+
     this._rightComparisonSide.refresh();
     this._leftComparisonSide.refresh();
   }

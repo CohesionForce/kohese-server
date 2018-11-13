@@ -27,6 +27,7 @@ if (typeof(LevelDown_Import) === "object") {
 var _ = require('underscore');
 
 var jsonExt = /\.json$/;
+var jsonMountExt = /\.json.mount$/;
 
 const expandRepoCommits = true;
 
@@ -200,7 +201,14 @@ export class KDBCache extends LevelCache {
   async loadCachedObjects() {
 
     await super.loadCachedObjects();
-    let headRef = kdbFS.loadJSONDoc(this.refsDirectory + '/' + 'HEAD.json');
+
+    let headRef;
+    try {
+      headRef = kdbFS.loadJSONDoc(this.refsDirectory + '/' + 'HEAD.json');
+    } catch (err) {
+      headRef = "INVALID";
+    }
+
     let headCommit = await this.getRef('HEAD');
 
     let storeCacheToLevel : boolean = false;
@@ -320,8 +328,9 @@ export class KDBCache extends LevelCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  addCachedObject(type, oid, object) {
+  async addCachedObject(type, oidObject, object) {
 
+    let oid = oidObject.toString();
     switch (type) {
       case 'repoCommit':
         this.cacheRepoCommit(oid, object);
@@ -329,12 +338,12 @@ export class KDBCache extends LevelCache {
 
         if (expandRepoCommits){
           var expandedCommitFilename = object.time + '_' + oid + '.json';
-          kdbFS.storeJSONDoc(this.expandedRepoCommitDirectory + path.sep + expandedCommitFilename, this.expandRepoCommit(oid));
+          kdbFS.storeJSONDoc(this.expandedRepoCommitDirectory + path.sep + expandedCommitFilename, await this.expandRepoCommit(oid));
         }
 
         // Store HashMap
         let treeConfig = new TreeConfiguration(oid);
-        this.loadProxiesForRepoCommit(oid, treeConfig);
+        await this.loadProxiesForRepoCommit(oid, treeConfig);
         treeConfig.loadingComplete();
         var treeHash = treeConfig.getAllTreeHashes();
         var hashmapFilename = object.time + '_' + oid + '.json';
@@ -433,8 +442,8 @@ export class KDBCache extends LevelCache {
         // eslint-disable-next-line no-unused-vars
         return revwalk.getCommitsUntil(function (commit) {
           return true;
-        }).then(function (commits) {
-          return kdbCache.indexCommit(repo, commits);
+        }).then(async function (commits) {
+          return await kdbCache.indexCommit(repo, commits);
         }).then(function () {
           try {
             kdbCache.cacheRef('HEAD', refHEAD);
@@ -464,11 +473,12 @@ export class KDBCache extends LevelCache {
       return;
     }
 
-    if (await this.getCommit(commit.id())){
-      // console.log('::: Already indexed commit ' + commit.id());
+    let commitId = commit.id().toString();
+    if (await this.getCommit(commitId)){
+      console.log('::: Already indexed commit ' + commitId);
       return await this.indexCommit(repository, commits);
     } else {
-      console.log('::: Processing commit ' + commit.id());
+      console.log('::: Processing commit ' + commitId);
 
       return commit.getTree().then(function (tree) {
         var co = {
@@ -483,18 +493,20 @@ export class KDBCache extends LevelCache {
         }
 
         // eslint-disable-next-line no-unused-vars
-        var commitDataPromise = new Promise((resolve, reject) => {
-          kdbCache.parseTree(repository, tree).then(() => {
+        var commitDataPromise = new Promise(async (resolve, reject) => {
+          await kdbCache.parseTree(repository, tree).then(() => {
             resolve(co);
           });
         });
 
         return commitDataPromise;
-      }).then(function (co) {
+      }).then(async function (co) {
 
-        kdbCache.addCachedObject('repoCommit', commit.id(), co);
-
+        await kdbCache.addCachedObject('repoCommit', commitId, co);
         return kdbCache.indexCommit(repository, commits);
+
+      }).then(function() {
+        console.log('%%% Finished indexing a commit');
       }).catch(function (err) {
         console.log(err.stack);
       });
@@ -518,7 +530,7 @@ export class KDBCache extends LevelCache {
 
       if (entry.isTree()) {
         // Retrieve subtree if it is not already cached
-        if (!await this.getRepoTree(entry.sha())){
+        if (!await this.getRepoTree(entry.sha().toString())){
           // jshint -W083
           promises.push(entry.getTree().then(function (t) {
             return kdbCache.parseTree(repository, t);
@@ -527,14 +539,14 @@ export class KDBCache extends LevelCache {
         }
       } else {
         // Retrieve Blob if it is not already cached
-        var oid = entry.sha();
+        var oid = entry.sha().toString();;
         if (!await this.getBlob(oid)){
           promises.push(this.getContents(repository, oid));
         }
       }
     }
 
-    this.addCachedObject('repoTree', tree.id(), entries);
+    await this.addCachedObject('repoTree', tree.id().toString(), entries);
 
     return Promise.all(promises);
   }
@@ -545,13 +557,13 @@ export class KDBCache extends LevelCache {
   getContents(repository, oid) {
     var kdbCache = this;
     return nodegit.Blob.lookup(repository, nodegit.Oid
-      .fromString(oid)).then(function (blob) {
-        kdbCache.addCachedObject('blob', oid, blob.content());
+      .fromString(oid)).then(async function (blob) {
+        await kdbCache.addCachedObject('blob', oid, blob.content());
         return Promise.resolve(oid);
-    }).catch(function (err) {
+    }).catch(async function (err) {
       console.log('*** Error retreiving blob from underlying repo: ' + oid);
       console.log(err.stack);
-      kdbCache.addCachedObject('blob', oid, {
+      await kdbCache.addCachedObject('blob', oid, {
         error: "Can Not Retrieve Item From Underlying Repo",
         oid: oid
       });
@@ -571,7 +583,7 @@ export class KDBCache extends LevelCache {
     };
 
     delete newCommitData.meta.treeId;
-    newCommitData.tree = this.expandRepoTree(commitData.treeId);
+    newCommitData.tree = await this.expandRepoTree(commitData.treeId);
 
     return newCommitData;
   }
@@ -579,13 +591,14 @@ export class KDBCache extends LevelCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  expandRepoTree(treeId) {
+  async expandRepoTree(treeId) {
     var treeData = {
         oid: treeId,
         contents: {}
     };
 
-    var treeEntry = this.getRepoTree(treeId);
+    // var treeEntry = (await this.getRepoTree(treeId));
+    var treeEntry = await this.getRepoTree(treeId);
 
     if (!treeEntry){
       console.log('*** Can\'t find cached tree: ' + treeId);
@@ -602,7 +615,7 @@ export class KDBCache extends LevelCache {
           };
           break;
         case 'tree':
-          contents[entryName] = this.expandRepoTree(entry.oid);
+          contents[entryName] = await this.expandRepoTree(entry.oid.toString());
           break;
         default:
           console.log('*** Error: Unexpected Kind ' + entry.kind + ' in tree: ' + treeId);
@@ -621,16 +634,16 @@ export class KDBCache extends LevelCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async loadProxiesForRepoCommit(commitId, treeConfig){
+  async loadProxiesForRepoCommit(commitId, treeConfig : TreeConfiguration){
     var commit = await this.expandRepoCommit(commitId);
-    this.loadProxiesForRepoRootDir(commit.tree, treeConfig);
+    await this.loadProxiesForRepoRootDir(commit.tree, treeConfig);
     treeConfig.loadingComplete();
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadProxiesForRepoRootDir(treeData, treeConfig){
+  async loadProxiesForRepoRootDir(treeData, treeConfig){
     var contents = treeData.contents;
 
     if (!contents) {
@@ -644,7 +657,7 @@ export class KDBCache extends LevelCache {
 
     if (contents.hasOwnProperty('export')) {
       console.log('::: Found early legacy dir (v0.1) for ' + treeData.oid);
-      this.loadProxiesForRepoRootDir(contents['export'], treeConfig);
+      await this.loadProxiesForRepoRootDir(contents['export'], treeConfig);
       return;
     }
 
@@ -659,10 +672,10 @@ export class KDBCache extends LevelCache {
             console.log('--- Skipping ' + kind);
             break;
           case 'Repository':
-            this.loadProxiesForRepoContents(contents.Repository.contents, treeConfig);
+            await this.loadProxiesForRepoContents(contents.Repository.contents, treeConfig);
             break;
           default:
-            this.loadProxiesForKindContents(kind, contents[kind].contents, treeConfig);
+            await this.loadProxiesForKindContents(kind, contents[kind].contents, treeConfig);
         }
 
       }
@@ -677,6 +690,8 @@ export class KDBCache extends LevelCache {
     console.log('::: Processing Repositories');
 
     for(var repoFile in repoDir){
+
+      //TODO:  Need to convert to jsonMountExt and merge the contents
 
       if (!jsonExt.test(repoFile)){
         console.log('>>> Skipping repo file ' + repoFile);
@@ -695,7 +710,7 @@ export class KDBCache extends LevelCache {
 
       var repoSubdir = repoDir[item.id];
       if(repoSubdir){
-        this.loadProxiesForRepoRootDir(repoSubdir, treeConfig);
+        await this.loadProxiesForRepoRootDir(repoSubdir, treeConfig);
       }
     }
   }
@@ -717,6 +732,12 @@ export class KDBCache extends LevelCache {
 
       var proxy = new ItemProxy(kind, item, treeConfig);
       let koid = proxy.oid;
+
+      if (koid === undefined){
+        proxy.calculateOID();
+        koid = proxy.oid;
+      }
+
       if (koid !== oid){
         let mismatchedBlob = await this.getBlob(koid);
         if (!mismatchedBlob){
