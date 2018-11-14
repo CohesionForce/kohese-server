@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, ViewChildren,
-  QueryList, Input } from '@angular/core';
+  QueryList, Input, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { CompareItemsComponent } from '../item-comparison/compare-items.component';
@@ -13,7 +14,8 @@ import { Comparison, Property } from '../comparison.class';
   styleUrls: ['./change-summary.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChangeSummaryComponent {
+export class ChangeSummaryComponent implements OnInit, OnDestroy,
+  AfterViewInit {
   private _comparisonsSubject: BehaviorSubject<Array<Comparison>>;
   get comparisonsSubject() {
     return this._comparisonsSubject;
@@ -24,19 +26,54 @@ export class ChangeSummaryComponent {
     this._comparisonsSubject = comparisonsSubject;
   }
   
+  private _expanded: boolean = false;
+  get expanded() {
+    return this._expanded;
+  }
+  @Input('expanded')
+  set expanded(expanded: boolean) {
+    this._expanded = expanded;
+  }
+  
+  private _showDifferencesOnlySubject: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(true);
+  get showDifferencesOnlySubject() {
+    return this._showDifferencesOnlySubject;
+  }
+  @Input('showDifferencesOnlySubject')
+  set showDifferencesOnlySubject(showDifferencesOnlySubject:
+    BehaviorSubject<boolean>) {
+    this._showDifferencesOnlySubject = showDifferencesOnlySubject;
+  }
+  
   @ViewChildren(MatExpansionPanel)
   private _differencePanels: QueryList<MatExpansionPanel>;
-  
-  get Array() {
-    return Array;
-  }
   
   get Comparison() {
     return Comparison;
   }
   
+  private _comparisonsSubscription: Subscription;
+  
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dialogService: DialogService) {
+  }
+  
+  public ngOnInit(): void {
+    this._comparisonsSubscription = this._comparisonsSubject.subscribe((
+      comparisons: Array<Comparison>) => {
+      this._changeDetectorRef.markForCheck();
+    });
+  }
+  
+  public ngOnDestroy(): void {
+    this._comparisonsSubscription.unsubscribe();
+  }
+  
+  public ngAfterViewInit(): void {
+    if (this._expanded) {
+      this.expandAll();
+    }
   }
   
   public expandAll(): void {
@@ -79,22 +116,5 @@ export class ChangeSummaryComponent {
     }
     
     return hasChanges;
-  }
-  
-  public getChangeStyle(change: any): object {
-    let style: object = {};
-    if (change.added) {
-      style = {
-        'background-color': 'lightgreen',
-        'color': 'darkgreen'
-      };
-    } else if (change.removed) {
-      style = {
-        'background-color': 'lightcoral',
-        'color': 'darkred'
-      };
-    }
-    
-    return style;
   }
 }

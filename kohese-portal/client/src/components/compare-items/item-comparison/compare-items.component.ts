@@ -1,15 +1,19 @@
 import {
   Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
-  ChangeDetectorRef, ViewChild, OnDestroy
+  ChangeDetectorRef
   } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
-import * as JsDiff from 'diff';
 
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { ComparisonSideComponent } from './comparison-side.component';
+import { ItemCache } from '../../../../../common/src/item-cache';
+import { Compare } from '../compare.class';
+import { Comparison } from '../comparison.class';
+import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 
 @Component({
   selector: 'compare-items',
@@ -17,9 +21,46 @@ import { ComparisonSideComponent } from './comparison-side.component';
   styleUrls: ['./compare-items.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CompareItemsComponent implements OnInit, OnDestroy {
+export class CompareItemsComponent implements OnInit {
+  private _baseProxySubject: BehaviorSubject<ItemProxy> =
+    new BehaviorSubject<ItemProxy>(undefined);
+  get baseProxySubject() {
+    return this._baseProxySubject;
+  }
+  
+  private _selectedBaseVersion: string;
+  get selectedBaseVersion() {
+    return this._selectedBaseVersion;
+  }
+  
+  private _baseVersions: Array<any> = [];
+  get baseVersions() {
+    return this._baseVersions;
+  }
+  
+  private _changeProxySubject: BehaviorSubject<ItemProxy> =
+    new BehaviorSubject<ItemProxy>(undefined);
+  get changeProxySubject() {
+    return this._changeProxySubject;
+  }
+  
+  private _selectedChangeVersion: string;
+  get selectedChangeVersion() {
+    return this._selectedChangeVersion;
+  }
+  
+  private _changeVersions: Array<any> = [];
+  get changeVersions() {
+    return this._changeVersions;
+  }
+  
+  private _comparison: Comparison;
+  get comparison() {
+    return this._comparison;
+  }
+  
   private _showDifferencesOnlySubject: BehaviorSubject<boolean> =
-    new BehaviorSubject<boolean>(false);
+    new BehaviorSubject<boolean>(true);
   get showDifferencesOnlySubject() {
     return this._showDifferencesOnlySubject;
   }
@@ -28,170 +69,165 @@ export class CompareItemsComponent implements OnInit, OnDestroy {
     return this._dialogParameters;
   }
 
-  @ViewChild('rightComparisonSide')
-  private _rightComparisonSide: ComparisonSideComponent;
-  @ViewChild('leftComparisonSide')
-  private _leftComparisonSide: ComparisonSideComponent;
-
-  private _rightSelectionSubscription: Subscription;
-  private _leftSelectionSubscription: Subscription;
-
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
-    private _changeDetectorRef: ChangeDetectorRef) {
+    private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
+    ItemRepository, private _dynamicTypesService: DynamicTypesService,
+    private _dialogService: DialogService) {
   }
 
   public ngOnInit(): void {
     if (this._dialogParameters) {
+      let baseProxyProcessingPromise: Promise<void>;
       let baseProxy: ItemProxy = this._dialogParameters['baseProxy'];
       if (baseProxy) {
-        this._leftComparisonSide.whenSelectedObjectChanges(baseProxy).
-          subscribe((baseVersions: Array<any>) => {
+        baseProxyProcessingPromise = new Promise<void>(async (resolve:
+          () => void, reject: () => void) => {
+          let baseVersions: Array<any> = await this.proxySelectionChanged(this.
+            _baseProxySubject, baseProxy);
           let baseVersion: VersionDesignator = this._dialogParameters[
             'baseVersion'];
           if (baseVersion) {
-            let versionId: string;
             if ((baseVersion as VersionDesignator) === VersionDesignator.
               STAGED_VERSION) {
-              versionId = baseVersions['Staged'];
+              this._selectedBaseVersion = baseVersions['Staged'];
             } else if ((baseVersion as VersionDesignator) ===
               VersionDesignator.LAST_COMMITTED_VERSION) {
               let numberOfStates: number = baseProxy.vcStatus.statusArray.length;
               if (numberOfStates > 0) {
-                versionId = baseVersions[numberOfStates].commit;
+                this._selectedBaseVersion = baseVersions[numberOfStates].commit;
               } else if (baseVersions.length > 1) {
-                versionId = baseVersions[1].commit;
+                this._selectedBaseVersion = baseVersions[1].commit;
               }
             }
-
-            if (versionId) {
-              this._leftComparisonSide.whenSelectedVersionChanges(baseProxy,
-                versionId);
-            }
           }
-          });
+          
+          resolve();
+        });
       }
-
+      
+      let changeProxyProcessingPromise: Promise<void>;
       let changeProxy: ItemProxy = this._dialogParameters['changeProxy'];
       if (changeProxy) {
-        this._rightComparisonSide.whenSelectedObjectChanges(changeProxy).
-          subscribe((changeVersions: Array<any>) => {
+        changeProxyProcessingPromise = new Promise<void>(async (resolve:
+          () => void, reject: () => void) => {
+          let changeVersions: Array<any> = await this.proxySelectionChanged(
+            this._changeProxySubject, changeProxy);
           let changeVersion: VersionDesignator = this._dialogParameters[
             'changeVersion'];
           if (changeVersion) {
-            let versionId: string;
             if ((changeVersion as VersionDesignator) === VersionDesignator.
               STAGED_VERSION) {
-              versionId = changeVersions['Staged'];
+              this._selectedChangeVersion = changeVersions['Staged'];
             } else if ((changeVersion as VersionDesignator) ===
               VersionDesignator.LAST_COMMITTED_VERSION) {
               let numberOfStates: number = changeProxy.vcStatus.statusArray.length;
               if (numberOfStates > 0) {
-                versionId = changeVersions[numberOfStates].commit;
+                this._selectedChangeVersion = changeVersions[numberOfStates].commit;
               } else if (changeVersions.length > 0) {
-                versionId = changeVersions[1].commit;
+                this._selectedChangeVersion = changeVersions[1].commit;
               }
             }
-
-            if (versionId) {
-              this._rightComparisonSide.whenSelectedVersionChanges(changeProxy,
-                versionId);
-            }
           }
-          });
+          
+          resolve();
+        });
+      }
+      
+      if (baseProxyProcessingPromise && changeProxyProcessingPromise) {
+        (async () => {
+          await Promise.all([baseProxyProcessingPromise,
+            changeProxyProcessingPromise]);
+          this.compare(this._selectedBaseVersion, this._selectedChangeVersion);
+        })();
       }
     }
-
-    this._rightSelectionSubscription = this._rightComparisonSide.
-      selectedObjectSubject.subscribe((object: any) => {
-      this.compare();
-      });
-
-    this._leftSelectionSubscription = this._leftComparisonSide.
-      selectedObjectSubject.subscribe((object: any) => {
-      this.compare();
-      });
   }
-
-  public ngOnDestroy(): void {
-    this._leftSelectionSubscription.unsubscribe();
-    this._rightSelectionSubscription.unsubscribe();
+  
+  public openProxySelectionDialog(proxySubject: BehaviorSubject<ItemProxy>):
+    void {
+    this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+      data: {
+        selected: proxySubject.getValue(),
+        allowMultiSelect : false
+      }
+    }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
+      if (selection) {
+        this.proxySelectionChanged(proxySubject, selection);
+      }
+    });
   }
-
-  public swapSides(): void {
-    let rightSelectedObject: any = this._rightComparisonSide.
-      selectedObjectSubject.getValue();
-    let rightSelectedVersion: string = this._rightComparisonSide.
-      selectedVersion;
-    let leftSelectedObject: any = this._leftComparisonSide.
-      selectedObjectSubject.getValue();
-    let leftSelectedVersion: string = this._leftComparisonSide.selectedVersion;
-    this._rightComparisonSide.whenSelectedVersionChanges(leftSelectedObject,
-      leftSelectedVersion);
-    this._leftComparisonSide.whenSelectedVersionChanges(rightSelectedObject,
-      rightSelectedVersion);
+  
+  public proxySelectionChanged(proxySubject: BehaviorSubject<ItemProxy>,
+    proxy: ItemProxy): Promise<Array<any>> {
+    return new Promise<Array<any>>(async (resolve: (history:
+      Array<any>) => void, reject: () => void) => {
+      let history: Array<any> = await this._itemRepository.getHistoryFor(proxy).
+        toPromise();
+      if (0 === proxy.vcStatus.statusArray.filter((status: string) => {
+        return status.startsWith('WT');
+      }).length && (history.length > 0)) {
+        /* If there are no unstaged changes to the selected Item, change the
+        commit ID of the most recent commit that included that Item to
+        'Unstaged' to operate on the working tree version of that Item. */
+        history[0].commit = 'Unstaged';
+      }
+      let uncommittedVersions: Array<any> = [];
+      if (proxy.vcStatus.statusArray.filter((status: string) => {
+        return status.startsWith('WT');
+      }).length > 0) {
+        uncommittedVersions.push({
+          commit: 'Unstaged',
+          message: 'Unstaged'
+        });
+      }
+  
+      if (proxy.vcStatus.statusArray.filter((status: string) => {
+        return status.startsWith('INDEX');
+      }).length > 0) {
+        uncommittedVersions.push({
+          commit: 'Staged',
+          message: 'Staged'
+        });
+      }
+      history.splice(0, 0, ...uncommittedVersions);
+      
+      if (proxySubject === this._baseProxySubject) {
+        this._selectedBaseVersion = 'Unstaged';
+        this._baseVersions = history;
+      } else {
+        this._selectedChangeVersion = 'Unstaged';
+        this._changeVersions = history;
+      }
+      
+      proxySubject.next(proxy);
+      await this.compare(this._selectedBaseVersion, this._selectedChangeVersion);
+      
+      resolve(history);
+    });
+  }
+  
+  public compare(baseCommitId: string, changeCommitId: string): Promise<void> {
+    if (baseCommitId && changeCommitId) {
+      return new Promise<void>(async (resolve: () => void, reject:
+        () => void) => {
+        this._comparison = await Compare.compareItems(this.
+          _baseProxySubject.getValue().item.id, baseCommitId, this.
+          _changeProxySubject.getValue().item.id, changeCommitId, this.
+          _dynamicTypesService);
+        this._changeDetectorRef.markForCheck();
+        
+        resolve();
+      });
+    } else {
+      return Promise.resolve();
+    }
   }
 
   public toggleShowingDifferencesOnly(): void {
     this._showDifferencesOnlySubject.next(!this._showDifferencesOnlySubject.
       getValue());
-    this._rightComparisonSide.refresh();
-    this._leftComparisonSide.refresh();
-  }
-
-  private compare(): void {
-    let rightVersion: any = this._rightComparisonSide.selectedObjectSubject.
-      getValue();
-    let leftVersion: any = this._leftComparisonSide.selectedObjectSubject.
-      getValue();
-
-    let propertyNames: Array<string> = [];
-    let rightProperties: Array<string> = Array.from(this._rightComparisonSide.
-      propertyDifferenceMap.keys());
-    for (let j: number = 0; j < rightProperties.length; j++) {
-      propertyNames.push(rightProperties[j]);
-    }
-
-    let leftProperties: Array<string> = Array.from(this._leftComparisonSide.
-      propertyDifferenceMap.keys());
-    for (let j: number = 0; j < leftProperties.length; j++) {
-      if (-1 === propertyNames.indexOf(leftProperties[j])) {
-        propertyNames.push(leftProperties[j]);
-      }
-    }
-
-    for (let j: number = 0; j < propertyNames.length; j++) {
-      let rightPropertyValue: any = this._rightComparisonSide.
-        getComparisonValue(propertyNames[j]);
-      let leftPropertyValue: any = this._leftComparisonSide.getComparisonValue(
-        propertyNames[j]);
-
-      if (!rightVersion && leftVersion) {
-        rightPropertyValue = leftPropertyValue;
-      } else if (rightVersion && !leftVersion) {
-        leftPropertyValue = rightPropertyValue;
-      }
-
-      let comparison: Array<any> = JsDiff.diffWords(leftPropertyValue,
-        rightPropertyValue);
-
-      let rightDifferenceArray: Array<any> = this._rightComparisonSide.
-        propertyDifferenceMap.get(propertyNames[j]);
-      if (rightDifferenceArray) {
-        rightDifferenceArray.length = 0;
-        rightDifferenceArray.push(...comparison);
-      }
-
-      let leftDifferenceArray: Array<any> = this._leftComparisonSide.
-        propertyDifferenceMap.get(propertyNames[j]);
-      if (leftDifferenceArray) {
-        leftDifferenceArray.length = 0;
-        leftDifferenceArray.push(...comparison);
-      }
-    }
-
-    this._rightComparisonSide.refresh();
-    this._leftComparisonSide.refresh();
+    this._changeDetectorRef.markForCheck();
   }
 }
 
