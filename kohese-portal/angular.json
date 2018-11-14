@@ -57,10 +57,10 @@
               "outputHashing": "all",
               "sourceMap": true,
               "extractCss": true,
-              "namedChunks": true,
-              "aot": true,
-              "extractLicenses": false,
-              "vendorChunk": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
               "buildOptimizer": false,
               "serviceWorker": true
             }
