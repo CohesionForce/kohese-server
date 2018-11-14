@@ -1,3 +1,4 @@
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 import {mergeMap} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
@@ -6,7 +7,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject } from 'rxjs';
 import { SocketService } from '../socket/socket.service';
-import { JwtHelperService } from '@auth0/angular-jwt';
 import { CurrentUserService } from '../user/current-user.service';
 
 @Injectable()
