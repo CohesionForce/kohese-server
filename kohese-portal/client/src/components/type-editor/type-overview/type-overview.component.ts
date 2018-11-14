@@ -1,7 +1,6 @@
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable ,  Subscription } from 'rxjs';
 
 import { IconSelectorComponent } from '../icon-selector/icon-selector.component';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';

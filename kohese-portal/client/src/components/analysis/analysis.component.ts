@@ -6,9 +6,8 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { AnalysisService } from '../../services/analysis/analysis.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { Subscription } from 'rxjs/Subscription';
 import { AnalysisViews, AnalysisFilter } from './AnalysisViewComponent.class';
 
 @Component({

@@ -1,10 +1,9 @@
+
+import {tap} from 'rxjs/operators';
 import { ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { VirtualScrollComponent } from 'angular2-virtual-scroll';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
 
 import { DialogService } from '../../services/dialog/dialog.service';
 import { TreeRow } from './tree-row/tree-row.class';
@@ -24,13 +23,13 @@ export abstract class Tree {
   get visibleRows() {
     return this._visibleRows;
   }
-  
+
   private _rootSubject: BehaviorSubject<any> =
     new BehaviorSubject<any>(undefined);
   get rootSubject() {
     return this._rootSubject;
   }
-  
+
   private _showRootWithDescendants: boolean = false;
   get showRootWithDescendants() {
     return this._showRootWithDescendants;
@@ -194,7 +193,7 @@ export abstract class Tree {
   get filterSubject() {
     return this._filterSubject;
   }
-  
+
   @ViewChild(VirtualScrollComponent)
   private _virtualScrollComponent: VirtualScrollComponent;
 
@@ -210,7 +209,7 @@ export abstract class Tree {
       }
     });
   }
-  
+
   protected initialize(): void {
     this._route.params.subscribe((parameters: Params) => {
       let focusedRow: TreeRow = this._rowMap.get(parameters['id']);
@@ -253,7 +252,7 @@ export abstract class Tree {
       } else {
         selectedObjects.splice(index, 1);
       }
-      
+
       this._selectedObjectsSubject.next(selectedObjects);
       
       if (this._canMoveRows) {
@@ -305,7 +304,7 @@ export abstract class Tree {
   protected getRow(id: any): TreeRow {
     return this._rowMap.get(id);
   }
-  
+
   public getRootRow(): TreeRow {
     return this.getRow(this.getId(this._rootSubject.getValue()));
   }
@@ -313,7 +312,7 @@ export abstract class Tree {
   public refresh(): void {
     this._rootSubject.next(this._rootSubject.getValue());
     if (this._virtualScrollComponent) {
-      this._virtualScrollComponent.refresh(true);
+      this._virtualScrollComponent.refresh();
     }
   }
 
@@ -322,23 +321,23 @@ export abstract class Tree {
       data: {
         filter: inputFilter
       }
-    }).updateSize('90%', '90%').afterClosed().do((resultingFilter: Filter) => {
+    }).updateSize('90%', '90%').afterClosed().pipe(tap((resultingFilter: Filter) => {
       if (resultingFilter) {
         this._filterSubject.next(resultingFilter);
         this.refresh();
       }
-    });
+    }));
   }
-  
+
   public removeFilter(): void {
     this._filterSubject.next(undefined);
     this.refresh();
   }
-  
+
   public setExpansion(object: any, expand: boolean): void {
     this._rowMap.get(this.getId(object)).expanded = expand;
   }
-  
+
   public selectAll(): void {
     let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     let rowArray: Array<TreeRow> = Array.from(this._rowMap.values());
@@ -350,9 +349,9 @@ export abstract class Tree {
         rowArray[j].expanded = true;
       }
     }
-    
+
     this.refresh();
-    
+
     let filter: Filter = this._filterSubject.getValue();
     for (let j: number = 0; j < this._visibleRows.length; j++) {
       if (this.isMultiselectEnabled(this._visibleRows[j].object) && (!filter ||
@@ -360,17 +359,17 @@ export abstract class Tree {
         selectedObjects.push(this._visibleRows[j].object);
       }
     }
-    
+
     for (let j: number = 0; j < rowArray.length; j++) {
       if (-1 === expandedObjects.indexOf(rowArray[j].object)) {
         rowArray[j].expanded = false;
       }
     }
-    
+
     this._selectedObjectsSubject.next(selectedObjects);
     this.refresh();
   }
-  
+
   public deselectAll(): void {
     let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     let rowArray: Array<TreeRow> = Array.from(this._rowMap.values());
@@ -382,9 +381,9 @@ export abstract class Tree {
         rowArray[j].expanded = true;
       }
     }
-    
+
     this.refresh();
-    
+
     let filter: Filter = this._filterSubject.getValue();
     for (let j: number = 0; j < this._visibleRows.length; j++) {
       if (this.isMultiselectEnabled(this._visibleRows[j].object) && (!filter ||
@@ -393,13 +392,13 @@ export abstract class Tree {
           object), 1);
       }
     }
-    
+
     for (let j: number = 0; j < rowArray.length; j++) {
       if (-1 === expandedObjects.indexOf(rowArray[j].object)) {
         rowArray[j].expanded = false;
       }
     }
-    
+
     this._selectedObjectsSubject.next(selectedObjects);
     this.refresh();
   }
@@ -476,15 +475,15 @@ export abstract class Tree {
         if (this._showRootWithDescendants) {
           depth++;
         }
-        
+
         if (parent === root) {
           break;
         }
-        
+
         if (!this._showRootWithDescendants) {
           depth++;
         }
-        
+
         parent = this.getParent(parent);
       }
     }
@@ -513,13 +512,13 @@ export abstract class Tree {
     }
     this.postRowProcessingActivity(row);
   }
-  
+
   protected abstract getId(object: any): any;
-  
+
   protected abstract getParent(object: any): any;
-  
+
   protected abstract getChildren(object: any): Array<any>;
-  
+
   protected abstract getText(object: any): string;
 
   protected abstract getIcon(object: any): string;
@@ -539,20 +538,20 @@ export abstract class Tree {
   protected postTreeTraversalActivity(): void {
     // Subclasses may override this function
   }
-  
+
   protected setRoot(object: any) {
     this._rootSubject.next(object);
   }
-  
+
   protected rowFocused(row: TreeRow): void {
     // Subclasses may override this function
   }
-  
+
   protected filter(object: any): boolean {
     return (-1 !== this._filterSubject.getValue().filter([object]).indexOf(
       object));
   }
-  
+
   protected isMultiselectEnabled(object: any): boolean {
     return this._canMoveRows && this._inTargetingMode;
   }

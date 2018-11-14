@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { SocketService } from '../socket/socket.service';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/bindCallback';
+import { Observable, bindCallback } from 'rxjs';
+
 
 @Injectable()
 export class VersionControlService {
   private _emitReturningObservable: (message: string, data: any) => Observable<any> =
-    Observable.bindCallback(this.socketService.getSocket().emit.bind(this.
+    bindCallback(this.socketService.getSocket().emit.bind(this.
     socketService.getSocket()));
 
   public constructor(private socketService: SocketService) {

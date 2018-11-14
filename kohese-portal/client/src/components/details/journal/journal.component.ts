@@ -6,7 +6,7 @@ import { ItemRepository, RepoStates } from '../../../services/item-repository/it
 import { SessionService } from '../../../services/user/session.service';
 import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'journal',

@@ -1,5 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
 import { ItemRepository } from './../item-repository/item-repository.service';
 import { Injectable } from '@angular/core';
 import { ItemProxy } from '../../../../common/src/item-proxy';

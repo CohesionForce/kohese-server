@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { LoggingEventRecord } from './k-logger';
 
 // TODO: does this need to be more configurable?

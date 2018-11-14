@@ -1,11 +1,10 @@
+
+import {tap} from 'rxjs/operators';
 import { Component, ChangeDetectionStrategy,
   ChangeDetectorRef, ViewChild, OnInit, OnDestroy,
   Input } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
@@ -293,13 +292,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       filter = new ItemProxyFilter(this._dynamicTypesService, this.
         _itemRepository);
     }
-
-    return super.openFilterDialog(filter).do((resultingFilter: Filter) => {
+    
+    return super.openFilterDialog(filter).pipe(tap((resultingFilter: Filter) => {
       if (resultingFilter && !resultingFilter.isElementPresent(this.
         _searchCriterion)) {
         this._searchCriterion.value = '';
       }
-    });
+    }));
   }
 
   public removeFilter(): void {

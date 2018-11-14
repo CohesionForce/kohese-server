@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy,
   ChangeDetectorRef, OnInit, OnDestroy, EventEmitter,
   Output } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository,

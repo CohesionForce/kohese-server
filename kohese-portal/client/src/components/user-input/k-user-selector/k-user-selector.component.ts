@@ -1,11 +1,12 @@
+
+import {map, startWith} from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserInput } from '../user-input.class';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
+import { Subscription ,  Observable } from 'rxjs';
 
 @Component({
   selector: 'k-user-selector',
@@ -28,13 +29,13 @@ export class KUserSelectorComponent extends UserInput implements OnInit, OnDestr
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) { 
             this.userProxies = this.SessionService.getUsers()
             this.filteredProxiesSub = 
-                this.formGroup.get(this.fieldId).valueChanges
-                    .startWith('')
-                    .map((text: string) => {
+                this.formGroup.get(this.fieldId).valueChanges.pipe(
+                    startWith(''),
+                    map((text: string) => {
                         return this.userProxies.filter((proxy) => {
                             return (-1 !== proxy.item.name.indexOf(text));
                         });
-                    })
+                    }),)
                     .subscribe((filteredProxies)=> {
                         this.filteredProxies = filteredProxies;
                     })

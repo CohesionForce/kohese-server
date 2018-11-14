@@ -1,6 +1,5 @@
-import { Subscription } from 'rxjs';
+import { Subscription ,  Observable } from 'rxjs';
 import { DashboardSelections } from './../dashboard-selector/dashboard-selector.component';
-import { Observable } from 'rxjs/Observable';
 import { Input } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 
