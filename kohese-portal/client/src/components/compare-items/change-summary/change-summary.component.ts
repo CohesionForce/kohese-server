@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, ViewChildren,
-  QueryList, Input, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+  QueryList, Input, OnInit, OnDestroy } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -14,8 +14,7 @@ import { Comparison, Property } from '../comparison.class';
   styleUrls: ['./change-summary.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChangeSummaryComponent implements OnInit, OnDestroy,
-  AfterViewInit {
+export class ChangeSummaryComponent implements OnInit, OnDestroy {
   private _comparisonsSubject: BehaviorSubject<Array<Comparison>>;
   get comparisonsSubject() {
     return this._comparisonsSubject;
@@ -68,12 +67,6 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy,
   
   public ngOnDestroy(): void {
     this._comparisonsSubscription.unsubscribe();
-  }
-  
-  public ngAfterViewInit(): void {
-    if (this._expanded) {
-      this.expandAll();
-    }
   }
   
   public expandAll(): void {

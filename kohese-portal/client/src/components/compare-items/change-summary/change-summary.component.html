@@ -11,7 +11,7 @@
 <div style="height: calc(100% - 50px); width: 100%; overflow: auto;">
   <ng-container *ngFor="let comparison of (comparisonsSubject | async)">
     <ng-container *ngIf="hasChanges(comparison)">
-      <mat-expansion-panel>
+      <mat-expansion-panel [expanded]="expanded">
         <mat-expansion-panel-header>
           {{comparison.changeObject.name}}
           <ng-container

@@ -211,9 +211,11 @@ export class CompareItemsComponent implements OnInit {
     if (baseCommitId && changeCommitId) {
       return new Promise<void>(async (resolve: () => void, reject:
         () => void) => {
+        let itemCache: ItemCache = TreeConfiguration.getItemCache();
         this._comparison = await Compare.compareItems(this.
-          _baseProxySubject.getValue().item.id, baseCommitId, this.
-          _changeProxySubject.getValue().item.id, changeCommitId, this.
+          _baseProxySubject.getValue().item.id, await itemCache.getTreeHashMap(
+          baseCommitId), this._changeProxySubject.getValue().item.id,
+          await itemCache.getTreeHashMap(changeCommitId), this.
           _dynamicTypesService);
         this._changeDetectorRef.markForCheck();
         

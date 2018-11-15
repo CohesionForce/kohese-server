@@ -12,12 +12,15 @@ export class Compare {
     dynamicTypesService: DynamicTypesService): Promise<Array<Comparison>> {
     let comparisons: Array<ItemProxyComparison> = [];
     let cache: ItemCache = TreeConfiguration.getItemCache();
-    let diff: any = TreeHashMap.diff(await cache.getTreeHashMap(baseCommitId),
-      await cache.getTreeHashMap(changeCommitId));
+    let baseTreeHashMap: TreeHashMap = await cache.getTreeHashMap(
+      baseCommitId);
+    let changeTreeHashMap: TreeHashMap = await cache.getTreeHashMap(
+      changeCommitId);
+    let diff: any = TreeHashMap.diff(baseTreeHashMap, changeTreeHashMap);
     if (!diff.match) {
       for (let id in diff.details) {
         let comparison: ItemProxyComparison = await Compare.compareItems(id,
-          baseCommitId, id, changeCommitId, dynamicTypesService);
+          baseTreeHashMap, id, changeTreeHashMap, dynamicTypesService);
         comparisons.push(comparison);
         
         let diffEntry: TreeHashEntryDifference = diff.details[id];
@@ -85,26 +88,14 @@ export class Compare {
     return comparisons;
   }
   
-  public static compareItems(baseId: string, baseCommitId: string, changeId:
-    string, changeCommitId: string, dynamicTypesService: DynamicTypesService):
-    Promise<ItemProxyComparison> {
+  public static compareItems(baseId: string, baseTreeHashMap: TreeHashMap,
+    changeId: string, changeTreeHashMap: TreeHashMap, dynamicTypesService:
+    DynamicTypesService): Promise<ItemProxyComparison> {
     return new Promise<ItemProxyComparison>(async (resolve: (comparison:
       ItemProxyComparison) => void, reject: () => void) => {
       let itemCache: ItemCache = TreeConfiguration.getItemCache();
       let baseItem: any;
-      if (baseCommitId === 'Unstaged') {
-        let baseProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(baseId);
-        baseItem = baseProxy.item;
-        baseItem.kind = baseProxy.kind;
-      } else if (baseCommitId === 'Staged') {
-        let baseProxy: ItemProxy = TreeConfiguration.getStagedTree().
-          getProxyFor(baseId);
-        baseItem = baseProxy.item;
-        baseItem.kind = baseProxy.kind;
-      } else {
-        let baseTreeHashMap: TreeHashMap = await itemCache.getTreeHashMap(
-          baseCommitId);
+      if (baseTreeHashMap) {
         baseItem = await itemCache.getBlob(baseTreeHashMap[baseId].oid);
         if (baseItem) {
           baseItem = JSON.parse(JSON.stringify(baseItem));
@@ -115,22 +106,21 @@ export class Compare {
           };
         }
         baseItem.kind = baseTreeHashMap[baseId].kind;
+      } else {
+        let baseProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(baseId);
+        if (!baseProxy) {
+          baseProxy = TreeConfiguration.getStagedTree().getProxyFor(baseId);
+        }
+        
+        if (baseProxy) {
+          baseItem = baseProxy.item;
+          baseItem.kind = baseProxy.kind;
+        }
       }
       
       let changeItem: any;
-      if (changeCommitId === 'Unstaged') {
-        let changeProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(changeId);
-        changeItem = changeProxy.item;
-        changeItem.kind = changeProxy.kind;
-      } else if (changeCommitId === 'Staged') {
-        let changeProxy: ItemProxy = TreeConfiguration.getStagedTree().
-          getProxyFor(changeId);
-        changeItem = changeProxy.item;
-        changeItem.kind = changeProxy.kind;
-      } else {
-        let changeTreeHashMap: TreeHashMap = await itemCache.getTreeHashMap(
-          changeCommitId);
+      if (changeTreeHashMap) {
         changeItem = await itemCache.getBlob(changeTreeHashMap[changeId].oid);
         if (changeItem) {
           changeItem = JSON.parse(JSON.stringify(changeItem));
@@ -141,6 +131,18 @@ export class Compare {
           };
         }
         changeItem.kind = changeTreeHashMap[changeId].kind;
+      } else {
+        let changeProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(changeId);
+        if (!changeProxy) {
+          changeProxy = TreeConfiguration.getStagedTree().getProxyFor(
+            changeId);
+        }
+        
+        if (changeProxy) {
+          changeItem = changeProxy.item;
+          changeItem.kind = changeProxy.kind;
+        }
       }
       
       let comparison: ItemProxyComparison = new ItemProxyComparison(baseItem,
@@ -152,31 +154,39 @@ export class Compare {
         if (uuidValueProperty) {
           let item: any;
           if (comparisonObject === baseItem) {
-            if (baseCommitId === 'Unstaged') {
-              item = TreeConfiguration.getWorkingTree().getProxyFor(
-                propertyValue).item;
-            } else if (baseCommitId === 'Staged') {
-              item = TreeConfiguration.getStagedTree().getProxyFor(
-                propertyValue).item;
+            if (baseTreeHashMap) {
+              if (baseTreeHashMap[propertyValue]) {
+                item = await itemCache.getBlob(baseTreeHashMap[propertyValue].
+                  oid);
+              }
             } else {
-              let treeHashMap: TreeHashMap = await itemCache.getTreeHashMap(
-                baseCommitId);
-              if (treeHashMap[propertyValue]) {
-                item = await itemCache.getBlob(treeHashMap[propertyValue].oid);
+              let proxy: ItemProxy = TreeConfiguration.getWorkingTree().
+                getProxyFor(propertyValue);
+              if (!proxy) {
+                proxy = TreeConfiguration.getStagedTree().getProxyFor(
+                  propertyValue);
+              }
+              
+              if (proxy) {
+                item = proxy.item;
               }
             }
           } else {
-            if (changeCommitId === 'Unstaged') {
-              item = TreeConfiguration.getWorkingTree().getProxyFor(
-                propertyValue).item;
-            } else if (changeCommitId === 'Staged') {
-              item = TreeConfiguration.getStagedTree().getProxyFor(
-                propertyValue).item;
+            if (changeTreeHashMap) {
+              if (changeTreeHashMap[propertyValue]) {
+                item = await itemCache.getBlob(changeTreeHashMap[propertyValue].
+                  oid);
+              }
             } else {
-              let treeHashMap: TreeHashMap = await itemCache.getTreeHashMap(
-                changeCommitId);
-              if (treeHashMap[propertyValue]) {
-                item = await itemCache.getBlob(treeHashMap[propertyValue].oid);
+              let proxy: ItemProxy = TreeConfiguration.getWorkingTree().
+                getProxyFor(propertyValue);
+              if (!proxy) {
+                proxy = TreeConfiguration.getStagedTree().getProxyFor(
+                  propertyValue);
+              }
+              
+              if (proxy) {
+                item = proxy.item;
               }
             }
           }

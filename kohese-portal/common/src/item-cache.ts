@@ -314,39 +314,40 @@ export class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   async getTreeHashMap(forCommit : string) : Promise<TreeHashMap> {
-    var treeHashMap = {};
-
+    let treeHashMap: TreeHashMap;
     let commit = await this.getCommit(forCommit);
-
-    let treeHashEntryStack : Array<{id:string, treeId:TreeHashValueType}> = [];
-    let reversedRootIds = Object.keys(commit.repoTreeRoots).reverse();
-    for (let repoIdx in reversedRootIds){
-      let repoId = reversedRootIds[repoIdx];
-      treeHashEntryStack.push({id:repoId, treeId:commit.repoTreeRoots[repoId].treeHash});
-    }
-
-    while (treeHashEntryStack.length > 0) {
-      let mapEntry = treeHashEntryStack.pop();
-      let treeHashEntry = await this.getTree(mapEntry.treeId)
-
-      if (treeHashEntry) {
-        treeHashMap [mapEntry.id] = treeHashEntry;
-
-        let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
-        for (let childIdx in reversedChildIds){
-          let childId = reversedChildIds[childIdx];
-          let treeId = treeHashEntry.childTreeHashes[childId];
-          switch (treeId){
-            case "Repository-Mount":
-            case "Internal":
-              // Ignore
-              break;
-            default:
-              treeHashEntryStack.push({id:childId, treeId: treeId});
+    if (commit) {
+      treeHashMap = {};
+      let treeHashEntryStack : Array<{id:string, treeId:TreeHashValueType}> = [];
+      let reversedRootIds = Object.keys(commit.repoTreeRoots).reverse();
+      for (let repoIdx in reversedRootIds){
+        let repoId = reversedRootIds[repoIdx];
+        treeHashEntryStack.push({id:repoId, treeId:commit.repoTreeRoots[repoId].treeHash});
+      }
+      
+      while (treeHashEntryStack.length > 0) {
+        let mapEntry = treeHashEntryStack.pop();
+        let treeHashEntry = await this.getTree(mapEntry.treeId)
+  
+        if (treeHashEntry) {
+          treeHashMap [mapEntry.id] = treeHashEntry;
+  
+          let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
+          for (let childIdx in reversedChildIds){
+            let childId = reversedChildIds[childIdx];
+            let treeId = treeHashEntry.childTreeHashes[childId];
+            switch (treeId){
+              case "Repository-Mount":
+              case "Internal":
+                // Ignore
+                break;
+              default:
+                treeHashEntryStack.push({id:childId, treeId: treeId});
+            }
           }
+        } else {
+          console.log('!!! Can not find treeHashEntry for: ' + JSON.stringify(mapEntry));
         }
-      } else {
-        console.log('!!! Can not find treeHashEntry for: ' + JSON.stringify(mapEntry));
       }
     }
 
