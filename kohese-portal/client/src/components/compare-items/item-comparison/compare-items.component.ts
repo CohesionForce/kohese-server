@@ -8,6 +8,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemCache } from '../../../../../common/src/item-cache';
@@ -32,6 +33,9 @@ export class CompareItemsComponent implements OnInit {
   get selectedBaseVersion() {
     return this._selectedBaseVersion;
   }
+  set selectedBaseVersion(selectedBaseVersion: string) {
+    this._selectedBaseVersion = selectedBaseVersion;
+  }
   
   private _baseVersions: Array<any> = [];
   get baseVersions() {
@@ -47,6 +51,9 @@ export class CompareItemsComponent implements OnInit {
   private _selectedChangeVersion: string;
   get selectedChangeVersion() {
     return this._selectedChangeVersion;
+  }
+  set selectedChangeVersion(selectedChangeVersion: string) {
+    this._selectedChangeVersion = selectedChangeVersion;
   }
   
   private _changeVersions: Array<any> = [];
@@ -68,12 +75,17 @@ export class CompareItemsComponent implements OnInit {
   get dialogParameters() {
     return this._dialogParameters;
   }
+  
+  get navigationService() {
+    return this._navigationService;
+  }
 
   public constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
     ItemRepository, private _dynamicTypesService: DynamicTypesService,
-    private _dialogService: DialogService) {
+    private _dialogService: DialogService, private _navigationService:
+    NavigationService) {
   }
 
   public ngOnInit(): void {
@@ -138,7 +150,7 @@ export class CompareItemsComponent implements OnInit {
         (async () => {
           await Promise.all([baseProxyProcessingPromise,
             changeProxyProcessingPromise]);
-          this.compare(this._selectedBaseVersion, this._selectedChangeVersion);
+          this.compare();
         })();
       }
     }
@@ -172,6 +184,12 @@ export class CompareItemsComponent implements OnInit {
         'Unstaged' to operate on the working tree version of that Item. */
         history[0].commit = 'Unstaged';
       }
+      
+      if (proxySubject === this._baseProxySubject) {
+        this._selectedBaseVersion = '';
+      } else {
+        this._selectedChangeVersion = '';
+      }
       let uncommittedVersions: Array<any> = [];
       if (proxy.vcStatus.statusArray.filter((status: string) => {
         return status.startsWith('WT');
@@ -189,34 +207,44 @@ export class CompareItemsComponent implements OnInit {
           commit: 'Staged',
           message: 'Staged'
         });
+        
+        if (proxySubject === this._baseProxySubject) {
+          this._selectedBaseVersion = 'Staged';
+        } else {
+          this._selectedChangeVersion = 'Staged';
+        }
       }
       history.splice(0, 0, ...uncommittedVersions);
       
       if (proxySubject === this._baseProxySubject) {
-        this._selectedBaseVersion = 'Unstaged';
-        this._baseVersions = history;
+        if (!this._selectedBaseVersion) {
+          this._selectedBaseVersion = history[0].commit;
+          this._baseVersions = history;
+        }
       } else {
-        this._selectedChangeVersion = 'Unstaged';
-        this._changeVersions = history;
+        if (!this._selectedChangeVersion) {
+          this._selectedChangeVersion = history[0].commit;
+          this._changeVersions = history;
+        }
       }
       
       proxySubject.next(proxy);
-      await this.compare(this._selectedBaseVersion, this._selectedChangeVersion);
+      await this.compare();
       
       resolve(history);
     });
   }
   
-  public compare(baseCommitId: string, changeCommitId: string): Promise<void> {
-    if (baseCommitId && changeCommitId) {
+  public compare(): Promise<void> {
+    if (this._selectedBaseVersion && this._selectedChangeVersion) {
       return new Promise<void>(async (resolve: () => void, reject:
         () => void) => {
         let itemCache: ItemCache = TreeConfiguration.getItemCache();
         this._comparison = await Compare.compareItems(this.
           _baseProxySubject.getValue().item.id, await itemCache.getTreeHashMap(
-          baseCommitId), this._changeProxySubject.getValue().item.id,
-          await itemCache.getTreeHashMap(changeCommitId), this.
-          _dynamicTypesService);
+          this._selectedBaseVersion), this._changeProxySubject.getValue().item.
+          id, await itemCache.getTreeHashMap(this._selectedChangeVersion),
+          this._dynamicTypesService);
         this._changeDetectorRef.markForCheck();
         
         resolve();

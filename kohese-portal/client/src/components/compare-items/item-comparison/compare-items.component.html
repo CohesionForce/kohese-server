@@ -2,14 +2,20 @@
   <button mat-icon-button (click)="openProxySelectionDialog(baseProxySubject)">
     <mat-icon class="fa fa-mouse-pointer"></mat-icon>
   </button>
+  <button mat-icon-button
+    [disabled]="!((selectedBaseVersion === 'Staged') || ((baseVersions.length >
+      0) && (selectedBaseVersion === baseVersions[0].commit)))"
+    (click)="navigationService.addTab('Explore', { id: baseProxySubject.
+      getValue().item.id })">
+    <mat-icon class="fa fa-arrow-right"></mat-icon>
+  </button>
   <mat-form-field style="padding: 3px; width: 45%;">
     <mat-select
       placeholder="{{((baseProxySubject | async) ? (baseProxySubject | async).
         item.name : 'No Base Object Selected')}}"
-      [value]="selectedBaseVersion"
-      [disabled]="!(baseProxySubject | async) ||
-        (1 === baseVersions.length)"
-      (selectionChange)="compare(selectedBaseVersion, selectedChangeVersion)">
+      [(ngModel)]="selectedBaseVersion"
+      (ngModelChange)="selectedBaseVersion = $event; compare()"
+      [disabled]="!(baseProxySubject | async) || (1 === baseVersions.length)">
       <mat-option *ngFor="let version of baseVersions"
         [value]="version.commit"
         matTooltip="{{version.message}} - {{version.date | date:'long'}}"
@@ -22,14 +28,21 @@
     (click)="openProxySelectionDialog(changeProxySubject)">
     <mat-icon class="fa fa-mouse-pointer"></mat-icon>
   </button>
+  <button mat-icon-button
+    [disabled]="!((selectedChangeVersion === 'Staged') || ((changeVersions.
+      length > 0) && (selectedChangeVersion === changeVersions[0].commit)))"
+    (click)="navigationService.addTab('Explore', { id: changeProxySubject.
+      getValue().item.id })">
+    <mat-icon class="fa fa-arrow-right"></mat-icon>
+  </button>
   <mat-form-field style="padding: 3px; width: 45%;">
     <mat-select
       placeholder="{{((changeProxySubject | async) ? (changeProxySubject |
         async).item.name : 'No Change Object Selected')}}"
-      [value]="selectedChangeVersion"
-      [disabled]="!(changeProxySubject | async) ||
-        (1 === changeVersions.length)"
-      (selectionChange)="compare(selectedBaseVersion, selectedChangeVersion)">
+      [(ngModel)]="selectedChangeVersion"
+      (ngModelChange)="selectedChangeVersion = $event; compare()"
+      [disabled]="!(changeProxySubject | async) || (1 === changeVersions.
+        length)">
       <mat-option *ngFor="let version of changeVersions"
         [value]="version.commit"
         matTooltip="{{version.message}} - {{version.date | date:'long'}}"
