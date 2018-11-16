@@ -48,7 +48,7 @@ import { DetailsDialogComponent } from "./details-dialog/details-dialog.componen
     ReactiveFormsModule,
     PipesModule,
     UserInputModule,
-    TreeModule
+    TreeModule.forRoot()
   ],
   exports : [
     DetailsComponent,

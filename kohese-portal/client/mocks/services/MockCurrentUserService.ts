@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import { ItemProxy } from '../../../common/src/item-proxy';
 
 import { MockUserData } from '../data/MockUser';

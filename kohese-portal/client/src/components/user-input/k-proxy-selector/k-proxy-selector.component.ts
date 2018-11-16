@@ -4,9 +4,8 @@ import { UserInput } from '../user-input.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/startWith';
+import { Observable ,  Subscription } from 'rxjs';
+
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { ProxySelectorDialogComponent } from './proxy-selector-dialog/proxy-selector-dialog.component';
 

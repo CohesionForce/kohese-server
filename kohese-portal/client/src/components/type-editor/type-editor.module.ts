@@ -1,3 +1,4 @@
+import { TableEditorComponent } from './property-editor/table-editor/table-editor.component';
 import { FormatModule } from './format-editor/format.module';
 import { FormatGuiComponent } from './format-editor/format-gui/format-gui.component';
 import { FormatEditorComponent } from './format-editor/format-editor.component';
@@ -20,7 +21,8 @@ import { AngularSplitModule } from 'angular-split';
     TypeEditorComponent,
     TypeOverviewComponent,
     PropertyEditorComponent,
-    IconSelectorComponent
+    IconSelectorComponent,
+    TableEditorComponent
   ],
   entryComponents: [
     IconSelectorComponent

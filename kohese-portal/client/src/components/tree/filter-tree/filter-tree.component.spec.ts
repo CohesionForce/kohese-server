@@ -70,12 +70,12 @@ describe('Component: filter-tree', () => {
   
   it('enters Targeting Mode', () => {
     component.enterCopyTargetingMode(undefined);
-    expect(component.inTargetingMode).toEqual(true);
+    expect(component.localInTargetingMode).toEqual(true);
   });
   
   it('exits Targeting Mode', () => {
-    component.exitTargetingMode();
-    expect(component.inTargetingMode).toEqual(false);
+    component.localExitTargetingMode();
+    expect(component.localInTargetingMode).toEqual(false);
   });
   
   it('determines if all of the selected objects are connections', () => {

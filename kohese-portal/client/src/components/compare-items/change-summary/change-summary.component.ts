@@ -1,8 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, ViewChildren,
   QueryList, Input, OnInit, OnDestroy } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { CompareItemsComponent } from '../item-comparison/compare-items.component';

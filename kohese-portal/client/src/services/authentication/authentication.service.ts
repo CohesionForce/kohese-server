@@ -1,10 +1,12 @@
+import { JwtHelperService } from '@auth0/angular-jwt';
+
+import {mergeMap} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeMap';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
+
+import { BehaviorSubject } from 'rxjs';
 import { SocketService } from '../socket/socket.service';
-import { JwtHelper } from 'angular2-jwt';
 import { CurrentUserService } from '../user/current-user.service';
 
 @Injectable()
@@ -12,7 +14,7 @@ export class AuthenticationService {
   private readonly TOKEN_KEY: string = 'auth-token';
   private readonly UNDEFINED_LOCAL_STORAGE_VALUE = 'undefined';
   private token: BehaviorSubject<string> = new BehaviorSubject(localStorage.getItem(this.TOKEN_KEY));
-  private jwtHelper: JwtHelper = new JwtHelper();
+  private jwtHelper: JwtHelperService = new JwtHelperService();
   
   constructor(private httpClient: HttpClient,
     private socketService: SocketService,
@@ -50,7 +52,7 @@ export class AuthenticationService {
     }, {
       observe: 'response',
       responseType: 'text'
-    }).mergeMap((httpResponse: any) => {
+    }).pipe(mergeMap((httpResponse: any) => {
       let t: any = httpResponse.body;
       localStorage.setItem(this.TOKEN_KEY, t);
       this.token.next(t);
@@ -59,7 +61,7 @@ export class AuthenticationService {
         token: t
       });
       return this.CurrentUserService.setCurrentUser(this.jwtHelper.decodeToken(t));
-    }) as BehaviorSubject<any>;
+    })) as BehaviorSubject<any>;
   }
   
   logout(): void {

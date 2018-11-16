@@ -11,9 +11,7 @@ import { SessionService } from '../../services/user/session.service';
 
 import * as commonmark from 'commonmark';
 import { HtmlRenderer, Parser } from 'commonmark';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
+import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ProxyDetailsComponent } from './ProxyDetails.Class';
 

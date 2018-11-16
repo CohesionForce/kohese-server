@@ -12,8 +12,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription ,  BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'details-form',
