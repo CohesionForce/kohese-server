@@ -117,13 +117,13 @@
     "directive-selector": [
       true,
       "attribute",
-      "app",
+      "<%= prefix %>",
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      "app",
+      "<%= prefix %>",
       "kebab-case"
     ],
     "angular-whitespace": [true, "check-interpolation"],
