@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 import { Commit } from '../tree/commit-tree/commit-tree.component';
 import { Comparison } from '../compare-items/comparison.class';

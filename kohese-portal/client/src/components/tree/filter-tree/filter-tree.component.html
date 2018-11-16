@@ -1,5 +1,5 @@
 <div class="top-bar">
-  <ng-container *ngIf="!inTargetingMode">
+  <ng-container *ngIf="!localInTargetingMode">
     <button mat-icon-button [matMenuTriggerFor]="addMenu"
       class="flex-right-align"
       [disabled]="(0 === (selectedObjectsSubject | async).length) || !areSelectedElementsConnections()">
@@ -44,8 +44,8 @@
       <mat-icon class="fa fa-trash"></mat-icon>
     </button>
   </ng-container>
-  <ng-container *ngIf="inTargetingMode">
-    <button mat-icon-button (click)="exitTargetingMode()"
+  <ng-container *ngIf="localInTargetingMode">
+    <button mat-icon-button (click)="localExitTargetingMode()"
       matTooltip="Exit Targeting Mode" class="flex-right-align">
       <mat-icon class="fa fa-times"></mat-icon>
     </button>

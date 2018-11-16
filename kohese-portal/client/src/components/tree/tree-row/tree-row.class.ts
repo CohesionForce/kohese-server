@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 export class TreeRow {
   get object() {
@@ -82,10 +82,6 @@ export class TreeRow {
   public isRowRoot(): boolean {
     // May be implemented externally
     return false;
-  }
-  
-  public setRowAsRoot(): void {
-    // May be implemented externally
   }
   
   public hasChildren(): boolean {

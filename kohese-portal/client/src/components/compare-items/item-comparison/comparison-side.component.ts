@@ -1,9 +1,9 @@
+
+import {map} from 'rxjs/operators';
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
   Input, ViewChild, Output, EventEmitter, OnInit,
   OnDestroy } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -152,7 +152,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
   }
 
   public whenSelectedObjectChanges(object: ItemProxy): Observable<Array<any>> {
-    return this._itemRepository.getHistoryFor(object).map((history:
+    return this._itemRepository.getHistoryFor(object).pipe(map((history:
       Array<any>) => {
       this._versions = history;
       if (0 === object.vcStatus.statusArray.filter((status: string) => {
@@ -185,7 +185,7 @@ export class ComparisonSideComponent implements OnInit, OnDestroy {
       this.whenSelectedVersionChanges(object, 'Unstaged');
 
       return this._versions;
-    });
+    }));
   }
 
   public async whenSelectedVersionChanges(object: any, versionIdentifier: string):

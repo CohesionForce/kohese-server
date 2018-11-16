@@ -6,10 +6,8 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
-import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector : 'children-tab',

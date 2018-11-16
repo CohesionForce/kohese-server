@@ -2,19 +2,17 @@ import { Component, OnInit, OnDestroy, Input, Optional, Inject } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
 import { FormGroup, FormControl } from '@angular/forms';
-import 'rxjs/add/operator/startWith';
+
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../common/src/item-proxy.js';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription ,  BehaviorSubject } from 'rxjs';
 import { ImportService } from '../../services/import/import.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
-
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'create-wizard',

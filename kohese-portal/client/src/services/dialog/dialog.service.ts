@@ -1,7 +1,7 @@
 import { Injectable, Component, Inject, TemplateRef } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class DialogService {

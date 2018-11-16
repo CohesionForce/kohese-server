@@ -1,10 +1,9 @@
 import { FormatPreviewComponent } from './format-preview/format-preview.component';
 import { DialogService } from './../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { Subscription } from 'rxjs';
+import { Subscription ,  Observable } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import * as uuidV1 from 'uuid/v1';

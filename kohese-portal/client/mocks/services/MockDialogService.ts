@@ -1,5 +1,6 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
+
+import {of as observableOf,  Observable } from 'rxjs';
+
 
 import { ItemProxy } from '../../../common/src/item-proxy';
 
@@ -16,14 +17,14 @@ export class MockDialogService {
   }
   
   public openYesNoDialog(title: string, text: string): Observable<any> {
-    return Observable.of(1);
+    return observableOf(1);
   }
   
   public openInputDialog(title: string, text: string, type: string,
     fieldName: string, initialValue: string): any {
     return {
       afterClosed: () => {
-        return Observable.of(fieldName);
+        return observableOf(fieldName);
       }
     };
   }
@@ -32,7 +33,7 @@ export class MockDialogService {
     initialValue: string, options: Array<string>): any {
     return {
       afterClosed: () => {
-        return Observable.of(options[0]);
+        return observableOf(options[0]);
       }
     };
   }
@@ -44,7 +45,7 @@ export class MockDialogService {
       },
       'afterClosed': () => {
         if ('ProxySelectorDialogComponent' === componentReference.name) {
-          return Observable.of({
+          return observableOf({
             selectedProxy: ItemProxy.getWorkingTree().getRootProxy()
           });
         }

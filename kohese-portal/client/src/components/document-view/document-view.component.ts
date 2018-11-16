@@ -3,9 +3,10 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from '../details/details-dialog/details-dialog.component';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
-import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, ElementRef, trigger, state, style, animate, transition, ViewChildren, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy,
+         ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { Parser, HtmlRenderer } from 'commonmark';
-import { Observable } from 'rxjs';
+import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
 
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
@@ -13,12 +14,11 @@ import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import * as commonmark from 'commonmark';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Router, NavigationEnd } from '@angular/router';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 export interface DocumentInfo {
   proxy: ItemProxy;

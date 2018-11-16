@@ -4,3 +4,63 @@
   display: flex;
   flex-direction: column;
 }
+
+.form-container {
+  width : 100%;
+  padding : 5px;
+}
+
+.display-header {
+  width : 100%;
+  color : white;
+  background-color : darkblue;
+  padding : 10px;
+  .display-title {
+    font-size : large;
+  }
+}
+
+.data-header {
+  width : 100%;
+  color : white;
+  background-color : darkgreen;
+  padding : 10px;
+  .data-title {
+    font-size : large;
+  }
+}
+
+.field-options {
+  vertical-align: top;
+  display : inline-block;
+  width : 40%;
+  border : 1px solid black;
+  border-radius : 10px;
+  padding : 10px;
+  .field-option {
+    display : inline-block;
+    width : 50%;
+  }
+}
+
+.value-container {
+  vertical-align: top;
+  display : inline-block;
+  width : 40%;
+  border : 1px solid black;
+  border-radius : 10px;
+  padding : 10px;
+}
+
+.table-tooltip {
+  font-size: small;
+  color : gray;
+  font-style: italic;
+}
+
+.table-definition {
+  border : 1px solid black;
+  border-radius : 10px;
+  padding : 5px;
+}
+

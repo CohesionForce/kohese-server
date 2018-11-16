@@ -3,8 +3,7 @@ import {
   ChangeDetectorRef, ViewChild, OnDestroy
   } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
 import * as JsDiff from 'diff';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy';

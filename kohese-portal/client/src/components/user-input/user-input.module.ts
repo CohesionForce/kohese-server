@@ -1,3 +1,4 @@
+import { ProxyTableComponent } from './k-proxy-selector/proxy-table/proxy-table.component';
 import { KdMarkdownComponent } from './k-markdown/kd-markdown/kd-markdown.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -33,6 +34,7 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     MarkdownCheatSheetComponent,
     ProxySelectorComponent,
     ProxySelectorDialogComponent,
+    ProxyTableComponent,
     KdMarkdownComponent
   ],
   imports: [
@@ -41,7 +43,7 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     ReactiveFormsModule,
     MaterialModule,
     MarkdownModule.forChild(),
-    TreeModule,
+    TreeModule.forRoot(),
     PipesModule
   ],
   exports: [
@@ -54,11 +56,13 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
     KMarkdownComponent,
     ProxySelectorComponent,
     KdProxySelectorComponent,
-    KdMarkdownComponent
+    KdMarkdownComponent,
+    ProxyTableComponent
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,
-    ProxySelectorDialogComponent
+    ProxySelectorDialogComponent,
+    ProxyTableComponent
   ]
 })
 export class UserInputModule {}
