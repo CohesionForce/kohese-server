@@ -45,9 +45,6 @@ export class StateMachineEditorComponent implements OnInit {
   }
   
   private _modified: boolean = false;
-  get modified() {
-    return this._modified;
-  }
   
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     private _dialogService: DialogService, private _changeDetectorRef:
