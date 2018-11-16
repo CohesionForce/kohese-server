@@ -1,6 +1,7 @@
 import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
-import { MAT_DIALOG_DATA, MatTableDataSource } from '@angular/material';
+import { MAT_DIALOG_DATA, MatTableDataSource,
+  MatDialogRef } from '@angular/material';
 
 import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
@@ -43,9 +44,15 @@ export class StateMachineEditorComponent implements OnInit {
     return columns;
   }
   
+  private _modified: boolean = false;
+  get modified() {
+    return this._modified;
+  }
+  
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    private _dialogService: DialogService,
-    private _changeDetectorRef: ChangeDetectorRef) {
+    private _dialogService: DialogService, private _changeDetectorRef:
+    ChangeDetectorRef, private _matDialogRef:
+    MatDialogRef<StateMachineEditorComponent>) {
   }
   
   public ngOnInit(): void {
@@ -64,6 +71,8 @@ export class StateMachineEditorComponent implements OnInit {
           description: ''
         };
         this._stateIds.push(name);
+        
+        this._modified = true;
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -102,6 +111,7 @@ export class StateMachineEditorComponent implements OnInit {
           }
         }
         
+        this._modified = true;
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -136,6 +146,7 @@ export class StateMachineEditorComponent implements OnInit {
           delete this._stateMachine.transition[affectedTransitionIds[j]];
         }
         
+        this._modified = true;
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -150,6 +161,8 @@ export class StateMachineEditorComponent implements OnInit {
           target: targetStateId,
           guard: {}
         };
+        
+        this._modified = true;
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -165,6 +178,8 @@ export class StateMachineEditorComponent implements OnInit {
         this._stateIds).afterClosed().subscribe((value: string) => {
         if (value) {
           this._stateMachine.transition[transitionId][propertyId] = value;
+          
+          this._modified = true;
           this._changeDetectorRef.markForCheck();
         }
       });
@@ -176,6 +191,8 @@ export class StateMachineEditorComponent implements OnInit {
           this._stateMachine.transition[value] = this._stateMachine.transition[
               transitionId];
           delete this._stateMachine.transition[transitionId];
+          
+          this._modified = true;
           this._changeDetectorRef.markForCheck();
         }
       });
@@ -188,6 +205,8 @@ export class StateMachineEditorComponent implements OnInit {
       (shouldDelete: any) => {
       if (shouldDelete) {
         delete this._stateMachine.transition[transitionId];
+        
+        this._modified = true;
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -207,6 +226,21 @@ export class StateMachineEditorComponent implements OnInit {
   
   public setDefaultState(stateId: string): void {
     this._defaultState = stateId;
+    
+    this._modified = true;
     this._changeDetectorRef.markForCheck();
+  }
+  
+  public async cancelSelected(): Promise<void> {
+    if (this._modified) {
+      let selection: any = await this._dialogService.openYesNoDialog(
+        'Unapplied Changes', 'All changes in this dialog will be lost. Do ' +
+        'you want to proceed?').toPromise();
+      if (!selection) {
+        return Promise.resolve();
+      }
+    }
+    
+    this._matDialogRef.close();
   }
 }

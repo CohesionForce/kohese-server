@@ -167,7 +167,8 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
       data: {
         stateMachine: stateMachine,
         defaultState: this._koheseType.fields[this.selectedPropertyId].default
-      }
+      },
+      disableClose: true
     }).updateSize('70%', '70%').afterClosed().subscribe((data: any) => {
       if (data) {
         this.updateProperty(['properties'], data.stateMachine);

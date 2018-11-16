@@ -4,11 +4,11 @@
   </h2>
   <div style="height: 83%; width: 100%; display: flex; flex-direction: column;">
     <h3 style="text-align: center;">
-      Source State
+      Target State
     </h3>
     <div style="display: flex; flex-direction: row; align-items: center;">
       <h3 style="writing-mode: tb-rl; transform: rotate(180deg)">
-        Target State
+        Source State
       </h3>
       <mat-table [dataSource]="tableDataSource" style="flex: 1 1 auto;">
         <ng-container matColumnDef="{{LEFTMOST_COLUMN_ID}}">
@@ -63,6 +63,12 @@
                 <button mat-menu-item (click)="editState(columnStateId, 'name')">
                   Rename...
                 </button>
+                <ng-container *ngIf="(defaultState !== columnStateId)">
+                  <button mat-menu-item
+                    (click)="setDefaultState(columnStateId)">
+                    Set as Default
+                  </button>
+                </ng-container>
                 <button mat-menu-item (click)="deleteState(columnStateId)">
                   <mat-icon class="fa fa-trash"></mat-icon>
                   Delete
@@ -71,40 +77,40 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let rowStateId"
               style="display: flex; justify-content: center;"
-              matTooltip="{{getTransitionId(columnStateId, rowStateId)}}">
+              matTooltip="{{getTransitionId(rowStateId, columnStateId)}}">
               <button mat-button [matMenuTriggerFor]="transitionMenu">
-                <ng-container *ngIf="getTransitionId(columnStateId, rowStateId)">
+                <ng-container *ngIf="getTransitionId(rowStateId, columnStateId)">
                   <span>X</span>
                 </ng-container>
-                <ng-container *ngIf="!getTransitionId(columnStateId, rowStateId)">
+                <ng-container *ngIf="!getTransitionId(rowStateId, columnStateId)">
                   <span>&nbsp;</span>
                 </ng-container>
               </button>
               <mat-menu #transitionMenu [overlapTrigger]="false">
-                <ng-container *ngIf="!getTransitionId(columnStateId, rowStateId)">
-                  <button mat-menu-item (click)="addTransition(columnStateId, rowStateId)">
+                <ng-container *ngIf="!getTransitionId(rowStateId, columnStateId)">
+                  <button mat-menu-item (click)="addTransition(rowStateId, columnStateId)">
                     <mat-icon class="fa fa-plus"></mat-icon>
                     Add Transition...
                   </button>
                 </ng-container>
-                <ng-container *ngIf="getTransitionId(columnStateId, rowStateId)">
+                <ng-container *ngIf="getTransitionId(rowStateId, columnStateId)">
                   <button mat-menu-item
-                    (click)="editTransition(getTransitionId(columnStateId, rowStateId), '')">
+                    (click)="editTransition(getTransitionId(rowStateId, columnStateId), '')">
                     Rename...
                   </button>
                   <button mat-menu-item
-                    (click)="editTransition(getTransitionId(columnStateId, rowStateId), 'source')">
+                    (click)="editTransition(getTransitionId(rowStateId, columnStateId), 'source')">
                     Change Source...
                   </button>
                   <button mat-menu-item
-                    (click)="editTransition(getTransitionId(columnStateId, rowStateId), 'target')">
+                    (click)="editTransition(getTransitionId(rowStateId, columnStateId), 'target')">
                     Change Target...
                   </button>
                   <button mat-menu-item [disabled]="true">
                     Specify Conditions...
                   </button>
                   <button mat-menu-item
-                    (click)="deleteTransition(getTransitionId(columnStateId, rowStateId))">
+                    (click)="deleteTransition(getTransitionId(rowStateId, columnStateId))">
                     <mat-icon class="fa fa-trash"></mat-icon>
                     Delete
                   </button>
@@ -127,7 +133,7 @@
             defaultState: defaultState }">
           Apply
         </button>
-        <button mat-raised-button [mat-dialog-close]="">
+        <button mat-raised-button (click)="cancelSelected()">
           Cancel
         </button>
       </span>
