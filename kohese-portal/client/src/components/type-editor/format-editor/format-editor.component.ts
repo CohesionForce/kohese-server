@@ -48,7 +48,6 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   selectedFormat: FormatDefinition;
   types = [];
   modelUndefined = false;
-  emptyDefinitions = false;
 
   formatDefs: any = {};
 
@@ -87,12 +86,8 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
         if (!koheseType.viewModelProxy.item.formatDefinitions) {
           koheseType.viewModelProxy.item.formatDefinitions = {};
           koheseType.viewModelProxy.item.defaultFormatKey = undefined;
-          // this.emptyDefinitions = true;
         }
         this.formatDefs = koheseType.viewModelProxy.item.formatDefinitions;
-        // if (this.formatDefs.isEmpty()) {
-        //   this.emptyDefinitions = true;
-        // }
 
         this.changeRef.markForCheck();
         console.log(this.currentType);
@@ -125,7 +120,6 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
     if (!this.currentType.viewModelProxy.item.defaultFormatKey) {
       this.currentType.viewModelProxy.item.defaultFormatKey = id;
     }
-    // this.emptyDefinitions = false;
   }
 
   saveFormat () {
