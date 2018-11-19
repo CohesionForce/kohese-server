@@ -108,4 +108,13 @@ export class MockItemRepository {
       configType: TreeConfigType.DEFAULT
     });
   }
+  
+  public getSessionMap(): Promise<any> {
+    return Promise.resolve({ 'socketId': {
+      sessionId: 'socketId',
+      address: '3.3.3.3',
+      username: 'admin',
+      numberOfConnections: 3
+    } });
+  }
 }

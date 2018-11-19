@@ -3,14 +3,13 @@ import { Comparison, ChangeType, Property } from './comparison.class';
 describe('Class: Comparison', () => {
   let comparison: Comparison;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     comparison = new Comparison({
       property: 'value'
       }, {
       property: 'Value'
     });
-    // TODO: Need to determine if we need to await
-    comparison.compare();
+    await comparison.compare();
   });
 
   it('compares two objects', () => {

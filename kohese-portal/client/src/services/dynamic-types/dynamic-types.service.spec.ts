@@ -6,8 +6,7 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../mocks/data/MockViewData';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
+import { of as ObservableOf } from 'rxjs';
 
 describe('DynamicTypesService', () => {
   let typeService: DynamicTypesService;
@@ -15,8 +14,8 @@ describe('DynamicTypesService', () => {
   beforeAll(() => {
     let itemRepositoryPlaceholder: any = jasmine.createSpyObj('ItemRepository',
       ['getRepoStatusSubject', 'getProxyFor', 'getTreeConfig']);
-    itemRepositoryPlaceholder.getRepoStatusSubject.and.returnValue(Observable.
-      of({
+    itemRepositoryPlaceholder.getRepoStatusSubject.and.returnValue(
+      ObservableOf({
       state: RepoStates.SYNCHRONIZATION_SUCCEEDED
     }));
 
@@ -28,7 +27,7 @@ describe('DynamicTypesService', () => {
           .getProxyFor('Model-Definitions'), new ItemProxy('KoheseView',
                                                          MockViewData()));
 
-    itemRepositoryPlaceholder.getTreeConfig.and.returnValue(Observable.of({
+    itemRepositoryPlaceholder.getTreeConfig.and.returnValue(ObservableOf({
       config: TreeConfiguration.getWorkingTree(),
       configType: TreeConfigType.DEFAULT
     }));

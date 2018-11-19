@@ -2,8 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
+import { of as ObservableOf } from 'rxjs';
 
 import { MaterialModule } from '../../../material.module';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -29,7 +28,9 @@ describe('Component: reference-tree', () => {
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: ActivatedRoute, useValue: { params: Observable.of({ id: '' }) } },
+        { provide: ActivatedRoute, useValue: { params: ObservableOf({
+          id: ''
+        }) } },
         { provide: DialogService, useClass: MockDialogService },
         { provide: NavigationService, useClass: MockNavigationService },
         { provide: DynamicTypesService, useClass: MockDynamicTypesService }

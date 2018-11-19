@@ -8,10 +8,10 @@ import { MaterialModule } from '../../../../material.module'
 import { OpenAssignmentComponent } from './open-assignment.component';
 import { MockAction } from '../../../../../mocks/data/MockItem';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
-import { NavigationService } from '../../../../services/navigation/navigation.service';
+import { DialogService } from '../../../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
-import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 
 describe('Component: ', ()=>{
   let openAssignmentComponent: OpenAssignmentComponent;
@@ -26,7 +26,7 @@ describe('Component: ', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide : NavigationService, useClass: MockNavigationService},
+        {provide: DialogService, useClass: MockDialogService},
         {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();

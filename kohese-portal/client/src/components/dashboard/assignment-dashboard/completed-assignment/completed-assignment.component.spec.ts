@@ -8,8 +8,8 @@ import { MaterialModule } from '../../../../material.module'
 import { CompletedAssignmentComponent } from './completed-assignment.component';
 import { MockAction } from '../../../../../mocks/data/MockItem';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
-import { NavigationService } from '../../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
+import { DialogService } from '../../../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { PipesModule } from '../../../../pipes/pipes.module';
@@ -28,7 +28,7 @@ describe('Component: Completed Assignment', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide : NavigationService, useClass: MockNavigationService},
+        {provide: DialogService, useClass: MockDialogService},
         {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();

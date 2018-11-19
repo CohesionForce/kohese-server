@@ -3,6 +3,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
+import { of as ObservableOf } from 'rxjs';
+
 import { MaterialModule } from '../../material.module'
 
 import { DocumentViewComponent } from './document-view.component';
@@ -12,9 +14,12 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../mocks/services/MockDialogService';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { MockDynamicTypesService } from '../../../mocks/services/MockDynamicTypesService';
 import { BehaviorSubject } from 'rxjs';
 import { MockItem, MockDocument } from '../../../mocks/data/MockItem';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { AnalysisViews } from '../analysis/AnalysisViewComponent.class';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -38,13 +43,15 @@ describe('Component: Document View', ()=>{
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ItemRepository, useClass: MockItemRepository},
-        {provide: DialogService, useClass: MockDialogService}
+        {provide: DialogService, useClass: MockDialogService},
+        {provide: DynamicTypesService, useClass: MockDynamicTypesService}
       ]
     }).compileComponents();
 
     documentViewFixture = TestBed.createComponent(DocumentViewComponent);
     documentViewComponent = documentViewFixture.componentInstance;
-
+    documentViewComponent.proxyStream = ObservableOf(TreeConfiguration.
+      getWorkingTree().getProxyFor('Kurios Iesous'));
     documentViewComponent.filterSubject = new BehaviorSubject({
       source : AnalysisViews.TERM_VIEW,
       filter : '',
@@ -54,6 +61,7 @@ describe('Component: Document View', ()=>{
       }
     });
 
+    documentViewFixture.detectChanges();
   })
 
   it('instantiates the Document View component', ()=>{

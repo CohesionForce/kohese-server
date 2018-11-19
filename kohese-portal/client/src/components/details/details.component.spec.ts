@@ -1,7 +1,6 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { of as ObservableOf } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -43,7 +42,7 @@ describe('Component: Details', ()=>{
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ActivatedRoute, useValue:{
-          params: Observable.of({ id: '1' })
+          params: ObservableOf({ id: '1' })
         }}
       ]
     }).compileComponents();

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { MaterialModule } from '../../../../material.module';
@@ -21,6 +22,7 @@ describe('Component: StatusDashboardComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ StatusDashboardComponent ],
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         PipesModule
         ],
