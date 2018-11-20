@@ -9,25 +9,25 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import * as uuidV1 from 'uuid/v1';
 
 export interface FormatDefinition {
-  name : string
-  header : FormatContainer
-  containers : Array<FormatContainer>
-  id : string
+  name: string;
+  header: FormatContainer;
+  containers: Array<FormatContainer>;
+  id: string;
 }
 
  export interface FormatContainer {
-  kind : string,
-  contents : Array<PropertyDefinition>
+  kind: string;
+  contents: Array<PropertyDefinition>;
 }
 
 export interface PropertyDefinition {
-  propertyName : string
-  hideLabel : boolean
-  customLabel? : string
-  labelOrientation: string
-  hideEmpty : boolean
-  kind : string,
-  inputOptions : any
+  propertyName: string;
+  hideLabel: boolean;
+  customLabel?: string;
+  labelOrientation: string;
+  hideEmpty: boolean;
+  kind: string;
+  inputOptions: any;
   // Will grow as we get to the property part
 }
 
@@ -41,54 +41,57 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
 
   @Input()
   koheseTypeStream: Observable<KoheseType>;
-  koheseTypeStreamSubscription : Subscription;
+  koheseTypeStreamSubscription: Subscription;
   currentType: KoheseType;
   idProperties: any = {};
   selectedPropertyId: string;
-  selectedFormat : FormatDefinition
+  selectedFormat: FormatDefinition;
   types = [];
-  modelUndefined : boolean = false;
+  modelUndefined = false;
 
-  formatDefs : Array<FormatDefinition>;
+  formatDefs: any = {};
 
-  constructor(private typeService : DynamicTypesService,
-     private changeRef : ChangeDetectorRef,
-     private itemRepository : ItemRepository,
-     private dialogService : DialogService) {
+  constructor(private typeService: DynamicTypesService,
+     private changeRef: ChangeDetectorRef,
+     private itemRepository: ItemRepository,
+     private dialogService: DialogService) {
 
   }
 
   ngOnInit(): void {
-    let koheseTypes: any = this.typeService.getKoheseTypes();
-    for (let type in koheseTypes) {
-      this.types[type] = type;
-      for (let propertyName in koheseTypes[type].dataModelProxy.item.properties) {
-        if (koheseTypes[type].dataModelProxy.item.properties[propertyName].id) {
-          if (!this.idProperties[type]) {
-            this.idProperties[type] = [];
+    const koheseTypes: any = this.typeService.getKoheseTypes();
+    for (const type in koheseTypes) {
+      if (type) {
+        this.types[type] = type;
+        for (const propertyName in koheseTypes[type].dataModelProxy.item.properties) {
+          if (koheseTypes[type].dataModelProxy.item.properties[propertyName].id) {
+            if (!this.idProperties[type]) {
+              this.idProperties[type] = [];
+            }
+            this.idProperties[type].push(propertyName);
           }
-
-          this.idProperties[type].push(propertyName);
         }
       }
     }
     this.koheseTypeStreamSubscription = this.koheseTypeStream.subscribe(
       (koheseType: KoheseType) => {
-      this.currentType = koheseType;
-      if (!koheseType.viewModelProxy) {
-        this.modelUndefined = true;
-        this.changeRef.markForCheck();
-        return;
-      }
-      this.modelUndefined = false;
-      if (!koheseType.viewModelProxy.item.formatDefinitions) {
-        koheseType.viewModelProxy.item.formatDefinitions = {};
-        koheseType.viewModelProxy.item.defaultFormatKey = undefined;
-      }
-      this.formatDefs = koheseType.viewModelProxy.item.formatDefinitions;
+      if (koheseType) {
+        this.currentType = koheseType;
+        if (!koheseType.viewModelProxy) {
+          this.modelUndefined = true;
+          this.changeRef.markForCheck();
+          return;
+        }
+        this.modelUndefined = false;
+        if (!koheseType.viewModelProxy.item.formatDefinitions) {
+          koheseType.viewModelProxy.item.formatDefinitions = {};
+          koheseType.viewModelProxy.item.defaultFormatKey = undefined;
+        }
+        this.formatDefs = koheseType.viewModelProxy.item.formatDefinitions;
 
-      this.changeRef.markForCheck();
-      console.log(this.currentType);
+        this.changeRef.markForCheck();
+        console.log(this.currentType);
+      }
     });
   }
 
@@ -97,7 +100,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
   }
 
   addDefinition () {
-    let id = uuidV1();
+    const id = uuidV1();
     this.formatDefs[id] = ({
       name : 'New definition ',
       header : {
@@ -113,7 +116,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
       },
       containers : [],
       id : id
-    })
+    });
     if (!this.currentType.viewModelProxy.item.defaultFormatKey) {
       this.currentType.viewModelProxy.item.defaultFormatKey = id;
     }
@@ -121,7 +124,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
 
   saveFormat () {
     console.log(this.currentType.viewModelProxy);
-    this.itemRepository.upsertItem(this.currentType.viewModelProxy).then((result) => { console.log(result)});
+    this.itemRepository.upsertItem(this.currentType.viewModelProxy).then((result) => { console.log(result); });
   }
 
   openPreview () {
@@ -131,7 +134,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
         type : this.currentType
       }
     })
-    .updateSize('70%','%70');
+    .updateSize('70%', '%70');
   }
 
   setDefault (id) {
@@ -141,11 +144,13 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
 
   deleteFormat (id) {
     delete this.formatDefs[id];
-    if(this.currentType.viewModelProxy.item.defaultFormatKey === id) {
+    if (this.currentType.viewModelProxy.item.defaultFormatKey === id) {
       delete this.currentType.viewModelProxy.item.defaultFormatKey;
-      for (let formatId in this.formatDefs) {
-        this.currentType.viewModelProxy.item.defaultFormatKey = formatId;
-        break;
+      for (const formatId in this.formatDefs) {
+        if (formatId) {
+          this.currentType.viewModelProxy.item.defaultFormatKey = formatId;
+          break;
+        }
       }
     }
     this.changeRef.markForCheck();
@@ -153,6 +158,15 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
       this.selectedFormat = undefined;
     }
   }
+
+  isEmpty(obj) {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+            return false;
+      }
+    }
+    return true;
+}
 
 
 
