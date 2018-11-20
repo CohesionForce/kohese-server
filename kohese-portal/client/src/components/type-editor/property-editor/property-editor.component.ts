@@ -165,12 +165,14 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
 
     this.dialogService.openComponentDialog(StateMachineEditorComponent, {
       data: {
-        stateMachine: stateMachine
-      }
-    }).updateSize('70%', '70%').afterClosed().subscribe(
-      (returnedStateMachine: any) => {
-      if (returnedStateMachine) {
-        this.updateProperty(['properties'], returnedStateMachine);
+        stateMachine: stateMachine,
+        defaultState: this._koheseType.fields[this.selectedPropertyId].default
+      },
+      disableClose: true
+    }).updateSize('70%', '70%').afterClosed().subscribe((data: any) => {
+      if (data) {
+        this.updateProperty(['properties'], data.stateMachine);
+        this.updateProperty(['default'], data.defaultState);
       }
     });
   }

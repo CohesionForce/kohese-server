@@ -42,7 +42,8 @@ describe('Component: state-machine-editor', () => {
                   guard: {}
                 }
               }
-            }
+            },
+            defaultState: 'stateOne'
           }
         },
         { provide: DialogService, useClass: MockDialogService },
@@ -117,5 +118,11 @@ describe('Component: state-machine-editor', () => {
       'transition');
     expect(component.getTransitionId('undefinedState', 'stateOne')).not.
       toBeDefined();
+  });
+  
+  it('sets the default state', () => {
+    expect(component.defaultState).toEqual('stateOne');
+    component.setDefaultState('stateTwo');
+    expect(component.defaultState).toEqual('stateTwo');
   });
 });
