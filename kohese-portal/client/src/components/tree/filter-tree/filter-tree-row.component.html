@@ -92,7 +92,7 @@
   </ng-container>
   <span class="flex-right-align">
     <ng-container *ngFor="let action of rowActions">
-      <ng-container *ngIf="action.show(treeRow.object)">
+      <ng-container *ngIf="action.canActivate(treeRow.object)">
         <button mat-icon-button matTooltip="{{action.description}}"
           (click)="action.perform(treeRow.object); $event.stopPropagation()">
           <mat-icon class="kt-icon {{action.icon}}"></mat-icon>

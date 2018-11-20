@@ -29,6 +29,14 @@ export abstract class Tree {
   get rootSubject() {
     return this._rootSubject;
   }
+  
+  private _anchorAction: Action = new Action('Anchor', 'Set the object of ' +
+    'this row as the root', 'fa fa-anchor', (object: any) => {
+    return (object !== this._rootSubject.getValue() && !this.
+      _inTargetingMode);
+    }, (object: any) => {
+    this.setRoot(object);
+  });
 
   private _showRootWithDescendants: boolean = false;
   get showRootWithDescendants() {
@@ -36,6 +44,11 @@ export abstract class Tree {
   }
   set showRootWithDescendants(showRootWithDescendants: boolean) {
     this._showRootWithDescendants = showRootWithDescendants;
+    if (this.showRootWithDescendants) {
+      this._rowActions.splice(this._rowActions.indexOf(this._anchorAction), 1);
+    } else {
+      this._rowActions.push(this._anchorAction);
+    }
   }
   
   private _canMoveRows: boolean = false;
@@ -143,13 +156,6 @@ export abstract class Tree {
   }
 
   private _rowActions: Array<DisplayableEntity> = [
-    new Action('Anchor', 'Set the object of this row as the root', 'fa ' +
-      'fa-anchor', (object: any) => {
-      return (object !== this._rootSubject.getValue() && !this.
-        _inTargetingMode);
-      }, (object: any) => {
-      this.setRoot(object);
-    }),
     this._targetActionGroup,
     this._exitTargetingModeAction
   ];
