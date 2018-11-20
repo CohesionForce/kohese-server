@@ -1,30 +1,68 @@
-<span style="height: 45px; width: 100%; display: flex; flex-direction: row;">
-  <button mat-icon-button (click)="swapSides()" class="flex-right-align"
-    matTooltip="Swap sides">
-    <mat-icon class="fa fa-exchange"></mat-icon>
+<div style="height: 45px; width: 100%; display: flex; flex-direction: row;">
+  <button mat-icon-button (click)="openProxySelectionDialog(baseProxySubject)">
+    <mat-icon class="fa fa-mouse-pointer"></mat-icon>
   </button>
+  <button mat-icon-button
+    [disabled]="!((selectedBaseVersion === 'Staged') || ((baseVersions.length >
+      0) && (selectedBaseVersion === baseVersions[0].commit)))"
+    (click)="navigationService.addTab('Explore', { id: baseProxySubject.
+      getValue().item.id })">
+    <mat-icon class="fa fa-arrow-right"></mat-icon>
+  </button>
+  <mat-form-field style="padding: 3px; width: 45%;">
+    <mat-select
+      placeholder="{{((baseProxySubject | async) ? (baseProxySubject | async).
+        item.name : 'No Base Object Selected')}}"
+      [(ngModel)]="selectedBaseVersion"
+      (ngModelChange)="selectedBaseVersion = $event; compare()"
+      [disabled]="!(baseProxySubject | async) || (1 === baseVersions.length)">
+      <mat-option *ngFor="let version of baseVersions"
+        [value]="version.commit"
+        matTooltip="{{version.message}} - {{version.date | date:'long'}}"
+        [matTooltipDisabled]="!version.date">
+        {{version.message}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button mat-icon-button
+    (click)="openProxySelectionDialog(changeProxySubject)">
+    <mat-icon class="fa fa-mouse-pointer"></mat-icon>
+  </button>
+  <button mat-icon-button
+    [disabled]="!((selectedChangeVersion === 'Staged') || ((changeVersions.
+      length > 0) && (selectedChangeVersion === changeVersions[0].commit)))"
+    (click)="navigationService.addTab('Explore', { id: changeProxySubject.
+      getValue().item.id })">
+    <mat-icon class="fa fa-arrow-right"></mat-icon>
+  </button>
+  <mat-form-field style="padding: 3px; width: 45%;">
+    <mat-select
+      placeholder="{{((changeProxySubject | async) ? (changeProxySubject |
+        async).item.name : 'No Change Object Selected')}}"
+      [(ngModel)]="selectedChangeVersion"
+      (ngModelChange)="selectedChangeVersion = $event; compare()"
+      [disabled]="!(changeProxySubject | async) || (1 === changeVersions.
+        length)">
+      <mat-option *ngFor="let version of changeVersions"
+        [value]="version.commit"
+        matTooltip="{{version.message}} - {{version.date | date:'long'}}"
+        [matTooltipDisabled]="!version.date">
+        {{version.message}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div style="height: 45px; width: 100%; display: flex; flex-direction: row;">
   <mat-checkbox (change)="toggleShowingDifferencesOnly()"
-    style="padding-top: 10px;">
+    class="flex-right-align" style="padding-top: 10px;"
+    [checked]="(showDifferencesOnlySubject | async)">
     Show Differences Only
   </mat-checkbox>
-</span>
-<div style="height: calc(100% - 109px); width: 100%;">
-  <split direction="horizontal">
-    <split-area [size]="50">
-      <comparison-side #leftComparisonSide [isBaseVersion]="true"
-        [editable]="'true' === dialogParameters['editable']"
-        [showDifferencesOnlySubject]="showDifferencesOnlySubject"
-        (scrolled)="rightComparisonSide.scroll($event)">
-      </comparison-side>
-    </split-area>
-    <split-area [size]="50">
-      <comparison-side #rightComparisonSide [isBaseVersion]="false"
-        [editable]="'true' === dialogParameters['editable']"
-        [showDifferencesOnlySubject]="showDifferencesOnlySubject"
-        (scrolled)="leftComparisonSide.scroll($event)">
-      </comparison-side>
-    </split-area>
-  </split>
+</div>
+<div style="height: calc(100% - 154px); width: 100%;">
+  <comparison [comparison]="comparison"
+    [showDifferencesOnlySubject]="showDifferencesOnlySubject">
+  </comparison>
 </div>
 <ng-container *ngIf="dialogParameters">
   <mat-dialog-actions style="height: 64px; width: 100%; display: flex;

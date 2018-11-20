@@ -11,7 +11,7 @@
 <div style="height: calc(100% - 50px); width: 100%; overflow: auto;">
   <ng-container *ngFor="let comparison of (comparisonsSubject | async)">
     <ng-container *ngIf="hasChanges(comparison)">
-      <mat-expansion-panel>
+      <mat-expansion-panel [expanded]="expanded">
         <mat-expansion-panel-header>
           {{comparison.changeObject.name}}
           <ng-container
@@ -31,38 +31,9 @@
             <mat-icon class="fa fa-exchange"></mat-icon>
           </button>
         </div>
-        <ng-container
-          *ngFor="let property of Array.from(comparison.propertyComparisonMap.
-            keys())">
-          <ng-container
-            *ngIf="(!property.hidden && (comparison.propertyComparisonMap.get(
-              property).length > 1) || (comparison.propertyComparisonMap.get(
-              property)[0].added || comparison.propertyComparisonMap.get(
-              property)[0].removed))">
-            <div style="padding: 0px 3px;">
-              <span>
-                {{property.name}}:
-              </span>
-              <ng-container
-                *ngFor="let change of comparison.propertyComparisonMap.get(
-                  property)">
-                <span [ngStyle]="getChangeStyle(change)">
-                  {{change.value}}
-                </span>
-              </ng-container>
-            </div>
-          </ng-container>
-        </ng-container>
-        <ng-container *ngIf="1 === comparison.numberOfHiddenProperties">
-          <div>
-            1 hidden property changed
-          </div>
-        </ng-container>
-        <ng-container *ngIf="comparison.numberOfHiddenProperties > 1">
-          <div>
-            {{comparison.numberOfHiddenProperties}} hidden properties changed
-          </div>
-        </ng-container>
+        <comparison [comparison]="comparison"
+          [showDifferencesOnlySubject]="showDifferencesOnlySubject">
+        </comparison>
       </mat-expansion-panel>
     </ng-container>
   </ng-container>

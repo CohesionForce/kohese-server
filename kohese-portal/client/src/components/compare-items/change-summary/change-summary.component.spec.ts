@@ -1,4 +1,5 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { MaterialModule } from '../../../material.module';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -13,7 +14,8 @@ describe('Component: change-summary', () => {
     TestBed.configureTestingModule({
       declarations: [ChangeSummaryComponent],
       imports: [MaterialModule],
-      providers: [{ provide: DialogService, useClass: MockDialogService }]
+      providers: [{ provide: DialogService, useClass: MockDialogService }],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     let fixture: ComponentFixture<ChangeSummaryComponent> = TestBed.
@@ -39,12 +41,5 @@ describe('Component: change-summary', () => {
     });
     await comparisonWithChanges.compare();
     expect(component.hasChanges(comparisonWithoutChanges)).toEqual(false);
-  });
-
-  it('returns a style object based on the given change', () => {
-    expect(component.getChangeStyle({ added: true })['background-color']).
-      toEqual('lightgreen');
-    expect(component.getChangeStyle({ removed: true })['background-color']
-      ).toEqual('lightcoral');
   });
 });
