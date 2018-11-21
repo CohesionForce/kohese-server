@@ -2,7 +2,10 @@
   <div class="selector">
     <mat-select placeholder="---" [(ngModel)]="property.propertyName" (selectionChange)="updateKind($event)">
       <mat-option *ngFor="let propertyName of kind.fields | mapKey | validProperty:{property : property,container:container}" [value]="propertyName">
-        {{propertyName}}
+        {{propertyName}} 
+        <span class="table-label" *ngIf=" kind.fields[propertyName].views.form &&
+                                          kind.fields[propertyName].views.form.inputType.options &&
+                                          kind.fields[propertyName].views.form.inputType.options.asTable">(Table)</span>
       </mat-option>
     </mat-select>
   </div>

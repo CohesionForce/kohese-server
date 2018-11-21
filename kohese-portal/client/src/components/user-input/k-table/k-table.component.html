@@ -1,4 +1,5 @@
-<proxy-table *ngIf="tableDefinition && tableData" [columns]="tableDefinition.columns" [data]="tableData">
+<button mat-button style="background-color: whitesmoke" [disabled]="!editable" (click)="openProxySelectionDialog()">Edit Proxies</button>
+<proxy-table *ngIf="tableDefinition && tableData" [columns]="tableDefinition.columns" [dataStream]="tableDataStream">
 <div *ngIf="tableDefinition && !tableData">
   Empty Table
 </div>

@@ -1,29 +1,32 @@
-<hr />
-<span style="font-size:large;">Table Editor</span>
-<button mat-button style="background-color : navy; color : white; margin-left : 10px;" (click)="openTablePreview()">Open
-  Preview</button> 
-<button mat-button style="background-color : darkgreen; color : white; margin-left: 10px;" (click)="saveTableFormat()">
-  Save Format
-</button>
-<mat-divider></mat-divider>
-<div class="table-options">
-  <h5>Table options : </h5>
-  <label style="font-weight : bold;">Table Kind : </label>
-  <mat-select  *ngIf="formDefinition.tableDef" placeholder="Type" [value]="formDefinition.tableDef.tableKind" (selectionChange)="selectTableKind($event)">
-    <mat-option *ngFor="let type of (types | mapKey)" matTooltip="{{types[type].dataModelProxy.item.description}}"
-      [value]="types[type].dataModelProxy.item.name">
-      <ng-container *ngIf="types[type].viewModelProxy">
-        <mat-icon class="{{types[type].viewModelProxy.item.icon}}">
-        </mat-icon>
-      </ng-container>
-      {{type}}
-    </mat-option>
-  </mat-select>
-  <h6 style="font-weight : bold;">Table Columns <button *ngIf="formDefinition.tableDef.tableKind" mat-icon-button class="fa fa-plus" (click)="addColumn()"></button></h6>
-  <div>
+<div *ngIf="formDefinition.tableDef">
+  <hr />
+  <span style="font-size:large;">Table Editor</span>
+  <button mat-button style="background-color : navy; color : white; margin-left : 10px;" (click)="openTablePreview()">Open
+    Preview</button>
+  <button mat-button style="background-color : darkgreen; color : white; margin-left: 10px;" (click)="saveTableFormat()">
+    Save Format
+  </button>
+  <mat-divider></mat-divider>
+  <div class="table-options">
+    <h5>Table options : </h5>
+    <label style="font-weight : bold;">Table Kind : </label>
+    <mat-select *ngIf="formDefinition.tableDef" placeholder="Type" [value]="formDefinition.tableDef.tableKind"
+      (selectionChange)="selectTableKind($event)">
+      <mat-option *ngFor="let type of (types | mapKey)" matTooltip="{{types[type].dataModelProxy.item.description}}"
+        [value]="types[type].dataModelProxy.item.name">
+        <ng-container *ngIf="types[type].viewModelProxy">
+          <mat-icon class="{{types[type].viewModelProxy.item.icon}}">
+          </mat-icon>
+        </ng-container>
+        {{type}}
+      </mat-option>
+    </mat-select>
+    <h6 style="font-weight : bold;">Table Columns <button *ngIf="formDefinition.tableDef.tableKind" mat-icon-button
+        class="fa fa-plus" (click)="addColumn()"></button></h6>
+    <div>
       <div *ngFor="let column of formDefinition.tableDef.columns">
-          {{column}} <button mat-icon-button class="fa fa-minus" (click)="deleteColumn(column);"></button>
+        {{column}} <button mat-icon-button class="fa fa-minus" (click)="deleteColumn(column);"></button>
       </div>
+    </div>
   </div>
 </div>
-

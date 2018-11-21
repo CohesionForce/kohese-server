@@ -32,11 +32,6 @@ export class TableEditorComponent implements OnInit, OnDestroy {
               private typeService: DynamicTypesService) { }
 
   ngOnInit(): void {
-    if (!this.formDefinition.tableDef) {
-      this.formDefinition.tableDef = {};
-      this.formDefinition.tableKind = 'Action';
-      this.changeDetectorRef.markForCheck();
-    }
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update: any) => {
       switch (update.state) {
@@ -49,6 +44,13 @@ export class TableEditorComponent implements OnInit, OnDestroy {
             this.types = this.typeService.getKoheseTypes();
             this.changeDetectorRef.markForCheck();
           });
+          if (!this.formDefinition.tableDef) {
+            this.formDefinition.tableDef = {};
+            this.formDefinition.tableKind = 'Action';
+            this.formDefinition.columns = ['name', 'createdBy'];
+            this.changeDetectorRef.markForCheck();
+            console.log('No table definition found');
+          }
       }
     });
     console.log(this.currentKind);
@@ -60,7 +62,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
         .subscribe((confirm) => {
           if (confirm) {
             this.formDefinition.tableDef.tableKind = kindEvent.value;
-            this.formDefinition.tableDef.columns = ['name', 'kind'];
+            this.formDefinition.tableDef.columns = ['name', 'createdBy'];
           }
           this.changeDetectorRef.markForCheck();
           });

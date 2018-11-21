@@ -1,3 +1,5 @@
+import { ChangeDetectorRef } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs';
 import { ItemRepository } from './../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from './../../../../../../common/src/item-proxy';
@@ -21,14 +23,15 @@ export class ProxyTableComponent implements OnInit {
     @Input()
     columns: Array<string>;
     @Input()
-    data: Array<any>;
+    dataStream: Observable<any>;
     dataSource: Array<ItemProxy>;
 
     expandedItem: ItemProxy;
     treeConfigSub: Subscription;
     treeConfig: TreeConfiguration;
 
-    constructor(private itemRepository: ItemRepository) {
+    constructor(private itemRepository: ItemRepository,
+                private changeRef: ChangeDetectorRef) {
 
     }
 
@@ -37,18 +40,19 @@ export class ProxyTableComponent implements OnInit {
         .subscribe((newConfig) => {
         if (newConfig) {
           this.treeConfig = newConfig.config;
-          this.dataSource = [];
-          for (const idx in this.data) {
-            if (idx) {
-              const proxy = newConfig.config.getProxyFor(this.data[idx].id);
-              if (proxy) {
-                this.dataSource.push(proxy);
+          this.dataStream.subscribe((data) => {
+            this.dataSource = [];
+            for (const idx in data) {
+              if (idx) {
+                const proxy = newConfig.config.getProxyFor(data[idx].id);
+                if (proxy) {
+                  this.dataSource.push(proxy);
+                }
               }
             }
-          }
-        }
-        if (this.dataSource.length > 0) {
-          console.log(this);
+            this.changeRef.markForCheck();
+            console.log(this);
+          });
         }
     });
   }

@@ -13,19 +13,20 @@ export class PropertyRowComponent implements OnInit {
   kind;
   console = console;
   @Input()
-  disableDelete : boolean = false;
+  disableDelete = false;
   @Input()
   container;
 
   @Output()
-  deleted : EventEmitter<PropertyDefinition> = new EventEmitter();
+  deleted: EventEmitter<PropertyDefinition> = new EventEmitter();
 
   constructor() { }
 
   ngOnInit() {
     if (!this.container) {
-      console.log('no container', this)
+      console.log('no container', this);
     }
+    console.log(this);
   }
 
   deleteRow() {

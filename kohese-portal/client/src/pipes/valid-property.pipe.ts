@@ -9,14 +9,14 @@ import {
 export class ValidPropertyPipe implements PipeTransform {
   transform(value: string, data: any) {
     console.log(value, data);
-    let validProperties = [];
-    for (let propertyName of value) {
-      let propInfo = data.property.inputOptions;
-      if (propInfo && propInfo.options.asTable) {
-        if (data.container.kind != 'list') {
+    const validProperties = [];
+    for (const propertyName of value) {
+      const propInfo = data.property.inputOptions;
+      if (propInfo && propInfo.options && propInfo.options.asTable) {
+        if (data.container.kind !== 'list') {
           continue;
         }
-      };
+      }
       validProperties.push(propertyName);
     }
     return validProperties;

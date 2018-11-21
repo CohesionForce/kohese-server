@@ -1,3 +1,6 @@
+import { BehaviorSubject } from 'rxjs';
+import { DialogService } from './../../../services/dialog/dialog.service';
+import { ProxySelectorDialogComponent } from './../k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { KoheseType } from './../../../classes/UDT/KoheseType.class';
 import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -27,9 +30,11 @@ export class KTableComponent implements OnInit, OnDestroy {
   tableDefinition;
   tableKind: string;
   tableData;
+  tableDataStream: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
   constructor(private typeService: DynamicTypesService,
-              private itemRepository: ItemRepository) { }
+              private itemRepository: ItemRepository,
+              private dialogService: DialogService) { }
 
   ngOnInit() {
     this.treeConfigSub = this.itemRepository.getTreeConfig()
@@ -42,9 +47,11 @@ export class KTableComponent implements OnInit, OnDestroy {
         this.tableDefinition = this.kindInformation.fields[this.property.propertyName].views.form.tableDef;
         this.tableKind = this.kindInformation.fields[this.property.propertyName].views.form.tableKind;
         this.tableData = this.proxy.item[this.property.propertyName];
-        if (this.tableData) {
-          console.log(this);
+        if (!this.tableData) {
+          this.tableData = [];
+          console.log('no table data');
         }
+        this.tableDataStream.next(this.tableData);
       }
     });
   }
@@ -53,6 +60,34 @@ export class KTableComponent implements OnInit, OnDestroy {
     if (this.treeConfigSub) {
       this.treeConfigSub.unsubscribe();
     }
+  }
+
+  public openProxySelectionDialog(): void {
+    const selectedProxies = [];
+    for (const idx in this.tableData) {
+      if (idx) {
+        const proxy = this.treeConfig.getProxyFor(this.tableData[idx].id);
+        if (proxy) {
+          selectedProxies.push(proxy);
+        }
+      }
+    }
+    this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+      data: {
+        selected: selectedProxies,
+        allowMultiSelect : this.kindInformation.fields[this.property.propertyName].views['form'].inputType.options['allowMultiSelect'],
+        proxyContext: this.proxy
+      }
+    }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
+      if (selection) {
+        const selectedIds = selection.map((proxy) => {
+          return {id : proxy.item.id};
+        });
+        this.tableData = selectedIds;
+        this.proxy.item[this.property.propertyName] = selectedIds;
+        this.tableDataStream.next(selectedIds);
+      }
+    });
   }
 
 }
