@@ -12,6 +12,7 @@
               [isMultiLine]="type.fields[property].views['form'].inputType.options['isMultiLine']">
             </k-text>
             <k-proxy-selector *ngSwitchCase="'proxy-selector'"
+              [proxyContext]="itemProxy"
               [formGroup]="formGroup" [fieldId]="property"
               [type]="type.fields[property].views['form'].inputType.options['type']"
               [fieldName]="type.fields[property].views['form'].displayName"

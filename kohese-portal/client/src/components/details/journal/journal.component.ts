@@ -271,7 +271,8 @@ export class JournalComponent implements OnInit, OnDestroy, OnChanges {
   public openObservingActivitySelectionDialog(): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {},
-      allowMultiSelect : false
+      allowMultiSelect : false,
+      proxyContext: this.itemProxy
     }).updateSize('70%', '70%').afterClosed().subscribe((selected: any) => {
       if (selected) {
         this._observingActivity = selected;
