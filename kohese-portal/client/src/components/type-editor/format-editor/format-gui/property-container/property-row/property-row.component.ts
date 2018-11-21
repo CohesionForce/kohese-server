@@ -33,7 +33,7 @@ export class PropertyRowComponent implements OnInit {
   }
 
   updateKind(propertyName) {
-    let viewProperty = this.kind.fields[propertyName.value].views.form;
+    const viewProperty = this.kind.fields[propertyName.value].views.form;
     if (viewProperty) {
       if (viewProperty.inputType.options.asTable) {
         this.property.kind = 'table';
@@ -43,7 +43,7 @@ export class PropertyRowComponent implements OnInit {
       this.property.inputOptions = viewProperty.inputType;
       console.log(viewProperty);
     } else {
-      this.property.kind = 'read-only'
+      this.property.kind = 'read-only';
     }
     console.log(this.property.kind);
   }

@@ -1,3 +1,4 @@
-<p>
-  k-table works!
-</p>
+<proxy-table *ngIf="tableDefinition && tableData" [columns]="tableDefinition.columns" [data]="tableData">
+<div *ngIf="tableDefinition && !tableData">
+  Empty Table
+</div>

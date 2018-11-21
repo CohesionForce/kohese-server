@@ -9,16 +9,15 @@ import { PropertyFormat } from '../../../../report-generator/report-generator.co
 })
 export class ListContainerComponent implements OnInit {
   @Input()
-  editable : boolean = false;
+  editable: boolean = false;
   @Input()
-  contents : Array<PropertyFormat>;
+  contents: Array<PropertyFormat>;
   @Input()
-  proxy
+  proxy;
 
   constructor() { }
 
   ngOnInit() {
-
   }
 
   stateChanged(stateName, value) {

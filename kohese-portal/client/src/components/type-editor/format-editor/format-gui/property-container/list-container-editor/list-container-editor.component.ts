@@ -21,6 +21,7 @@ export class ListContainerEditorComponent implements OnInit {
     if(!this.container) {
       console.log('no container', this)
     }
+    console.log(this);
   }
 
   addRow() {

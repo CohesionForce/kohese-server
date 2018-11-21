@@ -17,6 +17,10 @@ import { TablePreviewDialogComponent } from './table-preview-dialog/table-previe
 export class TableEditorComponent implements OnInit, OnDestroy {
   @Input()
   formDefinition: any;
+  @Input()
+  currentKind: KoheseType;
+  @Input()
+  propertyId: string;
   repoStatusSubscription: Subscription;
   treeConfigurationSubscription: Subscription;
   treeConfiguration: TreeConfiguration;
@@ -30,7 +34,8 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (!this.formDefinition.tableDef) {
       this.formDefinition.tableDef = {};
-      console.log('Init table def');
+      this.formDefinition.tableKind = 'Action';
+      this.changeDetectorRef.markForCheck();
     }
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe((update: any) => {
@@ -46,6 +51,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
           });
       }
     });
+    console.log(this.currentKind);
   }
 
   selectTableKind(kindEvent) {
@@ -100,5 +106,9 @@ export class TableEditorComponent implements OnInit, OnDestroy {
           this.changeDetectorRef.markForCheck();
         }
       });
+  }
+
+  saveTableFormat() {
+    this.currentKind.updateProperty(this.propertyId, this.currentKind.fields[this.propertyId]);
   }
 }

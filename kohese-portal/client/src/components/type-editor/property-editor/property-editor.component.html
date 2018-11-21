@@ -122,7 +122,9 @@
                     (Tables only available on multivalued references)
                   </span>
                   <table-editor *ngIf="koheseType.fields[selectedPropertyId].views['form'].inputType.options.asTable"
-                                [formDefinition]="koheseType.fields[selectedPropertyId].views['form']">
+                                [formDefinition]="koheseType.fields[selectedPropertyId].views['form']"
+                                [propertyId]="selectedPropertyId"
+                                [currentKind]="koheseType">
                   </table-editor>
                 </div>
                 <br />

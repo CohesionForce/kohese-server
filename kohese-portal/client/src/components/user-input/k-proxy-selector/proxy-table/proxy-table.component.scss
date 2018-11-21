@@ -6,11 +6,11 @@ table {
     height: 0;
   }
   
-  tr.example-item-row:not(.example-expanded-row):hover {
+  tr.item-row:not(.expanded-row):hover {
     background: #f5f5f5;
   }
   
-  tr.example-item-row:not(.example-expanded-row):active {
+  tr.example-item-row:not(.expanded-row):active {
     background: #efefef;
   }
   

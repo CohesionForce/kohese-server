@@ -9,13 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ColumnContainerComponent implements OnInit {
   @Input()
-  editable : boolean = false;
+  editable = false;
   @Input()
-  columns : Array<ColumnContainer>;
+  columns: Array<ColumnContainer>;
   @Input()
-  proxy
+  proxy;
   @Input()
-  numColumns : number;
+  numColumns: number;
 
   constructor() { }
 

@@ -29,6 +29,6 @@
   </div>
   <div *ngIf="property.kind === 'table'">
     <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
-    <k-table></k-table>
+    <k-table [property]="property" [editable]="editable" [proxy]="proxy"></k-table>
   </div>
 </div>
