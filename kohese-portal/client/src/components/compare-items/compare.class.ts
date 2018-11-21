@@ -16,66 +16,68 @@ export class Compare {
       baseCommitId);
     let changeTreeHashMap: TreeHashMap = await cache.getTreeHashMap(
       changeCommitId);
-    let diff: any = TreeHashMap.diff(baseTreeHashMap, changeTreeHashMap);
-    if (!diff.match) {
-      for (let id in diff.details) {
-        let comparison: ItemProxyComparison = await Compare.compareItems(id,
-          baseTreeHashMap, id, changeTreeHashMap, dynamicTypesService);
-        comparisons.push(comparison);
-        
-        let diffEntry: TreeHashEntryDifference = diff.details[id];
-        if (diffEntry.contentChanged) {
-          comparison.changeTypes.push(ChangeType.CONTENT_CHANGED);
-        }
-    
-        if (diffEntry.kindChanged) {
-          comparison.changeTypes.push(ChangeType.TYPE_CHANGED);
-        }
-    
-        if (diffEntry.parentChanged) {
-          comparison.changeTypes.push(ChangeType.PARENT_CHANGED);
-        }
-    
-        if (diffEntry.childrenAdded) {
-          comparison.changeTypes.push(ChangeType.CHILD_ADDED);
-        }
-    
-        if (diffEntry.childrenModified) {
-          comparison.changeTypes.push(ChangeType.CHILD_MODIFIED);
-        }
-    
-        if (diffEntry.childrenDeleted) {
-          comparison.changeTypes.push(ChangeType.CHILD_REMOVED);
-        }
-    
-        if (diffEntry.childrenReordered) {
-          comparison.changeTypes.push(ChangeType.CHILDREN_REORDERED);
-        }
-      }
+    if (baseTreeHashMap && changeTreeHashMap) {
+      let diff: any = TreeHashMap.diff(baseTreeHashMap, changeTreeHashMap);
+      if (!diff.match) {
+        for (let id in diff.details) {
+          let comparison: ItemProxyComparison = await Compare.compareItems(id,
+            baseTreeHashMap, id, changeTreeHashMap, dynamicTypesService);
+          comparisons.push(comparison);
+          
+          let diffEntry: TreeHashEntryDifference = diff.details[id];
+          if (diffEntry.contentChanged) {
+            comparison.changeTypes.push(ChangeType.CONTENT_CHANGED);
+          }
       
-      for (let j: number = 0; j < comparisons.length; j++) {
-        let comparison: ItemProxyComparison = comparisons[j];
-        let path: Array<string> = [];
-        let parentId: string = comparison.changeObject.parentId;
-        while (parentId) {
-          let k: number = 0;
-          while (k < comparisons.length) {
-            let commitComparison: ItemProxyComparison = comparisons[k];
-            if (commitComparison.changeObject.id === parentId) {
-              path.push(commitComparison.changeObject.name);
-              parentId = commitComparison.changeObject.parentId;
+          if (diffEntry.kindChanged) {
+            comparison.changeTypes.push(ChangeType.TYPE_CHANGED);
+          }
+      
+          if (diffEntry.parentChanged) {
+            comparison.changeTypes.push(ChangeType.PARENT_CHANGED);
+          }
+      
+          if (diffEntry.childrenAdded) {
+            comparison.changeTypes.push(ChangeType.CHILD_ADDED);
+          }
+      
+          if (diffEntry.childrenModified) {
+            comparison.changeTypes.push(ChangeType.CHILD_MODIFIED);
+          }
+      
+          if (diffEntry.childrenDeleted) {
+            comparison.changeTypes.push(ChangeType.CHILD_REMOVED);
+          }
+      
+          if (diffEntry.childrenReordered) {
+            comparison.changeTypes.push(ChangeType.CHILDREN_REORDERED);
+          }
+        }
+        
+        for (let j: number = 0; j < comparisons.length; j++) {
+          let comparison: ItemProxyComparison = comparisons[j];
+          let path: Array<string> = [];
+          let parentId: string = comparison.changeObject.parentId;
+          while (parentId) {
+            let k: number = 0;
+            while (k < comparisons.length) {
+              let commitComparison: ItemProxyComparison = comparisons[k];
+              if (commitComparison.changeObject.id === parentId) {
+                path.push(commitComparison.changeObject.name);
+                parentId = commitComparison.changeObject.parentId;
+                break;
+              }
+              k++;
+            }
+  
+            if (k === comparisons.length) {
               break;
             }
-            k++;
           }
-
-          if (k === comparisons.length) {
-            break;
-          }
+  
+          path.reverse();
+          comparison.path = path.join(' \u2192 ');
         }
-
-        path.reverse();
-        comparison.path = path.join(' \u2192 ');
       }
     }
 

@@ -45,8 +45,11 @@ export abstract class Tree {
   set showRootWithDescendants(showRootWithDescendants: boolean) {
     this._showRootWithDescendants = showRootWithDescendants;
     if (this.showRootWithDescendants) {
-      this._rowActions.splice(this._rowActions.indexOf(this._anchorAction), 1);
-    } else {
+      if (this._rowActions.indexOf(this._anchorAction) !== -1) {
+        this._rowActions.splice(this._rowActions.indexOf(this._anchorAction),
+          1);
+      }
+    } else if (this._rowActions.indexOf(this._anchorAction) === -1) {
       this._rowActions.push(this._anchorAction);
     }
   }
@@ -156,6 +159,7 @@ export abstract class Tree {
   }
 
   private _rowActions: Array<DisplayableEntity> = [
+    this._anchorAction,
     this._targetActionGroup,
     this._exitTargetingModeAction
   ];

@@ -1,9 +1,12 @@
 import { TestBed, async } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 import { AppComponent } from './app.component';
 import { AppFrameModule } from './components/app-frame/app-frame.module';
 import { AppRoutingModule } from './app-routing.module';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { AuthenticationService } from './services/authentication/authentication.service';
+import { TreeConfiguration } from '../../common/src/tree-configuration';
+import { ItemCache } from '../../common/src/item-cache';
 
 class MockAuthenticationService {
 
@@ -22,6 +25,9 @@ describe('AppComponent', () => {
       ],
       providers: [ {provide: AuthenticationService, useClass: MockAuthenticationService}]
     }).compileComponents();
+    
+    let itemCache: ItemCache = new ItemCache();
+    TreeConfiguration.setItemCache(itemCache);
   }));
   it('should create the app', async(() => {
     const fixture = TestBed.createComponent(AppComponent);

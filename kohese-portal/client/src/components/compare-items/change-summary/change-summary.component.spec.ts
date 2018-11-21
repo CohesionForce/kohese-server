@@ -1,5 +1,6 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 import { MaterialModule } from '../../../material.module';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -21,6 +22,7 @@ describe('Component: change-summary', () => {
     let fixture: ComponentFixture<ChangeSummaryComponent> = TestBed.
       createComponent(ChangeSummaryComponent);
     component = fixture.componentInstance;
+    component.comparisonsSubject = new BehaviorSubject<Array<Comparison>>([]);
 
     fixture.detectChanges();
   });

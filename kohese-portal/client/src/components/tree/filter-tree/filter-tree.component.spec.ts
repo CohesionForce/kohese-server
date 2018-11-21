@@ -95,4 +95,16 @@ describe('Component: filter-tree', () => {
       filterableProperty, FilterCriterion.CONDITIONS.CONTAINS, '')]);
     expect(component.areSelectedElementsCriteria()).toEqual(false);
   });
+  
+  it('suppresses display of the Anchor Action', () => {
+    let anchorActionPresent: boolean = false;
+    for (let j: number = 0; j < component.rowActions.length; j++) {
+      if (component.rowActions[j].text === 'Anchor') {
+        anchorActionPresent = true;
+        break;
+      }
+    }
+    
+    expect(anchorActionPresent).toEqual(false);
+  });
 });

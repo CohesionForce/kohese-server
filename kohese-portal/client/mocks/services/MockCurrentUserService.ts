@@ -5,7 +5,8 @@ import { MockUserData } from '../data/MockUser';
 
 export class MockCurrentUserService {
   getCurrentUserSubject () {
-    return new BehaviorSubject<any>(new ItemProxy('KoheseUser', MockUserData()));
+    let proxy: ItemProxy = new ItemProxy('KoheseUser', MockUserData());
+    return new BehaviorSubject<any>(proxy.item);
   }
 
   setCurrentUser (updatedUser) {

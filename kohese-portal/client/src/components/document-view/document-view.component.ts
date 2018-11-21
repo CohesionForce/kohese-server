@@ -189,7 +189,10 @@ implements OnInit, OnDestroy {
     if (this.filterSubscription) {
       this.filterSubscription.unsubscribe();
     }
-    this.proxyStreamSubscription.unsubscribe();
+    
+    if (this.proxyStreamSubscription) {
+      this.proxyStreamSubscription.unsubscribe();
+    }
   }
 
   determineLoad(subTree: Array < any > , currentLoad: number): number {
