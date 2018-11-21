@@ -200,6 +200,12 @@ export function MockDataModel () {
           }
         }
       }
+    },
+    "username": {
+      "type": "string",
+      "derived": true,
+      "id": true,
+      "calculated": "name"
     }
   },
   "validations": [],
