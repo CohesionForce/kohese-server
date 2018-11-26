@@ -10,6 +10,7 @@ import { LevelCache } from '../../common/src/level-cache';
 
 let socket: SocketIOClient.Socket;
 let clientMap = {};
+let _authRequest = {};
 let _connectionVerificationSet: Set<number> = new Set<number>();
 
 let initialized: boolean = false;
@@ -46,49 +47,39 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     initialized = true;
   }
 
-  let clientId = ++_lastClientId;
+  const clientId = ++_lastClientId;
   clientMap[clientId] = port;
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   port.onmessage = async (event: any) => {
-    let request = event.data;
+    const request = event.data;
 
-    let requestStartTime = Date.now();
+    const requestStartTime = Date.now();
     console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
 
     // Determine which message handler to invoke
-    switch(request.type){
+    switch (request.type) {
       case 'connect':
         if (!socket) {
           socket = SocketIoClient();
           socket.on('connect_error', () => {
             console.log('*** Worker socket connection error');
-            port.postMessage({ message: 'connectionError' });
+            postToAllPorts('connectionError', {});
           });
           socket.on('reconnect', async () => {
+            console.log('^^^ Socket reconnected');
+            _connectionAuthenticatedPromise = authenticate(_authRequest);
+            await _connectionAuthenticatedPromise;
+
             await sync();
-            port.postMessage({ message: 'reconnected' });
+            postToAllPorts('reconnected', {});
           });
           socket.connect();
 
-          _connectionAuthenticatedPromise = new Promise<void>((resolve: () => void, reject:
-            () => void) => {
-
-            socket.on('authenticated', async () => {
-
-              // Resolve the promise to allow all client tabs to proceed
-              resolve();
-
-              // Remaining initialization logic will proceed and provide incremental results to tabs
-              registerKoheseIOListeners();
-              sync();
-            });
-            socket.emit('authenticate', {
-              token: request.data
-            });
-          });
+          _authRequest = request.data;
+          _connectionAuthenticatedPromise = authenticate(_authRequest);
         }
 
         await _connectionAuthenticatedPromise;
@@ -100,7 +91,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           _fundamentalItemsPromise = synchronizeModels();
         }
 
-        let fundamentalItems = await _fundamentalItemsPromise;
+        const fundamentalItems = await _fundamentalItemsPromise;
 
         port.postMessage({
           id: request.id,
@@ -112,7 +103,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           _loadedCachePromise = populateCache();
         }
 
-        let objectMap = await _loadedCachePromise;
+        const objectMap = await _loadedCachePromise;
 
         port.postMessage({ message: 'cachePiece', data: {
           key: 'metadata',
@@ -130,12 +121,14 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           key: 'commit',
           value: objectMap.kCommitMap
         } });
+
         for (let chunkKey in objectMap.kTreeMapChunks) {
           port.postMessage({ message: 'cachePiece', data: {
             key: 'tree',
             value: objectMap.kTreeMapChunks[chunkKey]
           } });
         }
+
         for (let chunkKey in objectMap.blobMapChunks) {
           port.postMessage({ message: 'cachePiece', data: {
             key: 'blob',
@@ -161,7 +154,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           }
         }
 
-        let itemUpdates = await updatesPromise;
+        const itemUpdates = await updatesPromise;
 
         port.postMessage({
           id: request.id,
@@ -169,7 +162,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         });
         break;
       case 'getStatus':
-        let statusCount = await getStatus();
+        const statusCount = await getStatus();
         port.postMessage({
           id: request.id,
           data: {statusCount: statusCount}
@@ -192,10 +185,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         console.log(event);
     }
 
-    let requestFinishTime = Date.now();
+    const requestFinishTime = Date.now();
     console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
-      + ' - ' + (requestFinishTime - requestStartTime)/1000 + 's');
-  }
+      + ' - ' + (requestFinishTime - requestStartTime) / 1000 + 's');
+  };
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -224,11 +217,29 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     //   connectionVerificationAttempts = 0;
     // }
     // connectionVerificationAttempts++;
-    setTimeout(() => {
-      checkConnections();
-    }, 7000);
+    // setTimeout(() => {
+    //   checkConnections();
+    // }, 7000);
   };
   checkConnections();
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+async function authenticate(authRequest): Promise<void> {
+  return new Promise<void>((resolve: () => void, reject: () => void) => {
+    socket.on('authenticated', async () => {
+      // Resolve the promise to allow all client tabs to proceed
+      resolve();
+      // Remaining initialization logic will proceed and provide incremental results to tabs
+      registerKoheseIOListeners();
+      sync();
+    });
+    socket.emit('authenticate', {
+      token: authRequest
+    });
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -337,7 +348,7 @@ function registerKoheseIOListeners() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function buildOrUpdateProxy(item : any, kind : string, itemStatus : Array<string>) :   ItemProxy {
+function buildOrUpdateProxy(item: any, kind: string, itemStatus: Array<string>, bulkUpdate: boolean = false):   ItemProxy {
 
   let proxy: ItemProxy = _workingTree.getProxyFor(item.id);
 
@@ -365,7 +376,9 @@ function buildOrUpdateProxy(item : any, kind : string, itemStatus : Array<string
     });
   }
 
-  postToAllPorts('update', { item: item, kind: kind, status: itemStatus });
+  if (!bulkUpdate) {
+    postToAllPorts('update', { item: item, kind: kind, status: itemStatus });
+  }
 
   return proxy;
 }
@@ -482,7 +495,8 @@ async function populateCache(): Promise<any> {
 //
 //////////////////////////////////////////////////////////////////////////
 function processBulkUpdate(response: any): void {
-  let before = Date.now();
+  const before = Date.now();
+  const isABulkUpdate: boolean = true;
   for(let kind in response.cache) {
     console.log('--- Processing ' + kind);
     let kindList: any = response.cache[kind];
@@ -498,14 +512,14 @@ function processBulkUpdate(response: any): void {
   if (response.addItems) {
     for (let j: number = 0; j < response.addItems.length; j++) {
       buildOrUpdateProxy(response.addItems[j].item, response.addItems[j].kind,
-        undefined);
+        undefined, isABulkUpdate);
     }
   }
 
   if (response.changeItems) {
     for (let j: number = 0; j < response.changeItems.length; j++) {
       buildOrUpdateProxy(response.changeItems[j].item, response.changeItems[j].
-        kind, undefined);
+        kind, undefined, isABulkUpdate);
     }
   }
 
@@ -514,8 +528,8 @@ function processBulkUpdate(response: any): void {
       deleteItem(response.deleteItems[j]);
     }
   }
-  let after = Date.now();
-  console.log('^^^ processBulkUpdate took: ' + (after-before)/1000 );
+  const after = Date.now();
+  console.log('^^^ processBulkUpdate took: ' + (after - before) / 1000 );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -524,6 +538,7 @@ function processBulkUpdate(response: any): void {
 function updateCache(treeHashes: any): Promise<any> {
   return new Promise<any>((resolve: (data: any) => void, reject:
     () => void) => {
+    console.log('^^^ Requesting item update');
     socket.emit('Item/getAll', { repoTreeHashes: treeHashes },
       (response) => {
       processBulkUpdate(response);
