@@ -34,6 +34,7 @@
 
 .hovered-row {
   min-height: 200px;
+  vertical-align: text-bottom;
 }
 
 .hovered-body {
@@ -45,6 +46,8 @@
 .hovered-actions {
   background-color : green;
   color : white;
+  height : 100%;
+  vertical-align: top;
 }
 
 .row-actions {
