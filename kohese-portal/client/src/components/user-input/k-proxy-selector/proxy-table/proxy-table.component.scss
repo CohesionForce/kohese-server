@@ -39,10 +39,19 @@ table {
     line-height: normal;
   }
   
-  .example-item-description {
+  .item-description {
     padding: 16px;
   }
   
   .example-item-description-attribution {
     opacity: 0.5;
+  }
+  
+  .expanded-actions {
+    height: 200px; 
+    width : 50px; 
+    background-color: darkblue; 
+    color: white; 
+    display: inline-block;
+    vertical-align: top;
   }
