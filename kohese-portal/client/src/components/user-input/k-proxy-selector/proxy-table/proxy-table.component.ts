@@ -24,6 +24,10 @@ export class ProxyTableComponent implements OnInit {
     columns: Array<string>;
     @Input()
     dataStream: Observable<any>;
+    @Input()
+    expandable: boolean;
+    expandedEdit = false;
+
     dataSource: Array<ItemProxy>;
 
     expandedItem: ItemProxy;
@@ -70,5 +74,13 @@ export class ProxyTableComponent implements OnInit {
 
     stateChanged(a, b, c) {
       console.log(a, b, c);
+    }
+    ////
+    upsertItem(proxy: ItemProxy) {
+      this.itemRepository.upsertItem(proxy).then((savedProxy) => {
+        if (savedProxy) {
+          this.expandedEdit = false;
+        }
+      });
     }
 }

@@ -112,5 +112,34 @@ export class TableEditorComponent implements OnInit, OnDestroy {
 
   saveTableFormat() {
     this.currentKind.updateProperty(this.propertyId, this.currentKind.fields[this.propertyId]);
+    console.log(this);
+  }
+
+  addExpandedProperty(colNum: number) {
+    this.dialogService.openComponentDialog(TableColumnSelectorComponent, {
+      data : {
+        fields : this.types[this.formDefinition.tableDef.tableKind].fields
+      }
+    }).updateSize('20%', '20%')
+      .afterClosed()
+      .subscribe((newProp) => {
+        if (newProp) {
+          const columnName = 'column' + colNum;
+          this.formDefinition.tableDef.expandedFormat[columnName].push(newProp);
+          console.log(this);
+          this.changeDetectorRef.markForCheck();
+        }
+      });
+  }
+
+  onExpandedChecked(change) {
+    if (change.checked) {
+      this.formDefinition.tableDef.expandedFormat = {
+        column1 : [],
+        column2 : [],
+        column3 : [],
+        column4 : []
+      };
+    }
   }
 }
