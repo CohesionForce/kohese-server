@@ -23,6 +23,7 @@ export class KdMarkdownComponent implements OnInit {
   constructor(private dialogService : DialogService) { }
 
   ngOnInit() {
+    console.log(this);
   }
 
   showCheatSheet() {

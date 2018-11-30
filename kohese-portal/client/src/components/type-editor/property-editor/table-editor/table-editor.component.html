@@ -39,27 +39,26 @@
       <div *ngIf="formDefinition.tableDef.expandedRow">
         <div class="column">
           <div *ngFor="let property of formDefinition.tableDef.expandedFormat.column1">
-            {{property}}
+            {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 1)"></button>
           </div>
           <button mat-button class="add-prop-button" (click)="addExpandedProperty(1)">Add Property</button>
         </div>
         <div class="column">
           <div *ngFor="let property of formDefinition.tableDef.expandedFormat.column2">
-            {{property}}
+            {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 2)"></button>
           </div>
           <button mat-button class="add-prop-button" (click)="addExpandedProperty(2)">Add Property</button>
         </div>
         <div class="column">
-
           <div *ngFor="let property of formDefinition.tableDef.expandedFormat.column3">
-            {{property}}
+            {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 3)"></button>
           </div>
           <button mat-button class="add-prop-button" (click)="addExpandedProperty(3)">Add Property</button>
         </div>
         <div class="footer">
 
           <div *ngFor="let property of formDefinition.tableDef.expandedFormat.column4">
-            {{property}}
+            {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 4)"></button>
           </div>
           <button mat-button class="add-prop-button" (click)="addExpandedProperty(4)">Select Property</button>
         </div>

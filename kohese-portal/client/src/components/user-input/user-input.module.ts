@@ -1,3 +1,4 @@
+import { ExpandedRowColumnComponent } from './k-proxy-selector/proxy-table/expanded-row-column/expanded-row-column.component';
 import { ProxyTableComponent } from './k-proxy-selector/proxy-table/proxy-table.component';
 import { KTableComponent } from './k-table/k-table.component';
 import { KdMarkdownComponent } from './k-markdown/kd-markdown/kd-markdown.component';
@@ -38,7 +39,8 @@ import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform
     ProxySelectorDialogComponent,
     KdMarkdownComponent,
     KTableComponent,
-    ProxyTableComponent
+    ProxyTableComponent,
+    ExpandedRowColumnComponent
   ],
   imports: [
     CommonModule,
@@ -63,7 +65,8 @@ import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform
     KdProxySelectorComponent,
     KdMarkdownComponent,
     KTableComponent,
-    ProxyTableComponent
+    ProxyTableComponent,
+    ExpandedRowColumnComponent
   ],
   entryComponents: [
     MarkdownCheatSheetComponent,

@@ -1,3 +1,5 @@
+import { DetailsDialogComponent } from './../../../details/details-dialog/details-dialog.component';
+import { DialogService } from './../../../../services/dialog/dialog.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs';
@@ -25,7 +27,7 @@ export class ProxyTableComponent implements OnInit {
     @Input()
     dataStream: Observable<any>;
     @Input()
-    expandable: boolean;
+    expandedFormat: any;
     expandedEdit = false;
 
     dataSource: Array<ItemProxy>;
@@ -35,7 +37,8 @@ export class ProxyTableComponent implements OnInit {
     treeConfig: TreeConfiguration;
 
     constructor(private itemRepository: ItemRepository,
-                private changeRef: ChangeDetectorRef) {
+                private changeRef: ChangeDetectorRef,
+                private dialogService: DialogService) {
 
     }
 
@@ -82,5 +85,16 @@ export class ProxyTableComponent implements OnInit {
           this.expandedEdit = false;
         }
       });
+    }
+
+    openProxyDetails(proxy: ItemProxy) {
+        this.dialogService.openComponentDialog(DetailsDialogComponent, {
+          data : {
+            itemProxy : proxy
+          }
+          }).updateSize('80%', '80%')
+          .afterClosed().subscribe((results) => {
+          // Probably need to do something here to spin off an update
+          });
     }
 }

@@ -142,4 +142,14 @@ export class TableEditorComponent implements OnInit, OnDestroy {
       };
     }
   }
+
+  removeExpandedProperty(property, colNum) {
+    const column = 'column' + colNum;
+    const columnContents = this.formDefinition.tableDef.expandedFormat[column];
+    for (let i = 0; i < columnContents.length; i++) {
+      if (columnContents[i] === property) {
+        columnContents.splice(i, 1);
+      }
+    }
+  }
 }
