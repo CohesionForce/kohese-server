@@ -19,7 +19,7 @@
     <kd-proxy-selector [property]="property" [editable]="editable" [proxy]="proxy" [multiselect]="property.inputOptions.options.allowMultiSelect"></kd-proxy-selector>
   </div>
   <div *ngIf="property.inputType === 'state-editor'">
-    <k-state-editor [itemProxy]="proxy" (stateChanged)="stateChanged($event.fieldName, $event.candidate)" [disableTransition]="!editable"></k-state-editor>
+    <k-state-editor [itemProxy]="proxy" (stateChanged)="stateChanged($event.fieldName, $event.candidate)" [disableTransitioning]="!editable"></k-state-editor>
   </div>
   <div *ngIf="property.inputType === 'select'">
     Select not implemented
