@@ -39,8 +39,8 @@ export class TableEditorComponent implements OnInit, OnDestroy {
         case RepoStates.SYNCHRONIZATION_SUCCEEDED:
           this.treeConfigurationSubscription = this.itemRepository.
             getTreeConfig().subscribe(
-            (treeConfiguration: TreeConfiguration) => {
-            this.treeConfiguration = treeConfiguration;
+            (configObj: any) => {
+            this.treeConfiguration = configObj.config;
             this.types = this.typeService.getKoheseTypes();
             this.changeDetectorRef.markForCheck();
           });
