@@ -1,4 +1,3 @@
-import { TablePreviewProxyDialogComponent } from './property-editor/table-editor/table-preview-dialog/table-preview-proxy-dialog/table-preview-proxy-dialog.component';
 import { UserInputModule } from './../user-input/user-input.module';
 import { TablePreviewDialogComponent } from './property-editor/table-editor/table-preview-dialog/table-preview-dialog.component';
 import { TableColumnSelectorComponent } from './property-editor/table-editor/table-column-selector/table-column-selector.component';
@@ -29,13 +28,11 @@ import { AngularSplitModule } from 'angular-split';
     TableEditorComponent,
     TableColumnSelectorComponent,
     TablePreviewDialogComponent,
-    TablePreviewProxyDialogComponent
   ],
   entryComponents: [
     IconSelectorComponent,
     TableColumnSelectorComponent,
     TablePreviewDialogComponent,
-    TablePreviewProxyDialogComponent
   ],
   imports: [
     CommonModule,

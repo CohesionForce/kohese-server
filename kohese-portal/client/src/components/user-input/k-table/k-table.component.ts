@@ -16,8 +16,11 @@ import { TreeConfiguration } from './../../../../../common/src/tree-configuratio
   styleUrls: ['./k-table.component.scss']
 })
 export class KTableComponent implements OnInit, OnDestroy {
+  // Provide either a tableDefinition or a property
   @Input ()
   property;
+  @Input ()
+  tableDefinition;
   @Input ()
   editable = false;
   @Input ()
@@ -27,7 +30,6 @@ export class KTableComponent implements OnInit, OnDestroy {
   treeConfigSub: Subscription;
 
   kindInformation: KoheseType;
-  tableDefinition;
   tableKind: string;
   tableData;
   tableDataStream: BehaviorSubject<any> = new BehaviorSubject<any>([]);
@@ -44,8 +46,10 @@ export class KTableComponent implements OnInit, OnDestroy {
         const types = this.typeService.getKoheseTypes();
         const proxyKind = this.proxy.model.item.name;
         this.kindInformation = types[proxyKind];
-        this.tableDefinition = this.kindInformation.fields[this.property.propertyName].views.form.tableDef;
-        this.tableKind = this.kindInformation.fields[this.property.propertyName].views.form.tableKind;
+        if (!this.tableDefinition) {
+          this.tableDefinition = this.kindInformation.fields[this.property.propertyName].views.form.tableDef;
+          this.tableKind = this.kindInformation.fields[this.property.propertyName].views.form.tableKind;
+        }
         this.tableData = this.proxy.item[this.property.propertyName];
         if (!this.tableData) {
           this.tableData = [];

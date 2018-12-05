@@ -53,7 +53,6 @@ export class TableEditorComponent implements OnInit, OnDestroy {
           }
       }
     });
-    console.log(this.currentKind);
   }
 
   selectTableKind(kindEvent) {
@@ -80,7 +79,10 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   openTablePreview() {
       this.dialogService.openComponentDialog(TablePreviewDialogComponent, {
         data: {
-          tableDef : this.formDefinition.tableDef
+          tableDef : this.formDefinition.tableDef,
+          property : {
+            propertyName: this.propertyId
+          }
         }
       }).updateSize('60%', '60%').afterClosed().subscribe((selected: any) => {
     });

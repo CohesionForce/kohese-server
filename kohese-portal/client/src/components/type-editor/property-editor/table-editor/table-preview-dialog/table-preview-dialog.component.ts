@@ -1,8 +1,8 @@
-import { TablePreviewProxyDialogComponent } from './table-preview-proxy-dialog/table-preview-proxy-dialog.component';
 import { DialogService } from './../../../../../services/dialog/dialog.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Component, OnInit, Optional, Inject } from '@angular/core';
+import { ProxySelectorDialogComponent } from '../../../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 
 @Component({
   selector: 'table-preview-dialog',
@@ -11,10 +11,16 @@ import { Component, OnInit, Optional, Inject } from '@angular/core';
 })
 export class TablePreviewDialogComponent implements OnInit {
   previewProxy: ItemProxy;
+  tableDefinition;
+  property;
+
 
   constructor(private dialogRef: MatDialogRef<TablePreviewDialogComponent>,
               @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-              private dialogService: DialogService) { }
+              private dialogService: DialogService) {
+                this.tableDefinition = data.tableDef;
+                this.property = data.property;
+               }
 
   ngOnInit() {
     console.log(this);
@@ -25,11 +31,11 @@ export class TablePreviewDialogComponent implements OnInit {
   }
 
   openProxySelection() {
-    this.dialogService.openComponentDialog(TablePreviewProxyDialogComponent, {
+    this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data : {
         selected : this.previewProxy
       }
-    }).updateSize('50%', '50%')
+    }).updateSize('70%', '70%')
       .afterClosed()
       .subscribe((newSelection) => {
         if (newSelection) {
