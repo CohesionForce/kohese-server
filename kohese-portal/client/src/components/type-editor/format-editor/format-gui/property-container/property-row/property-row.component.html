@@ -1,8 +1,11 @@
 <div class="property-row">
   <div class="selector">
-    <mat-select placeholder="---" [(ngModel)]="property.propertyName" (change)="updateKind($event)">
-      <mat-option *ngFor="let propertyName of kind.fields | mapKey" [value]="propertyName">
-        {{propertyName}}
+    <mat-select placeholder="---" [(ngModel)]="property.propertyName" (selectionChange)="updateKind($event)">
+      <mat-option *ngFor="let propertyName of kind.fields | mapKey | validProperty:{property : property,container:container}" [value]="propertyName">
+        {{propertyName}} 
+        <span class="table-label" *ngIf=" kind.fields[propertyName].views.form &&
+                                          kind.fields[propertyName].views.form.inputType.options &&
+                                          kind.fields[propertyName].views.form.inputType.options.asTable">(Table)</span>
       </mat-option>
     </mat-select>
   </div>

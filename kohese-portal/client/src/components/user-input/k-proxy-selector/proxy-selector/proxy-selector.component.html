@@ -24,6 +24,21 @@
         </ng-template>
       </tree-root>
     </mat-tab>
+    <mat-tab label="Related" *ngIf="proxyContext">
+        <div *ngFor="let relationInfo of relatedProxies">
+            <span *ngIf="!selectedMap.get(relationInfo.proxy.item.id)"
+                  (click)="selectProxy(relationInfo.proxy)">
+              {{relationInfo.proxy.item.name}}
+              <span class="relation-kind"> {{relationInfo.relationKind}}</span>
+            </span>
+            <span *ngIf="selectedMap.get(relationInfo.proxy.item.id)"
+                  (click)="removeSelection(relationInfo.proxy)">
+              {{relationInfo.proxy.item.name}} <i class="fa fa-check"></i> 
+              <span class="relation-kind"> {{relationInfo.relationKind}}</span>
+            </span>
+            <hr/>
+          </div>
+    </mat-tab>
     <mat-tab label="Selector">
       <mat-form-field style="width: 100%;">
         <input matInput type="text" placeholder="Proxy" [formControl]="proxySearchControl"

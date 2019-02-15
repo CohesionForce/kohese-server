@@ -1,103 +1,100 @@
-import { Component, OnInit } from '@angular/core';
+import { DetailsDialogComponent } from './../../../details/details-dialog/details-dialog.component';
+import { DialogService } from './../../../../services/dialog/dialog.service';
+import { ChangeDetectorRef } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs';
+import { ItemRepository } from './../../../../services/item-repository/item-repository.service';
+import { ItemProxy } from './../../../../../../common/src/item-proxy';
+import { Component, OnInit, Input } from '@angular/core';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { TreeConfiguration } from './../../../../../../common/src/tree-configuration';
 
 @Component({
-  selector: 'app-proxy-table',
+  selector: 'proxy-table',
   templateUrl: './proxy-table.component.html',
-  styleUrls: ['./proxy-table.component.scss']
+  styleUrls: ['./proxy-table.component.scss'],
+  animations : [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0', display: 'none'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ]
 })
-export class ProxyTableComponent {
+export class ProxyTableComponent implements OnInit {
+    @Input()
+    columns: Array<string>;
+    @Input()
+    dataStream: Observable<any>;
+    @Input()
+    expandedFormat: any;
+    expandedEdit = false;
 
-    dataSource = ELEMENT_DATA;
-    columnsToDisplay = ['name', 'weight', 'symbol', 'position'];
-    expandedElement: PeriodicElement;
-}
+    dataSource: Array<ItemProxy>;
 
-  export interface PeriodicElement {
-    name: string;
-    position: number;
-    weight: number;
-    symbol: string;
-    description: string;
+    expandedItem: ItemProxy;
+    treeConfigSub: Subscription;
+    treeConfig: TreeConfiguration;
+
+    constructor(private itemRepository: ItemRepository,
+                private changeRef: ChangeDetectorRef,
+                private dialogService: DialogService) {
+
+    }
+
+    ngOnInit() {
+      this.treeConfigSub = this.itemRepository.getTreeConfig()
+        .subscribe((newConfig) => {
+        if (newConfig) {
+          this.treeConfig = newConfig.config;
+          this.dataStream.subscribe((data) => {
+            this.dataSource = [];
+            for (const idx in data) {
+              if (idx) {
+                const proxy = newConfig.config.getProxyFor(data[idx].id);
+                if (proxy) {
+                  this.dataSource.push(proxy);
+                }
+              }
+            }
+            this.changeRef.markForCheck();
+            console.log(this);
+          });
+        }
+    });
   }
 
-  const ELEMENT_DATA: PeriodicElement[] = [
-    {
-      position: 1,
-      name: 'Hydrogen',
-      weight: 1.0079,
-      symbol: 'H',
-      description: `Hydrogen is a chemical element with symbol H and atomic number 1. With a standard
-          atomic weight of 1.008, hydrogen is the lightest element on the periodic table.`
-    }, {
-      position: 2,
-      name: 'Helium',
-      weight: 4.0026,
-      symbol: 'He',
-      description: `Helium is a chemical element with symbol He and atomic number 2. It is a
-          colorless, odorless, tasteless, non-toxic, inert, monatomic gas, the first in the noble gas
-          group in the periodic table. Its boiling point is the lowest among all the elements.`
-    }, {
-      position: 3,
-      name: 'Lithium',
-      weight: 6.941,
-      symbol: 'Li',
-      description: `Lithium is a chemical element with symbol Li and atomic number 3. It is a soft,
-          silvery-white alkali metal. Under standard conditions, it is the lightest metal and the
-          lightest solid element.`
-    }, {
-      position: 4,
-      name: 'Beryllium',
-      weight: 9.0122,
-      symbol: 'Be',
-      description: `Beryllium is a chemical element with symbol Be and atomic number 4. It is a
-          relatively rare element in the universe, usually occurring as a product of the spallation of
-          larger atomic nuclei that have collided with cosmic rays.`
-    }, {
-      position: 5,
-      name: 'Boron',
-      weight: 10.811,
-      symbol: 'B',
-      description: `Boron is a chemical element with symbol B and atomic number 5. Produced entirely
-          by cosmic ray spallation and supernovae and not by stellar nucleosynthesis, it is a
-          low-abundance element in the Solar system and in the Earth's crust.`
-    }, {
-      position: 6,
-      name: 'Carbon',
-      weight: 12.0107,
-      symbol: 'C',
-      description: `Carbon is a chemical element with symbol C and atomic number 6. It is nonmetallic
-          and tetravalent—making four electrons available to form covalent chemical bonds. It belongs
-          to group 14 of the periodic table.`
-    }, {
-      position: 7,
-      name: 'Nitrogen',
-      weight: 14.0067,
-      symbol: 'N',
-      description: `Nitrogen is a chemical element with symbol N and atomic number 7. It was first
-          discovered and isolated by Scottish physician Daniel Rutherford in 1772.`
-    }, {
-      position: 8,
-      name: 'Oxygen',
-      weight: 15.9994,
-      symbol: 'O',
-      description: `Oxygen is a chemical element with symbol O and atomic number 8. It is a member of
-           the chalcogen group on the periodic table, a highly reactive nonmetal, and an oxidizing
-           agent that readily forms oxides with most elements as well as with other compounds.`
-    }, {
-      position: 9,
-      name: 'Fluorine',
-      weight: 18.9984,
-      symbol: 'F',
-      description: `Fluorine is a chemical element with symbol F and atomic number 9. It is the
-          lightest halogen and exists as a highly toxic pale yellow diatomic gas at standard
-          conditions.`
-    }, {
-      position: 10,
-      name: 'Neon',
-      weight: 20.1797,
-      symbol: 'Ne',
-      description: `Neon is a chemical element with symbol Ne and atomic number 10. It is a noble gas.
-          Neon is a colorless, odorless, inert monatomic gas under standard conditions, with about
-          two-thirds the density of air.`
-    },
-  ];
+    toggleExpand(item) {
+      console.log(item);
+      if (this.expandedItem !== item) {
+        this.expandedItem = item;
+      } else {
+        this.expandedItem = undefined;
+      }
+    }
+
+    ////////////
+
+    stateChanged(a, b, c) {
+      console.log(a, b, c);
+    }
+    ////
+    upsertItem(proxy: ItemProxy) {
+      this.itemRepository.upsertItem(proxy).then((savedProxy) => {
+        if (savedProxy) {
+          this.expandedEdit = false;
+        }
+      });
+    }
+
+    openProxyDetails(proxy: ItemProxy) {
+        this.dialogService.openComponentDialog(DetailsDialogComponent, {
+          data : {
+            itemProxy : proxy
+          }
+          }).updateSize('80%', '80%')
+          .afterClosed().subscribe((results) => {
+          // Probably need to do something here to spin off an update
+          });
+    }
+}

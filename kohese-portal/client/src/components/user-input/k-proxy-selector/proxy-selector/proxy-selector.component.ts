@@ -7,6 +7,10 @@ import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { Subscription } from 'rxjs';
 
+interface RelationInfo {
+  proxy: ItemProxy;
+  relationKind: string;
+}
 @Component({
   selector: 'proxy-selector',
   templateUrl: './proxy-selector.component.html',
@@ -21,6 +25,8 @@ export class ProxySelectorComponent implements OnInit {
   multiSelect: boolean;
   @Input()
   selection: any;
+  @Input()
+  proxyContext: ItemProxy;
   @Output()
   proxySelected: EventEmitter<any> = new EventEmitter();
 
@@ -33,6 +39,7 @@ export class ProxySelectorComponent implements OnInit {
   treeInitialized: boolean;
   filteredProxies: any;
   recentProxies: Array<ItemProxy>;
+  relatedProxies: Array<RelationInfo>;
 
   treeConfig: any;
   treeConfigSub: Subscription;
@@ -49,20 +56,23 @@ export class ProxySelectorComponent implements OnInit {
           this.rootProxy = this.treeConfig.getRootProxy();
           this.recentProxies = this.itemRepository.getRecentProxies();
           this.recentProxies = this.recentProxies.slice().reverse();
+          if (this.proxyContext) {
+            this.generateRelatedProxies();
+          }
           this.repoInitialized = true;
         }
         if (this.selection) {
           if (this.multiSelect) {
             this.selected = this.selection;
             for (let i = 0; i < this.selected.length; i++) {
-              let proxy = this.selected[i];
+              const proxy = this.selected[i];
               this.selectedMap.set(proxy.item.id, proxy);
             }
           } else {
             this.selected = this.selection;
           }
         }
-      })
+      });
   }
 
   initProxySearch() {
@@ -72,7 +82,7 @@ export class ProxySelectorComponent implements OnInit {
           return this.rootProxy.getDescendants().filter((proxy) => {
             return (-1 !== proxy.item.name.indexOf(text));
           });
-      }),);
+      }));
     }
     this.proxySearchInitialized = true;
   }
@@ -80,9 +90,9 @@ export class ProxySelectorComponent implements OnInit {
   selectProxy(selection: ItemProxy) {
     console.log(selection);
     if (this.multiSelect) {
-      let matchesSelection: boolean = false;
+      let matchesSelection = false;
       for (let i = 0; i < this.selected.length; i++) {
-        let proxy = this.selected[i];
+        const proxy = this.selected[i];
         if (proxy === selection) {
           matchesSelection = true;
           break;
@@ -96,7 +106,7 @@ export class ProxySelectorComponent implements OnInit {
 
     } else {
       this.selected = selection;
-      this.proxySelected.emit(this.selected)
+      this.proxySelected.emit(this.selected);
     }
   }
 
@@ -107,7 +117,7 @@ export class ProxySelectorComponent implements OnInit {
   }
 
   onTabSelected(tabEvent) {
-    switch(tabEvent.index) {
+    switch (tabEvent.index) {
       case 1:
         this.treeInitialized = true;
         break;
@@ -119,11 +129,28 @@ export class ProxySelectorComponent implements OnInit {
   removeSelection(selection: ItemProxy) {
     if (this.multiSelect) {
       for (let i = 0; i < this.selected.length; i++) {
-        let proxy = this.selected[i];
+        const proxy = this.selected[i];
         if (proxy === selection) {
           this.selected.splice(i, 1);
           this.selectedMap.delete(selection.item.id);
         }
+      }
+    }
+  }
+
+  generateRelatedProxies() {
+    this.relatedProxies = [];
+    console.log(this.proxyContext);
+    const siblingProxies = this.proxyContext.parentProxy.children;
+    for (const proxy in siblingProxies) {
+      if (siblingProxies[proxy]) {
+        if (siblingProxies[proxy].item.id === this.proxyContext.item.id) {
+          continue;
+        }
+        this.relatedProxies.push(
+          { proxy : siblingProxies[proxy],
+            relationKind : 'Sibling'
+          });
       }
     }
   }

@@ -28,13 +28,14 @@ export class DetailsFormComponent extends NavigatableComponent
   @Input()
   public proxyStream: BehaviorSubject<ItemProxy>;
   @Input()
-  editableStream: BehaviorSubject<boolean>
+  editableStream: BehaviorSubject<boolean>;
   @Input()
   public fieldFilterStream: BehaviorSubject<((fieldName: string) => boolean)>;
   @Output()
   formGroupUpdated = new EventEmitter<FormGroup>();
 
-  private initialized : boolean;
+  private initialized: boolean;
+  itemProxy: ItemProxy;
 
   private _nonFormFieldMap: Map<string, any> = new Map<string, any>();
   get nonFormFieldMap() {
@@ -86,6 +87,7 @@ export class DetailsFormComponent extends NavigatableComponent
     this._proxyStreamSubscription = this.proxyStream.subscribe(
       (newProxy: ItemProxy) => {
       if (newProxy) {
+        this.itemProxy = newProxy;
         this.type = this.DynamicTypeService.getKoheseTypes()[newProxy.kind];
         this.formGroup = this.createFormGroup();
         this.formGroupUpdated.emit(this.formGroup);
@@ -117,9 +119,8 @@ export class DetailsFormComponent extends NavigatableComponent
     }
   }
 
-  createFormGroup () : FormGroup {
+  createFormGroup (): FormGroup {
     const group = this.FormBuilder.group(this.buildPropertyMap(true));
-    //this.config.forEach(control => group.addControl(control.name, this.FormBuilder.control()));
     if (!this.editableStream.getValue()) {
       group.disable();
     }

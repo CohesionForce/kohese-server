@@ -86,7 +86,8 @@ export class KdProxySelectorComponent implements OnInit {
 
       data: {
         allowMultiSelect: this.multiselect,
-        selected: selected
+        selected: selected,
+        proxyContext: this.proxy
       }
     }).updateSize('80%', '80%').afterClosed().subscribe((selected : any) => {
       this.references = [];

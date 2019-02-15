@@ -1,3 +1,4 @@
+import { ValidPropertyPipe } from './valid-property.pipe';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -11,7 +12,8 @@ import { TruncatePipe } from './truncate.pipe';
     MapKeyPipe,
     HighlightPipe,
     SanitizeHtmlPipe,
-    TruncatePipe
+    TruncatePipe,
+    ValidPropertyPipe
   ],
   imports: [
     CommonModule
@@ -20,7 +22,8 @@ import { TruncatePipe } from './truncate.pipe';
     MapKeyPipe,
     HighlightPipe,
     SanitizeHtmlPipe,
-    TruncatePipe
+    TruncatePipe,
+    ValidPropertyPipe
   ]
 })
 export class PipesModule {}

@@ -19,13 +19,13 @@
 <div class="container-body">
   <div *ngIf="container.numColumns === 2" class="two-columns">
     <div class="c2c1">
-      <property-row *ngFor="let content of container.columns[0].contents" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
+      <property-row *ngFor="let content of container.columns[0].contents" [container]="container" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
       </property-row>
       <button mat-button class="add-button" (click)="addRow(0);">
         <i class="fa fa-plus"></i> Add Row</button>
     </div>
     <div class="c2c2">
-      <property-row *ngFor="let content of container.columns[1].contents" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
+      <property-row *ngFor="let content of container.columns[1].contents" [container]="container" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
       </property-row>
       <button mat-button class="add-button" (click)="addRow(1);">
         <i class="fa fa-plus"></i> Add Row</button>
@@ -33,19 +33,19 @@
   </div>
   <div *ngIf="container.numColumns === 3" class="three-columns">
     <div class="c3c1">
-      <property-row *ngFor="let content of container.columns[0].contents" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
+      <property-row *ngFor="let content of container.columns[0].contents" [container]="container" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
       </property-row>
       <button mat-button class="add-button" (click)="addRow(0);">
         <i class="fa fa-plus"></i> Add Row</button>
     </div>
     <div class="c3c2">
-      <property-row *ngFor="let content of container.columns[1].contents" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
+      <property-row *ngFor="let content of container.columns[1].contents" [container]="container" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
       </property-row>
       <button mat-button class="add-button" (click)="addRow(1);">
         <i class="fa fa-plus"></i> Add Row</button>
     </div>
     <div class="c3c3">
-      <property-row *ngFor="let content of container.columns[2].contents" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
+      <property-row *ngFor="let content of container.columns[2].contents" [container]="container" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
       </property-row>
       <button mat-button class="add-button" (click)="addRow(2);">
         <i class="fa fa-plus"></i> Add Row</button>

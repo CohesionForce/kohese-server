@@ -14,14 +14,14 @@ export class HeaderContainerComponent implements OnInit, OnDestroy {
   proxy;
   @Input()
   depth;
-  rendered : string;
+  rendered: string;
   @Input()
   editable = false;
   differ: KeyValueDiffer<string, any>;
   @Input()
-  upsertComplete : Observable<any>
-  upsertSub : Subscription
-  property : PropertyDefinition;
+  upsertComplete: Observable<any>;
+  upsertSub: Subscription;
+  property: PropertyDefinition;
 
   constructor(private differs: KeyValueDiffers) {
     this.differ = this.differs.find({}).create();
@@ -30,10 +30,10 @@ export class HeaderContainerComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.property = this.header.contents[0];
     this.render();
-    this.upsertSub = this.upsertComplete.subscribe(()=>{
+    this.upsertSub = this.upsertComplete.subscribe(() => {
       this.render();
       this.property = this.header.contents[0];
-    })
+    });
   }
 
   ngOnDestroy() {
@@ -42,8 +42,8 @@ export class HeaderContainerComponent implements OnInit, OnDestroy {
 
   render() {
     this.rendered =
-      "<h" + this.depth + '>' +
+      '<h' + this.depth + '>' +
       this.proxy.item[this.header.contents[0].propertyName] +
-      '</h' + this.depth + '>'
+      '</h' + this.depth + '>';
   }
 }

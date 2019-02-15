@@ -189,7 +189,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
   }
 
   public changeRelationness(checked: boolean): void {
-    let property: any = this._koheseType.fields[this.selectedPropertyId];
+    const property: any = this._koheseType.fields[this.selectedPropertyId];
     if (checked) {
       property.relation = {
         kind: 'Item',

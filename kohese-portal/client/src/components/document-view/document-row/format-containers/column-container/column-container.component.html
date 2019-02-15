@@ -11,7 +11,7 @@
         <div *ngIf="property.kind === 'markdown'">
           <kd-markdown [property]="property" [editable]="editable" [proxy]="proxy" [container]="'columns'"></kd-markdown>
         </div>
-        <div *ngIf="property.kind === 'proxy-selector'">
+        <div *ngIf="property.kind === 'proxy-selector' || property.kind === 'table'">
             <kd-proxy-selector [property]="property" [editable]="editable" [proxy]="proxy"
             [multiselect]="property.inputOptions.options.allowMultiSelect"></kd-proxy-selector>
         </div>

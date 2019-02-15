@@ -1,3 +1,71 @@
-<hr/>
-<span style="font-size:large;">Table Editor</span>
-<button mat-button style="background-color : navy; color : white;" (click)="openTablePreview()">Open Preview</button>
+<div *ngIf="formDefinition.tableDef">
+  <hr />
+  <span style="font-size:large;">Table Editor</span>
+  <button mat-button style="background-color : navy; color : white; margin-left : 10px;" (click)="openTablePreview()">Open
+    Preview</button>
+  <button mat-button style="background-color : darkgreen; color : white; margin-left: 10px;" (click)="saveTableFormat()">
+    Save Format
+  </button>
+  <mat-divider></mat-divider>
+  <div class="table-options">
+    <h5>Table options : </h5>
+    <label style="font-weight : bold;">Table Kind : </label>
+    <mat-select *ngIf="formDefinition.tableDef" placeholder="Type" [value]="formDefinition.tableDef.tableKind"
+      (selectionChange)="selectTableKind($event)">
+      <mat-option *ngFor="let type of (types | mapKey)" matTooltip="{{types[type].dataModelProxy.item.description}}"
+        [value]="types[type].dataModelProxy.item.name">
+        <ng-container *ngIf="types[type].viewModelProxy">
+          <mat-icon class="{{types[type].viewModelProxy.item.icon}}">
+          </mat-icon>
+        </ng-container>
+        {{type}}
+      </mat-option>
+    </mat-select>
+    <div class="property-section">
+      <h6 style="font-weight : bold;">Table Columns <button *ngIf="formDefinition.tableDef.tableKind" mat-icon-button
+          class="fa fa-plus" (click)="addColumn()"></button></h6>
+      <mat-divider></mat-divider>
+      <div>
+        <div *ngFor="let column of formDefinition.tableDef.columns">
+          {{column}} <button mat-icon-button class="fa fa-minus" (click)="deleteColumn(column);"></button>
+        </div>
+      </div>
+    </div>
+    <div class="property-section">
+      <h6 style="font-weight: bold;">Expanded Row</h6>
+      <mat-checkbox [(ngModel)]="formDefinition.tableDef.expandedRow" (change)="onExpandedChecked($event)">Use Expanded
+        Row</mat-checkbox>
+      <mat-divider></mat-divider>
+      <div *ngIf="formDefinition.tableDef.expandedRow">
+        <div class="column">
+          <div *ngFor="let property of formDefinition.tableDef.expandedFormat.column1">
+            {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 1)"></button>
+          </div>
+          <button mat-button class="add-prop-button" (click)="addExpandedProperty(1)">Add Property</button>
+        </div>
+        <div class="column">
+          <div *ngFor="let property of formDefinition.tableDef.expandedFormat.column2">
+            {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 2)"></button>
+          </div>
+          <button mat-button class="add-prop-button" (click)="addExpandedProperty(2)">Add Property</button>
+        </div>
+        <div class="column">
+          <div *ngFor="let property of formDefinition.tableDef.expandedFormat.column3">
+            {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 3)"></button>
+          </div>
+          <button mat-button class="add-prop-button" (click)="addExpandedProperty(3)">Add Property</button>
+        </div>
+        <div class="footer">
+
+          <div *ngFor="let property of formDefinition.tableDef.expandedFormat.column4">
+            {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 4)"></button>
+          </div>
+          <button mat-button class="add-prop-button" (click)="addExpandedProperty(4)">Select Property</button>
+        </div>
+      </div>
+      <div *ngIf="!formDefinition.tableDef.expandedRow">
+        <span style="color: gray; font-style: italic; font-weight: bold">Expanded Row Disabled</span>
+      </div>
+    </div>
+  </div>
+</div>

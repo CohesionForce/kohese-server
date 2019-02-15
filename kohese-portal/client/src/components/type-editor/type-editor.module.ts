@@ -1,3 +1,6 @@
+import { UserInputModule } from './../user-input/user-input.module';
+import { TablePreviewDialogComponent } from './property-editor/table-editor/table-preview-dialog/table-preview-dialog.component';
+import { TableColumnSelectorComponent } from './property-editor/table-editor/table-column-selector/table-column-selector.component';
 import { TableEditorComponent } from './property-editor/table-editor/table-editor.component';
 import { FormatModule } from './format-editor/format.module';
 import { FormatGuiComponent } from './format-editor/format-gui/format-gui.component';
@@ -22,10 +25,14 @@ import { AngularSplitModule } from 'angular-split';
     TypeOverviewComponent,
     PropertyEditorComponent,
     IconSelectorComponent,
-    TableEditorComponent
+    TableEditorComponent,
+    TableColumnSelectorComponent,
+    TablePreviewDialogComponent,
   ],
   entryComponents: [
-    IconSelectorComponent
+    IconSelectorComponent,
+    TableColumnSelectorComponent,
+    TablePreviewDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -34,7 +41,8 @@ import { AngularSplitModule } from 'angular-split';
     PipesModule,
     AngularSplitModule,
     StateMachineEditorModule,
-    FormatModule
+    FormatModule,
+    UserInputModule
   ]
 })
 export class TypeEditorModule {

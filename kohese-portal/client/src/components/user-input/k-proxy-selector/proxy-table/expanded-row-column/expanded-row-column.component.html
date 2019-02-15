@@ -1,0 +1,35 @@
+<div *ngFor="let property of columnFields">
+  <div *ngIf="property.field && property.field.views.form" style="font-weight: bold;">
+    <span *ngIf="property.field.views.form.displayName || !property.field.views.form.displayName === ''">{{property.field.views.form.displayName}}</span>
+    <span *ngIf="!property.field.views.form.displayName || property.field.views.form.displayName === ''">{{property.propertyName}}</span>
+  </div>
+  <div *ngIf="!property.field || !property.field.views.form" style="font-weight: bold;">
+      {{property.propertyName}}
+  </div>
+  <div *ngIf="['text', 'user-selector','date'].includes(property.inputType)">
+    <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
+    <div *ngIf="editable">
+      <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[property.propertyName]"></textarea>
+    </div>
+  </div>
+  <div *ngIf="property.inputType === 'markdown'">
+    <kd-markdown [property]="property" [editable]="editable" [proxy]="proxy" [container]="'list'"></kd-markdown>
+  </div>
+  <div *ngIf="property.inputType === 'proxy-selector' || property.inputType === 'table'">
+    <kd-proxy-selector [property]="property" [editable]="editable" [proxy]="proxy" [multiselect]="property.field.views.form.inputType.options.allowMultiSelect"></kd-proxy-selector>
+  </div>
+  <div *ngIf="property.inputType === 'state-editor'">
+    <k-state-editor [itemProxy]="proxy" (stateChanged)="stateChanged($event.fieldName, $event.candidate)" [disableTransitioning]="!editable"></k-state-editor>
+  </div>
+  <div *ngIf="property.inputType === 'select'">
+    Select not implemented
+    <!-- <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label> -->
+  </div>
+  <div *ngIf="property.inputType === 'read-only'">
+    <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
+    <div *ngIf="editable">
+      {{property.propertyName}} not available for editing
+    </div>
+  </div>
+  <mat-divider></mat-divider>
+</div>

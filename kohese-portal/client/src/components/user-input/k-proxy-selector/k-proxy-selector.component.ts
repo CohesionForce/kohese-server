@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { UserInput } from '../user-input.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -15,22 +15,24 @@ import { ProxySelectorDialogComponent } from './proxy-selector-dialog/proxy-sele
   styleUrls: ['./k-proxy-selector.component.scss']
 })
 export class KProxySelectorComponent extends UserInput
-  implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy, OnChanges {
   @Input()
   public type: string;
   @Input()
   public allowMultiSelect: boolean;
-  public selected : any;
+  public selected: any;
+  @Input()
+  proxyContext: ItemProxy;
   @Input()
   editableStream: Observable<boolean>;
   editableStreamSub: Subscription;
   editable: boolean;
-  initialized: boolean = false;
+  initialized = false;
 
   treeConfigSub: Subscription;
   treeConfig: any;
 
-  constructor(private ItemRepository: ItemRepository,
+  constructor(private itemRepository: ItemRepository,
     private dialogService: DialogService) {
     super();
   }
@@ -38,14 +40,14 @@ export class KProxySelectorComponent extends UserInput
   ngOnInit(): void {
     this.editableStreamSub = this.editableStream.subscribe((editable) => {
       this.editable = editable;
-    })
+    });
 
-    this.treeConfigSub = this.ItemRepository.getTreeConfig().subscribe((newConfig) => {
+    this.treeConfigSub = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
       if (newConfig) {
         this.treeConfig = newConfig.config;
         this.initSelections();
       }
-    })
+    });
 
     this.initialized = true;
   }
@@ -67,17 +69,17 @@ export class KProxySelectorComponent extends UserInput
   }
 
   initSelections() {
-    let selected = this.formGroup.controls[this.fieldId].value;
+    const selected = this.formGroup.controls[this.fieldId].value;
     if (this.allowMultiSelect) {
       this.selected = [];
       if (selected) {
         for (let i = 0; i < selected.length; i++) {
           if (selected[i].hasOwnProperty('id')) {
             // Must be a reference
-            this.selected.push(this.treeConfig.getProxyFor(selected[i].id))
+            this.selected.push(this.treeConfig.getProxyFor(selected[i].id));
           } else {
             // Must be an id field insteaad of a reference
-            this.selected.push(this.treeConfig.getProxyFor(selected[i]))
+            this.selected.push(this.treeConfig.getProxyFor(selected[i]));
           }
         }
       }
@@ -89,7 +91,7 @@ export class KProxySelectorComponent extends UserInput
       } else {
         // TODO - Update to handle non-editable historical records
         // Must be an id field insteaad of a reference
-        this.selected= this.treeConfig.getProxyFor(selected);
+        this.selected = this.treeConfig.getProxyFor(selected);
       }
     }
   }
@@ -107,11 +109,12 @@ export class KProxySelectorComponent extends UserInput
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {
         allowMultiSelect: this.allowMultiSelect,
-        selected: this.selected
+        selected: this.selected,
+        proxyContext: this.proxyContext
       }
-    }).updateSize('60%', '60%').afterClosed().subscribe((selected : any) => {
+    }).updateSize('60%', '60%').afterClosed().subscribe((selected: any) => {
       if (this.allowMultiSelect) {
-        let selectedIds = [];
+        const selectedIds = [];
         if (selected) {
           this.selected = selected;
           for (let i = 0; i < this.selected.length; i++) {
@@ -129,6 +132,6 @@ export class KProxySelectorComponent extends UserInput
         }
         this.formGroup.controls[this.fieldId].markAsDirty();
       }
-    })
+    });
   }
 }

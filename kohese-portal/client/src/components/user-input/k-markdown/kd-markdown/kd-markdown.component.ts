@@ -16,13 +16,14 @@ export class KdMarkdownComponent implements OnInit {
   @Input()
   editable: boolean;
   @Input()
-  proxy: ItemProxy
+  proxy: ItemProxy;
   @Input()
-  container : string;
+  container: string;
 
   constructor(private dialogService : DialogService) { }
 
   ngOnInit() {
+    console.log(this);
   }
 
   showCheatSheet() {

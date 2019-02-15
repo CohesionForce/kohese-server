@@ -22,7 +22,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 
 export interface DocumentInfo {
   proxy: ItemProxy;
-  format : Array<any>;
+  format: Array<any>;
   active: boolean;
   hovered: boolean;
   depth: number;
@@ -61,7 +61,7 @@ export interface DocumentInfo {
 export class DocumentViewComponent extends NavigatableComponent
 implements OnInit, OnDestroy {
   /* UI Toggles */
-  @ViewChild('docView') docView: ElementRef
+  @ViewChild('docView') docView: ElementRef;
 
   /* Data */
   itemProxy: ItemProxy;
@@ -75,46 +75,46 @@ implements OnInit, OnDestroy {
   filterRegex: RegExp;
   filterRegexHighlighted: RegExp;
   invalidFilterRegex: boolean;
-  itemsLoaded: number = 0;
+  itemsLoaded = 0;
   loadedProxies: Array < DocumentInfo > = [];
-  formatDefs : any = {};
+  formatDefs: any = {};
 
   /* Utils */
   docReader: Parser;
-  docWriter: HtmlRenderer
+  docWriter: HtmlRenderer;
   initialized: boolean;
-  treeConfig : TreeConfiguration;
-  treeConfigSubscription : Subscription;
-  repoStatusSubscription : Subscription;
+  treeConfig: TreeConfiguration;
+  treeConfigSubscription: Subscription;
+  repoStatusSubscription: Subscription;
 
 
   /* Observables */
   @Input()
   filterSubject: BehaviorSubject < AnalysisFilter > ;
   @Input()
-  proxyStream: Observable < ItemProxy >
+  proxyStream: Observable < ItemProxy >;
   @Input()
   incrementalLoad: boolean;
   @Input()
   fullscreen = false;
   @Input()
-  selectedProxyStream : Observable<ItemProxy>;
+  selectedProxyStream: Observable<ItemProxy>;
   @Output()
-  proxySelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
+  proxySelected: EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
 
 
   /* Subscriptions */
   filterSubscription: Subscription;
   proxyStreamSubscription: Subscription;
-  selectedProxySubscription : Subscription;
+  selectedProxySubscription: Subscription;
 
-  constructor(NavigationService: NavigationService,
+  constructor(navigationService: NavigationService,
     private changeRef: ChangeDetectorRef,
     private router: Router,
     private itemRepository: ItemRepository,
     private dialogService: DialogService,
-    private typeService : DynamicTypesService) {
-    super(NavigationService)
+    private typeService: DynamicTypesService) {
+    super(navigationService);
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({
       sourcepos: true
@@ -128,7 +128,7 @@ implements OnInit, OnDestroy {
         this.filter = newFilter.filter;
         this.onFilterChange();
         this.changeRef.markForCheck();
-      })
+      });
     }
 
     this.router.events.subscribe((event) => {
@@ -136,14 +136,14 @@ implements OnInit, OnDestroy {
         return;
       }
       this.docView.nativeElement.scrollTop = 0;
-    })
+    });
 
     if (this.selectedProxyStream) {
       this.selectedProxySubscription = this.selectedProxyStream.subscribe((newSelection) => {
         if (newSelection) {
           this.rowMap[newSelection.item.id].nativeElement.scrollIntoView();
         }
-      })
+      });
     }
 
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
@@ -153,36 +153,37 @@ implements OnInit, OnDestroy {
         case RepoStates.SYNCHRONIZATION_SUCCEEDED:
           this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
             if (newConfig) {
-              let types = this.typeService.getKoheseTypes();
+              const types = this.typeService.getKoheseTypes();
 
-              for (let type in types) {
-                let vm = types[type].viewModelProxy;
-                if (vm && vm.item.formatDefinitions && vm.item.defaultFormatKey) {
-                  this.formatDefs[type] = vm.item.formatDefinitions[vm.item.defaultFormatKey]
-                } else {
-                  console.log('Format not defined for ' + type);
+              for (const type in types) {
+                if (type) {
+                  const vm = types[type].viewModelProxy;
+                  if (vm && vm.item.formatDefinitions && vm.item.defaultFormatKey) {
+                    this.formatDefs[type] = vm.item.formatDefinitions[vm.item.defaultFormatKey];
+                  } else {
+                    console.log('Format not defined for ' + type);
+                  }
                 }
               }
-              console.log(this.formatDefs);
-
               this.treeConfig = newConfig.config;
               this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
                 if (newProxy) {
                   this.itemProxy = newProxy;
+                  this.itemRepository.registerRecentProxy(newProxy);
                   this.itemsLoaded = 0;
                   // TODO - Determine if there is a way to cache and diff the new doc before
                   // regenerating
                   this.generateDoc();
                   this.changeRef.markForCheck();
                 } else {
-                  this.itemProxy = undefined
+                  this.itemProxy = undefined;
                 }
-              })
-              this.initialized = true
+              });
+              this.initialized = true;
             }
-          })
+          });
       }
-    })
+    });
   }
 
   ngOnDestroy() {
@@ -193,10 +194,10 @@ implements OnInit, OnDestroy {
   }
 
   determineLoad(subTree: Array < any > , currentLoad: number): number {
-    let newLoad: number = 0;
-    let loadLength: number = 0;
-    let lengthIndex: number = 0;
-    const lengthLimit: number = 8000
+    let newLoad = 0;
+    let loadLength = 0;
+    let lengthIndex = 0;
+    const lengthLimit = 8000;
 
     // Case 1 : Load the whole document
     if (!this.incrementalLoad) {
@@ -205,7 +206,7 @@ implements OnInit, OnDestroy {
       // Determine content length
       while (loadLength < lengthLimit &&
         ((subTree[lengthIndex]))) {
-        let currentProxy = subTree[lengthIndex].proxy;
+        const currentProxy = subTree[lengthIndex].proxy;
         if (!currentProxy.item.description) {
           lengthIndex++;
           continue;
@@ -230,37 +231,35 @@ implements OnInit, OnDestroy {
   }
 
   generateDoc(): void {
-    let subtreeAsList = this.itemProxy.getSubtreeAsList();
+    const subtreeAsList = this.itemProxy.getSubtreeAsList();
     this.itemLength = subtreeAsList.length;
 
     if (this.itemsLoaded >= subtreeAsList.length) {
-      this.itemsLoaded = subtreeAsList.length
+      this.itemsLoaded = subtreeAsList.length;
       return;
     }
 
     this.loadedProxies = [];
-    let docRendered = '';
-
     this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
 
     if (this.itemsLoaded > subtreeAsList.length) {
-      this.itemsLoaded = subtreeAsList.length
+      this.itemsLoaded = subtreeAsList.length;
     }
 
     for (let i = 0;
       (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
-      let listItem = subtreeAsList[i];
+      const listItem = subtreeAsList[i];
       let format = this.formatDefs[listItem.proxy.kind];
       if (!format) {
         format = {
           header : {
-            kind: "header",
+            kind: 'header',
             contents : [
               {propertyName : 'name', hideLabel: true}
             ]
           },
           containers: []
-        }
+        };
       }
 
       this.loadedProxies.push({
@@ -269,7 +268,7 @@ implements OnInit, OnDestroy {
         active: false,
         hovered: false,
         depth: listItem.depth
-      })
+      });
     }
   }
 
@@ -282,8 +281,8 @@ implements OnInit, OnDestroy {
   onFilterChange() {
     console.log('>>> Filter string changed to: ' + this.filter);
 
-    var regexFilter = /^\/(.*)\/([gimy]*)$/;
-    var filterIsRegex = this.filter.match(regexFilter);
+    const regexFilter = /^\/(.*)\/([gimy]*)$/;
+    const filterIsRegex = this.filter.match(regexFilter);
 
     if (filterIsRegex) {
       try {
@@ -294,7 +293,7 @@ implements OnInit, OnDestroy {
         this.invalidFilterRegex = true;
       }
     } else {
-      let cleanedPhrase = this.filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const cleanedPhrase = this.filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       if (this.filter !== '') {
         this.filterRegex = new RegExp(cleanedPhrase, 'i');
         this.filterRegexHighlighted = new RegExp('(' + cleanedPhrase + ')', 'gi');
@@ -307,8 +306,8 @@ implements OnInit, OnDestroy {
     }
   }
 
-  selectRow(row: any, proxy : ItemProxy) {
+  selectRow(row: any, proxy: ItemProxy) {
     row.rowState = 'show';
-    this.proxySelected.emit(proxy)
+    this.proxySelected.emit(proxy);
   }
 }

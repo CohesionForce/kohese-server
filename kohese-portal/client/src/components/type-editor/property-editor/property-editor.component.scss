@@ -5,9 +5,16 @@
   flex-direction: column;
 }
 
+.property-container  {
+  overflow: hidden;
+  height: 100%;
+}
+
 .form-container {
   width : 100%;
   padding : 5px;
+  height: 87%;
+  overflow: auto;
 }
 
 .display-header {

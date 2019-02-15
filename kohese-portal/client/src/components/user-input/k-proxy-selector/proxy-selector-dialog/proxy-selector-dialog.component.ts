@@ -11,13 +11,15 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 })
 export class ProxySelectorDialogComponent implements OnInit, OnDestroy {
   /* Data */
-  selected : any
-  multiSelect : boolean;
+  selected: any;
+  multiSelect: boolean;
+  proxyContext: ItemProxy;
 
 
-  constructor (private dialogRef : MatDialogRef<ProxySelectorDialogComponent>,
-              @Optional() @Inject(MAT_DIALOG_DATA) private data: any,) {
+  constructor (private dialogRef: MatDialogRef<ProxySelectorDialogComponent>,
+              @Optional() @Inject(MAT_DIALOG_DATA) private data: any ) {
     this.multiSelect = data.allowMultiSelect;
+    this.proxyContext = data.proxyContext;
     if (this.multiSelect) {
       this.selected = $.extend(true, [], data.selected);
     } else {
@@ -33,14 +35,14 @@ export class ProxySelectorDialogComponent implements OnInit, OnDestroy {
 
   }
 
-  onProxySelected (newSelection : any) {
+  onProxySelected (newSelection: any) {
     this.selected = newSelection;
-    console.log('onProxySelected - dialog')
+    console.log('onProxySelected - dialog');
   }
 
   selectProxy () {
     this.dialogRef.close(this.selected);
-    console.log('selectProxy - dialog')
+    console.log('selectProxy - dialog');
   }
 
   closeDialog () {
