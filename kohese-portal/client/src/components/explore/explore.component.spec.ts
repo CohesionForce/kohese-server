@@ -1,7 +1,6 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/from';
+import { from as ObservableFrom } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
@@ -31,7 +30,7 @@ describe('Component: Explore', ()=>{
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ActivatedRoute, useValue:{
-          params: Observable.from([{id: 'test-uuid7'}])
+          params: ObservableFrom([{id: 'test-uuid7'}])
         }},
         {provide: ItemRepository, useClass: MockItemRepository}
       ]

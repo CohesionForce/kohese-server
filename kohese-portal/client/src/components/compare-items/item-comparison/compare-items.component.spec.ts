@@ -21,7 +21,7 @@ describe('Component: compare-items', () => {
 
   beforeEach(() => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      'Kurios Iesous');
+      'test-uuid3');
     TestBed.configureTestingModule({
       declarations: [CompareItemsComponent],
       imports : [
@@ -50,7 +50,7 @@ describe('Component: compare-items', () => {
   
   it('responds to selecting a base ItemProxy', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      'test-uuid3');
+      'test-uuid7');
     await component.proxySelectionChanged(component.baseProxySubject, proxy);
     expect(component.baseProxySubject.getValue()).toBe(proxy);
     expect(component.selectedBaseVersion).toBeTruthy();
@@ -59,7 +59,7 @@ describe('Component: compare-items', () => {
   
   it('responds to selecting a change ItemProxy', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      'test-uuid3');
+      'test-uuid7');
     await component.proxySelectionChanged(component.changeProxySubject, proxy);
     expect(component.changeProxySubject.getValue()).toBe(proxy);
     expect(component.selectedChangeVersion).toBeTruthy();
@@ -68,12 +68,12 @@ describe('Component: compare-items', () => {
   
   it('compares two objects', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      'Kurios Iesous');
+      'test-uuid7');
     await component.proxySelectionChanged(component.baseProxySubject, proxy);
     await component.proxySelectionChanged(component.changeProxySubject, proxy);
     await component.compare();
     expect(component.comparison).toBeDefined();
-  });
+  }, 10000);
   
   it('toggles the value of the showDifferencesOnlySubject', () => {
     expect(component.showDifferencesOnlySubject.getValue()).toEqual(true);

@@ -13,12 +13,14 @@ export class MockStateFilterService {
     }
     
     return {
-      'Kurios Iesous': {
+      'Action': {},
+      'Decision': {
         'decisionState': {
           states: Object.keys(stateObject),
           descriptions: descriptions
         }
-      }
+      },
+      'Task': {}
       };
   }
 }

@@ -163,26 +163,25 @@ describe('Component: default-tree', () => {
   it('moves an Item before another Item', () => {
     let targetingProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('Kurios Iesous');
+    targetingProxy.parentProxy.makeChildrenManualOrdered();
     let targetProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid1');
     component.selectedObjectsSubject.next([targetingProxy]);
     (component.rowActions[1] as ActionGroup).actions[0].perform(targetProxy);
     expect(targetingProxy.parentProxy.children.indexOf(targetingProxy)).
       toEqual(targetingProxy.parentProxy.children.indexOf(targetProxy) - 1);
-    expect(targetingProxy.parentProxy.childrenAreManuallyOrdered()).toEqual(
-      true);
   });
   
   it('moves an Item after another Item', () => {
     let targetProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('Kurios Iesous');
+    targetProxy.parentProxy.makeChildrenManualOrdered();
     let targetingProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid2');
     component.selectedObjectsSubject.next([targetingProxy]);
     (component.rowActions[1] as ActionGroup).actions[1].perform(targetProxy);
     expect(targetProxy.parentProxy.children.indexOf(targetProxy)).toEqual(
       targetProxy.parentProxy.children.indexOf(targetingProxy) - 1);
-    expect(targetProxy.parentProxy.childrenAreManuallyOrdered()).toEqual(true);
   });
   
   it('makes an Item a child of another Item', () => {

@@ -1,8 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of as ObservableOf } from 'rxjs';
 
 import { DashboardModule } from '../../dashboard.module';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
+import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 import { ProjectOverviewComponent } from './project-overview.component';
 
 describe('ProjectOverviewComponent', () => {
@@ -17,6 +19,12 @@ describe('ProjectOverviewComponent', () => {
     
     fixture = TestBed.createComponent(ProjectOverviewComponent);
     component = fixture.componentInstance;
+    component.projectStream = ObservableOf({
+      proxy: TreeConfiguration.getWorkingTree().getProxyFor('Kurios Iesous'),
+      users: [],
+      projectItems: []
+    });
+    
     fixture.detectChanges();
   });
 

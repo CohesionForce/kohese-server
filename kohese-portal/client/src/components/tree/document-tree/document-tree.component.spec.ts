@@ -2,7 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BehaviorSubject, of as ObservableOf } from 'rxjs';
 
 import { MaterialModule } from '../../../material.module';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -11,6 +12,7 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DocumentTreeComponent } from './document-tree.component';
 import { Filter } from '../../filter/filter.class';
 
@@ -23,6 +25,7 @@ describe('DocumentTreeComponent', () => {
       declarations: [ DocumentTreeComponent ],
       imports: [
         CommonModule,
+        BrowserAnimationsModule,
         MaterialModule
       ],
       providers: [
@@ -43,6 +46,9 @@ describe('DocumentTreeComponent', () => {
     
     fixture = TestBed.createComponent(DocumentTreeComponent);
     component = fixture.componentInstance;
+    component.selectedProxyStream = ObservableOf(TreeConfiguration.
+      getWorkingTree().getProxyFor('Kurios Iesous'));
+    
     fixture.detectChanges();
   });
 

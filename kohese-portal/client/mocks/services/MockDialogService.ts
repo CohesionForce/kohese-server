@@ -2,7 +2,7 @@
 import {of as observableOf,  Observable } from 'rxjs';
 
 
-import { ItemProxy } from '../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../common/src/tree-configuration';
 
 export class MockDialogService {
   public readonly INPUT_TYPES: any = {
@@ -45,9 +45,8 @@ export class MockDialogService {
       },
       'afterClosed': () => {
         if ('ProxySelectorDialogComponent' === componentReference.name) {
-          return observableOf({
-            selectedProxy: ItemProxy.getWorkingTree().getRootProxy()
-          });
+          return observableOf(TreeConfiguration.getWorkingTree().
+            getRootProxy());
         }
       }
     };

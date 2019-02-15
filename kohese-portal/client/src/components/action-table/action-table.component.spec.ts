@@ -15,9 +15,7 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 
 import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
-import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockKoheseType } from '../../../mocks/data/MockKoheseType';
-import { MockItem } from '../../../mocks/data/MockItem';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 describe('Component: Action Table', ()=>{
@@ -43,19 +41,16 @@ describe('Component: Action Table', ()=>{
     actionTableFixture = TestBed.createComponent(ActionTableComponent);
     actionTableComponent = actionTableFixture.componentInstance;
     let itemRepository: any = TestBed.get(ItemRepository);
-    let itemProxy = itemRepository.getRootProxy();
-    itemProxy.getSubtreeAsList = ()=>{
-      new KoheseModel(MockDataModel());
-      KoheseModel.modelDefinitionLoadingComplete();
-      
-      return [
-        { depth: 0, proxy: new ItemProxy('Item', MockItem())},
-        { depth: 0, proxy: new ItemProxy('Item', MockItem())},
-        { depth: 0, proxy: new ItemProxy('Item', MockItem())}
-      ]
-    };
-    itemRepository.getProxyFor('Item').type = MockKoheseType();
-    actionTableComponent.proxyStream = new BehaviorSubject<any>(itemProxy);
+    let proxy: ItemProxy = itemRepository.getRootProxy();
+    let koheseType: any = MockKoheseType();
+    KoheseModel.modelDefinitionLoadingComplete();
+    let list: Array<any> = proxy.getSubtreeAsList();
+    for (let j: number = 0; j < list.length; j++) {
+      if (!list[j].proxy.model) {
+        list[j].proxy.model = koheseType.dataModelProxy;
+      }
+    }
+    actionTableComponent.proxyStream = new BehaviorSubject<any>(proxy);
     actionTableComponent.editableStream = new BehaviorSubject<boolean>(true);
 
     actionTableFixture.detectChanges();

@@ -14,9 +14,12 @@ export function MockKoheseType () {
     property.views['form'] = viewModelProxy.item.viewProperties[propertyId];
   }
   
-  return {
+  let koheseType: any = {
     dataModelProxy : dataModelProxy,
     viewModelProxy : viewModelProxy,
     fields: properties
   };
+  dataModelProxy.type = koheseType;
+  
+  return koheseType;
 }

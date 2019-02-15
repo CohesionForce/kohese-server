@@ -3,6 +3,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
+import { of as ObservableOf } from 'rxjs';
+
 import { MaterialModule } from '../../material.module'
 
 import { DocumentViewComponent } from './document-view.component';
@@ -12,9 +14,12 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../mocks/services/MockDialogService';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { MockDynamicTypesService } from '../../../mocks/services/MockDynamicTypesService';
 import { BehaviorSubject } from 'rxjs';
 import { MockItem, MockDocument } from '../../../mocks/data/MockItem';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { AnalysisViews } from '../analysis/AnalysisViewComponent.class';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -38,13 +43,15 @@ describe('Component: Document View', ()=>{
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ItemRepository, useClass: MockItemRepository},
-        {provide: DialogService, useClass: MockDialogService}
+        {provide: DialogService, useClass: MockDialogService},
+        {provide: DynamicTypesService, useClass: MockDynamicTypesService}
       ]
     }).compileComponents();
 
     documentViewFixture = TestBed.createComponent(DocumentViewComponent);
     documentViewComponent = documentViewFixture.componentInstance;
-
+    documentViewComponent.proxyStream = ObservableOf(TreeConfiguration.
+      getWorkingTree().getProxyFor('Kurios Iesous'));
     documentViewComponent.filterSubject = new BehaviorSubject({
       source : AnalysisViews.TERM_VIEW,
       filter : '',
@@ -53,63 +60,45 @@ describe('Component: Document View', ()=>{
         ignoreCase: true
       }
     });
-
   })
 
   it('instantiates the Document View component', ()=>{
-    let documentProxy = new ItemProxy('Item', MockDocument());
-    documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
+    documentViewComponent.proxyStream = new BehaviorSubject(TreeConfiguration.
+      getWorkingTree().getProxyFor('Kurios Iesous'));
     expect(documentViewComponent).toBeTruthy();
   })
 
   it('loads the whole document when incremental load is off', ()=>{
-    let documentProxy = new ItemProxy('Item', MockDocument());
-
-    let mockChild = MockItem();
-    mockChild.parentId = documentProxy.item.id;
-    delete mockChild.id;
-
-    for (let i = 0; i < 5; i++) {
-      let childProxy = new ItemProxy('Item', mockChild);
-    }
-
-    documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
+    documentViewComponent.proxyStream = new BehaviorSubject(TreeConfiguration.
+      getWorkingTree().getRootProxy());
     documentViewComponent.incrementalLoad = false;
     documentViewFixture.detectChanges();
-    expect(documentViewComponent.itemsLoaded).toBe(6)
+    expect(documentViewComponent.itemsLoaded).toBe(12)
   })
 
   it('loads only a subset of the document when incremental load is on', ()=>{
-    let documentProxy = new ItemProxy('Item', MockItem());
-
-    let mockChild = MockItem();
-    mockChild.parentId = documentProxy.item.id;
-    delete mockChild.id;
-    for (let i = 0; i < 40; i++) {
-      let childProxy = new ItemProxy('Item', mockChild);
+    let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getRootProxy();
+    let item: any = MockItem();
+    item.parentId = '';
+    for (let j: number = 0; j < 33; j++) {
+      item.id = item.id + j;
+      new ItemProxy('Item', item);
     }
-
-    documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
+    documentViewComponent.proxyStream = new BehaviorSubject(proxy);
     documentViewComponent.incrementalLoad = true;
     documentViewFixture.detectChanges();
     expect(documentViewComponent.itemsLoaded).toBe(20);
   })
 
   it('stops loading at the character limit', ()=>{
-    let documentProxy = new ItemProxy('Item', MockDocument());
-
-    let mockChild = MockDocument();
-    mockChild.parentId = documentProxy.item.id;
-    delete mockChild.id;
-
-    for (let i = 0; i < 5; i++) {
-      let childProxy = new ItemProxy('Item', mockChild);
+    let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getRootProxy();
+    for (let j: number = 0; j < 8000; j++) {
+      proxy.children[2].item.description += "Description";
     }
-
-    documentViewComponent.proxyStream = new BehaviorSubject(documentProxy);
+    documentViewComponent.proxyStream = new BehaviorSubject(proxy);
     documentViewComponent.incrementalLoad = true;
     documentViewFixture.detectChanges();
-    expect(documentViewComponent.itemsLoaded).toBe(3);
+    expect(documentViewComponent.itemsLoaded).toBe(4);
   })
 
   afterEach(()=>{

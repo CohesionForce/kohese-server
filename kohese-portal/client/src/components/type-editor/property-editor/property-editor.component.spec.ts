@@ -66,17 +66,17 @@ describe('Component: Property Editor', ()=>{
   it('converts type strings to their multivalued form, if appropriate', () => {
     propertyEditorComponent.multivalued = true;
     expect(propertyEditorComponent.convertTypeString('type')).toEqual(
-      '[ type ]');
+      ['type']);
     
     propertyEditorComponent.multivalued = false;
     expect(propertyEditorComponent.convertTypeString('type')).toEqual('type');
   });
   
   it('determines whether two type strings represent the same type', () => {
-    expect(propertyEditorComponent.areTypesSame('type', '[ type ]')).toEqual(
+    expect(propertyEditorComponent.areTypesSame('type', ['type'])).toEqual(
       true);
     
-    expect(propertyEditorComponent.areTypesSame('[ type ]', 'type')).toEqual(
+    expect(propertyEditorComponent.areTypesSame(['type'], 'type')).toEqual(
       false);
     
     expect(propertyEditorComponent.areTypesSame('type', 'type')).toEqual(
