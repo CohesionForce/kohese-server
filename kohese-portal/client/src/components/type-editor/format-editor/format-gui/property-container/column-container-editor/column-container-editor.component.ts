@@ -64,6 +64,11 @@ export class ColumnContainerEditorComponent implements OnInit {
     })
   }
 
+  public deleteProperty(columnIndex: number, propertyDefinition:
+    PropertyDefinition): void {
+    this.container.columns[columnIndex].contents.splice(this.container.columns[
+      columnIndex].contents.indexOf(propertyDefinition), 1);
+  }
 
   removeContainer() {
     this.deleted.emit(this.container);
