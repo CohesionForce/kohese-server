@@ -5,20 +5,20 @@
     <span class="pull-right">({{itemsLoaded}}/{{itemLength}}) </span>
   </div>
   <div class="body-container">
-    <div class="panel-body doc-view" #docView>
-      <div data-infinite-scroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()" [scrollWindow]="false"
-        [fromRoot]="true" [immediateCheck]="true" [infiniteScrollContainer]="'.doc-view'">
-          <document-row
-          #row id="docInfo.proxy.item.id"
-          *ngFor="let docInfo of loadedProxies"
-          (mouseenter)="selectRow(row, docInfo.proxy)" #row
-          (mouseleave)="row.rowState = 'hide'"
-          [docInfo] = "docInfo"
-          [row] = "row"
-          (viewInitialized)="rowMap[docInfo.proxy.item.id] = $event"
-          [ngClass]="{'hovered-row': row.rowState === 'show'}"
-          style="background-color: lightgray;"></document-row>
-      </div>
+    <div data-infinite-scroll [infiniteScrollDistance]="2"
+      [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+      [scrollWindow]="false" [immediateCheck]="true"
+      class="panel-body doc-view" #docView>
+      <document-row
+        #row id="docInfo.proxy.item.id"
+        *ngFor="let docInfo of loadedProxies"
+        (mouseenter)="selectRow(row, docInfo.proxy)" #row
+        (mouseleave)="row.rowState = 'hide'"
+        [docInfo] = "docInfo"
+        [row] = "row"
+        (viewInitialized)="rowMap[docInfo.proxy.item.id] = $event"
+        [ngClass]="{'hovered-row': row.rowState === 'show'}"
+        style="background-color: lightgray;"></document-row>
     </div>
   </div>
 </div>
