@@ -1,16 +1,39 @@
 <div class="dependencies" style="display: inline-block">
     <h4>Dependencies : </h4>
     <h5>Predecessors :</h5>
-    <ul *ngIf="relations.references[kind]">
-      <li *ngFor="let predecessor of relations.references[kind].predecessors"> 
-        {{predecessor.item.name}} - {{predecessor.state}}
-      </li>
+    <ul *ngIf="relations.references[kind] && relations.references[kind].
+      predecessors">
+      <ng-container *ngIf="Array.isArray(relations.references[kind].
+        predecessors)">
+        <li *ngFor="let predecessor of relations.references[kind].
+          predecessors"> 
+          {{predecessor.item.name}} - {{predecessor.state}}
+        </li>
+      </ng-container>
+      <ng-container *ngIf="!Array.isArray(relations.references[kind].
+        predecessors)">
+        <li>
+          {{relations.references[kind].predecessors.item.name}} - {{relations.
+            references[kind].predecessors.state}}
+        </li>
+      </ng-container>
     </ul>
     <h5>Successors : </h5> 
-    <ul *ngIf="relations.referencedBy[kind]"> 
-
-      <li *ngFor="let successor of relations.referencedBy[kind].predecessors"> 
-        {{successor.item.name}} - {{successor.state}}
-      </li>
+    <ul *ngIf="relations.referencedBy[kind] && relations.referencedBy[kind].
+      predecessors"> 
+      <ng-container *ngIf="Array.isArray(relations.referencedBy[kind].
+        predecessors)">
+        <li *ngFor="let successor of relations.referencedBy[kind].
+          predecessors"> 
+          {{successor.item.name}} - {{successor.state}}
+        </li>
+      </ng-container>
+      <ng-container *ngIf="!Array.isArray(relations.referencedBy[kind].
+        predecessors)">
+        <li>
+          {{relations.referencedBy[kind].predecessors.item.name}} - {{relations.
+            referencedBy[kind].predecessors.state}}
+        </li>
+      </ng-container>
     </ul>
   </div>
