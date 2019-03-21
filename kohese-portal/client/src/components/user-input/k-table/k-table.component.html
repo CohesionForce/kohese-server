@@ -2,8 +2,10 @@
   <button mat-button style="background-color: whitesmoke" [disabled]="!editable" (click)="openProxySelectionDialog()">Select
     {{property.propertyName}}</button>
   <proxy-table *ngIf="tableDefinition && tableData" [expandedFormat]="tableDefinition.expandedFormat" [columns]="tableDefinition.columns"
-    [dataStream]="tableDataStream"></proxy-table>
-    <div *ngIf="tableDefinition && !tableData">
-      Empty Table
-    </div>
+    [dataStream]="tableDataStream" (move)="move($event)"
+    (remove)="remove($event)" [disabled]="!editable">
+  </proxy-table>
+  <div *ngIf="tableDefinition && !tableData">
+    Empty Table
+  </div>
 </div>

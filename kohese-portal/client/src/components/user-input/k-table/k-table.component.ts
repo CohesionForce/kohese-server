@@ -9,6 +9,8 @@ import { ItemProxy } from './../../../../../common/src/item-proxy';
 import { Component, OnInit, Input } from '@angular/core';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { TreeConfiguration } from './../../../../../common/src/tree-configuration';
+import { MoveDirection, MoveEvent,
+  RemoveEvent } from '../k-proxy-selector/proxy-table/proxy-table.component';
 
 @Component({
   selector: 'k-table',
@@ -93,5 +95,42 @@ export class KTableComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+  
+  public move(moveEvent: MoveEvent): void {
+    let candidates: Array<string> = moveEvent.candidates;
+    let references: Array<any> = this.proxy.item[this.property.propertyName];
+    if (moveEvent.moveDirection === MoveDirection.UP) {
+      for (let j: number = 0; j < candidates.length; j++) {
+        let candidateIndex: number = references.map((reference: any) => {
+          return reference.id;
+        }).indexOf(candidates[j]);
+        let removedReferences: Array<any> = references.splice(candidateIndex,
+          1);
+        references.splice(candidateIndex - 1, 0, removedReferences[0]);
+      }
+    } else {
+      for (let j: number = (candidates.length - 1); j >= 0; j--) {
+        let candidateIndex: number = references.map((reference: any) => {
+          return reference.id;
+        }).indexOf(candidates[j]);
+        let removedReferences: Array<any> = references.splice(candidateIndex,
+          1);
+        references.splice(candidateIndex + 1, 0, removedReferences[0]);
+      }
+    }
+    
+    this.tableData = references;
+    this.tableDataStream.next(this.tableData);
+  }
+  
+  public remove(removeEvent: RemoveEvent): void {
+    let candidates: Array<string> = removeEvent.candidates;
+    let references: Array<any> = this.proxy.item[this.property.propertyName];
+    for (let j: number = 0; j < candidates.length; j++) {
+      references.splice(references.indexOf(candidates[j]), 1);
+    }
+    
+    this.tableData = references;
+    this.tableDataStream.next(this.tableData);
+  }
 }

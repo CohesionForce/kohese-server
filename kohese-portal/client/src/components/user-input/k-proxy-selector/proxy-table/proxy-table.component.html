@@ -1,9 +1,37 @@
-<table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8">
+<div style="height: 10%; width: 100%; display: flex; flex-direction: row;">
+  <button mat-icon-button class="flex-right-align" [disabled]="(selectedIds.
+    length === 0) || !canMoveSelectionUp()" (click)="moveSelection(
+    MoveDirection.UP)">
+    <mat-icon class="fa fa-arrow-up"></mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="(selectedIds.length === 0) ||
+    !canMoveSelectionDown()" (click)="moveSelection(MoveDirection.DOWN)">
+    <mat-icon class="fa fa-arrow-down"></mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="selectedIds.length === 0"
+    (click)="removeSelection()">
+    <mat-icon class="fa fa-remove"></mat-icon>
+  </button>
+</div>
+<table mat-table [dataSource]="dataSource" multiTemplateDataRows
+  style="height: 90%; width: 100%;">
   <ng-container matColumnDef="{{column}}" *ngFor="let column of columns">
-    <th mat-header-cell *matHeaderCellDef> {{column}} </th>
-    <td mat-cell *matCellDef="let proxy"> {{proxy.item[column]}} </td>
+    <ng-container *ngIf="column === 'checkbox'">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let proxy">
+        <mat-checkbox [disabled]="disabled" [checked]="selectedIds.indexOf(
+          proxy.item.id) !== -1" (click)="$event.stopPropagation()"
+          (change)="checkStateChanged($event.checked, proxy)">
+        </mat-checkbox>
+      </td>
+    </ng-container>
+    <ng-container *ngIf="column !== 'checkbox'">
+      <th mat-header-cell *matHeaderCellDef> {{column}} </th>
+      <td mat-cell *matCellDef="let proxy">
+        {{proxy.item[column]}}
+      </td>
+    </ng-container>
   </ng-container>
-
   <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
   <ng-container matColumnDef="expandedDetail">
     <td mat-cell *matCellDef="let proxy" [attr.colspan]="columns.length" style="padding-left: 0px;">

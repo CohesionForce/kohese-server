@@ -66,6 +66,15 @@
       <span>
         {{selection.item.name | truncate : 30}}
         <span style="margin-left: auto;">
+          <button mat-icon-button [disabled]="selected.indexOf(selection) ===
+            0" (click)="move(MoveDirection.UP, selection)">
+            <mat-icon class="fa fa-arrow-up"></mat-icon>
+          </button>
+          <button mat-icon-button [disabled]="selected.indexOf(selection) ===
+            (selected.length - 1)" (click)="move(MoveDirection.DOWN,
+            selection)">
+            <mat-icon class="fa fa-arrow-down"></mat-icon>
+          </button>
           <button mat-icon-button class="fa fa-remove" (click)="removeSelection(selection)"></button>
         </span>
       </span>
