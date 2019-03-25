@@ -82,6 +82,8 @@ export class ProxyTableComponent implements OnInit {
       return MoveDirection;
     }
     
+    public static readonly CHECKBOX_COLUMN_WIDTH: number = 40;
+    
     constructor(private itemRepository: ItemRepository,
                 private changeRef: ChangeDetectorRef,
                 private dialogService: DialogService) {
@@ -199,5 +201,33 @@ export class ProxyTableComponent implements OnInit {
     this._removeEventEmitter.emit({ candidates: this._selectedIds });
     this._selectedIds.length = 0;
     this.changeRef.markForCheck();
+  }
+  
+  public getCheckboxColumnWidth(): object {
+    return {
+      'min-width': ProxyTableComponent.CHECKBOX_COLUMN_WIDTH + 'px'
+    };
+  }
+  
+  public getColumnWidthStyle(tableDivWidth: number): object {
+    let columnWidthStyle: any = {
+      'min-width': '100px'
+    };
+    // Subtract one to account for the checkbox column
+    let equalWidth: number = ((tableDivWidth - ProxyTableComponent.
+      CHECKBOX_COLUMN_WIDTH) / (this._columns.length - 1));
+    if (equalWidth > 100) {
+      columnWidthStyle['min-width'] = equalWidth + 'px';
+    }
+    
+    return columnWidthStyle;
+  }
+  
+  public getRowWidthStyle(tableDivWidth: number): object {
+    return {
+      'min-width': (((this._columns.length - 1) * this.getColumnWidthStyle(
+        tableDivWidth)['min-width']) + ProxyTableComponent.
+        CHECKBOX_COLUMN_WIDTH) + 'px'
+    };
   }
 }
