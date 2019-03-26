@@ -67,12 +67,20 @@ export class ProxyTableComponent implements OnInit {
     get selectedIds() {
       return this._selectedIds;
     }
-    @Output('move')
+    
     private _moveEventEmitter: EventEmitter<MoveEvent> =
       new EventEmitter<MoveEvent>();
-    @Output('remove')
+    @Output('move')
+    get moveEventEmitter() {
+      return this._moveEventEmitter;
+    }
+    
     private _removeEventEmitter: EventEmitter<RemoveEvent> =
       new EventEmitter<RemoveEvent>();
+    @Output('remove')
+    get removeEventEmitter() {
+      return this._removeEventEmitter;
+    }
 
     expandedItem: ItemProxy;
     treeConfigSub: Subscription;
