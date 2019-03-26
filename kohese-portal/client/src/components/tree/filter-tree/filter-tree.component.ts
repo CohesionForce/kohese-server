@@ -85,7 +85,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       'for the current action', 'fa fa-crosshairs', (object: any) => {
       return ((object instanceof FilterCriteriaConnection) &&
         (this._localInTargetingMode) && (-1 === this.selectedObjectsSubject.
-        getValue().indexOf(this.rootSubject.getValue())) && (this.
+        getValue().indexOf(this.rootSubject.getValue())) && (this._moveOrCopyElement !== object) && (this.
         _isTargetingForCopy || (-1 === this.selectedObjectsSubject.getValue().
         indexOf(object))));
       }, (object: any) => {
