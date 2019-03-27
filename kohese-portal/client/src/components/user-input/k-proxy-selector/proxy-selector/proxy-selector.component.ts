@@ -3,6 +3,7 @@ import { map, startWith} from 'rxjs/operators';
 import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { Subscription } from 'rxjs';
@@ -141,7 +142,13 @@ export class ProxySelectorComponent implements OnInit {
   generateRelatedProxies() {
     this.relatedProxies = [];
     console.log(this.proxyContext);
-    const siblingProxies = this.proxyContext.parentProxy.children;
+    let siblingProxies: Array<ItemProxy>;
+    if (this.proxyContext.parentProxy) {
+      siblingProxies = this.proxyContext.parentProxy.children;
+    } else {
+      siblingProxies = TreeConfiguration.getWorkingTree().getProxyFor(this.
+        proxyContext.item.parentId).children;
+    }
     for (const proxy in siblingProxies) {
       if (siblingProxies[proxy]) {
         if (siblingProxies[proxy].item.id === this.proxyContext.item.id) {

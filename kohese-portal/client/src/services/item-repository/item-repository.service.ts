@@ -427,6 +427,11 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   registerRecentProxy(itemProxy: ItemProxy) {
+    let recentProxyIndex: number = this.recentProxies.indexOf(itemProxy);
+    if (recentProxyIndex !== -1) {
+      this.recentProxies.splice(recentProxyIndex, 1);
+    }
+    
     this.recentProxies.push(itemProxy);
   }
 
