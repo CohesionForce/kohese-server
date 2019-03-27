@@ -12,6 +12,11 @@ interface RelationInfo {
   proxy: ItemProxy;
   relationKind: string;
 }
+
+enum MoveDirection {
+  UP, DOWN
+}
+
 @Component({
   selector: 'proxy-selector',
   templateUrl: './proxy-selector.component.html',
@@ -41,6 +46,10 @@ export class ProxySelectorComponent implements OnInit {
   filteredProxies: any;
   recentProxies: Array<ItemProxy>;
   relatedProxies: Array<RelationInfo>;
+  
+  get MoveDirection() {
+    return MoveDirection;
+  }
 
   treeConfig: any;
   treeConfigSub: Subscription;
@@ -124,6 +133,20 @@ export class ProxySelectorComponent implements OnInit {
         break;
       case 2:
         this.initProxySearch();
+    }
+  }
+  
+  /**
+   * Moves the given ItemProxy one index in the direction indicated by the
+   * given MoveDirection
+   */
+  public move(moveDirection: MoveDirection, itemProxy: ItemProxy): void {
+    let candidateIndex: number = this.selected.indexOf(itemProxy);
+    this.selected.splice(candidateIndex, 1);
+    if (moveDirection === MoveDirection.UP) {
+      this.selected.splice(candidateIndex - 1, 0, itemProxy);
+    } else {
+      this.selected.splice(candidateIndex + 1, 0, itemProxy);
     }
   }
 

@@ -22,12 +22,20 @@
       </mat-option>
     </mat-select>
     <div class="property-section">
-      <h6 style="font-weight : bold;">Table Columns <button *ngIf="formDefinition.tableDef.tableKind" mat-icon-button
-          class="fa fa-plus" (click)="addColumn()"></button></h6>
+      <h6 style="font-weight : bold;">
+        Table Columns
+        <button *ngIf="formDefinition.tableDef.tableKind" mat-icon-button
+          (click)="addColumn()">
+          <mat-icon class="fa fa-plus"></mat-icon>
+        </button>
+      </h6>
       <mat-divider></mat-divider>
       <div>
         <div *ngFor="let column of formDefinition.tableDef.columns">
-          {{column}} <button mat-icon-button class="fa fa-minus" (click)="deleteColumn(column);"></button>
+          {{column}}
+          <button mat-icon-button (click)="deleteColumn(column);">
+            <mat-icon class="fa fa-minus"></mat-icon>
+          </button>
         </div>
       </div>
     </div>
