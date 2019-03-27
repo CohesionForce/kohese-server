@@ -233,8 +233,8 @@ export class ProxyTableComponent implements OnInit {
   
   public getRowWidthStyle(tableDivWidth: number): object {
     return {
-      'min-width': (((this._columns.length - 1) * this.getColumnWidthStyle(
-        tableDivWidth)['min-width']) + ProxyTableComponent.
+      'min-width': (((this._columns.length - 1) * (+this.getColumnWidthStyle(
+        tableDivWidth)['min-width'].replace('px', ''))) + ProxyTableComponent.
         CHECKBOX_COLUMN_WIDTH) + 'px'
     };
   }
