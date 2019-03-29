@@ -115,22 +115,25 @@
                       </mat-option>
                     </mat-select>
                   </mat-form-field>
-                  <hr />
-                  <div class="table-definition">
-                    <mat-checkbox [disabled]="!(koheseType.fields[selectedPropertyId].views['form'].inputType.type === 'proxy-selector' && multivalued)"
-                      class="field-option" [ngModel]="koheseType.fields[selectedPropertyId].views['form'].inputType.options.asTable"
-                      (ngModelChange)="updateProperty(['views', 'form','inputType', 'options', 'asTable'], $event)">
-                      As Table
-                    </mat-checkbox>
-                    <span class="table-tooltip" *ngIf="!(koheseType.fields[selectedPropertyId].views['form'].inputType.type === 'proxy-selector' && multivalued)">
-                      (Tables only available on multivalued references)
-                    </span>
-                    <table-editor *ngIf="koheseType.fields[selectedPropertyId].views['form'].inputType.options.asTable"
-                      [formDefinition]="koheseType.fields[selectedPropertyId].views['form']" [propertyId]="selectedPropertyId"
-                      [currentKind]="koheseType">
-                    </table-editor>
-                  </div>
-                  <br />
+                  <ng-container *ngIf="koheseType.fields[selectedPropertyId].
+                    relation && multivalued">
+                    <div class="table-definition">
+                      <mat-checkbox class="field-option" [ngModel]="koheseType.
+                        fields[selectedPropertyId].views['form'].inputType.
+                        options.asTable" (ngModelChange)="updateProperty([
+                        'views', 'form', 'inputType', 'options', 'asTable'],
+                        $event)">
+                        As Table
+                      </mat-checkbox>
+                      <table-editor *ngIf="koheseType.fields[
+                        selectedPropertyId].views['form'].inputType.options.
+                        asTable" [formDefinition]="koheseType.fields[
+                        selectedPropertyId].views['form']"
+                        [propertyId]="selectedPropertyId"
+                        [currentKind]="koheseType">
+                      </table-editor>
+                    </div>
+                  </ng-container>
                 </div>
               </div>
             </ng-container>
