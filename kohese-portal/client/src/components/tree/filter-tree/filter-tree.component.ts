@@ -123,13 +123,13 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
           (response: any) => {
           if (response) {
             this.deleteElement(object as FilterElement);
+            this.refresh();
           }
         });
       } else {
         this.deleteElement(object as FilterElement);
+        this.refresh();
       }
-      
-      this.refresh();
     }));
 
     this.rootRowActions.push(...this.rowActions);
