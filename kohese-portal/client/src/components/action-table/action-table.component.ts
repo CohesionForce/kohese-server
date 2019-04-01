@@ -33,6 +33,10 @@ export class ActionTableComponent extends NavigatableComponent
 
   /* Subscriptions */
   proxyStreamSub: Subscription;
+  
+  get Array() {
+    return Array;
+  }
 
   constructor(protected NavigationService: NavigationService,
     private itemRepository: ItemRepository,
