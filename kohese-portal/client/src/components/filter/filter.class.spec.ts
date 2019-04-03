@@ -37,6 +37,15 @@ describe('Class: Filter', () => {
     results = filter.filter([evaluationObject]);
     expect(results.indexOf(evaluationObject)).not.toEqual(-1);
   });
+  
+  it('removes FilterElements', () => {
+    expect(filter.removeElement(filter.rootElement.connections[0].criteria[
+      0])).toEqual(true);
+    expect(filter.removeElement(filter.rootElement.connections[0])).toEqual(
+      true);
+    expect(filter.removeElement(new FilterCriteriaConnection(
+      FilterCriteriaConnectionType.AND))).toEqual(false);
+  });
 });
 
 describe('Class: FilterCriterion', () => {
