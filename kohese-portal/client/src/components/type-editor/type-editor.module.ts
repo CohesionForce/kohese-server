@@ -12,6 +12,8 @@ import { TypeEditorComponent } from './type-editor.component';
 import { TypeOverviewComponent } from './type-overview/type-overview.component';
 import { PropertyEditorComponent } from './property-editor/property-editor.component';
 import { IconSelectorComponent } from './icon-selector/icon-selector.component';
+import { LocalTypeEditorComponent } from './local-type-editor/local-type-editor.component';
+import { AttributeEditorComponent } from './attribute-editor/attribute-editor.component';
 
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
@@ -28,11 +30,15 @@ import { AngularSplitModule } from 'angular-split';
     TableEditorComponent,
     TableColumnSelectorComponent,
     TablePreviewDialogComponent,
+    LocalTypeEditorComponent,
+    AttributeEditorComponent
   ],
   entryComponents: [
     IconSelectorComponent,
     TableColumnSelectorComponent,
     TablePreviewDialogComponent,
+    LocalTypeEditorComponent,
+    AttributeEditorComponent
   ],
   imports: [
     CommonModule,
