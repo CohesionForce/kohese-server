@@ -119,6 +119,13 @@ export class KoheseModel extends ItemProxy {
       let modelProxy = models[index];
       let kind = modelProxy.item.name;
       console.log('::: Processing Model Properties ' + kind);
+      
+      // Migration code
+      if (kind === 'KoheseModel') {
+        modelProxy.item.properties['localTypes'] = {
+          type: ['object']
+        };
+      }
 
       let propertyOrder = _.clone(modelProxy.parentProxy.item.propertyOrder) || [];
       modelProxy.item.propertyOrder = propertyOrder.concat(Object.keys(modelProxy.item.properties));
@@ -130,7 +137,7 @@ export class KoheseModel extends ItemProxy {
       } else {
         modelProxy.item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy.item.properties));
       }
-
+      
       modelProxy.item.classProperties = _.clone(modelProxy.parentProxy.item.classProperties) || {};
       modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
       modelProxy.item.derivedProperties = _.clone(modelProxy.parentProxy.item.derivedProperties) || [];
