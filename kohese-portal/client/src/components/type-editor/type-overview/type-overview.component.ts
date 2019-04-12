@@ -3,6 +3,7 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
 import { Observable ,  Subscription } from 'rxjs';
 
 import { IconSelectorComponent } from '../icon-selector/icon-selector.component';
+import { LocalTypeEditorComponent } from '../local-type-editor/local-type-editor.component';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
@@ -68,5 +69,54 @@ export class TypeOverviewComponent implements OnInit, OnDestroy {
   public changeParentType(type: string): void {
     this._koheseType.dataModelProxy.item.base = type;
     this._koheseType.dataModelProxy.item.parentId = type;
+  }
+  
+  public addLocalType(): void {
+    this.dialogService.openComponentDialog(LocalTypeEditorComponent, {
+      data: {
+        containingType: this._koheseType.dataModelProxy.item,
+        view: this._koheseType.viewModelProxy.item
+      },
+      disableClose: true
+    }).updateSize('90%', '90%').afterClosed().subscribe((localType: any) => {
+      if (localType) {
+        // Migration code
+        let localTypes: Array<any> = this._koheseType.dataModelProxy.item.
+          localTypes;
+        if (!localTypes) {
+          localTypes = this._koheseType.dataModelProxy.item.localTypes = [];
+        }
+        
+        localTypes.push(localType);
+        this._changeDetectorRef.markForCheck();
+      }
+    });
+  }
+  
+  public editLocalType(localType: any): void {
+    this.dialogService.openComponentDialog(LocalTypeEditorComponent, {
+      data: {
+        type: localType,
+        containingType: this._koheseType.dataModelProxy.item,
+        view: this._koheseType.viewModelProxy.item
+      },
+      disableClose: true
+    }).updateSize('90%', '90%').afterClosed().subscribe((returnedLocalType:
+      any) => {
+      this._changeDetectorRef.markForCheck();
+    });
+  }
+  
+  public removeLocalType(localType: any): void {
+    this.dialogService.openYesNoDialog('Remove ' + localType.name,
+      'Are you sure that you want to remove ' + localType.name + '?').
+      subscribe((selection: any) => {
+      if (selection) {
+        let localTypes: Array<any> = this._koheseType.dataModelProxy.item.
+          localTypes;
+        localTypes.splice(localTypes.indexOf(localType), 1);
+        this._changeDetectorRef.markForCheck();
+      }
+    });
   }
 }
