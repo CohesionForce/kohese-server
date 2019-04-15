@@ -126,7 +126,7 @@ export abstract class Tree {
     return (this._inTargetingMode && (-1 === this._selectedObjectsSubject.
       getValue().indexOf(this.rootSubject.getValue())) && (-1 === this.
       _selectedObjectsSubject.getValue().indexOf(object)) && !this.
-      isAncestorSelected(object));
+      isAncestorSelected(this._selectedObjectsSubject.getValue(), object));
     }, [this._targetBeforeAction, this._targetAfterAction, this.
     _targetChildAction]);
   
@@ -645,9 +645,9 @@ export abstract class Tree {
     }
   }
   
-  private isAncestorSelected(object: any): boolean {
+  protected isAncestorSelected(selectedObjects: Array<any>, object: any):
+    boolean {
     let isAncestorSelected: boolean = false;
-    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     let parent: any = this.getParent(object);
     while (parent) {
       if (-1 !== selectedObjects.indexOf(parent)) {

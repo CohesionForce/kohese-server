@@ -84,11 +84,13 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     this.rowActions.push(new Action('Target', 'Target this connection ' +
       'for the current action', 'fa fa-crosshairs', (object: any) => {
       return ((object instanceof FilterCriteriaConnection) &&
-        (this._localInTargetingMode) && (-1 === this.selectedObjectsSubject.
-        getValue().indexOf(this.rootSubject.getValue())) && 
-        (this._moveOrCopyElement !== object) && (this.
-        _isTargetingForCopy || (-1 === this.selectedObjectsSubject.getValue().
-        indexOf(object))));
+        (this._localInTargetingMode) && (this._isTargetingForCopy || (this.
+        _moveOrCopyElement && (this._moveOrCopyElement !== object) && !this.
+        isAncestorSelected([this._moveOrCopyElement], object)) || (!this.
+        _moveOrCopyElement && (-1 === this.selectedObjectsSubject.getValue().
+        indexOf(this.rootSubject.getValue())) && ((-1 === this.
+        selectedObjectsSubject.getValue().indexOf(object)) && !this.
+        isAncestorSelected(this.selectedObjectsSubject.getValue(), object)))));
       }, (object: any) => {
       let connection: FilterCriteriaConnection =
         (object as FilterCriteriaConnection);
