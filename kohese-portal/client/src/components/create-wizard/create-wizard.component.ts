@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent
 import { FormGroup, FormControl } from '@angular/forms';
 
 
-import { NavigatableComponent } from '../../classes/NavigationComponent.class'
+import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../common/src/item-proxy.js';
@@ -24,6 +24,7 @@ export class CreateWizardComponent extends NavigatableComponent
   /* Data */
   @Input()
   private itemProxy: ItemProxy;
+  isDisabled = false;
   models: Array<ItemProxy>;
   types: Array<KoheseType> = [];
   recentProxies: Array<ItemProxy>;
@@ -115,6 +116,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
   createItem() {
     let item: any = this.createFormGroup.value;
+    this.isDisabled = true;
     for (let fieldName in this.nonFormFieldValueMap) {
       item[fieldName] = this.nonFormFieldValueMap[fieldName];
     }
@@ -131,7 +133,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
     this.itemRepository.buildItem(this.selectedType.dataModelProxy.item.name,
       item).then(() => {
-        console.log('Build Item promise resolve')
+        console.log('Build Item promise resolve');
         this.MatDialogRef.close();
       }, (error) => {
         // TODO show error on review stepper
