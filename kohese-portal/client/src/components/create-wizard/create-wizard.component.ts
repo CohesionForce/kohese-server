@@ -24,7 +24,11 @@ export class CreateWizardComponent extends NavigatableComponent
   /* Data */
   @Input()
   private itemProxy: ItemProxy;
-  isDisabled = false;
+// tslint:disable-next-line: no-inferrable-types
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
   models: Array<ItemProxy>;
   types: Array<KoheseType> = [];
   recentProxies: Array<ItemProxy>;
@@ -60,6 +64,7 @@ export class CreateWizardComponent extends NavigatableComponent
         if (newConfig) {
           this.treeConfig = newConfig.config;
           this.rootProxy = this.treeConfig.getRootProxy();
+// tslint:disable-next-line: prefer-const
           let types = this.DynamicTypesService.getKoheseTypes();
           for (let type in types) {
             this.types.push(types[type]);
@@ -116,7 +121,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
   createItem() {
     let item: any = this.createFormGroup.value;
-    this.isDisabled = true;
+    this._isDisabled = true;
     for (let fieldName in this.nonFormFieldValueMap) {
       item[fieldName] = this.nonFormFieldValueMap[fieldName];
     }
@@ -141,7 +146,7 @@ export class CreateWizardComponent extends NavigatableComponent
         console.log('*** Failed to upsert: ' + this.selectedType.
           dataModelProxy.item.name);
         console.log(error);
-        this.isDisabled = false;
+        this._isDisabled = false;
       });
 
   }
