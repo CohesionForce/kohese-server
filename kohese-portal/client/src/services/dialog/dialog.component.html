@@ -8,7 +8,7 @@
         <br/>
       </ng-container>
       <ng-container *ngIf="data.options">
-        <mat-form-field>
+        <mat-form-field style="width: 100%;">
           <mat-select placeholder="{{data.fieldName}}"
             [(ngModel)]="data.value">
             <mat-option *ngFor="let option of data.options" [value]="option">
@@ -18,18 +18,30 @@
         </mat-form-field>
       </ng-container>
       <ng-container *ngIf="data.inputType">
-        <ng-container *ngIf="(INPUT_TYPES.MULTILINE_TEXT === data.inputType)">
-          <mat-form-field>
-            <textarea matInput placeholder="{{data.fieldName}}" columns="80"
-              rows="3" [(ngModel)]="data.value">
-            </textarea>
-          </mat-form-field>
-        </ng-container>
-        <ng-container *ngIf="(INPUT_TYPES.MULTILINE_TEXT !== data.inputType)">
-          <mat-form-field>
-            <input matInput type="{{data.inputType}}"
-              placeholder="{{data.fieldName}}" [(ngModel)]="data.value"/>
-          </mat-form-field>
+        <ng-container [ngSwitch]="data.inputType">
+          <ng-container *ngSwitchCase="INPUT_TYPES.MULTILINE_TEXT">
+            <mat-form-field style="width: 100%;">
+              <textarea matInput placeholder="{{data.fieldName}}" columns="80"
+                rows="3" [(ngModel)]="data.value">
+              </textarea>
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngSwitchCase="INPUT_TYPES.MARKDOWN">
+            <mat-form-field style="width: 100%;">
+              <textarea matInput placeholder="{{data.fieldName}}" columns="80"
+                rows="3" [(ngModel)]="data.value" style="width: 50%;">
+              </textarea>
+              <span style="width: 50%;">
+                <markdown [data]="data.value"></markdown>
+              </span>
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <mat-form-field style="width: 100%;">
+              <input matInput type="{{data.inputType}}"
+                placeholder="{{data.fieldName}}" [(ngModel)]="data.value"/>
+            </mat-form-field>
+          </ng-container>
         </ng-container>
       </ng-container>
     </ng-container>
@@ -38,9 +50,9 @@
     <ng-container *ngIf="data.fieldName">
       <span class="dialog-actions">
         <button mat-raised-button [mat-dialog-close]="data.value">
-          Apply
+          Accept
         </button>
-        <button mat-raised-button [mat-dialog-close]="0">
+        <button mat-raised-button [mat-dialog-close]="">
           Cancel
         </button>
       </span>

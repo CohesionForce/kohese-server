@@ -69,12 +69,16 @@ export class AttributeEditorComponent implements OnInit {
     return this._data;
   }
   
+  /* Add an entry for 'Reference' if this is used for global types and adding
+  local types to local types is handled. */
   private _fundamentalTypes: any = {
     'Boolean': 'boolean',
     'Number': 'number',
-    'String': 'string',
+    'Date': 'date',
+    'Text': 'text',
+    'Markdown': 'markdown',
     'State': 'StateMachine',
-    'Object': 'object'
+    'Username': 'user-selector'
   };
   get fundamentalTypes() {
     return this._fundamentalTypes;

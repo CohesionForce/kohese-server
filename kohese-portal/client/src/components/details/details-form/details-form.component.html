@@ -36,6 +36,58 @@
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
               [editableStream]="editableStream"></k-markdown>
+            <ng-container *ngSwitchCase="'reference'">
+              <ng-container *ngIf="Array.isArray(type.dataModelProxy.item.
+                properties[property].type)">
+                <div style="display: flex; flex-direction: column;">
+                  <h3>
+                    {{property}}
+                  </h3>
+                  <span class="flex-right-align">
+                    <button mat-icon-button
+                      matTooltip="Add a value to {{property}}"
+                      [disabled]="!(editableStream | async)"
+                      (click)="addValue(property)">
+                      <mat-icon class="fa fa-plus"></mat-icon>
+                    </button>
+                  </span>
+                  <mat-list>
+                    <ng-container *ngFor="let value of (proxyStream | async).
+                      item[property]; let j = index">
+                      <mat-list-item>
+                        {{getTypeName(type.dataModelProxy.item.properties[
+                          property].type)}}
+                        <span class="flex-right-align">
+                          <button mat-icon-button matTooltip="Edit this value"
+                            [disabled]="!(editableStream | async)"
+                            (click)="editValue(j, property)">
+                            <mat-icon class="fa fa-edit"></mat-icon>
+                          </button>
+                          <button mat-icon-button
+                            matTooltip="Remove this value"
+                            [disabled]="!(editableStream | async)"
+                            (click)="removeValue(j, property)">
+                            <mat-icon class="fa fa-trash"></mat-icon>
+                          </button>
+                        </span>
+                      </mat-list-item>
+                    </ng-container>
+                  </mat-list>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="!Array.isArray(type.dataModelProxy.item.
+                properties[property].type)">
+                <label>
+                  {{property}}:&nbsp;
+                </label>
+                <button mat-raised-button matTooltip="Edit this value"
+                  [disabled]="!(editableStream | async)"
+                  (click)="openObjectEditor(property)">
+                  {{getTypeName(type.dataModelProxy.item.properties[property].
+                    type)}}
+                </button>
+              </ng-container>
+            </ng-container>
             <br/>
           </ng-container>
         </ng-container>

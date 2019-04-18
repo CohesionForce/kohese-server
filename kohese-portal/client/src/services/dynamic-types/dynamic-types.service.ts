@@ -20,7 +20,8 @@ export class DynamicTypesService {
     'date': 'Date',
     'select': 'Select',
     'markdown': 'Markdown',
-    'proxy-selector': 'Reference',
+    'reference': 'Reference',
+    'proxy-selector': 'Item Reference',
     'user-selector': 'User Name',
     'state-editor': 'State Editor'
   };

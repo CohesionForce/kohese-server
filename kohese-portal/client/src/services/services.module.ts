@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 /* 3rd Party */
 import { ToastrModule } from 'ngx-toastr';
+import { MarkdownModule } from 'ngx-markdown';
 
 /* Custom */
 import { ItemRepository } from './item-repository/item-repository.service';
@@ -40,6 +41,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
+    MarkdownModule
   ],
   exports : [
     DialogComponent

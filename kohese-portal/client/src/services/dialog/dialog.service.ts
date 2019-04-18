@@ -26,13 +26,14 @@ export class DialogService {
         title: title,
         text: text,
         buttonLabels: buttonLabels
-      }
+      },
+      disableClose: true
     }).afterClosed();
   }
   
   openInputDialog(title: string, text: string, type: string, fieldName: string,
-    initialValue: string): MatDialogRef<DialogComponent> {
-    if (!initialValue) {
+    initialValue: any): MatDialogRef<DialogComponent> {
+    if (initialValue == null) {
       initialValue = '';
     }
     return this.dialog.open(DialogComponent, {
@@ -42,15 +43,16 @@ export class DialogService {
         inputType: type,
         fieldName: fieldName,
         value: initialValue
-      }
-    });
+      },
+      disableClose: true
+    }).updateSize('40%', 'auto');
   }
   
   public openSelectDialog(title: string, text: string, label: string,
-    initialValue: string, options: Array<string>):
+    initialValue: any, options: Array<any>):
     MatDialogRef<DialogComponent> {
-    if (!initialValue) {
-      initialValue = '';
+    if (initialValue == null) {
+      initialValue = options[0];
     }
     return this.dialog.open(DialogComponent, {
       data: {
@@ -59,8 +61,9 @@ export class DialogService {
         fieldName: label,
         value: initialValue,
         options: options
-      }
-    });
+      },
+      disableClose: true
+    }).updateSize('40%', 'auto');
   }
 
   openComponentDialog<T>(component: ComponentType<T> | TemplateRef<T>, config : any): MatDialogRef<T> {
@@ -76,6 +79,8 @@ export class DialogComponent {
   public static readonly INPUT_TYPES: any = {
     TEXT: 'text',
     MULTILINE_TEXT: 'multilineText',
+    MARKDOWN: 'markdown',
+    NUMBER: 'number',
     DATE: 'date',
     TIME: 'time'
   };

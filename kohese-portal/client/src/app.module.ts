@@ -25,6 +25,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ExploreModule } from './components/explore/explore.module';
+import { ObjectEditorModule } from './components/object-editor/object-editor.module';
 import { NavigatorModule } from './components/navigator/navigator.module';
 import { StateMachineEditorModule } from './components/state-machine-editor/state-machine-editor.module';
 import { TreeViewModule } from './components/tree/tree.module'
@@ -74,6 +75,7 @@ import { LensModule } from './components/lens/lens.module';
     DashboardModule,
     CompareItemsModule,
     ExploreModule,
+    ObjectEditorModule,
     NavigatorModule,
     StateMachineEditorModule,
     TreeViewModule,

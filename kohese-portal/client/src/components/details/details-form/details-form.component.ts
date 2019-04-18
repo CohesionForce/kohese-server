@@ -8,9 +8,11 @@ import {
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { ObjectEditorComponent } from '../../object-editor/object-editor.component';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Subscription ,  BehaviorSubject } from 'rxjs';
 
@@ -51,10 +53,15 @@ export class DetailsFormComponent extends NavigatableComponent
   private editableStreamSubscription: Subscription;
   private _fieldFilterSubscription: Subscription;
   private _proxyStreamSubscription: Subscription;
+  
+  get Array() {
+    return Array;
+  }
 
   constructor(protected NavigationService: NavigationService,
     private FormBuilder: FormBuilder,
-    private DynamicTypeService: DynamicTypesService) {
+    private DynamicTypeService: DynamicTypesService, private _dialogService:
+    DialogService) {
     super(NavigationService);
     this.initialized = false;
   }
@@ -149,11 +156,100 @@ export class DetailsFormComponent extends NavigatableComponent
     return propertyMap;
   }
 
-  public whenNonFormFieldChanges(fieldName: string, fieldValue, any): void {
+  public whenNonFormFieldChanges(fieldName: string, fieldValue: any): void {
     this._nonFormFieldMap.set(fieldName, fieldValue);
     this.nonFormFieldChanged.emit({
       fieldName: fieldName,
       fieldValue: fieldValue
     });
+  }
+  
+  public openObjectEditor(attributeName: string): void {
+    this._dialogService.openComponentDialog(ObjectEditorComponent, {
+      data: {
+        object: this.proxyStream.getValue().item[attributeName],
+        type: this.getType(attributeName)
+      },
+      disableClose: true
+    }).updateSize('90%', '90%').afterClosed().subscribe((returnedObject:
+      any) => {
+      if (returnedObject) {
+        this.proxyStream.getValue().item[attributeName] = returnedObject;
+        this.whenNonFormFieldChanges(attributeName, returnedObject);
+      }
+    });
+  }
+  
+  public getTypeName(typeValue: any): string {
+    let type: string;
+    if (Array.isArray(typeValue)) {
+      type = typeValue[0];
+    } else {
+      type = typeValue;
+    }
+    
+    return type;
+  }
+  
+  public addValue(attributeName: string): void {
+    let item: any = this.proxyStream.getValue().item;
+    // Migration code
+    if (item[attributeName] == null) {
+      item[attributeName] = [];
+    }
+    
+    this.editValue(item[attributeName].length, attributeName);
+  }
+  
+  public editValue(index: number, attributeName: string): void {
+    this._dialogService.openComponentDialog(ObjectEditorComponent, {
+      data: {
+        object: this.proxyStream.getValue().item[attributeName][index],
+        type: this.getType(attributeName)
+      },
+      disableClose: true
+    }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
+      any) => {
+      if (returnedObject) {
+        this.proxyStream.getValue().item[attributeName].splice(index, 1,
+          returnedObject);
+        this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+          getValue().item[attributeName]);
+      }
+    });
+  }
+  
+  public removeValue(index: number, attributeName: string): void {
+    this.proxyStream.getValue().item[attributeName].splice(index, 1);
+    this.whenNonFormFieldChanges(attributeName, this.proxyStream.getValue().
+      item[attributeName]);
+  }
+  
+  private getType(attributeName: string): any {
+    let typeName: string = this.getTypeName(this.type.dataModelProxy.item.
+      properties[attributeName].type);
+    let type: any;
+    if (this.type.dataModelProxy.item.localTypes) {
+      for (let j: number = 0; j < this.type.dataModelProxy.item.localTypes.
+        length; j++) {
+        let localType: any = this.type.dataModelProxy.item.localTypes[j];
+        if (localType.name === typeName) {
+          type = localType;
+          break;
+        }
+      }
+    }
+    
+    if (!type) {
+      let koheseTypes: any = this.DynamicTypeService.getKoheseTypes();
+      for (let koheseTypeName in koheseTypes) {
+        if (koheseTypeName === typeName) {
+          type = koheseTypes[koheseTypeName].dataModelProxy.item;
+          break;
+        }
+      }
+    }
+    
+    return type;
   }
 }

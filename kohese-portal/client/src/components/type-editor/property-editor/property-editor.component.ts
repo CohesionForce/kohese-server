@@ -102,8 +102,25 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     this.userInputs = this.typeService.getUserInputTypes();
     this._koheseTypeStreamSubscription = this._koheseTypeStream.subscribe(
       (koheseType: KoheseType) => {
-      this._koheseType = koheseType;
-      this._changeDetectorRef.markForCheck();
+      if (koheseType) {
+        let localTypes: Array<any>;
+        if (this._koheseType) {
+          localTypes = this._koheseType.dataModelProxy.item.
+            localTypes;
+          for (let j: number = 0; j < localTypes.length; j++) {
+            delete this._types[localTypes[j].name];
+          }
+        }
+        
+        this._koheseType = koheseType;
+        localTypes = this._koheseType.dataModelProxy.item.
+          localTypes;
+        for (let j: number = 0; j < localTypes.length; j++) {
+          this._types[localTypes[j].name] = localTypes[j].name;
+        }
+        
+        this._changeDetectorRef.markForCheck();
+      }
     });
   }
 
