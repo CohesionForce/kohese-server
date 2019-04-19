@@ -37,6 +37,11 @@ export class ObjectEditorComponent implements OnInit {
     this._type = type;
   }
   
+  private _attributes: any = {};
+  get attributes() {
+    return this._attributes;
+  }
+  
   private _usernames: Array<string> = [];
   get usernames() {
     return this._usernames;
@@ -67,16 +72,25 @@ export class ObjectEditorComponent implements OnInit {
       this._type = this._data['type'];
     }
     
+    if (Object.keys(this._dynamicTypesService.getKoheseTypes()).indexOf(this.
+      _type.name) !== -1) {
+      for (let attributeName in this._type.classProperties) {
+        this._attributes[attributeName] = this._type.classProperties[
+          attributeName].definition;
+      }
+    } else {
+      this._attributes = this._type.properties;
+    }
+    
     if (this._object) {
       this._copy = JSON.parse(JSON.stringify(this._object));
     } else {
       this._copy = {};
-      for (let attributeName in this._type.properties) {
-        if (this._type.properties[attributeName].default != null) {
-          this._copy[attributeName] = this._type.properties[attributeName].
-            default;
+      for (let attributeName in this._attributes) {
+        if (this._attributes[attributeName].default != null) {
+          this._copy[attributeName] = this._attributes[attributeName].default;
         } else {
-          if (Array.isArray(this._type.properties[attributeName].type)) {
+          if (Array.isArray(this._attributes[attributeName].type)) {
             this._copy[attributeName] = [];
           } else {
             this._copy[attributeName] = undefined;
@@ -133,6 +147,7 @@ export class ObjectEditorComponent implements OnInit {
   public openItemSelector(attributeName: string): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {
+        type: this.getTypeName(this._attributes[attributeName].type),
         selected: (this._copy[attributeName] ? TreeConfiguration.
           getWorkingTree().getProxyFor(this._copy[attributeName].id) :
           undefined)
@@ -153,7 +168,7 @@ export class ObjectEditorComponent implements OnInit {
   public editValue(index: number, attributeName: string): void {
     const DIALOG_TITLE: string = 'Specify Value';
     let value: any = this._copy[attributeName][index];
-    switch (this.getTypeName(this._type.properties[attributeName].type)) {
+    switch (this.getTypeName(this._attributes[attributeName].type)) {
       case 'boolean':
         if (value == null) {
           value = false;
@@ -195,7 +210,7 @@ export class ObjectEditorComponent implements OnInit {
           }
         });
         break;
-      case 'text':
+      case 'string':
         if (value == null) {
           value = '';
         }
@@ -280,7 +295,7 @@ export class ObjectEditorComponent implements OnInit {
       }
     }
     
-    this._matDialogRef.close(this._object);
+    this._matDialogRef.close(accept ? this._object : undefined);
   }
   
   public getStringRepresentation(index: number, attributeName: string):
@@ -307,9 +322,29 @@ export class ObjectEditorComponent implements OnInit {
     return representation;
   }
   
+  public getAttributeRepresentation(attributeName: string): string {
+    let attributeRepresentation: string = attributeName;
+    if (this._attributes[attributeName].required) {
+      attributeRepresentation += '*';
+    }
+    
+    return attributeRepresentation;
+  }
+  
+  public isObjectValid(): boolean {
+    for (let attributeName in this._attributes) {
+      if (this._attributes[attributeName].required && this._copy[
+        attributeName] == null) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
   private getType(attributeName: string): any {
-    let typeName: string = this.getTypeName(this._type.properties[
-      attributeName].type);
+    let typeName: string = this.getTypeName(this._attributes[attributeName].
+      type);
     let type: any;
     if (this._type.localTypes) {
       for (let j: number = 0; j < this._type.localTypes.length; j++) {

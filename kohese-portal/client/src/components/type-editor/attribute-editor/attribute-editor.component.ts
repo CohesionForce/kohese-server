@@ -75,7 +75,7 @@ export class AttributeEditorComponent implements OnInit {
     'Boolean': 'boolean',
     'Number': 'number',
     'Date': 'date',
-    'Text': 'text',
+    'Text': 'string',
     'Markdown': 'markdown',
     'State': 'StateMachine',
     'Username': 'user-selector'
