@@ -146,7 +146,6 @@ export class CreateWizardComponent extends NavigatableComponent
         console.log('*** Failed to upsert: ' + this.selectedType.
           dataModelProxy.item.name);
         console.log(error);
-        this._isDisabled = false;
       });
 
   }
@@ -157,6 +156,11 @@ export class CreateWizardComponent extends NavigatableComponent
 
   cancel() {
     this.MatDialogRef.close();
+  }
+
+  clearError(){
+    this.errorMessage = null;
+    this._isDisabled = false;
   }
 
   public whenNonFormFieldChanges(updatedField: any): void {
