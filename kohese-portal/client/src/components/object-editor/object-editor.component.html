@@ -73,14 +73,21 @@
           </mat-form-field>
         </ng-container>
         <ng-container *ngSwitchCase="'StateMachine'">
-          <mat-form-field style="width: 100%;">
-            <mat-select placeholder="{{getAttributeRepresentation(
-              attributeName)}}" [(ngModel)]="copy[attributeName]">
-              <!-- ng-container *ngFor="let transitionCandidate of ">
-                <mat-option [value]="">
-                  {{}}
+          <label style="width: 40%;">
+            {{getAttributeRepresentation(attributeName)}}: {{copy[
+              attributeName]}}
+          </label>
+          <mat-form-field style="width: 60%;">
+            <mat-select placeholder="Target" [(ngModel)]="copy[attributeName]"
+              [disabled]="Object.keys(getStateTransitionCandidates(
+              attributeName)).length === 0">
+              <ng-container *ngFor="let transitionCandidateName of
+                (getStateTransitionCandidates(attributeName) | mapKey)">
+                <mat-option [value]="attributes[attributeName].properties.
+                  transition[transitionCandidateName].target">
+                  {{transitionCandidateName}}
                 </mat-option>
-              </ng-container-->
+              </ng-container>
             </mat-select>
           </mat-form-field>
         </ng-container>
@@ -97,26 +104,36 @@
           </mat-form-field>
         </ng-container>
         <ng-container *ngSwitchDefault>
-          <label>
-            {{getAttributeRepresentation(attributeName)}}:&nbsp;
-          </label>
-          <ng-container *ngIf="copy[attributeName]">
-            <button mat-raised-button (click)="openObjectEditor(
-              attributeName)">
-              {{getStringRepresentation(undefined, attributeName)}}
-            </button>
-          </ng-container>
-          <button mat-icon-button matTooltip="Select an object"
-            (click)="openItemSelector(attributeName)">
-            <mat-icon class="fa fa-ellipsis-h"></mat-icon>
-          </button>
-          <button mat-icon-button
-            matTooltip="Remove the selection for {{attributeName}}"
-            [disabled]="(copy[attributeName] == null)" (click)="copy[
-            attributeName] = undefined">
-            <mat-icon class="fa fa-times"></mat-icon>
-          </button>
-          <br/>
+          <div style="width: 100%; display: flex; flex-direction: row;">
+            <label style="width: 20%;">
+              {{getAttributeRepresentation(attributeName)}}:&nbsp;
+            </label>
+            <ng-container *ngIf="copy[attributeName]">
+              <!--
+                Remove the "disabled" attribute below once ItemProxy
+                selection can be restricted by kind.
+              -->
+              <button mat-raised-button (click)="openObjectEditor(
+                attributeName)" style="width: 60%;"
+                [disabled]="true">
+                {{getStringRepresentation(undefined, attributeName)}}
+              </button>
+            </ng-container>
+            <span class="flex-right-align" style="width: 20%; display: flex;
+              flex-direction: row;">
+              <button mat-icon-button matTooltip="Select an object"
+                (click)="openItemSelector(attributeName)"
+                class="flex-right-align">
+                <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+              </button>
+              <button mat-icon-button
+                matTooltip="Remove the selection for {{attributeName}}"
+                [disabled]="(copy[attributeName] == null)" (click)="copy[
+                attributeName] = undefined">
+                <mat-icon class="fa fa-times"></mat-icon>
+              </button>
+            </span>
+          </div>
         </ng-container>
       </ng-container>
     </ng-container>

@@ -51,6 +51,10 @@ export class ObjectEditorComponent implements OnInit {
     return this._data;
   }
   
+  get Object() {
+    return Object;
+  }
+  
   get Array() {
     return Array;
   }
@@ -282,6 +286,22 @@ export class ObjectEditorComponent implements OnInit {
   public removeValue(index: number, attributeName: string): void {
     this._copy[attributeName].splice(index, 1);
     this._changeDetectorRef.markForCheck();
+  }
+  
+  public getStateTransitionCandidates(attributeName: string): any {
+    let stateTransitionCandidates: any = {};
+    let currentStateName: string = this._copy[attributeName];
+    let stateMachine: any = this._attributes[attributeName].properties;
+    if (stateMachine) {
+      for (let transitionName in stateMachine.transition) {
+        let transition: any = stateMachine.transition[transitionName];
+        if (transition.source === currentStateName) {
+          stateTransitionCandidates[transitionName] = transition;
+        }
+      }
+    }
+    
+    return stateTransitionCandidates;
   }
   
   public close(accept: boolean): void {
