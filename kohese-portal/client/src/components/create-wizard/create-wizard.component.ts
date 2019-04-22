@@ -35,7 +35,7 @@ export class CreateWizardComponent extends NavigatableComponent
   selectedType: KoheseType;
   selectedParent: ItemProxy;
   rootProxy: ItemProxy;
-  errorMessage: string;
+  errorMessage: any;
   treeConfig;
   private _proxyPlaceholderStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
@@ -158,8 +158,8 @@ export class CreateWizardComponent extends NavigatableComponent
     this.MatDialogRef.close();
   }
 
-  clearError(){
-    this.errorMessage = null;
+  public clearError(): void {
+    this.errorMessage = undefined;
     this._isDisabled = false;
   }
 
