@@ -104,7 +104,8 @@
     "localTypes": {
       "type": [
         "object"
-      ]
+      ],
+      "required": true
     }
   },
   "validations": [],
