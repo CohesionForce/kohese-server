@@ -64,7 +64,7 @@ export class ObjectEditorComponent implements OnInit {
   }
 
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    private _matDialogRef: MatDialogRef<ObjectEditorComponent>,
+    @Optional() private _matDialogRef: MatDialogRef<ObjectEditorComponent>,
     private _changeDetectorRef: ChangeDetectorRef, private _dialogService:
     DialogService, private _dynamicTypesService: DynamicTypesService,
     private _itemRepository: ItemRepository) {
@@ -243,6 +243,18 @@ export class ObjectEditorComponent implements OnInit {
         });
         break;
       case 'StateMachine':
+        this._dialogService.openSelectDialog(DIALOG_TITLE, attributeName +
+          ': ' + this._copy[attributeName], 'Target', value, Object.keys(this.
+          getStateTransitionCandidates(attributeName)).map(
+          (transitionCandidateName: string) => {
+          return this._attributes[attributeName].properties.transition[
+            transitionCandidateName].target;
+        })).afterClosed().subscribe((value: string) => {
+          if (value) {
+            this._copy[attributeName].splice(index, 1, value);
+            this._changeDetectorRef.markForCheck();
+          }
+        });
         break;
       case 'user-selector':
         if (value == null) {

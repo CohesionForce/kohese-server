@@ -9,8 +9,8 @@
       </ng-container>
       <ng-container *ngIf="data.options">
         <mat-form-field style="width: 100%;">
-          <mat-select placeholder="{{data.fieldName}}"
-            [(ngModel)]="data.value">
+          <mat-select placeholder="{{data.fieldName}}" [disabled]="(data.
+            options.length === 0)" [(ngModel)]="data.value">
             <mat-option *ngFor="let option of data.options" [value]="option">
               {{option}}
             </mat-option>
