@@ -3,6 +3,7 @@ import { map, startWith} from 'rxjs/operators';
 import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 import { Subscription } from 'rxjs';
@@ -11,6 +12,11 @@ interface RelationInfo {
   proxy: ItemProxy;
   relationKind: string;
 }
+
+enum MoveDirection {
+  UP, DOWN
+}
+
 @Component({
   selector: 'proxy-selector',
   templateUrl: './proxy-selector.component.html',
@@ -40,6 +46,10 @@ export class ProxySelectorComponent implements OnInit {
   filteredProxies: any;
   recentProxies: Array<ItemProxy>;
   relatedProxies: Array<RelationInfo>;
+  
+  get MoveDirection() {
+    return MoveDirection;
+  }
 
   treeConfig: any;
   treeConfigSub: Subscription;
@@ -125,6 +135,20 @@ export class ProxySelectorComponent implements OnInit {
         this.initProxySearch();
     }
   }
+  
+  /**
+   * Moves the given ItemProxy one index in the direction indicated by the
+   * given MoveDirection
+   */
+  public move(moveDirection: MoveDirection, itemProxy: ItemProxy): void {
+    let candidateIndex: number = this.selected.indexOf(itemProxy);
+    this.selected.splice(candidateIndex, 1);
+    if (moveDirection === MoveDirection.UP) {
+      this.selected.splice(candidateIndex - 1, 0, itemProxy);
+    } else {
+      this.selected.splice(candidateIndex + 1, 0, itemProxy);
+    }
+  }
 
   removeSelection(selection: ItemProxy) {
     if (this.multiSelect) {
@@ -141,7 +165,13 @@ export class ProxySelectorComponent implements OnInit {
   generateRelatedProxies() {
     this.relatedProxies = [];
     console.log(this.proxyContext);
-    const siblingProxies = this.proxyContext.parentProxy.children;
+    let siblingProxies: Array<ItemProxy>;
+    if (this.proxyContext.parentProxy) {
+      siblingProxies = this.proxyContext.parentProxy.children;
+    } else {
+      siblingProxies = TreeConfiguration.getWorkingTree().getProxyFor(this.
+        proxyContext.item.parentId).children;
+    }
     for (const proxy in siblingProxies) {
       if (siblingProxies[proxy]) {
         if (siblingProxies[proxy].item.id === this.proxyContext.item.id) {

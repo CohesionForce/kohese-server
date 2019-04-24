@@ -83,11 +83,11 @@ export class Filter {
             connection.connections.splice(j, 1);
             removed = true;
             break searchLoop;
-          } else {
-            connectionStack.push(connection.connections[j]);
           }
         }
       }
+      
+      connectionStack.push(...connection.connections);
     }
     
     return removed;

@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent
 import { FormGroup, FormControl } from '@angular/forms';
 
 
-import { NavigatableComponent } from '../../classes/NavigationComponent.class'
+import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../common/src/item-proxy.js';
@@ -24,13 +24,18 @@ export class CreateWizardComponent extends NavigatableComponent
   /* Data */
   @Input()
   private itemProxy: ItemProxy;
+// tslint:disable-next-line: no-inferrable-types
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
   models: Array<ItemProxy>;
   types: Array<KoheseType> = [];
   recentProxies: Array<ItemProxy>;
   selectedType: KoheseType;
   selectedParent: ItemProxy;
   rootProxy: ItemProxy;
-  errorMessage: string;
+  errorMessage: any;
   treeConfig;
   private _proxyPlaceholderStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
@@ -59,6 +64,7 @@ export class CreateWizardComponent extends NavigatableComponent
         if (newConfig) {
           this.treeConfig = newConfig.config;
           this.rootProxy = this.treeConfig.getRootProxy();
+// tslint:disable-next-line: prefer-const
           let types = this.DynamicTypesService.getKoheseTypes();
           for (let type in types) {
             this.types.push(types[type]);
@@ -115,6 +121,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
   createItem() {
     let item: any = this.createFormGroup.value;
+    this._isDisabled = true;
     for (let fieldName in this.nonFormFieldValueMap) {
       item[fieldName] = this.nonFormFieldValueMap[fieldName];
     }
@@ -131,7 +138,7 @@ export class CreateWizardComponent extends NavigatableComponent
 
     this.itemRepository.buildItem(this.selectedType.dataModelProxy.item.name,
       item).then(() => {
-        console.log('Build Item promise resolve')
+        console.log('Build Item promise resolve');
         this.MatDialogRef.close();
       }, (error) => {
         // TODO show error on review stepper
@@ -149,6 +156,11 @@ export class CreateWizardComponent extends NavigatableComponent
 
   cancel() {
     this.MatDialogRef.close();
+  }
+
+  public clearError(): void {
+    this.errorMessage = undefined;
+    this._isDisabled = false;
   }
 
   public whenNonFormFieldChanges(updatedField: any): void {

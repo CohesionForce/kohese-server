@@ -1,48 +1,103 @@
-<table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8">
-  <ng-container matColumnDef="{{column}}" *ngFor="let column of columns">
-    <th mat-header-cell *matHeaderCellDef> {{column}} </th>
-    <td mat-cell *matCellDef="let proxy"> {{proxy.item[column]}} </td>
-  </ng-container>
-
-  <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
-  <ng-container matColumnDef="expandedDetail">
-    <td mat-cell *matCellDef="let proxy" [attr.colspan]="columns.length" style="padding-left: 0px;">
-      <div class="item-detail" *ngIf="expandedFormat" [@detailExpand]="proxy.item === expandedItem ? 'expanded' : 'collapsed'">
-        <div>
-          <div class="expanded-actions">
-            <button mat-icon-button class="fa fa-clipboard" (click)="openProxyDetails(proxy)"></button>
-            <button mat-icon-button *ngIf="!expandedEdit" class="fa fa-edit side-button" (click)="expandedEdit = true"></button>
-            <button mat-icon-button *ngIf="expandedEdit" class="fa fa-save side-button" (click)="upsertItem(proxy);"></button>
-            <button mat-icon-button *ngIf="expandedEdit" class="fa fa-times side-button" (click)="expandedEdit = false"></button>
-          </div>
-          <div class="item-description" style="display: inline-block">
-            <div class="column">
-              <expanded-row-column [editable]="expandedEdit" [columnProps]="expandedFormat.column1" [proxy]="proxy"></expanded-row-column>
+<div style="height: 10%; width: 100%; display: flex; flex-direction: row;">
+  <button mat-icon-button class="flex-right-align" [disabled]="(selectedIds.
+    length === 0) || !canMoveSelectionUp()" (click)="moveSelection(
+    MoveDirection.UP)">
+    <mat-icon class="fa fa-arrow-up"></mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="(selectedIds.length === 0) ||
+    !canMoveSelectionDown()" (click)="moveSelection(MoveDirection.DOWN)">
+    <mat-icon class="fa fa-arrow-down"></mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="selectedIds.length === 0"
+    (click)="removeSelection()">
+    <mat-icon class="fa fa-remove"></mat-icon>
+  </button>
+</div>
+<div #tableDiv style="height: 90%; width: 100%; overflow-x: auto;">
+  <table mat-table [dataSource]="dataSource" multiTemplateDataRows
+    [ngStyle]="getRowWidthStyle(tableDiv.offsetWidth)">
+    <ng-container matColumnDef="{{column}}" *ngFor="let column of columns">
+      <ng-container *ngIf="column === 'checkbox'">
+        <th mat-header-cell *matHeaderCellDef
+          [ngStyle]="getCheckboxColumnWidth()">
+        </th>
+        <td mat-cell *matCellDef="let proxy" style="padding: 0px 9px;"
+          [ngStyle]="getCheckboxColumnWidth()">
+          <mat-checkbox [disabled]="disabled" [checked]="selectedIds.indexOf(
+            proxy.item.id) !== -1" (click)="$event.stopPropagation()"
+            (change)="checkStateChanged($event.checked, proxy)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+      <ng-container *ngIf="column !== 'checkbox'">
+        <th mat-header-cell *matHeaderCellDef [ngStyle]="getColumnWidthStyle(
+          tableDiv.offsetWidth)">
+          {{column}}
+        </th>
+        <td mat-cell *matCellDef="let proxy" [ngStyle]="getColumnWidthStyle(
+          tableDiv.offsetWidth)">
+          {{proxy.item[column]}}
+        </td>
+      </ng-container>
+    </ng-container>
+    <!-- Expanded Content Column - The detail row is made up of this one column
+    that spans across all columns -->
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let proxy" [attr.colspan]="columns.length"
+        style="padding-left: 0px;">
+        <div class="item-detail" *ngIf="expandedFormat" [@detailExpand]="proxy.
+          item === expandedItem ? 'expanded' : 'collapsed'">
+          <div>
+            <div class="expanded-actions">
+              <button mat-icon-button class="fa fa-clipboard"
+                (click)="openProxyDetails(proxy)"></button>
+              <button mat-icon-button *ngIf="!expandedEdit" class="fa fa-edit
+                side-button" (click)="expandedEdit = true"></button>
+              <button mat-icon-button *ngIf="expandedEdit" class="fa fa-save
+                side-button" (click)="upsertItem(proxy);"></button>
+              <button mat-icon-button *ngIf="expandedEdit" class="fa fa-times
+                side-button" (click)="expandedEdit = false"></button>
             </div>
-            <div class="column">
-              <expanded-row-column [editable]="expandedEdit" [columnProps]="expandedFormat.column2" [proxy]="proxy"></expanded-row-column>
-            </div>
-            <div class="column">
-              <expanded-row-column [editable]="expandedEdit" [columnProps]="expandedFormat.column3" [proxy]="proxy"></expanded-row-column>
-            </div>
-            <mat-divider></mat-divider>
-            <div class="footer">
-              <expanded-row-column [editable]="expandedEdit" [columnProps]="expandedFormat.column4" [proxy]="proxy"></expanded-row-column>
+            <div class="item-description" style="display: inline-block">
+              <div class="column">
+                <expanded-row-column [editable]="expandedEdit"
+                  [columnProps]="expandedFormat.column1" [proxy]="proxy">
+                </expanded-row-column>
+              </div>
+              <div class="column">
+                <expanded-row-column [editable]="expandedEdit"
+                  [columnProps]="expandedFormat.column2" [proxy]="proxy">
+                </expanded-row-column>
+              </div>
+              <div class="column">
+                <expanded-row-column [editable]="expandedEdit"
+                  [columnProps]="expandedFormat.column3" [proxy]="proxy">
+                </expanded-row-column>
+              </div>
+              <mat-divider></mat-divider>
+              <div class="footer">
+                <expanded-row-column [editable]="expandedEdit"
+                  [columnProps]="expandedFormat.column4" [proxy]="proxy">
+                </expanded-row-column>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="columns"></tr>
-  <tr mat-row *matRowDef="let proxy; columns: columns;" class="item-row" [class.expanded-row]="expandedItem === proxy.item"
-    (click)="toggleExpand(proxy.item)">
-  </tr>
-  <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row">
-  </tr>
-</table>
-
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columns"
+      [ngStyle]="getRowWidthStyle(tableDiv.offsetWidth)">
+    </tr>
+    <tr mat-row *matRowDef="let proxy; columns: columns;" class="item-row"
+      [ngStyle]="getRowWidthStyle(tableDiv.offsetWidth)"
+      [class.expanded-row]="expandedItem === proxy.item" (click)="toggleExpand(
+      proxy.item)">
+    </tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"
+      class="example-detail-row">
+    </tr>
+  </table>
+</div>
 
 <!-- Copyright 2018 Google Inc. All Rights Reserved.
     Use of this source code is governed by an MIT-style license that

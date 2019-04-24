@@ -9,6 +9,10 @@ export class DependencyInfoComponent implements OnInit{
   relations;
   @Input()
   kind;
+  
+  get Array() {
+    return Array;
+  }
 
   constructor(){
 

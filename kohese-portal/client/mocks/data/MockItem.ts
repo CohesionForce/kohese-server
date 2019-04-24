@@ -44,6 +44,7 @@ export function MockDocument () {
 export function MockAction () {
   return {
     "actionState": "Verified",
+    predecessors: [],
     "assignedTo": "test-user",
     "estimatedStart": 151007,
     "estimatedCompletion": 151007,

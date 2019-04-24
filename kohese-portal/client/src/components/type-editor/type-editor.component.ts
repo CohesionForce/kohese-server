@@ -83,7 +83,40 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           name: name,
           modelName: name,
           parentId: 'view-item',
-          viewProperties: {}
+          viewProperties: {},
+          formatDefinitions: [
+            {
+              '89324a90-a7af-11e8-8662-71e48f0160fe': {
+                'name': 'New definition',
+                'header': {
+                  'kind': 'header',
+                  'contents': [
+                    {
+                      'propertyName': 'name',
+                      'hideLabel': false,
+                      'labelOrientation': 'Top',
+                      'kind': 'text'
+                    }
+                  ]
+                },
+                'containers': [
+                  {
+                    'kind': 'list',
+                    'contents': [
+                      {
+                        'propertyName': 'description',
+                        'hideLabel': false,
+                        'labelOrientation': 'Top',
+                        'kind': 'markdown'
+                      }
+                    ]
+                  }
+                ],
+                'id': '89324a90-a7af-11e8-8662-71e48f0160fe'
+              }
+            }
+          ],
+          defaultFormatKey: '89324a90-a7af-11e8-8662-71e48f0160fe'
         });
 
         Promise.all([dataModelProxyPromise, viewModelProxyPromise]).

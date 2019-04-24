@@ -31,6 +31,35 @@
           [disabled]="koheseType.dataModelProxy.item.isMetaModel">
         </textarea>
       </mat-form-field>
+      <div style="width: 100%; display: flex; flex-direction: column;">
+        <h3>
+          Local Types
+        </h3>
+        <span class="flex-right-align">
+          <button mat-icon-button matTooltip="Add a local type"
+            (click)="addLocalType()">
+            <mat-icon class="fa fa-plus"></mat-icon>
+          </button>
+        </span>
+        <mat-list>
+          <ng-container *ngFor="let localType of koheseType.dataModelProxy.
+            item.localTypes">
+            <mat-list-item>
+              {{localType.name}}
+              <span class="flex-right-align">
+                <button mat-icon-button matTooltip="Edit this local type"
+                  (click)="editLocalType(localType)">
+                  <mat-icon class="fa fa-edit"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Remove this local type"
+                  (click)="removeLocalType(localType)">
+                  <mat-icon class="fa fa-trash"></mat-icon>
+                </button>
+              </span>
+            </mat-list-item>
+          </ng-container>
+        </mat-list>
+      </div>
     </div>
     <ng-container *ngIf="koheseType.viewModelProxy">
       <div style="height: 100%; flex: 1 1 50%;" class="pad">
