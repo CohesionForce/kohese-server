@@ -62,9 +62,6 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     'Object': 'object',
     'State': 'StateMachine'
   };
-  get types() {
-    return this._types;
-  }
 
   // Work-around for angular-split defect
   private _showSplitPanes: boolean = false;
@@ -88,7 +85,6 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     let koheseTypes: any = this.typeService.getKoheseTypes();
     for (let type in koheseTypes) {
-      this._types[type] = type;
       for (let propertyName in koheseTypes[type].dataModelProxy.item.properties) {
         if (koheseTypes[type].dataModelProxy.item.properties[propertyName].id) {
           if (!this._idProperties[type]) {
@@ -102,25 +98,8 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     this.userInputs = this.typeService.getUserInputTypes();
     this._koheseTypeStreamSubscription = this._koheseTypeStream.subscribe(
       (koheseType: KoheseType) => {
-      if (koheseType) {
-        let localTypes: Array<any>;
-        if (this._koheseType) {
-          localTypes = this._koheseType.dataModelProxy.item.
-            localTypes;
-          for (let j: number = 0; j < localTypes.length; j++) {
-            delete this._types[localTypes[j].name];
-          }
-        }
-        
-        this._koheseType = koheseType;
-        localTypes = this._koheseType.dataModelProxy.item.
-          localTypes;
-        for (let j: number = 0; j < localTypes.length; j++) {
-          this._types[localTypes[j].name] = localTypes[j].name;
-        }
-        
-        this._changeDetectorRef.markForCheck();
-      }
+      this._koheseType = koheseType;
+      this._changeDetectorRef.markForCheck();
     });
   }
 
@@ -158,6 +137,22 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     subProperty[propertyIdSequence[propertyIdSequence.length - 1]] = value;
     this._koheseType.updateProperty(this.selectedPropertyId, property);
     this._changeDetectorRef.markForCheck();
+  }
+  
+  public getTypes(): any {
+    let types: any = Object.assign({}, this._types);
+    let koheseTypes: any = this.typeService.getKoheseTypes();
+    for (let koheseTypeName in koheseTypes) {
+      types[koheseTypeName] = koheseTypeName;
+    }
+    
+    let localTypeNames: Array<string> = this.typeService.localTypeMap.get(
+      this._koheseType.dataModelProxy.item.name);
+    for (let j: number = 0; j < localTypeNames.length; j++) {
+      types[localTypeNames[j]] = localTypeNames[j];
+    }
+    
+    return types;
   }
 
   public convertTypeString(type: any): string {
