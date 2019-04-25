@@ -1,9 +1,11 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   Optional, Inject, Input } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 
@@ -39,6 +41,15 @@ export class AttributeEditorComponent implements OnInit {
   @Input('view')
   set view(view: any) {
     this._view = view;
+  }
+  
+  private _editable: boolean = true;
+  get editable() {
+    return this._editable;
+  }
+  @Input('editable')
+  set editable(editable: boolean) {
+    this._editable = editable;
   }
   
   get dynamicTypesService() {
@@ -95,6 +106,7 @@ export class AttributeEditorComponent implements OnInit {
   }
   
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
+    @Optional() private _matDialogRef: MatDialogRef<AttributeEditorComponent>,
     private _changeDetectorRef: ChangeDetectorRef,
     private _dynamicTypesService: DynamicTypesService, private _dialogService:
     DialogService) {
@@ -107,6 +119,7 @@ export class AttributeEditorComponent implements OnInit {
         this._attribute = this._data['attribute'];
         this._view = this._data['view'];
       }
+      this._editable = this._data['editable'];
     }
     
     if (!this._attribute) {
@@ -204,5 +217,13 @@ export class AttributeEditorComponent implements OnInit {
   public areRelationsEqual(option: any, selection: any): boolean {
     return ((option.kind === selection.kind) && (option.foreignKey ===
       selection.foreignKey));
+  }
+  
+  public close(accept: boolean): void {
+    this._matDialogRef.close(accept ? {
+        attributeName: this._attributeName,
+        attribute: this._attribute,
+        view: this._view
+      } : undefined);
   }
 }

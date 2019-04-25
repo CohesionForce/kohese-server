@@ -50,6 +50,12 @@
         As Table
       </mat-checkbox>
       <br/>
+      <ng-container *ngIf="view.asTable">
+        <table-editor [tableDefinition]="view.tableDefinition"
+          [propertyId]="attributeName">
+        </table-editor>
+        <br/>
+      </ng-container>
       <mat-checkbox class="field-option" [(ngModel)]="attribute.
         required">
         Required
@@ -72,12 +78,10 @@
   <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
     flex-direction: column;">
     <span class="flex-right-align">
-      <button mat-raised-button
-        [mat-dialog-close]="{ attributeName: attributeName,
-        attribute: attribute, view: view }">
+      <button mat-raised-button [disabled]="!editable" (click)="close(true)">
         Accept
       </button>
-      <button mat-raised-button [mat-dialog-close]="">
+      <button mat-raised-button (click)="close(false)">
         Cancel
       </button>
     </span>
