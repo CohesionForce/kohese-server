@@ -1,0 +1,155 @@
+<div style="width: 100%; overflow: auto;" [ngStyle]="{ 'height': data ? '90%' :
+  '100%' }">
+  <ng-container *ngFor="let attributeName of (copy | mapKey)">
+    <ng-container [ngSwitch]="getTypeName(attributes[attributeName].type)">
+      <ng-container *ngIf="Array.isArray(attributes[attributeName].type)">
+        <div style="display: flex; flex-direction: column;">
+          <h3>
+            {{getAttributeRepresentation(attributeName)}}
+          </h3>
+          <span class="flex-right-align">
+            <button mat-icon-button
+              matTooltip="Add a value to {{attributeName}}"
+              (click)="addValue(attributeName)">
+              <mat-icon class="fa fa-plus"></mat-icon>
+            </button>
+          </span>
+          <mat-list>
+            <ng-container *ngFor="let value of copy[attributeName];
+              let j = index">
+              <mat-list-item>
+                {{getStringRepresentation(j, attributeName)}}
+                <span class="flex-right-align">
+                  <button mat-icon-button matTooltip="Edit this value"
+                    (click)="editValue(j, attributeName)">
+                    <mat-icon class="fa fa-edit"></mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Remove this value"
+                    (click)="removeValue(j, attributeName)">
+                    <mat-icon class="fa fa-trash"></mat-icon>
+                  </button>
+                </span>
+              </mat-list-item>
+            </ng-container>
+          </mat-list>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!Array.isArray(attributes[attributeName].type)">
+        <ng-container *ngSwitchCase="'boolean'">
+          <mat-checkbox [(ngModel)]="copy[attributeName]" style="width: 100%;">
+            {{getAttributeRepresentation(attributeName)}}
+          </mat-checkbox>
+        </ng-container>
+        <ng-container *ngSwitchCase="'number'">
+          <mat-form-field style="width: 100%;">
+            <input matInput type="number"
+              placeholder="{{getAttributeRepresentation(attributeName)}}"
+              [(ngModel)]="copy[attributeName]"/>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'date'">
+          <mat-form-field style="width: 100%;">
+            <input matInput type="date"
+              placeholder="{{getAttributeRepresentation(attributeName)}}"
+              [(ngModel)]="copy[attributeName]"/>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'string'">
+          <mat-form-field style="width: 100%;">
+            <input matInput type="text"
+              placeholder="{{getAttributeRepresentation(attributeName)}}"
+              [(ngModel)]="copy[attributeName]"/>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'markdown'">
+          <mat-form-field style="width: 100%;">
+            <textarea matInput placeholder="{{getAttributeRepresentation(
+              attributeName)}}" columns="80" rows="3" [(ngModel)]="copy[
+              attributeName]" style="width: 50%;">
+            </textarea>
+            <span style="width: 50%;">
+              <markdown [data]="copy[attributeName]"></markdown>
+            </span>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'StateMachine'">
+          <label style="width: 40%;">
+            {{getAttributeRepresentation(attributeName)}}: {{copy[
+              attributeName]}}
+          </label>
+          <mat-form-field style="width: 60%;">
+            <mat-select placeholder="Target" [(ngModel)]="copy[attributeName]"
+              [disabled]="Object.keys(getStateTransitionCandidates(
+              attributeName)).length === 0">
+              <ng-container *ngFor="let transitionCandidateName of
+                (getStateTransitionCandidates(attributeName) | mapKey)">
+                <mat-option [value]="attributes[attributeName].properties.
+                  transition[transitionCandidateName].target">
+                  {{transitionCandidateName}}
+                </mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'user-selector'">
+          <mat-form-field style="width: 100%;">
+            <mat-select placeholder="{{getAttributeRepresentation(
+              attributeName)}}" [(ngModel)]="copy[attributeName]">
+              <ng-container *ngFor="let username of usernames">
+                <mat-option [value]="username">
+                  {{username}}
+                </mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <div style="width: 100%; display: flex; flex-direction: row;">
+            <label style="width: 20%;">
+              {{getAttributeRepresentation(attributeName)}}:&nbsp;
+            </label>
+            <ng-container *ngIf="copy[attributeName]">
+              <!--
+                Remove the "disabled" attribute below once ItemProxy
+                selection can be restricted by kind.
+              -->
+              <button mat-raised-button (click)="openObjectEditor(
+                attributeName)" style="width: 60%;"
+                [disabled]="true">
+                {{getStringRepresentation(undefined, attributeName)}}
+              </button>
+            </ng-container>
+            <span class="flex-right-align" style="width: 20%; display: flex;
+              flex-direction: row;">
+              <button mat-icon-button matTooltip="Select an object"
+                (click)="openItemSelector(attributeName)"
+                class="flex-right-align">
+                <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+              </button>
+              <button mat-icon-button
+                matTooltip="Remove the selection for {{attributeName}}"
+                [disabled]="(copy[attributeName] == null)" (click)="copy[
+                attributeName] = undefined">
+                <mat-icon class="fa fa-times"></mat-icon>
+              </button>
+            </span>
+          </div>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</div>
+<ng-container *ngIf="data">
+  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
+    flex-direction: column;">
+    <span class="flex-right-align">
+      <button mat-raised-button [disabled]="!isObjectValid()" (click)="close(
+        true)">
+        Accept
+      </button>
+      <button mat-raised-button (click)="close(false)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>

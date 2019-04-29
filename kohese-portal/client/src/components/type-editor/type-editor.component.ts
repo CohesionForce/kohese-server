@@ -76,7 +76,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           validations: [],
           relations: {},
           acls: [],
-          methods: []
+          methods: [],
+          localTypes: []
         });
         let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
           buildItem('KoheseView', {
