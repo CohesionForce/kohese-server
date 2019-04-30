@@ -16,7 +16,8 @@ import { ObjectEditorComponent } from './object-editor.component';
     MarkdownModule,
     MaterialModule,
     PipesModule
-  ]
+  ],
+  exports: [ObjectEditorComponent]
 })
 export class ObjectEditorModule {
   public constructor() {

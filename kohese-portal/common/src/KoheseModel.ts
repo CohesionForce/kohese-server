@@ -145,6 +145,11 @@ export class KoheseModel extends ItemProxy {
       modelProxy.item.stateProperties = _.clone(modelProxy.parentProxy.item.stateProperties) || [];
       modelProxy.item.relationProperties = _.clone(modelProxy.parentProxy.item.relationProperties) || [];
       modelProxy.item.idProperties = _.clone(modelProxy.parentProxy.item.idProperties) || [];
+      
+      // Migration code
+      if (!modelProxy.item.localTypes) {
+        modelProxy.item.localTypes = [];
+      }
 
       for (var property in modelProxy.item.properties){
         var propertySettings = modelProxy.item.properties[property];

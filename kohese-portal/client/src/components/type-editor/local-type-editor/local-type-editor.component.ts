@@ -143,7 +143,9 @@ export class LocalTypeEditorComponent implements OnInit {
   
   public addAttribute(): void {
     this._dialogService.openComponentDialog(AttributeEditorComponent, {
-      data: {},
+      data: {
+        type: this._type
+      },
       disableClose: true
     }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
       any) => {
@@ -228,6 +230,7 @@ export class LocalTypeEditorComponent implements OnInit {
       data: {
         attributeName: attributeName,
         attribute: this._type.properties[attributeName],
+        type: this._type,
         view: this._view.viewProperties[attributeName],
         editable: await this.mayEditAttribute(attributeName)
       },
