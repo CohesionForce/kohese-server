@@ -127,7 +127,10 @@ export class AttributeEditorComponent implements OnInit {
         this._type = this._data['type'];
         this._view = this._data['view'];
       }
-      this._editable = this._data['editable'];
+      
+      if (this._data['editable'] === false) {
+        this._editable = false;
+      }
     }
     
     if (!this._attribute) {
