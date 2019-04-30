@@ -115,6 +115,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
         attributeName: attributeName,
         attribute: this._koheseType.dataModelProxy.item.properties[
           attributeName],
+        type: this._koheseType.dataModelProxy.item,
         view: this._koheseType.viewModelProxy.item.viewProperties[
           attributeName],
         editable: await this.mayEditAttribute(attributeName)

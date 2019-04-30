@@ -34,6 +34,15 @@ export class AttributeEditorComponent implements OnInit {
     this._attribute = attribute;
   }
   
+  private _type: any;
+  get type() {
+    return this._type;
+  }
+  @Input('type')
+  set type(type: any) {
+    this._type = type;
+  }
+  
   private _view: any;
   get view() {
     return this._view;
@@ -80,8 +89,6 @@ export class AttributeEditorComponent implements OnInit {
     return this._data;
   }
   
-  /* Add an entry for 'Reference' if this is used for global types and adding
-  local types to local types is handled. */
   private _fundamentalTypes: any = {
     'Boolean': 'boolean',
     'Number': 'number',
@@ -117,6 +124,7 @@ export class AttributeEditorComponent implements OnInit {
       if (this._data['attribute']) {
         this._attributeName = this._data['attributeName'];
         this._attribute = this._data['attribute'];
+        this._type = this._data['type'];
         this._view = this._data['view'];
       }
       this._editable = this._data['editable'];
@@ -143,6 +151,13 @@ export class AttributeEditorComponent implements OnInit {
           }
 
           this._idAttributes[typeName].push(attributeName);
+        }
+      }
+      
+      if (koheseType.dataModelProxy.item === this._type) {
+        for (let j: number = 0; j < this._type.localTypes.length; j++) {
+          let localType: any = this._type.localTypes[j];
+          this._attributeTypes[localType.name] = localType.name;
         }
       }
     }

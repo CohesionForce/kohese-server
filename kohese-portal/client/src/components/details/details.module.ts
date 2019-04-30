@@ -1,4 +1,6 @@
 import { NgModule } from "@angular/core/";
+import { MarkdownModule } from 'ngx-markdown';
+
 import { DetailsComponent } from './details.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ChildrenTabComponent } from './children-tab/children-tab.component';
@@ -48,7 +50,8 @@ import { DetailsDialogComponent } from "./details-dialog/details-dialog.componen
     ReactiveFormsModule,
     PipesModule,
     UserInputModule,
-    TreeModule.forRoot()
+    TreeModule.forRoot(),
+    MarkdownModule
   ],
   exports : [
     DetailsComponent,

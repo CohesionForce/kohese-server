@@ -1,5 +1,5 @@
 <mat-form-field class="variable-data" [formGroup]="formGroup" *ngIf="editable">
-  Description : 
+  {{fieldName}}: 
   <button mat-icon-button class="fa fa-question-circle" 
          matTooltip="Markdown cheat sheet" (click)="showCheatSheet()"></button>
   <textarea matInput  formControlName="{{fieldId}}"
