@@ -369,26 +369,48 @@ export class DetailsFormComponent extends NavigatableComponent
         let type: any = this.getType(attributeName);
         let isLocalTypeInstance: boolean = (Object.keys(this.
           DynamicTypeService.getKoheseTypes()).indexOf(type.name) === -1);
-        this._dialogService.openComponentDialog(ObjectEditorComponent, {
-          data: {
-            object: ((!value || isLocalTypeInstance) ? value :
-              TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
-            type: type
-          },
-          disableClose: true
-        }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
-          any) => {
-          if (returnedObject) {
-            if (isLocalTypeInstance) {
-              this.proxyStream.getValue().item[attributeName].splice(index, 1,
-                returnedObject);
+        if (!isLocalTypeInstance) {
+          this._dialogService.openComponentDialog(
+            ProxySelectorDialogComponent, {
+            data: {
+              type: this.getTypeName(this.type.fields[attributeName].type),
+              selected: (this.proxyStream.getValue().item[attributeName] ?
+                TreeConfiguration.getWorkingTree().getProxyFor(this.
+                proxyStream.getValue().item[attributeName].id) : undefined)
+            }
+          }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
+            ItemProxy) => {
+            if (itemProxy) {
+              this.proxyStream.getValue().item[attributeName].splice(index,
+                1, {
+                id: itemProxy.item.id
+              });
               this.whenNonFormFieldChanges(attributeName, this.proxyStream.
                 getValue().item[attributeName]);
-            } else {
-              this._itemRepository.upsertItem(returnedObject as ItemProxy);
             }
-          }
-        });
+          });
+        } else {
+          this._dialogService.openComponentDialog(ObjectEditorComponent, {
+            data: {
+              object: ((!value || isLocalTypeInstance) ? value :
+                TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
+              type: type
+            },
+            disableClose: true
+          }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
+            any) => {
+            if (returnedObject) {
+              if (isLocalTypeInstance) {
+                this.proxyStream.getValue().item[attributeName].splice(index,
+                  1, returnedObject);
+                this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+                  getValue().item[attributeName]);
+              } else {
+                this._itemRepository.upsertItem(returnedObject as ItemProxy);
+              }
+            }
+          });
+        }
     }
   }
   

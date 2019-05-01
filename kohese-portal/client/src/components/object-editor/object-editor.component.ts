@@ -148,7 +148,7 @@ export class ObjectEditorComponent implements OnInit {
     });
   }
   
-  public openItemSelector(attributeName: string): void {
+  public openObjectSelector(attributeName: string): void {
     this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {
         type: this.getTypeName(this._attributes[attributeName].type),
@@ -274,24 +274,43 @@ export class ObjectEditorComponent implements OnInit {
         let type: any = this.getType(attributeName);
         let isLocalTypeInstance: boolean = (Object.keys(this.
           _dynamicTypesService.getKoheseTypes()).indexOf(type.name) === -1);
-        this._dialogService.openComponentDialog(ObjectEditorComponent, {
-          data: {
-            object: ((!value || isLocalTypeInstance) ? value :
-              TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
-            type: type
-          },
-          disableClose: true
-        }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
-          any) => {
-          if (returnedObject) {
-            if (isLocalTypeInstance) {
-              this._copy[attributeName].splice(index, 1, returnedObject);
-              this._changeDetectorRef.markForCheck();
-            } else {
-              this._itemRepository.upsertItem(returnedObject as ItemProxy);
+        if (!isLocalTypeInstance) {
+          this._dialogService.openComponentDialog(
+            ProxySelectorDialogComponent, {
+            data: {
+              type: this.getTypeName(this._attributes[attributeName].type),
+              selected: (this._copy[attributeName] ? TreeConfiguration.
+                getWorkingTree().getProxyFor(this._copy[attributeName].id) :
+                undefined)
             }
-          }
-        });
+          }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
+            ItemProxy) => {
+            if (itemProxy) {
+              this._copy[attributeName].splice(index, 1,
+                { id: itemProxy.item.id });
+              this._changeDetectorRef.markForCheck();
+            }
+          });
+        } else {
+          this._dialogService.openComponentDialog(ObjectEditorComponent, {
+            data: {
+              object: ((!value || isLocalTypeInstance) ? value :
+                TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
+              type: type
+            },
+            disableClose: true
+          }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
+            any) => {
+            if (returnedObject) {
+              if (isLocalTypeInstance) {
+                this._copy[attributeName].splice(index, 1, returnedObject);
+                this._changeDetectorRef.markForCheck();
+              } else {
+                this._itemRepository.upsertItem(returnedObject as ItemProxy);
+              }
+            }
+          });
+        }
     }
   }
   
