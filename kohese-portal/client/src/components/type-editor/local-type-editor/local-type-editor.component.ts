@@ -237,7 +237,15 @@ export class LocalTypeEditorComponent implements OnInit {
       disableClose: true
     }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
       any) => {
-      this._changeDetectorRef.markForCheck();
+      if (attributeName !== returnedObject.attributeName) {
+        delete this._type.properties[attributeName];
+        this._type.properties[returnedObject.attributeName] = returnedObject.
+          attribute;
+        delete this._view.viewProperties[attributeName];
+        this._view.viewProperties[returnedObject.attributeName] =
+          returnedObject.view;
+        this._changeDetectorRef.markForCheck();
+      }
     });
   }
   
