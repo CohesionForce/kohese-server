@@ -84,7 +84,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           modelName: name,
           parentId: 'view-item',
           viewProperties: {},
-          formatDefinitions: [
+          formatDefinitions:
             {
               '89324a90-a7af-11e8-8662-71e48f0160fe': {
                 'name': 'New definition',
@@ -115,7 +115,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
                 'id': '89324a90-a7af-11e8-8662-71e48f0160fe'
               }
             }
-          ],
+          ,
           defaultFormatKey: '89324a90-a7af-11e8-8662-71e48f0160fe'
         });
 
