@@ -85,38 +85,36 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           modelName: name,
           parentId: 'view-item',
           viewProperties: {},
-          formatDefinitions: [
-            {
-              '89324a90-a7af-11e8-8662-71e48f0160fe': {
-                'name': 'New definition',
-                'header': {
-                  'kind': 'header',
+          formatDefinitions: {
+            '89324a90-a7af-11e8-8662-71e48f0160fe': {
+              'name': 'New definition',
+              'header': {
+                'kind': 'header',
+                'contents': [
+                   {
+                     'propertyName': 'name',
+                     'hideLabel': false,
+                     'labelOrientation': 'Top',
+                     'kind': 'text'
+                   }
+                 ]
+               },
+              'containers': [
+                {
+                  'kind': 'list',
                   'contents': [
                     {
-                      'propertyName': 'name',
-                      'hideLabel': false,
-                      'labelOrientation': 'Top',
-                      'kind': 'text'
+                       'propertyName': 'description',
+                       'hideLabel': false,
+                       'labelOrientation': 'Top',
+                       'kind': 'markdown'
                     }
-                  ]
-                },
-                'containers': [
-                  {
-                    'kind': 'list',
-                    'contents': [
-                      {
-                        'propertyName': 'description',
-                        'hideLabel': false,
-                        'labelOrientation': 'Top',
-                        'kind': 'markdown'
-                      }
-                    ]
-                  }
-                ],
-                'id': '89324a90-a7af-11e8-8662-71e48f0160fe'
-              }
+                 ]
+                }
+              ],
+              'id': '89324a90-a7af-11e8-8662-71e48f0160fe'
             }
-          ],
+          },
           defaultFormatKey: '89324a90-a7af-11e8-8662-71e48f0160fe'
         });
 
