@@ -23,9 +23,9 @@
         </th>
         <td mat-cell *matCellDef="let proxy" style="padding: 0px 9px;"
           [ngStyle]="getCheckboxColumnWidth()">
-          <mat-checkbox [disabled]="disabled" [checked]="selectedIds.indexOf(
-            proxy.item.id) !== -1" (click)="$event.stopPropagation()"
-            (change)="checkStateChanged($event.checked, proxy)">
+          <mat-checkbox [checked]="selectedIds.indexOf(proxy.item.id) !== -1"
+            (click)="$event.stopPropagation()" (change)="checkStateChanged(
+            $event.checked, proxy)">
           </mat-checkbox>
         </td>
       </ng-container>
