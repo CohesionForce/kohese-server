@@ -366,6 +366,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this._itemRepository.upsertItem(targetingProxy);
     }
   }
+  
+  protected mayMove(object: any): boolean {
+    return super.mayMove(object) && !(object as ItemProxy).internal;
+  }
 
   private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:
     VersionDesignator): void {
