@@ -38,7 +38,7 @@ export class KMarkdownComponent extends UserInput
     })
     this.formGroupSub = this.formGroup.get(this.fieldId).valueChanges.subscribe(value => {
       this.markdownData = value;
-    })
+    });
   }
 
   ngOnDestroy () {
@@ -64,5 +64,20 @@ export class KMarkdownComponent extends UserInput
   showCheatSheet() {
     this.dialogService.openComponentDialog(MarkdownCheatSheetComponent, {
     });
+  }
+  
+  public addImagesToMarkdown(insertionIndex: number, images: Array<File>):
+    void {
+    let fileReader: FileReader = new FileReader();
+    for (let j: number = images.length - 1; j >= 0; j--) {
+      fileReader.onload = () => {
+        let imageReference: string = '![' + images[j].name + '](' + fileReader.
+          result + ')';
+        this.formGroup.get(this.fieldId).setValue(this.markdownData.substring(
+          0, insertionIndex) + imageReference + this.markdownData.substring(
+          insertionIndex));
+      };
+      fileReader.readAsDataURL(images[j]);
+    }
   }
 }  

@@ -30,5 +30,20 @@ export class KdMarkdownComponent implements OnInit {
     this.dialogService.openComponentDialog(MarkdownCheatSheetComponent, {
     });
   }
-
+  
+  public addImagesToMarkdown(insertionIndex: number, images: Array<File>):
+    void {
+    let fileReader: FileReader = new FileReader();
+    for (let j: number = images.length - 1; j >= 0; j--) {
+      fileReader.onload = () => {
+        let imageReference: string = '![' + images[j].name + '](' + fileReader.
+          result + ')';
+        let markdown: string = this.proxy.item[this.property.propertyName];
+        this.proxy.item[this.property.propertyName] = (markdown.substring(0,
+          insertionIndex) + imageReference + markdown.substring(
+          insertionIndex));
+      };
+      fileReader.readAsDataURL(images[j]);
+    }
+  }
 }

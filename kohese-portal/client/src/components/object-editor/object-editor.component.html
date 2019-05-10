@@ -62,15 +62,10 @@
           </mat-form-field>
         </ng-container>
         <ng-container *ngSwitchCase="'markdown'">
-          <mat-form-field style="width: 100%;">
-            <textarea matInput placeholder="{{getAttributeRepresentation(
-              attributeName)}}" columns="80" rows="3" [(ngModel)]="copy[
-              attributeName]" style="width: 50%;">
-            </textarea>
-            <span style="width: 50%;">
-              <markdown [data]="copy[attributeName]"></markdown>
-            </span>
-          </mat-form-field>
+          <markdown-editor [value]="copy[attributeName]"
+            [valueIdentifier]="getAttributeRepresentation(attributeName)"
+            (valueChanged)="copy[attributeName] = $event">
+          </markdown-editor>
         </ng-container>
         <ng-container *ngSwitchCase="'StateMachine'">
           <label style="width: 40%;">
