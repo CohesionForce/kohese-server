@@ -9,13 +9,13 @@
             <span *ngSwitchCase="LENSES.HISTORY">
               <mat-icon class="custom-font-icon h-icon"></mat-icon>
             </span>
-            <span *ngSwitchCase="LENSES.DEFAULT"> 
+            <span *ngSwitchCase="LENSES.DEFAULT">
               <mat-icon class="custom-font-icon d-icon"></mat-icon>
             </span>
-            <span *ngSwitchCase="LENSES.BRANCH"> 
+            <span *ngSwitchCase="LENSES.BRANCH">
               <mat-icon class="custom-font-icon b-icon"></mat-icon>
             </span>
-            <span *ngSwitchCase="LENSES.SPHERE"> 
+            <span *ngSwitchCase="LENSES.SPHERE">
               <mat-icon class="custom-font-icon s-icon"></mat-icon>
             </span>
           </span>
@@ -36,6 +36,9 @@
           </button>
           <button mat-menu-item (click)="openImportDialog()">
             Import
+          </button>
+          <button mat-menu-item (click)="openUploadDialog()">
+            Upload Image
           </button>
         </mat-menu>
       </ng-container>
