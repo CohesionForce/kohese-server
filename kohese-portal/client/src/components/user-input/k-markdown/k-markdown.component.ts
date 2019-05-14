@@ -59,6 +59,8 @@ export class KMarkdownComponent extends UserInput
   ngOnChanges (changes : SimpleChanges) {
     if (changes['formGroup']) {
       this.formGroup = changes['formGroup'].currentValue;
+      this._value = this.formGroup.get(this.fieldId).value;
+      this.formatValue();
     }
   }
 
@@ -97,13 +99,14 @@ export class KMarkdownComponent extends UserInput
       if ((images[j].type === 'image/png') || (images[j].type ===
         'image/jpeg')) {
         fileReader.onload = () => {
+          this._images.push(fileReader.result);
           let imageReference: string = '![' + images[j].name + '](' +
-            fileReader.result + ')';
-          this._value = (this._value ? this._value.substring(0, insertionIndex)
-            : '') + imageReference + (this._value ? this._value.substring(
-            insertionIndex) : '');
-          this.formatValue();
-          this.formGroup.get(this.fieldId).setValue(this._value);
+            (this._images.length - 1) + ')';
+          this._formattedValue = (this._formattedValue ? this._formattedValue.
+            substring(0, insertionIndex) : '') + imageReference + (this.
+            _formattedValue ? this._formattedValue.substring(insertionIndex) :
+            '');
+          this.updateValue(this._formattedValue);
         };
         fileReader.readAsDataURL(images[j]);
       }

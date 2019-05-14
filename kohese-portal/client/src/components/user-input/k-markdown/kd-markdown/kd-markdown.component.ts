@@ -68,13 +68,14 @@ export class KdMarkdownComponent implements OnInit {
       if ((images[j].type === 'image/png') || (images[j].type ===
         'image/jpeg')) {
         fileReader.onload = () => {
+          this._images.push(fileReader.result);
           let imageReference: string = '![' + images[j].name + '](' +
-            fileReader.result + ')';
-          let markdown: string = this.proxy.item[this.property.propertyName];
-          this.proxy.item[this.property.propertyName] = (markdown ? markdown.
-            substring(0, insertionIndex) : '') + imageReference + (markdown ?
-            markdown.substring(insertionIndex) : '');
-          this.formatValue();
+            (this._images.length - 1) + ')';
+          this._formattedValue = (this._formattedValue ? this._formattedValue.
+            substring(0, insertionIndex) : '') + imageReference + (this.
+            _formattedValue ? this._formattedValue.substring(insertionIndex) :
+            '');
+          this.updateValue(this._formattedValue);
         };
         fileReader.readAsDataURL(images[j]);
       }
