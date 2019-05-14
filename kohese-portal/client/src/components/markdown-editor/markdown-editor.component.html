@@ -2,7 +2,7 @@
   {{valueIdentifier}}
   <div style="height: 10%; width: 100%; display: flex; flex-direction: row;">
     <!-- Hide the file input and route its functionality to a button -->
-    <input type="file" #fileInput multiple accept="image/png"
+    <input type="file" #fileInput multiple accept="image/png, image/jpeg"
       style="display: none;" (change)="addImagesToMarkdown(textArea.
       selectionStart, fileInput.files)" class="flex-right-align"/>
     <button mat-icon-button matTooltip="Add images" (click)="fileInput.click()"
@@ -16,12 +16,13 @@
   </div>
   <mat-form-field style="height: 45%; width: 100%;">
     <textarea matInput #textArea placeholder="Markdown" columns="80" rows="3"
-    [(ngModel)]="value" (ngModelChange)="valueChangedEmitter.emit(value)"
-    (paste)="addImagesToMarkdown(textArea.selectionStart, fileInput.files)">
+      [ngModel]="formattedValue" (ngModelChange)="updateValue($event)"
+      (paste)="addImagesToMarkdown(textArea.selectionStart, $event.
+      clipboardData.files)">
   </textarea>
   </mat-form-field>
   <div style="height: 45%; width: 100%;">
-    Preview
+    Preview:
     <markdown [data]="value"></markdown>
   </div>
 </div>
