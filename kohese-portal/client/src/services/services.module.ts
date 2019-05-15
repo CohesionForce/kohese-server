@@ -9,6 +9,7 @@ import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
 
 /* Custom */
+import { MarkdownEditorModule } from '../components/markdown-editor/markdown-editor.module';
 import { ItemRepository } from './item-repository/item-repository.service';
 import { SocketService } from './socket/socket.service';
 import { SessionService } from './user/session.service';
@@ -17,6 +18,7 @@ import { NavigationService } from './navigation/navigation.service';
 import { AnalysisService } from './analysis/analysis.service';
 import { DynamicTypesService } from './dynamic-types/dynamic-types.service';
 import { ImportService } from './import/import.service';
+import { UploadService } from './upload/upload.service';
 import { DataProcessingService } from './data/data-processing.service';
 import { DialogService, DialogComponent } from './dialog/dialog.service';
 import { StateService } from './state/state.service';
@@ -40,6 +42,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
+    MarkdownEditorModule
   ],
   exports : [
     DialogComponent
@@ -58,6 +61,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
     DialogService,
     DynamicTypesService,
     ImportService,
+    UploadService,
     StateService,
     LensService,
     ProjectService,

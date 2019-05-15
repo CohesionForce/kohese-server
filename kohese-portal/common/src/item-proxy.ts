@@ -181,10 +181,12 @@ export class ItemProxy {
 
     parent.addChild(proxy);
 
-    if (loadPending && (proxy.item.parentId !== 'LOST+FOUND')){
+    if (loadPending && (proxy.item.parentId !== 'LOST+FOUND') && (this.kind !==
+      'Internal') && (this.kind !== 'Internal-Model') && (this.kind !==
+      'Internal-View-Model')) {
       // Remove load pending since the item has now been loaded
       delete proxy.item.loadPending;
-      delete proxy.internal;
+      this.internal = false;
     }
 
     if (proxy.children){
@@ -539,13 +541,12 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   setItemKind(kind){
     this.kind = kind;
+    this.internal = ((this.kind === 'Internal') || (this.kind ===
+      'Internal-Lost') || (this.kind === 'Internal-Model') || (this.kind ===
+      'Internal-View-Model'));
 
     if (TreeConfiguration.koheseModelDefn){
       this.model = TreeConfiguration.koheseModelDefn.getModelProxyFor(kind);
-      if (this.internal && this.model && !this.model.internal) {
-        // Item was previously created in lost and found
-        delete this.internal;
-      }
     } else {
       this.treeConfig.proxyHasDeferredModelAssociation[this.item.id] = this;
     }

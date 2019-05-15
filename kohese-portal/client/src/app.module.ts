@@ -13,6 +13,7 @@ import { DocumentViewModule } from './components/document-view/document-view.mod
 import { ActionTableModule } from './components/action-table/action-table.module';
 import { TypeEditorModule } from './components/type-editor/type-editor.module';
 import { CreateWizardModule } from './components/create-wizard/create-wizard.module';
+import { UploadImageModule } from './components/upload-image/upload-image.module';
 import { PipesModule } from './pipes/pipes.module';
 import { AppFrameModule } from './components/app-frame/app-frame.module';
 import { ServicesModule } from './services/services.module';
@@ -25,6 +26,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ExploreModule } from './components/explore/explore.module';
+import { ObjectEditorModule } from './components/object-editor/object-editor.module';
 import { NavigatorModule } from './components/navigator/navigator.module';
 import { StateMachineEditorModule } from './components/state-machine-editor/state-machine-editor.module';
 import { TreeViewModule } from './components/tree/tree.module'
@@ -65,6 +67,7 @@ import { LensModule } from './components/lens/lens.module';
     TypeEditorModule,
     TreeModule.forRoot(),
     CreateWizardModule,
+    UploadImageModule,
     AppFrameModule,
     AuthenticationModule,
     LoginModule,
@@ -74,6 +77,7 @@ import { LensModule } from './components/lens/lens.module';
     DashboardModule,
     CompareItemsModule,
     ExploreModule,
+    ObjectEditorModule,
     NavigatorModule,
     StateMachineEditorModule,
     TreeViewModule,

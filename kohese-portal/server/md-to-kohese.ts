@@ -8,7 +8,7 @@ var commonmark = require('commonmark');
 var renderFunc = require('./md-to-kohese-helper');
 import { ItemProxy } from '../common/src/item-proxy';
 
-function mdToKohese(koheseUserName, filePath, rootItem) {
+function mdToKohese(koheseUserName, filePath, rootItem, preambleRequired) {
   var text;
 
   try {
@@ -42,7 +42,7 @@ function mdToKohese(koheseUserName, filePath, rootItem) {
     if(event.entering && event.node.type === 'document') {
       event = walker.next();
       // Check if document begins with heading. If not, make an item.
-      if(!(event.entering && event.node.type === 'heading')) {
+      if(!(event.entering && event.node.type === 'heading') && preambleRequired) {
         koheseItem = {
             name: 'Preamble',
             description: '',

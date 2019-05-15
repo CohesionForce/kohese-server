@@ -8,9 +8,15 @@ import {
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ObjectEditorComponent } from '../../object-editor/object-editor.component';
+import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import { DialogService,
+  DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Subscription ,  BehaviorSubject } from 'rxjs';
 
@@ -43,6 +49,11 @@ export class DetailsFormComponent extends NavigatableComponent
   }
   @Output()
   public nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
+  
+  private _usernames: Array<string> = [];
+  get usernames() {
+    return this._usernames;
+  }
 
   /* Utils */
   public formGroup: FormGroup;
@@ -51,10 +62,15 @@ export class DetailsFormComponent extends NavigatableComponent
   private editableStreamSubscription: Subscription;
   private _fieldFilterSubscription: Subscription;
   private _proxyStreamSubscription: Subscription;
+  
+  get Array() {
+    return Array;
+  }
 
   constructor(protected NavigationService: NavigationService,
     private FormBuilder: FormBuilder,
-    private DynamicTypeService: DynamicTypesService) {
+    private DynamicTypeService: DynamicTypesService, private _dialogService:
+    DialogService, private _itemRepository: ItemRepository) {
     super(NavigationService);
     this.initialized = false;
   }
@@ -99,6 +115,15 @@ export class DetailsFormComponent extends NavigatableComponent
       this.formGroup = this.createFormGroup();
       this.formGroupUpdated.emit(this.formGroup);
     });
+    
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree({
+      includeOrigin: false
+    }, (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === 'KoheseUser') {
+        this._usernames.push(itemProxy.item.name);
+      }
+    });
+    this._usernames.sort();
 
     this.initialized = true;
   }
@@ -149,11 +174,327 @@ export class DetailsFormComponent extends NavigatableComponent
     return propertyMap;
   }
 
-  public whenNonFormFieldChanges(fieldName: string, fieldValue, any): void {
+  public whenNonFormFieldChanges(fieldName: string, fieldValue: any): void {
     this._nonFormFieldMap.set(fieldName, fieldValue);
     this.nonFormFieldChanged.emit({
       fieldName: fieldName,
       fieldValue: fieldValue
     });
+  }
+  
+  public getTypeName(typeValue: any): string {
+    let type: string;
+    if (Array.isArray(typeValue)) {
+      type = typeValue[0];
+    } else {
+      type = typeValue;
+    }
+    
+    return type;
+  }
+  
+  public openObjectEditor(attributeName: string): void {
+    let type: any = this.getType(attributeName);
+    let isLocalTypeInstance: boolean = (Object.keys(this.
+      DynamicTypeService.getKoheseTypes()).indexOf(type.name) === -1);
+    let value: any = this.proxyStream.getValue().item[attributeName];
+    this._dialogService.openComponentDialog(ObjectEditorComponent, {
+      data: {
+        object: ((!value || isLocalTypeInstance) ? value : TreeConfiguration.
+          getWorkingTree().getProxyFor(value.id).item),
+        type: type
+      },
+      disableClose: true
+    }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
+      any) => {
+      if (returnedObject) {
+        if (isLocalTypeInstance) {
+          this.proxyStream.getValue().item[attributeName] = returnedObject;
+          this.whenNonFormFieldChanges(attributeName, returnedObject);
+        } else {
+          this._itemRepository.upsertItem(returnedObject as ItemProxy);
+        }
+      }
+    });
+  }
+  
+  public openObjectSelector(attributeName: string): void {
+    let type: any = this.getType(attributeName);
+    let isLocalTypeInstance: boolean = (Object.keys(this.
+      DynamicTypeService.getKoheseTypes()).indexOf(type.name) === -1);
+    if (isLocalTypeInstance) {
+      this._dialogService.openComponentDialog(ObjectEditorComponent, {
+        data: {
+          object: this.proxyStream.getValue().item[attributeName],
+          type: type
+        }
+      }).updateSize('90%', '90%').afterClosed().subscribe((localTypeInstance:
+        any) => {
+        if (localTypeInstance) {
+          this.proxyStream.getValue().item[attributeName] = localTypeInstance;
+          this.whenNonFormFieldChanges(attributeName, localTypeInstance);
+        }
+      });
+    } else {
+      this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+        data: {
+          type: this.getTypeName(this.type.fields[attributeName].type),
+          selected: (this.proxyStream.getValue().item[attributeName] ?
+            TreeConfiguration.getWorkingTree().getProxyFor(this.proxyStream.
+            getValue().item[attributeName].id) : undefined)
+        }
+      }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
+        ItemProxy) => {
+        if (itemProxy) {
+          this.proxyStream.getValue().item[attributeName] = {
+            id: itemProxy.item.id
+          };
+          this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+            getValue().item[attributeName]);
+        }
+      });
+    }
+  }
+  
+  public addValue(attributeName: string): void {
+    // Migration code
+    if (!this.proxyStream.getValue().item[attributeName]) {
+      this.proxyStream.getValue().item[attributeName] = [];
+    }
+    
+    this.editValue(this.proxyStream.getValue().item[attributeName].length,
+      attributeName);
+  }
+  
+  public editValue(index: number, attributeName: string): void {
+    const DIALOG_TITLE: string = 'Specify Value';
+    let value: any = this.proxyStream.getValue().item[attributeName][index];
+    switch (this.getTypeName(this.type.fields[attributeName].type)) {
+      case 'boolean':
+        if (value == null) {
+          value = false;
+        }
+        this._dialogService.openSelectDialog(DIALOG_TITLE, '',
+          attributeName, value, [true, false]).afterClosed().subscribe(
+          (value: boolean) => {
+          if (value != null) {
+            this.proxyStream.getValue().item[attributeName].splice(index, 1,
+              value);
+            this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+              getValue().item[attributeName]);
+          }
+        });
+        break;
+      case 'number':
+        if (value == null) {
+          value = 0;
+        }
+        
+        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
+          INPUT_TYPES.NUMBER, attributeName, value).afterClosed().subscribe(
+          (value: number) => {
+          if (value != null) {
+            this.proxyStream.getValue().item[attributeName].splice(index, 1,
+              value);
+            this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+              getValue().item[attributeName]);
+          }
+        });
+        break;
+      case 'date':
+        if (value == null) {
+          value = new Date().getTime();
+        }
+        
+        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
+          INPUT_TYPES.DATE, attributeName, value).afterClosed().subscribe(
+          (value: number) => {
+          if (value != null) {
+            this.proxyStream.getValue().item[attributeName].splice(index, 1,
+              value);
+            this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+              getValue().item[attributeName]);
+          }
+        });
+        break;
+      case 'string':
+        if (value == null) {
+          value = '';
+        }
+        
+        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
+          INPUT_TYPES.TEXT, attributeName, value).afterClosed().subscribe(
+          (value: string) => {
+          if (value) {
+            this.proxyStream.getValue().item[attributeName].splice(index, 1,
+              value);
+            this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+              getValue().item[attributeName]);
+          }
+        });
+        break;
+      case 'markdown':
+        if (value == null) {
+          value = '';
+        }
+        
+        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
+          INPUT_TYPES.MARKDOWN, attributeName, value).afterClosed().subscribe(
+          (value: string) => {
+          if (value) {
+            this.proxyStream.getValue().item[attributeName].splice(index, 1,
+              value);
+            this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+              getValue().item[attributeName]);
+          }
+        });
+        break;
+      case 'user-selector':
+        if (value == null) {
+          value = 'admin';
+        }
+        
+        this._dialogService.openSelectDialog(DIALOG_TITLE, '',
+          attributeName, value, this._usernames).afterClosed().subscribe(
+          (value: string) => {
+          if (value != null) {
+            this.proxyStream.getValue().item[attributeName].splice(index, 1,
+              value);
+            this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+              getValue().item[attributeName]);
+          }
+        });
+        break;
+      default:
+        let type: any = this.getType(attributeName);
+        let isLocalTypeInstance: boolean = (Object.keys(this.
+          DynamicTypeService.getKoheseTypes()).indexOf(type.name) === -1);
+        if (!isLocalTypeInstance) {
+          this._dialogService.openComponentDialog(
+            ProxySelectorDialogComponent, {
+            data: {
+              type: this.getTypeName(this.type.fields[attributeName].type),
+              selected: (this.proxyStream.getValue().item[attributeName] ?
+                TreeConfiguration.getWorkingTree().getProxyFor(this.
+                proxyStream.getValue().item[attributeName].id) : undefined)
+            }
+          }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
+            ItemProxy) => {
+            if (itemProxy) {
+              this.proxyStream.getValue().item[attributeName].splice(index,
+                1, {
+                id: itemProxy.item.id
+              });
+              this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+                getValue().item[attributeName]);
+            }
+          });
+        } else {
+          this._dialogService.openComponentDialog(ObjectEditorComponent, {
+            data: {
+              object: ((!value || isLocalTypeInstance) ? value :
+                TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
+              type: type
+            },
+            disableClose: true
+          }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
+            any) => {
+            if (returnedObject) {
+              if (isLocalTypeInstance) {
+                this.proxyStream.getValue().item[attributeName].splice(index,
+                  1, returnedObject);
+                this.whenNonFormFieldChanges(attributeName, this.proxyStream.
+                  getValue().item[attributeName]);
+              } else {
+                this._itemRepository.upsertItem(returnedObject as ItemProxy);
+              }
+            }
+          });
+        }
+    }
+  }
+  
+  public removeValue(index: number, attributeName: string): void {
+    this.proxyStream.getValue().item[attributeName].splice(index, 1);
+    this.whenNonFormFieldChanges(attributeName, this.proxyStream.getValue().
+      item[attributeName]);
+  }
+  
+  public getStateTransitionCandidates(attributeName: string): any {
+    let stateTransitionCandidates: any = {};
+    let currentStateName: string = this.proxyStream.getValue().item[
+      attributeName];
+    let stateMachine: any = this.type.fields[attributeName].properties;
+    if (stateMachine) {
+      for (let transitionName in stateMachine.transition) {
+        let transition: any = stateMachine.transition[transitionName];
+        if (transition.source === currentStateName) {
+          stateTransitionCandidates[transitionName] = transition;
+        }
+      }
+    }
+    
+    return stateTransitionCandidates;
+  }
+  
+  public getStringRepresentation(index: number, attributeName: string):
+    string {
+    let value: any;
+    if (index != null) {
+      value = this.proxyStream.getValue().item[attributeName][index];
+    } else {
+      value = this.proxyStream.getValue().item[attributeName];
+    }
+    
+    let representation: string = String(value);
+    if (representation === String({})) {
+      let type: any = this.getType(attributeName);
+      if (Object.keys(this.DynamicTypeService.getKoheseTypes()).indexOf(type.
+        name) === -1) {
+        representation = type.name;
+      } else {
+        representation = TreeConfiguration.getWorkingTree().getProxyFor(value.
+          id).item.name;
+      }
+    }
+    
+    return representation;
+  }
+  
+  public getAttributeRepresentation(attributeName: string): string {
+    let attributeRepresentation: string = attributeName;
+    if (this.type.fields[attributeName].required) {
+      attributeRepresentation += '*';
+    }
+    
+    return attributeRepresentation;
+  }
+  
+  private getType(attributeName: string): any {
+    let typeName: string = this.getTypeName(this.type.dataModelProxy.item.
+      properties[attributeName].type);
+    let type: any;
+    if (this.type.dataModelProxy.item.localTypes) {
+      for (let j: number = 0; j < this.type.dataModelProxy.item.localTypes.
+        length; j++) {
+        let localType: any = this.type.dataModelProxy.item.localTypes[j];
+        if (localType.name === typeName) {
+          type = localType;
+          break;
+        }
+      }
+    }
+    
+    if (!type) {
+      let koheseTypes: any = this.DynamicTypeService.getKoheseTypes();
+      for (let koheseTypeName in koheseTypes) {
+        if (koheseTypeName === typeName) {
+          type = koheseTypes[koheseTypeName].dataModelProxy.item;
+          break;
+        }
+      }
+    }
+    
+    return type;
   }
 }

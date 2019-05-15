@@ -6,6 +6,9 @@ import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 
 @Component({
   selector: 'local-type-editor',
@@ -140,7 +143,9 @@ export class LocalTypeEditorComponent implements OnInit {
   
   public addAttribute(): void {
     this._dialogService.openComponentDialog(AttributeEditorComponent, {
-      data: {},
+      data: {
+        type: this._type
+      },
       disableClose: true
     }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
       any) => {
@@ -154,23 +159,101 @@ export class LocalTypeEditorComponent implements OnInit {
     });
   }
   
-  public editAttribute(attributeName: string): void {
+  public mayEditAttribute(attributeName: string): Promise<boolean> {
+    let koheseType: KoheseType;
+    let localType: any;
+    let koheseTypes: Array<KoheseType> = Object.values(this.
+      _dynamicTypesService.getKoheseTypes());
+    for (let j: number = 0; j < koheseTypes.length; j++) {
+      if (koheseTypes[j].dataModelProxy.item === this._type) {
+        koheseType = koheseTypes[j];
+        break;
+      } else {
+        let localTypes: Array<any> = koheseTypes[j].dataModelProxy.item.
+          localTypes;
+        for (let k: number = 0; k < localTypes.length; k++) {
+          if (localTypes[k] === this._type) {
+            koheseType = koheseTypes[j];
+            localType = localTypes[k];
+            break;
+          }
+        }
+      }
+    }
+    
+    let itemProxys: Array<ItemProxy> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
+      (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === koheseType.dataModelProxy.item.name) {
+        if (localType) {
+          let attributes: any = koheseType.dataModelProxy.item.properties;
+          for (let globalTypeAttributeName in attributes) {
+            let attributeType: string;
+            if (Array.isArray(attributes[globalTypeAttributeName].type)) {
+              attributeType = attributes[globalTypeAttributeName].type[0];
+            } else {
+              attributeType = attributes[globalTypeAttributeName].type;
+            }
+            
+            if ((attributeType === localType.name) && itemProxy.item[
+              globalTypeAttributeName] && (itemProxy.item[
+              globalTypeAttributeName][attributeName] != null)) {
+              itemProxys.push(itemProxy);
+            }
+          }
+        } else {
+          if (itemProxy.item[attributeName] != null) {
+            itemProxys.push(itemProxy);
+          }
+        }
+      }
+    });
+    
+    if (itemProxys.length > 0) {
+      let message: string = 'The following Items prevent modification ' +
+        'of ' + attributeName + ':\n';
+      for (let j: number = 0; j < itemProxys.length; j++) {
+        message += '\n\t- ';
+        message += itemProxys[j].item.name;
+      }
+      return this._dialogService.openInformationDialog(
+        attributeName + ' Modification Prevented', message).toPromise().then(() => {
+        return false;  
+      });
+    } else {
+      return Promise.resolve(true);
+    }
+  }
+  
+  public async editAttribute(attributeName: string): Promise<void> {
     this._dialogService.openComponentDialog(AttributeEditorComponent, {
       data: {
         attributeName: attributeName,
         attribute: this._type.properties[attributeName],
-        view: this._view.viewProperties[attributeName]
+        type: this._type,
+        view: this._view.viewProperties[attributeName],
+        editable: await this.mayEditAttribute(attributeName)
       },
       disableClose: true
     }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
       any) => {
-      this._changeDetectorRef.markForCheck();
+      if (attributeName !== returnedObject.attributeName) {
+        delete this._type.properties[attributeName];
+        this._type.properties[returnedObject.attributeName] = returnedObject.
+          attribute;
+        delete this._view.viewProperties[attributeName];
+        this._view.viewProperties[returnedObject.attributeName] =
+          returnedObject.view;
+        this._changeDetectorRef.markForCheck();
+      }
     });
   }
   
-  public removeAttribute(attributeName: string): void {
-    delete this._type.properties[attributeName];
-    delete this._view.viewProperties[attributeName];
-    this._changeDetectorRef.markForCheck();
+  public async removeAttribute(attributeName: string): Promise<void> {
+    if (await this.mayEditAttribute(attributeName)) {
+      delete this._type.properties[attributeName];
+      delete this._view.viewProperties[attributeName];
+      this._changeDetectorRef.markForCheck();
+    }
   }
 }

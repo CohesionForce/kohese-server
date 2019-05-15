@@ -11,6 +11,12 @@ export class DynamicTypesService {
   /* Data */
   koheseTypes: object;
   treeConfig: any;
+  
+  private _localTypeMap: Map<string, Array<string>> =
+    new Map<string, Array<string>>();
+  get localTypeMap() {
+    return this._localTypeMap;
+  }
 
   /* Subscriptions */
   treeConfigSubscription: Subscription;
@@ -20,7 +26,8 @@ export class DynamicTypesService {
     'date': 'Date',
     'select': 'Select',
     'markdown': 'Markdown',
-    'proxy-selector': 'Reference',
+    'reference': 'Reference',
+    'proxy-selector': 'Item Reference',
     'user-selector': 'User Name',
     'state-editor': 'State Editor'
   };
@@ -87,6 +94,18 @@ export class DynamicTypesService {
     for (let koheseTypeName in intermediateObject) {
       this.koheseTypes[koheseTypeName] = intermediateObject[koheseTypeName];
     }
+    
+    let localTypeNames: Array<string> = [];
+    
+    // Migration code
+    if (!dataModelProxy.item.localTypes) {
+      dataModelProxy.item.localTypes = [];
+    }
+    
+    for (let j: number = 0; j < dataModelProxy.item.localTypes.length; j++) {
+      localTypeNames.push(dataModelProxy.item.localTypes[j].name);
+    }
+    this._localTypeMap.set(dataModelProxy.item.name, localTypeNames);
   }
 
   getViewProxyFor(modelProxy: ItemProxy): ItemProxy {

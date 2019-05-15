@@ -16,6 +16,8 @@ import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -41,6 +43,7 @@ describe('Component: Details Form', ()=>{
       providers: [
         {provide: NavigationService, useClass: MockNavigationService },
         {provide: FormBuilder, useClass: FormBuilder },
+        { provide: DialogService, useClass: MockDialogService },
         {provide: DynamicTypesService, useClass: MockDynamicTypesService },
         {provide: ItemRepository, useClass: MockItemRepository }
       ]

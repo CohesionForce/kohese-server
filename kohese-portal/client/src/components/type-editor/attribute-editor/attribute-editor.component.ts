@@ -1,9 +1,11 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   Optional, Inject, Input } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 
@@ -32,6 +34,15 @@ export class AttributeEditorComponent implements OnInit {
     this._attribute = attribute;
   }
   
+  private _type: any;
+  get type() {
+    return this._type;
+  }
+  @Input('type')
+  set type(type: any) {
+    this._type = type;
+  }
+  
   private _view: any;
   get view() {
     return this._view;
@@ -39,6 +50,15 @@ export class AttributeEditorComponent implements OnInit {
   @Input('view')
   set view(view: any) {
     this._view = view;
+  }
+  
+  private _editable: boolean = true;
+  get editable() {
+    return this._editable;
+  }
+  @Input('editable')
+  set editable(editable: boolean) {
+    this._editable = editable;
   }
   
   get dynamicTypesService() {
@@ -72,9 +92,11 @@ export class AttributeEditorComponent implements OnInit {
   private _fundamentalTypes: any = {
     'Boolean': 'boolean',
     'Number': 'number',
-    'String': 'string',
+    'Date': 'date',
+    'Text': 'string',
+    'Markdown': 'markdown',
     'State': 'StateMachine',
-    'Object': 'object'
+    'Username': 'user-selector'
   };
   get fundamentalTypes() {
     return this._fundamentalTypes;
@@ -91,6 +113,7 @@ export class AttributeEditorComponent implements OnInit {
   }
   
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
+    @Optional() private _matDialogRef: MatDialogRef<AttributeEditorComponent>,
     private _changeDetectorRef: ChangeDetectorRef,
     private _dynamicTypesService: DynamicTypesService, private _dialogService:
     DialogService) {
@@ -101,7 +124,12 @@ export class AttributeEditorComponent implements OnInit {
       if (this._data['attribute']) {
         this._attributeName = this._data['attributeName'];
         this._attribute = this._data['attribute'];
+        this._type = this._data['type'];
         this._view = this._data['view'];
+      }
+      
+      if (this._data['editable'] === false) {
+        this._editable = false;
       }
     }
     
@@ -126,6 +154,13 @@ export class AttributeEditorComponent implements OnInit {
           }
 
           this._idAttributes[typeName].push(attributeName);
+        }
+      }
+      
+      if (koheseType.dataModelProxy.item === this._type) {
+        for (let j: number = 0; j < this._type.localTypes.length; j++) {
+          let localType: any = this._type.localTypes[j];
+          this._attributeTypes[localType.name] = localType.name;
         }
       }
     }
@@ -200,5 +235,13 @@ export class AttributeEditorComponent implements OnInit {
   public areRelationsEqual(option: any, selection: any): boolean {
     return ((option.kind === selection.kind) && (option.foreignKey ===
       selection.foreignKey));
+  }
+  
+  public close(accept: boolean): void {
+    this._matDialogRef.close(accept ? {
+        attributeName: this._attributeName,
+        attribute: this._attribute,
+        view: this._view
+      } : undefined);
   }
 }

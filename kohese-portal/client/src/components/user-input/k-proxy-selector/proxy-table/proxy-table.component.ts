@@ -35,7 +35,9 @@ export interface RemoveEvent {
   ]
 })
 export class ProxyTableComponent implements OnInit {
-    private _columns: Array<string> = ['checkbox'];
+    private static readonly _CHECKBOX_COLUMN_ID: string = 'checkbox';
+    private _columns: Array<string> = [ProxyTableComponent.
+      _CHECKBOX_COLUMN_ID];
     get columns() {
       return this._columns;
     }
@@ -49,14 +51,16 @@ export class ProxyTableComponent implements OnInit {
     expandedFormat: any;
     expandedEdit = false;
     private _disabled: boolean = false;
-    get disabled() {
-      return this._disabled;
-    }
     @Input('disabled')
     set disabled(disabled: boolean) {
       this._disabled = disabled;
       this._intermediateSelectedIds.fill(undefined);
       this._selectedIds.length = 0;
+      if (this._disabled) {
+        this._columns.splice(0, 1);
+      } else {
+        this._columns.splice(0, 0, ProxyTableComponent._CHECKBOX_COLUMN_ID);
+      }
       this.changeRef.markForCheck();
     }
 
@@ -222,8 +226,9 @@ export class ProxyTableComponent implements OnInit {
       'min-width': '100px'
     };
     // Subtract one to account for the checkbox column
-    let equalWidth: number = ((tableDivWidth - ProxyTableComponent.
-      CHECKBOX_COLUMN_WIDTH) / (this._columns.length - 1));
+    let equalWidth: number = ((tableDivWidth - (this._disabled ? 0 :
+      ProxyTableComponent.CHECKBOX_COLUMN_WIDTH)) / (this._columns.length -
+      (this._disabled ? 0 : 1)));
     if (equalWidth > 100) {
       columnWidthStyle['min-width'] = equalWidth + 'px';
     }
@@ -233,9 +238,10 @@ export class ProxyTableComponent implements OnInit {
   
   public getRowWidthStyle(tableDivWidth: number): object {
     return {
-      'min-width': (((this._columns.length - 1) * (+this.getColumnWidthStyle(
-        tableDivWidth)['min-width'].replace('px', ''))) + ProxyTableComponent.
-        CHECKBOX_COLUMN_WIDTH) + 'px'
+      'min-width': (((this._columns.length - (this._disabled ? 0 : 1)) *
+        (+this.getColumnWidthStyle(tableDivWidth)['min-width'].replace('px',
+        ''))) + (this._disabled ? 0 : ProxyTableComponent.
+        CHECKBOX_COLUMN_WIDTH)) + 'px'
     };
   }
 }

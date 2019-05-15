@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { CreateWizardComponent } from '../../create-wizard/create-wizard.component'; 
+import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 import { ImportComponent } from '../../create-wizard/import/import.component';
+import { UploadImageComponent } from '../../upload-image/upload-image.component';
 import { CurrentUserService } from '../../../services/user/current-user.service';
 import { ApplicationLens, LensService } from '../../../services/lens-service/lens.service';
 import { Subscription } from 'rxjs';
@@ -19,7 +20,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   currentUserSubscription : Subscription;
   lensSubscription : Subscription;
-  
+
   constructor(private dialogService: DialogService,
     private itemRepository: ItemRepository,
     private currentUserService: CurrentUserService,
@@ -45,14 +46,20 @@ export class SideBarComponent implements OnInit, OnDestroy {
   changeLens(lens : ApplicationLens) {
     this.lensService.setLens(lens);
   }
-  
+
   openNewDialog(): void {
     this.dialogService.openComponentDialog(CreateWizardComponent, {}).
       updateSize('70%', '70%');
   }
-  
+
   openImportDialog(): void {
     this.dialogService.openComponentDialog(ImportComponent, {
+      data: {}
+    }).updateSize('70%', 'auto');
+  }
+
+  public openUploadDialog(): void {
+    this.dialogService.openComponentDialog(UploadImageComponent, {
       data: {}
     }).updateSize('70%', 'auto');
   }

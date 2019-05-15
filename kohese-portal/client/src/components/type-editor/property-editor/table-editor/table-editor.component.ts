@@ -1,6 +1,5 @@
 import { TableColumnSelectorComponent } from './table-column-selector/table-column-selector.component';
 import { DynamicTypesService } from './../../../../services/dynamic-types/dynamic-types.service';
-import { KoheseType } from './../../../../classes/UDT/KoheseType.class';
 import { TreeConfiguration } from './../../../../../../common/src/tree-configuration';
 import { ItemRepository, RepoStates } from './../../../../services/item-repository/item-repository.service';
 import { Subscription, Observable, BehaviorSubject } from 'rxjs';
@@ -15,10 +14,15 @@ import { TablePreviewDialogComponent } from './table-preview-dialog/table-previe
   styleUrls: ['./table-editor.component.scss']
 })
 export class TableEditorComponent implements OnInit, OnDestroy {
-  @Input()
-  formDefinition: any;
-  @Input()
-  currentKind: KoheseType;
+  private _tableDefinition: any;
+  get tableDefinition() {
+    return this._tableDefinition;
+  }
+  @Input('tableDefinition')
+  set tableDefinition(tableDefinition: any) {
+    this._tableDefinition = tableDefinition;
+  }
+  
   @Input()
   propertyId: string;
   repoStatusSubscription: Subscription;
@@ -44,28 +48,27 @@ export class TableEditorComponent implements OnInit, OnDestroy {
             this.types = this.typeService.getKoheseTypes();
             this.changeDetectorRef.markForCheck();
           });
-          if (!this.formDefinition.tableDef) {
-            this.formDefinition.tableDef = {};
-            this.formDefinition.tableKind = 'Action';
-            this.formDefinition.columns = ['name', 'createdBy'];
+          if (!this._tableDefinition) {
+            this._tableDefinition = {
+              tableKind: 'Action',
+              columns: ['name', 'createdBy']
+            };
             this.changeDetectorRef.markForCheck();
-            console.log('No table definition found');
           }
       }
     });
   }
 
   selectTableKind(kindEvent) {
-    if (this.formDefinition.tableDef) {
-      this.dialogService.openConfirmDialog('Table Discard', 'Changing table kind will discard your current table definition. Proceed?')
-        .subscribe((confirm) => {
-          if (confirm) {
-            this.formDefinition.tableDef.tableKind = kindEvent.value;
-            this.formDefinition.tableDef.columns = ['name', 'createdBy'];
-          }
-          this.changeDetectorRef.markForCheck();
-          });
-    }
+    this.dialogService.openConfirmDialog('Table Discard', 'Changing table '+
+      'kind will discard your current table definition. Proceed?').subscribe(
+      (confirm) => {
+      if (confirm) {
+        this._tableDefinition.tableKind = kindEvent.value;
+        this._tableDefinition.columns = ['name', 'createdBy'];
+      }
+      this.changeDetectorRef.markForCheck();
+    });
   }
 
 
@@ -79,7 +82,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   openTablePreview() {
       this.dialogService.openComponentDialog(TablePreviewDialogComponent, {
         data: {
-          tableDef : this.formDefinition.tableDef,
+          tableDef : this._tableDefinition,
           property : {
             propertyName: this.propertyId
           }
@@ -89,10 +92,10 @@ export class TableEditorComponent implements OnInit, OnDestroy {
     }
 
   deleteColumn(deletedColumn) {
-    for (let idx = 0; idx < this.formDefinition.tableDef.columns.length; idx++) {
-      const column = this.formDefinition.tableDef.columns[idx];
+    for (let idx = 0; idx < this._tableDefinition.columns.length; idx++) {
+      const column = this._tableDefinition.columns[idx];
       if (column === deletedColumn) {
-        this.formDefinition.tableDef.columns.splice(idx, 1);
+        this._tableDefinition.columns.splice(idx, 1);
       }
     }
   }
@@ -100,34 +103,29 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   addColumn() {
     this.dialogService.openComponentDialog(TableColumnSelectorComponent, {
       data : {
-        fields : this.types[this.formDefinition.tableDef.tableKind].fields
+        fields : this.types[this._tableDefinition.tableKind].fields
       }
     }).updateSize('20%', '20%')
       .afterClosed()
       .subscribe((newColumn) => {
         if (newColumn) {
-          this.formDefinition.tableDef.columns.push(newColumn);
+          this._tableDefinition.columns.push(newColumn);
           this.changeDetectorRef.markForCheck();
         }
       });
   }
 
-  saveTableFormat() {
-    this.currentKind.updateProperty(this.propertyId, this.currentKind.fields[this.propertyId]);
-    console.log(this);
-  }
-
   addExpandedProperty(colNum: number) {
     this.dialogService.openComponentDialog(TableColumnSelectorComponent, {
       data : {
-        fields : this.types[this.formDefinition.tableDef.tableKind].fields
+        fields : this.types[this._tableDefinition.tableKind].fields
       }
     }).updateSize('20%', '20%')
       .afterClosed()
       .subscribe((newProp) => {
         if (newProp) {
           const columnName = 'column' + colNum;
-          this.formDefinition.tableDef.expandedFormat[columnName].push(newProp);
+          this._tableDefinition.expandedFormat[columnName].push(newProp);
           console.log(this);
           this.changeDetectorRef.markForCheck();
         }
@@ -136,7 +134,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
 
   onExpandedChecked(change) {
     if (change.checked) {
-      this.formDefinition.tableDef.expandedFormat = {
+      this._tableDefinition.expandedFormat = {
         column1 : [],
         column2 : [],
         column3 : [],
@@ -147,7 +145,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
 
   removeExpandedProperty(property, colNum) {
     const column = 'column' + colNum;
-    const columnContents = this.formDefinition.tableDef.expandedFormat[column];
+    const columnContents = this._tableDefinition.expandedFormat[column];
     for (let i = 0; i < columnContents.length; i++) {
       if (columnContents[i] === property) {
         columnContents.splice(i, 1);

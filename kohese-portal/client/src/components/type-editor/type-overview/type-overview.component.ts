@@ -88,6 +88,8 @@ export class TypeOverviewComponent implements OnInit, OnDestroy {
         }
         
         localTypes.push(localType);
+        this.typeService.localTypeMap.get(this._koheseType.dataModelProxy.item.
+          name).push(localType.name);
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -115,6 +117,9 @@ export class TypeOverviewComponent implements OnInit, OnDestroy {
         let localTypes: Array<any> = this._koheseType.dataModelProxy.item.
           localTypes;
         localTypes.splice(localTypes.indexOf(localType), 1);
+        let localTypeNames: Array<string> = this.typeService.localTypeMap.get(
+          this._koheseType.dataModelProxy.item.name);
+        localTypeNames.splice(localTypeNames.indexOf(localType.name), 1);
         this._changeDetectorRef.markForCheck();
       }
     });
