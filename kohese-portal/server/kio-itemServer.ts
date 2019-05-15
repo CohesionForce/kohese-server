@@ -843,6 +843,28 @@ function KIOItemServer(socket){
     }
   });
 
+  socket.on('UploadImages', function (request, sendResponse) {
+    console.log('::: session %s: Received UploadImages for user %s at %s',
+        socket.id, socket.koheseUser.username, socket.handshake.address);
+
+    try {
+      var absolutes = [];
+      var root = Path.dirname(fs.realpathSync(__dirname));
+      root = Path.join(root, '..', 'data_import', socket.koheseUser.username);
+      absolutes.push(Path.join(root, request.file));
+
+      var results = importer.importFiles(socket.koheseUser.username, absolutes, request.parentItem);
+      console.log('added ids');
+      console.log(results);
+      sendResponse(results);
+
+    } catch (err) {
+      console.log(err);
+      console.log(err.stack);
+      sendResponse({err:err});
+    }
+  });
+
 }
 
 function updateStatus(proxies) {

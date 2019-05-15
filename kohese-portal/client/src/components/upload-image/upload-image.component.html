@@ -1,0 +1,30 @@
+<div>
+  <div style="height: 400px; overflow: auto;">
+    <proxy-selector
+      (proxySelected)="onParentSelected($event)"></proxy-selector>
+  </div>
+  <textarea matInput #fileTextArea cols="80" rows="7" placeholder="Images to Upload"
+    readonly="true">
+  </textarea>
+  <!-- Hide the file input and route its functionality to a button -->
+  <input type="file" #fileInput style="display: none;" multiple accept="image/png, image/jpeg"
+    (change)="fileTextArea.value = getSelectedImages(fileInput.files)"/>
+  <button mat-raised-button (click)="fileInput.click()">
+    Select Image(s)...
+  </button>
+</div>
+<ng-container *ngIf="data">
+  <div class="pull-right">
+    <mat-dialog-actions>
+      <button mat-raised-button [mat-dialog-close]="0">
+        Cancel
+      </button>
+      <button mat-raised-button [mat-dialog-close]="1"
+         (click)="uploadFile(fileInput)">
+        Upload
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-container>
+
+
