@@ -10,7 +10,7 @@
   <input type="file" #fileInput style="display: none;" multiple accept="image/png, image/jpeg"
     (change)="fileTextArea.value = getSelectedImages(fileInput.files)"/>
   <button mat-raised-button (click)="fileInput.click()">
-    Select Images()...
+    Select Image(s)...
   </button>
 </div>
 <ng-container *ngIf="data">

@@ -32,10 +32,19 @@ export class UploadImageComponent {
     return names.join('\n');
   }
 
-  public uploadFile (fileInput, userInput): void {
-    console.log (fileInput.files);
-    this.uploadService.uploadFile(fileInput.files,
-      this.selectedParent.item.id);
+  public uploadFile(fileInput: any): void {
+    let files: Array<File> = [];
+    for (let j: number = 0; j < fileInput.files.length; j++) {
+      console.log(fileInput.files[j]);
+      if ((fileInput.files[j].type === 'image/png') || (fileInput.files[j].type ===
+        'image/jpeg')) {
+        files.push(fileInput.files[j]);
+      }
+    }
+    console.log(files)
+    if (files.length > 0) {
+      this.uploadService.uploadFile(files, this.selectedParent.item.id);
+    }
   }
 
   public onParentSelected(newParent): void {
