@@ -35,13 +35,11 @@ export class UploadImageComponent {
   public uploadFile(fileInput: any): void {
     let files: Array<File> = [];
     for (let j: number = 0; j < fileInput.files.length; j++) {
-      console.log(fileInput.files[j]);
       if ((fileInput.files[j].type === 'image/png') || (fileInput.files[j].type ===
         'image/jpeg')) {
         files.push(fileInput.files[j]);
       }
     }
-    console.log(files)
     if (files.length > 0) {
       this.uploadService.uploadFile(files, this.selectedParent.item.id);
     }
