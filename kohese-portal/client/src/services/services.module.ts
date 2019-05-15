@@ -7,9 +7,9 @@ import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 /* 3rd Party */
 import { ToastrModule } from 'ngx-toastr';
-import { MarkdownModule } from 'ngx-markdown';
 
 /* Custom */
+import { MarkdownEditorModule } from '../components/markdown-editor/markdown-editor.module';
 import { ItemRepository } from './item-repository/item-repository.service';
 import { SocketService } from './socket/socket.service';
 import { SessionService } from './user/session.service';
@@ -41,7 +41,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
-    MarkdownModule
+    MarkdownEditorModule
   ],
   exports : [
     DialogComponent
