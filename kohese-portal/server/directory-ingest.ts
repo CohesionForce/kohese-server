@@ -12,6 +12,7 @@ var mdToKohese = require('./md-to-kohese');
 
 var basePath;
 var tempDirPath;
+var preambleRequired: boolean = true;
 
 function importFiles(koheseUserName, files, parentId) {
   if (0 === files.length) {
@@ -55,6 +56,8 @@ function processToMarkdown(filePath, basePath) {
   var path = Path.parse(pathDirBase);
   var tempPathDirName = Path.join(tempDirPath, path.dir, path.name);
   var mdOutPath = tempPathDirName + '.md';
+  var jpgOutPath = tempPathDirName + '.jpg';
+  var pngOutPath = tempPathDirName + '.png';
   var processed = true;
 
   // Need to convert doc extension to lower case for comparison
@@ -121,6 +124,23 @@ function processToMarkdown(filePath, basePath) {
     // eslint-disable-next-line no-unused-vars
     var cpy = child.spawnSync('cp', [pathDirBase, mdOutPath], { cwd: basePath, encoding : 'utf8' });
     break;
+  case '.jpeg':
+  case '.jpg':
+    // No Processing needed, but do need to copy
+    console.log('::: Copying existing jpg file');
+    // eslint-disable-next-line no-unused-vars
+    mdOutPath = jpgOutPath;
+    var cpy = child.spawnSync('cp', [pathDirBase, mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    preambleRequired = false;
+    break;
+  case '.png':
+    // No Processing needed, but do need to copy
+    console.log('::: Copying existing png file');
+    // eslint-disable-next-line no-unused-vars
+    mdOutPath = pngOutPath;
+    var cpy = child.spawnSync('cp', [pathDirBase, mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    preambleRequired = false;
+    break;
   default:
     console.log('!!! Unhandled extension: ' + path.ext + ' in ' + filePath);
     processed = false;
@@ -163,7 +183,7 @@ function process(koheseUserName, file, parent, addedIds) {
         parentId: parent,
         itemIds: []
       };
-      var added = mdToKohese(koheseUserName, processedFile.outputPath, mdRoot);
+      var added = mdToKohese(koheseUserName, processedFile.outputPath, mdRoot, preambleRequired);
       for (var j = 0; j < added.length; j++) {
         addedIds.push(added[j]);
       }
