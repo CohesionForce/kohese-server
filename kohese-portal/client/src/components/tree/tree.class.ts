@@ -172,7 +172,7 @@ export abstract class Tree {
     this._collapseDescendantsAction,
     new Action('Move', 'Move this object', 'fa fa-arrow-circle-o-right',
       (object: any) => {
-      return this._canMoveRows && !this._inTargetingMode;
+      return this.mayMove(object);  
     }, (object: any) => {
       let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
       selectedObjects.push(object);
@@ -659,6 +659,10 @@ export abstract class Tree {
     }
   
     return isAncestorSelected;
+  }
+  
+  protected mayMove(object: any): boolean {
+    return this._canMoveRows && !this._inTargetingMode;
   }
   
   private exitTargetingMode(): void {

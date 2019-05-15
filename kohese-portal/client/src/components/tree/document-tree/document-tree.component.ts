@@ -240,6 +240,10 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       this.itemRepository.upsertItem(targetingProxy);
     }
   }
+  
+  protected mayMove(object: any): boolean {
+    return super.mayMove(object) && !(object as ItemProxy).internal;
+  }
 
   public openFilterDialog(filter: Filter): Observable<any> {
     if (!filter) {
