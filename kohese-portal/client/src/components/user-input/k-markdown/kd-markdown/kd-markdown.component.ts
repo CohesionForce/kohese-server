@@ -63,10 +63,10 @@ export class KdMarkdownComponent implements OnInit {
   
   public addImagesToMarkdown(insertionIndex: number, images: Array<File>):
     void {
-    let fileReader: FileReader = new FileReader();
     for (let j: number = images.length - 1; j >= 0; j--) {
       if ((images[j].type === 'image/png') || (images[j].type ===
         'image/jpeg')) {
+        let fileReader: FileReader = new FileReader();
         fileReader.onload = () => {
           this._images.push(fileReader.result);
           let imageReference: string = '![' + images[j].name + '](' +
