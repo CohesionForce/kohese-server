@@ -1,28 +1,34 @@
-<mat-form-field class="variable-data" [formGroup]="formGroup" *ngIf="editable">
-  {{fieldName}}:
-  <div style="width: 100%; display: flex; flex-direction: row;">
-    <!-- Hide the file input and route its functionality to a button -->
-    <input type="file" #fileInput accept="image/png, image/jpeg"
-      style="display: none;" (change)="addImagesToMarkdown(textArea.
-      selectionStart, fileInput.files)" class="flex-right-align"/>
-    <button mat-icon-button matTooltip="Add images" (click)="fileInput.
-      click()">
-      <mat-icon class="fa fa-image"></mat-icon>
-    </button>
-    <button mat-icon-button matTooltip="Markdown cheat sheet"
-      (click)="showCheatSheet()">
-      <mat-icon class="fa fa-question-circle"></mat-icon>
-    </button>
+<div style="width: 100%;">
+  {{fieldName}}
+  <ng-container *ngIf="editable">
+    <div style="height: 10%; width: 100%; display: flex; flex-direction: row;">
+      <!-- Hide the file input and route its functionality to a button -->
+      <input type="file" #fileInput multiple accept="image/png, image/jpeg"
+        style="display: none;" (change)="addImagesToMarkdown(textArea.
+        selectionStart, fileInput.files)"/>
+      <button mat-icon-button matTooltip="Add images" (click)="fileInput.
+        click()" class="flex-right-align">
+        <mat-icon class="fa fa-image"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Markdown cheat sheet"
+        (click)="showCheatSheet()">
+        <mat-icon class="fa fa-question-circle"></mat-icon>
+      </button>
+    </div>
+    <mat-form-field [formGroup]="formGroup" style="height: 45%; width: 100%;">
+      <textarea matInput #textArea matTextareaAutosize matAutosizeMinRows="3"
+        matAutosizeMaxRows="25" placeholder="Markdown"
+        [ngModel]="formattedValue" (ngModelChange)="updateValue($event)"
+        (paste)="addImagesToMarkdown(textArea.selectionStart, $event.
+        clipboardData.files)" [ngModelOptions]="{ standalone: true }">
+      </textarea>
+      <input type="text" formControlName="{{fieldId}}" style="display: none;"/>
+    </mat-form-field>
+  </ng-container>
+  <div style="height: 45%; width: 100%;">
+    <ng-container *ngIf="editable">
+      Preview:
+    </ng-container>
+    <markdown [data]="value"></markdown>
   </div>
-  <textarea matInput #textArea matTextareaAutosize matAutosizeMinRows="3"
-    matAutosizeMaxRows="25" [ngModel]="formattedValue"
-    (ngModelChange)="updateValue($event)" (paste)="addImagesToMarkdown(
-    textArea.selectionStart, $event.clipboardData.files)"
-    [ngModelOptions]="{ standalone: true }">
-  </textarea>
-  <input type="text" formControlName="{{fieldId}}" style="display: none;"/>
-</mat-form-field>
-<div class="binding-container">
-  Markdown: 
-  <markdown class="variable-binding" [data]="value"></markdown>
 </div>

@@ -31,7 +31,8 @@ export class KMarkdownComponent extends UserInput
   }
   
   private _images: Array<string> = [];
-  private static readonly _IMAGE_REGEXP: RegExp = /\!\[.+\]\((.+)\)/g;
+  private static readonly _IMAGE_REGEXP: RegExp =
+    /!\[.*?(?<!\\)\]\((.+?)(?<!\\)\)/g;
 
   /* Subscriptions */
   editableStreamSub : Subscription;
