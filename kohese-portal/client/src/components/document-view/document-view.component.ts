@@ -220,7 +220,7 @@ implements OnInit, OnDestroy {
 
       if (loadLength > lengthLimit) {
         // Case 2 : Load to the content limit
-        newLoad = currentLoad + lengthIndex - 1;
+        newLoad = currentLoad + lengthIndex;
         if (newLoad > subTree.length) {
           newLoad = subTree.length;
         }
