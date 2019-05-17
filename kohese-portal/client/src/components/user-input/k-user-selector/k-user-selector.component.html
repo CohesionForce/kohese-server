@@ -1,7 +1,8 @@
 <ng-container [formGroup]="formGroup">
   <mat-form-field>
-    <input matInput type="text" placeholder="{{fieldName}}"
-      formControlName="{{fieldId}}" [matAutocomplete]="proxySelector"/>
+    <input matInput type="text" placeholder="{{fieldName +
+      (required ? '*' : '')}}" formControlName="{{fieldId}}"
+      [matAutocomplete]="proxySelector"/>
   </mat-form-field>
 
   <mat-autocomplete #proxySelector="matAutocomplete">

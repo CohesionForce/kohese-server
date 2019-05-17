@@ -2,9 +2,7 @@ import {
   Component, Input, Output, OnInit, OnDestroy, OnChanges,
   SimpleChanges, EventEmitter
 } from '@angular/core';
-import {
-  FormGroup, FormBuilder, Validators,
-} from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -145,7 +143,7 @@ export class DetailsFormComponent extends NavigatableComponent
   }
 
   createFormGroup (): FormGroup {
-    const group = this.FormBuilder.group(this.buildPropertyMap(true));
+    const group = this.FormBuilder.group(this.buildPropertyMap());
     if (!this.editableStream.getValue()) {
       group.disable();
     }
@@ -156,7 +154,7 @@ export class DetailsFormComponent extends NavigatableComponent
     return this.formGroup;
   }
 
-  buildPropertyMap(includeValidation: boolean): any {
+  buildPropertyMap(): any {
     let propertyMap: any = {};
     for (let propertyKey in this.type.fields) {
       if (this.fieldFilterStream.getValue()(propertyKey)) {
@@ -164,11 +162,7 @@ export class DetailsFormComponent extends NavigatableComponent
         let defaultValue: any = (this.proxyStream.getValue() ?
           this.proxyStream.getValue().item[propertyKey] : currentProperty.
             default);
-        if (includeValidation && currentProperty.required) {
-          propertyMap[propertyKey] = [defaultValue, Validators.required];
-        } else {
-          propertyMap[propertyKey] = [defaultValue];
-        }
+        propertyMap[propertyKey] = [defaultValue];
       }
     }
     return propertyMap;
