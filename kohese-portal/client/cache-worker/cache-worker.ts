@@ -325,7 +325,7 @@ function registerKoheseIOListeners() {
 
   socket.on('Item/delete', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
-    deleteItem(notification.id);
+    deleteItem(notification);
   });
 
   socket.on('Item/BulkUpdate', (bulkUpdate) => {
@@ -408,9 +408,9 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function deleteItem(id: string): void {
-  TreeConfiguration.getWorkingTree().getProxyFor(id).deleteItem();
-  postToAllPorts('deletion', id);
+function deleteItem(notification: any): void {
+  TreeConfiguration.getWorkingTree().getProxyFor(notification.id).deleteItem(notification.recursive);
+  postToAllPorts('deletion', notification);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -174,8 +174,8 @@ export class ItemRepository {
           this.updateItemStatus(msg.data.itemId, msg.data.status);
           break;
         case 'deletion':
-          TreeConfiguration.getWorkingTree().getProxyFor(msg.data).
-            deleteItem();
+          TreeConfiguration.getWorkingTree().getProxyFor(msg.data.id).
+            deleteItem(msg.data.recursive);
           break;
         case 'cachePiece':
           const cachePiece: any = msg.data;
@@ -431,7 +431,7 @@ export class ItemRepository {
     if (recentProxyIndex !== -1) {
       this.recentProxies.splice(recentProxyIndex, 1);
     }
-    
+
     this.recentProxies.push(itemProxy);
   }
 

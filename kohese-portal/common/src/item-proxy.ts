@@ -1608,7 +1608,8 @@ export class ItemProxy {
             type: 'delete',
             kind: this.kind,
             id: this.item.id,
-            proxy: this
+            proxy: this,
+            recursive: deleteDescendants
           });
         }
         delete this.treeConfig.proxyMap[byId];
@@ -1623,7 +1624,8 @@ export class ItemProxy {
               type: 'delete',
               kind: this.kind,
               id: this.item.id,
-              proxy: this
+              proxy: this,
+              recursive: deleteDescendants
             });
           }
           createMissingProxy('Item', 'id', byId, this.treeConfig);
@@ -1638,7 +1640,8 @@ export class ItemProxy {
               type: 'delete',
               kind: this.kind,
               id: this.item.id,
-              proxy: this
+              proxy: this,
+              recursive: deleteDescendants
             });
           }
           delete this.treeConfig.proxyMap[byId];
