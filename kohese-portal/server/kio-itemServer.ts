@@ -51,7 +51,8 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
         var notification = {
           type: change.type,
           kind: change.kind,
-          id: change.proxy.item.id
+          id: change.proxy.item.id,
+          recursive: change.recursive
         };
         kdb.removeModelInstance(change.proxy);
         kio.server.emit('Item/' + change.type, notification);
