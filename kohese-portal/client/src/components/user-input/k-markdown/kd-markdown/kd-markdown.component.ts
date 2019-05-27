@@ -26,8 +26,7 @@ export class KdMarkdownComponent implements OnInit {
   }
   
   private _images: Array<string> = [];
-  private static readonly _IMAGE_REGEXP: RegExp =
-    /!\[.*?(?<!\\)\]\((.+?)(?<!\\)\)/g;
+  private static readonly _IMAGE_REGEXP: RegExp = /!\[.*?\]\((.+?)\)/g;
 
   constructor(private dialogService : DialogService) { }
 
