@@ -1,7 +1,5 @@
-import {
-  Component, Input, Output, OnInit, OnDestroy, OnChanges,
-  SimpleChanges, EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges,
+  EventEmitter } from '@angular/core';
 import {
   FormGroup, FormBuilder, Validators,
 } from '@angular/forms';
@@ -18,6 +16,7 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { StateService } from '../../../services/state/state.service';
 import { Subscription ,  BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -41,7 +40,6 @@ export class DetailsFormComponent extends NavigatableComponent
   formGroupUpdated = new EventEmitter<FormGroup>();
 
   private initialized: boolean;
-  itemProxy: ItemProxy;
 
   private _nonFormFieldMap: Map<string, any> = new Map<string, any>();
   get nonFormFieldMap() {
@@ -53,6 +51,15 @@ export class DetailsFormComponent extends NavigatableComponent
   private _usernames: Array<string> = [];
   get usernames() {
     return this._usernames;
+  }
+  
+  private _transitionCandidates: any;
+  get transitionCandidates() {
+    return this._transitionCandidates;
+  }
+  private _transitionCandidateAttributeNames: Array<string>;
+  get transitionCandidateAttributeNames() {
+    return this._transitionCandidateAttributeNames;
   }
 
   /* Utils */
@@ -67,18 +74,19 @@ export class DetailsFormComponent extends NavigatableComponent
     return Array;
   }
 
-  get Object () {
-     return Object;
+  get Object() {
+    return Object;
   }
 
-  get dynamicTypesService () {
+  get dynamicTypesService() {
     return this.DynamicTypeService;
   }
 
   constructor(protected NavigationService: NavigationService,
     private FormBuilder: FormBuilder,
     private DynamicTypeService: DynamicTypesService, private _dialogService:
-    DialogService, private _itemRepository: ItemRepository) {
+    DialogService, private _itemRepository: ItemRepository,
+    private _stateService: StateService) {
     super(NavigationService);
     this.initialized = false;
   }
@@ -111,10 +119,14 @@ export class DetailsFormComponent extends NavigatableComponent
     this._proxyStreamSubscription = this.proxyStream.subscribe(
       (newProxy: ItemProxy) => {
       if (newProxy) {
-        this.itemProxy = newProxy;
         this.type = this.DynamicTypeService.getKoheseTypes()[newProxy.kind];
         this.formGroup = this.createFormGroup();
         this.formGroupUpdated.emit(this.formGroup);
+        
+        this._transitionCandidates = this._stateService.
+          getTransitionCandidates(newProxy);
+        this._transitionCandidateAttributeNames = Object.keys(this.
+          _transitionCandidates);
       }
     });
 
@@ -132,7 +144,7 @@ export class DetailsFormComponent extends NavigatableComponent
       }
     });
     this._usernames.sort();
-
+    
     this.initialized = true;
   }
 
@@ -153,15 +165,20 @@ export class DetailsFormComponent extends NavigatableComponent
   }
 
   public typeChanged(type: string): void {
-    this.itemProxy.kind = type;
-    let dataModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.itemProxy.kind);
+    let itemProxy: ItemProxy = this.proxyStream.getValue();
+    itemProxy.kind = type;
+    let dataModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+      getProxyFor(type);
+    itemProxy.model = dataModelProxy;
     for (let attributeName in dataModelProxy.item.properties) {
-      if ((this.itemProxy.item[attributeName] == null) && dataModelProxy.item.properties[attributeName].default) {
-        console.log(dataModelProxy.item.properties[attributeName].default);
-        this.itemProxy.item[attributeName] = dataModelProxy.item.properties[attributeName].default;
+      if ((itemProxy.item[attributeName] == null) && (dataModelProxy.item.
+        properties[attributeName].default != null)) {
+        itemProxy.item[attributeName] = dataModelProxy.item.properties[
+          attributeName].default;
       }
     }
-    this.proxyStream.next(this.itemProxy);
+    
+    this.proxyStream.next(itemProxy);
   }
 
   createFormGroup (): FormGroup {
@@ -488,6 +505,16 @@ export class DetailsFormComponent extends NavigatableComponent
     }
 
     return attributeRepresentation;
+  }
+  
+  public transition(fieldName: string, candidate: string): void {
+    this.whenNonFormFieldChanges(fieldName, candidate);
+    let itemProxy: ItemProxy = this.proxyStream.getValue();
+    itemProxy.item[fieldName] = candidate;
+    this._transitionCandidates = this._stateService.
+      getTransitionCandidates(itemProxy);
+    this._transitionCandidateAttributeNames = Object.keys(this.
+      _transitionCandidates);
   }
 
   private getType(attributeName: string): any {
