@@ -1,5 +1,6 @@
 <mat-form-field [formGroup]="formGroup">
-  <textarea matInput cols="80" rows="(isMultiLine ? 3 : 1)" placeholder="{{fieldName}}"
+  <textarea matInput cols="80" rows="(isMultiLine ? 3 : 1)"
+    placeholder="{{fieldName + (required ? '*' : '')}}"
     formControlName="{{fieldId}}">
   </textarea>
 </mat-form-field>

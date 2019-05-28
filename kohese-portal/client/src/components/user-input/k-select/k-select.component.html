@@ -1,5 +1,5 @@
 <mat-form-field [formGroup]="formGroup">
-  <mat-select placeholder={{fieldName}}
+  <mat-select placeholder="{{fieldName + (required ? '*' : '')}}"
     formControlName={{fieldId}}>
     <mat-option *ngFor="let option of options">
       {{ option }}
