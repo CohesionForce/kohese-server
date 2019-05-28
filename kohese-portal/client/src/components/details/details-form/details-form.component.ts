@@ -49,7 +49,7 @@ export class DetailsFormComponent extends NavigatableComponent
   }
   @Output()
   public nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
-  
+
   private _usernames: Array<string> = [];
   get usernames() {
     return this._usernames;
@@ -62,9 +62,17 @@ export class DetailsFormComponent extends NavigatableComponent
   private editableStreamSubscription: Subscription;
   private _fieldFilterSubscription: Subscription;
   private _proxyStreamSubscription: Subscription;
-  
+
   get Array() {
     return Array;
+  }
+
+  get Object () {
+     return Object;
+  }
+
+  get dynamicTypesService () {
+    return this.DynamicTypeService;
   }
 
   constructor(protected NavigationService: NavigationService,
@@ -115,7 +123,7 @@ export class DetailsFormComponent extends NavigatableComponent
       this.formGroup = this.createFormGroup();
       this.formGroupUpdated.emit(this.formGroup);
     });
-    
+
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree({
       includeOrigin: false
     }, (itemProxy: ItemProxy) => {
@@ -142,6 +150,18 @@ export class DetailsFormComponent extends NavigatableComponent
         this.type = changes['type'].currentValue;
       }
     }
+  }
+
+  public typeChanged(type: string): void {
+    this.itemProxy.kind = type;
+    let dataModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.itemProxy.kind);
+    for (let attributeName in dataModelProxy.item.properties) {
+      if ((this.itemProxy.item[attributeName] == null) && dataModelProxy.item.properties[attributeName].default) {
+        console.log(dataModelProxy.item.properties[attributeName].default);
+        this.itemProxy.item[attributeName] = dataModelProxy.item.properties[attributeName].default;
+      }
+    }
+    this.proxyStream.next(this.itemProxy);
   }
 
   createFormGroup (): FormGroup {
@@ -181,7 +201,7 @@ export class DetailsFormComponent extends NavigatableComponent
       fieldValue: fieldValue
     });
   }
-  
+
   public getTypeName(typeValue: any): string {
     let type: string;
     if (Array.isArray(typeValue)) {
@@ -189,10 +209,10 @@ export class DetailsFormComponent extends NavigatableComponent
     } else {
       type = typeValue;
     }
-    
+
     return type;
   }
-  
+
   public openObjectEditor(attributeName: string): void {
     let type: any = this.getType(attributeName);
     let isLocalTypeInstance: boolean = (Object.keys(this.
@@ -217,7 +237,7 @@ export class DetailsFormComponent extends NavigatableComponent
       }
     });
   }
-  
+
   public openObjectSelector(attributeName: string): void {
     let type: any = this.getType(attributeName);
     let isLocalTypeInstance: boolean = (Object.keys(this.
@@ -255,17 +275,17 @@ export class DetailsFormComponent extends NavigatableComponent
       });
     }
   }
-  
+
   public addValue(attributeName: string): void {
     // Migration code
     if (!this.proxyStream.getValue().item[attributeName]) {
       this.proxyStream.getValue().item[attributeName] = [];
     }
-    
+
     this.editValue(this.proxyStream.getValue().item[attributeName].length,
       attributeName);
   }
-  
+
   public editValue(index: number, attributeName: string): void {
     const DIALOG_TITLE: string = 'Specify Value';
     let value: any = this.proxyStream.getValue().item[attributeName][index];
@@ -289,7 +309,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = 0;
         }
-        
+
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
           INPUT_TYPES.NUMBER, attributeName, value).afterClosed().subscribe(
           (value: number) => {
@@ -305,7 +325,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = new Date().getTime();
         }
-        
+
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
           INPUT_TYPES.DATE, attributeName, value).afterClosed().subscribe(
           (value: number) => {
@@ -321,7 +341,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = '';
         }
-        
+
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
           INPUT_TYPES.TEXT, attributeName, value).afterClosed().subscribe(
           (value: string) => {
@@ -337,7 +357,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = '';
         }
-        
+
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
           INPUT_TYPES.MARKDOWN, attributeName, value).afterClosed().subscribe(
           (value: string) => {
@@ -353,7 +373,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = 'admin';
         }
-        
+
         this._dialogService.openSelectDialog(DIALOG_TITLE, '',
           attributeName, value, this._usernames).afterClosed().subscribe(
           (value: string) => {
@@ -413,13 +433,13 @@ export class DetailsFormComponent extends NavigatableComponent
         }
     }
   }
-  
+
   public removeValue(index: number, attributeName: string): void {
     this.proxyStream.getValue().item[attributeName].splice(index, 1);
     this.whenNonFormFieldChanges(attributeName, this.proxyStream.getValue().
       item[attributeName]);
   }
-  
+
   public getStateTransitionCandidates(attributeName: string): any {
     let stateTransitionCandidates: any = {};
     let currentStateName: string = this.proxyStream.getValue().item[
@@ -433,10 +453,10 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       }
     }
-    
+
     return stateTransitionCandidates;
   }
-  
+
   public getStringRepresentation(index: number, attributeName: string):
     string {
     let value: any;
@@ -445,7 +465,7 @@ export class DetailsFormComponent extends NavigatableComponent
     } else {
       value = this.proxyStream.getValue().item[attributeName];
     }
-    
+
     let representation: string = String(value);
     if (representation === String({})) {
       let type: any = this.getType(attributeName);
@@ -457,19 +477,19 @@ export class DetailsFormComponent extends NavigatableComponent
           id).item.name;
       }
     }
-    
+
     return representation;
   }
-  
+
   public getAttributeRepresentation(attributeName: string): string {
     let attributeRepresentation: string = attributeName;
     if (this.type.fields[attributeName].required) {
       attributeRepresentation += '*';
     }
-    
+
     return attributeRepresentation;
   }
-  
+
   private getType(attributeName: string): any {
     let typeName: string = this.getTypeName(this.type.dataModelProxy.item.
       properties[attributeName].type);
@@ -484,7 +504,7 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       }
     }
-    
+
     if (!type) {
       let koheseTypes: any = this.DynamicTypeService.getKoheseTypes();
       for (let koheseTypeName in koheseTypes) {
@@ -494,7 +514,7 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       }
     }
-    
+
     return type;
   }
 }
