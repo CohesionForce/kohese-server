@@ -4,7 +4,10 @@
  *  commonmark.c to determine proper conversion.
  */
 
-var Render = function() {
+import * as Fs from 'fs';
+import * as Path from 'path';
+
+var Render = function(path: string) {
 
        // Need to ignore underscores in identifiers
        // jshint -W106
@@ -57,17 +60,32 @@ var Render = function() {
 
                // eslint-disable-next-line no-unused-vars
                image: function(node, entering) {
-                       if(entering) {
-                               this.buffer += '![';
-                       }
-                       else {
-                               if(node.title) {
-                                       this.buffer += '](' + node.destination + ' "' + node.title + '")';
-                               } else {
-                                       this.buffer += '](' + node.destination + ')';
-                               }
-
-                       }
+                 if (entering) {
+                   this.buffer += '![';
+                 } else {
+                   let srcPath: string = Path.resolve(Path.dirname(path), node.
+                     destination);
+                   if (srcPath.endsWith('.png') || srcPath.endsWith('.jpg') ||
+                     srcPath.endsWith('.jpeg')) {
+                     let srcValue: string = 'data:image/';
+                     if (srcPath.endsWith('.png')) {
+                       srcValue += 'png';
+                     } else if (srcPath.endsWith('.jpg') || srcPath.endsWith(
+                       '.jpeg')) {
+                       srcValue += 'jpeg';
+                     }
+                     
+                     srcValue += ';base64,';
+                     srcValue += Fs.readFileSync(srcPath,
+                       { encoding: 'base64' });
+                     if (node.title) {
+                       this.buffer += '](' + srcValue + ' "' + node.title +
+                         '")';
+                     } else {
+                       this.buffer += '](' + srcValue + ')';
+                     }
+                   }
+                 }
                },
 
                addListTabs: function() {

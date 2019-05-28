@@ -9,6 +9,15 @@ export class UserInput {
   @Input()
   public fieldName: string;
   
+  private _required: boolean = false;
+  get required() {
+    return this._required;
+  }
+  @Input('required')
+  set required(required: boolean) {
+    this._required = required;
+  }
+  
   constructor() {
   }
 }

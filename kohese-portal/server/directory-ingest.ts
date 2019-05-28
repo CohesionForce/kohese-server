@@ -73,9 +73,10 @@ function processToMarkdown(filePath, basePath) {
     if(soffice.stdout) {
       console.log(soffice.stdout);
     }
-    var docPandoc = child.spawnSync('pandoc',
-        ['-f', 'odt', '-t', 'commonmark', '--atx-headers', (tempPathDirName + '.odt'),
-          '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    var docPandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', 'commonmark',
+      '--atx-headers', '--extract-media', Path.resolve(Path.dirname(mdOutPath),
+      'media'),(tempPathDirName + '.odt'), '-o', mdOutPath],
+      { cwd: basePath, encoding : 'utf8' });
     if(docPandoc.stdout) {
       console.log(docPandoc.stdout);
     }
@@ -86,9 +87,10 @@ function processToMarkdown(filePath, basePath) {
   case '.odt':
     // odt processing
     console.log('::: Processing odt to md');
-    var odtPandoc = child.spawnSync('pandoc',
-        ['-f', 'odt', '-t', 'commonmark', '--atx-headers', pathDirBase, '-o', mdOutPath],
-        { cwd: basePath, encoding : 'utf8' });
+    var odtPandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', 'commonmark',
+      '--atx-headers', '--extract-media', Path.resolve(Path.dirname(mdOutPath),
+      'media'), pathDirBase, '-o', mdOutPath],
+      { cwd: basePath, encoding : 'utf8' });
     if(odtPandoc.stdout) {
       console.log(odtPandoc.stdout);
     }
@@ -96,9 +98,10 @@ function processToMarkdown(filePath, basePath) {
   case '.docx':
     // docx processing
     console.log('::: Processing docx to md');
-    var docxPandoc = child.spawnSync('pandoc',
-        ['-f', 'docx', '-t', 'commonmark', '--atx-headers', pathDirBase,
-          '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    var docxPandoc = child.spawnSync('pandoc', ['-f', 'docx', '-t',
+      'commonmark', '--atx-headers', '--extract-media', Path.resolve(Path.
+      dirname(mdOutPath), 'media'), pathDirBase, '-o', mdOutPath],
+      { cwd: basePath, encoding : 'utf8' });
     if(docxPandoc.stdout) {
       console.log(docxPandoc.stdout);
     }
@@ -107,9 +110,10 @@ function processToMarkdown(filePath, basePath) {
   case '.html':
     // html processing
     console.log('::: Processing html to md');
-    var htmlPandoc = child.spawnSync('pandoc',
-        ['-f', 'html', '-t', 'commonmark', '--atx-headers', pathDirBase,
-          '-o', mdOutPath], { cwd: basePath, encoding : 'utf8' });
+    var htmlPandoc = child.spawnSync('pandoc', ['-f', 'html', '-t',
+      'commonmark', '--atx-headers', '--extract-media', Path.resolve(Path.
+      dirname(mdOutPath), 'media'), pathDirBase, '-o', mdOutPath],
+      { cwd: basePath, encoding : 'utf8' });
     if(htmlPandoc.stdout) {
       console.log(htmlPandoc.stdout);
     }

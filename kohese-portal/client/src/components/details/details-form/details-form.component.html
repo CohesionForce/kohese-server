@@ -23,7 +23,9 @@
             <k-text *ngSwitchCase="'text'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
-              [isMultiLine]="type.fields[property].views['form'].inputType.options['isMultiLine']">
+              [isMultiLine]="type.fields[property].views['form'].inputType.
+              options['isMultiLine']" [required]="type.fields[property].
+              required">
             </k-text>
             <k-proxy-selector *ngSwitchCase="'proxy-selector'"
               [proxyContext]="(proxyStream | async)"
@@ -31,25 +33,31 @@
               [type]="type.fields[property].views['form'].inputType.options['type']"
               [fieldName]="type.fields[property].views['form'].displayName"
               [allowMultiSelect]="type.fields[property].views['form'].inputType.options['allowMultiSelect']"
-              [editableStream]="editableStream">
+              [editableStream]="editableStream" [required]="type.fields[
+              property].required">
             </k-proxy-selector>
             <k-date *ngSwitchCase="'date'"
               [formGroup]="formGroup" [fieldId]="property"
-              [fieldName]="type.fields[property].views['form'].displayName">
+              [fieldName]="type.fields[property].views['form'].displayName"
+              [required]="type.fields[property].required">
             </k-date>
             <k-select *ngSwitchCase="'select'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
-              [options]="type.fields[property].views['form'].inputType.options['options']">
+              [options]="type.fields[property].views['form'].inputType.options[
+              'options']" [required]="type.fields[property].required">
             </k-select>
             <k-user-selector *ngSwitchCase="'user-selector'"
               [formGroup]="formGroup" [fieldId]="property"
-              [fieldName]="type.fields[property].views['form'].displayName">
+              [fieldName]="type.fields[property].views['form'].displayName"
+              [required]="type.fields[property].required">
             </k-user-selector>
             <k-markdown *ngSwitchCase="'markdown'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
-              [editableStream]="editableStream"></k-markdown>
+              [editableStream]="editableStream" [required]="type.fields[
+              property].required">
+            </k-markdown>
             <ng-container *ngSwitchCase="''">
               <ng-container *ngIf="(getTypeName(type.fields[property].type !==
                 'StateMachine'))">
