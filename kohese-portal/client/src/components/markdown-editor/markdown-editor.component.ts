@@ -42,7 +42,7 @@ export class MarkdownEditorComponent implements OnInit {
   }
   
   private _images: Array<string> = [];
-  private static readonly _IMAGE_REGEXP: RegExp = /\!\[.+\]\((.+)\)/g;
+  private static readonly _IMAGE_REGEXP: RegExp = /!\[.*?\]\((.+?)\)/g;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dialogService: DialogService) {

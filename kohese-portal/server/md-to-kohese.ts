@@ -35,7 +35,7 @@ function mdToKohese(koheseUserName, filePath, rootItem, preambleRequired) {
   var itemMap = {};
   itemMap[item.id] = item;
 
-  var render = renderFunc();
+  var render = renderFunc(filePath);
   var event = walker.next();
   while(event) {
     // console.log('Event: ' + event.node.type + ' Entering: ' + event.entering);

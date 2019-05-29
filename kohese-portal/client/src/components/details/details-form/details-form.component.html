@@ -1,4 +1,18 @@
 <div style="height: 100%;">
+  <mat-form-field style="width: 100%;">
+    <mat-select [ngModel]="(proxyStream | async).kind"
+      (ngModelChange)="typeChanged($event)" placeholder="Type"
+      [disabled]="!(editableStream | async)">
+      <ng-container *ngFor="let koheseType of Object.values(
+        dynamicTypesService.getKoheseTypes())">
+        <mat-option [value]="koheseType.dataModelProxy.item.name">
+          <mat-icon class="{{koheseType.viewModelProxy?.item.icon}}">
+          </mat-icon>
+          {{koheseType.dataModelProxy.item.name}}
+        </mat-option>
+      </ng-container>
+    </mat-select>
+  </mat-form-field>
   <ng-container *ngIf="(proxyStream | async)">
     <form [formGroup]="formGroup"
       novalidate class="form-group">
@@ -9,33 +23,41 @@
             <k-text *ngSwitchCase="'text'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
-              [isMultiLine]="type.fields[property].views['form'].inputType.options['isMultiLine']">
+              [isMultiLine]="type.fields[property].views['form'].inputType.
+              options['isMultiLine']" [required]="type.fields[property].
+              required">
             </k-text>
             <k-proxy-selector *ngSwitchCase="'proxy-selector'"
-              [proxyContext]="itemProxy"
+              [proxyContext]="(proxyStream | async)"
               [formGroup]="formGroup" [fieldId]="property"
               [type]="type.fields[property].views['form'].inputType.options['type']"
               [fieldName]="type.fields[property].views['form'].displayName"
               [allowMultiSelect]="type.fields[property].views['form'].inputType.options['allowMultiSelect']"
-              [editableStream]="editableStream">
+              [editableStream]="editableStream" [required]="type.fields[
+              property].required">
             </k-proxy-selector>
             <k-date *ngSwitchCase="'date'"
               [formGroup]="formGroup" [fieldId]="property"
-              [fieldName]="type.fields[property].views['form'].displayName">
+              [fieldName]="type.fields[property].views['form'].displayName"
+              [required]="type.fields[property].required">
             </k-date>
             <k-select *ngSwitchCase="'select'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
-              [options]="type.fields[property].views['form'].inputType.options['options']">
+              [options]="type.fields[property].views['form'].inputType.options[
+              'options']" [required]="type.fields[property].required">
             </k-select>
             <k-user-selector *ngSwitchCase="'user-selector'"
               [formGroup]="formGroup" [fieldId]="property"
-              [fieldName]="type.fields[property].views['form'].displayName">
+              [fieldName]="type.fields[property].views['form'].displayName"
+              [required]="type.fields[property].required">
             </k-user-selector>
             <k-markdown *ngSwitchCase="'markdown'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
-              [editableStream]="editableStream"></k-markdown>
+              [editableStream]="editableStream" [required]="type.fields[
+              property].required">
+            </k-markdown>
             <ng-container *ngSwitchCase="''">
               <ng-container *ngIf="(getTypeName(type.fields[property].type !==
                 'StateMachine'))">
@@ -158,8 +180,8 @@
                           <button mat-icon-button
                             matTooltip="Remove the selection for {{property}}"
                             [disabled]="(proxyStream.getValue().item[
-                              property] == null)" (click)="proxyStream.
-                              getValue().item[property] = undefined">
+                            property] == null)" (click)="proxyStream.
+                            getValue().item[property] = undefined">
                             <mat-icon class="fa fa-times"></mat-icon>
                           </button>
                         </span>
@@ -174,11 +196,27 @@
         </ng-container>
       </ng-container>
     </form>
-    <div id="detailsFormStateEditorContainer">
-      <k-state-editor [itemProxy]="(proxyStream | async)"
-        [disableTransitioning]="!(editableStream | async)"
-        (stateChanged)="whenNonFormFieldChanges($event.fieldName, $event.candidate)">
-      </k-state-editor>
+    <div style="width: 100%; display: flex; flex-direction: row;">
+      <ng-container
+        *ngFor="let attributeName of transitionCandidateAttributeNames">
+        <div style="margin: 5px;">
+          <label>
+            {{attributeName}}: {{proxyStream.getValue().item[attributeName]}}
+          </label>
+          <br/>
+          <ng-container *ngFor="let candidateId of (transitionCandidates[
+            attributeName] | mapKey)">
+            <button mat-raised-button matTooltip="{{type.fields[attributeName].
+              properties.state[transitionCandidates[attributeName][
+              candidateId].target].description}}"
+              [disabled]="!(editableStream | async)" (click)="transition(
+              attributeName, transitionCandidates[attributeName][candidateId].
+              target)" style="margin: 5px;">
+              {{candidateId}}
+            </button>
+          </ng-container>
+        </div>
+      </ng-container>
     </div>
   </ng-container>
 </div>

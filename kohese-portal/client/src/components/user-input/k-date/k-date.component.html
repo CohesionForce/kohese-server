@@ -1,4 +1,4 @@
 <mat-form-field [formGroup]="formGroup">
   <input matInput type="date" formControlName="{{fieldId}}"
-    placeholder="{{fieldName}}"/>
+    placeholder="{{fieldName + (required ? '*' : '')}}"/>
 </mat-form-field>
