@@ -1,7 +1,5 @@
-import {
-  Component, Input, Output, OnInit, OnDestroy, OnChanges,
-  SimpleChanges, EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges,
+  EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
@@ -16,6 +14,7 @@ import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { StateService } from '../../../services/state/state.service';
 import { Subscription ,  BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -39,7 +38,6 @@ export class DetailsFormComponent extends NavigatableComponent
   formGroupUpdated = new EventEmitter<FormGroup>();
 
   private initialized: boolean;
-  itemProxy: ItemProxy;
 
   private _nonFormFieldMap: Map<string, any> = new Map<string, any>();
   get nonFormFieldMap() {
@@ -47,10 +45,19 @@ export class DetailsFormComponent extends NavigatableComponent
   }
   @Output()
   public nonFormFieldChanged: EventEmitter<any> = new EventEmitter<any>();
-  
+
   private _usernames: Array<string> = [];
   get usernames() {
     return this._usernames;
+  }
+  
+  private _transitionCandidates: any;
+  get transitionCandidates() {
+    return this._transitionCandidates;
+  }
+  private _transitionCandidateAttributeNames: Array<string>;
+  get transitionCandidateAttributeNames() {
+    return this._transitionCandidateAttributeNames;
   }
 
   /* Utils */
@@ -60,15 +67,24 @@ export class DetailsFormComponent extends NavigatableComponent
   private editableStreamSubscription: Subscription;
   private _fieldFilterSubscription: Subscription;
   private _proxyStreamSubscription: Subscription;
-  
+
   get Array() {
     return Array;
+  }
+
+  get Object() {
+    return Object;
+  }
+
+  get dynamicTypesService() {
+    return this.DynamicTypeService;
   }
 
   constructor(protected NavigationService: NavigationService,
     private FormBuilder: FormBuilder,
     private DynamicTypeService: DynamicTypesService, private _dialogService:
-    DialogService, private _itemRepository: ItemRepository) {
+    DialogService, private _itemRepository: ItemRepository,
+    private _stateService: StateService) {
     super(NavigationService);
     this.initialized = false;
   }
@@ -101,10 +117,14 @@ export class DetailsFormComponent extends NavigatableComponent
     this._proxyStreamSubscription = this.proxyStream.subscribe(
       (newProxy: ItemProxy) => {
       if (newProxy) {
-        this.itemProxy = newProxy;
         this.type = this.DynamicTypeService.getKoheseTypes()[newProxy.kind];
         this.formGroup = this.createFormGroup();
         this.formGroupUpdated.emit(this.formGroup);
+        
+        this._transitionCandidates = this._stateService.
+          getTransitionCandidates(newProxy);
+        this._transitionCandidateAttributeNames = Object.keys(this.
+          _transitionCandidates);
       }
     });
 
@@ -113,7 +133,7 @@ export class DetailsFormComponent extends NavigatableComponent
       this.formGroup = this.createFormGroup();
       this.formGroupUpdated.emit(this.formGroup);
     });
-    
+
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree({
       includeOrigin: false
     }, (itemProxy: ItemProxy) => {
@@ -122,7 +142,7 @@ export class DetailsFormComponent extends NavigatableComponent
       }
     });
     this._usernames.sort();
-
+    
     this.initialized = true;
   }
 
@@ -140,6 +160,23 @@ export class DetailsFormComponent extends NavigatableComponent
         this.type = changes['type'].currentValue;
       }
     }
+  }
+
+  public typeChanged(type: string): void {
+    let itemProxy: ItemProxy = this.proxyStream.getValue();
+    itemProxy.kind = type;
+    let dataModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+      getProxyFor(type);
+    itemProxy.model = dataModelProxy;
+    for (let attributeName in dataModelProxy.item.properties) {
+      if ((itemProxy.item[attributeName] == null) && (dataModelProxy.item.
+        properties[attributeName].default != null)) {
+        itemProxy.item[attributeName] = dataModelProxy.item.properties[
+          attributeName].default;
+      }
+    }
+    
+    this.proxyStream.next(itemProxy);
   }
 
   createFormGroup (): FormGroup {
@@ -175,7 +212,7 @@ export class DetailsFormComponent extends NavigatableComponent
       fieldValue: fieldValue
     });
   }
-  
+
   public getTypeName(typeValue: any): string {
     let type: string;
     if (Array.isArray(typeValue)) {
@@ -183,10 +220,10 @@ export class DetailsFormComponent extends NavigatableComponent
     } else {
       type = typeValue;
     }
-    
+
     return type;
   }
-  
+
   public openObjectEditor(attributeName: string): void {
     let type: any = this.getType(attributeName);
     let isLocalTypeInstance: boolean = (Object.keys(this.
@@ -211,7 +248,7 @@ export class DetailsFormComponent extends NavigatableComponent
       }
     });
   }
-  
+
   public openObjectSelector(attributeName: string): void {
     let type: any = this.getType(attributeName);
     let isLocalTypeInstance: boolean = (Object.keys(this.
@@ -249,17 +286,17 @@ export class DetailsFormComponent extends NavigatableComponent
       });
     }
   }
-  
+
   public addValue(attributeName: string): void {
     // Migration code
     if (!this.proxyStream.getValue().item[attributeName]) {
       this.proxyStream.getValue().item[attributeName] = [];
     }
-    
+
     this.editValue(this.proxyStream.getValue().item[attributeName].length,
       attributeName);
   }
-  
+
   public editValue(index: number, attributeName: string): void {
     const DIALOG_TITLE: string = 'Specify Value';
     let value: any = this.proxyStream.getValue().item[attributeName][index];
@@ -283,7 +320,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = 0;
         }
-        
+
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
           INPUT_TYPES.NUMBER, attributeName, value).afterClosed().subscribe(
           (value: number) => {
@@ -299,7 +336,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = new Date().getTime();
         }
-        
+
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
           INPUT_TYPES.DATE, attributeName, value).afterClosed().subscribe(
           (value: number) => {
@@ -315,7 +352,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = '';
         }
-        
+
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
           INPUT_TYPES.TEXT, attributeName, value).afterClosed().subscribe(
           (value: string) => {
@@ -331,7 +368,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = '';
         }
-        
+
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
           INPUT_TYPES.MARKDOWN, attributeName, value).afterClosed().subscribe(
           (value: string) => {
@@ -347,7 +384,7 @@ export class DetailsFormComponent extends NavigatableComponent
         if (value == null) {
           value = 'admin';
         }
-        
+
         this._dialogService.openSelectDialog(DIALOG_TITLE, '',
           attributeName, value, this._usernames).afterClosed().subscribe(
           (value: string) => {
@@ -407,13 +444,13 @@ export class DetailsFormComponent extends NavigatableComponent
         }
     }
   }
-  
+
   public removeValue(index: number, attributeName: string): void {
     this.proxyStream.getValue().item[attributeName].splice(index, 1);
     this.whenNonFormFieldChanges(attributeName, this.proxyStream.getValue().
       item[attributeName]);
   }
-  
+
   public getStateTransitionCandidates(attributeName: string): any {
     let stateTransitionCandidates: any = {};
     let currentStateName: string = this.proxyStream.getValue().item[
@@ -427,10 +464,10 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       }
     }
-    
+
     return stateTransitionCandidates;
   }
-  
+
   public getStringRepresentation(index: number, attributeName: string):
     string {
     let value: any;
@@ -439,7 +476,7 @@ export class DetailsFormComponent extends NavigatableComponent
     } else {
       value = this.proxyStream.getValue().item[attributeName];
     }
-    
+
     let representation: string = String(value);
     if (representation === String({})) {
       let type: any = this.getType(attributeName);
@@ -451,19 +488,29 @@ export class DetailsFormComponent extends NavigatableComponent
           id).item.name;
       }
     }
-    
+
     return representation;
   }
-  
+
   public getAttributeRepresentation(attributeName: string): string {
     let attributeRepresentation: string = attributeName;
     if (this.type.fields[attributeName].required) {
       attributeRepresentation += '*';
     }
-    
+
     return attributeRepresentation;
   }
   
+  public transition(fieldName: string, candidate: string): void {
+    this.whenNonFormFieldChanges(fieldName, candidate);
+    let itemProxy: ItemProxy = this.proxyStream.getValue();
+    itemProxy.item[fieldName] = candidate;
+    this._transitionCandidates = this._stateService.
+      getTransitionCandidates(itemProxy);
+    this._transitionCandidateAttributeNames = Object.keys(this.
+      _transitionCandidates);
+  }
+
   private getType(attributeName: string): any {
     let typeName: string = this.getTypeName(this.type.dataModelProxy.item.
       properties[attributeName].type);
@@ -478,7 +525,7 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       }
     }
-    
+
     if (!type) {
       let koheseTypes: any = this.DynamicTypeService.getKoheseTypes();
       for (let koheseTypeName in koheseTypes) {
@@ -488,7 +535,7 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       }
     }
-    
+
     return type;
   }
 }
