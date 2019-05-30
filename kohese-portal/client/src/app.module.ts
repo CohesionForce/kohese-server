@@ -37,7 +37,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { MarkdownModule } from 'ngx-markdown';
+import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
 
 import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
@@ -55,7 +55,28 @@ import { LensModule } from './components/lens/lens.module';
     BrowserAnimationsModule,
     ServiceWorkerModule.register('/ngsw-worker.js', {enabled : true}),
     ToastrModule.forRoot(),
-    MarkdownModule.forRoot(),
+    MarkdownModule.forRoot({
+      markedOptions: {
+        provide: MarkedOptions,
+        useFactory: () => {
+          let markedRenderer: MarkedRenderer = new MarkedRenderer();
+          markedRenderer.image = (href: string, title: string, text:
+            string) => {
+            let imageHtml: string = new MarkedRenderer().image(href, title,
+              text);
+            imageHtml = imageHtml.substring(0, 5) +
+              'style="max-height: 100%; max-width: 100%;" ' + imageHtml.
+              substring(5);
+            
+            return imageHtml;
+          };
+          
+          let markedOptions: MarkedOptions = new MarkedOptions();
+          markedOptions.renderer = markedRenderer;
+          return markedOptions;
+        }
+      }
+    }),
     InfiniteScrollModule,
     PipesModule,
     MaterialModule,
