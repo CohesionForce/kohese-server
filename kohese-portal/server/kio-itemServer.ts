@@ -780,7 +780,7 @@ function KIOItemServer(socket){
         }
 
         if (isNewUnstagedFile) {
-          proxy.deleteItem();
+          proxy.deleteItem(false);
         } else {
           if (!repositoryPathMap[repositoryId]) {
             repositoryPathMap[repositoryId] = [];

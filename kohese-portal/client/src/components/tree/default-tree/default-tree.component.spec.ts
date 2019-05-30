@@ -90,7 +90,7 @@ describe('Component: default-tree', () => {
     let numberOfVisibleRows: number = component.visibleRows.length;
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       'test-uuid6');
-    proxy.deleteItem();
+    proxy.deleteItem(false);
     TreeConfiguration.getWorkingTree().getChangeSubject().next({
       type: 'delete',
       kind: 'Item',

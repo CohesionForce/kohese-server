@@ -99,15 +99,23 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
       return !(object as ItemProxy).internal;
       }, (object: any) => {
-      this._dialogService.openCustomTextDialog('Confirm Deletion',
-        'Are you sure you want to delete ' + (object as ItemProxy).item.name + '?', [
-        'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
+      let hasChildren: boolean = ((object as ItemProxy).children.length > 0);
+      let message: string = 'Are you sure that you want to remove ' +
+        (object as ItemProxy).item.name;
+      if (hasChildren) {
+        message += ' and all of its descendants?';
+      } else {
+        message += '?';
+      }
+      
+      this._dialogService.openYesNoDialog('Confirm Removal', message).
+        subscribe((result: any) => {
         if (result) {
           if (object === this.rootSubject.getValue()) {
             this.rootSubject.next(this.getParent(object));
           }
 
-          this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
+          this._itemRepository.deleteItem((object as ItemProxy), hasChildren);
         }
       });
     });
