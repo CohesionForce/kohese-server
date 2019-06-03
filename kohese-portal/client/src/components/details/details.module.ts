@@ -20,6 +20,7 @@ import { DocumentViewModule } from "../document-view/document-view.module";
 import { ActionTableModule } from "../action-table/action-table.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
+import { ReportsModule } from '../reports/reports.module';
 import { UserInputModule } from '../user-input/user-input.module';
 import { DetailsDialogComponent } from "./details-dialog/details-dialog.component";
 
@@ -49,6 +50,7 @@ import { DetailsDialogComponent } from "./details-dialog/details-dialog.componen
     FormsModule,
     ReactiveFormsModule,
     PipesModule,
+    ReportsModule,
     UserInputModule,
     TreeModule.forRoot(),
     MarkdownModule

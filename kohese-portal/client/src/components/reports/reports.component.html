@@ -1,0 +1,35 @@
+<label>
+  Produce a Report:
+</label>
+<button mat-button matTooltip="Produce a report in .docx format"
+  (click)="produceReport(ReportFormat.DOCX)">
+  {{ReportFormat.DOCX}}
+</button>
+<button mat-button matTooltip="Produce a report in .html format"
+  (click)="produceReport(ReportFormat.HTML)">
+  {{ReportFormat.HTML}}
+</button>
+<mat-list>
+  <h3>
+    Reports
+  </h3>
+  <ng-container *ngFor="let reportName of reportNames">
+    <mat-list-item>
+      {{reportName}}
+      <span class="flex-right-align">
+        <a #reportDownloadAnchor style="display: none;"
+          download="{{reportName}}" href="{{'/reports/' + item.id + '/' +
+          reportName}}">
+        </a>
+        <button mat-icon-button matTooltip="Download this report"
+          (click)="reportDownloadAnchor.click()">
+          <mat-icon class="fa fa-download"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Remove this report"
+          (click)="removeReport(reportName)">
+          <mat-icon class="fa fa-trash"></mat-icon>
+        </button>
+      </span>
+    </mat-list-item>
+  </ng-container>
+</mat-list>

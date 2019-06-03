@@ -64,7 +64,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
 
   add(): void {
     this.dialogService.openInputDialog('Add Type', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', '').afterClosed().subscribe((name: string) => {
+      INPUT_TYPES.TEXT, 'Name', '', undefined).afterClosed().subscribe((name:
+      string) => {
       if (name) {
         let dataModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
           buildItem('KoheseModel', {

@@ -698,19 +698,21 @@ export class ItemRepository {
 
     return promise;
   }
-
-  //////////////////////////////////////////////////////////////////////////
-  generateHTMLReportFor(proxy) {
-    this.socketService.socket.emit('Item/generateReport', { onId: proxy.item.id, format: 'html' }, (results) => {
-      this.logService.log(this.logEvents.generateHTMLReport, {response : results});
-    });
+  
+  public async produceReport(id: string, reportName: string, format: string):
+    Promise<void> {
+    return await this.sendMessageToWorker('produceReport',
+      { id: id, reportName: reportName, format: format }, true);
   }
-
-  //////////////////////////////////////////////////////////////////////////
-  generateDOCXReportFor(proxy) {
-    this.socketService.socket.emit('Item/generateReport', { onId: proxy.item.id, format: 'docx' }, (results) => {
-      this.logService.log(this.logEvents.generateDOCXReport, {response : results});
-    });
+  
+  public async getReportNames(id: string): Promise<Array<string>> {
+    return (await this.sendMessageToWorker('getReportNames', { id: id },
+      true)).data;
+  }
+  
+  public async removeReport(id: string, reportName: string): Promise<void> {
+    return await this.sendMessageToWorker('removeReport',
+      { id: id, reportName: reportName }, true);
   }
 
   //////////////////////////////////////////////////////////////////////////

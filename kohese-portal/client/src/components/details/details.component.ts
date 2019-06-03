@@ -117,14 +117,6 @@ export class DetailsComponent extends ProxyDetailsComponent
     return this.treeConfig.getProxyFor(id);
   }
 
-  generateHTMLReport(): void {
-    this.itemRepository.generateHTMLReportFor(this.itemProxy);
-  };
-
-  generateDOCXReport(): void {
-    this.itemRepository.generateDOCXReportFor(this.itemProxy);
-  };
-
   getHistory = function (): void {
     this.itemRepository.getHistoryFor(this.itemProxy);
   };

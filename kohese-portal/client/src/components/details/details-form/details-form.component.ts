@@ -322,8 +322,8 @@ export class DetailsFormComponent extends NavigatableComponent
         }
 
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.NUMBER, attributeName, value).afterClosed().subscribe(
-          (value: number) => {
+          INPUT_TYPES.NUMBER, attributeName, value, undefined).afterClosed().
+          subscribe((value: number) => {
           if (value != null) {
             this.proxyStream.getValue().item[attributeName].splice(index, 1,
               value);
@@ -338,8 +338,8 @@ export class DetailsFormComponent extends NavigatableComponent
         }
 
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.DATE, attributeName, value).afterClosed().subscribe(
-          (value: number) => {
+          INPUT_TYPES.DATE, attributeName, value, undefined).afterClosed().
+          subscribe((value: number) => {
           if (value != null) {
             this.proxyStream.getValue().item[attributeName].splice(index, 1,
               value);
@@ -354,8 +354,8 @@ export class DetailsFormComponent extends NavigatableComponent
         }
 
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.TEXT, attributeName, value).afterClosed().subscribe(
-          (value: string) => {
+          INPUT_TYPES.TEXT, attributeName, value, undefined).afterClosed().
+          subscribe((value: string) => {
           if (value) {
             this.proxyStream.getValue().item[attributeName].splice(index, 1,
               value);
@@ -370,8 +370,8 @@ export class DetailsFormComponent extends NavigatableComponent
         }
 
         this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.MARKDOWN, attributeName, value).afterClosed().subscribe(
-          (value: string) => {
+          INPUT_TYPES.MARKDOWN, attributeName, value, undefined).afterClosed().
+          subscribe((value: string) => {
           if (value) {
             this.proxyStream.getValue().item[attributeName].splice(index, 1,
               value);

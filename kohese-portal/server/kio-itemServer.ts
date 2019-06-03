@@ -13,6 +13,8 @@ const Path = require('path');
 const importer = require('./directory-ingest');
 var _ = require('underscore');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const _REPORTS_DIRECTORY_PATH = Path.resolve(fs.realpathSync(__dirname), '..',
+  '..', 'reports');
 
 console.log('::: Initializing KIO Item Server');
 
@@ -520,53 +522,46 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/generateReport', function(request, sendResponse) {
-
-    var showUndefined;
-    var forItemId = request.onId;
-    var outFormat = request.format;
-
-    console.log('::: Generating ' + outFormat + ' Report for ' + forItemId);
-
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(forItemId);
-    var result : any = {};
-
-    if (!proxy){
-      console.log('*** Could not find proxy for: ' + forItemId);
-      sendResponse({error: 'Item not found: ' + forItemId});
-      return;
+    let itemReportDirectoryPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH,
+      request.id);
+    if (!fs.existsSync(itemReportDirectoryPath)) {
+      fs.mkdirSync(itemReportDirectoryPath, { recursive: true });
+    }
+    
+    let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      request.id);
+    let format: string;
+    switch (request.format) {
+      case '.docx':
+        format = 'docx';
+        break;
+      default:
+        format = 'html5';
+    }
+    let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'markdown', '-t',
+      format, '-o', Path.resolve(itemReportDirectoryPath, request.reportName +
+      request.format)], { input: proxy.getDocument(undefined) });
+    
+    if (pandocProcess.stdout) {
+      console.log(pandocProcess.stdout);
     }
 
-    console.log('::: Found proxy for: ' + forItemId + ' - ' + proxy.item.name);
-
-    var reportTime = new Date();
-
-    var outputBuffer = '::: Dump of ' + forItemId + ': ' + proxy.item.name + ' at ' +
-        reportTime.toDateString() + ' ' + reportTime.toTimeString() + '\n\n';
-
-    outputBuffer += proxy.getDocument(showUndefined);
-
-    var itemName = proxy.item.name.replace(/[:\/]/g, ' ');
-    var fileBasename ='dump.' + forItemId + '.' + itemName;
-    var dumpFile= 'tmp_reports/' + fileBasename + '.md';
-    console.log('::: Creating: ' + dumpFile);
-
-    fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});
-    result.markdown = 'reports/' + fileBasename + '.md';
-
-    if (outFormat) {
-      console.log('::: Now spawning pandoc...');
-      var outFile = 'tmp_reports/' + fileBasename + '.' + outFormat;
-      console.log('::: Creating ' + outFile);
-      var pandoc = child.spawnSync('pandoc', ['-f', 'markdown', '-t', outFormat, dumpFile, '-o', outFile]);
-      if(pandoc.stdout) {
-        console.log(pandoc.stdout);
-      }
-      result[outFormat] = 'reports/' + fileBasename + '.' + outFormat;
-      console.log('::: Pandoc done!');
-    }
-
-    sendResponse(result);
-
+    sendResponse();
+  });
+  
+  socket.on('getReportNames', (request: any, respond: Function) => {
+    let itemReportDirectoryPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH,
+      request.id);
+    respond(fs.existsSync(itemReportDirectoryPath) ? fs.readdirSync(
+      itemReportDirectoryPath).map((fileName: string) => {
+      return Path.basename(fileName);
+    }) : []);
+  });
+  
+  socket.on('removeReport', (request: any, respond: Function) => {
+    fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.id, request.
+      reportName));
+    respond();
   });
 
   socket.on('VersionControl/stage', async function (request, sendResponse) {
@@ -864,7 +859,6 @@ function KIOItemServer(socket){
       sendResponse({err:err});
     }
   });
-
 }
 
 function updateStatus(proxies) {

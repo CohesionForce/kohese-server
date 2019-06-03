@@ -35,12 +35,6 @@
         <!-- Nav tabs -->
         <mat-tab-group id="details-tabs">
             <mat-tab id="defaultTab" label="Document">
-                <button (click)="generateHTMLReport()" class="btn btn-primary">
-                   Generate HTML Report
-               </button>
-                <button (click)="generateDOCXReport()" class="btn btn-primary">
-                   Generate Word Document
-               </button>
                <button
                       class= "btn btn-primary"
                       (click)="navigate('Analysis',
@@ -78,6 +72,9 @@
 
               <action-table [proxyStream]="proxyStream"
                             [editableStream]="editableStream"></action-table>
+            </mat-tab>
+            <mat-tab label="Reports">
+              <reports [item]="(proxyStream | async)?.item"></reports>
             </mat-tab>
             <mat-tab label="Raw Data">
                 <h4>Raw Data Tab</h4>

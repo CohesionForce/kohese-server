@@ -180,6 +180,35 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+      case 'produceReport':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject: () => void) => {
+          socket.emit('Item/generateReport', { id: request.data.id,
+            reportName: request.data.reportName, format: request.data.format },
+            () => {
+            resolve();
+          });
+        }) });
+        break;
+      case 'getReportNames':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (reportNames: Array<string>) => void, reject:
+          () => void) => {
+          socket.emit('getReportNames', { id: request.data.id }, (reportNames:
+            Array<string>) => {
+            resolve(reportNames);
+          });
+        }) });
+        break;
+      case 'removeReport':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject: () => void) => {
+          socket.emit('removeReport', { id: request.data.id,
+            reportName: request.data.reportName }, () => {
+            resolve();
+          });
+        }) });
+        break;
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);

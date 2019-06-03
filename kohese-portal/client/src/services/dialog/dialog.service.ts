@@ -32,7 +32,8 @@ export class DialogService {
   }
   
   openInputDialog(title: string, text: string, type: string, fieldName: string,
-    initialValue: any): MatDialogRef<DialogComponent> {
+    initialValue: any, validate: (input: any) => boolean):
+    MatDialogRef<DialogComponent> {
     if (initialValue == null) {
       initialValue = '';
     }
@@ -42,7 +43,8 @@ export class DialogService {
         text: text,
         inputType: type,
         fieldName: fieldName,
-        value: initialValue
+        value: initialValue,
+        validate: validate
       },
       disableClose: true
     }).updateSize('40%', 'auto');

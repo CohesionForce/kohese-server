@@ -45,7 +45,8 @@
 <mat-dialog-actions style="height: 10%; width: 100%;">
   <ng-container *ngIf="data.fieldName">
     <span class="dialog-actions">
-      <button mat-raised-button [mat-dialog-close]="data.value">
+      <button mat-raised-button [disabled]="(data.validate ? !data.validate(
+        data.value) : false)" [mat-dialog-close]="data.value">
         Accept
       </button>
       <button mat-raised-button [mat-dialog-close]="">
