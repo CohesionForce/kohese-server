@@ -528,8 +528,6 @@ function KIOItemServer(socket){
       fs.mkdirSync(itemReportDirectoryPath, { recursive: true });
     }
     
-    let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      request.id);
     let format: string;
     switch (request.format) {
       case '.docx':
@@ -540,7 +538,7 @@ function KIOItemServer(socket){
     }
     let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'markdown', '-t',
       format, '-o', Path.resolve(itemReportDirectoryPath, request.reportName +
-      request.format)], { input: proxy.getDocument(undefined) });
+      request.format)], { input: request.text });
     
     if (pandocProcess.stdout) {
       console.log(pandocProcess.stdout);

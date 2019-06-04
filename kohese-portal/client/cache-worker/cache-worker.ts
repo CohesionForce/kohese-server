@@ -184,8 +184,8 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
           socket.emit('Item/generateReport', { id: request.data.id,
-            reportName: request.data.reportName, format: request.data.format },
-            () => {
+            reportName: request.data.reportName, format: request.data.format,
+            text: request.data.text }, () => {
             resolve();
           });
         }) });

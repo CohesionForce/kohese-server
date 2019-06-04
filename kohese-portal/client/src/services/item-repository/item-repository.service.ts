@@ -19,6 +19,7 @@ import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback 
 
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
+import { LocationMap } from '../../constants/LocationMap.data';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -701,8 +702,26 @@ export class ItemRepository {
   
   public async produceReport(id: string, reportName: string, format: string):
     Promise<void> {
-    return await this.sendMessageToWorker('produceReport',
-      { id: id, reportName: reportName, format: format }, true);
+    let text: string = '';
+    let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      id);
+    itemProxy.visitTree(undefined, (proxy: ItemProxy) => {
+      let depth: number = proxy.getDepthFromAncestor(itemProxy) + 1;
+      for (let j: number = 0; j < depth; j++) {
+        text += '#';
+      }
+      
+      text += ' [' + proxy.item.name + '](' + window.location.origin +
+        LocationMap['Explore'].route + ';id=' + proxy.item.id + ')\n\n' +
+        (proxy.item.description ? proxy.item.description : '') + '\n\n';
+    });
+    
+    return await this.sendMessageToWorker('produceReport', {
+      id: id,
+      reportName: reportName,
+      format: format,
+      text: text
+    }, true);
   }
   
   public async getReportNames(id: string): Promise<Array<string>> {

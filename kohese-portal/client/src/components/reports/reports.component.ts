@@ -50,16 +50,29 @@ export class ReportsComponent implements OnInit {
   }
   
   public produceReport(reportFormat: ReportFormat): void {
+    let date: Date = new Date();
     this._dialogService.openInputDialog('Enter Report Name', '',
-      DialogComponent.INPUT_TYPES.TEXT, 'Report Name', new Date().
-      toDateString(), (reportName: string) => {
-      return (reportName && (this._reportNames.indexOf(reportName) === -1) &&
-        (reportName.search(/[\/\\]/) === -1));
+      DialogComponent.INPUT_TYPES.TEXT, 'Report Name', date.toDateString() +
+      ' ' + date.toTimeString(), (reportName: string) => {
+      return (reportName && (reportName.search(/[\/\\]/) === -1));
     }).afterClosed().subscribe(async (reportName: string) => {
       if (reportName) {
-        await this._itemRepository.produceReport(this._item.id, reportName,
-          reportFormat);
-        this.refresh();
+        if (this._reportNames.indexOf(reportName + reportFormat) !== -1) {
+          this._dialogService.openYesNoDialog('Overwrite ' + reportName,
+            'A report named ' + reportName + ' already exists. Proceeding ' +
+            'should overwrite that report. Do you want to proceed?').subscribe(
+            async (result: any) => {
+            if (result) {
+              await this._itemRepository.produceReport(this._item.id,
+                reportName, reportFormat);
+              this.refresh();
+            }
+          });
+        } else {
+          await this._itemRepository.produceReport(this._item.id, reportName,
+            reportFormat);
+          this.refresh();
+        }
       }
     });
   }

@@ -1016,25 +1016,6 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  visitDescendants(performAction) {
-    // Visit Breadth First
-    var proxyStack = [];
-
-    proxyStack.push(this);
-
-    var descendant = proxyStack.pop();
-    while (descendant) {
-      performAction(descendant);
-      for (var childIdx = descendant.children.length - 1; childIdx > -1; childIdx--) {
-        proxyStack.push(descendant.children[childIdx]);
-      }
-      descendant = proxyStack.pop();
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   /*
    * Flags -
    *   {
@@ -1129,47 +1110,6 @@ export class ItemProxy {
       var childProxy = this.children[childIdx];
       childProxy.dumpProxyNameAndDescription();
     }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  getDocument(showUndefined) {
-
-    var outputBuffer = '';
-    var document = this;
-
-    var displayItem = function(proxy){
-
-      var depth = proxy.getDepthFromAncestor(document);
-      var hdr = '';
-
-      for(var idx = 0; idx < depth; idx++){
-        hdr += '#';
-      }
-
-      if (depth === 0){
-        // Top Node
-        if (proxy.item.description || showUndefined) {
-          outputBuffer += '**' + proxy.item.name + '**  \n' + proxy.item.description + '\n\n';
-        } else {
-          outputBuffer += '**' + proxy.item.name + '**\n\n';
-        }
-      } else {
-        //Child Node
-        if (proxy.item.description || showUndefined) {
-          outputBuffer += hdr + ' ' + proxy.item.name + '\n' + proxy.item.description + '\n\n';
-        } else {
-          outputBuffer += hdr + ' ' + proxy.item.name + '\n\n';
-        }
-      }
-
-    };
-
-    this.visitDescendants(displayItem);
-
-    return outputBuffer;
-
   }
 
   //////////////////////////////////////////////////////////////////////////
