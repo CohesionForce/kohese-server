@@ -183,9 +183,9 @@ let _workingTree = TreeConfiguration.getWorkingTree();
       case 'produceReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
-          socket.emit('Item/generateReport', { id: request.data.id,
-            reportName: request.data.reportName, format: request.data.format,
-            text: request.data.text }, () => {
+          socket.emit('Item/generateReport', { reportName: request.data.
+            reportName, format: request.data.format, content: request.data.
+            content }, () => {
             resolve();
           });
         }) });
@@ -194,8 +194,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (reportNames: Array<string>) => void, reject:
           () => void) => {
-          socket.emit('getReportNames', { id: request.data.id }, (reportNames:
-            Array<string>) => {
+          socket.emit('getReportNames', {}, (reportNames: Array<string>) => {
             resolve(reportNames);
           });
         }) });
@@ -203,8 +202,8 @@ let _workingTree = TreeConfiguration.getWorkingTree();
       case 'removeReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
-          socket.emit('removeReport', { id: request.data.id,
-            reportName: request.data.reportName }, () => {
+          socket.emit('removeReport', { reportName: request.data.reportName },
+            () => {
             resolve();
           });
         }) });

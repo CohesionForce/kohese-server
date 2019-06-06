@@ -20,6 +20,7 @@ import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback 
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
 import { LocationMap } from '../../constants/LocationMap.data';
+import { ReportSelection } from '../../classes/ReportSelection.class';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -700,38 +701,59 @@ export class ItemRepository {
     return promise;
   }
   
-  public async produceReport(id: string, reportName: string, format: string):
-    Promise<void> {
-    let text: string = '';
-    let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      id);
-    itemProxy.visitTree(undefined, (proxy: ItemProxy) => {
-      let depth: number = proxy.getDepthFromAncestor(itemProxy) + 1;
-      for (let j: number = 0; j < depth; j++) {
-        text += '#';
+  public buildReport(reportSelections: Array<ReportSelection>, linkToItems:
+    boolean): string {
+    let content: string = '';
+    for (let j: number = 0; j < reportSelections.length; j++) {
+      let reportSelection: ReportSelection = reportSelections[j];
+      if (reportSelection.includeDescendants) {
+        reportSelection.itemProxy.visitTree(undefined, (itemProxy:
+          ItemProxy) => {
+          let depth: number = itemProxy.getDepthFromAncestor(reportSelection.
+            itemProxy) + 1;
+          for (let j: number = 0; j < depth; j++) {
+            content += '#';
+          }
+          
+          content += this.getItemReportText(itemProxy.item, linkToItems);
+        });
+      } else {
+        content += '#';
+        content += this.getItemReportText(reportSelections[j].itemProxy.item,
+          linkToItems);
       }
-      
-      text += ' [' + proxy.item.name + '](' + window.location.origin +
-        LocationMap['Explore'].route + ';id=' + proxy.item.id + ')\n\n' +
-        (proxy.item.description ? proxy.item.description : '') + '\n\n';
-    });
+    }
     
+    return content;
+  }
+  
+  private getItemReportText(item: any, linkToItems: boolean): string {
+    if (linkToItems) {
+      return ' [' + item.name + '](' + window.location.origin +
+        LocationMap['Explore'].route + ';id=' + item.id + ')\n\n' + (item.
+        description ? item.description : '') + '\n\n';
+    } else {
+      return ' ' + item.name + '\n\n' + (item.description ? item.
+        description : '') + '\n\n';
+    }
+  }
+  
+  public async produceReport(report: string, reportName: string, format:
+    string): Promise<void> {
     return await this.sendMessageToWorker('produceReport', {
-      id: id,
       reportName: reportName,
       format: format,
-      text: text
+      content: report
     }, true);
   }
   
-  public async getReportNames(id: string): Promise<Array<string>> {
-    return (await this.sendMessageToWorker('getReportNames', { id: id },
-      true)).data;
+  public async getReportNames(): Promise<Array<string>> {
+    return (await this.sendMessageToWorker('getReportNames', {}, true)).data;
   }
   
-  public async removeReport(id: string, reportName: string): Promise<void> {
+  public async removeReport(reportName: string): Promise<void> {
     return await this.sendMessageToWorker('removeReport',
-      { id: id, reportName: reportName }, true);
+      { reportName: reportName }, true);
   }
 
   //////////////////////////////////////////////////////////////////////////

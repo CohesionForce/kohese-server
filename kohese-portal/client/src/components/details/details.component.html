@@ -73,9 +73,6 @@
               <action-table [proxyStream]="proxyStream"
                             [editableStream]="editableStream"></action-table>
             </mat-tab>
-            <mat-tab label="Reports">
-              <reports [item]="(proxyStream | async)?.item"></reports>
-            </mat-tab>
             <mat-tab label="Raw Data">
                 <h4>Raw Data Tab</h4>
                 <h5>{{itemProxy.kind}}: {{itemProxy.item.name}} ({{itemProxy.item.id}})</h5>

@@ -22,6 +22,10 @@ if(global['app']){
   global['app'].on('newSession', KIOItemServer);
 }
 
+if (!fs.existsSync(_REPORTS_DIRECTORY_PATH)) {
+  fs.mkdirSync(_REPORTS_DIRECTORY_PATH);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
@@ -522,23 +526,23 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/generateReport', function(request, sendResponse) {
-    let itemReportDirectoryPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH,
-      request.id);
-    if (!fs.existsSync(itemReportDirectoryPath)) {
-      fs.mkdirSync(itemReportDirectoryPath, { recursive: true });
-    }
-    
     let format: string;
     switch (request.format) {
       case '.docx':
         format = 'docx';
         break;
+      case '.odt':
+        format = 'odt';
+        break;
+      case '.rtf':
+        format = 'rtf';
+        break;
       default:
         format = 'html5';
     }
     let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'markdown', '-t',
-      format, '-o', Path.resolve(itemReportDirectoryPath, request.reportName +
-      request.format)], { input: request.text });
+      format, '-o', Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName +
+      request.format)], { input: request.content });
     
     if (pandocProcess.stdout) {
       console.log(pandocProcess.stdout);
@@ -548,17 +552,13 @@ function KIOItemServer(socket){
   });
   
   socket.on('getReportNames', (request: any, respond: Function) => {
-    let itemReportDirectoryPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH,
-      request.id);
-    respond(fs.existsSync(itemReportDirectoryPath) ? fs.readdirSync(
-      itemReportDirectoryPath).map((fileName: string) => {
+    respond(fs.readdirSync(_REPORTS_DIRECTORY_PATH).map((fileName: string) => {
       return Path.basename(fileName);
-    }) : []);
+    }));
   });
   
   socket.on('removeReport', (request: any, respond: Function) => {
-    fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.id, request.
-      reportName));
+    fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName));
     respond();
   });
 
