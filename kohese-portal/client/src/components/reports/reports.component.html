@@ -50,7 +50,7 @@
           </mat-list>
         </split-area>
         <split-area [size]="40">
-          <div style="height: 10%; width: 100%; padding: 3px; display: flex;
+          <div style="height: 15%; width: 100%; padding: 3px; display: flex;
             flex-direction: row;">
             <mat-form-field style="width: 40%; padding: 3px;">
               <input matInput type="text" #reportNameInput
@@ -75,8 +75,9 @@
               Produce
             </button>
           </div>
-          <markdown [data]="report" style="height: 90%; width: 100%;">
-          </markdown>
+          <div style="height: 85%; width: 100%; overflow: auto;">
+            <markdown [data]="report"></markdown>
+          </div>
         </split-area>
       </split>
     </split-area>
@@ -90,7 +91,8 @@
             {{reportName}}
             <span class="flex-right-align">
               <a #reportDownloadAnchor style="display: none;"
-                download="{{reportName}}" href="{{'/reports/' + reportName}}">
+                download="{{reportName}}" href="{{'/producedReports/' +
+                reportName}}">
               </a>
               <button mat-icon-button matTooltip="Download this report"
                 (click)="reportDownloadAnchor.click()">
