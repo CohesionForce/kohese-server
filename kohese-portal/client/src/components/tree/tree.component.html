@@ -1,0 +1,30 @@
+<div style="height: 100%; width: 100%;">
+  <mat-form-field style="height: 15%; width: 100%;">
+    <input matInput type="text" placeholder="Search"
+      (input)="searchTextChanged($event)"/>
+  </mat-form-field>
+  <div style="height: 85%; width: 100%; overflow: auto;">
+    <ng-container *ngFor="let element of Array.from(elementMap.keys())">
+      <ng-container *ngIf="shouldDisplay(element)">
+        <div style="width: 100%;" [ngStyle]="getElementStyle(element)">
+          <ng-container *ngIf="!elementMap.get(element).expanded">
+            <mat-icon class="fa fa-caret-right" style="width: 7%;
+              text-align: center;" [ngStyle]="getExpansionIconStyle(element)"
+              (click)="expand(element); $event.stopPropagation()">
+            </mat-icon>
+          </ng-container>
+          <ng-container *ngIf="elementMap.get(element).expanded">
+            <mat-icon class="fa fa-caret-down" style="width: 7%;
+              text-align: center;" [ngStyle]="getExpansionIconStyle(element)"
+              (click)="collapse(element); $event.stopPropagation()">
+            </mat-icon>
+          </ng-container>
+          <button mat-button style="width: 93%; text-align: left;"
+            (click)="elementSelectedEventEmitter.emit(element)">
+            {{getText(element)}}
+          </button>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
