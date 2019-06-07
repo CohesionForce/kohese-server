@@ -20,7 +20,6 @@ import { Image, DisplayableEntity, Action,
   ActionGroup } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
-import { RowHeightCache } from '@swimlane/ngx-datatable/release/utils';
 
 @Component({
   selector: 'default-tree',
