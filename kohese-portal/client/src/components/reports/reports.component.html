@@ -56,7 +56,7 @@
               <input matInput type="text" #reportNameInput
                 placeholder="Report Name"/>
             </mat-form-field>
-            <mat-form-field style="width: 40%; padding: 3px;">
+            <mat-form-field style="width: 20%; padding: 3px;">
               <mat-select #reportFormatSelect placeholder="Report Format"
                 [value]="ReportFormat.DOCX">
                 <ng-container *ngFor="let reportFormatKey of (ReportFormat |
@@ -67,13 +67,19 @@
                 </ng-container>
               </mat-select>
             </mat-form-field>
+            <mat-checkbox #saveCheckbox [checked]="true">
+              Save
+            </mat-checkbox>
             <button mat-button
               matTooltip="Produce a report in the selected format"
               class="flex-right-align" [disabled]="!canProduceReport(
               reportNameInput.value)" (click)="produceReport(reportNameInput.
-              value, reportFormatSelect.selected.value)" style="padding: 3px;">
+              value, reportFormatSelect.selected.value, (saveCheckbox.checked ?
+              undefined : unsavedDownloadAnchor))"
+              style="padding: 3px;">
               Produce
             </button>
+            <a #unsavedDownloadAnchor style="display: none;"></a>
           </div>
           <div style="height: 85%; width: 100%; overflow: auto;">
             <markdown [data]="report"></markdown>

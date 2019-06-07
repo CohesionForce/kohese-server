@@ -119,23 +119,38 @@ export class ReportsComponent implements OnInit {
       _reportSelections.length > 0));
   }
   
-  public async produceReport(reportName: string, reportFormat: ReportFormat):
-    Promise<void> {
-    if (this._reportNames.indexOf(reportName + reportFormat) !== -1) {
+  public async produceReport(reportName: string, reportFormat: ReportFormat,
+    unsavedDownloadAnchor: any): Promise<void> {
+    let fullReportName: string = reportName + reportFormat;
+    if (this._reportNames.indexOf(fullReportName) !== -1) {
       this._dialogService.openYesNoDialog('Overwrite ' + reportName,
-        'A report named ' + reportName + ' already exists. Proceeding ' +
-        'should overwrite that report. Do you want to proceed?').subscribe(
-        async (result: any) => {
+        'A report named ' + fullReportName + ' already exists. ' +
+        'Proceeding should overwrite that report. Do you want to proceed?').
+        subscribe(async (result: any) => {
         if (result) {
           await this._itemRepository.produceReport(this._report, reportName,
             reportFormat);
-          this.updateReportList();
+          if (unsavedDownloadAnchor) {
+            unsavedDownloadAnchor.download = fullReportName;
+            unsavedDownloadAnchor.href = '/producedReports/' + fullReportName;
+            unsavedDownloadAnchor.click();
+            this.removeReport(fullReportName);
+          } else {
+            this.updateReportList();
+          }
         }
       });
     } else {
       await this._itemRepository.produceReport(this._report, reportName,
         reportFormat);
-      this.updateReportList();
+      if (unsavedDownloadAnchor) {
+        unsavedDownloadAnchor.download = fullReportName;
+        unsavedDownloadAnchor.href = '/producedReports/' + fullReportName;
+        unsavedDownloadAnchor.click();
+        this.removeReport(fullReportName);
+      } else {
+        this.updateReportList();
+      }
     }
   }
   
