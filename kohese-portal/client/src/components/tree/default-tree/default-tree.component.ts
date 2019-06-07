@@ -99,14 +99,15 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
       return !(object as ItemProxy).internal;
       }, (object: any) => {
-      this._dialogService.openCustomTextDialog('Confirm Deletion',
+        this._dialogService.openCustomTextDialog('Confirm Deletion',
         'Are you sure you want to delete ' + (object as ItemProxy).item.name + '?', [
         'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
+
         if (result) {
           if (object === this.rootSubject.getValue()) {
             this.rootSubject.next(this.getParent(object));
           }
-
+          this.rowFocused(undefined);
           this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
         }
       });
@@ -255,7 +256,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
   protected rowFocused(row: TreeRow): void {
     this._navigationService.navigate('Explore', {
-      id: this.getId(row.object)
+      id: (row ? this.getId(row.object) : '')
     });
   }
 
@@ -292,7 +293,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       filter = new ItemProxyFilter(this._dynamicTypesService, this.
         _itemRepository);
     }
-    
+
     return super.openFilterDialog(filter).pipe(tap((resultingFilter: Filter) => {
       if (resultingFilter && !resultingFilter.isElementPresent(this.
         _searchCriterion)) {
@@ -348,7 +349,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
         this._itemRepository.upsertItem(targetingProxy);
       }
-      
+
       parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
         1);
       let targetIndex: number = parentProxy.children.indexOf(targetProxy);
@@ -366,7 +367,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this._itemRepository.upsertItem(targetingProxy);
     }
   }
-  
+
   protected mayMove(object: any): boolean {
     return super.mayMove(object) && !(object as ItemProxy).internal;
   }

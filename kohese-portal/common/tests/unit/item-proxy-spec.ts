@@ -290,7 +290,7 @@ describe('ItemProxy Test', function () {
 
     let a = ItemProxy.getWorkingTree().getProxyFor('a');
 
-    a.deleteItem();
+    a.deleteItem(false);
     dump('Deleted a');
 
     expect(root.children[0].item.id).toBe('b');
@@ -526,7 +526,7 @@ describe('ItemProxy Test', function () {
     expect(getChildIds(d)).toBe(expectArray);
 
     expectArray = JSON.stringify(['da', 'db', 'dd', 'de', 'dab']);
-    dc.deleteItem();
+    dc.deleteItem(false);
     dump('Deleted dc');
     expect(getChildIds(d)).toBe(expectArray);
 
@@ -554,7 +554,7 @@ describe('ItemProxy Test', function () {
     expect(getChildIds(d)).toBe(expectArray);
 
     expectArray = JSON.stringify(['dab', 'de', 'dd', 'db', 'da', 'daa', 'dac']);
-    d.deleteItem();
+    d.deleteItem(false);
     d = new ItemProxy('Test', {
       id: 'd',
       name: 'D',
@@ -1263,7 +1263,7 @@ it('Retrieve Delta Tree Hash Map', () => {
 
   // Delete B
   var b = ItemProxy.getWorkingTree().getProxyFor('B');
-  b.deleteItem();
+  b.deleteItem(false);
 
   // Update C
   var c = ItemProxy.getWorkingTree().getProxyFor('C');
@@ -1581,7 +1581,7 @@ it('Should Not Hang When Deleting Lost+Found With Children', () => {
 
   // Try to delete item only
   var lfProxy = ItemProxy.getWorkingTree().getProxyFor('LOST+FOUND');
-  lfProxy.deleteItem();
+  lfProxy.deleteItem(false);
 
   // Try to delete item and descendants
   var lfProxyAfter = ItemProxy.getWorkingTree().getProxyFor('LOST+FOUND');
