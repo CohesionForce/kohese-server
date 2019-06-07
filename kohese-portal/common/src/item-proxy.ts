@@ -1326,7 +1326,7 @@ export class ItemProxy {
     }
 
     if (this.kind === 'Internal-Lost' && this.children.length === 0) {
-      this.deleteItem(false);
+      this.deleteItem();
     }
 
     this.calculateTreeHash();
@@ -1577,60 +1577,83 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  deleteItem(deleteDescendants: boolean) {
+  deleteItem(deleteDescendants: boolean = false) {
+    var byId = this.item.id;
+
+    // console.log('::: Deleting proxy for ' + byId);
+
+    var attemptToDeleteRestrictedNode = (
+      (this.item.id === this.treeConfig.lostAndFound.item.id) ||
+      (this.item.id === this.treeConfig.root.item.id));
+
     // Unlink from parent
-    if (this.parentProxy) {
+    if (this.parentProxy && !attemptToDeleteRestrictedNode) {
       this.parentProxy.removeChild(this);
     }
-    
-    let hasChildren: boolean = (this.children.length !== 0);
 
     // Unlink from all referred items
     this.removeAllReferences();
 
-    if (deleteDescendants){
+    if (deleteDescendants) {
       // Delete children depth first (after visit)
       this.visitChildren(null, null, (childProxy) => {
         childProxy.deleteItem(deleteDescendants);
       });
-      if(!this.treeConfig.loading){
-        this.treeConfig.changeSubject.next({
-          type: 'delete',
-          kind: this.kind,
-          id: this.item.id,
-          proxy: this,
-          recursive: deleteDescendants
-        });
+      if (attemptToDeleteRestrictedNode) {
+        // console.log('::: -> Not removing restricted node:' + this.item.name);
+      } else {
+        // console.log('::: -> Removing all references');
+        if (!this.treeConfig.loading) {
+          this.treeConfig.changeSubject.next({
+            type: 'delete',
+            kind: this.kind,
+            id: this.item.id,
+            proxy: this,
+            recursive: deleteDescendants
+          });
+        }
+        delete this.treeConfig.proxyMap[byId];
       }
     } else {
-      // This case should be temporarily inaccessible.
-      if (hasChildren) {
-        if(!this.treeConfig.loading){
-          this.treeConfig.changeSubject.next({
-            type: 'delete',
-            kind: this.kind,
-            id: this.item.id,
-            proxy: this,
-            recursive: deleteDescendants
-          });
+      // Remove this item and leave any children under Lost+Found
+      if (this.children.length !== 0) {
+        if (!attemptToDeleteRestrictedNode) {
+          // console.log('::: -> Node still has children');
+          if (!this.treeConfig.loading) {
+            this.treeConfig.changeSubject.next({
+              type: 'delete',
+              kind: this.kind,
+              id: this.item.id,
+              proxy: this,
+              recursive: deleteDescendants
+            });
+          }
+          createMissingProxy('Item', 'id', byId, this.treeConfig);
         }
-        createMissingProxy('Item', 'id', this.item.id, this.treeConfig);
       } else {
-        if(!this.treeConfig.loading){
-          this.treeConfig.changeSubject.next({
-            type: 'delete',
-            kind: this.kind,
-            id: this.item.id,
-            proxy: this,
-            recursive: deleteDescendants
-          });
+        if (attemptToDeleteRestrictedNode) {
+          // console.log('::: -> Not removing ' + this.item.name);
+        } else {
+          // console.log('::: -> Removing all references');
+          if (!this.treeConfig.loading) {
+            this.treeConfig.changeSubject.next({
+              type: 'delete',
+              kind: this.kind,
+              id: this.item.id,
+              proxy: this,
+              recursive: deleteDescendants
+            });
+          }
+          delete this.treeConfig.proxyMap[byId];
         }
       }
-      
-      delete this.treeConfig.proxyMap[this.item.id];
     }
   }
 }
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////
 //

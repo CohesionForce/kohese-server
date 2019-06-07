@@ -28,9 +28,9 @@ export class DialogService {
         buttonLabels: buttonLabels
       },
       disableClose: true
-    }).updateSize('40%', 'auto').afterClosed();
+    }).afterClosed();
   }
-  
+
   openInputDialog(title: string, text: string, type: string, fieldName: string,
     initialValue: any): MatDialogRef<DialogComponent> {
     if (initialValue == null) {
@@ -47,7 +47,7 @@ export class DialogService {
       disableClose: true
     }).updateSize('40%', 'auto');
   }
-  
+
   public openSelectDialog(title: string, text: string, label: string,
     initialValue: any, options: Array<any>):
     MatDialogRef<DialogComponent> {
@@ -84,11 +84,11 @@ export class DialogComponent {
     DATE: 'date',
     TIME: 'time'
   };
-  
+
   get INPUT_TYPES() {
     return DialogComponent.INPUT_TYPES;
   }
-  
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
   }
 }

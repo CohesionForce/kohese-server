@@ -62,7 +62,7 @@ export class KoheseModel extends ItemProxy {
     if (modelMap[itemId]){
       delete modelMap[itemId];
     }
-    super.deleteItem(false);
+    super.deleteItem();
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ export class KoheseModel extends ItemProxy {
       let modelProxy = models[index];
       let kind = modelProxy.item.name;
       console.log('::: Processing Model Properties ' + kind);
-      
+
       // Migration code
       if (kind === 'KoheseModel') {
         modelProxy.item.properties['localTypes'] = {
@@ -137,7 +137,7 @@ export class KoheseModel extends ItemProxy {
       } else {
         modelProxy.item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy.item.properties));
       }
-      
+
       modelProxy.item.classProperties = _.clone(modelProxy.parentProxy.item.classProperties) || {};
       modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
       modelProxy.item.derivedProperties = _.clone(modelProxy.parentProxy.item.derivedProperties) || [];
@@ -145,7 +145,7 @@ export class KoheseModel extends ItemProxy {
       modelProxy.item.stateProperties = _.clone(modelProxy.parentProxy.item.stateProperties) || [];
       modelProxy.item.relationProperties = _.clone(modelProxy.parentProxy.item.relationProperties) || [];
       modelProxy.item.idProperties = _.clone(modelProxy.parentProxy.item.idProperties) || [];
-      
+
       // Migration code
       if (!modelProxy.item.localTypes) {
         modelProxy.item.localTypes = [];
