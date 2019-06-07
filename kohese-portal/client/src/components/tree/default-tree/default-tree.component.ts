@@ -107,8 +107,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           if (object === this.rootSubject.getValue()) {
             this.rootSubject.next(this.getParent(object));
           }
-
           this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
+          this.rowFocused(this.getRow('ROOT'));
         }
       });
     });

@@ -570,7 +570,7 @@ export class ItemRepository {
       response.deleteItems.forEach((deletedItemId) => {
         var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
         if (proxy) {
-          proxy.deleteItem();
+          proxy.deleteItem(false);
         }
       });
     }

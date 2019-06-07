@@ -62,7 +62,7 @@ export class KoheseModel extends ItemProxy {
     if (modelMap[itemId]){
       delete modelMap[itemId];
     }
-    super.deleteItem();
+    super.deleteItem(false);
   }
 
   //////////////////////////////////////////////////////////////////////////

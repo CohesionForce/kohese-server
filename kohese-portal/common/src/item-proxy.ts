@@ -1326,7 +1326,7 @@ export class ItemProxy {
     }
 
     if (this.kind === 'Internal-Lost' && this.children.length === 0) {
-      this.deleteItem();
+      this.deleteItem(false);
     }
 
     this.calculateTreeHash();
@@ -1577,7 +1577,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  deleteItem(deleteDescendants: boolean = false) {
+  deleteItem(deleteDescendants: boolean) {
     var byId = this.item.id;
 
     // console.log('::: Deleting proxy for ' + byId);
@@ -1594,16 +1594,16 @@ export class ItemProxy {
     // Unlink from all referred items
     this.removeAllReferences();
 
-    if (deleteDescendants) {
+    if (deleteDescendants){
       // Delete children depth first (after visit)
       this.visitChildren(null, null, (childProxy) => {
         childProxy.deleteItem(deleteDescendants);
       });
-      if (attemptToDeleteRestrictedNode) {
+      if (attemptToDeleteRestrictedNode){
         // console.log('::: -> Not removing restricted node:' + this.item.name);
       } else {
         // console.log('::: -> Removing all references');
-        if (!this.treeConfig.loading) {
+        if (!this.treeConfig.loading){
           this.treeConfig.changeSubject.next({
             type: 'delete',
             kind: this.kind,
@@ -1616,8 +1616,8 @@ export class ItemProxy {
       }
     } else {
       // Remove this item and leave any children under Lost+Found
-      if (this.children.length !== 0) {
-        if (!attemptToDeleteRestrictedNode) {
+      if (this.children.length !== 0){
+        if (!attemptToDeleteRestrictedNode){
           // console.log('::: -> Node still has children');
           if (!this.treeConfig.loading) {
             this.treeConfig.changeSubject.next({
@@ -1631,11 +1631,11 @@ export class ItemProxy {
           createMissingProxy('Item', 'id', byId, this.treeConfig);
         }
       } else {
-        if (attemptToDeleteRestrictedNode) {
+        if (attemptToDeleteRestrictedNode){
           // console.log('::: -> Not removing ' + this.item.name);
         } else {
           // console.log('::: -> Removing all references');
-          if (!this.treeConfig.loading) {
+          if (!this.treeConfig.loading){
             this.treeConfig.changeSubject.next({
               type: 'delete',
               kind: this.kind,
