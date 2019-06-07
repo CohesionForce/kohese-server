@@ -74,6 +74,9 @@ export var LocationMap = {
     'title' : 'Document',
     'params' : ['id'],
     'route' : 'document'
+  },
+  'Reports': {
+    route: 'reports'
   }
 }
 

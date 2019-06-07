@@ -1,0 +1,111 @@
+<div style="height: 100%; width: 100%; padding: 3px;">
+  <split direction="vertical">
+    <split-area [size]="50">
+      <split direction="horizontal">
+        <split-area [size]="30">
+          <tree [root]="TreeConfiguration.getWorkingTree().getRootProxy()"
+            [getChildren]="getChildren" [getText]="getText"
+            (elementSelected)="addReportSelection($event)">
+          </tree>
+        </split-area>
+        <split-area [size]="30">
+          <div style="height: 10%; width: 100%; display: flex;
+            flex-direction: row;">
+            <mat-checkbox class="flex-right-align" [checked]="linkToItems"
+              (change)="linkToItems = $event.checked; updateReportPreview()">
+              Link To Items
+            </mat-checkbox>
+          </div>
+          <mat-list style="height: 85%; width: 100%; overflow: auto;">
+            <ng-container *ngFor="let reportSelection of reportSelections">
+              <mat-list-item>
+                {{reportSelection.itemProxy.item.name}}
+                <button mat-icon-button matTooltip="Include descendants"
+                  class="flex-right-align"
+                  [ngClass]="{ 'highlight': reportSelection.
+                  includeDescendants }" (click)="reportSelection.
+                  includeDescendants = !reportSelection.includeDescendants;
+                  updateReportPreview()">
+                  <mat-icon class="fa fa-arrow-circle-o-down"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Move this Item up"
+                  [disabled]="getReportSelectionsIndex(reportSelection.
+                  itemProxy) === 0" (click)="move(MoveDirection.UP,
+                  reportSelection); updateReportPreview()">
+                  <mat-icon class="fa fa-arrow-up"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Move this Item down"
+                  [disabled]="getReportSelectionsIndex(reportSelection.
+                  itemProxy) === reportSelections.length - 1" (click)="move(
+                  MoveDirection.DOWN, reportSelection); updateReportPreview()">
+                  <mat-icon class="fa fa-arrow-down"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Deselect this Item"
+                  (click)="reportSelections.splice(getReportSelectionsIndex(
+                  reportSelection.itemProxy), 1); updateReportPreview()">
+                  <mat-icon class="fa fa-trash"></mat-icon>
+                </button>
+              </mat-list-item>
+            </ng-container>
+          </mat-list>
+        </split-area>
+        <split-area [size]="40">
+          <div style="height: 15%; width: 100%; padding: 3px; display: flex;
+            flex-direction: row;">
+            <mat-form-field style="width: 40%; padding: 3px;">
+              <input matInput type="text" #reportNameInput
+                placeholder="Report Name"/>
+            </mat-form-field>
+            <mat-form-field style="width: 40%; padding: 3px;">
+              <mat-select #reportFormatSelect placeholder="Report Format"
+                [value]="ReportFormat.DOCX">
+                <ng-container *ngFor="let reportFormatKey of (ReportFormat |
+                  mapKey)">
+                  <mat-option [value]="ReportFormat[reportFormatKey]">
+                    {{ReportFormat[reportFormatKey]}}
+                  </mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
+            <button mat-button
+              matTooltip="Produce a report in the selected format"
+              class="flex-right-align" [disabled]="!canProduceReport(
+              reportNameInput.value)" (click)="produceReport(reportNameInput.
+              value, reportFormatSelect.selected.value)" style="padding: 3px;">
+              Produce
+            </button>
+          </div>
+          <div style="height: 85%; width: 100%; overflow: auto;">
+            <markdown [data]="report"></markdown>
+          </div>
+        </split-area>
+      </split>
+    </split-area>
+    <split-area [size]="50">
+      <mat-list style="height: 100%; width: 100%; overflow: auto;">
+        <h3>
+          Reports
+        </h3>
+        <ng-container *ngFor="let reportName of reportNames">
+          <mat-list-item>
+            {{reportName}}
+            <span class="flex-right-align">
+              <a #reportDownloadAnchor style="display: none;"
+                download="{{reportName}}" href="{{'/producedReports/' +
+                reportName}}">
+              </a>
+              <button mat-icon-button matTooltip="Download this report"
+                (click)="reportDownloadAnchor.click()">
+                <mat-icon class="fa fa-download"></mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Remove this report"
+                (click)="removeReport(reportName)">
+                <mat-icon class="fa fa-trash"></mat-icon>
+              </button>
+            </span>
+          </mat-list-item>
+        </ng-container>
+      </mat-list>
+    </split-area>
+  </split>
+</div>

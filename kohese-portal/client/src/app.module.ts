@@ -32,6 +32,7 @@ import { StateMachineEditorModule } from './components/state-machine-editor/stat
 import { TreeViewModule } from './components/tree/tree.module'
 import { VersionsModule } from './components/versions/versions.module';
 import { ReportGeneratorModule } from './components/report-generator/report-generator.module';
+import { ReportsModule } from './components/reports/reports.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
@@ -105,6 +106,7 @@ import { LensModule } from './components/lens/lens.module';
     VersionsModule,
     LensModule,
     ReportGeneratorModule,
+    ReportsModule,
     NoopAnimationsModule
   ],
   bootstrap: [AppComponent]

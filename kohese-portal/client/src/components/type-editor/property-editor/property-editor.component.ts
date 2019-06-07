@@ -49,7 +49,8 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
 
   add(): void {
     this.dialogService.openInputDialog('Add Property', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', '').afterClosed().subscribe((name: string) => {
+      INPUT_TYPES.TEXT, 'Name', '', undefined).afterClosed().subscribe((name:
+      string) => {
       if (name) {
         this._koheseType.addProperty(name);
         this._changeDetectorRef.markForCheck();
@@ -86,8 +87,17 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
       (itemProxy: ItemProxy) => {
       if (itemProxy.kind === koheseType.dataModelProxy.item.name) {
-        if (itemProxy.item[attributeName] != null) {
-          itemProxys.push(itemProxy);
+        if (Array.isArray(koheseType.dataModelProxy.item.properties[
+          attributeName].type)) {
+          // The first check below should not be necessary.
+          if (itemProxy.item[attributeName] && itemProxy.item[attributeName].
+            length > 0) {
+            itemProxys.push(itemProxy);
+          }
+        } else {
+          if (itemProxy.item[attributeName] != null) {
+            itemProxys.push(itemProxy);
+          }
         }
       }
     });

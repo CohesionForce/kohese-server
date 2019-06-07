@@ -9,7 +9,6 @@ module.exports = function (app) {
     var path = require('path');
     var bodyParser = require('body-parser');
     var util = require('util');
-    var serveIndex = require('serve-index');
     var serveFavicon = require('serve-favicon');
     var fs = require('fs');
 
@@ -30,7 +29,8 @@ module.exports = function (app) {
       /^\/typeeditor.*/,
       /^\/devtools.*/,
       /^\/document.*/,
-      /^\/report-gen.*/
+      /^\/report-gen.*/,
+      /^\/reports.*/
     ];
 
     app.use(ngRoutes, function (req, res) {
@@ -44,8 +44,8 @@ module.exports = function (app) {
     app.use('/socket.io-file-client',
             express.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
 
-    app.use('/reports', serveIndex('tmp_reports', {'icons':true, 'view':'details'}));
-    app.use('/reports', express.static(path.resolve(__dirname, '../../../tmp_reports')));
+    app.use('/producedReports', express.static(path.resolve(__dirname,
+      '../../../reports')));
 
     app.use(bodyParser.json());
 
