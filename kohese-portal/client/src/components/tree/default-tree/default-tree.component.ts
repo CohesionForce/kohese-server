@@ -20,6 +20,7 @@ import { Image, DisplayableEntity, Action,
   ActionGroup } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
+import { RowHeightCache } from '@swimlane/ngx-datatable/release/utils';
 
 @Component({
   selector: 'default-tree',
@@ -107,8 +108,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           if (object === this.rootSubject.getValue()) {
             this.rootSubject.next(this.getParent(object));
           }
+          this.rowFocused(undefined);
           this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
-          this.rowFocused(this.getRow('ROOT'));
         }
       });
     });
@@ -256,7 +257,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
   protected rowFocused(row: TreeRow): void {
     this._navigationService.navigate('Explore', {
-      id: this.getId(row.object)
+      id: (row ? this.getId(row.object) : '')
     });
   }
 
