@@ -542,8 +542,8 @@ function KIOItemServer(socket){
         format = 'html5';
     }
     let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'markdown', '-t',
-      format, '-o', Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName +
-      request.format)], { input: request.content });
+      format, '-s', '-o', Path.resolve(_REPORTS_DIRECTORY_PATH, request.
+      reportName + request.format)], { input: request.content });
     
     if (pandocProcess.stdout) {
       console.log(pandocProcess.stdout);
