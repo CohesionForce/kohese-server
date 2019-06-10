@@ -557,6 +557,12 @@ function KIOItemServer(socket){
     }));
   });
   
+  socket.on('renameReport', (request: any, respond: Function) => {
+    fs.renameSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.oldReportName),
+      Path.resolve(_REPORTS_DIRECTORY_PATH, request.newReportName));
+    respond();
+  });
+  
   socket.on('removeReport', (request: any, respond: Function) => {
     fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName));
     respond();

@@ -199,6 +199,15 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+      case 'renameReport':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject: () => void) => {
+          socket.emit('renameReport', { oldReportName: request.data.
+          oldReportName, newReportName: request.data.newReportName }, () => {
+            resolve();
+          });
+        }) });
+        break;
       case 'removeReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
