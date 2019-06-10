@@ -31,10 +31,14 @@ class ElementMapValue {
   }
 }
 
+enum ExpansionState {
+  EXPAND, COLLAPSE
+}
+
 @Component({
   selector: 'tree',
   templateUrl: './tree.component.html',
-  styleUrls: [],
+  styleUrls: ['./tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreeComponent implements OnInit {
@@ -81,8 +85,14 @@ export class TreeComponent implements OnInit {
     return this._elementSelectedEventEmitter;
   }
   
+  private _searchTimeoutIdentifier: any;
+  
   get Array() {
     return Array;
+  }
+  
+  get ExpansionState() {
+    return ExpansionState;
   }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
@@ -102,6 +112,32 @@ export class TreeComponent implements OnInit {
   }
   
   public searchTextChanged(searchText: string): void {
+    if (this._searchTimeoutIdentifier) {
+      clearTimeout(this._searchTimeoutIdentifier);
+    }
+    
+    this._searchTimeoutIdentifier = setTimeout(() => {
+      let keys: Array<any> = Array.from(this._elementMap.keys());
+      for (let j: number = 0; j < keys.length; j++) {
+        let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+        let matches: boolean = this._getText(keys[j]).includes(searchText);
+        elementMapValue.visible = matches;
+        if (matches) {
+          if (elementMapValue.parent) {
+            let parentElementMapValue: ElementMapValue = this._elementMap.get(
+              elementMapValue.parent);
+            while (parentElementMapValue) {
+              parentElementMapValue.visible = true;
+              parentElementMapValue = this._elementMap.get(
+                parentElementMapValue.parent);
+            }
+          }
+        }
+      }
+      
+      this._changeDetectorRef.markForCheck();
+      this._searchTimeoutIdentifier = undefined;
+    }, 1000);
   }
   
   public getElementStyle(element: any): object {
@@ -125,21 +161,35 @@ export class TreeComponent implements OnInit {
   }
   
   public shouldDisplay(element: any): boolean {
-    let parent: any = this._elementMap.get(element).parent;
-    if (parent === this._root) {
-      return true;
+    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    if (elementMapValue.visible) {
+      let parent: any = elementMapValue.parent;
+      if (parent === this._root) {
+        return true;
+      } else {
+        return this._elementMap.get(parent).expanded;
+      }
     } else {
-      return this._elementMap.get(parent).expanded;
+      return false;
     }
   }
   
-  public expand(element: any): void {
-    this._elementMap.get(element).expanded = true;
+  public changeSingleExpansionState(element: any, expansionState:
+    ExpansionState): void {
+    this._elementMap.get(element).expanded = (expansionState ===
+      ExpansionState.EXPAND);
     this._changeDetectorRef.markForCheck();
   }
   
-  public collapse(element: any): void {
-    this._elementMap.get(element).expanded = false;
+  public changeAllExpansionStates(expansionState: ExpansionState): void {
+    let keys: Array<any> = Array.from(this._elementMap.keys());
+    for (let j: number = 0; j < keys.length; j++) {
+      let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+      if (elementMapValue.visible) {
+        elementMapValue.expanded = (expansionState === ExpansionState.EXPAND);
+      }
+    }
+    
     this._changeDetectorRef.markForCheck();
   }
   
