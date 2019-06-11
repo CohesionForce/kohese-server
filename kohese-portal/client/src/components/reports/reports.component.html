@@ -3,8 +3,8 @@
     <split-area [size]="50">
       <split direction="horizontal">
         <split-area [size]="30">
-          <tree [root]="TreeConfiguration.getWorkingTree().getRootProxy()"
-            [getChildren]="getChildren" [getText]="getText"
+          <tree #itemProxyTree [root]="TreeConfiguration.getWorkingTree().
+            getRootProxy()" [getChildren]="getChildren" [getText]="getText"
             (elementSelected)="addReportSelection($event)">
           </tree>
         </split-area>

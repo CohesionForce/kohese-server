@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, OnInit, Input } from '@angular/core';
+  Inject, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { MarkdownService } from 'ngx-markdown';
+import { Subscription } from 'rxjs';
 
 import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
@@ -9,6 +10,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ReportSelection } from '../../classes/ReportSelection.class';
+import { TreeComponent } from '../tree/tree.component';
 
 enum ReportFormat {
   DOCX = '.docx', ODT = '.odt', HTML = '.html'
@@ -24,7 +26,7 @@ enum MoveDirection {
   styleUrls: ['./reports.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent implements OnInit, OnDestroy {
   private _reports: Map<string, string> = new Map<string, string>();
   get reports() {
     return this._reports;
@@ -60,6 +62,9 @@ export class ReportsComponent implements OnInit {
     return Array;
   }
   
+  @ViewChild('itemProxyTree')
+  private _itemProxyTree: TreeComponent;
+  
   get TreeConfiguration() {
     return TreeConfiguration;
   }
@@ -78,6 +83,8 @@ export class ReportsComponent implements OnInit {
     return this._getText;
   }
   
+  private _treeConfigurationSubscription: Subscription;
+  
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<ReportsComponent>,
     private _changeDetectorRef: ChangeDetectorRef, private _dialogService:
@@ -86,7 +93,22 @@ export class ReportsComponent implements OnInit {
   }
   
   public ngOnInit(): void {
+    this._treeConfigurationSubscription = TreeConfiguration.getWorkingTree().
+      getChangeSubject().subscribe((notification: any) => {
+      switch (notification.type) {
+        case 'create':
+        case 'delete':
+        case 'loaded':
+          this._itemProxyTree.update();
+          break;
+      }
+    });
+    
     this.updateReportList();
+  }
+  
+  public ngOnDestroy(): void {
+    this._treeConfigurationSubscription.unsubscribe();
   }
   
   public addReportSelection(itemProxy: ItemProxy): void {
