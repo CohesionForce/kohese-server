@@ -88,34 +88,50 @@
       </split>
     </split-area>
     <split-area [size]="50">
-      <mat-list style="height: 100%; width: 100%; overflow: auto;">
-        <h3>
-          Reports
-        </h3>
-        <ng-container *ngFor="let reportName of reportNames">
-          <mat-list-item>
-            {{reportName}}
-            <span class="flex-right-align">
-              <button mat-icon-button matTooltip="Rename this report"
-                (click)="renameReport(reportName)">
-                <mat-icon class="fa fa-i-cursor"></mat-icon>
-              </button>
-              <a #reportDownloadAnchor style="display: none;"
-                download="{{reportName}}" href="{{'/producedReports/' +
-                reportName}}">
-              </a>
-              <button mat-icon-button matTooltip="Download this report"
-                (click)="reportDownloadAnchor.click()">
-                <mat-icon class="fa fa-download"></mat-icon>
-              </button>
-              <button mat-icon-button matTooltip="Remove this report"
-                (click)="removeReport(reportName)">
-                <mat-icon class="fa fa-trash"></mat-icon>
-              </button>
-            </span>
-          </mat-list-item>
+      <h3>
+        Reports
+      </h3>
+      <mat-accordion multi="true">
+        <ng-container *ngFor="let reportName of Array.from(reports.keys())">
+          <mat-expansion-panel (opened)="retrieveSavedReportPreview(
+            reportName, false)">
+            <mat-expansion-panel-header>
+              <mat-panel-title style="align-items: center;">
+                {{reportName}}
+              </mat-panel-title>
+              <span class="flex-right-align">
+                <button mat-icon-button matTooltip="Rename this report"
+                  (click)="renameReport(reportName); $event.stopPropagation()">
+                  <mat-icon class="fa fa-i-cursor"></mat-icon>
+                </button>
+                <button mat-icon-button
+                  matTooltip="Preview this report in a new tab"
+                  (click)="retrieveSavedReportPreview(reportName,
+                  true); $event.stopPropagation()">
+                  <mat-icon class="fa fa-search"></mat-icon>
+                </button>
+                <a #reportDownloadAnchor style="display: none;"
+                  download="{{reportName}}" href="{{'/producedReports/' +
+                  reportName}}">
+                </a>
+                <button mat-icon-button matTooltip="Download this report"
+                  (click)="reportDownloadAnchor.click(); $event.
+                  stopPropagation()">
+                  <mat-icon class="fa fa-download"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Remove this report"
+                  (click)="removeReport(reportName); $event.stopPropagation()">
+                  <mat-icon class="fa fa-trash"></mat-icon>
+                </button>
+              </span>
+            </mat-expansion-panel-header>
+            <ng-template matExpansionPanelContent>
+              <markdown [data]="reports.get(reportName)">
+              </markdown>
+            </ng-template>
+          </mat-expansion-panel>
         </ng-container>
-      </mat-list>
+      </mat-accordion>
     </split-area>
   </split>
 </div>

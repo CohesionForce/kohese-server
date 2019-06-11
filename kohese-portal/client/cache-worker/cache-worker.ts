@@ -208,6 +208,15 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+      case 'getReportPreview':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (reportPreview: string) => void, reject: () => void) => {
+          socket.emit('getReportPreview', { reportName: request.data.
+          reportName }, (reportPreview: string) => {
+            resolve(reportPreview);
+          });
+        }) });
+        break;
       case 'removeReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {

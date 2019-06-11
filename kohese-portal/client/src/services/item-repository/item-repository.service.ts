@@ -757,6 +757,11 @@ export class ItemRepository {
       { oldReportName: oldReportName, newReportName: newReportName }, true);
   }
   
+  public async getReportPreview(reportName: string): Promise<string> {
+    return (await this.sendMessageToWorker('getReportPreview',
+      { reportName: reportName }, true)).data;
+  }
+  
   public async removeReport(reportName: string): Promise<void> {
     return await this.sendMessageToWorker('removeReport',
       { reportName: reportName }, true);

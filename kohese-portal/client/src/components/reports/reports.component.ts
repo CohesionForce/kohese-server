@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, OnInit, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MarkdownService } from 'ngx-markdown';
 
 import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
@@ -10,7 +11,7 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ReportSelection } from '../../classes/ReportSelection.class';
 
 enum ReportFormat {
-  DOCX = '.docx', ODT = '.odt', RTF = '.rtf', HTML = '.html'
+  DOCX = '.docx', ODT = '.odt', HTML = '.html'
 }
 
 enum MoveDirection {
@@ -24,9 +25,9 @@ enum MoveDirection {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReportsComponent implements OnInit {
-  private _reportNames: Array<string> = [];
-  get reportNames() {
-    return this._reportNames;
+  private _reports: Map<string, string> = new Map<string, string>();
+  get reports() {
+    return this._reports;
   }
   
   private _reportSelections: Array<ReportSelection> = [];
@@ -55,8 +56,8 @@ export class ReportsComponent implements OnInit {
     return MoveDirection;
   }
   
-  get Object() {
-    return Object;
+  get Array() {
+    return Array;
   }
   
   get TreeConfiguration() {
@@ -80,7 +81,8 @@ export class ReportsComponent implements OnInit {
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<ReportsComponent>,
     private _changeDetectorRef: ChangeDetectorRef, private _dialogService:
-    DialogService, private _itemRepository: ItemRepository) {
+    DialogService, private _itemRepository: ItemRepository,
+    private _markdownService: MarkdownService) {
   }
   
   public ngOnInit(): void {
@@ -122,7 +124,7 @@ export class ReportsComponent implements OnInit {
   public async produceReport(reportName: string, reportFormat: ReportFormat,
     unsavedDownloadAnchor: any): Promise<void> {
     let fullReportName: string = reportName + reportFormat;
-    if (this._reportNames.indexOf(fullReportName) !== -1) {
+    if (Array.from(this._reports.keys()).indexOf(fullReportName) !== -1) {
       this._dialogService.openYesNoDialog('Overwrite ' + reportName,
         'A report named ' + fullReportName + ' already exists. ' +
         'Proceeding should overwrite that report. Do you want to proceed?').
@@ -174,6 +176,27 @@ export class ReportsComponent implements OnInit {
     });
   }
   
+  public async retrieveSavedReportPreview(reportName: string, openInNewTab:
+    boolean): Promise<void> {
+    if (this._reports.get(reportName).length === 0) {
+      let reportPreview: string = await this._itemRepository.getReportPreview(
+        reportName);
+      this._reports.set(reportName, reportPreview);
+      
+      if (openInNewTab) {
+        window.open('data:text/html,' + encodeURIComponent(this.
+          _markdownService.compile(reportPreview)), '_blank');
+      } else {
+        this._changeDetectorRef.markForCheck();
+      }
+    } else {
+      if (openInNewTab) {
+        window.open('data:text/html,' + encodeURIComponent(this.
+          _markdownService.compile(this._reports.get(reportName))), '_blank');
+      }
+    }
+  }
+  
   public async removeReport(reportName: string): Promise<void> {
     await this._itemRepository.removeReport(reportName);
     this.updateReportList();
@@ -185,10 +208,14 @@ export class ReportsComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  public updateReportList(): void {
+  private updateReportList(): void {
     this._itemRepository.getReportNames().then((reportNames:
       Array<string>) => {
-      this._reportNames = reportNames;
+      this._reports.clear();
+      for (let j: number = 0; j < reportNames.length; j++) {
+        this._reports.set(reportNames[j], '');
+      }
+      
       this._changeDetectorRef.markForCheck();
     });
   }
