@@ -198,24 +198,12 @@ export class ReportsComponent implements OnInit, OnDestroy {
     });
   }
   
-  public async retrieveSavedReportPreview(reportName: string, openInNewTab:
-    boolean): Promise<void> {
+  public async retrieveSavedReportPreview(reportName: string): Promise<void> {
     if (this._reports.get(reportName).length === 0) {
       let reportPreview: string = await this._itemRepository.getReportPreview(
         reportName);
       this._reports.set(reportName, reportPreview);
-      
-      if (openInNewTab) {
-        window.open('data:text/html,' + encodeURIComponent(this.
-          _markdownService.compile(reportPreview)), '_blank');
-      } else {
-        this._changeDetectorRef.markForCheck();
-      }
-    } else {
-      if (openInNewTab) {
-        window.open('data:text/html,' + encodeURIComponent(this.
-          _markdownService.compile(this._reports.get(reportName))), '_blank');
-      }
+      this._changeDetectorRef.markForCheck();
     }
   }
   

@@ -94,7 +94,7 @@
       <mat-accordion multi="true">
         <ng-container *ngFor="let reportName of Array.from(reports.keys())">
           <mat-expansion-panel (opened)="retrieveSavedReportPreview(
-            reportName, false)">
+            reportName)">
             <mat-expansion-panel-header>
               <mat-panel-title style="align-items: center;">
                 {{reportName}}
@@ -103,12 +103,6 @@
                 <button mat-icon-button matTooltip="Rename this report"
                   (click)="renameReport(reportName); $event.stopPropagation()">
                   <mat-icon class="fa fa-i-cursor"></mat-icon>
-                </button>
-                <button mat-icon-button
-                  matTooltip="Preview this report in a new tab"
-                  (click)="retrieveSavedReportPreview(reportName,
-                  true); $event.stopPropagation()">
-                  <mat-icon class="fa fa-search"></mat-icon>
                 </button>
                 <a #reportDownloadAnchor style="display: none;"
                   download="{{reportName}}" href="{{'/producedReports/' +
