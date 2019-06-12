@@ -106,7 +106,7 @@
                 </button>
                 <a #reportDownloadAnchor style="display: none;"
                   download="{{reportName}}" href="{{'/producedReports/' +
-                  reportName}}">
+                  reportName}}" (click)="$event.stopPropagation()">
                 </a>
                 <button mat-icon-button matTooltip="Download this report"
                   (click)="reportDownloadAnchor.click(); $event.
