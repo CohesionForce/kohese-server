@@ -199,6 +199,8 @@ export class TreeComponent implements OnInit {
     for (let j: number = 0; j < children.length; j++) {
       this.processElement(children[j], this._root, 0);
     }
+    
+    this._changeDetectorRef.markForCheck();
   }
   
   private processElement(element: any, parent: any, depth: number): void {
