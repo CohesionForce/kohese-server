@@ -96,6 +96,10 @@
           <mat-list-item>
             {{reportName}}
             <span class="flex-right-align">
+              <button mat-icon-button matTooltip="Rename this report"
+                (click)="renameReport(reportName)">
+                <mat-icon class="fa fa-i-cursor"></mat-icon>
+              </button>
               <a #reportDownloadAnchor style="display: none;"
                 download="{{reportName}}" href="{{'/producedReports/' +
                 reportName}}">

@@ -751,6 +751,12 @@ export class ItemRepository {
     return (await this.sendMessageToWorker('getReportNames', {}, true)).data;
   }
   
+  public async renameReport(oldReportName: string, newReportName: string):
+    Promise<void> {
+    return await this.sendMessageToWorker('renameReport',
+      { oldReportName: oldReportName, newReportName: newReportName }, true);
+  }
+  
   public async removeReport(reportName: string): Promise<void> {
     return await this.sendMessageToWorker('removeReport',
       { reportName: reportName }, true);
