@@ -611,22 +611,26 @@ function KIOItemServer(socket){
       reportPreview = reportPreview.replace(/!\[.*?\]\((.+?)\)/g,
         (matchedSubstring: string, captureGroup: string, index: number,
         originalString: string) => {
-        let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
-          indexOf(captureGroup);
-        let dataUrl: string = 'data:image/';
-        if (captureGroup.endsWith('.png')) {
-          dataUrl += 'png';
-        } else if (captureGroup.endsWith('.jpg') || captureGroup.endsWith(
-          '.jpeg')) {
-          dataUrl += 'jpeg';
+        let imagePath: string = Path.resolve(mediaDirectoryPath, captureGroup);
+        if (fs.existsSync(imagePath)) {
+          let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+            indexOf(captureGroup);
+          let dataUrl: string = 'data:image/';
+          if (captureGroup.endsWith('.png')) {
+            dataUrl += 'png';
+          } else if (captureGroup.endsWith('.jpg') || captureGroup.endsWith(
+            '.jpeg')) {
+            dataUrl += 'jpeg';
+          }
+          
+          dataUrl += ';base64,';
+          dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
+          return matchedSubstring.substring(0,
+            matchedSubstringCaptureGroupIndex) + dataUrl + matchedSubstring.
+            substring(matchedSubstringCaptureGroupIndex + captureGroup.length);
+        } else {
+          return matchedSubstring;
         }
-        
-        dataUrl += ';base64,';
-        dataUrl += fs.readFileSync(Path.resolve(mediaDirectoryPath,
-          captureGroup), { encoding: 'base64' });
-        return matchedSubstring.substring(0, matchedSubstringCaptureGroupIndex) +
-          dataUrl + matchedSubstring.substring(
-          matchedSubstringCaptureGroupIndex + captureGroup.length);
       });
       
       if (fs.existsSync(mediaDirectoryPath)) {
