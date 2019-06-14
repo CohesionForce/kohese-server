@@ -120,8 +120,15 @@
               </span>
             </mat-expansion-panel-header>
             <ng-template matExpansionPanelContent>
-              <markdown [data]="reports.get(reportName)">
-              </markdown>
+              <ng-container *ngIf="reportName.endsWith('.md') else
+                notMarkdownReport">
+                <pre
+                  style="font-family: Roboto, 'Helvetica Neue', sans-serif;">{{reports.
+                  get(reportName)}}</pre>
+              </ng-container>
+              <ng-template #notMarkdownReport>
+                <markdown [data]="reports.get(reportName)"></markdown>
+              </ng-template>
             </ng-template>
           </mat-expansion-panel>
         </ng-container>

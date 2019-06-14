@@ -13,7 +13,7 @@ import { ReportSelection } from '../../classes/ReportSelection.class';
 import { TreeComponent } from '../tree/tree.component';
 
 enum ReportFormat {
-  DOCX = '.docx', ODT = '.odt', HTML = '.html'
+  DOCX = '.docx', ODT = '.odt', HTML = '.html', MARKDOWN = '.md'
 }
 
 enum MoveDirection {
