@@ -571,7 +571,7 @@ function processBulkUpdate(response: any): void {
 
   if (response.deleteItems) {
     for (let j: number = 0; j < response.deleteItems.length; j++) {
-      deleteItem(response.deleteItems[j]);
+      deleteItem({ id: response.deleteItems[j], recursive: false });
     }
   }
   const after = Date.now();
