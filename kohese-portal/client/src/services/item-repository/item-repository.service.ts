@@ -700,7 +700,7 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   public buildReport(reportSelections: Array<ReportSelection>, linkToItems:
     boolean): string {
     let content: string = '';
@@ -714,7 +714,7 @@ export class ItemRepository {
           for (let j: number = 0; j < depth; j++) {
             content += '#';
           }
-          
+
           content += this.getItemReportText(itemProxy.item, linkToItems);
         });
       } else {
@@ -723,10 +723,9 @@ export class ItemRepository {
           linkToItems);
       }
     }
-    
     return content;
   }
-  
+
   private getItemReportText(item: any, linkToItems: boolean): string {
     if (linkToItems) {
       return ' [' + item.name + '](' + window.location.origin +
@@ -737,7 +736,7 @@ export class ItemRepository {
         description : '') + '\n\n';
     }
   }
-  
+
   public async produceReport(report: string, reportName: string, format:
     string): Promise<void> {
     return await this.sendMessageToWorker('produceReport', {
@@ -746,22 +745,22 @@ export class ItemRepository {
       content: report
     }, true);
   }
-  
-  public async getReportNames(): Promise<Array<string>> {
-    return (await this.sendMessageToWorker('getReportNames', {}, true)).data;
+
+  public async getReportMetaData(): Promise<Array<any>> {
+    return (await this.sendMessageToWorker('getReportMetaData', {}, true)).data;
   }
-  
+
   public async renameReport(oldReportName: string, newReportName: string):
     Promise<void> {
     return await this.sendMessageToWorker('renameReport',
       { oldReportName: oldReportName, newReportName: newReportName }, true);
   }
-  
+
   public async getReportPreview(reportName: string): Promise<string> {
     return (await this.sendMessageToWorker('getReportPreview',
       { reportName: reportName }, true)).data;
   }
-  
+
   public async removeReport(reportName: string): Promise<void> {
     return await this.sendMessageToWorker('removeReport',
       { reportName: reportName }, true);

@@ -545,11 +545,11 @@ function KIOItemServer(socket){
         default:
           format = 'html5';
       }
-      
+
       let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'commonmark',
         '-t', format, '-s', '-o', Path.resolve(_REPORTS_DIRECTORY_PATH, request.
         reportName + request.format)], { input: request.content });
-      
+
       if (pandocProcess.stdout) {
         console.log(pandocProcess.stdout);
       }
@@ -557,19 +557,22 @@ function KIOItemServer(socket){
 
     sendResponse();
   });
-  
-  socket.on('getReportNames', (request: any, respond: Function) => {
+
+  socket.on('getReportMetaData', (request: any, respond: Function) => {
     respond(fs.readdirSync(_REPORTS_DIRECTORY_PATH).map((fileName: string) => {
-      return Path.basename(fileName);
+      return {
+        name: Path.basename(fileName),
+        dateProduced: fs.lstatSync(Path.resolve(_REPORTS_DIRECTORY_PATH, fileName)).birthtime
+      }
     }));
   });
-  
+
   socket.on('renameReport', (request: any, respond: Function) => {
     fs.renameSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.oldReportName),
       Path.resolve(_REPORTS_DIRECTORY_PATH, request.newReportName));
     respond();
   });
-  
+
   socket.on('getReportPreview', (request: any, respond: Function) => {
     let reportPreview: string;
     let reportName: string = request.reportName;
@@ -601,11 +604,11 @@ function KIOItemServer(socket){
         default:
           format = 'html';
       }
-      
+
       let pandocProcess: any = child.spawnSync('pandoc', ['-f', format, '-t',
         'commonmark', '--atx-headers', '--extract-media', __dirname, '-s', Path.
         resolve(_REPORTS_DIRECTORY_PATH, reportName)], undefined);
-      
+
       reportPreview = pandocProcess.stdout.toString();
       let mediaDirectoryPath: string = Path.resolve(__dirname, 'media');
       reportPreview = reportPreview.replace(/!\[.*?\]\((.+?)\)/g,
@@ -622,7 +625,7 @@ function KIOItemServer(socket){
             '.jpeg')) {
             dataUrl += 'jpeg';
           }
-          
+
           dataUrl += ';base64,';
           dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
           return matchedSubstring.substring(0,
@@ -632,7 +635,7 @@ function KIOItemServer(socket){
           return matchedSubstring;
         }
       });
-      
+
       if (fs.existsSync(mediaDirectoryPath)) {
         let directoryContents: Array<string> = fs.readdirSync(
           mediaDirectoryPath);
@@ -641,15 +644,15 @@ function KIOItemServer(socket){
         }
         fs.rmdirSync(mediaDirectoryPath);
       }
-      
+
       if (intermediateFilePath && fs.existsSync(intermediateFilePath)) {
         fs.unlinkSync(intermediateFilePath);
       }
     }
-    
+
     respond(reportPreview);
   });
-  
+
   socket.on('removeReport', (request: any, respond: Function) => {
     fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName));
     respond();
