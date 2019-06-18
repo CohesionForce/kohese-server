@@ -1,0 +1,106 @@
+<div [ngStyle]="{ 'height': data ? '35%' : '40%' }" style="width: 100%;
+  display: flex; flex-direction; row;">
+  <div style="height: 100%; width: 30%; padding: 3px; display: flex;
+    flex-direction: column; overflow: auto;">
+    <mat-checkbox [checked]="pdfImportParameters.forceTocStructuring"
+      (change)="pdfImportParameters.forceTocStructuring = $event.checked;
+      updatePreviews()"
+      [disabled]="pdfImportParameters.doNotStructure">
+      Force Table-of-Contents-Based Structuring
+    </mat-checkbox>
+    <mat-checkbox [checked]="pdfImportParameters.doNotStructure"
+      (change)="pdfImportParameters.doNotStructure = $event.checked;
+      updatePreviews()">
+      Do Not Structure
+    </mat-checkbox>
+    <mat-checkbox [checked]="pdfImportParameters.matchSectionNamesLeniently"
+      (change)="pdfImportParameters.matchSectionNamesLeniently = $event.
+      checked; updatePreviews()">
+      Match Section Names Leniently
+    </mat-checkbox>
+    <mat-checkbox [checked]="pdfImportParameters.moveFootnotes"
+      (change)="pdfImportParameters.moveFootnotes = $event.checked;
+      updatePreviews()">
+      Attempt To Move Footnotes Out Of Section Text
+    </mat-checkbox>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="text" placeholder="Table of Contents Entry Padding"
+        [ngModel]="pdfImportParameters.tocEntryPadding"
+        (ngModelChange)="pdfImportParameters.tocEntryPadding = $event;
+        updatePreviews()"/>
+    </mat-form-field>
+  </div>
+  <div style="height: 100%; width: 30%; padding: 3px; display: flex;
+    flex-direction: column; overflow: auto;">
+    <mat-form-field style="width: 100%;">
+      <input matInput type="number"
+        placeholder="Table of Contents Beginning Page Number"
+        [ngModel]="pdfImportParameters.tocBeginning"
+        (ngModelChange)="pdfImportParameters.tocBeginning = $event;
+        updatePreviews()"/>
+    </mat-form-field>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="number"
+        placeholder="Table of Contents Ending Page Number"
+        [ngModel]="pdfImportParameters.tocEnding"
+        (ngModelChange)="pdfImportParameters.tocEnding = $event;
+        updatePreviews()"/>
+    </mat-form-field>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="number" placeholder="Number of Header Lines"
+        [ngModel]="pdfImportParameters.headerLines"
+        (ngModelChange)="pdfImportParameters.headerLines = $event;
+        updatePreviews()"/>
+    </mat-form-field>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="number" placeholder="Number of Footer Lines"
+        [ngModel]="pdfImportParameters.footerLines"
+        (ngModelChange)="pdfImportParameters.footerLines = $event;
+        updatePreviews()"/>
+    </mat-form-field>
+  </div>
+  <tree #itemProxyTree [root]="TreeConfiguration.getWorkingTree().
+    getRootProxy()" [getChildren]="getChildren" [getText]="getText"
+    style="height: 100%; width: 40%;">
+  </tree>
+</div>
+<div style="height: 10%; width: 100%; display: flex; flex-direction: row;">
+  <h3>
+    PDF Files
+  </h3>
+  <input #fileInput type="file" style="display: none;" multiple
+    accept="application/pdf" (change)="addFiles(fileInput.files)"/>
+  <button mat-icon-button matTooltip="Select PDF files" (click)="fileInput.
+    click()" class="flex-right-align">
+    <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+  </button>
+</div>
+<div style="height: 50%; width: 100%; overflow: auto;">
+  <mat-accordion multi="true">
+    <ng-container *ngFor="let file of Array.from(selectedFileMap.keys())">
+      <mat-expansion-panel (opened)="retrievePdfImportPreview(file)">
+        <mat-expansion-panel-header>
+          <mat-panel-title style="align-items: center;">
+            {{file.name}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <markdown [data]="selectedFileMap.get(file)"></markdown>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-container>
+  </mat-accordion>
+</div>
+<ng-container *ngIf="data">
+  <div style="height: 5%; width: 100%; display: flex; flex-direction: row;">
+    <button mat-button matTooltip="Import the selected files"
+      class="flex-right-align" (click)="importSelectedFiles(itemProxyTree.
+      selection ? itemProxyTree.selection.item.id : ''); matDialogRef.close()">
+      Import
+    </button>
+    <button mat-button matTooltip="Cancel the PDF import process"
+      (click)="matDialogRef.close()">
+      Cancel
+    </button>
+  </div>
+</ng-container>

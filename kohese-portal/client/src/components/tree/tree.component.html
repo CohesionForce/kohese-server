@@ -32,7 +32,8 @@
             </mat-icon>
           </ng-container>
           <button mat-button style="width: 93%; text-align: left;"
-            (click)="elementSelectedEventEmitter.emit(element)">
+            (click)="selection = element; elementSelectedEventEmitter.emit(
+            element)" [ngClass]="{ 'highlight': (selection === element) }">
             {{getText(element)}}
           </button>
         </div>
