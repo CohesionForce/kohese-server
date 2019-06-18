@@ -109,7 +109,8 @@ export class TreeComponent implements OnInit {
   }
   
   public ngOnInit(): void {
-    if ((this._matDialogRef.componentInstance === this) && this._data) {
+    if (this._matDialogRef && (this._matDialogRef.componentInstance ===
+      this) && this._data) {
       this._root = this._data['root'];
       this._getChildren = this._data['getChildren'];
       this._hasChildren = this._data['hasChildren'];
