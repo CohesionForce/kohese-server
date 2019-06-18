@@ -83,6 +83,12 @@
           <mat-panel-title style="align-items: center;">
             {{file.name}}
           </mat-panel-title>
+          <span class="flex-right-align">
+            <button mat-icon-button matTooltip="De-select this file"
+              (click)="removeFile(file); $event.stopPropagation()">
+              <mat-icon class="fa fa-times"></mat-icon>
+            </button>
+          </span>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <markdown [data]="selectedFileMap.get(file)"></markdown>

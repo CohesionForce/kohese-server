@@ -85,6 +85,11 @@ export class PdfImportComponent {
     }
   }
   
+  public removeFile(pdfFile: File): void {
+    this._selectedFileMap.delete(pdfFile);
+    this._changeDetectorRef.markForCheck();
+  }
+  
   public updatePreviews(): void {
     let selectedFileKeys: Array<File> = Array.from(this._selectedFileMap.
       keys());
