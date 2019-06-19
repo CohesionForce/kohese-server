@@ -78,6 +78,14 @@ export class TreeComponent implements OnInit {
     this._getText = getText;
   }
   
+  private _selection: any;
+  get selection() {
+    return this._selection;
+  }
+  set selection(selection: any) {
+    this._selection = selection;
+  }
+  
   private _elementSelectedEventEmitter: EventEmitter<any> =
     new EventEmitter<any>();
   @Output('elementSelected')
@@ -101,7 +109,8 @@ export class TreeComponent implements OnInit {
   }
   
   public ngOnInit(): void {
-    if (this._data) {
+    if (this._matDialogRef && (this._matDialogRef.componentInstance ===
+      this) && this._data) {
       this._root = this._data['root'];
       this._getChildren = this._data['getChildren'];
       this._hasChildren = this._data['hasChildren'];
