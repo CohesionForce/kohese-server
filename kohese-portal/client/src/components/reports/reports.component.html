@@ -94,7 +94,7 @@
       <mat-accordion multi="true">
         <ng-container *ngFor="let reportObject of Array.from(reports.keys())">
           <mat-expansion-panel (opened)="retrieveSavedReportPreview(
-            reportObject.name)">
+            reportObject)">
             <mat-expansion-panel-header>
               <mat-panel-title style="align-items: center;">
                 {{reportObject.name}}
@@ -124,7 +124,7 @@
               </span>
             </mat-expansion-panel-header>
             <ng-template matExpansionPanelContent>
-              <ng-container *ngIf="reportObject.endsWith('.md') else
+              <ng-container *ngIf="reportObject.name.endsWith('.md') else
                 notMarkdownReport">
                 <pre
                   style="font-family: Roboto, 'Helvetica Neue', sans-serif;">{{reports.

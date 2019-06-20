@@ -201,11 +201,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
     });
   }
 
-  public async retrieveSavedReportPreview(reportName: string): Promise<void> {
-    if (this._reports.get(reportName).length === 0) {
+  public async retrieveSavedReportPreview(reportObject: any): Promise<void> {
+    if (this._reports.get(reportObject).length === 0) {
       let reportPreview: string = await this._itemRepository.getReportPreview(
-        reportName);
-      this._reports.set(reportName, reportPreview);
+        reportObject.name);
+      this._reports.set(reportObject.name, reportPreview);
       this._changeDetectorRef.markForCheck();
     }
   }
@@ -222,7 +222,10 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   public userInformation (reportObject: any) {
-    this._dialogService.openInformationDialog('Report Information', reportObject.dateProduced);
+    this._dialogService.openInformationDialog('Report Information',
+       '\nReport Name: ' + reportObject.name + '\n' +
+       'Creation Date: ' +
+       reportObject.dateProduced + ' UTC');
   }
 
   private updateReportList(): void {

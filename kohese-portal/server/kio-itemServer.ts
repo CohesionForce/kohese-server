@@ -558,11 +558,13 @@ function KIOItemServer(socket){
     sendResponse();
   });
 
+
   socket.on('getReportMetaData', (request: any, respond: Function) => {
     respond(fs.readdirSync(_REPORTS_DIRECTORY_PATH).map((fileName: string) => {
       return {
         name: Path.basename(fileName),
-        dateProduced: fs.lstatSync(Path.resolve(_REPORTS_DIRECTORY_PATH, fileName)).birthtime
+        dateProduced: fs.lstatSync(Path.resolve
+          (_REPORTS_DIRECTORY_PATH, fileName)).birthtime
       }
     }));
   });
