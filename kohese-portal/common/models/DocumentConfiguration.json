@@ -1,0 +1,18 @@
+{
+  "id": "DocumentConfiguration",
+  "name": "DocumentConfiguration",
+  "parentId": "Item",
+  "base": "Item",
+  "idInjection": true,
+  "invertItemOrder": true,
+  "properties": {
+    "types": {
+      "type": "object"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
+

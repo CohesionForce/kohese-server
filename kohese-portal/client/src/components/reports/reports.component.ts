@@ -11,6 +11,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ReportSelection } from '../../classes/ReportSelection.class';
 import { TreeComponent } from '../tree/tree.component';
+import { DocumentConfigurationEditorComponent } from '../object-editor/document-configuration/document-configuration-editor.component';
 
 enum ReportFormat {
   DOCX = '.docx', ODT = '.odt', HTML = '.html', MARKDOWN = '.md'
@@ -37,12 +38,17 @@ export class ReportsComponent implements OnInit, OnDestroy {
     return this._reportSelections;
   }
   
-  private _linkToItems: boolean;
-  get linkToItems() {
-    return this._linkToItems;
+  private _documentConfigurations: Array<any> = [];
+  get documentConfigurations() {
+    return this._documentConfigurations;
   }
-  set linkToItems(linkToItems: boolean) {
-    this._linkToItems = linkToItems;
+  
+  private _selectedDocumentConfiguration: any = '';
+  get selectedDocumentConfiguration() {
+    return this._selectedDocumentConfiguration;
+  }
+  set selectedDocumentConfiguration(selectedDocumentConfiguration: any) {
+    this._selectedDocumentConfiguration = selectedDocumentConfiguration;
   }
   
   private _report: string;
@@ -93,6 +99,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
   
   public ngOnInit(): void {
+    this.populateDocumentConfigurationArray();
+    
     this._treeConfigurationSubscription = TreeConfiguration.getWorkingTree().
       getChangeSubject().subscribe((notification: any) => {
       switch (notification.type) {
@@ -100,6 +108,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
         case 'delete':
         case 'loaded':
           this._itemProxyTree.update();
+          this.populateDocumentConfigurationArray();
           break;
       }
     });
@@ -114,6 +123,56 @@ export class ReportsComponent implements OnInit, OnDestroy {
   public addReportSelection(itemProxy: ItemProxy): void {
     this._reportSelections.push(new ReportSelection(itemProxy));
     this.updateReportPreview();
+  }
+  
+  public editDocumentConfiguration(documentConfiguration: any):
+    void {
+    this._dialogService.openComponentDialog(
+      DocumentConfigurationEditorComponent, {
+      data: {
+        documentConfiguration: (documentConfiguration ? documentConfiguration :
+          undefined)
+      }
+    }).updateSize('90%', '90%').afterClosed().subscribe(async (returnValue:
+      any) => {
+      if (returnValue) {
+        if (!documentConfiguration) {
+          await this._itemRepository.buildItem('DocumentConfiguration',
+            returnValue);
+          this._changeDetectorRef.markForCheck();
+        } else {
+          this.populateDocumentConfigurationArray();
+          this.updateReportPreview();
+          this._changeDetectorRef.markForCheck();
+        }
+      }
+    });
+  }
+  
+  public removeSelectedDocumentConfiguration(): void {
+    this._dialogService.openYesNoDialog('Remove ' + this.
+      _selectedDocumentConfiguration.name, 'Are you sure that you want to ' +
+      'remove ' + this._selectedDocumentConfiguration.name + '?').subscribe(
+      async (result: any) => {
+      if (result) {
+        await this._itemRepository.deleteItem(TreeConfiguration.
+          getWorkingTree().getProxyFor(this._selectedDocumentConfiguration.id),
+          false);
+        this._selectedDocumentConfiguration = '';
+        this.updateReportPreview();
+        this._changeDetectorRef.markForCheck();
+      }
+    });
+  }
+  
+  private populateDocumentConfigurationArray(): void {
+    this._documentConfigurations.length = 0;
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
+      (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === 'DocumentConfiguration') {
+        this._documentConfigurations.push(itemProxy.item);
+      }
+    }, undefined);
   }
   
   public getReportSelectionsIndex(itemProxy: ItemProxy): number {
@@ -214,7 +273,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
   
   public updateReportPreview(): void {
     this._report = this._itemRepository.buildReport(this._reportSelections,
-      this._linkToItems);
+      this._selectedDocumentConfiguration);
     this._changeDetectorRef.markForCheck();
   }
   

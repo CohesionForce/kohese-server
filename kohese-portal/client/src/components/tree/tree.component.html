@@ -1,4 +1,5 @@
-<div style="height: 100%; width: 100%;">
+<div style="width: 100%;" [ngStyle]="{ 'height': isDialogInstance() ? '90%' :
+  '100%' }">
   <div style="height: 15%; width: 100%; display: flex; flex-direction: row;">
     <button mat-icon-button matTooltip="Expand all"
       (click)="changeAllExpansionStates(ExpansionState.EXPAND)">
@@ -32,7 +33,8 @@
             </mat-icon>
           </ng-container>
           <button mat-button style="width: 93%; text-align: left;"
-            (click)="elementSelectedEventEmitter.emit(element)">
+            (click)="changeElementSelection(element)" [ngClass]="{ 'highlight':
+            (selection.indexOf(element) !== -1) }">
             {{getText(element)}}
           </button>
         </div>
@@ -40,3 +42,19 @@
     </ng-container>
   </div>
 </div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
+    flex-direction: column;">
+    <span class="flex-right-align">
+      <button mat-button matTooltip="Select these elements"
+        [disabled]="selection.length === 0" (click)="matDialogRef.close(
+        selection)">
+        Select
+      </button>
+      <button mat-button matTooltip="Cancel the selection process"
+        (click)="matDialogRef.close(undefined)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>

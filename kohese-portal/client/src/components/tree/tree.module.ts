@@ -33,6 +33,7 @@ import { TreeComponent } from './tree.component';
     TreeComponent
   ],
   entryComponents: [
+    TreeComponent
   ],
   imports : [
     CommonModule,

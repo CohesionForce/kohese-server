@@ -1,0 +1,103 @@
+<div style="height: 30%; width: 100%;">
+  <mat-form-field style="width: 100%;">
+    <input matInput type="text" placeholder="Name"
+      [(ngModel)]="copy.name"/>
+  </mat-form-field>
+  <mat-form-field style="width: 100%;">
+    <textarea matInput cols="80" rows="3" placeholder="Description"
+      [(ngModel)]="copy.description"></textarea>
+  </mat-form-field>
+  <div style="width: 100%; display: flex; flex-direction: row;">
+    Parent:&nbsp;
+    <button mat-raised-button style="width: 60%;" [disabled]="true">
+      {{TreeConfiguration.getWorkingTree().getProxyFor(copy.parentId).item.
+        name}}
+    </button>
+    <span class="flex-right-align" style="width: 20%; display: flex;
+      flex-direction: row;">
+      <button mat-icon-button matTooltip="Select a parent"
+        (click)="openParentSelector()"
+        class="flex-right-align">
+        <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+      </button>
+      <button mat-icon-button
+        matTooltip="Remove this parent selection" [disabled]="(copy.parentId ==
+        null)" (click)="copy.parentId = undefined">
+        <mat-icon class="fa fa-times"></mat-icon>
+      </button>
+    </span>
+  </div>
+  <mat-form-field style="width: 100%;">
+    <input matInput type="text" placeholder="Tags"
+      [(ngModel)]="copy.tags"/>
+  </mat-form-field>
+</div>
+<div style="height: 65%; width: 100%;">
+  <split direction="horizontal">
+    <split-area [size]="35">
+      <div style="height: 5%; width: 100%;">
+      </div>
+      <tree #sourceTree [root]="undefined" [getChildren]="getSourceChildren"
+        [getText]="getSourceText"
+        (elementSelected)="addToDocumentConfiguration(sourceTree.getTreePath(
+        $event))" style="height: 95%; width: 100%;">
+      </tree>
+    </split-area>
+    <split-area [size]="35">
+      <div style="height: 5%; width: 100%; display: flex;
+        flex-direction: row;">
+        <button mat-icon-button matTooltip="Remove this attribute"
+          class="flex-right-align" [disabled]="!targetTree.selection[0]"
+          (click)="removeAttribute(targetTree.getTreePath(targetTree.
+          selection[0]))">
+          <mat-icon class="fa fa-times"></mat-icon>
+        </button>
+      </div>
+      <tree #targetTree [root]="copy"
+        [getChildren]="getTargetChildren" [getText]="getTargetText"
+        (elementSelected)="changeDetectorRef.markForCheck()"
+        style="height: 95%; width: 100%;">
+      </tree>
+    </split-area>
+    <split-area [size]="30">
+      <ng-container *ngIf="targetTree.selection[0]">
+        <h3>
+          {{targetTree.selection[0].key}}
+        </h3>
+        <ng-container *ngIf="targetTree.selection[0].value.attributes else
+          attributeSelected">
+          <ng-container *ngIf="targetTree.selection[0].value.localTypes else
+            localTypeSelected">
+          </ng-container>
+          <ng-template #localTypeSelected>
+          </ng-template>
+        </ng-container>
+        <ng-template #attributeSelected>
+          <ng-container *ngIf="targetTree.selection[0].key === 'name'">
+            <mat-checkbox [checked]="targetTree.selection[0].value.linkToItem"
+              (change)="targetTree.selection[0].value.linkToItem = $event.
+              checked">
+              Link To Item
+            </mat-checkbox>
+            <br/>
+          </ng-container>
+          <mat-checkbox [checked]="targetTree.selection[0].value.
+            showAttributeName" (change)="targetTree.selection[0].value.
+            showAttributeName = $event.checked">
+            Show Attribute Name
+          </mat-checkbox>
+        </ng-template>
+      </ng-container>
+    </split-area>
+  </split>
+</div>
+<div style="height: 5%; width: 100%; display: flex; flex-direction: row;">
+  <button mat-button matTooltip="Apply the above specifications"
+    class="flex-right-align" (click)="close(true)">
+    Apply
+  </button>
+  <button mat-button matTooltip="Cancel this specification process"
+    (click)="close(false)">
+    Cancel
+  </button>
+</div>
