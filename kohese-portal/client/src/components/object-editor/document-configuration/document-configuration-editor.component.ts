@@ -47,10 +47,6 @@ export class DocumentConfigurationEditorComponent implements OnInit {
     return this._changeDetectorRef;
   }
   
-  get data() {
-    return this._data;
-  }
-  
   private _getSourceChildren: (element: any) => Array<any> = (element:
     any) => {
     let children: Array<any> = [];
@@ -149,8 +145,7 @@ export class DocumentConfigurationEditorComponent implements OnInit {
   }
   
   public ngOnInit(): void {
-    if (this._matDialogRef && (this._matDialogRef.componentInstance ===
-      this) && this._data) {
+    if (this.isDialogInstance()) {
       this._documentConfiguration = this._data[
         'documentConfiguration'];
     }
@@ -182,6 +177,11 @@ export class DocumentConfigurationEditorComponent implements OnInit {
         };
       }
     }
+  }
+  
+  public isDialogInstance(): boolean {
+    return this._matDialogRef && (this._matDialogRef.componentInstance ===
+      this) && this._data;
   }
   
   public openParentSelector(): void {

@@ -1,12 +1,12 @@
-<div style="height: 30%; width: 100%;">
+<div style="width: 100%;" [ngStyle]="{ 'height': isDialogInstance() ? '50%' :
+  '55%' }">
   <mat-form-field style="width: 100%;">
     <input matInput type="text" placeholder="Name"
       [(ngModel)]="copy.name"/>
   </mat-form-field>
-  <mat-form-field style="width: 100%;">
-    <textarea matInput cols="80" rows="3" placeholder="Description"
-      [(ngModel)]="copy.description"></textarea>
-  </mat-form-field>
+  <markdown-editor [value]="copy.description" [valueIdentifier]="'Description'"
+    (valueChanged)="copy.description = $event">
+  </markdown-editor>
   <div style="width: 100%; display: flex; flex-direction: row;">
     Parent:&nbsp;
     <button mat-raised-button style="width: 60%;" [disabled]="true">
@@ -32,7 +32,7 @@
       [(ngModel)]="copy.tags"/>
   </mat-form-field>
 </div>
-<div style="height: 65%; width: 100%;">
+<div style="height: 45%; width: 100%;">
   <split direction="horizontal">
     <split-area [size]="35">
       <div style="height: 5%; width: 100%;">
@@ -91,13 +91,16 @@
     </split-area>
   </split>
 </div>
-<div style="height: 5%; width: 100%; display: flex; flex-direction: row;">
-  <button mat-button matTooltip="Apply the above specifications"
-    class="flex-right-align" (click)="close(true)">
-    Apply
-  </button>
-  <button mat-button matTooltip="Cancel this specification process"
-    (click)="close(false)">
-    Cancel
-  </button>
-</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 5%; width: 100%; display: flex;
+    flex-direction: row;">
+    <button mat-button matTooltip="Apply the above specifications"
+      class="flex-right-align" (click)="close(true)">
+      Apply
+    </button>
+    <button mat-button matTooltip="Cancel this specification process"
+      (click)="close(false)">
+      Cancel
+    </button>
+  </mat-dialog-actions>
+</ng-container>
