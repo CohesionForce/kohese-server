@@ -12,8 +12,7 @@
           <div style="height: 10%; width: 100%; display: flex;
             flex-direction: row;">
             <mat-form-field style="width: 70%;">
-              <mat-select #documentConfigurationSelect
-                placeholder="Document Configuration"
+              <mat-select placeholder="Document Configuration"
                 [ngModel]="selectedDocumentConfiguration"
                 (ngModelChange)="selectedDocumentConfiguration = $event;
                 updateReportPreview()">

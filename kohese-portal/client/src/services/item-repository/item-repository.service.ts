@@ -778,12 +778,7 @@ export class ItemRepository {
         
         if (documentConfigurationType.attributes[attributeName].
           showAttributeName) {
-          let attributeViewProperty: any = TreeConfiguration.getWorkingTree().
-            getProxyFor('view-' + itemProxy.model.item.classProperties[
-            attributeName].definedInKind.toLowerCase()).item.viewProperties[
-            attributeName];
-          text += (attributeViewProperty ? attributeViewProperty.displayName :
-            attributeName) + ': ';
+          text += attributeName + ': ';
         }
         
         if (documentConfigurationType.attributes[attributeName].linkToItem) {
@@ -796,15 +791,26 @@ export class ItemRepository {
       } else {
         if (documentConfigurationType.attributes[attributeName].
           showAttributeName) {
-          let attributeViewProperty: any = TreeConfiguration.getWorkingTree().
-            getProxyFor('view-' + itemProxy.model.item.classProperties[
-            attributeName].definedInKind.toLowerCase()).item.viewProperties[
-            attributeName];
-          text += (attributeViewProperty ? attributeViewProperty.displayName :
-            attributeName) + ': ';
+          text += attributeName + ': ';
         }
         
-        text += itemProxy.item[attributeName] + '\n\n';
+        let addition: string;
+        let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(itemProxy.model.classProperties[attributeName].
+          definedInKind);
+        if (modelProxy.item.properties[attributeName].relation) {
+          let reference: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(itemProxy.item[attributeName]);
+          if (reference) {
+            addition = reference.item.name;
+          } else {
+            addition = itemProxy.item[attributeName];
+          }
+        } else {
+          addition = itemProxy.item[attributeName];
+        }
+        
+        text += addition + '\n\n';
       }
     }
     

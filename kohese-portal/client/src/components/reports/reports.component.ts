@@ -141,6 +141,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
             returnValue);
           this._changeDetectorRef.markForCheck();
         } else {
+          await this._itemRepository.upsertItem(TreeConfiguration.
+            getWorkingTree().getProxyFor(documentConfiguration.id));
           this.populateDocumentConfigurationArray();
           this.updateReportPreview();
           this._changeDetectorRef.markForCheck();
