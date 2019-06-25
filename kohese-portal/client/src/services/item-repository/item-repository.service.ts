@@ -796,7 +796,7 @@ export class ItemRepository {
         
         let addition: string;
         let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(itemProxy.model.classProperties[attributeName].
+          getProxyFor(itemProxy.model.item.classProperties[attributeName].
           definedInKind);
         if (modelProxy.item.properties[attributeName].relation) {
           let reference: ItemProxy = TreeConfiguration.getWorkingTree().
