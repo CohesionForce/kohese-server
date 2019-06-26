@@ -1,0 +1,10 @@
+{
+  "id": "view-documentconfiguration",
+  "name": "DocumentConfiguration View Model",
+  "parentId": "view-item",
+  "modelName": "DocumentConfiguration",
+  "icon": "fa fa-file",
+  "viewProperties": {},
+  "itemIds": []
+}
+

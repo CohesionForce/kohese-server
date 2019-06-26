@@ -11,10 +11,41 @@
         <split-area [size]="30">
           <div style="height: 10%; width: 100%; display: flex;
             flex-direction: row;">
-            <mat-checkbox class="flex-right-align" [checked]="linkToItems"
-              (change)="linkToItems = $event.checked; updateReportPreview()">
-              Link To Items
-            </mat-checkbox>
+            <mat-form-field style="width: 70%;">
+              <mat-select placeholder="Document Configuration"
+                [ngModel]="selectedDocumentConfiguration"
+                (ngModelChange)="selectedDocumentConfiguration = $event;
+                updateReportPreview()">
+                <mat-option [value]="''">
+                  Default Document Configuration
+                </mat-option>
+                <ng-container *ngFor="let documentConfiguration of
+                  documentConfigurations">
+                  <mat-option [value]="documentConfiguration">
+                    {{documentConfiguration.name}}
+                  </mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
+            <button mat-icon-button
+              matTooltip="Add a Document Configuration"
+              class="flex-right-align"
+              (click)="editDocumentConfiguration(undefined)">
+              <mat-icon class="fa fa-plus"></mat-icon>
+            </button>
+            <button mat-icon-button
+              matTooltip="Edit this Document Configuration"
+              [disabled]="!selectedDocumentConfiguration"
+              (click)="editDocumentConfiguration(
+              selectedDocumentConfiguration)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+            </button>
+            <button mat-icon-button
+              matTooltip="Remove this Document Configuration"
+              [disabled]="!selectedDocumentConfiguration"
+              (click)="removeSelectedDocumentConfiguration()">
+              <mat-icon class="fa fa-trash"></mat-icon>
+            </button>
           </div>
           <mat-list style="height: 85%; width: 100%; overflow: auto;">
             <ng-container *ngFor="let reportSelection of reportSelections">
