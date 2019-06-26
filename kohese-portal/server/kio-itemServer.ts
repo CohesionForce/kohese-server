@@ -527,6 +527,9 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/generateReport', function(request, sendResponse) {
+    let metaDataString: Array<string> = request.content.split("\n\n", 3);
+    fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
+      reportName + request.format), metaDataString.join ('\n\n'), undefined);
     if (request.format === '.md') {
       fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.
         reportName + request.format), request.content, undefined);
@@ -560,11 +563,12 @@ function KIOItemServer(socket){
 
 
   socket.on('getReportMetaData', (request: any, respond: Function) => {
-    respond(fs.readdirSync(_REPORTS_DIRECTORY_PATH).map((fileName: string) => {
+    respond(fs.readdirSync(_REPORTS_DIRECTORY_PATH).filter((fileName: string) => {
+      return (!fileName.startsWith('.'));
+    }).map((fileName: string) => {
       return {
         name: Path.basename(fileName),
-        dateProduced: fs.lstatSync(Path.resolve
-          (_REPORTS_DIRECTORY_PATH, fileName)).birthtime
+        metaContent: fs.readFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + fileName), 'utf8')
       }
     }));
   });

@@ -52,7 +52,6 @@ export class ItemRepository {
 
   shortProxyList: Array<ItemProxy>;
   modelTypes: Object;
-
   private _repoState: RepoStates = undefined;
 
   logEvents: any;
@@ -701,9 +700,15 @@ export class ItemRepository {
     return promise;
   }
 
-  public buildReport(reportSelections: Array<ReportSelection>, linkToItems:
+  public buildReport(reportName: string, reportSelections: Array<ReportSelection>, linkToItems:
     boolean): string {
     let content: string = '';
+    let userName: any = this.CurrentUserService.getCurrentUserSubject().
+      getValue();
+    let date = new Date();
+    content += 'Report Name: ' + reportName + '\n\n';
+    content += 'User Name: ' + userName.username + '\n\n';
+    content += 'Creation Date: ' + date + '\n\n';
     for (let j: number = 0; j < reportSelections.length; j++) {
       let reportSelection: ReportSelection = reportSelections[j];
       if (reportSelection.includeDescendants) {

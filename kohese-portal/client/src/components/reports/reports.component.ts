@@ -64,6 +64,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
     return Array;
   }
 
+  @ViewChild('reportNameInput')
+  private _reportNameInput: any;
+
   @ViewChild('itemProxyTree')
   private _itemProxyTree: TreeComponent;
 
@@ -216,16 +219,14 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   public updateReportPreview(): void {
-    this._report = this._itemRepository.buildReport(this._reportSelections,
+    this._report = this._itemRepository.buildReport(this._reportNameInput.nativeElement.value, this._reportSelections,
       this._linkToItems);
     this._changeDetectorRef.markForCheck();
   }
 
   public userInformation (reportObject: any) {
     this._dialogService.openInformationDialog('Report Information',
-       '\nReport Name: ' + reportObject.name + '\n' +
-       'Creation Date: ' +
-       reportObject.dateProduced + ' UTC');
+       '\n' + reportObject.metaContent);
   }
 
   private updateReportList(): void {

@@ -54,7 +54,7 @@
             flex-direction: row;">
             <mat-form-field style="width: 40%; padding: 3px;">
               <input matInput type="text" #reportNameInput
-                placeholder="Report Name"/>
+                placeholder="Report Name" (input)="updateReportPreview()"/>
             </mat-form-field>
             <mat-form-field style="width: 20%; padding: 3px;">
               <mat-select #reportFormatSelect placeholder="Report Format"
