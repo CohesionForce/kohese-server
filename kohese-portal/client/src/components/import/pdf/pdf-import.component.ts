@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef,
   MatExpansionPanel } from '@angular/material';
+import { ToastrService } from 'ngx-toastr';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { PdfImportParameters } from '../../../classes/PdfImportParameters.class';
@@ -59,7 +60,7 @@ export class PdfImportComponent {
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<PdfImportComponent>,
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
-    ItemRepository) {
+    ItemRepository, private _toastrService: ToastrService) {
   }
   
   public addFiles(files: Array<File>): void {
@@ -85,6 +86,11 @@ export class PdfImportComponent {
     }
   }
   
+  public removeFile(pdfFile: File): void {
+    this._selectedFileMap.delete(pdfFile);
+    this._changeDetectorRef.markForCheck();
+  }
+  
   public updatePreviews(): void {
     let selectedFileKeys: Array<File> = Array.from(this._selectedFileMap.
       keys());
@@ -104,12 +110,14 @@ export class PdfImportComponent {
     for (let j: number = 0; j < selectedFileKeys.length; j++) {
       let preview: string = this._selectedFileMap.get(selectedFileKeys[j]);
       if (!preview) {
-        return this._itemRepository.importMarkdown(selectedFileKeys[j].name.
+        await this._itemRepository.importMarkdown(selectedFileKeys[j].name.
           replace('.pdf', ''), await this.retrievePdfImportPreview(
           selectedFileKeys[j]), parentId);
+        this._toastrService.success(selectedFileKeys[j].name, 'PDF Imported');
       } else {
-        return this._itemRepository.importMarkdown(selectedFileKeys[j].name.
+        await this._itemRepository.importMarkdown(selectedFileKeys[j].name.
           replace('.pdf', ''), preview, parentId);
+        this._toastrService.success(selectedFileKeys[j].name, 'PDF Imported');
       }
     }
   }
