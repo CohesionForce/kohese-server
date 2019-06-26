@@ -78,12 +78,22 @@ export class TreeComponent implements OnInit {
     this._getText = getText;
   }
   
-  private _selection: any;
+  private _selection: Array<any> = [];
   get selection() {
     return this._selection;
   }
-  set selection(selection: any) {
+  @Input('selection')
+  set selection(selection: Array<any>) {
     this._selection = selection;
+  }
+  
+  private _allowMultiselect: boolean = false;
+  get allowMultiselect() {
+    return this._allowMultiselect;
+  }
+  @Input('allowMultiselect')
+  set allowMultiselect(allowMultiselect: boolean) {
+    this._allowMultiselect = allowMultiselect;
   }
   
   private _elementSelectedEventEmitter: EventEmitter<any> =
@@ -94,6 +104,10 @@ export class TreeComponent implements OnInit {
   }
   
   private _searchTimeoutIdentifier: any;
+  
+  get matDialogRef() {
+    return this._matDialogRef;
+  }
   
   get Array() {
     return Array;
@@ -109,15 +123,27 @@ export class TreeComponent implements OnInit {
   }
   
   public ngOnInit(): void {
-    if (this._matDialogRef && (this._matDialogRef.componentInstance ===
-      this) && this._data) {
+    if (this.isDialogInstance()) {
       this._root = this._data['root'];
       this._getChildren = this._data['getChildren'];
       this._hasChildren = this._data['hasChildren'];
       this._getText = this._data['getText'];
+      
+      if (this._data['selection']) {
+        this._selection = this._data['selection'];
+      }
+      
+      if (this._data['allowMultiselect']) {
+        this._allowMultiselect = true;
+      }
     }
     
     this.update();
+  }
+  
+  public isDialogInstance(): boolean {
+    return this._matDialogRef && (this._matDialogRef.componentInstance ===
+      this) && this._data;
   }
   
   public searchTextChanged(searchText: string): void {
@@ -202,6 +228,56 @@ export class TreeComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
   
+  public getExpansionStates(): Map<any, boolean> {
+    let expansionStates: Map<any, boolean> = new Map<any, boolean>();
+    let elements: Array<any> = Array.from(this._elementMap.keys());
+    for (let j: number = 0; j < elements.length; j++) {
+      expansionStates.set(elements[j], this._elementMap.get(elements[j]).
+        expanded);
+    }
+    
+    return expansionStates;
+  }
+  
+  public setExpansionStates(expansionStateMap: Map<any, boolean>): void {
+    let givenElements: Array<any> = Array.from(expansionStateMap.keys());
+    for (let j: number = 0; j < givenElements.length; j++) {
+      let elementMapValue: ElementMapValue = this._elementMap.get(
+        givenElements[j]);
+      if (elementMapValue) {
+        elementMapValue.expanded = expansionStateMap.get(givenElements[j]);
+      }
+    }
+    
+    this._changeDetectorRef.markForCheck();
+  }
+  
+  public getTreePath(element: any): Array<any> {
+    let treePath: Array<any> = [];
+    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    if (elementMapValue) {
+      treePath.unshift(element);
+      
+      if (elementMapValue.depth > 0) {
+        let elements: Array<any> = Array.from(this._elementMap.keys());
+        let beginningIndex: number = elements.indexOf(element);
+        for (let j: number = beginningIndex - 1; j >= 0; j--) {
+          let previousElementMapValue: ElementMapValue = this._elementMap.get(
+            elements[j]);
+          if (previousElementMapValue.depth === (elementMapValue.depth - 1)) {
+            treePath.unshift(elements[j]);
+            if (previousElementMapValue.depth === 0) {
+              break;
+            }
+            elementMapValue = previousElementMapValue;
+          }
+        }
+      }
+    }
+    
+    return treePath;
+  }
+  
   public update(): void {
     this._elementMap.clear();
     let children: Array<any> = this._getChildren(this._root);
@@ -219,5 +295,21 @@ export class TreeComponent implements OnInit {
     for (let j: number = 0; j < children.length; j++) {
       this.processElement(children[j], element, depth + 1);
     }
+  }
+  
+  public changeElementSelection(element: any): void {
+    if (this._allowMultiselect) {
+      let elementIndex: number = this._selection.indexOf(element);
+      if (elementIndex === -1) {
+        this._selection.push(element);
+      } else {
+        this._selection.splice(elementIndex, 1);
+      }
+    } else {
+      this._selection.length = 0;
+      this._selection.push(element);
+    }
+    
+    this._elementSelectedEventEmitter.emit(element);
   }
 }

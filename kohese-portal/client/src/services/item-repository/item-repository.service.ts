@@ -733,41 +733,120 @@ export class ItemRepository {
       { fileName: fileName, markdown: markdown, parentId: parentId }, true);
   }
   
-  public buildReport(reportSelections: Array<ReportSelection>, linkToItems:
-    boolean): string {
+  public buildReport(reportSelections: Array<ReportSelection>,
+    documentConfiguration: any): string {
     let content: string = '';
     for (let j: number = 0; j < reportSelections.length; j++) {
       let reportSelection: ReportSelection = reportSelections[j];
       if (reportSelection.includeDescendants) {
         reportSelection.itemProxy.visitTree(undefined, (itemProxy:
           ItemProxy) => {
-          let depth: number = itemProxy.getDepthFromAncestor(reportSelection.
-            itemProxy) + 1;
-          for (let j: number = 0; j < depth; j++) {
-            content += '#';
+          let documentConfigurationType: any;
+          if (documentConfiguration) {
+            documentConfigurationType = documentConfiguration.types[itemProxy.
+              kind];
+          } else {
+            documentConfigurationType = {
+              localTypes: {},
+              attributes: {
+                name: {
+                  linkToItem: false,
+                  showAttributeName: false
+                },
+                description: {
+                  showAttributeName: false
+                }
+              }
+            };
           }
           
-          content += this.getItemReportText(itemProxy.item, linkToItems);
+          if (documentConfigurationType) {
+            content += this.getItemReportText(itemProxy,
+              documentConfigurationType, itemProxy.getDepthFromAncestor(
+              reportSelection.itemProxy) + 1);
+          }
         });
       } else {
-        content += '#';
-        content += this.getItemReportText(reportSelections[j].itemProxy.item,
-          linkToItems);
+        let documentConfigurationType: any;
+        if (documentConfiguration) {
+          documentConfigurationType = documentConfiguration.types[
+            reportSelections[j].itemProxy.kind];
+        } else {
+          documentConfigurationType = {
+            localTypes: {},
+            attributes: {
+              name: {
+                linkToItem: false,
+                showAttributeName: false
+              },
+              description: {
+                showAttributeName: false
+              }
+            }
+          };
+        }
+          
+        if (documentConfigurationType) {
+          content += '#';
+          content += this.getItemReportText(reportSelections[j].itemProxy,
+            documentConfigurationType, 1);
+        }
       }
     }
     
     return content;
   }
   
-  private getItemReportText(item: any, linkToItems: boolean): string {
-    if (linkToItems) {
-      return ' [' + item.name + '](' + window.location.origin +
-        LocationMap['Explore'].route + ';id=' + item.id + ')\n\n' + (item.
-        description ? item.description : '') + '\n\n';
-    } else {
-      return ' ' + item.name + '\n\n' + (item.description ? item.
-        description : '') + '\n\n';
+  private getItemReportText(itemProxy: ItemProxy, documentConfigurationType:
+    any, depth: number): string {
+    let text: string = '';
+    for (let attributeName in documentConfigurationType.attributes) {
+      if (attributeName === 'name') {
+        for (let j: number = 0; j < depth; j++) {
+          text += '#';
+        }
+        
+        text += ' ';
+        
+        if (documentConfigurationType.attributes[attributeName].
+          showAttributeName) {
+          text += attributeName + ': ';
+        }
+        
+        if (documentConfigurationType.attributes[attributeName].linkToItem) {
+          text += '[' + itemProxy.item.name + '](' + window.location.origin +
+            LocationMap['Explore'].route + ';id=' + itemProxy.item.id +
+            ')\n\n';
+        } else {
+          text += itemProxy.item.name + '\n\n';
+        }
+      } else {
+        if (documentConfigurationType.attributes[attributeName].
+          showAttributeName) {
+          text += attributeName + ': ';
+        }
+        
+        let addition: string;
+        let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(itemProxy.model.item.classProperties[attributeName].
+          definedInKind);
+        if (modelProxy.item.properties[attributeName].relation) {
+          let reference: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(itemProxy.item[attributeName]);
+          if (reference) {
+            addition = reference.item.name;
+          } else {
+            addition = itemProxy.item[attributeName];
+          }
+        } else {
+          addition = itemProxy.item[attributeName];
+        }
+        
+        text += addition + '\n\n';
+      }
     }
+    
+    return text;
   }
   
   public async produceReport(report: string, reportName: string, format:
