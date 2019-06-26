@@ -138,7 +138,7 @@ export class ItemRepository {
 
       if (!msg.message){
 
-        if (msg.id && msg.data) {
+        if (msg.id) {
           // Ignore response that is directed to another event listener
           // console.log('^^^ Received response from worker in main listener for request: ' + msg.id);
         } else {
