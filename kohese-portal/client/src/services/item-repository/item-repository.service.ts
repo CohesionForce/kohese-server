@@ -700,7 +700,7 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   public getPdfImportPreview(pdfFile: File, pdfImportParameters:
     PdfImportParameters): Promise<string> {
     return new Promise<string>((resolve: (preview: string) => void, reject:
@@ -721,18 +721,18 @@ export class ItemRepository {
           footerLines: pdfImportParameters.footerLines
         }, true)).data);
       };
-      
+
       fileReader.readAsArrayBuffer(pdfFile);
     });
   }
-  
+
   public async importMarkdown(fileName: string, markdown: string, parentId:
     string): Promise<void> {
     return await this.sendMessageToWorker('importMarkdown',
       { fileName: fileName, markdown: markdown, parentId: parentId }, true);
   }
-  
-  public buildReport(reportSelections: Array<ReportSelection>,
+
+  public buildReport(reportName: string, reportSelections: Array<ReportSelection>,
     documentConfiguration: any): string {
     let content: string = '';
     let userName: any = this.CurrentUserService.getCurrentUserSubject().
@@ -764,7 +764,7 @@ export class ItemRepository {
               }
             };
           }
-          
+
           if (documentConfigurationType) {
             content += this.getItemReportText(itemProxy,
               documentConfigurationType, itemProxy.getDepthFromAncestor(
@@ -790,7 +790,7 @@ export class ItemRepository {
             }
           };
         }
-          
+
         if (documentConfigurationType) {
           content += '#';
           content += this.getItemReportText(reportSelections[j].itemProxy,
@@ -800,7 +800,7 @@ export class ItemRepository {
     }
     return content;
   }
-  
+
   private getItemReportText(itemProxy: ItemProxy, documentConfigurationType:
     any, depth: number): string {
     let text: string = '';
@@ -809,14 +809,14 @@ export class ItemRepository {
         for (let j: number = 0; j < depth; j++) {
           text += '#';
         }
-        
+
         text += ' ';
-        
+
         if (documentConfigurationType.attributes[attributeName].
           showAttributeName) {
           text += attributeName + ': ';
         }
-        
+
         if (documentConfigurationType.attributes[attributeName].linkToItem) {
           text += '[' + itemProxy.item.name + '](' + window.location.origin +
             LocationMap['Explore'].route + ';id=' + itemProxy.item.id +
@@ -829,7 +829,7 @@ export class ItemRepository {
           showAttributeName) {
           text += attributeName + ': ';
         }
-        
+
         let addition: string;
         let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(itemProxy.model.item.classProperties[attributeName].
@@ -845,11 +845,11 @@ export class ItemRepository {
         } else {
           addition = itemProxy.item[attributeName];
         }
-        
+
         text += addition + '\n\n';
       }
     }
-    
+
     return text;
   }
 

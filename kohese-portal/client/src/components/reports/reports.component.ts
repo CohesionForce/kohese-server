@@ -39,19 +39,12 @@ export class ReportsComponent implements OnInit, OnDestroy {
   get reportSelections() {
     return this._reportSelections;
   }
-<<<<<<< kohese-portal/client/src/components/reports/reports.component.ts
 
-  private _linkToItems: boolean;
-  get linkToItems() {
-    return this._linkToItems;
-=======
-  
   private _documentConfigurations: Array<any> = [];
   get documentConfigurations() {
     return this._documentConfigurations;
->>>>>>> kohese-portal/client/src/components/reports/reports.component.ts
   }
-  
+
   private _selectedDocumentConfiguration: any = '';
   get selectedDocumentConfiguration() {
     return this._selectedDocumentConfiguration;
@@ -112,7 +105,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.populateDocumentConfigurationArray();
-    
+
     this._treeConfigurationSubscription = TreeConfiguration.getWorkingTree().
       getChangeSubject().subscribe((notification: any) => {
       switch (notification.type) {
@@ -137,10 +130,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this._reportSelections.push(new ReportSelection(itemProxy));
     this.updateReportPreview();
   }
-<<<<<<< kohese-portal/client/src/components/reports/reports.component.ts
 
-=======
-  
   public editDocumentConfiguration(documentConfiguration: any):
     void {
     this._dialogService.openComponentDialog(
@@ -166,7 +156,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public removeSelectedDocumentConfiguration(): void {
     this._dialogService.openYesNoDialog('Remove ' + this.
       _selectedDocumentConfiguration.name, 'Are you sure that you want to ' +
@@ -182,7 +172,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   private populateDocumentConfigurationArray(): void {
     this._documentConfigurations.length = 0;
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
@@ -192,8 +182,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     }, undefined);
   }
-  
->>>>>>> kohese-portal/client/src/components/reports/reports.component.ts
+
   public getReportSelectionsIndex(itemProxy: ItemProxy): number {
     return this._reportSelections.map((reportSelection: ReportSelection) => {
       return reportSelection.itemProxy;
@@ -291,13 +280,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   public updateReportPreview(): void {
-<<<<<<< kohese-portal/client/src/components/reports/reports.component.ts
     this._report = this._itemRepository.buildReport(this._reportNameInput.nativeElement.value, this._reportSelections,
       this._selectedDocumentConfiguration);
-=======
-    this._report = this._itemRepository.buildReport(this._reportSelections,
-      this._selectedDocumentConfiguration);
->>>>>>> kohese-portal/client/src/components/reports/reports.component.ts
     this._changeDetectorRef.markForCheck();
   }
 
