@@ -523,6 +523,83 @@ function KIOItemServer(socket){
 
   });
   
+  socket.on('getImportPreview', (request: any, respond: Function) => {
+    let format: string;
+    let temporaryFileName: string = String(new Date().getTime());
+    let temporaryDirectoryPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH,
+      temporaryFileName);
+    fs.mkdirSync(temporaryDirectoryPath);
+    let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
+      temporaryFileName + request.extension);
+    fs.writeFileSync(temporaryFilePath, request.file);
+    switch (request.extension) {
+      case '.docx':
+        format = 'docx';
+        break;
+      case '.doc':
+      case '.rtf':
+        let sofficeProcess: any = child.spawnSync('soffice', ['--headless',
+          '--convert-to', 'odt', '--outdir', temporaryDirectoryPath,
+          temporaryFilePath], undefined);
+        fs.unlinkSync(temporaryFilePath);
+        temporaryFilePath = Path.resolve(temporaryDirectoryPath,
+          temporaryFileName + '.odt');
+        format = 'odt';
+        break;
+      case '.odt':
+        format = 'odt';
+        break;
+      default:
+        format = 'html';
+    }
+    
+    let pandocProcess: any = child.spawnSync('pandoc', ['-f', format, '-t',
+      'commonmark', '--atx-headers', '--extract-media', temporaryDirectoryPath,
+      '-s', temporaryFilePath], undefined);
+    
+    fs.unlinkSync(temporaryFilePath);
+    
+    let preview: string = pandocProcess.stdout.toString();
+    let mediaDirectoryPath: string = Path.resolve(temporaryDirectoryPath,
+      'media');
+    preview = preview.replace(/!\[.*?\]\((.+?)\)/g, (matchedSubstring: string,
+      captureGroup: string, index: number, originalString: string) => {
+      let imagePath: string = Path.resolve(mediaDirectoryPath, captureGroup);
+      if (fs.existsSync(imagePath)) {
+        let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+          indexOf(captureGroup);
+        let dataUrl: string = 'data:image/';
+        if (captureGroup.endsWith('.png')) {
+          dataUrl += 'png';
+        } else if (captureGroup.endsWith('.jpg') || captureGroup.endsWith(
+          '.jpeg')) {
+          dataUrl += 'jpeg';
+        }
+        
+        dataUrl += ';base64,';
+        dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
+        return matchedSubstring.substring(0,
+          matchedSubstringCaptureGroupIndex) + dataUrl + matchedSubstring.
+          substring(matchedSubstringCaptureGroupIndex + captureGroup.length);
+      } else {
+        return matchedSubstring;
+      }
+    });
+    
+    if (fs.existsSync(mediaDirectoryPath)) {
+      let directoryContents: Array<string> = fs.readdirSync(
+        mediaDirectoryPath);
+      for (let j: number = 0; j < directoryContents.length; j++) {
+        fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[j]));
+      }
+      fs.rmdirSync(mediaDirectoryPath);
+    }
+    
+    fs.rmdirSync(temporaryDirectoryPath);
+    
+    respond(preview);
+  });
+  
   socket.on('getPdfImportPreview', (request: any, respond: Function) => {
     let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
       dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',

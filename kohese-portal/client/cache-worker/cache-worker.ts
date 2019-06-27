@@ -180,6 +180,16 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+      case 'getImportPreview':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (preview: string) => void, reject: () => void) => {
+          socket.emit('getImportPreview', {
+            file: request.data.file,
+            extension: request.data.extension
+        }, (preview: string) => {
+          resolve(preview);
+        }); }) });
+        break;
       case 'getPdfImportPreview':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (preview: string) => void, reject: () => void) => {
