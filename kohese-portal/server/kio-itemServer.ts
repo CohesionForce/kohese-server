@@ -531,25 +531,34 @@ function KIOItemServer(socket){
     fs.mkdirSync(temporaryDirectoryPath);
     let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
       temporaryFileName + request.extension);
+    let mediaDirectoryPath: string;
     fs.writeFileSync(temporaryFilePath, request.file);
     switch (request.extension) {
       case '.docx':
+        mediaDirectoryPath = Path.resolve(temporaryDirectoryPath, 'media');
         format = 'docx';
         break;
       case '.doc':
       case '.rtf':
-        let sofficeProcess: any = child.spawnSync('soffice', ['--headless',
-          '--convert-to', 'odt', '--outdir', temporaryDirectoryPath,
-          temporaryFilePath], undefined);
+        child.spawnSync('soffice', ['--headless', '--convert-to', 'odt',
+          '--outdir', temporaryDirectoryPath, temporaryFilePath], undefined);
         fs.unlinkSync(temporaryFilePath);
         temporaryFilePath = Path.resolve(temporaryDirectoryPath,
           temporaryFileName + '.odt');
-        format = 'odt';
-        break;
+        if (!fs.existsSync(temporaryFilePath)) {
+          respond('**Unable to preview file**\n\nA possible cause may be an ' +
+            'soffice process on the server machine.');
+          return;
+        }
+        
+        // Fall through to '.odt' case
       case '.odt':
+        mediaDirectoryPath = Path.resolve(Path.dirname(mediaDirectoryPath),
+          'Pictures');
         format = 'odt';
         break;
       default:
+        mediaDirectoryPath = Path.resolve(temporaryDirectoryPath, 'media');
         format = 'html';
     }
     
@@ -560,8 +569,6 @@ function KIOItemServer(socket){
     fs.unlinkSync(temporaryFilePath);
     
     let preview: string = pandocProcess.stdout.toString();
-    let mediaDirectoryPath: string = Path.resolve(temporaryDirectoryPath,
-      'media');
     preview = preview.replace(/!\[.*?\]\((.+?)\)/g, (matchedSubstring: string,
       captureGroup: string, index: number, originalString: string) => {
       let imagePath: string = Path.resolve(mediaDirectoryPath, captureGroup);
