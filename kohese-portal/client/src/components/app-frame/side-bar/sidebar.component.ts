@@ -63,8 +63,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   openImportDialog(): void {
     this.dialogService.openComponentDialog(ImportComponent, {
-      data: {}
-    }).updateSize('70%', 'auto');
+      data: {},
+      disableClose: true
+    }).updateSize('90%', '90%');
   }
 
   public openUploadDialog(): void {

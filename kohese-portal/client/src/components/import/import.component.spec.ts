@@ -1,15 +1,14 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MarkdownModule } from 'ngx-markdown';
+import { ToastrModule } from 'ngx-toastr';
 
-import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../material.module'
-
+import { TreeViewModule } from '../tree/tree.module';
 import { ImportComponent } from './import.component';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
-import { MockImportService } from '../../../mocks/services/MockImportService';
-import { ImportService } from '../../services/import/import.service';
 
 describe('Component: ', ()=>{
   let importComponent: ImportComponent;
@@ -18,14 +17,16 @@ describe('Component: ', ()=>{
   beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [ImportComponent],
-      imports : [CommonModule,
-         MaterialModule,
-         BrowserAnimationsModule
-         ],
+      imports: [
+        BrowserAnimationsModule,
+        MarkdownModule,
+        ToastrModule.forRoot(),
+        MaterialModule,
+        TreeViewModule
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide: ItemRepository, useClass: MockItemRepository}, 
-        {provide: ImportService, useClass: MockImportService}
+        {provide: ItemRepository, useClass: MockItemRepository}
       ]
     }).compileComponents();
 

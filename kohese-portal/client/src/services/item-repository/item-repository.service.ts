@@ -702,6 +702,21 @@ export class ItemRepository {
     return promise;
   }
   
+  public getImportPreview(file: File): Promise<string> {
+    return new Promise<string>((resolve: (preview: string) => void, reject:
+      () => void) => {
+      let fileReader: FileReader = new FileReader();
+      fileReader.onload = async () => {
+        resolve((await this.sendMessageToWorker('getImportPreview', {
+          file: fileReader.result,
+          extension: file.name.substring(file.name.lastIndexOf('.'))
+        }, true)).data);
+      };
+      
+      fileReader.readAsArrayBuffer(file);
+    });
+  }
+  
   public getPdfImportPreview(pdfFile: File, pdfImportParameters:
     PdfImportParameters): Promise<string> {
     return new Promise<string>((resolve: (preview: string) => void, reject:
