@@ -126,7 +126,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           parentId: (object as ItemProxy).item.id
         },
         disableClose: true
-      }).updateSize('90%', '90%').afterClosed().subscribe();
+      }).updateSize('90%', '90%');
     });
     this.rootMenuActions.unshift(addChildAction);
     this.menuActions.unshift(addChildAction);
