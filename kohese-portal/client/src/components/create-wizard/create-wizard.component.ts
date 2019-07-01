@@ -33,7 +33,7 @@ export class CreateWizardComponent extends NavigatableComponent
   }
   errorMessage: any;
   private _proxyPlaceholderStream: BehaviorSubject<ItemProxy> =
-    new BehaviorSubject<ItemProxy>(this.buildProxyPlaceholder());
+    new BehaviorSubject<ItemProxy>(undefined);
   get proxyPlaceholderStream() {
     return this._proxyPlaceholderStream;
   }
@@ -51,6 +51,8 @@ export class CreateWizardComponent extends NavigatableComponent
     if (this.isDialogInstance()) {
       this._parentId = this.data['parentId'];
     }
+    
+    this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
   }
   
   public isDialogInstance(): boolean {
@@ -70,9 +72,11 @@ export class CreateWizardComponent extends NavigatableComponent
     };
 
     for (let fieldName in modelProxy.item.classProperties) {
-      proxyPlaceholder.item[fieldName] = TreeConfiguration.getWorkingTree().
-        getProxyFor(modelProxy.item.classProperties[fieldName].definedInKind).
-        item.properties[fieldName].default;
+      if (proxyPlaceholder.item[fieldName] == null) {
+        proxyPlaceholder.item[fieldName] = TreeConfiguration.getWorkingTree().
+          getProxyFor(modelProxy.item.classProperties[fieldName].
+          definedInKind).item.properties[fieldName].default;
+      }
     }
 
     return proxyPlaceholder;
