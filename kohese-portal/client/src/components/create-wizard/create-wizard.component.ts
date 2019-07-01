@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Optional, Inject } from '@angular/core';
+import { Component, OnInit, Input, Optional, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
 import { FormGroup, FormControl } from '@angular/forms';
@@ -7,12 +7,10 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
-import { ItemProxy } from '../../../../common/src/item-proxy.js';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { Subscription ,  BehaviorSubject } from 'rxjs';
-import { ImportService } from '../../services/import/import.service';
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { KoheseType } from '../../classes/UDT/KoheseType.class';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'create-wizard',
@@ -20,23 +18,20 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
   styleUrls: ['./create-wizard.component.scss']
 })
 export class CreateWizardComponent extends NavigatableComponent
-  implements OnInit, OnDestroy {
+  implements OnInit {
   /* Data */
-  @Input()
-  private itemProxy: ItemProxy;
+  private _parentId: string;
+  @Input('parentId')
+  set parentId(parentId: string) {
+    this._parentId = parentId;
+  }
+  
 // tslint:disable-next-line: no-inferrable-types
   private _isDisabled: boolean = false;
   get isDisabled() {
     return this._isDisabled;
   }
-  models: Array<ItemProxy>;
-  types: Array<KoheseType> = [];
-  recentProxies: Array<ItemProxy>;
-  selectedType: KoheseType;
-  selectedParent: ItemProxy;
-  rootProxy: ItemProxy;
   errorMessage: any;
-  treeConfig;
   private _proxyPlaceholderStream: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
   get proxyPlaceholderStream() {
@@ -45,70 +40,42 @@ export class CreateWizardComponent extends NavigatableComponent
   createFormGroup: FormGroup;
   private nonFormFieldValueMap: any = {};
 
-
-  /* Subscriptions */
-  private treeConfigSub: Subscription;
-
-
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
     protected NavigationService: NavigationService,
     private itemRepository: ItemRepository,
-    private DynamicTypesService: DynamicTypesService,
     public MatDialogRef: MatDialogRef<CreateWizardComponent>) {
     super(NavigationService);
   }
 
   ngOnInit(): void {
-    this.treeConfigSub = this.itemRepository.getTreeConfig()
-      .subscribe((newConfig) => {
-        if (newConfig) {
-          this.treeConfig = newConfig.config;
-          this.rootProxy = this.treeConfig.getRootProxy();
-// tslint:disable-next-line: prefer-const
-          let types = this.DynamicTypesService.getKoheseTypes();
-          for (let type in types) {
-            this.types.push(types[type]);
-          }
-
-          this.selectedType = this.types[0];
-          this.selectedParent = this.rootProxy;
-          this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
-        }
-      });
-  }
-
-  onTypeSelected(type, stepper: MatStepper) {
-    if (this.selectedType === type) {
-      console.log(type);
-      stepper.next();
-    } else {
-      this.selectedType = type;
-      this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
+    if (this.isDialogInstance()) {
+      this._parentId = this.data['parentId'];
     }
+    
+    this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
   }
-
-  onParentSelected(newParent : any, stepper: MatStepper) {
-    if (this.selectedParent === newParent) {
-      stepper.next();
-    } else {
-      this.selectedParent = newParent;
-      this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
-    }
+  
+  public isDialogInstance(): boolean {
+    return this.MatDialogRef && (this.MatDialogRef.componentInstance ===
+      this) && this.data;
   }
-
+  
   private buildProxyPlaceholder(): any {
+    let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      'Item');
     let proxyPlaceholder: any = {
-      kind: this.selectedType.dataModelProxy.item.name,
+      kind: 'Item',
       item: {
-        parentId: this.selectedParent.item.id
+        parentId: this._parentId
       },
-      model: this.selectedType.dataModelProxy
+      model: modelProxy
     };
 
-    for (let fieldName in this.selectedType.fields) {
-      if (!proxyPlaceholder.item[fieldName]) {
-        proxyPlaceholder.item[fieldName] = this.selectedType.fields[fieldName].
-          default;
+    for (let fieldName in modelProxy.item.classProperties) {
+      if (proxyPlaceholder.item[fieldName] == null) {
+        proxyPlaceholder.item[fieldName] = TreeConfiguration.getWorkingTree().
+          getProxyFor(modelProxy.item.classProperties[fieldName].
+          definedInKind).item.properties[fieldName].default;
       }
     }
 
@@ -128,30 +95,27 @@ export class CreateWizardComponent extends NavigatableComponent
 
     /* Set the value of each field that has an unspecified value to that
     field's default value */
-    let fields: object = this.treeConfig.getProxyFor(this.selectedType.
-      dataModelProxy.item.name).item.properties;
+    let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      this.proxyPlaceholderStream.getValue().kind);
+    let fields: object = modelProxy.item.classProperties;
     for (let fieldName in fields) {
       if (null === item[fieldName]) {
-        item[fieldName] = fields[fieldName].default;
+        item[fieldName] = TreeConfiguration.getWorkingTree().getProxyFor(
+          modelProxy.item.classProperties[fieldName].definedInKind).item.
+          properties[fieldName].default;
       }
     }
 
-    this.itemRepository.buildItem(this.selectedType.dataModelProxy.item.name,
+    this.itemRepository.buildItem(this.proxyPlaceholderStream.getValue().kind,
       item).then(() => {
         console.log('Build Item promise resolve');
         this.MatDialogRef.close();
       }, (error) => {
         // TODO show error on review stepper
         this.errorMessage = error;
-        console.log('*** Failed to upsert: ' + this.selectedType.
-          dataModelProxy.item.name);
         console.log(error);
       });
 
-  }
-
-  ngOnDestroy(): void {
-    this.treeConfigSub.unsubscribe();
   }
 
   cancel() {
