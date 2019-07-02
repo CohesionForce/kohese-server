@@ -185,26 +185,8 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           (resolve: (preview: string) => void, reject: () => void) => {
           socket.emit('getImportPreview', {
             file: request.data.file,
-            extension: request.data.extension
-        }, (preview: string) => {
-          resolve(preview);
-        }); }) });
-        break;
-      case 'getPdfImportPreview':
-        port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: (preview: string) => void, reject: () => void) => {
-          socket.emit('getPdfImportPreview', {
-            file: request.data.file,
-            forceTocStructuring: request.data.forceTocStructuring,
-            doNotStructure: request.data.doNotStructure,
-            matchSectionNamesLeniently: request.data.
-              matchSectionNamesLeniently,
-            moveFootnotes: request.data.moveFootnotes,
-            tocEntryPadding: request.data.tocEntryPadding,
-            tocBeginning: request.data.tocBeginning,
-            tocEnding: request.data.tocEnding,
-            headerLines: request.data.headerLines,
-            footerLines: request.data.footerLines
+            extension: request.data.extension,
+            parameters: request.data.parameters
         }, (preview: string) => {
           resolve(preview);
         }); }) });

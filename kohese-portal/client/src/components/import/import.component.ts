@@ -1,16 +1,38 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject } from '@angular/core';
+  Inject, OnInit, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef,
   MatExpansionPanel } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+import { ParameterSpecifierComponent } from './parameter-specifier/parameter-specifier.component';
+import { PdfImportParameters } from '../../classes/PdfImportParameters.class';
 
 enum SupportedExtensions {
   DOCX = '.docx', DOC = '.doc', ODT = '.odt', HTM = '.htm', HTML = '.html',
-    RTF = '.rtf', MARKDOWN = '.md'
+    RTF = '.rtf', PDF = '.pdf', MARKDOWN = '.md'
+}
+
+class FileMapValue {
+  get preview() {
+    return this._preview;
+  }
+  set preview(preview: string) {
+    this._preview = preview;
+  }
+  
+  get parameters() {
+    return this._parameters;
+  }
+  set parameters(parameters: any) {
+    this._parameters = parameters;
+  }
+
+  public constructor(private _preview: string, private _parameters: any) {
+  }
 }
 
 @Component({
@@ -19,10 +41,20 @@ enum SupportedExtensions {
   styleUrls: ['./import.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ImportComponent {
-  private _selectedFileMap: Map<File, string> = new Map<File, string>();
+export class ImportComponent implements OnInit {
+  private _selectedFileMap: Map<File, FileMapValue> =
+    new Map<File, FileMapValue>();
   get selectedFileMap() {
     return this._selectedFileMap;
+  }
+  
+  private _parentId: string;
+  get parentId() {
+    return this._parentId;
+  }
+  @Input('parentId')
+  set parentId(parentId: string) {
+    this._parentId = parentId;
   }
   
   get matDialogRef() {
@@ -62,7 +94,14 @@ export class ImportComponent {
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<ImportComponent>,
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
-    ItemRepository, private _toastrService: ToastrService) {
+    ItemRepository, private _toastrService: ToastrService,
+    private _dialogService: DialogService) {
+  }
+  
+  public ngOnInit(): void {
+    if (this.isDialogInstance()) {
+      this._parentId = this._data['parentId'];
+    }
   }
   
   public isDialogInstance(): boolean {
@@ -72,9 +111,17 @@ export class ImportComponent {
   
   public addFiles(files: Array<File>): void {
     for (let j: number = 0; j < files.length; j++) {
-      if (Object.values(SupportedExtensions).indexOf(files[j].name.substring(
-        files[j].name.lastIndexOf('.'))) !== -1) {
-        this._selectedFileMap.set(files[j], '');
+      let extension: string = files[j].name.substring(files[j].name.
+        lastIndexOf('.'));
+      if (Object.values(SupportedExtensions).indexOf(extension) !== -1) {
+        let parameters: any ;
+        if (extension === '.pdf') {
+          parameters = new PdfImportParameters();
+        } else {
+          parameters = {};
+        }
+        
+        this._selectedFileMap.set(files[j], new FileMapValue('', parameters));
       }
     }
     
@@ -82,10 +129,10 @@ export class ImportComponent {
   }
   
   public async retrieveImportPreview(file: File): Promise<string> {
-    let preview: string = this._selectedFileMap.get(file);
-    if (preview.length === 0) {
+    let fileMapValue: FileMapValue = this._selectedFileMap.get(file);
+    if (fileMapValue.preview.length === 0) {
       if (file.name.endsWith(SupportedExtensions.MARKDOWN)) {
-        preview = await new Promise<string>((resolve: (content:
+        fileMapValue.preview = await new Promise<string>((resolve: (content:
           string) => void, reject: () => void) => {
           let fileReader: FileReader = new FileReader();
           fileReader.onload = () => {
@@ -94,14 +141,28 @@ export class ImportComponent {
           fileReader.readAsText(file);
         });
       } else {
-        preview = await this._itemRepository.getImportPreview(file);
+        fileMapValue.preview = await this._itemRepository.getImportPreview(
+          file, fileMapValue.parameters);
       }
-      this._selectedFileMap.set(file, preview);
+      
       this._changeDetectorRef.markForCheck();
-      return preview;
+      return fileMapValue.preview;
     } else {
-      return Promise.resolve(preview);
+      return Promise.resolve(fileMapValue.preview);
     }
+  }
+  
+  public openParameterSpecifier(file: File): void {
+    this._dialogService.openComponentDialog(ParameterSpecifierComponent, {
+      data: {
+        parameters: this._selectedFileMap.get(file).parameters
+      },
+      disableClose: true
+    }).updateSize('80%', '80%').afterClosed().subscribe((parameters: any) => {
+      if (parameters) {
+        this.updatePreviews();
+      }
+    });
   }
   
   public removeFile(file: File): void {
@@ -113,8 +174,10 @@ export class ImportComponent {
     let selectedFileKeys: Array<File> = Array.from(this._selectedFileMap.
       keys());
     for (let j: number = 0; j < selectedFileKeys.length; j++) {
-      if (this._selectedFileMap.get(selectedFileKeys[j]).length !== 0) {
-        this._selectedFileMap.set(selectedFileKeys[j], '');
+      let fileMapValue: FileMapValue = this._selectedFileMap.get(
+        selectedFileKeys[j]);
+      if (fileMapValue.preview.length !== 0) {
+        fileMapValue.preview = '';
         this.retrieveImportPreview(selectedFileKeys[j]);
       }
     }
@@ -126,16 +189,17 @@ export class ImportComponent {
     let selectedFileKeys: Array<File> = Array.from(this._selectedFileMap.
       keys());
     for (let j: number = 0; j < selectedFileKeys.length; j++) {
-      let preview: string = this._selectedFileMap.get(selectedFileKeys[j]);
-      if (!preview) {
+      let fileMapValue: FileMapValue = this._selectedFileMap.get(
+        selectedFileKeys[j]);
+      if (!fileMapValue.preview) {
         await this._itemRepository.importMarkdown(selectedFileKeys[j].name.
           substring(0, selectedFileKeys[j].name.lastIndexOf('.')), await this.
           retrieveImportPreview(selectedFileKeys[j]), parentId);
         this._toastrService.success(selectedFileKeys[j].name, 'File Imported');
       } else {
         await this._itemRepository.importMarkdown(selectedFileKeys[j].name.
-          substring(0, selectedFileKeys[j].name.lastIndexOf('.')), preview,
-          parentId);
+          substring(0, selectedFileKeys[j].name.lastIndexOf('.')),
+          fileMapValue.preview, parentId);
         this._toastrService.success(selectedFileKeys[j].name, 'File Imported');
       }
     }

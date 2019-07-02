@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  Optional, Inject, OnInit, Output, EventEmitter } from '@angular/core';
+  Optional, Inject, OnInit, Output, EventEmitter, ViewChild,
+  AfterViewInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 class ElementMapValue {
@@ -41,7 +42,7 @@ enum ExpansionState {
   styleUrls: ['./tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeComponent implements OnInit {
+export class TreeComponent implements OnInit, AfterViewInit {
   private _elementMap: Map<any, ElementMapValue> =
     new Map<any, ElementMapValue>();
   get elementMap() {
@@ -105,6 +106,9 @@ export class TreeComponent implements OnInit {
   
   private _searchTimeoutIdentifier: any;
   
+  @ViewChild('elementContainer')
+  private _elementContainer: any;
+  
   get matDialogRef() {
     return this._matDialogRef;
   }
@@ -139,6 +143,47 @@ export class TreeComponent implements OnInit {
     }
     
     this.update();
+    
+    for (let j: number = 0; j < this._selection.length; j++) {
+      let selectionElementMapValue: ElementMapValue = this._elementMap.get(
+        this._selection[j]);
+      if (selectionElementMapValue) {
+        let parentElementMapValue: ElementMapValue = this._elementMap.get(
+          selectionElementMapValue.parent);
+        while (parentElementMapValue) {
+          parentElementMapValue.expanded = true;
+          parentElementMapValue = this._elementMap.get(parentElementMapValue.
+            parent);
+        }
+      }
+    }
+    
+    this._changeDetectorRef.markForCheck();
+  }
+  
+  public ngAfterViewInit(): void {
+    if (this._selection.length > 0) {
+      let firstSelectedElementIndex: number = this.getDisplayedElements().
+        indexOf(this._selection[0]);
+      if (firstSelectedElementIndex !== -1) {
+        // Each element row should be 36px tall.
+        this._elementContainer.nativeElement.scrollTop = (36 *
+          firstSelectedElementIndex);
+        this._changeDetectorRef.markForCheck();
+      }
+    }
+  }
+  
+  public getDisplayedElements(): Array<any> {
+    let displayedElements: Array<any> = [];
+    let elements: Array<any> = Array.from(this._elementMap.keys());
+    for (let j: number = 0; j < elements.length; j++) {
+      if (this.shouldDisplay(elements[j])) {
+        displayedElements.push(elements[j]);
+      }
+    }
+    
+    return displayedElements;
   }
   
   public isDialogInstance(): boolean {

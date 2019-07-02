@@ -21,7 +21,6 @@ import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
 import { LocationMap } from '../../constants/LocationMap.data';
 import { ReportSelection } from '../../classes/ReportSelection.class';
-import { PdfImportParameters } from '../../classes/PdfImportParameters.class';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -702,43 +701,19 @@ export class ItemRepository {
     return promise;
   }
   
-  public getImportPreview(file: File): Promise<string> {
+  public getImportPreview(file: File, parameters: any): Promise<string> {
     return new Promise<string>((resolve: (preview: string) => void, reject:
       () => void) => {
       let fileReader: FileReader = new FileReader();
       fileReader.onload = async () => {
         resolve((await this.sendMessageToWorker('getImportPreview', {
           file: fileReader.result,
-          extension: file.name.substring(file.name.lastIndexOf('.'))
+          extension: file.name.substring(file.name.lastIndexOf('.')),
+          parameters: parameters
         }, true)).data);
       };
       
       fileReader.readAsArrayBuffer(file);
-    });
-  }
-  
-  public getPdfImportPreview(pdfFile: File, pdfImportParameters:
-    PdfImportParameters): Promise<string> {
-    return new Promise<string>((resolve: (preview: string) => void, reject:
-      () => void) => {
-      let fileReader: FileReader = new FileReader();
-      fileReader.onload = async () => {
-        resolve((await this.sendMessageToWorker('getPdfImportPreview', {
-          file: fileReader.result,
-          forceTocStructuring: pdfImportParameters.forceTocStructuring,
-          doNotStructure: pdfImportParameters.doNotStructure,
-          matchSectionNamesLeniently: pdfImportParameters.
-            matchSectionNamesLeniently,
-          moveFootnotes: pdfImportParameters.moveFootnotes,
-          tocEntryPadding: pdfImportParameters.tocEntryPadding,
-          tocBeginning: pdfImportParameters.tocBeginning,
-          tocEnding: pdfImportParameters.tocEnding,
-          headerLines: pdfImportParameters.headerLines,
-          footerLines: pdfImportParameters.footerLines
-        }, true)).data);
-      };
-      
-      fileReader.readAsArrayBuffer(pdfFile);
     });
   }
   
