@@ -269,7 +269,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     if (this._reports.get(reportObject).length === 0) {
       let reportPreview: string = await this._itemRepository.getReportPreview(
         reportObject.name);
-      this._reports.set(reportObject.name, reportPreview);
+      this._reports.set(reportObject, reportPreview);
       this._changeDetectorRef.markForCheck();
     }
   }
