@@ -16,7 +16,7 @@
   <span class="flex-right-align">
     <mat-icon class="fa fa-info-circle" style="text-align: center;"
       matTooltip="{{'The following types of files are supported: ' + Object.
-      values(SupportedExtensions).toString()}}">
+      values(SupportedExtensions).join(',\n')}}">
     </mat-icon>
   </span>
   <input #fileInput type="file" style="display: none;" multiple

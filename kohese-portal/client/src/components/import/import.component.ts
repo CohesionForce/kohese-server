@@ -12,9 +12,9 @@ import { ParameterSpecifierComponent } from './parameter-specifier/parameter-spe
 import { PdfImportParameters } from '../../classes/PdfImportParameters.class';
 
 enum SupportedExtensions {
-  DOCX = '.docx', DOC = '.doc', ODT = '.odt', HTM = '.htm', HTML = '.html',
-    RTF = '.rtf', JPG = '.jpg', JPEG = '.jpeg', PNG = '.png', PDF = '.pdf',
-    MARKDOWN = '.md'
+  DOCX = '.docx', DOC = '.doc', ODT = '.odt', PDF = '.pdf', HTM = '.htm',
+    HTML = '.html', RTF = '.rtf', TXT = '.txt', JPG = '.jpg', JPEG = '.jpeg',
+    PNG = '.png', MARKDOWN = '.md'
 }
 
 class FileMapValue {
@@ -143,7 +143,8 @@ export class ImportComponent implements OnInit {
           };
           fileReader.readAsDataURL(file);
         });
-      } else if (file.name.endsWith(SupportedExtensions.MARKDOWN)) {
+      } else if (file.name.endsWith(SupportedExtensions.TXT) || file.name.
+        endsWith(SupportedExtensions.MARKDOWN)) {
         fileMapValue.preview = await new Promise<string>((resolve: (content:
           string) => void, reject: () => void) => {
           let fileReader: FileReader = new FileReader();
