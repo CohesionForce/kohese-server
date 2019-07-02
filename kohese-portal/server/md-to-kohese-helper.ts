@@ -65,25 +65,36 @@ var Render = function(path: string) {
                  } else {
                    let srcPath: string = Path.resolve(Path.dirname(path), node.
                      destination);
-                   if (srcPath.endsWith('.png') || srcPath.endsWith('.jpg') ||
-                     srcPath.endsWith('.jpeg')) {
-                     let srcValue: string = 'data:image/';
-                     if (srcPath.endsWith('.png')) {
-                       srcValue += 'png';
-                     } else if (srcPath.endsWith('.jpg') || srcPath.endsWith(
-                       '.jpeg')) {
-                       srcValue += 'jpeg';
+                   if (Fs.existsSync(srcPath)) {
+                     if (srcPath.endsWith('.png') || srcPath.endsWith(
+                       '.jpg') || srcPath.endsWith('.jpeg')) {
+                       let srcValue: string = 'data:image/';
+                       if (srcPath.endsWith('.png')) {
+                         srcValue += 'png';
+                       } else if (srcPath.endsWith('.jpg') || srcPath.endsWith(
+                         '.jpeg')) {
+                         srcValue += 'jpeg';
+                       }
+                       
+                       srcValue += ';base64,';
+                       srcValue += Fs.readFileSync(srcPath,
+                         { encoding: 'base64' });
+                       if (node.title) {
+                         this.buffer += '](' + srcValue + ' "' + node.title +
+                           '")';
+                       } else {
+                         this.buffer += '](' + srcValue + ')';
+                       }
                      }
-                     
-                     srcValue += ';base64,';
-                     srcValue += Fs.readFileSync(srcPath,
-                       { encoding: 'base64' });
+                   } else if (node.destination.startsWith('data:image/')) {
+                     this.buffer += '](' + node.destination;
                      if (node.title) {
-                       this.buffer += '](' + srcValue + ' "' + node.title +
-                         '")';
+                       this.buffer += ' "' + node.title + '")';
                      } else {
-                       this.buffer += '](' + srcValue + ')';
+                       this.buffer += ')';
                      }
+                   } else {
+                     this.buffer += ']()';
                    }
                  }
                },
