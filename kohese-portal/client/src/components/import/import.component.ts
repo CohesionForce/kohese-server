@@ -158,7 +158,7 @@ export class ImportComponent implements OnInit {
         parameters: this._selectedFileMap.get(file).parameters
       },
       disableClose: true
-    }).updateSize('80%', '80%').afterClosed().subscribe((parameters: any) => {
+    }).updateSize('80%', '60%').afterClosed().subscribe((parameters: any) => {
       if (parameters) {
         this.updatePreviews();
       }
