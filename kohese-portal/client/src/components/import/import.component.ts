@@ -13,7 +13,8 @@ import { PdfImportParameters } from '../../classes/PdfImportParameters.class';
 
 enum SupportedExtensions {
   DOCX = '.docx', DOC = '.doc', ODT = '.odt', HTM = '.htm', HTML = '.html',
-    RTF = '.rtf', PDF = '.pdf', MARKDOWN = '.md'
+    RTF = '.rtf', JPG = '.jpg', JPEG = '.jpeg', PNG = '.png', PDF = '.pdf',
+    MARKDOWN = '.md'
 }
 
 class FileMapValue {
@@ -131,7 +132,18 @@ export class ImportComponent implements OnInit {
   public async retrieveImportPreview(file: File): Promise<string> {
     let fileMapValue: FileMapValue = this._selectedFileMap.get(file);
     if (fileMapValue.preview.length === 0) {
-      if (file.name.endsWith(SupportedExtensions.MARKDOWN)) {
+      if (file.name.endsWith(SupportedExtensions.JPG) || file.name.endsWith(
+        SupportedExtensions.JPEG) || file.name.endsWith(SupportedExtensions.
+        PNG)) {
+        fileMapValue.preview = await new Promise<string>((resolve: (content:
+          string) => void, reject: () => void) => {
+          let fileReader: FileReader = new FileReader();
+          fileReader.onload = () => {
+            resolve('![' + file.name + '](' + fileReader.result + ')');
+          };
+          fileReader.readAsDataURL(file);
+        });
+      } else if (file.name.endsWith(SupportedExtensions.MARKDOWN)) {
         fileMapValue.preview = await new Promise<string>((resolve: (content:
           string) => void, reject: () => void) => {
           let fileReader: FileReader = new FileReader();
