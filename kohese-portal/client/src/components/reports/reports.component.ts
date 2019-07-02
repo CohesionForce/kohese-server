@@ -287,7 +287,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   public userInformation (reportObject: any) {
     this._dialogService.openInformationDialog('Report Information',
-       '\n' + reportObject.metaContent);
+       '\n' + reportObject.metaContent.split('\n\n').join('\n'));
   }
 
   private updateReportList(): void {
