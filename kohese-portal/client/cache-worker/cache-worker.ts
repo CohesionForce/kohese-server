@@ -185,7 +185,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           (resolve: (preview: string) => void, reject: () => void) => {
           socket.emit('getImportPreview', {
             file: request.data.file,
-            extension: request.data.extension,
+            type: request.data.type,
             parameters: request.data.parameters
         }, (preview: string) => {
           resolve(preview);

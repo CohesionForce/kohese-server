@@ -708,7 +708,7 @@ export class ItemRepository {
       fileReader.onload = async () => {
         resolve((await this.sendMessageToWorker('getImportPreview', {
           file: fileReader.result,
-          extension: file.name.substring(file.name.lastIndexOf('.')),
+          type: file.type,
           parameters: parameters
         }, true)).data);
       };

@@ -11,10 +11,12 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ParameterSpecifierComponent } from './parameter-specifier/parameter-specifier.component';
 import { PdfImportParameters } from '../../classes/PdfImportParameters.class';
 
-enum SupportedExtensions {
-  DOCX = '.docx', DOC = '.doc', ODT = '.odt', PDF = '.pdf', HTM = '.htm',
-    HTML = '.html', RTF = '.rtf', TXT = '.txt', JPG = '.jpg', JPEG = '.jpeg',
-    PNG = '.png', MARKDOWN = '.md'
+enum SupportedTypes {
+  DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.' +
+    'document', DOC = 'application/msword', ODT = 'application/vnd.oasis.' +
+    'opendocument.text', PDF = 'application/pdf', HTML = 'text/html', RTF =
+    'application/rtf', TXT = 'text/plain', JPEG = 'image/jpeg', PNG =
+    'image/png', Markdown = 'text/markdown'
 }
 
 class FileMapValue {
@@ -70,8 +72,8 @@ export class ImportComponent implements OnInit {
     return Array;
   }
   
-  get SupportedExtensions() {
-    return SupportedExtensions;
+  get SupportedTypes() {
+    return SupportedTypes;
   }
   
   get TreeConfiguration() {
@@ -112,11 +114,9 @@ export class ImportComponent implements OnInit {
   
   public addFiles(files: Array<File>): void {
     for (let j: number = 0; j < files.length; j++) {
-      let extension: string = files[j].name.substring(files[j].name.
-        lastIndexOf('.'));
-      if (Object.values(SupportedExtensions).indexOf(extension) !== -1) {
-        let parameters: any ;
-        if (extension === '.pdf') {
+      if (Object.values(SupportedTypes).indexOf(files[j].type) !== -1) {
+        let parameters: any;
+        if (files[j].type === SupportedTypes.PDF) {
           parameters = new PdfImportParameters();
         } else {
           parameters = {};
@@ -129,11 +129,28 @@ export class ImportComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
   
+  public canRetrieveUrlContent(url: string): boolean {
+    return /^https?:\/\/.+/.test(url);
+  }
+  
+  public async retrieveUrlContent(url: string): Promise<void> {
+    let response: any = await fetch(new Request(url, {
+      mode: 'cors'
+    }));
+    if (response.ok) {
+      let contentType: string = response.headers.get('Content-Type');
+      let file: File = new File([await response.arrayBuffer()], url, {
+        type: ((contentType.indexOf(';') !== -1) ? contentType.substring(0,
+          contentType.indexOf(';')) : contentType)
+      });
+      this.addFiles([file]);
+    }
+  }
+  
   public async retrieveImportPreview(file: File): Promise<string> {
     let fileMapValue: FileMapValue = this._selectedFileMap.get(file);
     if (fileMapValue.preview.length === 0) {
-      if (file.name.endsWith(SupportedExtensions.JPG) || file.name.endsWith(
-        SupportedExtensions.JPEG) || file.name.endsWith(SupportedExtensions.
+      if ((file.type === SupportedTypes.JPEG) || (file.type === SupportedTypes.
         PNG)) {
         fileMapValue.preview = await new Promise<string>((resolve: (content:
           string) => void, reject: () => void) => {
@@ -143,8 +160,8 @@ export class ImportComponent implements OnInit {
           };
           fileReader.readAsDataURL(file);
         });
-      } else if (file.name.endsWith(SupportedExtensions.TXT) || file.name.
-        endsWith(SupportedExtensions.MARKDOWN)) {
+      } else if ((file.type === SupportedTypes.TXT) || (file.type ===
+        SupportedTypes.Markdown)) {
         fileMapValue.preview = await new Promise<string>((resolve: (content:
           string) => void, reject: () => void) => {
           let fileReader: FileReader = new FileReader();

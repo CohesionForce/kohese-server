@@ -524,7 +524,9 @@ function KIOItemServer(socket){
   });
   
   socket.on('getImportPreview', (request: any, respond: Function) => {
-    if (request.extension === '.pdf') {
+    let parameterlessType: string = ((request.type.indexOf(';') !== -1) ?
+      request.type.substring(0, request.type.indexOf(';')) : request.type);
+    if (parameterlessType === 'application/pdf') {
       let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
         dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',
         'PdfConverter.jar')];
@@ -575,16 +577,17 @@ function KIOItemServer(socket){
         temporaryFileName);
       fs.mkdirSync(temporaryDirectoryPath);
       let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
-        temporaryFileName + request.extension);
+        temporaryFileName);
       let mediaDirectoryPath: string;
       fs.writeFileSync(temporaryFilePath, request.file);
-      switch (request.extension) {
-        case '.docx':
+      switch (parameterlessType) {
+        case 'application/vnd.openxmlformats-officedocument.' +
+          'wordprocessingml.document':
           mediaDirectoryPath = Path.resolve(temporaryDirectoryPath, 'media');
           format = 'docx';
           break;
-        case '.doc':
-        case '.rtf':
+        case 'application/msword':
+        case 'application/rtf':
           child.spawnSync('soffice', ['--headless', '--convert-to', 'odt',
             '--outdir', temporaryDirectoryPath, temporaryFilePath], undefined);
           fs.unlinkSync(temporaryFilePath);
@@ -597,8 +600,8 @@ function KIOItemServer(socket){
           }
           
           // Fall through to '.odt' case
-        case '.odt':
-          mediaDirectoryPath = Path.resolve(Path.dirname(mediaDirectoryPath),
+        case 'application/vnd.oasis.opendocument.text':
+          mediaDirectoryPath = Path.resolve(temporaryDirectoryPath,
             'Pictures');
           format = 'odt';
           break;
