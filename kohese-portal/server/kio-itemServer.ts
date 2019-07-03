@@ -522,7 +522,7 @@ function KIOItemServer(socket){
     itemAnalysis.performAnalysis(request.kind, request.id, sendResponse);
 
   });
-  
+
   socket.on('getPdfImportPreview', (request: any, respond: Function) => {
     let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
       dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',
@@ -530,44 +530,44 @@ function KIOItemServer(socket){
     if (request.forceTocStructuring) {
       parameters.push('-t');
     }
-    
+
     if (request.doNotStructure) {
       parameters.push('-u');
     }
-    
+
     if (request.matchSectionNamesLeniently) {
       parameters.push('-l');
     }
-    
+
     if (request.moveFootnotes) {
       parameters.push('-f');
     }
-    
+
     if (request.tocEntryPadding) {
       parameters.push('--toc-entry-padding=' + request.tocEntryPadding);
     }
-    
+
     if (!!request.tocBeginning) {
       parameters.push('--toc-begin=' + request.tocBeginning);
     }
-    
+
     if (!!request.tocEnding) {
       parameters.push('--toc-end=' + request.tocEnding);
     }
-    
+
     if (!!request.headerLines) {
       parameters.push('--header-length=' + request.headerLines);
     }
-    
+
     if (!!request.footerLines) {
       parameters.push('--footer-length=' + request.footerLines);
     }
-    
+
     let pdfConversionProcess: any = child.spawnSync('java', parameters,
       { input: request.file });
     respond(pdfConversionProcess.stdout.toString());
   });
-  
+
   socket.on('importMarkdown', (request: any, respond: Function) => {
     let temporaryDirectoryPath: string = Path.resolve(Path.dirname(Path.
       dirname(fs.realpathSync(__dirname))), 'data_import', String(new Date().
@@ -587,7 +587,7 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/generateReport', function(request, sendResponse) {
-    let metaDataString: Array<string> = request.content.split("\n\n", 3);
+    let metaDataString: Array<string> = request.content.split('\n\n', 3);
     fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
       reportName + request.format), metaDataString.join ('\n\n'), undefined);
     if (request.format === '.md') {

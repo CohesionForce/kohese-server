@@ -737,9 +737,9 @@ export class ItemRepository {
     let content: string = '';
     let userName: any = this.CurrentUserService.getCurrentUserSubject().
       getValue();
-    let date = new Date();
+    let date: any = new Date();
     content += 'Report Name: ' + reportName + '\n\n';
-    content += 'User Name: ' + userName.username + '\n\n';
+    content += 'Produced By: ' + userName.username + '\n\n';
     content += 'Creation Date: ' + date + '\n\n';
     for (let j: number = 0; j < reportSelections.length; j++) {
       let reportSelection: ReportSelection = reportSelections[j];

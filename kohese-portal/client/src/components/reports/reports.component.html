@@ -132,7 +132,7 @@
               </mat-panel-title>
               <span class="flex-right-align">
                 <button mat-icon-button matTooltip="Report Information"
-                  (click)="userInformation(reportObject); $event.stopPropagation()">
+                  (click)="getReportInformation(reportObject); $event.stopPropagation()">
                   <mat-icon class="fa fa-info-circle"></mat-icon>
                 </button>
                 <button mat-icon-button matTooltip="Rename this report"
@@ -141,7 +141,7 @@
                 </button>
                 <a #reportDownloadAnchor style="display: none;"
                   download="{{reportObject.name}}" href="{{'/producedReports/' +
-                  reportObject.name}}">
+                  reportObject.name}}" (click)="$event.stopPropagation()">
                 </a>
                 <button mat-icon-button matTooltip="Download this report"
                   (click)="reportDownloadAnchor.click(); $event.
