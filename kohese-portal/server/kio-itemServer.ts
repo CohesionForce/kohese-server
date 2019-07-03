@@ -522,50 +522,135 @@ function KIOItemServer(socket){
     itemAnalysis.performAnalysis(request.kind, request.id, sendResponse);
 
   });
-
-  socket.on('getPdfImportPreview', (request: any, respond: Function) => {
-    let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
-      dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',
-      'PdfConverter.jar')];
-    if (request.forceTocStructuring) {
-      parameters.push('-t');
+  
+  socket.on('getImportPreview', (request: any, respond: Function) => {
+    if (request.extension === '.pdf') {
+      let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
+        dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',
+        'PdfConverter.jar')];
+      if (request.parameters.forceTocStructuring) {
+        parameters.push('-t');
+      }
+      
+      if (request.parameters.doNotStructure) {
+        parameters.push('-u');
+      }
+      
+      if (request.parameters.matchSectionNamesLeniently) {
+        parameters.push('-l');
+      }
+      
+      if (request.parameters.moveFootnotes) {
+        parameters.push('-f');
+      }
+      
+      if (request.parameters.tocEntryPadding) {
+        parameters.push('--toc-entry-padding=' + request.parameters.
+          tocEntryPadding);
+      }
+      
+      if (!!request.parameters.tocBeginning) {
+        parameters.push('--toc-begin=' + request.parameters.tocBeginning);
+      }
+      
+      if (!!request.parameters.tocEnding) {
+        parameters.push('--toc-end=' + request.parameters.tocEnding);
+      }
+      
+      if (!!request.parameters.headerLines) {
+        parameters.push('--header-length=' + request.parameters.headerLines);
+      }
+      
+      if (!!request.parameters.footerLines) {
+        parameters.push('--footer-length=' + request.parameters.footerLines);
+      }
+      
+      let pdfConversionProcess: any = child.spawnSync('java', parameters,
+        { input: request.file });
+      respond(pdfConversionProcess.stdout.toString());
+    } else {
+      let format: string;
+      let temporaryFileName: string = String(new Date().getTime());
+      let temporaryDirectoryPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH,
+        temporaryFileName);
+      fs.mkdirSync(temporaryDirectoryPath);
+      let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
+        temporaryFileName + request.extension);
+      let mediaDirectoryPath: string;
+      fs.writeFileSync(temporaryFilePath, request.file);
+      switch (request.extension) {
+        case '.docx':
+          mediaDirectoryPath = Path.resolve(temporaryDirectoryPath, 'media');
+          format = 'docx';
+          break;
+        case '.doc':
+        case '.rtf':
+          child.spawnSync('soffice', ['--headless', '--convert-to', 'odt',
+            '--outdir', temporaryDirectoryPath, temporaryFilePath], undefined);
+          fs.unlinkSync(temporaryFilePath);
+          temporaryFilePath = Path.resolve(temporaryDirectoryPath,
+            temporaryFileName + '.odt');
+          if (!fs.existsSync(temporaryFilePath)) {
+            respond('**Unable to preview file**\n\nA possible cause may be an ' +
+              'soffice process on the server machine.');
+            return;
+          }
+          
+          // Fall through to '.odt' case
+        case '.odt':
+          mediaDirectoryPath = Path.resolve(Path.dirname(mediaDirectoryPath),
+            'Pictures');
+          format = 'odt';
+          break;
+        default:
+          mediaDirectoryPath = Path.resolve(temporaryDirectoryPath, 'media');
+          format = 'html';
+      }
+      
+      let pandocProcess: any = child.spawnSync('pandoc', ['-f', format, '-t',
+        'commonmark', '--atx-headers', '--extract-media', temporaryDirectoryPath,
+        '-s', temporaryFilePath], undefined);
+      
+      fs.unlinkSync(temporaryFilePath);
+      
+      let preview: string = pandocProcess.stdout.toString();
+      preview = preview.replace(/!\[.*?\]\((.+?)\)/g, (matchedSubstring: string,
+        captureGroup: string, index: number, originalString: string) => {
+        let imagePath: string = Path.resolve(mediaDirectoryPath, captureGroup);
+        if (fs.existsSync(imagePath)) {
+          let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+            indexOf(captureGroup);
+          let dataUrl: string = 'data:image/';
+          if (captureGroup.endsWith('.png')) {
+            dataUrl += 'png';
+          } else if (captureGroup.endsWith('.jpg') || captureGroup.endsWith(
+            '.jpeg')) {
+            dataUrl += 'jpeg';
+          }
+          
+          dataUrl += ';base64,';
+          dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
+          return matchedSubstring.substring(0,
+            matchedSubstringCaptureGroupIndex) + dataUrl + matchedSubstring.
+            substring(matchedSubstringCaptureGroupIndex + captureGroup.length);
+        } else {
+          return matchedSubstring;
+        }
+      });
+      
+      if (fs.existsSync(mediaDirectoryPath)) {
+        let directoryContents: Array<string> = fs.readdirSync(
+          mediaDirectoryPath);
+        for (let j: number = 0; j < directoryContents.length; j++) {
+          fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[j]));
+        }
+        fs.rmdirSync(mediaDirectoryPath);
+      }
+      
+      fs.rmdirSync(temporaryDirectoryPath);
+      
+      respond(preview);
     }
-
-    if (request.doNotStructure) {
-      parameters.push('-u');
-    }
-
-    if (request.matchSectionNamesLeniently) {
-      parameters.push('-l');
-    }
-
-    if (request.moveFootnotes) {
-      parameters.push('-f');
-    }
-
-    if (request.tocEntryPadding) {
-      parameters.push('--toc-entry-padding=' + request.tocEntryPadding);
-    }
-
-    if (!!request.tocBeginning) {
-      parameters.push('--toc-begin=' + request.tocBeginning);
-    }
-
-    if (!!request.tocEnding) {
-      parameters.push('--toc-end=' + request.tocEnding);
-    }
-
-    if (!!request.headerLines) {
-      parameters.push('--header-length=' + request.headerLines);
-    }
-
-    if (!!request.footerLines) {
-      parameters.push('--footer-length=' + request.footerLines);
-    }
-
-    let pdfConversionProcess: any = child.spawnSync('java', parameters,
-      { input: request.file });
-    respond(pdfConversionProcess.stdout.toString());
   });
 
   socket.on('importMarkdown', (request: any, respond: Function) => {

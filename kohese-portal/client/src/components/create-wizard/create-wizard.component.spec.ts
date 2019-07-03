@@ -19,12 +19,10 @@ import { MatStepper } from '@angular/material';
 /* Mocks */
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
-import { MockDynamicTypesService } from '../../../mocks/services/MockDynamicTypesService';
 import { MockItem } from '../../../mocks/data/MockItem';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
 describe('Component: Create Wizard', ()=>{
@@ -47,7 +45,6 @@ describe('Component: Create Wizard', ()=>{
       providers : [
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: NavigationService, useClass: MockNavigationService},
-        {provide: DynamicTypesService, useClass: MockDynamicTypesService},
         {provide: MatDialogRef, useValue : {close: ()=>{console.log('close')}}}
       ]
     })
@@ -63,81 +60,12 @@ describe('Component: Create Wizard', ()=>{
     it('instantiates the createWizard component', ()=>{
       expect(createWizardComponent).toBeTruthy();
     })
-
-    it('requests the required data from the server', ()=>{
-      expect(createWizardComponent.rootProxy).toBeDefined;
-      expect(createWizardComponent.models).toBeDefined;
-      expect(createWizardComponent.types).toBeDefined;
-    })
-
-    it('starts with the root proxy selected when no parent is provided', ()=>{
-      expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy)
-    })
-
-  })
-
-  describe('type selection', ()=>{
-    let stepper : MatStepper;
-    let nextSpy;
-    beforeEach(()=>{
-      stepper = <MatStepper> {
-        next : ()=>{
-
-        }
-      }
-
-      nextSpy = spyOn(stepper, 'next');
-    })
-
-    it('updates the selected type when selected for the first time', ()=>{
-      createWizardComponent.onTypeSelected(createWizardComponent.types[1], stepper);
-      expect(createWizardComponent.selectedType).toBe(createWizardComponent.types[1]);
-      expect(nextSpy).not.toHaveBeenCalled();
-    })
-
-    it('moves to the next step if a type is double clicked', ()=>{
-      createWizardComponent.onTypeSelected(createWizardComponent.types[1], stepper);
-      createWizardComponent.onTypeSelected(createWizardComponent.types[1], stepper);
-      expect(createWizardComponent.selectedType).toBe(createWizardComponent.types[1]);
-      expect(nextSpy).toHaveBeenCalled();
-    })
-  })
-  describe('parent selection', ()=>{
-    let stepper : MatStepper;
-    let nextSpy;
-    beforeEach(()=>{
-      stepper = <MatStepper> {
-        next : ()=>{
-
-        }
-      }
-
-      nextSpy = spyOn(stepper, 'next');
-    })
-
-    it('updates the selected parent when selected for the first time', ()=>{
-      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.
-        children[1], stepper);
-      expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy.children[1]);
-      expect(nextSpy).not.toHaveBeenCalled();
-    })
-
-    it('moves to the next step if a parent is double clicked', ()=>{
-      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.
-        children[1], stepper);
-      createWizardComponent.onParentSelected(createWizardComponent.rootProxy.
-        children[1], stepper);
-      expect(createWizardComponent.selectedParent).toBe(createWizardComponent.rootProxy.children[1]);
-      expect(nextSpy).toHaveBeenCalled();
-    })
   })
 
   describe('item creation', ()=>{
     let closeSpy;
 
     beforeEach(()=>{
-      createWizardComponent.selectedType = TestBed.get(DynamicTypesService).
-        getKoheseTypes()['Kurios Iesous'];
       createWizardComponent.createFormGroup = <FormGroup> {
         value : ItemProxy
       }

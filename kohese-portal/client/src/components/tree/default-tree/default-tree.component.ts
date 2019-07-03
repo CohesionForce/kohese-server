@@ -20,6 +20,8 @@ import { Image, DisplayableEntity, Action,
   ActionGroup } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
+import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
+import { ImportComponent } from '../../import/import.component';
 
 @Component({
   selector: 'default-tree',
@@ -112,8 +114,38 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       });
     });
-    this.rootMenuActions.push(deleteAction);
-    this.menuActions.push(deleteAction);
+    this.rootMenuActions.unshift(deleteAction);
+    this.menuActions.unshift(deleteAction);
+    
+    let importAction: Action = new Action('Import...', 'Import one or more ' +
+      'files as children of this Item', 'fa fa-file-o', (object: any) => {
+      return !(object as ItemProxy).internal || (object === this.
+        _absoluteRoot);
+    }, (object: any) => {
+      this._dialogService.openComponentDialog(ImportComponent, {
+        data: {
+          parentId: (object as ItemProxy).item.id
+        },
+        disableClose: true
+      }).updateSize('90%', '90%');
+    });
+    this.rootMenuActions.unshift(importAction);
+    this.menuActions.unshift(importAction);
+    
+    let addChildAction: Action = new Action('Add Child', 'Add a child to ' +
+      'this Item', 'fa fa-plus add-button', (object: any) => {
+      return !(object as ItemProxy).internal || (object === this.
+        _absoluteRoot);
+    }, (object: any) => {
+      this._dialogService.openComponentDialog(CreateWizardComponent, {
+        data: {
+          parentId: (object as ItemProxy).item.id
+        },
+        disableClose: true
+      }).updateSize('90%', '90%');
+    });
+    this.rootMenuActions.unshift(addChildAction);
+    this.menuActions.unshift(addChildAction);
 
     let stagedVersionComparisonAction: Action = new Action('Compare ' +
       'Against Staged Version', 'Compare this Item against the staged ' +

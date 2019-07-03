@@ -7,16 +7,16 @@ import { MaterialModule } from '../../material.module';
 import { UserInputModule } from '../user-input/user-input.module';
 import { TreeViewModule } from '../tree/tree.module';
 import { ImportComponent } from './import.component';
-import { PdfImportComponent } from './pdf/pdf-import.component';
+import { ParameterSpecifierComponent } from './parameter-specifier/parameter-specifier.component';
 
 @NgModule({
   declarations: [
     ImportComponent,
-    PdfImportComponent
+    ParameterSpecifierComponent
   ],
   entryComponents: [
     ImportComponent,
-    PdfImportComponent
+    ParameterSpecifierComponent
   ],
   imports: [
     CommonModule,
