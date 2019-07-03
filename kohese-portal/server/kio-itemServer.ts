@@ -589,7 +589,7 @@ function KIOItemServer(socket){
   socket.on('Item/generateReport', function(request, sendResponse) {
     let metaDataString: Array<string> = request.content.split('\n\n', 3);
     fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
-      reportName + request.format), metaDataString.join ('\n\n'), undefined);
+      reportName + request.format), metaDataString.join('\n\n'), undefined);
     if (request.format === '.md') {
       fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.
         reportName + request.format), request.content, undefined);

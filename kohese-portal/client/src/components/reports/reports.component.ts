@@ -285,9 +285,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
 
-  public getReportInformation(reportObject: any) {
+  public getReportInformation(reportObject: any): void {
     this._dialogService.openInformationDialog('Report Information',
-       '\n' + reportObject.metaContent.split('\n\n').join('\n'));
+      '\n' + reportObject.metaContent.split('\n\n').join('\n'));
   }
 
   private updateReportList(): void {
