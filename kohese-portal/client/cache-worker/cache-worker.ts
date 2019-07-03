@@ -180,21 +180,13 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
-      case 'getPdfImportPreview':
+      case 'getImportPreview':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (preview: string) => void, reject: () => void) => {
-          socket.emit('getPdfImportPreview', {
+          socket.emit('getImportPreview', {
             file: request.data.file,
-            forceTocStructuring: request.data.forceTocStructuring,
-            doNotStructure: request.data.doNotStructure,
-            matchSectionNamesLeniently: request.data.
-              matchSectionNamesLeniently,
-            moveFootnotes: request.data.moveFootnotes,
-            tocEntryPadding: request.data.tocEntryPadding,
-            tocBeginning: request.data.tocBeginning,
-            tocEnding: request.data.tocEnding,
-            headerLines: request.data.headerLines,
-            footerLines: request.data.footerLines
+            extension: request.data.extension,
+            parameters: request.data.parameters
         }, (preview: string) => {
           resolve(preview);
         }); }) });

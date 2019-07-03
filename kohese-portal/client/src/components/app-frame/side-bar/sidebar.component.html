@@ -34,21 +34,11 @@
           <button mat-menu-item (click)="openNewDialog()">
             New
           </button>
-          <button mat-menu-item [matMenuTriggerFor]="importMenu">
-            Import
+          <button mat-menu-item matTooltip="Import files"
+            (click)="openImportDialog()">
+            <mat-icon class="fa fa-file-o"></mat-icon>
+            Import...
           </button>
-          <mat-menu #importMenu="matMenu" [overlapTrigger]="false">
-            <button mat-menu-item matTooltip="Import PDF files"
-              (click)="openPdfImportDialog()">
-              <mat-icon class="fa fa-file-pdf-o"></mat-icon>
-              PDF...
-            </button>
-            <button mat-menu-item matTooltip="Import a different type of file"
-              (click)="openImportDialog()">
-              <mat-icon class="fa fa-file-o"></mat-icon>
-              Other...
-            </button>
-          </mat-menu>
           <button mat-menu-item (click)="openUploadDialog()">
             Upload Image
           </button>

@@ -1,28 +1,70 @@
-<div>
-  <div style="height: 400px; overflow: auto;">
-    <proxy-selector 
-      (proxySelected)="onParentSelected($event)"></proxy-selector>
-  </div>
-  <textarea matInput #fileTextArea cols="80" rows="7" placeholder="Files to import"
-    readonly="true">
-  </textarea>
-  <!-- Hide the file input and route its functionality to a button -->
-  <input type="file" #fileInput multiple style="display: none;"
-    (change)="fileTextArea.value = getSelectedFilenames(fileInput.files)"/>
-  <button mat-raised-button (click)="fileInput.click()">
-    Select File(s)...
+<div [ngStyle]="{ 'height': isDialogInstance() ? '40%' : '45%' }"
+  style="width: 100%;">
+  <h3 style="height: 10%;">
+    Parent
+  </h3>
+  <tree #itemProxyTree [root]="TreeConfiguration.getWorkingTree().
+    getRootProxy()" [getChildren]="getChildren" [getText]="getText"
+    style="height: 87%;" [selection]="[TreeConfiguration.getWorkingTree().
+    getProxyFor(parentId)]">
+  </tree>
+</div>
+<div style="height: 5%; width: 100%; display: flex; flex-direction: row;">
+  <h3>
+    Files
+  </h3>
+  <span class="flex-right-align">
+    <mat-icon class="fa fa-info-circle" style="text-align: center;"
+      matTooltip="{{'The following types of files are supported: ' + Object.
+      values(SupportedExtensions).toString()}}">
+    </mat-icon>
+  </span>
+  <input #fileInput type="file" style="display: none;" multiple
+    (change)="addFiles(fileInput.files)"/>
+  <button mat-button matTooltip="Select files" (click)="fileInput.click()">
+    Select...
   </button>
 </div>
-<ng-container *ngIf="data">
-  <div class="pull-right">
-    <mat-dialog-actions>
-      <button mat-raised-button [mat-dialog-close]="0">
-        Cancel
-      </button>
-      <button mat-raised-button [mat-dialog-close]="1"
-         (click)="importFile(fileInput)">
-        Import
-      </button>
-    </mat-dialog-actions>
+<div style="height: 50%; width: 100%; overflow: auto;">
+  <mat-accordion multi="true">
+    <ng-container *ngFor="let file of Array.from(selectedFileMap.keys())">
+      <mat-expansion-panel (opened)="retrieveImportPreview(file)">
+        <mat-expansion-panel-header>
+          <mat-panel-title style="align-items: center;">
+            {{file.name}}
+          </mat-panel-title>
+          <span class="flex-right-align">
+            <ng-container *ngIf="file.name.endsWith('.pdf')">
+              <button mat-icon-button matTooltip="Modify conversion parameters
+                for this file" (click)="openParameterSpecifier(file); $event.
+                stopPropagation()">
+                <mat-icon class="fa fa-list"></mat-icon>
+              </button>
+            </ng-container>
+            <button mat-icon-button matTooltip="De-select this file"
+              (click)="removeFile(file); $event.stopPropagation()">
+              <mat-icon class="fa fa-times"></mat-icon>
+            </button>
+          </span>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <markdown [data]="selectedFileMap.get(file).preview"></markdown>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-container>
+  </mat-accordion>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <div style="height: 5%; width: 100%; display: flex; flex-direction: row;">
+    <button mat-button matTooltip="Import the selected files"
+      class="flex-right-align" (click)="importSelectedFiles(itemProxyTree.
+      selection[0] ? itemProxyTree.selection[0].item.id : ''); matDialogRef.
+      close()">
+      Import
+    </button>
+    <button mat-button matTooltip="Cancel the import process"
+      (click)="matDialogRef.close()">
+      Cancel
+    </button>
   </div>
 </ng-container>

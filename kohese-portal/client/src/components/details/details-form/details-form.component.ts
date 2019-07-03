@@ -165,14 +165,18 @@ export class DetailsFormComponent extends NavigatableComponent
   public typeChanged(type: string): void {
     let itemProxy: ItemProxy = this.proxyStream.getValue();
     itemProxy.kind = type;
-    let dataModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-      getProxyFor(type);
-    itemProxy.model = dataModelProxy;
-    for (let attributeName in dataModelProxy.item.properties) {
-      if ((itemProxy.item[attributeName] == null) && (dataModelProxy.item.
-        properties[attributeName].default != null)) {
-        itemProxy.item[attributeName] = dataModelProxy.item.properties[
-          attributeName].default;
+    let typeProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      type);
+    itemProxy.model = typeProxy;
+    for (let attributeName in typeProxy.item.classProperties) {
+      if (itemProxy.item[attributeName] == null) {
+        let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(typeProxy.item.classProperties[attributeName].
+          definedInKind);
+        if (modelProxy.item.properties[attributeName].default != null) {
+          itemProxy.item[attributeName] = modelProxy.item.properties[
+            attributeName].default;
+        }
       }
     }
     

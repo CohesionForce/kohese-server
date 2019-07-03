@@ -8,8 +8,6 @@ import { CurrentUserService } from '../../../services/user/current-user.service'
 import { ApplicationLens, LensService } from '../../../services/lens-service/lens.service';
 import { Subscription } from 'rxjs';
 
-import { PdfImportComponent } from '../../import/pdf/pdf-import.component';
-
 @Component({
   selector: 'side-bar',
   templateUrl: './sidebar.component.html',
@@ -53,18 +51,12 @@ export class SideBarComponent implements OnInit, OnDestroy {
     this.dialogService.openComponentDialog(CreateWizardComponent, {}).
       updateSize('70%', '70%');
   }
-  
-  public openPdfImportDialog(): void {
-    this.dialogService.openComponentDialog(PdfImportComponent, {
-      data: {},
-      disableClose: true
-    }).updateSize('90%', '90%');
-  }
 
   openImportDialog(): void {
     this.dialogService.openComponentDialog(ImportComponent, {
-      data: {}
-    }).updateSize('70%', 'auto');
+      data: {},
+      disableClose: true
+    }).updateSize('90%', '90%');
   }
 
   public openUploadDialog(): void {
