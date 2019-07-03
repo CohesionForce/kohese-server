@@ -1,0 +1,67 @@
+<div style="width: 100%; display: flex; flex-direction: row;"
+  [ngStyle]="{ 'height': (isDialogInstance() ? '95%' : '100%') }">
+  <div style="height: 100%; width: 50%; padding: 3px; display: flex;
+    flex-direction: column; overflow: auto;">
+    <mat-checkbox [checked]="parameters.forceTocStructuring"
+      (change)="parameters.forceTocStructuring = $event.checked"
+      [disabled]="parameters.doNotStructure">
+      Force Table-of-Contents-Based Structuring
+    </mat-checkbox>
+    <mat-checkbox [checked]="parameters.doNotStructure" (change)="parameters.
+      doNotStructure = $event.checked">
+      Do Not Structure
+    </mat-checkbox>
+    <mat-checkbox [checked]="parameters.matchSectionNamesLeniently"
+      (change)="parameters.matchSectionNamesLeniently = $event.checked">
+      Match Section Names Leniently
+    </mat-checkbox>
+    <mat-checkbox [checked]="parameters.moveFootnotes"
+      (change)="parameters.moveFootnotes = $event.checked">
+      Attempt To Move Footnotes Out Of Section Text
+    </mat-checkbox>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="text" placeholder="Table of Contents Entry Padding"
+        [ngModel]="parameters.tocEntryPadding" (ngModelChange)="parameters.
+        tocEntryPadding = $event"/>
+    </mat-form-field>
+  </div>
+  <div style="height: 100%; width: 50%; padding: 3px; display: flex;
+    flex-direction: column; overflow: auto;">
+    <mat-form-field style="width: 100%;">
+      <input matInput type="number"
+        placeholder="Table of Contents Beginning Page Number"
+        [ngModel]="parameters.tocBeginning" (ngModelChange)="parameters.
+        tocBeginning = $event"/>
+    </mat-form-field>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="number"
+        placeholder="Table of Contents Ending Page Number"
+        [ngModel]="parameters.tocEnding" (ngModelChange)="parameters.
+        tocEnding = $event"/>
+    </mat-form-field>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="number" placeholder="Number of Header Lines"
+        [ngModel]="parameters.headerLines" (ngModelChange)="parameters.
+        headerLines = $event"/>
+    </mat-form-field>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="number" placeholder="Number of Footer Lines"
+        [ngModel]="parameters.footerLines" (ngModelChange)="parameters.
+        footerLines = $event"/>
+    </mat-form-field>
+  </div>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 5%; width: 100%;">
+    <span class="flex-right-align">
+      <button mat-button matTooltip="Apply these values" (click)="matDialogRef.
+        close(parameters)">
+        Apply
+      </button>
+      <button mat-button matTooltip="Cancel the parameter specification
+        process" (click)="matDialogRef.close(undefined)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>

@@ -5,7 +5,8 @@
   </h3>
   <tree #itemProxyTree [root]="TreeConfiguration.getWorkingTree().
     getRootProxy()" [getChildren]="getChildren" [getText]="getText"
-    style="height: 87%;">
+    style="height: 87%;" [selection]="[TreeConfiguration.getWorkingTree().
+    getProxyFor(parentId)]">
   </tree>
 </div>
 <div style="height: 5%; width: 100%; display: flex; flex-direction: row;">
@@ -33,6 +34,13 @@
             {{file.name}}
           </mat-panel-title>
           <span class="flex-right-align">
+            <ng-container *ngIf="file.name.endsWith('.pdf')">
+              <button mat-icon-button matTooltip="Modify conversion parameters
+                for this file" (click)="openParameterSpecifier(file); $event.
+                stopPropagation()">
+                <mat-icon class="fa fa-list"></mat-icon>
+              </button>
+            </ng-container>
             <button mat-icon-button matTooltip="De-select this file"
               (click)="removeFile(file); $event.stopPropagation()">
               <mat-icon class="fa fa-times"></mat-icon>
@@ -40,7 +48,7 @@
           </span>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <markdown [data]="selectedFileMap.get(file)"></markdown>
+          <markdown [data]="selectedFileMap.get(file).preview"></markdown>
         </ng-template>
       </mat-expansion-panel>
     </ng-container>
