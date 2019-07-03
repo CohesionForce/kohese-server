@@ -28,7 +28,7 @@ export class DialogService {
         buttonLabels: buttonLabels
       },
       disableClose: true
-    }).afterClosed();
+    }).updateSize('40%', 'auto').afterClosed();
   }
 
   openInputDialog(title: string, text: string, type: string, fieldName: string,

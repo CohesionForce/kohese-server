@@ -85,7 +85,7 @@
             flex-direction: row;">
             <mat-form-field style="width: 40%; padding: 3px;">
               <input matInput type="text" #reportNameInput
-                placeholder="Report Name"/>
+                placeholder="Report Name" (input)="updateReportPreview()"/>
             </mat-form-field>
             <mat-form-field style="width: 20%; padding: 3px;">
               <mat-select #reportFormatSelect placeholder="Report Format"
@@ -123,21 +123,25 @@
         Reports
       </h3>
       <mat-accordion multi="true">
-        <ng-container *ngFor="let reportName of Array.from(reports.keys())">
+        <ng-container *ngFor="let reportObject of Array.from(reports.keys())">
           <mat-expansion-panel (opened)="retrieveSavedReportPreview(
-            reportName)">
+            reportObject)">
             <mat-expansion-panel-header>
               <mat-panel-title style="align-items: center;">
-                {{reportName}}
+                {{reportObject.name}}
               </mat-panel-title>
               <span class="flex-right-align">
+                <button mat-icon-button matTooltip="Report Information"
+                  (click)="getReportInformation(reportObject); $event.stopPropagation()">
+                  <mat-icon class="fa fa-info-circle"></mat-icon>
+                </button>
                 <button mat-icon-button matTooltip="Rename this report"
-                  (click)="renameReport(reportName); $event.stopPropagation()">
+                  (click)="renameReport(reportObject.name); $event.stopPropagation()">
                   <mat-icon class="fa fa-i-cursor"></mat-icon>
                 </button>
                 <a #reportDownloadAnchor style="display: none;"
-                  download="{{reportName}}" href="{{'/producedReports/' +
-                  reportName}}" (click)="$event.stopPropagation()">
+                  download="{{reportObject.name}}" href="{{'/producedReports/' +
+                  reportObject.name}}" (click)="$event.stopPropagation()">
                 </a>
                 <button mat-icon-button matTooltip="Download this report"
                   (click)="reportDownloadAnchor.click(); $event.
@@ -145,20 +149,20 @@
                   <mat-icon class="fa fa-download"></mat-icon>
                 </button>
                 <button mat-icon-button matTooltip="Remove this report"
-                  (click)="removeReport(reportName); $event.stopPropagation()">
+                  (click)="removeReport(reportObject.name); $event.stopPropagation()">
                   <mat-icon class="fa fa-trash"></mat-icon>
                 </button>
               </span>
             </mat-expansion-panel-header>
             <ng-template matExpansionPanelContent>
-              <ng-container *ngIf="reportName.endsWith('.md') else
+              <ng-container *ngIf="reportObject.name.endsWith('.md') else
                 notMarkdownReport">
                 <pre
                   style="font-family: Roboto, 'Helvetica Neue', sans-serif;">{{reports.
-                  get(reportName)}}</pre>
+                  get(reportObject)}}</pre>
               </ng-container>
               <ng-template #notMarkdownReport>
-                <markdown [data]="reports.get(reportName)"></markdown>
+                <markdown [data]="reports.get(reportObject)"></markdown>
               </ng-template>
             </ng-template>
           </mat-expansion-panel>

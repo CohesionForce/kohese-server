@@ -211,12 +211,12 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
-      case 'getReportNames':
+      case 'getReportMetaData':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: (reportNames: Array<string>) => void, reject:
+          (resolve: (reportObjects: Array<any>) => void, reject:
           () => void) => {
-          socket.emit('getReportNames', {}, (reportNames: Array<string>) => {
-            resolve(reportNames);
+          socket.emit('getReportMetaData', {}, (reportObjects: Array<any>) => {
+            resolve(reportObjects);
           });
         }) });
         break;

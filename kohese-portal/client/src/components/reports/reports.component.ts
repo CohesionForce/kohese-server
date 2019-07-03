@@ -27,22 +27,24 @@ enum MoveDirection {
   styleUrls: ['./reports.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class ReportsComponent implements OnInit, OnDestroy {
-  private _reports: Map<string, string> = new Map<string, string>();
+
+  private _reports: Map<any, string> = new Map<any, string>();
   get reports() {
     return this._reports;
   }
-  
+
   private _reportSelections: Array<ReportSelection> = [];
   get reportSelections() {
     return this._reportSelections;
   }
-  
+
   private _documentConfigurations: Array<any> = [];
   get documentConfigurations() {
     return this._documentConfigurations;
   }
-  
+
   private _selectedDocumentConfiguration: any = '';
   get selectedDocumentConfiguration() {
     return this._selectedDocumentConfiguration;
@@ -50,57 +52,60 @@ export class ReportsComponent implements OnInit, OnDestroy {
   set selectedDocumentConfiguration(selectedDocumentConfiguration: any) {
     this._selectedDocumentConfiguration = selectedDocumentConfiguration;
   }
-  
+
   private _report: string;
   get report() {
     return this._report;
   }
-  
+
   get ReportFormat() {
     return ReportFormat;
   }
-  
+
   get MoveDirection() {
     return MoveDirection;
   }
-  
+
   get Array() {
     return Array;
   }
-  
+
+  @ViewChild('reportNameInput')
+  private _reportNameInput: any;
+
   @ViewChild('itemProxyTree')
   private _itemProxyTree: TreeComponent;
-  
+
   get TreeConfiguration() {
     return TreeConfiguration;
   }
-  
+
   private _getChildren: (element: any) => Array<any> = (element: any) => {
     return (element as ItemProxy).children;
   };
   get getChildren() {
     return this._getChildren;
   }
-  
+
   private _getText: (element: any) => string = (element: any) => {
     return (element as ItemProxy).item.name;
   };
   get getText() {
     return this._getText;
   }
-  
+
   private _treeConfigurationSubscription: Subscription;
-  
+
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<ReportsComponent>,
     private _changeDetectorRef: ChangeDetectorRef, private _dialogService:
     DialogService, private _itemRepository: ItemRepository,
     private _markdownService: MarkdownService) {
   }
-  
+
   public ngOnInit(): void {
     this.populateDocumentConfigurationArray();
-    
+
     this._treeConfigurationSubscription = TreeConfiguration.getWorkingTree().
       getChangeSubject().subscribe((notification: any) => {
       switch (notification.type) {
@@ -112,19 +117,20 @@ export class ReportsComponent implements OnInit, OnDestroy {
           break;
       }
     });
-    
+
     this.updateReportList();
   }
-  
+
   public ngOnDestroy(): void {
     this._treeConfigurationSubscription.unsubscribe();
   }
-  
+
   public addReportSelection(itemProxy: ItemProxy): void {
+    console.log(itemProxy);
     this._reportSelections.push(new ReportSelection(itemProxy));
     this.updateReportPreview();
   }
-  
+
   public editDocumentConfiguration(documentConfiguration: any):
     void {
     this._dialogService.openComponentDialog(
@@ -150,7 +156,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public removeSelectedDocumentConfiguration(): void {
     this._dialogService.openYesNoDialog('Remove ' + this.
       _selectedDocumentConfiguration.name, 'Are you sure that you want to ' +
@@ -166,7 +172,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   private populateDocumentConfigurationArray(): void {
     this._documentConfigurations.length = 0;
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
@@ -176,13 +182,13 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     }, undefined);
   }
-  
+
   public getReportSelectionsIndex(itemProxy: ItemProxy): number {
     return this._reportSelections.map((reportSelection: ReportSelection) => {
       return reportSelection.itemProxy;
     }).indexOf(itemProxy);
   }
-  
+
   /**
    * Moves the given ReportSelection one index in the direction indicated by
    *  the given MoveDirection
@@ -198,12 +204,12 @@ export class ReportsComponent implements OnInit, OnDestroy {
       this._reportSelections.splice(candidateIndex + 1, 0, reportSelection);
     }
   }
-  
+
   public canProduceReport(reportName: string): boolean {
     return (reportName && (reportName.search(/[\/\\]/) === -1) && (this.
       _reportSelections.length > 0));
   }
-  
+
   public async produceReport(reportName: string, reportFormat: ReportFormat,
     unsavedDownloadAnchor: any): Promise<void> {
     let fullReportName: string = reportName + reportFormat;
@@ -238,7 +244,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   public renameReport(targetReportName: string): void {
     let extensionStartIndex: number = targetReportName.lastIndexOf('.');
     let targetNameWithoutExtension: string = targetReportName.substring(0,
@@ -258,35 +264,40 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
-  public async retrieveSavedReportPreview(reportName: string): Promise<void> {
-    if (this._reports.get(reportName).length === 0) {
+
+  public async retrieveSavedReportPreview(reportObject: any): Promise<void> {
+    if (this._reports.get(reportObject).length === 0) {
       let reportPreview: string = await this._itemRepository.getReportPreview(
-        reportName);
-      this._reports.set(reportName, reportPreview);
+        reportObject.name);
+      this._reports.set(reportObject, reportPreview);
       this._changeDetectorRef.markForCheck();
     }
   }
-  
+
   public async removeReport(reportName: string): Promise<void> {
     await this._itemRepository.removeReport(reportName);
     this.updateReportList();
   }
-  
+
   public updateReportPreview(): void {
-    this._report = this._itemRepository.buildReport(this._reportSelections,
+    this._report = this._itemRepository.buildReport(this._reportNameInput.nativeElement.value, this._reportSelections,
       this._selectedDocumentConfiguration);
     this._changeDetectorRef.markForCheck();
   }
-  
+
+  public getReportInformation(reportObject: any): void {
+    this._dialogService.openInformationDialog('Report Information',
+      '\n' + reportObject.metaContent.split('\n\n').join('\n'));
+  }
+
   private updateReportList(): void {
-    this._itemRepository.getReportNames().then((reportNames:
-      Array<string>) => {
+    this._itemRepository.getReportMetaData().then((reportObjects:
+      Array<any>) => {
       this._reports.clear();
-      for (let j: number = 0; j < reportNames.length; j++) {
-        this._reports.set(reportNames[j], '');
+      for (let j: number = 0; j < reportObjects.length; j++) {
+        this._reports.set(reportObjects[j], '');
       }
-      
+
       this._changeDetectorRef.markForCheck();
     });
   }

@@ -52,7 +52,6 @@ export class ItemRepository {
 
   shortProxyList: Array<ItemProxy>;
   modelTypes: Object;
-
   private _repoState: RepoStates = undefined;
 
   logEvents: any;
@@ -716,16 +715,22 @@ export class ItemRepository {
       fileReader.readAsArrayBuffer(file);
     });
   }
-  
+
   public async importMarkdown(fileName: string, markdown: string, parentId:
     string): Promise<void> {
     return await this.sendMessageToWorker('importMarkdown',
       { fileName: fileName, markdown: markdown, parentId: parentId }, true);
   }
-  
-  public buildReport(reportSelections: Array<ReportSelection>,
+
+  public buildReport(reportName: string, reportSelections: Array<ReportSelection>,
     documentConfiguration: any): string {
     let content: string = '';
+    let userName: any = this.CurrentUserService.getCurrentUserSubject().
+      getValue();
+    let date: any = new Date();
+    content += 'Report Name: ' + reportName + '\n\n';
+    content += 'Produced By: ' + userName.username + '\n\n';
+    content += 'Creation Date: ' + date + '\n\n';
     for (let j: number = 0; j < reportSelections.length; j++) {
       let reportSelection: ReportSelection = reportSelections[j];
       if (reportSelection.includeDescendants) {
@@ -749,7 +754,7 @@ export class ItemRepository {
               }
             };
           }
-          
+
           if (documentConfigurationType) {
             content += this.getItemReportText(itemProxy,
               documentConfigurationType, itemProxy.getDepthFromAncestor(
@@ -775,7 +780,7 @@ export class ItemRepository {
             }
           };
         }
-          
+
         if (documentConfigurationType) {
           content += '#';
           content += this.getItemReportText(reportSelections[j].itemProxy,
@@ -783,10 +788,9 @@ export class ItemRepository {
         }
       }
     }
-    
     return content;
   }
-  
+
   private getItemReportText(itemProxy: ItemProxy, documentConfigurationType:
     any, depth: number): string {
     let text: string = '';
@@ -795,14 +799,14 @@ export class ItemRepository {
         for (let j: number = 0; j < depth; j++) {
           text += '#';
         }
-        
+
         text += ' ';
-        
+
         if (documentConfigurationType.attributes[attributeName].
           showAttributeName) {
           text += attributeName + ': ';
         }
-        
+
         if (documentConfigurationType.attributes[attributeName].linkToItem) {
           text += '[' + itemProxy.item.name + '](' + window.location.origin +
             LocationMap['Explore'].route + ';id=' + itemProxy.item.id +
@@ -815,7 +819,7 @@ export class ItemRepository {
           showAttributeName) {
           text += attributeName + ': ';
         }
-        
+
         let addition: string;
         let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(itemProxy.model.item.classProperties[attributeName].
@@ -831,14 +835,14 @@ export class ItemRepository {
         } else {
           addition = itemProxy.item[attributeName];
         }
-        
+
         text += addition + '\n\n';
       }
     }
-    
+
     return text;
   }
-  
+
   public async produceReport(report: string, reportName: string, format:
     string): Promise<void> {
     return await this.sendMessageToWorker('produceReport', {
@@ -847,22 +851,22 @@ export class ItemRepository {
       content: report
     }, true);
   }
-  
-  public async getReportNames(): Promise<Array<string>> {
-    return (await this.sendMessageToWorker('getReportNames', {}, true)).data;
+
+  public async getReportMetaData(): Promise<Array<any>> {
+    return (await this.sendMessageToWorker('getReportMetaData', {}, true)).data;
   }
-  
+
   public async renameReport(oldReportName: string, newReportName: string):
     Promise<void> {
     return await this.sendMessageToWorker('renameReport',
       { oldReportName: oldReportName, newReportName: newReportName }, true);
   }
-  
+
   public async getReportPreview(reportName: string): Promise<string> {
     return (await this.sendMessageToWorker('getReportPreview',
       { reportName: reportName }, true)).data;
   }
-  
+
   public async removeReport(reportName: string): Promise<void> {
     return await this.sendMessageToWorker('removeReport',
       { reportName: reportName }, true);
