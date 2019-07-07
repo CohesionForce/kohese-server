@@ -19,10 +19,12 @@
       <button mat-raised-button [mat-dialog-close]="0">
         Cancel
       </button>
-      <button mat-raised-button [mat-dialog-close]="1"
-         (click)="uploadFile(fileInput)">
-        Upload
-      </button>
+      <div matTooltip="Select A Parent" [matTooltipDisabled]="!isDisabled">
+        <button mat-raised-button [mat-dialog-close]="1" mat-button [disabled]="isDisabled"
+          (click)="uploadFile(fileInput)">
+          Upload
+        </button>
+      </div>
     </mat-dialog-actions>
   </div>
 </ng-container>
