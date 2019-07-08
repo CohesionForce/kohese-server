@@ -17,8 +17,8 @@
     <input #urlInput matInput type="text" placeholder="URL"/>
   </mat-form-field>
   <button mat-button matTooltip="Retrieve content from the inputted URL"
-    [disabled]="!canRetrieveUrlContent(urlInput.value)"
-    (click)="retrieveUrlContent(urlInput.value)">
+    [disabled]="(urlInput.value.length === 0)" (click)="retrieveUrlContent(
+    urlInput.value)">
     Retrieve Content
   </button>
   <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;">
@@ -38,7 +38,10 @@
 <div style="height: 50%; width: 100%; overflow: auto;">
   <mat-accordion multi="true">
     <ng-container *ngFor="let file of Array.from(selectedFileMap.keys())">
-      <mat-expansion-panel (opened)="retrieveImportPreview(file)">
+      <mat-expansion-panel [expanded]="selectedFileMap.get(file).expanded"
+        (opened)="retrieveImportPreview(file); selectedFileMap.get(file).
+        expanded = true" (closed)="selectedFileMap.get(file).expanded =
+        false;">
         <mat-expansion-panel-header>
           <mat-panel-title style="align-items: center;">
             {{file.name}}
@@ -51,6 +54,10 @@
                 <mat-icon class="fa fa-list"></mat-icon>
               </button>
             </ng-container>
+            <button mat-icon-button matTooltip="Retrieve updated content"
+              (click)="updateFile(file); $event.stopPropagation()">
+              <mat-icon class="fa fa-exchange"></mat-icon>
+            </button>
             <button mat-icon-button matTooltip="De-select this file"
               (click)="removeFile(file); $event.stopPropagation()">
               <mat-icon class="fa fa-times"></mat-icon>

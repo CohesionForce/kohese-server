@@ -1,3 +1,6 @@
+const Fetch = require('node-fetch');
+const StringReplaceAsync = require('string-replace-async');
+
 import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
@@ -523,7 +526,22 @@ function KIOItemServer(socket){
 
   });
   
-  socket.on('getImportPreview', (request: any, respond: Function) => {
+  socket.on('getUrlContent', async (request: any, respond: Function) => {
+    try {
+      let response: Response = await Fetch(request.url);
+      if (response.ok) {
+        respond({
+          content: await response.arrayBuffer(),
+          contentType: response.headers.get('Content-Type')
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      respond({ content: '', contentType: '' });
+    }
+  });
+  
+  socket.on('getImportPreview', async (request: any, respond: Function) => {
     let parameterlessType: string = ((request.type.indexOf(';') !== -1) ?
       request.type.substring(0, request.type.indexOf(';')) : request.type);
     if (parameterlessType === 'application/pdf') {
@@ -611,34 +629,81 @@ function KIOItemServer(socket){
       }
       
       let pandocProcess: any = child.spawnSync('pandoc', ['-f', format, '-t',
-        'commonmark', '--atx-headers', '--extract-media', temporaryDirectoryPath,
-        '-s', temporaryFilePath], undefined);
+        'commonmark', '--atx-headers', '--extract-media',
+        temporaryDirectoryPath, '-s', temporaryFilePath], undefined);
       
       fs.unlinkSync(temporaryFilePath);
       
       let preview: string = pandocProcess.stdout.toString();
-      preview = preview.replace(/!\[.*?\]\((.+?)\)/g, (matchedSubstring: string,
+      preview = await StringReplaceAsync(preview,
+        /\[[\s\S]*?\]\(([\s\S]+?)\)/g, async (matchedSubstring: string,
         captureGroup: string, index: number, originalString: string) => {
-        let imagePath: string = Path.resolve(mediaDirectoryPath, captureGroup);
-        if (fs.existsSync(imagePath)) {
-          let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
-            indexOf(captureGroup);
+        let replacement: string = '';
+        let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+          indexOf(captureGroup);
+        if ((index > 0) && (originalString.charAt(index - 1) === '!')) {
           let dataUrl: string = 'data:image/';
-          if (captureGroup.endsWith('.png')) {
-            dataUrl += 'png';
-          } else if (captureGroup.endsWith('.jpg') || captureGroup.endsWith(
-            '.jpeg')) {
-            dataUrl += 'jpeg';
+          if (request.parameters.pathBase) {
+            if (request.parameters.pathBase.startsWith('http')) {
+              try {
+                let imageUrl: string;
+                if (/^https?:\/\//.test(captureGroup)) {
+                  imageUrl = captureGroup;
+                } else {
+                  imageUrl = request.parameters.pathBase + captureGroup;
+                }
+                let response: any = await Fetch(imageUrl);
+                if (response.ok) {
+                  let contentType: string = response.headers.get(
+                    'Content-Type');
+                  let type: string = ((contentType.indexOf(';') !== -1) ?
+                    contentType.substring(0, contentType.indexOf(';')) :
+                    contentType);
+                  replacement = matchedSubstring.substring(0,
+                    matchedSubstringCaptureGroupIndex) + dataUrl + type.
+                    substring(type.indexOf('/') + 1) + ';base64,' +
+                    (await response.buffer()).toString('base64') +
+                    matchedSubstring.substring(
+                    matchedSubstringCaptureGroupIndex + captureGroup.length);
+                }
+              } catch (error) {
+                console.log(error);
+              }
+            }
+          } else {
+            let imagePath: string = Path.resolve(mediaDirectoryPath,
+              captureGroup);
+            if (fs.existsSync(imagePath)) {
+              if (captureGroup.endsWith('.png')) {
+                dataUrl += 'png';
+              } else if (captureGroup.endsWith('.jpg') || captureGroup.
+                endsWith('.jpeg')) {
+                dataUrl += 'jpeg';
+              }
+              
+              dataUrl += ';base64,';
+              dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
+              replacement = matchedSubstring.substring(0,
+                matchedSubstringCaptureGroupIndex) + dataUrl +
+                matchedSubstring.substring(matchedSubstringCaptureGroupIndex +
+                captureGroup.length);
+            } else {
+              replacement = matchedSubstring;
+            }
           }
-          
-          dataUrl += ';base64,';
-          dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
-          return matchedSubstring.substring(0,
-            matchedSubstringCaptureGroupIndex) + dataUrl + matchedSubstring.
-            substring(matchedSubstringCaptureGroupIndex + captureGroup.length);
         } else {
-          return matchedSubstring;
+          if (/^https?:\/\//.test(captureGroup) || captureGroup.startsWith(
+            'javascript:')) {
+            replacement = matchedSubstring;
+          } else {
+            replacement = matchedSubstring.substring(0,
+              matchedSubstringCaptureGroupIndex) + request.parameters.
+              pathBase + captureGroup + matchedSubstring.substring(
+              matchedSubstringCaptureGroupIndex + captureGroup.length);
+          }
         }
+          
+        return replacement;
       });
       
       if (fs.existsSync(mediaDirectoryPath)) {

@@ -33,6 +33,14 @@ class FileMapValue {
   set parameters(parameters: any) {
     this._parameters = parameters;
   }
+  
+  private _expanded: boolean = false;
+  get expanded() {
+    return this._expanded;
+  }
+  set expanded(expanded: boolean) {
+    this._expanded = expanded;
+  }
 
   public constructor(private _preview: string, private _parameters: any) {
   }
@@ -129,21 +137,34 @@ export class ImportComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  public canRetrieveUrlContent(url: string): boolean {
-    return /^https?:\/\/.+/.test(url);
-  }
-  
   public async retrieveUrlContent(url: string): Promise<void> {
-    let response: any = await fetch(new Request(url, {
-      mode: 'cors'
-    }));
-    if (response.ok) {
-      let contentType: string = response.headers.get('Content-Type');
-      let file: File = new File([await response.arrayBuffer()], url, {
-        type: ((contentType.indexOf(';') !== -1) ? contentType.substring(0,
-          contentType.indexOf(';')) : contentType)
-      });
-      this.addFiles([file]);
+    if (!/^https?:\/\//.test(url)) {
+      url = 'http://' + url;
+    }
+    let contentObject: any = await this._itemRepository.getUrlContent(url);
+    let file: File = new File([contentObject.content], url, {
+      type: ((contentObject.contentType.indexOf(';') !== -1) ? contentObject.
+        contentType.substring(0, contentObject.contentType.indexOf(';')) :
+        contentObject.contentType)
+    });
+    
+    if (Object.values(SupportedTypes).indexOf(file.type) !== -1) {
+      let parameters: any;
+      if (file.type === SupportedTypes.PDF) {
+        parameters = new PdfImportParameters();
+      } else {
+        parameters = {};
+      }
+      
+      let slashIndex: number = url.indexOf('/', url.indexOf('://') + 3);
+      if (slashIndex !== -1) {
+        parameters.pathBase = url.substring(0, slashIndex + 1);
+      } else {
+        parameters.pathBase = url + '/';
+      }
+      
+      this._selectedFileMap.set(file, new FileMapValue('', parameters));
+      this._changeDetectorRef.markForCheck();
     }
   }
   
@@ -174,12 +195,10 @@ export class ImportComponent implements OnInit {
         fileMapValue.preview = await this._itemRepository.getImportPreview(
           file, fileMapValue.parameters);
       }
-      
-      this._changeDetectorRef.markForCheck();
-      return fileMapValue.preview;
-    } else {
-      return Promise.resolve(fileMapValue.preview);
     }
+    
+    this._changeDetectorRef.markForCheck();
+    return fileMapValue.preview;
   }
   
   public openParameterSpecifier(file: File): void {
@@ -193,6 +212,44 @@ export class ImportComponent implements OnInit {
         this.updatePreviews();
       }
     });
+  }
+  
+  public async updateFile(file: File): Promise<void> {
+    let fileMapValue: FileMapValue = this._selectedFileMap.get(file);
+    if (/^https?:\/\//.test(file.name)) {
+      let insertionIndex: number = Array.from(this._selectedFileMap.
+        keys()).indexOf(file);
+      let temporaryMap: Map<File, any> = new Map<File, any>();
+      this._selectedFileMap.delete(file);
+      let selectedFiles: Array<File> = Array.from(this._selectedFileMap.
+        keys());
+      for (let j: number = 0; j < selectedFiles.length; j++) {
+        temporaryMap.set(selectedFiles[j], this._selectedFileMap.get(
+          selectedFiles[j]));
+      }
+      this._selectedFileMap.clear();
+      for (let j: number = 0; j < insertionIndex; j++) {
+        this._selectedFileMap.set(selectedFiles[j], temporaryMap.get(
+          selectedFiles[j]));
+      }
+      
+      let contentObject: any = await this._itemRepository.getUrlContent(file.
+        name);
+      file = new File([contentObject.content], file.name, {
+        type: ((contentObject.contentType.indexOf(';') !== -1) ? contentObject.
+          contentType.substring(0, contentObject.contentType.indexOf(';')) :
+          contentObject.contentType)
+      });
+      this._selectedFileMap.set(file, fileMapValue);
+      
+      for (let j: number = insertionIndex; j < selectedFiles.length; j++) {
+        this._selectedFileMap.set(selectedFiles[j], temporaryMap.get(
+          selectedFiles[j]));
+      }
+    }
+    
+    fileMapValue.preview = '';
+    this.retrieveImportPreview(file);
   }
   
   public removeFile(file: File): void {
