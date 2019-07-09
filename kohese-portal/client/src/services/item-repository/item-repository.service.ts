@@ -701,6 +701,11 @@ export class ItemRepository {
     return promise;
   }
   
+  public async getUrlContent(url: string): Promise<any> {
+    return (await this.sendMessageToWorker('getUrlContent', { url: url },
+      true)).data;
+  }
+  
   public getImportPreview(file: File, parameters: any): Promise<string> {
     return new Promise<string>((resolve: (preview: string) => void, reject:
       () => void) => {

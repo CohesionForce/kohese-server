@@ -635,22 +635,35 @@ function KIOItemServer(socket){
       fs.unlinkSync(temporaryFilePath);
       
       let preview: string = pandocProcess.stdout.toString();
+      /*
+        Regular expression information:
+          - '\s\S' is used instead of '.' to handle line breaks since the 's'
+            flag was unrecognized as of 2019-07-08.
+          - This regular expression is intended to handle images embedded in
+            links. It is assumed that in the case of an image embedded in a
+            link, the image is matched first (and the image path captured), and
+            then the link is matched (and the link target captured).
+      */
       preview = await StringReplaceAsync(preview,
-        /\[[\s\S]*?\]\(([\s\S]+?)\)/g, async (matchedSubstring: string,
-        captureGroup: string, index: number, originalString: string) => {
+        /\[(?:!\[[\s\S]*?\]\([\s\S]+?\))|[\s\S]*?\]\(([\s\S]+?)\)/g,
+        async (matchedSubstring: string, targetCaptureGroup: string, index:
+        number, originalString: string) => {
         let replacement: string = '';
         let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
-          indexOf(captureGroup);
+          indexOf(targetCaptureGroup);
+        let targetCaptureGroupPath: string = targetCaptureGroup.split(/\s+/,
+          1)[0];
         if ((index > 0) && (originalString.charAt(index - 1) === '!')) {
           let dataUrl: string = 'data:image/';
           if (request.parameters.pathBase) {
             if (request.parameters.pathBase.startsWith('http')) {
               try {
                 let imageUrl: string;
-                if (/^https?:\/\//.test(captureGroup)) {
-                  imageUrl = captureGroup;
+                if (/^https?:\/\//.test(targetCaptureGroupPath)) {
+                  imageUrl = targetCaptureGroupPath;
                 } else {
-                  imageUrl = request.parameters.pathBase + captureGroup;
+                  imageUrl = request.parameters.pathBase +
+                    targetCaptureGroupPath;
                 }
                 let response: any = await Fetch(imageUrl);
                 if (response.ok) {
@@ -664,7 +677,8 @@ function KIOItemServer(socket){
                     substring(type.indexOf('/') + 1) + ';base64,' +
                     (await response.buffer()).toString('base64') +
                     matchedSubstring.substring(
-                    matchedSubstringCaptureGroupIndex + captureGroup.length);
+                    matchedSubstringCaptureGroupIndex + targetCaptureGroupPath.
+                      length);
                 }
               } catch (error) {
                 console.log(error);
@@ -672,12 +686,12 @@ function KIOItemServer(socket){
             }
           } else {
             let imagePath: string = Path.resolve(mediaDirectoryPath,
-              captureGroup);
+              targetCaptureGroupPath);
             if (fs.existsSync(imagePath)) {
-              if (captureGroup.endsWith('.png')) {
+              if (targetCaptureGroupPath.endsWith('.png')) {
                 dataUrl += 'png';
-              } else if (captureGroup.endsWith('.jpg') || captureGroup.
-                endsWith('.jpeg')) {
+              } else if (targetCaptureGroupPath.endsWith('.jpg') ||
+                targetCaptureGroupPath.endsWith('.jpeg')) {
                 dataUrl += 'jpeg';
               }
               
@@ -686,20 +700,21 @@ function KIOItemServer(socket){
               replacement = matchedSubstring.substring(0,
                 matchedSubstringCaptureGroupIndex) + dataUrl +
                 matchedSubstring.substring(matchedSubstringCaptureGroupIndex +
-                captureGroup.length);
+                targetCaptureGroupPath.length);
             } else {
               replacement = matchedSubstring;
             }
           }
         } else {
-          if (/^https?:\/\//.test(captureGroup) || captureGroup.startsWith(
-            'javascript:')) {
+          if (/^https?:\/\//.test(targetCaptureGroupPath) ||
+            targetCaptureGroupPath.startsWith('javascript:')) {
             replacement = matchedSubstring;
           } else {
             replacement = matchedSubstring.substring(0,
               matchedSubstringCaptureGroupIndex) + request.parameters.
-              pathBase + captureGroup + matchedSubstring.substring(
-              matchedSubstringCaptureGroupIndex + captureGroup.length);
+              pathBase + targetCaptureGroupPath + matchedSubstring.substring(
+              matchedSubstringCaptureGroupIndex + targetCaptureGroupPath.
+              length);
           }
         }
           
