@@ -4,6 +4,7 @@ const StringReplaceAsync = require('string-replace-async');
 import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
+const MdToKohese = require('./md-to-kohese');
 
 var kio = require('./koheseIO');
 var kdb = require('./kdb');
@@ -591,8 +592,8 @@ function KIOItemServer(socket){
     } else {
       let format: string;
       let temporaryFileName: string = String(new Date().getTime());
-      let temporaryDirectoryPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH,
-        temporaryFileName);
+      let temporaryDirectoryPath: string = Path.resolve(fs.realpathSync(
+        __dirname), temporaryFileName);
       fs.mkdirSync(temporaryDirectoryPath);
       let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
         temporaryFileName);
@@ -640,81 +641,41 @@ function KIOItemServer(socket){
           - '\s\S' is used instead of '.' to handle line breaks since the 's'
             flag was unrecognized as of 2019-07-08.
           - This regular expression is intended to handle images embedded in
-            links. It is assumed that in the case of an image embedded in a
-            link, the image is matched first (and the image path captured), and
-            then the link is matched (and the link target captured).
+            links.
       */
       preview = await StringReplaceAsync(preview,
-        /\[(?:!\[[\s\S]*?\]\([\s\S]+?\))|[\s\S]*?\]\(([\s\S]+?)\)/g,
-        async (matchedSubstring: string, targetCaptureGroup: string, index:
-        number, originalString: string) => {
+        /\[(?:!\[[\s\S]*?\]\(([\s\S]+?)\)|[\s\S]*?)\]\(([\s\S]+?)\)/g,
+        async (matchedSubstring: string, embeddedImageCaptureGroup: string,
+        targetCaptureGroup: string, index: number, originalString: string) => {
         let replacement: string = '';
-        let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
-          indexOf(targetCaptureGroup);
-        let targetCaptureGroupPath: string = targetCaptureGroup.split(/\s+/,
-          1)[0];
         if ((index > 0) && (originalString.charAt(index - 1) === '!')) {
-          let dataUrl: string = 'data:image/';
-          if (request.parameters.pathBase) {
-            if (request.parameters.pathBase.startsWith('http')) {
-              try {
-                let imageUrl: string;
-                if (/^https?:\/\//.test(targetCaptureGroupPath)) {
-                  imageUrl = targetCaptureGroupPath;
-                } else {
-                  imageUrl = request.parameters.pathBase +
-                    targetCaptureGroupPath;
-                }
-                let response: any = await Fetch(imageUrl);
-                if (response.ok) {
-                  let contentType: string = response.headers.get(
-                    'Content-Type');
-                  let type: string = ((contentType.indexOf(';') !== -1) ?
-                    contentType.substring(0, contentType.indexOf(';')) :
-                    contentType);
-                  replacement = matchedSubstring.substring(0,
-                    matchedSubstringCaptureGroupIndex) + dataUrl + type.
-                    substring(type.indexOf('/') + 1) + ';base64,' +
-                    (await response.buffer()).toString('base64') +
-                    matchedSubstring.substring(
-                    matchedSubstringCaptureGroupIndex + targetCaptureGroupPath.
-                      length);
-                }
-              } catch (error) {
-                console.log(error);
-              }
-            }
-          } else {
-            let imagePath: string = Path.resolve(mediaDirectoryPath,
-              targetCaptureGroupPath);
-            if (fs.existsSync(imagePath)) {
-              if (targetCaptureGroupPath.endsWith('.png')) {
-                dataUrl += 'png';
-              } else if (targetCaptureGroupPath.endsWith('.jpg') ||
-                targetCaptureGroupPath.endsWith('.jpeg')) {
-                dataUrl += 'jpeg';
-              }
-              
-              dataUrl += ';base64,';
-              dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
-              replacement = matchedSubstring.substring(0,
-                matchedSubstringCaptureGroupIndex) + dataUrl +
-                matchedSubstring.substring(matchedSubstringCaptureGroupIndex +
-                targetCaptureGroupPath.length);
-            } else {
-              replacement = matchedSubstring;
-            }
-          }
+          replacement = await embedImage(matchedSubstring, targetCaptureGroup,
+            request.parameters.pathBase, mediaDirectoryPath);
         } else {
-          if (/^https?:\/\//.test(targetCaptureGroupPath) ||
-            targetCaptureGroupPath.startsWith('javascript:')) {
-            replacement = matchedSubstring;
+          replacement = matchedSubstring;
+          if (embeddedImageCaptureGroup) {
+            replacement = await embedImage(matchedSubstring,
+              embeddedImageCaptureGroup, request.parameters.pathBase,
+              mediaDirectoryPath);
+            if (!/^https?:\/\//.test(targetCaptureGroup) &&
+              !targetCaptureGroup.startsWith('javascript:')) {
+              let replacementCaptureGroupIndex: number = replacement.indexOf(
+                targetCaptureGroup);
+              replacement = replacement.substring(0,
+                replacementCaptureGroupIndex) + request.parameters.pathBase +
+                targetCaptureGroup + replacement.substring(
+                replacementCaptureGroupIndex + targetCaptureGroup.length);
+            }
           } else {
-            replacement = matchedSubstring.substring(0,
-              matchedSubstringCaptureGroupIndex) + request.parameters.
-              pathBase + targetCaptureGroupPath + matchedSubstring.substring(
-              matchedSubstringCaptureGroupIndex + targetCaptureGroupPath.
-              length);
+            if (!/^https?:\/\//.test(targetCaptureGroup) &&
+              !targetCaptureGroup.startsWith('javascript:')) {
+              let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+                indexOf(targetCaptureGroup);
+              replacement = matchedSubstring.substring(0,
+                matchedSubstringCaptureGroupIndex) + request.parameters.
+                pathBase + targetCaptureGroup + matchedSubstring.substring(
+                matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
+            }
           }
         }
           
@@ -725,7 +686,8 @@ function KIOItemServer(socket){
         let directoryContents: Array<string> = fs.readdirSync(
           mediaDirectoryPath);
         for (let j: number = 0; j < directoryContents.length; j++) {
-          fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[j]));
+          fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[
+            j]));
         }
         fs.rmdirSync(mediaDirectoryPath);
       }
@@ -737,17 +699,11 @@ function KIOItemServer(socket){
   });
   
   socket.on('importMarkdown', (request: any, respond: Function) => {
-    let temporaryDirectoryPath: string = Path.resolve(Path.dirname(Path.
-      dirname(fs.realpathSync(__dirname))), 'data_import', String(new Date().
-      getTime()));
-    fs.mkdirSync(temporaryDirectoryPath, { recursive: true });
-    let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
-      request.fileName + '.md');
-    fs.writeFileSync(temporaryFilePath, request.markdown, undefined);
-    importer.importFiles(socket.koheseUser.username, [temporaryFilePath],
-      request.parentId);
-    fs.unlinkSync(temporaryFilePath);
-    fs.rmdirSync(temporaryDirectoryPath);
+    MdToKohese.convertMarkdownToItems(request.markdown, {
+      name: request.fileName,
+      parentId: request.parentId,
+      itemIds: []
+    }, true);
     respond();
   });
 
@@ -1178,6 +1134,57 @@ function KIOItemServer(socket){
       sendResponse({err:err});
     }
   });
+}
+
+async function embedImage(matchSource: string, match: string, pathBase:
+  string, mediaDirectoryPath: string): Promise<string> {
+  let replacement: string = '';
+  let dataUrl: string = 'data:image/';
+  // To-do: handle the match being present in the square brackets
+  let matchSourceIndex: number = matchSource.indexOf(match);
+  let imagePath: string = match.split(/\s+/, 1)[0];
+  if (pathBase) {
+    if (pathBase.startsWith('http')) {
+      try {
+        let imageUrl: string;
+        if (/^https?:\/\//.test(imagePath)) {
+          imageUrl = imagePath;
+        } else {
+          imageUrl = pathBase + imagePath;
+        }
+        let response: any = await Fetch(imageUrl);
+        if (response.ok) {
+          let contentType: string = response.headers.get('Content-Type');
+          let type: string = ((contentType.indexOf(';') !== -1) ? contentType.
+            substring(0, contentType.indexOf(';')) : contentType);
+          replacement = matchSource.substring(0, matchSourceIndex) + dataUrl +
+            type.substring(type.indexOf('/') + 1) + ';base64,' +
+            (await response.buffer()).toString('base64') + matchSource.
+            substring(matchSourceIndex + imagePath.length);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  } else {
+    let mediaPath: string = Path.resolve(mediaDirectoryPath, imagePath);
+    if (fs.existsSync(mediaPath)) {
+      if (mediaPath.endsWith('.png')) {
+        dataUrl += 'png';
+      } else if (mediaPath.endsWith('.jpg') || mediaPath.endsWith('.jpeg')) {
+        dataUrl += 'jpeg';
+      }
+      
+      dataUrl += ';base64,';
+      dataUrl += fs.readFileSync(mediaPath, { encoding: 'base64' });
+      replacement = matchSource.substring(0, matchSourceIndex) + dataUrl +
+        matchSource.substring(matchSourceIndex + imagePath.length);
+    } else {
+      replacement = matchSource;
+    }
+  }
+  
+  return replacement;
 }
 
 function updateStatus(proxies) {
