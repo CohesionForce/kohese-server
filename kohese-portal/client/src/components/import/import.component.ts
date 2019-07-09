@@ -16,7 +16,7 @@ enum SupportedTypes {
     'document', DOC = 'application/msword', ODT = 'application/vnd.oasis.' +
     'opendocument.text', PDF = 'application/pdf', HTML = 'text/html', RTF =
     'application/rtf', TXT = 'text/plain', JPEG = 'image/jpeg', PNG =
-    'image/png', Markdown = 'text/markdown'
+    'image/png'//, Markdown = 'text/markdown'
 }
 
 class FileMapValue {
@@ -181,8 +181,8 @@ export class ImportComponent implements OnInit {
           };
           fileReader.readAsDataURL(file);
         });
-      } else if ((file.type === SupportedTypes.TXT) || (file.type ===
-        SupportedTypes.Markdown)) {
+      } else if (file.type === SupportedTypes.TXT)/* || (file.type ===
+        SupportedTypes.Markdown))*/ {
         fileMapValue.preview = await new Promise<string>((resolve: (content:
           string) => void, reject: () => void) => {
           let fileReader: FileReader = new FileReader();
