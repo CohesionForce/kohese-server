@@ -16,7 +16,6 @@ export class UploadImageComponent {
   selectedParent: ItemProxy;
   itemType: KoheseType;
 
-
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private itemRepository: ItemRepository,
     private uploadService: UploadService,
