@@ -16,10 +16,6 @@ export class UploadImageComponent {
   selectedParent: ItemProxy;
   itemType: KoheseType;
 
-  private _isDisabled: boolean = true;
-  get isDisabled() {
-    return this._isDisabled;
-  }
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private itemRepository: ItemRepository,
@@ -52,6 +48,5 @@ export class UploadImageComponent {
 
   public onParentSelected(newParent): void {
     this.selectedParent = newParent;
-    this._isDisabled = false;
   }
 }

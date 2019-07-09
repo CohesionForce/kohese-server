@@ -19,8 +19,8 @@
       <button mat-raised-button [mat-dialog-close]="0">
         Cancel
       </button>
-      <div matTooltip="Select A Parent" [matTooltipDisabled]="!isDisabled">
-        <button mat-raised-button [mat-dialog-close]="1" mat-button [disabled]="isDisabled"
+      <div matTooltip="Select A Parent" [matTooltipDisabled]="!!selectedParent">
+        <button mat-raised-button [mat-dialog-close]="1" [disabled]="!selectedParent"
           (click)="uploadFile(fileInput)">
           Upload
         </button>
