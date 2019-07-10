@@ -644,7 +644,7 @@ function KIOItemServer(socket){
             links.
       */
       preview = await StringReplaceAsync(preview,
-        /\[(?:!\[[\s\S]*?\]\(([\s\S]+?)\)|[\s\S]*?)\]\(([\s\S]+?)\)/g,
+        /\[(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?)\]\(([\s\S]+?)\)/g,
         async (matchedSubstring: string, embeddedImageCaptureGroup: string,
         targetCaptureGroup: string, index: number, originalString: string) => {
         let replacement: string = '';
