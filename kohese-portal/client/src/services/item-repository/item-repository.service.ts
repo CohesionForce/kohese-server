@@ -700,6 +700,11 @@ export class ItemRepository {
     return promise;
   }
   
+  public async getUrlContent(url: string): Promise<any> {
+    return (await this.sendMessageToWorker('getUrlContent', { url: url },
+      true)).data;
+  }
+  
   public getImportPreview(file: File, parameters: any): Promise<string> {
     return new Promise<string>((resolve: (preview: string) => void, reject:
       () => void) => {
@@ -707,7 +712,7 @@ export class ItemRepository {
       fileReader.onload = async () => {
         resolve((await this.sendMessageToWorker('getImportPreview', {
           file: fileReader.result,
-          extension: file.name.substring(file.name.lastIndexOf('.')),
+          type: file.type,
           parameters: parameters
         }, true)).data);
       };

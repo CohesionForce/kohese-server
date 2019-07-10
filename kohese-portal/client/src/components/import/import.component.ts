@@ -11,9 +11,12 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ParameterSpecifierComponent } from './parameter-specifier/parameter-specifier.component';
 import { PdfImportParameters } from '../../classes/PdfImportParameters.class';
 
-enum SupportedExtensions {
-  DOCX = '.docx', DOC = '.doc', ODT = '.odt', HTM = '.htm', HTML = '.html',
-    RTF = '.rtf', PDF = '.pdf', MARKDOWN = '.md'
+enum SupportedTypes {
+  DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.' +
+    'document', DOC = 'application/msword', ODT = 'application/vnd.oasis.' +
+    'opendocument.text', PDF = 'application/pdf', HTML = 'text/html', RTF =
+    'application/rtf', TXT = 'text/plain', JPEG = 'image/jpeg', PNG =
+    'image/png'//, Markdown = 'text/markdown'
 }
 
 class FileMapValue {
@@ -29,6 +32,14 @@ class FileMapValue {
   }
   set parameters(parameters: any) {
     this._parameters = parameters;
+  }
+  
+  private _expanded: boolean = false;
+  get expanded() {
+    return this._expanded;
+  }
+  set expanded(expanded: boolean) {
+    this._expanded = expanded;
   }
 
   public constructor(private _preview: string, private _parameters: any) {
@@ -69,8 +80,8 @@ export class ImportComponent implements OnInit {
     return Array;
   }
   
-  get SupportedExtensions() {
-    return SupportedExtensions;
+  get SupportedTypes() {
+    return SupportedTypes;
   }
   
   get TreeConfiguration() {
@@ -111,11 +122,9 @@ export class ImportComponent implements OnInit {
   
   public addFiles(files: Array<File>): void {
     for (let j: number = 0; j < files.length; j++) {
-      let extension: string = files[j].name.substring(files[j].name.
-        lastIndexOf('.'));
-      if (Object.values(SupportedExtensions).indexOf(extension) !== -1) {
-        let parameters: any ;
-        if (extension === '.pdf') {
+      if (Object.values(SupportedTypes).indexOf(files[j].type) !== -1) {
+        let parameters: any;
+        if (files[j].type === SupportedTypes.PDF) {
           parameters = new PdfImportParameters();
         } else {
           parameters = {};
@@ -128,10 +137,52 @@ export class ImportComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
   
+  public async retrieveUrlContent(url: string): Promise<void> {
+    if (!/^https?:\/\//.test(url)) {
+      url = 'http://' + url;
+    }
+    let contentObject: any = await this._itemRepository.getUrlContent(url);
+    let file: File = new File([contentObject.content], url, {
+      type: ((contentObject.contentType.indexOf(';') !== -1) ? contentObject.
+        contentType.substring(0, contentObject.contentType.indexOf(';')) :
+        contentObject.contentType)
+    });
+    
+    if (Object.values(SupportedTypes).indexOf(file.type) !== -1) {
+      let parameters: any;
+      if (file.type === SupportedTypes.PDF) {
+        parameters = new PdfImportParameters();
+      } else {
+        parameters = {};
+      }
+      
+      let slashIndex: number = url.indexOf('/', url.indexOf('://') + 3);
+      if (slashIndex !== -1) {
+        parameters.pathBase = url.substring(0, slashIndex + 1);
+      } else {
+        parameters.pathBase = url + '/';
+      }
+      
+      this._selectedFileMap.set(file, new FileMapValue('', parameters));
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+  
   public async retrieveImportPreview(file: File): Promise<string> {
     let fileMapValue: FileMapValue = this._selectedFileMap.get(file);
     if (fileMapValue.preview.length === 0) {
-      if (file.name.endsWith(SupportedExtensions.MARKDOWN)) {
+      if ((file.type === SupportedTypes.JPEG) || (file.type === SupportedTypes.
+        PNG)) {
+        fileMapValue.preview = await new Promise<string>((resolve: (content:
+          string) => void, reject: () => void) => {
+          let fileReader: FileReader = new FileReader();
+          fileReader.onload = () => {
+            resolve('![' + file.name + '](' + fileReader.result + ')');
+          };
+          fileReader.readAsDataURL(file);
+        });
+      } else if (file.type === SupportedTypes.TXT)/* || (file.type ===
+        SupportedTypes.Markdown))*/ {
         fileMapValue.preview = await new Promise<string>((resolve: (content:
           string) => void, reject: () => void) => {
           let fileReader: FileReader = new FileReader();
@@ -144,12 +195,10 @@ export class ImportComponent implements OnInit {
         fileMapValue.preview = await this._itemRepository.getImportPreview(
           file, fileMapValue.parameters);
       }
-      
-      this._changeDetectorRef.markForCheck();
-      return fileMapValue.preview;
-    } else {
-      return Promise.resolve(fileMapValue.preview);
     }
+    
+    this._changeDetectorRef.markForCheck();
+    return fileMapValue.preview;
   }
   
   public openParameterSpecifier(file: File): void {
@@ -163,6 +212,44 @@ export class ImportComponent implements OnInit {
         this.updatePreviews();
       }
     });
+  }
+  
+  public async updateFile(file: File): Promise<void> {
+    let fileMapValue: FileMapValue = this._selectedFileMap.get(file);
+    if (/^https?:\/\//.test(file.name)) {
+      let insertionIndex: number = Array.from(this._selectedFileMap.
+        keys()).indexOf(file);
+      let temporaryMap: Map<File, any> = new Map<File, any>();
+      this._selectedFileMap.delete(file);
+      let selectedFiles: Array<File> = Array.from(this._selectedFileMap.
+        keys());
+      for (let j: number = 0; j < selectedFiles.length; j++) {
+        temporaryMap.set(selectedFiles[j], this._selectedFileMap.get(
+          selectedFiles[j]));
+      }
+      this._selectedFileMap.clear();
+      for (let j: number = 0; j < insertionIndex; j++) {
+        this._selectedFileMap.set(selectedFiles[j], temporaryMap.get(
+          selectedFiles[j]));
+      }
+      
+      let contentObject: any = await this._itemRepository.getUrlContent(file.
+        name);
+      file = new File([contentObject.content], file.name, {
+        type: ((contentObject.contentType.indexOf(';') !== -1) ? contentObject.
+          contentType.substring(0, contentObject.contentType.indexOf(';')) :
+          contentObject.contentType)
+      });
+      this._selectedFileMap.set(file, fileMapValue);
+      
+      for (let j: number = insertionIndex; j < selectedFiles.length; j++) {
+        this._selectedFileMap.set(selectedFiles[j], temporaryMap.get(
+          selectedFiles[j]));
+      }
+    }
+    
+    fileMapValue.preview = '';
+    this.retrieveImportPreview(file);
   }
   
   public removeFile(file: File): void {

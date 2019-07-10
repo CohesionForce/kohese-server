@@ -4,10 +4,7 @@
  *  commonmark.c to determine proper conversion.
  */
 
-import * as Fs from 'fs';
-import * as Path from 'path';
-
-var Render = function(path: string) {
+var Render = function() {
 
        // Need to ignore underscores in identifiers
        // jshint -W106
@@ -63,27 +60,15 @@ var Render = function(path: string) {
                  if (entering) {
                    this.buffer += '![';
                  } else {
-                   let srcPath: string = Path.resolve(Path.dirname(path), node.
-                     destination);
-                   if (srcPath.endsWith('.png') || srcPath.endsWith('.jpg') ||
-                     srcPath.endsWith('.jpeg')) {
-                     let srcValue: string = 'data:image/';
-                     if (srcPath.endsWith('.png')) {
-                       srcValue += 'png';
-                     } else if (srcPath.endsWith('.jpg') || srcPath.endsWith(
-                       '.jpeg')) {
-                       srcValue += 'jpeg';
-                     }
-                     
-                     srcValue += ';base64,';
-                     srcValue += Fs.readFileSync(srcPath,
-                       { encoding: 'base64' });
+                   if (node.destination.startsWith('data:image/')) {
+                     this.buffer += '](' + node.destination;
                      if (node.title) {
-                       this.buffer += '](' + srcValue + ' "' + node.title +
-                         '")';
+                       this.buffer += ' "' + node.title + '")';
                      } else {
-                       this.buffer += '](' + srcValue + ')';
+                       this.buffer += ')';
                      }
+                   } else {
+                     this.buffer += ']()';
                    }
                  }
                },

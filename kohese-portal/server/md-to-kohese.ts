@@ -8,20 +8,24 @@ var commonmark = require('commonmark');
 var renderFunc = require('./md-to-kohese-helper');
 import { ItemProxy } from '../common/src/item-proxy';
 
-function mdToKohese(koheseUserName, filePath, rootItem, preambleRequired) {
-  var text;
-
+function mdToKohese(filePath: string, parent: any, producePreamble: boolean):
+  Array<any> {
   try {
-    text = fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
+    return convertMarkdownToItems(fs.readFileSync(filePath, 'utf8'), parent,
+      producePreamble);
   } catch(err) {
     console.log('Error reading input file ' + filePath);
-    return;
+    return [];
   }
+}
+module.exports.mdToKohese = mdToKohese;
 
-  var parsed = new commonmark.Parser().parse(text);
+function convertMarkdownToItems(markdown: string, parent: any, producePreamble:
+  boolean): Array<any> {
+  var parsed = new commonmark.Parser().parse(markdown);
   var walker = parsed.walker();
 
-  var item = new ItemProxy('Item',rootItem).item;
+  var item = new ItemProxy('Item', parent).item;
 
   var addedIds = [{
     id: item.id,
@@ -35,14 +39,15 @@ function mdToKohese(koheseUserName, filePath, rootItem, preambleRequired) {
   var itemMap = {};
   itemMap[item.id] = item;
 
-  var render = renderFunc(filePath);
+  var render = renderFunc();
   var event = walker.next();
   while(event) {
     // console.log('Event: ' + event.node.type + ' Entering: ' + event.entering);
     if(event.entering && event.node.type === 'document') {
       event = walker.next();
       // Check if document begins with heading. If not, make an item.
-      if(!(event.entering && event.node.type === 'heading') && preambleRequired) {
+      if(!(event.entering && event.node.type === 'heading') &&
+        producePreamble) {
         koheseItem = {
             name: 'Preamble',
             description: '',
@@ -61,15 +66,15 @@ function mdToKohese(koheseUserName, filePath, rootItem, preambleRequired) {
       }
 
       // Handle increasing jumps in level that are greater than one
-      var parent = undefined;
-      for (var i = event.node.level - 1; !parent && (i >= 0); i--) {
-        parent = lineage[i];
+      var parentId = undefined;
+      for (var i = event.node.level - 1; !parentId && (i >= 0); i--) {
+        parentId = lineage[i];
       }
 
       koheseItem = {
           name: '',
           description: '',
-          parentId: parent,
+          parentId: parentId,
           itemIds: [],
           tmpId: ++tmpIdCounter
       };
@@ -116,7 +121,7 @@ function mdToKohese(koheseUserName, filePath, rootItem, preambleRequired) {
 
   return addedIds;
 }
-module.exports = mdToKohese;
+module.exports.convertMarkdownToItems = convertMarkdownToItems;
 
 function upsert(koheseItem, render, idList, lineageMap, itemMap) {
   koheseItem.description = render.getBuffer();

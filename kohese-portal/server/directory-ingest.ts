@@ -64,12 +64,6 @@ function processToMarkdown(filePath, basePath) {
   var docType = path.ext.toLowerCase();
 
   switch (docType) {
-  case '.md':
-    // No Processing needed, but do need to copy
-    console.log('::: Copying existing md file');
-    // eslint-disable-next-line no-unused-vars
-    var cpy = child.spawnSync('cp', [pathDirBase, mdOutPath], { cwd: basePath, encoding : 'utf8' });
-    break;
   case '.jpeg':
   case '.jpg':
     // No Processing needed, but do need to copy
@@ -129,7 +123,8 @@ function process(koheseUserName, file, parent, addedIds) {
         parentId: parent,
         itemIds: []
       };
-      var added = mdToKohese(koheseUserName, processedFile.outputPath, mdRoot, preambleRequired);
+      var added = mdToKohese(processedFile.outputPath, mdRoot,
+        preambleRequired);
       for (var j = 0; j < added.length; j++) {
         addedIds.push(added[j]);
       }
