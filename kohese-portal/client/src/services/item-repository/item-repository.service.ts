@@ -700,6 +700,15 @@ export class ItemRepository {
     return promise;
   }
   
+  public async convertToMarkdown(content: string, contentType: string,
+    parameters: any): Promise<string> {
+    return (await this.sendMessageToWorker('convertToMarkdown', {
+      content: content,
+      contentType: contentType,
+      parameters: parameters
+    }, true)).data;
+  }
+  
   public async getUrlContent(url: string): Promise<any> {
     return (await this.sendMessageToWorker('getUrlContent', { url: url },
       true)).data;
@@ -710,11 +719,8 @@ export class ItemRepository {
       () => void) => {
       let fileReader: FileReader = new FileReader();
       fileReader.onload = async () => {
-        resolve((await this.sendMessageToWorker('getImportPreview', {
-          file: fileReader.result,
-          type: file.type,
-          parameters: parameters
-        }, true)).data);
+        resolve(await this.convertToMarkdown(fileReader.result, file.type,
+          parameters));
       };
       
       fileReader.readAsArrayBuffer(file);
