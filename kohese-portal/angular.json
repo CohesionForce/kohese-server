@@ -21,7 +21,22 @@
             "assets": [
               "client/favicon.ico",
               "client/assets",
-              "client/manifest.json"
+              "client/manifest.json",
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce/skins",
+                "output": "/tinymce/skins/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce/themes",
+                "output": "/tinymce/themes/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce/plugins",
+                "output": "/tinymce/plugins/"
+              }
             ],
             "styles": [
               "./client/css/index.css",
@@ -30,7 +45,8 @@
               "./node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [
-              "./build/client/cache-worker/cache-bundle.js"
+              "./build/client/cache-worker/cache-bundle.js",
+              "./node_modules/tinymce/tinymce.min.js"
             ]
           },
           "configurations": {

@@ -34,12 +34,14 @@ import { VersionsModule } from './components/versions/versions.module';
 import { ReportGeneratorModule } from './components/report-generator/report-generator.module';
 import { ReportsModule } from './components/reports/reports.module';
 import { ImportModule } from './components/import/import.module';
+import { TextEditorModule } from './components/text-editor/text-editor.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
+import { EditorModule } from '@tinymce/tinymce-angular';
 
 import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
@@ -80,6 +82,7 @@ import { LensModule } from './components/lens/lens.module';
       }
     }),
     InfiniteScrollModule,
+    EditorModule,
     PipesModule,
     MaterialModule,
     AngularSplitModule,
@@ -109,7 +112,8 @@ import { LensModule } from './components/lens/lens.module';
     ReportGeneratorModule,
     ReportsModule,
     NoopAnimationsModule,
-    ImportModule
+    ImportModule,
+    TextEditorModule
   ],
   bootstrap: [AppComponent]
 })

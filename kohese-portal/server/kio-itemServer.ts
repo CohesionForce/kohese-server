@@ -542,9 +542,10 @@ function KIOItemServer(socket){
     }
   });
   
-  socket.on('getImportPreview', async (request: any, respond: Function) => {
-    let parameterlessType: string = ((request.type.indexOf(';') !== -1) ?
-      request.type.substring(0, request.type.indexOf(';')) : request.type);
+  socket.on('convertToMarkdown', async (request: any, respond: Function) => {
+    let parameterlessType: string = ((request.contentType.indexOf(';') !==
+      -1) ? request.contentType.substring(0, request.contentType.indexOf(
+      ';')) : request.contentType);
     if (parameterlessType === 'application/pdf') {
       let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
         dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',
@@ -587,7 +588,7 @@ function KIOItemServer(socket){
       }
       
       let pdfConversionProcess: any = child.spawnSync('java', parameters,
-        { input: request.file });
+        { input: request.content });
       respond(pdfConversionProcess.stdout.toString());
     } else {
       let format: string;
@@ -598,7 +599,7 @@ function KIOItemServer(socket){
       let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
         temporaryFileName);
       let mediaDirectoryPath: string;
-      fs.writeFileSync(temporaryFilePath, request.file);
+      fs.writeFileSync(temporaryFilePath, request.content);
       switch (parameterlessType) {
         case 'application/vnd.openxmlformats-officedocument.' +
           'wordprocessingml.document':
@@ -625,7 +626,7 @@ function KIOItemServer(socket){
           format = 'odt';
           break;
         default:
-          mediaDirectoryPath = Path.resolve(temporaryDirectoryPath, 'media');
+          mediaDirectoryPath = temporaryDirectoryPath;
           format = 'html';
       }
       
@@ -644,7 +645,7 @@ function KIOItemServer(socket){
             links.
       */
       preview = await StringReplaceAsync(preview,
-        /\[(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?)\]\(([\s\S]+?)\)/g,
+        /\[(?:(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?))\]\(([\s\S]+?)\)/g,
         async (matchedSubstring: string, embeddedImageCaptureGroup: string,
         targetCaptureGroup: string, index: number, originalString: string) => {
         let replacement: string = '';
@@ -678,7 +679,7 @@ function KIOItemServer(socket){
             }
           }
         }
-          
+        
         return replacement;
       });
       
@@ -689,7 +690,10 @@ function KIOItemServer(socket){
           fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[
             j]));
         }
-        fs.rmdirSync(mediaDirectoryPath);
+        
+        if (mediaDirectoryPath !== temporaryDirectoryPath) {
+          fs.rmdirSync(mediaDirectoryPath);
+        }
       }
       
       fs.rmdirSync(temporaryDirectoryPath);
