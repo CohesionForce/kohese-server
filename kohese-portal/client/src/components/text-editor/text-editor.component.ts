@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { MarkdownService } from 'ngx-markdown';
+import { ToastrService } from 'ngx-toastr';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
@@ -59,7 +60,8 @@ export class TextEditorComponent implements OnInit {
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
     private _markdownService: MarkdownService, private _itemRepository:
     ItemRepository, private _dialogService: DialogService,
-    private _sessionService: SessionService) {
+    private _sessionService: SessionService, private _toastrService:
+    ToastrService) {
   }
   
   public ngOnInit(): void {
@@ -140,6 +142,9 @@ export class TextEditorComponent implements OnInit {
                       await componentThis._itemRepository.removeReport(
                         reportSpecifications.name);
                     }
+                    
+                    componentThis._toastrService.success(reportSpecifications.
+                      name, 'Report Produced');
                   }
                 });
               } else {
@@ -155,6 +160,9 @@ export class TextEditorComponent implements OnInit {
                   await componentThis._itemRepository.removeReport(
                     reportSpecifications.name);
                 }
+                
+                componentThis._toastrService.success(reportSpecifications.name,
+                  'Report Produced');
               }
             });
           }

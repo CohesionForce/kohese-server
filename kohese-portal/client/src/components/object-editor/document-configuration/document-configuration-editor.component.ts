@@ -9,6 +9,10 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../tree/tree.component';
 
+enum MoveDirection {
+  UP, DOWN
+}
+
 @Component({
   selector: 'document-configuration-editor',
   templateUrl: './document-configuration-editor.component.html',
@@ -36,6 +40,10 @@ export class DocumentConfigurationEditorComponent implements OnInit {
   
   get TreeConfiguration() {
     return TreeConfiguration;
+  }
+  
+  get MoveDirection() {
+    return MoveDirection;
   }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
@@ -137,6 +145,39 @@ export class DocumentConfigurationEditorComponent implements OnInit {
       
       this._changeDetectorRef.markForCheck();
     });
+  }
+  
+  public canMove(moveDirection: MoveDirection, componentId: string): boolean {
+    let componentIds: Array<string> = Object.keys(this._copy.components);
+    if (moveDirection === MoveDirection.UP) {
+      return (componentIds.indexOf(componentId) !== 0);
+    } else {
+      return (componentIds.indexOf(componentId) !== (componentIds.length - 1));
+    }
+  }
+  
+  public move(moveDirection: MoveDirection, componentId: string): void {
+    let intermediateObject: any = {};
+    let componentIds: Array<string> = Object.keys(this._copy.components);
+    let candidateIndex: number = componentIds.indexOf(componentId);
+    componentIds.splice(candidateIndex, 1);
+    if (moveDirection === MoveDirection.UP) {
+      componentIds.splice(candidateIndex - 1, 0, componentId);
+    } else {
+      componentIds.splice(candidateIndex + 1, 0, componentId);
+    }
+    
+    for (let j: number = 0; j < componentIds.length; j++) {
+      intermediateObject[componentIds[j]] = this._copy.components[componentIds[
+        j]];
+      delete this._copy.components[componentIds[j]];
+    }
+    
+    for (let id in intermediateObject) {
+      this._copy.components[id] = intermediateObject[id];
+    }
+    
+    this._changeDetectorRef.markForCheck();
   }
   
   public removeSelection(componentId: string): void {

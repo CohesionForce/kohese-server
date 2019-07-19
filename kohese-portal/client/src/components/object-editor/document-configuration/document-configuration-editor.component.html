@@ -51,6 +51,16 @@
           [(ngModel)]="copy.components[componentId].includeDescendants">
           Include Descendants
         </mat-checkbox>
+        <button mat-icon-button matTooltip="Move this Item up"
+          [disabled]="!canMove(MoveDirection.UP, componentId)"
+          (click)="move(MoveDirection.UP, componentId)">
+          <mat-icon class="fa fa-arrow-up"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Move this Item down"
+          [disabled]="!canMove(MoveDirection.DOWN, componentId)"
+          (click)="move(MoveDirection.DOWN, componentId)">
+          <mat-icon class="fa fa-arrow-down"></mat-icon>
+        </button>
         <button mat-icon-button matTooltip="De-select this Item"
           (click)="removeSelection(componentId)">
           <mat-icon class="fa fa-times"></mat-icon>
