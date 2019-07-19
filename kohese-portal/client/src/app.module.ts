@@ -35,6 +35,7 @@ import { ReportGeneratorModule } from './components/report-generator/report-gene
 import { ReportsModule } from './components/reports/reports.module';
 import { ImportModule } from './components/import/import.module';
 import { TextEditorModule } from './components/text-editor/text-editor.module';
+import { DocumentModule } from './components/document/document.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
@@ -113,7 +114,8 @@ import { LensModule } from './components/lens/lens.module';
     ReportsModule,
     NoopAnimationsModule,
     ImportModule,
-    TextEditorModule
+    TextEditorModule,
+    DocumentModule
   ],
   bootstrap: [AppComponent]
 })

@@ -630,9 +630,18 @@ function KIOItemServer(socket){
           format = 'html';
       }
       
-      let pandocProcess: any = child.spawnSync('pandoc', ['-f', format, '-t',
-        'commonmark', '--atx-headers', '--extract-media',
-        temporaryDirectoryPath, '-s', temporaryFilePath], undefined);
+      let pandocParameters: Array<string> = ['-f', format, '-t', 'commonmark',
+        '--atx-headers', '-s'];
+      
+      if (format !== 'html') {
+        pandocParameters.push('--extract-media');
+        pandocParameters.push(temporaryDirectoryPath);
+      }
+      
+      pandocParameters.push(temporaryFilePath);
+      
+      let pandocProcess: any = child.spawnSync('pandoc', pandocParameters,
+        undefined);
       
       fs.unlinkSync(temporaryFilePath);
       
@@ -676,6 +685,8 @@ function KIOItemServer(socket){
                 matchedSubstringCaptureGroupIndex) + request.parameters.
                 pathBase + targetCaptureGroup + matchedSubstring.substring(
                 matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
+            } else {
+              replacement = '';
             }
           }
         }
@@ -717,21 +728,19 @@ function KIOItemServer(socket){
   socket.on('Item/generateReport', function(request, sendResponse) {
     let metaDataString: Array<string> = request.content.split('\n\n', 3);
     fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
-      reportName + request.format), metaDataString.join('\n\n'), undefined);
+      reportName), metaDataString.join('\n\n'), undefined);
     if (request.format === '.md') {
       fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.
-        reportName + request.format), request.content, undefined);
+        reportName), request.content, undefined);
     } else {
       let format: string;
       switch (request.format) {
-        case '.docx':
+        case 'application/vnd.openxmlformats-officedocument.' +
+          'wordprocessingml.document':
           format = 'docx';
           break;
-        case '.odt':
+        case 'application/vnd.oasis.opendocument.text':
           format = 'odt';
-          break;
-        case '.rtf':
-          format = 'rtf';
           break;
         default:
           format = 'html5';
@@ -739,7 +748,7 @@ function KIOItemServer(socket){
 
       let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'commonmark',
         '-t', format, '-s', '-o', Path.resolve(_REPORTS_DIRECTORY_PATH, request.
-        reportName + request.format)], { input: request.content });
+        reportName)], { input: request.content });
 
       if (pandocProcess.stdout) {
         console.log(pandocProcess.stdout);

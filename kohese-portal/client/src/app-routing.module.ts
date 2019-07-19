@@ -11,9 +11,9 @@ import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeEditorComponent } from './components/type-editor/type-editor.component';
 import { DevToolsComponent } from './components/admin/dev-tools/dev-tools.component';
-import { FullscreenDocumentComponent } from './components/document-view/fullscreen-document/fullscreen-document.component';
 import { ReportGeneratorComponent } from './components/report-generator/report-generator.component';
 import { ReportsComponent } from './components/reports/reports.component';
+import { DocumentComponent } from './components/document/document.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -26,7 +26,7 @@ const routes: Routes = [
   { path: 'analysis', component: AnalysisComponent },
   { path: 'typeeditor', component: TypeEditorComponent},
   { path: 'devtools', component: DevToolsComponent},
-  { path: 'document', component: FullscreenDocumentComponent},
+  { path: 'document', component: DocumentComponent },
   { path: 'report-gen', component: ReportGeneratorComponent},
   { path: 'reports', component: ReportsComponent }
 ]

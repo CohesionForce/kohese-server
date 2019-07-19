@@ -1,9 +1,11 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit } from '@angular/core';
+  Inject, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { MarkdownService } from 'ngx-markdown';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { ReportSpecificationComponent, ReportSpecifications } from './report-specification/report-specification.component';
 
 @Component({
   selector: 'text-editor',
@@ -16,6 +18,7 @@ export class TextEditorComponent implements OnInit {
   @Input('text')
   set text(text: string) {
     this._text = text;
+    this._html = this._markdownService.compile(this._text);
   }
   
   private _html: string;
@@ -32,19 +35,35 @@ export class TextEditorComponent implements OnInit {
     this._disabled = disabled;
   }
   
+  private _formatText: (text: string) => string = (text: string) => {
+    return text;
+  };
+  @Input('formatText')
+  set formatText(formatText: (text: string) => string) {
+    this._formatText = formatText;
+  }
+  
+  private _textModified: EventEmitter<string> = new EventEmitter<string>();
+  @Output('textModified')
+  get textModified() {
+    return this._textModified;
+  }
+  
+  get componentReference() {
+    return this;
+  }
+  
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
     private _markdownService: MarkdownService, private _itemRepository:
-    ItemRepository) {
+    ItemRepository, private _dialogService: DialogService) {
   }
   
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
-      this._text = this._data['text'];
+      this.text = this._data['text'];
     }
-    
-    this._html = this._markdownService.compile(this._text);
   }
   
   public isDialogInstance(): boolean {
@@ -76,8 +95,69 @@ export class TextEditorComponent implements OnInit {
     fileInput.click();
   }
   
+  public customizeEditor(editor: any): void {
+    /* Get a reference to TextEditorComponent.this, as 'this' currently
+    references TinyMCE's init object. */
+    let componentThis: TextEditorComponent = this.componentReference;
+    editor.ui.registry.addButton('export', {
+      text: 'Export',
+      disabled: !this._text,
+      onAction: (button: any) => {
+        componentThis._dialogService.openComponentDialog(
+          ReportSpecificationComponent, {
+          data: {}
+        }).updateSize('40%', '40%').afterClosed().subscribe(
+          (reportSpecifications: ReportSpecifications) => {
+          if (reportSpecifications) {
+            componentThis._itemRepository.getReportMetaData().then(
+              async (reportObjects: Array<any>) => {
+              if (reportObjects.map((reportObject: any) => {
+                return reportObject.name;
+              }).indexOf(reportSpecifications.name) !== -1) {
+                componentThis._dialogService.openYesNoDialog('Overwrite ' +
+                  reportSpecifications.name, 'A report named ' +
+                  reportSpecifications.name + ' already exists. Proceeding ' +
+                  'should overwrite that report. Do you want to proceed?').
+                  subscribe(async (result: any) => {
+                  if (result) {
+                    await componentThis._itemRepository.produceReport(
+                      componentThis._formatText(componentThis._text),
+                      reportSpecifications.name, reportSpecifications.format);
+                    if (!reportSpecifications.saveReport) {
+                      let downloadAnchor: any = document.createElement('a');
+                      downloadAnchor.download = reportSpecifications.name;
+                      downloadAnchor.href = '/producedReports/' +
+                        reportSpecifications.name;
+                      downloadAnchor.click();
+                      await componentThis._itemRepository.removeReport(
+                        reportSpecifications.name);
+                    }
+                  }
+                });
+              } else {
+                await componentThis._itemRepository.produceReport(
+                  componentThis._formatText(componentThis._text),
+                  reportSpecifications.name, reportSpecifications.format);
+                if (!reportSpecifications.saveReport) {
+                  let downloadAnchor: any = document.createElement('a');
+                  downloadAnchor.download = reportSpecifications.name;
+                  downloadAnchor.href = '/producedReports/' +
+                    reportSpecifications.name;
+                  downloadAnchor.click();
+                  await componentThis._itemRepository.removeReport(
+                    reportSpecifications.name);
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+  
   public async convertHtmlToMarkdown(html: string): Promise<void> {
     this._text = await this._itemRepository.convertToMarkdown(html,
       'text/html', {});
+    this._textModified.emit(this._text);
   }
 }

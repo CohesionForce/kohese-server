@@ -1,15 +1,29 @@
 <editor [ngModel]="html" (ngModelChange)="convertHtmlToMarkdown($event)"
-  [init]="{ branding: false, menubar: false, style_formats: [
-  { title: 'Paragraph', format: 'p' }, { title: 'Blockquote',
-  format: 'blockquote' }, { title: 'Heading 1', format: 'h1' },
-  { title: 'Heading 2', format: 'h2' }, { title: 'Heading 3', format: 'h3' },
-  { title: 'Heading 4', format: 'h4' }, { title: 'Heading 5', format: 'h5' },
-  { title: 'Heading 6', format: 'h6' }], image_title: true,
-  paste_data_images: true, file_picker_callback: openFileSelector,
-  file_picker_types: 'image' }"
-  plugins="lists hr link image table searchreplace wordcount paste"
+  plugins="lists hr link image table searchreplace wordcount paste charmap"
   toolbar="undo redo | styleselect | bold italic strikethrough |
   alignleft aligncenter alignright alignjustify |
-  bullist numlist outdent indent hr link image | table | searchreplace"
-  [disabled]="disabled">
+  bullist numlist outdent indent hr link image charmap | table |
+  searchreplace | export"
+  [disabled]="disabled" style="height: 100%;" [init]="{
+    componentReference: componentReference,
+    branding: false,
+    menubar: false,
+    style_formats: [
+      { title: 'Paragraph', format: 'p' },
+      { title: 'Blockquote', format: 'blockquote' },
+      { title: 'Heading 1', format: 'h1' },
+      { title: 'Heading 2', format: 'h2' },
+      { title: 'Heading 3', format: 'h3' },
+      { title: 'Heading 4', format: 'h4' },
+      { title: 'Heading 5', format: 'h5' },
+      { title: 'Heading 6', format: 'h6' }
+    ],
+    image_title: true,
+    paste_data_images: true,
+    file_picker_callback: openFileSelector,
+    file_picker_types: 'image',
+    elementpath: false,
+    content_style: '* { visibility: visible; }',
+    setup: customizeEditor
+  }">
 </editor>
