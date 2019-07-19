@@ -858,6 +858,8 @@ function KIOItemServer(socket){
 
   socket.on('removeReport', (request: any, respond: Function) => {
     fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName));
+    fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
+      reportName));
     respond();
   });
 

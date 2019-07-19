@@ -5,6 +5,7 @@ import { MarkdownService } from 'ngx-markdown';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
+import { SessionService } from '../../services/user/session.service';
 import { ReportSpecificationComponent, ReportSpecifications } from './report-specification/report-specification.component';
 
 @Component({
@@ -57,7 +58,8 @@ export class TextEditorComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
     private _markdownService: MarkdownService, private _itemRepository:
-    ItemRepository, private _dialogService: DialogService) {
+    ItemRepository, private _dialogService: DialogService,
+    private _sessionService: SessionService) {
   }
   
   public ngOnInit(): void {
@@ -105,12 +107,18 @@ export class TextEditorComponent implements OnInit {
       onAction: (button: any) => {
         componentThis._dialogService.openComponentDialog(
           ReportSpecificationComponent, {
-          data: {}
+          data: {},
+          disableClose: true
         }).updateSize('40%', '40%').afterClosed().subscribe(
           (reportSpecifications: ReportSpecifications) => {
           if (reportSpecifications) {
             componentThis._itemRepository.getReportMetaData().then(
               async (reportObjects: Array<any>) => {
+              let reportContent: string = 'Name: ' +
+                reportSpecifications.name + '\n\nProduced by: ' +
+                componentThis._sessionService.getSessionUser().getValue().item.
+                name + '\n\nProduced on: ' + new Date() + '\n\n' +
+                componentThis._formatText(componentThis._text);
               if (reportObjects.map((reportObject: any) => {
                 return reportObject.name;
               }).indexOf(reportSpecifications.name) !== -1) {
@@ -121,8 +129,8 @@ export class TextEditorComponent implements OnInit {
                   subscribe(async (result: any) => {
                   if (result) {
                     await componentThis._itemRepository.produceReport(
-                      componentThis._formatText(componentThis._text),
-                      reportSpecifications.name, reportSpecifications.format);
+                      reportContent, reportSpecifications.name,
+                      reportSpecifications.format);
                     if (!reportSpecifications.saveReport) {
                       let downloadAnchor: any = document.createElement('a');
                       downloadAnchor.download = reportSpecifications.name;
@@ -136,8 +144,8 @@ export class TextEditorComponent implements OnInit {
                 });
               } else {
                 await componentThis._itemRepository.produceReport(
-                  componentThis._formatText(componentThis._text),
-                  reportSpecifications.name, reportSpecifications.format);
+                  reportContent, reportSpecifications.name,
+                  reportSpecifications.format);
                 if (!reportSpecifications.saveReport) {
                   let downloadAnchor: any = document.createElement('a');
                   downloadAnchor.download = reportSpecifications.name;
