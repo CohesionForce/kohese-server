@@ -19,8 +19,6 @@ import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback 
 
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
-import { LocationMap } from '../../constants/LocationMap.data';
-import { ReportSelection } from '../../classes/ReportSelection.class';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -700,6 +698,15 @@ export class ItemRepository {
     return promise;
   }
   
+  public async convertToMarkdown(content: string, contentType: string,
+    parameters: any): Promise<string> {
+    return (await this.sendMessageToWorker('convertToMarkdown', {
+      content: content,
+      contentType: contentType,
+      parameters: parameters
+    }, true)).data;
+  }
+  
   public async getUrlContent(url: string): Promise<any> {
     return (await this.sendMessageToWorker('getUrlContent', { url: url },
       true)).data;
@@ -710,11 +717,8 @@ export class ItemRepository {
       () => void) => {
       let fileReader: FileReader = new FileReader();
       fileReader.onload = async () => {
-        resolve((await this.sendMessageToWorker('getImportPreview', {
-          file: fileReader.result,
-          type: file.type,
-          parameters: parameters
-        }, true)).data);
+        resolve(await this.convertToMarkdown(fileReader.result, file.type,
+          parameters));
       };
       
       fileReader.readAsArrayBuffer(file);
@@ -725,127 +729,6 @@ export class ItemRepository {
     string): Promise<void> {
     return await this.sendMessageToWorker('importMarkdown',
       { fileName: fileName, markdown: markdown, parentId: parentId }, true);
-  }
-
-  public buildReport(reportName: string, reportSelections: Array<ReportSelection>,
-    documentConfiguration: any): string {
-    let content: string = '';
-    let userName: any = this.CurrentUserService.getCurrentUserSubject().
-      getValue();
-    let date: any = new Date();
-    content += 'Report Name: ' + reportName + '\n\n';
-    content += 'Produced By: ' + userName.username + '\n\n';
-    content += 'Creation Date: ' + date + '\n\n';
-    for (let j: number = 0; j < reportSelections.length; j++) {
-      let reportSelection: ReportSelection = reportSelections[j];
-      if (reportSelection.includeDescendants) {
-        reportSelection.itemProxy.visitTree(undefined, (itemProxy:
-          ItemProxy) => {
-          let documentConfigurationType: any;
-          if (documentConfiguration) {
-            documentConfigurationType = documentConfiguration.types[itemProxy.
-              kind];
-          } else {
-            documentConfigurationType = {
-              localTypes: {},
-              attributes: {
-                name: {
-                  linkToItem: false,
-                  showAttributeName: false
-                },
-                description: {
-                  showAttributeName: false
-                }
-              }
-            };
-          }
-
-          if (documentConfigurationType) {
-            content += this.getItemReportText(itemProxy,
-              documentConfigurationType, itemProxy.getDepthFromAncestor(
-              reportSelection.itemProxy) + 1);
-          }
-        });
-      } else {
-        let documentConfigurationType: any;
-        if (documentConfiguration) {
-          documentConfigurationType = documentConfiguration.types[
-            reportSelections[j].itemProxy.kind];
-        } else {
-          documentConfigurationType = {
-            localTypes: {},
-            attributes: {
-              name: {
-                linkToItem: false,
-                showAttributeName: false
-              },
-              description: {
-                showAttributeName: false
-              }
-            }
-          };
-        }
-
-        if (documentConfigurationType) {
-          content += '#';
-          content += this.getItemReportText(reportSelections[j].itemProxy,
-            documentConfigurationType, 1);
-        }
-      }
-    }
-    return content;
-  }
-
-  private getItemReportText(itemProxy: ItemProxy, documentConfigurationType:
-    any, depth: number): string {
-    let text: string = '';
-    for (let attributeName in documentConfigurationType.attributes) {
-      if (attributeName === 'name') {
-        for (let j: number = 0; j < depth; j++) {
-          text += '#';
-        }
-
-        text += ' ';
-
-        if (documentConfigurationType.attributes[attributeName].
-          showAttributeName) {
-          text += attributeName + ': ';
-        }
-
-        if (documentConfigurationType.attributes[attributeName].linkToItem) {
-          text += '[' + itemProxy.item.name + '](' + window.location.origin +
-            LocationMap['Explore'].route + ';id=' + itemProxy.item.id +
-            ')\n\n';
-        } else {
-          text += itemProxy.item.name + '\n\n';
-        }
-      } else {
-        if (documentConfigurationType.attributes[attributeName].
-          showAttributeName) {
-          text += attributeName + ': ';
-        }
-
-        let addition: string;
-        let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(itemProxy.model.item.classProperties[attributeName].
-          definedInKind);
-        if (modelProxy.item.properties[attributeName].relation) {
-          let reference: ItemProxy = TreeConfiguration.getWorkingTree().
-            getProxyFor(itemProxy.item[attributeName]);
-          if (reference) {
-            addition = reference.item.name;
-          } else {
-            addition = itemProxy.item[attributeName];
-          }
-        } else {
-          addition = itemProxy.item[attributeName];
-        }
-
-        text += addition + '\n\n';
-      }
-    }
-
-    return text;
   }
 
   public async produceReport(report: string, reportName: string, format:

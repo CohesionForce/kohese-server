@@ -33,63 +33,41 @@
   </mat-form-field>
 </div>
 <div style="height: 45%; width: 100%;">
-  <split direction="horizontal">
-    <split-area [size]="35">
-      <div style="height: 5%; width: 100%;">
-      </div>
-      <tree #sourceTree [root]="undefined" [getChildren]="getSourceChildren"
-        [getText]="getSourceText"
-        (elementSelected)="addToDocumentConfiguration(sourceTree.getTreePath(
-        $event))" style="height: 95%; width: 100%;">
-      </tree>
-    </split-area>
-    <split-area [size]="35">
-      <div style="height: 5%; width: 100%; display: flex;
-        flex-direction: row;">
-        <button mat-icon-button matTooltip="Remove this attribute"
-          class="flex-right-align" [disabled]="!targetTree.selection[0]"
-          (click)="removeAttribute(targetTree.getTreePath(targetTree.
-          selection[0]))">
+  <div style="height: 10%; display: flex; flex-direction: row;">
+    <h3>
+      Items
+    </h3>
+    <button mat-button matTooltip="Select the Items to associate"
+      class="flex-right-align" (click)="openComponentSelector()">
+      Select Items...
+    </button>
+  </div>
+  <mat-list>
+    <ng-container *ngFor="let componentId of Object.keys(copy.components)">
+      <mat-list-item>
+        {{TreeConfiguration.getWorkingTree().getProxyFor(componentId).item.
+          name}}
+        <mat-checkbox class="flex-right-align" style="padding: 3px;"
+          [(ngModel)]="copy.components[componentId].includeDescendants">
+          Include Descendants
+        </mat-checkbox>
+        <button mat-icon-button matTooltip="Move this Item up"
+          [disabled]="!canMove(MoveDirection.UP, componentId)"
+          (click)="move(MoveDirection.UP, componentId)">
+          <mat-icon class="fa fa-arrow-up"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Move this Item down"
+          [disabled]="!canMove(MoveDirection.DOWN, componentId)"
+          (click)="move(MoveDirection.DOWN, componentId)">
+          <mat-icon class="fa fa-arrow-down"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="De-select this Item"
+          (click)="removeSelection(componentId)">
           <mat-icon class="fa fa-times"></mat-icon>
         </button>
-      </div>
-      <tree #targetTree [root]="copy"
-        [getChildren]="getTargetChildren" [getText]="getTargetText"
-        (elementSelected)="changeDetectorRef.markForCheck()"
-        style="height: 95%; width: 100%;">
-      </tree>
-    </split-area>
-    <split-area [size]="30">
-      <ng-container *ngIf="targetTree.selection[0]">
-        <h3>
-          {{targetTree.selection[0].key}}
-        </h3>
-        <ng-container *ngIf="targetTree.selection[0].value.attributes else
-          attributeSelected">
-          <ng-container *ngIf="targetTree.selection[0].value.localTypes else
-            localTypeSelected">
-          </ng-container>
-          <ng-template #localTypeSelected>
-          </ng-template>
-        </ng-container>
-        <ng-template #attributeSelected>
-          <ng-container *ngIf="targetTree.selection[0].key === 'name'">
-            <mat-checkbox [checked]="targetTree.selection[0].value.linkToItem"
-              (change)="targetTree.selection[0].value.linkToItem = $event.
-              checked">
-              Link To Item
-            </mat-checkbox>
-            <br/>
-          </ng-container>
-          <mat-checkbox [checked]="targetTree.selection[0].value.
-            showAttributeName" (change)="targetTree.selection[0].value.
-            showAttributeName = $event.checked">
-            Show Attribute Name
-          </mat-checkbox>
-        </ng-template>
-      </ng-container>
-    </split-area>
-  </split>
+      </mat-list-item>
+    </ng-container>
+  </mat-list>
 </div>
 <ng-container *ngIf="isDialogInstance()">
   <mat-dialog-actions style="height: 5%; width: 100%; display: flex;

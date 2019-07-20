@@ -6,8 +6,10 @@
   "idInjection": true,
   "invertItemOrder": true,
   "properties": {
-    "types": {
-      "type": "object"
+    "components": {
+      "type": "object",
+      "required": true,
+      "default": {}
     }
   },
   "validations": [],

@@ -189,15 +189,15 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           resolve(contentObject);
         }); }) });
         break;
-      case 'getImportPreview':
+      case 'convertToMarkdown':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: (preview: string) => void, reject: () => void) => {
-          socket.emit('getImportPreview', {
-            file: request.data.file,
-            type: request.data.type,
+          (resolve: (markdown: string) => void, reject: () => void) => {
+          socket.emit('convertToMarkdown', {
+            content: request.data.content,
+            contentType: request.data.contentType,
             parameters: request.data.parameters
-        }, (preview: string) => {
-          resolve(preview);
+        }, (markdown: string) => {
+          resolve(markdown);
         }); }) });
         break;
       case 'importMarkdown':

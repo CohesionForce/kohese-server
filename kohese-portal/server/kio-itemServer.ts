@@ -542,9 +542,10 @@ function KIOItemServer(socket){
     }
   });
   
-  socket.on('getImportPreview', async (request: any, respond: Function) => {
-    let parameterlessType: string = ((request.type.indexOf(';') !== -1) ?
-      request.type.substring(0, request.type.indexOf(';')) : request.type);
+  socket.on('convertToMarkdown', async (request: any, respond: Function) => {
+    let parameterlessType: string = ((request.contentType.indexOf(';') !==
+      -1) ? request.contentType.substring(0, request.contentType.indexOf(
+      ';')) : request.contentType);
     if (parameterlessType === 'application/pdf') {
       let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
         dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',
@@ -587,7 +588,7 @@ function KIOItemServer(socket){
       }
       
       let pdfConversionProcess: any = child.spawnSync('java', parameters,
-        { input: request.file });
+        { input: request.content });
       respond(pdfConversionProcess.stdout.toString());
     } else {
       let format: string;
@@ -598,7 +599,7 @@ function KIOItemServer(socket){
       let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
         temporaryFileName);
       let mediaDirectoryPath: string;
-      fs.writeFileSync(temporaryFilePath, request.file);
+      fs.writeFileSync(temporaryFilePath, request.content);
       switch (parameterlessType) {
         case 'application/vnd.openxmlformats-officedocument.' +
           'wordprocessingml.document':
@@ -625,13 +626,22 @@ function KIOItemServer(socket){
           format = 'odt';
           break;
         default:
-          mediaDirectoryPath = Path.resolve(temporaryDirectoryPath, 'media');
+          mediaDirectoryPath = temporaryDirectoryPath;
           format = 'html';
       }
       
-      let pandocProcess: any = child.spawnSync('pandoc', ['-f', format, '-t',
-        'commonmark', '--atx-headers', '--extract-media',
-        temporaryDirectoryPath, '-s', temporaryFilePath], undefined);
+      let pandocParameters: Array<string> = ['-f', format, '-t', 'commonmark',
+        '--atx-headers', '-s'];
+      
+      if (format !== 'html') {
+        pandocParameters.push('--extract-media');
+        pandocParameters.push(temporaryDirectoryPath);
+      }
+      
+      pandocParameters.push(temporaryFilePath);
+      
+      let pandocProcess: any = child.spawnSync('pandoc', pandocParameters,
+        undefined);
       
       fs.unlinkSync(temporaryFilePath);
       
@@ -644,7 +654,7 @@ function KIOItemServer(socket){
             links.
       */
       preview = await StringReplaceAsync(preview,
-        /\[(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?)\]\(([\s\S]+?)\)/g,
+        /\[(?:(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?))\]\(([\s\S]+?)\)/g,
         async (matchedSubstring: string, embeddedImageCaptureGroup: string,
         targetCaptureGroup: string, index: number, originalString: string) => {
         let replacement: string = '';
@@ -675,10 +685,12 @@ function KIOItemServer(socket){
                 matchedSubstringCaptureGroupIndex) + request.parameters.
                 pathBase + targetCaptureGroup + matchedSubstring.substring(
                 matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
+            } else {
+              replacement = '';
             }
           }
         }
-          
+        
         return replacement;
       });
       
@@ -689,7 +701,10 @@ function KIOItemServer(socket){
           fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[
             j]));
         }
-        fs.rmdirSync(mediaDirectoryPath);
+        
+        if (mediaDirectoryPath !== temporaryDirectoryPath) {
+          fs.rmdirSync(mediaDirectoryPath);
+        }
       }
       
       fs.rmdirSync(temporaryDirectoryPath);
@@ -713,21 +728,19 @@ function KIOItemServer(socket){
   socket.on('Item/generateReport', function(request, sendResponse) {
     let metaDataString: Array<string> = request.content.split('\n\n', 3);
     fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
-      reportName + request.format), metaDataString.join('\n\n'), undefined);
+      reportName), metaDataString.join('\n\n'), undefined);
     if (request.format === '.md') {
       fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.
-        reportName + request.format), request.content, undefined);
+        reportName), request.content, undefined);
     } else {
       let format: string;
       switch (request.format) {
-        case '.docx':
+        case 'application/vnd.openxmlformats-officedocument.' +
+          'wordprocessingml.document':
           format = 'docx';
           break;
-        case '.odt':
+        case 'application/vnd.oasis.opendocument.text':
           format = 'odt';
-          break;
-        case '.rtf':
-          format = 'rtf';
           break;
         default:
           format = 'html5';
@@ -735,7 +748,7 @@ function KIOItemServer(socket){
 
       let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'commonmark',
         '-t', format, '-s', '-o', Path.resolve(_REPORTS_DIRECTORY_PATH, request.
-        reportName + request.format)], { input: request.content });
+        reportName)], { input: request.content });
 
       if (pandocProcess.stdout) {
         console.log(pandocProcess.stdout);
@@ -845,6 +858,8 @@ function KIOItemServer(socket){
 
   socket.on('removeReport', (request: any, respond: Function) => {
     fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName));
+    fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
+      reportName));
     respond();
   });
 
