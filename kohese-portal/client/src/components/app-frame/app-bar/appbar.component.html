@@ -4,41 +4,44 @@
     <div class="navbar-header">
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
-          'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
+                'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
         (click)="navigate('Explore', {id : ''})">
-        Explorer  |
-        <i class="fa fa-exclamation-triangle"
-          *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
-           - {{syncStatusString}}
+        Explorer |
+        <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
+          - {{syncStatusString}}
         </i>
       </span>
-      <span class="navbar-brand" (click)="navigate('Dashboard', {})">Dashboard  |</span>
+      <!-- <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider> -->
+      <span class="navbar-brand" (click)="navigate('Dashboard', {})">
+        Dashboard |
+      </span>
+      <!-- <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider> -->
       <span class="navbar-brand" (click)="navigate('Document', { id: '' })">
-        Document  |
+        Document |
       </span>
+     <!-- <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider>-->
       <span class="navbar-brand" (click)="navigate('Reports', {})">
-        Reports  |
+        Reports |
       </span>
+      <!---<mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider>-->
     </div>
-    <mat-list class="nav navbar-top-link navbar-right">
-      <button mat-button id="notificationMenu" [matMenuTriggerFor]="notificationMenu">
-        <mat-icon class="fa fa-bell fa-1.5x" matBadgeSize="medium" matBadge="{{messageCount}}"
-          [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
-        </mat-icon>
-      </button>
-      <mat-menu width=100% height=100% #notificationMenu="matMenu" [overlapTrigger]="false">
-        <div style="text-align:center">Notifications</div>
-        <div *ngFor=" let message of messages">
-          <mat-list-item style='font-size: 10pt'>
-            {{message}}
-            <button mat-icon-button matTooltip="Delete Notification" (click)="deleteMessage(message)">
-              <mat-icon class="fa fa-times-circle-o"></mat-icon>
-            </button>
-            <mat-divider></mat-divider>
-          </mat-list-item>
-        </div>
-      </mat-menu>
-    </mat-list>
+    <button mat-button id="notificationMenu" [matMenuTriggerFor]="notificationMenu">
+      <mat-icon class="fa fa-bell fa-1.5x" matBadgeSize="medium" matBadge="{{messageCount}}"
+        [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
+      </mat-icon>
+    </button>
+    <mat-menu width=100% height=100% #notificationMenu="matMenu" [overlapTrigger]="false">
+      <div style="text-align:center">Notifications</div>
+      <div *ngFor=" let message of messages">
+        <mat-list-item style='font-size: 10pt'>
+          {{message}}
+          <button mat-icon-button matTooltip="Delete Notification" (click)="deleteMessage(message)">
+            <mat-icon class="fa fa-times-circle-o"></mat-icon>
+          </button>
+          <mat-divider></mat-divider>
+        </mat-list-item>
+      </div>
+    </mat-menu>
     <ul class="nav navbar-top-links navbar-right">
       <button mat-button id="userMenu" [matMenuTriggerFor]="userMenu">
         <mat-icon class="fa fa-user fa-fw"></mat-icon>
