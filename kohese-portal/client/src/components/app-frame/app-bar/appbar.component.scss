@@ -1,0 +1,80 @@
+@import '../../../app.component';
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: $topNavHeight;
+  border: 0;
+  width: 100%;
+  margin-bottom: 0;
+  background: -webkit-linear-gradient(right, $primaryColor + 100, $primaryColor);
+  background-image: -moz-linear-gradient(right, $primaryColor + 100, $primaryColor);
+  background-image: -ms-linear-gradient(right, $primaryColor + 100, $primaryColor);
+  background-image: -o-linear-gradient(right, $primaryColor + 100, $primaryColor);
+  .navbar-brand {
+    color: white;
+    cursor: pointer;
+    &:hover {
+      color: white;
+      background-color: $buttonAccentColor;
+    }
+  }
+
+   .navbar-disconnected {
+    color: white;
+    cursor: pointer;
+    background-color: red;
+  }
+
+  .navbar-syncing {
+    background-color: rgba(255, 166, 0, 0.438);
+  }
+
+  .navbar-top-links {
+    margin-right: 0;
+    height: 100%;
+
+    #userMenu {
+      padding: 4px 0px;
+      height: 100%;
+      display: inline-block;
+    }
+  }
+
+  .navbar-top-link {
+    margin-right: auto;
+    height: 100%;
+
+    #notificationMenu {
+      margin-right: auto;
+      height: 100%;
+      box-sizing: unset;
+    }
+  }
+
+
+  li {
+    display: inline-block;
+    :last-child {
+      margin-right: 15px;
+    }
+
+    a {
+      padding: 15px;
+      min-height: 50px;
+    }
+  }
+
+  #login-button {
+    height: $topNavHeight;
+    width: 100px;
+    padding: 5px;
+    font-size: 18px;
+    background-color: $primaryColor;
+    color: white;
+    i {
+      margin-right: 15px;
+    }
+  }
+}

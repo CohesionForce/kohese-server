@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { SocketService } from '../socket/socket.service';
 import { ToastrService } from 'ngx-toastr';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { NotificationService } from '../../services/notifications/notification.service';
 
 import * as SocketIOFileClient from 'socket.io-file-client';
 
@@ -16,7 +17,7 @@ export class ImportService {
   private importedItems : Array<ItemProxy> = [];
 
   constructor(private SocketService : SocketService,
-    private toastrService: ToastrService) {
+    private toastrService: ToastrService, private _notificationService: NotificationService) {
     this.fileSocket = new SocketIOFileClient(SocketService.getSocket());
     this.fileSocket.on('start', (fileInfo: any) => {
     });
@@ -27,7 +28,7 @@ export class ImportService {
         file: fileInfo.name,
         parentItem: this.parentId
       };
-      
+
       this.SocketService.getSocket().emit('ImportDocuments', data,
         (results: any) => {
           if (results.error || (0 === results.length)) {
@@ -35,13 +36,15 @@ export class ImportService {
               console.log(results.error);
             }
             this.toastrService.error('Import Failed', 'Import');
+            this._notificationService.addNotifications('ERROR: Import - Files Failed');
           } else {
             for (let i: number = 0; i < results.length; i++) {
               this.importedItems.push(results[i]);
             }
-            
+
             if (this.importedItems.length >= this.uploadListLength) {
               this.toastrService.success('Import Succeeded', 'Import');
+              this._notificationService.addNotifications('COMPLETED: Import - Files Succeeded');
             }
           }
       });

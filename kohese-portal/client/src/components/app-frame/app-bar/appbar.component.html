@@ -6,20 +6,37 @@
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
           'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
         (click)="navigate('Explore', {id : ''})">
-        Kohese Portal
+        Explorer  |
         <i class="fa fa-exclamation-triangle"
           *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
            - {{syncStatusString}}
         </i>
       </span>
-      <span class="navbar-brand" (click)="navigate('Dashboard', {})">Dashboard</span>
+      <span class="navbar-brand" (click)="navigate('Dashboard', {})">Dashboard  |</span>
       <span class="navbar-brand" (click)="navigate('Document', { id: '' })">
-        Document
+        Document  |
       </span>
       <span class="navbar-brand" (click)="navigate('Reports', {})">
-        Reports
+        Reports  |
       </span>
     </div>
+    <mat-list class="nav navbar-top-link navbar-right">
+      <button mat-button id="notificationMenu" [matMenuTriggerFor]="notificationMenu">
+        <mat-icon class="fa fa-bell fa-1.5x" matBadgeSize="medium" matBadge="{{messageCount}}"
+          [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
+        </mat-icon>
+      </button>
+      <!---<div style="height: auto; width: auto;">-->
+        <mat-menu #notificationMenu="matMenu" [overlapTrigger]="false">
+          <div *ngFor=" let message of messages">
+            <button (click)="deleteMessage(message)">
+              <i class="fa fa-times-circle-o"></i>
+            </button>
+            <mat-list-item style='font-size: 9pt'>{{message}}</mat-list-item>
+          </div>
+        </mat-menu>
+      <!---</div>-->
+    </mat-list>
     <ul class="nav navbar-top-links navbar-right">
       <button mat-button id="userMenu" [matMenuTriggerFor]="userMenu">
         <mat-icon class="fa fa-user fa-fw"></mat-icon>

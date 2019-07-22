@@ -5,11 +5,13 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { CurrentUserService } from '../../../services/user/current-user.service';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
+import { NotificationService } from '../../../services/notifications/notification.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'app-bar',
-  templateUrl: './appbar.component.html'
+  templateUrl: './appbar.component.html',
+  styleUrls: ['./appbar.component.scss'],
 })
 
 export class AppBarComponent extends NavigatableComponent
@@ -18,17 +20,21 @@ export class AppBarComponent extends NavigatableComponent
   private repositoryStatus: any;
   public authenticated : boolean = false;
   private userSubscription: Subscription;
+  private notificationSubscription: Subscription;
   private repositoryStatusSubscription: Subscription;
   private _itemRepositoryState: RepoStates;
   get itemRepositoryState() {
     return this._itemRepositoryState;
   }
   public readonly State: any = RepoStates;
-  public syncStatusString : string;
+  public syncStatusString: string;
+  public messageCount: number = 0;
+  public messages: Array<string> = [];
 
   constructor(private sessionService: SessionService,
     protected NavigationService: NavigationService,
     private CurrentUserService: CurrentUserService,
+    private _notificationService: NotificationService,
     private itemRepository: ItemRepository) {
     super(NavigationService);
   }
@@ -58,22 +64,31 @@ export class AppBarComponent extends NavigatableComponent
     this.userSubscription = this.CurrentUserService.getCurrentUserSubject().subscribe((userInfo)=>{
       if (userInfo) {
         this.authenticated = true;
-        this.userName = userInfo.username
+        this.userName = userInfo.username;
         console.log(this);
       } else {
         this.authenticated = false;
         this.userName = undefined;
       }
     });
+    this.notificationSubscription = this._notificationService.getNotifications().subscribe((notifications) => {
+      this.messageCount = notifications.totalNotifications;
+      this.messages = notifications.message;
+    });
   }
 
   ngOnDestroy(): void {
     this.userSubscription.unsubscribe();
     this.repositoryStatusSubscription.unsubscribe();
+    this.notificationSubscription.unsubscribe();
   }
 
   logout(): void {
     this.CurrentUserService.logout();
     this.navigate('Login', {});
+  }
+
+  deleteMessage(message: string) {
+    this._notificationService.deleteNotification(message);
   }
 }
