@@ -37,11 +37,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return this._document;
   }
   
-  private _updatedDocument: string;
-  get updatedDocument() {
-    return this._updatedDocument;
-  }
-  
   get matDialogRef() {
     return this._matDialogRef;
   }
@@ -197,11 +192,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
   
-  public storeUpdatedDocument(updatedDocument: string): void {
-    this._updatedDocument = updatedDocument;
-    this._changeDetectorRef.markForCheck();
-  }
-  
   public getUnifiedDocumentFunction(): (text: string) => string {
     /* The below function is passed to text-editor, so bind the correct 'this'
     to that function. */
@@ -210,51 +200,52 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }).bind(this);
   }
   
-  public save(): void {
-    // Remove the last '</div>' and two '\n's.
-    let regExpTarget: string = this._updatedDocument.substring(0, this.
-      _updatedDocument.length - 8);
-    /* Reverse regExpTarget to prevent match indices from being incorrect on
-    matches after the first. */
-    let splitTarget: string = regExpTarget.split('').reverse().join('');
-    let ids: Array<string> = [];
-    let match: any;
-    // Remove all other '</div>'s and two '\n's for each.
-    while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-      regExpTarget)) != null) {
-      ids.push(match[1]);
-      if (match.index !== 0) {
-        splitTarget = splitTarget.substring(0, (splitTarget.length - match.
-          index + 1)) + splitTarget.substring(splitTarget.length - match.
-          index + 9);
-      }
-    }
-    // Re-orient splitTarget.
-    splitTarget = splitTarget.split('').reverse().join('');
-    let descriptions: Array<string> = splitTarget.split(DocumentComponent.
-      _SEPARATOR_DIV_REGEXP);
-    /* Remove the first element, as it should be empty, and every odd-indexed
-    element, as it should be a capture group. */
-    descriptions = descriptions.filter((element: string) => {
-      let index: number = descriptions.indexOf(element);
-      if ((index !== 0) && ((index % 2) === 0)) {
-        return element;
-      }
-    });
-    
-    for (let componentId in this._documentConfiguration.components) {
-      let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-        getProxyFor(componentId);
-      let idIndex: number = ids.indexOf(itemProxy.item.id);
-      if (idIndex === -1) {
-        itemProxy.item.description = '';
-      } else {
-        // Don't save any Items whose description was not modified.
-        if (itemProxy.item.description !== descriptions[idIndex]) {
-          itemProxy.item.description = descriptions[idIndex];
-          this._itemRepository.upsertItem(itemProxy);
+  public getSaveFunction(): (text: string) => void {
+    return ((text: string) => {
+      // Remove the last '</div>' and two '\n's.
+      let regExpTarget: string = text.substring(0, text.length - 8);
+      /* Reverse regExpTarget to prevent match indices from being incorrect on
+      matches after the first. */
+      let splitTarget: string = regExpTarget.split('').reverse().join('');
+      let ids: Array<string> = [];
+      let match: any;
+      // Remove all other '</div>'s and two '\n's for each.
+      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+        regExpTarget)) != null) {
+        ids.push(match[1]);
+        if (match.index !== 0) {
+          splitTarget = splitTarget.substring(0, (splitTarget.length - match.
+            index + 1)) + splitTarget.substring(splitTarget.length - match.
+            index + 9);
         }
       }
-    }
+      // Re-orient splitTarget.
+      splitTarget = splitTarget.split('').reverse().join('');
+      let descriptions: Array<string> = splitTarget.split(DocumentComponent.
+        _SEPARATOR_DIV_REGEXP);
+      /* Remove the first element, as it should be empty, and every odd-indexed
+      element, as it should be a capture group. */
+      descriptions = descriptions.filter((element: string) => {
+        let index: number = descriptions.indexOf(element);
+        if ((index !== 0) && ((index % 2) === 0)) {
+          return element;
+        }
+      });
+      
+      for (let componentId in this._documentConfiguration.components) {
+        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(componentId);
+        let idIndex: number = ids.indexOf(itemProxy.item.id);
+        if (idIndex === -1) {
+          itemProxy.item.description = '';
+        } else {
+          // Don't save any Items whose description was not modified.
+          if (itemProxy.item.description !== descriptions[idIndex]) {
+            itemProxy.item.description = descriptions[idIndex];
+            this._itemRepository.upsertItem(itemProxy);
+          }
+        }
+      }
+    }).bind(this);
   }
 }

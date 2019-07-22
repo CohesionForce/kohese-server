@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit, Output, EventEmitter } from '@angular/core';
+  Inject, Input, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { MarkdownService } from 'ngx-markdown';
 import { ToastrService } from 'ngx-toastr';
@@ -45,10 +45,10 @@ export class TextEditorComponent implements OnInit {
     this._formatText = formatText;
   }
   
-  private _textModified: EventEmitter<string> = new EventEmitter<string>();
-  @Output('textModified')
-  get textModified() {
-    return this._textModified;
+  private _save: (text: string) => void = (text: string) => {};
+  @Input('save')
+  set save(save: (text: string) => void) {
+    this._save = save;
   }
   
   get componentReference() {
@@ -171,9 +171,13 @@ export class TextEditorComponent implements OnInit {
     });
   }
   
-  public async convertHtmlToMarkdown(html: string): Promise<void> {
-    this._text = await this._itemRepository.convertToMarkdown(html,
-      'text/html', {});
-    this._textModified.emit(this._text);
+  public async saveText(): Promise<void> {
+    /* Get a reference to TextEditorComponent.this, as 'this' currently
+    references a TinyMCE object. */
+    let componentThis: TextEditorComponent = (<any> this).settings.
+      componentReference;
+    componentThis._text = await componentThis._itemRepository.
+      convertToMarkdown(componentThis._html, 'text/html', {});
+    componentThis._save(componentThis._text);
   }
 }
