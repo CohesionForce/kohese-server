@@ -3,7 +3,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { MarkdownService } from 'ngx-markdown';
 import { ToastrService } from 'ngx-toastr';
-import { NotificationService} from '../../services/notifications/notification.service'
+import { NotificationService } from '../../services/notifications/notification.service'
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { SessionService } from '../../services/user/session.service';
@@ -114,6 +114,7 @@ export class TextEditorComponent implements OnInit {
           disableClose: true
         }).updateSize('40%', '40%').afterClosed().subscribe(
           (reportSpecifications: ReportSpecifications) => {
+          componentThis._notificationService.addNotifications('PROCESSING: Export Report ' + reportSpecifications.name);
           if (reportSpecifications) {
             componentThis._itemRepository.getReportMetaData().then(
               async (reportObjects: Array<any>) => {
@@ -146,7 +147,7 @@ export class TextEditorComponent implements OnInit {
 
                     componentThis._toastrService.success(reportSpecifications.
                       name, 'Report Produced');
-                    this._notificationService.addNotifications('COMPLETED: Report Completed ' + reportSpecifications.name);
+                    componentThis._notificationService.addNotifications('COMPLETED: Export Report Completed ' + reportSpecifications.name);
                   }
                 });
               } else {
@@ -165,7 +166,7 @@ export class TextEditorComponent implements OnInit {
 
                 componentThis._toastrService.success(reportSpecifications.name,
                   'Report Produced');
-                this._notificationService.addNotifications('COMPLETED: Report Completed ' + reportSpecifications.name);
+                componentThis._notificationService.addNotifications('COMPLETED: Export Report Completed ' + reportSpecifications.name);
               }
             });
           }
