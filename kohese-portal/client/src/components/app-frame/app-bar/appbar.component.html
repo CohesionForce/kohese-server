@@ -26,16 +26,17 @@
           [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
         </mat-icon>
       </button>
-      <!---<div style="height: auto; width: auto;">-->
-        <mat-menu #notificationMenu="matMenu" [overlapTrigger]="false">
+        <mat-menu width=100% height=100% #notificationMenu="matMenu" [overlapTrigger]="false">
           <div *ngFor=" let message of messages">
-            <button (click)="deleteMessage(message)">
-              <i class="fa fa-times-circle-o"></i>
-            </button>
-            <mat-list-item style='font-size: 9pt'>{{message}}</mat-list-item>
+            <mat-list-item style='font-size: 10pt'>
+              {{message}}
+              <button mat-icon-button matTooltip="Delete Notification"
+                (click)="deleteMessage(message)">
+                <mat-icon class="fa fa-times-circle-o"></mat-icon>
+              </button>
+            </mat-list-item>
           </div>
         </mat-menu>
-      <!---</div>-->
     </mat-list>
     <ul class="nav navbar-top-links navbar-right">
       <button mat-button id="userMenu" [matMenuTriggerFor]="userMenu">
