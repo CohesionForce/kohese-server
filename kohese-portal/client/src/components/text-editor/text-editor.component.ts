@@ -3,7 +3,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { MarkdownService } from 'ngx-markdown';
 import { ToastrService } from 'ngx-toastr';
-
+import { NotificationService} from '../../services/notifications/notification.service'
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { SessionService } from '../../services/user/session.service';
@@ -22,12 +22,12 @@ export class TextEditorComponent implements OnInit {
     this._text = text;
     this._html = this._markdownService.compile(this._text);
   }
-  
+
   private _html: string;
   get html() {
     return this._html;
   }
-  
+
   private _disabled: boolean = false;
   get disabled() {
     return this._disabled;
@@ -36,7 +36,7 @@ export class TextEditorComponent implements OnInit {
   set disabled(disabled: boolean) {
     this._disabled = disabled;
   }
-  
+
   private _formatText: (text: string) => string = (text: string) => {
     return text;
   };
@@ -44,37 +44,38 @@ export class TextEditorComponent implements OnInit {
   set formatText(formatText: (text: string) => string) {
     this._formatText = formatText;
   }
-  
+
   private _textModified: EventEmitter<string> = new EventEmitter<string>();
   @Output('textModified')
   get textModified() {
     return this._textModified;
   }
-  
+
   get componentReference() {
     return this;
   }
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
     private _markdownService: MarkdownService, private _itemRepository:
     ItemRepository, private _dialogService: DialogService,
-    private _sessionService: SessionService, private _toastrService:
-    ToastrService) {
+    private _sessionService: SessionService,
+    private _notificationService: NotificationService,
+    private _toastrService: ToastrService) {
   }
-  
+
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this.text = this._data['text'];
     }
   }
-  
+
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
   }
-  
+
   public openFileSelector(callback: (newValue: string, additionalData:
     any) => void, currentValue: string, additionalData: any): void {
     let fileInput: any = document.createElement('input');
@@ -95,10 +96,10 @@ export class TextEditorComponent implements OnInit {
         }
       };
     }
-    
+
     fileInput.click();
   }
-  
+
   public customizeEditor(editor: any): void {
     /* Get a reference to TextEditorComponent.this, as 'this' currently
     references TinyMCE's init object. */
@@ -142,9 +143,10 @@ export class TextEditorComponent implements OnInit {
                       await componentThis._itemRepository.removeReport(
                         reportSpecifications.name);
                     }
-                    
+
                     componentThis._toastrService.success(reportSpecifications.
                       name, 'Report Produced');
+                    this._notificationService.addNotifications('COMPLETED: Report Completed ' + reportSpecifications.name);
                   }
                 });
               } else {
@@ -160,9 +162,10 @@ export class TextEditorComponent implements OnInit {
                   await componentThis._itemRepository.removeReport(
                     reportSpecifications.name);
                 }
-                
+
                 componentThis._toastrService.success(reportSpecifications.name,
                   'Report Produced');
+                this._notificationService.addNotifications('COMPLETED: Report Completed ' + reportSpecifications.name);
               }
             });
           }
@@ -170,7 +173,7 @@ export class TextEditorComponent implements OnInit {
       }
     });
   }
-  
+
   public async convertHtmlToMarkdown(html: string): Promise<void> {
     this._text = await this._itemRepository.convertToMarkdown(html,
       'text/html', {});
