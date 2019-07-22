@@ -39,20 +39,14 @@ export class ReportsComponent implements OnInit {
   }
 
   public renameReport(targetReportName: string): void {
-    let extensionStartIndex: number = targetReportName.lastIndexOf('.');
-    let targetNameWithoutExtension: string = targetReportName.substring(0,
-      extensionStartIndex);
     this._dialogService.openInputDialog('Rename ' + targetReportName, '',
-      DialogComponent.INPUT_TYPES.TEXT, 'New Name', targetNameWithoutExtension,
+      DialogComponent.INPUT_TYPES.TEXT, 'New Name', targetReportName,
       (input: any) => {
-      return (input !== targetNameWithoutExtension) && (input.search(
-        /[\/\\]/) === -1);
-    }).afterClosed().subscribe(async (newReportNameWithoutExtension:
-      string) => {
-      if (newReportNameWithoutExtension) {
+      return (input !== targetReportName) && (input.search(/[\/\\]/) === -1);
+    }).afterClosed().subscribe(async (newReportName: string) => {
+      if (newReportName) {
         await this._itemRepository.renameReport(targetReportName,
-          newReportNameWithoutExtension + targetReportName.substring(
-          extensionStartIndex));
+          newReportName);
         this.updateReportList();
       }
     });
