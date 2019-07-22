@@ -27,6 +27,9 @@ export class TextEditorComponent implements OnInit {
   get html() {
     return this._html;
   }
+  set html(html: string) {
+    this._html = html;
+  }
   
   private _disabled: boolean = false;
   get disabled() {
