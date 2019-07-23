@@ -35,7 +35,7 @@
       <div *ngFor=" let message of messages">
         <mat-list-item style='font-size: 10pt'>
           {{message}}
-          <button mat-icon-button matTooltip="Delete Notification" (click)="deleteMessage(message)">
+          <button mat-icon-button matTooltip="Delete Notification" (click)="deleteMessage(message); $event.stopPropagation()">
             <mat-icon class="fa fa-times-circle-o"></mat-icon>
           </button>
           <mat-divider></mat-divider>
