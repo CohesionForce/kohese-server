@@ -6,25 +6,22 @@
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
                 'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
         (click)="navigate('Explore', {id : ''})">
+        <img src="../../../../assets/icons/favicon.ico" width="36" height="36" alt="Markdown">
         Explorer |
         <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
           - {{syncStatusString}}
         </i>
       </span>
-      <!-- <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider> -->
       <span class="navbar-brand" (click)="navigate('Dashboard', {})">
         Dashboard |
       </span>
-      <!-- <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider> -->
       <span class="navbar-brand" (click)="navigate('Document', { id: '' })">
         Document |
       </span>
-     <!-- <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider>-->
       <span class="navbar-brand" (click)="navigate('Reports', {})">
         Reports |
       </span>
-      <!---<mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider>-->
-    </div>
+      </div>
     <button mat-button id="notificationMenu" [matMenuTriggerFor]="notificationMenu">
       <mat-icon class="fa fa-bell fa-1.5x" matBadgeSize="medium" matBadge="{{messageCount}}"
         [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
