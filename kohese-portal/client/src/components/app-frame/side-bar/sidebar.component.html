@@ -26,14 +26,14 @@
             <button mat-menu-item (click)="changeLens(LENSES.SPHERE)">Sphere</button>
           </mat-menu>
         </div>
-        <button mat-icon-button>
-          <mat-icon matTooltip="Create Item" class="fa fa-plus" (click)="openNewDialog()"></mat-icon>
+        <button mat-icon-button matTooltip="Create Item" (click)="openNewDialog()">
+          <mat-icon class="fa fa-plus"></mat-icon>
         </button>
-        <button mat-icon-button>
-          <mat-icon matTooltip="Import Files" class="fa fa-file-o" (click)='openImportDialog()'></mat-icon>
+        <button mat-icon-button matTooltip="Import Files" (click)='openImportDialog()'>
+          <mat-icon class="fa fa-file-o"></mat-icon>
         </button>
-        <button mat-icon-button>
-          <mat-icon matTooltip="Upload Image" class="fa fa-picture-o" (click)="openUploadDialog()"></mat-icon>
+        <button mat-icon-button matTooltip="Upload Image" (click)="openUploadDialog()">
+          <mat-icon class="fa fa-picture-o"></mat-icon>
         </button>
       </ng-container>
     </div>
