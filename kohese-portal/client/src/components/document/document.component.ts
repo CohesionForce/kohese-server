@@ -37,11 +37,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return this._document;
   }
   
-  private _updatedDocument: string;
-  get updatedDocument() {
-    return this._updatedDocument;
-  }
-  
   get matDialogRef() {
     return this._matDialogRef;
   }
@@ -107,11 +102,11 @@ export class DocumentComponent implements OnInit, OnDestroy {
   
   public documentConfigurationSelected(documentConfiguration: any): void {
     this._documentConfiguration = documentConfiguration;
-    this._document = this.buildDocument(true);
+    this._document = this.buildDocument();
     this._changeDetectorRef.markForCheck();
   }
   
-  public buildDocument(delineateItems: boolean): string {
+  public buildDocument(): string {
     let document: string = '';
     let componentIds: Array<string> = Object.keys(this._documentConfiguration.
       components);
@@ -134,21 +129,17 @@ export class DocumentComponent implements OnInit, OnDestroy {
       let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
         getProxyFor(documentIds[j]);
       
-      if (delineateItems) {
-        document += ('<div id="' + itemProxy.item.id +
-          '" style="visibility: hidden;">\n\n');
-      }
+      document += ('<div id="' + itemProxy.item.id +
+        '" style="visibility: hidden;">\n\n');
       
       if (itemProxy.item.description) {
         document += itemProxy.item.description;
       }
-      if (j < (documentIds[j].length - 1)) {
+      if (j < (documentIds.length - 1)) {
         document += '\n\n';
       }
       
-      if (delineateItems) {
-        document += '</div>\n\n';
-      }
+      document += '</div>\n\n';
     }
     
     return document;
@@ -197,64 +188,94 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
   
-  public storeUpdatedDocument(updatedDocument: string): void {
-    this._updatedDocument = updatedDocument;
-    this._changeDetectorRef.markForCheck();
-  }
-  
   public getUnifiedDocumentFunction(): (text: string) => string {
     /* The below function is passed to text-editor, so bind the correct 'this'
     to that function. */
     return ((text: string) => {
-      return this.buildDocument(false);
+      // Remove the last '</div>\n\n'.
+      let regExpTarget: string = text.substring(0, text.length - 8);
+      let ids: Array<string> = [];
+      // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
+      let document: string = regExpTarget.split('').reverse().join('');
+      let match: any;
+      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+        regExpTarget)) != null) {
+        ids.push(match[1]);
+        if (match.index !== 0) {
+          document = document.substring(0, (regExpTarget.length - match.
+            index)) + document.substring(regExpTarget.length - match.index +
+            8);
+        }
+      }
+      // Re-orient document.
+      document = document.split('').reverse().join('');
+      document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP, '');
+      
+      return document;
     }).bind(this);
   }
   
-  public save(): void {
-    // Remove the last '</div>' and two '\n's.
-    let regExpTarget: string = this._updatedDocument.substring(0, this.
-      _updatedDocument.length - 8);
-    /* Reverse regExpTarget to prevent match indices from being incorrect on
-    matches after the first. */
-    let splitTarget: string = regExpTarget.split('').reverse().join('');
-    let ids: Array<string> = [];
-    let match: any;
-    // Remove all other '</div>'s and two '\n's for each.
-    while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-      regExpTarget)) != null) {
-      ids.push(match[1]);
-      if (match.index !== 0) {
-        splitTarget = splitTarget.substring(0, (splitTarget.length - match.
-          index + 1)) + splitTarget.substring(splitTarget.length - match.
-          index + 9);
+  public getSaveFunction(): (text: string) => void {
+    /* The below function is passed to text-editor, so bind the correct 'this'
+    to that function. */
+    return ((text: string) => {
+      // Remove the last '</div>\n\n'.
+      let regExpTarget: string = text.substring(0, text.length - 8);
+      // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
+      let splitTarget: string = regExpTarget.split('').reverse().join('');
+      let match: any;
+      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+        regExpTarget)) != null) {
+        if (match.index !== 0) {
+          splitTarget = splitTarget.substring(0, (regExpTarget.length - match.
+            index)) + splitTarget.substring(regExpTarget.length - match.
+            index + 8);
+        }
       }
-    }
-    // Re-orient splitTarget.
-    splitTarget = splitTarget.split('').reverse().join('');
-    let descriptions: Array<string> = splitTarget.split(DocumentComponent.
-      _SEPARATOR_DIV_REGEXP);
-    /* Remove the first element, as it should be empty, and every odd-indexed
-    element, as it should be a capture group. */
-    descriptions = descriptions.filter((element: string) => {
-      let index: number = descriptions.indexOf(element);
-      if ((index !== 0) && ((index % 2) === 0)) {
-        return element;
+      // Re-orient splitTarget.
+      splitTarget = splitTarget.split('').reverse().join('');
+      let descriptions: Array<string> = splitTarget.split(DocumentComponent.
+        _SEPARATOR_DIV_REGEXP);
+      // Remove the first element, as it should be empty.
+      descriptions.shift();
+      let documentMap: Map<string, string> = new Map<string, string>();
+      for (let j: number = 0; j < descriptions.length; j++) {
+        if ((j % 2) === 0) {
+          documentMap.set(descriptions[j], descriptions[j + 1]);
+        }
       }
-    });
-    
-    for (let componentId in this._documentConfiguration.components) {
-      let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-        getProxyFor(componentId);
-      let idIndex: number = ids.indexOf(itemProxy.item.id);
-      if (idIndex === -1) {
-        itemProxy.item.description = '';
-      } else {
+      
+      let componentIds: Array<string> = Object.keys(this.
+        _documentConfiguration.components);
+      let documentIds: Array<string> = [];
+      for (let j: number = 0; j < componentIds.length; j++) {
+        documentIds.push(componentIds[j]);
+        let componentSettings: any = this._documentConfiguration.components[
+          componentIds[j]];
+        if (componentSettings.includeDescendants) {
+          let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(componentIds[j]);
+          itemProxy.visitTree({ includeOrigin: false }, (descendantItemProxy:
+            ItemProxy) => {
+            documentIds.push(descendantItemProxy.item.id);
+          });
+        }
+      }
+      
+      for (let j: number = 0; j < documentIds.length; j++) {
+        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(documentIds[j]);
+        let description: string = documentMap.get(documentIds[j]);
+        if (description == null) {
+          description = '';
+        }
+        
         // Don't save any Items whose description was not modified.
-        if (itemProxy.item.description !== descriptions[idIndex]) {
-          itemProxy.item.description = descriptions[idIndex];
+        if (itemProxy.item.description !== description) {
+          itemProxy.item.description = description;
           this._itemRepository.upsertItem(itemProxy);
         }
       }
-    }
+    }).bind(this);
   }
 }

@@ -25,16 +25,11 @@
       (click)="removeSelectedDocumentConfiguration()">
       <mat-icon class="fa fa-trash"></mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Save this document"
-      class="flex-right-align" [disabled]="!updatedDocument" (click)="save()">
-      <mat-icon class="fa fa-save"></mat-icon>
-    </button>
   </div>
   <div [ngStyle]="{ 'height': (isDialogInstance() ? '90%' : '95%') }">
-    <text-editor [text]="document" (textModified)="storeUpdatedDocument(
-      $event)" [disabled]="!documentConfiguration || (Object.keys(
-      documentConfiguration.components).length === 0)"
-      [formatText]="getUnifiedDocumentFunction()">
+    <text-editor [text]="document" [disabled]="!documentConfiguration ||
+      (Object.keys(documentConfiguration.components).length === 0)"
+      [formatText]="getUnifiedDocumentFunction()" [save]="getSaveFunction()">
     </text-editor>
   </div>
   <ng-container *ngIf="isDialogInstance()">
