@@ -88,7 +88,7 @@ export class AppBarComponent extends NavigatableComponent
     this.navigate('Login', {});
   }
 
-  deleteMessage(message: string) {
+  public deleteMessage(message: string): void {
     this._notificationService.deleteNotification(message);
   }
 }

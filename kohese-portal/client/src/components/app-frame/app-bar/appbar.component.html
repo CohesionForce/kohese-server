@@ -2,12 +2,12 @@
   <ng-container
     *ngIf="(authenticated)">
     <div class="navbar-header">
+      <img src="../../../../assets/icons/favicon.ico" width="51" height="51">
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
-                'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
+                            'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
         (click)="navigate('Explore', {id : ''})">
-        <img src="../../../../assets/icons/favicon.ico" width="36" height="36" alt="Markdown">
-        Explorer |
+         Explorer |
         <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
           - {{syncStatusString}}
         </i>
@@ -21,7 +21,7 @@
       <span class="navbar-brand" (click)="navigate('Reports', {})">
         Reports |
       </span>
-      </div>
+    </div>
     <button mat-button id="notificationMenu" [matMenuTriggerFor]="notificationMenu">
       <mat-icon class="fa fa-bell fa-1.5x" matBadgeSize="medium" matBadge="{{messageCount}}"
         [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>

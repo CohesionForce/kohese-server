@@ -3,24 +3,20 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class NotificationService {
-  private notificationDetails: Array<string>;
-  Notifications: BehaviorSubject<any>;
-  private numberOfNotifications: number;
+  private notificationDetails: Array<string> = [];
+  private Notifications: BehaviorSubject<any> = new BehaviorSubject({
+    totalNotifications: 0,
+    message: this.notificationDetails
+  });
 
-  constructor() {
-    this.numberOfNotifications = 0;
-    this.notificationDetails = [];
-    this.Notifications = new BehaviorSubject({
-      totalNotifications: this.numberOfNotifications,
-      message: this.notificationDetails
-    });
+  public constructor() {
   }
 
-  getNotifications (): BehaviorSubject<any> {
+  public getNotifications(): BehaviorSubject<any> {
     return this.Notifications;
   }
 
-  addNotifications (notificationMessage: string) {
+  public addNotifications(notificationMessage: string) {
     this.notificationDetails.push(notificationMessage);
     this.Notifications.next({
       totalNotifications: this.notificationDetails.length,
@@ -28,8 +24,8 @@ export class NotificationService {
     });
   }
 
-  deleteNotification (notificationMessage: string) {
-    let index = this.notificationDetails.indexOf(notificationMessage);
+  public deleteNotification(notificationMessage: string) {
+    let index: number = this.notificationDetails.indexOf(notificationMessage);
     this.notificationDetails.splice(index, 1);
     this.Notifications.next({
       totalNotifications: this.notificationDetails.length,

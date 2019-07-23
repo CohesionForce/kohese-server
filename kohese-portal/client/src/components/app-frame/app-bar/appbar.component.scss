@@ -1,5 +1,6 @@
 @import '../../../app.component';
 
+
 .navbar {
   position: fixed;
   top: 0;
@@ -8,11 +9,13 @@
   border: 0;
   width: 100%;
   margin-bottom: 0;
+  padding: unset;
   background: -webkit-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -moz-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -ms-linear-gradient(right, $primaryColor + 100, $primaryColor);
   background-image: -o-linear-gradient(right, $primaryColor + 100, $primaryColor);
   .navbar-brand {
+    display: unset;
     color: white;
     cursor: pointer;
     &:hover {
@@ -20,7 +23,6 @@
       background-color: $buttonAccentColor;
     }
   }
-
    .navbar-disconnected {
     color: white;
     cursor: pointer;
@@ -43,11 +45,11 @@
   }
 
   .navbar-top-link {
-    margin-right: auto;
+    margin-right: left;
     height: 100%;
 
     #notificationMenu {
-      margin-right: auto;
+      margin-right: left;
       height: 100%;
       box-sizing: unset;
     }
