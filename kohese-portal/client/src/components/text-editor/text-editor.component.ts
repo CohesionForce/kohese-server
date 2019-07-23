@@ -108,70 +108,72 @@ export class TextEditorComponent implements OnInit {
     let componentThis: TextEditorComponent = this.componentReference;
     editor.ui.registry.addButton('export', {
       text: 'Export',
-      disabled: !this._text,
-      onAction: (button: any) => {
-        componentThis._dialogService.openComponentDialog(
-          ReportSpecificationComponent, {
-          data: {},
-          disableClose: true
-        }).updateSize('40%', '40%').afterClosed().subscribe(
-          (reportSpecifications: ReportSpecifications) => {
-          if (reportSpecifications) {
-            componentThis._itemRepository.getReportMetaData().then(
-              async (reportObjects: Array<any>) => {
-              let reportContent: string = 'Name: ' +
-                reportSpecifications.name + '\n\nProduced by: ' +
-                componentThis._sessionService.getSessionUser().getValue().item.
-                name + '\n\nProduced on: ' + new Date() + '\n\n' +
-                componentThis._formatText(componentThis._text);
-              if (reportObjects.map((reportObject: any) => {
-                return reportObject.name;
-              }).indexOf(reportSpecifications.name) !== -1) {
-                componentThis._dialogService.openYesNoDialog('Overwrite ' +
-                  reportSpecifications.name, 'A report named ' +
-                  reportSpecifications.name + ' already exists. Proceeding ' +
-                  'should overwrite that report. Do you want to proceed?').
-                  subscribe(async (result: any) => {
-                  if (result) {
-                    await componentThis._itemRepository.produceReport(
-                      reportContent, reportSpecifications.name,
-                      reportSpecifications.format);
-                    if (!reportSpecifications.saveReport) {
-                      let downloadAnchor: any = document.createElement('a');
-                      downloadAnchor.download = reportSpecifications.name;
-                      downloadAnchor.href = '/producedReports/' +
-                        reportSpecifications.name;
-                      downloadAnchor.click();
-                      await componentThis._itemRepository.removeReport(
-                        reportSpecifications.name);
-                    }
-                    
-                    componentThis._toastrService.success(reportSpecifications.
-                      name, 'Report Produced');
-                  }
-                });
-              } else {
-                await componentThis._itemRepository.produceReport(
-                  reportContent, reportSpecifications.name,
-                  reportSpecifications.format);
-                if (!reportSpecifications.saveReport) {
-                  let downloadAnchor: any = document.createElement('a');
-                  downloadAnchor.download = reportSpecifications.name;
-                  downloadAnchor.href = '/producedReports/' +
-                    reportSpecifications.name;
-                  downloadAnchor.click();
-                  await componentThis._itemRepository.removeReport(
-                    reportSpecifications.name);
-                }
-                
-                componentThis._toastrService.success(reportSpecifications.name,
-                  'Report Produced');
-              }
-            });
-          }
-        });
-      }
+      disabled: !componentThis._text,
+      onAction: componentThis.getExportFunction(componentThis)
     });
+  }
+  
+  private getExportFunction(componentThis: TextEditorComponent): (button:
+    any) => void {
+    return ((button: any) => {
+      this._dialogService.openComponentDialog(
+        ReportSpecificationComponent, {
+        data: {},
+        disableClose: true
+      }).updateSize('40%', '40%').afterClosed().subscribe(
+        (reportSpecifications: ReportSpecifications) => {
+        if (reportSpecifications) {
+          this._itemRepository.getReportMetaData().then(async (reportObjects:
+            Array<any>) => {
+            let reportContent: string = 'Name: ' + reportSpecifications.name +
+              '\n\nProduced by: ' + this._sessionService.getSessionUser().
+              getValue().item.name + '\n\nProduced on: ' + new Date() +
+              '\n\n' + this._formatText(this._text);
+            if (reportObjects.map((reportObject: any) => {
+              return reportObject.name;
+            }).indexOf(reportSpecifications.name) !== -1) {
+              this._dialogService.openYesNoDialog('Overwrite ' +
+                reportSpecifications.name, 'A report named ' +
+                reportSpecifications.name + ' already exists. Proceeding ' +
+                'should overwrite that report. Do you want to proceed?').
+                subscribe(async (result: any) => {
+                if (result) {
+                  await this._itemRepository.produceReport(reportContent,
+                    reportSpecifications.name, reportSpecifications.format);
+                  if (!reportSpecifications.saveReport) {
+                    let downloadAnchor: any = document.createElement('a');
+                    downloadAnchor.download = reportSpecifications.name;
+                    downloadAnchor.href = '/producedReports/' +
+                      reportSpecifications.name;
+                    downloadAnchor.click();
+                    await this._itemRepository.removeReport(
+                      reportSpecifications.name);
+                  }
+                  
+                  this._toastrService.success(reportSpecifications.name,
+                    'Report Produced');
+                }
+              });
+            } else {
+              await this._itemRepository.produceReport(reportContent,
+                reportSpecifications.name, reportSpecifications.format);
+              if (!reportSpecifications.saveReport) {
+                let downloadAnchor: any = document.createElement('a');
+                downloadAnchor.download = reportSpecifications.name;
+                downloadAnchor.href = '/producedReports/' +
+                  reportSpecifications.name;
+                downloadAnchor.click();
+                await this._itemRepository.removeReport(reportSpecifications.
+                  name);
+              }
+              
+              this._toastrService.success(reportSpecifications.name,
+                'Report Produced');
+            }
+          });
+        }
+      });
+    }).bind(componentThis);
   }
   
   public async saveText(): Promise<void> {
