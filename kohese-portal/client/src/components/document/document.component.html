@@ -3,7 +3,7 @@
     <mat-form-field style="width: 30%;">
       <mat-select placeholder="Document Configuration"
         [ngModel]="documentConfiguration"
-        (ngModelChange)="documentConfigurationSelected($event)">
+        (ngModelChange)="documentConfiguration = $event">
         <ng-container *ngFor="let configuration of documentConfigurations">
           <mat-option [value]="configuration">
             {{configuration.name}}

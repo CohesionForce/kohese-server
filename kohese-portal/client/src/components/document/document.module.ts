@@ -9,6 +9,7 @@ import { DocumentComponent } from './document.component';
 @NgModule({
   declarations: [DocumentComponent],
   entryComponents: [DocumentComponent],
+  exports: [DocumentComponent],
   imports: [
     CommonModule,
     FormsModule,
