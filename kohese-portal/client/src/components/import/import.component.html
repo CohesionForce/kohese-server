@@ -23,17 +23,17 @@
   </button>
   <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;">
   </mat-divider>
+  <input #fileInput type="file" style="display: none;" multiple
+    (change)="addFiles(fileInput.files)"/>
+  <button mat-button matTooltip="Select files" (click)="fileInput.click()">
+    Select Files...
+  </button>
   <span>
     <mat-icon class="fa fa-info-circle" style="text-align: center;"
       matTooltip="{{'The following types of files are supported: ' + Object.
       keys(SupportedTypes).join(',\n')}}">
     </mat-icon>
   </span>
-  <input #fileInput type="file" style="display: none;" multiple
-    (change)="addFiles(fileInput.files)"/>
-  <button mat-button matTooltip="Select files" (click)="fileInput.click()">
-    Select Files...
-  </button>
 </div>
 <div style="height: 50%; width: 100%; overflow: auto;">
   <mat-accordion multi="true">
