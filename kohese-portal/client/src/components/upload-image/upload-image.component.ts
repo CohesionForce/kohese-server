@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { UploadService } from '../../services/upload/upload.service';
+import { NotificationService } from '../../services/notifications/notification.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
@@ -19,6 +20,7 @@ export class UploadImageComponent {
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private itemRepository: ItemRepository,
     private uploadService: UploadService,
+    private _notificationService: NotificationService,
 // tslint:disable-next-line: no-shadowed-variable
     public MatDialogRef: MatDialogRef<UploadImageComponent>) {
   }
@@ -43,6 +45,7 @@ export class UploadImageComponent {
     if (files.length > 0) {
       this.uploadService.uploadFile(files, this.selectedParent.item.id);
     }
+    this._notificationService.addNotifications('PROCESSING: Uploading Images');
   }
 
   public onParentSelected(newParent): void {

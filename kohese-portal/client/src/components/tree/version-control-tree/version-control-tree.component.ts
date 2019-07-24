@@ -11,6 +11,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
+import { NotificationService } from '../../../services/notifications/notification.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
@@ -63,7 +64,9 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     ActivatedRoute, private _itemRepository: ItemRepository, dialogService:
     DialogService, private _navigationService: NavigationService,
     private _versionControlService: VersionControlService,
-    private _toastrService: ToastrService, private _dynamicTypesService:
+    private _toastrService: ToastrService,
+    private _notificationService: NotificationService,
+    private _dynamicTypesService:
     DynamicTypesService) {
     super(route, dialogService);
   }
@@ -83,9 +86,11 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
               subscribe((statusMap: any) => {
               if (statusMap.error) {
                 this._toastrService.error('Revert Failed', 'Version Control');
+                this._notificationService.addNotifications('ERROR: Version Control - Revert Failed');
               } else {
                 this._toastrService.success('Revert Succeeded',
                   'Version Control');
+                  this._notificationService.addNotifications('COMPLETED: Version Control - Revert Succeeded');
               }
             });
           }
@@ -99,8 +104,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           (statusMap: any) => {
           if (statusMap.error) {
             this._toastrService.error('Stage Failed', 'Version Control');
+            this._notificationService.addNotifications('ERROR: Version Control - Stage Failed');
           } else {
             this._toastrService.success('Stage Succeeded', 'Version Control');
+            this._notificationService.addNotifications('COMPLETED: Version Control - Stage Succeeded');
           }
         });
       }),
@@ -112,9 +119,11 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           subscribe((statusMap: any) => {
           if (statusMap.error) {
             this._toastrService.error('Unstage Failed', 'Version Control');
+            this._notificationService.addNotifications('ERROR: Version Control - Unstage Failed');
           } else {
             this._toastrService.success('Unstage Succeeded',
               'Version Control');
+              this._notificationService.addNotifications('COMPLETED: Version Control - Unstage Succeeded');
           }
         });
       })
@@ -323,7 +332,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       filter = new ItemProxyFilter(this._dynamicTypesService, this.
         _itemRepository);
     }
-    
+
     return super.openFilterDialog(filter).pipe(tap((resultingFilter: Filter) => {
       if (resultingFilter && !resultingFilter.isElementPresent(this.
         _searchCriterion)) {
@@ -390,8 +399,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       getValue() as Array<ItemProxy>).subscribe((statusMap: any) => {
       if (statusMap.error) {
         this._toastrService.error('Stage Failed', 'Version Control');
+        this._notificationService.addNotifications('ERROR: Version Control - Stage Failed');
       } else {
         this._toastrService.success('Stage Succeeded', 'Version Control');
+        this._notificationService.addNotifications('COMPLETED: Version Control - Stage Succeeded');
       }
     });
   }
@@ -401,9 +412,11 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       getValue() as Array<ItemProxy>).subscribe((statusMap: any) => {
       if (statusMap.error) {
         this._toastrService.error('Unstage Failed', 'Version Control');
+        this._notificationService.addNotifications('ERROR: Version Control - Unstage Failed');
       } else {
         this._toastrService.success('Unstage Succeeded',
           'Version Control');
+          this._notificationService.addNotifications('COMPLETED: Version Control - Unstage Succeeded');
       }
     });
   }
@@ -413,8 +426,10 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       getValue() as Array<ItemProxy>).subscribe((statusMap: any) => {
       if (statusMap.error) {
         this._toastrService.error('Revert Failed', 'Version Control');
+        this._notificationService.addNotifications('ERROR: Version Control - Revert Failed');
       } else {
         this._toastrService.success('Revert Succeeded', 'Version Control');
+        this._notificationService.addNotifications('COMPLETED: Version Control - Revert Succeeded');
       }
     });
   }

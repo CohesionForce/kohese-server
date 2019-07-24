@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { SocketService } from '../socket/socket.service';
 import { ToastrService } from 'ngx-toastr';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { NotificationService } from '../../services/notifications/notification.service';
 
 import * as SocketIOFileClient from 'socket.io-file-client';
 
@@ -15,7 +16,8 @@ export class UploadService {
   private uploadedItems : Array<ItemProxy> = [];
 
   constructor(private SocketService: SocketService,
-    private toastrService: ToastrService) {
+    private toastrService: ToastrService,
+    private _notificationService: NotificationService) {
     this.fileSocket = new SocketIOFileClient(SocketService.getSocket());
     this.fileSocket.on('start', (fileInfo: any) => {
     });
@@ -34,6 +36,7 @@ export class UploadService {
               console.log(results.error);
             }
             this.toastrService.error('Upload Failed', 'Upload');
+            this._notificationService.addNotifications('ERROR: Upload - Image Failed');
           } else {
             for (let i: number = 0; i < results.length; i++) {
               this.uploadedItems.push(results[i]);
@@ -41,6 +44,7 @@ export class UploadService {
 
             if (this.uploadedItems.length >= this.uploadListLength) {
               this.toastrService.success('Upload Succeeded', 'Upload');
+              this._notificationService.addNotifications('COMPLETED: Upload - Image Succeeded');
             }
           }
       });
