@@ -5,9 +5,9 @@
       <img src="../../../../assets/icons/favicon.ico" width="51" height="51">
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
-                            'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
+                                'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
         (click)="navigate('Explore', {id : ''})">
-         Explorer |
+        Explorer |
         <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
           - {{syncStatusString}}
         </i>
@@ -21,12 +21,12 @@
       <span class="navbar-brand" (click)="navigate('Reports', {})">
         Reports |
       </span>
+      <button mat-button id="notificationMenu" [matMenuTriggerFor]="notificationMenu">
+        <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
+          [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
+        </mat-icon>
+      </button>
     </div>
-    <button mat-button id="notificationMenu" [matMenuTriggerFor]="notificationMenu">
-      <mat-icon class="fa fa-bell fa-1.5x" matBadgeSize="medium" matBadge="{{messageCount}}"
-        [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
-      </mat-icon>
-    </button>
     <mat-menu width=100% height=100% #notificationMenu="matMenu" [overlapTrigger]="false">
       <div style="text-align:center">Notifications</div>
       <div *ngFor=" let message of messages">
