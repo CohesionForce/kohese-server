@@ -1,24 +1,23 @@
 <div class="navbar-default sidebar" role="navigation">
   <div class="sidebar-nav navbar-collapse">
     <div class="static-side-panel">
-      <ng-container
-        *ngIf="(authenticated)">
+      <ng-container *ngIf="(authenticated)">
         <div class="lens-selector">
           <button mat-icon-button [matMenuTriggerFor]="lensMenu">
-          <span [ngSwitch]="currentLens">
-            <span *ngSwitchCase="LENSES.HISTORY">
-              <mat-icon class="custom-font-icon h-icon"></mat-icon>
+            <span [ngSwitch]="currentLens">
+              <span *ngSwitchCase="LENSES.HISTORY">
+                <mat-icon class="custom-font-icon h-icon"></mat-icon>
+              </span>
+              <span *ngSwitchCase="LENSES.DEFAULT">
+                <mat-icon class="custom-font-icon d-icon"></mat-icon>
+              </span>
+              <span *ngSwitchCase="LENSES.BRANCH">
+                <mat-icon class="custom-font-icon b-icon"></mat-icon>
+              </span>
+              <span *ngSwitchCase="LENSES.SPHERE">
+                <mat-icon class="custom-font-icon s-icon"></mat-icon>
+              </span>
             </span>
-            <span *ngSwitchCase="LENSES.DEFAULT">
-              <mat-icon class="custom-font-icon d-icon"></mat-icon>
-            </span>
-            <span *ngSwitchCase="LENSES.BRANCH">
-              <mat-icon class="custom-font-icon b-icon"></mat-icon>
-            </span>
-            <span *ngSwitchCase="LENSES.SPHERE">
-              <mat-icon class="custom-font-icon s-icon"></mat-icon>
-            </span>
-          </span>
           </button>
           <mat-menu #lensMenu="matMenu" [overlapTrigger]="false">
             <button mat-menu-item (click)="changeLens(LENSES.DEFAULT)">Default</button>
@@ -27,22 +26,15 @@
             <button mat-menu-item (click)="changeLens(LENSES.SPHERE)">Sphere</button>
           </mat-menu>
         </div>
-        <button mat-icon-button [matMenuTriggerFor]="createMenu">
+        <button mat-icon-button matTooltip="Create Item" (click)="openNewDialog()">
           <mat-icon class="fa fa-plus"></mat-icon>
         </button>
-        <mat-menu #createMenu="matMenu" [overlapTrigger]="false">
-          <button mat-menu-item (click)="openNewDialog()">
-            New
-          </button>
-          <button mat-menu-item matTooltip="Import files"
-            (click)="openImportDialog()">
-            <mat-icon class="fa fa-file-o"></mat-icon>
-            Import...
-          </button>
-          <button mat-menu-item (click)="openUploadDialog()">
-            Upload Image
-          </button>
-        </mat-menu>
+        <button mat-icon-button matTooltip="Import Files" (click)='openImportDialog()'>
+          <mat-icon class="fa fa-file-o"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Upload Image" (click)="openUploadDialog()">
+          <mat-icon class="fa fa-picture-o"></mat-icon>
+        </button>
       </ng-container>
     </div>
   </div>

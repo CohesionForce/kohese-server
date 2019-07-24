@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { NavigationService } from '../../services/navigation/navigation.service';
 import { DocumentConfigurationEditorComponent } from '../object-editor/document-configuration/document-configuration-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
@@ -17,7 +18,6 @@ import { LocationMap } from '../../constants/LocationMap.data';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocumentComponent implements OnInit, OnDestroy {
-  // To-do: allow setting via route
   private _documentConfiguration: any;
   get documentConfiguration() {
     return this._documentConfiguration;
@@ -25,6 +25,24 @@ export class DocumentComponent implements OnInit, OnDestroy {
   @Input('documentConfiguration')
   set documentConfiguration(documentConfiguration: any) {
     this._documentConfiguration = documentConfiguration;
+    if (this._documentConfiguration) {
+      this._document = this.buildDocument();
+      
+      /* If the selected DocumentConfiguration has not been persisted, add it
+      to the Array of DocumentConfigurations. */
+      if (this._documentConfigurations.indexOf(this._documentConfiguration) ===
+        -1) {
+        this._documentConfigurations.unshift(this._documentConfiguration);
+      }
+      
+      this._navigationService.navigate('Document', {
+        id: this._documentConfiguration.id
+      });
+    } else {
+      this._document = '';
+    }
+    
+    this._changeDetectorRef.markForCheck();
   }
   
   private _documentConfigurations: Array<any> = [];
@@ -54,7 +72,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<DocumentComponent>,
     private _dialogService: DialogService, private _itemRepository:
-    ItemRepository) {
+    ItemRepository, private _navigationService: NavigationService) {
   }
   
   public ngOnInit(): void {
@@ -74,11 +92,15 @@ export class DocumentComponent implements OnInit, OnDestroy {
           
           if ((notification.type === 'loaded') && this.
             _documentConfiguration) {
-            this.documentConfigurationSelected(this._documentConfiguration);
+            this.documentConfiguration = this._documentConfiguration;
           }
           break;
       }
     });
+    
+    if (this._documentConfiguration) {
+      this.documentConfiguration = this._documentConfiguration;
+    }
   }
   
   public ngOnDestroy(): void {
@@ -100,13 +122,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }, undefined);
   }
   
-  public documentConfigurationSelected(documentConfiguration: any): void {
-    this._documentConfiguration = documentConfiguration;
-    this._document = this.buildDocument();
-    this._changeDetectorRef.markForCheck();
-  }
-  
-  public buildDocument(): string {
+  private buildDocument(): string {
     let document: string = '';
     let componentIds: Array<string> = Object.keys(this._documentConfiguration.
       components);
@@ -157,14 +173,25 @@ export class DocumentComponent implements OnInit, OnDestroy {
       any) => {
       if (returnValue) {
         if (!documentConfiguration) {
-          await this._itemRepository.buildItem('DocumentConfiguration',
-            returnValue);
+          let itemProxy: ItemProxy = await this._itemRepository.buildItem(
+            'DocumentConfiguration', returnValue);
+          if (!this._documentConfiguration) {
+            this.documentConfiguration = itemProxy.item;
+          }
           this._changeDetectorRef.markForCheck();
         } else {
-          await this._itemRepository.upsertItem(TreeConfiguration.
-            getWorkingTree().getProxyFor(documentConfiguration.id));
+          if (TreeConfiguration.getWorkingTree().getProxyFor(
+            documentConfiguration.id).kind !== 'DocumentConfiguration') {
+            // The edited DocumentConfiguration has not been persisted.
+            delete documentConfiguration.id;
+            documentConfiguration = (await this._itemRepository.buildItem(
+              'DocumentConfiguration', documentConfiguration)).item;
+          } else {
+            await this._itemRepository.upsertItem(TreeConfiguration.
+              getWorkingTree().getProxyFor(documentConfiguration.id));
+          }
+          this.documentConfiguration = documentConfiguration;
           this.populateDocumentConfigurationArray();
-          this.documentConfigurationSelected(documentConfiguration);
           this._changeDetectorRef.markForCheck();
         }
       }

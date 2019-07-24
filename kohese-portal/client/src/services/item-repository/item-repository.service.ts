@@ -629,7 +629,8 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   buildItem(kind: string, item: any): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve: (itemProxy: ItemProxy) => void, reject:
+      (error: any) => void) => {
       this.socketService.socket.emit('Item/upsert', { kind: kind, item: item }, (response) => {
         if (response.error) {
           this.logService.log(this.logEvents.createError, {error : response})

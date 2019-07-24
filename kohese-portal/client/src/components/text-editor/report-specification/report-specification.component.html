@@ -5,8 +5,8 @@
   </mat-form-field>
   <br/>
   <mat-form-field style="width: 100%;">
-    <mat-select placeholder="Format" [value]="reportSpecifications.format"
-      (selectionChange)="reportSpecifications.format = $event.value">
+    <mat-select placeholder="Format" [ngModel]="reportSpecifications.format"
+      (ngModelChange)="reportSpecifications.format = $event">
       <ng-container *ngFor="let reportFormat of Object.keys(ReportFormat)">
         <mat-option [value]="ReportFormat[reportFormat]">
           {{reportFormat}}
