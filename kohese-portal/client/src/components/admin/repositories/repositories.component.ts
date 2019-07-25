@@ -4,6 +4,7 @@ import { NavigatableComponent } from '../../../classes/NavigationComponent.class
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
+import { NotificationService } from '../../../services/notifications/notification.service';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import { Observable ,  Subscription } from 'rxjs';
@@ -33,6 +34,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
     private versionControlService: VersionControlService,
     private itemRepository: ItemRepository,
     private _toastrService: ToastrService,
+    private _notificationService: NotificationService,
     private _sessionService: SessionService) {
     super(navigationService);
     // TODO update this file to do the repo status sequence
@@ -65,8 +67,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
         this.remoteNameInput, this.remoteUrlInput).subscribe((remoteName: any) => {
           if (remoteName.error) {
             this._toastrService.error('Add Remote Failed', 'Version Control');
+            this._notificationService.addNotifications('ERROR: Version Control - Add Remote Failed');
           } else {
             this._toastrService.success('Add Remote Succeeded', 'Version Control');
+            this._notificationService.addNotifications('COMPLETED: Version Control - Add Remote Succeeded');
           }
         });
     } else {
@@ -80,8 +84,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
         this.remotes = remotes;
         if (remotes.error) {
           this._toastrService.error('Remote Retrieval Failed', 'Version Control');
+          this._notificationService.addNotifications('ERROR: Version Control - Remote Retrieval Failed');;
         } else {
           this._toastrService.success('Remote Retrieval Succeeded', 'Version Control');
+          this._notificationService.addNotifications('COMPLETED: Version Control - Remote Retrieval Succeeded');
         }
       });
   }
@@ -95,8 +101,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
       this.commitMessageInput).subscribe((statusMap: any) => {
         if (statusMap.error) {
           this._toastrService.error('Commit Failed', 'Version Control');
+          this._notificationService.addNotifications('ERROR: Version Control - Commit Failed');
         } else {
           this._toastrService.success('Commit Succeeded', 'Version Control');
+          this._notificationService.addNotifications('COMPLETED: Version Control - Commit Succeeded');
         }
       });
   }
@@ -106,8 +114,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
       id], this.pushRemoteNameInput).subscribe((pushStatusMap: any) => {
         if (pushStatusMap.error) {
           this._toastrService.error('Push Failed', 'Version Control');
+          this._notificationService.addNotifications('ERROR: Version Control - Push Failed');
         } else {
           this._toastrService.success('Push Succeeded', 'Version Control');
+          this._notificationService.addNotifications('COMPLETED: Version Control - Push Succeeded');
         }
       });
   }

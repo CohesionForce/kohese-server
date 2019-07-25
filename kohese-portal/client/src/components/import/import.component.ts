@@ -10,6 +10,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ParameterSpecifierComponent } from './parameter-specifier/parameter-specifier.component';
 import { PdfImportParameters } from '../../classes/PdfImportParameters.class';
+import { NotificationService } from '../../services/notifications/notification.service';
 
 enum SupportedTypes {
   DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.' +
@@ -26,14 +27,14 @@ class FileMapValue {
   set preview(preview: string) {
     this._preview = preview;
   }
-  
+
   get parameters() {
     return this._parameters;
   }
   set parameters(parameters: any) {
     this._parameters = parameters;
   }
-  
+
   private _expanded: boolean = false;
   get expanded() {
     return this._expanded;
@@ -58,7 +59,7 @@ export class ImportComponent implements OnInit {
   get selectedFileMap() {
     return this._selectedFileMap;
   }
-  
+
   private _parentId: string;
   get parentId() {
     return this._parentId;
@@ -67,59 +68,60 @@ export class ImportComponent implements OnInit {
   set parentId(parentId: string) {
     this._parentId = parentId;
   }
-  
+
   get matDialogRef() {
     return this._matDialogRef;
   }
-  
+
   get Object() {
     return Object;
   }
-  
+
   get Array() {
     return Array;
   }
-  
+
   get SupportedTypes() {
     return SupportedTypes;
   }
-  
+
   get TreeConfiguration() {
     return TreeConfiguration;
   }
-  
+
   private _getChildren: (element: any) => Array<any> = (element: any) => {
     return (element as ItemProxy).children;
   };
   get getChildren() {
     return this._getChildren;
   }
-  
+
   private _getText: (element: any) => string = (element: any) => {
     return (element as ItemProxy).item.name;
   };
   get getText() {
     return this._getText;
   }
-  
+
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<ImportComponent>,
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
     ItemRepository, private _toastrService: ToastrService,
+    private _notificationService: NotificationService,
     private _dialogService: DialogService) {
   }
-  
+
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this._parentId = this._data['parentId'];
     }
   }
-  
+
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
   }
-  
+
   public addFiles(files: Array<File>): void {
     for (let j: number = 0; j < files.length; j++) {
       if (Object.values(SupportedTypes).indexOf(files[j].type) !== -1) {
@@ -129,14 +131,14 @@ export class ImportComponent implements OnInit {
         } else {
           parameters = {};
         }
-        
+
         this._selectedFileMap.set(files[j], new FileMapValue('', parameters));
       }
     }
-    
+
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public async retrieveUrlContent(url: string): Promise<void> {
     if (!/^https?:\/\//.test(url)) {
       url = 'http://' + url;
@@ -147,7 +149,7 @@ export class ImportComponent implements OnInit {
         contentType.substring(0, contentObject.contentType.indexOf(';')) :
         contentObject.contentType)
     });
-    
+
     if (Object.values(SupportedTypes).indexOf(file.type) !== -1) {
       let parameters: any;
       if (file.type === SupportedTypes.PDF) {
@@ -155,19 +157,19 @@ export class ImportComponent implements OnInit {
       } else {
         parameters = {};
       }
-      
+
       let slashIndex: number = url.indexOf('/', url.indexOf('://') + 3);
       if (slashIndex !== -1) {
         parameters.pathBase = url.substring(0, slashIndex + 1);
       } else {
         parameters.pathBase = url + '/';
       }
-      
+
       this._selectedFileMap.set(file, new FileMapValue('', parameters));
       this._changeDetectorRef.markForCheck();
     }
   }
-  
+
   public async retrieveImportPreview(file: File): Promise<string> {
     let fileMapValue: FileMapValue = this._selectedFileMap.get(file);
     if (fileMapValue.preview.length === 0) {
@@ -196,11 +198,11 @@ export class ImportComponent implements OnInit {
           file, fileMapValue.parameters);
       }
     }
-    
+
     this._changeDetectorRef.markForCheck();
     return fileMapValue.preview;
   }
-  
+
   public openParameterSpecifier(file: File): void {
     this._dialogService.openComponentDialog(ParameterSpecifierComponent, {
       data: {
@@ -213,7 +215,7 @@ export class ImportComponent implements OnInit {
       }
     });
   }
-  
+
   public async updateFile(file: File): Promise<void> {
     let fileMapValue: FileMapValue = this._selectedFileMap.get(file);
     if (/^https?:\/\//.test(file.name)) {
@@ -232,7 +234,7 @@ export class ImportComponent implements OnInit {
         this._selectedFileMap.set(selectedFiles[j], temporaryMap.get(
           selectedFiles[j]));
       }
-      
+
       let contentObject: any = await this._itemRepository.getUrlContent(file.
         name);
       file = new File([contentObject.content], file.name, {
@@ -241,22 +243,22 @@ export class ImportComponent implements OnInit {
           contentObject.contentType)
       });
       this._selectedFileMap.set(file, fileMapValue);
-      
+
       for (let j: number = insertionIndex; j < selectedFiles.length; j++) {
         this._selectedFileMap.set(selectedFiles[j], temporaryMap.get(
           selectedFiles[j]));
       }
     }
-    
+
     fileMapValue.preview = '';
     this.retrieveImportPreview(file);
   }
-  
+
   public removeFile(file: File): void {
     this._selectedFileMap.delete(file);
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public updatePreviews(): void {
     let selectedFileKeys: Array<File> = Array.from(this._selectedFileMap.
       keys());
@@ -268,26 +270,29 @@ export class ImportComponent implements OnInit {
         this.retrieveImportPreview(selectedFileKeys[j]);
       }
     }
-    
+
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public async importSelectedFiles(parentId: string): Promise<void> {
     let selectedFileKeys: Array<File> = Array.from(this._selectedFileMap.
       keys());
     for (let j: number = 0; j < selectedFileKeys.length; j++) {
       let fileMapValue: FileMapValue = this._selectedFileMap.get(
         selectedFileKeys[j]);
+      this._notificationService.addNotifications('PROCESSING: Import File ' + selectedFileKeys[j].name);
       if (!fileMapValue.preview) {
         await this._itemRepository.importMarkdown(selectedFileKeys[j].name.
           substring(0, selectedFileKeys[j].name.lastIndexOf('.')), await this.
           retrieveImportPreview(selectedFileKeys[j]), parentId);
         this._toastrService.success(selectedFileKeys[j].name, 'File Imported');
+        this._notificationService.addNotifications('COMPLETED: Import File ' + selectedFileKeys[j].name);
       } else {
         await this._itemRepository.importMarkdown(selectedFileKeys[j].name.
           substring(0, selectedFileKeys[j].name.lastIndexOf('.')),
           fileMapValue.preview, parentId);
         this._toastrService.success(selectedFileKeys[j].name, 'File Imported');
+        this._notificationService.addNotifications('COMPLETED: Import File ' + selectedFileKeys[j].name);
       }
     }
   }
