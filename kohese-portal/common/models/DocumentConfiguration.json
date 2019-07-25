@@ -10,6 +10,11 @@
       "type": "object",
       "required": true,
       "default": {}
+    },
+    "document": {
+      "type": "string",
+      "required": true,
+      "default": ""
     }
   },
   "validations": [],

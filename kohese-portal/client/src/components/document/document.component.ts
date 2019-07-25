@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit, OnDestroy } from '@angular/core';
+  Inject, Input, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Subscription } from 'rxjs';
 
@@ -7,6 +7,10 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DocumentConfigurationEditorComponent } from '../object-editor/document-configuration/document-configuration-editor.component';
+import { TextEditorComponent,
+  FormatSpecification } from '../text-editor/text-editor.component';
+import { AttributeInsertionSpecification,
+  InsertionLocation } from '../text-editor/attribute-insertion/attribute-insertion.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { LocationMap } from '../../constants/LocationMap.data';
@@ -26,7 +30,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
   set documentConfiguration(documentConfiguration: any) {
     this._documentConfiguration = documentConfiguration;
     if (this._documentConfiguration) {
-      this._document = this.buildDocument();
+      this._document = (this._documentConfiguration.document ? this.
+        _documentConfiguration.document : this.buildDocument());
       
       /* If the selected DocumentConfiguration has not been persisted, add it
       to the Array of DocumentConfigurations. */
@@ -42,6 +47,11 @@ export class DocumentComponent implements OnInit, OnDestroy {
       this._document = '';
     }
     
+    if (this._textEditor && this._textEditor.editor && this._textEditor.editor.
+      editor) {
+      this._textEditor.editor.editor.undoManager.clear();
+    }
+    
     this._changeDetectorRef.markForCheck();
   }
   
@@ -55,6 +65,9 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return this._document;
   }
   
+  @ViewChild('textEditor')
+  private _textEditor: TextEditorComponent;
+  
   get matDialogRef() {
     return this._matDialogRef;
   }
@@ -65,8 +78,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return Object;
   }
   
+  private static readonly _OPENING_HIDDEN_TAG: string =
+    '<div id="" style="visibility: hidden;">\n\n';
+  private static readonly _CLOSING_HIDDEN_TAG: string = '</div>\n\n';
   private static readonly _SEPARATOR_DIV_REGEXP: RegExp =
     /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;">\s{2}/g;
+  private static readonly _INSERTED_ATTRIBUTE_REGEXP: RegExp =
+    /<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]+" style="visibility: hidden;">\s{2}/g;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
@@ -145,17 +163,16 @@ export class DocumentComponent implements OnInit, OnDestroy {
       let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
         getProxyFor(documentIds[j]);
       
-      document += ('<div id="' + itemProxy.item.id +
-        '" style="visibility: hidden;">\n\n');
+      document += this.getFormattedOpeningHiddenTag(itemProxy.item.id);
       
+      document += this.getFormattedOpeningHiddenTag(itemProxy.item.id +
+        'description');
       if (itemProxy.item.description) {
-        document += itemProxy.item.description;
+        document += (itemProxy.item.description + '\n\n');
       }
-      if (j < (documentIds.length - 1)) {
-        document += '\n\n';
-      }
+      document += DocumentComponent._CLOSING_HIDDEN_TAG;
       
-      document += '</div>\n\n';
+      document += DocumentComponent._CLOSING_HIDDEN_TAG;
     }
     
     return document;
@@ -215,31 +232,140 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
   
-  public getUnifiedDocumentFunction(): (text: string) => string {
+  public getFormattedTextFunction(): (text: string, formatSpecification:
+    FormatSpecification) => string {
     /* The below function is passed to text-editor, so bind the correct 'this'
     to that function. */
-    return ((text: string) => {
-      // Remove the last '</div>\n\n'.
-      let regExpTarget: string = text.substring(0, text.length - 8);
-      let ids: Array<string> = [];
-      // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
-      let document: string = regExpTarget.split('').reverse().join('');
-      let match: any;
-      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-        regExpTarget)) != null) {
-        ids.push(match[1]);
-        if (match.index !== 0) {
-          document = document.substring(0, (regExpTarget.length - match.
-            index)) + document.substring(regExpTarget.length - match.index +
-            8);
+    return ((text: string, formatSpecification: FormatSpecification) => {
+      let formattedText: string = text;
+      if (formatSpecification.attributeInsertionSpecification) {
+        let insertionMap: Map<number, string> = new Map<number, string>();
+        let match: any;
+        let previousItemProxy: ItemProxy = undefined;
+        while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+          formattedText)) != null) {
+          let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(match[1]);
+          let typeObject: any = formatSpecification.
+            attributeInsertionSpecification.types[itemProxy.kind];
+          if (typeObject) {
+            if (formatSpecification.attributeInsertionSpecification.
+              insertionLocation === InsertionLocation.Top) {
+              insertionMap.set(match.index + match[0].length, this.
+                getAttributeInsertionString(typeObject, itemProxy));
+            } else {
+              /* Insert the attribute string at the end of the content for the
+              previous ItemProxy. */
+              if (previousItemProxy) {
+                // Subtract the length of '</div>\n\n'.
+                insertionMap.set(match.index - 8, this.
+                  getAttributeInsertionString(typeObject,
+                  previousItemProxy));
+              }
+              
+              /* If this is the last match, insert the attribute before the
+              last '</div>\n\n'. */
+              if (formattedText.substring(match.index + match[0].length).
+                search(DocumentComponent._SEPARATOR_DIV_REGEXP) === -1) {
+                // Subtract the length of '</div>\n\n'.
+                insertionMap.set(formattedText.length - 8, this.
+                  getAttributeInsertionString(typeObject, itemProxy));
+              }
+            }
+          }
+          
+          previousItemProxy = itemProxy;
+        }
+        
+        let insertionMapKeys: Array<number> = Array.from(insertionMap.keys());
+        for (let j: number = (insertionMapKeys.length - 1); j >= 0; j--) {
+          formattedText = formattedText.substring(0, insertionMapKeys[j]) +
+            insertionMap.get(insertionMapKeys[j]) + formattedText.substring(
+            insertionMapKeys[j]);
         }
       }
-      // Re-orient document.
-      document = document.split('').reverse().join('');
-      document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP, '');
       
-      return document;
+      if (formatSpecification.removeExternalFormatting) {
+        // Remove the last '</div>\n\n'.
+        let regExpTarget: string = formattedText.substring(0, formattedText.
+          length - 8);
+        let ids: Array<string> = [];
+        // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
+        let document: string = regExpTarget.split('').reverse().join('');
+        let match: any;
+        while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+          regExpTarget)) != null) {
+          ids.push(match[1]);
+          if (match.index !== 0) {
+            document = document.substring(0, (regExpTarget.length - match.
+              index)) + document.substring(regExpTarget.length - match.index +
+              8);
+          }
+        }
+        // Re-orient document.
+        document = document.split('').reverse().join('');
+        document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP,
+          '');
+        
+        formattedText = document;
+      }
+      
+      if (formatSpecification.updateSource) {
+        this._document = formattedText;
+        this._changeDetectorRef.markForCheck();
+      }
+      
+      return formattedText;
     }).bind(this);
+  }
+  
+  private getAttributeInsertionString(typeObject: any, itemProxy: ItemProxy):
+    string {
+    let attributeString: string = '';
+    for (let attributeName in typeObject.attributes) {
+      attributeString += this.getFormattedOpeningHiddenTag(itemProxy.item.id +
+        attributeName);
+      
+      if (attributeName === 'name') {
+        if (typeObject.attributes[attributeName].showAttributeName) {
+          attributeString += attributeName + ': ';
+        }
+
+        if (typeObject.attributes[attributeName].linkToItem) {
+          attributeString += '[' + itemProxy.item.name + '](' + window.
+            location.origin + LocationMap['Explore'].route + ';id=' +
+            itemProxy.item.id + ')\n\n';
+        } else {
+          attributeString += itemProxy.item.name + '\n\n';
+        }
+      } else {
+        if (typeObject.attributes[attributeName].showAttributeName) {
+          attributeString += attributeName + ': ';
+        }
+
+        let addition: string;
+        let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(itemProxy.model.item.classProperties[attributeName].
+          definedInKind);
+        if (modelProxy.item.properties[attributeName].relation) {
+          let reference: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(itemProxy.item[attributeName]);
+          if (reference) {
+            addition = reference.item.name;
+          } else {
+            addition = itemProxy.item[attributeName];
+          }
+        } else {
+          addition = itemProxy.item[attributeName];
+        }
+
+        attributeString += addition + '\n\n';
+      }
+      
+      attributeString += DocumentComponent._CLOSING_HIDDEN_TAG;
+    }
+    
+    return attributeString;
   }
   
   public getSaveFunction(): (text: string) => void {
@@ -261,14 +387,25 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
       // Re-orient splitTarget.
       splitTarget = splitTarget.split('').reverse().join('');
-      let descriptions: Array<string> = splitTarget.split(DocumentComponent.
-        _SEPARATOR_DIV_REGEXP);
+      
+      let itemIdsAndContent: Array<string> = splitTarget.split(
+        DocumentComponent._SEPARATOR_DIV_REGEXP);
       // Remove the first element, as it should be empty.
-      descriptions.shift();
+      itemIdsAndContent.shift();
       let documentMap: Map<string, string> = new Map<string, string>();
-      for (let j: number = 0; j < descriptions.length; j++) {
+      for (let j: number = 0; j < itemIdsAndContent.length; j++) {
         if ((j % 2) === 0) {
-          documentMap.set(descriptions[j], descriptions[j + 1]);
+          let itemId: string = itemIdsAndContent[j];
+          let description: string = itemIdsAndContent[j + 1];
+          let descriptionHiddenTag: string = this.getFormattedOpeningHiddenTag(
+            itemId + 'description');
+          // Remove non-description content
+          description = description.substring(description.indexOf(
+            descriptionHiddenTag) + descriptionHiddenTag.length);
+          description = description.substring(0, description.search(
+            DocumentComponent._INSERTED_ATTRIBUTE_REGEXP) - 8);
+          
+          documentMap.set(itemId, description);
         }
       }
       
@@ -303,6 +440,20 @@ export class DocumentComponent implements OnInit, OnDestroy {
           this._itemRepository.upsertItem(itemProxy);
         }
       }
+      
+      this._documentConfiguration.document = text;
+      
+      // Only save the documentConfiguration if it has already been persisted
+      if (TreeConfiguration.getWorkingTree().getProxyFor(this.
+        _documentConfiguration.id).kind === 'DocumentConfiguration') {
+        this._itemRepository.upsertItem(TreeConfiguration.getWorkingTree().
+          getProxyFor(this._documentConfiguration.id));
+      }
     }).bind(this);
+  }
+  
+  private getFormattedOpeningHiddenTag(id: string): string {
+    return DocumentComponent._OPENING_HIDDEN_TAG.substring(0, 9) + id +
+      DocumentComponent._OPENING_HIDDEN_TAG.substring(9);
   }
 }

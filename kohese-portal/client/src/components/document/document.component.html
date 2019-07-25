@@ -27,9 +27,10 @@
     </button>
   </div>
   <div [ngStyle]="{ 'height': (isDialogInstance() ? '90%' : '95%') }">
-    <text-editor [text]="document" [disabled]="!documentConfiguration ||
-      (Object.keys(documentConfiguration.components).length === 0)"
-      [formatText]="getUnifiedDocumentFunction()" [save]="getSaveFunction()">
+    <text-editor #textEditor [text]="document"
+      [disabled]="!documentConfiguration || (Object.keys(documentConfiguration.
+      components).length === 0)" [formatText]="getFormattedTextFunction()"
+      [save]="getSaveFunction()">
     </text-editor>
   </div>
   <ng-container *ngIf="isDialogInstance()">
