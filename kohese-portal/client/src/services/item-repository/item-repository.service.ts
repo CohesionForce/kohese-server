@@ -50,7 +50,6 @@ export class ItemRepository {
 
   shortProxyList: Array<ItemProxy>;
   modelTypes: Object;
-
   private _repoState: RepoStates = undefined;
 
   logEvents: any;
@@ -135,7 +134,7 @@ export class ItemRepository {
 
       if (!msg.message){
 
-        if (msg.id && msg.data) {
+        if (msg.id) {
           // Ignore response that is directed to another event listener
           // console.log('^^^ Received response from worker in main listener for request: ' + msg.id);
         } else {
@@ -174,8 +173,8 @@ export class ItemRepository {
           this.updateItemStatus(msg.data.itemId, msg.data.status);
           break;
         case 'deletion':
-          TreeConfiguration.getWorkingTree().getProxyFor(msg.data).
-            deleteItem();
+          TreeConfiguration.getWorkingTree().getProxyFor(msg.data.id).
+            deleteItem(msg.data.recursive);
           break;
         case 'cachePiece':
           const cachePiece: any = msg.data;
@@ -431,7 +430,7 @@ export class ItemRepository {
     if (recentProxyIndex !== -1) {
       this.recentProxies.splice(recentProxyIndex, 1);
     }
-    
+
     this.recentProxies.push(itemProxy);
   }
 
@@ -570,7 +569,7 @@ export class ItemRepository {
       response.deleteItems.forEach((deletedItemId) => {
         var proxy = ItemProxy.getWorkingTree().getProxyFor(deletedItemId);
         if (proxy) {
-          proxy.deleteItem();
+          proxy.deleteItem(false);
         }
       });
     }
@@ -630,7 +629,8 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   buildItem(kind: string, item: any): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve: (itemProxy: ItemProxy) => void, reject:
+      (error: any) => void) => {
       this.socketService.socket.emit('Item/upsert', { kind: kind, item: item }, (response) => {
         if (response.error) {
           this.logService.log(this.logEvents.createError, {error : response})
@@ -698,19 +698,67 @@ export class ItemRepository {
 
     return promise;
   }
-
-  //////////////////////////////////////////////////////////////////////////
-  generateHTMLReportFor(proxy) {
-    this.socketService.socket.emit('Item/generateReport', { onId: proxy.item.id, format: 'html' }, (results) => {
-      this.logService.log(this.logEvents.generateHTMLReport, {response : results});
+  
+  public async convertToMarkdown(content: string, contentType: string,
+    parameters: any): Promise<string> {
+    return (await this.sendMessageToWorker('convertToMarkdown', {
+      content: content,
+      contentType: contentType,
+      parameters: parameters
+    }, true)).data;
+  }
+  
+  public async getUrlContent(url: string): Promise<any> {
+    return (await this.sendMessageToWorker('getUrlContent', { url: url },
+      true)).data;
+  }
+  
+  public getImportPreview(file: File, parameters: any): Promise<string> {
+    return new Promise<string>((resolve: (preview: string) => void, reject:
+      () => void) => {
+      let fileReader: FileReader = new FileReader();
+      fileReader.onload = async () => {
+        resolve(await this.convertToMarkdown(fileReader.result, file.type,
+          parameters));
+      };
+      
+      fileReader.readAsArrayBuffer(file);
     });
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  generateDOCXReportFor(proxy) {
-    this.socketService.socket.emit('Item/generateReport', { onId: proxy.item.id, format: 'docx' }, (results) => {
-      this.logService.log(this.logEvents.generateDOCXReport, {response : results});
-    });
+  public async importMarkdown(fileName: string, markdown: string, parentId:
+    string): Promise<void> {
+    return await this.sendMessageToWorker('importMarkdown',
+      { fileName: fileName, markdown: markdown, parentId: parentId }, true);
+  }
+
+  public async produceReport(report: string, reportName: string, format:
+    string): Promise<void> {
+    return await this.sendMessageToWorker('produceReport', {
+      reportName: reportName,
+      format: format,
+      content: report
+    }, true);
+  }
+
+  public async getReportMetaData(): Promise<Array<any>> {
+    return (await this.sendMessageToWorker('getReportMetaData', {}, true)).data;
+  }
+
+  public async renameReport(oldReportName: string, newReportName: string):
+    Promise<void> {
+    return await this.sendMessageToWorker('renameReport',
+      { oldReportName: oldReportName, newReportName: newReportName }, true);
+  }
+
+  public async getReportPreview(reportName: string): Promise<string> {
+    return (await this.sendMessageToWorker('getReportPreview',
+      { reportName: reportName }, true)).data;
+  }
+
+  public async removeReport(reportName: string): Promise<void> {
+    return await this.sendMessageToWorker('removeReport',
+      { reportName: reportName }, true);
   }
 
   //////////////////////////////////////////////////////////////////////////

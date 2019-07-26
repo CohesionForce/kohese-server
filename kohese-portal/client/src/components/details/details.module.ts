@@ -22,7 +22,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
 import { UserInputModule } from '../user-input/user-input.module';
 import { DetailsDialogComponent } from "./details-dialog/details-dialog.component";
-
+import { TextEditorModule } from '../text-editor/text-editor.module';
 
 @NgModule({
   declarations: [
@@ -51,7 +51,8 @@ import { DetailsDialogComponent } from "./details-dialog/details-dialog.componen
     PipesModule,
     UserInputModule,
     TreeModule.forRoot(),
-    MarkdownModule
+    MarkdownModule,
+    TextEditorModule
   ],
   exports : [
     DetailsComponent,

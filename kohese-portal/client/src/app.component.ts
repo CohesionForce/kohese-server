@@ -8,5 +8,9 @@ import { AuthenticationService } from './services/authentication/authentication.
 })
 export class AppComponent {
   constructor(private authenticationService: AuthenticationService) {
+    window['tinyMCE'].overrideDefaults({
+      base_url: '/tinymce/',
+      suffix: '.min'
+    });
   }
 }

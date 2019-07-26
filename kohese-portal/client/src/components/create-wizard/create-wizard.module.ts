@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations'
 
-import { ImportComponent } from './import/import.component';
 import { CreateWizardComponent } from './create-wizard.component';
 import { MaterialModule } from "../../material.module";
 import { PipesModule } from "../../pipes/pipes.module";
@@ -14,11 +13,9 @@ import { UserInputModule } from "../user-input/user-input.module";
 
 @NgModule({
   declarations: [
-    ImportComponent,
-    CreateWizardComponent,
+    CreateWizardComponent
   ],
   entryComponents: [
-    ImportComponent,
     CreateWizardComponent
   ],
   imports : [
@@ -34,7 +31,6 @@ import { UserInputModule } from "../user-input/user-input.module";
     
   ],
   exports : [
-    ImportComponent,
     CreateWizardComponent,
     UserInputModule
   ]

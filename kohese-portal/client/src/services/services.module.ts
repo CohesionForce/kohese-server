@@ -19,6 +19,7 @@ import { AnalysisService } from './analysis/analysis.service';
 import { DynamicTypesService } from './dynamic-types/dynamic-types.service';
 import { ImportService } from './import/import.service';
 import { UploadService } from './upload/upload.service';
+import { NotificationService} from './notifications/notification.service';
 import { DataProcessingService } from './data/data-processing.service';
 import { DialogService, DialogComponent } from './dialog/dialog.service';
 import { StateService } from './state/state.service';
@@ -62,6 +63,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
     DynamicTypesService,
     ImportService,
     UploadService,
+    NotificationService,
     StateService,
     LensService,
     ProjectService,

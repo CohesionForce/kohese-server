@@ -61,7 +61,8 @@ export class StateMachineEditorComponent implements OnInit {
   
   public addState(): void {
     this._dialogService.openInputDialog('Add State', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', '').afterClosed().subscribe((name: string) => {
+      INPUT_TYPES.TEXT, 'Name', '', undefined).afterClosed().subscribe((name:
+      string) => {
       if (name) {
         this._stateMachine.state[name] = {
           name: name,
@@ -87,7 +88,7 @@ export class StateMachineEditorComponent implements OnInit {
       propertyId.slice(1);
     
     this._dialogService.openInputDialog('Edit ' + propertyName, '', inputType,
-      propertyName, this._stateMachine.state[stateId][propertyId]).
+      propertyName, this._stateMachine.state[stateId][propertyId], undefined).
       afterClosed().subscribe((value: string) => {
       if (value) {
         this._stateMachine.state[stateId][propertyId] = value;
@@ -151,7 +152,8 @@ export class StateMachineEditorComponent implements OnInit {
   
   public addTransition(sourceStateId: string, targetStateId: string): void {
     this._dialogService.openInputDialog('Add Transition', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', '').afterClosed().subscribe((name: string) => {
+      INPUT_TYPES.TEXT, 'Name', '', undefined).afterClosed().subscribe((name:
+      string) => {
       if (name) {
         this._stateMachine.transition[name] = {
           source: sourceStateId,
@@ -182,8 +184,8 @@ export class StateMachineEditorComponent implements OnInit {
       });
     } else {
       this._dialogService.openInputDialog('Edit Name', '', DialogComponent.
-        INPUT_TYPES.TEXT, 'Name', transitionId).afterClosed().subscribe(
-        (value: string) => {
+        INPUT_TYPES.TEXT, 'Name', transitionId, undefined).afterClosed().
+        subscribe((value: string) => {
         if (value) {
           this._stateMachine.transition[value] = this._stateMachine.transition[
               transitionId];

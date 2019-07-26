@@ -97,6 +97,10 @@ table {
   height: calc(100% - $topNavHeight);
 }
 
+.light {
+  color: whitesmoke;
+}
+
 // Define 3 theme colors
 
 // $kohese-theme-primary: mat-palette($mat-green, 700, 300, 900);

@@ -32,12 +32,17 @@ import { StateMachineEditorModule } from './components/state-machine-editor/stat
 import { TreeViewModule } from './components/tree/tree.module'
 import { VersionsModule } from './components/versions/versions.module';
 import { ReportGeneratorModule } from './components/report-generator/report-generator.module';
+import { ReportsModule } from './components/reports/reports.module';
+import { ImportModule } from './components/import/import.module';
+import { TextEditorModule } from './components/text-editor/text-editor.module';
+import { DocumentModule } from './components/document/document.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from 'angular-tree-component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { MarkdownModule } from 'ngx-markdown';
+import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
+import { EditorModule } from '@tinymce/tinymce-angular';
 
 import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
@@ -55,8 +60,30 @@ import { LensModule } from './components/lens/lens.module';
     BrowserAnimationsModule,
     ServiceWorkerModule.register('/ngsw-worker.js', {enabled : true}),
     ToastrModule.forRoot(),
-    MarkdownModule.forRoot(),
+    MarkdownModule.forRoot({
+      markedOptions: {
+        provide: MarkedOptions,
+        useFactory: () => {
+          let markedRenderer: MarkedRenderer = new MarkedRenderer();
+          markedRenderer.image = (href: string, title: string, text:
+            string) => {
+            let imageHtml: string = new MarkedRenderer().image(href, title,
+              text);
+            imageHtml = imageHtml.substring(0, 5) +
+              'style="max-height: 100%; max-width: 100%;" ' + imageHtml.
+              substring(5);
+            
+            return imageHtml;
+          };
+          
+          let markedOptions: MarkedOptions = new MarkedOptions();
+          markedOptions.renderer = markedRenderer;
+          return markedOptions;
+        }
+      }
+    }),
     InfiniteScrollModule,
+    EditorModule,
     PipesModule,
     MaterialModule,
     AngularSplitModule,
@@ -84,7 +111,11 @@ import { LensModule } from './components/lens/lens.module';
     VersionsModule,
     LensModule,
     ReportGeneratorModule,
-    NoopAnimationsModule
+    ReportsModule,
+    NoopAnimationsModule,
+    ImportModule,
+    TextEditorModule,
+    DocumentModule
   ],
   bootstrap: [AppComponent]
 })

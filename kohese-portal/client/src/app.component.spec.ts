@@ -28,6 +28,11 @@ describe('AppComponent', () => {
     
     let itemCache: ItemCache = new ItemCache();
     TreeConfiguration.setItemCache(itemCache);
+    
+    // Set a substitute 'tinyMCE' object.
+    window['tinyMCE'] = {
+      overrideDefaults: (settingsObject: any) => {}
+    };
   }));
   it('should create the app', async(() => {
     const fixture = TestBed.createComponent(AppComponent);

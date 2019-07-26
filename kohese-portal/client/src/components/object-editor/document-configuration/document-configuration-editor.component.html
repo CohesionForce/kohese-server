@@ -1,0 +1,85 @@
+<div style="width: 100%;" [ngStyle]="{ 'height': isDialogInstance() ? '50%' :
+  '55%' }">
+  <mat-form-field style="width: 100%;">
+    <input matInput type="text" placeholder="Name"
+      [(ngModel)]="copy.name"/>
+  </mat-form-field>
+  <markdown-editor [value]="copy.description" [valueIdentifier]="'Description'"
+    (valueChanged)="copy.description = $event">
+  </markdown-editor>
+  <br/>
+  <div style="width: 100%; display: flex; flex-direction: row;">
+    Parent:&nbsp;
+    <button mat-raised-button style="width: 60%;" [disabled]="true">
+      {{TreeConfiguration.getWorkingTree().getProxyFor(copy.parentId).item.
+        name}}
+    </button>
+    <span class="flex-right-align" style="width: 20%; display: flex;
+      flex-direction: row;">
+      <button mat-icon-button matTooltip="Select a parent"
+        (click)="openParentSelector()"
+        class="flex-right-align">
+        <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+      </button>
+      <button mat-icon-button
+        matTooltip="Remove this parent selection" [disabled]="(copy.parentId ==
+        null)" (click)="copy.parentId = undefined">
+        <mat-icon class="fa fa-times"></mat-icon>
+      </button>
+    </span>
+  </div>
+  <mat-form-field style="width: 100%;">
+    <input matInput type="text" placeholder="Tags"
+      [(ngModel)]="copy.tags"/>
+  </mat-form-field>
+</div>
+<div style="height: 45%; width: 100%;">
+  <div style="height: 10%; display: flex; flex-direction: row;">
+    <h3>
+      Items
+    </h3>
+    <button mat-button matTooltip="Select the Items to associate"
+      class="flex-right-align" (click)="openComponentSelector()">
+      Select Items...
+    </button>
+  </div>
+  <mat-list>
+    <ng-container *ngFor="let componentId of Object.keys(copy.components)">
+      <mat-list-item>
+        {{TreeConfiguration.getWorkingTree().getProxyFor(componentId).item.
+          name}}
+        <mat-checkbox class="flex-right-align" style="padding: 3px;"
+          [(ngModel)]="copy.components[componentId].includeDescendants">
+          Include Descendants
+        </mat-checkbox>
+        <button mat-icon-button matTooltip="Move this Item up"
+          [disabled]="!canMove(MoveDirection.UP, componentId)"
+          (click)="move(MoveDirection.UP, componentId)">
+          <mat-icon class="fa fa-arrow-up"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Move this Item down"
+          [disabled]="!canMove(MoveDirection.DOWN, componentId)"
+          (click)="move(MoveDirection.DOWN, componentId)">
+          <mat-icon class="fa fa-arrow-down"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="De-select this Item"
+          (click)="removeSelection(componentId)">
+          <mat-icon class="fa fa-times"></mat-icon>
+        </button>
+      </mat-list-item>
+    </ng-container>
+  </mat-list>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 5%; width: 100%; display: flex;
+    flex-direction: row;">
+    <button mat-button matTooltip="Apply the above specifications"
+      class="flex-right-align" (click)="close(true)">
+      Apply
+    </button>
+    <button mat-button matTooltip="Cancel this specification process"
+      (click)="close(false)">
+      Cancel
+    </button>
+  </mat-dialog-actions>
+</ng-container>

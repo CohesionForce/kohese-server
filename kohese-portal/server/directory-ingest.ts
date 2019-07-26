@@ -64,66 +64,6 @@ function processToMarkdown(filePath, basePath) {
   var docType = path.ext.toLowerCase();
 
   switch (docType) {
-  case '.doc':
-    // doc processing
-    console.log('::: Processing doc to odt to md');
-    var soffice = child.spawnSync('soffice',
-        ['--headless', '--convert-to', 'odt', pathDirBase,
-          '--outdir', Path.join(tempDirPath, path.dir) ], { cwd: basePath, encoding : 'utf8' });
-    if(soffice.stdout) {
-      console.log(soffice.stdout);
-    }
-    var docPandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', 'commonmark',
-      '--atx-headers', '--extract-media', Path.resolve(Path.dirname(mdOutPath),
-      'media'),(tempPathDirName + '.odt'), '-o', mdOutPath],
-      { cwd: basePath, encoding : 'utf8' });
-    if(docPandoc.stdout) {
-      console.log(docPandoc.stdout);
-    }
-    if(docPandoc.stderr) {
-      console.log(docPandoc.stderr);
-    }
-    break;
-  case '.odt':
-    // odt processing
-    console.log('::: Processing odt to md');
-    var odtPandoc = child.spawnSync('pandoc', ['-f', 'odt', '-t', 'commonmark',
-      '--atx-headers', '--extract-media', Path.resolve(Path.dirname(mdOutPath),
-      'media'), pathDirBase, '-o', mdOutPath],
-      { cwd: basePath, encoding : 'utf8' });
-    if(odtPandoc.stdout) {
-      console.log(odtPandoc.stdout);
-    }
-    break;
-  case '.docx':
-    // docx processing
-    console.log('::: Processing docx to md');
-    var docxPandoc = child.spawnSync('pandoc', ['-f', 'docx', '-t',
-      'commonmark', '--atx-headers', '--extract-media', Path.resolve(Path.
-      dirname(mdOutPath), 'media'), pathDirBase, '-o', mdOutPath],
-      { cwd: basePath, encoding : 'utf8' });
-    if(docxPandoc.stdout) {
-      console.log(docxPandoc.stdout);
-    }
-    break;
-  case '.htm':
-  case '.html':
-    // html processing
-    console.log('::: Processing html to md');
-    var htmlPandoc = child.spawnSync('pandoc', ['-f', 'html', '-t',
-      'commonmark', '--atx-headers', '--extract-media', Path.resolve(Path.
-      dirname(mdOutPath), 'media'), pathDirBase, '-o', mdOutPath],
-      { cwd: basePath, encoding : 'utf8' });
-    if(htmlPandoc.stdout) {
-      console.log(htmlPandoc.stdout);
-    }
-    break;
-  case '.md':
-    // No Processing needed, but do need to copy
-    console.log('::: Copying existing md file');
-    // eslint-disable-next-line no-unused-vars
-    var cpy = child.spawnSync('cp', [pathDirBase, mdOutPath], { cwd: basePath, encoding : 'utf8' });
-    break;
   case '.jpeg':
   case '.jpg':
     // No Processing needed, but do need to copy
@@ -183,7 +123,8 @@ function process(koheseUserName, file, parent, addedIds) {
         parentId: parent,
         itemIds: []
       };
-      var added = mdToKohese(koheseUserName, processedFile.outputPath, mdRoot, preambleRequired);
+      var added = mdToKohese(processedFile.outputPath, mdRoot,
+        preambleRequired);
       for (var j = 0; j < added.length; j++) {
         addedIds.push(added[j]);
       }

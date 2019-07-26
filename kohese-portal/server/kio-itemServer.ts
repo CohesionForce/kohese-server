@@ -1,6 +1,10 @@
+const Fetch = require('node-fetch');
+const StringReplaceAsync = require('string-replace-async');
+
 import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
+const MdToKohese = require('./md-to-kohese');
 
 var kio = require('./koheseIO');
 var kdb = require('./kdb');
@@ -13,11 +17,17 @@ const Path = require('path');
 const importer = require('./directory-ingest');
 var _ = require('underscore');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const _REPORTS_DIRECTORY_PATH = Path.resolve(fs.realpathSync(__dirname), '..',
+  '..', 'reports');
 
 console.log('::: Initializing KIO Item Server');
 
 if(global['app']){
   global['app'].on('newSession', KIOItemServer);
+}
+
+if (!fs.existsSync(_REPORTS_DIRECTORY_PATH)) {
+  fs.mkdirSync(_REPORTS_DIRECTORY_PATH);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -51,7 +61,8 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
         var notification = {
           type: change.type,
           kind: change.kind,
-          id: change.proxy.item.id
+          id: change.proxy.item.id,
+          recursive: change.recursive
         };
         kdb.removeModelInstance(change.proxy);
         kio.server.emit('Item/' + change.type, notification);
@@ -515,58 +526,344 @@ function KIOItemServer(socket){
     itemAnalysis.performAnalysis(request.kind, request.id, sendResponse);
 
   });
+  
+  socket.on('getUrlContent', async (request: any, respond: Function) => {
+    try {
+      let response: Response = await Fetch(request.url);
+      if (response.ok) {
+        respond({
+          content: await response.arrayBuffer(),
+          contentType: response.headers.get('Content-Type')
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      respond({ content: '', contentType: '' });
+    }
+  });
+  
+  socket.on('convertToMarkdown', async (request: any, respond: Function) => {
+    let parameterlessType: string = ((request.contentType.indexOf(';') !==
+      -1) ? request.contentType.substring(0, request.contentType.indexOf(
+      ';')) : request.contentType);
+    if (parameterlessType === 'application/pdf') {
+      let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
+        dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',
+        'PdfConverter.jar')];
+      if (request.parameters.forceTocStructuring) {
+        parameters.push('-t');
+      }
+      
+      if (request.parameters.doNotStructure) {
+        parameters.push('-u');
+      }
+      
+      if (request.parameters.matchSectionNamesLeniently) {
+        parameters.push('-l');
+      }
+      
+      if (request.parameters.moveFootnotes) {
+        parameters.push('-f');
+      }
+      
+      if (request.parameters.tocEntryPadding) {
+        parameters.push('--toc-entry-padding=' + request.parameters.
+          tocEntryPadding);
+      }
+      
+      if (!!request.parameters.tocBeginning) {
+        parameters.push('--toc-begin=' + request.parameters.tocBeginning);
+      }
+      
+      if (!!request.parameters.tocEnding) {
+        parameters.push('--toc-end=' + request.parameters.tocEnding);
+      }
+      
+      if (!!request.parameters.headerLines) {
+        parameters.push('--header-length=' + request.parameters.headerLines);
+      }
+      
+      if (!!request.parameters.footerLines) {
+        parameters.push('--footer-length=' + request.parameters.footerLines);
+      }
+      
+      let pdfConversionProcess: any = child.spawnSync('java', parameters,
+        { input: request.content });
+      respond(pdfConversionProcess.stdout.toString());
+    } else {
+      let format: string;
+      let temporaryFileName: string = String(new Date().getTime());
+      let temporaryDirectoryPath: string = Path.resolve(fs.realpathSync(
+        __dirname), temporaryFileName);
+      fs.mkdirSync(temporaryDirectoryPath);
+      let temporaryFilePath: string = Path.resolve(temporaryDirectoryPath,
+        temporaryFileName);
+      let mediaDirectoryPath: string;
+      fs.writeFileSync(temporaryFilePath, request.content);
+      switch (parameterlessType) {
+        case 'application/vnd.openxmlformats-officedocument.' +
+          'wordprocessingml.document':
+          mediaDirectoryPath = Path.resolve(temporaryDirectoryPath, 'media');
+          format = 'docx';
+          break;
+        case 'application/msword':
+        case 'application/rtf':
+          child.spawnSync('soffice', ['--headless', '--convert-to', 'odt',
+            '--outdir', temporaryDirectoryPath, temporaryFilePath], undefined);
+          fs.unlinkSync(temporaryFilePath);
+          temporaryFilePath = Path.resolve(temporaryDirectoryPath,
+            temporaryFileName + '.odt');
+          if (!fs.existsSync(temporaryFilePath)) {
+            respond('**Unable to preview file**\n\nA possible cause may be an ' +
+              'soffice process on the server machine.');
+            return;
+          }
+          
+          // Fall through to '.odt' case
+        case 'application/vnd.oasis.opendocument.text':
+          mediaDirectoryPath = Path.resolve(temporaryDirectoryPath,
+            'Pictures');
+          format = 'odt';
+          break;
+        default:
+          mediaDirectoryPath = temporaryDirectoryPath;
+          format = 'html';
+      }
+      
+      let pandocParameters: Array<string> = ['-f', format, '-t', 'commonmark',
+        '--atx-headers', '-s'];
+      
+      if (format !== 'html') {
+        pandocParameters.push('--extract-media');
+        pandocParameters.push(temporaryDirectoryPath);
+      }
+      
+      pandocParameters.push(temporaryFilePath);
+      
+      let pandocProcess: any = child.spawnSync('pandoc', pandocParameters,
+        undefined);
+      
+      fs.unlinkSync(temporaryFilePath);
+      
+      let preview: string = pandocProcess.stdout.toString();
+      /*
+        Regular expression information:
+          - '\s\S' is used instead of '.' to handle line breaks since the 's'
+            flag was unrecognized as of 2019-07-08.
+          - This regular expression is intended to handle images embedded in
+            links.
+      */
+      preview = await StringReplaceAsync(preview,
+        /\[(?:(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?))\]\(([\s\S]+?)\)/g,
+        async (matchedSubstring: string, embeddedImageCaptureGroup: string,
+        targetCaptureGroup: string, index: number, originalString: string) => {
+        let replacement: string = '';
+        if ((index > 0) && (originalString.charAt(index - 1) === '!')) {
+          replacement = await embedImage(matchedSubstring, targetCaptureGroup,
+            request.parameters.pathBase, mediaDirectoryPath);
+        } else {
+          replacement = matchedSubstring;
+          if (embeddedImageCaptureGroup) {
+            replacement = await embedImage(matchedSubstring,
+              embeddedImageCaptureGroup, request.parameters.pathBase,
+              mediaDirectoryPath);
+            if (!/^https?:\/\//.test(targetCaptureGroup) &&
+              !targetCaptureGroup.startsWith('javascript:')) {
+              let replacementCaptureGroupIndex: number = replacement.indexOf(
+                targetCaptureGroup);
+              replacement = replacement.substring(0,
+                replacementCaptureGroupIndex) + request.parameters.pathBase +
+                targetCaptureGroup + replacement.substring(
+                replacementCaptureGroupIndex + targetCaptureGroup.length);
+            }
+          } else {
+            if (!/^https?:\/\//.test(targetCaptureGroup) &&
+              !targetCaptureGroup.startsWith('javascript:')) {
+              let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+                indexOf(targetCaptureGroup);
+              replacement = matchedSubstring.substring(0,
+                matchedSubstringCaptureGroupIndex) + request.parameters.
+                pathBase + targetCaptureGroup + matchedSubstring.substring(
+                matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
+            } else {
+              replacement = '';
+            }
+          }
+        }
+        
+        return replacement;
+      });
+      
+      if (fs.existsSync(mediaDirectoryPath)) {
+        let directoryContents: Array<string> = fs.readdirSync(
+          mediaDirectoryPath);
+        for (let j: number = 0; j < directoryContents.length; j++) {
+          fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[
+            j]));
+        }
+        
+        if (mediaDirectoryPath !== temporaryDirectoryPath) {
+          fs.rmdirSync(mediaDirectoryPath);
+        }
+      }
+      
+      fs.rmdirSync(temporaryDirectoryPath);
+      
+      respond(preview);
+    }
+  });
+
+  socket.on('importMarkdown', (request: any, respond: Function) => {
+    MdToKohese.convertMarkdownToItems(request.markdown, {
+      name: request.fileName,
+      parentId: request.parentId,
+      itemIds: []
+    }, true);
+    respond();
+  });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/generateReport', function(request, sendResponse) {
-
-    var showUndefined;
-    var forItemId = request.onId;
-    var outFormat = request.format;
-
-    console.log('::: Generating ' + outFormat + ' Report for ' + forItemId);
-
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(forItemId);
-    var result : any = {};
-
-    if (!proxy){
-      console.log('*** Could not find proxy for: ' + forItemId);
-      sendResponse({error: 'Item not found: ' + forItemId});
-      return;
-    }
-
-    console.log('::: Found proxy for: ' + forItemId + ' - ' + proxy.item.name);
-
-    var reportTime = new Date();
-
-    var outputBuffer = '::: Dump of ' + forItemId + ': ' + proxy.item.name + ' at ' +
-        reportTime.toDateString() + ' ' + reportTime.toTimeString() + '\n\n';
-
-    outputBuffer += proxy.getDocument(showUndefined);
-
-    var itemName = proxy.item.name.replace(/[:\/]/g, ' ');
-    var fileBasename ='dump.' + forItemId + '.' + itemName;
-    var dumpFile= 'tmp_reports/' + fileBasename + '.md';
-    console.log('::: Creating: ' + dumpFile);
-
-    fs.writeFileSync(dumpFile, outputBuffer, {encoding: 'utf8', flag: 'w'});
-    result.markdown = 'reports/' + fileBasename + '.md';
-
-    if (outFormat) {
-      console.log('::: Now spawning pandoc...');
-      var outFile = 'tmp_reports/' + fileBasename + '.' + outFormat;
-      console.log('::: Creating ' + outFile);
-      var pandoc = child.spawnSync('pandoc', ['-f', 'markdown', '-t', outFormat, dumpFile, '-o', outFile]);
-      if(pandoc.stdout) {
-        console.log(pandoc.stdout);
+    let metaDataString: Array<string> = request.content.split('\n\n', 3);
+    fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
+      reportName), metaDataString.join('\n\n'), undefined);
+    if (request.format === '.md') {
+      fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.
+        reportName), request.content, undefined);
+    } else {
+      let format: string;
+      switch (request.format) {
+        case 'application/vnd.openxmlformats-officedocument.' +
+          'wordprocessingml.document':
+          format = 'docx';
+          break;
+        case 'application/vnd.oasis.opendocument.text':
+          format = 'odt';
+          break;
+        default:
+          format = 'html5';
       }
-      result[outFormat] = 'reports/' + fileBasename + '.' + outFormat;
-      console.log('::: Pandoc done!');
+
+      let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'commonmark',
+        '-t', format, '-s', '-o', Path.resolve(_REPORTS_DIRECTORY_PATH, request.
+        reportName)], { input: request.content });
+
+      if (pandocProcess.stdout) {
+        console.log(pandocProcess.stdout);
+      }
     }
 
-    sendResponse(result);
+    sendResponse();
+  });
 
+
+  socket.on('getReportMetaData', (request: any, respond: Function) => {
+    respond(fs.readdirSync(_REPORTS_DIRECTORY_PATH).filter((fileName: string) => {
+      return (!fileName.startsWith('.'));
+    }).map((fileName: string) => {
+      return {
+        name: Path.basename(fileName),
+        metaContent: fs.readFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + fileName), 'utf8')
+      }
+    }));
+  });
+
+  socket.on('renameReport', (request: any, respond: Function) => {
+    fs.renameSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.oldReportName),
+      Path.resolve(_REPORTS_DIRECTORY_PATH, request.newReportName));
+    fs.renameSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
+      oldReportName), Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
+      newReportName));
+    respond();
+  });
+
+  socket.on('getReportPreview', (request: any, respond: Function) => {
+    let reportPreview: string;
+    let reportName: string = request.reportName;
+    let format: string;
+    let reportExtension: string = reportName.substring(reportName.lastIndexOf(
+      '.'));
+    if (reportExtension === '.md') {
+      reportPreview = fs.readFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH,
+        reportName), 'utf8');
+    } else {
+      let intermediateFilePath: string;
+      switch (reportExtension) {
+        case '.docx':
+          format = 'docx';
+          break;
+        case '.odt':
+          format = 'odt';
+          break;
+        case '.rtf':
+          child.spawnSync('soffice', ['--headless', '--convert-to', 'odt',
+            '--outdir', _REPORTS_DIRECTORY_PATH, Path.resolve(
+            _REPORTS_DIRECTORY_PATH, reportName)], undefined);
+          reportName = reportName.substring(0, reportName.lastIndexOf('.')) +
+            '.odt';
+          intermediateFilePath = Path.resolve(_REPORTS_DIRECTORY_PATH,
+            reportName);
+          format = 'odt';
+          break;
+        default:
+          format = 'html';
+      }
+
+      let pandocProcess: any = child.spawnSync('pandoc', ['-f', format, '-t',
+        'commonmark', '--atx-headers', '--extract-media', __dirname, '-s', Path.
+        resolve(_REPORTS_DIRECTORY_PATH, reportName)], undefined);
+
+      reportPreview = pandocProcess.stdout.toString();
+      let mediaDirectoryPath: string = Path.resolve(__dirname, 'media');
+      reportPreview = reportPreview.replace(/!\[.*?\]\((.+?)\)/g,
+        (matchedSubstring: string, captureGroup: string, index: number,
+        originalString: string) => {
+        let imagePath: string = Path.resolve(mediaDirectoryPath, captureGroup);
+        if (fs.existsSync(imagePath)) {
+          let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+            indexOf(captureGroup);
+          let dataUrl: string = 'data:image/';
+          if (captureGroup.endsWith('.png')) {
+            dataUrl += 'png';
+          } else if (captureGroup.endsWith('.jpg') || captureGroup.endsWith(
+            '.jpeg')) {
+            dataUrl += 'jpeg';
+          }
+
+          dataUrl += ';base64,';
+          dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
+          return matchedSubstring.substring(0,
+            matchedSubstringCaptureGroupIndex) + dataUrl + matchedSubstring.
+            substring(matchedSubstringCaptureGroupIndex + captureGroup.length);
+        } else {
+          return matchedSubstring;
+        }
+      });
+
+      if (fs.existsSync(mediaDirectoryPath)) {
+        let directoryContents: Array<string> = fs.readdirSync(
+          mediaDirectoryPath);
+        for (let j: number = 0; j < directoryContents.length; j++) {
+          fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[j]));
+        }
+        fs.rmdirSync(mediaDirectoryPath);
+      }
+
+      if (intermediateFilePath && fs.existsSync(intermediateFilePath)) {
+        fs.unlinkSync(intermediateFilePath);
+      }
+    }
+
+    respond(reportPreview);
+  });
+
+  socket.on('removeReport', (request: any, respond: Function) => {
+    fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName));
+    fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
+      reportName));
+    respond();
   });
 
   socket.on('VersionControl/stage', async function (request, sendResponse) {
@@ -779,7 +1076,7 @@ function KIOItemServer(socket){
         }
 
         if (isNewUnstagedFile) {
-          proxy.deleteItem();
+          proxy.deleteItem(false);
         } else {
           if (!repositoryPathMap[repositoryId]) {
             repositoryPathMap[repositoryId] = [];
@@ -864,7 +1161,57 @@ function KIOItemServer(socket){
       sendResponse({err:err});
     }
   });
+}
 
+async function embedImage(matchSource: string, match: string, pathBase:
+  string, mediaDirectoryPath: string): Promise<string> {
+  let replacement: string = '';
+  let dataUrl: string = 'data:image/';
+  // To-do: handle the match being present in the square brackets
+  let matchSourceIndex: number = matchSource.indexOf(match);
+  let imagePath: string = match.split(/\s+/, 1)[0];
+  if (pathBase) {
+    if (pathBase.startsWith('http')) {
+      try {
+        let imageUrl: string;
+        if (/^https?:\/\//.test(imagePath)) {
+          imageUrl = imagePath;
+        } else {
+          imageUrl = pathBase + imagePath;
+        }
+        let response: any = await Fetch(imageUrl);
+        if (response.ok) {
+          let contentType: string = response.headers.get('Content-Type');
+          let type: string = ((contentType.indexOf(';') !== -1) ? contentType.
+            substring(0, contentType.indexOf(';')) : contentType);
+          replacement = matchSource.substring(0, matchSourceIndex) + dataUrl +
+            type.substring(type.indexOf('/') + 1) + ';base64,' +
+            (await response.buffer()).toString('base64') + matchSource.
+            substring(matchSourceIndex + imagePath.length);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  } else {
+    let mediaPath: string = Path.resolve(mediaDirectoryPath, imagePath);
+    if (fs.existsSync(mediaPath)) {
+      if (mediaPath.endsWith('.png')) {
+        dataUrl += 'png';
+      } else if (mediaPath.endsWith('.jpg') || mediaPath.endsWith('.jpeg')) {
+        dataUrl += 'jpeg';
+      }
+      
+      dataUrl += ';base64,';
+      dataUrl += fs.readFileSync(mediaPath, { encoding: 'base64' });
+      replacement = matchSource.substring(0, matchSourceIndex) + dataUrl +
+        matchSource.substring(matchSourceIndex + imagePath.length);
+    } else {
+      replacement = matchSource;
+    }
+  }
+  
+  return replacement;
 }
 
 function updateStatus(proxies) {

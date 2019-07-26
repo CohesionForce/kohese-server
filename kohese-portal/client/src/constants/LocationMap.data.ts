@@ -70,10 +70,11 @@ export var LocationMap = {
     'route' : '/devtools'
   },
   'Document' : {
-    'type' : 'multi',
-    'title' : 'Document',
     'params' : ['id'],
     'route' : 'document'
+  },
+  'Reports': {
+    route: 'reports'
   }
 }
 

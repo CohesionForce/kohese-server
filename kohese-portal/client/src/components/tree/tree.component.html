@@ -1,0 +1,60 @@
+<div style="width: 100%;" [ngStyle]="{ 'height': isDialogInstance() ? '90%' :
+  '100%' }">
+  <div style="height: 15%; width: 100%; display: flex; flex-direction: row;">
+    <button mat-icon-button matTooltip="Expand all"
+      (click)="changeAllExpansionStates(ExpansionState.EXPAND)">
+      <mat-icon class="fa fa-caret-right"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Collapse all"
+      (click)="changeAllExpansionStates(ExpansionState.COLLAPSE)">
+      <mat-icon class="fa fa-caret-down"></mat-icon>
+    </button>
+    <mat-form-field style="width: 70%;" class="flex-right-align">
+      <input matInput type="text" placeholder="Search"
+        (input)="searchTextChanged($event.target.value)"/>
+    </mat-form-field>
+  </div>
+  <div #elementContainer style="height: 85%; width: 100%; overflow: auto;">
+    <ng-container *ngFor="let element of Array.from(elementMap.keys())">
+      <ng-container *ngIf="shouldDisplay(element)">
+        <div style="width: 100%;" [ngStyle]="getElementStyle(element)">
+          <ng-container *ngIf="!elementMap.get(element).expanded">
+            <mat-icon class="fa fa-caret-right" style="width: 7%;
+              text-align: center;" [ngStyle]="getExpansionIconStyle(element)"
+              (click)="changeSingleExpansionState(element, ExpansionState.
+              EXPAND); $event.stopPropagation()">
+            </mat-icon>
+          </ng-container>
+          <ng-container *ngIf="elementMap.get(element).expanded">
+            <mat-icon class="fa fa-caret-down" style="width: 7%;
+              text-align: center;" [ngStyle]="getExpansionIconStyle(element)"
+              (click)="changeSingleExpansionState(element, ExpansionState.
+              COLLAPSE); $event.stopPropagation()">
+            </mat-icon>
+          </ng-container>
+          <button mat-button style="width: 93%; text-align: left;"
+            (click)="changeElementSelection(element)" [ngClass]="{ 'highlight':
+            (selection.indexOf(element) !== -1) }">
+            {{getText(element)}}
+          </button>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
+    flex-direction: column;">
+    <span class="flex-right-align">
+      <button mat-button matTooltip="Select these elements"
+        [disabled]="selection.length === 0" (click)="matDialogRef.close(
+        selection)">
+        Select
+      </button>
+      <button mat-button matTooltip="Cancel the selection process"
+        (click)="matDialogRef.close(undefined)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>

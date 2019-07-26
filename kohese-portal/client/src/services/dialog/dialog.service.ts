@@ -28,11 +28,12 @@ export class DialogService {
         buttonLabels: buttonLabels
       },
       disableClose: true
-    }).afterClosed();
+    }).updateSize('40%', 'auto').afterClosed();
   }
-  
+
   openInputDialog(title: string, text: string, type: string, fieldName: string,
-    initialValue: any): MatDialogRef<DialogComponent> {
+    initialValue: any, validate: (input: any) => boolean):
+    MatDialogRef<DialogComponent> {
     if (initialValue == null) {
       initialValue = '';
     }
@@ -42,12 +43,13 @@ export class DialogService {
         text: text,
         inputType: type,
         fieldName: fieldName,
-        value: initialValue
+        value: initialValue,
+        validate: validate
       },
       disableClose: true
     }).updateSize('40%', 'auto');
   }
-  
+
   public openSelectDialog(title: string, text: string, label: string,
     initialValue: any, options: Array<any>):
     MatDialogRef<DialogComponent> {
@@ -84,11 +86,11 @@ export class DialogComponent {
     DATE: 'date',
     TIME: 'time'
   };
-  
+
   get INPUT_TYPES() {
     return DialogComponent.INPUT_TYPES;
   }
-  
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
   }
 }

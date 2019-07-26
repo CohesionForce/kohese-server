@@ -13,8 +13,9 @@ let socket: SocketIOClient.Socket;
 let clientMap = {};
 let _authRequest = {};
 let _connectionVerificationSet: Set<number> = new Set<number>();
+let kioListenersInitialized: boolean = false;
 
-let initialized: boolean = false;
+let cacheInitialized: boolean = false;
 let _cache: LevelCache;
 let _connectionAuthenticatedPromise: Promise<any>;
 let _fundamentalItemsPromise: Promise<any>;
@@ -42,10 +43,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
   console.log('::: Received new connection');
   console.log(connectEvent);
 
-  if (!initialized) {
+  if (!cacheInitialized) {
     _cache = new LevelCache(LevelJs('item-cache'));
     TreeConfiguration.setItemCache(_cache);
-    initialized = true;
+    cacheInitialized = true;
   }
 
   const clientId = ++_lastClientId;
@@ -74,7 +75,6 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             _connectionAuthenticatedPromise = authenticate(_authRequest);
             await _connectionAuthenticatedPromise;
 
-            await sync();
             postToAllPorts('reconnected', {});
           });
           socket.connect();
@@ -181,6 +181,82 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+      case 'getUrlContent':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (contentObject: any) => void, reject: () => void) => {
+          socket.emit('getUrlContent', {
+            url: request.data.url
+        }, (contentObject: any) => {
+          resolve(contentObject);
+        }); }) });
+        break;
+      case 'convertToMarkdown':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (markdown: string) => void, reject: () => void) => {
+          socket.emit('convertToMarkdown', {
+            content: request.data.content,
+            contentType: request.data.contentType,
+            parameters: request.data.parameters
+        }, (markdown: string) => {
+          resolve(markdown);
+        }); }) });
+        break;
+      case 'importMarkdown':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject: () => void) => {
+          socket.emit('importMarkdown', { fileName: request.data.fileName,
+            markdown: request.data.markdown, parentId: request.data.parentId },
+            () => {
+            resolve();
+          });
+        }) });
+        break;
+      case 'produceReport':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject: () => void) => {
+          socket.emit('Item/generateReport', { reportName: request.data.
+            reportName, format: request.data.format, content: request.data.
+            content }, () => {
+            resolve();
+          });
+        }) });
+        break;
+      case 'getReportMetaData':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (reportObjects: Array<any>) => void, reject:
+          () => void) => {
+          socket.emit('getReportMetaData', {}, (reportObjects: Array<any>) => {
+            resolve(reportObjects);
+          });
+        }) });
+        break;
+      case 'renameReport':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject: () => void) => {
+          socket.emit('renameReport', { oldReportName: request.data.
+          oldReportName, newReportName: request.data.newReportName }, () => {
+            resolve();
+          });
+        }) });
+        break;
+      case 'getReportPreview':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (reportPreview: string) => void, reject: () => void) => {
+          socket.emit('getReportPreview', { reportName: request.data.
+          reportName }, (reportPreview: string) => {
+            resolve(reportPreview);
+          });
+        }) });
+        break;
+      case 'removeReport':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject: () => void) => {
+          socket.emit('removeReport', { reportName: request.data.reportName },
+            () => {
+            resolve();
+          });
+        }) });
+        break;
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);
@@ -231,12 +307,24 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 async function authenticate(authRequest): Promise<void> {
   return new Promise<void>((resolve: () => void, reject: () => void) => {
     socket.on('authenticated', async () => {
+      console.log('^^^ Session authenticated');
+
+      // Remove event listener for authenticated
+      socket.off('authenticated');
+
       // Resolve the promise to allow all client tabs to proceed
       resolve();
-      // Remaining initialization logic will proceed and provide incremental results to tabs
-      registerKoheseIOListeners();
+
+      if(!kioListenersInitialized) {
+        registerKoheseIOListeners();
+        kioListenersInitialized = true;
+      }
+
+      // Begin synchronization process
       sync();
     });
+
+    console.log('^^^ Requesting authentication');
     socket.emit('authenticate', {
       token: authRequest
     });
@@ -248,6 +336,7 @@ async function authenticate(authRequest): Promise<void> {
 //////////////////////////////////////////////////////////////////////////
 async function sync(): Promise<void> {
 
+  console.log('^^^ Sync initiated');
   let workingTree = TreeConfiguration.getWorkingTree();
   let beforeSync = Date.now();
 
@@ -297,12 +386,14 @@ async function sync(): Promise<void> {
 //////////////////////////////////////////////////////////////////////////
 async function getStatus() : Promise<number> {
   return new Promise((resolve : (statusCount:number) => void, reject) => {
+    console.log('^^^ Requesting getStatus from server')
     socket.emit('Item/getStatus', {
       repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
     }, (response: Array<any>) => {
       for (let j: number = 0; j < response.length; j++) {
         updateItemStatus(response[j].id, response[j].status);
       }
+      console.log('^^^ Received getStatus response from server')
       resolve(response.length);
     });
   });
@@ -326,7 +417,7 @@ function registerKoheseIOListeners() {
 
   socket.on('Item/delete', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
-    deleteItem(notification.id);
+    deleteItem(notification);
   });
 
   socket.on('Item/BulkUpdate', (bulkUpdate) => {
@@ -409,9 +500,9 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function deleteItem(id: string): void {
-  TreeConfiguration.getWorkingTree().getProxyFor(id).deleteItem();
-  postToAllPorts('deletion', id);
+function deleteItem(notification: any): void {
+  TreeConfiguration.getWorkingTree().getProxyFor(notification.id).deleteItem(notification.recursive);
+  postToAllPorts('deletion', notification);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -619,7 +710,7 @@ function processBulkUpdate(response: any): void {
 
   if (response.deleteItems) {
     for (let j: number = 0; j < response.deleteItems.length; j++) {
-      deleteItem(response.deleteItems[j]);
+      deleteItem({ id: response.deleteItems[j], recursive: false });
     }
   }
   const after = Date.now();

@@ -57,7 +57,7 @@ export class TreeRowComponent implements OnInit {
 
   public getIndentationStyle(): object {
     return {
-      'padding-left': (this._treeRow.depth * 15) + 'px'
+      'padding-left': (this._treeRow.depth * 31) + 'px'
     };
   }
   

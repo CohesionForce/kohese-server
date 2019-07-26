@@ -438,52 +438,6 @@ icon-selector .highlight {
   transform: translateX(50px);
   z-index: 10; }
 
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 50px;
-  border: 0;
-  width: 100%;
-  margin-bottom: 0;
-  background: -webkit-linear-gradient(right, #64be95, #005A31);
-  background-image: -moz-linear-gradient(right, #64be95, #005A31);
-  background-image: -ms-linear-gradient(right, #64be95, #005A31);
-  background-image: -o-linear-gradient(right, #64be95, #005A31); }
-  .navbar .navbar-brand {
-    color: white;
-    cursor: pointer; }
-    .navbar .navbar-brand:hover {
-      color: white;
-      background-color: #7dd7ae; }
-  .navbar .navbar-disconnected {
-    color: white;
-    cursor: pointer;
-    background-color: red; }
-  .navbar .navbar-syncing {
-    background-color: rgba(255, 166, 0, 0.438); }
-  .navbar .navbar-top-links {
-    margin-right: 0;
-    height: 100%; }
-    .navbar .navbar-top-links #userMenu {
-      height: 100%; }
-  .navbar li {
-    display: inline-block; }
-    .navbar li :last-child {
-      margin-right: 15px; }
-    .navbar li a {
-      padding: 15px;
-      min-height: 50px; }
-  .navbar #login-button {
-    height: 50px;
-    width: 100px;
-    padding: 5px;
-    font-size: 18px;
-    background-color: #005A31;
-    color: white; }
-    .navbar #login-button i {
-      margin-right: 15px; }
-
 /*
 Stylesheet for the content container element and the configurations for the dual view and single view children e
 elements

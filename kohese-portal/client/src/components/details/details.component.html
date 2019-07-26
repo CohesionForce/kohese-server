@@ -35,12 +35,6 @@
         <!-- Nav tabs -->
         <mat-tab-group id="details-tabs">
             <mat-tab id="defaultTab" label="Document">
-                <button (click)="generateHTMLReport()" class="btn btn-primary">
-                   Generate HTML Report
-               </button>
-                <button (click)="generateDOCXReport()" class="btn btn-primary">
-                   Generate Word Document
-               </button>
                <button
                       class= "btn btn-primary"
                       (click)="navigate('Analysis',
@@ -50,19 +44,15 @@
                 <document-view [proxyStream]="proxyStream"
                                [incrementalLoad]="true"></document-view>
             </mat-tab>
-            <mat-tab label="Details">
-                <ng-template mat-tab-label>
-                   Details
-                   <span *ngIf="detailsFormGroup?.dirty">
-                      <img src="../../../assets/icons/versioncontrol/dirty.ico"
-                      title = "Dirty item" />
-                  </span>
-                </ng-template>
+            <mat-tab label="{{((detailsFormGroup && detailsFormGroup.dirty) ?
+              'Details*' : 'Details')}}">
+              <ng-template matTabContent>
                 <details-form #editor [proxyStream]="proxyStream"
                   [editableStream]="editableStream"
                   (formGroupUpdated)="onFormGroupUpdated($event)"
                   (nonFormFieldChanged)="onNonFormFieldChanged($event)">
                 </details-form>
+              </ng-template>
             </mat-tab>
             <mat-tab label="References">
                 <references-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></references-tab>

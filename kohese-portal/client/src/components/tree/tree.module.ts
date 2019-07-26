@@ -18,6 +18,7 @@ import { FilterTreeRowComponent } from './filter-tree/filter-tree-row.component'
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { PipesModule } from "../../pipes/pipes.module";
 import { DocumentTreeComponent } from "./document-tree/document-tree.component";
+import { TreeComponent } from './tree.component';
 
 @NgModule({
   declarations: [
@@ -28,9 +29,11 @@ import { DocumentTreeComponent } from "./document-tree/document-tree.component";
     CommitTreeComponent,
     DocumentTreeComponent,
     FilterTreeComponent,
-    FilterTreeRowComponent
+    FilterTreeRowComponent,
+    TreeComponent
   ],
   entryComponents: [
+    TreeComponent
   ],
   imports : [
     CommonModule,
@@ -48,7 +51,8 @@ import { DocumentTreeComponent } from "./document-tree/document-tree.component";
     VersionControlTreeComponent,
     CommitTreeComponent,
     DocumentTreeComponent,
-    FilterTreeComponent
+    FilterTreeComponent,
+    TreeComponent
   ]
 })
 export class TreeViewModule {}
