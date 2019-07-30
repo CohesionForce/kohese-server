@@ -158,7 +158,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
       }
     }
     
-    this.update();
+    this.update(true);
     
     for (let j: number = 0; j < this._selection.length; j++) {
       let selectionElementMapValue: ElementMapValue = this._elementMap.get(
@@ -350,11 +350,13 @@ export class TreeComponent implements OnInit, AfterViewInit {
     return treePath;
   }
   
-  public update(): void {
-    this._elementMap.clear();
-    let children: Array<any> = this._getChildren(this._root);
-    for (let j: number = 0; j < children.length; j++) {
-      this.processElement(children[j], this._root, 0);
+  public update(updateStructure: boolean): void {
+    if (updateStructure) {
+      this._elementMap.clear();
+      let children: Array<any> = this._getChildren(this._root);
+      for (let j: number = 0; j < children.length; j++) {
+        this.processElement(children[j], this._root, 0);
+      }
     }
     
     this._changeDetectorRef.markForCheck();

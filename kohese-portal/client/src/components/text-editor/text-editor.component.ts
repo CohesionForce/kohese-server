@@ -61,6 +61,16 @@ export class TextEditorComponent implements OnInit {
   }
   set html(html: string) {
     this._html = html;
+    if (this._contentChangeDelayIdentifier) {
+      clearTimeout(this._contentChangeDelayIdentifier);
+    }
+    
+    this._contentChangeDelayIdentifier = setTimeout(async () => {
+      this._contentChangedEventEmitter.emit(await this._itemRepository.
+        convertToMarkdown(this._html, 'text/html', {}));
+      
+      this._contentChangeDelayIdentifier = undefined;
+    }, 700);
   }
 
   private _disabled: boolean = false;
@@ -101,6 +111,12 @@ export class TextEditorComponent implements OnInit {
   get selectionChangedEventEmitter() {
     return this._selectionChangedEventEmitter;
   }
+  
+  @Output('contentChanged')
+  private _contentChangedEventEmitter: EventEmitter<string> =
+    new EventEmitter<string>();
+  
+  private _contentChangeDelayIdentifier: any;
 
   get componentReference() {
     return this;
