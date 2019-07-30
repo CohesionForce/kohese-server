@@ -12,8 +12,9 @@ let socket: SocketIOClient.Socket;
 let clientMap = {};
 let _authRequest = {};
 let _connectionVerificationSet: Set<number> = new Set<number>();
+let kioListenersInitialized: boolean = false;
 
-let initialized: boolean = false;
+let cacheInitialized: boolean = false;
 let _cache: LevelCache;
 let _connectionAuthenticatedPromise: Promise<any>;
 let _fundamentalItemsPromise: Promise<any>;
@@ -41,10 +42,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
   console.log('::: Received new connection');
   console.log(connectEvent);
 
-  if (!initialized) {
+  if (!cacheInitialized) {
     _cache = new LevelCache(LevelJs('item-cache'));
     TreeConfiguration.setItemCache(_cache);
-    initialized = true;
+    cacheInitialized = true;
   }
 
   const clientId = ++_lastClientId;
@@ -73,7 +74,6 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             _connectionAuthenticatedPromise = authenticate(_authRequest);
             await _connectionAuthenticatedPromise;
 
-            await sync();
             postToAllPorts('reconnected', {});
           });
           socket.connect();
@@ -306,12 +306,24 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 async function authenticate(authRequest): Promise<void> {
   return new Promise<void>((resolve: () => void, reject: () => void) => {
     socket.on('authenticated', async () => {
+      console.log('^^^ Session authenticated');
+
+      // Remove event listener for authenticated
+      socket.off('authenticated');
+
       // Resolve the promise to allow all client tabs to proceed
       resolve();
-      // Remaining initialization logic will proceed and provide incremental results to tabs
-      registerKoheseIOListeners();
+
+      if(!kioListenersInitialized) {
+        registerKoheseIOListeners();
+        kioListenersInitialized = true;
+      }
+
+      // Begin synchronization process
       sync();
     });
+
+    console.log('^^^ Requesting authentication');
     socket.emit('authenticate', {
       token: authRequest
     });
@@ -323,6 +335,7 @@ async function authenticate(authRequest): Promise<void> {
 //////////////////////////////////////////////////////////////////////////
 async function sync(): Promise<void> {
 
+  console.log('^^^ Sync initiated');
   let workingTree = TreeConfiguration.getWorkingTree();
   let beforeSync = Date.now();
 
@@ -372,12 +385,14 @@ async function sync(): Promise<void> {
 //////////////////////////////////////////////////////////////////////////
 async function getStatus() : Promise<number> {
   return new Promise((resolve : (statusCount:number) => void, reject) => {
+    console.log('^^^ Requesting getStatus from server')
     socket.emit('Item/getStatus', {
       repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
     }, (response: Array<any>) => {
       for (let j: number = 0; j < response.length; j++) {
         updateItemStatus(response[j].id, response[j].status);
       }
+      console.log('^^^ Received getStatus response from server')
       resolve(response.length);
     });
   });
