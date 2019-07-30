@@ -52,7 +52,7 @@
       <text-editor #textEditor [text]="document"
         [disabled]="!documentConfiguration || (Object.keys(
         documentConfiguration.components).length === 0)"
-        [formatText]="getUnifiedDocumentFunction()" [save]="getSaveFunction()"
+        [formatText]="getFormattedTextFunction()" [save]="getSaveFunction()"
         (selectionChanged)="(isOutlineOpenAndLinked() ? selectItemInOutline(
         $event) : '')">
       </text-editor>
