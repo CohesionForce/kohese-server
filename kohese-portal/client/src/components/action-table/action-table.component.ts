@@ -92,7 +92,7 @@ export class ActionTableComponent extends NavigatableComponent
   saveRow(savedAction: ItemProxy) {
     console.log('Save row');
     console.log(savedAction);
-    this.itemRepository.upsertItem(savedAction)
+    this.itemRepository.upsertItem(savedAction.kind, savedAction.item)
       .then((updatedItemProxy: ItemProxy) => {
         console.log((updatedItemProxy));
         this.editableRows[updatedItemProxy.item.id] = false;

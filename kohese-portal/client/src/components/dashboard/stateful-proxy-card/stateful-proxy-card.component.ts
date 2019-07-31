@@ -47,7 +47,7 @@ export class StatefulProxyCardComponent implements OnInit {
   }
 
   upsertItem() {
-    this.itemRepository.upsertItem(this.proxy)
+    this.itemRepository.upsertItem(this.proxy.kind, this.proxy.item)
       .then((newAssignment)=>{
         this.proxy = newAssignment;
         this.editable = false;

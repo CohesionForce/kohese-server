@@ -30,7 +30,7 @@ export class CreationRowComponent implements OnInit {
     } else if (this.relation === 'child') {
       parentId = this.referenceProxy.item.id
     }
-    this.itemRepository.buildItem('Item', {
+    this.itemRepository.upsertItem('Item', {
       name : this.name,
       description : this.description,
       parentId : parentId

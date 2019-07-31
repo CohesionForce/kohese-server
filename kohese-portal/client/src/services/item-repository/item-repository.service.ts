@@ -2,6 +2,7 @@
 import { map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import * as _ from 'underscore';
+import { MarkdownService } from 'ngx-markdown';
 
 import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from '../user/current-user.service';
@@ -83,7 +84,8 @@ export class ItemRepository {
     private toastrService: ToastrService,
     private dialogService: DialogService,
     private _versionControlService: VersionControlService,
-    private logService: LogService) {
+    private logService: LogService, private _markdownService:
+    MarkdownService) {
     this.logEvents = InitializeLogs(logService)
     this.logService.log(this.logEvents.itemRepoInit);
 
@@ -628,54 +630,63 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  buildItem(kind: string, item: any): Promise<any> {
-    return new Promise((resolve: (itemProxy: ItemProxy) => void, reject:
-      (error: any) => void) => {
-      this.socketService.socket.emit('Item/upsert', { kind: kind, item: item }, (response) => {
-        if (response.error) {
-          this.logService.log(this.logEvents.createError, {error : response})
-          reject(response.error);
+  public async upsertItem(type: string, item: any): Promise<ItemProxy> {
+    for (let attributeName in item) {
+      // The itemIds attribute is currently absent from classProperties.
+      if (attributeName !== 'itemIds') {
+        let isMarkdownAttribute: boolean = false;
+        let dataModelItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(type);
+        if (dataModelItemProxy.item.classProperties[attributeName].definition.
+          type === 'markdown') {
+          isMarkdownAttribute = true;
         } else {
-          this.logService.log(this.logEvents.createSuccess, {response : response});
-          let proxy;
-          if (response.kind === 'KoheseModel') {
-            proxy = new KoheseModel(response.item);
-          } else {
-            proxy = new ItemProxy(response.kind, response.item);
+          let viewModelItemProxy: ItemProxy = TreeConfiguration.
+            getWorkingTree().getProxyFor('view-' + dataModelItemProxy.item.
+            name.toLowerCase());
+          // Currently, not every data model has a view model.
+          if (!viewModelItemProxy) {
+            viewModelItemProxy = TreeConfiguration.getWorkingTree().
+              getProxyFor('view-item');
           }
-
-          proxy.dirty = false;
-          resolve(proxy);
+          
+          let viewModelAttribute: any = viewModelItemProxy.item.viewProperties[
+            attributeName];
+          if (viewModelAttribute && viewModelAttribute.inputType.type ===
+            'markdown') {
+            isMarkdownAttribute = true;
+          }
         }
-      });
-    });
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  upsertItem(proxy: ItemProxy): Promise<ItemProxy> {
+        
+        if (isMarkdownAttribute) {
+          item[attributeName] = await this.convertToMarkdown(this.
+            _markdownService.compile(item[attributeName]), 'text/html', {});
+        }
+      }
+    }
+    
     return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void),
       reject: ((value: any) => void)) => {
       this.socketService.getSocket().emit('Item/upsert', {
-        kind: proxy.kind,
-        item: proxy.item
+        kind: type,
+        item: item
       }, (response: any) => {
         if (response.error) {
           reject(response.error);
         } else {
-          if (!proxy.updateItem) {
-            // TODO Need to figure out why this is here
-            proxy.item = response.item;
-
-            if (response.kind === 'KoheseModel') {
+          let proxy: ItemProxy;
+          if (!item.id) {
+            if (type === 'KoheseModel') {
               proxy = new KoheseModel(response.item);
             } else {
               proxy = new ItemProxy(response.kind, response.item);
             }
-
           } else {
+            proxy = TreeConfiguration.getWorkingTree().getProxyFor(item.id);
             proxy.updateItem(response.kind, response.item);
+            proxy.dirty = false;
           }
-          proxy.dirty = false;
+          
           resolve(proxy);
         }
       });

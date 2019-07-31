@@ -83,7 +83,8 @@ export class AdminComponent implements OnInit, OnDestroy {
           this.selectedUserProxy.item.password = this.passwordInput;
         }
 
-        this.itemRepository.upsertItem(this.selectedUserProxy);
+        this.itemRepository.upsertItem(this.selectedUserProxy.kind, this.
+          selectedUserProxy.item);
       } else {
         let item: any = {
           parentId: this.sessionService.getSessionUser().getValue().item.parentId,
@@ -95,7 +96,7 @@ export class AdminComponent implements OnInit, OnDestroy {
           item.password = this.passwordInput;
         }
 
-        this.itemRepository.buildItem('KoheseUser', item)
+        this.itemRepository.upsertItem('KoheseUser', item)
           .then(()=>{
             this.users = this.sessionService.getUsers();
           });
