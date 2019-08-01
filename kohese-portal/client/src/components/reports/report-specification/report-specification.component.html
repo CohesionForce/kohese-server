@@ -6,7 +6,7 @@
   <br/>
   <mat-form-field style="width: 100%;">
     <mat-select placeholder="Format" [ngModel]="reportSpecifications.format"
-      (ngModelChange)="reportSpecifications.format = $event">
+      (ngModelChange)="formatSelectionChanged($event)">
       <ng-container *ngFor="let reportFormat of Object.keys(ReportFormat)">
         <mat-option [value]="ReportFormat[reportFormat]">
           {{reportFormat}}
@@ -15,6 +15,19 @@
     </mat-select>
   </mat-form-field>
   <br/>
+  <ng-container *ngIf="allowDescendantInclusionSpecification">
+    <mat-checkbox [(ngModel)]="reportSpecifications.includeDescendants">
+      Include Descendants
+    </mat-checkbox>
+    <br/>
+  </ng-container>
+  <ng-container *ngIf="allowLinkSpecification">
+    <mat-checkbox [(ngModel)]="reportSpecifications.addLinks"
+      style="width: 100%;">
+      Add Links
+    </mat-checkbox>
+    <br/>
+  </ng-container>
   <mat-checkbox [(ngModel)]="reportSpecifications.saveReport"
     style="width: 100%;">
     Save Report
@@ -25,8 +38,7 @@
     flex-direction: column;">
     <span class="flex-right-align">
       <button mat-button matTooltip="Produce a report based on this document"
-        [disabled]="!canProduceReport()" (click)="matDialogRef.close(
-        reportSpecifications)">
+        [disabled]="!canProduceReport()" (click)="produceReport()">
         Produce
       </button>
       <button mat-button matTooltip="Cancel the document export process"

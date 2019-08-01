@@ -10,9 +10,10 @@ import { DocumentConfigurationEditorComponent } from '../object-editor/document-
 import { TreeComponent } from '../tree/tree.component';
 import { TextEditorComponent,
   FormatSpecification } from '../text-editor/text-editor.component';
+import { ReportSpecificationComponent,
+  ReportSpecifications } from '../reports/report-specification/report-specification.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
-import { LocationMap } from '../../constants/LocationMap.data';
 
 @Component({
   selector: 'document',
@@ -370,54 +371,75 @@ export class DocumentComponent implements OnInit, OnDestroy {
     /* The below function is passed to text-editor, so bind the correct 'this'
     to that function. */
     return ((text: string, formatSpecification: FormatSpecification) => {
-      let formattedText: string = text;
-      if (formatSpecification.removeExternalFormatting) {
-        // Remove the last '</div>\n\n'.
-        let regExpTarget: string = formattedText.substring(0, formattedText.
-          length - 8);
-        let ids: Array<string> = [];
-        // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
-        let document: string = regExpTarget.split('').reverse().join('');
-        let match: any;
-        while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-          regExpTarget)) != null) {
-          ids.push(match[1]);
-          if (match.index !== 0) {
-            document = document.substring(0, (regExpTarget.length - match.
-              index)) + document.substring(regExpTarget.length - match.index +
-              8);
+      return this.format(text, formatSpecification);
+    }).bind(this);
+  }
+  
+  private format(text: string, formatSpecification: FormatSpecification):
+    string {
+    let formattedText: string = text;
+    if (formatSpecification.removeExternalFormatting) {
+      // Remove the last '</div>\n\n'.
+      let regExpTarget: string = formattedText.substring(0, formattedText.
+        length - 8);
+      let ids: Array<string> = [];
+      // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
+      let document: string = regExpTarget.split('').reverse().join('');
+      let match: any;
+      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+        regExpTarget)) != null) {
+        ids.push(match[1]);
+        if (match.index !== 0) {
+          document = document.substring(0, (regExpTarget.length - match.
+            index)) + document.substring(regExpTarget.length - match.index +
+            8);
+        }
+      }
+      // Re-orient document.
+      document = document.split('').reverse().join('');
+      document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP, '');
+      
+      formattedText = document;
+    }
+    
+    if (formatSpecification.updateSource) {
+      this._document = formattedText;
+      
+      if (formatSpecification.delineate !== undefined) {
+        this._changeDetectorRef.detectChanges();
+        
+        let documentIds: Array<string> = Array.from(this._documentMap.keys());
+        for (let j: number = 0; j < documentIds.length; j++) {
+          let element: any = this._textEditor.editor.editor.dom.select('div#' +
+            documentIds[j] + 'delineator')[0];
+          if (element) {
+            this._textEditor.editor.editor.dom.setStyle(element, 'display',
+              (formatSpecification.delineate ? '' : 'none'));
           }
         }
-        // Re-orient document.
-        document = document.split('').reverse().join('');
-        document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP,
-          '');
-        
-        formattedText = document;
       }
       
-      if (formatSpecification.updateSource) {
-        this._document = formattedText;
-        
-        if (formatSpecification.delineate !== undefined) {
-          this._changeDetectorRef.detectChanges();
-          
-          let documentIds: Array<string> = Array.from(this._documentMap.
-            keys());
-          for (let j: number = 0; j < documentIds.length; j++) {
-            let element: any = this._textEditor.editor.editor.dom.select(
-              'div#' + documentIds[j] + 'delineator')[0];
-            if (element) {
-              this._textEditor.editor.editor.dom.setStyle(element, 'display',
-                (formatSpecification.delineate ? '' : 'none'));
-            }
+      this._changeDetectorRef.markForCheck();
+    }
+    
+    return formattedText;
+  }
+  
+  public getExportFunction(): (text: string) => void {
+    return ((text: string) => {
+      this._dialogService.openComponentDialog(
+        ReportSpecificationComponent, {
+        data: {
+          defaultName: this._documentConfiguration.name + '_' + new Date().
+            toISOString(),
+          getReportContent: (initialContent: string, reportSpecifications:
+            ReportSpecifications) => {
+            return initialContent + this.format(text,
+              new FormatSpecification());
           }
-        }
-        
-        this._changeDetectorRef.markForCheck();
-      }
-      
-      return formattedText;
+        },
+        disableClose: true
+      }).updateSize('40%', '40%');
     }).bind(this);
   }
   

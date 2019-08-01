@@ -7,10 +7,15 @@ import { MarkdownModule } from 'ngx-markdown';
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ReportsComponent } from './reports.component';
+import { ReportSpecificationComponent } from './report-specification/report-specification.component';
 import { TreeViewModule } from '../tree/tree.module';
 
 @NgModule({
-  declarations: [ReportsComponent],
+  declarations: [
+    ReportsComponent,
+    ReportSpecificationComponent
+  ],
+  entryComponents: [ReportSpecificationComponent],
   exports: [ReportsComponent],
   imports: [
     CommonModule,
