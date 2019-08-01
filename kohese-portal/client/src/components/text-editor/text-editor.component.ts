@@ -1,18 +1,24 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit, ViewChild } from '@angular/core';
+  Inject, Input, OnInit, ViewChild, EventEmitter,
+  Output } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { EditorComponent } from '@tinymce/tinymce-angular';
 import { MarkdownService } from 'ngx-markdown';
-import { ToastrService } from 'ngx-toastr';
-import { NotificationService } from '../../services/notifications/notification.service';
+
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
-import { SessionService } from '../../services/user/session.service';
 import { AttributeInsertionComponent,
   AttributeInsertionSpecification } from './attribute-insertion/attribute-insertion.component';
-import { ReportSpecificationComponent, ReportSpecifications } from './report-specification/report-specification.component';
 
 export class FormatSpecification {
+  private _removeExternalFormatting: boolean = true;
+  get removeExternalFormatting() {
+    return this._removeExternalFormatting;
+  }
+  set removeExternalFormatting(removeExternalFormatting: boolean) {
+    this._removeExternalFormatting = removeExternalFormatting;
+  }
+  
   private _attributeInsertionSpecification: AttributeInsertionSpecification;
   get attributeInsertionSpecification() {
     return this._attributeInsertionSpecification;
@@ -22,12 +28,12 @@ export class FormatSpecification {
     this._attributeInsertionSpecification = attributeInsertionSpecification;
   }
   
-  private _removeExternalFormatting: boolean = true;
-  get removeExternalFormatting() {
-    return this._removeExternalFormatting;
+  private _delineate: boolean;
+  get delineate() {
+    return this._delineate;
   }
-  set removeExternalFormatting(removeExternalFormatting: boolean) {
-    this._removeExternalFormatting = removeExternalFormatting;
+  set delineate(delineate: boolean) {
+    this._delineate = delineate;
   }
   
   private _updateSource: boolean = false;
@@ -62,6 +68,16 @@ export class TextEditorComponent implements OnInit {
   }
   set html(html: string) {
     this._html = html;
+    if (this._contentChangeDelayIdentifier) {
+      clearTimeout(this._contentChangeDelayIdentifier);
+    }
+    
+    this._contentChangeDelayIdentifier = setTimeout(async () => {
+      this._contentChangedEventEmitter.emit(await this._itemRepository.
+        convertToMarkdown(this._html, 'text/html', {}));
+      
+      this._contentChangeDelayIdentifier = undefined;
+    }, 700);
   }
 
   private _disabled: boolean = false;
@@ -83,6 +99,13 @@ export class TextEditorComponent implements OnInit {
     FormatSpecification) => string) {
     this._formatText = formatText;
   }
+  
+  private _exportText: (text: string) => void = (text: string) => {
+  };
+  @Input('exportText')
+  set exportText(exportText: (text: string) => void) {
+    this._exportText = exportText;
+  }
 
   private _save: (text: string) => void = (text: string) => {};
   @Input('save')
@@ -96,6 +119,19 @@ export class TextEditorComponent implements OnInit {
     return this._editor;
   }
   
+  @Output('selectionChanged')
+  private _selectionChangedEventEmitter: EventEmitter<any> =
+    new EventEmitter<any>();
+  get selectionChangedEventEmitter() {
+    return this._selectionChangedEventEmitter;
+  }
+  
+  @Output('contentChanged')
+  private _contentChangedEventEmitter: EventEmitter<string> =
+    new EventEmitter<string>();
+  
+  private _contentChangeDelayIdentifier: any;
+
   get componentReference() {
     return this;
   }
@@ -104,10 +140,7 @@ export class TextEditorComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
     private _markdownService: MarkdownService, private _itemRepository:
-    ItemRepository, private _dialogService: DialogService,
-    private _sessionService: SessionService,
-    private _notificationService: NotificationService,
-    private _toastrService: ToastrService) {
+    ItemRepository, private _dialogService: DialogService) {
   }
 
   public ngOnInit(): void {
@@ -146,9 +179,6 @@ export class TextEditorComponent implements OnInit {
   }
 
   public customizeEditor(editor: any): void {
-    /* Get a reference to TextEditorComponent.this, as 'this' currently
-    references TinyMCE's init object. */
-    let componentThis: TextEditorComponent = this.componentReference;
     editor.ui.registry.addMenuButton('insert', {
       text: 'Insert',
       fetch: (callback: Function) => {
@@ -156,19 +186,32 @@ export class TextEditorComponent implements OnInit {
           {
             type: 'menuitem',
             text: 'Globally...',
-            disabled: !componentThis._text,
+            disabled: !this._text,
             onAction: (button: any) => {
-              componentThis.openGlobalInserter()
+              this.openGlobalInserter();
             }
           }
         ]);
       }
     });
+    editor.ui.registry.addToggleButton('delineate', {
+      text: 'Delineate',
+      onAction: (button: any) => {
+        let delineate: boolean = !button.isActive();
+        let formatSpecification: FormatSpecification =
+          new FormatSpecification();
+        formatSpecification.removeExternalFormatting = false;
+        formatSpecification.delineate = delineate;
+        formatSpecification.updateSource = true;
+        this._formatText(this._text, formatSpecification);
+        button.setActive(delineate);
+      }
+    });
     editor.ui.registry.addButton('export', {
       text: 'Export',
-      disabled: !componentThis._text,
+      disabled: !this._text,
       onAction: (button: any) => {
-        componentThis.openExporter()
+        this._exportText(this._text);
       }
     });
   }
@@ -191,78 +234,10 @@ export class TextEditorComponent implements OnInit {
       }
     });
   }
-  
-  private openExporter(): void {
-    this._dialogService.openComponentDialog(
-      ReportSpecificationComponent, {
-      data: {},
-      disableClose: true
-    }).updateSize('40%', '40%').afterClosed().subscribe(
-      (reportSpecifications: ReportSpecifications) => {
-      if (reportSpecifications) {
-        this._itemRepository.getReportMetaData().then(async (reportObjects:
-          Array<any>) => {
-          let reportContent: string = 'Name: ' + reportSpecifications.name +
-            '\n\nProduced by: ' + this._sessionService.getSessionUser().
-            getValue().item.name + '\n\nProduced on: ' + new Date() +
-            '\n\n' + this._formatText(this._text, new FormatSpecification());
-          if (reportObjects.map((reportObject: any) => {
-            return reportObject.name;
-          }).indexOf(reportSpecifications.name) !== -1) {
-            this._dialogService.openYesNoDialog('Overwrite ' +
-              reportSpecifications.name, 'A report named ' +
-              reportSpecifications.name + ' already exists. Proceeding ' +
-              'should overwrite that report. Do you want to proceed?').
-              subscribe(async (result: any) => {
-              if (result) {
-                await this._itemRepository.produceReport(reportContent,
-                  reportSpecifications.name, reportSpecifications.format);
-                if (!reportSpecifications.saveReport) {
-                  let downloadAnchor: any = document.createElement('a');
-                  downloadAnchor.download = reportSpecifications.name;
-                  downloadAnchor.href = '/producedReports/' +
-                    reportSpecifications.name;
-                  downloadAnchor.click();
-                  await this._itemRepository.removeReport(
-                    reportSpecifications.name);
-                }
-                
-                this._toastrService.success(reportSpecifications.name,
-                  'Report Produced');
-                this._notificationService.addNotifications('COMPLETED: ' +
-                  'Report Completed ' + reportSpecifications.name);
-              }
-            });
-          } else {
-            await this._itemRepository.produceReport(reportContent,
-              reportSpecifications.name, reportSpecifications.format);
-            if (!reportSpecifications.saveReport) {
-              let downloadAnchor: any = document.createElement('a');
-              downloadAnchor.download = reportSpecifications.name;
-              downloadAnchor.href = '/producedReports/' +
-                reportSpecifications.name;
-              downloadAnchor.click();
-              await this._itemRepository.removeReport(reportSpecifications.
-                name);
-            }
-            
-            this._toastrService.success(reportSpecifications.name,
-              'Report Produced');
-            this._notificationService.addNotifications('COMPLETED: Report ' +
-              'Completed ' + reportSpecifications.name);
-          }
-        });
-      }
-    });
-  }
 
   public async saveText(): Promise<void> {
-    /* Get a reference to TextEditorComponent.this, as 'this' currently
-    references a TinyMCE object. */
-    let componentThis: TextEditorComponent = (<any> this).settings.
-      componentReference;
-    componentThis._text = await componentThis._itemRepository.
-      convertToMarkdown(componentThis._html, 'text/html', {});
-    componentThis._save(componentThis._text);
+    this._text = await this._itemRepository.convertToMarkdown(this._html,
+      'text/html', {});
+    this._save(this._text);
   }
 }

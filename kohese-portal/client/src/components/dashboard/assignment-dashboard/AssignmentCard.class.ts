@@ -37,7 +37,7 @@ export class AssignmentCard {
   }
 
   upsertItem() {
-    this.itemRepository.upsertItem(this.assignment)
+    this.itemRepository.upsertItem(this.assignment.kind, this.assignment.item)
       .then((newAssignment)=>{
         this.assignment = newAssignment;
         this.editable = false;

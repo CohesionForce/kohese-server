@@ -86,6 +86,22 @@ export class TreeComponent implements OnInit, AfterViewInit {
   @Input('selection')
   set selection(selection: Array<any>) {
     this._selection = selection;
+    
+    for (let j: number = 0; j < this._selection.length; j++) {
+      let selectionElementMapValue: ElementMapValue = this._elementMap.get(
+        this._selection[j]);
+      if (selectionElementMapValue) {
+        let parentElementMapValue: ElementMapValue = this._elementMap.get(
+          selectionElementMapValue.parent);
+        while (parentElementMapValue) {
+          parentElementMapValue.expanded = true;
+          parentElementMapValue = this._elementMap.get(parentElementMapValue.
+            parent);
+        }
+      }
+    }
+    
+    this._changeDetectorRef.markForCheck();
   }
   
   private _allowMultiselect: boolean = false;
@@ -142,7 +158,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
       }
     }
     
-    this.update();
+    this.update(true);
     
     for (let j: number = 0; j < this._selection.length; j++) {
       let selectionElementMapValue: ElementMapValue = this._elementMap.get(
@@ -256,8 +272,19 @@ export class TreeComponent implements OnInit, AfterViewInit {
   
   public changeSingleExpansionState(element: any, expansionState:
     ExpansionState): void {
-    this._elementMap.get(element).expanded = (expansionState ===
-      ExpansionState.EXPAND);
+    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    elementMapValue.expanded = (expansionState === ExpansionState.EXPAND);
+    if (!elementMapValue.expanded) {
+      let descendantStack: Array<any> = [...this._getChildren(element)];
+      while (descendantStack.length > 0) {
+        let descendantElement: any = descendantStack.pop();
+        let descendantElementMapValue: ElementMapValue = this._elementMap.get(
+          descendantElement);
+        descendantElementMapValue.expanded = false;
+        descendantStack.push(...this._getChildren(descendantElement));
+      }
+    }
+    
     this._changeDetectorRef.markForCheck();
   }
   
@@ -323,11 +350,13 @@ export class TreeComponent implements OnInit, AfterViewInit {
     return treePath;
   }
   
-  public update(): void {
-    this._elementMap.clear();
-    let children: Array<any> = this._getChildren(this._root);
-    for (let j: number = 0; j < children.length; j++) {
-      this.processElement(children[j], this._root, 0);
+  public update(updateStructure: boolean): void {
+    if (updateStructure) {
+      this._elementMap.clear();
+      let children: Array<any> = this._getChildren(this._root);
+      for (let j: number = 0; j < children.length; j++) {
+        this.processElement(children[j], this._root, 0);
+      }
     }
     
     this._changeDetectorRef.markForCheck();

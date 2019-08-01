@@ -39,7 +39,8 @@ export abstract class ProxyDetailsComponent extends NavigatableComponent {
     for (let fieldName in this.nonFormFieldValueMap) {
       this.itemProxy.item[fieldName] = this.nonFormFieldValueMap[fieldName];
     }
-    this.itemRepository.upsertItem(this.itemProxy)
+    
+    this.itemRepository.upsertItem(this.itemProxy.kind, this.itemProxy.item)
       .then((updatedItemProxy: ItemProxy) => {
         this.editableStream.next(false);
       });

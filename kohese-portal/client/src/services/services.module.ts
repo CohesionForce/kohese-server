@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 /* 3rd Party */
 import { ToastrModule } from 'ngx-toastr';
+import { MarkdownModule } from 'ngx-markdown';
 
 /* Custom */
 import { MarkdownEditorModule } from '../components/markdown-editor/markdown-editor.module';
@@ -39,6 +40,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
   imports : [
     CommonModule,
     ToastrModule,
+    MarkdownModule.forChild(),
     MaterialModule,
     RouterModule,
     FormsModule,

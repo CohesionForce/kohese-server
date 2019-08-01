@@ -211,7 +211,7 @@ export class AttributeInsertionComponent {
     }
     
     this._attributeInsertionSpecification.types = types;
-    this._targetTree.update();
+    this._targetTree.update(true);
     this._changeDetectorRef.markForCheck();
   }
   
@@ -232,7 +232,7 @@ export class AttributeInsertionComponent {
       delete types[treePath[0].key];
     }
     
-    this._targetTree.update();
+    this._targetTree.update(true);
     this._changeDetectorRef.markForCheck();
   }
 }

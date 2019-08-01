@@ -9,18 +9,15 @@ import { MaterialModule } from '../../material.module';
 import { TreeViewModule } from '../tree/tree.module';
 import { TextEditorComponent } from './text-editor.component';
 import { AttributeInsertionComponent } from './attribute-insertion/attribute-insertion.component';
-import { ReportSpecificationComponent } from './report-specification/report-specification.component';
 
 @NgModule({
   declarations: [
     TextEditorComponent,
-    AttributeInsertionComponent,
-    ReportSpecificationComponent
+    AttributeInsertionComponent
   ],
   entryComponents: [
     TextEditorComponent,
-    AttributeInsertionComponent,
-    ReportSpecificationComponent
+    AttributeInsertionComponent
   ],
   imports: [
     CommonModule,

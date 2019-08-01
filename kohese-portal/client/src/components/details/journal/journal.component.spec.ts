@@ -59,10 +59,10 @@ describe('Component: Journal', ()=>{
     journalComponent.observationName = 'Kurios Iesous';
     journalComponent.openObservingActivitySelectionDialog();
     tick();
-    spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.
+    spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.
       resolve());
     journalComponent.addJournalEntry();
-    let observation: any = TestBed.get(ItemRepository).buildItem.calls.
+    let observation: any = TestBed.get(ItemRepository).upsertItem.calls.
       argsFor(0)[1];
     expect(observation.name).toEqual('Kurios Iesous');
     expect(observation.parentId).toEqual(ItemProxy.getWorkingTree().

@@ -18,6 +18,7 @@ import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeEditorComponent } from './components/type-editor/type-editor.component';
 import { DevToolsComponent } from './components/admin/dev-tools/dev-tools.component';
+import { FullscreenDocumentComponent } from './components/document-view/fullscreen-document/fullscreen-document.component';
 import { ReportGeneratorComponent } from './components/report-generator/report-generator.component';
 import { ReportsComponent } from './components/reports/reports.component';
 
@@ -94,6 +95,7 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
       { path: 'analysis', component: AnalysisComponent },
       { path: 'typeeditor', component: TypeEditorComponent},
       { path: 'devtools', component: DevToolsComponent},
+      { path: 'fullscreendocument', component: FullscreenDocumentComponent },
       { path: 'document', component: DocumentRouteComponent },
       { path: 'report-gen', component: ReportGeneratorComponent},
       { path: 'reports', component: ReportsComponent }

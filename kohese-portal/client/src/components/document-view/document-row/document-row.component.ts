@@ -62,7 +62,7 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
   }
 
   upsertItem(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
-    this.itemRepository.upsertItem(proxy).then((newProxy) => {
+    this.itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
       row.editable = false;
       docInfo.proxy = newProxy;
       this.upsertComplete.next();
