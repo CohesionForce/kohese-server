@@ -52,6 +52,10 @@ function convertMarkdownToItems(markdown: string, parent: any, producePreamble:
             name: 'Preamble',
             description: '',
             parentId: lineage[0],
+            modifiedBy: parent.modifiedBy,
+            modifiedOn: parent.modifiedOn,
+            createdBy: parent.modifiedBy,
+            createdOn: parent.modifiedOn,
             itemIds: []
         };
         readyToUpsert = true;
@@ -75,6 +79,10 @@ function convertMarkdownToItems(markdown: string, parent: any, producePreamble:
           name: '',
           description: '',
           parentId: parentId,
+          modifiedBy: parent.modifiedBy,
+          modifiedOn: parent.modifiedOn,
+          createdBy: parent.modifiedBy,
+          createdOn: parent.modifiedOn,
           itemIds: [],
           tmpId: ++tmpIdCounter
       };

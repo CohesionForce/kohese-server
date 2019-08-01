@@ -714,9 +714,14 @@ function KIOItemServer(socket){
   });
 
   socket.on('importMarkdown', (request: any, respond: Function) => {
+    let timestamp: number = Date.now();
     MdToKohese.convertMarkdownToItems(request.markdown, {
       name: request.fileName,
       parentId: request.parentId,
+      modifiedBy: socket.koheseUser.username,
+      modifiedOn: timestamp,
+      createdBy: socket.koheseUser.username,
+      createdOn: timestamp,
       itemIds: []
     }, true);
     respond();
