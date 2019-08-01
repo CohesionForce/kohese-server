@@ -12,6 +12,35 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { SessionService } from '../../services/user/session.service';
 import { ReportSpecificationComponent, ReportSpecifications } from './report-specification/report-specification.component';
 
+export class FormatSpecification {
+  private _removeExternalFormatting: boolean = true;
+  get removeExternalFormatting() {
+    return this._removeExternalFormatting;
+  }
+  set removeExternalFormatting(removeExternalFormatting: boolean) {
+    this._removeExternalFormatting = removeExternalFormatting;
+  }
+  
+  private _delineate: boolean;
+  get delineate() {
+    return this._delineate;
+  }
+  set delineate(delineate: boolean) {
+    this._delineate = delineate;
+  }
+  
+  private _updateSource: boolean = false;
+  get updateSource() {
+    return this._updateSource;
+  }
+  set updateSource(updateSource: boolean) {
+    this._updateSource = updateSource;
+  }
+  
+  public constructor() {
+  }
+}
+
 @Component({
   selector: 'text-editor',
   templateUrl: './text-editor.component.html',
@@ -32,6 +61,16 @@ export class TextEditorComponent implements OnInit {
   }
   set html(html: string) {
     this._html = html;
+    if (this._contentChangeDelayIdentifier) {
+      clearTimeout(this._contentChangeDelayIdentifier);
+    }
+    
+    this._contentChangeDelayIdentifier = setTimeout(async () => {
+      this._contentChangedEventEmitter.emit(await this._itemRepository.
+        convertToMarkdown(this._html, 'text/html', {}));
+      
+      this._contentChangeDelayIdentifier = undefined;
+    }, 700);
   }
 
   private _disabled: boolean = false;
@@ -43,11 +82,14 @@ export class TextEditorComponent implements OnInit {
     this._disabled = disabled;
   }
 
-  private _formatText: (text: string) => string = (text: string) => {
+  private _formatText: (text: string, formatSpecification:
+    FormatSpecification) => string = (text: string, formatSpecification:
+    FormatSpecification) => {
     return text;
   };
   @Input('formatText')
-  set formatText(formatText: (text: string) => string) {
+  set formatText(formatText: (text: string, formatSpecification:
+    FormatSpecification) => string) {
     this._formatText = formatText;
   }
 
@@ -69,6 +111,12 @@ export class TextEditorComponent implements OnInit {
   get selectionChangedEventEmitter() {
     return this._selectionChangedEventEmitter;
   }
+  
+  @Output('contentChanged')
+  private _contentChangedEventEmitter: EventEmitter<string> =
+    new EventEmitter<string>();
+  
+  private _contentChangeDelayIdentifier: any;
 
   get componentReference() {
     return this;
@@ -120,93 +168,97 @@ export class TextEditorComponent implements OnInit {
   }
 
   public customizeEditor(editor: any): void {
-    /* Get a reference to TextEditorComponent.this, as 'this' currently
-    references TinyMCE's init object. */
-    let componentThis: TextEditorComponent = this.componentReference;
+    editor.ui.registry.addToggleButton('delineate', {
+      text: 'Delineate',
+      onAction: (button: any) => {
+        let delineate: boolean = !button.isActive();
+        let formatSpecification: FormatSpecification =
+          new FormatSpecification();
+        formatSpecification.removeExternalFormatting = false;
+        formatSpecification.delineate = delineate;
+        formatSpecification.updateSource = true;
+        this._formatText(this._text, formatSpecification);
+        button.setActive(delineate);
+      }
+    });
     editor.ui.registry.addButton('export', {
       text: 'Export',
-      disabled: !componentThis._text,
-      onAction: componentThis.getExportFunction(componentThis)
+      disabled: !this._text,
+      onAction: (button: any) => {
+        this.openExporter();
+      }
     });
   }
 
-  private getExportFunction(componentThis: TextEditorComponent): (button:
-    any) => void {
-    return ((button: any) => {
-      this._dialogService.openComponentDialog(
-        ReportSpecificationComponent, {
-        data: {},
-        disableClose: true
-      }).updateSize('40%', '40%').afterClosed().subscribe(
-        (reportSpecifications: ReportSpecifications) => {
-        this._notificationService.addNotifications('PROCESSING: Export Report ' +
-          reportSpecifications.name);
-        if (reportSpecifications) {
-          this._itemRepository.getReportMetaData().then(async (reportObjects:
-            Array<any>) => {
-            let reportContent: string = 'Name: ' + reportSpecifications.name +
-              '\n\nProduced by: ' + this._sessionService.getSessionUser().
-              getValue().item.name + '\n\nProduced on: ' + new Date() +
-              '\n\n' + this._formatText(this._text);
-            if (reportObjects.map((reportObject: any) => {
-              return reportObject.name;
-            }).indexOf(reportSpecifications.name) !== -1) {
-              this._dialogService.openYesNoDialog('Overwrite ' +
-                reportSpecifications.name, 'A report named ' +
-                reportSpecifications.name + ' already exists. Proceeding ' +
-                'should overwrite that report. Do you want to proceed?').
-                subscribe(async (result: any) => {
-                if (result) {
-                  await this._itemRepository.produceReport(reportContent,
-                    reportSpecifications.name, reportSpecifications.format);
-                  if (!reportSpecifications.saveReport) {
-                    let downloadAnchor: any = document.createElement('a');
-                    downloadAnchor.download = reportSpecifications.name;
-                    downloadAnchor.href = '/producedReports/' +
-                      reportSpecifications.name;
-                    downloadAnchor.click();
-                    await this._itemRepository.removeReport(
-                      reportSpecifications.name);
-                  }
-
-                  this._toastrService.success(reportSpecifications.name,
-                    'Report Produced');
-                  this._notificationService.addNotifications('COMPLETED: Report Completed ' +
+  private openExporter(): void {
+    this._dialogService.openComponentDialog(
+      ReportSpecificationComponent, {
+      data: {},
+      disableClose: true
+    }).updateSize('40%', '40%').afterClosed().subscribe(
+      (reportSpecifications: ReportSpecifications) => {
+      this._notificationService.addNotifications('PROCESSING: Export Report ' +
+        reportSpecifications.name);
+      if (reportSpecifications) {
+        this._itemRepository.getReportMetaData().then(async (reportObjects:
+          Array<any>) => {
+          let reportContent: string = 'Name: ' + reportSpecifications.name +
+            '\n\nProduced by: ' + this._sessionService.getSessionUser().
+            getValue().item.name + '\n\nProduced on: ' + new Date() +
+            '\n\n' + this._formatText(this._text, new FormatSpecification());
+          if (reportObjects.map((reportObject: any) => {
+            return reportObject.name;
+          }).indexOf(reportSpecifications.name) !== -1) {
+            this._dialogService.openYesNoDialog('Overwrite ' +
+              reportSpecifications.name, 'A report named ' +
+              reportSpecifications.name + ' already exists. Proceeding ' +
+              'should overwrite that report. Do you want to proceed?').
+              subscribe(async (result: any) => {
+              if (result) {
+                await this._itemRepository.produceReport(reportContent,
+                  reportSpecifications.name, reportSpecifications.format);
+                if (!reportSpecifications.saveReport) {
+                  let downloadAnchor: any = document.createElement('a');
+                  downloadAnchor.download = reportSpecifications.name;
+                  downloadAnchor.href = '/producedReports/' +
+                    reportSpecifications.name;
+                  downloadAnchor.click();
+                  await this._itemRepository.removeReport(
                     reportSpecifications.name);
-
                 }
-              });
-            } else {
-              await this._itemRepository.produceReport(reportContent,
-                reportSpecifications.name, reportSpecifications.format);
-              if (!reportSpecifications.saveReport) {
-                let downloadAnchor: any = document.createElement('a');
-                downloadAnchor.download = reportSpecifications.name;
-                downloadAnchor.href = '/producedReports/' +
-                  reportSpecifications.name;
-                downloadAnchor.click();
-                await this._itemRepository.removeReport(reportSpecifications.
-                  name);
-              }
 
-              this._toastrService.success(reportSpecifications.name,
-                'Report Produced');
-              this._notificationService.addNotifications('COMPLETED: Report Completed ' +
-                reportSpecifications.name);
+                this._toastrService.success(reportSpecifications.name,
+                  'Report Produced');
+                this._notificationService.addNotifications('COMPLETED: Report Completed ' +
+                  reportSpecifications.name);
+              }
+            });
+          } else {
+            await this._itemRepository.produceReport(reportContent,
+              reportSpecifications.name, reportSpecifications.format);
+            if (!reportSpecifications.saveReport) {
+              let downloadAnchor: any = document.createElement('a');
+              downloadAnchor.download = reportSpecifications.name;
+              downloadAnchor.href = '/producedReports/' +
+                reportSpecifications.name;
+              downloadAnchor.click();
+              await this._itemRepository.removeReport(reportSpecifications.
+                name);
             }
-          });
-        }
-      });
-    }).bind(componentThis);
+
+            this._toastrService.success(reportSpecifications.name,
+              'Report Produced');
+            this._notificationService.addNotifications('COMPLETED: Report Completed ' +
+              reportSpecifications.name);
+          }
+        });
+      }
+    });
   }
 
   public async saveText(): Promise<void> {
-    /* Get a reference to TextEditorComponent.this, as 'this' currently
-    references a TinyMCE object. */
-    let componentThis: TextEditorComponent = (<any> this).settings.
-      componentReference;
-    componentThis._text = await componentThis._itemRepository.
-      convertToMarkdown(componentThis._html, 'text/html', {});
-    componentThis._save(componentThis._text);
+    this._text = await this._itemRepository.convertToMarkdown(this._html,
+      'text/html', {});
+    this._save(this._text);
   }
 }

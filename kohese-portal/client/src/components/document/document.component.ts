@@ -8,7 +8,8 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DocumentConfigurationEditorComponent } from '../object-editor/document-configuration/document-configuration-editor.component';
 import { TreeComponent } from '../tree/tree.component';
-import { TextEditorComponent } from '../text-editor/text-editor.component';
+import { TextEditorComponent,
+  FormatSpecification } from '../text-editor/text-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { LocationMap } from '../../constants/LocationMap.data';
@@ -28,7 +29,43 @@ export class DocumentComponent implements OnInit, OnDestroy {
   set documentConfiguration(documentConfiguration: any) {
     this._documentConfiguration = documentConfiguration;
     if (this._documentConfiguration) {
-      this._document = this.buildDocument();
+      this._documentMap.clear();
+      this._document = '';
+      let componentIds: Array<string> = Object.keys(this._documentConfiguration.
+        components);
+      let documentIds: Array<string> = [];
+      for (let j: number = 0; j < componentIds.length; j++) {
+        documentIds.push(componentIds[j]);
+        let componentSettings: any = this._documentConfiguration.components[
+          componentIds[j]];
+        if (componentSettings.includeDescendants) {
+          let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(componentIds[j]);
+          itemProxy.visitTree({ includeOrigin: false }, (descendantItemProxy:
+            ItemProxy) => {
+            documentIds.push(descendantItemProxy.item.id);
+          });
+        }
+      }
+      
+      for (let j: number = 0; j < documentIds.length; j++) {
+        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(documentIds[j]);
+        
+        this._document += this.getFormattedOpeningHiddenTag(itemProxy.item.id,
+          itemProxy.item.name);
+        this._document += this.getFormattedOpeningHiddenTag(itemProxy.item.id +
+          'description', 'Description');
+        
+        this._documentMap.set(documentIds[j], itemProxy.item.description);
+        if (itemProxy.item.description) {
+          this._document += (itemProxy.item.description + '\n\n');
+        }
+        
+        this._document += DocumentComponent._CLOSING_HIDDEN_TAG;
+        
+        this._document += DocumentComponent._CLOSING_HIDDEN_TAG;
+      }
       
       /* If the selected DocumentConfiguration has not been persisted, add it
       to the Array of DocumentConfigurations. */
@@ -51,6 +88,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
   get documentConfigurations() {
     return this._documentConfigurations;
   }
+  
+  private _documentMap: Map<string, string> = new Map<string, string>();
   
   private _document: string = '';
   get document() {
@@ -85,11 +124,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return this._getOutlineItemChildren;
   }
   
-  private _getOutlineItemText: (element: any) => string = (element: any) => {
-    return (element as ItemProxy).item.name;
+  private _getItemText: (element: any) => string = (element: any) => {
+    return ((element as ItemProxy).item.name + (this._documentMap.get(
+      (element as ItemProxy).item.id) === (element as ItemProxy).item.
+      description ? '' : '*'));
   };
-  get getOutlineItemText() {
-    return this._getOutlineItemText;
+  get getItemText() {
+    return this._getItemText;
   }
   
   @ViewChild('outlineTree')
@@ -108,8 +149,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return Object;
   }
   
+  private static readonly _OPENING_HIDDEN_TAG: string =
+    '<div id="" style="visibility: hidden;"><div id="delineator" class="mceNonEditable" style="color: lightgray; text-align: center; display: none;">------------------------</div>\n\n';
+  private static readonly _CLOSING_HIDDEN_TAG: string = '</div>\n\n';
   private static readonly _SEPARATOR_DIV_REGEXP: RegExp =
-    /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;">\s{2}/g;
+    /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;">\s{2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{2}\\-{12}[\s\S]+?-{12}\s{2}<\/div>\s{2}/g;
+  private static readonly _ATTRIBUTE_REGEXP: RegExp =
+    /<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]+" style="visibility: hidden;">\s{2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{2}\\-{12}[\s\S]+?-{12}\s{2}<\/div>\s{2}/g;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
@@ -163,45 +209,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
         this._documentConfigurations.push(itemProxy.item);
       }
     }, undefined);
-  }
-  
-  private buildDocument(): string {
-    let document: string = '';
-    let componentIds: Array<string> = Object.keys(this._documentConfiguration.
-      components);
-    let documentIds: Array<string> = [];
-    for (let j: number = 0; j < componentIds.length; j++) {
-      documentIds.push(componentIds[j]);
-      let componentSettings: any = this._documentConfiguration.components[
-        componentIds[j]];
-      if (componentSettings.includeDescendants) {
-        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(componentIds[j]);
-        itemProxy.visitTree({ includeOrigin: false }, (descendantItemProxy:
-          ItemProxy) => {
-          documentIds.push(descendantItemProxy.item.id);
-        });
-      }
-    }
-    
-    for (let j: number = 0; j < documentIds.length; j++) {
-      let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-        getProxyFor(documentIds[j]);
-      
-      document += ('<div id="' + itemProxy.item.id +
-        '" style="visibility: hidden;">\n\n');
-      
-      if (itemProxy.item.description) {
-        document += itemProxy.item.description;
-      }
-      if (j < (documentIds.length - 1)) {
-        document += '\n\n';
-      }
-      
-      document += '</div>\n\n';
-    }
-    
-    return document;
   }
   
   public editDocumentConfiguration(documentConfiguration: any):
@@ -269,12 +276,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
   
   public selectItemInOutline(node: any): void {
     let id: string;
-    // Reuse _SEPARATOR_DIV_REGEXP, trimming off '>\s{2}'.
-    let separatorDivRegExpSource: string = DocumentComponent.
-      _SEPARATOR_DIV_REGEXP.source;
-    let startsWithSeparatorRegExp: RegExp = new RegExp('^' +
-      separatorDivRegExpSource.substring(0, separatorDivRegExpSource.length -
-      6));
+    let startsWithSeparatorRegExp: RegExp =
+      /^<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;"/;
     let match: any;
     do {
       if ((match = startsWithSeparatorRegExp.exec(node.outerHTML)) !== null) {
@@ -292,30 +295,113 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }
   }
   
-  public getUnifiedDocumentFunction(): (text: string) => string {
-    /* The below function is passed to text-editor, so bind the correct 'this'
-    to that function. */
-    return ((text: string) => {
-      // Remove the last '</div>\n\n'.
-      let regExpTarget: string = text.substring(0, text.length - 8);
-      let ids: Array<string> = [];
-      // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
-      let document: string = regExpTarget.split('').reverse().join('');
-      let match: any;
-      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-        regExpTarget)) != null) {
-        ids.push(match[1]);
-        if (match.index !== 0) {
-          document = document.substring(0, (regExpTarget.length - match.
-            index)) + document.substring(regExpTarget.length - match.index +
-            8);
+  public textEditorContentChanged(text: string): void {
+    // Remove the last '</div>\n\n'.
+    let regExpTarget: string = text.substring(0, text.length - 8);
+    // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
+    let splitTarget: string = regExpTarget.split('').reverse().join('');
+    let match: any;
+    while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+      regExpTarget)) != null) {
+      if (match.index !== 0) {
+        splitTarget = splitTarget.substring(0, (regExpTarget.length - match.
+          index)) + splitTarget.substring(regExpTarget.length - match.
+          index + 8);
+      }
+    }
+    // Re-orient splitTarget.
+    splitTarget = splitTarget.split('').reverse().join('');
+    
+    let itemIdsAndContent: Array<string> = splitTarget.split(
+      DocumentComponent._SEPARATOR_DIV_REGEXP);
+    // Remove the first element, as it should be empty.
+    itemIdsAndContent.shift();
+    for (let j: number = 0; j < itemIdsAndContent.length; j++) {
+      if ((j % 2) === 0) {
+        let itemId: string = itemIdsAndContent[j];
+        let description: string = itemIdsAndContent[j + 1];
+        let descriptionHiddenTag: string = this.getFormattedOpeningHiddenTag(
+          itemId + 'description', 'Description');
+        // Remove non-description content
+        description = description.substring(description.indexOf(
+          descriptionHiddenTag) + descriptionHiddenTag.length);
+        description = description.substring(0, description.search(
+          DocumentComponent._ATTRIBUTE_REGEXP) - 8);
+        
+        this._documentMap.set(itemId, description);
+        
+        let element: any = this._textEditor.editor.editor.dom.select('div#' +
+          itemId + 'delineator')[0];
+        if (element) {
+          let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(itemId);
+          this._textEditor.editor.editor.dom.setHTML(element, '------------' +
+            itemProxy.item.name + ((itemProxy.item.description ===
+            description) ? '' : '*') + '------------');
         }
       }
-      // Re-orient document.
-      document = document.split('').reverse().join('');
-      document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP, '');
+    }
+    
+    if (this._outlineTree) {
+      this._outlineTree.update(false);
+    }
+    
+    this._changeDetectorRef.markForCheck();
+  }
+  
+  public getFormattedTextFunction(): (text: string, formatSpecification:
+    FormatSpecification) => string {
+    /* The below function is passed to text-editor, so bind the correct 'this'
+    to that function. */
+    return ((text: string, formatSpecification: FormatSpecification) => {
+      let formattedText: string = text;
+      if (formatSpecification.removeExternalFormatting) {
+        // Remove the last '</div>\n\n'.
+        let regExpTarget: string = formattedText.substring(0, formattedText.
+          length - 8);
+        let ids: Array<string> = [];
+        // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
+        let document: string = regExpTarget.split('').reverse().join('');
+        let match: any;
+        while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+          regExpTarget)) != null) {
+          ids.push(match[1]);
+          if (match.index !== 0) {
+            document = document.substring(0, (regExpTarget.length - match.
+              index)) + document.substring(regExpTarget.length - match.index +
+              8);
+          }
+        }
+        // Re-orient document.
+        document = document.split('').reverse().join('');
+        document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP,
+          '');
+        
+        formattedText = document;
+      }
       
-      return document;
+      if (formatSpecification.updateSource) {
+        this._document = formattedText;
+        
+        if (formatSpecification.delineate !== undefined) {
+          this._changeDetectorRef.detectChanges();
+          
+          let documentIds: Array<string> = Array.from(this._documentMap.
+            keys());
+          for (let j: number = 0; j < documentIds.length; j++) {
+            let element: any = this._textEditor.editor.editor.dom.select(
+              'div#' + documentIds[j] + 'delineator')[0];
+            if (element) {
+              this._textEditor.editor.editor.dom.setStyle(element, 'display',
+                (formatSpecification.delineate ? '' : 'none'));
+            }
+          }
+        }
+        
+        this._changeDetectorRef.markForCheck();
+      }
+      
+      return formattedText;
     }).bind(this);
   }
   
@@ -323,53 +409,12 @@ export class DocumentComponent implements OnInit, OnDestroy {
     /* The below function is passed to text-editor, so bind the correct 'this'
     to that function. */
     return ((text: string) => {
-      // Remove the last '</div>\n\n'.
-      let regExpTarget: string = text.substring(0, text.length - 8);
-      // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
-      let splitTarget: string = regExpTarget.split('').reverse().join('');
-      let match: any;
-      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-        regExpTarget)) != null) {
-        if (match.index !== 0) {
-          splitTarget = splitTarget.substring(0, (regExpTarget.length - match.
-            index)) + splitTarget.substring(regExpTarget.length - match.
-            index + 8);
-        }
-      }
-      // Re-orient splitTarget.
-      splitTarget = splitTarget.split('').reverse().join('');
-      let descriptions: Array<string> = splitTarget.split(DocumentComponent.
-        _SEPARATOR_DIV_REGEXP);
-      // Remove the first element, as it should be empty.
-      descriptions.shift();
-      let documentMap: Map<string, string> = new Map<string, string>();
-      for (let j: number = 0; j < descriptions.length; j++) {
-        if ((j % 2) === 0) {
-          documentMap.set(descriptions[j], descriptions[j + 1]);
-        }
-      }
-      
-      let componentIds: Array<string> = Object.keys(this.
-        _documentConfiguration.components);
-      let documentIds: Array<string> = [];
-      for (let j: number = 0; j < componentIds.length; j++) {
-        documentIds.push(componentIds[j]);
-        let componentSettings: any = this._documentConfiguration.components[
-          componentIds[j]];
-        if (componentSettings.includeDescendants) {
-          let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-            getProxyFor(componentIds[j]);
-          itemProxy.visitTree({ includeOrigin: false }, (descendantItemProxy:
-            ItemProxy) => {
-            documentIds.push(descendantItemProxy.item.id);
-          });
-        }
-      }
-      
+      this.textEditorContentChanged(text);
+      let documentIds: Array<string> = Array.from(this._documentMap.keys());
       for (let j: number = 0; j < documentIds.length; j++) {
         let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(documentIds[j]);
-        let description: string = documentMap.get(documentIds[j]);
+        let description: string = this._documentMap.get(documentIds[j]);
         if (description == null) {
           description = '';
         }
@@ -379,7 +424,35 @@ export class DocumentComponent implements OnInit, OnDestroy {
           itemProxy.item.description = description;
           this._itemRepository.upsertItem(itemProxy);
         }
+        
+        let element: any = this._textEditor.editor.editor.dom.select('div#' +
+          documentIds[j] + 'delineator')[0];
+        if (element) {
+          this._textEditor.editor.editor.dom.setHTML(element, '------------' +
+            itemProxy.item.name + ((itemProxy.item.description ===
+            description) ? '' : '*') + '------------');
+        }
+      }
+      
+      if (this._outlineTree) {
+        this._outlineTree.update(false);
       }
     }).bind(this);
+  }
+  
+  private getFormattedOpeningHiddenTag(id: string, text: string): string {
+    // Insert id after 'id="'.
+    let formattedOpeningHiddenTag: string = (DocumentComponent.
+      _OPENING_HIDDEN_TAG.substring(0, 9) + id + DocumentComponent.
+      _OPENING_HIDDEN_TAG.substring(9, 48) + id + DocumentComponent.
+      _OPENING_HIDDEN_TAG.substring(48));
+    
+    // Insert text in the middle of the 24 '-'s.
+    formattedOpeningHiddenTag = formattedOpeningHiddenTag.substring(0,
+      formattedOpeningHiddenTag.length - 20) + text +
+      formattedOpeningHiddenTag.substring(formattedOpeningHiddenTag.length -
+      20);
+    
+    return formattedOpeningHiddenTag;
   }
 }
