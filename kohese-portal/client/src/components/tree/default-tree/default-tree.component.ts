@@ -390,7 +390,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       if (targetingProxy.item.parentId !== parentProxy.item.id) {
         targetingProxy.item.parentId = parentProxy.item.id;
         targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
-        this._itemRepository.upsertItem(targetingProxy);
+        this._itemRepository.upsertItem(targetingProxy.kind, targetingProxy.
+          item);
       }
 
       parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
@@ -403,11 +404,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       }
 
       parentProxy.updateChildrenManualOrder();
-      this._itemRepository.upsertItem(parentProxy);
+      this._itemRepository.upsertItem(parentProxy.kind, parentProxy.item);
     } else {
       targetingProxy.item.parentId = targetProxy.item.id;
       targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
-      this._itemRepository.upsertItem(targetingProxy);
+      this._itemRepository.upsertItem(targetingProxy.kind, targetingProxy.
+        item);
     }
   }
 

@@ -53,9 +53,9 @@ export class DocumentComponent implements OnInit, OnDestroy {
           getProxyFor(documentIds[j]);
         
         this._document += this.getFormattedOpeningHiddenTag(itemProxy.item.id,
-          itemProxy.item.name);
+          itemProxy.item.name, false);
         this._document += this.getFormattedOpeningHiddenTag(itemProxy.item.id +
-          'description', 'Description');
+          'description', 'Description', false);
         
         this._documentMap.set(documentIds[j], itemProxy.item.description);
         if (itemProxy.item.description) {
@@ -149,13 +149,15 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return Object;
   }
   
-  private static readonly _OPENING_HIDDEN_TAG: string =
+  private static readonly _INPUT_OPENING_HIDDEN_TAG: string =
     '<div id="" style="visibility: hidden;"><div id="delineator" class="mceNonEditable" style="color: lightgray; text-align: center; display: none;">------------------------</div>\n\n';
+  private static readonly _OUTPUT_OPENING_HIDDEN_TAG: string =
+    '<div id="" style="visibility: hidden;">\n\n<div id="delineator" class="mceNonEditable" style="color: lightgray; text-align: center; display: none;">\n\n\\------------------------\n\n</div>\n\n';
   private static readonly _CLOSING_HIDDEN_TAG: string = '</div>\n\n';
   private static readonly _SEPARATOR_DIV_REGEXP: RegExp =
     /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;">\s{2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{2}\\-{12}[\s\S]+?-{12}\s{2}<\/div>\s{2}/g;
   private static readonly _ATTRIBUTE_REGEXP: RegExp =
-    /<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]+" style="visibility: hidden;">\s{2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{2}\\-{12}[\s\S]+?-{12}\s{2}<\/div>\s{2}/g;
+    /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]+)" style="visibility: hidden;">\s{2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{2}\\-{12}[\s\S]+?-{12}\s{2}<\/div>\s{2}/g;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
@@ -223,7 +225,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       any) => {
       if (returnValue) {
         if (!documentConfiguration) {
-          let itemProxy: ItemProxy = await this._itemRepository.buildItem(
+          let itemProxy: ItemProxy = await this._itemRepository.upsertItem(
             'DocumentConfiguration', returnValue);
           if (!this._documentConfiguration) {
             this.documentConfiguration = itemProxy.item;
@@ -234,11 +236,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
             documentConfiguration.id).kind !== 'DocumentConfiguration') {
             // The edited DocumentConfiguration has not been persisted.
             delete documentConfiguration.id;
-            documentConfiguration = (await this._itemRepository.buildItem(
+            documentConfiguration = (await this._itemRepository.upsertItem(
               'DocumentConfiguration', documentConfiguration)).item;
           } else {
-            await this._itemRepository.upsertItem(TreeConfiguration.
-              getWorkingTree().getProxyFor(documentConfiguration.id));
+            let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+              getProxyFor(documentConfiguration.id);
+            await this._itemRepository.upsertItem(itemProxy.kind, itemProxy.
+              item);
           }
           this.documentConfiguration = documentConfiguration;
           this.populateDocumentConfigurationArray();
@@ -321,12 +325,24 @@ export class DocumentComponent implements OnInit, OnDestroy {
         let itemId: string = itemIdsAndContent[j];
         let description: string = itemIdsAndContent[j + 1];
         let descriptionHiddenTag: string = this.getFormattedOpeningHiddenTag(
-          itemId + 'description', 'Description');
+          itemId + 'description', 'Description', true);
         // Remove non-description content
         description = description.substring(description.indexOf(
           descriptionHiddenTag) + descriptionHiddenTag.length);
-        description = description.substring(0, description.search(
-          DocumentComponent._ATTRIBUTE_REGEXP) - 8);
+        let nonDescriptionHiddenTagIndex: number = description.search(
+          DocumentComponent._ATTRIBUTE_REGEXP);
+        // Appropriately remove '</div>\n\n'.
+        if (nonDescriptionHiddenTagIndex !== -1) {
+          description = description.substring(0, nonDescriptionHiddenTagIndex -
+            8);
+        } else {
+          description = description.substring(0, description.length - 8);
+        }
+        
+        if (j !== (itemIdsAndContent.length - 2)) {
+          // Trim off an extra '\n'.
+          description = description.substring(0, description.length - 1);
+        }
         
         this._documentMap.set(itemId, description);
         
@@ -422,7 +438,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
         // Don't save any Items whose description was not modified.
         if (itemProxy.item.description !== description) {
           itemProxy.item.description = description;
-          this._itemRepository.upsertItem(itemProxy);
+          this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
         }
         
         let element: any = this._textEditor.editor.editor.dom.select('div#' +
@@ -440,18 +456,34 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }).bind(this);
   }
   
-  private getFormattedOpeningHiddenTag(id: string, text: string): string {
-    // Insert id after 'id="'.
-    let formattedOpeningHiddenTag: string = (DocumentComponent.
-      _OPENING_HIDDEN_TAG.substring(0, 9) + id + DocumentComponent.
-      _OPENING_HIDDEN_TAG.substring(9, 48) + id + DocumentComponent.
-      _OPENING_HIDDEN_TAG.substring(48));
-    
-    // Insert text in the middle of the 24 '-'s.
-    formattedOpeningHiddenTag = formattedOpeningHiddenTag.substring(0,
-      formattedOpeningHiddenTag.length - 20) + text +
-      formattedOpeningHiddenTag.substring(formattedOpeningHiddenTag.length -
-      20);
+  private getFormattedOpeningHiddenTag(id: string, text: string,
+    inOutputFormat: boolean): string {
+    let formattedOpeningHiddenTag: string;
+    if (inOutputFormat) {
+      // Insert id after 'id="'.
+      formattedOpeningHiddenTag = (DocumentComponent.
+        _OUTPUT_OPENING_HIDDEN_TAG.substring(0, 9) + id + DocumentComponent.
+        _OUTPUT_OPENING_HIDDEN_TAG.substring(9, 50) + id + DocumentComponent.
+        _OUTPUT_OPENING_HIDDEN_TAG.substring(50));
+      
+      // Insert text in the middle of the 24 '-'s.
+      formattedOpeningHiddenTag = formattedOpeningHiddenTag.substring(0,
+        formattedOpeningHiddenTag.length - 22) + text +
+        formattedOpeningHiddenTag.substring(formattedOpeningHiddenTag.length -
+        22);
+    } else {
+      // Insert id after 'id="'.
+      formattedOpeningHiddenTag = (DocumentComponent.
+        _INPUT_OPENING_HIDDEN_TAG.substring(0, 9) + id + DocumentComponent.
+        _INPUT_OPENING_HIDDEN_TAG.substring(9, 48) + id + DocumentComponent.
+        _INPUT_OPENING_HIDDEN_TAG.substring(48));
+      
+      // Insert text in the middle of the 24 '-'s.
+      formattedOpeningHiddenTag = formattedOpeningHiddenTag.substring(0,
+        formattedOpeningHiddenTag.length - 20) + text +
+        formattedOpeningHiddenTag.substring(formattedOpeningHiddenTag.length -
+        20);
+    }
     
     return formattedOpeningHiddenTag;
   }

@@ -106,7 +106,7 @@ export class CreateWizardComponent extends NavigatableComponent
       }
     }
 
-    this.itemRepository.buildItem(this.proxyPlaceholderStream.getValue().kind,
+    this.itemRepository.upsertItem(this.proxyPlaceholderStream.getValue().kind,
       item).then(() => {
         console.log('Build Item promise resolve');
         this.MatDialogRef.close();

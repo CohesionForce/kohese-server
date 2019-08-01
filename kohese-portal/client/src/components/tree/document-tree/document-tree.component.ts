@@ -220,7 +220,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       if (targetingProxy.item.parentId !== parentProxy.item.id) {
         targetingProxy.item.parentId = parentProxy.item.id;
         targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
-        this.itemRepository.upsertItem(targetingProxy);
+        this.itemRepository.upsertItem(targetingProxy.kind, targetingProxy.
+          item);
       }
       
       parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
@@ -233,11 +234,11 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       }
 
       parentProxy.updateChildrenManualOrder();
-      this.itemRepository.upsertItem(parentProxy);
+      this.itemRepository.upsertItem(parentProxy.kind, parentProxy.item);
     } else {
       targetingProxy.item.parentId = targetProxy.item.id;
       targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
-      this.itemRepository.upsertItem(targetingProxy);
+      this.itemRepository.upsertItem(targetingProxy.kind, targetingProxy.item);
     }
   }
   

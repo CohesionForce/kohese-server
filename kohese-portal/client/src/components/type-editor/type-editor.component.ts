@@ -68,7 +68,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       string) => {
       if (name) {
         let dataModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
-          buildItem('KoheseModel', {
+          upsertItem('KoheseModel', {
           name: name,
           parentId: 'Item',
           base: 'Item',
@@ -81,7 +81,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           localTypes: []
         });
         let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
-          buildItem('KoheseView', {
+          upsertItem('KoheseView', {
           name: name,
           modelName: name,
           parentId: 'view-item',
@@ -130,14 +130,14 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
 
   save(): void {
     let koheseType: KoheseType = this._koheseTypeStream.getValue();
-    this.itemRepository.upsertItem(koheseType.dataModelProxy).catch(
-      (error: any) => {
+    this.itemRepository.upsertItem(koheseType.dataModelProxy.kind, koheseType.
+      dataModelProxy.item).catch((error: any) => {
       console.log('Error saving data model for ' + koheseType.dataModelProxy.
         item.name + '.');
       console.log(error);
     });
-    this.itemRepository.upsertItem(koheseType.viewModelProxy).catch(
-      (error: any) => {
+    this.itemRepository.upsertItem(koheseType.viewModelProxy.kind, koheseType.
+      viewModelProxy.item).catch((error: any) => {
       console.log('Error saving view model for ' + koheseType.dataModelProxy.
         item.name + '.');
       console.log(error);

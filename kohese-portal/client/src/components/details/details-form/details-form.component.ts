@@ -247,7 +247,8 @@ export class DetailsFormComponent extends NavigatableComponent
           this.proxyStream.getValue().item[attributeName] = returnedObject;
           this.whenNonFormFieldChanges(attributeName, returnedObject);
         } else {
-          this._itemRepository.upsertItem(returnedObject as ItemProxy);
+          let itemProxy: ItemProxy = (returnedObject as ItemProxy);
+          this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
         }
       }
     });
@@ -441,7 +442,9 @@ export class DetailsFormComponent extends NavigatableComponent
                 this.whenNonFormFieldChanges(attributeName, this.proxyStream.
                   getValue().item[attributeName]);
               } else {
-                this._itemRepository.upsertItem(returnedObject as ItemProxy);
+                let itemProxy: ItemProxy = (returnedObject as ItemProxy);
+                this._itemRepository.upsertItem(itemProxy.kind, itemProxy.
+                  item);
               }
             }
           });

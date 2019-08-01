@@ -124,7 +124,8 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
 
   saveFormat () {
     console.log(this.currentType.viewModelProxy);
-    this.itemRepository.upsertItem(this.currentType.viewModelProxy).then((result) => { console.log(result); });
+    this.itemRepository.upsertItem(this.currentType.viewModelProxy.kind, this.
+      currentType.viewModelProxy.item);
   }
 
   openPreview () {

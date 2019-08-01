@@ -81,7 +81,7 @@ describe('Component: Create Wizard', ()=>{
         fieldName: fieldName,
         fieldValue: fieldValue
       });
-      let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.resolve());
+      let buildSpy = spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve());
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();
@@ -92,7 +92,7 @@ describe('Component: Create Wizard', ()=>{
     }))
 
     it('displays an error when a build fails', async(()=>{
-      let buildSpy = spyOn(TestBed.get(ItemRepository), 'buildItem').and.returnValue(Promise.reject('Incorrect Fields'));
+      let buildSpy = spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.reject('Incorrect Fields'));
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();

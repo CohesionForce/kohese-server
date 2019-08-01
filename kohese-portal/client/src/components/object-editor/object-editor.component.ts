@@ -142,7 +142,8 @@ export class ObjectEditorComponent implements OnInit {
         if (isLocalTypeInstance) {
           this._copy[attributeName] = returnedObject;
         } else {
-          this._itemRepository.upsertItem(returnedObject as ItemProxy);
+          let itemProxy: ItemProxy = (returnedObject as ItemProxy);
+          this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
         }
       }
     });
@@ -306,7 +307,9 @@ export class ObjectEditorComponent implements OnInit {
                 this._copy[attributeName].splice(index, 1, returnedObject);
                 this._changeDetectorRef.markForCheck();
               } else {
-                this._itemRepository.upsertItem(returnedObject as ItemProxy);
+                let itemProxy: ItemProxy = (returnedObject as ItemProxy);
+                this._itemRepository.upsertItem(itemProxy.kind, itemProxy.
+                  item);
               }
             }
           });
