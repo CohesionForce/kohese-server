@@ -1,8 +1,11 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit } from '@angular/core';
+  Inject, Input, OnInit, ViewChild, EventEmitter,
+  Output } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { EditorComponent } from '@tinymce/tinymce-angular';
 import { MarkdownService } from 'ngx-markdown';
 import { ToastrService } from 'ngx-toastr';
+
 import { NotificationService } from '../../services/notifications/notification.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
@@ -52,6 +55,19 @@ export class TextEditorComponent implements OnInit {
   @Input('save')
   set save(save: (text: string) => void) {
     this._save = save;
+  }
+  
+  @ViewChild('editor')
+  private _editor: EditorComponent;
+  get editor() {
+    return this._editor;
+  }
+  
+  @Output('selectionChanged')
+  private _selectionChangedEventEmitter: EventEmitter<any> =
+    new EventEmitter<any>();
+  get selectionChangedEventEmitter() {
+    return this._selectionChangedEventEmitter;
   }
 
   get componentReference() {

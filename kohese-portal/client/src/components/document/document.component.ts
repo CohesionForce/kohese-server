@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit, OnDestroy } from '@angular/core';
+  Inject, Input, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Subscription } from 'rxjs';
 
@@ -7,6 +7,8 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DocumentConfigurationEditorComponent } from '../object-editor/document-configuration/document-configuration-editor.component';
+import { TreeComponent } from '../tree/tree.component';
+import { TextEditorComponent } from '../text-editor/text-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { LocationMap } from '../../constants/LocationMap.data';
@@ -54,6 +56,47 @@ export class DocumentComponent implements OnInit, OnDestroy {
   get document() {
     return this._document;
   }
+  
+  private _linkOutlineAndDocument: boolean = false;
+  get linkOutlineAndDocument() {
+    return this._linkOutlineAndDocument;
+  }
+  set linkOutlineAndDocument(linkOutlineAndDocument: boolean) {
+    this._linkOutlineAndDocument = linkOutlineAndDocument;
+  }
+  
+  private _getOutlineItemChildren: (element: any) => Array<any> = (element:
+    any) => {
+    let children: Array<any> = [];
+    if (element === this._documentConfiguration) {
+      let componentIds: Array<string> = Object.keys(this.
+        _documentConfiguration.components);
+      for (let j: number = 0; j < componentIds.length; j++) {
+        children.push(TreeConfiguration.getWorkingTree().getProxyFor(
+          componentIds[j]));
+      }
+    } else {
+      children.push(...(element as ItemProxy).children);
+    }
+    
+    return children;
+  };
+  get getOutlineItemChildren() {
+    return this._getOutlineItemChildren;
+  }
+  
+  private _getOutlineItemText: (element: any) => string = (element: any) => {
+    return (element as ItemProxy).item.name;
+  };
+  get getOutlineItemText() {
+    return this._getOutlineItemText;
+  }
+  
+  @ViewChild('outlineTree')
+  private _outlineTree: TreeComponent;
+  
+  @ViewChild('textEditor')
+  private _textEditor: TextEditorComponent;
   
   get matDialogRef() {
     return this._matDialogRef;
@@ -213,6 +256,40 @@ export class DocumentComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       }
     });
+  }
+  
+  public scrollDocumentToItem(item: any): void {
+    this._textEditor.editor.editor.dom.select('div#' + item.id)[0].
+      scrollIntoView();
+  }
+  
+  public isOutlineOpenAndLinked(): boolean {
+    return (this._outlineTree && this._linkOutlineAndDocument);
+  }
+  
+  public selectItemInOutline(node: any): void {
+    let id: string;
+    // Reuse _SEPARATOR_DIV_REGEXP, trimming off '>\s{2}'.
+    let separatorDivRegExpSource: string = DocumentComponent.
+      _SEPARATOR_DIV_REGEXP.source;
+    let startsWithSeparatorRegExp: RegExp = new RegExp('^' +
+      separatorDivRegExpSource.substring(0, separatorDivRegExpSource.length -
+      6));
+    let match: any;
+    do {
+      if ((match = startsWithSeparatorRegExp.exec(node.outerHTML)) !== null) {
+        id = match[1];
+        break;
+      }
+      
+      node = node.parentNode;
+    } while (node);
+    
+    if (id) {
+      this._outlineTree.selection = [TreeConfiguration.getWorkingTree().
+        getProxyFor(id)];
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
   public getUnifiedDocumentFunction(): (text: string) => string {
