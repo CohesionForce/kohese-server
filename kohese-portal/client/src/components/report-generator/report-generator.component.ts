@@ -76,7 +76,7 @@ export class ReportGeneratorComponent implements OnInit {
       };
       }
 
-    this.itemRepository.buildItem('ReportDefinition', {
+    this.itemRepository.upsertItem('ReportDefinition', {
       name : 'New Report',
       entryPoints : [],
       typeFormats : typeFormats,
@@ -177,7 +177,8 @@ export class ReportGeneratorComponent implements OnInit {
   }
 
   saveReport() {
-    this.itemRepository.upsertItem(this.selectedReport).then((newProxy)=>{
+    this.itemRepository.upsertItem(this.selectedReport.kind, this.
+      selectedReport.item).then((newProxy)=>{
       this.selectedReport.dirty = false;
       this.changeRef.markForCheck();
     });

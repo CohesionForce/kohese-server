@@ -1,9 +1,11 @@
 <div class="panel right-zone" [ngClass]="{'details-doc' : incrementalLoad}">
   <div class="panel-heading">
-    <button mat-icon-button (click)="navigate('Document',
-      { id: itemProxy.item.id })">
-      <mat-icon class="fa fa-file-text-o"></mat-icon>
-    </button>
+    <ng-container *ngIf="!fullscreen">
+      <button mat-icon-button (click)="navigate('FullscreenDocument',
+        { id: itemProxy.item.id })">
+        <mat-icon class="fa fa-list"></mat-icon>
+      </button>
+    </ng-container>
     Document View
     <span class="pull-right">({{itemsLoaded}}/{{itemLength}}) </span>
   </div>

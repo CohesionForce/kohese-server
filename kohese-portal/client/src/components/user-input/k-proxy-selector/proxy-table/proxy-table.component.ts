@@ -142,7 +142,8 @@ export class ProxyTableComponent implements OnInit {
     }
     ////
     upsertItem(proxy: ItemProxy) {
-      this.itemRepository.upsertItem(proxy).then((savedProxy) => {
+      this.itemRepository.upsertItem(proxy.kind, proxy.item).then((savedProxy:
+        ItemProxy) => {
         if (savedProxy) {
           this.expandedEdit = false;
         }

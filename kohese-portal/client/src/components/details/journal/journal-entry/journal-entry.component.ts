@@ -51,7 +51,8 @@ export class JournalEntryComponent implements OnInit, OnChanges {
   
   save(): void {
     this.itemProxy.item.description = this.editText;
-    this.itemRepository.upsertItem(this.itemProxy).then((proxy: ItemProxy) => {
+    this.itemRepository.upsertItem(this.itemProxy.kind, this.itemProxy.item).
+      then((proxy: ItemProxy) => {
       this.inEditMode = false;
     });
   }

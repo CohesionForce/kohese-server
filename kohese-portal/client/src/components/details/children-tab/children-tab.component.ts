@@ -115,7 +115,7 @@ export class ChildrenTabComponent extends NavigatableComponent
 
     this.saveEmitter.subscribe((proxy) => {
       console.log(proxy);
-      this.ItemRepository.upsertItem(proxy);
+      this.ItemRepository.upsertItem(proxy.kind, proxy.item);
     })
   }
 }

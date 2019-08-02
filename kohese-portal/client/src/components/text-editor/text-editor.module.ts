@@ -6,16 +6,13 @@ import { EditorModule } from '@tinymce/tinymce-angular';
 
 import { MaterialModule } from '../../material.module';
 import { TextEditorComponent } from './text-editor.component';
-import { ReportSpecificationComponent } from './report-specification/report-specification.component';
 
 @NgModule({
   declarations: [
-    TextEditorComponent,
-    ReportSpecificationComponent
+    TextEditorComponent
   ],
   entryComponents: [
-    TextEditorComponent,
-    ReportSpecificationComponent
+    TextEditorComponent
   ],
   imports: [
     CommonModule,
