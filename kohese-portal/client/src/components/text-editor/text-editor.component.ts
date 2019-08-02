@@ -4,13 +4,8 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { EditorComponent } from '@tinymce/tinymce-angular';
 import { MarkdownService } from 'ngx-markdown';
-import { ToastrService } from 'ngx-toastr';
 
-import { NotificationService } from '../../services/notifications/notification.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { DialogService } from '../../services/dialog/dialog.service';
-import { SessionService } from '../../services/user/session.service';
-import { ReportSpecificationComponent, ReportSpecifications } from './report-specification/report-specification.component';
 
 export class FormatSpecification {
   private _removeExternalFormatting: boolean = true;
@@ -92,6 +87,13 @@ export class TextEditorComponent implements OnInit {
     FormatSpecification) => string) {
     this._formatText = formatText;
   }
+  
+  private _exportText: (text: string) => void = (text: string) => {
+  };
+  @Input('exportText')
+  set exportText(exportText: (text: string) => void) {
+    this._exportText = exportText;
+  }
 
   private _save: (text: string) => void = (text: string) => {};
   @Input('save')
@@ -126,10 +128,7 @@ export class TextEditorComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
     private _markdownService: MarkdownService, private _itemRepository:
-    ItemRepository, private _dialogService: DialogService,
-    private _sessionService: SessionService,
-    private _notificationService: NotificationService,
-    private _toastrService: ToastrService) {
+    ItemRepository) {
   }
 
   public ngOnInit(): void {
@@ -185,73 +184,7 @@ export class TextEditorComponent implements OnInit {
       text: 'Export',
       disabled: !this._text,
       onAction: (button: any) => {
-        this.openExporter();
-      }
-    });
-  }
-
-  private openExporter(): void {
-    this._dialogService.openComponentDialog(
-      ReportSpecificationComponent, {
-      data: {},
-      disableClose: true
-    }).updateSize('40%', '40%').afterClosed().subscribe(
-      (reportSpecifications: ReportSpecifications) => {
-      this._notificationService.addNotifications('PROCESSING: Export Report ' +
-        reportSpecifications.name);
-      if (reportSpecifications) {
-        this._itemRepository.getReportMetaData().then(async (reportObjects:
-          Array<any>) => {
-          let reportContent: string = 'Name: ' + reportSpecifications.name +
-            '\n\nProduced by: ' + this._sessionService.getSessionUser().
-            getValue().item.name + '\n\nProduced on: ' + new Date() +
-            '\n\n' + this._formatText(this._text, new FormatSpecification());
-          if (reportObjects.map((reportObject: any) => {
-            return reportObject.name;
-          }).indexOf(reportSpecifications.name) !== -1) {
-            this._dialogService.openYesNoDialog('Overwrite ' +
-              reportSpecifications.name, 'A report named ' +
-              reportSpecifications.name + ' already exists. Proceeding ' +
-              'should overwrite that report. Do you want to proceed?').
-              subscribe(async (result: any) => {
-              if (result) {
-                await this._itemRepository.produceReport(reportContent,
-                  reportSpecifications.name, reportSpecifications.format);
-                if (!reportSpecifications.saveReport) {
-                  let downloadAnchor: any = document.createElement('a');
-                  downloadAnchor.download = reportSpecifications.name;
-                  downloadAnchor.href = '/producedReports/' +
-                    reportSpecifications.name;
-                  downloadAnchor.click();
-                  await this._itemRepository.removeReport(
-                    reportSpecifications.name);
-                }
-
-                this._toastrService.success(reportSpecifications.name,
-                  'Report Produced');
-                this._notificationService.addNotifications('COMPLETED: Report Completed ' +
-                  reportSpecifications.name);
-              }
-            });
-          } else {
-            await this._itemRepository.produceReport(reportContent,
-              reportSpecifications.name, reportSpecifications.format);
-            if (!reportSpecifications.saveReport) {
-              let downloadAnchor: any = document.createElement('a');
-              downloadAnchor.download = reportSpecifications.name;
-              downloadAnchor.href = '/producedReports/' +
-                reportSpecifications.name;
-              downloadAnchor.click();
-              await this._itemRepository.removeReport(reportSpecifications.
-                name);
-            }
-
-            this._toastrService.success(reportSpecifications.name,
-              'Report Produced');
-            this._notificationService.addNotifications('COMPLETED: Report Completed ' +
-              reportSpecifications.name);
-          }
-        });
+        this._exportText(this._text);
       }
     });
   }

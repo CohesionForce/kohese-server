@@ -14,12 +14,15 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
+import { ReportSpecificationComponent,
+  ReportSpecifications } from '../../reports/report-specification/report-specification.component';
 import { Tree, TargetPosition } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, DisplayableEntity, Action,
   ActionGroup } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
+import { LocationMap } from '../../../constants/LocationMap.data';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 import { ImportComponent } from '../../import/import.component';
 
@@ -116,6 +119,62 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(deleteAction);
     this.menuActions.unshift(deleteAction);
+    
+    let produceReportAction: Action = new Action('Produce Report', 'Produce ' +
+      'a report from this Item and its descendants', 'fa fa-file-text-o',
+      (object: any) => {
+      return !(object as ItemProxy).internal;
+    }, (object: any) => {
+      this._dialogService.openComponentDialog(
+        ReportSpecificationComponent, {
+        data: {
+          defaultName: (object as ItemProxy).item.name + '_' + new Date().
+            toISOString(),
+          allowDescendantInclusionSpecification: true,
+          allowLinkSpecification: true,
+          getReportContent: (initialContent: string, reportSpecifications:
+            ReportSpecifications) => {
+            let processItemProxy: (itemProxy: ItemProxy) => void = (itemProxy:
+              ItemProxy) => {
+              let headingLevel: number = itemProxy.getDepthFromAncestor(
+                (object as ItemProxy));
+              for (let j: number = 0; j < headingLevel; j++) {
+                initialContent += '#';
+              }
+              initialContent += ' ';
+              
+              if (reportSpecifications.addLinks) {
+                initialContent += ('[' + itemProxy.item.name + '](' + window.
+                  location.origin + LocationMap['Explore'].route + ';id=' +
+                  itemProxy.item.id + ')\n\n');
+              } else {
+                initialContent += (itemProxy.item.name + '\n\n');
+              }
+              
+              if (itemProxy.item.description) {
+                initialContent += (itemProxy.item.description + '\n\n');
+              }
+            };
+            
+            if (reportSpecifications.includeDescendants) {
+              let itemProxyStack: Array<ItemProxy> = [(object as ItemProxy)];
+              while (itemProxyStack.length > 0) {
+                let itemProxy: ItemProxy = itemProxyStack.shift();
+                processItemProxy(itemProxy);
+                itemProxyStack.unshift(...itemProxy.children);
+              }
+            } else {
+              processItemProxy((object as ItemProxy));
+            }
+            
+            return initialContent;
+          }
+        },
+        disableClose: true
+      }).updateSize('40%', '40%');
+    });
+    this.rootMenuActions.unshift(produceReportAction);
+    this.menuActions.unshift(produceReportAction);
     
     let openAsDocumentAction: Action = new Action('Open As Document', 'Open ' +
       'this Item and its descendants as a document', 'fa fa-file-text-o',
