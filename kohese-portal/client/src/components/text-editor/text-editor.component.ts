@@ -6,9 +6,6 @@ import { EditorComponent } from '@tinymce/tinymce-angular';
 import { MarkdownService } from 'ngx-markdown';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { DialogService } from '../../services/dialog/dialog.service';
-import { AttributeInsertionComponent,
-  AttributeInsertionSpecification } from './attribute-insertion/attribute-insertion.component';
 
 export class FormatSpecification {
   private _removeExternalFormatting: boolean = true;
@@ -17,15 +14,6 @@ export class FormatSpecification {
   }
   set removeExternalFormatting(removeExternalFormatting: boolean) {
     this._removeExternalFormatting = removeExternalFormatting;
-  }
-  
-  private _attributeInsertionSpecification: AttributeInsertionSpecification;
-  get attributeInsertionSpecification() {
-    return this._attributeInsertionSpecification;
-  }
-  set attributeInsertionSpecification(attributeInsertionSpecification:
-    AttributeInsertionSpecification) {
-    this._attributeInsertionSpecification = attributeInsertionSpecification;
   }
   
   private _delineate: boolean;
@@ -100,6 +88,15 @@ export class TextEditorComponent implements OnInit {
     this._formatText = formatText;
   }
   
+  private _insertText: (text: string, isGlobalInsertion: boolean) => void =
+    (text: string, isGlobalInsertion: boolean) => {
+  };
+  @Input('insertText')
+  set insertText(insertText: (text: string, isGlobalInsertion:
+    boolean) => void) {
+    this._insertText = insertText;
+  }
+  
   private _exportText: (text: string) => void = (text: string) => {
   };
   @Input('exportText')
@@ -140,7 +137,7 @@ export class TextEditorComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
     private _markdownService: MarkdownService, private _itemRepository:
-    ItemRepository, private _dialogService: DialogService) {
+    ItemRepository) {
   }
 
   public ngOnInit(): void {
@@ -188,7 +185,8 @@ export class TextEditorComponent implements OnInit {
             text: 'Globally...',
             disabled: !this._text,
             onAction: (button: any) => {
-              this.openGlobalInserter();
+              this._insertText(this._text, true);
+              this._editor.editor.setDirty(true);
             }
           }
         ]);
@@ -216,25 +214,6 @@ export class TextEditorComponent implements OnInit {
     });
   }
   
-  private openGlobalInserter(): void {
-    this._dialogService.openComponentDialog(AttributeInsertionComponent, {
-      data: {},
-      disableClose: true
-    }).updateSize('90%', '90%').afterClosed().subscribe(
-      (attributeInsertionSpecification: AttributeInsertionSpecification) => {
-      if (attributeInsertionSpecification) {
-        let formatSpecification: FormatSpecification =
-          new FormatSpecification();
-        formatSpecification.attributeInsertionSpecification =
-          attributeInsertionSpecification;
-        formatSpecification.removeExternalFormatting = false;
-        formatSpecification.updateSource = true;
-        this._editor.editor.setDirty(true);
-        this._changeDetectorRef.markForCheck();
-      }
-    });
-  }
-
   public async saveText(): Promise<void> {
     this._text = await this._itemRepository.convertToMarkdown(this._html,
       'text/html', {});

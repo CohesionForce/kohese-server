@@ -54,7 +54,8 @@
         [disabled]="!documentConfiguration || (Object.keys(
         documentConfiguration.components).length === 0)"
         [formatText]="getFormattedTextFunction()"
-        [exportText]="getExportFunction()" [save]="getSaveFunction()"
+        [insertText]="getInsertFunction()" [exportText]="getExportFunction()"
+        [save]="getSaveFunction()"
         (selectionChanged)="(isOutlineOpenAndLinked() ? selectItemInOutline(
         $event) : '')" (contentChanged)="textEditorContentChanged($event)">
       </text-editor>

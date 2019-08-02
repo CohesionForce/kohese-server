@@ -10,8 +10,9 @@ import { DocumentConfigurationEditorComponent } from '../object-editor/document-
 import { TreeComponent } from '../tree/tree.component';
 import { TextEditorComponent,
   FormatSpecification } from '../text-editor/text-editor.component';
-import { AttributeInsertionSpecification,
-  InsertionLocation } from '../text-editor/attribute-insertion/attribute-insertion.component';
+import { AttributeInsertionComponent, AttributeInsertionSpecification,
+  InsertionLocation,
+  HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
 import { ReportSpecificationComponent,
   ReportSpecifications } from '../reports/report-specification/report-specification.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -164,14 +165,23 @@ export class DocumentComponent implements OnInit, OnDestroy {
   }
   
   private static readonly _INPUT_OPENING_HIDDEN_TAG: string =
-    '<div id="" style="visibility: hidden;"><div id="delineator" class="mceNonEditable" style="color: lightgray; text-align: center; display: none;">------------------------</div>\n\n';
+    '<div id="" style="visibility: hidden;">' +
+    '<div id="delineator" class="mceNonEditable" style="color: lightgray; text-align: center; display: none;">' +
+    '------------------------' +
+    '</div>\n\n';
   private static readonly _OUTPUT_OPENING_HIDDEN_TAG: string =
-    '<div id="" style="visibility: hidden;">\n\n<div id="delineator" class="mceNonEditable" style="color: lightgray; text-align: center; display: none;">\n\n\\------------------------\n\n</div>\n\n';
+    '<div id="" style="visibility: hidden;">' +
+    '\n\n' +
+    '<div id="delineator" class="mceNonEditable" style="color: lightgray; text-align: center; display: none;">' +
+    '\n\n' +
+    '\\------------------------' +
+    '\n\n' +
+    '</div>\n\n';
   private static readonly _CLOSING_HIDDEN_TAG: string = '</div>\n\n';
   private static readonly _SEPARATOR_DIV_REGEXP: RegExp =
-    /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;">\s{2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{2}\\-{12}[\s\S]+?-{12}\s{2}<\/div>\s{2}/g;
+    /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;">\s{0,2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{0,2}\\{0,1}-{12}[\s\S]+?-{12}\s{0,2}<\/div>\s{2}/g;
   private static readonly _ATTRIBUTE_REGEXP: RegExp =
-    /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]+)" style="visibility: hidden;">\s{2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{2}\\-{12}[\s\S]+?-{12}\s{2}<\/div>\s{2}/g;
+    /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]*?)" style="visibility: hidden;">\s{0,2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]*?delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{0,2}\\{0,1}-{12}[\s\S]+?-{12}\s{0,2}<\/div>\s{2}/g;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
@@ -372,6 +382,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     }
     
+    this._documentConfiguration.document = text;
+    
     if (this._outlineTree) {
       this._outlineTree.update(false);
     }
@@ -391,53 +403,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
   private format(text: string, formatSpecification: FormatSpecification):
     string {
     let formattedText: string = text;
-    if (formatSpecification.attributeInsertionSpecification) {
-      let insertionMap: Map<number, string> = new Map<number, string>();
-      let match: any;
-      let previousItemProxy: ItemProxy = undefined;
-      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-        formattedText)) != null) {
-        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(match[1]);
-        let typeObject: any = formatSpecification.
-          attributeInsertionSpecification.types[itemProxy.kind];
-        if (typeObject) {
-          if (formatSpecification.attributeInsertionSpecification.
-            insertionLocation === InsertionLocation.Top) {
-            insertionMap.set(match.index + match[0].length, this.
-              getAttributeInsertionString(typeObject, itemProxy));
-          } else {
-            /* Insert the attribute string at the end of the content for the
-            previous ItemProxy. */
-            if (previousItemProxy) {
-              // Subtract the length of '</div>\n\n'.
-              insertionMap.set(match.index - 8, this.
-                getAttributeInsertionString(typeObject,
-                previousItemProxy));
-            }
-            
-            /* If this is the last match, insert the attribute before the
-            last '</div>\n\n'. */
-            if (formattedText.substring(match.index + match[0].length).
-              search(DocumentComponent._SEPARATOR_DIV_REGEXP) === -1) {
-              // Subtract the length of '</div>\n\n'.
-              insertionMap.set(formattedText.length - 8, this.
-                getAttributeInsertionString(typeObject, itemProxy));
-            }
-          }
-        }
-        
-        previousItemProxy = itemProxy;
-      }
-      
-      let insertionMapKeys: Array<number> = Array.from(insertionMap.keys());
-      for (let j: number = (insertionMapKeys.length - 1); j >= 0; j--) {
-        formattedText = formattedText.substring(0, insertionMapKeys[j]) +
-          insertionMap.get(insertionMapKeys[j]) + formattedText.substring(
-          insertionMapKeys[j]);
-      }
-    }
-      
     if (formatSpecification.removeExternalFormatting) {
       // Remove the last '</div>\n\n'.
       let regExpTarget: string = formattedText.substring(0, formattedText.
@@ -454,22 +419,15 @@ export class DocumentComponent implements OnInit, OnDestroy {
             index)) + document.substring(regExpTarget.length - match.index +
             8);
         }
-        // Re-orient document.
-        document = document.split('').reverse().join('');
-        document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP,
-          '');
-        
-        formattedText = document;
       }
-      
-      if (formatSpecification.updateSource) {
-        this._document = formattedText;
-        this._changeDetectorRef.markForCheck();
-      }
+      // Re-orient document.
+      document = document.split('').reverse().join('');
+      document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP,
+        '');
       
       formattedText = document;
     }
-    
+      
     if (formatSpecification.updateSource) {
       this._document = formattedText;
       
@@ -491,6 +449,69 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }
     
     return formattedText;
+  }
+  
+  public getInsertFunction(): (text: string, isGlobalInsertion:
+    boolean) => string {
+    return ((text: string, isGlobalInsertion: boolean) => {
+      this._dialogService.openComponentDialog(AttributeInsertionComponent, {
+        data: {},
+        disableClose: true
+      }).updateSize('90%', '90%').afterClosed().subscribe(
+        (attributeInsertionSpecification: AttributeInsertionSpecification) => {
+        if (attributeInsertionSpecification) {
+          let insertionMap: Map<number, string> = new Map<number, string>();
+          let match: any;
+          let previousItemProxy: ItemProxy = undefined;
+          while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
+            text)) != null) {
+            let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+              getProxyFor(match[1]);
+            let typeObject: any = attributeInsertionSpecification.types[
+              itemProxy.kind];
+            if (typeObject) {
+              if (attributeInsertionSpecification.insertionLocation ===
+                InsertionLocation.Top) {
+                insertionMap.set(match.index + match[0].length, this.
+                  getAttributeInsertionString(typeObject, itemProxy));
+              } else {
+                /* Insert the attribute string at the end of the content for
+                the previous ItemProxy. */
+                if (previousItemProxy) {
+                  // Subtract the length of '</div>\n\n'.
+                  insertionMap.set(match.index - 8, this.
+                    getAttributeInsertionString(typeObject,
+                    previousItemProxy));
+                }
+                
+                /* If this is the last match, insert the attribute before the
+                last '</div>\n\n'. */
+                if (text.substring(match.index + match[0].length).search(
+                  DocumentComponent._SEPARATOR_DIV_REGEXP) === -1) {
+                  // Subtract the length of '</div>\n\n'.
+                  insertionMap.set(text.length - 8, this.
+                    getAttributeInsertionString(typeObject, itemProxy));
+                }
+              }
+            }
+            
+            previousItemProxy = itemProxy;
+          }
+          
+          let insertionMapKeys: Array<number> = Array.from(insertionMap.
+            keys());
+          for (let j: number = (insertionMapKeys.length - 1); j >= 0; j--) {
+            text = text.substring(0, insertionMapKeys[j]) + insertionMap.get(
+              insertionMapKeys[j]) + text.substring(insertionMapKeys[j]);
+          }
+          
+          this._document = text;
+          this._changeDetectorRef.markForCheck();
+          
+          return text;
+        }
+      });
+    }).bind(this);
   }
   
   public getExportFunction(): (text: string) => void {
@@ -521,6 +542,34 @@ export class DocumentComponent implements OnInit, OnDestroy {
       if (attributeName === 'name') {
         if (typeObject.attributes[attributeName].showAttributeName) {
           attributeString += attributeName + ': ';
+        }
+        
+        let headingLevel: number = -1;
+        if (typeObject.attributes[attributeName].headingStyle === HeadingStyle.
+          STRUCTURAL) {
+          let componentIds: Array<string> = Object.keys(this.
+            _documentConfiguration.components);
+          for (let j: number = 0; j < componentIds.length; j++) {
+            headingLevel = itemProxy.getDepthFromAncestor(TreeConfiguration.
+              getWorkingTree().getProxyFor(componentIds[j]));
+            if (headingLevel !== -1) {
+              // Add one to headingLevel to account for the hierarchy root
+              headingLevel += 1;
+              break;
+            }
+          }
+        } else {
+          let headingStyleValues: Array<string> = Object.values(HeadingStyle);
+          headingLevel = headingStyleValues.indexOf(typeObject.attributes[
+            attributeName].headingStyle);
+        }
+        
+        for (let j: number = 0; j < headingLevel; j++) {
+          attributeString += '#';
+        }
+        
+        if (headingLevel > 0) {
+          attributeString += ' ';
         }
 
         if (typeObject.attributes[attributeName].linkToItem) {
@@ -588,8 +637,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
             description) ? '' : '*') + '------------');
         }
       }
-      
-      this._documentConfiguration.document = text;
       
       // Only save the documentConfiguration if it has already been persisted
       let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().

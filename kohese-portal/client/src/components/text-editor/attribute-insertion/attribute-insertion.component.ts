@@ -24,6 +24,12 @@ export enum InsertionLocation {
   Top = 'Top', Bottom = 'Bottom'
 }
 
+export enum HeadingStyle {
+  NONE = 'None', ONE = 'Heading 1', TWO = 'Heading 2', THREE = 'Heading 3',
+    FOUR = 'Heading 4', FIVE = 'Heading 5', SIX = 'Heading 6', STRUCTURAL =
+    'Structurally-Based'
+}
+
 export class AttributeInsertionSpecification {
   private _insertionLocation: InsertionLocation = InsertionLocation.Bottom;
   get insertionLocation() {
@@ -162,6 +168,10 @@ export class AttributeInsertionComponent {
   get InsertionLocation() {
     return InsertionLocation;
   }
+  
+  get HeadingStyle() {
+    return HeadingStyle;
+  }
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
@@ -198,14 +208,18 @@ export class AttributeInsertionComponent {
         
         if (treePath.length > 2) {
           typeValue.localTypes[treePath[1].key].attributes[treePath[2].key] = {
+            showAttributeName: false,
             linkToItem: (treePath[2].key === 'name' ? false : undefined),
-            showAttributeName: false
+            headingStyle: (treePath[2].key === 'name' ? HeadingStyle.
+              STRUCTURAL : undefined)
           };
         }
       } else {
         typeValue.attributes[treePath[1].key] = {
+          showAttributeName: false,
           linkToItem: (treePath[1].key === 'name' ? false : undefined),
-          showAttributeName: false
+          headingStyle: (treePath[1].key === 'name' ? HeadingStyle.STRUCTURAL :
+            undefined)
         };
       }
     }

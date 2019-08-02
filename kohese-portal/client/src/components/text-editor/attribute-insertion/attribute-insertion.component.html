@@ -53,6 +53,12 @@
           </ng-template>
         </ng-container>
         <ng-template #attributeSelected>
+          <mat-checkbox [checked]="targetTree.selection[0].value.
+            showAttributeName" (change)="targetTree.selection[0].value.
+            showAttributeName = $event.checked">
+            Show Attribute Name
+          </mat-checkbox>
+          <br/>
           <ng-container *ngIf="targetTree.selection[0].key === 'name'">
             <mat-checkbox [checked]="targetTree.selection[0].value.linkToItem"
               (change)="targetTree.selection[0].value.linkToItem = $event.
@@ -60,12 +66,18 @@
               Link To Item
             </mat-checkbox>
             <br/>
+            <mat-form-field style="width: 100%;">
+              <mat-select placeholder="Heading Style" [(ngModel)]="targetTree.
+                selection[0].value.headingStyle">
+                <ng-container *ngFor="let headingStyle of Object.keys(
+                  HeadingStyle)">
+                  <mat-option [value]="HeadingStyle[headingStyle]">
+                    {{HeadingStyle[headingStyle]}}
+                  </mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
           </ng-container>
-          <mat-checkbox [checked]="targetTree.selection[0].value.
-            showAttributeName" (change)="targetTree.selection[0].value.
-            showAttributeName = $event.checked">
-            Show Attribute Name
-          </mat-checkbox>
         </ng-template>
       </ng-container>
     </split-area>
