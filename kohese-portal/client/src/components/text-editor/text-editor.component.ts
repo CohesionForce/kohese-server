@@ -103,6 +103,14 @@ export class TextEditorComponent implements OnInit {
   set exportText(exportText: (text: string) => void) {
     this._exportText = exportText;
   }
+  
+  private _update: (text: string, fromComponents: boolean) => void = (text:
+    string, fromComponents: boolean) => {
+  };
+  @Input('update')
+  set update(update: (text: string, fromComponents: boolean) => void) {
+    this._update = update;
+  }
 
   private _save: (text: string) => void = (text: string) => {};
   @Input('save')
@@ -210,6 +218,29 @@ export class TextEditorComponent implements OnInit {
       disabled: !this._text,
       onAction: (button: any) => {
         this._exportText(this._text);
+      }
+    });
+    editor.ui.registry.addMenuButton('update', {
+      text: 'Update',
+      fetch: (callback: Function) => {
+        callback([
+          {
+            type: 'menuitem',
+            text: 'Document from Components...',
+            disabled: !this._text,
+            onAction: (button: any) => {
+              this._update(this._text, true);
+            }
+          },
+          {
+            type: 'menuitem',
+            text: 'Components from Document...',
+            disabled: !this._text,
+            onAction: (button: any) => {
+              this._update(this._text, false);
+            }
+          }
+        ]);
       }
     });
   }

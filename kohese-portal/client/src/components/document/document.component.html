@@ -55,7 +55,7 @@
         documentConfiguration.components).length === 0)"
         [formatText]="getFormattedTextFunction()"
         [insertText]="getInsertFunction()" [exportText]="getExportFunction()"
-        [save]="getSaveFunction()"
+        [update]="getUpdateFunction()" [save]="getSaveFunction()"
         (selectionChanged)="(isOutlineOpenAndLinked() ? selectItemInOutline(
         $event) : '')" (contentChanged)="textEditorContentChanged($event)">
       </text-editor>
@@ -63,7 +63,7 @@
   </mat-drawer-container>
   <ng-container *ngIf="isDialogInstance()">
     <mat-dialog-actions style="height: 5%; display: flex;
-      flex-direction: column;">
+      flex-direction: row;">
       <span class="flex-right-align">
         <button mat-button matTooltip="Propagate this configuration"
           [disabled]="!documentConfiguration" (click)="matDialogRef.close(

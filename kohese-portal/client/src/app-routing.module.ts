@@ -63,7 +63,8 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
                   name,
                 id: itemProxy.item.id,
                 parentId: itemProxy.item.parentId,
-                components: components
+                components: components,
+                document: ''
               };
             }
           } else {

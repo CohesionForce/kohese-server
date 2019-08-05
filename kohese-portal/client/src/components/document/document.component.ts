@@ -15,6 +15,8 @@ import { AttributeInsertionComponent, AttributeInsertionSpecification,
   HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
 import { ReportSpecificationComponent,
   ReportSpecifications } from '../reports/report-specification/report-specification.component';
+import { MergeComponent, Difference,
+  VersionSelection } from '../merge/merge.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { LocationMap } from '../../constants/LocationMap.data';
@@ -66,7 +68,9 @@ export class DocumentComponent implements OnInit, OnDestroy {
           this._document += this.getFormattedOpeningHiddenTag(itemProxy.item.
             id + 'description', 'Description', false);
           
-          this._documentMap.set(documentIds[j], itemProxy.item.description);
+          let attributeMap: Map<string, string> = new Map<string, string>();
+          attributeMap.set('description', itemProxy.item.description);
+          this._documentMap.set(documentIds[j], attributeMap);
           if (itemProxy.item.description) {
             this._document += (itemProxy.item.description + '\n\n');
           }
@@ -104,7 +108,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return this._documentConfigurations;
   }
   
-  private _documentMap: Map<string, string> = new Map<string, string>();
+  private _documentMap: Map<string, Map<string, string>> =
+    new Map<string, Map<string, string>>();
   
   private _document: string = '';
   get document() {
@@ -141,8 +146,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
   
   private _getItemText: (element: any) => string = (element: any) => {
     return ((element as ItemProxy).item.name + (this._documentMap.get(
-      (element as ItemProxy).item.id) === (element as ItemProxy).item.
-      description ? '' : '*'));
+      (element as ItemProxy).item.id).get('description') ===
+      (element as ItemProxy).item.description ? '' : '*'));
   };
   get getItemText() {
     return this._getItemText;
@@ -347,28 +352,47 @@ export class DocumentComponent implements OnInit, OnDestroy {
     for (let j: number = 0; j < itemIdsAndContent.length; j++) {
       if ((j % 2) === 0) {
         let itemId: string = itemIdsAndContent[j];
-        let description: string = itemIdsAndContent[j + 1];
-        let descriptionHiddenTag: string = this.getFormattedOpeningHiddenTag(
-          itemId + 'description', 'Description', true);
-        // Remove non-description content
-        description = description.substring(description.indexOf(
-          descriptionHiddenTag) + descriptionHiddenTag.length);
-        let nonDescriptionHiddenTagIndex: number = description.search(
-          DocumentComponent._ATTRIBUTE_REGEXP);
-        // Appropriately remove '</div>\n\n'.
-        if (nonDescriptionHiddenTagIndex !== -1) {
-          description = description.substring(0, nonDescriptionHiddenTagIndex -
-            8);
+        let attributeMap: Map<string, string> = this._documentMap.get(itemId);
+        if (!attributeMap) {
+          attributeMap = new Map<string, string>();
+          this._documentMap.set(itemId, attributeMap);
         } else {
-          description = description.substring(0, description.length - 8);
+          attributeMap.clear();
         }
         
-        if (j !== (itemIdsAndContent.length - 2)) {
-          // Trim off an extra '\n'.
-          description = description.substring(0, description.length - 1);
+        let content: string = itemIdsAndContent[j + 1];
+        // Remove the last '</div>\n\n'.
+        regExpTarget = content.substring(0, content.length - 8);
+        // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
+        splitTarget = regExpTarget.split('').reverse().join('');
+        let match: any;
+        while ((match = DocumentComponent._ATTRIBUTE_REGEXP.exec(
+          regExpTarget)) != null) {
+          if (match.index !== 0) {
+            splitTarget = splitTarget.substring(0, (regExpTarget.length - match.
+              index)) + splitTarget.substring(regExpTarget.length - match.
+              index + 8);
+          }
         }
+        // Re-orient splitTarget.
+        splitTarget = splitTarget.split('').reverse().join('');
         
-        this._documentMap.set(itemId, description);
+        let idsAndValues: Array<string> = splitTarget.split(
+          DocumentComponent._ATTRIBUTE_REGEXP);
+        idsAndValues.shift();
+        for (let k: number = 0; k < idsAndValues.length; k++) {
+          if ((k % 2) === 0) {
+            let attribute: string = idsAndValues[k + 1];
+            /* If this attribute is not the last attribute of the document,
+            trim off two '\n's. */
+            if (!((j === (itemIdsAndContent.length - 2)) && (k ===
+              (idsAndValues.length - 2)))) {
+              attribute = attribute.substring(0, attribute.length - 2);
+            }
+            
+            attributeMap.set(idsAndValues[k].substring(36), attribute);
+          }
+        }
         
         let element: any = this._textEditor.editor.editor.dom.select('div#' +
           itemId + 'delineator')[0];
@@ -377,12 +401,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
             getProxyFor(itemId);
           this._textEditor.editor.editor.dom.setHTML(element, '------------' +
             itemProxy.item.name + ((itemProxy.item.description ===
-            description) ? '' : '*') + '------------');
+            attributeMap.get('description')) ? '' : '*') + '------------');
         }
       }
     }
-    
-    this._documentConfiguration.document = text;
     
     if (this._outlineTree) {
       this._outlineTree.update(false);
@@ -609,16 +631,89 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return attributeString;
   }
   
+  public getUpdateFunction(): (text: string, fromComponents: boolean) => void {
+    return ((text: string, fromComponents: boolean) => {
+      let differences: Array<Difference> = [];
+      let documentIds: Array<string> = Array.from(this._documentMap.keys());
+      for (let j: number = 0; j < documentIds.length; j++) {
+        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(documentIds[j]);
+        let difference: Difference;
+        let attributeMap: Map<string, string> = this._documentMap.get(
+          documentIds[j]);
+        let attributeNames: Array<string> = Array.from(attributeMap.keys());
+        for (let k: number = 0; k < attributeNames.length; k++) {
+          let remoteValue: string = String(itemProxy.item[
+            attributeNames[k]]);
+          let localValue: string = attributeMap.get(
+            attributeNames[k]);
+          if (remoteValue !== localValue) {
+            if (!difference) {
+              difference = new Difference(itemProxy, undefined, undefined, []);
+              differences.push(difference);
+            }
+            
+            difference.subDifferences.push(new Difference(attributeNames[k],
+              localValue, remoteValue, []));
+          }
+        }
+      }
+      
+      if (differences.length > 0) {
+        this._dialogService.openComponentDialog(MergeComponent, {
+          data: {
+            differences: differences
+          },
+          disableClose: true
+        }).updateSize('90%', '90%').afterClosed().subscribe((differences:
+          Array<Difference>) => {
+          for (let j: number = 0; j < differences.length; j++) {
+            let difference: Difference = differences[j];
+            let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+              getProxyFor(difference.element.item.id);
+            let saveItemProxy: boolean = false;
+            for (let k: number = 0; k < difference.subDifferences.length;
+              k++) {
+              let subDifference: Difference = difference.subDifferences[k];
+              if (fromComponents) {
+                let attributeMap: Map<string, string> = this._documentMap.get(
+                  itemProxy.item.id);
+                if (subDifference.versionSelection === VersionSelection.
+                  REMOTE) {
+                  attributeMap.set(subDifference.element, subDifference.
+                    remoteValue);
+                }
+              } else {
+                if (subDifference.versionSelection === VersionSelection.
+                  LOCAL) {
+                  saveItemProxy = true;
+                  itemProxy.item[subDifference.element] = subDifference.
+                    localValue;
+                }
+              }
+            }
+            
+            if (saveItemProxy) {
+              this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+            }
+          }
+        });
+      }
+    }).bind(this);
+  }
+  
   public getSaveFunction(): (text: string) => void {
     /* The below function is passed to text-editor, so bind the correct 'this'
     to that function. */
     return ((text: string) => {
       this.textEditorContentChanged(text);
+      
       let documentIds: Array<string> = Array.from(this._documentMap.keys());
       for (let j: number = 0; j < documentIds.length; j++) {
         let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(documentIds[j]);
-        let description: string = this._documentMap.get(documentIds[j]);
+        let description: string = this._documentMap.get(documentIds[j]).get(
+          'description');
         if (description == null) {
           description = '';
         }
@@ -637,6 +732,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
             description) ? '' : '*') + '------------');
         }
       }
+      
+      this._documentConfiguration.document = text;
       
       // Only save the documentConfiguration if it has already been persisted
       let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().

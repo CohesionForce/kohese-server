@@ -69,7 +69,8 @@ export class DocumentConfigurationEditorComponent implements OnInit {
         description: '',
         tags: [],
         parentId: '',
-        components: {}
+        components: {},
+        document: ''
       };
     }
   }
@@ -120,30 +121,32 @@ export class DocumentConfigurationEditorComponent implements OnInit {
       }
     }).updateSize('80%', '80%').afterClosed().subscribe((selection:
       Array<any>) => {
-      let ids: Array<string> = selection.map((itemProxy: ItemProxy) => {
-        return itemProxy.item.id;
-      });
-      let intermediateObject: any = {};
-      for (let j: number = 0; j < ids.length; j++) {
-        let componentSettings: any = this._copy.components[ids[j]];
-        if (!componentSettings) {
-          componentSettings = {
-            includeDescendants: true
-          };
+      if (selection) {
+        let ids: Array<string> = selection.map((itemProxy: ItemProxy) => {
+          return itemProxy.item.id;
+        });
+        let intermediateObject: any = {};
+        for (let j: number = 0; j < ids.length; j++) {
+          let componentSettings: any = this._copy.components[ids[j]];
+          if (!componentSettings) {
+            componentSettings = {
+              includeDescendants: true
+            };
+          }
+          
+          intermediateObject[ids[j]] = componentSettings;
         }
         
-        intermediateObject[ids[j]] = componentSettings;
+        for (let componentId in this._copy.components) {
+          delete this._copy.components[componentId];
+        }
+        
+        for (let componentId in intermediateObject) {
+          this._copy.components[componentId] = intermediateObject[componentId];
+        }
+        
+        this._changeDetectorRef.markForCheck();
       }
-      
-      for (let componentId in this._copy.components) {
-        delete this._copy.components[componentId];
-      }
-      
-      for (let componentId in intermediateObject) {
-        this._copy.components[componentId] = intermediateObject[componentId];
-      }
-      
-      this._changeDetectorRef.markForCheck();
     });
   }
   
