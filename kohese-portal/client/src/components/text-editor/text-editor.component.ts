@@ -220,27 +220,11 @@ export class TextEditorComponent implements OnInit {
         this._exportText(this._text);
       }
     });
-    editor.ui.registry.addMenuButton('update', {
+    editor.ui.registry.addButton('update', {
       text: 'Update',
-      fetch: (callback: Function) => {
-        callback([
-          {
-            type: 'menuitem',
-            text: 'Document from Components...',
-            disabled: !this._text,
-            onAction: (button: any) => {
-              this._update(this._text, true);
-            }
-          },
-          {
-            type: 'menuitem',
-            text: 'Components from Document...',
-            disabled: !this._text,
-            onAction: (button: any) => {
-              this._update(this._text, false);
-            }
-          }
-        ]);
+      disabled: !this._text,
+      onAction: (button: any) => {
+        this._update(this._text, true);
       }
     });
   }

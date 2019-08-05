@@ -159,8 +159,17 @@ export class DocumentComponent implements OnInit, OnDestroy {
   @ViewChild('textEditor')
   private _textEditor: TextEditorComponent;
   
+  private _selectedItemProxy: ItemProxy;
+  get selectedItemProxy() {
+    return this._selectedItemProxy;
+  }
+  
   get matDialogRef() {
     return this._matDialogRef;
+  }
+  
+  get itemRepository() {
+    return this._itemRepository;
   }
   
   private _treeConfigurationSubscription: Subscription;
@@ -298,8 +307,9 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
   
-  public scrollDocumentToItem(item: any): void {
-    this._textEditor.editor.editor.dom.select('div#' + item.id)[0].
+  public outlineItemProxySelected(itemProxy: ItemProxy): void {
+    this._selectedItemProxy = itemProxy;
+    this._textEditor.editor.editor.dom.select('div#' + itemProxy.item.id)[0].
       scrollIntoView();
   }
   
@@ -307,7 +317,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return (this._outlineTree && this._linkOutlineAndDocument);
   }
   
-  public selectItemInOutline(node: any): void {
+  public selectItem(node: any): void {
     let id: string;
     let startsWithSeparatorRegExp: RegExp =
       /^<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;"/;
@@ -322,8 +332,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
     } while (node);
     
     if (id) {
-      this._outlineTree.selection = [TreeConfiguration.getWorkingTree().
-        getProxyFor(id)];
+      this._selectedItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+        id);
+      
+      if (this._outlineTree) {
+        this._outlineTree.selection = [this._selectedItemProxy];
+      }
+      
       this._changeDetectorRef.markForCheck();
     }
   }
@@ -671,7 +686,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
             let difference: Difference = differences[j];
             let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
               getProxyFor(difference.element.item.id);
-            let saveItemProxy: boolean = false;
             for (let k: number = 0; k < difference.subDifferences.length;
               k++) {
               let subDifference: Difference = difference.subDifferences[k];
@@ -683,18 +697,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
                   attributeMap.set(subDifference.element, subDifference.
                     remoteValue);
                 }
-              } else {
-                if (subDifference.versionSelection === VersionSelection.
-                  LOCAL) {
-                  saveItemProxy = true;
-                  itemProxy.item[subDifference.element] = subDifference.
-                    localValue;
-                }
               }
-            }
-            
-            if (saveItemProxy) {
-              this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
             }
           }
         });

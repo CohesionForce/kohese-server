@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, OnInit, Input } from '@angular/core';
+  Inject, OnInit, Input, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+
+import { TreeComponent } from '../tree/tree.component';
 
 export enum VersionSelection {
   LOCAL = 'Local', REMOTE = 'Remote'
@@ -69,7 +71,7 @@ export class MergeComponent implements OnInit {
   private _getText: (element: any) => string = (element: any) => {
     let difference: Difference = (element as Difference);
     return difference.element.toString() + (difference.versionSelection ?
-      (' ' + difference.versionSelection) : '');
+      (' (' + difference.versionSelection + ')') : '');
   };
   get getText() {
     return this._getText;
@@ -79,6 +81,9 @@ export class MergeComponent implements OnInit {
   get selectedDifference() {
     return this._selectedDifference;
   }
+  
+  @ViewChild('differenceTree')
+  private _differenceTree: TreeComponent;
   
   get VersionSelection() {
     return VersionSelection;
@@ -100,8 +105,27 @@ export class MergeComponent implements OnInit {
       this) && this._data;
   }
   
+  public selectVersionForAllDifferences(versionSelection: VersionSelection):
+    void {
+    let differenceStack: Array<Difference> = [...this._differences];
+    while (differenceStack.length > 0) {
+      let difference: Difference = differenceStack.pop();
+      difference.versionSelection = versionSelection;
+      differenceStack.push(...difference.subDifferences);
+    }
+    
+    this._differenceTree.update(false);
+    this._changeDetectorRef.markForCheck();
+  }
+  
   public differenceSelected(difference: Difference): void {
     this._selectedDifference = difference;
+    this._changeDetectorRef.markForCheck();
+  }
+  
+  public versionSelected(versionSelection: VersionSelection): void {
+    this._selectedDifference.versionSelection = versionSelection;
+    this._differenceTree.update(false);
     this._changeDetectorRef.markForCheck();
   }
   
