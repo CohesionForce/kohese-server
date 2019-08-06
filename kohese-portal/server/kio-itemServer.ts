@@ -686,7 +686,7 @@ function KIOItemServer(socket){
                 pathBase + targetCaptureGroup + matchedSubstring.substring(
                 matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
             } else {
-              replacement = '';
+              replacement = matchedSubstring;
             }
           }
         }

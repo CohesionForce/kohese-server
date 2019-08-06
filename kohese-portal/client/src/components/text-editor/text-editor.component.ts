@@ -8,14 +8,6 @@ import { MarkdownService } from 'ngx-markdown';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 export class FormatSpecification {
-  private _removeExternalFormatting: boolean = true;
-  get removeExternalFormatting() {
-    return this._removeExternalFormatting;
-  }
-  set removeExternalFormatting(removeExternalFormatting: boolean) {
-    this._removeExternalFormatting = removeExternalFormatting;
-  }
-  
   private _delineate: boolean;
   get delineate() {
     return this._delineate;
@@ -65,7 +57,7 @@ export class TextEditorComponent implements OnInit {
         convertToMarkdown(this._html, 'text/html', {}));
       
       this._contentChangeDelayIdentifier = undefined;
-    }, 700);
+    }, 1000);
   }
 
   private _disabled: boolean = false;
@@ -206,7 +198,6 @@ export class TextEditorComponent implements OnInit {
         let delineate: boolean = !button.isActive();
         let formatSpecification: FormatSpecification =
           new FormatSpecification();
-        formatSpecification.removeExternalFormatting = false;
         formatSpecification.delineate = delineate;
         formatSpecification.updateSource = true;
         this._formatText(this._text, formatSpecification);

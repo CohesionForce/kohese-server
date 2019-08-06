@@ -25,7 +25,9 @@
     elementpath: false,
     content_style: '* { visibility: initial; }',
     setup: customizeEditor.bind(componentReference),
-    save_onsavecallback: saveText.bind(componentReference)
+    save_onsavecallback: saveText.bind(componentReference),
+    link_context_toolbar: true,
+    convert_urls: false
   }" (onSelectionChange)="selectionChangedEventEmitter.emit($event.editor.
   selection.getNode())">
 </editor>

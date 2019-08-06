@@ -440,31 +440,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
   private format(text: string, formatSpecification: FormatSpecification):
     string {
     let formattedText: string = text;
-    if (formatSpecification.removeExternalFormatting) {
-      // Remove the last '</div>\n\n'.
-      let regExpTarget: string = formattedText.substring(0, formattedText.
-        length - 8);
-      let ids: Array<string> = [];
-      // Reverse regExpTarget to remove inserted '</div>\n\n's in reverse.
-      let document: string = regExpTarget.split('').reverse().join('');
-      let match: any;
-      while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-        regExpTarget)) != null) {
-        ids.push(match[1]);
-        if (match.index !== 0) {
-          document = document.substring(0, (regExpTarget.length - match.
-            index)) + document.substring(regExpTarget.length - match.index +
-            8);
-        }
-      }
-      // Re-orient document.
-      document = document.split('').reverse().join('');
-      document = document.replace(DocumentComponent._SEPARATOR_DIV_REGEXP,
-        '');
-      
-      formattedText = document;
-    }
-      
     if (formatSpecification.updateSource) {
       this._document = formattedText;
       
@@ -543,6 +518,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
           }
           
           this._document = text;
+          this.textEditorContentChanged(this._document);
           this._changeDetectorRef.markForCheck();
           
           return text;
@@ -560,8 +536,25 @@ export class DocumentComponent implements OnInit, OnDestroy {
             toISOString(),
           getReportContent: (initialContent: string, reportSpecifications:
             ReportSpecifications) => {
-            return initialContent + this.format(text,
-              new FormatSpecification());
+            let content: string = initialContent;
+            let documentIds: Array<string> = Array.from(this._documentMap.
+              keys());
+            for (let j: number = 0; j < documentIds.length; j++) {
+              let attributeMap: Map<string, string> = this._documentMap.
+                get(documentIds[j]);
+              let attributeNames: Array<string> = Array.from(attributeMap.
+                keys());
+              for (let k: number = 0; k < attributeNames.length; k++) {
+                content += attributeMap.get(attributeNames[k]);
+                
+                if (!((j === (documentIds.length - 1)) && (k ===
+                  (attributeNames.length - 1)))) {
+                  content += '\n\n';
+                }
+              }
+            }
+            
+            return content;
           }
         },
         disableClose: true
@@ -682,20 +675,22 @@ export class DocumentComponent implements OnInit, OnDestroy {
           disableClose: true
         }).updateSize('90%', '90%').afterClosed().subscribe((differences:
           Array<Difference>) => {
-          for (let j: number = 0; j < differences.length; j++) {
-            let difference: Difference = differences[j];
-            let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-              getProxyFor(difference.element.item.id);
-            for (let k: number = 0; k < difference.subDifferences.length;
-              k++) {
-              let subDifference: Difference = difference.subDifferences[k];
-              if (fromComponents) {
-                let attributeMap: Map<string, string> = this._documentMap.get(
-                  itemProxy.item.id);
-                if (subDifference.versionSelection === VersionSelection.
-                  REMOTE) {
-                  attributeMap.set(subDifference.element, subDifference.
-                    remoteValue);
+          if (differences) {
+            for (let j: number = 0; j < differences.length; j++) {
+              let difference: Difference = differences[j];
+              let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+                getProxyFor(difference.element.item.id);
+              for (let k: number = 0; k < difference.subDifferences.length;
+                k++) {
+                let subDifference: Difference = difference.subDifferences[k];
+                if (fromComponents) {
+                  let attributeMap: Map<string, string> = this._documentMap.
+                    get(itemProxy.item.id);
+                  if (subDifference.versionSelection === VersionSelection.
+                    REMOTE) {
+                    attributeMap.set(subDifference.element, subDifference.
+                      remoteValue);
+                  }
                 }
               }
             }
