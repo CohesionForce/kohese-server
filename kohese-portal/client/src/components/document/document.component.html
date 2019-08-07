@@ -58,10 +58,9 @@
       <text-editor #textEditor [text]="document"
         [disabled]="!documentConfiguration || (Object.keys(
         documentConfiguration.components).length === 0)"
-        [formatText]="getFormattedTextFunction()"
-        [insertText]="getInsertFunction()" [exportText]="getExportFunction()"
-        [update]="getUpdateFunction()" [save]="getSaveFunction()"
-        (selectionChanged)="selectItem($event)"
+        [formatText]="format.bind(this)" [insertText]="insert.bind(this)"
+        [exportText]="export.bind(this)" [update]="update.bind(this)"
+        [save]="save.bind(this)" (selectionChanged)="selectItem($event)"
         (contentChanged)="textEditorContentChanged($event)">
       </text-editor>
     </mat-drawer-content>

@@ -70,43 +70,47 @@ export class TextEditorComponent implements OnInit {
   }
   
   private _formatText: (text: string, formatSpecification:
-    FormatSpecification) => string = (text: string, formatSpecification:
-    FormatSpecification) => {
+    FormatSpecification) => Promise<string> = async (text: string,
+    formatSpecification: FormatSpecification) => {
     return text;
   };
   @Input('formatText')
   set formatText(formatText: (text: string, formatSpecification:
-    FormatSpecification) => string) {
+    FormatSpecification) => Promise<string>) {
     this._formatText = formatText;
   }
   
-  private _insertText: (text: string, isGlobalInsertion: boolean) => void =
-    (text: string, isGlobalInsertion: boolean) => {
+  private _insertText: (text: string, isGlobalInsertion:
+    boolean) => Promise<void> = async (text: string, isGlobalInsertion:
+    boolean) => {
   };
   @Input('insertText')
   set insertText(insertText: (text: string, isGlobalInsertion:
-    boolean) => void) {
+    boolean) => Promise<void>) {
     this._insertText = insertText;
   }
   
-  private _exportText: (text: string) => void = (text: string) => {
+  private _exportText: (text: string) => Promise<void> = async (text:
+    string) => {
   };
   @Input('exportText')
-  set exportText(exportText: (text: string) => void) {
+  set exportText(exportText: (text: string) => Promise<void>) {
     this._exportText = exportText;
   }
   
-  private _update: (text: string, fromComponents: boolean) => void = (text:
-    string, fromComponents: boolean) => {
+  private _update: (text: string, fromComponents: boolean) => Promise<void> =
+    async (text: string, fromComponents: boolean) => {
   };
   @Input('update')
-  set update(update: (text: string, fromComponents: boolean) => void) {
+  set update(update: (text: string, fromComponents:
+    boolean) => Promise<void>) {
     this._update = update;
   }
 
-  private _save: (text: string) => void = (text: string) => {};
+  private _save: (text: string) => Promise<void> = async (text: string) => {
+  };
   @Input('save')
-  set save(save: (text: string) => void) {
+  set save(save: (text: string) => Promise<void>) {
     this._save = save;
   }
   
@@ -128,10 +132,6 @@ export class TextEditorComponent implements OnInit {
     new EventEmitter<string>();
   
   private _contentChangeDelayIdentifier: any;
-
-  get componentReference() {
-    return this;
-  }
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
@@ -186,7 +186,6 @@ export class TextEditorComponent implements OnInit {
             disabled: !this._text,
             onAction: (button: any) => {
               this._insertText(this._text, true);
-              this._editor.editor.setDirty(true);
             }
           }
         ]);

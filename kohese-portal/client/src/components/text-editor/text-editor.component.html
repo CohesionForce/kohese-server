@@ -5,7 +5,6 @@
   bullist numlist outdent indent hr link image charmap | table |
   searchreplace | insert | delineate | export | update"
   [disabled]="disabled" style="height: 100%;" [init]="{
-    componentReference: componentReference,
     branding: false,
     menubar: false,
     style_formats: [
@@ -24,8 +23,8 @@
     file_picker_types: 'image',
     elementpath: false,
     content_style: '* { visibility: initial; }',
-    setup: customizeEditor.bind(componentReference),
-    save_onsavecallback: saveText.bind(componentReference),
+    setup: customizeEditor.bind(this),
+    save_onsavecallback: saveText.bind(this),
     link_context_toolbar: true,
     convert_urls: false
   }" (onSelectionChange)="selectionChangedEventEmitter.emit($event.editor.

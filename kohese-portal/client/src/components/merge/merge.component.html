@@ -1,5 +1,8 @@
 <div [ngStyle]="{ 'height': (isDialogInstance() ? '95%' : '100%') }">
   <div style="height: 10%; display: flex; flex-direction: row;">
+    <h3>
+      Differences
+    </h3>
     <button mat-icon-button matTooltip="Select all local changes"
       class="flex-right-align" (click)="selectVersionForAllDifferences(
       VersionSelection.LOCAL)">
@@ -19,6 +22,9 @@
       <split-area [size]="50">
         <ng-container *ngIf="selectedDifference">
           <div style="height: 20%; display: flex; flex-direction: row;">
+            <h3>
+              Local
+            </h3>
             <button mat-icon-button matTooltip="Select this version"
               (click)="versionSelected(VersionSelection.LOCAL)"
               [ngClass]="{ 'highlight': (selectedDifference.
@@ -35,6 +41,9 @@
       <split-area [size]="50">
         <ng-container *ngIf="selectedDifference">
           <div style="height: 20%; display: flex; flex-direction: row;">
+            <h3>
+              Remote
+            </h3>
             <button mat-icon-button matTooltip="Select this version"
               (click)="versionSelected(VersionSelection.REMOTE)"
               [ngClass]="{ 'highlight': (selectedDifference.
@@ -54,9 +63,8 @@
 <ng-container *ngIf="isDialogInstance()">
   <mat-dialog-actions style="height: 5%; display: flex; flex-direction: row;">
     <span class="flex-right-align">
-      <button mat-button matTooltip="Accept the merge selections and save the
-        affected Items" [disabled]="!canMerge()" (click)="matDialogRef.close(
-        differences)">
+      <button mat-button matTooltip="Accept the merge selections"
+        [disabled]="!canMerge()" (click)="matDialogRef.close(differences)">
         Merge
       </button>
       <button mat-button matTooltip="Cancel the merge process"

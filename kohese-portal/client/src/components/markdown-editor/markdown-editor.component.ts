@@ -18,6 +18,7 @@ export class MarkdownEditorComponent implements OnInit {
   @Input('value')
   set value(value: string) {
     this._value = value;
+    this.formatValue();
   }
   
   private _formattedValue: string;
