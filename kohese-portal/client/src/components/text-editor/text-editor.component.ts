@@ -80,14 +80,23 @@ export class TextEditorComponent implements OnInit {
     this._formatText = formatText;
   }
   
-  private _insertText: (text: string, isGlobalInsertion:
-    boolean) => Promise<void> = async (text: string, isGlobalInsertion:
-    boolean) => {
+  private _insertText: (text: string, insertionIdentifier:
+    string) => Promise<void> = async (text: string, insertionIdentifier:
+    string) => {
   };
   @Input('insertText')
-  set insertText(insertText: (text: string, isGlobalInsertion:
-    boolean) => Promise<void>) {
+  set insertText(insertText: (text: string, insertionIdentifier:
+    string) => Promise<void>) {
     this._insertText = insertText;
+  }
+  
+  private _getInsertionCandidates: () => Promise<Array<string>> = async () => {
+    return [];
+  };
+  @Input('getInsertionCandidates')
+  set getInsertionCandidates(getInsertionCandidates:
+    () => Promise<Array<string>>) {
+    this._getInsertionCandidates = getInsertionCandidates;
   }
   
   private _exportText: (text: string) => Promise<void> = async (text:
@@ -179,16 +188,29 @@ export class TextEditorComponent implements OnInit {
     editor.ui.registry.addMenuButton('insert', {
       text: 'Insert',
       fetch: (callback: Function) => {
-        callback([
+        let menuItems: Array<any> = [
           {
             type: 'menuitem',
             text: 'Globally...',
             disabled: !this._text,
             onAction: (button: any) => {
-              this._insertText(this._text, true);
+              this._insertText(this._text, undefined);
             }
           }
-        ]);
+        ];
+        this._getInsertionCandidates().then((insertionCandidates:
+          Array<string>) => {
+          for (let j: number = (insertionCandidates.length - 1); j >= 0; j--) {
+            menuItems.unshift({
+              type: 'menuitem',
+              text: insertionCandidates[j],
+              onAction: (button: any) => {
+                this._insertText(this._text, insertionCandidates[j]);
+              }
+            });
+          }
+          callback(menuItems);
+        });
       }
     });
     editor.ui.registry.addToggleButton('delineate', {
