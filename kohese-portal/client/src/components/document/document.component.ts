@@ -8,8 +8,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DocumentConfigurationEditorComponent } from '../object-editor/document-configuration/document-configuration-editor.component';
 import { TreeComponent } from '../tree/tree.component';
-import { TextEditorComponent,
-  FormatSpecification } from '../text-editor/text-editor.component';
+import { TextEditorComponent } from '../text-editor/text-editor.component';
 import { AttributeInsertionComponent, AttributeInsertionSpecification,
   InsertionLocation,
   HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
@@ -38,8 +37,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     if (this._documentConfiguration) {
       this._documentMap.clear();
       if (this._documentConfiguration.document) {
-        this._document = this._documentConfiguration.document;
-        this.textEditorContentChanged(this._document);
+        this.textEditorContentChanged(this._documentConfiguration.document);
         this._changeDetectorRef.detectChanges();
         let documentIds: Array<string> = Array.from(this._documentMap.keys());
         for (let j: number = 0; j < documentIds.length; j++) {
@@ -59,7 +57,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
           this._outlineTree.update(false);
         }
       } else {
-        this._document = '';
+        this._documentConfiguration.document = '';
         let componentIds: Array<string> = Object.keys(this.
           _documentConfiguration.components);
         let documentIds: Array<string> = [];
@@ -81,20 +79,23 @@ export class DocumentComponent implements OnInit, OnDestroy {
           let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
             getProxyFor(documentIds[j]);
           
-          this._document += this.getFormattedOpeningHiddenTag(itemProxy.item.
-            id, itemProxy.item.name, false);
-          this._document += this.getFormattedOpeningHiddenTag(itemProxy.item.
-            id + 'description', 'description', false);
+          this._documentConfiguration.document += this.
+            getFormattedOpeningHiddenTag(itemProxy.item.id, itemProxy.item.
+            name, false);
+          this._documentConfiguration.document += this.
+            getFormattedOpeningHiddenTag(itemProxy.item.id + 'description',
+            'description', false);
           
           let attributeMap: Map<string, string> = new Map<string, string>();
           attributeMap.set('description', itemProxy.item.description);
           this._documentMap.set(documentIds[j], attributeMap);
-          if (itemProxy.item.description) {
-            this._document += (itemProxy.item.description + '\n\n');
-          }
+          this._documentConfiguration.document += (itemProxy.item.
+            description + '\n\n');
           
-          this._document += DocumentComponent._CLOSING_HIDDEN_TAG;
-          this._document += DocumentComponent._CLOSING_HIDDEN_TAG;
+          this._documentConfiguration.document += DocumentComponent.
+            _CLOSING_HIDDEN_TAG;
+          this._documentConfiguration.document += DocumentComponent.
+            _CLOSING_HIDDEN_TAG;
         }
       }
       
@@ -108,8 +109,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
       this._navigationService.navigate('Document', {
         id: this._documentConfiguration.id
       });
-    } else {
-      this._document = '';
     }
     
     if (this._textEditor && this._textEditor.editor && this._textEditor.editor.
@@ -127,11 +126,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
   
   private _documentMap: Map<string, Map<string, string>> =
     new Map<string, Map<string, string>>();
-  
-  private _document: string = '';
-  get document() {
-    return this._document;
-  }
   
   private _linkOutlineAndDocument: boolean = false;
   get linkOutlineAndDocument() {
@@ -175,6 +169,12 @@ export class DocumentComponent implements OnInit, OnDestroy {
   
   @ViewChild('textEditor')
   private _textEditor: TextEditorComponent;
+  
+  private _additionalToolbarButtonIds: Array<string> = ['insert', 'delineate',
+    'export', 'update'];
+  get additionalToolbarButtonIds() {
+    return this._additionalToolbarButtonIds;
+  }
   
   private _selectedItemProxy: ItemProxy;
   get selectedItemProxy() {
@@ -326,6 +326,65 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
   
+  public customizeEditor(editor: any): void {
+    editor.ui.registry.addMenuButton(this._additionalToolbarButtonIds[0], {
+      text: 'Insert',
+      fetch: (callback: Function) => {
+        let menuItems: Array<any> = [
+          {
+            type: 'menuitem',
+            text: 'Globally...',
+            onAction: (button: any) => {
+              this.insert(undefined);
+            }
+          }
+        ];
+        if (this._selectedItemProxy) {
+          let insertionCandidates: Array<string> = Object.keys(this.
+            _selectedItemProxy.model.item.classProperties).filter(
+            (attributeName: string) => {
+            return (attributeName !== 'description');
+          });
+          
+          for (let j: number = (insertionCandidates.length - 1); j >= 0; j--) {
+            menuItems.unshift({
+              type: 'menuitem',
+              text: insertionCandidates[j],
+              onAction: (button: any) => {
+                this.insert(insertionCandidates[j]);
+              }
+            });
+          }
+        }
+        
+        callback(menuItems);
+      }
+    });
+    editor.ui.registry.addToggleButton(this._additionalToolbarButtonIds[1], {
+      text: 'Delineate',
+      active: (this._documentConfiguration && this._documentConfiguration.
+        delineated),
+      onAction: (button: any) => {
+        let delineate: boolean = !button.isActive();
+        this.toggleDelineation(delineate);
+        button.setActive(delineate);
+      }
+    });
+    editor.ui.registry.addButton(this._additionalToolbarButtonIds[2], {
+      text: 'Export',
+      onAction: (button: any) => {
+        this.export();
+      }
+    });
+    editor.ui.registry.addButton(this._additionalToolbarButtonIds[3], {
+      text: 'Update',
+      //disabled: !this.areUpdatesAvailable(),
+      onAction: (button: any) => {
+        this.update();
+      }
+    });
+  }
+  
   public outlineItemProxySelected(itemProxy: ItemProxy): void {
     this._selectedItemProxy = itemProxy;
     this._textEditor.editor.editor.dom.select('div#' + itemProxy.item.id)[0].
@@ -435,7 +494,9 @@ export class DocumentComponent implements OnInit, OnDestroy {
               attribute = attribute.substring(0, attribute.length - 1);
             }
             
-            attributeMap.set(idsAndValues[k].substring(36), attribute);
+            if ((idsAndValues[k] === 'description') || attribute) {
+              attributeMap.set(idsAndValues[k].substring(36), attribute);
+            }
           }
         }
         
@@ -458,47 +519,19 @@ export class DocumentComponent implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
-  public async format(text: string, formatSpecification: FormatSpecification):
-    Promise<string> {
-    let formattedText: string = text;
-    if (formatSpecification.updateSource) {
-      this._document = formattedText;
-      
-      if (formatSpecification.delineate !== undefined) {
-        this._changeDetectorRef.detectChanges();
-        
-        let documentIds: Array<string> = Array.from(this._documentMap.keys());
-        for (let j: number = 0; j < documentIds.length; j++) {
-          let separatorIds: Array<string> = [documentIds[j]];
-          // separatorIds.push(...Array.from(this._documentMap.get(documentIds[
-          //   j]).keys()).map((attributeName: string) => {
-          //   return documentIds[j] + attributeName;
-          // }));
-          for (let k: number = 0; k < separatorIds.length; k++) {
-            let element: any = this._textEditor.editor.editor.dom.select(
-              'div#' + separatorIds[k] + 'delineator')[0];
-            if (element) {
-              this._textEditor.editor.editor.dom.setStyle(element, 'display',
-                (formatSpecification.delineate ? '' : 'none'));
-            }
-          }
-        }
-      }
-      
-      this._changeDetectorRef.markForCheck();
-    }
-    
-    return formattedText;
-  }
-  
-  public async insert(text: string, insertionIdentifier: string):
-    Promise<void> {
+  private insert(insertionIdentifier: string): void {
     if (insertionIdentifier) {
       let insertionPositions: Array<string> = ['Before', 'After'];
       let attributeMap: Map<string, string> = this._documentMap.get(this.
         _selectedItemProxy.item.id);
       let intermediateMap: Map<string, string> = new Map<string, string>();
       let attributeNames: Array<string> = Array.from(attributeMap.keys());
+      let insertionIdentifierIndex: number = attributeNames.indexOf(
+        insertionIdentifier);
+      if (insertionIdentifierIndex !== -1) {
+        attributeNames.splice(insertionIdentifierIndex, 1);
+      }
+      
       let selectedAttributeIndex: number = attributeNames.indexOf(this.
         _selectedAttributeName);
       this._dialogService.openSelectDialog('Select Insertion Position',
@@ -537,8 +570,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
               attributeNames[j]));
           }
           
-          this._document = this.populateDocumentFromMap(false);
-          this.textEditorContentChanged(this._document);
+          this.populateDocumentFromMap(false);
+          this.textEditorContentChanged(this._documentConfiguration.document);
           this._textEditor.editor.editor.setDirty(true);
           this._changeDetectorRef.markForCheck();
         }
@@ -553,8 +586,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
           let insertionMap: Map<number, string> = new Map<number, string>();
           let match: any;
           let previousItemProxy: ItemProxy = undefined;
-          while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(
-            text)) != null) {
+          while ((match = DocumentComponent._SEPARATOR_DIV_REGEXP.exec(this.
+            _documentConfiguration.document)) != null) {
             let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
               getProxyFor(match[1]);
             let typeObject: any = attributeInsertionSpecification.types[
@@ -576,11 +609,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 
                 /* If this is the last match, insert the attribute before the
                 last '</div>\n\n'. */
-                if (text.substring(match.index + match[0].length).search(
-                  DocumentComponent._SEPARATOR_DIV_REGEXP) === -1) {
+                if (this._documentConfiguration.document.substring(match.
+                  index + match[0].length).search(DocumentComponent.
+                  _SEPARATOR_DIV_REGEXP) === -1) {
                   // Subtract the length of '</div>\n\n'.
-                  insertionMap.set(text.length - 8, this.
-                    getAttributeInsertionString(typeObject, itemProxy));
+                  insertionMap.set(this._documentConfiguration.document.
+                    length - 8, this.getAttributeInsertionString(typeObject,
+                    itemProxy));
                 }
               }
             }
@@ -591,61 +626,18 @@ export class DocumentComponent implements OnInit, OnDestroy {
           let insertionMapKeys: Array<number> = Array.from(insertionMap.
             keys());
           for (let j: number = (insertionMapKeys.length - 1); j >= 0; j--) {
-            text = text.substring(0, insertionMapKeys[j]) + insertionMap.get(
-              insertionMapKeys[j]) + text.substring(insertionMapKeys[j]);
+            this._documentConfiguration.document = this._documentConfiguration.
+              document.substring(0, insertionMapKeys[j]) + insertionMap.get(
+              insertionMapKeys[j]) + this._documentConfiguration.document.
+              substring(insertionMapKeys[j]);
           }
           
-          this._document = text;
-          this.textEditorContentChanged(this._document);
+          this.textEditorContentChanged(this._documentConfiguration.document);
           this._textEditor.editor.editor.setDirty(true);
           this._changeDetectorRef.markForCheck();
         }
       });
     }
-  }
-  
-  public async getInsertionCandidates(): Promise<Array<string>> {
-    if (this._selectedItemProxy) {
-      return Object.keys(this._selectedItemProxy.model.item.classProperties).
-        filter((attributeName: string) => {
-        return (attributeName !== 'description');
-      });
-    } else {
-      return [];
-    }
-  }
-  
-  public async export(text: string): Promise<void> {
-    this._dialogService.openComponentDialog(
-      ReportSpecificationComponent, {
-      data: {
-        defaultName: this._documentConfiguration.name + '_' + new Date().
-          toISOString(),
-        getReportContent: (initialContent: string, reportSpecifications:
-          ReportSpecifications) => {
-          let content: string = initialContent;
-          let documentIds: Array<string> = Array.from(this._documentMap.
-            keys());
-          for (let j: number = 0; j < documentIds.length; j++) {
-            let attributeMap: Map<string, string> = this._documentMap.
-              get(documentIds[j]);
-            let attributeNames: Array<string> = Array.from(attributeMap.
-              keys());
-            for (let k: number = 0; k < attributeNames.length; k++) {
-              content += attributeMap.get(attributeNames[k]);
-              
-              if (!((j === (documentIds.length - 1)) && (k ===
-                (attributeNames.length - 1)))) {
-                content += '\n\n';
-              }
-            }
-          }
-          
-          return content;
-        }
-      },
-      disableClose: true
-    }).updateSize('40%', '40%');
   }
   
   private getAttributeInsertionString(typeObject: any, itemProxy: ItemProxy):
@@ -725,7 +717,83 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return attributeString;
   }
   
-  public async update(text: string, fromComponents: boolean): Promise<void> {
+  private toggleDelineation(delineate: boolean): void {
+    let documentIds: Array<string> = Array.from(this._documentMap.keys());
+    for (let j: number = 0; j < documentIds.length; j++) {
+      let separatorIds: Array<string> = [documentIds[j]];
+      // separatorIds.push(...Array.from(this._documentMap.get(documentIds[j]).
+      //   keys()).map((attributeName: string) => {
+      //   return documentIds[j] + attributeName;
+      // }));
+      for (let k: number = 0; k < separatorIds.length; k++) {
+        let element: any = this._textEditor.editor.editor.dom.select('div#' +
+          separatorIds[k] + 'delineator')[0];
+        if (element) {
+          this._textEditor.editor.editor.dom.setStyle(element, 'display',
+            (delineate ? '' : 'none'));
+        }
+      }
+    }
+    
+    this._documentConfiguration.delineated = delineate;
+  }
+  
+  private export(): void {
+    this._dialogService.openComponentDialog(
+      ReportSpecificationComponent, {
+      data: {
+        defaultName: this._documentConfiguration.name + '_' + new Date().
+          toISOString(),
+        getReportContent: (initialContent: string, reportSpecifications:
+          ReportSpecifications) => {
+          let content: string = initialContent;
+          let documentIds: Array<string> = Array.from(this._documentMap.
+            keys());
+          for (let j: number = 0; j < documentIds.length; j++) {
+            let attributeMap: Map<string, string> = this._documentMap.
+              get(documentIds[j]);
+            let attributeNames: Array<string> = Array.from(attributeMap.
+              keys());
+            for (let k: number = 0; k < attributeNames.length; k++) {
+              content += attributeMap.get(attributeNames[k]);
+              
+              if (!((j === (documentIds.length - 1)) && (k ===
+                (attributeNames.length - 1)))) {
+                content += '\n\n';
+              }
+            }
+          }
+          
+          return content;
+        }
+      },
+      disableClose: true
+    }).updateSize('40%', '40%');
+  }
+  
+  private areUpdatesAvailable(): boolean {
+    let documentIds: Array<string> = Array.from(this._documentMap.keys());
+    for (let j: number = 0; j < documentIds.length; j++) {
+      let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+        getProxyFor(documentIds[j]);
+      let attributeMap: Map<string, string> = this._documentMap.get(
+        documentIds[j]);
+      let attributeNames: Array<string> = Array.from(attributeMap.keys());
+      for (let k: number = 0; k < attributeNames.length; k++) {
+        let remoteValue: string = String(itemProxy.item[
+          attributeNames[k]]);
+        let localValue: string = attributeMap.get(
+          attributeNames[k]);
+        if (remoteValue !== localValue) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  }
+  
+  private update(): void {
     let differences: Array<Difference> = [];
     let documentIds: Array<string> = Array.from(this._documentMap.keys());
     for (let j: number = 0; j < documentIds.length; j++) {
@@ -768,20 +836,16 @@ export class DocumentComponent implements OnInit, OnDestroy {
             for (let k: number = 0; k < difference.subDifferences.length;
               k++) {
               let subDifference: Difference = difference.subDifferences[k];
-              if (fromComponents) {
-                let attributeMap: Map<string, string> = this._documentMap.
-                  get(itemProxy.item.id);
-                if (subDifference.versionSelection === VersionSelection.
-                  REMOTE) {
-                  attributeMap.set(subDifference.element, subDifference.
-                    remoteValue);
-                }
+              let attributeMap: Map<string, string> = this._documentMap.get(
+                itemProxy.item.id);
+              if (subDifference.versionSelection === VersionSelection.REMOTE) {
+                attributeMap.set(subDifference.element, subDifference.
+                  remoteValue);
               }
             }
           }
           
-          this._documentConfiguration.document = this.populateDocumentFromMap(
-            true);
+          this.populateDocumentFromMap(true);
           this.textEditorContentChanged(this._documentConfiguration.document);
           /* Only save the documentConfiguration if it has already been
           persisted */
@@ -801,27 +865,31 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }
   }
   
-  private populateDocumentFromMap(clearModificationIndicator: boolean):
-    string {
-    let document: string = '';
+  private populateDocumentFromMap(clearModificationIndicator: boolean): void {
+    this._documentConfiguration.document = '';
     let documentIds: Array<string> = Array.from(this._documentMap.keys());
     for (let j: number = 0; j < documentIds.length; j++) {
       let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
         getProxyFor(documentIds[j]);
-      document += this.getFormattedOpeningHiddenTag(documentIds[j], itemProxy.
-        item.name, false);
+      this._documentConfiguration.document += this.
+        getFormattedOpeningHiddenTag(documentIds[j], itemProxy.item.name,
+        false);
       
       let attributeMap: Map<string, string> = this._documentMap.get(
         documentIds[j]);
       let attributeNames: Array<string> = Array.from(attributeMap.keys());
       for (let k: number = 0; k < attributeNames.length; k++) {
-        document += this.getFormattedOpeningHiddenTag(documentIds[j] +
-          attributeNames[k], attributeNames[k], false);
-        document += attributeMap.get(attributeNames[k]) + '\n\n';
-        document += DocumentComponent._CLOSING_HIDDEN_TAG;
+        this._documentConfiguration.document += this.
+          getFormattedOpeningHiddenTag(documentIds[j] + attributeNames[k],
+          attributeNames[k], false);
+        this._documentConfiguration.document += attributeMap.get(
+          attributeNames[k]) + '\n\n';
+        this._documentConfiguration.document += DocumentComponent.
+          _CLOSING_HIDDEN_TAG;
       }
       
-      document += DocumentComponent._CLOSING_HIDDEN_TAG;
+      this._documentConfiguration.document += DocumentComponent.
+        _CLOSING_HIDDEN_TAG;
       
       if (clearModificationIndicator) {
         let element: any = this._textEditor.editor.editor.dom.select('div#' +
@@ -832,8 +900,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
-    return document;
   }
   
   public async save(text: string): Promise<void> {
@@ -903,6 +969,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
         formattedOpeningHiddenTag.length - 20) + text +
         formattedOpeningHiddenTag.substring(formattedOpeningHiddenTag.length -
         20);
+    }
+    
+    /* If the document was previously delineated, display Item-level
+    delineation. */
+    if (this._documentConfiguration.delineated && (id.length === 36)) {
+      formattedOpeningHiddenTag = formattedOpeningHiddenTag.replace(
+        /display: none;/, '');
     }
     
     return formattedOpeningHiddenTag;

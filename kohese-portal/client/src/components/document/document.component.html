@@ -55,13 +55,12 @@
       </ng-container>
     </mat-drawer>
     <mat-drawer-content>
-      <text-editor #textEditor [text]="document"
+      <text-editor #textEditor [text]="documentConfiguration?.document"
         [disabled]="!documentConfiguration || (Object.keys(
         documentConfiguration.components).length === 0)"
-        [formatText]="format.bind(this)" [insertText]="insert.bind(this)"
-        [getInsertionCandidates]="getInsertionCandidates.bind(this)"
-        [exportText]="export.bind(this)" [update]="update.bind(this)"
-        [save]="save.bind(this)" (selectionChanged)="selectItem($event)"
+        [additionalToolbarButtons]="additionalToolbarButtonIds"
+        [customizeEditor]="customizeEditor.bind(this)" [save]="save.bind(this)"
+        (selectionChanged)="selectItem($event)"
         (contentChanged)="textEditorContentChanged($event)">
       </text-editor>
     </mat-drawer-content>

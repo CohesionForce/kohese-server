@@ -7,27 +7,6 @@ import { MarkdownService } from 'ngx-markdown';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
-export class FormatSpecification {
-  private _delineate: boolean;
-  get delineate() {
-    return this._delineate;
-  }
-  set delineate(delineate: boolean) {
-    this._delineate = delineate;
-  }
-  
-  private _updateSource: boolean = false;
-  get updateSource() {
-    return this._updateSource;
-  }
-  set updateSource(updateSource: boolean) {
-    this._updateSource = updateSource;
-  }
-  
-  public constructor() {
-  }
-}
-
 @Component({
   selector: 'text-editor',
   templateUrl: './text-editor.component.html',
@@ -69,53 +48,19 @@ export class TextEditorComponent implements OnInit {
     this._disabled = disabled;
   }
   
-  private _formatText: (text: string, formatSpecification:
-    FormatSpecification) => Promise<string> = async (text: string,
-    formatSpecification: FormatSpecification) => {
-    return text;
-  };
-  @Input('formatText')
-  set formatText(formatText: (text: string, formatSpecification:
-    FormatSpecification) => Promise<string>) {
-    this._formatText = formatText;
+  private _additionalToolbarButtons: Array<string> = [];
+  @Input('additionalToolbarButtons')
+  set additionalToolbarButtons(additionalToolbarButtons: Array<string>) {
+    this._additionalToolbarButtons = additionalToolbarButtons;
   }
   
-  private _insertText: (text: string, insertionIdentifier:
-    string) => Promise<void> = async (text: string, insertionIdentifier:
-    string) => {
+  private _customizeEditor: (editor: any) => void = (editor: any) => {
   };
-  @Input('insertText')
-  set insertText(insertText: (text: string, insertionIdentifier:
-    string) => Promise<void>) {
-    this._insertText = insertText;
+  @Input('customizeEditor')
+  set customizeEditor(customizeEditor: (editor: any) => void) {
+    this._customizeEditor = customizeEditor;
   }
   
-  private _getInsertionCandidates: () => Promise<Array<string>> = async () => {
-    return [];
-  };
-  @Input('getInsertionCandidates')
-  set getInsertionCandidates(getInsertionCandidates:
-    () => Promise<Array<string>>) {
-    this._getInsertionCandidates = getInsertionCandidates;
-  }
-  
-  private _exportText: (text: string) => Promise<void> = async (text:
-    string) => {
-  };
-  @Input('exportText')
-  set exportText(exportText: (text: string) => Promise<void>) {
-    this._exportText = exportText;
-  }
-  
-  private _update: (text: string, fromComponents: boolean) => Promise<void> =
-    async (text: string, fromComponents: boolean) => {
-  };
-  @Input('update')
-  set update(update: (text: string, fromComponents:
-    boolean) => Promise<void>) {
-    this._update = update;
-  }
-
   private _save: (text: string) => Promise<void> = async (text: string) => {
   };
   @Input('save')
@@ -152,6 +97,23 @@ export class TextEditorComponent implements OnInit {
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this.text = this._data['text'];
+      
+      if (this._data['disabled']) {
+        this._disabled = this._data['disabled'];
+      }
+      
+      if (this._data['additionalToolbarButtons']) {
+        this._additionalToolbarButtons = this._data[
+          'additionalToolbarButtons'];
+      }
+      
+      if (this._data['customizeEditor']) {
+        this._customizeEditor = this._data['customizeEditor'];
+      }
+      
+      if (this._data['save']) {
+        this._save = this._data['save'];
+      }
     }
   }
 
@@ -183,62 +145,13 @@ export class TextEditorComponent implements OnInit {
 
     fileInput.click();
   }
+  
+  public getAdditionalToolbarButtonsString(): string {
+    return this._additionalToolbarButtons.join(' | ');
+  }
 
-  public customizeEditor(editor: any): void {
-    editor.ui.registry.addMenuButton('insert', {
-      text: 'Insert',
-      fetch: (callback: Function) => {
-        let menuItems: Array<any> = [
-          {
-            type: 'menuitem',
-            text: 'Globally...',
-            disabled: !this._text,
-            onAction: (button: any) => {
-              this._insertText(this._text, undefined);
-            }
-          }
-        ];
-        this._getInsertionCandidates().then((insertionCandidates:
-          Array<string>) => {
-          for (let j: number = (insertionCandidates.length - 1); j >= 0; j--) {
-            menuItems.unshift({
-              type: 'menuitem',
-              text: insertionCandidates[j],
-              onAction: (button: any) => {
-                this._insertText(this._text, insertionCandidates[j]);
-              }
-            });
-          }
-          callback(menuItems);
-        });
-      }
-    });
-    editor.ui.registry.addToggleButton('delineate', {
-      text: 'Delineate',
-      onAction: (button: any) => {
-        let delineate: boolean = !button.isActive();
-        let formatSpecification: FormatSpecification =
-          new FormatSpecification();
-        formatSpecification.delineate = delineate;
-        formatSpecification.updateSource = true;
-        this._formatText(this._text, formatSpecification);
-        button.setActive(delineate);
-      }
-    });
-    editor.ui.registry.addButton('export', {
-      text: 'Export',
-      disabled: !this._text,
-      onAction: (button: any) => {
-        this._exportText(this._text);
-      }
-    });
-    editor.ui.registry.addButton('update', {
-      text: 'Update',
-      disabled: !this._text,
-      onAction: (button: any) => {
-        this._update(this._text, true);
-      }
-    });
+  public configureEditor(editor: any): void {
+    this._customizeEditor(editor);
   }
   
   public async saveText(): Promise<void> {
