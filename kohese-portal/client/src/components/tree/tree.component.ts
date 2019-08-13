@@ -416,11 +416,14 @@ export class TreeComponent implements OnInit, AfterViewInit {
   
   public update(updateStructure: boolean): void {
     if (updateStructure) {
+      let expansionStates: Map<any, boolean> = this.getExpansionStates();
       this._elementMap.clear();
       let children: Array<any> = this._getChildren(this._root);
       for (let j: number = 0; j < children.length; j++) {
         this.processElement(children[j], this._root, 0);
       }
+      
+      this.setExpansionStates(expansionStates);
     }
     
     this._changeDetectorRef.markForCheck();
