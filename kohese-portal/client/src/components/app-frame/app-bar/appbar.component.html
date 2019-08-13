@@ -5,23 +5,23 @@
         (click)="navigate('Dashboard', {})">
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
-                                'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
+                                          'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
         (click)="navigate('Explore', {id : ''})">
-        Explorer |
+        Explorer
         <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
           - {{syncStatusString}}
         </i>
       </span>
       <span class="navbar-brand" (click)="navigate('Dashboard', {})">
-        Dashboard |
+        Dashboard
       </span>
       <span class="navbar-brand" (click)="navigate('Document', { id: '' })">
-        Document |
+        Document
       </span>
       <span class="navbar-brand" (click)="navigate('Reports', {})">
-        Reports |
+        Reports
       </span>
-    </div>
+      </div>
     <button class="nav navbar-top-links navbar-right" mat-button id="notificationMenu"
       [matMenuTriggerFor]="notificationMenu">
       <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
