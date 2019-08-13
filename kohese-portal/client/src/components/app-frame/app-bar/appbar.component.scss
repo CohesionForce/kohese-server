@@ -44,13 +44,12 @@
   }
 
   .navbar-top-link {
-    margin-right: left;
+    margin-right: 0;
     height: 100%;
 
     #notificationMenu {
-      margin-right: left;
       height: 100%;
-      box-sizing: unset;
+      display: inline-block;
     }
   }
 
