@@ -1,6 +1,5 @@
-<editor #editor [(ngModel)]="html"
-  plugins="lists hr link image table searchreplace wordcount paste charmap
-  save noneditable" toolbar="{{'undo redo | save | styleselect |
+<editor #editor plugins="lists hr link image table searchreplace wordcount
+  paste charmap save noneditable" toolbar="{{'undo redo | save | styleselect |
   bold italic strikethrough | alignleft aligncenter alignright alignjustify |
   bullist numlist outdent indent hr link image charmap | table |
   searchreplace | ' + getAdditionalToolbarButtonsString()}}"
@@ -27,6 +26,7 @@
     save_onsavecallback: saveText.bind(this),
     link_context_toolbar: true,
     convert_urls: false
-  }" (onSelectionChange)="selectionChangedEventEmitter.emit($event.editor.
+  }" (ngModelChange)="contentChanged($event)"
+  (onSelectionChange)="selectionChangedEventEmitter.emit($event.editor.
   selection.getNode())">
 </editor>

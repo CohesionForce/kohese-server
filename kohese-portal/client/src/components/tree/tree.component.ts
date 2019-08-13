@@ -36,6 +36,46 @@ enum ExpansionState {
   EXPAND, COLLAPSE
 }
 
+export class Action {
+  get tooltip() {
+    return this._tooltip;
+  }
+  
+  get classes() {
+    return this._classes;
+  }
+  
+  get isVisible() {
+    return this._isVisible;
+  }
+  
+  get canExecute() {
+    return this._canExecute;
+  }
+  
+  get execute() {
+    return this._execute;
+  }
+  
+  public constructor(private _tooltip: string, private _classes: string,
+    private _isVisible: (element: any) => boolean, private _canExecute:
+    (element: any) => boolean, private _execute: (element: any) => void) {
+  }
+}
+
+export class ToggleAction extends Action {
+  get isSelected() {
+    return this._isSelected;
+  }
+  
+  public constructor(tooltip: string, classes: string, isVisible: (element:
+    any) => boolean, canExecute: (element: any) => boolean,
+    private _isSelected: (element: any) => boolean, execute: (element:
+    any) => void) {
+    super(tooltip, classes, isVisible, canExecute, execute);
+  }
+}
+
 @Component({
   selector: 'tree',
   templateUrl: './tree.component.html',
@@ -113,6 +153,22 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._allowMultiselect = allowMultiselect;
   }
   
+  private _actions: Array<Action> = [];
+  get actions() {
+    return this._actions;
+  }
+  @Input('actions')
+  set actions(actions: Array<Action>) {
+    this._actions = actions;
+  }
+  
+  private _elementSelected: (element: any) => void = (element: any) => {
+  };
+  @Input('elementSelectionHandler')
+  set elementSelected(elementSelected: (element: any) => void) {
+    this._elementSelected = elementSelected;
+  }
+  
   private _elementSelectedEventEmitter: EventEmitter<any> =
     new EventEmitter<any>();
   @Output('elementSelected')
@@ -156,6 +212,14 @@ export class TreeComponent implements OnInit, AfterViewInit {
       if (this._data['allowMultiselect']) {
         this._allowMultiselect = true;
       }
+      
+      if (this._data['actions']) {
+        this._actions = this._data['actions'];
+      }
+      
+      if (this._data['elementSelectionHandler']) {
+        this._elementSelected = this._data['elementSelectionHandler'];
+      }
     }
     
     this.update(true);
@@ -182,9 +246,9 @@ export class TreeComponent implements OnInit, AfterViewInit {
       let firstSelectedElementIndex: number = this.getDisplayedElements().
         indexOf(this._selection[0]);
       if (firstSelectedElementIndex !== -1) {
-        // Each element row should be 36px tall.
-        this._elementContainer.nativeElement.scrollTop = (36 *
-          firstSelectedElementIndex);
+        // Each element row should be 40px or 36px tall.
+        this._elementContainer.nativeElement.scrollTop = (((this._actions.
+          length > 0) ? 40 : 36) * firstSelectedElementIndex);
         this._changeDetectorRef.markForCheck();
       }
     }
@@ -384,6 +448,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
       this._selection.push(element);
     }
     
+    this._elementSelected(element);
     this._elementSelectedEventEmitter.emit(element);
   }
 }

@@ -11,11 +11,6 @@
       "required": true,
       "default": {}
     },
-    "document": {
-      "type": "string",
-      "required": true,
-      "default": ""
-    },
     "delineated": {
       "type": "boolean",
       "required": true,

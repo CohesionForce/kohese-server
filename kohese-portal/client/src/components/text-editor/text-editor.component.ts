@@ -3,7 +3,6 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Output } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { EditorComponent } from '@tinymce/tinymce-angular';
-import { MarkdownService } from 'ngx-markdown';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
@@ -14,31 +13,6 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TextEditorComponent implements OnInit {
-  private _text: string;
-  @Input('text')
-  set text(text: string) {
-    this._text = text;
-    this._html = this._markdownService.compile(this._text);
-  }
-
-  private _html: string;
-  get html() {
-    return this._html;
-  }
-  set html(html: string) {
-    this._html = html;
-    if (this._contentChangeDelayIdentifier) {
-      clearTimeout(this._contentChangeDelayIdentifier);
-    }
-    
-    this._contentChangeDelayIdentifier = setTimeout(async () => {
-      this._contentChangedEventEmitter.emit(await this._itemRepository.
-        convertToMarkdown(this._html, 'text/html', {}));
-      
-      this._contentChangeDelayIdentifier = undefined;
-    }, 1000);
-  }
-
   private _disabled: boolean = false;
   get disabled() {
     return this._disabled;
@@ -90,14 +64,11 @@ export class TextEditorComponent implements OnInit {
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
-    private _markdownService: MarkdownService, private _itemRepository:
-    ItemRepository) {
+    private _itemRepository: ItemRepository) {
   }
 
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
-      this.text = this._data['text'];
-      
       if (this._data['disabled']) {
         this._disabled = this._data['disabled'];
       }
@@ -154,9 +125,21 @@ export class TextEditorComponent implements OnInit {
     this._customizeEditor(editor);
   }
   
+  public contentChanged(html: string): void {
+    if (this._contentChangeDelayIdentifier) {
+      clearTimeout(this._contentChangeDelayIdentifier);
+    }
+    
+    this._contentChangeDelayIdentifier = setTimeout(async () => {
+      this._contentChangedEventEmitter.emit(await this._itemRepository.
+        convertToMarkdown(html, 'text/html', {}));
+      
+      this._contentChangeDelayIdentifier = undefined;
+    }, 1000);
+  }
+  
   public async saveText(): Promise<void> {
-    this._text = await this._itemRepository.convertToMarkdown(this._html,
-      'text/html', {});
-    this._save(this._text);
+    this._save(await this._itemRepository.convertToMarkdown(this._editor.
+      editor.getContent(), 'text/html', {}));
   }
 }

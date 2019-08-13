@@ -39,25 +39,28 @@
   <mat-drawer-container style="height: 95%;">
     <mat-drawer #outlineDrawer mode="side" disableClose style="width: 25%;">
       <div style="height: 5%; display: flex; flex-direction: row;">
+        <button mat-icon-button matTooltip="Add Items to the selected Document
+          Configuration" class="flex-right-align" (click)="addToDocument()">
+          <mat-icon class="fa fa-plus"></mat-icon>
+        </button>
         <button mat-icon-button matTooltip="Link outline and document"
-          class="flex-right-align" [ngClass]="{ 'highlight':
-          linkOutlineAndDocument }" (click)="linkOutlineAndDocument =
-          !linkOutlineAndDocument">
+          [ngClass]="{ 'highlight': linkOutlineAndDocument }"
+          (click)="linkOutlineAndDocument = !linkOutlineAndDocument">
           <mat-icon class="fa fa-exchange"></mat-icon>
         </button>
       </div>
       <ng-container *ngIf="documentConfiguration">
         <tree #outlineTree [root]="documentConfiguration"
-          [getChildren]="getOutlineItemChildren" [getText]="getItemText"
-          (elementSelected)="outlineItemProxySelected($event)"
-          style="height: 95%;">
+          [getChildren]="getOutlineDocumentComponentChildren"
+          [getText]="getDocumentComponentText"
+          (elementSelected)="outlineDocumentComponentSelected($event.id)"
+          [actions]="outlineActions" style="height: 95%;">
         </tree>
       </ng-container>
     </mat-drawer>
     <mat-drawer-content>
-      <text-editor #textEditor [text]="documentConfiguration?.document"
-        [disabled]="!documentConfiguration || (Object.keys(
-        documentConfiguration.components).length === 0)"
+      <text-editor #textEditor [disabled]="!documentConfiguration || (Object.
+        keys(documentConfiguration.components).length === 0)"
         [additionalToolbarButtons]="additionalToolbarButtonIds"
         [customizeEditor]="customizeEditor.bind(this)" [save]="save.bind(this)"
         (selectionChanged)="selectItem($event)"
