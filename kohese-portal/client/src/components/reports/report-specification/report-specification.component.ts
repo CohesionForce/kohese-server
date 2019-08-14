@@ -22,7 +22,7 @@ export class ReportSpecifications {
   set name(name: string) {
     this._name = name;
   }
-  
+
   private _format: string = ReportFormat.DOCX;
   get format() {
     return this._format;
@@ -30,7 +30,7 @@ export class ReportSpecifications {
   set format(format: string) {
     this._format = format;
   }
-  
+
   private _includeDescendants: boolean = true;
   get includeDescendants() {
     return this._includeDescendants;
@@ -38,7 +38,7 @@ export class ReportSpecifications {
   set includeDescendants(includeDescendants: boolean) {
     this._includeDescendants = includeDescendants;
   }
-  
+
   private _addLinks: boolean = false;
   get addLinks() {
     return this._addLinks;
@@ -46,7 +46,7 @@ export class ReportSpecifications {
   set addLinks(addLinks: boolean) {
     this._addLinks = addLinks;
   }
-  
+
   private _saveReport: boolean = true;
   get saveReport() {
     return this._saveReport;
@@ -54,7 +54,7 @@ export class ReportSpecifications {
   set saveReport(saveReport: boolean) {
     this._saveReport = saveReport;
   }
-  
+
   public constructor() {
   }
 }
@@ -71,13 +71,13 @@ export class ReportSpecificationComponent {
   get reportSpecifications() {
     return this._reportSpecifications;
   }
-  
+
   private _defaultName: string = '';
   @Input('defaultName')
   set defaultName(defaultName: string) {
     this._defaultName = defaultName;
   }
-  
+
   private _allowDescendantInclusionSpecification: boolean = false;
   get allowDescendantInclusionSpecification() {
     return this._allowDescendantInclusionSpecification;
@@ -88,7 +88,7 @@ export class ReportSpecificationComponent {
     this._allowDescendantInclusionSpecification =
       allowDescendantInclusionSpecification;
   }
-  
+
   private _allowLinkSpecification: boolean = false;
   get allowLinkSpecification() {
     return this._allowLinkSpecification;
@@ -97,7 +97,7 @@ export class ReportSpecificationComponent {
   set allowLinkSpecification(allowLinkSpecification: boolean) {
     this._allowLinkSpecification = allowLinkSpecification;
   }
-  
+
   private _getReportContent: (initialContent: string, reportSpecifications:
     ReportSpecifications) => string;
   @Input('getReportContent')
@@ -105,19 +105,19 @@ export class ReportSpecificationComponent {
     reportSpecifications: ReportSpecifications) => string) {
     this._getReportContent = getReportContent;
   }
-  
+
   get matDialogRef() {
     return this._matDialogRef;
   }
-  
+
   get Object() {
     return Object;
   }
-  
+
   get ReportFormat() {
     return ReportFormat;
   }
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef:
@@ -126,7 +126,7 @@ export class ReportSpecificationComponent {
     private _notificationService: NotificationService, private _sessionService:
     SessionService, private _toastrService: ToastrService) {
   }
-  
+
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this._defaultName = this._data['defaultName'];
@@ -135,16 +135,16 @@ export class ReportSpecificationComponent {
       this._allowLinkSpecification = this._data['allowLinkSpecification'];
       this._getReportContent = this._data['getReportContent'];
     }
-    
+
     this._reportSpecifications.name = this._defaultName;
     this.formatSelectionChanged(this._reportSpecifications.format);
   }
-  
+
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
   }
-  
+
   public formatSelectionChanged(format: string): void {
     let extension: string;
     switch (this._reportSpecifications.format) {
@@ -160,12 +160,12 @@ export class ReportSpecificationComponent {
       default:
         extension = '.md';
     }
-    
+
     if (this._reportSpecifications.name.endsWith(extension)) {
       this._reportSpecifications.name = this._reportSpecifications.name.
         substring(0, this._reportSpecifications.name.lastIndexOf(extension));
     }
-    
+
     this._reportSpecifications.format = format;
     switch (this._reportSpecifications.format) {
       case ReportFormat.DOCX:
@@ -180,17 +180,17 @@ export class ReportSpecificationComponent {
       default:
         extension = '.md';
     }
-    
+
     this._reportSpecifications.name += extension;
-    
+
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public canProduceReport(): boolean {
     return (this._reportSpecifications.name && (this._reportSpecifications.
       name.search(/[\/\\]/) === -1));
   }
-  
+
   public async produceReport(): Promise<void> {
     let reportObjects: Array<any> = await this._itemRepository.
       getReportMetaData();
@@ -210,13 +210,13 @@ export class ReportSpecificationComponent {
       await this._produceReport();
     }
   }
-  
+
   private async _produceReport(): Promise<void> {
     this._notificationService.addNotifications('PROCESSING: ' +
       'Export Report ' + this._reportSpecifications.name);
     let initialReportContent: string = 'Name: ' + this._reportSpecifications.
       name + '\n\nProduced by: ' + this._sessionService.getSessionUser().
-      getValue().item.name + '\n\nProduced on: ' + new Date() + '\n\n'; 
+      getValue().item.name + '\n\nProduced on: ' + new Date() + '\n\n';
     await this._itemRepository.produceReport(this._getReportContent(
       initialReportContent, this._reportSpecifications), this.
       _reportSpecifications.name, this._reportSpecifications.format);
@@ -229,12 +229,12 @@ export class ReportSpecificationComponent {
       await this._itemRepository.removeReport(this._reportSpecifications.
         name);
     }
-    
+
     this._toastrService.success(this._reportSpecifications.name,
-      'Report Produced');
+      'Report Produced', {positionClass: 'toast-bottom-right'});
     this._notificationService.addNotifications('COMPLETED: Report ' +
       'Completed ' + this._reportSpecifications.name);
-    
+
     if (this.isDialogInstance()) {
       this._matDialogRef.close(this._reportSpecifications);
     }
