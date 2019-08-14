@@ -24,7 +24,7 @@
     </div>
     <div class="nav navbar-top-links navbar-right">
       <div [matMenuTriggerFor]="notificationMenu">
-        <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
+        <mat-icon style='margin-right: 10px' class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
           [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
         </mat-icon>
         <mat-menu #notificationMenu="matMenu" [overlapTrigger]="false">
