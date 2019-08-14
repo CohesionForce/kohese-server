@@ -21,26 +21,27 @@
       <span class="navbar-brand" (click)="navigate('Reports', {})">
         Reports
       </span>
+    </div>
+    <div class="nav navbar-top-links navbar-right">
+      <div [matMenuTriggerFor]="notificationMenu">
+        <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
+          [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
+        </mat-icon>
+        <mat-menu #notificationMenu="matMenu" [overlapTrigger]="false">
+          <div style="text-align:center">Notifications</div>
+          <div *ngFor=" let message of messages">
+            <mat-list-item style='font-size: 10pt'>
+              {{message}}
+              <button mat-icon-button matTooltip="Delete Notification"
+                (click)="deleteMessage(message); $event.stopPropagation()">
+                <mat-icon class="fa fa-times-circle-o"></mat-icon>
+              </button>
+              <mat-divider></mat-divider>
+            </mat-list-item>
+          </div>
+        </mat-menu>
       </div>
-    <button class="nav navbar-top-links navbar-right" mat-button id="notificationMenu"
-      [matMenuTriggerFor]="notificationMenu">
-      <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
-        [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
-      </mat-icon>
-      <mat-menu #notificationMenu="matMenu" [overlapTrigger]="false">
-        <div style="text-align:center">Notifications</div>
-        <div *ngFor=" let message of messages">
-          <mat-list-item style='font-size: 10pt'>
-            {{message}}
-            <button mat-icon-button matTooltip="Delete Notification"
-              (click)="deleteMessage(message); $event.stopPropagation()">
-              <mat-icon class="fa fa-times-circle-o"></mat-icon>
-            </button>
-            <mat-divider></mat-divider>
-          </mat-list-item>
-        </div>
-      </mat-menu>
-      <span class="nav navbar-top-links navbar-right" mat-button id="userMenu" [matMenuTriggerFor]="userMenu">
+      <div [matMenuTriggerFor]="userMenu">
         <mat-icon class="fa fa-user fa-fw"></mat-icon>
         <span>{{userName}}</span>
         <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
@@ -69,7 +70,7 @@
             <span>Logout</span>
           </button>
         </mat-menu>
-      </span>
-    </button>
+      </div>
+    </div>
   </ng-container>
 </div>

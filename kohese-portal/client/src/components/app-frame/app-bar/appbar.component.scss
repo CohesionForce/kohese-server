@@ -18,13 +18,13 @@
     display: unset;
     color: white;
     cursor: pointer;
+    margin-right: 0;
     &:hover {
       color: white;
       background-color: $buttonAccentColor;
     }
-    text-align: left;
     border-right: 1px solid white;
-    padding: 10px;
+    padding: 20px;
   }
    .navbar-disconnected {
     color: white;
@@ -37,25 +37,18 @@
   }
 
   .navbar-top-links {
-    margin-right: 0;
-    height: 100%;
+    margin-right: 15px;
 
     #userMenu {
       height: 100%;
       display: inline-block;
     }
-  }
-
-  .navbar-top-link {
-    margin-right: 0;
-    height: 100%;
 
     #notificationMenu {
       height: 100%;
       display: inline-block;
     }
   }
-
 
   li {
     display: inline-block;
