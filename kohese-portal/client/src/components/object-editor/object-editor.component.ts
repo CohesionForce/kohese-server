@@ -18,6 +18,9 @@ import { ProxySelectorDialogComponent } from '../user-input/k-proxy-selector/pro
 })
 export class ObjectEditorComponent implements OnInit {
   private _object: any;
+  get object() {
+    return this._object;
+  }
   @Input('object')
   set object(object: any) {
     this._object = object;
@@ -84,7 +87,7 @@ export class ObjectEditorComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  private _copy: any;
+  private _copy: any = {};
   get copy() {
     return this._copy;
   }
@@ -375,7 +378,7 @@ export class ObjectEditorComponent implements OnInit {
     return stateTransitionCandidates;
   }
   
-  public close(accept: boolean): void {
+  public close(accept: boolean): any {
     if (accept) {
       if (!this._object) {
         this._object = {};
@@ -386,7 +389,11 @@ export class ObjectEditorComponent implements OnInit {
       }
     }
     
-    this._matDialogRef.close(accept ? this._object : undefined);
+    if (this.isDialogInstance()) {
+      this._matDialogRef.close(accept ? this._object : undefined);
+    }
+    
+    return this._object;
   }
   
   public getStringRepresentation(index: number, attributeName: string):

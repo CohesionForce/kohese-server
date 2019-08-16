@@ -1,6 +1,6 @@
 <div style="width: 100%; overflow: auto; padding: 7px;" [ngStyle]="{ 'height':
   isDialogInstance() ? '90%' : '100%' }">
-  <ng-container *ngFor="let attributeName of (copy | mapKey)">
+  <ng-container *ngFor="let attributeName of Object.keys(copy)">
     <ng-container *ngIf="attributes[attributeName]">
       <ng-container [ngSwitch]="getTypeName(attributes[attributeName].type)">
         <ng-container *ngIf="Array.isArray(attributes[attributeName].type)">
@@ -79,7 +79,7 @@
                 [disabled]="Object.keys(getStateTransitionCandidates(
                 attributeName)).length === 0">
                 <ng-container *ngFor="let transitionCandidateName of
-                  (getStateTransitionCandidates(attributeName) | mapKey)">
+                  Object.keys(getStateTransitionCandidates(attributeName))">
                   <mat-option [value]="attributes[attributeName].properties.
                     transition[transitionCandidateName].target">
                     {{transitionCandidateName}}
