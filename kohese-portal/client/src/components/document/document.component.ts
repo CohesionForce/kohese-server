@@ -45,6 +45,55 @@ export class DocumentComponent implements OnInit, OnDestroy {
     this._documentConfiguration = documentConfiguration;
     if (this._textEditor && this._textEditor.editor) {
       if (this._documentConfiguration) {
+        // Migration code
+        for (let id in this._documentConfiguration.components) {
+          if (this._documentConfiguration.components[id].hasOwnProperty(
+            'includeDescendants')) {
+            let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+              getProxyFor(id);
+            let documentComponent: any = {
+              id: id,
+              attributeMap: {
+                description: itemProxy.item.description
+              },
+              parentId: null,
+              childIds: []
+            };
+            
+            let includeDescendants: boolean = this._documentConfiguration.
+              components[id].includeDescendants;
+            this._documentConfiguration.components[id] = documentComponent;
+            
+            if (includeDescendants) {
+              let process: (descendant: ItemProxy) => void = (descendant:
+                ItemProxy) => {
+                let descendantDocumentComponent: any = {
+                  id: descendant.item.id,
+                  attributeMap: {
+                    description: descendant.item.description
+                  },
+                  parentId: descendant.item.parentId,
+                  childIds: []
+                };
+                
+                this._documentConfiguration.components[descendant.item.id] =
+                  descendantDocumentComponent;
+                
+                for (let j: number = 0; j < descendant.children.length; j++) {
+                  let child: ItemProxy = descendant.children[j];
+                  process(child);
+                  descendantDocumentComponent.childIds.push(child.item.id);
+                }
+              };
+              for (let k: number = 0; k < itemProxy.children.length; k++) {
+                let child: ItemProxy = itemProxy.children[k];
+                process(child);
+                documentComponent.childIds.push(child.item.id);
+              }
+            }
+          }
+        }
+        
         if (this._textEditor.editor.editor) {
           this.buildDocument(true);
           this._textEditor.editor.editor.undoManager.clear();
