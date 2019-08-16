@@ -10,6 +10,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { DocumentConfigurationEditorComponent } from '../object-editor/document-configuration/document-configuration-editor.component';
 import { TreeComponent, Action, ToggleAction } from '../tree/tree.component';
 import { TextEditorComponent } from '../text-editor/text-editor.component';
+import { ObjectEditorComponent } from '../object-editor/object-editor.component';
 import { AttributeInsertionComponent, AttributeInsertionSpecification,
   InsertionLocation,
   HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
@@ -122,142 +123,14 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }, (element: any) => {
       return true;
     }, (element: any) => {
-      let selectedMoveLocation: string;
-      let locations: Array<string> = ['Before', 'After', 'Child'];
-      this._dialogService.openComponentDialog(TreeComponent, {
-        data: {
-          root: this._documentConfiguration,
-          getChildren: (moveTargetElement: any) => {
-            let children: Array<any> = this.
-              _getOutlineDocumentComponentChildren(moveTargetElement);
-            let moveCandidateIndex: number = children.indexOf(
-              element as DocumentComponent);
-            if (moveCandidateIndex !== -1) {
-              children.splice(moveCandidateIndex, 1);
-            }
-            return children;
-          },
-          getText: this._getDocumentComponentText,
-          elementSelectionHandler: (element: any) => {
-            this._dialogService.openSelectDialog('Move Location', 'Please ' +
-              'select a move location:', 'Move Location', locations[2],
-              locations).afterClosed().subscribe((selectedLocation:
-              string) => {
-              if (selectedLocation) {
-                selectedMoveLocation = selectedLocation;
-              } else {
-                selectedMoveLocation = locations[2];
-              }
-            });
-          }
-        },
-        disableClose: true
-      }).updateSize('80%', '80%').afterClosed().subscribe((selection:
-        Array<any>) => {
-        if (selection) {
-          // To-do: add allowMultiselect
-          let outlineDocumentComponent: DocumentComponent =
-            (element as DocumentComponent);
-          let referenceDocumentComponent: DocumentComponent =
-            (selection[0] as DocumentComponent);
-          if (outlineDocumentComponent.parentId !== null) {
-            let previousParent: DocumentComponent = this.
-              _documentConfiguration.components[outlineDocumentComponent.
-              parentId];
-            previousParent.childIds.splice(previousParent.childIds.indexOf(
-              outlineDocumentComponent.id), 1);
-          }
-          
-          if (selectedMoveLocation === locations[2]) {
-            outlineDocumentComponent.parentId = referenceDocumentComponent.id;
-            referenceDocumentComponent.childIds.push(outlineDocumentComponent.
-              id);
-          } else {
-            let newParent: DocumentComponent = this._documentConfiguration.
-              components[referenceDocumentComponent.parentId];
-            outlineDocumentComponent.parentId = newParent.id;
-            newParent.childIds.splice(newParent.childIds.indexOf(
-              referenceDocumentComponent.id) + ((selectedMoveLocation ===
-              locations[0]) ? 0 : 1), 0, outlineDocumentComponent.id);
-          }
-          
-          this.buildDocument(false);
-          this._textEditor.editor.editor.setDirty(true);
-          this._outlineTree.update(true);
-          this._changeDetectorRef.markForCheck();
-        }
-      });
+      this.moveDocumentComponents([(element as DocumentComponent)]);
     }), new Action('Remove this Item from the selected Document Configuration',
       'fa fa-times', (element: any) => {
       return true;
     }, (element: any) => {
       return true;
     }, (element: any) => {
-      let documentComponent: DocumentComponent =
-        (element as DocumentComponent);
-      if ((element as DocumentComponent).childIds.length > 0) {
-        this._dialogService.openCustomTextDialog('Remove Descendants', 'Do ' +
-          'you want to remove the descendants of ' + TreeConfiguration.
-          getWorkingTree().getProxyFor((element as DocumentComponent).id).item.
-          name + ' also?', ['Cancel', 'Yes', 'No']).subscribe((response:
-          any) => {
-          if (response) {
-            if (response === 1) {
-              let documentComponentStack: Array<DocumentComponent> = [
-                ...documentComponent.childIds.map((childId: string) => {
-                return this._documentConfiguration.components[childId];
-              })];
-              while (documentComponentStack.length > 0) {
-                let descendant: DocumentComponent = documentComponentStack.
-                  shift();
-                documentComponentStack.push(...descendant.childIds.map(
-                  (childId: string) => {
-                  return this._documentConfiguration.components[childId];
-                }));
-                delete this._documentConfiguration.components[descendant.id];
-              }
-            } else {
-              /* Since descendants are not to be removed, move all descendants
-              up one level. */
-              if (documentComponent.parentId !== null) {
-                let parent: DocumentComponent = this._documentConfiguration.
-                  components[documentComponent.parentId];
-                parent.childIds.splice(parent.childIds.indexOf(
-                  documentComponent.id), 0, ...documentComponent.childIds);
-              }
-              for (let j: number = 0; j < documentComponent.childIds.length; j++) {
-                this._documentConfiguration.components[documentComponent.
-                  childIds[j]].parentId = documentComponent.parentId;
-              }
-            }
-            
-            if (documentComponent.parentId !== null) {
-              let parent: DocumentComponent = this._documentConfiguration.
-                components[documentComponent.parentId];
-              parent.childIds.splice(parent.childIds.indexOf(
-                documentComponent.id), 1);
-            }
-            delete this._documentConfiguration.components[documentComponent.
-              id];
-            this.buildDocument(false);
-            this._textEditor.editor.editor.setDirty(true);
-            this._outlineTree.update(true);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
-      } else {
-        if (documentComponent.parentId !== null) {
-          let parent: DocumentComponent = this._documentConfiguration.
-            components[documentComponent.parentId];
-          parent.childIds.splice(parent.childIds.indexOf(documentComponent.id),
-            1);
-        }
-        delete this._documentConfiguration.components[documentComponent.id];
-        this.buildDocument(false);
-        this._textEditor.editor.editor.setDirty(true);
-        this._outlineTree.update(true);
-        this._changeDetectorRef.markForCheck();
-      }
+      this.removeDocumentComponents([(element as DocumentComponent)]);
     })
   ];
   get outlineActions() {
@@ -270,18 +143,21 @@ export class DocumentComponent implements OnInit, OnDestroy {
   @ViewChild('textEditor')
   private _textEditor: TextEditorComponent;
   
+  private _document: string = '';
+  get document() {
+    return this._document;
+  }
+  
   private _additionalToolbarButtonIds: Array<string> = ['insert', 'delineate',
     'export', 'update'];
   get additionalToolbarButtonIds() {
     return this._additionalToolbarButtonIds;
   }
   
-  private _selectedItemProxy: ItemProxy;
-  get selectedItemProxy() {
-    return this._selectedItemProxy;
-  }
-  
   private _selectedAttributeName: string;
+  
+  @ViewChild('objectEditor')
+  private _objectEditor: ObjectEditorComponent;
   
   get matDialogRef() {
     return this._matDialogRef;
@@ -440,22 +316,37 @@ export class DocumentComponent implements OnInit, OnDestroy {
             }
           }
         ];
-        if (this._selectedItemProxy) {
-          let insertionCandidates: Array<string> = Object.keys(this.
-            _selectedItemProxy.model.item.classProperties).filter(
-            (attributeName: string) => {
+        let insertionCandidates: Array<string> = [];
+        let outlineTreeSelection: Array<any> = this._outlineTree.selection;
+        if (outlineTreeSelection.length > 0) {
+          let firstAttributeNameSet: Array<string> = Object.keys(
+            TreeConfiguration.getWorkingTree().getProxyFor(
+            (outlineTreeSelection[0] as DocumentComponent).id).model.item.
+            classProperties).filter((attributeName: string) => {
             return (attributeName !== 'description');
           });
-          
-          for (let j: number = (insertionCandidates.length - 1); j >= 0; j--) {
-            menuItems.unshift({
-              type: 'menuitem',
-              text: insertionCandidates[j],
-              onAction: (button: any) => {
-                this.insert(insertionCandidates[j]);
-              }
+          for (let j: number = 1; j < outlineTreeSelection.length; j++) {
+            let otherAttributeNameSet: Array<string> = Object.keys(
+              TreeConfiguration.getWorkingTree().getProxyFor(
+              (outlineTreeSelection[j] as DocumentComponent).id).model.item.
+              classProperties);
+            firstAttributeNameSet = firstAttributeNameSet.filter(
+              (attributeName: string) => {
+              return (otherAttributeNameSet.indexOf(attributeName) !== -1);
             });
           }
+          
+          insertionCandidates = firstAttributeNameSet;
+        }
+          
+        for (let j: number = (insertionCandidates.length - 1); j >= 0; j--) {
+          menuItems.unshift({
+            type: 'menuitem',
+            text: insertionCandidates[j],
+            onAction: (button: any) => {
+              this.insert(insertionCandidates[j]);
+            }
+          });
         }
         
         callback(menuItems);
@@ -486,7 +377,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
   
-  public addToDocument(): void {
+  public addDocumentComponents(): void {
     let includeDescendantsArray: Array<ItemProxy> = [];
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
@@ -569,48 +460,328 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
   
-  public outlineDocumentComponentSelected(id: string): void {
-    this._selectedItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      id);
-    this._textEditor.editor.editor.dom.select('div#' + this._selectedItemProxy.
-      item.id)[0].scrollIntoView();
+  public moveDocumentComponents(documentComponents: Array<DocumentComponent>):
+    void {
+    let selectedMoveLocation: string;
+    let locations: Array<string> = ['Before', 'After', 'Child'];
+    this._dialogService.openComponentDialog(TreeComponent, {
+      data: {
+        root: this._documentConfiguration,
+        getChildren: (element: any) => {
+          let children: Array<any> = this._getOutlineDocumentComponentChildren(
+            element);
+          for (let j: number = 0; j < documentComponents.length; j++) {
+            let moveCandidateIndex: number = children.indexOf(
+              documentComponents[j]);
+            if (moveCandidateIndex !== -1) {
+              children.splice(moveCandidateIndex, 1);
+            }
+          }
+          
+          return children;
+        },
+        getText: this._getDocumentComponentText,
+        elementSelectionHandler: (element: any) => {
+          this._dialogService.openSelectDialog('Move Location', 'Please ' +
+            'select a move location:', 'Move Location', locations[2],
+            locations).afterClosed().subscribe((selectedLocation:
+            string) => {
+            if (selectedLocation) {
+              selectedMoveLocation = selectedLocation;
+            } else {
+              selectedMoveLocation = locations[2];
+            }
+          });
+        }
+      },
+      disableClose: true
+    }).updateSize('80%', '80%').afterClosed().subscribe((selection:
+      Array<any>) => {
+      if (selection) {
+        for (let j: number = 0; j < documentComponents.length; j++) {
+          let outlineDocumentComponent: DocumentComponent = documentComponents[
+            j];
+          let referenceDocumentComponent: DocumentComponent =
+            (selection[0] as DocumentComponent);
+          if (outlineDocumentComponent.parentId !== null) {
+            let previousParent: DocumentComponent = this.
+              _documentConfiguration.components[outlineDocumentComponent.
+              parentId];
+            previousParent.childIds.splice(previousParent.childIds.indexOf(
+              outlineDocumentComponent.id), 1);
+          }
+          
+          if (selectedMoveLocation === locations[2]) {
+            outlineDocumentComponent.parentId = referenceDocumentComponent.id;
+            referenceDocumentComponent.childIds.push(outlineDocumentComponent.
+              id);
+          } else {
+            let newParent: DocumentComponent = this._documentConfiguration.
+              components[referenceDocumentComponent.parentId];
+            outlineDocumentComponent.parentId = newParent.id;
+            newParent.childIds.splice(newParent.childIds.indexOf(
+              referenceDocumentComponent.id) + ((selectedMoveLocation ===
+              locations[0]) ? 0 : 1), 0, outlineDocumentComponent.id);
+          }
+        }
+        
+        this.buildDocument(false);
+        this._textEditor.editor.editor.setDirty(true);
+        this._outlineTree.update(true);
+        this._changeDetectorRef.markForCheck();
+      }
+    });
   }
   
-  public selectItem(node: any): void {
-    let itemId: string;
-    let attributeName: string;
-    let startsWithSeparatorRegExp: RegExp =
-      /^<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]*?)" style="visibility: hidden;"/;
+  public removeDocumentComponents(documentComponents:
+    Array<DocumentComponent>): void {
+    if ((documentComponents.length === 1) && (documentComponents[0].childIds.
+      length === 0)) {
+      let documentComponent: DocumentComponent = documentComponents[0];
+      if (documentComponent.parentId !== null) {
+        let parent: DocumentComponent = this._documentConfiguration.
+          components[documentComponent.parentId];
+        parent.childIds.splice(parent.childIds.indexOf(documentComponent.id),
+          1);
+      }
+      delete this._documentConfiguration.components[documentComponent.id];
+      
+      this.buildDocument(false);
+      this._textEditor.editor.editor.setDirty(true);
+      this._outlineTree.update(true);
+      this._changeDetectorRef.markForCheck();
+    } else {
+      this._dialogService.openCustomTextDialog('Remove Descendants', 'Do ' +
+        'you want to remove the descendants of the selected components also?',
+        ['Cancel', 'Yes', 'No']).subscribe((response: any) => {
+        if (response) {
+          for (let j: number = 0; j < documentComponents.length; j++) {
+            let documentComponent: DocumentComponent = documentComponents[j];
+            if (response === 1) {
+              let documentComponentStack: Array<DocumentComponent> = [
+                ...documentComponent.childIds.map((childId: string) => {
+                return this._documentConfiguration.components[childId];
+              })];
+              while (documentComponentStack.length > 0) {
+                let descendant: DocumentComponent = documentComponentStack.
+                  shift();
+                documentComponentStack.push(...descendant.childIds.map(
+                  (childId: string) => {
+                  return this._documentConfiguration.components[childId];
+                }));
+                delete this._documentConfiguration.components[descendant.id];
+              }
+            } else {
+              /* Since descendants are not to be removed, move all descendants
+              up one level. */
+              if (documentComponent.parentId !== null) {
+                let parent: DocumentComponent = this._documentConfiguration.
+                  components[documentComponent.parentId];
+                parent.childIds.splice(parent.childIds.indexOf(
+                  documentComponent.id), 0, ...documentComponent.childIds);
+              }
+              for (let j: number = 0; j < documentComponent.childIds.length;
+                j++) {
+                this._documentConfiguration.components[documentComponent.
+                  childIds[j]].parentId = documentComponent.parentId;
+              }
+            }
+            
+            if (documentComponent.parentId !== null) {
+              let parent: DocumentComponent = this._documentConfiguration.
+                components[documentComponent.parentId];
+              parent.childIds.splice(parent.childIds.indexOf(
+                documentComponent.id), 1);
+            }
+            delete this._documentConfiguration.components[documentComponent.
+              id];
+          }
+          
+          this.buildDocument(false);
+          this._textEditor.editor.editor.setDirty(true);
+          this._outlineTree.update(true);
+          this._changeDetectorRef.markForCheck();
+        }
+      });
+    }
+  }
+  
+  public outlineDocumentComponentSelected(id: string): void {
+    this._textEditor.editor.editor.dom.select('div#' + id)[0].scrollIntoView();
+    let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      id);
+    /* Currently, type must be set before object, as the object setter
+    references type. */
+    this._objectEditor.type = itemProxy.model.item;
+    this._objectEditor.object = itemProxy.item;
+    this._changeDetectorRef.markForCheck();
+  }
+  
+  public selectionChanged(selection: any): void {
+    let anchorReference: any = selection.getSel().anchorNode;
+    let focusReference: any = selection.getSel().focusNode;
+    let itemStartRegExp: RegExp =
+      /^<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;"/;
+    let attributeStartRegExp: RegExp =
+      /^<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]+?)" style="visibility: hidden;"/;
     let match: any;
     do {
-      if ((match = startsWithSeparatorRegExp.exec(node.outerHTML)) !== null) {
-        if (match[1].length > 36) {
-          itemId = match[1].substring(0, 36);
-          attributeName = match[1].substring(36);
-        } else {
-          itemId = match[1];
+      if ((match = attributeStartRegExp.exec(anchorReference.outerHTML)) !==
+        null) {
+        let itemId: string = match[1].substring(0, 36);
+        this._selectedAttributeName = match[1].substring(36);
+        /* If the Selection's focusNode was set from a previous modification,
+        do not further modify the Selection. */
+        if (attributeStartRegExp.exec(focusReference.outerHTML) === null) {
+          let focusMatch: any;
+          do {
+            if ((focusMatch = itemStartRegExp.exec(focusReference.
+              outerHTML)) !== null) {
+              /* The Selection's focusNode was set from a previous modification
+              to the Selection. */
+              break;
+            }
+            
+            if ((focusMatch = attributeStartRegExp.exec(focusReference.
+              outerHTML)) !== null) {
+              let focusNode: any;
+              let focusItemId: string = focusMatch[1].substring(0, 36);
+              let focusAttributeName: string = focusMatch[1].substring(36);
+              if (itemId !== focusItemId) {
+                // Different Items
+                let anchorDocumentComponentIndex: number = this.
+                  getDocumentComponentIndex(itemId);
+                let focusDocumentComponentIndex: number = this.
+                  getDocumentComponentIndex(focusItemId);
+                if (anchorDocumentComponentIndex <
+                  focusDocumentComponentIndex) {
+                  // Forward selection
+                  focusNode = this._textEditor.editor.editor.dom.select(
+                    'div#' + this.getDocumentComponent(
+                    anchorDocumentComponentIndex + 1).id)[0];                      
+                } else {
+                  // Reverse selection. Skip the delineator.
+                  focusNode = anchorReference.childNodes.item(1);
+                }
+              } else if (this._selectedAttributeName !== focusAttributeName) {
+                // Same Item, different attributes
+                let attributeNames: Array<string> = Object.keys(this.
+                  _documentConfiguration.components[itemId].attributeMap);
+                let anchorAttributeNameIndex: number = attributeNames.indexOf(
+                  this._selectedAttributeName);
+                if (anchorAttributeNameIndex < attributeNames.indexOf(
+                  focusAttributeName)) {
+                  // Forward selection
+                  focusNode = this._textEditor.editor.editor.dom.select(
+                    'div#' + itemId + attributeNames[anchorAttributeNameIndex +
+                    1])[0];
+                } else {
+                  // Reverse selection. Skip the delineator.
+                  focusNode = this._textEditor.editor.editor.dom.select(
+                    'div#' + itemId + this._selectedAttributeName)[0].
+                    childNodes.item(1);
+                }
+              }
+              
+              if (focusNode) {
+                selection.getSel().extend(focusNode, 0);
+              }
+            
+              break;
+            }
+            
+            focusReference = focusReference.parentNode;
+          } while (focusReference);
         }
+        
+        if (this._outlineTree && this._linkOutlineAndDocument) {
+          this._outlineTree.selection = [this._documentConfiguration.
+            components[itemId]];
+        }
+        
+        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+          getProxyFor(itemId);
+        /* Currently, type must be set before object, as the object setter
+        references type. */
+        this._objectEditor.type = itemProxy.model.item;
+        this._objectEditor.object = itemProxy.item;
+        
+        this._changeDetectorRef.markForCheck();
+        
         break;
       }
       
-      node = node.parentNode;
-    } while (node);
-    
-    if (itemId) {
-      this._selectedItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-        itemId);
-      
-      if (this._outlineTree && this._linkOutlineAndDocument) {
-        this._outlineTree.selection = [this._documentConfiguration.components[
-          this._selectedItemProxy.item.id]];
+      anchorReference = anchorReference.parentNode;
+    } while (anchorReference);
+  }
+  
+  private getDocumentComponentIndex(id: string): number {
+    let index: number = 0;
+    let process: (documentComponent: DocumentComponent) => number =
+      (documentComponent: DocumentComponent) => {
+      if (documentComponent.id === id) {
+        return index;
+      } else {
+        index++;
+        for (let j: number = 0; j < documentComponent.childIds.length; j++) {
+          let result: number = process(this._documentConfiguration.components[
+            documentComponent.childIds[j]]);
+          if (result !== undefined) {
+            return index;
+          }
+        }
+        
+        return undefined;
       }
-      
-      if (attributeName) {
-        this._selectedAttributeName = attributeName;
+    };
+    for (let id in this._documentConfiguration.components) {
+      let documentComponent: DocumentComponent = this._documentConfiguration.
+        components[id];
+      if (documentComponent.parentId == null) {
+        let result: number = process(documentComponent);
+        if (result !== undefined) {
+          return index;
+        }
       }
-      
-      this._changeDetectorRef.markForCheck();
     }
+    
+    return -1;
+  }
+  
+  private getDocumentComponent(index: number): DocumentComponent {
+    if (index > -1) {
+      let process: (documentComponent:
+        DocumentComponent) => DocumentComponent = (documentComponent:
+        DocumentComponent) => {
+        if (index === 0) {
+          return documentComponent;
+        } else {
+          index--;
+          for (let j: number = 0; j < documentComponent.childIds.length; j++) {
+            let result: DocumentComponent = process(this.
+              _documentConfiguration.components[documentComponent.childIds[
+              j]]);
+            if (result !== undefined) {
+              return result;
+            }
+          }
+          
+          return undefined;
+        }
+      };
+      for (let id in this._documentConfiguration.components) {
+        let documentComponent: DocumentComponent = this._documentConfiguration.
+          components[id];
+        if (documentComponent.parentId == null) {
+          let result: DocumentComponent = process(documentComponent);
+          if (result !== undefined) {
+            return result;
+          }
+        }
+      }
+    }
+    
+    return undefined;
   }
   
   public textEditorContentChanged(text: string): void {
@@ -712,60 +883,65 @@ export class DocumentComponent implements OnInit, OnDestroy {
   private insert(insertionIdentifier: string): void {
     if (insertionIdentifier) {
       let insertionPositions: Array<string> = ['Before', 'After'];
-      let attributeMap: any = this._documentConfiguration.components[this.
-        _selectedItemProxy.item.id].attributeMap;
-      let intermediateMap: any = {};
-      let attributeNames: Array<string> = Object.keys(attributeMap);
-      let insertionIdentifierIndex: number = attributeNames.indexOf(
-        insertionIdentifier);
-      if (insertionIdentifierIndex !== -1) {
-        attributeNames.splice(insertionIdentifierIndex, 1);
-      }
-      
-      let selectedAttributeIndex: number = attributeNames.indexOf(this.
-        _selectedAttributeName);
-      this._dialogService.openSelectDialog('Select Insertion Position',
-        'Please select where you want to insert the value of ' +
-        insertionIdentifier + ' in relation to the selected attribute:',
-        'Insertion Position', insertionPositions[1], insertionPositions).
-        afterClosed().subscribe((insertionPosition: string) => {
-        if (insertionPosition) {
-          for (let j: number = 0; j < selectedAttributeIndex; j++) {
-            intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
-              j]];
-          }
-          
-          if (insertionPosition === insertionPositions[0]) {
-            intermediateMap[insertionIdentifier] = this._selectedItemProxy.
-              item[insertionIdentifier];
-            intermediateMap[attributeNames[selectedAttributeIndex]] =
-              attributeMap[attributeNames[selectedAttributeIndex]];
-          } else {
-            intermediateMap[attributeNames[selectedAttributeIndex]] =
-              attributeMap[attributeNames[selectedAttributeIndex]];
-            intermediateMap[insertionIdentifier] = this._selectedItemProxy.
-              item[insertionIdentifier];
-          }
-          
-          for (let j: number = selectedAttributeIndex + 1; j <
-            attributeNames.length; j++) {
-            intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
-              j]];
-          }
-          
-          for (let attributeName in attributeMap) {
-            delete attributeMap[attributeName];
-          }
-          
-          for (let attributeName in intermediateMap) {
-            attributeMap[attributeName] = intermediateMap[attributeName];
-          }
-          
-          this.buildDocument(false);
-          this._textEditor.editor.editor.setDirty(true);
-          this._changeDetectorRef.markForCheck();
+      for (let j: number = 0; j < this._outlineTree.selection.length; j++) {
+        let documentComponent: DocumentComponent = this._outlineTree.selection[
+          j];
+        let attributeMap: any = documentComponent.attributeMap;
+        let intermediateMap: any = {};
+        let attributeNames: Array<string> = Object.keys(attributeMap);
+        let insertionIdentifierIndex: number = attributeNames.indexOf(
+          insertionIdentifier);
+        if (insertionIdentifierIndex !== -1) {
+          attributeNames.splice(insertionIdentifierIndex, 1);
         }
-      });
+        
+        let selectedAttributeIndex: number = attributeNames.indexOf(this.
+          _selectedAttributeName);
+        this._dialogService.openSelectDialog('Select Insertion Position',
+          'Please select where you want to insert the value of ' +
+          insertionIdentifier + ' in relation to the selected attribute:',
+          'Insertion Position', insertionPositions[1], insertionPositions).
+          afterClosed().subscribe((insertionPosition: string) => {
+          if (insertionPosition) {
+            for (let j: number = 0; j < selectedAttributeIndex; j++) {
+              intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
+                j]];
+            }
+            
+            let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+              getProxyFor(documentComponent.id);
+            if (insertionPosition === insertionPositions[0]) {
+              intermediateMap[insertionIdentifier] = itemProxy.item[
+                insertionIdentifier];
+              intermediateMap[attributeNames[selectedAttributeIndex]] =
+                attributeMap[attributeNames[selectedAttributeIndex]];
+            } else {
+              intermediateMap[attributeNames[selectedAttributeIndex]] =
+                attributeMap[attributeNames[selectedAttributeIndex]];
+              intermediateMap[insertionIdentifier] = itemProxy.item[
+                insertionIdentifier];
+            }
+            
+            for (let j: number = selectedAttributeIndex + 1; j <
+              attributeNames.length; j++) {
+              intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
+                j]];
+            }
+            
+            for (let attributeName in attributeMap) {
+              delete attributeMap[attributeName];
+            }
+            
+            for (let attributeName in intermediateMap) {
+              attributeMap[attributeName] = intermediateMap[attributeName];
+            }
+            
+            this.buildDocument(false);
+            this._textEditor.editor.editor.setDirty(true);
+            this._changeDetectorRef.markForCheck();
+          }
+        });
+      }
     } else {
       this._dialogService.openComponentDialog(AttributeInsertionComponent, {
         data: {},
@@ -1045,6 +1221,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }
   }
   
+  public saveObjectEditorObject(): void {
+    let objectEditorObject: any = this._objectEditor.close(true);
+    let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      objectEditorObject['id']);
+    this._itemRepository.upsertItem(itemProxy.kind, objectEditorObject);
+  }
+  
   private buildDocument(clearModificationIndicator: boolean): void {
     let document: string = '';
     let documentComponents: Array<DocumentComponent> = Object.values(this.
@@ -1088,13 +1271,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     }
     
-    if (this._textEditor.editor.editor) {
-      this._textEditor.editor.editor.setContent(this._markdownService.compile(
-        document));
-    } else {
-      this._textEditor.editor.initialValue = this._markdownService.compile(
-        document);
-    }
+    this._document = this._markdownService.compile(document);
   }
   
   public async save(text: string): Promise<void> {

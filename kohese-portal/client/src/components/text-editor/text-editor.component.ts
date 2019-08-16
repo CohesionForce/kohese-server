@@ -13,6 +13,15 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TextEditorComponent implements OnInit {
+  private _content: string;
+  get content() {
+    return this._content;
+  }
+  @Input('content')
+  set content(content: string) {
+    this._content = content;
+  }
+  
   private _disabled: boolean = false;
   get disabled() {
     return this._disabled;
@@ -69,6 +78,8 @@ export class TextEditorComponent implements OnInit {
 
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
+      this._content = this._data['content'];
+      
       if (this._data['disabled']) {
         this._disabled = this._data['disabled'];
       }
