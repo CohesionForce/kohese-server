@@ -284,12 +284,14 @@ export class ImportComponent implements OnInit {
       if (!fileMapValue.preview) {
         await this._itemRepository.importMarkdown(selectedFileKeys[j].name,
           await this.retrieveImportPreview(selectedFileKeys[j]), parentId);
-        this._toastrService.success(selectedFileKeys[j].name, 'File Imported');
+        this._toastrService.success(selectedFileKeys[j].name, 'File Imported',
+          {positionClass: 'toast-bottom-right'});
         this._notificationService.addNotifications('COMPLETED: Import File ' + selectedFileKeys[j].name);
       } else {
         await this._itemRepository.importMarkdown(selectedFileKeys[j].name,
           fileMapValue.preview, parentId);
-        this._toastrService.success(selectedFileKeys[j].name, 'File Imported');
+        this._toastrService.success(selectedFileKeys[j].name, 'File Imported',
+          {positionClass: 'toast-bottom-right'});
         this._notificationService.addNotifications('COMPLETED: Import File ' + selectedFileKeys[j].name);
       }
     }

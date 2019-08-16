@@ -35,7 +35,8 @@ export class UploadService {
             if (results.error) {
               console.log(results.error);
             }
-            this.toastrService.error('Upload Failed', 'Upload');
+            this.toastrService.error('Upload Failed', 'Upload',
+              {positionClass: 'toast-bottom-right'});
             this._notificationService.addNotifications('ERROR: Upload - Image Failed');
           } else {
             for (let i: number = 0; i < results.length; i++) {
@@ -43,7 +44,8 @@ export class UploadService {
             }
 
             if (this.uploadedItems.length >= this.uploadListLength) {
-              this.toastrService.success('Upload Succeeded', 'Upload');
+              this.toastrService.success('Upload Succeeded', 'Upload',
+                {positionClass: 'toast-bottom-right'});
               this._notificationService.addNotifications('COMPLETED: Upload - Image Succeeded');
             }
           }

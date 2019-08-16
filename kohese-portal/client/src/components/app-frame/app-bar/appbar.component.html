@@ -1,7 +1,7 @@
 <div class="navbar">
   <ng-container *ngIf="(authenticated)">
     <div class="navbar-header">
-      <img src="../../../../assets/icons/favicon.ico" width="50" height="50" mat-icon-button
+      <img src="../../../../assets/icons/favicon.ico" width="50" height="50"
         (click)="navigate('Dashboard', {})">
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
@@ -23,7 +23,7 @@
       </span>
     </div>
     <div class="nav navbar-top-links navbar-right">
-      <div [matMenuTriggerFor]="notificationMenu">
+      <button mat-button [matMenuTriggerFor]="notificationMenu">
         <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
           [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
         </mat-icon>
@@ -40,8 +40,8 @@
             </mat-list-item>
           </div>
         </mat-menu>
-      </div>
-      <div [matMenuTriggerFor]="userMenu">
+      </button>
+      <button mat-button [matMenuTriggerFor]="userMenu">
         <mat-icon class="fa fa-user fa-fw"></mat-icon>
         <span>{{userName}}</span>
         <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
@@ -70,7 +70,7 @@
             <span>Logout</span>
           </button>
         </mat-menu>
-      </div>
+      </button>
     </div>
   </ng-container>
 </div>
