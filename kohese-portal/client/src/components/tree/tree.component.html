@@ -9,6 +9,16 @@
       (click)="changeAllExpansionStates(ExpansionState.COLLAPSE)">
       <mat-icon class="fa fa-caret-down"></mat-icon>
     </button>
+    <ng-container *ngIf="allowMultiselect">
+      <button mat-icon-button matTooltip="Select all elements"
+        (click)="changeSelectionOfAll(true)">
+        <mat-icon class="fa fa-check-square-o"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="De-select all elements"
+        (click)="changeSelectionOfAll(false)">
+        <mat-icon class="fa fa-square-o"></mat-icon>
+      </button>
+    </ng-container>
     <mat-form-field style="width: 70%;" class="flex-right-align">
       <input matInput type="text" placeholder="Search"
         (input)="searchTextChanged($event.target.value)"/>

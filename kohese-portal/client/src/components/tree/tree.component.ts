@@ -364,6 +364,29 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._changeDetectorRef.markForCheck();
   }
   
+  public changeSelectionOfAll(select: boolean): void {
+    let keys: Array<any> = Array.from(this._elementMap.keys());
+    for (let j: number = 0; j < keys.length; j++) {
+      let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+      if (elementMapValue.visible) {
+        let elementIndex: number = this._selection.indexOf(keys[j]);
+        if (select) {
+          if (elementIndex === -1) {
+            this._selection.push(keys[j]);
+            this._elementSelected(keys[j]);
+            this._elementSelectedEventEmitter.emit(keys[j]);
+          }
+        } else {
+          if (elementIndex !== -1) {
+            this._selection.splice(elementIndex, 1);
+          }
+        }
+      }
+    }
+    
+    this._changeDetectorRef.markForCheck();
+  }
+  
   public getExpansionStates(): Map<any, boolean> {
     let expansionStates: Map<any, boolean> = new Map<any, boolean>();
     let elements: Array<any> = Array.from(this._elementMap.keys());
@@ -443,15 +466,16 @@ export class TreeComponent implements OnInit, AfterViewInit {
       let elementIndex: number = this._selection.indexOf(element);
       if (elementIndex === -1) {
         this._selection.push(element);
+        this._elementSelected(element);
+        this._elementSelectedEventEmitter.emit(element);
       } else {
         this._selection.splice(elementIndex, 1);
       }
     } else {
       this._selection.length = 0;
       this._selection.push(element);
+      this._elementSelected(element);
+      this._elementSelectedEventEmitter.emit(element);
     }
-    
-    this._elementSelected(element);
-    this._elementSelectedEventEmitter.emit(element);
   }
 }
