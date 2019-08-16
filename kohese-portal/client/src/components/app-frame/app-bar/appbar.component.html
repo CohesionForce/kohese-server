@@ -6,7 +6,7 @@
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
                                           'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
-        (click)="navigate('Dashboard', {id : ''})">
+        (click)="navigate('Dashboard', {})">
         Dashboard
         <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
           - {{syncStatusString}}
