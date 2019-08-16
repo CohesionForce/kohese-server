@@ -35,7 +35,8 @@ export class ImportService {
             if (results.error) {
               console.log(results.error);
             }
-            this.toastrService.error('Import Failed', 'Import');
+            this.toastrService.error('Import Failed', 'Import',
+              {positionClass: 'toast-bottom-right'});
             this._notificationService.addNotifications('ERROR: Import - Files Failed');
           } else {
             for (let i: number = 0; i < results.length; i++) {
@@ -43,7 +44,8 @@ export class ImportService {
             }
 
             if (this.importedItems.length >= this.uploadListLength) {
-              this.toastrService.success('Import Succeeded', 'Import');
+              this.toastrService.success('Import Succeeded', 'Import',
+                {positionClass: 'toast-bottom-right'});
               this._notificationService.addNotifications('COMPLETED: Import - Files Succeeded');
             }
           }
