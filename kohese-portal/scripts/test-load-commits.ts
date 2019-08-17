@@ -95,16 +95,26 @@ async function compareDiff_c282fb(){
   }
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+function printMissingCommitData(missingCommitData) {
+  console.log('^^^ Missing commit data');
+  console.log(JSON.stringify(missingCommitData, null, '  '));
+}
+
 //////////////////////////////////////////////////////////////////////////
 async function evaluateAllCommits() {
+  console.log('^^^ Begin evaluating all commits');
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
-    await itemCache.detectMissingCommitData();
-} catch (err) {
+    let missingCommitData = await itemCache.detectMissingCommitData();
+    printMissingCommitData(missingCommitData);
+  } catch (err) {
     console.log('*** Error');
     console.log(err);
 
   }
+  console.log('^^^ Finish evaluating all commits');
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -132,7 +142,8 @@ async function evaluateEachCommit() {
     let commitMap = itemCache.getCommits();
 
     for (let commitId of Array.from(commitMap.keys())){
-      await itemCache.detectMissingCommitData(commitId);
+      let missingCommitData = await itemCache.detectMissingCommitData(commitId);
+      printMissingCommitData(missingCommitData);
     }
 } catch (err) {
     console.log('*** Error');
@@ -160,7 +171,8 @@ async function diffEachCommit() {
 async function evaluateCommit(selectedCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
-    await itemCache.detectMissingCommitData(selectedCommitId);
+    let missingCommitData = await itemCache.detectMissingCommitData(selectedCommitId);
+    printMissingCommitData(selectedCommitId);
 
   } catch (err) {
     console.log('*** Error');
@@ -262,8 +274,6 @@ async function loadCommit(selectedCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
     let treeConfig = new TreeConfiguration(selectedCommitId);
-
-    // await itemCache.detectMissingCommitData(selectedCommitId);
 
     await itemCache.loadProxiesForCommit(selectedCommitId, treeConfig);
     treeConfig.calculateAllTreeHashes();
@@ -385,6 +395,7 @@ try {
 
     console.log('^^^ Finish listing');
 
+    await evaluateAllCommits();
 
   });
 

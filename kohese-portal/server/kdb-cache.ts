@@ -57,6 +57,10 @@ export class KDBCache extends LevelCache {
 
     let cacheDirectory = path.join(repoPath, '.cache');
     let dbDirectory = path.join(cacheDirectory, 'cacheDB');
+
+    kdbFS.createDirIfMissing(cacheDirectory);
+    kdbFS.createGITIgnoreAllIfMissing(cacheDirectory + '/.gitignore');
+
     let levelDown = LevelDown(dbDirectory);
     super(levelDown);
 
@@ -97,8 +101,6 @@ export class KDBCache extends LevelCache {
     this.expandedRepoCommitDirectory = path.join(this.cacheDirectory, 'expanded-repo-commit');
     this.hashmapDirectory = path.join(this.cacheDirectory, 'hashmap');
 
-    kdbFS.createDirIfMissing(this.cacheDirectory);
-    kdbFS.createGITIgnoreAllIfMissing(this.cacheDirectory + '/.gitignore');
     kdbFS.createDirIfMissing(this.objectDirectory);
     kdbFS.createDirIfMissing(this.repoCommitDirectory);
     kdbFS.createDirIfMissing(this.repoTreeDirectory);
@@ -390,6 +392,7 @@ export class KDBCache extends LevelCache {
           } else {
             kdbFS.storeJSONDoc(this.blobMismatchDirectory + path.sep + koid + '.json', convertedBlob);
           }
+          this.cacheBlob(koid, convertedBlob);
         }
         this.cacheBlob(oid, convertedBlob);
         if (convertedBlob.binary) {
