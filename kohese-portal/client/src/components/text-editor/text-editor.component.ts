@@ -7,35 +7,6 @@ import { MarkdownService } from 'ngx-markdown';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
-export class FormatSpecification {
-  private _removeExternalFormatting: boolean = true;
-  get removeExternalFormatting() {
-    return this._removeExternalFormatting;
-  }
-  set removeExternalFormatting(removeExternalFormatting: boolean) {
-    this._removeExternalFormatting = removeExternalFormatting;
-  }
-  
-  private _delineate: boolean;
-  get delineate() {
-    return this._delineate;
-  }
-  set delineate(delineate: boolean) {
-    this._delineate = delineate;
-  }
-  
-  private _updateSource: boolean = false;
-  get updateSource() {
-    return this._updateSource;
-  }
-  set updateSource(updateSource: boolean) {
-    this._updateSource = updateSource;
-  }
-  
-  public constructor() {
-  }
-}
-
 @Component({
   selector: 'text-editor',
   templateUrl: './text-editor.component.html',
@@ -65,7 +36,7 @@ export class TextEditorComponent implements OnInit {
         convertToMarkdown(this._html, 'text/html', {}));
       
       this._contentChangeDelayIdentifier = undefined;
-    }, 700);
+    }, 1000);
   }
 
   private _disabled: boolean = false;
@@ -76,28 +47,24 @@ export class TextEditorComponent implements OnInit {
   set disabled(disabled: boolean) {
     this._disabled = disabled;
   }
-
-  private _formatText: (text: string, formatSpecification:
-    FormatSpecification) => string = (text: string, formatSpecification:
-    FormatSpecification) => {
-    return text;
-  };
-  @Input('formatText')
-  set formatText(formatText: (text: string, formatSpecification:
-    FormatSpecification) => string) {
-    this._formatText = formatText;
+  
+  private _additionalToolbarButtons: Array<string> = [];
+  @Input('additionalToolbarButtons')
+  set additionalToolbarButtons(additionalToolbarButtons: Array<string>) {
+    this._additionalToolbarButtons = additionalToolbarButtons;
   }
   
-  private _exportText: (text: string) => void = (text: string) => {
+  private _customizeEditor: (editor: any) => void = (editor: any) => {
   };
-  @Input('exportText')
-  set exportText(exportText: (text: string) => void) {
-    this._exportText = exportText;
+  @Input('customizeEditor')
+  set customizeEditor(customizeEditor: (editor: any) => void) {
+    this._customizeEditor = customizeEditor;
   }
-
-  private _save: (text: string) => void = (text: string) => {};
+  
+  private _save: (text: string) => Promise<void> = async (text: string) => {
+  };
   @Input('save')
-  set save(save: (text: string) => void) {
+  set save(save: (text: string) => Promise<void>) {
     this._save = save;
   }
   
@@ -120,10 +87,6 @@ export class TextEditorComponent implements OnInit {
   
   private _contentChangeDelayIdentifier: any;
 
-  get componentReference() {
-    return this;
-  }
-
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<TextEditorComponent>,
@@ -134,6 +97,23 @@ export class TextEditorComponent implements OnInit {
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this.text = this._data['text'];
+      
+      if (this._data['disabled']) {
+        this._disabled = this._data['disabled'];
+      }
+      
+      if (this._data['additionalToolbarButtons']) {
+        this._additionalToolbarButtons = this._data[
+          'additionalToolbarButtons'];
+      }
+      
+      if (this._data['customizeEditor']) {
+        this._customizeEditor = this._data['customizeEditor'];
+      }
+      
+      if (this._data['save']) {
+        this._save = this._data['save'];
+      }
     }
   }
 
@@ -165,30 +145,15 @@ export class TextEditorComponent implements OnInit {
 
     fileInput.click();
   }
-
-  public customizeEditor(editor: any): void {
-    editor.ui.registry.addToggleButton('delineate', {
-      text: 'Delineate',
-      onAction: (button: any) => {
-        let delineate: boolean = !button.isActive();
-        let formatSpecification: FormatSpecification =
-          new FormatSpecification();
-        formatSpecification.removeExternalFormatting = false;
-        formatSpecification.delineate = delineate;
-        formatSpecification.updateSource = true;
-        this._formatText(this._text, formatSpecification);
-        button.setActive(delineate);
-      }
-    });
-    editor.ui.registry.addButton('export', {
-      text: 'Export',
-      disabled: !this._text,
-      onAction: (button: any) => {
-        this._exportText(this._text);
-      }
-    });
+  
+  public getAdditionalToolbarButtonsString(): string {
+    return this._additionalToolbarButtons.join(' | ');
   }
 
+  public configureEditor(editor: any): void {
+    this._customizeEditor(editor);
+  }
+  
   public async saveText(): Promise<void> {
     this._text = await this._itemRepository.convertToMarkdown(this._html,
       'text/html', {});

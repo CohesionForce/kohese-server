@@ -10,6 +10,16 @@
       "type": "object",
       "required": true,
       "default": {}
+    },
+    "document": {
+      "type": "string",
+      "required": true,
+      "default": ""
+    },
+    "delineated": {
+      "type": "boolean",
+      "required": true,
+      "default": false
     }
   },
   "validations": [],

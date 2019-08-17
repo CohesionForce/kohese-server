@@ -1,0 +1,76 @@
+<div [ngStyle]="{ 'height': (isDialogInstance() ? '95%' : '100%') }">
+  <div style="height: 10%; display: flex; flex-direction: row;">
+    <h3>
+      Differences
+    </h3>
+    <button mat-icon-button matTooltip="Select all local changes"
+      class="flex-right-align" (click)="selectVersionForAllDifferences(
+      VersionSelection.LOCAL)">
+      <mat-icon class="fa fa-arrow-circle-o-left"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Select all remote changes"
+      (click)="selectVersionForAllDifferences(VersionSelection.REMOTE)">
+      <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
+    </button>
+  </div>
+  <tree #differenceTree [root]="differences" [getChildren]="getChildren"
+    [getText]="getText" style="height: 50%;"
+    (elementSelected)="differenceSelected($event)">
+  </tree>
+  <div style="height: 40%;">
+    <split direction="horizontal">
+      <split-area [size]="50">
+        <ng-container *ngIf="selectedDifference">
+          <div style="height: 20%; display: flex; flex-direction: row;">
+            <h3>
+              Local
+            </h3>
+            <button mat-icon-button matTooltip="Select this version"
+              (click)="versionSelected(VersionSelection.LOCAL)"
+              [ngClass]="{ 'highlight': (selectedDifference.
+              versionSelection === VersionSelection.LOCAL) }"
+              class="flex-right-align">
+              <mat-icon class="fa fa-crosshairs"></mat-icon>
+            </button>
+          </div>
+          <div style="height: 80%; overflow: auto;">
+            <markdown [data]="selectedDifference.localValue"></markdown>
+          </div>
+        </ng-container>
+      </split-area>
+      <split-area [size]="50">
+        <ng-container *ngIf="selectedDifference">
+          <div style="height: 20%; display: flex; flex-direction: row;">
+            <h3>
+              Remote
+            </h3>
+            <button mat-icon-button matTooltip="Select this version"
+              (click)="versionSelected(VersionSelection.REMOTE)"
+              [ngClass]="{ 'highlight': (selectedDifference.
+              versionSelection === VersionSelection.REMOTE) }"
+              class="flex-right-align">
+              <mat-icon class="fa fa-crosshairs"></mat-icon>
+            </button>
+          </div>
+          <div style="height: 80%; overflow: auto;">
+            <markdown [data]="selectedDifference.remoteValue"></markdown>
+          </div>
+        </ng-container>
+      </split-area>
+    </split>
+  </div>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 5%; display: flex; flex-direction: row;">
+    <span class="flex-right-align">
+      <button mat-button matTooltip="Accept the merge selections"
+        [disabled]="!canMerge()" (click)="matDialogRef.close(differences)">
+        Merge
+      </button>
+      <button mat-button matTooltip="Cancel the merge process"
+        (click)="matDialogRef.close(undefined)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>

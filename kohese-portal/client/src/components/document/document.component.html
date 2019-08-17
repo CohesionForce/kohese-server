@@ -25,14 +25,19 @@
       (click)="removeSelectedDocumentConfiguration()">
       <mat-icon class="fa fa-trash"></mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Toggle outline" (click)="drawer.
+    <button mat-icon-button matTooltip="Toggle outline" (click)="outlineDrawer.
       toggle()" class="flex-right-align" [disabled]="!documentConfiguration"
-      [ngClass]="{ 'highlight': drawer.opened }">
+      [ngClass]="{ 'highlight': outlineDrawer.opened }">
       <mat-icon class="fa fa-list"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Toggle object editor"
+      (click)="objectEditorDrawer.toggle()" [disabled]="!selectedItemProxy"
+      [ngClass]="{ 'highlight': objectEditorDrawer.opened }">
+      <mat-icon class="fa fa-pencil"></mat-icon>
     </button>
   </div>
   <mat-drawer-container style="height: 95%;">
-    <mat-drawer #drawer mode="side" disableClose style="width: 25%;">
+    <mat-drawer #outlineDrawer mode="side" disableClose style="width: 25%;">
       <div style="height: 5%; display: flex; flex-direction: row;">
         <button mat-icon-button matTooltip="Link outline and document"
           class="flex-right-align" [ngClass]="{ 'highlight':
@@ -44,25 +49,40 @@
       <ng-container *ngIf="documentConfiguration">
         <tree #outlineTree [root]="documentConfiguration"
           [getChildren]="getOutlineItemChildren" [getText]="getItemText"
-          (elementSelected)="scrollDocumentToItem($event.item)"
+          (elementSelected)="outlineItemProxySelected($event)"
           style="height: 95%;">
         </tree>
       </ng-container>
     </mat-drawer>
     <mat-drawer-content>
-      <text-editor #textEditor [text]="document"
+      <text-editor #textEditor [text]="documentConfiguration?.document"
         [disabled]="!documentConfiguration || (Object.keys(
         documentConfiguration.components).length === 0)"
-        [formatText]="getFormattedTextFunction()"
-        [exportText]="getExportFunction()" [save]="getSaveFunction()"
-        (selectionChanged)="(isOutlineOpenAndLinked() ? selectItemInOutline(
-        $event) : '')" (contentChanged)="textEditorContentChanged($event)">
+        [additionalToolbarButtons]="additionalToolbarButtonIds"
+        [customizeEditor]="customizeEditor.bind(this)" [save]="save.bind(this)"
+        (selectionChanged)="selectItem($event)"
+        (contentChanged)="textEditorContentChanged($event)">
       </text-editor>
     </mat-drawer-content>
+    <mat-drawer #objectEditorDrawer mode="side" position="end" disableClose
+      style="width: 25%;">
+      <ng-container *ngIf="selectedItemProxy">
+        <div style="height: 5%; display: flex; flex-direction: row;">
+          <button mat-icon-button matTooltip="Save this Item"
+            class="flex-right-align" (click)="itemRepository.upsertItem(
+            selectedItemProxy.kind, selectedItemProxy.item)">
+            <mat-icon class="fa fa-save"></mat-icon>
+          </button>
+        </div>
+        <object-editor [object]="selectedItemProxy.item"
+          [type]="selectedItemProxy.model.item">
+        </object-editor>
+      </ng-container>
+    </mat-drawer>
   </mat-drawer-container>
   <ng-container *ngIf="isDialogInstance()">
     <mat-dialog-actions style="height: 5%; display: flex;
-      flex-direction: column;">
+      flex-direction: row;">
       <span class="flex-right-align">
         <button mat-button matTooltip="Propagate this configuration"
           [disabled]="!documentConfiguration" (click)="matDialogRef.close(

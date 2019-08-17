@@ -1,11 +1,10 @@
 <editor #editor [(ngModel)]="html"
   plugins="lists hr link image table searchreplace wordcount paste charmap
-  save noneditable" toolbar="undo redo | save | styleselect |
+  save noneditable" toolbar="{{'undo redo | save | styleselect |
   bold italic strikethrough | alignleft aligncenter alignright alignjustify |
   bullist numlist outdent indent hr link image charmap | table |
-  searchreplace | delineate | export"
+  searchreplace | ' + getAdditionalToolbarButtonsString()}}"
   [disabled]="disabled" style="height: 100%;" [init]="{
-    componentReference: componentReference,
     branding: false,
     menubar: false,
     style_formats: [
@@ -24,8 +23,10 @@
     file_picker_types: 'image',
     elementpath: false,
     content_style: '* { visibility: initial; }',
-    setup: customizeEditor.bind(componentReference),
-    save_onsavecallback: saveText.bind(componentReference)
+    setup: configureEditor.bind(this),
+    save_onsavecallback: saveText.bind(this),
+    link_context_toolbar: true,
+    convert_urls: false
   }" (onSelectionChange)="selectionChangedEventEmitter.emit($event.editor.
   selection.getNode())">
 </editor>
