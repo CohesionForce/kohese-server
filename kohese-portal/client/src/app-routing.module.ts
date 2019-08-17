@@ -54,9 +54,27 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
               this._documentConfiguration = itemProxy.item;
             } else {
               let components: any = {};
-              components[itemProxy.item.id] = {
-                includeDescendants: true
+              let process: (proxy: ItemProxy) => void = (proxy: ItemProxy) => {
+                let documentComponent: any = {
+                  id: proxy.item.id,
+                  attributeMap: {
+                    description: proxy.item.description
+                  },
+                  parentId: proxy.item.parentId,
+                  childIds: []
+                };
+                
+                components[proxy.item.id] = documentComponent;
+                
+                for (let j: number = 0; j < proxy.children.length; j++) {
+                  let child: ItemProxy = proxy.children[j];
+                  process(child);
+                  documentComponent.childIds.push(child.item.id);
+                }
               };
+              process(itemProxy);
+              components[itemProxy.item.id].parentId = null;
+              
               this._documentConfiguration = {
                 name: itemProxy.item.name,
                 description: 'Document Configuration for ' + itemProxy.item.
@@ -64,7 +82,7 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
                 id: itemProxy.item.id,
                 parentId: itemProxy.item.parentId,
                 components: components,
-                document: ''
+                delineated: false
               };
             }
           } else {
