@@ -590,6 +590,11 @@ export class DocumentComponent implements OnInit, OnDestroy {
               for (let attributeName in documentComponentCopy.attributeMap) {
                 documentComponentCopy.attributeMap[attributeName] =
                   documentComponent.attributeMap[attributeName];
+                
+                if ((attributeName === 'description') && (documentComponent[
+                  attributeName] == null)) {
+                  documentComponentCopy[attributeName] = '';
+                }
               }
               
               if (documentComponents[j].parentId === null) {
