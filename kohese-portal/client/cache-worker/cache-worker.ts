@@ -26,6 +26,26 @@ let _lastClientId :number = 0;
 
 let _workingTree = TreeConfiguration.getWorkingTree();
 
+type MissingBlobType = {
+  id: string,
+  oid: string
+};
+
+type MissingTreeType = {
+  id: string,
+  hash: string
+};
+
+type MissingCacheDataType = {
+  tree: Array<MissingTreeType>,
+  blob: Array<MissingBlobType>
+}
+
+let _missingCacheData: MissingCacheDataType = {
+  tree: [],
+  blob: []
+};
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
@@ -372,6 +392,12 @@ async function sync(): Promise<void> {
   await _itemUpdatesPromise;
   let afterGetAll = Date.now();
   console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
+  printMissingCacheData();
+
+  console.log('^^^ Checking for missing cache data')
+  let missingLCData = await _cache.detectMissingCommitData();
+  console.log(missingLCData);
+
   workingTree.loadingComplete(false);
   let afterLoading = Date.now();
   console.log('^^^ Time to complete loading: ' + (afterLoading - afterGetAll) / 1000);
@@ -564,6 +590,11 @@ async function populateCache(): Promise<any> {
   console.log('$$$ Latest HEAD in client cache: ' + headCommit);
   const requestTime = Date.now();
 
+  let missingCacheData = {
+    tree: [],
+    blob: []
+  }
+
   //////////////////////////////////////////////////////////////////////////
   async function fetchItemCache() {
     console.log('$$$ Fetching Item Cache');
@@ -604,11 +635,13 @@ async function populateCache(): Promise<any> {
     const treeEntry = await fetchTreeEntry(treeId, treeHash);
 
     if (!treeEntry) {
-      console.log('$$$*** Missing cache for blob: ' + treeId + ' - ' + treeHash);
+      console.log('$$$*** Missing cache for tree: ' + ' - '+ treeId + ' - ' + treeHash);
+      missingCacheData.tree.push({id: treeId, hash:treeHash});
       console.log(JSON.stringify(treeHashEntry, null, '  '));
       const item = await _cache.getBlob(treeHashEntry.oid);
       if (!item) {
-        console.log('$$$*** Object not found: ' + treeId);
+        console.log('$$$*** Missing cache for blob: ' + ' - '+ treeId + ' - ' + treeHashEntry.oid);
+        missingCacheData.blob.push({id: treeId, oid:treeHashEntry.oid});
       } else {
         // console.log('$$$ Found object for: ' + treeId + ' - ' + item.name);
       }
@@ -618,11 +651,20 @@ async function populateCache(): Promise<any> {
     // tslint:disable-next-line:forin
     for (const childTreeId in treeHashEntry.childTreeHashes) {
       const childTreeHash = treeHashEntry.childTreeHashes[childTreeId];
-      const childTreeHashEntry = await fetchTreeEntry(childTreeId, childTreeHash);
-      if (!childTreeHashEntry) {
-        console.log('$$$*** Missing cache for child tree: ' + childTreeId + ' - ' + childTreeHash);
-      } else {
-        // console.log('$$$ Found cache for child tree: ' + childTreeId + ' - ' + childTreeHash);
+      switch (childTreeHash) {
+        case 'Repository-Mount':
+        case 'Internal':
+          // These types of entries are not cached
+          // console.log('$$$ Derived data not expected in cache: ' + childTreeId + ' - ' + childTreeHash);
+          break;
+        default:
+          const childTreeHashEntry = await fetchTreeEntry(childTreeId, childTreeHash);
+          if (!childTreeHashEntry) {
+            console.log('$$$*** Missing cache for child tree: ' + childTreeId + ' - ' + childTreeHash);
+            missingCacheData.tree.push({id: childTreeId, hash:treeHash});
+          } else {
+            // console.log('$$$ Found cache for child tree: ' + childTreeId + ' - ' + childTreeHash);
+          }
       }
     }
 
@@ -666,6 +708,9 @@ async function populateCache(): Promise<any> {
       console.log('$$$ Calling fetchItemCache incremental');
       await fetchItemCache();
       console.log('$$$ Return from fetchItemCache incremental');
+      console.log(missingCacheData);
+      console.log('$$$ Need to fetch the above');
+      _missingCacheData = missingCacheData;
       resolve(_cache.getObjectMap());
     } else {
       console.log('$$$ Calling fetchItemCache');
@@ -674,6 +719,26 @@ async function populateCache(): Promise<any> {
       resolve(_cache.getObjectMap());
     }
   });
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function printMissingCacheData(){
+
+  console.log('::: Printing missing cache data');
+
+  for(let blobIdx in _missingCacheData.blob){
+    let missingBlob = _missingCacheData.blob[blobIdx];
+    let proxy = _workingTree.getProxyFor(missingBlob.id);
+    console.log('$$$--- Missing blob for ' + missingBlob.id + ' - ' + proxy.item.name + ' - ' + proxy.kind);
+  }
+
+  for(let treeIdx in _missingCacheData.tree){
+    let missingTree = _missingCacheData.tree[treeIdx];
+    let proxy = _workingTree.getProxyFor(missingTree.id);
+    console.log('$$$--- Missing tree for ' + missingTree.id + ' - ' + proxy.item.name + ' - ' + proxy.kind);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
