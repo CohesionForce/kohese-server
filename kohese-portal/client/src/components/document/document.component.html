@@ -46,6 +46,11 @@
             (click)="addDocumentComponents()">
             <mat-icon class="fa fa-plus"></mat-icon>
           </button>
+          <button mat-icon-button matTooltip="Copy the selected Items"
+            [disabled]="(outlineTree.selection.length === 0)"
+            (click)="copyDocumentComponents(outlineTree.selection)">
+            <mat-icon class="fa fa-copy"></mat-icon>
+          </button>
           <button mat-icon-button matTooltip="Move the selected Items"
             [disabled]="(outlineTree.selection.length === 0)"
             (click)="moveDocumentComponents(outlineTree.selection)">

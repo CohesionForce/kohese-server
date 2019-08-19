@@ -1,0 +1,42 @@
+<div style="width: 100%;" [ngStyle]="{ 'height': isDialogInstance() ? '90%' :
+  '100%' }">
+  <mat-form-field style="width: 100%;">
+    <input matInput type="text" placeholder="{{copySpecifications.
+      appendToOriginalName ? 'Suffix' : 'Name'}}"
+      [(ngModel)]="copySpecifications.nameOrSuffix"/>
+  </mat-form-field>
+  <mat-checkbox [(ngModel)]="copySpecifications.appendToOriginalName">
+    Append To Original Name
+  </mat-checkbox>
+  <br/>
+  <mat-checkbox [(ngModel)]="copySpecifications.copyDescendants">
+    Copy Descendants
+  </mat-checkbox>
+  <br/>
+  <mat-checkbox [(ngModel)]="copySpecifications.clearNonNameAttributes">
+    Clear Non-Name Attributes
+  </mat-checkbox>
+  <br/>
+  <ng-container *ngIf="allowDocumentAdditionSpecification">
+    <mat-checkbox [(ngModel)]="copySpecifications.addToDocument">
+      Add To Document
+    </mat-checkbox>
+  </ng-container>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
+    flex-direction: column;">
+    <span class="flex-right-align">
+      <button mat-button matTooltip="Copy the selected elements"
+        [disabled]="!copySpecifications.appendToOriginalName &&
+        !copySpecifications.nameOrSuffix" (click)="matDialogRef.close(
+        copySpecifications)">
+        Copy
+      </button>
+      <button mat-button matTooltip="Cancel the copy process"
+        (click)="matDialogRef.close(undefined)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>
