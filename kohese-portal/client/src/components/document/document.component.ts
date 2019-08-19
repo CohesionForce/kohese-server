@@ -274,8 +274,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
         case 'loaded':
           this.populateDocumentConfigurationArray();
           
-          if ((notification.type === 'loaded') && this.
-            _documentConfiguration) {
+          if (this._documentConfiguration) {
             this.documentConfiguration = this._documentConfiguration;
           }
           break;
