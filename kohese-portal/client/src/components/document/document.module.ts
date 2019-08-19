@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../material.module';
 import { TextEditorModule } from '../text-editor/text-editor.module';
 import { TreeViewModule } from '../tree/tree.module';
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
+import { MergeModule } from '../merge/merge.module';
 import { DocumentComponent } from './document.component';
 
 @NgModule({
@@ -16,7 +18,9 @@ import { DocumentComponent } from './document.component';
     FormsModule,
     MaterialModule,
     TextEditorModule,
-    TreeViewModule
+    TreeViewModule,
+    ObjectEditorModule,
+    MergeModule
   ]
 })
 export class DocumentModule {

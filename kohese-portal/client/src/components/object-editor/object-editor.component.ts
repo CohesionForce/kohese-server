@@ -18,12 +18,76 @@ import { ProxySelectorDialogComponent } from '../user-input/k-proxy-selector/pro
 })
 export class ObjectEditorComponent implements OnInit {
   private _object: any;
+  get object() {
+    return this._object;
+  }
   @Input('object')
   set object(object: any) {
     this._object = object;
+    if (this._type) {
+      if (Object.keys(this._dynamicTypesService.getKoheseTypes()).indexOf(this.
+        _type.name) !== -1) {
+        this._attributes = {};
+        for (let attributeName in this._type.classProperties) {
+          this._attributes[attributeName] = JSON.parse(JSON.stringify(this.
+            _type.classProperties[attributeName].definition));
+          
+          /* The below code is intended to be retained only until the "system
+          type" data models are improved. */
+          let viewModelItemProxy: ItemProxy = TreeConfiguration.
+            getWorkingTree().getProxyFor('view-' + this._type.classProperties[
+            attributeName].definedInKind.toLowerCase());
+          if (viewModelItemProxy) {
+            let viewModelAttribute: any = viewModelItemProxy.item.
+              viewProperties[attributeName];
+            if (viewModelAttribute) {
+              switch (viewModelAttribute.inputType.type) {
+                case 'markdown':
+                  this._attributes[attributeName].type = 'markdown';
+                  break;
+                case 'user-selector':
+                  this._attributes[attributeName].type = 'user-selector';
+                  break;
+                case 'date':
+                  this._attributes[attributeName].type = 'date';
+                  break;
+                case 'proxy-selector':
+                  this._attributes[attributeName].type = viewModelAttribute.
+                    inputType.options.type;
+                  break;
+              }
+            } else {
+              delete this._attributes[attributeName];
+            }
+          }
+        }
+      } else {
+        this._attributes = this._type.properties;
+      }
+    
+      if (this._object) {
+        this._copy = JSON.parse(JSON.stringify(this._object));
+      } else {
+        this._copy = {};
+        for (let attributeName in this._attributes) {
+          if (this._attributes[attributeName].default != null) {
+            this._copy[attributeName] = this._attributes[attributeName].
+              default;
+          } else {
+            if (Array.isArray(this._attributes[attributeName].type)) {
+              this._copy[attributeName] = [];
+            } else {
+              this._copy[attributeName] = undefined;
+            }
+          }
+        }
+      }
+    }
+    
+    this._changeDetectorRef.markForCheck();
   }
   
-  private _copy: any;
+  private _copy: any = {};
   get copy() {
     return this._copy;
   }
@@ -37,7 +101,7 @@ export class ObjectEditorComponent implements OnInit {
     this._type = type;
   }
   
-  private _attributes: any = {};
+  private _attributes: any;
   get attributes() {
     return this._attributes;
   }
@@ -45,10 +109,6 @@ export class ObjectEditorComponent implements OnInit {
   private _usernames: Array<string> = [];
   get usernames() {
     return this._usernames;
-  }
-  
-  get data() {
-    return this._data;
   }
   
   get Object() {
@@ -71,37 +131,12 @@ export class ObjectEditorComponent implements OnInit {
   }
   
   public ngOnInit(): void {
-    if (this._data) {
+    if (this.isDialogInstance()) {
       this._object = this._data['object'];
       this._type = this._data['type'];
     }
     
-    if (Object.keys(this._dynamicTypesService.getKoheseTypes()).indexOf(this.
-      _type.name) !== -1) {
-      for (let attributeName in this._type.classProperties) {
-        this._attributes[attributeName] = this._type.classProperties[
-          attributeName].definition;
-      }
-    } else {
-      this._attributes = this._type.properties;
-    }
-    
-    if (this._object) {
-      this._copy = JSON.parse(JSON.stringify(this._object));
-    } else {
-      this._copy = {};
-      for (let attributeName in this._attributes) {
-        if (this._attributes[attributeName].default != null) {
-          this._copy[attributeName] = this._attributes[attributeName].default;
-        } else {
-          if (Array.isArray(this._attributes[attributeName].type)) {
-            this._copy[attributeName] = [];
-          } else {
-            this._copy[attributeName] = undefined;
-          }
-        }
-      }
-    }
+    this.object = this._object;
     
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree({
       includeOrigin: false
@@ -111,6 +146,11 @@ export class ObjectEditorComponent implements OnInit {
       }
     });
     this._usernames.sort();
+  }
+  
+  public isDialogInstance(): boolean {
+    return this._matDialogRef && (this._matDialogRef.componentInstance ===
+      this) && this._data;
   }
   
   public getTypeName(typeValue: any): string {
@@ -338,7 +378,7 @@ export class ObjectEditorComponent implements OnInit {
     return stateTransitionCandidates;
   }
   
-  public close(accept: boolean): void {
+  public close(accept: boolean): any {
     if (accept) {
       if (!this._object) {
         this._object = {};
@@ -349,7 +389,11 @@ export class ObjectEditorComponent implements OnInit {
       }
     }
     
-    this._matDialogRef.close(accept ? this._object : undefined);
+    if (this.isDialogInstance()) {
+      this._matDialogRef.close(accept ? this._object : undefined);
+    }
+    
+    return this._object;
   }
   
   public getStringRepresentation(index: number, attributeName: string):

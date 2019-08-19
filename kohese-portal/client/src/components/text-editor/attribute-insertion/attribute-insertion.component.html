@@ -1,0 +1,102 @@
+<div [ngStyle]="{ 'height': (isDialogInstance() ? '90%' : '100%') }"
+  style="overflow: auto;">
+  <mat-form-field style="height: 10%; width: 100%;">
+    <mat-select placeholder="Insertion Location"
+      [(ngModel)]="attributeInsertionSpecification.insertionLocation">
+      <ng-container *ngFor="let insertionLocation of Object.keys(
+        InsertionLocation)">
+        <mat-option [value]="InsertionLocation[insertionLocation]">
+          {{insertionLocation}}
+        </mat-option>
+      </ng-container>
+    </mat-select>
+  </mat-form-field>
+  <h3 style="height: 10%;">
+    Attributes
+  </h3>
+  <split direction="horizontal" style="height: 80%;">
+    <split-area [size]="35">
+      <div style="height: 5%; width: 100%;">
+      </div>
+      <tree #sourceTree [root]="undefined" [getChildren]="getSourceChildren"
+        [getText]="getSourceText" (elementSelected)="addAttribute(sourceTree.
+        getTreePath($event))" style="height: 95%; width: 100%;">
+      </tree>
+    </split-area>
+    <split-area [size]="35">
+      <div style="height: 5%; width: 100%; display: flex;
+        flex-direction: row;">
+        <button mat-icon-button matTooltip="Remove this attribute"
+          class="flex-right-align" [disabled]="!targetTree.selection[0]"
+          (click)="removeAttribute(targetTree.getTreePath(targetTree.
+          selection[0]))">
+          <mat-icon class="fa fa-times"></mat-icon>
+        </button>
+      </div>
+      <tree #targetTree [root]="attributeInsertionSpecification"
+        [getChildren]="getTargetChildren" [getText]="getTargetText"
+        (elementSelected)="changeDetectorRef.markForCheck()"
+        style="height: 95%; width: 100%;">
+      </tree>
+    </split-area>
+    <split-area [size]="30">
+      <ng-container *ngIf="targetTree.selection[0]">
+        <h3>
+          {{targetTree.selection[0].key}}
+        </h3>
+        <ng-container *ngIf="targetTree.selection[0].value.attributes else
+          attributeSelected">
+          <ng-container *ngIf="targetTree.selection[0].value.localTypes else
+            localTypeSelected">
+          </ng-container>
+          <ng-template #localTypeSelected>
+          </ng-template>
+        </ng-container>
+        <ng-template #attributeSelected>
+          <mat-checkbox [checked]="targetTree.selection[0].value.
+            showAttributeName" (change)="targetTree.selection[0].value.
+            showAttributeName = $event.checked">
+            Show Attribute Name
+          </mat-checkbox>
+          <br/>
+          <ng-container *ngIf="targetTree.selection[0].key === 'name'">
+            <mat-checkbox [checked]="targetTree.selection[0].value.linkToItem"
+              (change)="targetTree.selection[0].value.linkToItem = $event.
+              checked">
+              Link To Item
+            </mat-checkbox>
+            <br/>
+            <mat-form-field style="width: 100%;">
+              <mat-select placeholder="Heading Style" [(ngModel)]="targetTree.
+                selection[0].value.headingStyle">
+                <ng-container *ngFor="let headingStyle of Object.keys(
+                  HeadingStyle)">
+                  <mat-option [value]="HeadingStyle[headingStyle]">
+                    {{HeadingStyle[headingStyle]}}
+                  </mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
+          </ng-container>
+        </ng-template>
+      </ng-container>
+    </split-area>
+  </split>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 10%; display: flex;
+    flex-direction: column;">
+    <span class="flex-right-align">
+      <button mat-button matTooltip="Insert the selected attributes into the
+        document" [disabled]="Object.keys(attributeInsertionSpecification.
+        types).length === 0" (click)="matDialogRef.close(
+        attributeInsertionSpecification)">
+        Insert
+      </button>
+      <button mat-button matTooltip="Cancel the attribute insertion process"
+        (click)="matDialogRef.close(undefined)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>

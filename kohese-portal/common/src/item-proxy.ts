@@ -1589,6 +1589,10 @@ export class ItemProxy {
       }
     }
   }
+  
+  public toString(): string {
+    return this.item.name;
+  }
 }
 
 
