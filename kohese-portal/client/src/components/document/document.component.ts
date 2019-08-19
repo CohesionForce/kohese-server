@@ -55,7 +55,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
             let documentComponent: any = {
               id: id,
               attributeMap: {
-                description: itemProxy.item.description
+                description: (itemProxy.item.description ? itemProxy.item.
+                  description : '')
               },
               parentId: null,
               childIds: []
@@ -71,7 +72,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 let descendantDocumentComponent: any = {
                   id: descendant.item.id,
                   attributeMap: {
-                    description: descendant.item.description
+                    description: (descendant.item.description ? descendant.
+                      item.description : '')
                   },
                   parentId: descendant.item.parentId,
                   childIds: []
@@ -471,7 +473,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
           let documentComponent: any = {
             id: itemProxy.item.id,
             attributeMap: {
-              description: itemProxy.item.description
+              description: (itemProxy.item.description ? itemProxy.item.
+                description : '')
             },
             parentId: null,
             childIds: []
@@ -486,7 +489,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
               let descendantDocumentComponent: any = {
                 id: descendant.item.id,
                 attributeMap: {
-                  description: descendant.item.description
+                  description: (descendant.item.description ? descendant.item.
+                    description : '')
                 },
                 parentId: descendant.item.parentId,
                 childIds: []

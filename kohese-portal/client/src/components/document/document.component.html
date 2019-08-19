@@ -2,8 +2,7 @@
   <div style="height: 5%; display: flex; flex-direction: row;">
     <mat-form-field style="width: 30%;">
       <mat-select placeholder="Document Configuration"
-        [ngModel]="documentConfiguration"
-        (ngModelChange)="documentConfiguration = $event">
+        [(ngModel)]="documentConfiguration">
         <ng-container *ngFor="let configuration of documentConfigurations">
           <mat-option [value]="configuration">
             {{configuration.name}}
