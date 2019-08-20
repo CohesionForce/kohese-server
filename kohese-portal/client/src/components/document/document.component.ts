@@ -9,6 +9,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DocumentConfigurationEditorComponent } from '../object-editor/document-configuration/document-configuration-editor.component';
 import { TreeComponent, Action, ToggleAction } from '../tree/tree.component';
+import { CopyComponent, CopySpecifications } from '../copy/copy.component';
 import { TextEditorComponent } from '../text-editor/text-editor.component';
 import { ObjectEditorComponent } from '../object-editor/object-editor.component';
 import { AttributeInsertionComponent, AttributeInsertionSpecification,
@@ -54,7 +55,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
             let documentComponent: any = {
               id: id,
               attributeMap: {
-                description: itemProxy.item.description
+                description: (itemProxy.item.description ? itemProxy.item.
+                  description : '')
               },
               parentId: null,
               childIds: []
@@ -70,7 +72,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 let descendantDocumentComponent: any = {
                   id: descendant.item.id,
                   attributeMap: {
-                    description: descendant.item.description
+                    description: (descendant.item.description ? descendant.
+                      item.description : '')
                   },
                   parentId: descendant.item.parentId,
                   childIds: []
@@ -166,6 +169,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
   }
   
   private _outlineActions: Array<Action> = [
+    new Action('Copy this Item', 'fa fa-copy', (element: any) => {
+      return true;
+    }, (element: any) => {
+      return true;
+    }, (element: any) => {
+      this.copyDocumentComponents([(element as DocumentComponent)]);
+    }),
     new Action('Move this Item', 'fa fa-arrow-circle-o-right', (element:
       any) => {
       return true;
@@ -264,8 +274,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
         case 'loaded':
           this.populateDocumentConfigurationArray();
           
-          if ((notification.type === 'loaded') && this.
-            _documentConfiguration) {
+          if (this._documentConfiguration) {
             this.documentConfiguration = this._documentConfiguration;
           }
           break;
@@ -463,7 +472,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
           let documentComponent: any = {
             id: itemProxy.item.id,
             attributeMap: {
-              description: itemProxy.item.description
+              description: (itemProxy.item.description ? itemProxy.item.
+                description : '')
             },
             parentId: null,
             childIds: []
@@ -478,7 +488,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
               let descendantDocumentComponent: any = {
                 id: descendant.item.id,
                 attributeMap: {
-                  description: descendant.item.description
+                  description: (descendant.item.description ? descendant.item.
+                    description : '')
                 },
                 parentId: descendant.item.parentId,
                 childIds: []
@@ -504,6 +515,118 @@ export class DocumentComponent implements OnInit, OnDestroy {
         this.buildDocument(false);
         this._textEditor.editor.editor.setDirty(true);
         this._outlineTree.update(true);
+        this._changeDetectorRef.markForCheck();
+      }
+    });
+  }
+  
+  public copyDocumentComponents(documentComponents: Array<DocumentComponent>):
+    void {
+    this._dialogService.openComponentDialog(CopyComponent, {
+      data: {
+        allowDocumentAdditionSpecification: true
+      },
+      disableClose: true
+    }).updateSize('40%', '40%').afterClosed().subscribe(
+      async (copySpecifications: CopySpecifications) => {
+      if (copySpecifications) {
+        for (let j: number = 0; j < documentComponents.length; j++) {
+          let process: (itemProxy: ItemProxy, parentId:
+            string) => Promise<ItemProxy> = async (itemProxy: ItemProxy,
+            parentId: string) => {
+            let documentComponent: DocumentComponent = documentComponents[j];
+            let item: any = JSON.parse(JSON.stringify(itemProxy.item));
+            delete item.id;
+            delete item.itemIds;
+            /* Removing the below attribute should cause a related attribute to
+            also be set. */
+            delete item.createdBy;
+            
+            if (copySpecifications.clearNonNameAttributes) {
+              for (let attributeName in item) {
+                if ((attributeName !== 'name') && (attributeName !==
+                  'parentId')) {
+                  if (itemProxy.model.item.classProperties[attributeName].
+                    definition.default) {
+                    item[attributeName] = itemProxy.model.item.classProperties[
+                      attributeName].definition.default;
+                  } else {
+                    delete item[attributeName];
+                  }
+                }
+              }
+            } else {
+              for (let attributeName in documentComponent.attributeMap) {
+                item[attributeName] = documentComponent.attributeMap[
+                  attributeName];
+              }
+            }
+            
+            item.parentId = parentId;
+            
+            if (copySpecifications.appendToOriginalName) {
+              item.name += copySpecifications.nameOrSuffix;
+            } else {
+              item.name = copySpecifications.nameOrSuffix;
+            }
+            
+            let copiedItemProxy: ItemProxy = await this._itemRepository.
+              upsertItem(itemProxy.kind, item);
+            
+            let childIds: Array<string> = [];
+            if (copySpecifications.copyDescendants) {
+              for (let k: number = 0; k < itemProxy.children.length; k++) {
+                childIds.push((await process(itemProxy.children[k],
+                  copiedItemProxy.item.id)).item.id);
+                // To-do: populate itemIds for copiedItemProxy
+              }
+            }
+            
+            if (copySpecifications.addToDocument) {
+              let documentComponentCopy: DocumentComponent = JSON.parse(JSON.
+                stringify(documentComponent));
+              documentComponentCopy.id = copiedItemProxy.item.id;
+              for (let attributeName in documentComponentCopy.attributeMap) {
+                documentComponentCopy.attributeMap[attributeName] =
+                  copiedItemProxy.item[attributeName];
+                
+                if ((attributeName === 'description') &&
+                  (documentComponentCopy[attributeName] == null)) {
+                  documentComponentCopy[attributeName] = '';
+                }
+              }
+              
+              if (documentComponent.parentId === null) {
+                documentComponentCopy.parentId = null;
+              } else {
+                documentComponentCopy.parentId = parentId;
+                let parent: DocumentComponent = this._documentConfiguration.
+                  components[parentId];
+                if (parent && parent.childIds.indexOf(documentComponentCopy.
+                  id) === -1) {
+                  parent.childIds.push(documentComponentCopy.id);
+                }
+              }
+              
+              documentComponentCopy.childIds = childIds;
+              
+              this._documentConfiguration.components[documentComponentCopy.id] =
+                documentComponentCopy;
+            }
+            
+            return copiedItemProxy;
+          };
+          let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(documentComponents[j].id);
+          await process(itemProxy, itemProxy.item.parentId);
+        }
+        
+        if (copySpecifications.addToDocument) {
+          this.buildDocument(false);
+          this._textEditor.editor.editor.setDirty(true);
+          this._outlineTree.update(true);
+        }
+        
         this._changeDetectorRef.markForCheck();
       }
     });

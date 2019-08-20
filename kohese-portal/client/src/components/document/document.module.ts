@@ -7,6 +7,7 @@ import { TextEditorModule } from '../text-editor/text-editor.module';
 import { TreeViewModule } from '../tree/tree.module';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 import { MergeModule } from '../merge/merge.module';
+import { CopyModule } from '../copy/copy.module';
 import { DocumentComponent } from './document.component';
 
 @NgModule({
@@ -20,7 +21,8 @@ import { DocumentComponent } from './document.component';
     TextEditorModule,
     TreeViewModule,
     ObjectEditorModule,
-    MergeModule
+    MergeModule,
+    CopyModule
   ]
 })
 export class DocumentModule {

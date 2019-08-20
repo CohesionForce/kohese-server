@@ -2,8 +2,7 @@
   <div style="height: 5%; display: flex; flex-direction: row;">
     <mat-form-field style="width: 30%;">
       <mat-select placeholder="Document Configuration"
-        [ngModel]="documentConfiguration"
-        (ngModelChange)="documentConfiguration = $event">
+        [(ngModel)]="documentConfiguration">
         <ng-container *ngFor="let configuration of documentConfigurations">
           <mat-option [value]="configuration">
             {{configuration.name}}
@@ -45,6 +44,11 @@
             Document Configuration" class="flex-right-align"
             (click)="addDocumentComponents()">
             <mat-icon class="fa fa-plus"></mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Copy the selected Items"
+            [disabled]="(outlineTree.selection.length === 0)"
+            (click)="copyDocumentComponents(outlineTree.selection)">
+            <mat-icon class="fa fa-copy"></mat-icon>
           </button>
           <button mat-icon-button matTooltip="Move the selected Items"
             [disabled]="(outlineTree.selection.length === 0)"
