@@ -18,6 +18,12 @@ git log --graph
 # log across branches
 git log --all --name-status --date-order --graph
 
+# simplified view of log
+git log --oneline
+
+# to find recent head refs
+git reflog
+
 # to find status of working tree and index (short)
 git status -s
 
