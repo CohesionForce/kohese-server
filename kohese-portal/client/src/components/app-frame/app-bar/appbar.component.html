@@ -1,75 +1,76 @@
 <div class="navbar">
-  <ng-container
-    *ngIf="(authenticated)">
+  <ng-container *ngIf="(authenticated)">
     <div class="navbar-header">
-      <img src="../../../../assets/icons/favicon.ico" width="51" height="51">
+      <img src="../../../../assets/icons/favicon.ico" width="50" height="50"
+        (click)="navigate('Dashboard', {})">
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
-                                'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
-        (click)="navigate('Explore', {id : ''})">
-        Explorer |
+                                          'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
+        (click)="navigate('Dashboard', {})">
+        Dashboard
         <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
           - {{syncStatusString}}
         </i>
       </span>
-      <span class="navbar-brand" (click)="navigate('Dashboard', {})">
-        Dashboard |
+      <span class="navbar-brand" (click)="navigate('Explore', {id : ''})">
+        Explorer
       </span>
       <span class="navbar-brand" (click)="navigate('Document', { id: '' })">
-        Document |
+        Document
       </span>
       <span class="navbar-brand" (click)="navigate('Reports', {})">
-        Reports |
+        Reports
       </span>
-      <button mat-button id="notificationMenu" [matMenuTriggerFor]="notificationMenu">
+    </div>
+    <div class="nav navbar-top-links navbar-right">
+      <button mat-button [matMenuTriggerFor]="notificationMenu">
         <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
           [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
         </mat-icon>
+        <mat-menu #notificationMenu="matMenu" [overlapTrigger]="false">
+          <div style="text-align:center">Notifications</div>
+          <div *ngFor=" let message of messages">
+            <mat-list-item style='font-size: 10pt'>
+              {{message}}
+              <button mat-icon-button matTooltip="Delete Notification"
+                (click)="deleteMessage(message); $event.stopPropagation()">
+                <mat-icon class="fa fa-times-circle-o"></mat-icon>
+              </button>
+              <mat-divider></mat-divider>
+            </mat-list-item>
+          </div>
+        </mat-menu>
       </button>
-    </div>
-    <mat-menu width=100% height=100% #notificationMenu="matMenu" [overlapTrigger]="false">
-      <div style="text-align:center">Notifications</div>
-      <div *ngFor=" let message of messages">
-        <mat-list-item style='font-size: 10pt'>
-          {{message}}
-          <button mat-icon-button matTooltip="Delete Notification" (click)="deleteMessage(message); $event.stopPropagation()">
-            <mat-icon class="fa fa-times-circle-o"></mat-icon>
-          </button>
-          <mat-divider></mat-divider>
-        </mat-list-item>
-      </div>
-    </mat-menu>
-    <ul class="nav navbar-top-links navbar-right">
-      <button mat-button id="userMenu" [matMenuTriggerFor]="userMenu">
+      <button mat-button [matMenuTriggerFor]="userMenu">
         <mat-icon class="fa fa-user fa-fw"></mat-icon>
         <span>{{userName}}</span>
+        <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
+          <button mat-menu-item (click)="navigate('Admin', {})">
+            <mat-icon class="fa fa-user-plus"></mat-icon>
+            <span>Users</span>
+          </button>
+          <button mat-menu-item (click)="navigate('Versions', {})">
+            <mat-icon class=""></mat-icon>
+            Versions
+          </button>
+          <button mat-menu-item (click)="navigate('Repositories', {})">
+            <mat-icon class="fa fa-git-square"></mat-icon>
+            <span>Repositories</span>
+          </button>
+          <button mat-menu-item (click)="navigate('Type-Editor', {})">
+            <mat-icon class="fa fa-sitemap"></mat-icon>
+            <span>Type Editor</span>
+          </button>
+          <button mat-menu-item (click)="navigate('Dev-Tools', {})">
+            <mat-icon class="fa fa-code"></mat-icon>
+            <span>Dev Tools</span>
+          </button>
+          <button mat-menu-item (click)="logout();">
+            <mat-icon class="fa fa-sign-out fa-fw"></mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
       </button>
-      <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item (click)="navigate('Admin', {})">
-          <mat-icon class="fa fa-user-plus"></mat-icon>
-          <span>Users</span>
-        </button>
-        <button mat-menu-item (click)="navigate('Versions', {})">
-          <mat-icon class=""></mat-icon>
-          Versions
-        </button>
-        <button mat-menu-item (click)="navigate('Repositories', {})">
-          <mat-icon class="fa fa-git-square"></mat-icon>
-          <span>Repositories</span>
-        </button>
-        <button mat-menu-item (click)="navigate('Type-Editor', {})">
-          <mat-icon class="fa fa-sitemap"></mat-icon>
-          <span>Type Editor</span>
-        </button>
-        <button mat-menu-item (click)="navigate('Dev-Tools', {})">
-          <mat-icon class="fa fa-code"></mat-icon>
-          <span>Dev Tools</span>
-        </button>
-        <button mat-menu-item (click)="logout();">
-          <mat-icon class="fa fa-sign-out fa-fw"></mat-icon>
-          <span>Logout</span>
-        </button>
-      </mat-menu>
-    </ul>
+    </div>
   </ng-container>
 </div>

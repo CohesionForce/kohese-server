@@ -4,6 +4,7 @@ import * as SocketIoClient from 'socket.io-client';
 import * as LevelJs from 'level-js';
 
 import { ItemProxy } from '../../common/src/item-proxy';
+import { TreeHashEntry, TreeHashMap } from '../../common/src/tree-hash';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
 import { LevelCache } from '../../common/src/level-cache';
@@ -12,8 +13,9 @@ let socket: SocketIOClient.Socket;
 let clientMap = {};
 let _authRequest = {};
 let _connectionVerificationSet: Set<number> = new Set<number>();
+let kioListenersInitialized: boolean = false;
 
-let initialized: boolean = false;
+let cacheInitialized: boolean = false;
 let _cache: LevelCache;
 let _connectionAuthenticatedPromise: Promise<any>;
 let _fundamentalItemsPromise: Promise<any>;
@@ -23,6 +25,26 @@ let _itemUpdatesPromise: Promise<any>;
 let _lastClientId :number = 0;
 
 let _workingTree = TreeConfiguration.getWorkingTree();
+
+type MissingBlobType = {
+  id: string,
+  oid: string
+};
+
+type MissingTreeType = {
+  id: string,
+  hash: string
+};
+
+type MissingCacheDataType = {
+  tree: Array<MissingTreeType>,
+  blob: Array<MissingBlobType>
+}
+
+let _missingCacheData: MissingCacheDataType = {
+  tree: [],
+  blob: []
+};
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -41,10 +63,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
   console.log('::: Received new connection');
   console.log(connectEvent);
 
-  if (!initialized) {
+  if (!cacheInitialized) {
     _cache = new LevelCache(LevelJs('item-cache'));
     TreeConfiguration.setItemCache(_cache);
-    initialized = true;
+    cacheInitialized = true;
   }
 
   const clientId = ++_lastClientId;
@@ -73,7 +95,6 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             _connectionAuthenticatedPromise = authenticate(_authRequest);
             await _connectionAuthenticatedPromise;
 
-            await sync();
             postToAllPorts('reconnected', {});
           });
           socket.connect();
@@ -306,12 +327,24 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 async function authenticate(authRequest): Promise<void> {
   return new Promise<void>((resolve: () => void, reject: () => void) => {
     socket.on('authenticated', async () => {
+      console.log('^^^ Session authenticated');
+
+      // Remove event listener for authenticated
+      socket.off('authenticated');
+
       // Resolve the promise to allow all client tabs to proceed
       resolve();
-      // Remaining initialization logic will proceed and provide incremental results to tabs
-      registerKoheseIOListeners();
+
+      if(!kioListenersInitialized) {
+        registerKoheseIOListeners();
+        kioListenersInitialized = true;
+      }
+
+      // Begin synchronization process
       sync();
     });
+
+    console.log('^^^ Requesting authentication');
     socket.emit('authenticate', {
       token: authRequest
     });
@@ -323,6 +356,7 @@ async function authenticate(authRequest): Promise<void> {
 //////////////////////////////////////////////////////////////////////////
 async function sync(): Promise<void> {
 
+  console.log('^^^ Sync initiated');
   let workingTree = TreeConfiguration.getWorkingTree();
   let beforeSync = Date.now();
 
@@ -358,6 +392,12 @@ async function sync(): Promise<void> {
   await _itemUpdatesPromise;
   let afterGetAll = Date.now();
   console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
+  printMissingCacheData();
+
+  console.log('^^^ Checking for missing cache data')
+  let missingLCData = await _cache.detectMissingCommitData();
+  console.log(missingLCData);
+
   workingTree.loadingComplete(false);
   let afterLoading = Date.now();
   console.log('^^^ Time to complete loading: ' + (afterLoading - afterGetAll) / 1000);
@@ -372,12 +412,14 @@ async function sync(): Promise<void> {
 //////////////////////////////////////////////////////////////////////////
 async function getStatus() : Promise<number> {
   return new Promise((resolve : (statusCount:number) => void, reject) => {
+    console.log('^^^ Requesting getStatus from server')
     socket.emit('Item/getStatus', {
       repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
     }, (response: Array<any>) => {
       for (let j: number = 0; j < response.length; j++) {
         updateItemStatus(response[j].id, response[j].status);
       }
+      console.log('^^^ Received getStatus response from server')
       resolve(response.length);
     });
   });
@@ -535,7 +577,6 @@ function synchronizeModels(): Promise<any> {
 //////////////////////////////////////////////////////////////////////////
 async function populateCache(): Promise<any> {
   console.log('$$$ Get Item Cache');
-  let requestTime = Date.now();
 
   await _cache.loadCachedObjects();
   let headCommit: string;
@@ -545,26 +586,159 @@ async function populateCache(): Promise<any> {
     headCommit = '';
   }
 
+  const incrementalCacheLoad = true;
   console.log('$$$ Latest HEAD in client cache: ' + headCommit);
-  return new Promise<any>((resolve: (objectMap: any) => void, reject:
+  const requestTime = Date.now();
+
+  let missingCacheData = {
+    tree: [],
+    blob: []
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  async function fetchItemCache() {
+    console.log('$$$ Fetching Item Cache');
+    return new Promise<any>((resolve: () => void, reject:
     () => void) => {
-    socket.emit('Item/getItemCache', {
-      timestamp: {
-        requestTime: requestTime
-      },
-      headCommit: headCommit
-    }, (response) => {
-      var responseReceiptTime = Date.now();
-      let timestamp = response.timestamp;
-      timestamp.responseReceiptTime = responseReceiptTime;
-      console.log(timestamp);
-      console.log('::: Response for getItemCache');
-      for(let tsKey in timestamp){
-        console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey]-requestTime));
-      }
-      resolve(_cache.getObjectMap());
+      socket.emit('Item/getItemCache', {
+        timestamp: {
+          requestTime: requestTime
+        },
+        headCommit: headCommit
+      }, (response) => {
+        const responseReceiptTime = Date.now();
+        const timestamp = response.timestamp;
+        timestamp.responseReceiptTime = responseReceiptTime;
+        console.log(timestamp);
+        console.log('::: Response for getItemCache');
+        // tslint:disable-next-line:forin
+        for (const tsKey in timestamp) {
+          console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey] - requestTime));
+        }
+        console.log('$$$ Fetched Item Cache');
+        resolve();
+      });
     });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  async function fetchTreeEntry(treeId, treeHash) {
+    const treeEntry = await _cache.getTree(treeHash);
+    return treeEntry;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  async function processTree(treeId, treeHashEntry) {
+
+    const treeHash = treeHashEntry.treeHash;
+
+    const treeEntry = await fetchTreeEntry(treeId, treeHash);
+
+    if (!treeEntry) {
+      console.log('$$$*** Missing cache for tree: ' + ' - '+ treeId + ' - ' + treeHash);
+      missingCacheData.tree.push({id: treeId, hash:treeHash});
+      console.log(JSON.stringify(treeHashEntry, null, '  '));
+      const item = await _cache.getBlob(treeHashEntry.oid);
+      if (!item) {
+        console.log('$$$*** Missing cache for blob: ' + ' - '+ treeId + ' - ' + treeHashEntry.oid);
+        missingCacheData.blob.push({id: treeId, oid:treeHashEntry.oid});
+      } else {
+        // console.log('$$$ Found object for: ' + treeId + ' - ' + item.name);
+      }
+    }
+
+    // Check to see if children trees are cached
+    // tslint:disable-next-line:forin
+    for (const childTreeId in treeHashEntry.childTreeHashes) {
+      const childTreeHash = treeHashEntry.childTreeHashes[childTreeId];
+      switch (childTreeHash) {
+        case 'Repository-Mount':
+        case 'Internal':
+          // These types of entries are not cached
+          // console.log('$$$ Derived data not expected in cache: ' + childTreeId + ' - ' + childTreeHash);
+          break;
+        default:
+          const childTreeHashEntry = await fetchTreeEntry(childTreeId, childTreeHash);
+          if (!childTreeHashEntry) {
+            console.log('$$$*** Missing cache for child tree: ' + childTreeId + ' - ' + childTreeHash);
+            missingCacheData.tree.push({id: childTreeId, hash:treeHash});
+          } else {
+            // console.log('$$$ Found cache for child tree: ' + childTreeId + ' - ' + childTreeHash);
+          }
+      }
+    }
+
+    return treeEntry;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  async function fetchRepoHashes() {
+    console.log('$$$ Fetching Repo Hashes');
+    const fetchRequestTime = Date.now();
+    return new Promise<any>((resolve: () => void, reject:
+    () => void) => {
+      socket.emit('Item/getRepoHashmap', {
+        timestamp: {
+          requestTime: requestTime
+        },
+        headCommit: headCommit
+      }, async (response) => {
+        const responseReceiptTime = Date.now();
+        console.log('$$$ Response for getRepoHashmap: ' + (responseReceiptTime - fetchRequestTime) / 1000);
+        // console.log(JSON.stringify(response.repoTreeHashes, null, '  '));
+
+        // tslint:disable-next-line:forin
+        for (const treeId in response.repoTreeHashes) {
+          const treeHashEntry: TreeHashEntry = response.repoTreeHashes[treeId];
+          const repoTree = await processTree(treeId, treeHashEntry);
+          if (!repoTree) {
+            console.log('$$$*** Could not find cache entry for root of repo: ' + treeId + ' - ' + treeHashEntry.treeHash);
+          }
+        }
+        console.log('$$$ Fetched RepoHashMap');
+        resolve();
+      });
+    });
+  }
+
+  return new Promise<any>(async (resolve: (objectMap: any) => void, reject:
+    () => void) => {
+    if (incrementalCacheLoad) {
+      await fetchRepoHashes();
+      console.log('$$$ Calling fetchItemCache incremental');
+      await fetchItemCache();
+      console.log('$$$ Return from fetchItemCache incremental');
+      console.log(missingCacheData);
+      console.log('$$$ Need to fetch the above');
+      _missingCacheData = missingCacheData;
+      resolve(_cache.getObjectMap());
+    } else {
+      console.log('$$$ Calling fetchItemCache');
+      await fetchItemCache();
+      console.log('$$$ Return from fetchItemCache');
+      resolve(_cache.getObjectMap());
+    }
   });
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function printMissingCacheData(){
+
+  console.log('::: Printing missing cache data');
+
+  for(let blobIdx in _missingCacheData.blob){
+    let missingBlob = _missingCacheData.blob[blobIdx];
+    let proxy = _workingTree.getProxyFor(missingBlob.id);
+    console.log('$$$--- Missing blob for ' + missingBlob.id + ' - ' + proxy.item.name + ' - ' + proxy.kind);
+  }
+
+  for(let treeIdx in _missingCacheData.tree){
+    let missingTree = _missingCacheData.tree[treeIdx];
+    let proxy = _workingTree.getProxyFor(missingTree.id);
+    console.log('$$$--- Missing tree for ' + missingTree.id + ' - ' + proxy.item.name + ' - ' + proxy.kind);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////

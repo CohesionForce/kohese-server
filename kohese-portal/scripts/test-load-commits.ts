@@ -1,26 +1,26 @@
-"use strict";
-import { ItemProxy } from "../common/src/item-proxy";
-import { ItemCache } from "../common/src/item-cache";
-import { TreeConfiguration } from "../common/src/tree-configuration";
-import { TreeHashMap } from "../common/src/tree-hash";
-import * as _ from "underscore";
-let heapdump = require ('heapdump');
+'use strict';
+import { ItemProxy } from '../common/src/item-proxy';
+import { ItemCache } from '../common/src/item-cache';
+import { TreeConfiguration } from '../common/src/tree-configuration';
+import { TreeHashMap } from '../common/src/tree-hash';
+import * as _ from 'underscore';
+// let heapdump = require ('heapdump');
 
-var kdb = require("../server/kdb.js");
+var kdb = require('../server/kdb.js');
 
 //Paths may be provided via arguments when starting via -kdb=PATH
 var baseRepoPath;
 for (var i = 2; i < process.argv.length; i++) {
-  var arg = process.argv[i].split("=");
-  if (arg[0] === "-kdb" && arg[1] !== "") {
+  var arg = process.argv[i].split('=');
+  if (arg[0] === '-kdb' && arg[1] !== '') {
     baseRepoPath = arg[1];
     break;
   }
 }
 
 if (!baseRepoPath) {
-  console.log("*** KDB repo must be supplied");
-  console.log("usage: node scripts/index-commits.js -kdb=repo-subdir");
+  console.log('*** KDB repo must be supplied');
+  console.log('usage: node scripts/index-commits.js -kdb=repo-subdir');
   process.exit(1);
 }
 
@@ -40,7 +40,7 @@ async function diffCommitAndPrev(refCommitId) {
     compareCommits(prevCommitId, refCommitId);
 
 } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
   }
 }
@@ -55,7 +55,7 @@ async function diffHeadAndPrev() {
     diffCommitAndPrev(headCommitId);
 
 } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
   }
 }
@@ -65,13 +65,13 @@ async function compareCommits(earlierCommit, laterCommit){
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
 
-    console.log("::: Evaluating diff between commits: " +earlierCommit + ' - ' + laterCommit);
+    console.log('::: Evaluating diff between commits: ' +earlierCommit + ' - ' + laterCommit);
     let laterTHM = await itemCache.getTreeHashMap(laterCommit);
     let earlierTHM = await itemCache.getTreeHashMap(earlierCommit);
     let diff = TreeHashMap.diff(earlierTHM, laterTHM);
     console.log(JSON.stringify(diff, null, '  '));
 } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
@@ -82,29 +82,39 @@ async function compareDiff_c282fb(){
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
 
-    console.log("::: Evaluating diff for commit: c282fb161979b120314ecb613a282411302f4e9d");
+    console.log('::: Evaluating diff for commit: c282fb161979b120314ecb613a282411302f4e9d');
     let errorTHM = await itemCache.getTreeHashMap('c282fb161979b120314ecb613a282411302f4e9d');
     let priorTHM = await itemCache.getTreeHashMap('82694888fae22340a5f37006f6c405d7cd8ddef7');
     let errorDiff = TreeHashMap.diff(priorTHM, errorTHM);
     console.log(JSON.stringify(errorDiff.summary, null, '  '));
 
   } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+function printMissingCommitData(missingCommitData) {
+  console.log('^^^ Missing commit data');
+  console.log(JSON.stringify(missingCommitData, null, '  '));
+}
+
 //////////////////////////////////////////////////////////////////////////
 async function evaluateAllCommits() {
+  console.log('^^^ Begin evaluating all commits');
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
-    await itemCache.detectMissingCommitData();
-} catch (err) {
-    console.log("*** Error");
+    let missingCommitData = await itemCache.detectMissingCommitData();
+    printMissingCommitData(missingCommitData);
+  } catch (err) {
+    console.log('*** Error');
     console.log(err);
 
   }
+  console.log('^^^ Finish evaluating all commits');
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -118,7 +128,7 @@ async function evaluateEachTree() {
       await itemCache.detectMissingTreeData(treeId);
     }
 } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
@@ -132,10 +142,11 @@ async function evaluateEachCommit() {
     let commitMap = itemCache.getCommits();
 
     for (let commitId of Array.from(commitMap.keys())){
-      await itemCache.detectMissingCommitData(commitId);
+      let missingCommitData = await itemCache.detectMissingCommitData(commitId);
+      printMissingCommitData(missingCommitData);
     }
 } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
@@ -150,7 +161,7 @@ async function diffEachCommit() {
 
     // TODO: missing diff logic
 } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
@@ -160,10 +171,11 @@ async function diffEachCommit() {
 async function evaluateCommit(selectedCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
-    await itemCache.detectMissingCommitData(selectedCommitId);
+    let missingCommitData = await itemCache.detectMissingCommitData(selectedCommitId);
+    printMissingCommitData(selectedCommitId);
 
   } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
@@ -234,24 +246,24 @@ async function evaluateBlob(oid) {
     console.log('::: Test OID: ' + newOID);
 
     let anotherTest = {
-      "origin": "TBD",
-      "mounted": true,
-      "id": "2852f690-66ce-11e5-82ed-75f294dafaa2",
-      "name": "Kohese",
-      "description": "Kohese Project",
-      "parentId": "1965e4e0-db21-11e5-89b9-2dc8a2699c19",
-      "createdBy": "admin",
-      "createdOn": 1443547133043,
-      "modifiedBy": "dphillips",
-      "modifiedOn": 1474052723333,
-      "itemIds": []
+      'origin': 'TBD',
+      'mounted': true,
+      'id': '2852f690-66ce-11e5-82ed-75f294dafaa2',
+      'name': 'Kohese',
+      'description': 'Kohese Project',
+      'parentId': '1965e4e0-db21-11e5-89b9-2dc8a2699c19',
+      'createdBy': 'admin',
+      'createdOn': 1443547133043,
+      'modifiedBy': 'dphillips',
+      'modifiedOn': 1474052723333,
+      'itemIds': []
     };
 
     newOID = ItemProxy.gitDocumentOID(anotherTest);;
     console.log('::: Raw OID: ' + newOID);
 
   } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
@@ -262,8 +274,6 @@ async function loadCommit(selectedCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
     let treeConfig = new TreeConfiguration(selectedCommitId);
-
-    // await itemCache.detectMissingCommitData(selectedCommitId);
 
     await itemCache.loadProxiesForCommit(selectedCommitId, treeConfig);
     treeConfig.calculateAllTreeHashes();
@@ -281,7 +291,7 @@ async function loadCommit(selectedCommitId) {
     root.dumpProxy();
 
   } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
@@ -300,24 +310,24 @@ async function loadConfigForEachCommit() {
       await itemCache.loadProxiesForCommit(commitId, treeConfig);
       treeConfig.loadingComplete();
       let heapUsed = process.memoryUsage().heapUsed;
-      console.log("==> Memory used: " + heapUsed);
+      console.log('==> Memory used: ' + heapUsed);
 //        treeConfig.reset();
       treeConfig.deleteConfig();
 
       heapUsed = process.memoryUsage().heapUsed;
-      console.log("==> After reset: " + heapUsed);
+      console.log('==> After reset: ' + heapUsed);
       try {
         global.gc();
       } catch (e) {
-        console.log("You must run program with '--expose-gc'");
+        console.log('You must run program with "--expose-gc"');
       }
       heapUsed = process.memoryUsage().heapUsed;
-      console.log("==> After GC:    " + heapUsed);
+      console.log('==> After GC:    ' + heapUsed);
 //        heapdump.writeSnapshot(Date.now() + '.heapsnapshot');
     }
 
   } catch (err) {
-    console.log("*** Error");
+    console.log('*** Error');
     console.log(err);
 
   }
@@ -343,7 +353,7 @@ let indexCommitsAndExit = true;
 
 try {
   kdb.initialize(baseRepoPath, indexCommitsAndExit).then(async function() {
-    console.log("::: Finished cache update for: " + baseRepoPath);
+    console.log('::: Finished cache update for: ' + baseRepoPath);
 
     /////////////////////
     // Logic to be tested
@@ -377,17 +387,20 @@ try {
     let commitMap = itemCache.getCommits();
     let keys = commitMap.keys();
 
-    console.log('^^^ Before listing')
+    console.log('^^^ Before listing');
 
     for (let key of Array.from(keys)){
       console.log('^^^ key: ' + key);
     }
 
-    console.log('^^^ Finishing')
+    console.log('^^^ Finish listing');
+
+    await evaluateAllCommits();
+
   });
 
 } catch (err) {
-  console.log("*** Error");
+  console.log('*** Error');
   console.log(err);
 
 }

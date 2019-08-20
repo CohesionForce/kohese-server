@@ -324,21 +324,21 @@ export class ItemCache {
         let repoId = reversedRootIds[repoIdx];
         treeHashEntryStack.push({id:repoId, treeId:commit.repoTreeRoots[repoId].treeHash});
       }
-      
+
       while (treeHashEntryStack.length > 0) {
         let mapEntry = treeHashEntryStack.pop();
         let treeHashEntry = await this.getTree(mapEntry.treeId)
-  
+
         if (treeHashEntry) {
           treeHashMap [mapEntry.id] = treeHashEntry;
-  
+
           let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
           for (let childIdx in reversedChildIds){
             let childId = reversedChildIds[childIdx];
             let treeId = treeHashEntry.childTreeHashes[childId];
             switch (treeId){
-              case "Repository-Mount":
-              case "Internal":
+              case 'Repository-Mount':
+              case 'Internal':
                 // Ignore
                 break;
               default:
@@ -434,12 +434,25 @@ export class ItemCache {
     let cache = this;
     let blobEvaluated = {};
     let treeEvaluated = {};
+    let rootEvaluated = {};
+    let commitParentEvaluated = {};
+    let missingCommitData = {
+      blob : {},
+      tree : {},
+      root: {},
+      commit : []
+    }
 
     async function evaluateBlob (itemId, kind, oid) {
       if (!blobEvaluated[oid]){
         // console.log('::: Evaluating blob for ' + itemId);
         if (!await cache.getBlob(oid)){
           console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
+          missingCommitData.blob[oid] = {
+            itemdId: itemId,
+            kind: kind,
+            oid: oid
+          };
         }
         blobEvaluated[oid] = true;
       }
@@ -463,7 +476,14 @@ export class ItemCache {
               if (childTree) {
                 await evaluateTreeEntry(childId, childTree);
               } else {
-                console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
+                if (!treeEvaluated[childTreeHash]) {
+                  console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
+                  missingCommitData.tree[childTreeHash] = {
+                    itemId: childId,
+                    treeHash: childTreeHash
+                  };
+                  treeEvaluated[childTreeHash] = true;
+                }
               }
           }
         }
@@ -477,15 +497,47 @@ export class ItemCache {
 
         for (let rootId in commit.repoTreeRoots){
           let root = commit.repoTreeRoots[rootId];
-          // console.log('::: Evaluating root:  ' + rootId);
-          if (root){
-            await evaluateTreeEntry(rootId, root);
-          } else {
-            console.log('*** Missing tree hash for ' + rootId);
+
+          if (root && !rootEvaluated[root.treeHash]){
+            // console.log('::: Evaluating root:  ' + rootId + ' - ' + root.treeHash);
+
+            let rootTree = await cache.getTree(root.treeHash);
+
+            if (rootTree) {
+              await evaluateTreeEntry(rootId, rootTree);
+            } else {
+              if (!rootEvaluated[root.treeHash]) {
+                console.log('*** Missing tree for root (%s) with treeHash (%s)', rootId, root.treeHash);
+                missingCommitData.root[root.treeHash] = {
+                  rootId: rootId,
+                  rootData: root
+                };
+
+                // Evaluate with the root tree data instead
+                await evaluateTreeEntry(rootId, root);
+              }
+            }
+            rootEvaluated[root.treeHash] = true;
           }
         }
       }
+
+      // Check for missing parent commits
+      // console.log('::: Checking for parent commits: ' + commit.parents);
+      for (let parentCommitId of commit.parents) {
+        if (!commitParentEvaluated[parentCommitId]) {
+          // console.log('::: Checking for commit parent: ' + parentCommitId);
+          let parentCommit = await cache.getCommit(parentCommitId);
+          if (!parentCommit) {
+            console.log('*** Missing commit: ' + parentCommitId);
+            missingCommitData.commit.push(parentCommitId);
+          }
+          commitParentEvaluated[parentCommitId] = true;
+        }
+      }
     };
+
+    return missingCommitData;
   }
 
   //////////////////////////////////////////////////////////////////////////

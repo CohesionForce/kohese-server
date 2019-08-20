@@ -16,7 +16,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 export class AppBarComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
-  private userName : string;
+  public userName : string;
   private repositoryStatus: any;
   public authenticated : boolean = false;
   private userSubscription: Subscription;

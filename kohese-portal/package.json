@@ -12,6 +12,7 @@
     "build-all": "npm run build-server && npm run build-client",
     "server": "node --max_old_space_size=2048 .",
     "index": "node build/scripts/index-commits.js -kdb=kohese-kdb",
+    "test-load-commits": "node build/scripts/test-load-commits.js -kdb=kohese-kdb",
     "build-all-prod": "npm run build-server && npm run build-client-prod",
     "build-server": "tsc --p server/tsconfig.json && date",
     "build-client": "./node_modules/webpack/bin/webpack.js && ng build --configuration development && npm run sw-config && npm run sw-copy && ./scripts/ls-bundles.sh && date",
