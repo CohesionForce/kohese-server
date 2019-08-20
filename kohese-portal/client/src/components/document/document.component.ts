@@ -536,13 +536,18 @@ export class DocumentComponent implements OnInit, OnDestroy {
             parentId: string) => {
             let documentComponent: DocumentComponent = documentComponents[j];
             let item: any = JSON.parse(JSON.stringify(itemProxy.item));
+            delete item.id;
+            delete item.itemIds;
+            /* Removing the below attribute should cause a related attribute to
+            also be set. */
+            delete item.createdBy;
             
             if (copySpecifications.clearNonNameAttributes) {
               for (let attributeName in item) {
                 if ((attributeName !== 'name') && (attributeName !==
                   'parentId')) {
                   if (itemProxy.model.item.classProperties[attributeName].
-                    definition.required) {
+                    definition.default) {
                     item[attributeName] = itemProxy.model.item.classProperties[
                       attributeName].definition.default;
                   } else {
@@ -555,12 +560,6 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 item[attributeName] = documentComponent.attributeMap[
                   attributeName];
               }
-              
-              delete item.id;
-              /* Removing the below attribute should cause a related attribute
-              to also be set. */
-              delete item.createdBy;
-              delete item.itemIds;
             }
             
             item.parentId = parentId;
@@ -589,15 +588,15 @@ export class DocumentComponent implements OnInit, OnDestroy {
               documentComponentCopy.id = copiedItemProxy.item.id;
               for (let attributeName in documentComponentCopy.attributeMap) {
                 documentComponentCopy.attributeMap[attributeName] =
-                  documentComponent.attributeMap[attributeName];
+                  copiedItemProxy.item[attributeName];
                 
-                if ((attributeName === 'description') && (documentComponent[
-                  attributeName] == null)) {
+                if ((attributeName === 'description') &&
+                  (documentComponentCopy[attributeName] == null)) {
                   documentComponentCopy[attributeName] = '';
                 }
               }
               
-              if (documentComponents[j].parentId === null) {
+              if (documentComponent.parentId === null) {
                 documentComponentCopy.parentId = null;
               } else {
                 documentComponentCopy.parentId = parentId;
