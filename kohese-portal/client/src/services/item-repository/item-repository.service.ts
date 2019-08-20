@@ -809,12 +809,12 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  async setTreeConfig(treeId: string, configType: TreeConfigType): Promise<void> {
-    let treeConfiguration = TreeConfiguration.getTreeConfigFor(treeId);
+  async setTreeConfig(commitId: string, configType: TreeConfigType): Promise<void> {
+    let treeConfiguration = TreeConfiguration.getTreeConfigFor(commitId);
     if (!treeConfiguration) {
-      treeConfiguration = new TreeConfiguration(treeId);
-      let itemCache = TreeConfiguration.getItemCache();
-      await itemCache.loadProxiesForCommit(treeId, treeConfiguration);
+      treeConfiguration = new TreeConfiguration(commitId);
+      let itemCache : ItemCache = TreeConfiguration.getItemCache();
+      await itemCache.loadProxiesForCommit(commitId, treeConfiguration);
       treeConfiguration.loadingComplete();
     }
 
