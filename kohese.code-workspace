@@ -5,6 +5,9 @@
 		}
 	],
 	"settings": {
-		"workbench.editor.enablePreviewFromQuickOpen": false
+		"workbench.editor.enablePreviewFromQuickOpen": false,
+		"files.watcherExclude": {
+			"**/kdb/**": true
+		}
 	}
 }

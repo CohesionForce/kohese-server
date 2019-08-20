@@ -429,35 +429,40 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async detectMissingCommitData(selectedCommitId?) {
+  async detectMissingCacheData(selectedCommitId?, selectedTreeRoots?, selectedTreeId?) {
 
     let cache = this;
     let blobEvaluated = {};
     let treeEvaluated = {};
     let rootEvaluated = {};
     let commitParentEvaluated = {};
-    let missingCommitData = {
-      blob : {},
-      tree : {},
-      root: {},
-      commit : []
-    }
 
+    let missingCacheData = {
+      found: false,
+      blob: {},
+      tree: {},
+      root: {},
+      commit: []
+    };
+
+    //////////////////////////////////////////////////////////////////////////
     async function evaluateBlob (itemId, kind, oid) {
       if (!blobEvaluated[oid]){
         // console.log('::: Evaluating blob for ' + itemId);
         if (!await cache.getBlob(oid)){
-          console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
-          missingCommitData.blob[oid] = {
+          // console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
+          missingCacheData.blob[oid] = {
             itemdId: itemId,
             kind: kind,
             oid: oid
           };
+          missingCacheData.found = true;
         }
         blobEvaluated[oid] = true;
       }
     }
 
+    //////////////////////////////////////////////////////////////////////////
     async function evaluateTreeEntry (itemId, tree) {
       if (!tree){
         console.log('*** Missing tree for ' + itemId);
@@ -477,11 +482,12 @@ export class ItemCache {
                 await evaluateTreeEntry(childId, childTree);
               } else {
                 if (!treeEvaluated[childTreeHash]) {
-                  console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
-                  missingCommitData.tree[childTreeHash] = {
+                  // console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
+                  missingCacheData.tree[childTreeHash] = {
                     itemId: childId,
                     treeHash: childTreeHash
                   };
+                  missingCacheData.found = true;
                   treeEvaluated[childTreeHash] = true;
                 }
               }
@@ -491,36 +497,46 @@ export class ItemCache {
       }
     }
 
-    for (let [commitId, commit] of Array.from(this.kCommitMap.entries())) {
-      if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
-        // console.log('::: Evaluating commit:  ' + commitId);
+    //////////////////////////////////////////////////////////////////////////
+    async function evaluateRoot(rootId, root) {
+      if (root && !rootEvaluated[root.treeHash]){
+        // console.log('::: Evaluating root:  ' + rootId + ' - ' + root.treeHash);
 
-        for (let rootId in commit.repoTreeRoots){
-          let root = commit.repoTreeRoots[rootId];
+        let rootTree = await cache.getTree(root.treeHash);
 
-          if (root && !rootEvaluated[root.treeHash]){
-            // console.log('::: Evaluating root:  ' + rootId + ' - ' + root.treeHash);
+        if (rootTree) {
+          await evaluateTreeEntry(rootId, rootTree);
+        } else {
+          if (!rootEvaluated[root.treeHash]) {
+            // console.log('*** Missing tree for root (%s) with treeHash (%s)', rootId, root.treeHash);
+            missingCacheData.root[root.treeHash] = {
+              rootId: rootId,
+              treeHash: root.treeHash
+            };
+            missingCacheData.found = true;
 
-            let rootTree = await cache.getTree(root.treeHash);
-
-            if (rootTree) {
-              await evaluateTreeEntry(rootId, rootTree);
-            } else {
-              if (!rootEvaluated[root.treeHash]) {
-                console.log('*** Missing tree for root (%s) with treeHash (%s)', rootId, root.treeHash);
-                missingCommitData.root[root.treeHash] = {
-                  rootId: rootId,
-                  rootData: root
-                };
-
-                // Evaluate with the root tree data instead
-                await evaluateTreeEntry(rootId, root);
-              }
-            }
-            rootEvaluated[root.treeHash] = true;
+            // Evaluate with the root tree data instead
+            await evaluateTreeEntry(rootId, root);
           }
         }
+        rootEvaluated[root.treeHash] = true;
       }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    async function evaluateTreeRoots(repoTreeRoots) {
+      for (let rootId in repoTreeRoots){
+        let root = repoTreeRoots[rootId];
+
+        await evaluateRoot(rootId, root);
+      }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    async function evaluateCommit(commitId, commit) {
+      // console.log('::: Evaluating commit:  ' + commitId);
+
+      await evaluateTreeRoots(commit.repoTreeRoots);
 
       // Check for missing parent commits
       // console.log('::: Checking for parent commits: ' + commit.parents);
@@ -529,68 +545,79 @@ export class ItemCache {
           // console.log('::: Checking for commit parent: ' + parentCommitId);
           let parentCommit = await cache.getCommit(parentCommitId);
           if (!parentCommit) {
-            console.log('*** Missing commit: ' + parentCommitId);
-            missingCommitData.commit.push(parentCommitId);
+            // console.log('*** Missing commit: ' + parentCommitId);
+            missingCacheData.commit.push(parentCommitId);
+            missingCacheData.found = true;
           }
           commitParentEvaluated[parentCommitId] = true;
         }
       }
-    };
+    }
 
-    return missingCommitData;
+    // The following logic will evaluate one of the provided inputs.
+    // If there are multiple inputs provided, the will be processed
+    // in the following precedence: Commit, Tree, Root.  To skip the
+    // earlier attributes, provide a null.  Leave all inputs empty to
+    // process all commits.
+
+    if (selectedCommitId !== null) {
+      for (let [commitId, commit] of Array.from(this.kCommitMap.entries())) {
+        if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
+          await evaluateCommit(commitId, commit);
+        }
+      };
+    } else if (selectedTreeRoots !== null) {
+      await evaluateTreeRoots(selectedTreeRoots);
+    } else {
+
+      for (let treeId in this.kTreeMap) {
+        if (!selectedTreeId || (selectedTreeId && (treeId === selectedTreeId))){
+          let tree = this.kTreeMap.get(treeId);
+
+          await evaluateTreeEntry(treeId, tree);
+        }
+      };
+    }
+
+    // Delete unneessary result categories
+    if (Object.keys(missingCacheData.blob).length === 0) {
+      delete missingCacheData.blob;
+    }
+
+    if (Object.keys(missingCacheData.tree).length === 0) {
+      delete missingCacheData.tree;
+    }
+
+    if (Object.keys(missingCacheData.root).length === 0) {
+      delete missingCacheData.root;
+    }
+
+    if (missingCacheData.commit.length === 0) {
+      delete missingCacheData.commit;
+    }
+
+    return missingCacheData;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async detectMissingCommitData(selectedCommitId?) {
+    return await this.detectMissingCacheData(selectedCommitId);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async detectMissingTreeRootData(selectedTreeRoots) {
+    return await this.detectMissingCacheData(null, selectedTreeRoots);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   async detectMissingTreeData(selectedTreeId?) {
-
-    let cache = this;
-    let blobEvaluated = {};
-    let treeEvaluated = {};
-
-    async function evaluateBlob (itemId, kind, oid) {
-      if (!blobEvaluated[oid]){
-        // console.log('::: Evaluating blob for ' + itemId);
-        if (!await cache.getBlob(oid)){
-          console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
-        }
-        blobEvaluated[oid] = true;
-      }
-    }
-
-    async function evaluateTreeEntry (itemId, tree) {
-      if (!treeEvaluated[tree.treeHash]){
-        // console.log('::: Evaluating tree for ' + itemId);
-        await evaluateBlob(itemId, tree.kind, tree.oid);
-        for (let childId in tree.childTreeHashes) {
-          let childTreeHash = tree.childTreeHashes[childId];
-          switch (childTreeHash){
-            case 'Repository-Mount':
-            case 'Internal':
-              break;
-            default:
-              let childTree = await cache.getTree(childTreeHash);
-              if (childTree) {
-                await evaluateTreeEntry(childId, childTree);
-              } else {
-                console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);
-              }
-          }
-        }
-        treeEvaluated[tree.treeHash] = true;
-      }
-    }
-
-    for (let treeId in this.kTreeMap) {
-      if (!selectedTreeId || (selectedTreeId && (treeId === selectedTreeId))){
-        let tree = this.kTreeMap.get(treeId);
-        console.log('::: Evaluating tree:  ' + treeId);
-        // console.log(JSON.stringify(commit, null, '  '));
-
-        await evaluateTreeEntry(treeId, tree);
-      }
-    };
+    return await this.detectMissingCacheData(null, null, selectedTreeId);
   }
 
   //////////////////////////////////////////////////////////////////////////

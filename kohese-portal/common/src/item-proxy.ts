@@ -671,45 +671,19 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   static gitDocumentOID(forDoc) {
+
+    // This function calculates a OID that is equivalaent to the one calculated
+    // natively by git.for the contents of a blob
+
     var shaObj = new jsSHA('SHA-1', 'TEXT');
 
     var forText = JSON.stringify(forDoc, null, '  ');
 
     var length = forText.length;
-//    console.log(forText);
-//    console.log('\n');
+
     shaObj.update('blob ' + length + '\0' + forText);
 
     var oid = shaObj.getHash('HEX');
-
-//    for(var l = length - 5; l < length +5; l++){
-//      shaObj.update('blob ' + l + '\0' + forText);
-//      var newOid = shaObj.getHash('HEX');
-//      console.log('>>> ' + l + ' - ' + newOid);
-//    }
-
-    return oid;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static gitFileOID(forFile) {
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-
-
-    var length = forFile.length;
-//    console.log(forText);
-//    console.log('\n');
-    shaObj.update('blob ' + length + '\0' + forFile);
-
-    var oid = shaObj.getHash('HEX');
-
-//    for(var l = length - 5; l < length +5; l++){
-//      shaObj.update('blob ' + l + '\0' + forText);
-//      var newOid = shaObj.getHash('HEX');
-//      console.log('>>> ' + l + ' - ' + newOid);
-//    }
 
     return oid;
   }
@@ -798,6 +772,12 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   calculateTreeHashes(deferCalc : boolean = false, repoOnly : boolean = true) : Promise<number> {
+
+    // Note: This operation can take a long time on large data sets.  The iterationCount
+    //       allows a configurable number of items to be processed and then yields the
+    //       processing to allow other processing of the application to continue.  If
+    //       not deferCalc, then the processing will run to completion without yielding
+    //       the CPU.
 
     let iterationCount = 0;
     let resultPromise = new Promise<number>((resolve, reject) => {
@@ -1589,7 +1569,7 @@ export class ItemProxy {
       }
     }
   }
-  
+
   public toString(): string {
     return this.item.name;
   }

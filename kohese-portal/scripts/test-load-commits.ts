@@ -97,24 +97,29 @@ async function compareDiff_c282fb(){
 
 
 //////////////////////////////////////////////////////////////////////////
-function printMissingCommitData(missingCommitData) {
-  console.log('^^^ Missing commit data');
-  console.log(JSON.stringify(missingCommitData, null, '  '));
+function printMissingCacheData(missingCacheData) {
+  if (missingCacheData.found){
+    console.log('^^^ Missing cache data');
+    console.log(JSON.stringify(missingCacheData, null, '  '));
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
 async function evaluateAllCommits() {
   console.log('^^^ Begin evaluating all commits');
+  let startTime = Date.now();
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
     let missingCommitData = await itemCache.detectMissingCommitData();
-    printMissingCommitData(missingCommitData);
+    printMissingCacheData(missingCommitData);
   } catch (err) {
     console.log('*** Error');
     console.log(err);
 
   }
-  console.log('^^^ Finish evaluating all commits');
+  let finishTime = Date.now();
+
+  console.log('^^^ Finish evaluating all commits: ' + (finishTime-startTime)/1000);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -125,7 +130,8 @@ async function evaluateEachTree() {
     let treeMap = itemCache.getTrees();
 
     for (let treeId in treeMap){
-      await itemCache.detectMissingTreeData(treeId);
+      let missingData = await itemCache.detectMissingTreeData(treeId);
+      printMissingCacheData(missingData);
     }
 } catch (err) {
     console.log('*** Error');
@@ -142,8 +148,8 @@ async function evaluateEachCommit() {
     let commitMap = itemCache.getCommits();
 
     for (let commitId of Array.from(commitMap.keys())){
-      let missingCommitData = await itemCache.detectMissingCommitData(commitId);
-      printMissingCommitData(missingCommitData);
+      let missingData = await itemCache.detectMissingCommitData(commitId);
+      printMissingCacheData(missingData);
     }
 } catch (err) {
     console.log('*** Error');
@@ -171,8 +177,8 @@ async function diffEachCommit() {
 async function evaluateCommit(selectedCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
-    let missingCommitData = await itemCache.detectMissingCommitData(selectedCommitId);
-    printMissingCommitData(selectedCommitId);
+    let missingData = await itemCache.detectMissingCommitData(selectedCommitId);
+    printMissingCacheData(missingData);
 
   } catch (err) {
     console.log('*** Error');
