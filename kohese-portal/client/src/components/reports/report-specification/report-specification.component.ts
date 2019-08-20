@@ -47,7 +47,7 @@ export class ReportSpecifications {
     this._addLinks = addLinks;
   }
   
-  private _saveReport: boolean = true;
+  private _saveReport: boolean = false;
   get saveReport() {
     return this._saveReport;
   }
@@ -220,14 +220,12 @@ export class ReportSpecificationComponent {
     await this._itemRepository.produceReport(this._getReportContent(
       initialReportContent, this._reportSpecifications), this.
       _reportSpecifications.name, this._reportSpecifications.format);
-    if (!this._reportSpecifications.saveReport) {
+    if (this._reportSpecifications.saveReport) {
       let downloadAnchor: any = document.createElement('a');
       downloadAnchor.download = this._reportSpecifications.name;
       downloadAnchor.href = '/producedReports/' +
         this._reportSpecifications.name;
       downloadAnchor.click();
-      await this._itemRepository.removeReport(this._reportSpecifications.
-        name);
     }
     
     this._toastrService.success(this._reportSpecifications.name,
