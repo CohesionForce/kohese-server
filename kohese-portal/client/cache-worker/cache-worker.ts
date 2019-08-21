@@ -355,6 +355,14 @@ async function sync(): Promise<void> {
     await _loadedCachePromise;
     let afterSyncCache = Date.now();
     console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
+
+    console.log('^^^ Checking for missing cache data')
+    let missingCommitData = await _cache.detectMissingCommitData();
+    if (missingCommitData.found){
+      console.log('*** Found missing commit data:');
+      console.log(JSON.stringify(missingCommitData, null, '  '));
+    }
+
     let headRef = await _cache.getRef('HEAD');
     await _cache.loadProxiesForCommit(headRef, workingTree);
     afterLoadHead = Date.now();
@@ -372,13 +380,6 @@ async function sync(): Promise<void> {
   await _itemUpdatesPromise;
   let afterGetAll = Date.now();
   console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
-
-  console.log('^^^ Checking for missing cache data')
-  let missingCommitData = await _cache.detectMissingCommitData();
-  if (missingCommitData.found){
-    console.log('*** Found missing commit data:');
-    console.log(JSON.stringify(missingCommitData, null, '  '));
-  }
 
   workingTree.loadingComplete(false);
   let afterLoading = Date.now();
@@ -433,9 +434,9 @@ function registerKoheseIOListeners() {
     processBulkUpdate(bulkUpdate);
   });
 
-  socket.on('Item/BulkCacheUpdate', (bulkCacheUpdate) => {
+  socket.on('Item/BulkCacheUpdate', async (bulkCacheUpdate) => {
     console.log('::: Received Bulk Cache Update');
-    _cache.processBulkCacheUpdate(bulkCacheUpdate);
+    await _cache.processBulkCacheUpdate(bulkCacheUpdate);
   });
 
   socket.on('VersionControl/statusUpdated', (statusMap: any) => {
@@ -596,12 +597,6 @@ async function populateCache(): Promise<any> {
         resolve();
       });
     });
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  async function fetchTreeEntry(treeId, treeHash) {
-    const treeEntry = await _cache.getTree(treeHash);
-    return treeEntry;
   }
 
   //////////////////////////////////////////////////////////////////////////

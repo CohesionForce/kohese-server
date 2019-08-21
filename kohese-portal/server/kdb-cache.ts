@@ -73,14 +73,14 @@ export class KDBCache extends LevelCache {
     this.registerSublevel(
       'rCommit',
       this.getRepoCommits,
-      this.cacheRepoCommit,
+      this.cacheRepoCommitLocal,
       this.getRepoCommit
     );
 
     this.registerSublevel(
       'rTree',
       this.getRepoTrees,
-      this.cacheRepoTree,
+      this.cacheRepoTreeLocal,
       this.getRepoTree
     );
 
@@ -125,6 +125,13 @@ export class KDBCache extends LevelCache {
   //
   //////////////////////////////////////////////////////////////////////////
   cacheRepoCommit(oid, commit){
+    this.cacheKeyValuePair('rCommit', oid, commit);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private cacheRepoCommitLocal(oid, commit){
     Object.freeze(commit);
     this.repoCommitMap.set(oid, commit);
   }
@@ -147,6 +154,13 @@ export class KDBCache extends LevelCache {
   //
   //////////////////////////////////////////////////////////////////////////
   cacheRepoTree(oid, tree){
+    this.cacheKeyValuePair('rTree', oid, tree);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private cacheRepoTreeLocal(oid, tree){
     Object.freeze(tree);
     this.repoTreeMap.set(oid, tree);
   }
