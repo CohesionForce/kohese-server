@@ -99,6 +99,13 @@ export class LevelCache extends ItemCache {
       super.cacheBlob,
       this.getBlob
     );
+
+    this.registerSublevel(
+      'workspace',
+      this.getWorkspaces,
+      super.cacheWorkspace,
+      this.getWorkspace
+    );
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -127,7 +134,6 @@ export class LevelCache extends ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   async retrieveValue (sublevelName, key) : Promise<any> {
-    let beforeRetrieve = Date.now();
     let registration : SublevelRegistration = this.registrationMap.get(sublevelName);
     if(!sublevelName){
       console.log('*** Invalid sublevel map Lookup: ' + sublevelName + ' - ' + key);
@@ -138,21 +144,16 @@ export class LevelCache extends ItemCache {
       console.log('@@@ Map Lookup: ' + sublevelName + ' - ' + key );
     }
 
-    let afterRetrieve = Date.now();
     if (value !== undefined) {
-      // console.log('@@@ Map Lookup: ' + key + ' - ' + (afterRetrieve - beforeRetrieve)  + ' ms');
       return Promise.resolve(value);
     } else {
-      // console.log('$$$ Waiting for value to load: ' + sublevelName + ' - ' + key);
       let levelPromise = registration.sublevel.get(key)
 
       let result = new Promise((resolve) => {
 
         levelPromise.then((value) => {
-          let afterLevelRetrieve = Date.now();
           registration.setValueMethod.call(this, key, value);
           resolve(value);
-          // console.log('@@@ Map Lookup (via Level): ' + key + ' - ' + (afterLevelRetrieve - afterRetrieve) + ' ms');
         }).catch((err) => {
           resolve(undefined);
         });
@@ -173,11 +174,13 @@ export class LevelCache extends ItemCache {
     if (registration) {
       //  console.log('$$$ Set Value for: ' + sublevelName + ' - ' + key + ' - ' + alreadyCached);
       registration.setValueMethod.call(this, key, value);
-      this.pendingWrite[sublevelName].push({
-        type: 'put',
-        key: key,
-        value: value
-      });
+      if (!alreadyCached){
+        this.pendingWrite[sublevelName].push({
+          type: 'put',
+          key: key,
+          value: value
+        });
+      }
 
     } else {
       console.log('*** Sublevel Registration not found for: ' + sublevelName);
@@ -229,6 +232,13 @@ export class LevelCache extends ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  cacheWorkspace(name, workspace){
+    this.cacheKeyValuePair('workspace', name, workspace);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   async loadCachedObjects() {
 
     let beforeLoadCache = Date.now();
@@ -273,7 +283,7 @@ export class LevelCache extends ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   async saveSublevel(sublevelName){
-    console.log('::: Saving Sublevel: ' + sublevelName);
+    // console.log('::: Saving Sublevel: ' + sublevelName);
     try {
       let registration = this.registrationMap.get(sublevelName);
       let sublevel = registration.sublevel;
@@ -283,7 +293,7 @@ export class LevelCache extends ItemCache {
         // Clear the pendingWrite array
         this.pendingWrite[sublevelName] = [];
 
-        console.log('$$$ Adding ' + entries.length + ' entries to ' + sublevelName);
+        console.log('+++ Adding ' + entries.length + ' entries to ' + sublevelName);
         await sublevel.batch(entries);
       }
 
@@ -297,6 +307,7 @@ export class LevelCache extends ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   async saveAllPendingWrites(){
+    console.log('::: Checking for cache data to save');
     let sublevelNames = Array.from(this.registrationMap.keys());
     for (let sublevelName of sublevelNames){
       await this.saveSublevel(sublevelName);

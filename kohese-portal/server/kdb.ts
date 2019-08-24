@@ -600,9 +600,9 @@ async function openRepositories(indexAndExit) {
   return Promise.all(promises).then(() => {
     // Need to wait for all repos to be loaded before continuing
     console.log('::: End KDB File Load');
-    console.log(new Date());
-    ItemProxy.getWorkingTree().loadingComplete();
-    console.log(new Date());
+    let workingTree = ItemProxy.getWorkingTree();
+    workingTree.loadingComplete();
+    workingTree.saveToCache();
   });
 
 }

@@ -21,6 +21,8 @@ export class KoheseCommit {
   repoTreeRoots: { [ key : string ] : TreeHashEntry };
 }
 
+export type Workspace = Array<TreeHashEntry>;
+
 type KoheseTree = TreeHashEntry;
 
 type Blob = any;
@@ -47,10 +49,9 @@ export class ItemCache {
   private kCommitMap = new Map<string, KoheseCommit>();
   private kTreeMap  = new Map<string, KoheseTree>();
   private blobMap  = new Map<string, Blob>();
+  private workspaceMap  = new Map<string, Workspace>();
 
   private mapMap = new Map<string, Map<string, any>>();
-
-  private objectMap;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -63,6 +64,7 @@ export class ItemCache {
     this.registerCacheMap('kCommit', this.kCommitMap);
     this.registerCacheMap('kTree', this.kTreeMap);
     this.registerCacheMap('blob', this.blobMap);
+    this.registerCacheMap('workspace', this.workspaceMap);
 
     this.metadata.set('numRefs', 0);
     this.metadata.set('numTags', 0);
@@ -70,6 +72,13 @@ export class ItemCache {
     this.metadata.set('numTrees', 0);
     this.metadata.set('numBlobs', 0);
 
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async saveAllPendingWrites(){
+    // Default implementation does nothing
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -118,78 +127,25 @@ export class ItemCache {
   //
   //////////////////////////////////////////////////////////////////////////
   getObjectMap(){
-    if (!this.objectMap){
-      this.objectMap = {
-        metadata : {
-          numRefs: this.refMap.size,
-          numTags: this.tagMap.size,
-          numCommits: this.kCommitMap.size,
-          numTrees: this.kTreeMap.size,
-          numBlobs: this.blobMap.size
-        },
-        refMap : this.mapToObject(this.refMap),
-        tagMap : this.mapToObject(this.tagMap),
-        kCommitMap : this.mapToObject(this.kCommitMap),
-        kTreeMapChunks: this.splitObject(this.mapToObject(this.kTreeMap)),
-        blobMapChunks: this.splitObject(this.mapToObject(this.blobMap))
-      }
-    }
-    return this.objectMap;
-  }
 
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  setObjectMap(objectMap){
-    let metadata = objectMap.metadata;
+    // TODO:  Need to evaluate removal of this method
 
-    if (objectMap.refMap){
-      this.refMap = objectMap.refMap;
-      this.metadata.set('numRefs', this.refMap.size);
-      if(this.metadata.get('numRefs') !== objectMap.metadata.numRefs){
-        console.log('*** Number of refs do not match: ' + this.refMap.size);
-      }
+    let objectMap = {
+      metadata : {
+        numRefs: this.refMap.size,
+        numTags: this.tagMap.size,
+        numCommits: this.kCommitMap.size,
+        numTrees: this.kTreeMap.size,
+        numBlobs: this.blobMap.size
+      },
+      refMap : this.mapToObject(this.refMap),
+      tagMap : this.mapToObject(this.tagMap),
+      kCommitMap : this.mapToObject(this.kCommitMap),
+      kTreeMapChunks: this.splitObject(this.mapToObject(this.kTreeMap)),
+      blobMapChunks: this.splitObject(this.mapToObject(this.blobMap)),
+      workspaceMap : this.mapToObject(this.workspaceMap)
     }
-
-    if (objectMap.tagMap){
-      this.tagMap = objectMap.tagMap;
-      this.metadata.set('numTags', this.tagMap.size);
-      if(this.metadata.get('numTags') !== objectMap.metadata.numTags){
-        console.log('*** Number of tags do not match: ' + this.tagMap.size);
-      }
-    }
-
-    if (objectMap.kCommitMap){
-      this.kCommitMap = objectMap.kCommitMap;
-      this.metadata.set('numCommits', this.kCommitMap.size);
-      if(this.metadata.get('numCommits') !== objectMap.metadata.numCommits){
-        console.log('*** Number of commits do not match: ' + this.kCommitMap.size);
-      }
-    }
-
-    if (objectMap.kTreeMap){
-      this.kTreeMap = objectMap.kTreeMap;
-      this.metadata.set('numTrees', this.kTreeMap.size);
-      if(this.metadata.get('numTrees') !== objectMap.metadata.numTrees){
-        console.log('*** Number of trees do not match: ' + this.kTreeMap);
-      }
-    }
-
-    if (objectMap.blobMap){
-      this.blobMap = objectMap.blobMap;
-      this.metadata.set('numBlobs', this.blobMap.size);
-      if(this.metadata.get('numBlobs') !== objectMap.metadata.numBlobs){
-        console.log('*** Number of blobs do not match: ' + this.blobMap.size);
-      }
-    }
-
-    if (!_.isEqual(this.mapToObject(this.metadata), objectMap.metadata)){
-      console.log('*** Cache metadata does not match: ');
-      console.log('*** Server Cache Metadata:')
-      console.log(objectMap.metadata);
-      console.log('*** Client Cache Metadata:')
-      console.log(this.metadata);
-    }
+    return objectMap;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -388,6 +344,28 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  cacheWorkspace(name:string, workspace:Workspace){
+    this.workspaceMap.set(name, workspace);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async getWorkspace(name){
+    console.log('%%% Retrieving workspace: ' + name);
+    return this.retrieveValue('workspace', name);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getWorkspaces(){
+    return this.workspaceMap;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   numberOfRefs(){
     return this.refMap.size;
   }
@@ -452,7 +430,7 @@ export class ItemCache {
         if (!await cache.getBlob(oid)){
           // console.log('*** Missing blob for tree (%s) of kind (%s) with oid (%s)', itemId, kind, oid);
           missingCacheData.blob[oid] = {
-            itemdId: itemId,
+            itemId: itemId,
             kind: kind,
             oid: oid
           };
@@ -632,15 +610,24 @@ export class ItemCache {
   async loadProxiesForCommit(commitId, treeConfig){
     let commit = await this.getCommit(commitId);
 
-    console.log('$$$ Loading commit: ');
+    console.log('$$$ Loading tree config: ' + treeConfig.treeId);
     console.log(JSON.stringify(commit, [ 'time', 'author', 'message', 'parents' ], '  '));
 
-    for(let repoId in commit.repoTreeRoots){
-      let repoTreeHashEntry = commit.repoTreeRoots[repoId];
+    await this.loadProxiesForTreeRoots(commit.repoTreeRoots, treeConfig);
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async loadProxiesForTreeRoots(repoTreeRoots:Array<TreeHashEntry>, treeConfig){
+
+    for(let repoId in repoTreeRoots){
+      let repoTreeHashEntry = repoTreeRoots[repoId];
       await this.loadProxiesForTree(repoId, repoTreeHashEntry, treeConfig);
     }
 
-    console.log('$$$ Loading complete');
+    console.log('$$$ Loading complete: ' + treeConfig.treeId);
 
   }
 

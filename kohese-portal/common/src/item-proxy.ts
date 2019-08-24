@@ -783,6 +783,7 @@ export class ItemProxy {
     let resultPromise = new Promise<number>((resolve, reject) => {
       const deferredRollup = true;
       const yieldAtIteration = 100;
+      const msToYield = 100;
 
       let flags = {
         postorder: true
@@ -805,7 +806,7 @@ export class ItemProxy {
           proxy = thisIteration.value;
           proxy.calculateTreeHash(deferredRollup);
           if (deferCalc && (iterationCount % yieldAtIteration === 0)) {
-            setTimeout(performTreeHashCalculations, 100);
+            setTimeout(performTreeHashCalculations, msToYield);
             return;
           }
         }
@@ -816,7 +817,7 @@ export class ItemProxy {
       let iterator = this.iterateTree(flags);
 
       if (deferCalc){
-        setTimeout(performTreeHashCalculations, 500);
+        setTimeout(performTreeHashCalculations, msToYield);
       } else {
         performTreeHashCalculations();
       }

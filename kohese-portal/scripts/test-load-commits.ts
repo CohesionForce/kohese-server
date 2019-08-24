@@ -282,7 +282,7 @@ async function loadCommit(selectedCommitId) {
     let treeConfig = new TreeConfiguration(selectedCommitId);
 
     await itemCache.loadProxiesForCommit(selectedCommitId, treeConfig);
-    treeConfig.calculateAllTreeHashes();
+    await treeConfig.calculateAllTreeHashes();
 
     let savedTH = await itemCache.getTreeHashMap(selectedCommitId);
     let restoredTH = await treeConfig.getAllTreeHashes();
@@ -340,17 +340,6 @@ async function loadConfigForEachCommit() {
 }
 
 //////////////////////////////////////////////////////////////////////////
-function exportObjectCache() {
-  let itemCache : ItemCache = TreeConfiguration.getItemCache();
-  console.log('::: Export Object Cache');
-  let objectMap = itemCache.getObjectMap();
-
-  let fs = require('fs');
-  fs.writeFileSync('./test.objectCache.json', JSON.stringify(objectMap, null, '  '));
-
-}
-
-//////////////////////////////////////////////////////////////////////////
 // Main Processing
 //////////////////////////////////////////////////////////////////////////
 
@@ -384,7 +373,6 @@ try {
     // await evaluateEachCommit();
     // await evaluateEachTree();
     // await diffHeadAndPrev();
-    // exportObjectCache();
 
     let itemCache = TreeConfiguration.getItemCache();
     let HEAD = await itemCache.getRef('HEAD');

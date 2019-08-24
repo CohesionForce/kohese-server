@@ -322,13 +322,7 @@ export class KDBCache extends LevelCache {
       console.log('::: Found ' + this.numberOfRefs() + ' refs');
 
       console.log('::: Storing cache data to level repository');
-      await this.saveSublevel('kCommit');
-      await this.saveSublevel('kTree');
-      await this.saveSublevel('blob');
-      await this.saveSublevel('tag');
-      await this.saveSublevel('rCommit');
-      await this.saveSublevel('rTree');
-      await this.saveSublevel('ref');
+      await this.saveAllPendingWrites();
       console.log('::: Finished storing cache data to level repository');
     } else {
       console.log('::: Found ' + this.numberOfBlobs() + ' blobs');
@@ -440,9 +434,6 @@ export class KDBCache extends LevelCache {
     var deltaLoadTime = afterTime-beforeTime;
     console.log('::: Load time for cached objects in ' + this.repoPath + ': ' + deltaLoadTime/1000);
 
-    console.log('%%% Get objectMap:');
-    let objectMap = this.getObjectMap();
-
     beforeTime = Date.now();
 
     var kdbCache = this;
@@ -461,10 +452,13 @@ export class KDBCache extends LevelCache {
           return true;
         }).then(async function (commits) {
           return await kdbCache.indexCommit(repo, commits);
-        }).then(function () {
+        }).then(async () => {
           try {
-            kdbCache.cacheRef('HEAD', refHEAD);
-            kdbFS.storeJSONDoc(kdbCache.refsDirectory + '/HEAD.json', refHEAD);
+            let head = await kdbCache.getRef('HEAD');
+            if (head !== refHEAD){
+              kdbCache.cacheRef('HEAD', refHEAD);
+              kdbFS.storeJSONDoc(kdbCache.refsDirectory + '/HEAD.json', refHEAD);
+            }
           } catch (err) {
             console.log('*** Error while writing HEAD reference');
             console.log(err);
@@ -492,7 +486,7 @@ export class KDBCache extends LevelCache {
 
     let commitId = commit.id().toString();
     if (await this.getCommit(commitId)){
-      console.log('::: Already indexed commit ' + commitId);
+      // console.log('::: Already indexed commit ' + commitId);
       return await this.indexCommit(repository, commits);
     } else {
       console.log('::: Processing commit ' + commitId);
@@ -511,7 +505,7 @@ export class KDBCache extends LevelCache {
 
         // eslint-disable-next-line no-unused-vars
         var commitDataPromise = new Promise(async (resolve, reject) => {
-          await kdbCache.parseTree(repository, tree).then(() => {
+          await kdbCache.parseRepoTree(repository, tree).then(() => {
             resolve(co);
           });
         });
@@ -533,7 +527,7 @@ export class KDBCache extends LevelCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async parseTree(repository, tree) {
+  async parseRepoTree(repository, tree) {
     var kdbCache = this;
     var promises = [];
     var entries = {};
@@ -550,7 +544,7 @@ export class KDBCache extends LevelCache {
         if (!await this.getRepoTree(entry.sha().toString())){
           // jshint -W083
           promises.push(entry.getTree().then(function (t) {
-            return kdbCache.parseTree(repository, t);
+            return kdbCache.parseRepoTree(repository, t);
           }));
           // jshint +W083
         }
@@ -558,7 +552,7 @@ export class KDBCache extends LevelCache {
         // Retrieve Blob if it is not already cached
         var oid = entry.sha().toString();;
         if (!await this.getBlob(oid)){
-          promises.push(this.getContents(repository, oid));
+          promises.push(this.getRepoContents(repository, oid));
         }
       }
     }
@@ -571,7 +565,7 @@ export class KDBCache extends LevelCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getContents(repository, oid) {
+  getRepoContents(repository, oid) {
     var kdbCache = this;
     return nodegit.Blob.lookup(repository, nodegit.Oid
       .fromString(oid)).then(async function (blob) {

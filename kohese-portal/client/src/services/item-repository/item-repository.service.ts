@@ -153,7 +153,7 @@ export class ItemRepository {
 
       switch (msg.message) {
         case 'reconnected':
-          this.align();
+          this.sync();
           break;
         case 'connectionError':
 
@@ -208,7 +208,7 @@ export class ItemRepository {
         );
         this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
           true).then(async () => {
-          this.align();
+          this.sync();
         });
       }
     });
@@ -219,7 +219,7 @@ export class ItemRepository {
       data;
   }
 
-  private align(): Promise<void> {
+  private sync(): Promise<void> {
     return new Promise<void>(async (resolve: () => void, reject: () => void) => {
       this.updateRepositorySyncState(
         RepoStates.SYNCHRONIZING,
@@ -235,10 +235,18 @@ export class ItemRepository {
 
         await this.sendMessageToWorker('getCache', { refresh: false }, true);
 
-        const headRef = await this._cache.getRef('HEAD');
-        await this._cache.loadProxiesForCommit(headRef, workingTree);
+        const workingWorkspace = await this._cache.getWorkspace('Working');
 
-        workingTree.calculateAllTreeHashes();
+        if (workingWorkspace) {
+          console.log('%%% Using workspace');
+          await this._cache.loadProxiesForTreeRoots(workingWorkspace, workingTree);
+        } else {
+          console.log('%%% Using HEAD: workspace not found');
+          const headRef = await this._cache.getRef('HEAD');
+          await this._cache.loadProxiesForCommit(headRef, workingTree);
+        }
+
+        await workingTree.calculateAllTreeHashes();
       }
 
       const treeHashes = workingTree.getAllTreeHashes();
@@ -273,7 +281,7 @@ export class ItemRepository {
             'Item Repository Ready'
           );
 
-          await Promise.all(workingTree.loadingComplete(calculateTreeHashesAsynchronously));
+          await workingTree.loadingComplete(calculateTreeHashesAsynchronously);
 
           console.log('^^^ Completed calculating TreeHashes asynchronously');
 
@@ -282,7 +290,7 @@ export class ItemRepository {
           console.log('^^^ Calculating TreeHashes synchronously');
 
           // This call will block until complete since the TreeHash processing is not deferred
-          await Promise.all(workingTree.loadingComplete(false));
+          await workingTree.loadingComplete(false);
 
         }
       }
@@ -509,6 +517,11 @@ export class ItemRepository {
           this._cache.cacheBlob(key, cachePiece.value[key]);
         }
         break;
+      case 'workspace':
+        for (let key in cachePiece.value) {
+          this._cache.cacheWorkspace(key, cachePiece.value[key]);
+        }
+        break;
     }
   }
 
@@ -649,7 +662,7 @@ export class ItemRepository {
             viewModelItemProxy = TreeConfiguration.getWorkingTree().
               getProxyFor('view-item');
           }
-          
+
           let viewModelAttribute: any = viewModelItemProxy.item.viewProperties[
             attributeName];
           if (viewModelAttribute && viewModelAttribute.inputType.type ===
@@ -657,14 +670,14 @@ export class ItemRepository {
             isMarkdownAttribute = true;
           }
         }
-        
+
         if (isMarkdownAttribute) {
           item[attributeName] = await this.convertToMarkdown(this.
             _markdownService.compile(item[attributeName]), 'text/html', {});
         }
       }
     }
-    
+
     return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void),
       reject: ((value: any) => void)) => {
       this.socketService.getSocket().emit('Item/upsert', {
@@ -686,7 +699,7 @@ export class ItemRepository {
             proxy.updateItem(response.kind, response.item);
             proxy.dirty = false;
           }
-          
+
           resolve(proxy);
         }
       });
@@ -709,7 +722,7 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   public async convertToMarkdown(content: string, contentType: string,
     parameters: any): Promise<string> {
     return (await this.sendMessageToWorker('convertToMarkdown', {
@@ -718,12 +731,12 @@ export class ItemRepository {
       parameters: parameters
     }, true)).data;
   }
-  
+
   public async getUrlContent(url: string): Promise<any> {
     return (await this.sendMessageToWorker('getUrlContent', { url: url },
       true)).data;
   }
-  
+
   public getImportPreview(file: File, parameters: any): Promise<string> {
     return new Promise<string>((resolve: (preview: string) => void, reject:
       () => void) => {
@@ -732,7 +745,7 @@ export class ItemRepository {
         resolve(await this.convertToMarkdown(fileReader.result, file.type,
           parameters));
       };
-      
+
       fileReader.readAsArrayBuffer(file);
     });
   }

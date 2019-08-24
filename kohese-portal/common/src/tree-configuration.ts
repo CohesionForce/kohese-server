@@ -1,8 +1,8 @@
 import { ItemProxy } from './item-proxy';
+import { ItemCache } from './item-cache';
 import { Subject } from 'rxjs';
 
 import * as  _ from 'underscore';
-import { TreeHashMap } from './tree-hash';
 
 
 let treeConfigMap : { [treeId:string] : TreeConfiguration } = {};
@@ -17,6 +17,8 @@ let KoheseModelDefn;
 //////////////////////////////////////////////////////////////////////////
 export class TreeConfiguration {
 
+  public static itemCache: ItemCache;
+
   public treeId;
   public proxyMap;
   public idMap;
@@ -30,8 +32,6 @@ export class TreeConfiguration {
   public lostAndFound : ItemProxy;
   public rootModelProxy;
   public rootViewModelProxy;
-
-  public static itemCache;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -87,13 +87,6 @@ export class TreeConfiguration {
     treeConfigMap[treeId] = this;
 
     return this;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  deleteConfig(){
-    delete treeConfigMap[this.treeId];
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -165,7 +158,12 @@ export class TreeConfiguration {
     return stagedTree;
   }
 
-
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  deleteConfig(){
+    delete treeConfigMap[this.treeId];
+  }
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -220,13 +218,81 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  loadingComplete(deferCalc: boolean = false) : Array<Promise<number>> {
+  loadingComplete(deferCalc: boolean = false) : Promise<any> {
+    console.log('::: Loading complete called for tree: ' + this.treeId + ' (deferCalc = ' + deferCalc + ')');
     this.loading = false;
-    let deferredCalcPromises : Array<Promise<number>> = this.calculateAllTreeHashes(deferCalc);
+    let deferredCalcPromise = this.calculateAllTreeHashes(deferCalc);
     this.changeSubject.next({
       type: 'loaded'
     });
-    return deferredCalcPromises;
+    return deferredCalcPromise;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async saveToCache() {
+    let treeRoots = this.getRepoTreeHashes();
+    console.log('::: Checking for missing cache data for: ' + this.treeId);
+    let missingCacheData = await TreeConfiguration.itemCache.detectMissingTreeRootData(treeRoots);
+    let foundMissingCacheData = false;
+    let updateIteration = 0;
+    while (missingCacheData.found  && (missingCacheData.blob || missingCacheData.tree || missingCacheData.root)) {
+      foundMissingCacheData = true;
+      updateIteration++;
+      console.log('!!! Found missing cache data for: ' + this.treeId + ' - ' + updateIteration);
+      // console.log(JSON.stringify(missingCacheData, null, '  '));
+
+      if(missingCacheData.blob){
+        for(let oid in missingCacheData.blob){
+          let missingBlobInfo = missingCacheData.blob[oid];
+
+          // console.log('%%% Trying to find missing blob oid: ' + oid);
+          let proxy = this.getProxyFor(missingBlobInfo.itemId);
+          if(proxy.oid === oid){
+            // console.log('%%% Proxy matches missing blob oid: ' + oid);
+            TreeConfiguration.itemCache.cacheBlob(oid, proxy.item);
+          } else {
+            console.log('*** Proxy does not match missing blob oid: ' + oid + ' - ' + proxy.oid);
+          }
+        }
+      }
+
+      if(missingCacheData.tree){
+        for(let treehash in missingCacheData.tree){
+          let missingTreeInfo = missingCacheData.tree[treehash];
+          // console.log('%%% Trying to find missing tree: ' + treehash);
+          let proxy = this.getProxyFor(missingTreeInfo.itemId);
+          if(proxy.treeHash === treehash){
+            // console.log('%%% Proxy matches missing tree: ' + treehash);
+            TreeConfiguration.itemCache.cacheTree(treehash, proxy.treeHashEntry);
+          } else {
+            console.log('*** Proxy does not match missing tree: ' + treehash + ' - ' + proxy.treeHash);
+          }
+        }
+      }
+
+      if(missingCacheData.root){
+        for(let rootTreehash in missingCacheData.root){
+          let missingRootInfo = missingCacheData.root[rootTreehash];
+          let itemId = missingRootInfo.rootId;
+
+          let proxy = this.getProxyFor(missingRootInfo.rootId);
+          if(proxy.treeHash === rootTreehash){
+            // console.log('%%% Proxy matches missing tree: ' + treehash);
+            TreeConfiguration.itemCache.cacheTree(rootTreehash, proxy.treeHashEntry);
+          } else {
+            console.log('*** Proxy does not match missing root tree: ' + rootTreehash + ' - ' + proxy.treeHash);
+          }
+        }
+      }
+
+      missingCacheData = await TreeConfiguration.itemCache.detectMissingTreeRootData(treeRoots);
+    }
+
+    if (foundMissingCacheData){
+      await TreeConfiguration.itemCache.saveAllPendingWrites();
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -286,9 +352,9 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   getProxyFor(id) : ItemProxy {
     // TODO Need to remove this returning of the ROOT when the string is empty
-	  if(id === '') {
-		  return this.root;
-	  }
+    if(id === '') {
+      return this.root;
+    }
     return this.proxyMap[id];
   }
 
@@ -308,7 +374,7 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateAllTreeHashes(deferCalc : boolean = false) : Array<Promise<number>>  {
+  async calculateAllTreeHashes(deferCalc : boolean = false) {
     const isRepoOnly = false;
     let treeHashCalculations : Array<Promise<number>> = [];
     if (isRepoOnly){
@@ -337,9 +403,15 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   getAllTreeHashes() {
 
+    // TODO: Remove these log statements
+
     if (!this.treehashCalculated){
       // TreeHashes have not been calculated yet
+      console.log('$$$ Treehashes have not been calculated');
       this.calculateAllTreeHashes();
+      console.log('$$$ Treehash calculation completed');
+    } else {
+      console.log('$$$ Treehashes are already calculated');
     }
 
     var proxyTreeHashes = {};

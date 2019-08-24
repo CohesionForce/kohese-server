@@ -236,21 +236,11 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received getRepoHashmap for user %s at %s', socket.id, username,
                 socket.handshake.address);
 
-    // consoleLogObject('$$$ Request', request);
-
     var repoTreeHashes = ItemProxy.getWorkingTree().getRepoTreeHashes();
-
-    // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
-
-    // var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
-
-    // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
 
     let response = {
       repoTreeHashes: repoTreeHashes
     };
-
-    // consoleLogObject('$$$ Response', response);
 
     console.log('::: Sending getRepoHashmap response');
     sendResponse(response);
@@ -526,7 +516,7 @@ function KIOItemServer(socket){
     itemAnalysis.performAnalysis(request.kind, request.id, sendResponse);
 
   });
-  
+
   socket.on('getUrlContent', async (request: any, respond: Function) => {
     try {
       let response: Response = await Fetch(request.url);
@@ -541,7 +531,7 @@ function KIOItemServer(socket){
       respond({ content: '', contentType: '' });
     }
   });
-  
+
   socket.on('convertToMarkdown', async (request: any, respond: Function) => {
     let parameterlessType: string = ((request.contentType.indexOf(';') !==
       -1) ? request.contentType.substring(0, request.contentType.indexOf(
@@ -553,40 +543,40 @@ function KIOItemServer(socket){
       if (request.parameters.forceTocStructuring) {
         parameters.push('-t');
       }
-      
+
       if (request.parameters.doNotStructure) {
         parameters.push('-u');
       }
-      
+
       if (request.parameters.matchSectionNamesLeniently) {
         parameters.push('-l');
       }
-      
+
       if (request.parameters.moveFootnotes) {
         parameters.push('-f');
       }
-      
+
       if (request.parameters.tocEntryPadding) {
         parameters.push('--toc-entry-padding=' + request.parameters.
           tocEntryPadding);
       }
-      
+
       if (!!request.parameters.tocBeginning) {
         parameters.push('--toc-begin=' + request.parameters.tocBeginning);
       }
-      
+
       if (!!request.parameters.tocEnding) {
         parameters.push('--toc-end=' + request.parameters.tocEnding);
       }
-      
+
       if (!!request.parameters.headerLines) {
         parameters.push('--header-length=' + request.parameters.headerLines);
       }
-      
+
       if (!!request.parameters.footerLines) {
         parameters.push('--footer-length=' + request.parameters.footerLines);
       }
-      
+
       let pdfConversionProcess: any = child.spawnSync('java', parameters,
         { input: request.content });
       respond(pdfConversionProcess.stdout.toString());
@@ -618,7 +608,7 @@ function KIOItemServer(socket){
               'soffice process on the server machine.');
             return;
           }
-          
+
           // Fall through to '.odt' case
         case 'application/vnd.oasis.opendocument.text':
           mediaDirectoryPath = Path.resolve(temporaryDirectoryPath,
@@ -629,22 +619,22 @@ function KIOItemServer(socket){
           mediaDirectoryPath = temporaryDirectoryPath;
           format = 'html';
       }
-      
+
       let pandocParameters: Array<string> = ['-f', format, '-t', 'commonmark',
         '--atx-headers', '-s'];
-      
+
       if (format !== 'html') {
         pandocParameters.push('--extract-media');
         pandocParameters.push(temporaryDirectoryPath);
       }
-      
+
       pandocParameters.push(temporaryFilePath);
-      
+
       let pandocProcess: any = child.spawnSync('pandoc', pandocParameters,
         undefined);
-      
+
       fs.unlinkSync(temporaryFilePath);
-      
+
       let preview: string = pandocProcess.stdout.toString();
       /*
         Regular expression information:
@@ -690,10 +680,10 @@ function KIOItemServer(socket){
             }
           }
         }
-        
+
         return replacement;
       });
-      
+
       if (fs.existsSync(mediaDirectoryPath)) {
         let directoryContents: Array<string> = fs.readdirSync(
           mediaDirectoryPath);
@@ -701,14 +691,14 @@ function KIOItemServer(socket){
           fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[
             j]));
         }
-        
+
         if (mediaDirectoryPath !== temporaryDirectoryPath) {
           fs.rmdirSync(mediaDirectoryPath);
         }
       }
-      
+
       fs.rmdirSync(temporaryDirectoryPath);
-      
+
       respond(preview);
     }
   });
@@ -1206,7 +1196,7 @@ async function embedImage(matchSource: string, match: string, pathBase:
       } else if (mediaPath.endsWith('.jpg') || mediaPath.endsWith('.jpeg')) {
         dataUrl += 'jpeg';
       }
-      
+
       dataUrl += ';base64,';
       dataUrl += fs.readFileSync(mediaPath, { encoding: 'base64' });
       replacement = matchSource.substring(0, matchSourceIndex) + dataUrl +
@@ -1215,7 +1205,7 @@ async function embedImage(matchSource: string, match: string, pathBase:
       replacement = matchSource;
     }
   }
-  
+
   return replacement;
 }
 
