@@ -1,14 +1,14 @@
 'use strict';
 import { ItemProxy } from '../common/src/item-proxy';
-import { ItemCache } from '../common/src/item-cache';
+import { ItemCache, CacheAnalysis } from '../common/src/item-cache';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
-import * as _ from 'underscore';
+import _ from 'underscore';
 // let heapdump = require ('heapdump');
 
 var kdb = require('../server/kdb.js');
 
-//Paths may be provided via arguments when starting via -kdb=PATH
+// Paths may be provided via arguments when starting via -kdb=PATH
 var baseRepoPath;
 for (var i = 2; i < process.argv.length; i++) {
   var arg = process.argv[i].split('=');
@@ -110,7 +110,8 @@ async function evaluateAllCommits() {
   let startTime = Date.now();
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
-    let missingCommitData = await itemCache.detectMissingCommitData();
+    let cacheAnalysis = new CacheAnalysis(itemCache);
+    let missingCommitData = await cacheAnalysis.detectMissingCommitData();
     printMissingCacheData(missingCommitData);
   } catch (err) {
     console.log('*** Error');
@@ -130,7 +131,8 @@ async function evaluateEachTree() {
     let treeMap = itemCache.getTrees();
 
     for (let treeId in treeMap){
-      let missingData = await itemCache.detectMissingTreeData(treeId);
+      let cacheAnalysis = new CacheAnalysis(itemCache);
+      let missingData = await cacheAnalysis.detectMissingTreeData(treeId);
       printMissingCacheData(missingData);
     }
 } catch (err) {
@@ -148,7 +150,8 @@ async function evaluateEachCommit() {
     let commitMap = itemCache.getCommits();
 
     for (let commitId of Array.from(commitMap.keys())){
-      let missingData = await itemCache.detectMissingCommitData(commitId);
+      let cacheAnalysis = new CacheAnalysis(itemCache);
+      let missingData = await cacheAnalysis.detectMissingCommitData(commitId);
       printMissingCacheData(missingData);
     }
 } catch (err) {
@@ -177,7 +180,8 @@ async function diffEachCommit() {
 async function evaluateCommit(selectedCommitId) {
   try {
     let itemCache : ItemCache = TreeConfiguration.getItemCache();
-    let missingData = await itemCache.detectMissingCommitData(selectedCommitId);
+    let cacheAnalysis = new CacheAnalysis(itemCache);
+    let missingData = await cacheAnalysis.detectMissingCommitData(selectedCommitId);
     printMissingCacheData(missingData);
 
   } catch (err) {

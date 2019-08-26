@@ -1,5 +1,5 @@
 import { ItemProxy } from './item-proxy';
-import { ItemCache } from './item-cache';
+import { ItemCache, CacheAnalysis } from './item-cache';
 import { Subject } from 'rxjs';
 
 import * as  _ from 'underscore';
@@ -234,7 +234,8 @@ export class TreeConfiguration {
   async saveToCache() {
     let treeRoots = this.getRepoTreeHashes();
     console.log('::: Checking for missing cache data for: ' + this.treeId);
-    let missingCacheData = await TreeConfiguration.itemCache.detectMissingTreeRootData(treeRoots);
+    let cachAnalysis = new CacheAnalysis(TreeConfiguration.itemCache);
+    let missingCacheData = await cachAnalysis.detectMissingTreeRootData(treeRoots);
     let foundMissingCacheData = false;
     let updateIteration = 0;
     while (missingCacheData.found  && (missingCacheData.blob || missingCacheData.tree || missingCacheData.root)) {
@@ -287,7 +288,8 @@ export class TreeConfiguration {
         }
       }
 
-      missingCacheData = await TreeConfiguration.itemCache.detectMissingTreeRootData(treeRoots);
+      let cacheAnalysis = new CacheAnalysis(TreeConfiguration.itemCache);
+      missingCacheData = await cacheAnalysis.detectMissingTreeRootData(treeRoots);
     }
 
     if (foundMissingCacheData){

@@ -8,6 +8,7 @@ import { TreeHashEntry, TreeHashMap } from '../../common/src/tree-hash';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
 import { LevelCache } from '../../common/src/level-cache';
+import { CacheAnalysis } from '../../common/src/item-cache';
 
 let socket: SocketIOClient.Socket;
 let clientMap = {};
@@ -364,8 +365,9 @@ async function sync(): Promise<void> {
     console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
 
     let treeRoots = await fetchRepoHashes();
-    console.log('^^^ Checking for missing tree root data')
-    let missingTreeRootData = await _cache.detectMissingTreeRootData(treeRoots);
+    console.log('^^^ Checking for missing tree root data');
+    let cacheAnalysis = new CacheAnalysis(_cache);
+    let missingTreeRootData = await cacheAnalysis.detectMissingTreeRootData(treeRoots);
     if (missingTreeRootData.found){
       console.log('*** Found missing cache data:');
       console.log(JSON.stringify(missingTreeRootData, null, '  '));
@@ -628,23 +630,23 @@ async function populateCache(): Promise<any> {
       let repoTreeRoots = await fetchRepoHashes();
       console.log('^^^ Checking for missing tree root data')
 
-      let missingTRData = await _cache.detectMissingTreeRootData(repoTreeRoots);
-      if (missingTRData.found){
+      let cacheAnalysis = new CacheAnalysis(_cache);
+      let missingTreeRootData = await cacheAnalysis.detectMissingTreeRootData(repoTreeRoots);
+      if (missingTreeRootData.found){
         console.log('*** Found missing tree root data:');
-        console.log(JSON.stringify(missingTRData, null, '  '));
+        console.log(JSON.stringify(missingTreeRootData, null, '  '));
       }
 
       let workingWorkspace = await _cache.getWorkspace('Working');
-      if (workingWorkspace) {
-        // TODO: check for difference
-        if (!missingTRData.found){
+      if (!missingTreeRootData.found){
+        if (workingWorkspace) {
+          // TODO: check for difference
           _cache.cacheWorkspace('Working', repoTreeRoots);
-        }
-      } else {
-        if (!missingTRData.found){
+        } else {
           _cache.cacheWorkspace('Working', repoTreeRoots);
         }
       }
+
       _cache.saveAllPendingWrites();
 
       console.log('$$$ Got tree roots');
