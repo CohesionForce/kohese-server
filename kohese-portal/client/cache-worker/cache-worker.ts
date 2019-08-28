@@ -371,11 +371,22 @@ async function sync(): Promise<void> {
     if (missingTreeRootData.found){
       console.log('*** Found missing cache data:');
       console.log(JSON.stringify(missingTreeRootData, null, '  '));
-      let headRef = await _cache.getRef('HEAD');
-      await _cache.loadProxiesForCommit(headRef, workingTree);
-      afterLoadWorking = Date.now();
-      console.log('^^^ Time to load HEAD: ' + (afterLoadWorking - afterSyncCache) / 1000);
+      let workingWorkspace = await _cache.getWorkspace('Working');
+      if (workingWorkspace){
+        console.log('^^^ Loading previous Working');
+        await _cache.loadProxiesForTreeRoots(workingWorkspace, workingTree);
+        afterLoadWorking = Date.now();
+        console.log('^^^ Time to load previous Working: ' + (afterLoadWorking - afterSyncCache) / 1000);
+      } else {
+        console.log('^^^ Loading HEAD')
+        let headRef = await _cache.getRef('HEAD');
+        await _cache.loadProxiesForCommit(headRef, workingTree);
+        afterLoadWorking = Date.now();
+        console.log('^^^ Time to load HEAD: ' + (afterLoadWorking - afterSyncCache) / 1000);
+      }
+
     } else {
+      console.log('^^^ Loading current Working')
       await _cache.loadProxiesForTreeRoots(treeRoots, workingTree);
       afterLoadWorking = Date.now();
       console.log('^^^ Time to load Working: ' + (afterLoadWorking - afterSyncCache) / 1000);

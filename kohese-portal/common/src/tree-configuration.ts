@@ -258,7 +258,7 @@ export class TreeConfiguration {
           let proxy = this.getProxyFor(missingBlobInfo.itemId);
           if(proxy.oid === oid){
             // console.log('%%% Proxy matches missing blob oid: ' + oid);
-            TreeConfiguration.itemCache.cacheBlob(oid, proxy.item);
+            TreeConfiguration.itemCache.cacheBlob(oid, JSON.parse(JSON.stringify(proxy.item)));
           } else {
             console.log('*** Proxy does not match missing blob oid: ' + oid + ' - ' + proxy.oid);
           }
@@ -272,7 +272,7 @@ export class TreeConfiguration {
           let proxy = this.getProxyFor(missingTreeInfo.itemId);
           if(proxy.treeHash === treehash){
             // console.log('%%% Proxy matches missing tree: ' + treehash);
-            TreeConfiguration.itemCache.cacheTree(treehash, proxy.treeHashEntry);
+            TreeConfiguration.itemCache.cacheTree(treehash, JSON.parse(JSON.stringify(proxy.treeHashEntry)));
           } else {
             console.log('*** Proxy does not match missing tree: ' + treehash + ' - ' + proxy.treeHash);
           }
@@ -287,7 +287,7 @@ export class TreeConfiguration {
           let proxy = this.getProxyFor(missingRootInfo.rootId);
           if(proxy.treeHash === rootTreehash){
             // console.log('%%% Proxy matches missing tree: ' + treehash);
-            TreeConfiguration.itemCache.cacheTree(rootTreehash, proxy.treeHashEntry);
+            TreeConfiguration.itemCache.cacheTree(rootTreehash, JSON.parse(JSON.stringify(proxy.treeHashEntry)));
           } else {
             console.log('*** Proxy does not match missing root tree: ' + rootTreehash + ' - ' + proxy.treeHash);
           }

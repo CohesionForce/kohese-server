@@ -562,7 +562,7 @@ export class CacheAnalysis {
         await this.evaluateTreeEntry(rootId, rootTree);
       } else {
         if (!this.rootEvaluated[root.treeHash]) {
-          console.log('*** Missing tree for root (%s) with treeHash (%s)', rootId, root.treeHash);
+          // console.log('*** Missing tree for root (%s) with treeHash (%s)', rootId, root.treeHash);
           this.missingCacheData.root[root.treeHash] = {
             rootId: rootId,
             treeHash: root.treeHash
