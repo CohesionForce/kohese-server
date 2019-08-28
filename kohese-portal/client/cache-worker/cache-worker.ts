@@ -155,7 +155,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
           }
 
-          updatesPromise = updateCache(treeHashes);
+          updatesPromise = updateWorking(treeHashes);
           if (!request.data.refresh){
             console.log('^^^ Updating _itemUpdatesPromise');
             _itemUpdatesPromise = updatesPromise;
@@ -381,7 +381,8 @@ async function sync(): Promise<void> {
       console.log('^^^ Time to load Working: ' + (afterLoadWorking - afterSyncCache) / 1000);
     }
 
-    await workingTree.calculateAllTreeHashes();
+    await workingTree.loadingComplete(false);
+
     afterCalcTreeHashes = Date.now();
   } else {
     afterLoadWorking = Date.now();
@@ -390,12 +391,10 @@ async function sync(): Promise<void> {
   console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadWorking) / 1000);
 
   // TODO: Need to deal with loss of data on refresh
-  _itemUpdatesPromise = updateCache(workingTree.getAllTreeHashes());
+  _itemUpdatesPromise = updateWorking(workingTree.getAllTreeHashes());
   await _itemUpdatesPromise;
   let afterGetAll = Date.now();
   console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
-
-  await workingTree.loadingComplete(false);
 
   // Perform an update of the cache
   await workingTree.saveToCache();
@@ -728,7 +727,7 @@ function processBulkUpdate(response: any): void {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function updateCache(treeHashes: any): Promise<any> {
+function updateWorking(treeHashes: any): Promise<any> {
   return new Promise<any>((resolve: (data: any) => void, reject:
     () => void) => {
     console.log('^^^ Requesting item update');

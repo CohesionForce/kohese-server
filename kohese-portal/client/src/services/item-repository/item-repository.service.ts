@@ -246,61 +246,21 @@ export class ItemRepository {
           await this._cache.loadProxiesForCommit(headRef, workingTree);
         }
 
-        await workingTree.calculateAllTreeHashes();
+        await workingTree.loadingComplete();
       }
 
       const treeHashes = workingTree.getAllTreeHashes();
 
+      console.log('^^^ Requesting item updates');
       const itemUpdatesResponse = await this.sendMessageToWorker(
         'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
       this.processBulkUpdate(itemUpdatesResponse.data);
 
       // Ensure status for all items is updated
+      console.log('^^^ Getting status');
       const statusResponse = await this.sendMessageToWorker(
         'getStatus', undefined, true);
       console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
-
-      const calculateTreeHashesAsynchronously: boolean = this.loadFeatureSwitch(
-        'IR-defer-calc', true);
-
-      if (!this._initialized) {
-        if (calculateTreeHashesAsynchronously) {
-
-          console.log('^^^ Calculating TreeHashes asynchronously');
-
-          // Send early notification to other components
-          this.currentTreeConfigSubject.next({
-            config: workingTree,
-            configType: TreeConfigType.DEFAULT
-          });
-
-          this._initialWorkingTreeNotificationSent = true;
-
-          this.updateRepositorySyncState(
-            RepoStates.SYNCHRONIZATION_SUCCEEDED,
-            'Item Repository Ready'
-          );
-
-          await workingTree.loadingComplete(calculateTreeHashesAsynchronously);
-
-          console.log('^^^ Completed calculating TreeHashes asynchronously');
-
-        } else {
-
-          console.log('^^^ Calculating TreeHashes synchronously');
-
-          // This call will block until complete since the TreeHash processing is not deferred
-          await workingTree.loadingComplete(false);
-
-        }
-      }
-
-      if (this._initialized){
-        console.log('^^^ Requesting re-sync');
-      } else {
-        console.log('^^^ Requesting second sync');
-        this._initialized = true;
-      }
 
       let secondItemUpdateResponse = await this.sendMessageToWorker(
         'getItemUpdates', { refresh: true, treeHashes: workingTree.getAllTreeHashes() }, true);

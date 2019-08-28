@@ -286,7 +286,7 @@ async function loadCommit(selectedCommitId) {
     let treeConfig = new TreeConfiguration(selectedCommitId);
 
     await itemCache.loadProxiesForCommit(selectedCommitId, treeConfig);
-    await treeConfig.calculateAllTreeHashes();
+    await treeConfig.loadingComplete();
 
     let savedTH = await itemCache.getTreeHashMap(selectedCommitId);
     let restoredTH = await treeConfig.getAllTreeHashes();

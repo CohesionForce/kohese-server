@@ -50,6 +50,7 @@ export class ItemCache {
   private kTreeMap  = new Map<string, KoheseTree>();
   private blobMap  = new Map<string, Blob>();
   private workspaceMap  = new Map<string, Workspace>();
+  private analysis : CacheAnalysis;
 
   private mapMap = new Map<string, Map<string, any>>();
 
@@ -58,12 +59,11 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   constructor(sublevel?) {
 
-    this.registerCacheMap('metadata', this.metadata);
-    this.registerCacheMap('ref', this.refMap);
-    this.registerCacheMap('tag', this.tagMap);
-    this.registerCacheMap('kCommit', this.kCommitMap);
-    this.registerCacheMap('kTree', this.kTreeMap);
     this.registerCacheMap('blob', this.blobMap);
+    this.registerCacheMap('kTree', this.kTreeMap);
+    this.registerCacheMap('kCommit', this.kCommitMap);
+    this.registerCacheMap('tag', this.tagMap);
+    this.registerCacheMap('ref', this.refMap);
     this.registerCacheMap('workspace', this.workspaceMap);
 
     this.metadata.set('numRefs', 0);
@@ -72,6 +72,8 @@ export class ItemCache {
     this.metadata.set('numTrees', 0);
     this.metadata.set('numBlobs', 0);
 
+    // tslint:disable-next-line: no-use-before-declare
+    this.analysis = new CacheAnalysis(this);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -560,7 +562,7 @@ export class CacheAnalysis {
         await this.evaluateTreeEntry(rootId, rootTree);
       } else {
         if (!this.rootEvaluated[root.treeHash]) {
-          // console.log('*** Missing tree for root (%s) with treeHash (%s)', rootId, root.treeHash);
+          console.log('*** Missing tree for root (%s) with treeHash (%s)', rootId, root.treeHash);
           this.missingCacheData.root[root.treeHash] = {
             rootId: rootId,
             treeHash: root.treeHash
@@ -617,27 +619,142 @@ export class CacheAnalysis {
     // earlier attributes, provide a null.  Leave all inputs empty to
     // process all commits.
 
+    this.resetMissingDataIndicators();
+
     if (selectedCommitId !== null) {
-      let kCommitMap = this.cache.getCommits();
-      for (let [commitId, commit] of Array.from(kCommitMap.entries())) {
-        if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
-          await this.evaluateCommit(commitId, commit);
-        }
-      };
     } else if (selectedTreeRoots !== null) {
-      await this.evaluateTreeRoots(selectedTreeRoots);
     } else {
 
-      let kTreeMap = this.cache.getTrees();
-      for (let treeId in kTreeMap) {
-        if (!selectedTreeId || (selectedTreeId && (treeId === selectedTreeId))){
-          let tree = kTreeMap.get(treeId);
-
-          await this.evaluateTreeEntry(treeId, tree);
-        }
-      };
     }
 
+    return this.getMissingData();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async detectMissingCommitData(selectedCommitId?) {
+    let kCommitMap = this.cache.getCommits();
+    for (let [commitId, commit] of Array.from(kCommitMap.entries())) {
+      if (!selectedCommitId || (selectedCommitId && (commitId === selectedCommitId))){
+        await this.evaluateCommit(commitId, commit);
+      }
+    };
+
+    return this.getMissingData();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async detectMissingTreeRootData(selectedTreeRoots) {
+    await this.evaluateTreeRoots(selectedTreeRoots);
+    return this.getMissingData();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async detectMissingTreeData(selectedTreeId?) {
+    let kTreeMap = this.cache.getTrees();
+    for (let treeId in kTreeMap) {
+      if (!selectedTreeId || (selectedTreeId && (treeId === selectedTreeId))){
+        let tree = kTreeMap.get(treeId);
+
+        await this.evaluateTreeEntry(treeId, tree);
+      }
+    };
+    return this.getMissingData();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async detectAllMissingData(){
+    await this.detectMissingTreeData();
+    await this.detectMissingCommitData();
+    return this.getMissingData();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private resetMissingDataIndicators() {
+    this.missingCacheData.found = false;
+
+    // Clean out progress indicators
+    for(let oid in this.missingCacheData.blob){
+      delete this.blobEvaluated[oid];
+      delete this.missingCacheData.blob[oid];
+    }
+
+    for(let treehash in this.missingCacheData.tree){
+      delete this.treeEvaluated[treehash];
+      delete this.missingCacheData.tree[treehash];
+    }
+
+    for(let rootTreehash in this.missingCacheData.root){
+      delete this.rootEvaluated[rootTreehash];
+      delete this.missingCacheData[rootTreehash];
+    }
+
+    // TODO: Need to clean missing commits
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async reevaluateMissingData() {
+    console.log('%%% Reevaluate missing cache data');
+    let missingCacheData = JSON.parse(JSON.stringify(this.missingCacheData));
+
+    this.resetMissingDataIndicators();
+
+    // Begin re-evaluation
+    for(let oid in missingCacheData.blob){
+      let blobInfo = missingCacheData.blob[oid];
+      // console.log('%%% Reevaluate blob: ' + oid);
+      await this.evaluateBlob(blobInfo.itemId, blobInfo.kind, blobInfo.oid);
+    }
+
+    for(let treehash in missingCacheData.tree){
+      let treeInfo = missingCacheData.tree[treehash];
+      let tree = await this.cache.getTree(treehash);
+      if (tree){
+        // console.log('%%% Reevaluate tree: ' + treehash);
+        await this.evaluateTreeEntry(treeInfo.itemId, tree);
+      } else {
+        // Tree is still missing
+        console.log('%%% Tree still missing: ' + treehash);
+        this.missingCacheData.tree[treehash] = treeInfo;
+        this.missingCacheData.found = true;
+      }
+    }
+
+    for(let rootTreehash in missingCacheData.root){
+      let rootInfo = missingCacheData.root[rootTreehash];
+      let root = await this.cache.getTree(rootTreehash);
+      if (root){
+        // console.log('%%% Reevaluate root: ' + rootTreehash);
+        await this.evaluateRoot(rootInfo.rootId, root);
+      } else {
+        // Root is still missing
+        console.log('%%% Root is still missing: ' + rootTreehash);
+        this.missingCacheData.root[rootTreehash] = rootInfo;
+        this.missingCacheData.found = true;
+      }
+    }
+
+    // TODO: Need to re-evaluate missing commits
+
+    return this.getMissingData();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  getMissingData() {
     let missingData = JSON.parse(JSON.stringify(this.missingCacheData));
     // Delete unneessary result categories
     if (Object.keys(missingData.blob).length === 0) {
@@ -657,26 +774,5 @@ export class CacheAnalysis {
     }
 
     return missingData;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  async detectMissingCommitData(selectedCommitId?) {
-    return await this.detectMissingCacheData(selectedCommitId);
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  async detectMissingTreeRootData(selectedTreeRoots) {
-    return await this.detectMissingCacheData(null, selectedTreeRoots);
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  async detectMissingTreeData(selectedTreeId?) {
-    return await this.detectMissingCacheData(null, null, selectedTreeId);
   }
 }

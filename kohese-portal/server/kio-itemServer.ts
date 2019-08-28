@@ -228,7 +228,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getRepoHashmap', function(request, sendResponse){
+  socket.on('Item/getRepoHashmap', async function(request, sendResponse){
     var username = 'Unknown';
     if (socket.koheseUser){
       username = socket.koheseUser.username;
@@ -236,7 +236,9 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received getRepoHashmap for user %s at %s', socket.id, username,
                 socket.handshake.address);
 
-    var repoTreeHashes = ItemProxy.getWorkingTree().getRepoTreeHashes();
+    let working : TreeConfiguration = ItemProxy.getWorkingTree();
+    await working.saveToCache();
+    var repoTreeHashes = working.getRepoTreeHashes();
 
     let response = {
       repoTreeHashes: repoTreeHashes

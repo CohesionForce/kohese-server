@@ -99,7 +99,7 @@ export class ItemProxy {
 
     ItemProxy.validateItemContent(kind, forItem, treeConfig);
 
-    let proxy = treeConfig.proxyMap[itemId];
+    let proxy : ItemProxy = treeConfig.proxyMap[itemId];
 
     if (!proxy) {
     //  console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);

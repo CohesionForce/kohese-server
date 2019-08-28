@@ -33,6 +33,8 @@ export class TreeConfiguration {
   public rootModelProxy;
   public rootViewModelProxy;
 
+  private cacheAnalysis;
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -234,14 +236,18 @@ export class TreeConfiguration {
   async saveToCache() {
     let treeRoots = this.getRepoTreeHashes();
     console.log('::: Checking for missing cache data for: ' + this.treeId);
-    let cachAnalysis = new CacheAnalysis(TreeConfiguration.itemCache);
-    let missingCacheData = await cachAnalysis.detectMissingTreeRootData(treeRoots);
+    let before = Date.now();
+    if (!this.cacheAnalysis) {
+      this.cacheAnalysis = new CacheAnalysis(TreeConfiguration.itemCache);
+    }
+    let missingCacheData = await this.cacheAnalysis.detectMissingTreeRootData(treeRoots);
+    let after = Date.now();
     let foundMissingCacheData = false;
     let updateIteration = 0;
     while (missingCacheData.found  && (missingCacheData.blob || missingCacheData.tree || missingCacheData.root)) {
       foundMissingCacheData = true;
       updateIteration++;
-      console.log('!!! Found missing cache data for: ' + this.treeId + ' - ' + updateIteration);
+      console.log('!!! Found missing cache data for: ' + this.treeId + ' - ' + updateIteration + ' - ' + (after-before)/1000);
       // console.log(JSON.stringify(missingCacheData, null, '  '));
 
       if(missingCacheData.blob){
@@ -288,13 +294,14 @@ export class TreeConfiguration {
         }
       }
 
-      let cacheAnalysis = new CacheAnalysis(TreeConfiguration.itemCache);
-      missingCacheData = await cacheAnalysis.detectMissingTreeRootData(treeRoots);
+      missingCacheData = await this.cacheAnalysis.reevaluateMissingData();
+      after = Date.now();
     }
 
     if (foundMissingCacheData){
       await TreeConfiguration.itemCache.saveAllPendingWrites();
     }
+    console.log('::: Total time to check and save cache updates: ' + (after-before)/1000)
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -376,7 +383,8 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async calculateAllTreeHashes(deferCalc : boolean = false) {
+  private async calculateAllTreeHashes(deferCalc : boolean = false) {
+    console.log('$$$ Beginning calculation of treehashes')
     const isRepoOnly = false;
     let treeHashCalculations : Array<Promise<number>> = [];
     if (isRepoOnly){
