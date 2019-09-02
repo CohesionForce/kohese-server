@@ -18,5 +18,5 @@ for(var modelDefIdx in modelDefFileList){
   modelDef[modelDefDoc.name]=modelDefDoc;
 }
 
-//console.log('::: modelDef');
-//console.log(JSON.stringify(modelDef, null, '  '));
+// console.log('::: modelDef');
+// console.log(JSON.stringify(modelDef, null, '  '));

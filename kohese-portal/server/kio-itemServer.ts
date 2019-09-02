@@ -47,25 +47,25 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
       case 'update':
         kdb.storeModelInstance(change.proxy, change.type === 'create')
         .then(function (status) {
-          var notification = {
+          let createNotification = {
               type: change.type,
               kind: change.kind,
               id: change.proxy.item.id,
               item: change.proxy.item,
               status: status
           };
-          kio.server.emit('Item/' + change.type, notification);
+          kio.server.emit('Item/' + change.type, createNotification);
         });
         break;
       case 'delete':
-        var notification = {
+        let deleteNotification = {
           type: change.type,
           kind: change.kind,
           id: change.proxy.item.id,
           recursive: change.recursive
         };
         kdb.removeModelInstance(change.proxy);
-        kio.server.emit('Item/' + change.type, notification);
+        kio.server.emit('Item/' + change.type, deleteNotification);
         break;
       case 'loading':
       case 'loaded':
@@ -677,6 +677,7 @@ function KIOItemServer(socket){
           }
 
           // Fall through to '.odt' case
+          // tslint:disable-next-line:no-switch-case-fall-through
         case 'application/vnd.oasis.opendocument.text':
           mediaDirectoryPath = Path.resolve(temporaryDirectoryPath,
             'Pictures');
@@ -1076,10 +1077,10 @@ function KIOItemServer(socket){
     var idsArray = Array.from(request.proxyIds);
     var pendingEvaluationPromises = [];
 
-    for (var i = 0; i < idsArray.length; i++) {
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
-      var repositoryInformation = getRepositoryInformation(proxy);
-      var repositoryId = repositoryInformation.repositoryProxy.item.id;
+    for (let i = 0; i < idsArray.length; i++) {
+      let proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
+      let repositoryInformation = getRepositoryInformation(proxy);
+      let repositoryId = repositoryInformation.repositoryProxy.item.id;
 
       // jshint -W083
       // eslint-disable-next-line no-unused-vars
@@ -1122,15 +1123,15 @@ function KIOItemServer(socket){
     // Wait for any pending unstage requests to complete
     Promise.all(pendingEvaluationPromises).then(function(statusArray){
       // Determine if items need to be checked out or deleted
-      for (var i = 0; i < idsArray.length; i++) {
-        var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
-        var repositoryInformation = getRepositoryInformation(proxy);
+      for (let i = 0; i < idsArray.length; i++) {
+        let proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
+        let repositoryInformation = getRepositoryInformation(proxy);
         let repositoryId = repositoryInformation.repositoryProxy.item.id;
         var status = statusArray[i];
 
         var isNewUnstagedFile = false;
 
-        for (var j = 0; j < status.length; j++) {
+        for (let j = 0; j < status.length; j++) {
           if (status[j].endsWith('WT_NEW')) {
             isNewUnstagedFile = true;
             break;
@@ -1159,8 +1160,8 @@ function KIOItemServer(socket){
       Promise.all(pendingCheckoutProxies)
       .then(function () {
         // Update content based on reverted files
-        for (var j = 0; j < proxies.length; j++) {
-          var proxy = proxies[j];
+        for (let j = 0; j < proxies.length; j++) {
+          let proxy = proxies[j];
           var item = kdbFS.loadJSONDoc(proxy.repoPath);
           if (proxy.kind === 'Repository') {
             item.parentId = proxy.item.parentId;

@@ -6,11 +6,11 @@ import { MarkdownService } from 'ngx-markdown';
 
 import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from '../user/current-user.service';
-import { ToastrService } from "ngx-toastr";
+import { ToastrService } from 'ngx-toastr';
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
-import { TreeConfiguration } from  '../../../../common/src/tree-configuration';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
 import { ItemProxy } from '../../../../common/src/item-proxy';

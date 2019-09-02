@@ -7,7 +7,7 @@ import * as SubLevelDown_Import from 'subleveldown';
 // Adjust for the differences in CommonJS and ES6
 //
 let LevelUp;
-if (typeof(LevelUp_Import) === "object") {
+if (typeof(LevelUp_Import) === 'object') {
   LevelUp = (<any>LevelUp_Import).default;
 } else {
   LevelUp = LevelUp_Import;
@@ -17,7 +17,7 @@ if (typeof(LevelUp_Import) === "object") {
 // Adjust for the differences in CommonJS and ES6
 //
 let SubLevelDown;
-if (typeof(SubLevelDown_Import) === "object") {
+if (typeof(SubLevelDown_Import) === 'object') {
   SubLevelDown = (<any>SubLevelDown_Import).default;
 } else {
   SubLevelDown = SubLevelDown_Import;
@@ -36,13 +36,13 @@ type GetMapMethod = (this : ItemCache) => Map<string, any>;
 type SetValueMethod = (this : ItemCache, key:string, value: any) => void;
 type GetValueMethod = (this : ItemCache, key:string) => Promise<any>;
 
-type SublevelRegistration = {
+interface SublevelRegistration {
   sublevelName : string,
   sublevel : any,
   getMapMethod : GetMapMethod,
   setValueMethod: SetValueMethod,
   getValueMethod: GetValueMethod
-};
+}
 
 export class LevelCache extends ItemCache {
 
@@ -152,9 +152,9 @@ export class LevelCache extends ItemCache {
 
       let result = new Promise((resolve) => {
 
-        levelPromise.then((value) => {
-          registration.setValueMethod.call(this, key, value);
-          resolve(value);
+        levelPromise.then((dbValue) => {
+          registration.setValueMethod.call(this, key, dbValue);
+          resolve(dbValue);
         }).catch((err) => {
           resolve(undefined);
         });

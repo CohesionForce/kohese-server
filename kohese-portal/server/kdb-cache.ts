@@ -18,7 +18,7 @@ import * as LevelDown_Import from 'leveldown';
 // Adjust for the differences in CommonJS and ES6
 //
 let LevelDown;
-if (typeof(LevelDown_Import) === "object") {
+if (typeof(LevelDown_Import) === 'object') {
   LevelDown = (<any>LevelDown_Import).default;
 } else {
   LevelDown = LevelDown_Import;
@@ -222,7 +222,7 @@ export class KDBCache extends LevelCache {
     try {
       headRef = kdbFS.loadJSONDoc(this.refsDirectory + '/' + 'HEAD.json');
     } catch (err) {
-      headRef = "INVALID";
+      headRef = 'INVALID';
     }
 
     let headCommit = await this.getRef('HEAD');
@@ -430,8 +430,8 @@ export class KDBCache extends LevelCache {
     var beforeTime = Date.now();
 
     await this.loadCachedObjects();
-    var afterTime = Date.now();
-    var deltaLoadTime = afterTime-beforeTime;
+    var afterLoadCache = Date.now();
+    var deltaLoadTime = afterLoadCache-beforeTime;
     console.log('::: Load time for cached objects in ' + this.repoPath + ': ' + deltaLoadTime/1000);
 
     beforeTime = Date.now();
@@ -465,7 +465,7 @@ export class KDBCache extends LevelCache {
           }
 
           let afterTime = Date.now();
-          var deltaUpdateTime = afterTime-beforeTime;
+          var deltaUpdateTime = afterTime-afterLoadCache;
           console.log('::: Update time for cached objects in ' + kdbCache.repoPath + ': ' + deltaUpdateTime/1000);
         });
       });
@@ -575,7 +575,7 @@ export class KDBCache extends LevelCache {
       console.log('*** Error retreiving blob from underlying repo: ' + oid);
       console.log(err.stack);
       await kdbCache.addCachedObject('blob', oid, {
-        error: "Can Not Retrieve Item From Underlying Repo",
+        error: 'Can Not Retrieve Item From Underlying Repo',
         oid: oid
       });
       return Promise.resolve(oid);
@@ -702,7 +702,7 @@ export class KDBCache extends LevelCache {
 
     for(var repoFile in repoDir){
 
-      //TODO:  Need to convert to jsonMountExt and merge the contents
+      // TODO: Need to convert to jsonMountExt and merge the contents
 
       if (!jsonExt.test(repoFile)){
         console.log('>>> Skipping repo file ' + repoFile);

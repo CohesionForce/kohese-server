@@ -14,7 +14,7 @@ import { VersionStatus } from './version-status';
 // Adjust for the differences in CommonJS and ES6 for jssha
 //
 let jsSHA;
-if (typeof(jsSHA_Import) === "object") {
+if (typeof(jsSHA_Import) === 'object') {
   jsSHA = (<any>jsSHA_Import).default;
 } else {
   jsSHA = jsSHA_Import;
@@ -22,7 +22,7 @@ if (typeof(jsSHA_Import) === "object") {
 
 // Adjust for the differences in CommonJS and ES6 for uuid
 let uuidV1;
-if (typeof(uuidV1_Import) === "object") {
+if (typeof(uuidV1_Import) === 'object') {
   uuidV1 = uuidV1_Import.default;
 } else {
   uuidV1 = uuidV1_Import;
@@ -539,7 +539,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  removeReference(toProxy, forProperty, isSingle){
+  removeReference(toProxy, forProperty, isSingle) {
     // Remove reference to the referencing proxy
     if (!this.relations.references[this.kind]){
       this.relations.references[this.kind] = {};
@@ -555,10 +555,10 @@ export class ItemProxy {
         this.relations.references[this.kind][forProperty] = [];
       }
 
-      let proxyIdx = this.relations.references[this.kind][forProperty].indexOf(toProxy);
-      if (proxyIdx > -1){
+      let proxyArrayIdx = this.relations.references[this.kind][forProperty].indexOf(toProxy);
+      if (proxyArrayIdx > -1){
         // console.log('%%% Removing reference from array for ' + toProxy.item.id);
-        this.relations.references[this.kind][forProperty].splice(proxyIdx, 1);
+        this.relations.references[this.kind][forProperty].splice(proxyArrayIdx, 1);
       }
     }
 
@@ -811,6 +811,8 @@ export class ItemProxy {
         // console.log('$$$ Beginning TreeHash calculation at: ' + iterationCount);
         let proxy : ItemProxy;
         let thisIteration;
+
+        // tslint:disable-next-line: no-use-before-declare
         while (thisIteration = iterator.next()){
           iterationCount++;
           if (thisIteration.done){
@@ -1047,8 +1049,8 @@ export class ItemProxy {
           yield proxy;
         }
 
-        for ( var childIdx in proxy.children) {
-          var childProxy = proxy.children[childIdx];
+        for (let childIdx in proxy.children) {
+          let childProxy = proxy.children[childIdx];
           yield* visitChild(childProxy);
         }
 
@@ -1063,8 +1065,8 @@ export class ItemProxy {
       yield this;
     }
 
-    for ( var childIdx in this.children) {
-      var childProxy = this.children[childIdx];
+    for (let childIdx in this.children) {
+      let childProxy = this.children[childIdx];
       yield* visitChild(childProxy);
     }
 
@@ -1077,7 +1079,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  dumpProxy(indent : string = undefined) {
+  dumpProxy(indent? : string) {
     var thisIndent = '';
     var childIndent = '|-';
     if (indent) {
@@ -1284,24 +1286,24 @@ export class ItemProxy {
     let orderBeforeSort = this.getOrderedChildIds();
     if (!this.item.itemIds || this.item.itemIds.length === 0){
       this.children.sort(function(a, b){
-        if (a.item.name > b.item.name) return 1;
-        if (a.item.name < b.item.name) return -1;
+        if (a.item.name > b.item.name) { return 1; }
+        if (a.item.name < b.item.name) { return -1; }
         if (a.item.name === b.item.name) {
-          if (a.item.id > b.item.id) return 1;
-          if (a.item.id < b.item.id) return -1;
+          if (a.item.id > b.item.id) { return 1; }
+          if (a.item.id < b.item.id) { return -1; }
         }
         return 0;
       });
     } else {
-    	// Sort by itemIds list if it is present
-    	var itemIds = this.item.itemIds;
+      // Sort by itemIds list if it is present
+      var itemIds = this.item.itemIds;
 
-    	this.children.sort(function(a, b){
-    		var aIndex = itemIds.indexOf(a.item.id);
-    		var bIndex = itemIds.indexOf(b.item.id);
-    		if (aIndex < 0) {
+      this.children.sort(function(a, b) {
+        var aIndex = itemIds.indexOf(a.item.id);
+        var bIndex = itemIds.indexOf(b.item.id);
+        if (aIndex < 0) {
           aIndex = itemIds.length;
-    		}
+        }
         if (bIndex < 0) {
           bIndex = itemIds.length;
           // Detect when both items are not in the list
@@ -1312,14 +1314,14 @@ export class ItemProxy {
               bIndex++;
             } else {
               // Names are the same, so sort on the id
-              if (a.item.id > b.item.id) aIndex++;
-              if (a.item.id < b.item.id) bIndex++;
+              if (a.item.id > b.item.id) { aIndex++; }
+              if (a.item.id < b.item.id) { bIndex++; }
             }
           }
         }
 
-        if (aIndex > bIndex) return 1;
-        if (aIndex < bIndex) return -1;
+        if (aIndex > bIndex) { return 1; }
+        if (aIndex < bIndex) { return -1; }
         return 0;
       });
     }
