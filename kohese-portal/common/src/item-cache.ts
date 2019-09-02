@@ -7,6 +7,7 @@
 import * as   _ from 'underscore';
 import { ItemProxy } from './item-proxy';
 import { TreeHashEntry, TreeHashMap, TreeHashValueType } from './tree-hash';
+import { TreeConfiguration } from './tree-configuration';
 
 
 // TODO set back to false and/or remove disable check below
@@ -50,7 +51,7 @@ export class ItemCache {
   private kTreeMap  = new Map<string, KoheseTree>();
   private blobMap  = new Map<string, Blob>();
   private workspaceMap  = new Map<string, Workspace>();
-  private analysis : CacheAnalysis;
+  public analysis : CacheAnalysis;
 
   private mapMap = new Map<string, Map<string, any>>();
 
@@ -409,7 +410,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async loadProxiesForCommit(commitId, treeConfig){
+  async loadProxiesForCommit(commitId, treeConfig:TreeConfiguration){
     let commit = await this.getCommit(commitId);
 
     console.log('$$$ Loading tree config: ' + treeConfig.treeId);
@@ -422,7 +423,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async loadProxiesForTreeRoots(repoTreeRoots:Array<TreeHashEntry>, treeConfig){
+  async loadProxiesForTreeRoots(repoTreeRoots:Workspace, treeConfig:TreeConfiguration){
 
     for(let repoId in repoTreeRoots){
       let repoTreeHashEntry = repoTreeRoots[repoId];
@@ -436,7 +437,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  private async loadProxiesForTree(treeId, treeHashEntry, treeConfig){
+  private async loadProxiesForTree(treeId, treeHashEntry, treeConfig:TreeConfiguration){
     // console.log('$$$ Processing tree: ' + treeId);
     // console.log(treeHashEntry);
     let kind = treeHashEntry.kind;
@@ -484,12 +485,13 @@ export class CacheAnalysis {
   private treeEvaluated = {};
   private rootEvaluated = {};
   private commitParentEvaluated = {};
+  private commitEvaluated = {};
   private missingCacheData = {
     found: false,
     blob: {},
     tree: {},
     root: {},
-    commit: []
+    commit: {}
   };
 
   //////////////////////////////////////////////////////////////////////////
@@ -600,34 +602,15 @@ export class CacheAnalysis {
         let parentCommit = await this.cache.getCommit(parentCommitId);
         if (!parentCommit) {
           // console.log('*** Missing commit: ' + parentCommitId);
-          this.missingCacheData.commit.push(parentCommitId);
+          this.missingCacheData.commit[parentCommitId] = {
+            commitId: parentCommitId
+          };
           this.missingCacheData.found = true;
         }
         this.commitParentEvaluated[parentCommitId] = true;
       }
     }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  async detectMissingCacheData(selectedCommitId?, selectedTreeRoots?, selectedTreeId?) {
-
-    // The following logic will evaluate one of the provided inputs.
-    // If there are multiple inputs provided, the will be processed
-    // in the following precedence: Commit, Tree, Root.  To skip the
-    // earlier attributes, provide a null.  Leave all inputs empty to
-    // process all commits.
-
-    this.resetMissingDataIndicators();
-
-    if (selectedCommitId !== null) {
-    } else if (selectedTreeRoots !== null) {
-    } else {
-
-    }
-
-    return this.getMissingData();
+    this.commitEvaluated[commitId] = true;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -695,10 +678,13 @@ export class CacheAnalysis {
 
     for(let rootTreehash in this.missingCacheData.root){
       delete this.rootEvaluated[rootTreehash];
-      delete this.missingCacheData[rootTreehash];
+      delete this.missingCacheData.root[rootTreehash];
     }
 
-    // TODO: Need to clean missing commits
+    for(let commitId in this.missingCacheData.commit){
+      delete this.commitEvaluated[commitId];
+      delete this.missingCacheData.commit[commitId];
+    }
 
   }
 
@@ -746,7 +732,20 @@ export class CacheAnalysis {
       }
     }
 
-    // TODO: Need to re-evaluate missing commits
+    for(let commitId in missingCacheData.commit){
+      let commitInfo = missingCacheData.commit[commitId];
+      let commit = await this.cache.getCommit(commitId);
+      if (commit){
+        // console.log('%%% Reevaluate commit: ' + commitId);
+        await this.evaluateCommit(commitInfo.commitId, commit);
+      } else {
+        // Root is still missing
+        console.log('%%% Commit is still missing: ' + commitId);
+        this.missingCacheData.commit[commitId] = commitInfo;
+        this.missingCacheData.found = true;
+      }
+    }
+
 
     return this.getMissingData();
   }

@@ -228,6 +228,71 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  socket.on('Item/getMissingCacheInfo', async function(request, sendResponse){
+
+    let username = 'Unknown';
+    let requestReceiptTime = Date.now();
+    if (socket.koheseUser){
+      username = socket.koheseUser.username;
+    }
+    console.log('::: session %s: Received getMissingCacheInfo for user %s at %s', socket.id, username,
+                socket.handshake.address);
+
+    consoleLogObject('$$$ Request', request);
+
+    let itemCache = TreeConfiguration.getItemCache();
+    let missingCacheData = request.missingCacheData;
+    let cacheData : any = {};
+
+    // Retrieve missing data
+    if(missingCacheData.blob){
+      cacheData.blob = {};
+      for(let oid in missingCacheData.blob){
+        let blob = await itemCache.getBlob(oid);
+        cacheData.blob[oid] = blob;
+      }
+    }
+
+    if(missingCacheData.tree){
+      cacheData.tree = {};
+      for(let treehash in missingCacheData.tree){
+        let tree = await itemCache.getTree(treehash);
+        cacheData.tree[treehash] = tree;
+      }
+    }
+
+    if(missingCacheData.root){
+      cacheData.root = {};
+      for(let rootTreehash in missingCacheData.root){
+        let root = await itemCache.getTree(rootTreehash);
+        cacheData.root[rootTreehash] = root;
+      }
+    }
+
+    if(missingCacheData.commit){
+      cacheData.commit = {};
+      for(let commitId in missingCacheData.commit){
+        let commit = await itemCache.getCommit(commitId);
+        cacheData.commit[commitId] = commit;
+      }
+    }
+
+    let response = {
+      timestamp: {
+        requestTime: request.timestamp.requestTime,
+        requestReceiptTime: requestReceiptTime,
+        responseTransmitTime: Date.now()
+      },
+      cacheData: cacheData
+    };
+
+    console.log('::: Sending getMissingCacheInfo response');
+    sendResponse(response);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getRepoHashmap', async function(request, sendResponse){
     var username = 'Unknown';
     if (socket.koheseUser){

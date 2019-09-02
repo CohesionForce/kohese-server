@@ -365,9 +365,11 @@ async function sync(): Promise<void> {
     console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
 
     let treeRoots = await fetchRepoHashes();
+
+    ItemProxy.displayCalcCounts();
+
     console.log('^^^ Checking for missing tree root data');
-    let cacheAnalysis = new CacheAnalysis(_cache);
-    let missingTreeRootData = await cacheAnalysis.detectMissingTreeRootData(treeRoots);
+    let missingTreeRootData = await _cache.analysis.detectMissingTreeRootData(treeRoots);
     if (missingTreeRootData.found){
       console.log('*** Found missing cache data:');
       console.log(JSON.stringify(missingTreeRootData, null, '  '));
@@ -392,7 +394,11 @@ async function sync(): Promise<void> {
       console.log('^^^ Time to load Working: ' + (afterLoadWorking - afterSyncCache) / 1000);
     }
 
+    ItemProxy.displayCalcCounts();
+
     await workingTree.loadingComplete(false);
+
+    ItemProxy.displayCalcCounts();
 
     afterCalcTreeHashes = Date.now();
   } else {
@@ -410,12 +416,15 @@ async function sync(): Promise<void> {
   // Perform an update of the cache
   await workingTree.saveToCache();
 
-  let afterLoading = Date.now();
-  console.log('^^^ Time to complete loading: ' + (afterLoading - afterGetAll) / 1000);
-  console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
+  let afterSaveToCache = Date.now();
+  console.log('^^^ Time to save working to cache: ' + (afterSaveToCache - afterGetAll) / 1000);
 
   // TODO: Need to handle refresh
   await getStatus();
+  let afterGetStatus = Date.now();
+  console.log('^^^ Time to get status: ' + (afterGetStatus - afterSaveToCache) / 1000);
+  console.log('^^^ Total time to sync: ' + (afterGetStatus - beforeSync) / 1000);
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -589,6 +598,71 @@ function synchronizeModels(): Promise<any> {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+async function fetchMissingCacheInformation(missingCacheData){
+  const requestTime = Date.now();
+  let promise = new Promise<any>((resolve: () => void, reject:
+  () => void) => {
+    socket.emit('Item/getMissingCacheInfo', {
+      timestamp: {
+        requestTime: requestTime
+      },
+      missingCacheData: missingCacheData
+    }, async (response) => {
+      const responseReceiptTime = Date.now();
+      const timestamp = response.timestamp;
+      timestamp.responseReceiptTime = responseReceiptTime;
+      console.log('::: Response for getMissingCacheInfo');
+      // tslint:disable-next-line:forin
+      for (const tsKey in timestamp) {
+        console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey] - requestTime));
+      }
+
+      let cacheData = response.cacheData;
+
+      console.log('$$$ Fetched missing cache info');
+      if(cacheData.blob){
+        for(let oid in cacheData.blob){
+          console.log('^^^ Fetched missing blob: ' + oid);
+          let blob = cacheData.blob[oid];
+          _cache.cacheBlob(oid, blob);
+        }
+      }
+
+      if(cacheData.tree){
+        for(let treehash in cacheData.tree){
+          console.log('^^^ Fetched missing tree: ' + treehash);
+          let tree = cacheData.tree[treehash];
+          _cache.cacheTree(treehash, tree);
+        }
+      }
+
+      if(cacheData.root){
+        for(let rootTreehash in cacheData.root){
+          console.log('^^^ Fetched missing root: ' + rootTreehash);
+          let root = cacheData.root[rootTreehash];
+          _cache.cacheTree(rootTreehash, root);
+        }
+      }
+
+      if(cacheData.commit){
+        for(let commitId in cacheData.commit){
+          console.log('^^^ Fetched missing commit: ' + commitId);
+          let commit = cacheData.commit[commitId];
+          _cache.cacheCommit(commitId, commit);
+        }
+      }
+
+      await _cache.saveAllPendingWrites();
+      resolve();
+    });
+  });
+
+  await promise;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 async function populateCache(): Promise<any> {
   console.log('$$$ Get Item Cache');
 
@@ -636,23 +710,37 @@ async function populateCache(): Promise<any> {
       console.log('$$$ Calling fetchItemCache incremental');
       await fetchItemCache();
 
+      console.log('^^^ Checking for missing cache data');
+      let missingCacheData = await _cache.analysis.detectAllMissingData();
+
+      while (missingCacheData.found){
+        console.log('*** Found missing cache data:');
+        console.log(JSON.stringify(missingCacheData, null, '  '));
+        await fetchMissingCacheInformation(missingCacheData);
+        missingCacheData = await _cache.analysis.reevaluateMissingData();
+      }
+
       console.log('$$$ Getting tree roots');
       let repoTreeRoots = await fetchRepoHashes();
-      console.log('^^^ Checking for missing tree root data')
 
-      let cacheAnalysis = new CacheAnalysis(_cache);
-      let missingTreeRootData = await cacheAnalysis.detectMissingTreeRootData(repoTreeRoots);
-      if (missingTreeRootData.found){
+      console.log('^^^ Checking for missing tree root data')
+      let missingTreeRootData = await _cache.analysis.detectMissingTreeRootData(repoTreeRoots);
+
+      while (missingTreeRootData.found){
         console.log('*** Found missing tree root data:');
         console.log(JSON.stringify(missingTreeRootData, null, '  '));
+        await fetchMissingCacheInformation(missingTreeRootData);
+        missingTreeRootData = await _cache.analysis.reevaluateMissingData();
       }
 
       let workingWorkspace = await _cache.getWorkspace('Working');
       if (!missingTreeRootData.found){
         if (workingWorkspace) {
           // TODO: check for difference
+
           _cache.cacheWorkspace('Working', repoTreeRoots);
         } else {
+          // Store the workspace
           _cache.cacheWorkspace('Working', repoTreeRoots);
         }
       }

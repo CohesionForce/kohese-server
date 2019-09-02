@@ -2,7 +2,7 @@
  *
  */
 
-'use strict'; //Required for use of 'class'
+'use strict'; // Required for use of 'class'
 import * as  _ from 'underscore';
 import * as jsSHA_Import from 'jssha';
 import * as uuidV1_Import from 'uuid/v1';
@@ -38,6 +38,10 @@ class RelationIdMap {
 //////////////////////////////////////////////////////////////////////////
 
 export class ItemProxy {
+
+  public static oidCalcCount = 0;
+  public static theCalcCount = 0;
+  // private static shaObj = new jsSHA('SHA-1', 'TEXT');
 
   public model;
   public state;
@@ -207,6 +211,84 @@ export class ItemProxy {
     }
 
     return proxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static validateItemContent (kind, forItem, treeConfig) {
+    let validation = {
+      valid : true
+    };
+
+    if (TreeConfiguration.koheseModelDefn) {
+      let modelProxy = TreeConfiguration.koheseModelDefn.getModelProxyFor(kind);
+      if(modelProxy && (modelProxy.kind === 'KoheseModel')){
+        // if (modelProxy.constructor.name !== 'KoheseModel'){
+        //   modelProxy.dumpProxy();
+        //   throw({
+        //     error: 'Class Mismatch',
+        //     expected: 'KoheseModel',
+        //     found: modelProxy.constructor.name
+        //   });
+        // }
+        validation = modelProxy.validateItemContent(forItem);
+
+        if (!validation.valid){
+          // TODO Need to remove this bypass logic which is needed to load some existing data
+          if(treeConfig.loading){
+            console.log('*** Error: Invalid data item');
+            console.log('Kind: ' + kind);
+            console.log(forItem);
+            console.log(validation);
+          } else {
+            throw ({
+              error: 'Not-Valid',
+              validation: validation,
+              item: forItem
+            });
+
+          }
+        }
+      }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getWorkingTree() : TreeConfiguration {
+    // TODO remove all references
+    return TreeConfiguration.getWorkingTree();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static gitDocumentOID(forDoc) {
+
+    // This function calculates a OID that is equivalaent to the one calculated
+    // natively by git.for the contents of a blob
+
+    var forText = JSON.stringify(forDoc, null, '  ');
+
+    var length = forText.length;
+
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
+
+    shaObj.update('blob ' + length + '\0' + forText);
+
+    var oid = shaObj.getHash('HEX');
+
+    return oid;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static displayCalcCounts() {
+    console.log('^^^ OID Calc Count: ' + ItemProxy.oidCalcCount);
+    console.log('^^^ THE Calc Count: ' + ItemProxy.theCalcCount);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -531,14 +613,6 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static getWorkingTree() : TreeConfiguration {
-    // TODO remove all references
-    return TreeConfiguration.getWorkingTree();
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   setItemKind(kind){
     this.kind = kind;
     this.internal = ((this.kind === 'Internal') || (this.kind ===
@@ -587,47 +661,6 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static validateItemContent (kind, forItem, treeConfig) {
-    let validation = {
-      valid : true
-    };
-
-    if (TreeConfiguration.koheseModelDefn) {
-      let modelProxy = TreeConfiguration.koheseModelDefn.getModelProxyFor(kind);
-      if(modelProxy && (modelProxy.kind === 'KoheseModel')){
-        // if (modelProxy.constructor.name !== 'KoheseModel'){
-        //   modelProxy.dumpProxy();
-        //   throw({
-        //     error: 'Class Mismatch',
-        //     expected: 'KoheseModel',
-        //     found: modelProxy.constructor.name
-        //   });
-        // }
-        validation = modelProxy.validateItemContent(forItem);
-
-        if (!validation.valid){
-          // TODO Need to remove this bypass logic which is needed to load some existing data
-          if(treeConfig.loading){
-            console.log('*** Error: Invalid data item');
-            console.log('Kind: ' + kind);
-            console.log(forItem);
-            console.log(validation);
-          } else {
-            throw ({
-              error: 'Not-Valid',
-              validation: validation,
-              item: forItem
-            });
-
-          }
-        }
-      }
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   document() {
     this.checkPropertyOrder();
     return JSON.stringify(this.item, null, '  ');
@@ -670,27 +703,6 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static gitDocumentOID(forDoc) {
-
-    // This function calculates a OID that is equivalaent to the one calculated
-    // natively by git.for the contents of a blob
-
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-
-    var forText = JSON.stringify(forDoc, null, '  ');
-
-    var length = forText.length;
-
-    shaObj.update('blob ' + length + '\0' + forText);
-
-    var oid = shaObj.getHash('HEX');
-
-    return oid;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   calculateOID() {
     // Skip placeholder nodes that haven't been loaded yet
     if (!this.item){
@@ -703,6 +715,7 @@ export class ItemProxy {
     shaObj.update('blob ' + doc.length + '\0' + doc);
 
     this.oid = shaObj.getHash('HEX');
+    ItemProxy.oidCalcCount++;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -747,9 +760,10 @@ export class ItemProxy {
     var shaObj = new jsSHA('SHA-1', 'TEXT');
     shaObj.update(JSON.stringify(treeHashEntry));
     this.treeHash =  shaObj.getHash('HEX');
+    ItemProxy.theCalcCount++;
 
     treeHashEntry.treeHash = this.treeHash;
-    if(this.deferTreeHash){
+    if (this.deferTreeHash){
       delete this.deferTreeHash;
     }
 

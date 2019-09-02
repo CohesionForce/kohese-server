@@ -33,7 +33,6 @@ export class TreeConfiguration {
   public rootModelProxy;
   public rootViewModelProxy;
 
-  private cacheAnalysis;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -237,10 +236,7 @@ export class TreeConfiguration {
     let treeRoots = this.getRepoTreeHashes();
     console.log('::: Checking for missing cache data for: ' + this.treeId);
     let before = Date.now();
-    if (!this.cacheAnalysis) {
-      this.cacheAnalysis = new CacheAnalysis(TreeConfiguration.itemCache);
-    }
-    let missingCacheData = await this.cacheAnalysis.detectMissingTreeRootData(treeRoots);
+    let missingCacheData = await TreeConfiguration.itemCache.analysis.detectMissingTreeRootData(treeRoots);
     let after = Date.now();
     let foundMissingCacheData = false;
     let updateIteration = 0;
@@ -294,7 +290,7 @@ export class TreeConfiguration {
         }
       }
 
-      missingCacheData = await this.cacheAnalysis.reevaluateMissingData();
+      missingCacheData = await TreeConfiguration.itemCache.analysis.reevaluateMissingData();
       after = Date.now();
     }
 
@@ -384,8 +380,9 @@ export class TreeConfiguration {
   //
   //////////////////////////////////////////////////////////////////////////
   private async calculateAllTreeHashes(deferCalc : boolean = false) {
-    console.log('$$$ Beginning calculation of treehashes')
+    console.log('::: Beginning calculation of treehashes')
     const isRepoOnly = false;
+    let before = Date.now();
     let treeHashCalculations : Array<Promise<number>> = [];
     if (isRepoOnly){
       for (let repoId in this.repoMap){
@@ -399,10 +396,13 @@ export class TreeConfiguration {
     if (deferCalc){
       Promise.all(treeHashCalculations).then(() => {
         this.treehashCalculated = true;
-        console.log('$$$ TreeHash Calcuation Completed');
+        let after = Date.now();
+        console.log('$$$ TreeHash Calculation Completed: ' + (after-before)/1000);
       });
     } else {
       this.treehashCalculated = true;
+      let after = Date.now();
+      console.log('$$$ TreeHash Calculation Completed: ' + (after-before)/1000);
     }
 
     return treeHashCalculations;

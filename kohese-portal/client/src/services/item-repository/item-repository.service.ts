@@ -228,26 +228,50 @@ export class ItemRepository {
 
       let workingTree: TreeConfiguration = TreeConfiguration.getWorkingTree();
 
+      let beforeSync = Date.now();
+      let afterLoadWorking;
+      let afterCalcTreeHashes;
+
       if (!this._initialized) {
         const fundamentalItemsResponse = await this.sendMessageToWorker(
           'getFundamentalItems', { refresh: false }, true);
         this.processBulkUpdate(fundamentalItemsResponse.data);
 
+        let afterSyncMetaModels = Date.now();
+        console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
+
         await this.sendMessageToWorker('getCache', { refresh: false }, true);
+
+        let afterSyncCache = Date.now();
+        console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
 
         const workingWorkspace = await this._cache.getWorkspace('Working');
 
         if (workingWorkspace) {
-          console.log('%%% Using workspace');
+          console.log('^^^ Loading Working')
           await this._cache.loadProxiesForTreeRoots(workingWorkspace, workingTree);
+          afterLoadWorking = Date.now();
+          console.log('^^^ Time to load Working: ' + (afterLoadWorking - afterSyncCache) / 1000);
+
         } else {
-          console.log('%%% Using HEAD: workspace not found');
+          console.log('^^^ Loading HEAD')
           const headRef = await this._cache.getRef('HEAD');
           await this._cache.loadProxiesForCommit(headRef, workingTree);
+
+          afterLoadWorking = Date.now();
+          console.log('^^^ Time to load HEAD: ' + (afterLoadWorking - afterSyncCache) / 1000);
         }
 
         await workingTree.loadingComplete();
+
+        afterCalcTreeHashes = Date.now();
+
+      } else {
+        afterLoadWorking = Date.now();
+        afterCalcTreeHashes = Date.now();
       }
+
+      console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadWorking) / 1000);
 
       const treeHashes = workingTree.getAllTreeHashes();
 
@@ -256,16 +280,28 @@ export class ItemRepository {
         'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
       this.processBulkUpdate(itemUpdatesResponse.data);
 
+      let afterGetAll = Date.now();
+      console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
+
       // Ensure status for all items is updated
       console.log('^^^ Getting status');
       const statusResponse = await this.sendMessageToWorker(
         'getStatus', undefined, true);
       console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
 
+      let afterGetStatus = Date.now();
+      console.log('^^^ Time to get status: ' + (afterGetStatus - afterGetAll) / 1000);
+
+      // TODO: Need to determine if second update is required
+
       let secondItemUpdateResponse = await this.sendMessageToWorker(
         'getItemUpdates', { refresh: true, treeHashes: workingTree.getAllTreeHashes() }, true);
 
-      let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
+        let afterLoading = Date.now();
+        console.log('^^^ Time to perform second sync: ' + (afterLoading - afterGetStatus) / 1000);
+        console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
+
+        let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
 
       if (syncIsComplete){
         this.logService.log(this.logEvents.kdbSynced);

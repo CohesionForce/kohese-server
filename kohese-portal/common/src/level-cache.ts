@@ -86,6 +86,14 @@ export class LevelCache extends ItemCache {
       this.getCommit
     );
 
+
+    this.registerSublevel(
+      'workspace',
+      this.getWorkspaces,
+      super.cacheWorkspace,
+      this.getWorkspace
+    );
+
     this.registerSublevel(
       'kTree',
       this.getTrees,
@@ -98,13 +106,6 @@ export class LevelCache extends ItemCache {
       this.getBlobs,
       super.cacheBlob,
       this.getBlob
-    );
-
-    this.registerSublevel(
-      'workspace',
-      this.getWorkspaces,
-      super.cacheWorkspace,
-      this.getWorkspace
     );
   }
 
@@ -246,6 +247,7 @@ export class LevelCache extends ItemCache {
 
     let sublevelNames = Array.from(this.registrationMap.keys());
     for (let sublevelName of sublevelNames){
+      let beforeSublevel = Date.now();
       console.log('::: Loading cache for sublevel: ' + sublevelName);
       let sublevel = this.registrationMap.get(sublevelName).sublevel;
 
@@ -272,6 +274,8 @@ export class LevelCache extends ItemCache {
           });
         });
       }
+      let afterSublevel = Date.now();
+      console.log('::: Loaded cache for sublevel: ' + sublevelName + ' - ' + (afterSublevel-beforeSublevel)/1000);
     }
 
     let afterLoadCache = Date.now();
