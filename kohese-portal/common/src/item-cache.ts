@@ -441,8 +441,9 @@ export class ItemCache {
     // console.log('$$$ Processing tree: ' + treeId);
     // console.log(treeHashEntry);
     let kind = treeHashEntry.kind;
+    let treeProxy : ItemProxy;
 
-    switch(kind){
+    switch (kind) {
       case 'Internal':
       case 'Internal-Lost':
       case 'Internal-Model':
@@ -453,7 +454,7 @@ export class ItemCache {
         let item = await this.getBlob(treeHashEntry.oid);
         if (item){
           // eslint-disable-next-line no-unused-vars
-          let treeProxy : ItemProxy = new ItemProxy(kind,  item, treeConfig);
+          treeProxy = new ItemProxy(kind,  item, treeConfig);
         } else {
           console.log('*** Could not find item for: ' + kind + ' - with item id - ' + treeId + ' - oid - ' + treeHashEntry.oid);
           console.log(treeHashEntry);
@@ -468,6 +469,10 @@ export class ItemCache {
         let childTreeHashEntry = await this.getTree(childTreeHash);
         await this.loadProxiesForTree(childId, childTreeHashEntry, treeConfig);
       }
+    }
+
+    if (treeProxy) {
+      treeProxy.calculateTreeHash(true, treeHashEntry.oid, treeHashEntry);
     }
   }
 }
@@ -653,7 +658,19 @@ export class CacheAnalysis {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  private markBlobsAsEvaluated() {
+    let blobMap = this.cache.getBlobs();
+    for (let oid in blobMap) {
+      this.blobEvaluated[oid] = true;
+    };
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   async detectAllMissingData(){
+    console.log('^^^ Detecting all missing data');
+    this.markBlobsAsEvaluated();
     await this.detectMissingTreeData();
     await this.detectMissingCommitData();
     return this.getMissingData();

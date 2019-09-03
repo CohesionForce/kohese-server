@@ -721,7 +721,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateTreeHash(deferredRollup : boolean = false) {
+  calculateTreeHash(deferredRollup : boolean = false, toOID?, toTreeHashEntry?) {
 
     // Don't calculateTreeHash during initial load
     if (!this.item || (this.treeConfig.loading && !deferredRollup)){
@@ -730,7 +730,11 @@ export class ItemProxy {
     }
 
     // TODO: Should only have to do this when content is updated
-    this.calculateOID();
+    if (toOID){
+      this.oid = toOID;
+    } else {
+      this.calculateOID();
+    }
 
     let treeHashEntry : TreeHashEntry = {
         kind: this.kind,
@@ -757,22 +761,49 @@ export class ItemProxy {
       }
     }
 
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-    shaObj.update(JSON.stringify(treeHashEntry));
-    this.treeHash =  shaObj.getHash('HEX');
-    ItemProxy.theCalcCount++;
+    let calculateTreeHashSha = true;
+    let removeDeferTreeHash = true;
 
-    treeHashEntry.treeHash = this.treeHash;
-    if (this.deferTreeHash){
-      delete this.deferTreeHash;
+    if (toTreeHashEntry) {
+      this.treeHash = toTreeHashEntry.treeHash;
+      treeHashEntry.treeHash = this.treeHash;
+
+      // Add the parentId to the treeHash entry
+      if (this.item.parentId){
+        treeHashEntry.parentId = this.item.parentId;
+      }
+
+      let diff = TreeHashEntry.diff(toTreeHashEntry, treeHashEntry);
+      if (!diff.match) {
+        console.log('!!! TreeHashEntry did not match expected: ' + this.item.id + ' - ' + this.item.name);
+        console.log(diff);
+        delete treeHashEntry.treeHash;
+        delete treeHashEntry.parentId;
+        removeDeferTreeHash = false;
+      } else {
+        calculateTreeHashSha = false;
+      }
     }
 
-    // Add the parentId to the treeHash entry
-    if (this.item.parentId){
-      treeHashEntry.parentId = this.item.parentId;
+    if (calculateTreeHashSha){
+      var shaObj = new jsSHA('SHA-1', 'TEXT');
+      shaObj.update(JSON.stringify(treeHashEntry));
+      this.treeHash =  shaObj.getHash('HEX');
+      ItemProxy.theCalcCount++;
+
+      treeHashEntry.treeHash = this.treeHash;
+
+      // Add the parentId to the treeHash entry
+      if (this.item.parentId){
+        treeHashEntry.parentId = this.item.parentId;
+      }
     }
 
     this.treeHashEntry = treeHashEntry;
+
+    if (this.deferTreeHash && removeDeferTreeHash) {
+      delete this.deferTreeHash;
+    }
 
     // Propagate changes up the tree
     if (!deferredRollup){
@@ -814,16 +845,18 @@ export class ItemProxy {
 
         // tslint:disable-next-line: no-use-before-declare
         while (thisIteration = iterator.next()){
-          iterationCount++;
           if (thisIteration.done){
             resolve(iterationCount);
             return;
           }
           proxy = thisIteration.value;
-          proxy.calculateTreeHash(deferredRollup);
-          if (deferCalc && (iterationCount % yieldAtIteration === 0)) {
-            setTimeout(performTreeHashCalculations, msToYield);
-            return;
+          if (proxy.deferTreeHash) {
+            iterationCount++;
+            proxy.calculateTreeHash(deferredRollup);
+            if (deferCalc && (iterationCount % yieldAtIteration === 0)) {
+              setTimeout(performTreeHashCalculations, msToYield);
+              return;
+            }
           }
         }
 

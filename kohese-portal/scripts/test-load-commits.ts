@@ -344,6 +344,11 @@ async function loadConfigForEachCommit() {
 }
 
 //////////////////////////////////////////////////////////////////////////
+function deltaMessage(message, before, after) {
+  console.log('^^^ ' + message + ': ' + (after-before)/1000);
+}
+
+//////////////////////////////////////////////////////////////////////////
 // Main Processing
 //////////////////////////////////////////////////////////////////////////
 
@@ -352,53 +357,62 @@ let indexCommitsAndExit = true;
 
 try {
   kdb.initialize(baseRepoPath, indexCommitsAndExit).then(async function() {
-    console.log('::: Finished cache update for: ' + baseRepoPath);
+    try {
+      console.log('::: Finished cache update for: ' + baseRepoPath);
 
-    /////////////////////
-    // Logic to be tested
-    /////////////////////
+      /////////////////////
+      // Logic to be tested
+      /////////////////////
 
-    // loadConfigForEachCommit();
-    // await evaluateCommit('01846aea16b25b0eb2c929543b2705fcbfa78b96');
-    // await evaluateCommit('9127262235d201e40f7abf693d081770b5311570');
+      // loadConfigForEachCommit();
+      // await evaluateCommit('01846aea16b25b0eb2c929543b2705fcbfa78b96');
+      // await evaluateCommit('9127262235d201e40f7abf693d081770b5311570');
 
-    // await evaluateCommit('17e608d0f28e2c8c690c24a8a5f78253b817a3de');
-    // await loadCommit('17e608d0f28e2c8c690c24a8a5f78253b817a3de');
+      // await evaluateCommit('17e608d0f28e2c8c690c24a8a5f78253b817a3de');
+      // await loadCommit('17e608d0f28e2c8c690c24a8a5f78253b817a3de');
 
-    // await evaluateBlob('f780e55001b8ddf6798c0b38922497e0531f423e');
-    // await evaluateCommit('fdf75ab379e28c4a541403e79e41c808090ecebf');
+      // await evaluateBlob('f780e55001b8ddf6798c0b38922497e0531f423e');
+      // await evaluateCommit('fdf75ab379e28c4a541403e79e41c808090ecebf');
 
-    // await compareDiff_c282fb();
+      // await compareDiff_c282fb();
 
-    // Note:  This one is missing added items from details
-    // await compareCommits('1b7aabf0a845269a078ff6ad2da9a5683c6728da', '17e608d0f28e2c8c690c24a8a5f78253b817a3de');
+      // Note:  This one is missing added items from details
+      // await compareCommits('1b7aabf0a845269a078ff6ad2da9a5683c6728da', '17e608d0f28e2c8c690c24a8a5f78253b817a3de');
 
-    // await evaluateAllCommits();
-    // await evaluateEachCommit();
-    // await evaluateEachTree();
-    // await diffHeadAndPrev();
+      // await evaluateAllCommits();
+      // await evaluateEachCommit();
+      // await evaluateEachTree();
+      // await diffHeadAndPrev();
 
-    let itemCache = TreeConfiguration.getItemCache();
-    let HEAD = await itemCache.getRef('HEAD');
-    // await evaluateCommit(HEAD);
+      let itemCache = TreeConfiguration.getItemCache();
+      let beforeGetHead = Date.now();
+      let HEAD = await itemCache.getRef('HEAD');
+      let afterGetHead = Date.now();
+      deltaMessage('Time to get HEAD', beforeGetHead, afterGetHead);
 
-    let commitMap = itemCache.getCommits();
-    let keys = commitMap.keys();
+      await itemCache.analysis.detectAllMissingData();
+      let afterDetectAllMissingData = Date.now();
+      deltaMessage('Time to detect all missing data', afterGetHead, afterDetectAllMissingData);
 
-    console.log('^^^ Before listing');
+      let headTree = new TreeConfiguration(HEAD);
+      await itemCache.loadProxiesForCommit(HEAD, headTree);
+      let afterLoadHead = Date.now();
+      deltaMessage('Time to load head', afterDetectAllMissingData, afterLoadHead);
 
-    for (let key of Array.from(keys)){
-      console.log('^^^ key: ' + key);
+      await headTree.loadingComplete();
+      let afterCalcTreehashes = Date.now();
+      deltaMessage('Time to calculate treehashes', afterLoadHead, afterCalcTreehashes);
+      deltaMessage('Time to perform sync simulation', beforeGetHead, afterCalcTreehashes);
+
+    } catch (err) {
+      console.log('*** Error');
+      console.log(err);
+      console.log(err.stack);
     }
-
-    console.log('^^^ Finish listing');
-
-    await evaluateAllCommits();
-
   });
 
 } catch (err) {
   console.log('*** Error');
   console.log(err);
-
+  console.log(err.stack);
 }
