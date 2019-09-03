@@ -2,7 +2,7 @@
  *
  */
 
-'use strict'; //Required for use of 'class'
+'use strict'; // Required for use of 'class'
 import * as  _ from 'underscore';
 import * as jsSHA_Import from 'jssha';
 import * as uuidV1_Import from 'uuid/v1';
@@ -14,7 +14,7 @@ import { VersionStatus } from './version-status';
 // Adjust for the differences in CommonJS and ES6 for jssha
 //
 let jsSHA;
-if (typeof(jsSHA_Import) === "object") {
+if (typeof(jsSHA_Import) === 'object') {
   jsSHA = (<any>jsSHA_Import).default;
 } else {
   jsSHA = jsSHA_Import;
@@ -22,7 +22,7 @@ if (typeof(jsSHA_Import) === "object") {
 
 // Adjust for the differences in CommonJS and ES6 for uuid
 let uuidV1;
-if (typeof(uuidV1_Import) === "object") {
+if (typeof(uuidV1_Import) === 'object') {
   uuidV1 = uuidV1_Import.default;
 } else {
   uuidV1 = uuidV1_Import;
@@ -38,6 +38,10 @@ class RelationIdMap {
 //////////////////////////////////////////////////////////////////////////
 
 export class ItemProxy {
+
+  public static oidCalcCount = 0;
+  public static theCalcCount = 0;
+  // private static shaObj = new jsSHA('SHA-1', 'TEXT');
 
   public model;
   public state;
@@ -99,7 +103,7 @@ export class ItemProxy {
 
     ItemProxy.validateItemContent(kind, forItem, treeConfig);
 
-    let proxy = treeConfig.proxyMap[itemId];
+    let proxy : ItemProxy = treeConfig.proxyMap[itemId];
 
     if (!proxy) {
     //  console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
@@ -207,6 +211,84 @@ export class ItemProxy {
     }
 
     return proxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static validateItemContent (kind, forItem, treeConfig) {
+    let validation = {
+      valid : true
+    };
+
+    if (TreeConfiguration.koheseModelDefn) {
+      let modelProxy = TreeConfiguration.koheseModelDefn.getModelProxyFor(kind);
+      if(modelProxy && (modelProxy.kind === 'KoheseModel')){
+        // if (modelProxy.constructor.name !== 'KoheseModel'){
+        //   modelProxy.dumpProxy();
+        //   throw({
+        //     error: 'Class Mismatch',
+        //     expected: 'KoheseModel',
+        //     found: modelProxy.constructor.name
+        //   });
+        // }
+        validation = modelProxy.validateItemContent(forItem);
+
+        if (!validation.valid){
+          // TODO Need to remove this bypass logic which is needed to load some existing data
+          if(treeConfig.loading){
+            console.log('*** Error: Invalid data item');
+            console.log('Kind: ' + kind);
+            console.log(forItem);
+            console.log(validation);
+          } else {
+            throw ({
+              error: 'Not-Valid',
+              validation: validation,
+              item: forItem
+            });
+
+          }
+        }
+      }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getWorkingTree() : TreeConfiguration {
+    // TODO remove all references
+    return TreeConfiguration.getWorkingTree();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static gitDocumentOID(forDoc) {
+
+    // This function calculates a OID that is equivalaent to the one calculated
+    // natively by git.for the contents of a blob
+
+    var forText = JSON.stringify(forDoc, null, '  ');
+
+    var length = forText.length;
+
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
+
+    shaObj.update('blob ' + length + '\0' + forText);
+
+    var oid = shaObj.getHash('HEX');
+
+    return oid;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static displayCalcCounts() {
+    console.log('^^^ OID Calc Count: ' + ItemProxy.oidCalcCount);
+    console.log('^^^ THE Calc Count: ' + ItemProxy.theCalcCount);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -457,7 +539,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  removeReference(toProxy, forProperty, isSingle){
+  removeReference(toProxy, forProperty, isSingle) {
     // Remove reference to the referencing proxy
     if (!this.relations.references[this.kind]){
       this.relations.references[this.kind] = {};
@@ -473,10 +555,10 @@ export class ItemProxy {
         this.relations.references[this.kind][forProperty] = [];
       }
 
-      let proxyIdx = this.relations.references[this.kind][forProperty].indexOf(toProxy);
-      if (proxyIdx > -1){
+      let proxyArrayIdx = this.relations.references[this.kind][forProperty].indexOf(toProxy);
+      if (proxyArrayIdx > -1){
         // console.log('%%% Removing reference from array for ' + toProxy.item.id);
-        this.relations.references[this.kind][forProperty].splice(proxyIdx, 1);
+        this.relations.references[this.kind][forProperty].splice(proxyArrayIdx, 1);
       }
     }
 
@@ -531,14 +613,6 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static getWorkingTree() : TreeConfiguration {
-    // TODO remove all references
-    return TreeConfiguration.getWorkingTree();
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   setItemKind(kind){
     this.kind = kind;
     this.internal = ((this.kind === 'Internal') || (this.kind ===
@@ -587,47 +661,6 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static validateItemContent (kind, forItem, treeConfig) {
-    let validation = {
-      valid : true
-    };
-
-    if (TreeConfiguration.koheseModelDefn) {
-      let modelProxy = TreeConfiguration.koheseModelDefn.getModelProxyFor(kind);
-      if(modelProxy && (modelProxy.kind === 'KoheseModel')){
-        // if (modelProxy.constructor.name !== 'KoheseModel'){
-        //   modelProxy.dumpProxy();
-        //   throw({
-        //     error: 'Class Mismatch',
-        //     expected: 'KoheseModel',
-        //     found: modelProxy.constructor.name
-        //   });
-        // }
-        validation = modelProxy.validateItemContent(forItem);
-
-        if (!validation.valid){
-          // TODO Need to remove this bypass logic which is needed to load some existing data
-          if(treeConfig.loading){
-            console.log('*** Error: Invalid data item');
-            console.log('Kind: ' + kind);
-            console.log(forItem);
-            console.log(validation);
-          } else {
-            throw ({
-              error: 'Not-Valid',
-              validation: validation,
-              item: forItem
-            });
-
-          }
-        }
-      }
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   document() {
     this.checkPropertyOrder();
     return JSON.stringify(this.item, null, '  ');
@@ -670,27 +703,6 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static gitDocumentOID(forDoc) {
-
-    // This function calculates a OID that is equivalaent to the one calculated
-    // natively by git.for the contents of a blob
-
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-
-    var forText = JSON.stringify(forDoc, null, '  ');
-
-    var length = forText.length;
-
-    shaObj.update('blob ' + length + '\0' + forText);
-
-    var oid = shaObj.getHash('HEX');
-
-    return oid;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
   calculateOID() {
     // Skip placeholder nodes that haven't been loaded yet
     if (!this.item){
@@ -703,12 +715,13 @@ export class ItemProxy {
     shaObj.update('blob ' + doc.length + '\0' + doc);
 
     this.oid = shaObj.getHash('HEX');
+    ItemProxy.oidCalcCount++;
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  calculateTreeHash(deferredRollup : boolean = false) {
+  calculateTreeHash(deferredRollup : boolean = false, toOID?, toTreeHashEntry?) {
 
     // Don't calculateTreeHash during initial load
     if (!this.item || (this.treeConfig.loading && !deferredRollup)){
@@ -717,7 +730,11 @@ export class ItemProxy {
     }
 
     // TODO: Should only have to do this when content is updated
-    this.calculateOID();
+    if (toOID){
+      this.oid = toOID;
+    } else {
+      this.calculateOID();
+    }
 
     let treeHashEntry : TreeHashEntry = {
         kind: this.kind,
@@ -744,21 +761,49 @@ export class ItemProxy {
       }
     }
 
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-    shaObj.update(JSON.stringify(treeHashEntry));
-    this.treeHash =  shaObj.getHash('HEX');
+    let calculateTreeHashSha = true;
+    let removeDeferTreeHash = true;
 
-    treeHashEntry.treeHash = this.treeHash;
-    if(this.deferTreeHash){
-      delete this.deferTreeHash;
+    if (toTreeHashEntry) {
+      this.treeHash = toTreeHashEntry.treeHash;
+      treeHashEntry.treeHash = this.treeHash;
+
+      // Add the parentId to the treeHash entry
+      if (this.item.parentId){
+        treeHashEntry.parentId = this.item.parentId;
+      }
+
+      let diff = TreeHashEntry.diff(toTreeHashEntry, treeHashEntry);
+      if (!diff.match) {
+        console.log('!!! TreeHashEntry did not match expected: ' + this.item.id + ' - ' + this.item.name);
+        console.log(diff);
+        delete treeHashEntry.treeHash;
+        delete treeHashEntry.parentId;
+        removeDeferTreeHash = false;
+      } else {
+        calculateTreeHashSha = false;
+      }
     }
 
-    // Add the parentId to the treeHash entry
-    if (this.item.parentId){
-      treeHashEntry.parentId = this.item.parentId;
+    if (calculateTreeHashSha){
+      var shaObj = new jsSHA('SHA-1', 'TEXT');
+      shaObj.update(JSON.stringify(treeHashEntry));
+      this.treeHash =  shaObj.getHash('HEX');
+      ItemProxy.theCalcCount++;
+
+      treeHashEntry.treeHash = this.treeHash;
+
+      // Add the parentId to the treeHash entry
+      if (this.item.parentId){
+        treeHashEntry.parentId = this.item.parentId;
+      }
     }
 
     this.treeHashEntry = treeHashEntry;
+
+    if (this.deferTreeHash && removeDeferTreeHash) {
+      delete this.deferTreeHash;
+    }
 
     // Propagate changes up the tree
     if (!deferredRollup){
@@ -783,6 +828,7 @@ export class ItemProxy {
     let resultPromise = new Promise<number>((resolve, reject) => {
       const deferredRollup = true;
       const yieldAtIteration = 100;
+      const msToYield = 100;
 
       let flags = {
         postorder: true
@@ -796,17 +842,21 @@ export class ItemProxy {
         // console.log('$$$ Beginning TreeHash calculation at: ' + iterationCount);
         let proxy : ItemProxy;
         let thisIteration;
+
+        // tslint:disable-next-line: no-use-before-declare
         while (thisIteration = iterator.next()){
-          iterationCount++;
           if (thisIteration.done){
             resolve(iterationCount);
             return;
           }
           proxy = thisIteration.value;
-          proxy.calculateTreeHash(deferredRollup);
-          if (deferCalc && (iterationCount % yieldAtIteration === 0)) {
-            setTimeout(performTreeHashCalculations, 100);
-            return;
+          if (proxy.deferTreeHash) {
+            iterationCount++;
+            proxy.calculateTreeHash(deferredRollup);
+            if (deferCalc && (iterationCount % yieldAtIteration === 0)) {
+              setTimeout(performTreeHashCalculations, msToYield);
+              return;
+            }
           }
         }
 
@@ -816,7 +866,7 @@ export class ItemProxy {
       let iterator = this.iterateTree(flags);
 
       if (deferCalc){
-        setTimeout(performTreeHashCalculations, 500);
+        setTimeout(performTreeHashCalculations, msToYield);
       } else {
         performTreeHashCalculations();
       }
@@ -1032,8 +1082,8 @@ export class ItemProxy {
           yield proxy;
         }
 
-        for ( var childIdx in proxy.children) {
-          var childProxy = proxy.children[childIdx];
+        for (let childIdx in proxy.children) {
+          let childProxy = proxy.children[childIdx];
           yield* visitChild(childProxy);
         }
 
@@ -1048,8 +1098,8 @@ export class ItemProxy {
       yield this;
     }
 
-    for ( var childIdx in this.children) {
-      var childProxy = this.children[childIdx];
+    for (let childIdx in this.children) {
+      let childProxy = this.children[childIdx];
       yield* visitChild(childProxy);
     }
 
@@ -1062,7 +1112,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  dumpProxy(indent : string = undefined) {
+  dumpProxy(indent? : string) {
     var thisIndent = '';
     var childIndent = '|-';
     if (indent) {
@@ -1269,24 +1319,24 @@ export class ItemProxy {
     let orderBeforeSort = this.getOrderedChildIds();
     if (!this.item.itemIds || this.item.itemIds.length === 0){
       this.children.sort(function(a, b){
-        if (a.item.name > b.item.name) return 1;
-        if (a.item.name < b.item.name) return -1;
+        if (a.item.name > b.item.name) { return 1; }
+        if (a.item.name < b.item.name) { return -1; }
         if (a.item.name === b.item.name) {
-          if (a.item.id > b.item.id) return 1;
-          if (a.item.id < b.item.id) return -1;
+          if (a.item.id > b.item.id) { return 1; }
+          if (a.item.id < b.item.id) { return -1; }
         }
         return 0;
       });
     } else {
-    	// Sort by itemIds list if it is present
-    	var itemIds = this.item.itemIds;
+      // Sort by itemIds list if it is present
+      var itemIds = this.item.itemIds;
 
-    	this.children.sort(function(a, b){
-    		var aIndex = itemIds.indexOf(a.item.id);
-    		var bIndex = itemIds.indexOf(b.item.id);
-    		if (aIndex < 0) {
+      this.children.sort(function(a, b) {
+        var aIndex = itemIds.indexOf(a.item.id);
+        var bIndex = itemIds.indexOf(b.item.id);
+        if (aIndex < 0) {
           aIndex = itemIds.length;
-    		}
+        }
         if (bIndex < 0) {
           bIndex = itemIds.length;
           // Detect when both items are not in the list
@@ -1297,14 +1347,14 @@ export class ItemProxy {
               bIndex++;
             } else {
               // Names are the same, so sort on the id
-              if (a.item.id > b.item.id) aIndex++;
-              if (a.item.id < b.item.id) bIndex++;
+              if (a.item.id > b.item.id) { aIndex++; }
+              if (a.item.id < b.item.id) { bIndex++; }
             }
           }
         }
 
-        if (aIndex > bIndex) return 1;
-        if (aIndex < bIndex) return -1;
+        if (aIndex > bIndex) { return 1; }
+        if (aIndex < bIndex) { return -1; }
         return 0;
       });
     }

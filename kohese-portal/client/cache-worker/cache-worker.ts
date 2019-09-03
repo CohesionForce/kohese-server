@@ -8,6 +8,7 @@ import { TreeHashEntry, TreeHashMap } from '../../common/src/tree-hash';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
 import { LevelCache } from '../../common/src/level-cache';
+import { CacheAnalysis } from '../../common/src/item-cache';
 
 let socket: SocketIOClient.Socket;
 let clientMap = {};
@@ -104,7 +105,8 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           _loadedCachePromise = populateCache();
         }
 
-        const objectMap = await _loadedCachePromise;
+        await _loadedCachePromise;
+        let objectMap = _cache.getObjectMap();
 
         port.postMessage({ message: 'cachePiece', data: {
           key: 'metadata',
@@ -137,6 +139,11 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           } });
         }
 
+        port.postMessage({ message: 'cachePiece', data: {
+          key: 'workspace',
+          value: objectMap.workspaceMap
+        } });
+
         port.postMessage({ id: request.id });
         break;
       case 'getItemUpdates':
@@ -148,7 +155,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
           }
 
-          updatesPromise = updateCache(treeHashes);
+          updatesPromise = updateWorking(treeHashes);
           if (!request.data.refresh){
             console.log('^^^ Updating _itemUpdatesPromise');
             _itemUpdatesPromise = updatesPromise;
@@ -348,45 +355,76 @@ async function sync(): Promise<void> {
   let afterSyncMetaModels = Date.now();
   console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
 
-  let afterLoadHead;
+  let afterLoadWorking;
   let afterCalcTreeHashes;
   if (!_loadedCachePromise){
     _loadedCachePromise = populateCache();
     await _loadedCachePromise;
+
     let afterSyncCache = Date.now();
     console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
-    let headRef = await _cache.getRef('HEAD');
-    await _cache.loadProxiesForCommit(headRef, workingTree);
-    afterLoadHead = Date.now();
-    console.log('^^^ Time to load HEAD: ' + (afterLoadHead - afterSyncCache) / 1000);
-    workingTree.calculateAllTreeHashes();
+
+    let treeRoots = await fetchRepoHashes();
+
+    ItemProxy.displayCalcCounts();
+
+    console.log('^^^ Checking for missing tree root data');
+    let missingTreeRootData = await _cache.analysis.detectMissingTreeRootData(treeRoots);
+    if (missingTreeRootData.found){
+      console.log('*** Found missing cache data:');
+      console.log(JSON.stringify(missingTreeRootData, null, '  '));
+      let workingWorkspace = await _cache.getWorkspace('Working');
+      if (workingWorkspace){
+        console.log('^^^ Loading previous Working');
+        await _cache.loadProxiesForTreeRoots(workingWorkspace, workingTree);
+        afterLoadWorking = Date.now();
+        console.log('^^^ Time to load previous Working: ' + (afterLoadWorking - afterSyncCache) / 1000);
+      } else {
+        console.log('^^^ Loading HEAD')
+        let headRef = await _cache.getRef('HEAD');
+        await _cache.loadProxiesForCommit(headRef, workingTree);
+        afterLoadWorking = Date.now();
+        console.log('^^^ Time to load HEAD: ' + (afterLoadWorking - afterSyncCache) / 1000);
+      }
+
+    } else {
+      console.log('^^^ Loading current Working')
+      await _cache.loadProxiesForTreeRoots(treeRoots, workingTree);
+      afterLoadWorking = Date.now();
+      console.log('^^^ Time to load Working: ' + (afterLoadWorking - afterSyncCache) / 1000);
+    }
+
+    ItemProxy.displayCalcCounts();
+
+    await workingTree.loadingComplete(false);
+
+    ItemProxy.displayCalcCounts();
+
     afterCalcTreeHashes = Date.now();
   } else {
-    afterLoadHead = Date.now();
+    afterLoadWorking = Date.now();
     afterCalcTreeHashes = Date.now();
   }
-  console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadHead) / 1000);
+  console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadWorking) / 1000);
 
   // TODO: Need to deal with loss of data on refresh
-  _itemUpdatesPromise = updateCache(workingTree.getAllTreeHashes());
+  _itemUpdatesPromise = updateWorking(workingTree.getAllTreeHashes());
   await _itemUpdatesPromise;
   let afterGetAll = Date.now();
   console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
 
-  console.log('^^^ Checking for missing cache data')
-  let missingCommitData = await _cache.detectMissingCommitData();
-  if (missingCommitData.found){
-    console.log('*** Found missing commit data:');
-    console.log(JSON.stringify(missingCommitData, null, '  '));
-  }
+  // Perform an update of the cache
+  await workingTree.saveToCache();
 
-  workingTree.loadingComplete(false);
-  let afterLoading = Date.now();
-  console.log('^^^ Time to complete loading: ' + (afterLoading - afterGetAll) / 1000);
-  console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
+  let afterSaveToCache = Date.now();
+  console.log('^^^ Time to save working to cache: ' + (afterSaveToCache - afterGetAll) / 1000);
 
   // TODO: Need to handle refresh
   await getStatus();
+  let afterGetStatus = Date.now();
+  console.log('^^^ Time to get status: ' + (afterGetStatus - afterSaveToCache) / 1000);
+  console.log('^^^ Total time to sync: ' + (afterGetStatus - beforeSync) / 1000);
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -433,9 +471,9 @@ function registerKoheseIOListeners() {
     processBulkUpdate(bulkUpdate);
   });
 
-  socket.on('Item/BulkCacheUpdate', (bulkCacheUpdate) => {
+  socket.on('Item/BulkCacheUpdate', async (bulkCacheUpdate) => {
     console.log('::: Received Bulk Cache Update');
-    _cache.processBulkCacheUpdate(bulkCacheUpdate);
+    await _cache.processBulkCacheUpdate(bulkCacheUpdate);
   });
 
   socket.on('VersionControl/statusUpdated', (statusMap: any) => {
@@ -509,8 +547,11 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 //
 //////////////////////////////////////////////////////////////////////////
 function deleteItem(notification: any): void {
-  TreeConfiguration.getWorkingTree().getProxyFor(notification.id).deleteItem(notification.recursive);
-  postToAllPorts('deletion', notification);
+  let proxy = TreeConfiguration.getWorkingTree().getProxyFor(notification.id);
+  if (proxy){
+    proxy.deleteItem(notification.recursive);
+    postToAllPorts('deletion', notification);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -557,6 +598,71 @@ function synchronizeModels(): Promise<any> {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+async function fetchMissingCacheInformation(missingCacheData){
+  const requestTime = Date.now();
+  let promise = new Promise<any>((resolve: () => void, reject:
+  () => void) => {
+    socket.emit('Item/getMissingCacheInfo', {
+      timestamp: {
+        requestTime: requestTime
+      },
+      missingCacheData: missingCacheData
+    }, async (response) => {
+      const responseReceiptTime = Date.now();
+      const timestamp = response.timestamp;
+      timestamp.responseReceiptTime = responseReceiptTime;
+      console.log('::: Response for getMissingCacheInfo');
+      // tslint:disable-next-line:forin
+      for (const tsKey in timestamp) {
+        console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey] - requestTime));
+      }
+
+      let cacheData = response.cacheData;
+
+      console.log('$$$ Fetched missing cache info');
+      if(cacheData.blob){
+        for(let oid in cacheData.blob){
+          console.log('^^^ Fetched missing blob: ' + oid);
+          let blob = cacheData.blob[oid];
+          _cache.cacheBlob(oid, blob);
+        }
+      }
+
+      if(cacheData.tree){
+        for(let treehash in cacheData.tree){
+          console.log('^^^ Fetched missing tree: ' + treehash);
+          let tree = cacheData.tree[treehash];
+          _cache.cacheTree(treehash, tree);
+        }
+      }
+
+      if(cacheData.root){
+        for(let rootTreehash in cacheData.root){
+          console.log('^^^ Fetched missing root: ' + rootTreehash);
+          let root = cacheData.root[rootTreehash];
+          _cache.cacheTree(rootTreehash, root);
+        }
+      }
+
+      if(cacheData.commit){
+        for(let commitId in cacheData.commit){
+          console.log('^^^ Fetched missing commit: ' + commitId);
+          let commit = cacheData.commit[commitId];
+          _cache.cacheCommit(commitId, commit);
+        }
+      }
+
+      await _cache.saveAllPendingWrites();
+      resolve();
+    });
+  });
+
+  await promise;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 async function populateCache(): Promise<any> {
   console.log('$$$ Get Item Cache');
 
@@ -598,57 +704,83 @@ async function populateCache(): Promise<any> {
     });
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  async function fetchTreeEntry(treeId, treeHash) {
-    const treeEntry = await _cache.getTree(treeHash);
-    return treeEntry;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  async function fetchRepoHashes() {
-    console.log('$$$ Fetching Repo Hashes');
-    const fetchRequestTime = Date.now();
-    return new Promise<any>((resolve: () => void, reject:
-    () => void) => {
-      socket.emit('Item/getRepoHashmap', {
-        timestamp: {
-          requestTime: requestTime
-        },
-        headCommit: headCommit
-      }, async (response) => {
-        const responseReceiptTime = Date.now();
-        console.log('$$$ Response for getRepoHashmap: ' + (responseReceiptTime - fetchRequestTime) / 1000);
-
-        console.log('^^^ Checking for missing tree root data')
-
-        let missingTRData = await _cache.detectMissingTreeRootData(response.repoTreeHashes);
-        if (missingTRData.found){
-          console.log('*** Found missing tree root data:');
-          console.log(JSON.stringify(missingTRData, null, '  '));
-        }
-
-        console.log('$$$ Fetched RepoHashMap');
-        resolve();
-      });
-    });
-  }
-
-  return new Promise<any>(async (resolve: (objectMap: any) => void, reject:
+  return new Promise<any>(async (resolve: () => void, reject:
     () => void) => {
     if (incrementalCacheLoad) {
-      await fetchRepoHashes();
       console.log('$$$ Calling fetchItemCache incremental');
       await fetchItemCache();
+
+      console.log('^^^ Checking for missing cache data');
+      let missingCacheData = await _cache.analysis.detectAllMissingData();
+
+      while (missingCacheData.found){
+        console.log('*** Found missing cache data:');
+        console.log(JSON.stringify(missingCacheData, null, '  '));
+        await fetchMissingCacheInformation(missingCacheData);
+        missingCacheData = await _cache.analysis.reevaluateMissingData();
+      }
+
+      console.log('$$$ Getting tree roots');
+      let repoTreeRoots = await fetchRepoHashes();
+
+      console.log('^^^ Checking for missing tree root data')
+      let missingTreeRootData = await _cache.analysis.detectMissingTreeRootData(repoTreeRoots);
+
+      while (missingTreeRootData.found){
+        console.log('*** Found missing tree root data:');
+        console.log(JSON.stringify(missingTreeRootData, null, '  '));
+        await fetchMissingCacheInformation(missingTreeRootData);
+        missingTreeRootData = await _cache.analysis.reevaluateMissingData();
+      }
+
+      let workingWorkspace = await _cache.getWorkspace('Working');
+      if (!missingTreeRootData.found){
+        if (workingWorkspace) {
+          // TODO: check for difference
+
+          _cache.cacheWorkspace('Working', repoTreeRoots);
+        } else {
+          // Store the workspace
+          _cache.cacheWorkspace('Working', repoTreeRoots);
+        }
+      }
+
+      _cache.saveAllPendingWrites();
+
+      console.log('$$$ Got tree roots');
+      console.log(repoTreeRoots);
+
       console.log('$$$ Return from fetchItemCache incremental');
-      resolve(_cache.getObjectMap());
+      resolve();
     } else {
       console.log('$$$ Calling fetchItemCache');
       await fetchItemCache();
       console.log('$$$ Return from fetchItemCache');
-      resolve(_cache.getObjectMap());
+      resolve();
     }
   });
 }
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+async function fetchRepoHashes(): Promise<Array<TreeHashEntry>> {
+    console.log('$$$ Fetching Repo Hashes');
+    const fetchRequestTime = Date.now();
+    return new Promise<any>((resolve, reject) => {
+      socket.emit('Item/getRepoHashmap', {
+        timestamp: {
+          requestTime: fetchRequestTime
+        },
+      }, async (response) => {
+        const responseReceiptTime = Date.now();
+        console.log('$$$ Response for getRepoHashmap: ' + (responseReceiptTime - fetchRequestTime) / 1000);
+
+        console.log('$$$ Fetched RepoHashMap');
+        resolve(response.repoTreeHashes);
+      });
+    });
+  }
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -694,7 +826,7 @@ function processBulkUpdate(response: any): void {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function updateCache(treeHashes: any): Promise<any> {
+function updateWorking(treeHashes: any): Promise<any> {
   return new Promise<any>((resolve: (data: any) => void, reject:
     () => void) => {
     console.log('^^^ Requesting item update');

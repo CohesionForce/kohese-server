@@ -1,11 +1,10 @@
 'use strict';
-import { ItemProxy } from "../common/src/item-proxy";
-import { LevelCache } from "../common/src/level-cache";
-import { TreeConfiguration } from "../common/src/tree-configuration";
-import { TreeHashMap } from "../common/src/tree-hash";
+import { LevelCache } from '../common/src/level-cache';
+import { TreeConfiguration } from '../common/src/tree-configuration';
+import { CacheAnalysis } from '../common/src/item-cache';
 
 
-//Paths may be provided via arguments when starting via -kdb=PATH
+// Paths may be provided via arguments when starting via -kdb=PATH
 var baseRepoPath : string;
 for (var i = 2; i < process.argv.length; i++) {
   var arg = process.argv[i].split('=');
@@ -35,7 +34,8 @@ kdb.initialize(baseRepoPath, indexAndExit).then(async () =>  {
 
   console.log('::: Checking for missing data in cache');
   try {
-    await itemCache.detectMissingCommitData();
+    let cacheAnalysis = new CacheAnalysis(itemCache);
+    let missingData = await cacheAnalysis.detectMissingCommitData();
   } catch (err){
     console.log('*** Error: ' + err);
     console.log(err.stack);

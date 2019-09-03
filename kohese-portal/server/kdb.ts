@@ -597,12 +597,12 @@ async function openRepositories(indexAndExit) {
     console.log('--- Child descendant count of ' + childProxy.item.name + ': ' + childProxy.descendantCount);
   }
 
-  return Promise.all(promises).then(() => {
+  return Promise.all(promises).then(async () => {
     // Need to wait for all repos to be loaded before continuing
     console.log('::: End KDB File Load');
-    console.log(new Date());
-    ItemProxy.getWorkingTree().loadingComplete();
-    console.log(new Date());
+    let workingTree = ItemProxy.getWorkingTree();
+    workingTree.loadingComplete();
+    await workingTree.saveToCache();
   });
 
 }

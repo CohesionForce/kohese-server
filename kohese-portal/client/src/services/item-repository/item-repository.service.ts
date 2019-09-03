@@ -6,11 +6,11 @@ import { MarkdownService } from 'ngx-markdown';
 
 import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from '../user/current-user.service';
-import { ToastrService } from "ngx-toastr";
+import { ToastrService } from 'ngx-toastr';
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
-import { TreeConfiguration } from  '../../../../common/src/tree-configuration';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -153,7 +153,7 @@ export class ItemRepository {
 
       switch (msg.message) {
         case 'reconnected':
-          this.align();
+          this.sync();
           break;
         case 'connectionError':
 
@@ -208,7 +208,7 @@ export class ItemRepository {
         );
         this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
           true).then(async () => {
-          this.align();
+          this.sync();
         });
       }
     });
@@ -219,7 +219,7 @@ export class ItemRepository {
       data;
   }
 
-  private align(): Promise<void> {
+  private sync(): Promise<void> {
     return new Promise<void>(async (resolve: () => void, reject: () => void) => {
       this.updateRepositorySyncState(
         RepoStates.SYNCHRONIZING,
@@ -228,76 +228,80 @@ export class ItemRepository {
 
       let workingTree: TreeConfiguration = TreeConfiguration.getWorkingTree();
 
+      let beforeSync = Date.now();
+      let afterLoadWorking;
+      let afterCalcTreeHashes;
+
       if (!this._initialized) {
         const fundamentalItemsResponse = await this.sendMessageToWorker(
           'getFundamentalItems', { refresh: false }, true);
         this.processBulkUpdate(fundamentalItemsResponse.data);
 
+        let afterSyncMetaModels = Date.now();
+        console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
+
         await this.sendMessageToWorker('getCache', { refresh: false }, true);
 
-        const headRef = await this._cache.getRef('HEAD');
-        await this._cache.loadProxiesForCommit(headRef, workingTree);
+        let afterSyncCache = Date.now();
+        console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
 
-        workingTree.calculateAllTreeHashes();
+        const workingWorkspace = await this._cache.getWorkspace('Working');
+
+        if (workingWorkspace) {
+          console.log('^^^ Loading Working')
+          await this._cache.loadProxiesForTreeRoots(workingWorkspace, workingTree);
+          afterLoadWorking = Date.now();
+          console.log('^^^ Time to load Working: ' + (afterLoadWorking - afterSyncCache) / 1000);
+
+        } else {
+          console.log('^^^ Loading HEAD')
+          const headRef = await this._cache.getRef('HEAD');
+          await this._cache.loadProxiesForCommit(headRef, workingTree);
+
+          afterLoadWorking = Date.now();
+          console.log('^^^ Time to load HEAD: ' + (afterLoadWorking - afterSyncCache) / 1000);
+        }
+
+        await workingTree.loadingComplete();
+
+        afterCalcTreeHashes = Date.now();
+
+      } else {
+        afterLoadWorking = Date.now();
+        afterCalcTreeHashes = Date.now();
       }
+
+      console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadWorking) / 1000);
 
       const treeHashes = workingTree.getAllTreeHashes();
 
+      console.log('^^^ Requesting item updates');
       const itemUpdatesResponse = await this.sendMessageToWorker(
         'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
       this.processBulkUpdate(itemUpdatesResponse.data);
 
+      let afterGetAll = Date.now();
+      console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
+
       // Ensure status for all items is updated
+      console.log('^^^ Getting status');
       const statusResponse = await this.sendMessageToWorker(
         'getStatus', undefined, true);
       console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
 
-      const calculateTreeHashesAsynchronously: boolean = this.loadFeatureSwitch(
-        'IR-defer-calc', true);
+      let afterGetStatus = Date.now();
+      console.log('^^^ Time to get status: ' + (afterGetStatus - afterGetAll) / 1000);
 
-      if (!this._initialized) {
-        if (calculateTreeHashesAsynchronously) {
-
-          console.log('^^^ Calculating TreeHashes asynchronously');
-
-          // Send early notification to other components
-          this.currentTreeConfigSubject.next({
-            config: workingTree,
-            configType: TreeConfigType.DEFAULT
-          });
-
-          this._initialWorkingTreeNotificationSent = true;
-
-          this.updateRepositorySyncState(
-            RepoStates.SYNCHRONIZATION_SUCCEEDED,
-            'Item Repository Ready'
-          );
-
-          await Promise.all(workingTree.loadingComplete(calculateTreeHashesAsynchronously));
-
-          console.log('^^^ Completed calculating TreeHashes asynchronously');
-
-        } else {
-
-          console.log('^^^ Calculating TreeHashes synchronously');
-
-          // This call will block until complete since the TreeHash processing is not deferred
-          await Promise.all(workingTree.loadingComplete(false));
-
-        }
-      }
-
-      if (this._initialized){
-        console.log('^^^ Requesting re-sync');
-      } else {
-        console.log('^^^ Requesting second sync');
-        this._initialized = true;
-      }
+      // TODO: Need to determine if second update is required
 
       let secondItemUpdateResponse = await this.sendMessageToWorker(
         'getItemUpdates', { refresh: true, treeHashes: workingTree.getAllTreeHashes() }, true);
 
-      let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
+        let afterLoading = Date.now();
+        console.log('^^^ Time to perform second sync: ' + (afterLoading - afterGetStatus) / 1000);
+        console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
+
+        let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
 
       if (syncIsComplete){
         this.logService.log(this.logEvents.kdbSynced);
@@ -509,6 +513,11 @@ export class ItemRepository {
           this._cache.cacheBlob(key, cachePiece.value[key]);
         }
         break;
+      case 'workspace':
+        for (let key in cachePiece.value) {
+          this._cache.cacheWorkspace(key, cachePiece.value[key]);
+        }
+        break;
     }
   }
 
@@ -649,7 +658,7 @@ export class ItemRepository {
             viewModelItemProxy = TreeConfiguration.getWorkingTree().
               getProxyFor('view-item');
           }
-          
+
           let viewModelAttribute: any = viewModelItemProxy.item.viewProperties[
             attributeName];
           if (viewModelAttribute && viewModelAttribute.inputType.type ===
@@ -657,14 +666,14 @@ export class ItemRepository {
             isMarkdownAttribute = true;
           }
         }
-        
+
         if (isMarkdownAttribute) {
           item[attributeName] = await this.convertToMarkdown(this.
             _markdownService.compile(item[attributeName]), 'text/html', {});
         }
       }
     }
-    
+
     return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void),
       reject: ((value: any) => void)) => {
       this.socketService.getSocket().emit('Item/upsert', {
@@ -686,7 +695,7 @@ export class ItemRepository {
             proxy.updateItem(response.kind, response.item);
             proxy.dirty = false;
           }
-          
+
           resolve(proxy);
         }
       });
@@ -709,7 +718,7 @@ export class ItemRepository {
 
     return promise;
   }
-  
+
   public async convertToMarkdown(content: string, contentType: string,
     parameters: any): Promise<string> {
     return (await this.sendMessageToWorker('convertToMarkdown', {
@@ -718,12 +727,12 @@ export class ItemRepository {
       parameters: parameters
     }, true)).data;
   }
-  
+
   public async getUrlContent(url: string): Promise<any> {
     return (await this.sendMessageToWorker('getUrlContent', { url: url },
       true)).data;
   }
-  
+
   public getImportPreview(file: File, parameters: any): Promise<string> {
     return new Promise<string>((resolve: (preview: string) => void, reject:
       () => void) => {
@@ -732,7 +741,7 @@ export class ItemRepository {
         resolve(await this.convertToMarkdown(fileReader.result, file.type,
           parameters));
       };
-      
+
       fileReader.readAsArrayBuffer(file);
     });
   }

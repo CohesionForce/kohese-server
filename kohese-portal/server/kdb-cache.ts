@@ -18,7 +18,7 @@ import * as LevelDown_Import from 'leveldown';
 // Adjust for the differences in CommonJS and ES6
 //
 let LevelDown;
-if (typeof(LevelDown_Import) === "object") {
+if (typeof(LevelDown_Import) === 'object') {
   LevelDown = (<any>LevelDown_Import).default;
 } else {
   LevelDown = LevelDown_Import;
@@ -73,14 +73,14 @@ export class KDBCache extends LevelCache {
     this.registerSublevel(
       'rCommit',
       this.getRepoCommits,
-      this.cacheRepoCommit,
+      this.cacheRepoCommitLocal,
       this.getRepoCommit
     );
 
     this.registerSublevel(
       'rTree',
       this.getRepoTrees,
-      this.cacheRepoTree,
+      this.cacheRepoTreeLocal,
       this.getRepoTree
     );
 
@@ -125,6 +125,13 @@ export class KDBCache extends LevelCache {
   //
   //////////////////////////////////////////////////////////////////////////
   cacheRepoCommit(oid, commit){
+    this.cacheKeyValuePair('rCommit', oid, commit);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private cacheRepoCommitLocal(oid, commit){
     Object.freeze(commit);
     this.repoCommitMap.set(oid, commit);
   }
@@ -147,6 +154,13 @@ export class KDBCache extends LevelCache {
   //
   //////////////////////////////////////////////////////////////////////////
   cacheRepoTree(oid, tree){
+    this.cacheKeyValuePair('rTree', oid, tree);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private cacheRepoTreeLocal(oid, tree){
     Object.freeze(tree);
     this.repoTreeMap.set(oid, tree);
   }
@@ -208,7 +222,7 @@ export class KDBCache extends LevelCache {
     try {
       headRef = kdbFS.loadJSONDoc(this.refsDirectory + '/' + 'HEAD.json');
     } catch (err) {
-      headRef = "INVALID";
+      headRef = 'INVALID';
     }
 
     let headCommit = await this.getRef('HEAD');
@@ -308,13 +322,7 @@ export class KDBCache extends LevelCache {
       console.log('::: Found ' + this.numberOfRefs() + ' refs');
 
       console.log('::: Storing cache data to level repository');
-      await this.saveSublevel('kCommit');
-      await this.saveSublevel('kTree');
-      await this.saveSublevel('blob');
-      await this.saveSublevel('tag');
-      await this.saveSublevel('rCommit');
-      await this.saveSublevel('rTree');
-      await this.saveSublevel('ref');
+      await this.saveAllPendingWrites();
       console.log('::: Finished storing cache data to level repository');
     } else {
       console.log('::: Found ' + this.numberOfBlobs() + ' blobs');
@@ -422,12 +430,9 @@ export class KDBCache extends LevelCache {
     var beforeTime = Date.now();
 
     await this.loadCachedObjects();
-    var afterTime = Date.now();
-    var deltaLoadTime = afterTime-beforeTime;
+    var afterLoadCache = Date.now();
+    var deltaLoadTime = afterLoadCache-beforeTime;
     console.log('::: Load time for cached objects in ' + this.repoPath + ': ' + deltaLoadTime/1000);
-
-    console.log('%%% Get objectMap:');
-    let objectMap = this.getObjectMap();
 
     beforeTime = Date.now();
 
@@ -447,17 +452,20 @@ export class KDBCache extends LevelCache {
           return true;
         }).then(async function (commits) {
           return await kdbCache.indexCommit(repo, commits);
-        }).then(function () {
+        }).then(async () => {
           try {
-            kdbCache.cacheRef('HEAD', refHEAD);
-            kdbFS.storeJSONDoc(kdbCache.refsDirectory + '/HEAD.json', refHEAD);
+            let head = await kdbCache.getRef('HEAD');
+            if (head !== refHEAD){
+              kdbCache.cacheRef('HEAD', refHEAD);
+              kdbFS.storeJSONDoc(kdbCache.refsDirectory + '/HEAD.json', refHEAD);
+            }
           } catch (err) {
             console.log('*** Error while writing HEAD reference');
             console.log(err);
           }
 
           let afterTime = Date.now();
-          var deltaUpdateTime = afterTime-beforeTime;
+          var deltaUpdateTime = afterTime-afterLoadCache;
           console.log('::: Update time for cached objects in ' + kdbCache.repoPath + ': ' + deltaUpdateTime/1000);
         });
       });
@@ -478,7 +486,7 @@ export class KDBCache extends LevelCache {
 
     let commitId = commit.id().toString();
     if (await this.getCommit(commitId)){
-      console.log('::: Already indexed commit ' + commitId);
+      // console.log('::: Already indexed commit ' + commitId);
       return await this.indexCommit(repository, commits);
     } else {
       console.log('::: Processing commit ' + commitId);
@@ -497,7 +505,7 @@ export class KDBCache extends LevelCache {
 
         // eslint-disable-next-line no-unused-vars
         var commitDataPromise = new Promise(async (resolve, reject) => {
-          await kdbCache.parseTree(repository, tree).then(() => {
+          await kdbCache.parseRepoTree(repository, tree).then(() => {
             resolve(co);
           });
         });
@@ -519,7 +527,7 @@ export class KDBCache extends LevelCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async parseTree(repository, tree) {
+  async parseRepoTree(repository, tree) {
     var kdbCache = this;
     var promises = [];
     var entries = {};
@@ -536,7 +544,7 @@ export class KDBCache extends LevelCache {
         if (!await this.getRepoTree(entry.sha().toString())){
           // jshint -W083
           promises.push(entry.getTree().then(function (t) {
-            return kdbCache.parseTree(repository, t);
+            return kdbCache.parseRepoTree(repository, t);
           }));
           // jshint +W083
         }
@@ -544,7 +552,7 @@ export class KDBCache extends LevelCache {
         // Retrieve Blob if it is not already cached
         var oid = entry.sha().toString();;
         if (!await this.getBlob(oid)){
-          promises.push(this.getContents(repository, oid));
+          promises.push(this.getRepoContents(repository, oid));
         }
       }
     }
@@ -557,7 +565,7 @@ export class KDBCache extends LevelCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  getContents(repository, oid) {
+  getRepoContents(repository, oid) {
     var kdbCache = this;
     return nodegit.Blob.lookup(repository, nodegit.Oid
       .fromString(oid)).then(async function (blob) {
@@ -567,7 +575,7 @@ export class KDBCache extends LevelCache {
       console.log('*** Error retreiving blob from underlying repo: ' + oid);
       console.log(err.stack);
       await kdbCache.addCachedObject('blob', oid, {
-        error: "Can Not Retrieve Item From Underlying Repo",
+        error: 'Can Not Retrieve Item From Underlying Repo',
         oid: oid
       });
       return Promise.resolve(oid);
@@ -694,7 +702,7 @@ export class KDBCache extends LevelCache {
 
     for(var repoFile in repoDir){
 
-      //TODO:  Need to convert to jsonMountExt and merge the contents
+      // TODO: Need to convert to jsonMountExt and merge the contents
 
       if (!jsonExt.test(repoFile)){
         console.log('>>> Skipping repo file ' + repoFile);

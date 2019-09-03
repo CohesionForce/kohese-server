@@ -47,25 +47,25 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
       case 'update':
         kdb.storeModelInstance(change.proxy, change.type === 'create')
         .then(function (status) {
-          var notification = {
+          let createNotification = {
               type: change.type,
               kind: change.kind,
               id: change.proxy.item.id,
               item: change.proxy.item,
               status: status
           };
-          kio.server.emit('Item/' + change.type, notification);
+          kio.server.emit('Item/' + change.type, createNotification);
         });
         break;
       case 'delete':
-        var notification = {
+        let deleteNotification = {
           type: change.type,
           kind: change.kind,
           id: change.proxy.item.id,
           recursive: change.recursive
         };
         kdb.removeModelInstance(change.proxy);
-        kio.server.emit('Item/' + change.type, notification);
+        kio.server.emit('Item/' + change.type, deleteNotification);
         break;
       case 'loading':
       case 'loaded':
@@ -228,7 +228,72 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getRepoHashmap', function(request, sendResponse){
+  socket.on('Item/getMissingCacheInfo', async function(request, sendResponse){
+
+    let username = 'Unknown';
+    let requestReceiptTime = Date.now();
+    if (socket.koheseUser){
+      username = socket.koheseUser.username;
+    }
+    console.log('::: session %s: Received getMissingCacheInfo for user %s at %s', socket.id, username,
+                socket.handshake.address);
+
+    consoleLogObject('$$$ Request', request);
+
+    let itemCache = TreeConfiguration.getItemCache();
+    let missingCacheData = request.missingCacheData;
+    let cacheData : any = {};
+
+    // Retrieve missing data
+    if(missingCacheData.blob){
+      cacheData.blob = {};
+      for(let oid in missingCacheData.blob){
+        let blob = await itemCache.getBlob(oid);
+        cacheData.blob[oid] = blob;
+      }
+    }
+
+    if(missingCacheData.tree){
+      cacheData.tree = {};
+      for(let treehash in missingCacheData.tree){
+        let tree = await itemCache.getTree(treehash);
+        cacheData.tree[treehash] = tree;
+      }
+    }
+
+    if(missingCacheData.root){
+      cacheData.root = {};
+      for(let rootTreehash in missingCacheData.root){
+        let root = await itemCache.getTree(rootTreehash);
+        cacheData.root[rootTreehash] = root;
+      }
+    }
+
+    if(missingCacheData.commit){
+      cacheData.commit = {};
+      for(let commitId in missingCacheData.commit){
+        let commit = await itemCache.getCommit(commitId);
+        cacheData.commit[commitId] = commit;
+      }
+    }
+
+    let response = {
+      timestamp: {
+        requestTime: request.timestamp.requestTime,
+        requestReceiptTime: requestReceiptTime,
+        responseTransmitTime: Date.now()
+      },
+      cacheData: cacheData
+    };
+
+    console.log('::: Sending getMissingCacheInfo response');
+    sendResponse(response);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Item/getRepoHashmap', async function(request, sendResponse){
     var username = 'Unknown';
     if (socket.koheseUser){
       username = socket.koheseUser.username;
@@ -236,21 +301,13 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received getRepoHashmap for user %s at %s', socket.id, username,
                 socket.handshake.address);
 
-    // consoleLogObject('$$$ Request', request);
-
-    var repoTreeHashes = ItemProxy.getWorkingTree().getRepoTreeHashes();
-
-    // consoleLogObject('$$$ Server Repo THM', repoTreeHashes);
-
-    // var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
-
-    // consoleLogObject('$$$ Client/Server THM Compare', thmCompare);
+    let working : TreeConfiguration = ItemProxy.getWorkingTree();
+    await working.saveToCache();
+    var repoTreeHashes = working.getRepoTreeHashes();
 
     let response = {
       repoTreeHashes: repoTreeHashes
     };
-
-    // consoleLogObject('$$$ Response', response);
 
     console.log('::: Sending getRepoHashmap response');
     sendResponse(response);
@@ -526,7 +583,7 @@ function KIOItemServer(socket){
     itemAnalysis.performAnalysis(request.kind, request.id, sendResponse);
 
   });
-  
+
   socket.on('getUrlContent', async (request: any, respond: Function) => {
     try {
       let response: Response = await Fetch(request.url);
@@ -541,7 +598,7 @@ function KIOItemServer(socket){
       respond({ content: '', contentType: '' });
     }
   });
-  
+
   socket.on('convertToMarkdown', async (request: any, respond: Function) => {
     let parameterlessType: string = ((request.contentType.indexOf(';') !==
       -1) ? request.contentType.substring(0, request.contentType.indexOf(
@@ -553,40 +610,40 @@ function KIOItemServer(socket){
       if (request.parameters.forceTocStructuring) {
         parameters.push('-t');
       }
-      
+
       if (request.parameters.doNotStructure) {
         parameters.push('-u');
       }
-      
+
       if (request.parameters.matchSectionNamesLeniently) {
         parameters.push('-l');
       }
-      
+
       if (request.parameters.moveFootnotes) {
         parameters.push('-f');
       }
-      
+
       if (request.parameters.tocEntryPadding) {
         parameters.push('--toc-entry-padding=' + request.parameters.
           tocEntryPadding);
       }
-      
+
       if (!!request.parameters.tocBeginning) {
         parameters.push('--toc-begin=' + request.parameters.tocBeginning);
       }
-      
+
       if (!!request.parameters.tocEnding) {
         parameters.push('--toc-end=' + request.parameters.tocEnding);
       }
-      
+
       if (!!request.parameters.headerLines) {
         parameters.push('--header-length=' + request.parameters.headerLines);
       }
-      
+
       if (!!request.parameters.footerLines) {
         parameters.push('--footer-length=' + request.parameters.footerLines);
       }
-      
+
       let pdfConversionProcess: any = child.spawnSync('java', parameters,
         { input: request.content });
       respond(pdfConversionProcess.stdout.toString());
@@ -618,8 +675,9 @@ function KIOItemServer(socket){
               'soffice process on the server machine.');
             return;
           }
-          
+
           // Fall through to '.odt' case
+          // tslint:disable-next-line:no-switch-case-fall-through
         case 'application/vnd.oasis.opendocument.text':
           mediaDirectoryPath = Path.resolve(temporaryDirectoryPath,
             'Pictures');
@@ -629,22 +687,22 @@ function KIOItemServer(socket){
           mediaDirectoryPath = temporaryDirectoryPath;
           format = 'html';
       }
-      
+
       let pandocParameters: Array<string> = ['-f', format, '-t', 'commonmark',
         '--atx-headers', '-s'];
-      
+
       if (format !== 'html') {
         pandocParameters.push('--extract-media');
         pandocParameters.push(temporaryDirectoryPath);
       }
-      
+
       pandocParameters.push(temporaryFilePath);
-      
+
       let pandocProcess: any = child.spawnSync('pandoc', pandocParameters,
         undefined);
-      
+
       fs.unlinkSync(temporaryFilePath);
-      
+
       let preview: string = pandocProcess.stdout.toString();
       /*
         Regular expression information:
@@ -690,10 +748,10 @@ function KIOItemServer(socket){
             }
           }
         }
-        
+
         return replacement;
       });
-      
+
       if (fs.existsSync(mediaDirectoryPath)) {
         let directoryContents: Array<string> = fs.readdirSync(
           mediaDirectoryPath);
@@ -701,14 +759,14 @@ function KIOItemServer(socket){
           fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[
             j]));
         }
-        
+
         if (mediaDirectoryPath !== temporaryDirectoryPath) {
           fs.rmdirSync(mediaDirectoryPath);
         }
       }
-      
+
       fs.rmdirSync(temporaryDirectoryPath);
-      
+
       respond(preview);
     }
   });
@@ -1019,10 +1077,10 @@ function KIOItemServer(socket){
     var idsArray = Array.from(request.proxyIds);
     var pendingEvaluationPromises = [];
 
-    for (var i = 0; i < idsArray.length; i++) {
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
-      var repositoryInformation = getRepositoryInformation(proxy);
-      var repositoryId = repositoryInformation.repositoryProxy.item.id;
+    for (let i = 0; i < idsArray.length; i++) {
+      let proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
+      let repositoryInformation = getRepositoryInformation(proxy);
+      let repositoryId = repositoryInformation.repositoryProxy.item.id;
 
       // jshint -W083
       // eslint-disable-next-line no-unused-vars
@@ -1065,15 +1123,15 @@ function KIOItemServer(socket){
     // Wait for any pending unstage requests to complete
     Promise.all(pendingEvaluationPromises).then(function(statusArray){
       // Determine if items need to be checked out or deleted
-      for (var i = 0; i < idsArray.length; i++) {
-        var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
-        var repositoryInformation = getRepositoryInformation(proxy);
+      for (let i = 0; i < idsArray.length; i++) {
+        let proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
+        let repositoryInformation = getRepositoryInformation(proxy);
         let repositoryId = repositoryInformation.repositoryProxy.item.id;
         var status = statusArray[i];
 
         var isNewUnstagedFile = false;
 
-        for (var j = 0; j < status.length; j++) {
+        for (let j = 0; j < status.length; j++) {
           if (status[j].endsWith('WT_NEW')) {
             isNewUnstagedFile = true;
             break;
@@ -1102,8 +1160,8 @@ function KIOItemServer(socket){
       Promise.all(pendingCheckoutProxies)
       .then(function () {
         // Update content based on reverted files
-        for (var j = 0; j < proxies.length; j++) {
-          var proxy = proxies[j];
+        for (let j = 0; j < proxies.length; j++) {
+          let proxy = proxies[j];
           var item = kdbFS.loadJSONDoc(proxy.repoPath);
           if (proxy.kind === 'Repository') {
             item.parentId = proxy.item.parentId;
@@ -1206,7 +1264,7 @@ async function embedImage(matchSource: string, match: string, pathBase:
       } else if (mediaPath.endsWith('.jpg') || mediaPath.endsWith('.jpeg')) {
         dataUrl += 'jpeg';
       }
-      
+
       dataUrl += ';base64,';
       dataUrl += fs.readFileSync(mediaPath, { encoding: 'base64' });
       replacement = matchSource.substring(0, matchSourceIndex) + dataUrl +
@@ -1215,7 +1273,7 @@ async function embedImage(matchSource: string, match: string, pathBase:
       replacement = matchSource;
     }
   }
-  
+
   return replacement;
 }
 
