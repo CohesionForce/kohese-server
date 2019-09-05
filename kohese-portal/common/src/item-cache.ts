@@ -669,7 +669,6 @@ export class CacheAnalysis {
   //
   //////////////////////////////////////////////////////////////////////////
   async detectAllMissingData(){
-    console.log('^^^ Detecting all missing data');
     this.markBlobsAsEvaluated();
     await this.detectMissingTreeData();
     await this.detectMissingCommitData();
@@ -785,7 +784,7 @@ export class CacheAnalysis {
       delete missingData.root;
     }
 
-    if (missingData.commit.length === 0) {
+    if (Object.keys(missingData.commit).length === 0) {
       delete missingData.commit;
     }
 
