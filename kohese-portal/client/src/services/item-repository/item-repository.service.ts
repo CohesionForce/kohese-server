@@ -263,6 +263,7 @@ export class ItemRepository {
         }
 
         await workingTree.loadingComplete();
+        this._initialized = true;
 
         afterCalcTreeHashes = Date.now();
 

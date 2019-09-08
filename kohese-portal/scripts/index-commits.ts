@@ -34,8 +34,13 @@ kdb.initialize(baseRepoPath, indexAndExit).then(async () =>  {
 
   console.log('::: Checking for missing data in cache');
   try {
-    let cacheAnalysis = new CacheAnalysis(itemCache);
-    let missingData = await cacheAnalysis.detectMissingCommitData();
+    const missingCacheData = await itemCache.analysis.detectAllMissingData();
+    if (missingCacheData.found) {
+      console.log('*** Missing cache data');
+      console.log(JSON.stringify(missingCacheData, null, '  '));
+    } else {
+      console.log('::: No missing cahce data was detected')
+    }
   } catch (err){
     console.log('*** Error: ' + err);
     console.log(err.stack);
