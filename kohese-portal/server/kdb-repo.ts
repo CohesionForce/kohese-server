@@ -525,19 +525,39 @@ module.exports.getItemStatus = getItemStatus;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+var commitsFromIndex;
+
+function loadCommitsFromIndex(){
+  commitsFromIndex = {};
+  var commitFiles = fs.readdirSync(INDEX_DIRECTORY);
+  for (var j = 0; j < commitFiles.length; j++) {
+    let commitFile = commitFiles[j];
+    let commitId = commitFile.substring(0, commitFile.lastIndexOf('.json'))
+    var content = JSON.parse(fs.readFileSync(path.join(INDEX_DIRECTORY,
+      commitFile), ''));
+    commitsFromIndex[commitId] = content;
+  }
+}
+module.exports.loadCommitsFromIndex = loadCommitsFromIndex;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function walkHistoryForFile(itemId, callback){
 
   // TODO Need to pass path instead of itemId.  kdb-repo should not know about the internals of the content
 
-  var commitFiles = fs.readdirSync(INDEX_DIRECTORY);
+  if (!commitsFromIndex){
+    loadCommitsFromIndex();
+  }
+
   var relatedCommits = [];
-  for (var j = 0; j < commitFiles.length; j++) {
-    var content = JSON.parse(fs.readFileSync(path.join(INDEX_DIRECTORY,
-      commitFiles[j]), ''));
+  for (let commitId in commitsFromIndex) {
+    var content = commitsFromIndex[commitId];
     var entry = content.objects[itemId];
     if (entry) {
       relatedCommits.push({
-        commit: commitFiles[j].substring(0, commitFiles[j].lastIndexOf('.json')),
+        commit: commitId,
         message: content.meta.message,
         author: content.meta.author,
         date: content.meta.time,

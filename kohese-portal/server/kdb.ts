@@ -615,6 +615,8 @@ function index(proxy, overwrite) {
   return kdbRepo.generateCommitHistoryIndices((repositoryPath.endsWith('Root.json') ?
       path.dirname(repositoryPath) : repositoryPath), overwrite).then(function () {
     console.log('::: Indexing of ' + proxy.item.name + ' complete.');
+    kdbRepo.loadCommitsFromIndex();
+    console.log('::: Loaded commits from index');
   });
 }
 module.exports.index = index;
