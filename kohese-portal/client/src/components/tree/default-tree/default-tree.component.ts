@@ -292,7 +292,13 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
               break;
             default:
               if (notification.proxy) {
-                this.getRow(notification.proxy.item.id).refresh();
+                let row: TreeRow = this.getRow(notification.proxy.item.id);
+                /* The below conditional should not be necessary; however, an
+                error has been produced during removal without this
+                conditional. */
+                if (row) {
+                  row.refresh();
+                }
               }
           }
         });
