@@ -446,7 +446,12 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/getHistory', function(request, sendResponse){
-    console.log('::: Getting history for ' + request.onId);
+    var username = 'Unknown';
+    if (socket.koheseUser){
+      username = socket.koheseUser.username;
+    }
+
+    console.log('::: Getting history for ' + request.onId + ' for user ' + username);
 
     let requestTime = Date.now();
 
@@ -464,7 +469,7 @@ function KIOItemServer(socket){
     if (proxy && proxy.history) {
       let responseTime = Date.now();
       console.log('+++ History for ' + request.onId);
-      console.log(proxy.history);
+      console.log(JSON.stringify(proxy.history, null, '  '));
       console.log('$$$ History response time: ' + (responseTime - requestTime)/1000);
       sendResponse(proxy.history);
     } else {
