@@ -605,6 +605,10 @@ function KIOItemServer(socket){
   });
 
   socket.on('convertToMarkdown', async (request: any, respond: Function) => {
+    console.log('::: session %s: Received convertToMarkdown for %s for user %s at %s',
+        socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+    console.log(request);
+    let beforeTime = Date.now();
     let parameterlessType: string = ((request.contentType.indexOf(';') !==
       -1) ? request.contentType.substring(0, request.contentType.indexOf(
       ';')) : request.contentType);
@@ -651,7 +655,9 @@ function KIOItemServer(socket){
 
       let pdfConversionProcess: any = child.spawnSync('java', parameters,
         { input: request.content });
-      respond(pdfConversionProcess.stdout.toString());
+        let afterTime = Date.now();
+        console.log('::: Sending response for convertToMarkdown (pdf): ' + (afterTime-beforeTime)/1000);
+        respond(pdfConversionProcess.stdout.toString());
     } else {
       let format: string;
       let temporaryFileName: string = String(new Date().getTime());
@@ -772,11 +778,16 @@ function KIOItemServer(socket){
 
       fs.rmdirSync(temporaryDirectoryPath);
 
+      let afterTime = Date.now();
+      console.log('::: Sending response for convertToMarkdown (not pdf): ' + (afterTime-beforeTime)/1000);
       respond(preview);
     }
   });
 
   socket.on('importMarkdown', (request: any, respond: Function) => {
+    console.log('::: session %s: Received importMarkdown for %s for user %s at %s',
+        socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+    // console.log(request);
     let timestamp: number = Date.now();
     MdToKohese.convertMarkdownToItems(request.markdown, {
       name: request.fileName,
