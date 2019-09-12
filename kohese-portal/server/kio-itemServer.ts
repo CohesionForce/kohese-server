@@ -649,9 +649,20 @@ function KIOItemServer(socket){
         parameters.push('--footer-length=' + request.parameters.footerLines);
       }
 
-      let pdfConversionProcess: any = child.spawnSync('java', parameters,
-        { input: request.content });
-      respond(pdfConversionProcess.stdout.toString());
+      let pdfConversionProcess: any = child.spawn('java', parameters,
+        undefined);
+      pdfConversionProcess.stdin.write(request.content);
+      pdfConversionProcess.stdin.end();
+      let output: string = '';
+      pdfConversionProcess.stdout.on('data', (data: string) => {
+        output += data;
+      });
+      pdfConversionProcess.on('close', (exitCode: number) => {
+        respond(output);
+      });
+      pdfConversionProcess.on('error', (error: any) => {
+        respond(undefined);
+      });
     } else {
       let format: string;
       let temporaryFileName: string = String(new Date().getTime());
@@ -703,12 +714,22 @@ function KIOItemServer(socket){
 
       pandocParameters.push(temporaryFilePath);
 
-      let pandocProcess: any = child.spawnSync('pandoc', pandocParameters,
+      let pandocProcess: any = child.spawn('pandoc', pandocParameters,
         undefined);
-
-      fs.unlinkSync(temporaryFilePath);
-
-      let preview: string = pandocProcess.stdout.toString();
+      let preview: string = await new Promise<string>((resolve: (output:
+        string) => void, reject: () => void) => {
+        let output: string = '';
+        pandocProcess.stdout.on('data', (data: string) => {
+          output += data;
+        });
+        pandocProcess.on('close', (exitCode: number) => {
+          fs.unlinkSync(temporaryFilePath);
+          resolve(output);
+        });
+        pandocProcess.on('error', (error: any) => {
+          respond(undefined);
+        });
+      });
       /*
         Regular expression information:
           - '\s\S' is used instead of '.' to handle line breaks since the 's'
