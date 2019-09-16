@@ -48,6 +48,8 @@ export class ItemRepository {
   private static loggingInitialized: boolean = false;
   private static componentId: number;
   private static itemRepoInitEvent: number;
+  private static markdownNormalizationEnabled =
+    ItemRepository.loadFeatureSwitch('IR-markdown-normalization-enabled', false);
 
   shortProxyList: Array<ItemProxy>;
   modelTypes: Object;
@@ -212,6 +214,40 @@ export class ItemRepository {
         });
       }
     });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  static createFeatureSwitch(featureName, defaultValue){
+
+    let storedValue = localStorage.getItem(featureName)
+
+    if (!storedValue) {
+      ItemRepository.setFeatureSwitch(featureName, defaultValue);
+    };
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  static setFeatureSwitch(featureName, value){
+
+    localStorage.setItem(featureName, JSON.stringify(value));
+
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  static loadFeatureSwitch(featureName, defaultValue){
+
+    let switchResult = defaultValue;
+
+    let storedValue = localStorage.getItem(featureName)
+
+    if (storedValue) {
+      switchResult = JSON.parse(storedValue);
+    } else {
+      ItemRepository.createFeatureSwitch(featureName, defaultValue);
+    };
+
+    return switchResult
   }
 
   public async getSessionMap(): Promise<any> {
@@ -447,40 +483,6 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  createFeatureSwitch(featureName, defaultValue){
-
-    let storedValue = localStorage.getItem(featureName)
-
-    if (!storedValue) {
-      this.setFeatureSwitch(featureName, defaultValue);
-    };
-
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  setFeatureSwitch(featureName, value){
-
-    localStorage.setItem(featureName, JSON.stringify(value));
-
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  loadFeatureSwitch(featureName, defaultValue){
-
-    let switchResult = defaultValue;
-
-    let storedValue = localStorage.getItem(featureName)
-
-    if (storedValue) {
-      switchResult = JSON.parse(storedValue);
-    } else {
-      this.createFeatureSwitch(featureName, defaultValue);
-    };
-
-    return switchResult
-  }
-
-  //////////////////////////////////////////////////////////////////////////
   processCachePiece(cachePiece) {
 
     switch (cachePiece.key) {
@@ -641,36 +643,38 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   public async upsertItem(type: string, item: any): Promise<ItemProxy> {
-    for (let attributeName in item) {
-      // The itemIds attribute is currently absent from classProperties.
-      if (attributeName !== 'itemIds') {
-        let isMarkdownAttribute: boolean = false;
-        let dataModelItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(type);
-        if (dataModelItemProxy.item.classProperties[attributeName].definition.
-          type === 'markdown') {
-          isMarkdownAttribute = true;
-        } else {
-          let viewModelItemProxy: ItemProxy = TreeConfiguration.
-            getWorkingTree().getProxyFor('view-' + dataModelItemProxy.item.
-            name.toLowerCase());
-          // Currently, not every data model has a view model.
-          if (!viewModelItemProxy) {
-            viewModelItemProxy = TreeConfiguration.getWorkingTree().
-              getProxyFor('view-item');
-          }
-
-          let viewModelAttribute: any = viewModelItemProxy.item.viewProperties[
-            attributeName];
-          if (viewModelAttribute && viewModelAttribute.inputType.type ===
-            'markdown') {
+    if (ItemRepository.markdownNormalizationEnabled){
+      for (let attributeName in item) {
+        // The itemIds attribute is currently absent from classProperties.
+        if (attributeName !== 'itemIds') {
+          let isMarkdownAttribute: boolean = false;
+          let dataModelItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(type);
+          if (dataModelItemProxy.item.classProperties[attributeName].definition.
+            type === 'markdown') {
             isMarkdownAttribute = true;
-          }
-        }
+          } else {
+            let viewModelItemProxy: ItemProxy = TreeConfiguration.
+              getWorkingTree().getProxyFor('view-' + dataModelItemProxy.item.
+              name.toLowerCase());
+            // Currently, not every data model has a view model.
+            if (!viewModelItemProxy) {
+              viewModelItemProxy = TreeConfiguration.getWorkingTree().
+                getProxyFor('view-item');
+            }
 
-        if (isMarkdownAttribute) {
-          item[attributeName] = await this.convertToMarkdown(this.
-            _markdownService.compile(item[attributeName]), 'text/html', {});
+            let viewModelAttribute: any = viewModelItemProxy.item.viewProperties[
+              attributeName];
+            if (viewModelAttribute && viewModelAttribute.inputType.type ===
+              'markdown') {
+              isMarkdownAttribute = true;
+            }
+          }
+
+          if (isMarkdownAttribute) {
+            item[attributeName] = await this.convertToMarkdown(this.
+              _markdownService.compile(item[attributeName]), 'text/html', {});
+          }
         }
       }
     }

@@ -64,9 +64,38 @@
       XKPC: 'Pseudo Chunk'
   };
 
-  function requestAnalysisJSON(forProxy, cb) {
+  let pendingAnalysis = {};
+  let analysisInProgress: boolean = false;
+
+  function queueAnalysisJSON(forProxy, cb) {
+
+    let onId = forProxy.item.id;
+    console.log('::: Queue ANALYSIS: ' + onId);
+
+    if (pendingAnalysis[onId]){
+      // Add to the pending callback list
+      pendingAnalysis[onId].callbacks.push(cb);
+      return;
+    } else {
+      // Create a new pendingAnalysis
+      pendingAnalysis[onId] = {
+        forProxy: forProxy,
+        callbacks: [ cb ]
+      }
+      if (analysisInProgress){
+        return;
+      } else {
+        analysisInProgress = true;
+        requestAnalysisJSON(forProxy);
+      }
+    }
+  }
+
+  function requestAnalysisJSON(forProxy) {
+
     let onId = forProxy.item.id;
     let forModelKind= forProxy.kind;
+
     console.log('::: ANALYZING: ' + onId);
 
     var instance = forProxy.item;
@@ -109,7 +138,10 @@
         error.code = analysisError.code;
         error.syscall = analysisError.syscall;
         console.log(error);
-        cb({error: error});
+        for(let cbIndex in pendingAnalysis[onId].callbacks) {
+          let cb = pendingAnalysis[onId].callbacks[cbIndex];
+          cb({error: error});
+        }
 
         console.log('*** Error:');
         console.log(error);
@@ -130,7 +162,10 @@
           kdb.storeModelAnalysis(analysis);
 
           console.log('::: ANALYSIS Completed: ' + onId);
-          cb(analysis);
+          for(let cbIndex in pendingAnalysis[onId].callbacks) {
+            let cb = pendingAnalysis[onId].callbacks[cbIndex];
+            cb(analysis);
+          }
         } catch (err) {
           console.log('*** Error parsing result for: ' + forModelKind + ' - ' +
               onId + ' - ' + analysis.name);
@@ -144,10 +179,22 @@
           '*** Failure while parsing analysis');
           parseError.onId = onId;
           console.log(parseError);
-          cb({error: parseError});
+          for(let cbIndex in pendingAnalysis[onId].callbacks) {
+            let cb = pendingAnalysis[onId].callbacks[cbIndex];
+            cb({error: parseError});
+          }
 
         }
 
+      }
+      delete pendingAnalysis[onId];
+      let nextId = Object.keys(pendingAnalysis)[0];
+      console.log('::: Checking for additional analysis to perform: ' + nextId);
+      if (nextId) {
+        let nextProxy = pendingAnalysis[nextId].forProxy;
+        requestAnalysisJSON(nextProxy);
+      } else {
+        analysisInProgress = false;
       }
     });
   }
@@ -162,7 +209,7 @@
     if (analysis) {
       cb(analysis);
     } else {
-      requestAnalysisJSON(forProxy, cb);
+      queueAnalysisJSON(forProxy, cb);
     }
   }
   module.exports.performAnalysis = performAnalysis;
