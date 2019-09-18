@@ -232,7 +232,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
 
       // Build the ancestors if necessary
       let ancestor = proxy.parentProxy;
-      while (!this.getRow(ancestor.item.id)){
+      while (ancestor && !this.getRow(ancestor.item.id)){
         this.buildRow(ancestor);
         ancestor = ancestor.parentProxy;
       }
@@ -240,23 +240,17 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   }
 
   private removeRowAndAncestors(proxy: ItemProxy){
-    let currentRow: TreeRow = this.getRow(proxy.item.id);
-    if (currentRow){
-      if (!(this.proxyHasVCStatus(proxy) || this.getChildren(proxy).length)){
-        // Delete the row and any applicable ancestors
-        this.deleteRow(proxy.item.id);
+    if (!(this.proxyHasVCStatus(proxy) || this.getChildren(proxy).length)){
+      // Delete the row and any applicable ancestors
+      this.deleteRow(proxy.item.id);
 
-        let ancestor: ItemProxy = proxy.parentProxy;
-        let ancestorRow: TreeRow = this.getRow(ancestor.item.id);
-        while ((ancestor !== this._absoluteRoot) && !(this.proxyHasVCStatus(
-          ancestor) || this.getChildren(ancestor).length)){
-          this.deleteRow(ancestor.item.id);
-          ancestor = ancestor.parentProxy;
-          ancestorRow = this.getRow(ancestor.item.id);
-        }
+      let ancestor: ItemProxy = proxy.parentProxy;
+      while (ancestor && (ancestor !== this._absoluteRoot) && !(this.
+        proxyHasVCStatus(ancestor) || this.getChildren(ancestor).length)){
+        this.deleteRow(ancestor.item.id);
+        ancestor = ancestor.parentProxy;
       }
     }
-
   }
 
   private buildRows(root: ItemProxy): void {
