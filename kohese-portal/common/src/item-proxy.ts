@@ -173,7 +173,7 @@ export class ItemProxy {
     if (parentId.hasOwnProperty('id')){
       // parentId supplied as a reference object
       parentId = parentId.id;
-      forItem.parentId = parentId;
+      proxy.item.parentId = parentId;
     }
 
     var parent = proxy.treeConfig.proxyMap[parentId];
@@ -850,7 +850,7 @@ export class ItemProxy {
             return;
           }
           proxy = thisIteration.value;
-          if (proxy.deferTreeHash) {
+          if (proxy.deferTreeHash || !proxy.treeHashEntry) {
             iterationCount++;
             proxy.calculateTreeHash(deferredRollup);
             if (deferCalc && (iterationCount % yieldAtIteration === 0)) {
