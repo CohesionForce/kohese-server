@@ -54,7 +54,6 @@ export class KLogger {
   loggingCategoryRegistry: { [nameString: string]: LoggingCategoryRecord } = {};
 
   loggingEventRegisteredSubject: Subject <LoggingEventRecord> = new Subject<LoggingEventRecord>()
-  logMap : any = {};
 
   private showAllErrors: boolean = true;
 
@@ -63,7 +62,7 @@ export class KLogger {
       KLogger.singleton = this;
       if (logRegistry) {
         for (let logEvent of logRegistry) {
-          this.logMap[logEvent.id] = logEvent;
+          this.loggingEventRegistry[logEvent.id] = logEvent;
         }
       } else {
         console.log('Initializing Log Registry');
@@ -94,7 +93,8 @@ export class KLogger {
   }
 
   getEventId(componentId: string, eventName: string): string {
-    let loggingEventRecord: LoggingEventRecord = this.logMap['[' + eventName + ']'];
+    let loggingEventRecord: LoggingEventRecord = this.loggingEventRegistry[
+      '[' + eventName + ']'];
     let id;
     if (loggingEventRecord) {
       id = loggingEventRecord.id;
@@ -115,7 +115,7 @@ export class KLogger {
       automaticallyCreated: true,
       active : false
     }
-    this.loggingEventRegistry[eventName] = loggingEventRecord;
+    this.loggingEventRegistry[loggingEventRecord.id] = loggingEventRecord;
     this.loggingEventRegisteredSubject.next(loggingEventRecord)
 
     return loggingEventRecord;
@@ -130,7 +130,7 @@ export class KLogger {
   }
 
   log(eventId: string, infoObject?: any) {
-    if (this.logMap[eventId].active) {
+    if (this.loggingEventRegistry[eventId].active) {
       console.log(eventId);
       if (infoObject) {
         console.log(infoObject);
