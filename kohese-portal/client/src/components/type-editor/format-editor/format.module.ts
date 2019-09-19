@@ -6,6 +6,7 @@ import { ContainerSelectorComponent } from './format-gui/container-selector/cont
 import { FormatEditorComponent } from './format-editor.component';
 import { PipesModule } from '../../../pipes/pipes.module';
 import { MaterialModule } from '../../../material.module';
+import { UserInputModule } from '../../user-input/user-input.module';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
@@ -13,6 +14,8 @@ import { FormatGuiComponent } from './format-gui/format-gui.component';
 import { TableContainerComponent } from './format-gui/property-container/table-container/table-container.component';
 import { ListContainerEditorComponent } from './format-gui/property-container/list-container-editor/list-container-editor.component';
 import { ColumnContainerEditorComponent } from './format-gui/property-container/column-container-editor/column-container-editor.component';
+import { TableEditorComponent } from './table-editor/table-editor.component';
+import { TablePreviewDialogComponent } from './table-editor/table-preview-dialog/table-preview-dialog.component';
 
 @NgModule({
   declarations: [
@@ -24,11 +27,14 @@ import { ColumnContainerEditorComponent } from './format-gui/property-container/
     ListContainerEditorComponent,
     PropertyRowComponent,
     HeaderContainerEditorComponent,
-    FormatPreviewComponent
+    FormatPreviewComponent,
+    TableEditorComponent,
+    TablePreviewDialogComponent
   ],
   entryComponents: [
     ContainerSelectorComponent,
-    FormatPreviewComponent
+    FormatPreviewComponent,
+    TablePreviewDialogComponent
   ],
   exports : [
     FormatEditorComponent,
@@ -39,6 +45,7 @@ import { ColumnContainerEditorComponent } from './format-gui/property-container/
     FormsModule,
     MaterialModule,
     PipesModule,
+    UserInputModule,
     DocumentViewModule
   ]
 })

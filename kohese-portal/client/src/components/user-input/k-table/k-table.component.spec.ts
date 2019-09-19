@@ -37,7 +37,18 @@ describe('Component: k-table', () => {
       propertyName: 'predecessors',
       hideLabel: false,
       labelOrientation: 'Top',
-      kind: 'table'
+      kind: 'table',
+      tableDefinition: {
+        columns: [
+          'name'
+        ],
+        expandedFormat: {
+          column1: [],
+          column2: [],
+          column3: [],
+          column4: []
+        }
+      }
     };
     fixture.detectChanges();
   });

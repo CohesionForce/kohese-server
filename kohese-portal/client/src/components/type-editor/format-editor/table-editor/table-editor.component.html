@@ -1,0 +1,52 @@
+<span style="font-size:large;">Table Editor</span>
+  <button mat-button style="background-color : navy; color : white; margin-left : 10px;" (click)="openTablePreview()">Open
+    Preview</button>
+<mat-divider></mat-divider>
+<div class="table-options">
+  <h5>Table options : </h5>
+  <div class="property-section">
+    <h6 style="font-weight : bold;">
+      Table Columns
+      <button mat-icon-button [disabled]="(Object.keys(attributes).length ===
+        tableDefinition.columns.length)" (click)="addColumn()">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+    </h6>
+    <mat-divider></mat-divider>
+    <div>
+      <div *ngFor="let column of tableDefinition.columns">
+        {{column}}
+        <button mat-icon-button (click)="deleteColumn(column);">
+          <mat-icon class="fa fa-minus"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="property-section">
+    <h6 style="font-weight: bold;">Expanded Row</h6>
+    <div class="column">
+      <div *ngFor="let property of tableDefinition.expandedFormat.column1">
+        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 1)"></button>
+      </div>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(1)">Add Property</button>
+    </div>
+    <div class="column">
+      <div *ngFor="let property of tableDefinition.expandedFormat.column2">
+        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 2)"></button>
+      </div>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(2)">Add Property</button>
+    </div>
+    <div class="column">
+      <div *ngFor="let property of tableDefinition.expandedFormat.column3">
+        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 3)"></button>
+      </div>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(3)">Add Property</button>
+    </div>
+    <div class="footer">
+      <div *ngFor="let property of tableDefinition.expandedFormat.column4">
+        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 4)"></button>
+      </div>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(4)">Add Property</button>
+    </div>
+  </div>
+</div>

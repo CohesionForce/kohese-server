@@ -44,18 +44,6 @@
         Multivalued
       </mat-checkbox>
       <br/>
-      <mat-checkbox class="field-option" [disabled]="!attribute.relation ||
-        !multivalued" [ngModel]="view.asTable" (ngModelChange)="view.asTable =
-        $event">
-        As Table
-      </mat-checkbox>
-      <br/>
-      <ng-container *ngIf="view.asTable">
-        <table-editor [tableDefinition]="view.tableDefinition"
-          [propertyId]="attributeName">
-        </table-editor>
-        <br/>
-      </ng-container>
       <mat-checkbox class="field-option" [(ngModel)]="attribute.
         required">
         Required

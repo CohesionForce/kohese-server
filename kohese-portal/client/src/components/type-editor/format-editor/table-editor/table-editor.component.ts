@@ -1,5 +1,3 @@
-import { TableColumnSelectorComponent } from './table-column-selector/table-column-selector.component';
-import { DynamicTypesService } from './../../../../services/dynamic-types/dynamic-types.service';
 import { TreeConfiguration } from './../../../../../../common/src/tree-configuration';
 import { ItemRepository, RepoStates } from './../../../../services/item-repository/item-repository.service';
 import { Subscription, Observable, BehaviorSubject } from 'rxjs';
@@ -25,15 +23,27 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   
   @Input()
   propertyId: string;
+  
+  private _attributes: Array<any>;
+  get attributes() {
+    return this._attributes;
+  }
+  @Input('attributes')
+  set attributes(attributes: Array<any>) {
+    this._attributes = attributes;
+  }
+  
   repoStatusSubscription: Subscription;
   treeConfigurationSubscription: Subscription;
   treeConfiguration: TreeConfiguration;
-  types: any;
+  
+  get Object() {
+    return Object;
+  }
 
   constructor(private dialogService: DialogService,
               private itemRepository: ItemRepository,
-              private changeDetectorRef: ChangeDetectorRef,
-              private typeService: DynamicTypesService) { }
+              private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
@@ -45,32 +55,11 @@ export class TableEditorComponent implements OnInit, OnDestroy {
             getTreeConfig().subscribe(
             (configObj: any) => {
             this.treeConfiguration = configObj.config;
-            this.types = this.typeService.getKoheseTypes();
             this.changeDetectorRef.markForCheck();
           });
-          if (!this._tableDefinition) {
-            this._tableDefinition = {
-              tableKind: 'Action',
-              columns: ['name', 'createdBy']
-            };
-            this.changeDetectorRef.markForCheck();
-          }
       }
     });
   }
-
-  selectTableKind(kindEvent) {
-    this.dialogService.openConfirmDialog('Table Discard', 'Changing table '+
-      'kind will discard your current table definition. Proceed?').subscribe(
-      (confirm) => {
-      if (confirm) {
-        this._tableDefinition.tableKind = kindEvent.value;
-        this._tableDefinition.columns = ['name', 'createdBy'];
-      }
-      this.changeDetectorRef.markForCheck();
-    });
-  }
-
 
   ngOnDestroy(): void {
     if (this.treeConfigurationSubscription) {
@@ -101,13 +90,15 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   }
 
   addColumn() {
-    this.dialogService.openComponentDialog(TableColumnSelectorComponent, {
-      data : {
-        fields : this.types[this._tableDefinition.tableKind].fields
-      }
-    }).updateSize('20%', '20%')
-      .afterClosed()
-      .subscribe((newColumn) => {
+    let attributeNames: Array<string> = this._attributes.map((attribute:
+      any) => {
+      return attribute.name;
+    }).filter((attributeName: string) => {
+      return (this._tableDefinition.columns.indexOf(attributeName) === -1);
+    });
+    this.dialogService.openSelectDialog('Add Column', '', 'Attribute',
+      attributeNames[0], attributeNames).afterClosed().subscribe(
+      (newColumn) => {
         if (newColumn) {
           this._tableDefinition.columns.push(newColumn);
           this.changeDetectorRef.markForCheck();
@@ -116,13 +107,12 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   }
 
   addExpandedProperty(colNum: number) {
-    this.dialogService.openComponentDialog(TableColumnSelectorComponent, {
-      data : {
-        fields : this.types[this._tableDefinition.tableKind].fields
-      }
-    }).updateSize('20%', '20%')
-      .afterClosed()
-      .subscribe((newProp) => {
+    let attributeNames: Array<string> = this._attributes.map((attribute:
+      any) => {
+      return attribute.name;
+    });
+    this.dialogService.openSelectDialog('Add Column', '', 'Attribute',
+      attributeNames[0], attributeNames).afterClosed().subscribe((newProp) => {
         if (newProp) {
           const columnName = 'column' + colNum;
           this._tableDefinition.expandedFormat[columnName].push(newProp);
@@ -130,17 +120,6 @@ export class TableEditorComponent implements OnInit, OnDestroy {
           this.changeDetectorRef.markForCheck();
         }
       });
-  }
-
-  onExpandedChecked(change) {
-    if (change.checked) {
-      this._tableDefinition.expandedFormat = {
-        column1 : [],
-        column2 : [],
-        column3 : [],
-        column4 : []
-      };
-    }
   }
 
   removeExpandedProperty(property, colNum) {
