@@ -315,7 +315,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
 
-        this.showFocus();
+        /* Let one or more queued asynchronous tasks execute prior to
+        executing showFocus so that showFocus will succeed */
+        setTimeout(() => {
+          this.showFocus();
+        }, 0);
       }
     });
   }
