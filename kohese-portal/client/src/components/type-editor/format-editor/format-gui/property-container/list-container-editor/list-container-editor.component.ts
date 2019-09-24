@@ -14,6 +14,10 @@ export class ListContainerEditorComponent implements OnInit {
   kind : KoheseType
   @Output()
   deleted : EventEmitter<any> = new EventEmitter()
+  
+  get Object() {
+    return Object;
+  }
 
   constructor() { }
 
@@ -26,7 +30,8 @@ export class ListContainerEditorComponent implements OnInit {
 
   addRow() {
     this.container.contents.push({
-      propertyName : '',
+      propertyName : Object.keys(this.kind.dataModelProxy.item.
+        classProperties)[0],
       hideLabel : false,
       labelOrientation: 'Top',
       kind :  '',
