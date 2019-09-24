@@ -105,6 +105,15 @@ export class TableEditorComponent implements OnInit, OnDestroy {
         }
       });
   }
+  
+  public moveAttribute(attributeName: string, moveUp: boolean): void {
+    let attributeIndex: number = this._tableDefinition.columns.indexOf(
+      attributeName);
+    this._tableDefinition.columns.splice(attributeIndex, 1);
+    this._tableDefinition.columns.splice(attributeIndex + (moveUp ? -1 : 1), 0,
+      attributeName);
+    this.changeDetectorRef.markForCheck();
+  }
 
   addExpandedProperty(colNum: number) {
     let attributeNames: Array<string> = this._attributes.map((attribute:
