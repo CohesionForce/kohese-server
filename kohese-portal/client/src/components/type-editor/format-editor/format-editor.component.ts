@@ -88,6 +88,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
           koheseType.viewModelProxy.item.defaultFormatKey = undefined;
         }
         this.formatDefs = koheseType.viewModelProxy.item.formatDefinitions;
+        this.selectedFormat = undefined;
 
         this.changeRef.markForCheck();
         console.log(this.currentType);
