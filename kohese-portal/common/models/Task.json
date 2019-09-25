@@ -62,10 +62,16 @@
             "guard": {},
             "requires": ""
           },
-          "Reassign": {
+          "Request Reassign": {
             "source": "Assigned",
             "target": "PendingReassign",
             "guard": {}
+          },
+          "Reassign": {
+            "source": "PendingReassign",
+            "target": "Assigned",
+            "guard": {},
+            "requires": []
           },
           "Complete": {
             "source": "InWork",

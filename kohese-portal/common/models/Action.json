@@ -63,7 +63,7 @@
             "target": "PendingReassign",
             "guard": {}
           },
-          "Redisposition": {
+          "Request Redisposition After Assigned": {
             "source": "Assigned",
             "target": "PendingRedisposition",
             "guard": {},
@@ -79,9 +79,14 @@
             "target": "PendingReassign",
             "guard": {}
           },
-          "Redisposition After Accepted": {
+          "Request Redisposition After Accepted": {
             "source": "Accepted",
             "target": "PendingRedisposition",
+            "guard": {}
+          },
+          "Redisposition": {
+            "source": "PendingRedisposition",
+            "target": "Proposed",
             "guard": {}
           },
           "Begin Work": {
