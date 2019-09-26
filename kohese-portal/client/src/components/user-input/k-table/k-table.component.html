@@ -5,12 +5,9 @@
       Select {{property.propertyName}}
     </button>
   </div>
-  <proxy-table *ngIf="tableDefinition && tableData" [expandedFormat]="tableDefinition.expandedFormat" [columns]="tableDefinition.columns"
-    [dataStream]="tableDataStream" (move)="move($event)"
-    (remove)="remove($event)" [disabled]="!editable" style="height: 90%;
-    width: 100%;">
+  <proxy-table [expandedFormat]="property.tableDefinition.expandedFormat"
+    [columns]="property.tableDefinition.columns" [dataStream]="tableDataStream"
+    (move)="move($event)" (remove)="remove($event)" [disabled]="!editable"
+    style="height: 90%; width: 100%;">
   </proxy-table>
-  <div *ngIf="tableDefinition && !tableData">
-    Empty Table
-  </div>
 </div>

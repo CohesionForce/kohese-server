@@ -136,9 +136,7 @@ export class AttributeEditorComponent implements OnInit {
     if (!this._attribute) {
       this._attributeName = '';
       this._attribute = {};
-      this._view = {
-        asTable: false
-      };
+      this._view = {};
     }
     
     let koheseTypes: any = this._dynamicTypesService.getKoheseTypes();

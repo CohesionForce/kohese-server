@@ -1,0 +1,68 @@
+<span style="font-size:large;">Table Editor</span>
+  <button mat-button style="background-color : navy; color : white; margin-left : 10px;" (click)="openTablePreview()">Open
+    Preview</button>
+<mat-divider></mat-divider>
+<div class="table-options">
+  <h5>Table options : </h5>
+  <div class="property-section">
+    <div style="width: 100%; display: flex; flex-direction: row;">
+      <h3>
+        Columns
+      </h3>
+      <button mat-icon-button [disabled]="(Object.keys(attributes).length ===
+        tableDefinition.columns.length)" class="flex-right-align"
+        (click)="addColumn()">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+    </div>
+    <mat-list>
+      <ng-container *ngFor="let attributeName of tableDefinition.columns">
+        <mat-list-item>
+          {{attributeName}}
+          <button mat-icon-button matTooltip="Move this element up"
+            class="flex-right-align" [disabled]="(tableDefinition.columns[
+            0] === attributeName)" (click)="moveAttribute(attributeName,
+            true)">
+            <mat-icon class="fa fa-arrow-up"></mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Move this element down"
+            [disabled]="(tableDefinition.columns[tableDefinition.columns.
+            length - 1] === attributeName)" (click)="moveAttribute(
+            attributeName, false)">
+            <mat-icon class="fa fa-arrow-down"></mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteColumn(column);">
+            <mat-icon class="fa fa-times"></mat-icon>
+          </button>
+        </mat-list-item>
+      </ng-container>
+    </mat-list>
+  </div>
+  <div class="property-section">
+    <h6 style="font-weight: bold;">Expanded Row</h6>
+    <div class="column">
+      <div *ngFor="let property of tableDefinition.expandedFormat.column1">
+        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 1)"></button>
+      </div>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(1)">Add Property</button>
+    </div>
+    <div class="column">
+      <div *ngFor="let property of tableDefinition.expandedFormat.column2">
+        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 2)"></button>
+      </div>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(2)">Add Property</button>
+    </div>
+    <div class="column">
+      <div *ngFor="let property of tableDefinition.expandedFormat.column3">
+        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 3)"></button>
+      </div>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(3)">Add Property</button>
+    </div>
+    <div class="footer">
+      <div *ngFor="let property of tableDefinition.expandedFormat.column4">
+        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 4)"></button>
+      </div>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(4)">Add Property</button>
+    </div>
+  </div>
+</div>

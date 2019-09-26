@@ -1,13 +1,12 @@
 <div class="property-row">
   <div class="selector">
-    <mat-select placeholder="---" [(ngModel)]="property.propertyName" (selectionChange)="updateKind($event)">
-      <mat-option *ngFor="let propertyName of kind.fields | mapKey | validProperty:{property : property,container:container}" [value]="propertyName">
-        {{propertyName}} 
-        <span class="table-label" *ngIf=" kind.fields[propertyName].views.form &&
-                                          kind.fields[propertyName].views.form.inputType.options &&
-                                          kind.fields[propertyName].views.form.inputType.options.asTable">(Table)</span>
-      </mat-option>
-    </mat-select>
+    <mat-form-field style="width: 100%;">
+      <mat-select placeholder="Attribute" [(ngModel)]="property.propertyName" (selectionChange)="updateKind($event)">
+        <mat-option *ngFor="let propertyName of kind.fields | mapKey | validProperty:{property : property,container:container}" [value]="propertyName">
+          {{propertyName}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
   <mat-expansion-panel>
     <mat-expansion-panel-header>
@@ -39,15 +38,34 @@
     </mat-expansion-panel>
 
     <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Content
-          </mat-panel-title>
-          <mat-panel-description>
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-        <mat-checkbox [(ngModel)]="property.hideEmpty">Hide if empty</mat-checkbox>
-      </mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Content
+        </mat-panel-title>
+        <mat-panel-description>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <ng-container *ngIf="kind.dataModelProxy.item.classProperties[property.
+        propertyName].definition.relation && Array.isArray(kind.dataModelProxy.
+        item.classProperties[property.propertyName].definition.type) &&
+        (container.kind === 'list')">
+        <mat-checkbox [ngModel]="!!property.tableDefinition"
+          (ngModelChange)="$event ? property.tableDefinition = { columns:
+          [ 'name', 'createdBy' ], expandedFormat: { column1: [], column2: [],
+          column3: [], column4: [] } } : property.tableDefinition = null">
+          As Table
+        </mat-checkbox>
+        <br/>
+        <ng-container *ngIf="property.tableDefinition">
+          <table-editor [tableDefinition]="property.tableDefinition"
+            [propertyId]="property.propertyName"
+            [attributes]="getAttributes()">
+          </table-editor>
+          <br/>
+        </ng-container>
+      </ng-container>
+      <mat-checkbox [(ngModel)]="property.hideEmpty">Hide if empty</mat-checkbox>
+    </mat-expansion-panel>
   </mat-expansion-panel>
   <button *ngIf="!disableDelete" mat-button class="remove-button" (click)="deleteRow()">Delete Row</button>
 </div>
