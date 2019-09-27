@@ -54,8 +54,12 @@ export class ColumnContainerEditorComponent implements OnInit {
   }
 
   addRow(rowNum : number) {
+    let model: any = this.kind.dataModelProxy.item;
     this.container.columns[rowNum].contents.push({
-      propertyName : '',
+      propertyName : {
+        kind: model.name,
+        attribute: Object.keys(model.classProperties)[0]
+      },
       hideLabel : false,
       labelOrientation: 'Top',
       kind :  '',

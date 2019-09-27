@@ -10,6 +10,7 @@ import { MockDialogService } from '../../../../mocks/services/MockDialogService'
 import { KTableComponent } from './k-table.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { MockAction } from '../../../../mocks/data/MockItem';
+import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MoveDirection } from '../k-proxy-selector/proxy-table/proxy-table.component';
 
 describe('Component: k-table', () => {
@@ -32,9 +33,13 @@ describe('Component: k-table', () => {
       KTableComponent);
     component = fixture.componentInstance;
     component.proxy = new ItemProxy('Action', MockAction());
+    component.proxy.model = new ItemProxy('KoheseModel', MockDataModel());
     component.proxy.item.predecessors = references;
     component.property = {
-      propertyName: 'predecessors',
+      propertyName: {
+        kind: 'Action',
+        attribute: 'predecessors'
+      },
       hideLabel: false,
       labelOrientation: 'Top',
       kind: 'table',

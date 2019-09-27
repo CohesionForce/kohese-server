@@ -21,7 +21,7 @@ export interface FormatDefinition {
 }
 
 export interface PropertyDefinition {
-  propertyName: string;
+  propertyName: { kind: string, attribute: string };
   hideLabel: boolean;
   customLabel?: string;
   labelOrientation: string;
@@ -136,7 +136,7 @@ export class FormatEditorComponent implements OnInit, OnDestroy {
         type : this.currentType
       }
     })
-    .updateSize('70%', '%70');
+    .updateSize('70%', '70%');
   }
 
   setDefault (id) {

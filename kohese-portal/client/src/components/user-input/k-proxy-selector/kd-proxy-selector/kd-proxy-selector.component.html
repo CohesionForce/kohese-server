@@ -1,4 +1,6 @@
-<label *ngIf="!property.hideLabel" style="font-weight : bold;">{{property.propertyName}}</label>
+<label *ngIf="!property.hideLabel" style="font-weight : bold;">
+  {{property.propertyName.attribute}}
+</label>
 <div *ngIf="!editable">
   <div *ngFor="let proxy of references ">
    <a (click)="openDetails(proxy)" style="cursor:pointer;"> {{proxy.item.name}}</a>

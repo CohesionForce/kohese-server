@@ -19,9 +19,23 @@ export class PropertyRowComponent implements OnInit {
   disableDelete = false;
   @Input()
   container;
+  
+  private _attribute: any;
+  get attribute() {
+    return this._attribute;
+  }
+  
+  private _attributeNames: any = {};
+  get attributeNames() {
+    return this._attributeNames;
+  }
 
   @Output()
   deleted: EventEmitter<PropertyDefinition> = new EventEmitter();
+  
+  get Object() {
+    return Object;
+  }
   
   get Array() {
     return Array;
@@ -35,39 +49,94 @@ export class PropertyRowComponent implements OnInit {
       console.log('no container', this);
     }
     console.log(this);
+    
+    // Migration code
+    if (typeof this.property.propertyName === 'string') {
+      this.property.propertyName = {
+        kind: this.kind.dataModelProxy.item.name,
+        attribute: this.property.propertyName
+      };
+    }
+    
+    this._attribute = TreeConfiguration.getWorkingTree().getProxyFor(
+      this.property.propertyName.kind).item.classProperties[this.property.
+      propertyName.attribute].definition;
+    
+    this._attributeNames[this.kind.dataModelProxy.item.name] = Object.keys(
+      this.kind.dataModelProxy.item.classProperties);
+    for (let kindName in this._dynamicTypesService.getKoheseTypes()) {
+      if (kindName !== this.kind.dataModelProxy.item.name) {
+        this._attributeNames[kindName] = this._dynamicTypesService.
+          getKoheseTypes()[kindName].dataModelProxy.item.relationProperties;
+      }
+    }
   }
 
   deleteRow() {
     this.deleted.emit(this.property);
   }
 
-  updateKind(propertyName) {
-    const viewProperty = this.kind.fields[propertyName.value].views.form;
-    if (viewProperty) {
-      this.property.inputOptions = viewProperty.inputType;
-      console.log(viewProperty);
+  public updateKind(attributeObject: { kind: string, attribute: string }):
+    void {
+    this.property.hideLabel = false;
+    this.property.customLabel = '';
+    this.property.labelOrientation = 'Top';
+    this.property.hideEmpty = false;
+    if (attributeObject.kind === this.kind.dataModelProxy.item.name) {
+      const viewProperty = TreeConfiguration.getWorkingTree().getProxyFor(
+        'view-' + attributeObject.kind.toLowerCase()).item.viewProperties[
+        attributeObject.attribute];
+      if (viewProperty) {
+        this.property.inputOptions = viewProperty.inputType;
+        console.log(viewProperty);
+      } else {
+        this.property.kind = 'read-only';
+      }
+      delete this.property['tableDefinition'];
     } else {
-      this.property.kind = 'read-only';
+      this.property.inputOptions = null;
+      this.property.kind = '';
+      this.property['tableDefinition'] = {
+        columns: [ 'name', 'createdBy' ],
+        expandedFormat: {
+          column1: [],
+          column2: [],
+          column3: [],
+          column4: []
+        }
+      };
     }
+    
+    this._attribute = TreeConfiguration.getWorkingTree().getProxyFor(
+      attributeObject.kind).item.classProperties[attributeObject.attribute].
+      definition;
+    
     console.log(this.property.kind);
+  }
+  
+  public areSameAttribute(option: { kind: string, attribute: string },
+    selection: { kind: string, attribute: string }): boolean {
+    return ((option.kind === selection.kind) && (option.attribute ===
+      selection.attribute));
   }
   
   public getAttributes(): Array<any> {
     let attributes: Array<any> = [];
-    let type: any = TreeConfiguration.getWorkingTree().getProxyFor(this.kind.
-      dataModelProxy.item.name).item;
-    let typeName: string = type.classProperties[this.property.propertyName].
-      definition.type[0];
-    for (let j: number = 0; j < type.localTypes.length; j++) {
-      if (type.localTypes[j].name === typeName) {
-        for (let attributeName in type.localTypes[j].properties) {
-          let attribute: any = JSON.parse(JSON.stringify(type.localTypes[j].
-            properties[attributeName]));
-          attribute.name = attributeName;
-          attributes.push(attribute);
+    let type: any = TreeConfiguration.getWorkingTree().getProxyFor(this.
+      property.propertyName.kind).item;
+    let typeName: string = this._attribute.type[0];
+    if (type.name === this.kind.dataModelProxy.item.name) {
+      for (let j: number = 0; j < type.localTypes.length; j++) {
+        if (type.localTypes[j].name === typeName) {
+          for (let attributeName in type.localTypes[j].properties) {
+            let attribute: any = JSON.parse(JSON.stringify(type.localTypes[j].
+              properties[attributeName]));
+            attribute.name = attributeName;
+            attributes.push(attribute);
+          }
+          
+          break;
         }
-        
-        break;
       }
     }
     

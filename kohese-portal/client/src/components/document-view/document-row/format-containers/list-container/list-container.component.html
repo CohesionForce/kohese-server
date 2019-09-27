@@ -1,15 +1,25 @@
 <div *ngFor="let property of contents">
   <ng-container *ngIf="property.tableDefinition else notTable">
-    <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
+    <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.
+      propertyName.attribute}}:
+    </label>
     <k-table [property]="property" [editable]="editable" [proxy]="proxy"></k-table>
   </ng-container>
   <ng-template #notTable>
     <div *ngIf="['text', 'user-selector','date'].includes(property.kind)">
-      <label *ngIf="!property.hideLabel && !property.customLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
+      <label *ngIf="!property.hideLabel && !property.customLabel"
+        style="font-weight: bold;">
+        {{property.propertyName.attribute}}:
+      </label>
       <label *ngIf="!property.hideLabel && property.customLabel" style="font-weight: bold;">{{property.customLabel}} : </label>
-      <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
+      <div *ngIf="!editable">
+        {{proxy.item[property.propertyName.attribute]}}
+      </div>
       <div *ngIf="editable">
-        <textarea style="background-color: white;" matInput matTextareaAutosize #description [(ngModel)]="proxy.item[property.propertyName]"></textarea>
+        <textarea style="background-color: white;" matInput
+          matTextareaAutosize #description [(ngModel)]="proxy.item[property.
+          propertyName.attribute]">
+        </textarea>
       </div>
     </div>
     <div *ngIf="property.kind === 'markdown'">
@@ -26,10 +36,14 @@
       <!-- <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label> -->
     </div>
     <div *ngIf="property.kind === 'read-only'">
-      <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label>
-      <div *ngIf="!editable">{{proxy.item[property.propertyName]}}</div>
+      <label *ngIf="!property.hideLabel" style="font-weight: bold;">
+        {{property.propertyName.attribute}}:
+      </label>
+      <div *ngIf="!editable">
+        {{proxy.item[property.propertyName.attribute]}}
+      </div>
       <div *ngIf="editable">
-        {{property.propertyName}} not available for editing
+        {{property.propertyName.attribute}} not available for editing
       </div>
     </div>
   </ng-template>
