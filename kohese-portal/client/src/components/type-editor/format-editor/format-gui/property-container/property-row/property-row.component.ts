@@ -66,8 +66,19 @@ export class PropertyRowComponent implements OnInit {
       this.kind.dataModelProxy.item.classProperties);
     for (let kindName in this._dynamicTypesService.getKoheseTypes()) {
       if (kindName !== this.kind.dataModelProxy.item.name) {
-        this._attributeNames[kindName] = this._dynamicTypesService.
-          getKoheseTypes()[kindName].dataModelProxy.item.relationProperties;
+        let model: any = this._dynamicTypesService.getKoheseTypes()[kindName].
+          dataModelProxy.item;
+        let referenceAttributes: Array<any> = model.relationProperties;
+        for (let j: number = 0; j < referenceAttributes.length; j++) {
+          if (Array.isArray(model.classProperties[referenceAttributes[j]].
+            definition.type)) {
+            if (!this._attributeNames[kindName]) {
+              this._attributeNames[kindName] = [];
+            }
+            
+            this._attributeNames[kindName].push(referenceAttributes[j]);
+          }
+        }
       }
     }
   }
