@@ -58,8 +58,18 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  public async delete(propertyId: string): Promise<void> {
-    if (await this.mayEditAttribute(propertyId)) {
+  public delete(propertyId: string): void {
+    let attributeUsages: Array<any> = this.getAttributeUsages(propertyId);
+    if (attributeUsages.length > 0) {
+      let message: string = 'The following Items prevent removal of ' +
+        propertyId + ':\n';
+      for (let j: number = 0; j < attributeUsages.length; j++) {
+        message += '\n\t- ';
+        message += attributeUsages[j].name;
+      }
+      this.dialogService.openInformationDialog(propertyId + ' Removal ' +
+        'Prevented', message);
+    } else {
       this.dialogService.openYesNoDialog('Delete ' + propertyId,
         'Are you sure that you want to delete ' + propertyId + '?').
         subscribe((choiceValue: any) => {
@@ -71,8 +81,8 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
     }
   }
   
-  public mayEditAttribute(attributeName: string): Promise<boolean> {
-    let itemProxys: Array<ItemProxy> = [];
+  private getAttributeUsages(attributeName: string): Array<any> {
+    let attributeUsages: Array<any> = [];
     let koheseType: KoheseType;
     let localType: any;
     let koheseTypes: Array<KoheseType> = Object.values(this.
@@ -92,34 +102,27 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
           // The first check below should not be necessary.
           if (itemProxy.item[attributeName] && itemProxy.item[attributeName].
             length > 0) {
-            itemProxys.push(itemProxy);
+            attributeUsages.push(itemProxy.item);
           }
         } else {
           if (itemProxy.item[attributeName] != null) {
-            itemProxys.push(itemProxy);
+            attributeUsages.push(itemProxy.item);
           }
         }
       }
     });
     
-    if (itemProxys.length > 0) {
-      let message: string = 'The following Items prevent modification ' +
-        'of ' + attributeName + ':\n';
-      for (let j: number = 0; j < itemProxys.length; j++) {
-        message += '\n\t- ';
-        message += itemProxys[j].item.name;
-      }
-      return this.dialogService.openInformationDialog(
-        attributeName + ' Modification Prevented', message).toPromise().then(
-        () => {
-        return false;
-      });
-    } else {
-      return Promise.resolve(true);
-    }
+    return attributeUsages;
   }
 
   public async openAttributeEditor(attributeName: string): Promise<void> {
+    let attributeUsages: Array<any> = this.getAttributeUsages(attributeName);
+    if (attributeUsages.length > 0) {
+      await this.dialogService.openInformationDialog('Data Invalidation',
+        'Due to usage of this attribute, modifying this attribute may ' +
+        'invalidate data.').toPromise();
+    }
+    
     this.dialogService.openComponentDialog(AttributeEditorComponent, {
       data: {
         attributeName: attributeName,
@@ -127,8 +130,7 @@ export class PropertyEditorComponent implements OnInit, OnDestroy {
           attributeName],
         type: this._koheseType.dataModelProxy.item,
         view: this._koheseType.viewModelProxy.item.viewProperties[
-          attributeName],
-        editable: await this.mayEditAttribute(attributeName)
+          attributeName]
       }
     }).updateSize('90%', '90%').afterClosed().subscribe((returnedObject:
       any) => {
