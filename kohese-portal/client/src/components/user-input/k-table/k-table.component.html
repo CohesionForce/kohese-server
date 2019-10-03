@@ -1,13 +1,16 @@
 <div style="border: 1px solid black; border-radius: 10px; padding: 10px;">
-  <div style="height: 10%; width: 100%;">
-    <button mat-button style="background-color: whitesmoke"
-      [disabled]="!editable" (click)="openProxySelectionDialog()">
-      Select {{property.propertyName}}
-    </button>
-  </div>
+  <ng-container *ngIf="(property.propertyName.kind === proxy.model.item.name)">
+    <div style="height: 10%; width: 100%;">
+      <button mat-button style="background-color: whitesmoke"
+        [disabled]="!editable" (click)="openProxySelectionDialog()">
+        Select {{property.propertyName.attribute}}
+      </button>
+    </div>
+  </ng-container>
   <proxy-table [expandedFormat]="property.tableDefinition.expandedFormat"
     [columns]="property.tableDefinition.columns" [dataStream]="tableDataStream"
-    (move)="move($event)" (remove)="remove($event)" [disabled]="!editable"
+    (move)="move($event)" (remove)="remove($event)" [disabled]="(!editable ||
+    (property.propertyName.kind !== proxy.model.item.name))"
     style="height: 90%; width: 100%;">
   </proxy-table>
 </div>

@@ -29,9 +29,12 @@ export class ListContainerEditorComponent implements OnInit {
   }
 
   addRow() {
+    let model: any = this.kind.dataModelProxy.item;
     this.container.contents.push({
-      propertyName : Object.keys(this.kind.dataModelProxy.item.
-        classProperties)[0],
+      propertyName : {
+        kind: model.name,
+        attribute: Object.keys(model.classProperties)[0]
+      },
       hideLabel : false,
       labelOrientation: 'Top',
       kind :  '',

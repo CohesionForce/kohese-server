@@ -39,10 +39,11 @@ export class KdProxySelectorComponent implements OnInit {
   }
 
   ngOnInit() {
-    let selected = this.proxy.item[this.property.propertyName];
+    let selected = this.proxy.item[this.property.propertyName.attribute];
     if (selected) {
       if (this.multiselect) {
-        for (let proxyIdStruct of this.proxy.item[this.property.propertyName]) {
+        for (let proxyIdStruct of this.proxy.item[this.property.propertyName.
+          attribute]) {
           this.references.push(ItemProxy.getWorkingTree().getProxyFor(proxyIdStruct.id));
         }
       } else {
@@ -66,7 +67,7 @@ export class KdProxySelectorComponent implements OnInit {
   }
 
   openProxySelectionDialog(): void {
-    let ids = this.proxy.item[this.property.propertyName];
+    let ids = this.proxy.item[this.property.propertyName.attribute];
     let selected;
     if (this.multiselect) {
       if (ids) {
@@ -99,13 +100,14 @@ export class KdProxySelectorComponent implements OnInit {
             proxyIds.push({id: proxy.item.id})
           })
         }
-        this.proxy.item[this.property.propertyName] = proxyIds;
+        this.proxy.item[this.property.propertyName.attribute] = proxyIds;
       } else {
         if (selected) {
-          this.proxy.item[this.property.propertyName] = { id: selected.item.id };
+          this.proxy.item[this.property.propertyName.attribute] =
+            { id: selected.item.id };
           this.references.push(selected);
         } else {
-          this.proxy.item[this.property.propertyName] = undefined;
+          this.proxy.item[this.property.propertyName.attribute] = undefined;
         }
         console.log('proxy saved');
       }

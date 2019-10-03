@@ -44,7 +44,24 @@ export class KTableComponent implements OnInit, OnDestroy {
         const types = this.typeService.getKoheseTypes();
         const proxyKind = this.proxy.model.item.name;
         this.kindInformation = types[proxyKind];
-        this.tableData = this.proxy.item[this.property.propertyName];
+        if (proxyKind === this.property.propertyName.kind) {
+          this.tableData = this.proxy.item[this.property.propertyName.
+            attribute];
+        } else {
+          let upstreamKindReferences: any = this.proxy.relations.referencedBy[
+            this.property.propertyName.kind];
+          if (upstreamKindReferences) {
+            let upstreamKindAttributeReferences: Array<ItemProxy> =
+              upstreamKindReferences[this.property.propertyName.attribute];
+            if (upstreamKindAttributeReferences) {
+              this.tableData = upstreamKindAttributeReferences.map((itemProxy:
+                ItemProxy) => {
+                return { id: itemProxy.item.id };
+              });
+            }
+          }
+        }
+        
         if (!this.tableData) {
           this.tableData = [];
           console.log('no table data');
@@ -73,7 +90,9 @@ export class KTableComponent implements OnInit, OnDestroy {
     this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
       data: {
         selected: selectedProxies,
-        allowMultiSelect : this.kindInformation.fields[this.property.propertyName].views['form'].inputType.options['allowMultiSelect'],
+        allowMultiSelect : this.kindInformation.fields[this.property.
+          propertyName.attribute].views['form'].inputType.options[
+          'allowMultiSelect'],
         proxyContext: this.proxy
       }
     }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
@@ -82,7 +101,7 @@ export class KTableComponent implements OnInit, OnDestroy {
           return {id : proxy.item.id};
         });
         this.tableData = selectedIds;
-        this.proxy.item[this.property.propertyName] = selectedIds;
+        this.proxy.item[this.property.propertyName.attribute] = selectedIds;
         this.tableDataStream.next(selectedIds);
       }
     });
@@ -90,7 +109,8 @@ export class KTableComponent implements OnInit, OnDestroy {
   
   public move(moveEvent: MoveEvent): void {
     let candidates: Array<string> = moveEvent.candidates;
-    let references: Array<any> = this.proxy.item[this.property.propertyName];
+    let references: Array<any> = this.proxy.item[this.property.propertyName.
+      attribute];
     if (moveEvent.moveDirection === MoveDirection.UP) {
       for (let j: number = 0; j < candidates.length; j++) {
         let candidateIndex: number = references.map((reference: any) => {
@@ -117,7 +137,8 @@ export class KTableComponent implements OnInit, OnDestroy {
   
   public remove(removeEvent: RemoveEvent): void {
     let candidates: Array<string> = removeEvent.candidates;
-    let references: Array<any> = this.proxy.item[this.property.propertyName];
+    let references: Array<any> = this.proxy.item[this.property.propertyName.
+      attribute];
     for (let j: number = 0; j < candidates.length; j++) {
       references.splice(references.indexOf(candidates[j]), 1);
     }

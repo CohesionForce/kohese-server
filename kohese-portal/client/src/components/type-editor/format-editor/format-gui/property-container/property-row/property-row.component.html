@@ -1,10 +1,18 @@
 <div class="property-row">
   <div class="selector">
     <mat-form-field style="width: 100%;">
-      <mat-select placeholder="Attribute" [(ngModel)]="property.propertyName" (selectionChange)="updateKind($event)">
-        <mat-option *ngFor="let propertyName of kind.fields | mapKey | validProperty:{property : property,container:container}" [value]="propertyName">
-          {{propertyName}}
-        </mat-option>
+      <mat-select placeholder="Attribute" [(ngModel)]="property.propertyName"
+        (selectionChange)="updateKind($event.value)"
+        [compareWith]="areSameAttribute">
+        <ng-container *ngFor="let kind of Object.keys(attributeNames)">
+          <mat-optgroup [label]="kind">
+            <ng-container *ngFor="let attributeName of attributeNames[kind]">
+              <mat-option [value]="{ kind: kind, attribute: attributeName }">
+                {{attributeName}}
+              </mat-option>
+            </ng-container>
+          </mat-optgroup>
+        </ng-container>
       </mat-select>
     </mat-form-field>
   </div>
@@ -45,14 +53,14 @@
         <mat-panel-description>
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <ng-container *ngIf="kind.dataModelProxy.item.classProperties[property.
-        propertyName].definition.relation && Array.isArray(kind.dataModelProxy.
-        item.classProperties[property.propertyName].definition.type) &&
-        (container.kind === 'list')">
+      <ng-container *ngIf="attribute.relation && Array.isArray(attribute.
+        type) && (container.kind === 'list')">
         <mat-checkbox [ngModel]="!!property.tableDefinition"
           (ngModelChange)="$event ? property.tableDefinition = { columns:
           [ 'name', 'createdBy' ], expandedFormat: { column1: [], column2: [],
-          column3: [], column4: [] } } : property.tableDefinition = null">
+          column3: [], column4: [] } } : property.tableDefinition = null"
+          [disabled]="(property.propertyName.kind !== kind.dataModelProxy.item.
+          name)">
           As Table
         </mat-checkbox>
         <br/>

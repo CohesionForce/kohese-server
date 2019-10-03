@@ -40,8 +40,8 @@ export class KdMarkdownComponent implements OnInit {
   }
   
   public updateValue(input: string): void {
-    this.proxy.item[this.property.propertyName] = (input ? input.replace(
-      KdMarkdownComponent._IMAGE_REGEXP, (matchedSubstring: string,
+    this.proxy.item[this.property.propertyName.attribute] = (input ? input.
+      replace(KdMarkdownComponent._IMAGE_REGEXP, (matchedSubstring: string,
       captureGroup: string, index: number, originalString: string) => {
       let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
         lastIndexOf(captureGroup);
@@ -83,10 +83,10 @@ export class KdMarkdownComponent implements OnInit {
   }
   
   private formatValue(): void {
-    this._formattedValue = (this.proxy.item[this.property.propertyName] ? this.
-      proxy.item[this.property.propertyName].replace(KdMarkdownComponent.
-      _IMAGE_REGEXP, (matchedSubstring: string, captureGroup: string, index:
-      number, originalString: string) => {
+    this._formattedValue = (this.proxy.item[this.property.propertyName.
+      attribute] ? this.proxy.item[this.property.propertyName.attribute].
+      replace(KdMarkdownComponent._IMAGE_REGEXP, (matchedSubstring: string,
+      captureGroup: string, index: number, originalString: string) => {
       if (captureGroup.startsWith('data:')) {
         let imageIndex: number = this._images.indexOf(captureGroup);
         if (imageIndex === -1) {
@@ -102,6 +102,6 @@ export class KdMarkdownComponent implements OnInit {
       } else {
         return matchedSubstring;
       }
-    }) : this.proxy.item[this.property.propertyName]);
+    }) : this.proxy.item[this.property.propertyName.attribute]);
   }
 }
