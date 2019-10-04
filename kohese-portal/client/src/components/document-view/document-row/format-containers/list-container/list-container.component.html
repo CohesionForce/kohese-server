@@ -3,7 +3,36 @@
     <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.
       propertyName.attribute}}:
     </label>
-    <k-table [property]="property" [editable]="editable" [proxy]="proxy"></k-table>
+    <ng-container *ngIf="(property.propertyName.kind === proxy.model.
+      item.name)">
+      <div style="height: 40px; width: 100%;">
+        <button mat-button style="background-color: whitesmoke"
+          [disabled]="!editable" (click)="openProxySelectionDialog(property)">
+          Select {{property.propertyName.attribute}}
+        </button>
+      </div>
+      <div style="height: 50px; width: 100%; display: flex; flex-direction: row;">
+        <button mat-icon-button class="flex-right-align"
+          [disabled]="(!editable || (kTable.selection.length === 0) ||
+          !mayMoveSelection(true, property))" (click)="moveSelection(true,
+          property)">
+          <mat-icon class="fa fa-arrow-up"></mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="(!editable || (kTable.selection.
+          length === 0) || !mayMoveSelection(false, property))"
+          (click)="moveSelection(false, property)">
+          <mat-icon class="fa fa-arrow-down"></mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="(!editable || (kTable.selection.
+          length === 0))" (click)="removeSelection(property)">
+          <mat-icon class="fa fa-remove"></mat-icon>
+        </button>
+      </div>
+    </ng-container>
+    <k-table #kTable [tableDefinition]="getTableDefinition(property)"
+      [rows]="getRows(property)" [editable]="(editable && (property.
+      propertyName.kind === proxy.model.item.name))">
+    </k-table>
   </ng-container>
   <ng-template #notTable>
     <div *ngIf="['text', 'user-selector','date'].includes(property.kind)">

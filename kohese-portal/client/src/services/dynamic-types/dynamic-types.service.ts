@@ -106,6 +106,12 @@ export class DynamicTypesService {
       localTypeNames.push(dataModelProxy.item.localTypes[j].name);
     }
     this._localTypeMap.set(dataModelProxy.item.name, localTypeNames);
+    
+    // Migration code
+    if (viewModelProxyMap[dataModelProxy.item.id] && !viewModelProxyMap[
+      dataModelProxy.item.id].item.tableDefinitions) {
+      viewModelProxyMap[dataModelProxy.item.id].item.tableDefinitions = {};
+    }
   }
 
   getViewProxyFor(modelProxy: ItemProxy): ItemProxy {
