@@ -68,7 +68,10 @@
         "kind": "header",
         "contents": [
           {
-            "propertyName": "name",
+            "propertyName": {
+              "kind": "Decision",
+              "attribute": "name"
+            },
             "hideLabel": false,
             "labelOrientation": "Top",
             "kind": "text"
@@ -80,7 +83,10 @@
           "kind": "list",
           "contents": [
             {
-              "propertyName": "description",
+              "propertyName": {
+                "kind": "Decision",
+                "attribute": "description"
+              },
               "hideLabel": false,
               "labelOrientation": "Top",
               "kind": "markdown"
