@@ -43,7 +43,7 @@ export class HeaderContainerComponent implements OnInit, OnDestroy {
   render() {
     this.rendered =
       '<h' + this.depth + '>' +
-      this.proxy.item[this.header.contents[0].propertyName] +
+      this.proxy.item[this.header.contents[0].propertyName.attribute] +
       '</h' + this.depth + '>';
   }
 }
