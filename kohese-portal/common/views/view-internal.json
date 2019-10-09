@@ -57,7 +57,10 @@
         "kind": "header",
         "contents": [
           {
-            "propertyName": "name",
+            "propertyName": {
+              "kind": "Internal",
+              "attribute": "name"
+            },
             "hideLabel": false,
             "labelOrientation": "Top",
             "kind": "text"
@@ -69,7 +72,10 @@
           "kind": "list",
           "contents": [
             {
-              "propertyName": "description",
+              "propertyName": {
+                "kind": "Internal",
+                "attribute": "description"
+              },
               "hideLabel": false,
               "labelOrientation": "Top",
               "kind": "markdown"

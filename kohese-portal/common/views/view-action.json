@@ -125,7 +125,10 @@
         "kind": "header",
         "contents": [
           {
-            "propertyName": "name",
+            "propertyName": {
+              "kind": "Action",
+              "attribute": "name"
+            },
             "hideLabel": false,
             "labelOrientation": "Top",
             "kind": "text"
@@ -137,7 +140,10 @@
           "kind": "list",
           "contents": [
             {
-              "propertyName": "description",
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "description"
+              },
               "hideLabel": false,
               "labelOrientation": "Top",
               "kind": "markdown"

@@ -96,7 +96,10 @@
         "kind": "header",
         "contents": [
           {
-            "propertyName": "name",
+            "propertyName": {
+              "kind": "Issue",
+              "attribute": "name"
+            },
             "hideLabel": false,
             "labelOrientation": "Top",
             "kind": "text"
@@ -108,7 +111,10 @@
           "kind": "list",
           "contents": [
             {
-              "propertyName": "description",
+              "propertyName": {
+                "kind": "Issue",
+                "attribute": "description"
+              },
               "hideLabel": false,
               "labelOrientation": "Top",
               "kind": "markdown"

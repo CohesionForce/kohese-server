@@ -26,7 +26,10 @@
         "kind": "header",
         "contents": [
           {
-            "propertyName": "name",
+            "propertyName": {
+              "kind": "Project",
+              "attribute": "name"
+            },
             "hideLabel": false,
             "labelOrientation": "Top",
             "kind": "text"
@@ -38,7 +41,10 @@
           "kind": "list",
           "contents": [
             {
-              "propertyName": "description",
+              "propertyName": {
+                "kind": "Project",
+                "attribute": "description"
+              },
               "hideLabel": false,
               "labelOrientation": "Top",
               "kind": "markdown"
