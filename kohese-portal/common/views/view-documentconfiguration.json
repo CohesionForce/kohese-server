@@ -5,6 +5,7 @@
   "modelName": "DocumentConfiguration",
   "icon": "fa fa-file",
   "viewProperties": {},
+  "tableDefinitions": {},
   "itemIds": []
 }
 

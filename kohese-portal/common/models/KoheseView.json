@@ -24,6 +24,10 @@
     "defaultFormatKey" : {
       "type": "string",
       "required": true
+    },
+    "tableDefinitions": {
+      "type": "object",
+      "required": true
     }
   },
   "validations": [],

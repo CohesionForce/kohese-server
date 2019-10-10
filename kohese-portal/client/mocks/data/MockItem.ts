@@ -10,7 +10,8 @@ export function MockItem () {
     "modifiedOn": 1510596684590,
     "itemIds": [],
     actionState: 'Proposed',
-    decisionState: 'InReview'
+    decisionState: 'InReview',
+    predecessors: []
   };
 }
 

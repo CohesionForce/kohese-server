@@ -93,6 +93,7 @@ export function MockItemSubclassView() {
         },
         "displayName": "Subclass Property"
       }
-    }
+    },
+    "tableDefinitions": {}
   };
 }

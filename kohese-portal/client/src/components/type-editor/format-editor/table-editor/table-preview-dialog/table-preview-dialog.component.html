@@ -3,7 +3,13 @@
     <button mat-raised-button (click)="openProxySelection()">Select Proxy</button>
   </span>
 </div>
-<k-table *ngIf="previewProxy" [property]="property" editable="editable" [proxy]="previewProxy"></k-table>
+<!--
+  Change retrieval of tableDefinition below to get an actual TableDefinition
+  and not a reference to a TableDefinition
+-->
+<k-table *ngIf="previewProxy" [tableDefinition]="property.tableDefinition"
+  [rows]="getRows()">
+</k-table>
 <div *ngIf="!previewProxy" class="no-proxy-area">
   <h1>Please Select an item to preview</h1>
 </div>
