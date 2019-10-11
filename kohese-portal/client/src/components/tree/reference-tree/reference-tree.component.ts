@@ -115,10 +115,13 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
         this.rootSubject.next(root);
 
         this._route.params.subscribe((parameters: Params) => {
-          root = [this._selectedTreeConfiguration.getProxyFor(parameters[
-            'id']).item.id];
-          this.buildRows(root);
-          this.rootSubject.next(root);
+          let itemProxy: ItemProxy = this._selectedTreeConfiguration.
+            getProxyFor(parameters['id']);
+          if (itemProxy) {
+            root = [itemProxy.item.id];
+            this.buildRows(root);
+            this.rootSubject.next(root);
+          }
         });
 
         this.initialize();
