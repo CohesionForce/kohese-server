@@ -16,6 +16,8 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { SessionService } from '../../../services/user/session.service';
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
+import { NotificationService } from '../../../services/notifications/notification.service';
+import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
 
 describe('Component: Repositories', ()=>{
   let repositoriesComponent: RepositoriesComponent;
@@ -36,7 +38,8 @@ describe('Component: Repositories', ()=>{
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: VersionControlService, useClass: MockVersionControlService},
         {provide: NavigationService, useClass: MockNavigationService},
-        { provide: SessionService, useClass: MockSessionService }
+        { provide: SessionService, useClass: MockSessionService },
+        { provide: NotificationService, useClass: MockNotificationService }
       ]
     }).compileComponents();
 

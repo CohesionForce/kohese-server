@@ -16,6 +16,8 @@ import { SessionService } from '../../../services/user/session.service';
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { NotificationService } from '../../../services/notifications/notification.service';
+import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
 import { BehaviorSubject } from 'rxjs';
 
 describe('Component: App Bar', ()=>{
@@ -36,7 +38,8 @@ describe('Component: App Bar', ()=>{
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: CurrentUserService, useClass: MockCurrentUserService},
         {provide: SessionService, useClass: MockSessionService},
-        {provide: NavigationService, useClass: MockNavigationService}
+        {provide: NavigationService, useClass: MockNavigationService},
+        { provide: NotificationService, useClass: MockNotificationService }
       ]
     }).compileComponents();
 
