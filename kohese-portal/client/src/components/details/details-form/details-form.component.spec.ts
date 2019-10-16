@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
@@ -22,6 +23,8 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { StateService } from '../../../services/state/state.service';
+import { MockStateService } from '../../../../mocks/services/MockStateService';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -37,6 +40,7 @@ describe('Component: Details Form', ()=>{
          BrowserAnimationsModule,
          FormsModule,
          ReactiveFormsModule,
+         MarkdownModule,
          PipesModule
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -45,7 +49,8 @@ describe('Component: Details Form', ()=>{
         {provide: FormBuilder, useClass: FormBuilder },
         { provide: DialogService, useClass: MockDialogService },
         {provide: DynamicTypesService, useClass: MockDynamicTypesService },
-        {provide: ItemRepository, useClass: MockItemRepository }
+        {provide: ItemRepository, useClass: MockItemRepository },
+        { provide: StateService, useClass: MockStateService }
       ]
     }).compileComponents();
 
