@@ -27,6 +27,6 @@ describe('Component: tree-row', () => {
   });
 
   it('calculates the correct number of pixels by which to indent', () => {
-    expect(component.getIndentationStyle()['padding-left']).toEqual('45px');
+    expect(component.getIndentationStyle()['padding-left']).toEqual('93px');
   });
 });
