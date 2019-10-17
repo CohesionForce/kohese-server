@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
+import * as Uuid from 'uuid/v1';
+
 import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
@@ -80,44 +82,52 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           methods: [],
           localTypes: []
         });
-        let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
-          upsertItem('KoheseView', {
+        let formatDefinitionId: string = (<any> Uuid).default();
+        let viewModel: any = {
           name: name,
           modelName: name,
           parentId: 'view-item',
           viewProperties: {},
-          formatDefinitions: {
-            '89324a90-a7af-11e8-8662-71e48f0160fe': {
-              'name': 'New definition',
-              'header': {
-                'kind': 'header',
-                'contents': [
-                   {
-                     'propertyName': 'name',
-                     'hideLabel': false,
-                     'labelOrientation': 'Top',
-                     'kind': 'text'
-                   }
-                 ]
-               },
-              'containers': [
+          formatDefinitions: {},
+          defaultFormatKey: formatDefinitionId,
+          tableDefinitions: {}
+        };
+        viewModel.formatDefinitions[formatDefinitionId] = {
+          'name': 'New definition',
+          'header': {
+            'kind': 'header',
+            'contents': [
+               {
+                 'propertyName': {
+                   kind: name,
+                   attribute: 'name'
+                 },
+                 'hideLabel': false,
+                 'labelOrientation': 'Top',
+                 'kind': 'text'
+               }
+             ]
+           },
+          'containers': [
+            {
+              'kind': 'list',
+              'contents': [
                 {
-                  'kind': 'list',
-                  'contents': [
-                    {
-                       'propertyName': 'description',
-                       'hideLabel': false,
-                       'labelOrientation': 'Top',
-                       'kind': 'markdown'
-                    }
-                 ]
+                   'propertyName': {
+                     kind: name,
+                     attribute: 'description'
+                   },
+                   'hideLabel': false,
+                   'labelOrientation': 'Top',
+                   'kind': 'markdown'
                 }
-              ],
-              'id': '89324a90-a7af-11e8-8662-71e48f0160fe'
+             ]
             }
-          },
-          defaultFormatKey: '89324a90-a7af-11e8-8662-71e48f0160fe'
-        });
+          ],
+          'id': formatDefinitionId
+        };
+        let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
+          upsertItem('KoheseView', viewModel);
 
         Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
           then((proxies: Array<ItemProxy>) => {

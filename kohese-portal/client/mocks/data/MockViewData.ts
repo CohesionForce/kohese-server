@@ -56,6 +56,21 @@ export function MockViewData () {
   "createdOn": 1510596684590,
   "modifiedBy": "admin",
   "modifiedOn": 1517006598071,
+  "tableDefinitions": {
+    "3b4d68d0-e603-11e9-bf30-55b2f7a3af55": {
+      "id": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55",
+      "name": "Table Definition",
+      "columns": [
+        "name"
+      ],
+      "expandedFormat": {
+        "column1": [],
+        "column2": [],
+        "column3": [],
+        "column4": []
+      }
+    }
+  },
   "itemIds": []
   }
 }
@@ -78,6 +93,7 @@ export function MockItemSubclassView() {
         },
         "displayName": "Subclass Property"
       }
-    }
+    },
+    "tableDefinitions": {}
   };
 }

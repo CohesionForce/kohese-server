@@ -1,12 +1,15 @@
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 import { Observable ,  Subscription } from 'rxjs';
+import * as Uuid from 'uuid/v1';
 
 import { IconSelectorComponent } from '../icon-selector/icon-selector.component';
 import { LocalTypeEditorComponent } from '../local-type-editor/local-type-editor.component';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { DialogService } from '../../../services/dialog/dialog.service';
+import { DialogService,
+  DialogComponent } from '../../../services/dialog/dialog.service';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+import { TableDefinition } from '../TableDefinition.interface';
 
 @Component({
   selector: 'type-overview',
@@ -30,6 +33,10 @@ export class TypeOverviewComponent implements OnInit, OnDestroy {
   
   private _koheseTypeStreamSubscription: Subscription;
   
+  get Object() {
+    return Object;
+  }
+  
   constructor(private dialogService: DialogService,
     private typeService: DynamicTypesService,
     private _changeDetectorRef: ChangeDetectorRef) {
@@ -39,11 +46,14 @@ export class TypeOverviewComponent implements OnInit, OnDestroy {
     this._koheseTypeStreamSubscription = this._koheseTypeStream.subscribe(
       (koheseType: KoheseType) => {
       this._koheseType = koheseType;
-      this.filteredTypes = {};
-      let types: any = this.typeService.getKoheseTypes();
-      for (let typeName in types) {
-        if (this._koheseType.dataModelProxy.item.name !== typeName) {
-          this.filteredTypes[typeName] = types[typeName];
+      
+      if (this._koheseType) {
+        this.filteredTypes = {};
+        let types: any = this.typeService.getKoheseTypes();
+        for (let typeName in types) {
+          if (this._koheseType.dataModelProxy.item.name !== typeName) {
+            this.filteredTypes[typeName] = types[typeName];
+          }
         }
       }
       
@@ -123,5 +133,50 @@ export class TypeOverviewComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       }
     });
+  }
+  
+  public addTableDefinition(): void {
+    this.dialogService.openInputDialog('Add Table Definition', '',
+      DialogComponent.INPUT_TYPES.TEXT, 'Name', '', (input: any) => {
+      return !!input;
+    }).afterClosed().subscribe((name: any) => {
+      if (name) {
+        let id: string = (<any> Uuid).default();
+        this._koheseType.viewModelProxy.item.tableDefinitions[id] = {
+          id: id,
+          name: name,
+          columns: [],
+          expandedFormat: {
+            column1: [],
+            column2: [],
+            column3: [],
+            column4: []
+          }
+        };
+        
+        this._changeDetectorRef.markForCheck();
+      }
+    });
+  }
+  
+  public renameTableDefinition(tableDefinitionId: string): void {
+    let tableDefinition: TableDefinition = this._koheseType.viewModelProxy.
+      item.tableDefinitions[tableDefinitionId];
+    this.dialogService.openInputDialog('Rename ' + tableDefinition.name, '',
+      DialogComponent.INPUT_TYPES.TEXT, 'Name', tableDefinition.name, (input:
+      any) => {
+      return !!input;
+    }).afterClosed().subscribe((name: any) => {
+      if (name) {
+        tableDefinition.name = name;
+        this._changeDetectorRef.markForCheck();
+      }
+    });
+  }
+  
+  public removeTableDefinition(tableDefinitionId: string): void {
+    delete this._koheseType.viewModelProxy.item.tableDefinitions[
+      tableDefinitionId];
+    this._changeDetectorRef.markForCheck();
   }
 }

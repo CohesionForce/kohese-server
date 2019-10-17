@@ -87,5 +87,20 @@
     }
   },
   "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "tableDefinitions": {
+    "3b4d68d0-e603-11e9-bf30-55b2f7a3af55": {
+      "id": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55",
+      "name": "Item Table",
+      "columns": [
+        "name"
+      ],
+      "expandedFormat": {
+        "column1": [],
+        "column2": [],
+        "column3": [],
+        "column4": []
+      }
+    }
+  },
   "itemIds": []
 }

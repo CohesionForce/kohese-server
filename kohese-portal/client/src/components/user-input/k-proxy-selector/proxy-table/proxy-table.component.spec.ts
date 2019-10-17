@@ -35,31 +35,11 @@ describe('Component: proxy-table', () => {
   
   it('can change the check state associated with an ItemProxy', () => {
     let itemProxy: ItemProxy = component.dataSource[2];
-    expect(component.selectedIds.indexOf(itemProxy.item.id)).toEqual(-1);
-    component.checkStateChanged(true, itemProxy);
-    expect(component.selectedIds.indexOf(itemProxy.item.id)).not.toEqual(-1);
-    component.checkStateChanged(false, itemProxy);
-    expect(component.selectedIds.indexOf(itemProxy.item.id)).toEqual(-1);
-  });
-  
-  it('can determine if the selected ItemProxys may be moved up', () => {
-    component.checkStateChanged(true, component.dataSource[2]);
-    expect(component.canMoveSelectionUp()).toEqual(true);
-    component.checkStateChanged(true, component.dataSource[0]);
-    expect(component.canMoveSelectionUp()).toEqual(false);
-  });
-  
-  it('can determine if the selected ItemProxys may be moved down', () => {
-    component.checkStateChanged(true, component.dataSource[1]);
-    expect(component.canMoveSelectionDown()).toEqual(true);
-    component.checkStateChanged(true, component.dataSource[2]);
-    expect(component.canMoveSelectionDown()).toEqual(false);
-  });
-  
-  it('can remove the selected ItemProxys', () => {
-    component.checkStateChanged(true, component.dataSource[2]);
-    component.removeSelection();
-    expect(component.selectedIds.length).toEqual(0);
+    expect(component.selection.indexOf(itemProxy)).toEqual(-1);
+    component.checkStateChanged(itemProxy);
+    expect(component.selection.indexOf(itemProxy)).not.toEqual(-1);
+    component.checkStateChanged(itemProxy);
+    expect(component.selection.indexOf(itemProxy)).toEqual(-1);
   });
   
   it('can calculate the minimum width of the checkbox column', () => {

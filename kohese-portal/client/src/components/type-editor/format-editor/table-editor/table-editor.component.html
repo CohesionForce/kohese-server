@@ -1,6 +1,4 @@
 <span style="font-size:large;">Table Editor</span>
-  <button mat-button style="background-color : navy; color : white; margin-left : 10px;" (click)="openTablePreview()">Open
-    Preview</button>
 <mat-divider></mat-divider>
 <div class="table-options">
   <h5>Table options : </h5>
@@ -9,8 +7,8 @@
       <h3>
         Columns
       </h3>
-      <button mat-icon-button [disabled]="(Object.keys(attributes).length ===
-        tableDefinition.columns.length)" class="flex-right-align"
+      <button mat-icon-button [disabled]="(Object.keys(kind.classProperties).
+        length === tableDefinition.columns.length)" class="flex-right-align"
         (click)="addColumn()">
         <mat-icon class="fa fa-plus"></mat-icon>
       </button>

@@ -38,7 +38,8 @@ import { TablePreviewDialogComponent } from './table-editor/table-preview-dialog
   ],
   exports : [
     FormatEditorComponent,
-    FormatGuiComponent
+    FormatGuiComponent,
+    TableEditorComponent
   ],
   imports: [
     CommonModule,

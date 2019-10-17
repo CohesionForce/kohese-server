@@ -2,6 +2,8 @@ import { PropertyDefinition } from './../../../format-editor.component';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { DynamicTypesService } from '../../../../../../services/dynamic-types/dynamic-types.service';
+import { TableDefinition } from '../../../../TableDefinition.interface';
+import { ItemProxy } from '../../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../../common/src/tree-configuration';
 
 @Component({
@@ -28,6 +30,11 @@ export class PropertyRowComponent implements OnInit {
   private _attributeNames: any = {};
   get attributeNames() {
     return this._attributeNames;
+  }
+  
+  private _tableDefinitions: Array<TableDefinition>;
+  get tableDefinitions() {
+    return this._tableDefinitions;
   }
 
   @Output()
@@ -66,20 +73,33 @@ export class PropertyRowComponent implements OnInit {
       this.kind.dataModelProxy.item.classProperties);
     for (let kindName in this._dynamicTypesService.getKoheseTypes()) {
       if (kindName !== this.kind.dataModelProxy.item.name) {
-        let model: any = this._dynamicTypesService.getKoheseTypes()[kindName].
-          dataModelProxy.item;
+        let model: any = this._dynamicTypesService.getKoheseTypes()[
+          kindName].dataModelProxy.item;
         let referenceAttributes: Array<any> = model.relationProperties;
         for (let j: number = 0; j < referenceAttributes.length; j++) {
-          if (Array.isArray(model.classProperties[referenceAttributes[j]].
-            definition.type)) {
-            if (!this._attributeNames[kindName]) {
-              this._attributeNames[kindName] = [];
+          let attributeType: any = model.classProperties[referenceAttributes[
+            j]].definition.type;
+          if (Array.isArray(attributeType)) {
+            let viewModelProxy: ItemProxy = TreeConfiguration.
+              getWorkingTree().getProxyFor('view-' + attributeType[0].
+              toLowerCase());
+            if (viewModelProxy && (Object.keys(viewModelProxy.item.
+              tableDefinitions).length > 0)) {
+              if (!this._attributeNames[kindName]) {
+                this._attributeNames[kindName] = [];
+              }
+              
+              this._attributeNames[kindName].push(referenceAttributes[j]);
             }
-            
-            this._attributeNames[kindName].push(referenceAttributes[j]);
           }
         }
       }
+    }
+    
+    if (this._attribute.relation && Array.isArray(this._attribute.type)) {
+      this._tableDefinitions = Object.values(TreeConfiguration.
+        getWorkingTree().getProxyFor('view-' + this._attribute.type[0].
+        toLowerCase()).item.tableDefinitions);
     }
   }
 
@@ -89,6 +109,16 @@ export class PropertyRowComponent implements OnInit {
 
   public updateKind(attributeObject: { kind: string, attribute: string }):
     void {
+    this._attribute = TreeConfiguration.getWorkingTree().getProxyFor(
+      attributeObject.kind).item.classProperties[attributeObject.attribute].
+      definition;
+    
+    if (this._attribute.relation && Array.isArray(this._attribute.type)) {
+      this._tableDefinitions = Object.values(TreeConfiguration.
+        getWorkingTree().getProxyFor('view-' + this._attribute.type[0].
+        toLowerCase()).item.tableDefinitions);
+    }
+    
     this.property.hideLabel = false;
     this.property.customLabel = '';
     this.property.labelOrientation = 'Top';
@@ -107,20 +137,8 @@ export class PropertyRowComponent implements OnInit {
     } else {
       this.property.inputOptions = null;
       this.property.kind = '';
-      this.property['tableDefinition'] = {
-        columns: [ 'name', 'createdBy' ],
-        expandedFormat: {
-          column1: [],
-          column2: [],
-          column3: [],
-          column4: []
-        }
-      };
+      this.property['tableDefinition'] = this._tableDefinitions[0].id;
     }
-    
-    this._attribute = TreeConfiguration.getWorkingTree().getProxyFor(
-      attributeObject.kind).item.classProperties[attributeObject.attribute].
-      definition;
     
     console.log(this.property.kind);
   }
@@ -129,39 +147,5 @@ export class PropertyRowComponent implements OnInit {
     selection: { kind: string, attribute: string }): boolean {
     return ((option.kind === selection.kind) && (option.attribute ===
       selection.attribute));
-  }
-  
-  public getAttributes(): Array<any> {
-    let attributes: Array<any> = [];
-    let type: any = TreeConfiguration.getWorkingTree().getProxyFor(this.
-      property.propertyName.kind).item;
-    let typeName: string = this._attribute.type[0];
-    if (type.name === this.kind.dataModelProxy.item.name) {
-      for (let j: number = 0; j < type.localTypes.length; j++) {
-        if (type.localTypes[j].name === typeName) {
-          for (let attributeName in type.localTypes[j].properties) {
-            let attribute: any = JSON.parse(JSON.stringify(type.localTypes[j].
-              properties[attributeName]));
-            attribute.name = attributeName;
-            attributes.push(attribute);
-          }
-          
-          break;
-        }
-      }
-    }
-    
-    if (attributes.length === 0) {
-      let attributeMap: any = TreeConfiguration.getWorkingTree().getProxyFor(
-        typeName).item.classProperties;
-      for (let attributeName in attributeMap) {
-        let attribute: any = JSON.parse(JSON.stringify(attributeMap[
-          attributeName].definition));
-        attribute.name = attributeName;
-        attributes.push(attribute);
-      }
-    }
-    
-    return attributes;
   }
 }

@@ -54,23 +54,25 @@
         </mat-panel-description>
       </mat-expansion-panel-header>
       <ng-container *ngIf="attribute.relation && Array.isArray(attribute.
-        type) && (container.kind === 'list')">
+        type) && (container.kind === 'list') && (tableDefinitions.length > 0)">
         <mat-checkbox [ngModel]="!!property.tableDefinition"
-          (ngModelChange)="$event ? property.tableDefinition = { columns:
-          [ 'name', 'createdBy' ], expandedFormat: { column1: [], column2: [],
-          column3: [], column4: [] } } : property.tableDefinition = null"
-          [disabled]="(property.propertyName.kind !== kind.dataModelProxy.item.
-          name)">
+          (ngModelChange)="property.tableDefinition = ($event ?
+          tableDefinitionSelect.selected.value : null)" [disabled]="(property.
+          propertyName.kind !== kind.dataModelProxy.item.name)">
           As Table
         </mat-checkbox>
         <br/>
-        <ng-container *ngIf="property.tableDefinition">
-          <table-editor [tableDefinition]="property.tableDefinition"
-            [propertyId]="property.propertyName"
-            [attributes]="getAttributes()">
-          </table-editor>
-          <br/>
-        </ng-container>
+        <mat-form-field style="width: 100%;">
+          <mat-select #tableDefinitionSelect placeholder="Table Definition"
+            [disabled]="!property.tableDefinition"
+            [ngModel]="tableDefinitions[0].id">
+            <ng-container *ngFor="let tableDefinition of tableDefinitions">
+              <mat-option [value]="tableDefinition.id">
+                {{tableDefinition.name}}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
       </ng-container>
       <mat-checkbox [(ngModel)]="property.hideEmpty">Hide if empty</mat-checkbox>
     </mat-expansion-panel>

@@ -201,6 +201,15 @@ export function MockDataModel () {
         }
       }
     },
+    "predecessors": {
+      "type": [
+        "Item"
+      ],
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    },
     "username": {
       "type": "string",
       "derived": true,

@@ -43,5 +43,26 @@ export class TablePreviewDialogComponent implements OnInit {
         }
       });
   }
-
+  
+  public getRows(): Array<any> {
+    if (this.previewProxy.model.item.name === this.property.propertyName.
+      kind) {
+      return this.previewProxy.item[this.property.propertyName.attribute];
+    } else {
+      let upstreamKindReferences: any = this.previewProxy.relations.
+        referencedBy[this.property.propertyName.kind];
+      if (upstreamKindReferences) {
+        let upstreamKindAttributeReferences: Array<ItemProxy> =
+          upstreamKindReferences[this.property.propertyName.attribute];
+        if (upstreamKindAttributeReferences) {
+          return upstreamKindAttributeReferences.map((itemProxy:
+            ItemProxy) => {
+            return { id: itemProxy.item.id };
+          });
+        }
+      }
+      
+      return [];
+    }
+  }
 }

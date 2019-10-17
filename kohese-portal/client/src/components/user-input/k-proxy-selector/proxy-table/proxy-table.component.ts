@@ -9,19 +9,6 @@ import { Component, OnInit, Input } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { TreeConfiguration } from './../../../../../../common/src/tree-configuration';
 
-export enum MoveDirection {
-  UP, DOWN
-}
-
-export interface MoveEvent {
-  moveDirection: MoveDirection;
-  candidates: Array<string>;
-}
-
-export interface RemoveEvent {
-  candidates: Array<string>;
-}
-
 @Component({
   selector: 'proxy-table',
   templateUrl: './proxy-table.component.html',
@@ -54,8 +41,7 @@ export class ProxyTableComponent implements OnInit {
     @Input('disabled')
     set disabled(disabled: boolean) {
       this._disabled = disabled;
-      this._intermediateSelectedIds.fill(undefined);
-      this._selectedIds.length = 0;
+      this._selection.length = 0;
       if (this._disabled) {
         this._columns.splice(0, 1);
       } else {
@@ -66,33 +52,14 @@ export class ProxyTableComponent implements OnInit {
 
     dataSource: Array<ItemProxy>;
     
-    private _intermediateSelectedIds: Array<string> = [];
-    private _selectedIds: Array<string> = [];
-    get selectedIds() {
-      return this._selectedIds;
-    }
-    
-    private _moveEventEmitter: EventEmitter<MoveEvent> =
-      new EventEmitter<MoveEvent>();
-    @Output('move')
-    get moveEventEmitter() {
-      return this._moveEventEmitter;
-    }
-    
-    private _removeEventEmitter: EventEmitter<RemoveEvent> =
-      new EventEmitter<RemoveEvent>();
-    @Output('remove')
-    get removeEventEmitter() {
-      return this._removeEventEmitter;
+    private _selection: Array<any> = [];
+    get selection() {
+      return this._selection;
     }
 
     expandedItem: ItemProxy;
     treeConfigSub: Subscription;
     treeConfig: TreeConfiguration;
-    
-    get MoveDirection() {
-      return MoveDirection;
-    }
     
     public static readonly CHECKBOX_COLUMN_WIDTH: number = 40;
     
@@ -117,8 +84,7 @@ export class ProxyTableComponent implements OnInit {
                 }
               }
             }
-            this._intermediateSelectedIds.length = this.dataSource.length;
-            this._intermediateSelectedIds.fill(undefined);
+            
             this.changeRef.markForCheck();
             console.log(this);
           });
@@ -161,59 +127,13 @@ export class ProxyTableComponent implements OnInit {
           });
     }
   
-  public checkStateChanged(checked: boolean, itemProxy: ItemProxy): void {
-    if (checked) {
-      this._intermediateSelectedIds.splice(this.dataSource.indexOf(itemProxy),
-        1, itemProxy.item.id);
+  public checkStateChanged(itemProxy: ItemProxy): void {
+    let elementIndex: number = this._selection.indexOf(itemProxy);
+      if (elementIndex === -1) {
+      this._selection.push(itemProxy);
     } else {
-      this._intermediateSelectedIds.splice(this.dataSource.indexOf(itemProxy),
-        1, undefined);
+      this._selection.splice(elementIndex, 1);
     }
-    
-    this._selectedIds.length = 0;
-    for (let j: number = 0; j < this._intermediateSelectedIds.length; j++) {
-      if (this._intermediateSelectedIds[j]) {
-        this._selectedIds.push(this._intermediateSelectedIds[j]);
-      }
-    }
-  }
-  
-  public canMoveSelectionUp(): boolean {
-    let ids: Array<string> = this.dataSource.map((itemProxy: ItemProxy) => {
-      return itemProxy.item.id;
-    });
-    for (let j: number = 0; j < this._selectedIds.length; j++) {
-      if (ids.indexOf(this._selectedIds[j]) === 0) {
-        return false;
-      }
-    }
-    
-    return true;
-  }
-  
-  public canMoveSelectionDown(): boolean {
-    let ids: Array<string> = this.dataSource.map((itemProxy: ItemProxy) => {
-      return itemProxy.item.id;
-    });
-    for (let j: number = 0; j < this._selectedIds.length; j++) {
-      if (ids.indexOf(this._selectedIds[j]) === (ids.length - 1)) {
-        return false;
-      }
-    }
-    
-    return true;
-  }
-  
-  public moveSelection(moveDirection: MoveDirection): void {
-    this._moveEventEmitter.emit({ moveDirection: moveDirection,
-      candidates: this._selectedIds });
-    this.changeRef.markForCheck();
-  }
-  
-  public removeSelection(): void {
-    this._removeEventEmitter.emit({ candidates: this._selectedIds });
-    this._selectedIds.length = 0;
-    this.changeRef.markForCheck();
   }
   
   public getCheckboxColumnWidth(): object {
