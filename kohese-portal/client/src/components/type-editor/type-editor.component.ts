@@ -93,7 +93,10 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
                 'kind': 'header',
                 'contents': [
                    {
-                     'propertyName': 'name',
+                     'propertyName': {
+                       kind: name,
+                       attribute: 'name'
+                     },
                      'hideLabel': false,
                      'labelOrientation': 'Top',
                      'kind': 'text'
@@ -105,7 +108,10 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
                   'kind': 'list',
                   'contents': [
                     {
-                       'propertyName': 'description',
+                       'propertyName': {
+                         kind: name,
+                         attribute: 'description'
+                       },
                        'hideLabel': false,
                        'labelOrientation': 'Top',
                        'kind': 'markdown'
@@ -116,7 +122,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
               'id': '89324a90-a7af-11e8-8662-71e48f0160fe'
             }
           },
-          defaultFormatKey: '89324a90-a7af-11e8-8662-71e48f0160fe'
+          defaultFormatKey: '89324a90-a7af-11e8-8662-71e48f0160fe',
+          tableDefinitions: {}
         });
 
         Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
