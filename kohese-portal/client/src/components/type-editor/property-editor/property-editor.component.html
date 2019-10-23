@@ -1,22 +1,134 @@
 <div style="height: 100%; width: 100%; display: flex; flex-direction: column;">
   <ng-container *ngIf="koheseType">
-    <span class="flex-right-align">
-      <button mat-icon-button (click)="add()" [disabled]="koheseType.dataModelProxy.item.isMetaModel">
+    <div style="height: 50px; width: 100%; display: flex;
+      flex-direction: row;">
+      <button mat-icon-button matTooltip="Add an attribute"
+        class="flex-right-align" (click)="add()" [disabled]="koheseType.
+        dataModelProxy.item.isMetaModel">
         <mat-icon class="fa fa-plus"></mat-icon>
       </button>
-    </span>
-    <mat-list>
-      <mat-list-item *ngFor="let propertyId of (koheseType.dataModelProxy.item.properties | mapKey)">
-        {{propertyId}}
-        <span class="flex-right-align">
-          <button mat-icon-button (click)="openAttributeEditor(propertyId)">
-            <mat-icon class="fa fa-edit"></mat-icon>
+    </div>
+    <mat-table #table matSort [dataSource]="Object.values(koheseType.
+      dataModelProxy.item.properties)" style="height: calc(100% - 50px);
+      overflow: auto;">
+      <ng-container matColumnDef="Name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Name
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <mat-form-field style="width: 100%; padding-right: 5px;">
+            <input matInput type="text" [ngModel]="Object.keys(koheseType.
+              dataModelProxy.item.properties)[Object.values(koheseType.
+              dataModelProxy.item.properties).indexOf(element)]"
+              (ngModelChange)="setAttributeName(element, $event)"/>
+          </mat-form-field>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Type">
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          style="flex: 0 0 400px;">
+          Type
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" style="flex: 0 0 400px;">
+          <mat-form-field style="width: 180px;">
+            <mat-select [ngModel]="element.type" (ngModelChange)="typeSelected(
+              element, $event)" [compareWith]="areTypesSame">
+              <mat-option *ngFor="let attributeType of (attributeTypes |
+                mapKey)"
+                [value]="attributeTypes[attributeType]">
+                {{attributeType}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <ng-container *ngIf="element.type === 'StateMachine'">
+            <button mat-icon-button matTooltip="Edit the associated state
+              machine" (click)="openStateMachineEditor(element)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="(Object.values(fundamentalTypes).indexOf(
+            isMultivalued(element) ? element.type[0] : element.type) === -1)">
+            <mat-form-field style="width: 180px; padding: 0px 5px 0px 5px;">
+              <mat-select placeholder="Reference Attribute"
+                [ngModel]="element.relation" (ngModelChange)="element.
+                relation = $event" [compareWith]="areRelationsEqual">
+                <mat-optgroup *ngFor="let typeName of (idAttributes | mapKey)"
+                  [label]="typeName">
+                  <mat-option *ngFor="let attributeName of idAttributes[
+                    typeName]" [value]="{ kind: typeName, foreignKey:
+                    attributeName }">
+                    {{attributeName}}
+                  </mat-option>
+                </mat-optgroup>
+              </mat-select>
+            </mat-form-field>
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Is Multivalued">
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          style="flex: 0 0 80px;">
+          Is Multivalued
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" style="flex: 0 0 80px;">
+          <mat-checkbox [ngModel]="isMultivalued(element)"
+            (ngModelChange)="toggleMultivaluedness(element)">
+          </mat-checkbox>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Is Required">
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          style="flex: 0 0 80px;">
+          Is Required
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" style="flex: 0 0 80px;">
+          <mat-checkbox [(ngModel)]="element.required"></mat-checkbox>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Is Kind ID">
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          style="flex: 0 0 80px;">
+          Is Kind ID
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" style="flex: 0 0 80px;">
+          <mat-checkbox [(ngModel)]="element.id"></mat-checkbox>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Default Value">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Default Value
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <mat-form-field style="width: 100%;">
+            <input matInput type="text" [(ngModel)]="element.default"/>
+          </mat-form-field>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef style="flex: 0 0 74px;">
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" style="flex: 0 0 74px;">
+          <button mat-icon-button [matMenuTriggerFor]="actionMenu">
+            <mat-icon class="fa fa-bars"></mat-icon>
           </button>
-          <button mat-icon-button (click)="delete(propertyId)" [disabled]="koheseType.dataModelProxy.item.isMetaModel">
-            <mat-icon class="fa fa-trash"></mat-icon>
-          </button>
-        </span>
-      </mat-list-item>
-    </mat-list>
+          <mat-menu #actionMenu="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item matTooltip="Remove this attribute"
+              (click)="delete(Object.keys(koheseType.dataModelProxy.item.
+              properties)[Object.values(koheseType.dataModelProxy.item.
+              properties).indexOf(element)])">
+              <mat-icon class="fa fa-trash"></mat-icon>
+              Remove
+            </button>
+          </mat-menu>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row *matHeaderRowDef="['Name', 'Type', 'Is Multivalued',
+        'Is Required', 'Is Kind ID', 'Default Value', 'actions'];
+        sticky: true">
+      </mat-header-row>
+      <mat-row *matRowDef="let row; columns: ['Name', 'Type', 'Is Multivalued',
+        'Is Required', 'Is Kind ID', 'Default Value', 'actions']">
+      </mat-row>
+    </mat-table>
   </ng-container>
 </div>
