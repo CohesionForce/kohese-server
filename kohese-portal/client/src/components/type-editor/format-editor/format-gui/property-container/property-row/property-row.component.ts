@@ -1,4 +1,4 @@
-import { PropertyDefinition } from './../../../format-editor.component';
+import { PropertyDefinition } from './../../../../PropertyDefinition.interface';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { DynamicTypesService } from '../../../../../../services/dynamic-types/dynamic-types.service';
@@ -40,6 +40,15 @@ export class PropertyRowComponent implements OnInit {
   @Output()
   deleted: EventEmitter<PropertyDefinition> = new EventEmitter();
   
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
+  @Input('disabled')
+  set isDisabled(isDisabled: boolean) {
+    this._isDisabled = isDisabled;
+  }
+  
   get Object() {
     return Object;
   }
@@ -60,7 +69,7 @@ export class PropertyRowComponent implements OnInit {
     // Migration code
     if (typeof this.property.propertyName === 'string') {
       this.property.propertyName = {
-        kind: this.kind.dataModelProxy.item.name,
+        kind: this.kind.name,
         attribute: this.property.propertyName
       };
     }
@@ -69,10 +78,10 @@ export class PropertyRowComponent implements OnInit {
       this.property.propertyName.kind).item.classProperties[this.property.
       propertyName.attribute].definition;
     
-    this._attributeNames[this.kind.dataModelProxy.item.name] = Object.keys(
-      this.kind.dataModelProxy.item.classProperties);
+    this._attributeNames[this.kind.name] = Object.keys(this.kind.
+      classProperties);
     for (let kindName in this._dynamicTypesService.getKoheseTypes()) {
-      if (kindName !== this.kind.dataModelProxy.item.name) {
+      if (kindName !== this.kind.name) {
         let model: any = this._dynamicTypesService.getKoheseTypes()[
           kindName].dataModelProxy.item;
         let referenceAttributes: Array<any> = model.relationProperties;
@@ -123,7 +132,7 @@ export class PropertyRowComponent implements OnInit {
     this.property.customLabel = '';
     this.property.labelOrientation = 'Top';
     this.property.hideEmpty = false;
-    if (attributeObject.kind === this.kind.dataModelProxy.item.name) {
+    if (attributeObject.kind === this.kind.name) {
       const viewProperty = TreeConfiguration.getWorkingTree().getProxyFor(
         'view-' + attributeObject.kind.toLowerCase()).item.viewProperties[
         attributeObject.attribute];

@@ -10,7 +10,7 @@ import {
 } from './../../../../../../common/src/item-proxy';
 import {
   PropertyDefinition
-} from './../../../type-editor/format-editor/format-editor.component';
+} from './../../../type-editor/PropertyDefinition.interface';
 import {
   Component,
   OnInit,

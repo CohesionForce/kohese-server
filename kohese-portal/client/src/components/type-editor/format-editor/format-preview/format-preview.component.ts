@@ -1,7 +1,6 @@
-import { KoheseType } from './../../../../classes/UDT/KoheseType.class';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { Component, OnInit, Optional, Inject, ElementRef } from '@angular/core';
-import { FormatDefinition } from '../format-editor.component';
+import { FormatDefinition } from '../../FormatDefinition.interface';
 
 let textDefault = 'Example Text'
 
@@ -21,7 +20,7 @@ const defaultValues = {
 })
 export class FormatPreviewComponent implements OnInit {
   format : FormatDefinition;
-  type : KoheseType;
+  type : any;
   mockRow = {
     editable : false
   }
@@ -42,8 +41,8 @@ export class FormatPreviewComponent implements OnInit {
         name : 'Test Header',
         description : "This is an example description"
       },
-      kind : this.type.dataModelProxy.item.name,
-      model: this.type.dataModelProxy,
+      kind : this.type.name,
+      model: this.type,
       relations: {
         references: {},
         referencedBy: {}

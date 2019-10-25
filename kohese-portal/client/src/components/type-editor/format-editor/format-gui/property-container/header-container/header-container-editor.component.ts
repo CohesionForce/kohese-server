@@ -1,4 +1,4 @@
-import { FormatContainer } from './../../../format-editor.component';
+import { FormatContainer } from './../../../../FormatContainer.interface';
 import { Input } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 
@@ -12,6 +12,15 @@ export class HeaderContainerEditorComponent implements OnInit {
   header : FormatContainer;
   @Input()
   kind;
+  
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
+  @Input('disabled')
+  set isDisabled(isDisabled: boolean) {
+    this._isDisabled = isDisabled;
+  }
 
   constructor() { }
 

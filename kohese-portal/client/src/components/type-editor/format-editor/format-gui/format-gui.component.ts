@@ -4,7 +4,7 @@ import { KoheseType } from '../../../../classes/UDT/KoheseType.class';
 import { Subscription ,  Observable } from 'rxjs';
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
-import { FormatDefinition } from '../format-editor.component';
+import { FormatDefinition } from '../../FormatDefinition.interface';
 
 @Component({
   selector: 'format-gui',
@@ -17,7 +17,16 @@ export class FormatGuiComponent implements OnInit, OnDestroy {
   @Input()
   format : FormatDefinition
   @Input()
-  kind : KoheseType
+  kind : any
+  
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
+  @Input('disabled')
+  set isDisabled(isDisabled: boolean) {
+    this._isDisabled = isDisabled;
+  }
 
   constructor(private dialogService : DialogService, private changeRef : ChangeDetectorRef) {
 

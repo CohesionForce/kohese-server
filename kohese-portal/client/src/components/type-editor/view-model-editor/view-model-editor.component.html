@@ -1,0 +1,166 @@
+<div style="height: 50px; display: flex; flex-direction: row;">
+  <ng-container *ngIf="!editable else editableBlock">
+    <button mat-icon-button matTooltip="Edit display settings for this kind"
+      class="flex-right-align" (click)="editable = true">
+      <mat-icon class="fa fa-edit"></mat-icon>
+    </button>
+  </ng-container>
+  <ng-template #editableBlock>
+    <!-- Leave the "save" button always enabled for now. -->
+    <button mat-icon-button matTooltip="Save display settings for this kind"
+      class="flex-right-align" (click)="save()">
+      <mat-icon class="fa fa-save"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Discard display changes to this kind"
+      (click)="discardChanges()">
+      <mat-icon class="fa fa-times"></mat-icon>
+    </button>
+  </ng-template>
+</div>
+<label>
+  Icon:
+  <span>
+    <mat-icon class="{{viewModel.icon}}">
+    </mat-icon>
+  </span>
+</label>
+<button mat-raised-button (click)="openIconSelectionDialog()"
+  [disabled]="!editable">
+  Select Icon...
+</button>
+<br/>
+<br/>
+<div style="height: 30%;">
+  <div style="height: 50px; display: flex; flex-direction: row;">
+    <h3>
+      Tables
+    </h3>
+    <button mat-icon-button matTooltip="Add a table definition"
+      class="flex-right-align" (click)="addTableDefinition()"
+      [disabled]="!editable">
+      <mat-icon class="fa fa-plus"></mat-icon>
+    </button>
+  </div>
+  <div style="height: calc(100% - 50px); overflow: auto;">
+    <ng-container *ngFor="let tableDefinition of Object.values(viewModel.
+      tableDefinitions)">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title style="align-items: center;">
+            {{tableDefinition.name}}
+          </mat-panel-title>
+          <button mat-icon-button matTooltip="Rename this table
+            definition" class="flex-right-align"
+            (click)="renameTableDefinition(tableDefinition.id); $event.
+            stopPropagation()" [disabled]="!editable">
+            <mat-icon class="fa fa-i-cursor"></mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Remove this table
+            definition" (click)="removeTableDefinition(
+            tableDefinition.id); $event.stopPropagation()"
+            [disabled]="!editable">
+            <mat-icon class="fa fa-trash"></mat-icon>
+          </button>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <!-- Handle local type selection -->
+          <table-editor [tableDefinition]="tableDefinition"
+            [kind]="TreeConfiguration.getWorkingTree().getProxyFor(viewModel.
+            modelName).item" [disabled]="!editable">
+          </table-editor>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-container>
+  </div>
+</div>
+<div style="height: 30%;">
+  <div style="height: 50px; display: flex; flex-direction: row;">
+    <h3>
+      Format Definitions
+    </h3>
+    <button mat-icon-button matTooltip="Add a format definition"
+      class="flex-right-align" (click)="addFormatDefinition()"
+      [disabled]="!editable">
+      <mat-icon class="fa fa-plus"></mat-icon>
+    </button>
+  </div>
+  <div style="height: calc(100% - 50px); overflow: auto;">
+    <ng-container *ngFor="let formatDefinition of Object.values(viewModel.
+      formatDefinitions)">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title style="align-items: center;">
+            {{formatDefinition.name}}
+          </mat-panel-title>
+          <button mat-icon-button matTooltip="Rename this format definition"
+            class="flex-right-align" (click)="renameFormatDefinition(
+            formatDefinition.id); $event.stopPropagation()"
+            [disabled]="!editable">
+            <mat-icon class="fa fa-i-cursor"></mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Preview this format definition"
+            (click)="previewFormatDefinition(formatDefinition.id); $event.
+            stopPropagation()">
+            <mat-icon class="fa fa-search"></mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Make this format definition the
+            default for this kind" (click)="setDefaultFormatDefinition(
+            formatDefinition.id); $event.stopPropagation()"
+            [disabled]="!editable">
+            <mat-icon class="fa fa-star" [ngClass]="{ 'highlight-foreground':
+              (viewModel.defaultFormatKey === formatDefinition.id) }">
+            </mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Remove this format definition"
+            (click)="removeFormatDefinition(formatDefinition.id); $event.
+            stopPropagation()" [disabled]="(!editable || (Object.keys(
+            viewModel.formatDefinitions).length === 1))">
+            <mat-icon class="fa fa-trash"></mat-icon>
+          </button>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <format-gui [format]="formatDefinition" [kind]="TreeConfiguration.
+            getWorkingTree().getProxyFor(viewModel.modelName).item"
+            [disabled]="!editable">
+          </format-gui>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-container>
+  </div>
+</div>
+<div style="height: 50px; width: 100%;">
+  <h3>
+    Attributes
+  </h3>
+</div>
+<mat-table #table matSort [dataSource]="Object.values(viewModel.
+  viewProperties)" (matSortChange)="sortAttributes(table, $event.active,
+  $event.direction)">
+  <ng-container matColumnDef="Name">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>
+      Name
+    </mat-header-cell>
+    <mat-cell *matCellDef="let element">
+      {{Object.keys(viewModel.viewProperties)[Object.values(viewModel.
+        viewProperties).indexOf(element)]}}
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="Display Name">
+    <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 100%;
+      padding-right: 5px;">
+      Display Name
+    </mat-header-cell>
+    <mat-cell *matCellDef="let element" style="width: 100%;
+      padding-right: 5px;">
+      <mat-form-field style="width: 100%;">
+        <input matInput type="text" [ngModel]="element.displayName"
+          (ngModelChange)="element.displayName = $event; itemProxy.dirty =
+          true" [disabled]="!editable"/>
+      </mat-form-field>
+    </mat-cell>
+  </ng-container>
+  <mat-header-row *matHeaderRowDef="['Name', 'Display Name']; sticky: true">
+  </mat-header-row>
+  <mat-row *matRowDef="let row; columns: ['Name', 'Display Name']">
+  </mat-row>
+</mat-table>

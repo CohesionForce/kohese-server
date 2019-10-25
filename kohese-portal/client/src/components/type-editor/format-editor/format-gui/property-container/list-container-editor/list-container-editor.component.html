@@ -5,7 +5,8 @@
       <mat-icon class="fa fa-bars"></mat-icon>
     </button>
     <mat-menu #actionMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item (click)="removeContainer()">
+      <button mat-menu-item (click)="removeContainer()"
+        [disabled]="isDisabled">
         <mat-icon class="fa fa-trash"></mat-icon>
         <span>Delete Container</span>
       </button>
@@ -13,9 +14,12 @@
   </span>
 </div>
 <div class="container-body">
-  <property-row *ngFor="let content of container.contents" [container]="container" [property]="content" [kind]="kind" (deleted)="deleteProperty($event);">
+  <property-row *ngFor="let content of container.contents"
+    [container]="container" [property]="content" [kind]="kind"
+    (deleted)="deleteProperty($event);" [disabled]="isDisabled">
   </property-row>
   <button mat-button class="add-button" [disabled]="(Object.keys(kind.
-    dataModelProxy.item.classProperties).length === 0)" (click)="addRow();">
+    classProperties).length === 0)" (click)="addRow();"
+    [disabled]="isDisabled">
     <i class="fa fa-plus"></i> Add Row</button>
 </div>

@@ -1,6 +1,5 @@
-import { PropertyDefinition } from './../../../format-editor.component';
-import { KoheseType } from '../../../../../../classes/UDT/KoheseType.class';
-import { FormatContainer } from '../../../format-editor.component';
+import { PropertyDefinition } from './../../../../PropertyDefinition.interface';
+import { FormatContainer } from '../../../../FormatContainer.interface';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 export interface ColumnContainer extends FormatContainer {
@@ -22,9 +21,18 @@ export class ColumnContainerEditorComponent implements OnInit {
   @Input()
   container : ColumnContainer;
   @Input()
-  kind : KoheseType
+  kind : any
   @Output()
   deleted = new EventEmitter();
+  
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
+  @Input('disabled')
+  set isDisabled(isDisabled: boolean) {
+    this._isDisabled = isDisabled;
+  }
 
   constructor() { }
 
@@ -54,11 +62,10 @@ export class ColumnContainerEditorComponent implements OnInit {
   }
 
   addRow(rowNum : number) {
-    let model: any = this.kind.dataModelProxy.item;
     this.container.columns[rowNum].contents.push({
       propertyName : {
-        kind: model.name,
-        attribute: Object.keys(model.classProperties)[0]
+        kind: this.kind.name,
+        attribute: Object.keys(this.kind.classProperties)[0]
       },
       hideLabel : false,
       labelOrientation: 'Top',

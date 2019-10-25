@@ -85,6 +85,10 @@ table {
   color: whitesmoke;
 }
 
+.highlight-foreground {
+  color: $primaryColor + 100;
+}
+
 .flex-right-align {
   margin-left: auto;
 }

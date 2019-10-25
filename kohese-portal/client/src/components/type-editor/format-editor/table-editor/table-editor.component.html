@@ -9,7 +9,7 @@
       </h3>
       <button mat-icon-button [disabled]="(Object.keys(kind.classProperties).
         length === tableDefinition.columns.length)" class="flex-right-align"
-        (click)="addColumn()">
+        (click)="addColumn()" [disabled]="isDisabled">
         <mat-icon class="fa fa-plus"></mat-icon>
       </button>
     </div>
@@ -20,16 +20,17 @@
           <button mat-icon-button matTooltip="Move this element up"
             class="flex-right-align" [disabled]="(tableDefinition.columns[
             0] === attributeName)" (click)="moveAttribute(attributeName,
-            true)">
+            true)" [disabled]="isDisabled">
             <mat-icon class="fa fa-arrow-up"></mat-icon>
           </button>
           <button mat-icon-button matTooltip="Move this element down"
             [disabled]="(tableDefinition.columns[tableDefinition.columns.
             length - 1] === attributeName)" (click)="moveAttribute(
-            attributeName, false)">
+            attributeName, false)" [disabled]="isDisabled">
             <mat-icon class="fa fa-arrow-down"></mat-icon>
           </button>
-          <button mat-icon-button (click)="deleteColumn(attributeName)">
+          <button mat-icon-button (click)="deleteColumn(attributeName)"
+            [disabled]="isDisabled">
             <mat-icon class="fa fa-times"></mat-icon>
           </button>
         </mat-list-item>
@@ -40,27 +41,55 @@
     <h6 style="font-weight: bold;">Expanded Row</h6>
     <div class="column">
       <div *ngFor="let property of tableDefinition.expandedFormat.column1">
-        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 1)"></button>
+        {{property}}
+        <button mat-icon-button class="fa fa-times"
+          (click)="removeExpandedProperty(property, 1)"
+          [disabled]="isDisabled">
+        </button>
       </div>
-      <button mat-button class="add-prop-button" (click)="addExpandedProperty(1)">Add Property</button>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(
+        1)" [disabled]="isDisabled">
+        Add Property
+      </button>
     </div>
     <div class="column">
       <div *ngFor="let property of tableDefinition.expandedFormat.column2">
-        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 2)"></button>
+        {{property}}
+        <button mat-icon-button class="fa fa-times"
+          (click)="removeExpandedProperty(property, 2)"
+          [disabled]="isDisabled">
+        </button>
       </div>
-      <button mat-button class="add-prop-button" (click)="addExpandedProperty(2)">Add Property</button>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(
+        2)" [disabled]="isDisabled">
+        Add Property
+      </button>
     </div>
     <div class="column">
       <div *ngFor="let property of tableDefinition.expandedFormat.column3">
-        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 3)"></button>
+        {{property}}
+        <button mat-icon-button class="fa fa-times"
+          (click)="removeExpandedProperty(property, 3)"
+          [disabled]="isDisabled">
+        </button>
       </div>
-      <button mat-button class="add-prop-button" (click)="addExpandedProperty(3)">Add Property</button>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(
+        3)" [disabled]="isDisabled">
+        Add Property
+      </button>
     </div>
     <div class="footer">
       <div *ngFor="let property of tableDefinition.expandedFormat.column4">
-        {{property}} <button mat-icon-button class="fa fa-times" (click)="removeExpandedProperty(property, 4)"></button>
+        {{property}}
+        <button mat-icon-button class="fa fa-times"
+          (click)="removeExpandedProperty(property, 4)"
+          [disabled]="isDisabled">
+        </button>
       </div>
-      <button mat-button class="add-prop-button" (click)="addExpandedProperty(4)">Add Property</button>
+      <button mat-button class="add-prop-button" (click)="addExpandedProperty(
+        4)" [disabled]="isDisabled">
+        Add Property
+      </button>
     </div>
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { PropertyDefinition } from './../../../../type-editor/format-editor/format-editor.component';
+import { PropertyDefinition } from './../../../../type-editor/PropertyDefinition.interface';
 import { DynamicTypesService } from './../../../../../services/dynamic-types/dynamic-types.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { Component, OnInit, Input } from '@angular/core';

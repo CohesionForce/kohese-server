@@ -1,6 +1,5 @@
-import { KoheseType } from '../../../../../../classes/UDT/KoheseType.class';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormatContainer } from '../../../format-editor.component';
+import { FormatContainer } from '../../../../FormatContainer.interface';
 
 @Component({
   selector: 'list-container-editor',
@@ -11,9 +10,18 @@ export class ListContainerEditorComponent implements OnInit {
   @Input()
   container : FormatContainer;
   @Input()
-  kind : KoheseType
+  kind : any
   @Output()
   deleted : EventEmitter<any> = new EventEmitter()
+  
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
+  @Input('disabled')
+  set isDisabled(isDisabled: boolean) {
+    this._isDisabled = isDisabled;
+  }
   
   get Object() {
     return Object;
@@ -29,11 +37,10 @@ export class ListContainerEditorComponent implements OnInit {
   }
 
   addRow() {
-    let model: any = this.kind.dataModelProxy.item;
     this.container.contents.push({
       propertyName : {
-        kind: model.name,
-        attribute: Object.keys(model.classProperties)[0]
+        kind: this.kind.name,
+        attribute: Object.keys(this.kind.classProperties)[0]
       },
       hideLabel : false,
       labelOrientation: 'Top',
