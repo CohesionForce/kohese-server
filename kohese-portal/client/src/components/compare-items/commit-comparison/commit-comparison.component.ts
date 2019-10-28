@@ -4,10 +4,9 @@ import { MAT_DIALOG_DATA } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
 
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { Comparison } from '../comparison.class';
 import { Compare } from '../compare.class';
+import { ItemCache } from '../../../../../common/src/item-cache';
 
 @Component({
   selector: 'commit-comparison',
@@ -54,7 +53,7 @@ export class CommitComparisonComponent {
 
   public ngOnInit(): void {
     if (this._data) {
-      let commitMap = TreeConfiguration.getItemCache().getCommits();
+      let commitMap = ItemCache.getItemCache().getCommits();
       let sortedCommitArray: Array<any> = [];
       for (let oid of Array.from(commitMap.keys())) {
         sortedCommitArray.push({

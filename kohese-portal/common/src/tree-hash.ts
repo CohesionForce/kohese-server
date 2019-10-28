@@ -1,7 +1,50 @@
 import * as  _ from 'underscore';
 
+export type ObjectHashValueType = string;
 export type TreeHashValueType = string;
 export type ItemIdType = string;
+
+export class TreeHashMapDifference {
+  match : boolean;
+  summary: {
+    roots: {
+      added: Array<ItemIdType>,
+      deleted: Array<ItemIdType>,
+      common: Array<ItemIdType>
+    },
+    kindChanged: {
+      [id:string] : {
+        fromKind : string,
+        toKind:  string
+      }
+    },
+    contentChanged: {
+      [id:string] : {
+        fromOID : ObjectHashValueType,
+        toOID:  ObjectHashValueType
+      }
+    },
+    parentChanged: {
+      [id:string] : {
+        fromParentId : ItemIdType,
+        toParentId:  ItemIdType
+      }
+    },
+    itemAdded: {
+      [id:string] : ObjectHashValueType
+    },
+    itemDeleted: {
+      [id:string] : ObjectHashValueType
+    },
+    itemMissing: {
+      leftMissing: Array<ItemIdType>,
+      rightMissing: Array<ItemIdType>
+    }
+  };
+  details: {
+    [id:string] : TreeHashEntryDifference
+  }
+};
 
 export class TreeHashMap {
   [id:string] : TreeHashEntry
@@ -9,7 +52,7 @@ export class TreeHashMap {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static diff(left : TreeHashMap, right : TreeHashMap){
+  static diff(left : TreeHashMap, right : TreeHashMap) : TreeHashMapDifference {
 
     let leftRoots : Array<ItemIdType> = [ Object.keys(left)[0] ];
     for (let itemId in left){
@@ -44,7 +87,7 @@ export class TreeHashMap {
 
     let compareStack : Array<ItemIdType> = _.clone(commonRoots).reverse();
 
-    let result = {
+    let result : TreeHashMapDifference = {
       match: true,
       summary: {
         roots: {
@@ -93,8 +136,8 @@ export class TreeHashMap {
 
         if (diff.kindChanged){
           result.summary.kindChanged[diffId] = {
-            fromOID :diff.kindChanged.fromKind,
-            toOID: diff.kindChanged.toKind
+            fromKind :diff.kindChanged.fromKind,
+            toKind: diff.kindChanged.toKind
           };
         }
 
@@ -283,7 +326,7 @@ export class TreeHashEntryDifference {
   childrenAdded?  : Array<{id: ItemIdType, treeId: TreeHashValueType}>;
   childrenDeleted? : Array<{id: ItemIdType, treeId: TreeHashValueType}>;
   childrenModified? : Array<{id:ItemIdType, fromTreeId: TreeHashValueType, toTreeId: TreeHashValueType}>;
-  childrenReordered? : Array<{index:number, fromId: ItemIdType, toId: ItemIdType}>;
+  childrenReordered? : Array<{index:number, fromId?: ItemIdType, toId?: ItemIdType}>;
 };
 
 export class TreeHashEntry {

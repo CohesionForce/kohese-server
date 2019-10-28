@@ -17,8 +17,6 @@ let KoheseModelDefn;
 //////////////////////////////////////////////////////////////////////////
 export class TreeConfiguration {
 
-  public static itemCache: ItemCache;
-
   public treeId;
   public proxyMap;
   public idMap;
@@ -88,23 +86,6 @@ export class TreeConfiguration {
     treeConfigMap[treeId] = this;
 
     return this;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static setItemCache(itemCache) {
-    if (this.itemCache){
-      console.log('*** Error: Unexpected replacement of cache');
-    }
-    this.itemCache = itemCache;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getItemCache() {
-    return this.itemCache;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -236,7 +217,8 @@ export class TreeConfiguration {
     let treeRoots = this.getRepoTreeHashes();
     console.log('::: Checking for missing cache data for: ' + this.treeId);
     let before = Date.now();
-    let missingCacheData = await TreeConfiguration.itemCache.analysis.detectMissingTreeRootData(treeRoots);
+    let itemCache = ItemCache.getItemCache();
+    let missingCacheData = await itemCache.analysis.detectMissingTreeRootData(treeRoots);
     let after = Date.now();
     let foundMissingCacheData = false;
     let updateIteration = 0;
@@ -254,7 +236,7 @@ export class TreeConfiguration {
           let proxy = this.getProxyFor(missingBlobInfo.itemId);
           if(proxy.oid === oid){
             // console.log('%%% Proxy matches missing blob oid: ' + oid);
-            TreeConfiguration.itemCache.cacheBlob(oid, JSON.parse(JSON.stringify(proxy.item)));
+            itemCache.cacheBlob(oid, JSON.parse(JSON.stringify(proxy.item)));
           } else {
             console.log('*** Proxy does not match missing blob oid: ' + oid + ' - ' + proxy.oid);
           }
@@ -268,7 +250,7 @@ export class TreeConfiguration {
           let proxy = this.getProxyFor(missingTreeInfo.itemId);
           if(proxy.treeHash === treehash){
             // console.log('%%% Proxy matches missing tree: ' + treehash);
-            TreeConfiguration.itemCache.cacheTree(treehash, JSON.parse(JSON.stringify(proxy.treeHashEntry)));
+            itemCache.cacheTree(treehash, JSON.parse(JSON.stringify(proxy.treeHashEntry)));
           } else {
             console.log('*** Proxy does not match missing tree: ' + treehash + ' - ' + proxy.treeHash);
           }
@@ -283,19 +265,19 @@ export class TreeConfiguration {
           let proxy = this.getProxyFor(missingRootInfo.rootId);
           if(proxy.treeHash === rootTreehash){
             // console.log('%%% Proxy matches missing tree: ' + treehash);
-            TreeConfiguration.itemCache.cacheTree(rootTreehash, JSON.parse(JSON.stringify(proxy.treeHashEntry)));
+            itemCache.cacheTree(rootTreehash, JSON.parse(JSON.stringify(proxy.treeHashEntry)));
           } else {
             console.log('*** Proxy does not match missing root tree: ' + rootTreehash + ' - ' + proxy.treeHash);
           }
         }
       }
 
-      missingCacheData = await TreeConfiguration.itemCache.analysis.reevaluateMissingData();
+      missingCacheData = await itemCache.analysis.reevaluateMissingData();
       after = Date.now();
     }
 
     if (foundMissingCacheData){
-      await TreeConfiguration.itemCache.saveAllPendingWrites();
+      await itemCache.saveAllPendingWrites();
     }
     console.log('::: Total time to check and save cache updates: ' + (after-before)/1000)
   }

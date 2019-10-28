@@ -6,7 +6,7 @@
 
 import * as   _ from 'underscore';
 import { ItemProxy } from './item-proxy';
-import { TreeHashEntry, TreeHashMap, TreeHashValueType } from './tree-hash';
+import { TreeHashEntry, TreeHashMap, TreeHashValueType, ItemIdType, TreeHashMapDifference } from './tree-hash';
 import { TreeConfiguration } from './tree-configuration';
 
 
@@ -15,11 +15,39 @@ const disableObjectFreeze = false;
 const chunkSize : number = 1000;
 
 export class KoheseCommit {
-  time: number;
-  author: string;
-  message: string;
-  parents?: Array<string>;
-  repoTreeRoots: { [ key : string ] : TreeHashEntry };
+  public time: number;
+  public author: string;
+  public message: string;
+  public parents?: Array<ItemIdType>;
+  public repoTreeRoots: { [ key : string ] : TreeHashEntry };
+
+  // //////////////////////////////////////////////////////////////////////////
+  // async getTreeHashMap() : Promise<TreeHashMap> {
+  //   let itemCache = ItemCache.getItemCache();
+  //   return itemCache.getTreeHashMap();
+  // }
+
+  //////////////////////////////////////////////////////////////////////////
+  async getParentCommits() : Promise<Array<KoheseCommit>> {
+    let itemCache = ItemCache.getItemCache();
+    let parentCommitArray = Array<KoheseCommit>;
+
+    for(let parentCommitId in this.parents){
+      let parentCommit = await itemCache.getCommit(parentCommitId)
+      parentCommitArray.push(parentCommit);
+    }
+
+    return parentCommitArray;
+  }
+
+  // //////////////////////////////////////////////////////////////////////////
+  // async diff() : Promise<TreeHashMapDifference> {
+  //   let parentCommits = await this.getParentCommits();
+  //
+  //   let parentCommitTHM = parentCommits[0].
+  //
+  //   return undefined;
+  // }
 }
 
 export type Workspace = Array<TreeHashEntry>;
@@ -44,6 +72,7 @@ type Blob = any;
 //////////////////////////////////////////////////////////////////////////
 
 export class ItemCache {
+  private static itemCache : ItemCache;
   private metadata = new Map<string, number>();
   private refMap = new Map<string, any>();
   private tagMap = new Map<string, any>();
@@ -75,6 +104,23 @@ export class ItemCache {
 
     // tslint:disable-next-line: no-use-before-declare
     this.analysis = new CacheAnalysis(this);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static setItemCache(itemCache) {
+    if (ItemCache.itemCache){
+      console.log('*** Error: Unexpected replacement of cache');
+    }
+    ItemCache.itemCache = itemCache;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getItemCache() {
+    return ItemCache.itemCache;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -498,6 +544,12 @@ export class CacheAnalysis {
     root: {},
     commit: {}
   };
+  // private reference = {
+  //   blob: {},
+  //   tree: {},
+  //   root: {},
+  //   commit: {}
+  // };
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -531,6 +583,13 @@ export class CacheAnalysis {
     if (tree && !this.treeEvaluated[tree.treeHash]){
       // console.log('::: Evaluating tree for ' + itemId + ' - ' + tree.treeHash);
       await this.evaluateBlob(itemId, tree.kind, tree.oid);
+
+      // // Add reference of blob by tree
+      // if (!this.reference.blob[tree.oid]){
+      //   this.reference.blob[tree.oid] ={tree: {}};
+      // }
+      // this.reference.blob[tree.oid].tree[tree.treeHash] = {ref: 'tree'};
+
       for (let childId in tree.childTreeHashes) {
         let childTreeHash = tree.childTreeHashes[childId];
         switch (childTreeHash){
@@ -541,6 +600,16 @@ export class CacheAnalysis {
             let childTree = await this.cache.getTree(childTreeHash);
             if (childTree) {
               await this.evaluateTreeEntry(childId, childTree);
+
+              // // Add reference of childTree by tree
+              // if (!this.reference.tree[childTree.treeHash]){
+              //   this.reference.tree[childTree.treeHash] ={tree: {}};
+              // }
+              // if (!this.reference.tree[childTree.treeHash].tree){
+              //   this.reference.tree[childTree.treeHash].tree ={};
+              // }
+              // this.reference.tree[childTree.treeHash].tree[tree.treeHash] = {ref: 'tree'};
+
             } else {
               if (!this.treeEvaluated[childTreeHash]) {
                 // console.log('*** Missing tree for tree (%s) with treeHash (%s)', childId, childTreeHash);

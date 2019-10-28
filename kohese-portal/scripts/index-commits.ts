@@ -1,7 +1,5 @@
 'use strict';
 import { LevelCache } from '../common/src/level-cache';
-import { TreeConfiguration } from '../common/src/tree-configuration';
-import { CacheAnalysis } from '../common/src/item-cache';
 
 
 // Paths may be provided via arguments when starting via -kdb=PATH
@@ -30,7 +28,7 @@ global['koheseKDB'] = kdb;
 let indexAndExit = true;
 kdb.initialize(baseRepoPath, indexAndExit).then(async () =>  {
   console.log('::: Finished cache update for: ' + baseRepoPath);
-  let itemCache : LevelCache = <LevelCache>TreeConfiguration.getItemCache();
+  let itemCache : LevelCache = <LevelCache>LevelCache.getItemCache();
 
   console.log('::: Checking for missing data in cache');
   try {

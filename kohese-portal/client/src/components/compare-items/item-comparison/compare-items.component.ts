@@ -10,7 +10,6 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemCache } from '../../../../../common/src/item-cache';
 import { Compare } from '../compare.class';
 import { Comparison } from '../comparison.class';
@@ -239,7 +238,7 @@ export class CompareItemsComponent implements OnInit {
     if (this._selectedBaseVersion && this._selectedChangeVersion) {
       return new Promise<void>(async (resolve: () => void, reject:
         () => void) => {
-        let itemCache: ItemCache = TreeConfiguration.getItemCache();
+        let itemCache: ItemCache = ItemCache.getItemCache();
         this._comparison = await Compare.compareItems(this.
           _baseProxySubject.getValue().item.id, await itemCache.getTreeHashMap(
           this._selectedBaseVersion), this._changeProxySubject.getValue().item.

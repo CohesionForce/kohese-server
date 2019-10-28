@@ -11,7 +11,7 @@ export class Compare {
   public static async compareCommits(baseCommitId: string, changeCommitId: string,
     dynamicTypesService: DynamicTypesService): Promise<Array<Comparison>> {
     let comparisons: Array<ItemProxyComparison> = [];
-    let cache: ItemCache = TreeConfiguration.getItemCache();
+    let cache: ItemCache = ItemCache.getItemCache();
     let baseTreeHashMap: TreeHashMap = await cache.getTreeHashMap(
       baseCommitId);
     let changeTreeHashMap: TreeHashMap = await cache.getTreeHashMap(
@@ -95,7 +95,7 @@ export class Compare {
     DynamicTypesService): Promise<ItemProxyComparison> {
     return new Promise<ItemProxyComparison>(async (resolve: (comparison:
       ItemProxyComparison) => void, reject: () => void) => {
-      let itemCache: ItemCache = TreeConfiguration.getItemCache();
+      let itemCache: ItemCache = ItemCache.getItemCache();
       let baseItem: any;
       if (baseTreeHashMap) {
         baseItem = await itemCache.getBlob(baseTreeHashMap[baseId].oid);
