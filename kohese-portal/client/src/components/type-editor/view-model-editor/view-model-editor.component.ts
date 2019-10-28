@@ -31,6 +31,13 @@ export class ViewModelEditorComponent {
     this._itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.
       _viewModel.id);
     this._editable = this._itemProxy.dirty;
+    this._attributes = [];
+    for (let attributeName in this._viewModel.viewProperties) {
+      let attribute: any = this._viewModel.viewProperties[attributeName];
+      // Migration code
+      attribute.name = attributeName;
+      this._attributes.push(attribute);
+    }
   }
   
   private _itemProxy: ItemProxy;
@@ -44,6 +51,11 @@ export class ViewModelEditorComponent {
   }
   set editable(editable: boolean) {
     this._editable = editable;
+  }
+  
+  private _attributes: Array<any>;
+  get attributes() {
+    return this._attributes;
   }
   
   get Object() {
@@ -209,36 +221,36 @@ export class ViewModelEditorComponent {
   
   public sortAttributes(table: MatTable<any>, columnId: string, sortDirection:
     string): void {
-    let data: Array<any> = (table.dataSource as Array<any>);
     if (sortDirection) {
-      if (columnId === 'Name') {
-        data.sort((oneElement: any, anotherElement: any) => {
-          let oneIndex: number = data.indexOf(oneElement);
-          let anotherIndex: number = data.indexOf(anotherElement);
-          let attributeNames: Array<string> = Object.keys(this._viewModel.
-            viewProperties);
+      let attributeName: string;
+        switch (columnId) {
+          case 'Name':
+            attributeName = 'name';
+            break;
+          case 'Display Name':
+            attributeName = 'displayName';
+            break;
+        }
+        
+        this._attributes.sort((oneElement: any, anotherElement: any) => {
           if (sortDirection === 'asc') {
-            return attributeNames[oneIndex].localeCompare(attributeNames[
-              anotherIndex]);
+            return String(oneElement[attributeName]).localeCompare(
+              String(anotherElement[attributeName]));
           } else {
-            return attributeNames[anotherIndex].localeCompare(attributeNames[
-              oneIndex]);
+            return String(anotherElement[attributeName]).localeCompare(
+              String(oneElement[attributeName]));
           }
         });
-      } else {
-        data.sort((oneElement: any, anotherElement: any) => {
-          if (sortDirection === 'asc') {
-            return oneElement.displayName.localeCompare(anotherElement.
-              displayName);
-          } else {
-            return anotherElement.displayName.localeCompare(oneElement.
-              displayName);
-          }
-        });
-      }
     } else {
-      let unsortedData: Array<any> = Object.values(this._viewModel.viewProperties);
-      data.sort((oneElement: any, anotherElement: any) => {
+      let unsortedData: Array<any> = [];
+      for (let attributeName in this._viewModel.viewProperties) {
+        let attribute: any = this._viewModel.viewProperties[attributeName];
+        // Migration code
+        attribute.name = attributeName;
+        unsortedData.push(attribute);
+      }
+      
+      this._attributes.sort((oneElement: any, anotherElement: any) => {
         return (unsortedData.indexOf(oneElement) - unsortedData.indexOf(
           anotherElement));
       });

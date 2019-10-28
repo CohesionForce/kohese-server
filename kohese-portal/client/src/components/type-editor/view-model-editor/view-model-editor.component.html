@@ -133,16 +133,14 @@
     Attributes
   </h3>
 </div>
-<mat-table #table matSort [dataSource]="Object.values(viewModel.
-  viewProperties)" (matSortChange)="sortAttributes(table, $event.active,
-  $event.direction)">
+<mat-table #table matSort [dataSource]="attributes"
+  (matSortChange)="sortAttributes(table, $event.active, $event.direction)">
   <ng-container matColumnDef="Name">
     <mat-header-cell *matHeaderCellDef mat-sort-header>
       Name
     </mat-header-cell>
     <mat-cell *matCellDef="let element">
-      {{Object.keys(viewModel.viewProperties)[Object.values(viewModel.
-        viewProperties).indexOf(element)]}}
+      {{element.name}}
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="Display Name">

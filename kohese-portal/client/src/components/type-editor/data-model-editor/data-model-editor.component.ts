@@ -41,6 +41,13 @@ export class DataModelEditorComponent implements OnInit {
     this._itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.
       _dataModel.id);
     this._editable = this._itemProxy.dirty;
+    this._attributes = [];
+    for (let attributeName in this._dataModel.properties) {
+      let attribute: any = this._dataModel.properties[attributeName];
+      // Migration code
+      attribute.name = attributeName;
+      this._attributes.push(attribute);
+    }
   }
   
   private _filteredKinds: Array<any> = [];
@@ -83,6 +90,11 @@ export class DataModelEditorComponent implements OnInit {
   }
   set editable(editable: boolean) {
     this._editable = editable;
+  }
+  
+  private _attributes: Array<any>;
+  get attributes() {
+    return this._attributes;
   }
   
   get Object() {
@@ -238,24 +250,9 @@ export class DataModelEditorComponent implements OnInit {
   
   public sortAttributes(table: MatTable<any>, columnId: string, sortDirection:
     string): void {
-    let data: Array<any> = (table.dataSource as Array<any>);
     if (sortDirection) {
-      if (columnId === 'Name') {
-        data.sort((oneElement: any, anotherElement: any) => {
-          let oneIndex: number = data.indexOf(oneElement);
-          let anotherIndex: number = data.indexOf(anotherElement);
-          let attributeNames: Array<string> = Object.keys(this._dataModel.
-            properties);
-          if (sortDirection === 'asc') {
-            return attributeNames[oneIndex].localeCompare(attributeNames[
-              anotherIndex]);
-          } else {
-            return attributeNames[anotherIndex].localeCompare(attributeNames[
-              oneIndex]);
-          }
-        });
-      } else if (columnId === 'Type') {
-        data.sort((oneElement: any, anotherElement: any) => {
+      if (columnId === 'Type') {
+        this._attributes.sort((oneElement: any, anotherElement: any) => {
           let oneType: string = (Array.isArray(oneElement.type) ? oneElement.
             type[0] : oneElement.type);
           let anotherType: string = (Array.isArray(anotherElement.type) ?
@@ -267,7 +264,7 @@ export class DataModelEditorComponent implements OnInit {
           }
         });
       } else if (columnId === 'Is Multivalued') {
-        data.sort((oneElement: any, anotherElement: any) => {
+        this._attributes.sort((oneElement: any, anotherElement: any) => {
           let oneValue: number = (Array.isArray(oneElement.type) ? 1 : 0);
           let anotherValue: number = (Array.isArray(anotherElement.type) ? 1 :
             0);
@@ -277,21 +274,38 @@ export class DataModelEditorComponent implements OnInit {
             return anotherValue - oneValue;
           }
         });
+      } else if (columnId === 'Is Required') {
+        this._attributes.sort((oneElement: any, anotherElement: any) => {
+          let oneValue: number = (oneElement.required ? 1 : 0);
+          let anotherValue: number = (anotherElement.required ? 1 : 0);
+          if (sortDirection === 'asc') {
+            return oneValue - anotherValue;
+          } else {
+            return anotherValue - oneValue;
+          }
+        });
+      } else if (columnId === 'Is Kind ID') {
+        this._attributes.sort((oneElement: any, anotherElement: any) => {
+          let oneValue: number = (oneElement.id ? 1 : 0);
+          let anotherValue: number = (anotherElement.id ? 1 : 0);
+          if (sortDirection === 'asc') {
+            return oneValue - anotherValue;
+          } else {
+            return anotherValue - oneValue;
+          }
+        });
       } else {
         let attributeName: string;
         switch (columnId) {
-          case 'Is Required':
-            attributeName = 'required';
-            break;
-          case 'Is Kind ID':
-            attributeName = 'id';
+          case 'Name':
+            attributeName = 'name';
             break;
           case 'Default Value':
             attributeName = 'default';
             break;
         }
         
-        data.sort((oneElement: any, anotherElement: any) => {
+        this._attributes.sort((oneElement: any, anotherElement: any) => {
           if (sortDirection === 'asc') {
             return String(oneElement[attributeName]).localeCompare(
               String(anotherElement[attributeName]));
@@ -302,8 +316,15 @@ export class DataModelEditorComponent implements OnInit {
         });
       }
     } else {
-      let unsortedData: Array<any> = Object.values(this._dataModel.properties);
-      data.sort((oneElement: any, anotherElement: any) => {
+      let unsortedData: Array<any> = [];
+      for (let attributeName in this._dataModel.properties) {
+        let attribute: any = this._dataModel.properties[attributeName];
+        // Migration code
+        attribute.name = attributeName;
+        unsortedData.push(attribute);
+      }
+      
+      this._attributes.sort((oneElement: any, anotherElement: any) => {
         return (unsortedData.indexOf(oneElement) - unsortedData.indexOf(
           anotherElement));
       });
@@ -315,10 +336,7 @@ export class DataModelEditorComponent implements OnInit {
   
   public setAttributeName(attribute: any, name: string): void {
     let attributeMap: any = this._dataModel.properties;
-    let attributeIndex: number = Object.values(attributeMap).indexOf(
-      attribute);
-    let previousAttributeName: string = Object.keys(attributeMap)[
-      attributeIndex];
+    let previousAttributeName: string = attribute.name;
     let intermediateMap: any = {};
     for (let attributeName in attributeMap) {
       if (attributeName === previousAttributeName) {
@@ -334,6 +352,7 @@ export class DataModelEditorComponent implements OnInit {
       attributeMap[attributeName] = intermediateMap[attributeName];
     }
     
+    attribute.name = name;
     this._itemProxy.dirty = true;
     this._changeDetectorRef.markForCheck();
   }

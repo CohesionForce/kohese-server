@@ -79,7 +79,7 @@
     <mat-icon class="fa fa-plus"></mat-icon>
   </button>
 </div>
-<mat-table #table matSort [dataSource]="Object.values(dataModel.properties)"
+<mat-table #table matSort [dataSource]="attributes"
   (matSortChange)="sortAttributes(table, $event.active, $event.direction)">
   <ng-container matColumnDef="Name">
     <mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -87,8 +87,7 @@
     </mat-header-cell>
     <mat-cell *matCellDef="let element">
       <mat-form-field style="width: 100%; padding-right: 5px;">
-        <input matInput type="text" [ngModel]="Object.keys(dataModel.
-          properties)[Object.values(dataModel.properties).indexOf(element)]"
+        <input matInput type="text" [ngModel]="element.name"
           (ngModelChange)="setAttributeName(element, $event)"
           [disabled]="!editable"/>
       </mat-form-field>
@@ -193,10 +192,8 @@
       </button>
       <mat-menu #actionMenu="matMenu" [overlapTrigger]="false">
         <button mat-menu-item matTooltip="Remove this attribute"
-          [disabled]="(!editable || (getAttributeUsages(Object.keys(dataModel.
-          properties)[Object.values(dataModel.properties).indexOf(element)]).
-          length > 0))" (click)="removeAttribute(Object.keys(dataModel.
-          properties)[Object.values(dataModel.properties).indexOf(element)])">
+          [disabled]="(!editable || (getAttributeUsages(element.name).length >
+          0))" (click)="removeAttribute(element.name)">
           <mat-icon class="fa fa-trash"></mat-icon>
           Remove
         </button>
