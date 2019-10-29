@@ -4,6 +4,7 @@ import { NavigatableComponent } from '../../../classes/NavigationComponent.class
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 
 import { Observable, Subscription } from 'rxjs';
@@ -105,12 +106,20 @@ export class AssignmentDashboardComponent extends NavigatableComponent
   }
 
   isCompleted(assignment : ItemProxy) : boolean {
-    if (assignment.kind === 'Task') {
+    let types: Array<string> = [];
+    let kindProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      assignment.kind);
+    while (kindProxy) {
+      types.push(kindProxy.item.name);
+      kindProxy = TreeConfiguration.getWorkingTree().getProxyFor(kindProxy.
+        item.base);
+    }
+    
+    if (types.indexOf('Task') !== -1) {
       if (assignment.item.taskState === 'Completed') {
         return true;
       }
-    }
-    if (assignment.kind === 'Action') {
+    } else if (types.indexOf('Action') !== -1) {
       if (assignment.item.actionState === 'Verified' ||
           assignment.item.actionState === 'Closed') {
           return true
