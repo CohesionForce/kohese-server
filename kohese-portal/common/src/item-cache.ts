@@ -30,7 +30,7 @@ export class KoheseCommit {
   //////////////////////////////////////////////////////////////////////////
   async getParentCommits() : Promise<Array<KoheseCommit>> {
     let itemCache = ItemCache.getItemCache();
-    let parentCommitArray = Array<KoheseCommit>;
+    let parentCommitArray : Array<KoheseCommit> = [];
 
     for(let parentCommitId in this.parents){
       let parentCommit = await itemCache.getCommit(parentCommitId)
