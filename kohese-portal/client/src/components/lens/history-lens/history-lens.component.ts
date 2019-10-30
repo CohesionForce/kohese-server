@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { ItemCache } from "../../../../../common/src/item-cache";
 import { ItemRepository } from "../../../services/item-repository/item-repository.service";
 import { DialogService } from "../../../services/dialog/dialog.service";
 import { CommitBrowserComponent } from "../commit-browser/commit-browser.component";
@@ -27,7 +27,7 @@ export class HistoryLensComponent implements OnInit, OnDestroy {
     this._treeConfigurationSubscription = this.itemRepository.
       getTreeConfig().subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
-        this._selectedCommit = TreeConfiguration.getItemCache().getCommits()
+        this._selectedCommit = ItemCache.getItemCache().getCommits()
           .get(treeConfigurationObject.config.treeId);
       } else {
         this._selectedCommit = undefined;

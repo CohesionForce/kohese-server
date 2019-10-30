@@ -196,7 +196,7 @@ export class ItemRepository {
       }
     });
 
-    TreeConfiguration.setItemCache(this._cache);
+    ItemCache.setItemCache(this._cache);
     this._worker.port.start();
 
     this.CurrentUserService.getCurrentUserSubject()
@@ -827,7 +827,7 @@ export class ItemRepository {
     let treeConfiguration = TreeConfiguration.getTreeConfigFor(commitId);
     if (!treeConfiguration) {
       treeConfiguration = new TreeConfiguration(commitId);
-      let itemCache : ItemCache = TreeConfiguration.getItemCache();
+      let itemCache : ItemCache = ItemCache.getItemCache();
       await itemCache.loadProxiesForCommit(commitId, treeConfiguration);
       treeConfiguration.loadingComplete();
     }

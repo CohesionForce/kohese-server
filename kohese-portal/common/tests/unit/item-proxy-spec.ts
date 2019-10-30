@@ -1,6 +1,6 @@
 import { ItemProxy } from '../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../common/src/tree-configuration'
-import { TreeHashEntry, TreeHashMap } from '../../../common/src/tree-hash';
+import { TreeHashEntry, TreeHashMap, TreeHashMapDifference } from '../../../common/src/tree-hash';
 import { KoheseModel } from '../../../common/src/KoheseModel';
 describe('ItemProxy Test', function () {
 
@@ -1360,7 +1360,7 @@ it('Retrieve Delta Tree Hash Map', () => {
     }
   };
 
-  let expectedDiffResult = {
+  let expectedDiffResult : TreeHashMapDifference = {
     'match': false,
     'summary': {
       'roots': {

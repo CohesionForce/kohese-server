@@ -61,11 +61,12 @@ async function initialize (koheseKdbPath, indexAndExit) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
+  // TODO: Need to remove storage of modelDef.json
   kdbFS.storeJSONDoc(kdbDirPath + '/modelDef.json', kdbModel.modelDef);
 
   checkAndCreateDir(kdbDirPath);
   checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
-  //TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
+  // TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
 
   TreeConfiguration.getWorkingTree().getRootProxy().repoPath = path.join(koheseKDBDirPath, 'Root.json');
 
@@ -549,7 +550,7 @@ async function openRepositories(indexAndExit) {
 
   let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
   let kdbCache = new KDBCache(koheseKDBDirPath);
-  TreeConfiguration.setItemCache(kdbCache);
+  KDBCache.setItemCache(kdbCache);
 
   await kdbCache.updateCache();
 

@@ -46,7 +46,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
   if (!cacheInitialized) {
     _cache = new LevelCache(LevelJs('item-cache'));
-    TreeConfiguration.setItemCache(_cache);
+    LevelCache.setItemCache(_cache);
     cacheInitialized = true;
   }
 

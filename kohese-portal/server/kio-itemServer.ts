@@ -4,6 +4,7 @@ const StringReplaceAsync = require('string-replace-async');
 import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
+import { ItemCache } from '../common/src/item-cache';
 const MdToKohese = require('./md-to-kohese');
 
 var kio = require('./koheseIO');
@@ -190,7 +191,7 @@ function KIOItemServer(socket){
 
     consoleLogObject('$$$ Request', request);
 
-    let itemCache = TreeConfiguration.getItemCache();
+    let itemCache = ItemCache.getItemCache();
     let headCommit = await itemCache.getRef('HEAD');
 
     if (headCommit !== request.headCommit){
@@ -240,7 +241,7 @@ function KIOItemServer(socket){
 
     consoleLogObject('$$$ Request', request);
 
-    let itemCache = TreeConfiguration.getItemCache();
+    let itemCache = ItemCache.getItemCache();
     let missingCacheData = request.missingCacheData;
     let cacheData : any = {};
 

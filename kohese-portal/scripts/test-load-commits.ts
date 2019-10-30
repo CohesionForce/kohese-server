@@ -29,7 +29,7 @@ if (!baseRepoPath) {
 //////////////////////////////////////////////////////////////////////////
 async function diffCommitAndPrev(refCommitId) {
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
 
     let refCommit = await itemCache.getCommit(refCommitId);
     let prevCommitId = refCommit.parents[0];
@@ -37,9 +37,9 @@ async function diffCommitAndPrev(refCommitId) {
     console.log('::: Ref Commit: ' + refCommitId);
     console.log('::: Prev Commit: ' + prevCommitId);
 
-    compareCommits(prevCommitId, refCommitId);
+    await compareCommits(prevCommitId, refCommitId);
 
-} catch (err) {
+  } catch (err) {
     console.log('*** Error');
     console.log(err);
   }
@@ -49,12 +49,34 @@ async function diffCommitAndPrev(refCommitId) {
 async function diffHeadAndPrev() {
   try {
 
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
 
     let headCommitId = await itemCache.getRef('HEAD');
     diffCommitAndPrev(headCommitId);
 
-} catch (err) {
+  } catch (err) {
+    console.log('*** Error');
+    console.log(err);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+async function diffAllCommits(refCommitId) {
+  try {
+    let itemCache : ItemCache = ItemCache.getItemCache();
+
+    let refCommit = await itemCache.getCommit(refCommitId);
+    let prevCommitId = refCommit.parents[0];
+
+    console.log('::: Ref Commit: ' + refCommitId);
+    console.log('::: Prev Commit: ' + prevCommitId);
+
+    if (prevCommitId){
+      await compareCommits(prevCommitId, refCommitId);
+      await diffAllCommits(prevCommitId);
+    }
+
+  } catch (err) {
     console.log('*** Error');
     console.log(err);
   }
@@ -63,14 +85,22 @@ async function diffHeadAndPrev() {
 //////////////////////////////////////////////////////////////////////////
 async function compareCommits(earlierCommit, laterCommit){
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
 
     console.log('::: Evaluating diff between commits: ' +earlierCommit + ' - ' + laterCommit);
+    let beforeTime = Date.now();
     let laterTHM = await itemCache.getTreeHashMap(laterCommit);
+    let afterFirstTHM = Date.now();
+    deltaMessage("Time to get first THM", beforeTime, afterFirstTHM);
     let earlierTHM = await itemCache.getTreeHashMap(earlierCommit);
+    let afterSecondTHM = Date.now();
+    deltaMessage("Time to get second THM", afterFirstTHM, afterSecondTHM);
     let diff = TreeHashMap.diff(earlierTHM, laterTHM);
+    let afterDiff = Date.now();
+    deltaMessage("Time to perform diff", afterSecondTHM, afterDiff);
+    deltaMessage('Total compare time', beforeTime, afterDiff);
     console.log(JSON.stringify(diff, null, '  '));
-} catch (err) {
+  } catch (err) {
     console.log('*** Error');
     console.log(err);
 
@@ -80,7 +110,7 @@ async function compareCommits(earlierCommit, laterCommit){
 //////////////////////////////////////////////////////////////////////////
 async function compareDiff_c282fb(){
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
 
     console.log('::: Evaluating diff for commit: c282fb161979b120314ecb613a282411302f4e9d');
     let errorTHM = await itemCache.getTreeHashMap('c282fb161979b120314ecb613a282411302f4e9d');
@@ -109,7 +139,7 @@ async function evaluateAllCommits() {
   console.log('^^^ Begin evaluating all commits');
   let startTime = Date.now();
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
     let cacheAnalysis = new CacheAnalysis(itemCache);
     let missingCommitData = await cacheAnalysis.detectMissingCommitData();
     printMissingCacheData(missingCommitData);
@@ -126,7 +156,7 @@ async function evaluateAllCommits() {
 //////////////////////////////////////////////////////////////////////////
 async function evaluateEachTree() {
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
 
     let treeMap = itemCache.getTrees();
 
@@ -135,7 +165,7 @@ async function evaluateEachTree() {
       let missingData = await cacheAnalysis.detectMissingTreeData(treeId);
       printMissingCacheData(missingData);
     }
-} catch (err) {
+  } catch (err) {
     console.log('*** Error');
     console.log(err);
 
@@ -145,7 +175,7 @@ async function evaluateEachTree() {
 //////////////////////////////////////////////////////////////////////////
 async function evaluateEachCommit() {
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
 
     let commitMap = itemCache.getCommits();
 
@@ -154,7 +184,7 @@ async function evaluateEachCommit() {
       let missingData = await cacheAnalysis.detectMissingCommitData(commitId);
       printMissingCacheData(missingData);
     }
-} catch (err) {
+  } catch (err) {
     console.log('*** Error');
     console.log(err);
 
@@ -164,12 +194,17 @@ async function evaluateEachCommit() {
 //////////////////////////////////////////////////////////////////////////
 async function diffEachCommit() {
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
 
+    let beforeTime = Date.now();
     let currentCommit = await itemCache.getRef('HEAD');
 
-    // TODO: missing diff logic
-} catch (err) {
+    await diffAllCommits(currentCommit);
+    let afterTime = Date.now();
+
+    deltaMessage('Time to diff all commits', beforeTime, afterTime);
+
+  } catch (err) {
     console.log('*** Error');
     console.log(err);
 
@@ -179,7 +214,7 @@ async function diffEachCommit() {
 //////////////////////////////////////////////////////////////////////////
 async function evaluateCommit(selectedCommitId) {
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
     let cacheAnalysis = new CacheAnalysis(itemCache);
     let missingData = await cacheAnalysis.detectMissingCommitData(selectedCommitId);
     printMissingCacheData(missingData);
@@ -232,7 +267,7 @@ function copyAttributes(fromItem, toProxy) {
 //////////////////////////////////////////////////////////////////////////
 async function evaluateBlob(oid) {
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
     let blob = await itemCache.getBlob(oid);
     console.log('::: Blob: ' + oid);
     console.log(JSON.stringify(blob, null, '  '));
@@ -282,7 +317,7 @@ async function evaluateBlob(oid) {
 //////////////////////////////////////////////////////////////////////////
 async function loadCommit(selectedCommitId) {
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
     let treeConfig = new TreeConfiguration(selectedCommitId);
 
     await itemCache.loadProxiesForCommit(selectedCommitId, treeConfig);
@@ -310,7 +345,7 @@ async function loadCommit(selectedCommitId) {
 //////////////////////////////////////////////////////////////////////////
 async function loadConfigForEachCommit() {
   try {
-    let itemCache : ItemCache = TreeConfiguration.getItemCache();
+    let itemCache : ItemCache = ItemCache.getItemCache();
 
     let commitMap = itemCache.getCommits();
 
@@ -349,6 +384,31 @@ function deltaMessage(message, before, after) {
 }
 
 //////////////////////////////////////////////////////////////////////////
+async function simulateClientSync() {
+
+  let itemCache = ItemCache.getItemCache();
+  let beforeGetHead = Date.now();
+  let HEAD = await itemCache.getRef('HEAD');
+  let afterGetHead = Date.now();
+  deltaMessage('Time to get HEAD', beforeGetHead, afterGetHead);
+
+  await itemCache.analysis.detectAllMissingData();
+  let afterDetectAllMissingData = Date.now();
+  deltaMessage('Time to detect all missing data', afterGetHead, afterDetectAllMissingData);
+
+  let headTree = new TreeConfiguration(HEAD);
+  await itemCache.loadProxiesForCommit(HEAD, headTree);
+  let afterLoadHead = Date.now();
+  deltaMessage('Time to load head', afterDetectAllMissingData, afterLoadHead);
+
+  await headTree.loadingComplete();
+  let afterCalcTreehashes = Date.now();
+  deltaMessage('Time to calculate treehashes', afterLoadHead, afterCalcTreehashes);
+  deltaMessage('Time to perform sync simulation', beforeGetHead, afterCalcTreehashes);
+
+}
+
+//////////////////////////////////////////////////////////////////////////
 // Main Processing
 //////////////////////////////////////////////////////////////////////////
 
@@ -384,25 +444,9 @@ try {
       // await evaluateEachTree();
       // await diffHeadAndPrev();
 
-      let itemCache = TreeConfiguration.getItemCache();
-      let beforeGetHead = Date.now();
-      let HEAD = await itemCache.getRef('HEAD');
-      let afterGetHead = Date.now();
-      deltaMessage('Time to get HEAD', beforeGetHead, afterGetHead);
+      // await simulateClientSync();
 
-      await itemCache.analysis.detectAllMissingData();
-      let afterDetectAllMissingData = Date.now();
-      deltaMessage('Time to detect all missing data', afterGetHead, afterDetectAllMissingData);
-
-      let headTree = new TreeConfiguration(HEAD);
-      await itemCache.loadProxiesForCommit(HEAD, headTree);
-      let afterLoadHead = Date.now();
-      deltaMessage('Time to load head', afterDetectAllMissingData, afterLoadHead);
-
-      await headTree.loadingComplete();
-      let afterCalcTreehashes = Date.now();
-      deltaMessage('Time to calculate treehashes', afterLoadHead, afterCalcTreehashes);
-      deltaMessage('Time to perform sync simulation', beforeGetHead, afterCalcTreehashes);
+      await diffEachCommit();
 
     } catch (err) {
       console.log('*** Error');

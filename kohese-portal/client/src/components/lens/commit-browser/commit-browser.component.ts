@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { ItemCache } from "../../../../../common/src/item-cache";
 import { ItemRepository, RepoStates,
   TreeConfigType } from "../../../services/item-repository/item-repository.service";
 import { MatDialogRef } from "@angular/material";
@@ -40,7 +39,7 @@ export class CommitBrowserComponent implements OnInit, OnDestroy {
     this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
       .subscribe(async (update) => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.commitMap = TreeConfiguration.getItemCache().getCommits();
+          this.commitMap = ItemCache.getItemCache().getCommits();
 
           // Convert to array for sorting in the view
           for (let commitId of <Array<string>>Array.from(this.commitMap.keys())) {

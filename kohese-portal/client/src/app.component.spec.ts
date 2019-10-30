@@ -5,7 +5,6 @@ import { AppComponent } from './app.component';
 import { AppFrameModule } from './components/app-frame/app-frame.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AuthenticationService } from './services/authentication/authentication.service';
-import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { ItemCache } from '../../common/src/item-cache';
 
 class MockAuthenticationService {
@@ -26,8 +25,9 @@ describe('AppComponent', () => {
       providers: [ {provide: AuthenticationService, useClass: MockAuthenticationService}]
     }).compileComponents();
     
+    // TODO: Why is this here in addition to ItemRepository
     let itemCache: ItemCache = new ItemCache();
-    TreeConfiguration.setItemCache(itemCache);
+    ItemCache.setItemCache(itemCache);
     
     // Set a substitute 'tinyMCE' object.
     window['tinyMCE'] = {

@@ -14,10 +14,7 @@ import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, Action } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemCache, KoheseCommit } from '../../../../../common/src/item-cache';
-import { TreeHashMap, TreeHashEntry,
-  TreeHashEntryDifference } from '../../../../../common/src/tree-hash';
 import { Comparison, ChangeType } from '../../compare-items/comparison.class';
 import { ItemProxyComparison } from '../../compare-items/item-proxy-comparison.class';
 import { Compare } from '../../compare-items/compare.class';
@@ -129,7 +126,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   private async buildRows(): Promise<void> {
     this.clear();
 
-    let cache: ItemCache = TreeConfiguration.getItemCache();
+    let cache: ItemCache = ItemCache.getItemCache();
     let commitMap: any = cache.getCommits();
     let sortedCommitArray: Array<any> = [];
     for (let oid of Array.from(commitMap.keys())) {
