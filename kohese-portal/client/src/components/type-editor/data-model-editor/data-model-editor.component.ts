@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, OnInit,
+  ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material';
 
 import { DialogService,
@@ -92,6 +92,9 @@ export class DataModelEditorComponent implements OnInit {
     this._editable = editable;
   }
   
+  @ViewChild('attributeTable')
+  private _attributeTable: MatTable<any>;
+  
   private _attributes: Array<any>;
   get attributes() {
     return this._attributes;
@@ -136,7 +139,10 @@ export class DataModelEditorComponent implements OnInit {
   }
   
   public save(): void {
-    this._itemRepository.upsertItem('KoheseModel', this._dataModel);
+    this._itemRepository.upsertItem('KoheseModel', this._dataModel).then(
+      (itemProxy: ItemProxy) => {
+      this._changeDetectorRef.markForCheck();
+    });
     this._editable = false;
   }
   
@@ -228,28 +234,25 @@ export class DataModelEditorComponent implements OnInit {
       disableClose: true
     }).afterClosed().subscribe((attributeObject: any) => {
       if (attributeObject) {
-        this._dataModel.properties[attributeObject.attributeName] = {
-          type: attributeObject.attribute.type,
-          required: attributeObject.attribute.required
-        };
-        viewModelProxy.item.viewProperties[attributeObject.attributeName] = {
-          displayName: attributeObject.attribute.displayName,
-          inputType: {
-            type: attributeObject.attribute.type,
-            options: {}
-          }
-        };
+        this._dataModel.properties[attributeObject.attributeName] =
+          attributeObject.attribute;
+        viewModelProxy.item.viewProperties[attributeObject.attributeName] =
+          attributeObject.view;
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+        this._attributes.push(attributeObject.attribute);
+        this._attributeTable.renderRows();
+        
+        // Re-enter edit mode
+        this._editable = true;
         
         this._changeDetectorRef.markForCheck();
       }
     });
   }
   
-  public sortAttributes(table: MatTable<any>, columnId: string, sortDirection:
-    string): void {
+  public sortAttributes(columnId: string, sortDirection: string): void {
     if (sortDirection) {
       if (columnId === 'Type') {
         this._attributes.sort((oneElement: any, anotherElement: any) => {
@@ -330,7 +333,7 @@ export class DataModelEditorComponent implements OnInit {
       });
     }
     
-    table.renderRows();
+    this._attributeTable.renderRows();
     this._changeDetectorRef.markForCheck();
   }
   
@@ -474,6 +477,12 @@ export class DataModelEditorComponent implements OnInit {
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModel);
+        this._attributes.splice(Object.keys(this._dataModel.properties).
+          indexOf(propertyId), 1);
+        this._attributeTable.renderRows();
+        
+        // Re-enter edit mode
+        this._editable = true;
         
         this._changeDetectorRef.markForCheck();
       }

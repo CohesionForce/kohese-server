@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
-  Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
+  ViewChild } from '@angular/core';
 import * as Uuid from 'uuid/v1';
 import { MatTable } from '@angular/material';
 
@@ -52,6 +52,9 @@ export class ViewModelEditorComponent {
   set editable(editable: boolean) {
     this._editable = editable;
   }
+  
+  @ViewChild('attributeTable')
+  private _attributeTable: MatTable<any>;
   
   private _attributes: Array<any>;
   get attributes() {
@@ -219,8 +222,7 @@ export class ViewModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public sortAttributes(table: MatTable<any>, columnId: string, sortDirection:
-    string): void {
+  public sortAttributes(columnId: string, sortDirection: string): void {
     if (sortDirection) {
       let attributeName: string;
         switch (columnId) {
@@ -256,7 +258,7 @@ export class ViewModelEditorComponent {
       });
     }
     
-    table.renderRows();
+    this._attributeTable.renderRows();
     this._changeDetectorRef.markForCheck();
   }
 }

@@ -16,16 +16,24 @@ import { StateMachineEditorComponent } from '../../state-machine-editor/state-ma
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AttributeEditorComponent implements OnInit {
-  private _attributeName: string;
+  private _attributeName: string = '';
   get attributeName() {
     return this._attributeName;
   }
   @Input('attributeName')
   set attributeName(attributeName: string) {
     this._attributeName = attributeName;
+    this._attribute.name = this._attributeName;
+    this._view.name = this._attributeName;
   }
   
-  private _attribute: any;
+  private _attribute: any = {
+    name: this._attributeName,
+    type: 'boolean',
+    required: false,
+    default: '',
+    id: false
+  };
   get attribute() {
     return this._attribute;
   }
@@ -43,7 +51,14 @@ export class AttributeEditorComponent implements OnInit {
     this._type = type;
   }
   
-  private _view: any;
+  private _view: any  = {
+    name: this._attributeName,
+    displayName: this._attributeName,
+    inputType: {
+      type: 'boolean',
+      options: {}
+    }
+  };
   get view() {
     return this._view;
   }
@@ -133,12 +148,6 @@ export class AttributeEditorComponent implements OnInit {
       }
     }
     
-    if (!this._attribute) {
-      this._attributeName = '';
-      this._attribute = {};
-      this._view = {};
-    }
-    
     let koheseTypes: any = this._dynamicTypesService.getKoheseTypes();
     for (let typeName in koheseTypes) {
       this._attributeTypes[typeName] = typeName;
@@ -178,8 +187,12 @@ export class AttributeEditorComponent implements OnInit {
           foreignKey: 'id'
         };
       }
+      
+      this._view.inputType.type = 'proxy-selector';
     } else {
       delete this._attribute.relation;
+      
+      this._view.inputType.type = attributeType;
     }
   }
   

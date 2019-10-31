@@ -79,8 +79,8 @@
     <mat-icon class="fa fa-plus"></mat-icon>
   </button>
 </div>
-<mat-table #table matSort [dataSource]="attributes"
-  (matSortChange)="sortAttributes(table, $event.active, $event.direction)">
+<mat-table #attributeTable matSort [dataSource]="attributes"
+  (matSortChange)="sortAttributes($event.active, $event.direction)">
   <ng-container matColumnDef="Name">
     <mat-header-cell *matHeaderCellDef mat-sort-header>
       Name

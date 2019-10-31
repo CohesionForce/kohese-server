@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture, fakeAsync,
   tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MAT_DIALOG_DATA, MatDialogRef,
   MatTableModule } from '@angular/material';
 
@@ -17,6 +18,7 @@ describe('Component: state-machine-editor', () => {
       declarations: [StateMachineEditorComponent],
       imports: [
         FormsModule,
+        BrowserAnimationsModule,
         MatTableModule,
         MaterialModule
       ],
