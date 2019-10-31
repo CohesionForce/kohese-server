@@ -188,7 +188,7 @@ export class AttributeEditorComponent implements OnInit {
         };
       }
       
-      this._view.inputType.type = 'proxy-selector';
+      this._view.inputType.type = '';
     } else {
       delete this._attribute.relation;
       

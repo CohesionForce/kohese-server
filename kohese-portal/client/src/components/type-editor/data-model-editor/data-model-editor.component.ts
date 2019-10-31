@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, OnInit,
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material';
 
@@ -18,7 +18,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
   styleUrls: ['./data-model-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DataModelEditorComponent implements OnInit {
+export class DataModelEditorComponent {
   private _dataModel: any;
   get dataModel() {
     return this._dataModel;
@@ -26,16 +26,39 @@ export class DataModelEditorComponent implements OnInit {
   @Input('dataModel')
   set dataModel(dataModel: any) {
     this._dataModel = dataModel;
+    this._filteredKinds = [];
+    this._attributeTypes = JSON.parse(JSON.stringify(this._fundamentalTypes));
+    this._idAttributes = {};
+    
+    for (let j: number = 0; j < this._dataModel.localTypes.length; j++) {
+      let localType: any = this._dataModel.localTypes[j];
+      this._attributeTypes[localType.name] = localType.name;
+    }
     
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
-      if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.name !== this.
-        _dataModel.name)) {
-        this._filteredKinds.push(itemProxy.item);
+      if (itemProxy.kind === 'KoheseModel') {
+        let item: any = itemProxy.item;
+        if (item.name !== this._dataModel.name) {
+          this._filteredKinds.push(item);
+        }
+        
+        this._attributeTypes[item.name] = item.name;
+        
+        for (let attributeName in item.properties) {
+          let attribute: any = item.properties[attributeName];
+          if (attribute.id) {
+            if (!this._idAttributes[item.name]) {
+              this._idAttributes[item.name] = [];
+            }
+  
+            this._idAttributes[item.name].push(attributeName);
+          }
+        }
       }
     }, undefined);
     this._filteredKinds.sort((oneKind: any, anotherKind: any) => {
-      return (oneKind - anotherKind);
+      return oneKind.name.localeCompare(anotherKind.name);
     });
     
     this._itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.
@@ -50,7 +73,7 @@ export class DataModelEditorComponent implements OnInit {
     }
   }
   
-  private _filteredKinds: Array<any> = [];
+  private _filteredKinds: Array<any>;
   get filteredKinds() {
     return this._filteredKinds;
   }
@@ -68,13 +91,12 @@ export class DataModelEditorComponent implements OnInit {
     return this._fundamentalTypes;
   }
   
-  private _attributeTypes: any = JSON.parse(JSON.stringify(this.
-    _fundamentalTypes));
+  private _attributeTypes: any;
   get attributeTypes() {
     return this._attributeTypes;
   }
   
-  private _idAttributes: any = {};
+  private _idAttributes: any;
   get idAttributes() {
     return this._idAttributes;
   }
@@ -109,35 +131,6 @@ export class DataModelEditorComponent implements OnInit {
     DynamicTypesService, private _itemRepository: ItemRepository) {
   }
   
-  public ngOnInit(): void {
-    for (let j: number = 0; j < this._dataModel.localTypes.length; j++) {
-      let localType: any = this._dataModel.localTypes[j];
-      this._attributeTypes[localType.name] = localType.name;
-    }
-    
-    let dataModels: Array<any> = [];
-    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
-      { includeOrigin: false }, (itemProxy: ItemProxy) => {
-      if (itemProxy.kind === 'KoheseModel') {
-        dataModels.push(itemProxy.item);
-      }
-    }, undefined);
-    
-    for (let j: number = 0; j < dataModels.length; j++) {
-      this._attributeTypes[dataModels[j].name] = dataModels[j].name;
-      for (let attributeName in dataModels[j].properties) {
-        let attribute: any = dataModels[j].properties[attributeName];
-        if (attribute.id) {
-          if (!this._idAttributes[dataModels[j].name]) {
-            this._idAttributes[dataModels[j].name] = [];
-          }
-
-          this._idAttributes[dataModels[j].name].push(attributeName);
-        }
-      }
-    }
-  }
-  
   public save(): void {
     this._itemRepository.upsertItem('KoheseModel', this._dataModel).then(
       (itemProxy: ItemProxy) => {
@@ -158,7 +151,7 @@ export class DataModelEditorComponent implements OnInit {
       data: {
         containingType: this._dataModel,
         view: TreeConfiguration.getWorkingTree().getProxyFor('view-' + this.
-          _dataModel.name).item
+          _dataModel.name.toLowerCase()).item
       },
       disableClose: true
     }).updateSize('90%', '90%').afterClosed().subscribe((localType: any) => {
@@ -185,7 +178,7 @@ export class DataModelEditorComponent implements OnInit {
         type: localType,
         containingType: this._dataModel,
         view: TreeConfiguration.getWorkingTree().getProxyFor('view-' + this.
-          _dataModel.name).item
+          _dataModel.name.toLowerCase()).item
       },
       disableClose: true
     }).updateSize('90%', '90%').afterClosed().subscribe((returnedLocalType:
@@ -371,7 +364,20 @@ export class DataModelEditorComponent implements OnInit {
     return (option === selectionType);
   }
   
-  public typeSelected(attribute: any, attributeType: string): void {
+  public async typeSelected(attribute: any, attributeType: string):
+    Promise<void> {
+    let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+      getProxyFor('view-' + this._dataModel.name.toLowerCase());
+    if (this._itemProxy.dirty || viewModelProxy.dirty) {
+      let response: any = await this._dialogService.openYesNoDialog(
+        'Display Modifications', 'All unsaved modifications to this kind ' +
+        'are to be saved if an attribute is added to this kind. Do you want ' +
+        'to proceed?').toPromise();
+      if (!response) {
+        return;
+      }
+    }
+    
     if (Array.isArray(attribute.type)) {
       attribute.type = [attributeType];
     } else {
@@ -385,11 +391,21 @@ export class DataModelEditorComponent implements OnInit {
           foreignKey: 'id'
         };
       }
+      
+      viewModelProxy.item.viewProperties[attribute.name].inputType.type = '';
     } else {
       delete attribute.relation;
+      
+      viewModelProxy.item.viewProperties[attribute.name].inputType.type =
+        attributeType;
     }
     
-    this._itemProxy.dirty = true;
+    this.save();
+    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+    
+    // Re-enter edit mode
+    this._editable = true;
+        
     this._changeDetectorRef.markForCheck();
   }
   
