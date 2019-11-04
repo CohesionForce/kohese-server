@@ -64,9 +64,8 @@
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <!-- Handle local type selection -->
-          <table-editor [tableDefinition]="tableDefinition"
-            [kind]="TreeConfiguration.getWorkingTree().getProxyFor(viewModel.
-            modelName).item" [disabled]="!editable">
+          <table-editor [tableDefinition]="tableDefinition" [kind]="dataModel"
+            [disabled]="!editable">
           </table-editor>
         </ng-template>
       </mat-expansion-panel>
@@ -119,8 +118,7 @@
           </button>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <format-gui [format]="formatDefinition" [kind]="TreeConfiguration.
-            getWorkingTree().getProxyFor(viewModel.modelName).item"
+          <format-gui [format]="formatDefinition" [kind]="dataModel"
             [disabled]="!editable">
           </format-gui>
         </ng-template>
@@ -157,8 +155,28 @@
       </mat-form-field>
     </mat-cell>
   </ng-container>
-  <mat-header-row *matHeaderRowDef="['Name', 'Display Name']; sticky: true">
+  <ng-container matColumnDef="Display Type">
+    <mat-header-cell *matHeaderCellDef mat-sort-header
+      style="flex: 0 0 180px;">
+      Display Type
+    </mat-header-cell>
+    <mat-cell *matCellDef="let element" style="flex: 0 0 180px;">
+      <mat-form-field style="width: 100%; padding: 0px 5px 0px 5px;">
+        <mat-select [ngModel]="element.inputType.type"
+          (ngModelChange)="element.inputType.type = $event; itemProxy.dirty =
+          true" [disabled]="!editable" [compareWith]="areTypeValuesEqual">
+          <mat-option *ngFor="let attributeType of getTypes(element.name)"
+            [value]="getTypeValue(element.name, attributeType)">
+            {{attributeType}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-cell>
+  </ng-container>
+  <mat-header-row *matHeaderRowDef="['Name', 'Display Name', 'Display Type'];
+    sticky: true">
   </mat-header-row>
-  <mat-row *matRowDef="let row; columns: ['Name', 'Display Name']">
+  <mat-row *matRowDef="let row; columns: ['Name', 'Display Name',
+    'Display Type']">
   </mat-row>
 </mat-table>

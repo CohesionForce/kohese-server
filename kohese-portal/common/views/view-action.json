@@ -55,7 +55,7 @@
     },
     "estimatedHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }
@@ -84,7 +84,7 @@
     },
     "remainingHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }
@@ -95,7 +95,7 @@
     },
     "actualHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }
