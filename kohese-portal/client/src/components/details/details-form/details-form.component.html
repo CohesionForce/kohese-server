@@ -20,6 +20,12 @@
         <ng-container *ngIf="type.fields[property].views['form']">
           <ng-container
             [ngSwitch]="type.fields[property].views['form'].inputType.type">
+            <ng-container *ngSwitchCase="'boolean'">
+              <mat-checkbox formControlName="{{property}}"
+                style="width: 100%;">
+                {{getAttributeRepresentation(property)}}
+              </mat-checkbox>
+            </ng-container>
             <k-text *ngSwitchCase="'text'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"

@@ -1,5 +1,5 @@
 import { MarkdownCheatSheetComponent } from './../markdown-cheat-sheet.component';
-import { PropertyDefinition } from './../../../type-editor/format-editor/format-editor.component';
+import { PropertyDefinition } from './../../../type-editor/PropertyDefinition.interface';
 import { Input } from '@angular/core';
 import { ItemProxy } from './../../../../../../common/src/item-proxy';
 import { Component, OnInit } from '@angular/core';

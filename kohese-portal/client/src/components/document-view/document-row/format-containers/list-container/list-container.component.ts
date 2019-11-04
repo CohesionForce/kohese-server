@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 
 import { DialogService } from '../../../../../services/dialog/dialog.service';
-import { PropertyDefinition } from '../../../../type-editor/format-editor/format-editor.component';
+import { PropertyDefinition } from '../../../../type-editor/PropertyDefinition.interface';
 import { KTableComponent } from '../../../../user-input/k-table/k-table.component';
 import { ProxySelectorDialogComponent } from '../../../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { ItemProxy } from '../../../../../../../common/src/item-proxy';

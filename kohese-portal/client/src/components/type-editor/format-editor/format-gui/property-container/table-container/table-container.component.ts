@@ -1,5 +1,4 @@
-import { KoheseType } from './../../../../../../classes/UDT/KoheseType.class';
-import { FormatContainer } from './../../../format-editor.component';
+import { FormatContainer } from './../../../../FormatContainer.interface';
 import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
@@ -11,7 +10,16 @@ export class TableContainerComponent implements OnInit {
   @Input()
   container : FormatContainer;
   @Input()
-  kind : KoheseType
+  kind : any
+  
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
+  @Input('disabled')
+  set isDisabled(isDisabled: boolean) {
+    this._isDisabled = isDisabled;
+  }
 
   constructor() { }
 

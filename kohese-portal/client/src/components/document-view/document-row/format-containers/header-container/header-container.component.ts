@@ -1,6 +1,6 @@
 import { Observable, Subscription } from 'rxjs';
 import { Component, OnInit, Input, OnChanges, KeyValueDiffer, KeyValueDiffers, DoCheck, OnDestroy } from '@angular/core';
-import { PropertyDefinition } from '../../../../type-editor/format-editor/format-editor.component';
+import { PropertyDefinition } from '../../../../type-editor/PropertyDefinition.interface';
 
 @Component({
   selector: 'header-container',

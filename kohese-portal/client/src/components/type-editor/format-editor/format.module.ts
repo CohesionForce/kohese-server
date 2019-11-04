@@ -3,7 +3,6 @@ import { FormatPreviewComponent } from './format-preview/format-preview.componen
 import { HeaderContainerEditorComponent } from './format-gui/property-container/header-container/header-container-editor.component';
 import { PropertyRowComponent } from './format-gui/property-container/property-row/property-row.component';
 import { ContainerSelectorComponent } from './format-gui/container-selector/container-selector.component';
-import { FormatEditorComponent } from './format-editor.component';
 import { PipesModule } from '../../../pipes/pipes.module';
 import { MaterialModule } from '../../../material.module';
 import { UserInputModule } from '../../user-input/user-input.module';
@@ -19,7 +18,6 @@ import { TablePreviewDialogComponent } from './table-editor/table-preview-dialog
 
 @NgModule({
   declarations: [
-    FormatEditorComponent,
     FormatGuiComponent,
     ContainerSelectorComponent,
     TableContainerComponent,
@@ -37,7 +35,6 @@ import { TablePreviewDialogComponent } from './table-editor/table-preview-dialog
     TablePreviewDialogComponent
   ],
   exports : [
-    FormatEditorComponent,
     FormatGuiComponent,
     TableEditorComponent
   ],

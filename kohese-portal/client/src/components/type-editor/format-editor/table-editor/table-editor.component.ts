@@ -28,6 +28,15 @@ export class TableEditorComponent implements OnInit, OnDestroy {
     this._kind = kind;
   }
   
+  private _isDisabled: boolean = false;
+  get isDisabled() {
+    return this._isDisabled;
+  }
+  @Input('disabled')
+  set isDisabled(isDisabled: boolean) {
+    this._isDisabled = isDisabled;
+  }
+  
   repoStatusSubscription: Subscription;
   treeConfigurationSubscription: Subscription;
   treeConfiguration: TreeConfiguration;

@@ -138,22 +138,6 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  save(): void {
-    let koheseType: KoheseType = this._koheseTypeStream.getValue();
-    this.itemRepository.upsertItem(koheseType.dataModelProxy.kind, koheseType.
-      dataModelProxy.item).catch((error: any) => {
-      console.log('Error saving data model for ' + koheseType.dataModelProxy.
-        item.name + '.');
-      console.log(error);
-    });
-    this.itemRepository.upsertItem(koheseType.viewModelProxy.kind, koheseType.
-      viewModelProxy.item).catch((error: any) => {
-      console.log('Error saving view model for ' + koheseType.dataModelProxy.
-        item.name + '.');
-      console.log(error);
-    });
-  }
-
   delete(): void {
     let koheseType: KoheseType = this._koheseTypeStream.getValue();
     this.dialogService.openYesNoDialog('Delete ' + koheseType.dataModelProxy.

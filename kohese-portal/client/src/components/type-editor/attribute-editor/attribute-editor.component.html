@@ -3,6 +3,10 @@
     <input matInput type="text" placeholder="Name"
       [(ngModel)]="attributeName"/>
   </mat-form-field>
+  <mat-form-field style="width: 100%; padding: 3px 3px;">
+    <input matInput type="text" placeholder="Display Name"
+      [(ngModel)]="view.displayName"/>
+  </mat-form-field>
   <div class="property-container" style="width: 100%;">
     <div class="form-container">
       <mat-form-field style="width: 100%;">
@@ -16,30 +20,34 @@
         </mat-select>
       </mat-form-field>
       <ng-container *ngIf="attribute.type === 'StateMachine'">
-        <button mat-raised-button (click)="openStateMachineEditor()">
-          Edit State Machine...
+        <button mat-icon-button matTooltip="Edit the associated state machine"
+          (click)="openStateMachineEditor()">
+          <mat-icon class="fa fa-edit"></mat-icon>
         </button>
         <br/>
         <br/>
       </ng-container>
-      <mat-form-field style="width: 100%;">
-        <mat-select placeholder="Reference Attribute"
-          [ngModel]="attribute.relation" (ngModelChange)="attribute.
-          relation = $event" [compareWith]="areRelationsEqual"
-          [disabled]="!attribute.relation">
-          <ng-container *ngIf="attribute.relation">
-            <mat-optgroup *ngFor="let typeName of (idAttributes | mapKey)"
-              [label]="typeName">
-              <mat-option *ngFor="let attributeName of idAttributes[
-                typeName]" [value]="{ kind: typeName,
-                foreignKey: attributeName }">
-                {{attributeName}}
-              </mat-option>
-            </mat-optgroup>
-          </ng-container>
-        </mat-select>
-      </mat-form-field>
-      <br/>
+      <ng-container *ngIf="(Object.values(fundamentalTypes).indexOf(
+        multivalued ? attribute.type[0] : attribute.type) === -1)">
+        <mat-form-field style="width: 100%;">
+          <mat-select placeholder="Reference Attribute"
+            [ngModel]="attribute.relation" (ngModelChange)="attribute.
+            relation = $event" [compareWith]="areRelationsEqual"
+            [disabled]="!attribute.relation">
+            <ng-container *ngIf="attribute.relation">
+              <mat-optgroup *ngFor="let typeName of (idAttributes | mapKey)"
+                [label]="typeName">
+                <mat-option *ngFor="let attributeName of idAttributes[
+                  typeName]" [value]="{ kind: typeName,
+                  foreignKey: attributeName }">
+                  {{attributeName}}
+                </mat-option>
+              </mat-optgroup>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+        <br/>
+      </ng-container>
       <mat-checkbox class="field-option" [(ngModel)]="multivalued">
         Multivalued
       </mat-checkbox>
@@ -49,15 +57,15 @@
         Required
       </mat-checkbox>
       <br/>
+      <mat-checkbox class="field-option" [(ngModel)]="attribute.id">
+        Kind ID
+      </mat-checkbox>
+      <br/>
       <mat-form-field style="width: 100%;">
         <textarea matInput placeholder="Default Value" rows="3" cols="80"
           [(ngModel)]="attribute.default">
         </textarea>
       </mat-form-field>
-      <br/>
-      <mat-checkbox class="field-option" [(ngModel)]="attribute.id">
-        ID Field
-      </mat-checkbox>
       <br/>
     </div>
   </div>

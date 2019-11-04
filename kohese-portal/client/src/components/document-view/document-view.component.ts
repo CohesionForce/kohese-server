@@ -1,4 +1,3 @@
-import { FormatDefinition } from '../type-editor/format-editor/format-editor.component';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from '../details/details-dialog/details-dialog.component';
