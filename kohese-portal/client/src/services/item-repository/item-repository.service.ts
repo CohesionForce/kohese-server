@@ -177,8 +177,7 @@ export class ItemRepository {
           this.updateItemStatus(msg.data.itemId, msg.data.status);
           break;
         case 'deletion':
-          TreeConfiguration.getWorkingTree().getProxyFor(msg.data.id).
-            deleteItem(msg.data.recursive);
+          TreeConfiguration.getWorkingTree().getProxyFor(msg.data.id).deleteItem();
           break;
         case 'cachePiece':
           const cachePiece: any = msg.data;

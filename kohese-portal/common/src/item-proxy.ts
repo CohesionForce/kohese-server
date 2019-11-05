@@ -598,12 +598,17 @@ export class ItemProxy {
       for(let relationKey in relationsForKind){
         let relationList = relationsForKind[relationKey];
         if (Array.isArray(relationList)){
-          for(let index = 0; index < relationList.length; index++){
-            this.removeReference(relationList[index], relationKey, false);
-          }
+          if (kindKey !== 'Item' && relationKey !== 'children'){
+            for(let index = 0; index < relationList.length; index++){
+              console.log('>>> Remove reference:  ' + relationList[index].item.id);
+              this.removeReference(relationList[index], relationKey, false);
+            }
+          }  
         } else {
           if (relationList){
-            this.removeReference(relationList, relationKey, true);
+            if (kindKey !== 'Item' && relationKey !== 'parent'){
+              this.removeReference(relationList, relationKey, true);
+            }
           }
         }
       }
@@ -1547,7 +1552,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  deleteItem(deleteDescendants: boolean) {
+  deleteItem(deleteDescendants: boolean = false) {
     var byId = this.item.id;
 
     // console.log('::: Deleting proxy for ' + byId);
@@ -1578,8 +1583,7 @@ export class ItemProxy {
             type: 'delete',
             kind: this.kind,
             id: this.item.id,
-            proxy: this,
-            recursive: deleteDescendants
+            proxy: this
           });
         }
         delete this.treeConfig.proxyMap[byId];
@@ -1594,8 +1598,7 @@ export class ItemProxy {
               type: 'delete',
               kind: this.kind,
               id: this.item.id,
-              proxy: this,
-              recursive: deleteDescendants
+              proxy: this
             });
           }
           createMissingProxy('Item', 'id', byId, this.treeConfig);
@@ -1610,8 +1613,7 @@ export class ItemProxy {
               type: 'delete',
               kind: this.kind,
               id: this.item.id,
-              proxy: this,
-              recursive: deleteDescendants
+              proxy: this
             });
           }
           delete this.treeConfig.proxyMap[byId];
