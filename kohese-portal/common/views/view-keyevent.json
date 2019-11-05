@@ -1,0 +1,174 @@
+{
+  "id": "view-keyevent",
+  "name": "KeyEvent",
+  "parentId": "view-decision",
+  "createdBy": "gmckune",
+  "createdOn": 1566607211956,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1572489285633,
+  "modelName": "KeyEvent",
+  "icon": "fa fa-paper-plane",
+  "viewProperties": {
+    "EventName": {
+      "displayName": "EventName",
+      "inputType": {
+        "type": "text",
+        "options": {}
+      }
+    },
+    "DetectionMechanism": {
+      "displayName": "DetectionMechanism",
+      "inputType": {
+        "type": "text",
+        "options": {}
+      }
+    },
+    "EventInputData": {
+      "displayName": "EventInputData",
+      "inputType": {
+        "type": "text",
+        "options": {}
+      }
+    },
+    "Responses": {
+      "displayName": "Responses",
+      "inputType": {
+        "type": "text",
+        "options": {}
+      }
+    },
+    "EventOutputData": {
+      "displayName": "EventOutputData",
+      "inputType": {
+        "type": "text",
+        "options": {}
+      }
+    }
+  },
+  "formatDefinitions": {
+    "89324a90-a7af-11e8-8662-71e48f0160fe": {
+      "name": "New definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "KeyEvent",
+              "attribute": "name"
+            },
+            "hideLabel": false,
+            "labelOrientation": "Top",
+            "kind": "text"
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "KeyEvent",
+                "attribute": "description"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "markdown"
+            },
+            {
+              "propertyName": {
+                "kind": "KeyEvent",
+                "attribute": "EventName"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "text",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "text",
+                "options": {}
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "KeyEvent",
+                "attribute": "DetectionMechanism"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "text",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "text",
+                "options": {}
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "KeyEvent",
+                "attribute": "EventInputData"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "text",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "text",
+                "options": {}
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "KeyEvent",
+                "attribute": "Responses"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "text",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "text",
+                "options": {}
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "KeyEvent",
+                "attribute": "EventOutputData"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "text",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "text",
+                "options": {}
+              }
+            }
+          ]
+        }
+      ],
+      "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    }
+  },
+  "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "tableDefinitions": {
+    "b1090aa0-fb86-11e9-be56-311e0135452a": {
+      "id": "b1090aa0-fb86-11e9-be56-311e0135452a",
+      "name": "KeyEventInfo",
+      "columns": [
+        "EventName",
+        "DetectionMechanism",
+        "EventInputData",
+        "Responses",
+        "EventOutputData"
+      ],
+      "expandedFormat": {
+        "column1": [],
+        "column2": [],
+        "column3": [],
+        "column4": []
+      }
+    }
+  }
+}
