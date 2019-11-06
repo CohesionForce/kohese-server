@@ -1,0 +1,28 @@
+{
+  "id": "KeyEventDictionary",
+  "name": "KeyEventDictionary",
+  "parentId": "Decision",
+  "createdBy": "gmckune",
+  "createdOn": 1572491164821,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1572491746960,
+  "base": "Decision",
+  "idInjection": true,
+  "properties": {
+    "KeyEvents": {
+      "type": [
+        "KeyEvent"
+      ],
+      "required": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": [],
+  "localTypes": []
+}
