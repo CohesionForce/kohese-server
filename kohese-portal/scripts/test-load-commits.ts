@@ -1,6 +1,6 @@
 'use strict';
 import { ItemProxy } from '../common/src/item-proxy';
-import { ItemCache, CacheAnalysis } from '../common/src/item-cache';
+import { ItemCache, CacheAnalysis, KoheseCommit } from '../common/src/item-cache';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
 import _ from 'underscore';
@@ -61,7 +61,7 @@ async function diffHeadAndPrev() {
 }
 
 //////////////////////////////////////////////////////////////////////////
-async function diffAllCommits(refCommitId) {
+async function diffPrevCommits(refCommitId) {
   try {
     let itemCache : ItemCache = ItemCache.getItemCache();
 
@@ -72,13 +72,25 @@ async function diffAllCommits(refCommitId) {
     console.log('::: Prev Commit: ' + prevCommitId);
 
     if (prevCommitId){
-      await compareCommits(prevCommitId, refCommitId);
-      await diffAllCommits(prevCommitId);
+      // await compareCommits(prevCommitId, refCommitId);
+      let beforeTime = Date.now();
+      let refCommitClone = _.clone(refCommit);
+      let newDiff = await refCommit.diff();
+      let updatedRefCommitClone = _.clone(refCommit);
+      if (!_.isEqual(refCommitClone, updatedRefCommitClone)){
+        console.log('### Saving modified commit data');
+        itemCache.cacheKeyValuePair('kCommit', refCommitId, refCommit);
+      }
+      let afterTime = Date.now();
+      console.log('^^^ Total compare time: ' + (afterTime-beforeTime)/1000);
+      console.log(JSON.stringify(newDiff, null, '  '));
+      await diffPrevCommits(prevCommitId);
     }
 
   } catch (err) {
     console.log('*** Error');
     console.log(err);
+    console.log(err.stack);
   }
 }
 
@@ -199,9 +211,10 @@ async function diffEachCommit() {
     let beforeTime = Date.now();
     let currentCommit = await itemCache.getRef('HEAD');
 
-    await diffAllCommits(currentCommit);
+    await diffPrevCommits(currentCommit);
     let afterTime = Date.now();
 
+    itemCache.saveAllPendingWrites();
     deltaMessage('Time to diff all commits', beforeTime, afterTime);
 
   } catch (err) {
@@ -447,7 +460,7 @@ try {
       // await simulateClientSync();
 
       await diffEachCommit();
-
+ 
     } catch (err) {
       console.log('*** Error');
       console.log(err);

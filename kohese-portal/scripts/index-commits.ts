@@ -37,7 +37,7 @@ kdb.initialize(baseRepoPath, indexAndExit).then(async () =>  {
       console.log('*** Missing cache data');
       console.log(JSON.stringify(missingCacheData, null, '  '));
     } else {
-      console.log('::: No missing cahce data was detected')
+      console.log('::: No missing cache data was detected');
     }
   } catch (err){
     console.log('*** Error: ' + err);

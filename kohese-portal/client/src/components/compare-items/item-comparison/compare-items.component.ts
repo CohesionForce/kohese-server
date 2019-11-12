@@ -239,10 +239,29 @@ export class CompareItemsComponent implements OnInit {
       return new Promise<void>(async (resolve: () => void, reject:
         () => void) => {
         let itemCache: ItemCache = ItemCache.getItemCache();
-        this._comparison = await Compare.compareItems(this.
-          _baseProxySubject.getValue().item.id, await itemCache.getTreeHashMap(
-          this._selectedBaseVersion), this._changeProxySubject.getValue().item.
-          id, await itemCache.getTreeHashMap(this._selectedChangeVersion),
+        let baseTreeHashMap = await itemCache.getTreeHashMap(this._selectedBaseVersion);
+        let baseItemId = this._baseProxySubject.getValue().item.id;
+        let baseBlobKind;
+        let baseBlobOID;
+        if (baseTreeHashMap){
+          baseBlobKind = baseTreeHashMap[baseItemId].kind;
+          baseBlobOID = baseTreeHashMap[baseItemId].oid;
+        }
+        let changeTreeHashMap = await itemCache.getTreeHashMap(this._selectedChangeVersion);
+        let changeItemId = this._changeProxySubject.getValue().item.id;
+        let changeBlobKind; 
+        let changeBlobOID;
+        if (changeTreeHashMap){
+          changeBlobKind = changeTreeHashMap[changeItemId].kind;
+          changeBlobOID = changeTreeHashMap[changeItemId].oid;  
+        }
+        this._comparison = await Compare.compareItems(
+          baseItemId,
+          baseBlobKind,
+          baseBlobOID,
+          changeItemId,
+          changeBlobKind,
+          changeBlobOID,
           this._dynamicTypesService);
         this._changeDetectorRef.markForCheck();
         

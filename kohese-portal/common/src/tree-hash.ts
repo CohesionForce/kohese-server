@@ -20,7 +20,7 @@ export class TreeHashMapDifference {
     },
     contentChanged: {
       [id:string] : {
-        fromOID : ObjectHashValueType,
+        fromOID: ObjectHashValueType,
         toOID:  ObjectHashValueType
       }
     },
@@ -88,7 +88,7 @@ export class TreeHashMap {
     let compareStack : Array<ItemIdType> = _.clone(commonRoots).reverse();
 
     let result : TreeHashMapDifference = {
-      match: true,
+      match: _.isEqual(sortedLeftRoots, sortedRightRoots),
       summary: {
         roots: {
           added: addedRoots,
@@ -143,7 +143,7 @@ export class TreeHashMap {
 
         if (diff.contentChanged){
           result.summary.contentChanged[diffId] = {
-            fromOID :diff.contentChanged.fromOID,
+            fromOID: diff.contentChanged.fromOID,
             toOID: diff.contentChanged.toOID
           };
         }
@@ -231,7 +231,7 @@ export class TreeHashMap {
         console.log('*** Error: ' + err + ' while processing ' + diffId);
         console.log(err.stack);
       }
-        }
+    }
 
     return result;
   }
@@ -318,15 +318,17 @@ export class TreeHashMap {
 }
 
 export class TreeHashEntryDifference {
-  match : boolean;
-  treeHashChanged? : {fromTreeId: TreeHashValueType, toTreeId: TreeHashValueType};
-  kindChanged? : {fromKind:string, toKind: string};
-  contentChanged? : {fromOID: TreeHashValueType, toOID: TreeHashValueType};
-  parentChanged? : {fromId: ItemIdType, toId: ItemIdType};
-  childrenAdded?  : Array<{id: ItemIdType, treeId: TreeHashValueType}>;
-  childrenDeleted? : Array<{id: ItemIdType, treeId: TreeHashValueType}>;
-  childrenModified? : Array<{id:ItemIdType, fromTreeId: TreeHashValueType, toTreeId: TreeHashValueType}>;
-  childrenReordered? : Array<{index:number, fromId?: ItemIdType, toId?: ItemIdType}>;
+  match: boolean;
+  left?: TreeHashEntry;
+  right?: TreeHashEntry;
+  treeHashChanged?: {fromTreeId: TreeHashValueType, toTreeId: TreeHashValueType};
+  kindChanged?: {fromKind:string, toKind: string};
+  contentChanged?: {fromOID: TreeHashValueType, toOID: TreeHashValueType};
+  parentChanged?: {fromId: ItemIdType, toId: ItemIdType};
+  childrenAdded?: Array<{id: ItemIdType, treeId: TreeHashValueType}>;
+  childrenDeleted?: Array<{id: ItemIdType, treeId: TreeHashValueType}>;
+  childrenModified?: Array<{id:ItemIdType, fromTreeId: TreeHashValueType, toTreeId: TreeHashValueType}>;
+  childrenReordered?: Array<{index:number, fromId?: ItemIdType, toId?: ItemIdType}>;
 };
 
 export class TreeHashEntry {
@@ -351,6 +353,8 @@ export class TreeHashEntry {
 
     if (!diff.match){
       // Determine the differences
+      diff.left = _.clone(left);
+      diff.right = _.clone(right);
 
       diff.treeHashChanged = {
         fromTreeId: left.treeHash,

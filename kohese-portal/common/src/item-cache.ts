@@ -9,30 +9,100 @@ import { ItemProxy } from './item-proxy';
 import { TreeHashEntry, TreeHashMap, TreeHashValueType, ItemIdType, TreeHashMapDifference } from './tree-hash';
 import { TreeConfiguration } from './tree-configuration';
 
-
 // TODO set back to false and/or remove disable check below
 const disableObjectFreeze = false;
 const chunkSize : number = 1000;
 
 export class KoheseCommit {
+  // Commit Id
+  public commitId: string;
+  // Commit Data
   public time: number;
   public author: string;
   public message: string;
   public parents?: Array<ItemIdType>;
-  public repoTreeRoots: { [ key : string ] : TreeHashEntry };
+  public repoTreeRoots: Workspace;
+  // Derived Data
+  private treeHashMap?: TreeHashMap;
+  private treeDifference?: TreeHashMapDifference;
 
-  // //////////////////////////////////////////////////////////////////////////
-  // async getTreeHashMap() : Promise<TreeHashMap> {
-  //   let itemCache = ItemCache.getItemCache();
-  //   return itemCache.getTreeHashMap();
-  // }
+  //////////////////////////////////////////////////////////////////////////
+  constructor (commitId: string, commitData : KoheseCommit){
+    this.commitId = commitId;
+    this.time = commitData.time;
+    this.author = commitData.author;
+    this.message = commitData.message;
+    if (commitData.parents){
+      this.parents = commitData.parents;
+    }
+    this.repoTreeRoots = commitData.repoTreeRoots;
+    if (commitData.treeDifference){
+      this.treeDifference = commitData.treeDifference;
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  public toJSON() {
+    return {
+      time: this.time,
+      author: this.author,
+      message: this.message,
+      parents: this.parents,
+      repoTreeRoots: this.repoTreeRoots,
+      // TODO: Add storage and distribution of treeDifference
+      // TODO: Need to determine trade off of transfer vs calc to/at client
+      treeDifference: this.treeDifference
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  async getTreeHashMap() : Promise<TreeHashMap> {
+
+    if (!this.treeHashMap){
+      let itemCache = ItemCache.getItemCache();
+      this.treeHashMap = {};
+      let treeHashEntryStack : Array<{id:string, treeId:TreeHashValueType}> = [];
+      let reversedRootIds = Object.keys(this.repoTreeRoots).reverse();
+      for (let repoIdx in reversedRootIds){
+        let repoId = reversedRootIds[repoIdx];
+        treeHashEntryStack.push({id:repoId, treeId:this.repoTreeRoots[repoId].treeHash});
+      }
+  
+      while (treeHashEntryStack.length > 0) {
+        let mapEntry = treeHashEntryStack.pop();
+        let treeHashEntry = await itemCache.getTree(mapEntry.treeId)
+  
+        if (treeHashEntry) {
+          this.treeHashMap [mapEntry.id] = treeHashEntry;
+  
+          let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
+          for (let childIdx in reversedChildIds){
+            let childId = reversedChildIds[childIdx];
+            let treeId = treeHashEntry.childTreeHashes[childId];
+            switch (treeId){
+              case 'Repository-Mount':
+              case 'Internal':
+                // Ignore
+                break;
+              default:
+                treeHashEntryStack.push({id:childId, treeId: treeId});
+            }
+          }
+        } else {
+          console.log('!!! Can not find treeHashEntry for: ' + JSON.stringify(mapEntry));
+        }
+      }
+    }
+
+    return this.treeHashMap;
+  }
 
   //////////////////////////////////////////////////////////////////////////
   async getParentCommits() : Promise<Array<KoheseCommit>> {
     let itemCache = ItemCache.getItemCache();
     let parentCommitArray : Array<KoheseCommit> = [];
 
-    for(let parentCommitId in this.parents){
+    for(let parentCommitId of this.parents){
       let parentCommit = await itemCache.getCommit(parentCommitId)
       parentCommitArray.push(parentCommit);
     }
@@ -40,14 +110,279 @@ export class KoheseCommit {
     return parentCommitArray;
   }
 
-  // //////////////////////////////////////////////////////////////////////////
-  // async diff() : Promise<TreeHashMapDifference> {
-  //   let parentCommits = await this.getParentCommits();
-  //
-  //   let parentCommitTHM = parentCommits[0].
-  //
-  //   return undefined;
-  // }
+  //////////////////////////////////////////////////////////////////////////
+  async diff() : Promise<TreeHashMapDifference> {
+
+    if (!this.treeDifference){
+      let parentCommits = await this.getParentCommits();
+
+      let prevCommit = parentCommits[0];
+  
+      if (prevCommit){
+        let thisCommitTHM = await this.getTreeHashMap();
+        let parentCommitTHM = await prevCommit.getTreeHashMap();
+        this.treeDifference = TreeHashMap.diff(parentCommitTHM, thisCommitTHM);
+      }
+    }
+
+    return this.treeDifference;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  private async newDiff() : Promise<TreeHashMapDifference> {
+
+    // TODO: Method marked as private to prevent use until it is final
+    
+    console.log('*** WARNING:  This method does not produce the same results yet!');
+
+    let itemCache = ItemCache.getItemCache();
+
+    // TODO: Remove this line
+    let oldCommitDiff = await this.diff()
+
+    let parentCommits = await this.getParentCommits();
+    let prevCommit = parentCommits[0];
+
+    let leftRoots : Array<ItemIdType> = Object.keys(prevCommit.repoTreeRoots);
+    let rightRoots : Array<ItemIdType> = Object.keys(this.repoTreeRoots);
+
+    let sortedLeftRoots = _.clone(leftRoots).sort();
+    let sortedRightRoots = _.clone(rightRoots).sort();
+    let addedRoots = _.difference(sortedRightRoots, sortedLeftRoots);
+    let deletedRoots = _.difference(sortedLeftRoots, sortedRightRoots);
+    let commonRoots = _.intersection(leftRoots, rightRoots);
+
+    let treeDifference : TreeHashMapDifference = {
+      match: _.isEqual(sortedLeftRoots, sortedRightRoots),
+      summary: {
+        roots: {
+          added: addedRoots,
+          deleted: deletedRoots,
+          common: commonRoots
+        },
+        kindChanged: {},
+        contentChanged: {},
+        parentChanged: {},
+        itemAdded: {},
+        itemDeleted: {},
+        itemMissing: {
+          leftMissing: [],
+          rightMissing: []
+        }
+      },
+      details: {}
+    };
+
+    let left = _.clone(prevCommit.repoTreeRoots);
+    let right = _.clone(this.repoTreeRoots);
+
+    let gatherStack : Array<ItemIdType> = _.clone(commonRoots).reverse();
+
+    while (gatherStack.length){
+      let diffId = gatherStack.pop();
+      try {
+
+        let leftVersion : TreeHashEntry = left[diffId];
+        let rightVersion : TreeHashEntry = right[diffId];
+
+        if (_.isEqual(leftVersion, rightVersion)){
+          continue;
+        }
+
+        if (leftVersion) {
+          for (let leftChildId of Object.keys(leftVersion.childTreeHashes)){
+            let leftChildTreeHash = leftVersion.childTreeHashes[leftChildId];
+            switch (leftChildTreeHash){
+              case "Repository-Mount":
+              case "Internal":
+                // ignore
+                break;
+              default:
+                if(!left[leftChildId]){
+                  let leftChildTree = await itemCache.getTree(leftChildTreeHash);
+                  let leftChildTreeClone =  _.clone(leftChildTree);
+                  left[leftChildId] = leftChildTreeClone;
+                  if(_.indexOf(gatherStack, leftChildId) === -1) {
+                    gatherStack.push(leftChildId);
+                  }  
+                }
+            }
+          }  
+        }
+
+        if (rightVersion) {
+          for (let rightChildId of Object.keys(rightVersion.childTreeHashes)){
+            let rightChildTreeHash = rightVersion.childTreeHashes[rightChildId];
+            switch (rightChildTreeHash){
+              case "Repository-Mount":
+              case "Internal":
+                // ignore
+                break;
+              default:
+                if(!right[rightChildId]){
+                  let rightChildTree = await itemCache.getTree(rightChildTreeHash);
+                  let rightChildTreeClone =  _.clone(rightChildTree);
+                  right[rightChildId] = rightChildTreeClone;
+                  if(_.indexOf(gatherStack, rightChildId) === -1) {
+                    gatherStack.push(rightChildId);
+                  }  
+                }
+            }
+          }  
+        }
+
+      } catch (err){
+        console.log('*** Error: ' + err + ' while processing ' + diffId);
+        console.log(err.stack);
+      }
+    }
+
+    let compareStack : Array<ItemIdType> = _.clone(commonRoots).reverse();
+
+    while (compareStack.length){
+      let diffId = compareStack.pop();
+      try {
+
+        let leftVersion : TreeHashEntry = left[diffId];
+        let rightVersion : TreeHashEntry = right[diffId];
+
+        if (_.isEqual(leftVersion, rightVersion)){
+          continue;
+        }
+
+        if (!leftVersion){
+          treeDifference.summary.itemMissing.leftMissing.push(diffId);
+          treeDifference.match = false;
+        }
+        if(!rightVersion){
+          treeDifference.summary.itemMissing.rightMissing.push(diffId);
+          treeDifference.match = false;
+        }
+        if(!leftVersion || !rightVersion){
+          continue;
+        }
+
+        let diff = TreeHashEntry.diff(leftVersion, rightVersion);
+
+        if (!diff.match){
+          treeDifference.details[diffId] = diff;
+          treeDifference.match = false;
+        }
+
+        if (diff.kindChanged){
+          treeDifference.summary.kindChanged[diffId] = {
+            fromKind :diff.kindChanged.fromKind,
+            toKind: diff.kindChanged.toKind
+          };
+        }
+
+        if (diff.contentChanged){
+          treeDifference.summary.contentChanged[diffId] = {
+            fromOID: diff.contentChanged.fromOID,
+            toOID: diff.contentChanged.toOID
+          };
+        }
+
+        if (diff.parentChanged){
+          treeDifference.summary.parentChanged[diffId] = {
+            fromParentId :diff.parentChanged.fromId,
+            toParentId: diff.parentChanged.toId
+          };
+        }
+
+        if (diff.childrenAdded){
+          let childrenThatMoved : Array<ItemIdType> = [];
+          for(let addedChild of diff.childrenAdded) {
+          
+            // Recursively add deleted children that have not been moved
+            let childStack : Array<{id:ItemIdType, treeId:TreeHashValueType}> = [ addedChild ];
+            while (childStack.length > 0){
+
+              let addedEntry = childStack.pop();
+              let addedItem = right[addedEntry.id];
+              if (!addedItem) {
+                console.log('### Added item was not found:' + addedEntry.id);
+                addedItem = await itemCache.getTree(addedEntry.treeId);
+              }
+
+              if (left[addedChild.id]){
+                // Child was moved, add it to the list to get a diff for
+                childrenThatMoved.push(addedEntry.id);
+              } else {
+                // Child was added
+                treeDifference.summary.itemAdded[addedEntry.id] = addedEntry.treeId;
+              }
+
+              // Now check it's children
+              let childIds = Object.keys(addedItem.childTreeHashes);
+              if (childIds.length > 0){
+                for(let idx in childIds){
+                  let childId = childIds[idx];
+                  childStack.push({id: childId, treeId: addedItem.childTreeHashes[childId]})
+                }
+              }
+            }
+          }
+
+          // Add any new children that have been moved to the compare stack
+          childrenThatMoved.reverse();
+          childrenThatMoved.forEach((childId) => {
+            compareStack.push(childId);
+          });
+        }
+
+        if (diff.childrenDeleted){
+          diff.childrenDeleted.forEach((deletedChild) => {
+
+            // Recursively add deleted children that have not been moved
+            let childStack : Array<{id:ItemIdType, treeId:TreeHashValueType}> = [ deletedChild ];
+            while (childStack.length > 0){
+
+              let deletedEntry = childStack.pop();
+              let deletedItem = left[deletedEntry.id];
+
+              if (right[deletedChild.id]){
+                // Child was moved, it will be added to diff list where it is added
+              } else {
+                treeDifference.summary.itemDeleted[deletedEntry.id] = deletedEntry.treeId;
+
+                // Now check it's children
+                let childIds = Object.keys(deletedItem.childTreeHashes);
+                if (childIds.length > 0){
+                  for(let idx in childIds){
+                    let childId = childIds[idx];
+                    childStack.push({id: childId, treeId: deletedItem.childTreeHashes[childId]})
+                  }
+                }
+              }
+            }
+          });
+        }
+
+        if (diff.childrenModified){
+          let childrenModified = _.clone(diff.childrenModified);
+          childrenModified.reverse();
+          childrenModified.forEach((modifiedChild) => {
+            compareStack.push(modifiedChild.id);
+          });
+        }
+      } catch (err){
+        console.log('*** Error: ' + err + ' while processing ' + diffId);
+        console.log(err.stack);
+      }
+    }
+
+    // TODO: Remove the oldCommitDiff tests below
+    if (!_.isEqual(oldCommitDiff.summary.roots, treeDifference.summary.roots)){
+      console.log('### Roots does not match: ' + this.time);
+    }
+  
+    if (!_.isEqual(oldCommitDiff.summary, treeDifference.summary)){
+      console.log('### Summary does not match: '+ this.time);
+      // console.log(JSON.stringify(treeDifference.details, null, '  '));
+    }
+    return treeDifference;
+  }
 }
 
 export type Workspace = Array<TreeHashEntry>;
@@ -101,6 +436,7 @@ export class ItemCache {
     this.metadata.set('numCommits', 0);
     this.metadata.set('numTrees', 0);
     this.metadata.set('numBlobs', 0);
+    this.metadata.set('cacheVersion', 0.1);
 
     // tslint:disable-next-line: no-use-before-declare
     this.analysis = new CacheAnalysis(this);
@@ -123,6 +459,13 @@ export class ItemCache {
     return ItemCache.itemCache;
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  cacheKeyValuePair(sublevelName, key, value, alreadyCached: boolean = false) {
+    // Default implementation does nothing
+  }
+  
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -185,7 +528,8 @@ export class ItemCache {
         numTags: this.tagMap.size,
         numCommits: this.kCommitMap.size,
         numTrees: this.kTreeMap.size,
-        numBlobs: this.blobMap.size
+        numBlobs: this.blobMap.size,
+        cacheVerersion: this.metadata.get('cacheVersion')
       },
       refMap : this.mapToObject(this.refMap),
       tagMap : this.mapToObject(this.tagMap),
@@ -290,14 +634,17 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   cacheCommit(oid : string, commit : KoheseCommit){
     Object.freeze(commit);
-    this.kCommitMap.set(oid, commit);
+    let commitObject = new KoheseCommit(oid, commit);
+    this.kCommitMap.set(oid, commitObject);
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async getCommit(oid : string){
-    return this.retrieveValue('kCommit', oid);
+  async getCommit(oid : string) : Promise<KoheseCommit>{
+    let commit : KoheseCommit;
+    commit = await this.retrieveValue('kCommit', oid);
+    return commit;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -322,38 +669,7 @@ export class ItemCache {
     let treeHashMap: TreeHashMap;
     let commit = await this.getCommit(forCommit);
     if (commit) {
-      treeHashMap = {};
-      let treeHashEntryStack : Array<{id:string, treeId:TreeHashValueType}> = [];
-      let reversedRootIds = Object.keys(commit.repoTreeRoots).reverse();
-      for (let repoIdx in reversedRootIds){
-        let repoId = reversedRootIds[repoIdx];
-        treeHashEntryStack.push({id:repoId, treeId:commit.repoTreeRoots[repoId].treeHash});
-      }
-
-      while (treeHashEntryStack.length > 0) {
-        let mapEntry = treeHashEntryStack.pop();
-        let treeHashEntry = await this.getTree(mapEntry.treeId)
-
-        if (treeHashEntry) {
-          treeHashMap [mapEntry.id] = treeHashEntry;
-
-          let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
-          for (let childIdx in reversedChildIds){
-            let childId = reversedChildIds[childIdx];
-            let treeId = treeHashEntry.childTreeHashes[childId];
-            switch (treeId){
-              case 'Repository-Mount':
-              case 'Internal':
-                // Ignore
-                break;
-              default:
-                treeHashEntryStack.push({id:childId, treeId: treeId});
-            }
-          }
-        } else {
-          console.log('!!! Can not find treeHashEntry for: ' + JSON.stringify(mapEntry));
-        }
-      }
+      treeHashMap = await commit.getTreeHashMap();
     }
 
     return treeHashMap;
@@ -670,20 +986,23 @@ export class CacheAnalysis {
 
     // Check for missing parent commits
     // console.log('::: Checking for parent commits: ' + commit.parents);
-    for (let parentCommitId of commit.parents) {
-      if (!this.commitParentEvaluated[parentCommitId]) {
-        // console.log('::: Checking for commit parent: ' + parentCommitId);
-        let parentCommit = await this.cache.getCommit(parentCommitId);
-        if (!parentCommit) {
-          // console.log('*** Missing commit: ' + parentCommitId);
-          this.missingCacheData.commit[parentCommitId] = {
-            commitId: parentCommitId
-          };
-          this.missingCacheData.found = true;
+    if (commit.parents) {
+      for (let parentCommitId of commit.parents) {
+        if (!this.commitParentEvaluated[parentCommitId]) {
+          // console.log('::: Checking for commit parent: ' + parentCommitId);
+          let parentCommit = await this.cache.getCommit(parentCommitId);
+          if (!parentCommit) {
+            // console.log('*** Missing commit: ' + parentCommitId);
+            this.missingCacheData.commit[parentCommitId] = {
+              commitId: parentCommitId
+            };
+            this.missingCacheData.found = true;
+          }
+          this.commitParentEvaluated[parentCommitId] = true;
         }
-        this.commitParentEvaluated[parentCommitId] = true;
-      }
+      }  
     }
+
     this.commitEvaluated[commitId] = true;
   }
 
