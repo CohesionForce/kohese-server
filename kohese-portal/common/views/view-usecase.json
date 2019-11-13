@@ -1,0 +1,111 @@
+{
+  "id": "view-usecase",
+  "name": "UseCase",
+  "parentId": "view-item",
+  "createdBy": "gmckune",
+  "createdOn": 1570033169859,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1572491077359,
+  "modelName": "UseCase",
+  "icon": "fa fa-tasks",
+  "viewProperties": {
+    "Flow": {
+      "name": "Flow"
+    },
+    "PostConditions": {
+      "name": "PostConditions"
+    },
+    "Actors": {
+      "displayName": "Actors",
+      "inputType": {
+        "type": "text",
+        "options": {}
+      },
+      "name": "Actors"
+    },
+    "BasicPath": {
+      "displayName": "BasicPath",
+      "inputType": {
+        "type": "",
+        "options": {}
+      },
+      "name": "BasicPath"
+    },
+    "AlternativePaths": {
+      "displayName": "AlternativePaths",
+      "inputType": {
+        "type": "",
+        "options": {}
+      },
+      "name": "AlternativePaths"
+    }
+  },
+  "formatDefinitions": {
+    "89324a90-a7af-11e8-8662-71e48f0160fe": {
+      "name": "New definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "UseCase",
+              "attribute": "name"
+            },
+            "hideLabel": false,
+            "labelOrientation": "Top",
+            "kind": "text"
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "UseCase",
+                "attribute": "description"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "markdown"
+            },
+            {
+              "propertyName": {
+                "kind": "UseCase",
+                "attribute": "Actors"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "",
+                "options": {}
+              },
+              "customLabel": ""
+            }
+          ]
+        }
+      ],
+      "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    }
+  },
+  "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "tableDefinitions": {
+    "2d055090-f9e9-11e9-b7dd-656a0313eaea": {
+      "id": "2d055090-f9e9-11e9-b7dd-656a0313eaea",
+      "name": "Use Case Table",
+      "columns": [
+        "BasicPath",
+        "AlternativePaths"
+      ],
+      "expandedFormat": {
+        "column1": [],
+        "column2": [],
+        "column3": [],
+        "column4": []
+      }
+    }
+  }
+}

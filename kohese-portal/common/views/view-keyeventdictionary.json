@@ -1,0 +1,89 @@
+{
+  "id": "view-keyeventdictionary",
+  "name": "KeyEventDictionary",
+  "parentId": "view-item",
+  "createdBy": "gmckune",
+  "createdOn": 1572491164827,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1572826394102,
+  "modelName": "KeyEventDictionary",
+  "icon": "fa fa-tasks",
+  "viewProperties": {
+    "KeyEvents": {
+      "displayName": "KeyEvents",
+      "inputType": {
+        "type": "proxy-selector",
+        "options": {}
+      },
+      "name": "KeyEvents"
+    }
+  },
+  "formatDefinitions": {
+    "606b9540-fb8b-11e9-8df2-e9413ca0bcbd": {
+      "name": "New definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "KeyEventDictionary",
+              "attribute": "name"
+            },
+            "hideLabel": false,
+            "labelOrientation": "Top",
+            "kind": "text"
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "KeyEventDictionary",
+                "attribute": "description"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "markdown"
+            },
+            {
+              "propertyName": {
+                "kind": "KeyEventDictionary",
+                "attribute": "KeyEvents"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "proxy-selector",
+                "options": {}
+              },
+              "customLabel": "",
+              "tableDefinition": "b1090aa0-fb86-11e9-be56-311e0135452a"
+            }
+          ]
+        }
+      ],
+      "id": "606b9540-fb8b-11e9-8df2-e9413ca0bcbd"
+    }
+  },
+  "defaultFormatKey": "606b9540-fb8b-11e9-8df2-e9413ca0bcbd",
+  "tableDefinitions": {
+    "8446d010-fb8b-11e9-8df2-e9413ca0bcbd": {
+      "id": "8446d010-fb8b-11e9-8df2-e9413ca0bcbd",
+      "name": "KeyEventTable",
+      "columns": [
+        "KeyEvents"
+      ],
+      "expandedFormat": {
+        "column1": [],
+        "column2": [],
+        "column3": [],
+        "column4": []
+      }
+    }
+  }
+}

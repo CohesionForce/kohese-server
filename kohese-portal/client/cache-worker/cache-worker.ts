@@ -549,7 +549,7 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 function deleteItem(notification: any): void {
   let proxy = TreeConfiguration.getWorkingTree().getProxyFor(notification.id);
   if (proxy){
-    proxy.deleteItem(notification.recursive);
+    proxy.deleteItem();
     postToAllPorts('deletion', notification);
   }
 }
@@ -816,7 +816,7 @@ function processBulkUpdate(response: any): void {
 
   if (response.deleteItems) {
     for (let j: number = 0; j < response.deleteItems.length; j++) {
-      deleteItem({ id: response.deleteItems[j], recursive: false });
+      deleteItem({ id: response.deleteItems[j] });
     }
   }
   const after = Date.now();

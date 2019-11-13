@@ -1,0 +1,69 @@
+{
+  "id": "UseCase",
+  "name": "UseCase",
+  "description": "This type contains the attributes needed to define a Use Case.",
+  "parentId": "Decision",
+  "createdBy": "gmckune",
+  "createdOn": 1570033169840,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1572491077313,
+  "base": "Decision",
+  "idInjection": true,
+  "properties": {
+    "Actors": {
+      "type": [
+        "string"
+      ],
+      "required": false
+    },
+    "BasicPath": {
+      "type": "FlowOfEvents",
+      "required": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    },
+    "AlternativePaths": {
+      "type": [
+        "FlowOfEvents"
+      ],
+      "required": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": [],
+  "localTypes": [
+    {
+      "name": "FlowOfEvents",
+      "properties": {
+        "PreConditions": {
+          "type": [
+            "string"
+          ]
+        },
+        "PostConditions": {
+          "type": [
+            "string"
+          ]
+        },
+        "Flow": {
+          "type": [
+            "KeyEvent"
+          ],
+          "required": false,
+          "relation": {
+            "kind": "Item",
+            "foreignKey": "id"
+          }
+        }
+      }
+    }
+  ]
+}

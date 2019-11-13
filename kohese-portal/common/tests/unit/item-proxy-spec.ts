@@ -1705,6 +1705,91 @@ it('Should Not Hang When Deleting Lost+Found With Children', () => {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+it('Recursive Delete', () => {
+  resetItemRepository();
+  defineTestModel();
+
+  let changeNotification = {
+    update: [],
+    delete: []
+  };
+
+  let subscription = ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
+    console.log('+++ Received notification of change: ' + change.type);
+    if(change.proxy){
+      console.log(change.kind);
+      console.log(change.proxy.item);
+    }
+
+    // Ignore internal instances
+    if (!change.proxy.internal){
+      switch (change.type){
+        case 'create':
+        case 'update':
+          changeNotification.update.push(change.proxy.item.id);
+          break;
+        case 'delete':
+          changeNotification.delete.push(change.proxy.item.id);
+          break;
+        case 'loading':
+        case 'loaded':
+        case 'reference-added':
+        case 'reference-removed':
+        case 'reference-reordered':
+          // Ignore
+          break;
+        default:
+          console.log('*** Not processing change notification: ' + change.type);
+        }
+    }
+
+  });
+
+  // NOTE:  The kind of this item has to be Item to catch any regression in recursive delete
+  var a = new ItemProxy('Item', {
+    id: 'A',
+    name: 'A Item'
+  });
+  // eslint-disable-next-line no-unused-vars
+  var aa = new ItemProxy('Test', {
+    id: 'AA',
+    name: 'AA Item',
+    parentId: 'A'
+  });
+  // eslint-disable-next-line no-unused-vars
+  var aaa = new ItemProxy('Test', {
+    id: 'AAA',
+    name: 'AAA Item',
+    parentId: 'AA'
+  });
+  // eslint-disable-next-line no-unused-vars
+  var aab = new ItemProxy('Test', {
+    id: 'AAB',
+    name: 'AAB Item',
+    parentId: 'AA'
+  });
+  // eslint-disable-next-line no-unused-vars
+  var ab = new ItemProxy('Test', {
+    id: 'AB',
+    name: 'AA Item',
+    parentId: 'A'
+  });
+
+  a.deleteItem(true);
+
+  subscription.unsubscribe();
+
+  let expectedChangeNotification = { 
+    update: [ 'A', 'AA', 'AAA', 'AAB', 'AB' ], 
+    delete: [ 'AAA', 'AAB', 'AA', 'AB', 'A' ] 
+  };
+  
+  expect(changeNotification).toEqual(expectedChangeNotification);
+});
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 it('Update Tree Hash When Creating Already Existing Item', () => {
 
   resetItemRepository();

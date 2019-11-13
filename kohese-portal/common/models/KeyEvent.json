@@ -1,0 +1,45 @@
+{
+  "id": "KeyEvent",
+  "name": "KeyEvent",
+  "description": "This Kind allows for the definition of the attributes associated with a Key Event.",
+  "parentId": "Decision",
+  "createdBy": "gmckune",
+  "createdOn": 1566607211922,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1572489285621,
+  "base": "Decision",
+  "idInjection": true,
+  "properties": {
+    "EventName": {
+      "type": "string",
+      "required": true,
+      "id": true,
+      "name": "EventName"
+    },
+    "DetectionMechanism": {
+      "type": "string",
+      "required": true,
+      "name": "DetectionMechanism"
+    },
+    "EventInputData": {
+      "type": "string",
+      "required": true,
+      "name": "EventInputData"
+    },
+    "Responses": {
+      "type": "string",
+      "required": true,
+      "name": "Responses"
+    },
+    "EventOutputData": {
+      "type": "string",
+      "required": true,
+      "name": "EventOutputData"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": [],
+  "localTypes": []
+}
