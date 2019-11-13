@@ -794,6 +794,9 @@ export class ItemRepository {
     return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).pipe(
       map((response: any) => {
         proxy.history = response.history;
+        this._cache.getHistory(proxy.item.id).then((history) => {
+          proxy.newHistory = history;
+        });
         /* Return a copy of the history so that subscribers may modify the
         returned history, if desired. */
         return JSON.parse(JSON.stringify(proxy.history));

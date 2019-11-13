@@ -166,7 +166,7 @@ export class TreeHashMap {
               let addedEntry = childStack.pop();
               let addedItem = right[addedEntry.id];
 
-              if (left[addedChild.id]){
+              if (left[addedEntry.id]){
                 // Child was moved, add it to the list to get a diff for
                 childrenThatMoved.push(addedEntry.id);
               } else {
@@ -202,7 +202,7 @@ export class TreeHashMap {
               let deletedEntry = childStack.pop();
               let deletedItem = left[deletedEntry.id];
 
-              if (right[deletedChild.id]){
+              if (right[deletedEntry.id]){
                 // Child was moved, it will be added to diff list where it is added
               } else {
                 result.summary.itemDeleted[deletedEntry.id] = deletedEntry.treeId;

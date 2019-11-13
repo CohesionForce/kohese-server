@@ -129,10 +129,8 @@ export class KoheseCommit {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  private async newDiff() : Promise<TreeHashMapDifference> {
+  async newDiff() : Promise<TreeHashMapDifference> {
 
-    // TODO: Method marked as private to prevent use until it is final
-    
     console.log('*** WARNING:  This method does not produce the same results yet!');
 
     let itemCache = ItemCache.getItemCache();
@@ -305,7 +303,7 @@ export class KoheseCommit {
                 addedItem = await itemCache.getTree(addedEntry.treeId);
               }
 
-              if (left[addedChild.id]){
+              if (left[addedEntry.id]){
                 // Child was moved, add it to the list to get a diff for
                 childrenThatMoved.push(addedEntry.id);
               } else {
@@ -341,7 +339,7 @@ export class KoheseCommit {
               let deletedEntry = childStack.pop();
               let deletedItem = left[deletedEntry.id];
 
-              if (right[deletedChild.id]){
+              if (right[deletedEntry.id]){
                 // Child was moved, it will be added to diff list where it is added
               } else {
                 treeDifference.summary.itemDeleted[deletedEntry.id] = deletedEntry.treeId;
@@ -418,6 +416,8 @@ export class ItemCache {
   public analysis : CacheAnalysis;
 
   private mapMap = new Map<string, Map<string, any>>();
+
+  private historyMap;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -645,6 +645,89 @@ export class ItemCache {
     let commit : KoheseCommit;
     commit = await this.retrieveValue('kCommit', oid);
     return commit;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  addToHistoryMap(itemId, commit) {
+    let mapEntry = this.historyMap[itemId];
+    if (mapEntry) {
+      mapEntry.push(commit);
+    } else {
+      this.historyMap[itemId] = [commit];
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async getHistory(forItemId: ItemIdType){
+
+    let itemCache : ItemCache = ItemCache.getItemCache();
+
+    if (!this.historyMap){
+      let beforeTime = Date.now();
+      let commitArray : Array<KoheseCommit> = [];
+      this.kCommitMap.forEach((commit) => {
+        commitArray.push(commit);
+      });
+      commitArray.sort((left: KoheseCommit, right: KoheseCommit) => {
+        return right.time - left.time;
+      });
+  
+      this.historyMap = {};
+      for (let commit of commitArray) {
+        let diff : TreeHashMapDifference = await commit.diff();
+        if(diff){
+          for (let itemId of Object.keys(diff.summary.itemAdded)) {
+            this.addToHistoryMap(itemId, {
+              change: 'added',
+              commit: commit,
+              summary: diff.summary.itemAdded[itemId],
+              details: {right: await itemCache.getTree(diff.summary.itemAdded[itemId])}
+            });
+          }
+          for (let itemId of Object.keys(diff.summary.contentChanged)) {
+            this.addToHistoryMap(itemId, {
+              change: 'changed',
+              commit: commit,
+              summary: diff.summary.contentChanged[itemId],
+              details: diff.details[itemId]
+            });
+          }
+          for (let itemId of Object.keys(diff.summary.itemDeleted)) {
+            this.addToHistoryMap(itemId, {
+              change: 'deleted',
+              commit: commit,
+              summary: diff.summary.itemDeleted[itemId],
+              details: {left: await itemCache.getTree(diff.summary.itemDeleted[itemId])}
+            });
+          }  
+        }
+      }
+      
+      let afterTime = Date.now();
+  
+      console.log('### Time to compute history map: ' + (afterTime-beforeTime)/1000);
+  
+    }
+ 
+    let history = [];
+    if (this.historyMap[forItemId]){
+      this.historyMap[forItemId].forEach((difference) => {
+        history.push({
+          change: difference.change,
+          commitId: difference.commit.commitId,
+          message: difference.commit.message,
+          author: difference.commit.author,
+          date: difference.commit.time,
+          summary: difference.summary,
+          details: difference.details
+        });
+      });
+    }
+    return history;
   }
 
   //////////////////////////////////////////////////////////////////////////
