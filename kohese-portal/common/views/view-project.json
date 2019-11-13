@@ -4,6 +4,7 @@
   "parentId": "view-item",
   "modelName": "Project",
   "icon": "fa fa-pie-chart",
+  "color": "#800080",
   "viewProperties": {
     "projectItems": {
       "inputType": {

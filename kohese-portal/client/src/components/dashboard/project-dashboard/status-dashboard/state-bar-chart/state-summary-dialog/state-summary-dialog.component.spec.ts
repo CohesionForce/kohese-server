@@ -16,10 +16,11 @@ describe('StateSummaryDialogComponent', () => {
       providers: [ {
         provide: MAT_DIALOG_DATA,
         useValue: {
-          stateInfo: { stateName: 'Approved', kind: 'Kurios Iesous', proxies: [] },
-          color: 'white'
-          }
-        } ],
+          proxies: [],
+          kindName: 'Item',
+          stateName: 'Approved'
+        }
+      } ],
       schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();

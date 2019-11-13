@@ -4,6 +4,7 @@
   "parentId": "view-decision",
   "modelName": "Action",
   "icon": "fa fa-paper-plane",
+  "color": "#00008b",
   "viewProperties": {
     "actionState": {
       "inputType": {
