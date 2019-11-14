@@ -14,9 +14,6 @@
         [kind]="kind" (deleted)="deleteContainer($event)"
         [disabled]="isDisabled">
       </column-container-editor>
-      <table-container [container]="container" *ngSwitchCase="'table'"
-        [kind]="kind" [disabled]="isDisabled">
-      </table-container>
     </div>
     <mat-divider></mat-divider>
   </div>
