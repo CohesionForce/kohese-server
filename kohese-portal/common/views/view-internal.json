@@ -4,6 +4,7 @@
   "parentId": "View-Model-Definitions",
   "modelName": "Internal",
   "icon": "fa fa-wrench",
+  "color": "#000000",
   "viewProperties": {
     "name": {
       "inputType": {

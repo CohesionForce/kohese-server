@@ -4,6 +4,7 @@
   "parentId": "View-Model-Definitions",
   "modelName": "Item",
   "icon": "fa fa-sticky-note",
+  "color": "#000000",
   "viewProperties": {
     "name": {
       "inputType": {

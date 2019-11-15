@@ -4,6 +4,7 @@
   "parentId": "view-item",
   "modelName": "Task",
   "icon": "fa fa-tasks",
+  "color": "#008000",
   "viewProperties": {
     "taskState": {
       "inputType": {

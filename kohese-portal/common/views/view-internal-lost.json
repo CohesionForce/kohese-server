@@ -4,6 +4,7 @@
   "parentId": "View-Model-Definitions",
   "modelName": "Internal-Lost",
   "icon": "fa fa-question",
+  "color": "#000000",
   "viewProperties": {
     "name": {
       "inputType": {

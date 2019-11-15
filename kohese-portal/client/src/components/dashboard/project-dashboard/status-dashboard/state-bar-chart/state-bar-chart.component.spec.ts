@@ -1,8 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of as ObservableOf } from 'rxjs';
 
-import { StateFilterService } from '../../../state-filter.service';
-import { MockStateFilterService } from '../../../../../../mocks/services/MockStateFilterService';
+import { MaterialModule } from '../../../../../material.module';
 import { DialogService } from '../../../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
@@ -15,10 +17,13 @@ describe('StateBarChartComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ StateBarChartComponent ],
-      providers: [ {
-        provide: StateFilterService,
-        useClass: MockStateFilterService
-        }, { provide: DialogService, useClass: MockDialogService } ]
+      imports: [
+        FormsModule,
+        BrowserAnimationsModule,
+        MaterialModule
+      ],
+      providers: [ { provide: DialogService, useClass: MockDialogService } ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
   }));

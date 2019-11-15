@@ -4,6 +4,7 @@
   "parentId": "view-item",
   "modelName": "DocumentConfiguration",
   "icon": "fa fa-file",
+  "color": "#ffa500",
   "viewProperties": {},
   "tableDefinitions": {},
   "itemIds": []

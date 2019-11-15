@@ -1,8 +1,8 @@
 <div class='dialog-container'>
   <div class="title" [ngStyle]="{'background-color' : color}">
-    {{stateInfo.kind}} : {{ stateInfo.stateName}}
+    {{kindName}}: {{stateName}}
   </div>
-    <ngx-datatable #proxyTable class="material expandable" [rows]="stateInfo.proxies" [columnMode]="'force'" [headerHeight]="50"
+    <ngx-datatable #proxyTable class="material expandable" [rows]="proxies" [columnMode]="'force'" [headerHeight]="50"
       [footerHeight]="50" [rowHeight]="50" [scrollbarV]="true" style="height: 90%;">
       <ngx-datatable-row-detail [rowHeight]="300" #myDetailRow (toggle)="onDetailToggle($event)">
         <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
