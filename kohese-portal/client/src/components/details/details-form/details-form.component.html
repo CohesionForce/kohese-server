@@ -26,6 +26,13 @@
                 {{getAttributeRepresentation(property)}}
               </mat-checkbox>
             </ng-container>
+            <ng-container *ngSwitchCase="'number'">
+              <mat-form-field style="width: 100%; padding: 0px 10px 0px 10px;">
+                <input matInput type="number"
+                  placeholder="{{getAttributeRepresentation(property)}}"
+                  formControlName="{{property}}"/>
+              </mat-form-field>
+            </ng-container>
             <k-text *ngSwitchCase="'text'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
