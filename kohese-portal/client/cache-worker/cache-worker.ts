@@ -4,11 +4,10 @@ import * as SocketIoClient from 'socket.io-client';
 import * as LevelJs from 'level-js';
 
 import { ItemProxy } from '../../common/src/item-proxy';
-import { TreeHashEntry, TreeHashMap } from '../../common/src/tree-hash';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
 import { LevelCache } from '../../common/src/level-cache';
-import { CacheAnalysis } from '../../common/src/item-cache';
+import { Workspace } from '../../common/src/item-cache';
 
 let socket: SocketIOClient.Socket;
 let clientMap = {};
@@ -764,7 +763,7 @@ async function populateCache(): Promise<any> {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-async function fetchRepoHashes(): Promise<Array<TreeHashEntry>> {
+async function fetchRepoHashes(): Promise<Workspace> {
     console.log('$$$ Fetching Repo Hashes');
     const fetchRequestTime = Date.now();
     return new Promise<any>((resolve, reject) => {

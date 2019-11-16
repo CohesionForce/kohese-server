@@ -76,41 +76,13 @@ async function diffPrevCommits(refCommitId) {
       // await compareCommits(prevCommitId, refCommitId);
       let beforeTime = Date.now();
       let refCommitClone = _.clone(refCommit);
-      let diff = await refCommit.diff();
+      let diff = await refCommit.oldDiff();
+
       let newDiff = JSON.parse(JSON.stringify(await refCommit.newDiff()));
       if (!_.isEqual(diff, newDiff)){
-        console.log('$$$ New Diff does not match: ' + refCommit.commitId);
-        if(!_.isEqual(diff.summary, newDiff.summary)){
-          console.log('$$$ Summary is not equal');
-          for(let key of Object.keys(diff.summary)){
-            if (!_.isEqual(diff.summary[key], newDiff.summary[key])){
-              console.log("$$$ Summary is different for: " + key);
-              console.log('$$$ Diff:');
-              console.log(diff.summary[key]);
-              console.log('$$$ New Diff:');
-              console.log(newDiff.summary[key]);
-
-            }
-          }
-        }
-        if(!_.isEqual(diff.details, newDiff.details)){
-          console.log('$$$ Details are not equal');
-          for(let key of Object.keys(diff.details)){
-            if (!_.isEqual(diff.details[key], newDiff.details[key])){
-              console.log("$$$ Detail is different for: " + key);
-              for (let key2 of Object.keys(diff.details[key])){
-                if (!_.isEqual(diff.details[key][key2], newDiff.details[key][key2])){
-                  console.log("$$$ Detail is different for: " + key + ' - ' + key2);
-                  console.log('$$$ Diff:');
-                  console.log(diff.details[key][key2]);
-                  console.log('$$$ New Diff:');
-                  console.log(newDiff.details[key][key2]);
-                }
-              }
-            }
-          }
-        }
+        console.log('*** New diff did not match: ' + refCommit.commitId);
       }
+
       let updatedRefCommitClone = _.clone(refCommit);
       if (!_.isEqual(refCommitClone, updatedRefCommitClone)){
         console.log('### Saving modified commit data');
@@ -118,7 +90,6 @@ async function diffPrevCommits(refCommitId) {
       }
       let afterTime = Date.now();
       console.log('^^^ Total compare time: ' + (afterTime-beforeTime)/1000);
-      console.log(JSON.stringify(newDiff, null, '  '));
       await diffPrevCommits(prevCommitId);
     }
 

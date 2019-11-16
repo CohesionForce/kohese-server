@@ -111,7 +111,7 @@ export class KoheseCommit {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  async diff() : Promise<TreeHashMapDifference> {
+  async oldDiff() : Promise<TreeHashMapDifference> {
 
     if (!this.treeDifference){
       let parentCommits = await this.getParentCommits();
@@ -129,17 +129,14 @@ export class KoheseCommit {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  async newDiff() : Promise<TreeHashMapDifference> {
-
-    console.log('*** WARNING:  This method does not produce the same results yet!');
+  async newDiff(prevCommit?: KoheseCommit) : Promise<TreeHashMapDifference> {
 
     let itemCache = ItemCache.getItemCache();
 
-    // TODO: Remove this line
-    let oldCommitDiff = await this.diff()
-
-    let parentCommits = await this.getParentCommits();
-    let prevCommit = parentCommits[0];
+    if (!prevCommit){
+      let parentCommits = await this.getParentCommits();
+      prevCommit = parentCommits[0];
+    }
 
     let leftRoots : Array<ItemIdType> = Object.keys(prevCommit.repoTreeRoots);
     let rightRoots : Array<ItemIdType> = Object.keys(this.repoTreeRoots);
@@ -174,7 +171,7 @@ export class KoheseCommit {
     let left = _.clone(prevCommit.repoTreeRoots);
     let right = _.clone(this.repoTreeRoots);
 
-    let gatherStack : Array<ItemIdType> = _.clone(commonRoots).reverse();
+    let gatherStack : Array<ItemIdType> = _.clone(leftRoots.concat(addedRoots));
 
     while (gatherStack.length){
       let diffId = gatherStack.pop();
@@ -184,6 +181,9 @@ export class KoheseCommit {
         let rightVersion : TreeHashEntry = right[diffId];
 
         if (_.isEqual(leftVersion, rightVersion)){
+          // Don't need the nodes for items that match
+          delete left[diffId];
+          delete right[diffId];
           continue;
         }
 
@@ -235,6 +235,7 @@ export class KoheseCommit {
       }
     }
 
+    // TODO: Should this be the union of the roots?
     let compareStack : Array<ItemIdType> = _.clone(commonRoots).reverse();
 
     while (compareStack.length){
@@ -292,15 +293,23 @@ export class KoheseCommit {
           let childrenThatMoved : Array<ItemIdType> = [];
           for(let addedChild of diff.childrenAdded) {
           
-            // Recursively add deleted children that have not been moved
+            // Recursively add children for item that moved
             let childStack : Array<{id:ItemIdType, treeId:TreeHashValueType}> = [ addedChild ];
             while (childStack.length > 0){
 
               let addedEntry = childStack.pop();
+
+              switch (addedEntry.id){
+                case "Repository-Mount":
+                case "Internal":
+                  // Ignore references to a mount or internal root
+                  continue;
+              }
+
               let addedItem = right[addedEntry.id];
               if (!addedItem) {
-                console.log('### Added item was not found:' + addedEntry.id);
-                addedItem = await itemCache.getTree(addedEntry.treeId);
+                // Don't need to process
+                continue;
               }
 
               if (left[addedEntry.id]){
@@ -330,14 +339,26 @@ export class KoheseCommit {
         }
 
         if (diff.childrenDeleted){
-          diff.childrenDeleted.forEach((deletedChild) => {
+          for(let deletedChild of diff.childrenDeleted) {
 
             // Recursively add deleted children that have not been moved
             let childStack : Array<{id:ItemIdType, treeId:TreeHashValueType}> = [ deletedChild ];
             while (childStack.length > 0){
 
               let deletedEntry = childStack.pop();
+
+              switch (deletedEntry.id){
+                case "Repository-Mount":
+                case "Internal":
+                  // Ignore references to a mount or internal root
+                  continue;
+              }
+
               let deletedItem = left[deletedEntry.id];
+              if (!deletedItem) {
+                // Don't need to process
+                continue;
+              }
 
               if (right[deletedEntry.id]){
                 // Child was moved, it will be added to diff list where it is added
@@ -354,7 +375,7 @@ export class KoheseCommit {
                 }
               }
             }
-          });
+          }
         }
 
         if (diff.childrenModified){
@@ -370,20 +391,11 @@ export class KoheseCommit {
       }
     }
 
-    // TODO: Remove the oldCommitDiff tests below
-    if (!_.isEqual(oldCommitDiff.summary.roots, treeDifference.summary.roots)){
-      console.log('### Roots does not match: ' + this.time);
-    }
-  
-    if (!_.isEqual(oldCommitDiff.summary, treeDifference.summary)){
-      console.log('### Summary does not match: '+ this.time);
-      // console.log(JSON.stringify(treeDifference.details, null, '  '));
-    }
     return treeDifference;
   }
 }
 
-export type Workspace = Array<TreeHashEntry>;
+export type Workspace = {[id:string] : TreeHashEntry};
 
 type KoheseTree = TreeHashEntry;
 
@@ -560,6 +572,65 @@ export class ItemCache {
   }
 
   //////////////////////////////////////////////////////////////////////////
+  static compareObjects(left, right, prefix = '') {
+    // Adjust the prefix
+    if (prefix){
+      prefix = prefix + '.';
+    } else {
+      prefix = ''
+    }
+
+    // Determine differences
+    let leftKeys = Object.keys(left);
+    let rightKeys = Object.keys(right);
+
+    let difference : any = {
+      match:  _.isEqual(left,right),
+      keyOrderMatches: _.isEqual(leftKeys, rightKeys),
+    }
+
+    if (difference.match){
+      return difference;
+    }
+
+    let sortedLeftKeys = _.clone(leftKeys).sort();
+    let sortedRightKeys = _.clone(rightKeys).sort();
+    difference.addedKeys  = _.difference(sortedRightKeys, sortedLeftKeys);
+    difference.deletedKeys = _.difference(sortedLeftKeys, sortedRightKeys);
+    let commonKeys = _.intersection(leftKeys, rightKeys);
+
+    difference.details = {
+      deleted: {},
+      added: {},
+      changed: {}
+    };
+
+    let details = difference.details;
+
+    for(let key of difference.deletedKeys) {
+      details.deleted[prefix + key] = left[key];
+    }
+
+    for(let key of difference.addedKeys) {
+      details.added[prefix + key] = right[key];
+    }
+
+    for(let key of commonKeys) {
+      if(!_.isEqual(left[key], right[key])){
+        if (_.isObject(left[key])){
+          details.changed[prefix + key] = ItemCache.compareObjects(left[key], right[key], prefix + key);
+          delete details.changed[prefix + key].match
+        } else {
+          details.changed[prefix + key] = {}
+          details.changed[prefix + key].left = left[key];
+          details.changed[prefix + key].right = right[key];
+        }
+      }
+    }
+    return difference;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   getAllMetaData() : Map<string, number> {
@@ -678,7 +749,7 @@ export class ItemCache {
   
       this.historyMap = {};
       for (let commit of commitArray) {
-        let diff : TreeHashMapDifference = await commit.diff();
+        let diff : TreeHashMapDifference = await commit.oldDiff();
         if(diff){
           for (let itemId of Object.keys(diff.summary.itemAdded)) {
             this.addToHistoryMap(itemId, {

@@ -19,7 +19,7 @@ export class Compare {
       let diff: TreeHashMapDifference;
       let changeCommitParents = await changeCommit.getParentCommits();
       if (baseCommit === changeCommitParents[0]){
-        diff = await changeCommit.diff();
+        diff = await changeCommit.oldDiff();
       } else {
         console.log('$$$ Base commit is not a parent: ' + baseCommitId + ' - ' + changeCommitId);
         let baseTreeHashMap: TreeHashMap = await baseCommit.getTreeHashMap();
