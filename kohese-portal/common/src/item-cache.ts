@@ -733,10 +733,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async getHistory(forItemId: ItemIdType){
-
-    let itemCache : ItemCache = ItemCache.getItemCache();
-
+  async getHistoryMap() : Promise<any> {
     if (!this.historyMap){
       let beforeTime = Date.now();
       let commitArray : Array<KoheseCommit> = [];
@@ -752,27 +749,33 @@ export class ItemCache {
         let diff : TreeHashMapDifference = await commit.oldDiff();
         if(diff){
           for (let itemId of Object.keys(diff.summary.itemAdded)) {
+            let newTreeEntry = await this.getTree(diff.summary.itemAdded[itemId]);
             this.addToHistoryMap(itemId, {
               change: 'added',
               commit: commit,
+              newTreeEntry: newTreeEntry,
               summary: diff.summary.itemAdded[itemId],
-              details: {right: await itemCache.getTree(diff.summary.itemAdded[itemId])}
+              details: {right: newTreeEntry}
             });
           }
           for (let itemId of Object.keys(diff.summary.contentChanged)) {
             this.addToHistoryMap(itemId, {
               change: 'changed',
               commit: commit,
+              newTreeEntry: diff.details[itemId].right,
+              oldTreeEntry: diff.details[itemId].left,
               summary: diff.summary.contentChanged[itemId],
               details: diff.details[itemId]
             });
           }
           for (let itemId of Object.keys(diff.summary.itemDeleted)) {
+            let oldTreeEntry = await this.getTree(diff.summary.itemDeleted[itemId]);
             this.addToHistoryMap(itemId, {
               change: 'deleted',
               commit: commit,
+              oldTreeEntry: oldTreeEntry,
               summary: diff.summary.itemDeleted[itemId],
-              details: {left: await itemCache.getTree(diff.summary.itemDeleted[itemId])}
+              details: {left: oldTreeEntry}
             });
           }  
         }
@@ -783,7 +786,19 @@ export class ItemCache {
       console.log('### Time to compute history map: ' + (afterTime-beforeTime)/1000);
   
     }
- 
+
+    return this.historyMap;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async getHistory(forItemId: ItemIdType){
+
+    if (!this.historyMap){
+      let hMap = await this.getHistoryMap();
+    }
+
     let history = [];
     if (this.historyMap[forItemId]){
       this.historyMap[forItemId].forEach((difference) => {
@@ -792,13 +807,42 @@ export class ItemCache {
           commitId: difference.commit.commitId,
           message: difference.commit.message,
           author: difference.commit.author,
-          date: difference.commit.time,
+          time: difference.commit.time,
+          newTreeEntry: difference.newTreeEntry,
+          oldTreeEntry: difference.oldTreeEntry,
           summary: difference.summary,
           details: difference.details
         });
       });
     }
     return history;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async getHistoryWithOldStyle(forItemId: ItemIdType){
+
+    let newHistory = await this.getHistory(forItemId);
+    let oldStyleHistory = [];
+
+    for (let entry of newHistory){
+      let indexEntry = {};
+      if (entry.newTreeEntry){
+        indexEntry = {
+          oid: entry.newTreeEntry.oid,
+          kind: entry.newTreeEntry.kind
+        }
+      }
+      oldStyleHistory.push({
+        commit: entry.commitId,
+        message: entry.message,
+        author: entry.author,
+        date: entry.time,
+        indexEntry: indexEntry
+      });
+    }
+    return oldStyleHistory;
   }
 
   //////////////////////////////////////////////////////////////////////////

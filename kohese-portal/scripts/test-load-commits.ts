@@ -62,19 +62,14 @@ async function diffHeadAndPrev() {
 }
 
 //////////////////////////////////////////////////////////////////////////
-async function diffPrevCommits(refCommitId) {
+async function compareCommitDiff(refCommit : KoheseCommit) {
   try {
     let itemCache : ItemCache = ItemCache.getItemCache();
 
-    let refCommit = await itemCache.getCommit(refCommitId);
     let prevCommitId = refCommit.parents[0];
-
-    console.log('::: Ref Commit: ' + refCommitId);
-    console.log('::: Prev Commit: ' + prevCommitId);
 
     if (prevCommitId){
       // await compareCommits(prevCommitId, refCommitId);
-      let beforeTime = Date.now();
       let refCommitClone = _.clone(refCommit);
       let diff = await refCommit.oldDiff();
 
@@ -86,11 +81,8 @@ async function diffPrevCommits(refCommitId) {
       let updatedRefCommitClone = _.clone(refCommit);
       if (!_.isEqual(refCommitClone, updatedRefCommitClone)){
         console.log('### Saving modified commit data');
-        itemCache.cacheKeyValuePair('kCommit', refCommitId, refCommit);
+        itemCache.cacheKeyValuePair('kCommit', refCommit.commitId, refCommit);
       }
-      let afterTime = Date.now();
-      console.log('^^^ Total compare time: ' + (afterTime-beforeTime)/1000);
-      await diffPrevCommits(prevCommitId);
     }
 
   } catch (err) {
@@ -215,9 +207,13 @@ async function diffEachCommit() {
     let itemCache : ItemCache = ItemCache.getItemCache();
 
     let beforeTime = Date.now();
-    let currentCommit = await itemCache.getRef('HEAD');
+    let commitMap = itemCache.getCommits();
 
-    await diffPrevCommits(currentCommit);
+    for (let commitId of Array.from(commitMap.keys())){
+      let commit : KoheseCommit = await itemCache.getCommit(commitId);
+      await compareCommitDiff(commit);
+    }
+
     let afterTime = Date.now();
 
     itemCache.saveAllPendingWrites();
@@ -408,6 +404,30 @@ async function getOldHistory(itemId: ItemIdType) : Promise<any> {
 }
 
 //////////////////////////////////////////////////////////////////////////
+async function comparehistory(itemId: ItemIdType) {
+  let itemCache : ItemCache = ItemCache.getItemCache();
+  console.log('$$$ Evaluating history: ' + itemId);
+  let oldHistory = await getOldHistory(itemId);
+  let newHistory = await itemCache.getHistoryWithOldStyle(itemId);
+  let historyDiff = ItemCache.compareObjects(oldHistory.history, newHistory);
+  if (!historyDiff.match){
+    console.log("*** History does not match: " + itemId);
+    console.log(JSON.stringify(historyDiff, null, '  '));
+  } else {
+    console.log('$$$ History matches: ' + itemId);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+async function compareAllHistories() {
+  let itemCache = ItemCache.getItemCache();
+  let historyMap = await itemCache.getHistoryMap();
+  for (let itemId of Object.keys(historyMap)){
+    await comparehistory(itemId);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
 function deltaMessage(message, before, after) {
   console.log('^^^ ' + message + ': ' + (after-before)/1000);
 }
@@ -476,6 +496,9 @@ try {
       // await simulateClientSync();
 
       await diffEachCommit();
+
+      // await comparehistory('92fb0ee0-8727-11e6-bd34-510d6905e776');
+      await compareAllHistories();
 
     } catch (err) {
       console.log('*** Error');

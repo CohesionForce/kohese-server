@@ -796,6 +796,9 @@ export class ItemRepository {
         this._cache.getHistory(proxy.item.id).then((history) => {
           proxy.newHistory = history;
         });
+        this._cache.getHistoryWithOldStyle(proxy.item.id).then((history) => {
+          proxy.newHistoryOldStyle = history;
+        });
         /* Return a copy of the history so that subscribers may modify the
         returned history, if desired. */
         return JSON.parse(JSON.stringify(proxy.history));
