@@ -1,7 +1,8 @@
 <div class="assignment-list">
   <ng-container *ngFor="let assignment of sortedAssignmentList">
-    <mat-card [ngStyle]="{ 'background-color': getViewModel(
-        assignment).color }" style="color: whitesmoke; margin-bottom: 3px;">
+    <mat-card [ngStyle]="{ 'background-color': (getViewModel(
+        assignment).color ? getViewModel(assignment).color : '#000000') }"
+        style="color: whitesmoke; margin-bottom: 3px;">
       <mat-card-title style="display: flex; flex-direction: row;">
         <h3>
           <mat-icon class="{{getViewModel(assignment).icon}}">
