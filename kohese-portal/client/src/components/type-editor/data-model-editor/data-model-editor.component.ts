@@ -81,9 +81,7 @@ export class DataModelEditorComponent {
   private _fundamentalTypes: any = {
     'Boolean': 'boolean',
     'Number': 'number',
-    'Date': 'date',
     'Text': 'string',
-    'Markdown': 'markdown',
     'State': 'StateMachine',
     'Username': 'user-selector'
   };
@@ -396,8 +394,13 @@ export class DataModelEditorComponent {
     } else {
       delete attribute.relation;
       
-      viewModelProxy.item.viewProperties[attribute.name].inputType.type =
-        attributeType;
+      if (attributeType === 'string') {
+        viewModelProxy.item.viewProperties[attribute.name].inputType.type =
+          'text';
+      } else {
+        viewModelProxy.item.viewProperties[attribute.name].inputType.type =
+          attributeType;
+      }
     }
     
     this.save();

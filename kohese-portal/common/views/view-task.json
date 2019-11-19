@@ -4,6 +4,7 @@
   "parentId": "view-item",
   "modelName": "Task",
   "icon": "fa fa-tasks",
+  "color": "#008000",
   "viewProperties": {
     "taskState": {
       "inputType": {
@@ -49,7 +50,7 @@
     },
     "estimatedHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }
@@ -78,7 +79,7 @@
     },
     "remainingHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }
@@ -89,7 +90,7 @@
     },
     "actualHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }

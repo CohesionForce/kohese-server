@@ -1,15 +1,8 @@
-.right-content {
-  overflow: auto !important;
-  height: 700px !important;
-  width: 20%;
-  display: inline-block;
-}
+@import '../../../../../app.component';
 
-.left-content {
-  overflow: hidden;
-  height: 700px !important;
-  width: 70%;
-  display: inline-block;
+/deep/ .mat-expansion-panel-content {
+  height: 300px;
+  overflow: auto !important;
 }
 
 .selected-type {

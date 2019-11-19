@@ -4,6 +4,7 @@
   "parentId": "view-decision",
   "modelName": "Action",
   "icon": "fa fa-paper-plane",
+  "color": "#00008b",
   "viewProperties": {
     "actionState": {
       "inputType": {
@@ -55,7 +56,7 @@
     },
     "estimatedHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }
@@ -84,7 +85,7 @@
     },
     "remainingHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }
@@ -95,7 +96,7 @@
     },
     "actualHoursEffort": {
       "inputType": {
-        "type": "text",
+        "type": "number",
         "options": {
           "isMultiLine": false
         }

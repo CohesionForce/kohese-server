@@ -134,12 +134,20 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   }
 
   isCompleted(assignment : ItemProxy) : boolean {
-    if (assignment.kind === 'Task') {
+    let types: Array<string> = [];
+    let kindProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      assignment.kind);
+    while (kindProxy) {
+      types.push(kindProxy.item.name);
+      kindProxy = TreeConfiguration.getWorkingTree().getProxyFor(kindProxy.
+        item.base);
+    }
+    
+    if (types.indexOf('Task') !== -1) {
       if (assignment.item.taskState === 'Completed') {
         return true;
       }
-    }
-    if (assignment.kind === 'Action') {
+    } else if (types.indexOf('Action') !== -1) {
       if (assignment.item.actionState === 'Verified' ||
           assignment.item.actionState === 'Closed') {
           return true

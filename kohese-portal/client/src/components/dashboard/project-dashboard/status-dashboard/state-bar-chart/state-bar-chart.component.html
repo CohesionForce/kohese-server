@@ -1,20 +1,106 @@
-<div #chart class="left-content">
-
-</div>
-<div class="right-content" *ngIf="activeGraphInfo">
-  <div *ngIf="activeGraphInfo.length > 1">
-    <h1 style="background-color: black; color: white">{{selectedState}}</h1>
-    <h5>Total Count : {{totalCount}}</h5>
-
-  </div>
-
-  <div *ngFor="let graphInfo of activeGraphInfo">
-    <h1 [ngStyle]="{'background-color' : kindScale(graphInfo.kind)}" style="color: white">{{graphInfo.kind}}</h1>
-    <h2> {{graphInfo.stateName}}
-      <button mat-icon-button class="fa fa-search" (click)="openStateSummaryDialog(graphInfo)"></button>
-    </h2>
-    <h5> {{graphInfo.description}}</h5>
-    <div>
-      <strong>Count : </strong> {{graphInfo.proxies.length}}</div>
-  </div>
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    Filter
+  </mat-expansion-panel-header>
+  <ng-template matExpansionPanelContent>
+    <mat-checkbox [(ngModel)]="hideEmptyStates">
+      Hide Empty States
+    </mat-checkbox>
+    <div style="width: 100%; display: flex; flex-direction: row;">
+      <div style="flex: 1 1 50%;">
+        <div style="display: flex; flex-direction: row;">
+          <h3>
+            Kinds
+          </h3>
+          <button mat-button matTooltip="Select all kinds"
+            class="flex-right-align" (click)="toggleAllSelected(true)">
+            Add All
+          </button>
+        </div>
+        <div style="width: 100%; display: flex; flex-direction: column;">
+          <ng-container *ngFor="let kindName of kindNames">
+            <button mat-button matTooltip="{{kindName}}"
+              [disabled]="(Object.keys(stateMap).indexOf(kindName) !== -1)"
+              (click)="kindSelectionToggled([kindName], true)">
+              {{kindName}}
+            </button>
+          </ng-container>
+        </div>
+      </div>
+      <div style="flex: 1 1 50%;">
+        <div style="display: flex; flex-direction: row;">
+          <h3>
+            Selections
+          </h3>
+          <button mat-button matTooltip="De-select all kinds"
+            class="flex-right-align" (click)="toggleAllSelected(false)">
+            Remove All
+          </button>
+        </div>
+        <div style="width:100%; display: flex; flex-direction: column;">
+          <ng-container *ngFor="let kindName of Object.keys(stateMap)">
+            <div style="display: flex; flex-direction: row;">
+              <button mat-button matTooltip="{{kindName}}"
+                style="flex: 1 1 50%;" (click)="kindSelectionToggled(
+                [kindName], false)">
+                {{kindName}}
+              </button>
+              <button mat-icon-button matTooltip="Move this selection up"
+                class="flex-right-align" [disabled]="!canMove(kindName, true)"
+                (click)="move(kindName, true)">
+                <mat-icon class="fa fa-arrow-up"></mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Move this selection down"
+                [disabled]="!canMove(kindName, false)" (click)="move(kindName,
+                false)">
+                <mat-icon class="fa fa-arrow-down"></mat-icon>
+              </button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-expansion-panel>
+<div style="height: calc(100% - 50px); padding-top: 10px; display: flex;
+  flex-direction: row;">
+  <!--
+    The padding-bottom value below is calculated via the following formula:
+      padding-bottom = width * (viewBox height / viewBox width)
+  -->
+  <svg #chart viewBox="0 0 100 50" preserveAspectRatio="xMidYMin slice"
+    style="width: 80%; padding-bottom: 40%; height: 1px; overflow: visible;">
+  </svg>
+  <ng-container *ngIf="selection">
+    <div style="height: 100%; width: 20%;">
+      <ng-container *ngIf="(selection.kindNames.length > 1)">
+        <h1 style="background-color: black; color: white">
+          {{selection.stateName}}
+        </h1>
+        <h5>Total Count: {{getStateTotal()}}</h5>
+      </ng-container>
+      <ng-container *ngFor="let kindName of selection.kindNames">
+        <h1 [ngStyle]="{ 'background-color': TreeConfiguration.getWorkingTree().
+          getProxyFor('view-' + kindName.toLowerCase()).item.color }"
+          style="color: white;">
+          {{kindName}}
+        </h1>
+        <h2>
+          {{selection.stateName}}
+          <button mat-icon-button (click)="openStateSummaryDialog(stateMap[
+            kindName][selection.attributeName][selection.stateName], kindName,
+            selection.stateName)">
+            <mat-icon class="fa fa-search"></mat-icon>
+          </button>
+        </h2>
+        <h5>
+          {{getStateDescription(kindName)}}
+        </h5>
+        <div>
+          <strong>Count:</strong>
+          {{stateMap[kindName][selection.attributeName][selection.stateName].length}}
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
 </div>

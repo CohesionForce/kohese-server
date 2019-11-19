@@ -107,15 +107,33 @@ export class AttributeEditorComponent implements OnInit {
   private _fundamentalTypes: any = {
     'Boolean': 'boolean',
     'Number': 'number',
-    'Date': 'date',
     'Text': 'string',
-    'Markdown': 'markdown',
     'State': 'StateMachine',
     'Username': 'user-selector'
   };
   get fundamentalTypes() {
     return this._fundamentalTypes;
   }
+  
+  private _displayTypes: any = {
+    'boolean': {
+      'Boolean': 'boolean'
+    },
+    'number': {
+      'Number': 'number',
+      'Date': 'date'
+    },
+    'string': {
+      'Text': 'text',
+      'Markdown': 'markdown'
+    },
+    'StateMachine': {
+      'State': 'state-editor'
+    },
+    'user-selector': {
+      'Username': 'user-selector'
+    }
+  };
   
   private _attributeTypes: any = JSON.parse(JSON.stringify(this.
     _fundamentalTypes));
@@ -192,7 +210,11 @@ export class AttributeEditorComponent implements OnInit {
     } else {
       delete this._attribute.relation;
       
-      this._view.inputType.type = attributeType;
+      if (attributeType === 'string') {
+        this._view.inputType.type = 'text';
+      } else {
+        this._view.inputType.type = attributeType;
+      }
     }
   }
   
@@ -246,6 +268,42 @@ export class AttributeEditorComponent implements OnInit {
   public areRelationsEqual(option: any, selection: any): boolean {
     return ((option.kind === selection.kind) && (option.foreignKey ===
       selection.foreignKey));
+  }
+  
+  public getTypes(): Array<string> {
+    let dataModelType: string = (Array.isArray(this._attribute.type) ? this.
+      _attribute.type[0] : this._attribute.type);
+    if ((dataModelType === 'string') && this._attribute.relation) {
+      return Object.keys(this._displayTypes['user-selector']);
+    } else if (this._displayTypes[dataModelType]) {
+      return Object.keys(this._displayTypes[dataModelType]);
+    } else {
+      return ['Reference'];
+    }
+  }
+  
+  public getTypeValue(type: string): string {
+    if (type === 'Reference') {
+      return '';
+    } else {
+      if ((type === Object.keys(this._displayTypes['user-selector'])[0]) &&
+        this._attribute.relation) {
+        return 'user-selector';
+      } else {
+        return this._displayTypes[(Array.isArray(this._attribute.type) ? this.
+          _attribute.type[0] : this._attribute.type)][type];
+      }
+    }
+  }
+  
+  public areTypeValuesEqual(option: string, selection: string): boolean {
+    if ((option === '') && (selection === 'proxy-selector')) {
+      return true;
+    } else if ((option === 'state-editor') && (selection === 'StateMachine')) {
+      return true;
+    } else {
+      return (option === selection);
+    }
   }
   
   public close(accept: boolean): void {

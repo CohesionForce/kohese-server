@@ -27,6 +27,8 @@ export class ViewModelEditorComponent {
   @Input('viewModel')
   set viewModel(viewModel: any) {
     this._viewModel = viewModel;
+    this._dataModel = TreeConfiguration.getWorkingTree().getProxyFor(this.
+      _viewModel.modelName).item;
     
     this._itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.
       _viewModel.id);
@@ -61,12 +63,33 @@ export class ViewModelEditorComponent {
     return this._attributes;
   }
   
-  get Object() {
-    return Object;
+  private _types: any = {
+    'boolean': {
+      'Boolean': 'boolean'
+    },
+    'number': {
+      'Number': 'number',
+      'Date': 'date'
+    },
+    'string': {
+      'Text': 'text',
+      'Markdown': 'markdown'
+    },
+    'StateMachine': {
+      'State': 'state-editor'
+    },
+    'user-selector': {
+      'Username': 'user-selector'
+    }
+  };
+  
+  private _dataModel: any;
+  get dataModel() {
+    return this._dataModel;
   }
   
-  get TreeConfiguration() {
-    return TreeConfiguration;
+  get Object() {
+    return Object;
   }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
@@ -198,8 +221,7 @@ export class ViewModelEditorComponent {
     this._dialogService.openComponentDialog(FormatPreviewComponent, {
       data: {
         format: this._viewModel.formatDefinitions[formatDefinitionId],
-        type: TreeConfiguration.getWorkingTree().getProxyFor(this._viewModel.
-          modelName).item
+        type: this._dataModel
       }
     }).updateSize('70%', '70%');
   }
@@ -224,7 +246,18 @@ export class ViewModelEditorComponent {
   
   public sortAttributes(columnId: string, sortDirection: string): void {
     if (sortDirection) {
-      let attributeName: string;
+      if (columnId === 'Display Type') {
+        this._attributes.sort((oneElement: any, anotherElement: any) => {
+          if (sortDirection === 'asc') {
+            return oneElement.inputType.type.localeCompare(anotherElement.
+              inputType.type);
+          } else {
+            return anotherElement.inputType.type.localeCompare(oneElement.
+              inputType.type);
+          }
+        });
+      } else {
+        let attributeName: string;
         switch (columnId) {
           case 'Name':
             attributeName = 'name';
@@ -243,6 +276,7 @@ export class ViewModelEditorComponent {
               String(oneElement[attributeName]));
           }
         });
+      }
     } else {
       let unsortedData: Array<any> = [];
       for (let attributeName in this._viewModel.viewProperties) {
@@ -260,5 +294,44 @@ export class ViewModelEditorComponent {
     
     this._attributeTable.renderRows();
     this._changeDetectorRef.markForCheck();
+  }
+  
+  public getTypes(attributeName: string): Array<string> {
+    let dataModelType: string = (Array.isArray(this._dataModel.properties[
+      attributeName].type) ? this._dataModel.properties[attributeName].type[
+      0] : this._dataModel.properties[attributeName].type);
+    if ((dataModelType === 'string') && this._dataModel.properties[
+      attributeName].relation) {
+      return Object.keys(this._types['user-selector']);
+    } else if (this._types[dataModelType]) {
+      return Object.keys(this._types[dataModelType]);
+    } else {
+      return ['Reference'];
+    }
+  }
+  
+  public getTypeValue(attributeName: string, type: string): string {
+    if (type === 'Reference') {
+      return '';
+    } else {
+      if ((type === Object.keys(this._types['user-selector'])[0]) && this.
+        _dataModel.properties[attributeName].relation) {
+        return 'user-selector';
+      } else {
+        return this._types[(Array.isArray(this._dataModel.properties[
+          attributeName].type) ? this._dataModel.properties[attributeName].
+          type[0] : this._dataModel.properties[attributeName].type)][type];
+      }
+    }
+  }
+  
+  public areTypeValuesEqual(option: string, selection: string): boolean {
+    if ((option === '') && (selection === 'proxy-selector')) {
+      return true;
+    } else if ((option === 'state-editor') && (selection === 'StateMachine')) {
+      return true;
+    } else {
+      return (option === selection);
+    }
   }
 }

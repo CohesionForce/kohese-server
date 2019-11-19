@@ -4,6 +4,7 @@
   "parentId": "view-observation",
   "modelName": "Issue",
   "icon": "fa fa-exclamation-circle",
+  "color": "#ff0000",
   "viewProperties": {
     "issueState": {
       "inputType": {

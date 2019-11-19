@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormatGuiComponent } from './format-gui/format-gui.component';
-import { TableContainerComponent } from './format-gui/property-container/table-container/table-container.component';
 import { ListContainerEditorComponent } from './format-gui/property-container/list-container-editor/list-container-editor.component';
 import { ColumnContainerEditorComponent } from './format-gui/property-container/column-container-editor/column-container-editor.component';
 import { TableEditorComponent } from './table-editor/table-editor.component';
@@ -20,7 +19,6 @@ import { TablePreviewDialogComponent } from './table-editor/table-preview-dialog
   declarations: [
     FormatGuiComponent,
     ContainerSelectorComponent,
-    TableContainerComponent,
     ColumnContainerEditorComponent,
     ListContainerEditorComponent,
     PropertyRowComponent,

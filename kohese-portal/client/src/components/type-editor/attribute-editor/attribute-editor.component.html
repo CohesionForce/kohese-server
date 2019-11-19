@@ -48,6 +48,16 @@
         </mat-form-field>
         <br/>
       </ng-container>
+      <mat-form-field style="width: 100%;">
+        <mat-select placeholder="Display Type" [ngModel]="view.inputType.type"
+          (ngModelChange)="view.inputType.type = $event"
+          [compareWith]="areTypeValuesEqual">
+          <mat-option *ngFor="let attributeType of getTypes()"
+            [value]="getTypeValue(attributeType)">
+            {{attributeType}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
       <mat-checkbox class="field-option" [(ngModel)]="multivalued">
         Multivalued
       </mat-checkbox>
