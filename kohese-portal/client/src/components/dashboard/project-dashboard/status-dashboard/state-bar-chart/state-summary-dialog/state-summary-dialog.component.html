@@ -33,6 +33,10 @@
                     <mat-icon class="fa fa-times"></mat-icon>
                   </button>
                 </ng-template>
+                <button mat-icon-button matTooltip="Display Item information"
+                  (click)="displayInformation(row)">
+                  <mat-icon class="fa fa-search"></mat-icon>
+                </button>
                 <button mat-icon-button matTooltip="Navigate to this Item"
                   (click)="navigate(row)">
                   <mat-icon class="fa fa-arrow-right"></mat-icon>

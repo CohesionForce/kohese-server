@@ -3,6 +3,8 @@ import { Input, Inject, ViewChild } from '@angular/core';
 
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../../../../services/navigation/navigation.service';
+import { DialogService } from '../../../../../../services/dialog/dialog.service';
+import { DetailsDialogComponent } from '../../../../../details/details-dialog/details-dialog.component';
 import { ItemProxy } from './../../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../../common/src/tree-configuration';
 import { Component, OnInit } from '@angular/core';
@@ -50,7 +52,7 @@ export class StateSummaryDialogComponent implements OnInit {
 
   constructor(@Inject(MAT_DIALOG_DATA) private data: any,
     private _itemRepository: ItemRepository, private _navigationService:
-    NavigationService) {
+    NavigationService, private _dialogService: DialogService) {
     if (this.data) {
       this._proxies = data.proxies;
       this._kindName = data.kindName;
@@ -83,6 +85,15 @@ export class StateSummaryDialogComponent implements OnInit {
     this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+  }
+  
+  public displayInformation(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsDialogComponent, {
+      data: {
+        itemProxy: itemProxy
+      },
+      disableClose: true
+    }).updateSize('70%', '70%');
   }
   
   public navigate(itemProxy: ItemProxy): void {

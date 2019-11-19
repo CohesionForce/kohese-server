@@ -2,6 +2,8 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDet
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { DetailsDialogComponent } from '../../details/details-dialog/details-dialog.component';
 import { FormatDefinition } from '../../type-editor/FormatDefinition.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -38,7 +40,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
 
   constructor(private navigationService : NavigationService,
     private changeRef : ChangeDetectorRef, private _itemRepository:
-    ItemRepository) {
+    ItemRepository, private _dialogService: DialogService) {
     this.assignmentTypes = DashboardSelections;
     console.log(this.assignmentTypes)
   }
@@ -79,6 +81,15 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
     this.changeRef.markForCheck();
+  }
+  
+  public displayInformation(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsDialogComponent, {
+      data: {
+        itemProxy: itemProxy
+      },
+      disableClose: true
+    }).updateSize('90%', '90%');
   }
   
   public navigate(itemProxy: ItemProxy): void {
