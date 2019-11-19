@@ -28,7 +28,7 @@
   <mat-table #table matSort [dataSource]="rows"
     style="height: calc(100% - 50px); overflow: auto;">
     <ng-container matColumnDef="name" sticky>
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
+      <mat-header-cell *matHeaderCellDef>
         Name
       </mat-header-cell>
       <mat-cell *matCellDef="let element">
@@ -70,7 +70,7 @@
     <ng-container *ngFor="let column of columns">
       <ng-container *ngIf="(column !== 'name')">
         <ng-container matColumnDef="{{column}}">
-          <mat-header-cell *matHeaderCellDef mat-sort-header>
+          <mat-header-cell *matHeaderCellDef>
             {{column}}
           </mat-header-cell>
           <mat-cell *matCellDef="let element">
