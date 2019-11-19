@@ -327,14 +327,18 @@ export class FormatObjectEditorComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  public getTableElements(attributeDefinition: PropertyDefinition):
-    Array<any> {
+  public isKindAttribute(attributeDefinition: PropertyDefinition): boolean {
     let typeAttributeObject: any = this._type.classProperties[
       attributeDefinition.propertyName.attribute];
-    if (typeAttributeObject && (typeAttributeObject.definedInKind ===
+    return (typeAttributeObject && (typeAttributeObject.definedInKind ===
       TreeConfiguration.getWorkingTree().getProxyFor(attributeDefinition.
       propertyName.kind).item.classProperties[attributeDefinition.propertyName.
-      attribute].definedInKind)) {
+      attribute].definedInKind));
+  }
+  
+  public getTableElements(attributeDefinition: PropertyDefinition):
+    Array<any> {
+    if (this.isKindAttribute(attributeDefinition)) {
       if (this._object[attributeDefinition.propertyName.attribute]) {
         return this._object[attributeDefinition.propertyName.attribute].map(
           (reference: { id: string }) => {
@@ -372,6 +376,91 @@ export class FormatObjectEditorComponent implements OnInit {
       propertyName.kind).item.classProperties[attributeDefinition.propertyName.
       attribute].definition.type[0].toLowerCase()).item.tableDefinitions[
       attributeDefinition['tableDefinition']].columns;
+  }
+  
+  public getTableElementAdditionFunction(attributeDefinition:
+    PropertyDefinition): () => Promise<Array<any>> {
+    return async () => {
+      let references: Array<{ id: string }> = this._object[attributeDefinition.
+        propertyName.attribute];
+      let selection: any = await this._dialogService.openComponentDialog(
+        ProxySelectorDialogComponent, {
+        data: {
+          selected: references.map((reference: { id: string }) => {
+            return TreeConfiguration.getWorkingTree().getProxyFor(reference.
+              id);
+          }),
+          allowMultiSelect: true
+        },
+        disableClose: true
+      }).updateSize('70%', '70%').afterClosed().toPromise();
+      
+      let rows: Array<any> = [];
+      if (selection) {
+        references.length = 0;
+        references.push(...selection.map((itemProxy: ItemProxy) => {
+          return { id: itemProxy.item.id };
+        }));
+      }
+      
+      rows.push(...references.map((reference: { id: string }) => {
+        return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
+          item;
+      }));
+      
+      this._changeDetectorRef.markForCheck();
+      return rows;
+    };
+  }
+  
+  public getTableElementMovementFunction(attributeDefinition:
+    PropertyDefinition): (elements: Array<any>, referenceElement: any,
+    moveBefore: boolean) => void {
+    return (elements: Array<any>, referenceElement: any,
+      moveBefore: boolean) => {
+      let references: Array<{ id: string }> = this._object[attributeDefinition.
+        propertyName.attribute];
+      for (let j: number = 0; j < elements.length; j++) {
+        references.splice(references.map((reference: { id: string }) => {
+          return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
+            item;
+        }).indexOf(elements[j]), 1);
+      }
+      
+      if (moveBefore) {
+        references.splice(references.map((reference: { id: string }) => {
+          return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
+            item;
+        }).indexOf(referenceElement), 0, ...elements.map((item: any) => {
+          return { id: item.id };
+        }));
+      } else {
+        references.splice(references.map((reference: { id: string }) => {
+          return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
+            item;
+        }).indexOf(referenceElement) + 1, 0, ...elements.map((item: any) => {
+          return { id: item.id };
+        }));
+      }
+      
+      this._changeDetectorRef.markForCheck();
+    };
+  }
+  
+  public getTableElementRemovalFunction(attributeDefinition:
+    PropertyDefinition): (elements: Array<any>) => void {
+    return (elements: Array<any>) => {
+      for (let j: number = 0; j < elements.length; j++) {
+        this._object[attributeDefinition.propertyName.attribute].splice(this.
+          _object[attributeDefinition.propertyName.attribute].map((reference:
+            { id: string }) => {
+            return TreeConfiguration.getWorkingTree().getProxyFor(reference.
+              id).item;
+        }).indexOf(elements[j]), 1);
+      }
+      
+      this._changeDetectorRef.markForCheck();
+    };
   }
   
   public getAttributeRepresentation(attributeDefinition: PropertyDefinition):

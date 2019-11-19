@@ -8,10 +8,22 @@
       singleValuedBlock">
       <ng-container *ngIf="attributeDefinition.tableDefinition else
         notTableBlock">
-        <table_ [rows]="getTableElements(attributeDefinition)"
-          [getName]="getTableElementName" [columns]="getTableColumns(
-          attributeDefinition)" [disabled]="isDisabled">
-        </table_>
+        <ng-container *ngIf="isKindAttribute(attributeDefinition) else
+          notKindAttributeBlock">
+          <table_ [rows]="getTableElements(attributeDefinition)"
+            [getName]="getTableElementName" [columns]="getTableColumns(
+            attributeDefinition)" [add]="getTableElementAdditionFunction(
+            attributeDefinition)" [move]="getTableElementMovementFunction(
+            attributeDefinition)" [remove]="getTableElementRemovalFunction(
+            attributeDefinition)" [disabled]="isDisabled">
+          </table_>
+        </ng-container>
+        <ng-template #notKindAttributeBlock>
+          <table_ [rows]="getTableElements(attributeDefinition)"
+            [getName]="getTableElementName" [columns]="getTableColumns(
+            attributeDefinition)" [disabled]="true">
+          </table_>
+        </ng-template>
       </ng-container>
       <ng-template #notTableBlock>
         <div style="display: flex; flex-direction: column;">

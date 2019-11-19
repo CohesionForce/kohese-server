@@ -97,6 +97,7 @@ export class TableComponent implements OnInit {
         this._remove(elements);
         for (let j: number = 0; j < elements.length; j++) {
           this._rows.splice(this._rows.indexOf(elements[j]), 1);
+          this._selection.splice(this._selection.indexOf(elements[j]), 1);
         }
         this._table.renderRows();
         this._changeDetectorRef.markForCheck();
@@ -175,9 +176,9 @@ export class TableComponent implements OnInit {
     let locations: Array<string> = ['Before', 'After'];
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
-        root: this._rows,
+        root: undefined,
         getChildren: (element: any) => {
-          if (element === this._rows) {
+          if (element === undefined) {
             return this._rows.filter((rowElement: any) => {
               return (elements.indexOf(rowElement) === -1);
             });
