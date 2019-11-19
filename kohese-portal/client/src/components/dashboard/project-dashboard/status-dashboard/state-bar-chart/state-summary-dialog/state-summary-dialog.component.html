@@ -4,11 +4,48 @@
   </div>
     <ngx-datatable #proxyTable class="material expandable" [rows]="proxies" [columnMode]="'force'" [headerHeight]="50"
       [footerHeight]="50" [rowHeight]="50" [scrollbarV]="true" style="height: 90%;">
-      <ngx-datatable-row-detail [rowHeight]="300" #myDetailRow (toggle)="onDetailToggle($event)">
+      <ngx-datatable-row-detail [rowHeight]="300" #myDetailRow>
         <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
           <div style="padding-left:35px;">
-            <stateful-proxy-card [proxy]="row" [highlightColor]="color"></stateful-proxy-card>
-            </div>
+            <mat-card [ngStyle]="{ 'background-color': color }"
+              style="color: whitesmoke; margin-bottom: 3px;">
+              <mat-card-title style="display: flex; flex-direction: row;">
+                <h3>
+                  <mat-icon class="{{getViewModel(row).icon}}">
+                  </mat-icon>
+                  {{row.item.name}}
+                </h3>
+                <ng-container *ngIf="(editableSet.indexOf(row.item.id) === -1)
+                  else editableBlock">
+                  <button mat-icon-button matTooltip="Edit this Item"
+                    class="flex-right-align" (click)="editableSet.push(row.
+                    item.id)">
+                    <mat-icon class="fa fa-edit"></mat-icon>
+                  </button>
+                </ng-container>
+                <ng-template #editableBlock>
+                  <button mat-icon-button matTooltip="Save this Item"
+                    class="flex-right-align" (click)="save(row)">
+                    <mat-icon class="fa fa-save"></mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Discard unsaved changes
+                    to this Item" (click)="discardChanges(row)">
+                    <mat-icon class="fa fa-times"></mat-icon>
+                  </button>
+                </ng-template>
+                <button mat-icon-button matTooltip="Navigate to this Item"
+                  (click)="navigate(row)">
+                  <mat-icon class="fa fa-arrow-right"></mat-icon>
+                </button>
+              </mat-card-title>
+              <mat-card-content style="background-color: white; color: black;">
+                <format-object-editor [type]="row.model.item"
+                  [object]="row.item" [disabled]="(editableSet.indexOf(
+                  row.item.id) === -1)">
+                </format-object-editor>
+              </mat-card-content>
+            </mat-card>
+          </div>
         </ng-template>
       </ngx-datatable-row-detail>
       <!-- Column Templates -->

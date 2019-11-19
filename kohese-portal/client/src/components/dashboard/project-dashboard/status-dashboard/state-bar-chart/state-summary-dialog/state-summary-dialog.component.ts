@@ -1,5 +1,8 @@
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { Input, Inject, ViewChild } from '@angular/core';
+
+import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
+import { NavigationService } from '../../../../../../services/navigation/navigation.service';
 import { ItemProxy } from './../../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../../common/src/tree-configuration';
 import { Component, OnInit } from '@angular/core';
@@ -39,8 +42,15 @@ export class StateSummaryDialogComponent implements OnInit {
   set stateName(stateName: string) {
     this._stateName = stateName;
   }
+  
+  private _editableSet: Array<string> = [];
+  get editableSet() {
+    return this._editableSet;
+  }
 
-  constructor(@Inject(MAT_DIALOG_DATA) private data: any) {
+  constructor(@Inject(MAT_DIALOG_DATA) private data: any,
+    private _itemRepository: ItemRepository, private _navigationService:
+    NavigationService) {
     if (this.data) {
       this._proxies = data.proxies;
       this._kindName = data.kindName;
@@ -59,8 +69,23 @@ export class StateSummaryDialogComponent implements OnInit {
     this.table.rowDetail.toggleExpandRow(row);
   }
 
-  onDetailToggle(event) {
-    console.log('Detail Toggled', event);
+  public getViewModel(itemProxy: ItemProxy): any {
+    return TreeConfiguration.getWorkingTree().getProxyFor('view-' + itemProxy.
+      kind.toLowerCase()).item;
   }
-
+  
+  public save(itemProxy: ItemProxy): void {
+    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+  }
+  
+  public discardChanges(itemProxy: ItemProxy): void {
+    this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
+      getProxyFor(itemProxy.item.id));
+    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+  }
+  
+  public navigate(itemProxy: ItemProxy): void {
+    this._navigationService.addTab('Explore', { id: itemProxy.item.id });
+  }
 }
