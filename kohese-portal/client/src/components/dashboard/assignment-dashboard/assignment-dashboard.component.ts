@@ -1,9 +1,11 @@
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
-import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { FormatDefinition } from '../../type-editor/FormatDefinition.interface';
+import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 
 import { Observable, Subscription } from 'rxjs';
@@ -14,8 +16,7 @@ import { Observable, Subscription } from 'rxjs';
   styleUrls : ['./assignment-dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssignmentDashboardComponent extends NavigatableComponent
-                                          implements OnInit, OnDestroy {
+export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   /* Data */
   @Input()
   assignmentListStream : Observable<Array<ItemProxy>>;
@@ -29,10 +30,15 @@ export class AssignmentDashboardComponent extends NavigatableComponent
   assignmentTypeSub : Subscription;
 
   assignmentTypes = {};
+  
+  private _editableSet: Array<string> = [];
+  get editableSet() {
+    return this._editableSet;
+  }
 
   constructor(private navigationService : NavigationService,
-              private changeRef : ChangeDetectorRef) {
-    super (navigationService);
+    private changeRef : ChangeDetectorRef, private _itemRepository:
+    ItemRepository) {
     this.assignmentTypes = DashboardSelections;
     console.log(this.assignmentTypes)
   }
@@ -48,14 +54,37 @@ export class AssignmentDashboardComponent extends NavigatableComponent
       this.sortedAssignmentList = this.sortAssignments(this.assignmentType, assignmentList);
       this.changeRef.markForCheck();
     })
-
   }
 
   ngOnDestroy() {
     this.assignmentTypeSub.unsubscribe();
     this.assignmentListSub.unsubscribe();
   }
-
+  
+  public getViewModel(itemProxy: ItemProxy): any {
+    return TreeConfiguration.getWorkingTree().getProxyFor('view-' + itemProxy.
+      kind.toLowerCase()).item;
+  }
+  
+  public save(itemProxy: ItemProxy): void {
+    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
+      (returnedItemProxy: ItemProxy) => {
+      this.changeRef.markForCheck();
+    });
+    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+  }
+  
+  public discardChanges(itemProxy: ItemProxy): void {
+    this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
+      getProxyFor(itemProxy.item.id));
+    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+    this.changeRef.markForCheck();
+  }
+  
+  public navigate(itemProxy: ItemProxy): void {
+    this.navigationService.addTab('Explore', { id: itemProxy.item.id });
+  }
+  
   sortAssignments(sortStrategy : DashboardSelections, assignmentList : Array<ItemProxy>) {
     let sortedArray = [];
     switch (sortStrategy) {

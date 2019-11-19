@@ -1,0 +1,100 @@
+<div style="width: 100%;" [ngStyle]="{ 'height': isDialogInstance() ? '90%' :
+  '100%' }">
+  <div style="height: 50px; display: flex; flex-direction: row;">
+    <button mat-icon-button matTooltip="Add elements"
+      [disabled]="(isDisabled || !add)" (click)="add()"
+      class="flex-right-align">
+      <mat-icon class="fa fa-plus"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Move the selected elements"
+      [disabled]="(isDisabled || !move || (selection.length === 0))"
+      (click)="moveElements(selection)">
+      <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Remove the selected elements"
+      [disabled]="(isDisabled || !remove || (selection.length === 0))"
+      (click)="remove(selection)">
+      <mat-icon class="fa fa-times"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Select all elements"
+      [disabled]="isDisabled" (click)="changeSelectionOfAll(true)">
+      <mat-icon class="fa fa-check-square-o"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="De-select all elements"
+      [disabled]="isDisabled" (click)="changeSelectionOfAll(false)">
+      <mat-icon class="fa fa-square-o"></mat-icon>
+    </button>
+  </div>
+  <mat-table #table matSort [dataSource]="rows"
+    style="height: calc(100% - 50px); overflow: auto;">
+    <ng-container matColumnDef="name" sticky>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Name
+      </mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <mat-checkbox [checked]="(selection.indexOf(element) !== -1)"
+          (change)="toggleSelection(element)" [disabled]="isDisabled"
+          style="padding: 7px;">
+        </mat-checkbox>
+        <button mat-raised-button [matMenuTriggerFor]="rowMenu"
+          [disabled]="(isDisabled || (!edit && !move && !remove))"
+          style="padding: 3px; white-space: nowrap; overflow: hidden;
+          text-overflow: ellipsis;">
+          {{getName(element)}}
+        </button>
+        <mat-menu #rowMenu="matMenu" [overlapTrigger]="false">
+          <ng-container *ngIf="edit">
+            <button mat-menu-item matTooltip="Edit this element" (click)="edit(
+              element)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+              Edit
+            </button>
+          </ng-container>
+          <ng-container *ngIf="move">
+            <button mat-menu-item matTooltip="Move this element"
+              (click)="moveElements([element])">
+              <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
+              Move
+            </button>
+          </ng-container>
+          <ng-container *ngIf="remove">
+            <button mat-menu-item matTooltip="Remove this element"
+              (click)="remove([element])">
+              <mat-icon class="fa fa-times"></mat-icon>
+              Remove
+            </button>
+          </ng-container>
+        </mat-menu>
+      </mat-cell>
+    </ng-container>
+    <ng-container *ngFor="let column of columns">
+      <ng-container *ngIf="(column !== 'name')">
+        <ng-container matColumnDef="{{column}}">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{column}}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            {{element[column]}}
+          </mat-cell>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="columns; sticky: true"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: columns"></mat-row>
+  </mat-table>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
+    flex-direction: column;">
+    <span class="flex-right-align">
+      <button mat-button matTooltip="Select these elements"
+        (click)="matDialogRef.close(selection)">
+        Select
+      </button>
+      <button mat-button matTooltip="Cancel the selection process"
+        (click)="matDialogRef.close(undefined)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>

@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { NgModule } from "@angular/core/";
-import { NgxDatatableModule } from '@swimlane/ngx-datatable'
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 import { CommonModule } from "@angular/common";
 import { KMarkdownComponent } from "../user-input/k-markdown/k-markdown.component";
@@ -32,6 +32,7 @@ import { StateFilterService } from './state-filter.service';
 import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy-card.component';
 import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
 import { ReportGeneratorModule } from '../report-generator/report-generator.module';
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import { ReportGeneratorModule } from '../report-generator/report-generator.modu
     FormsModule,
     ReactiveFormsModule,
     NgxDatatableModule,
-    ReportGeneratorModule
+    ReportGeneratorModule,
+    ObjectEditorModule
   ],
   exports : [
     DashboardComponent

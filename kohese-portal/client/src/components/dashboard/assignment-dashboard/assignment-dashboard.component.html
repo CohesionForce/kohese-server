@@ -1,18 +1,44 @@
 <div class="assignment-list">
-  <div *ngFor="let assignment of sortedAssignmentList" style="padding : 10px;">
-    <span [ngSwitch]="assignmentType">
-      <span *ngSwitchCase="assignmentTypes.DUE_ASSIGNMENTS">
-        <due-assignment [itemProxy]="assignment"></due-assignment>
-      </span>
-      <span *ngSwitchCase="assignmentTypes.OPEN_ASSIGNMENTS">
-        <open-assignment [itemProxy]="assignment"></open-assignment>
-      </span>
-      <span *ngSwitchCase="assignmentTypes.COMPLETED_ASSIGNMENTS">
-        <completed-assignment [itemProxy]="assignment"></completed-assignment>
-      </span>
-    </span>
-    <hr>
-  </div>
+  <ng-container *ngFor="let assignment of sortedAssignmentList">
+    <mat-card [ngStyle]="{ 'background-color': getViewModel(
+        assignment).color }" style="color: whitesmoke; margin-bottom: 3px;">
+      <mat-card-title style="display: flex; flex-direction: row;">
+        <h3>
+          <mat-icon class="{{getViewModel(assignment).icon}}">
+          </mat-icon>
+          {{assignment.item.name}}
+        </h3>
+        <ng-container *ngIf="(editableSet.indexOf(assignment.item.id) === -1)
+          else editableBlock">
+          <button mat-icon-button matTooltip="Edit this Item"
+            class="flex-right-align" (click)="editableSet.push(assignment.item.
+            id)">
+            <mat-icon class="fa fa-edit"></mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #editableBlock>
+          <button mat-icon-button matTooltip="Save this Item"
+            class="flex-right-align" (click)="save(assignment)">
+            <mat-icon class="fa fa-save"></mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Discard unsaved changes to this
+            Item" (click)="discardChanges(assignment)">
+            <mat-icon class="fa fa-times"></mat-icon>
+          </button>
+        </ng-template>
+        <button mat-icon-button matTooltip="Navigate to this Item"
+          (click)="navigate(assignment)">
+          <mat-icon class="fa fa-arrow-right"></mat-icon>
+        </button>
+      </mat-card-title>
+      <mat-card-content style="background-color: white; color: black;">
+        <format-object-editor [type]="assignment.model.item"
+          [object]="assignment.item" [disabled]="(editableSet.indexOf(
+          assignment.item.id) === -1)">
+        </format-object-editor>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
 </div>
 <div class="activity-feed" >
   <activity-feed [activityList]="assignmentList"></activity-feed>

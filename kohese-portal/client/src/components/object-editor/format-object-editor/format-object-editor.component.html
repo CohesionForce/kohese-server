@@ -1,0 +1,192 @@
+<div style="width: 100%; overflow: auto; padding: 7px;" [ngStyle]="{ 'height':
+  isDialogInstance() ? '90%' : '100%' }">
+  <ng-container *ngFor="let attributeDefinition of viewModel.formatDefinitions[
+    viewModel.defaultFormatKey].containers[0].contents">
+    <ng-container *ngIf="Array.isArray(TreeConfiguration.getWorkingTree().
+      getProxyFor(attributeDefinition.propertyName.kind).item.classProperties[
+      attributeDefinition.propertyName.attribute].definition.type) else
+      singleValuedBlock">
+      <ng-container *ngIf="attributeDefinition.tableDefinition else
+        notTableBlock">
+        <table_ [rows]="getTableElements(attributeDefinition)"
+          [getName]="getTableElementName" [columns]="getTableColumns(
+          attributeDefinition)" [disabled]="isDisabled">
+        </table_>
+      </ng-container>
+      <ng-template #notTableBlock>
+        <div style="display: flex; flex-direction: column;">
+          <h3>
+            {{getAttributeRepresentation(attributeDefinition)}}
+          </h3>
+          <span class="flex-right-align">
+            <button mat-icon-button
+              matTooltip="Add a value to {{attributeDefinition.propertyName.
+              attribute}}" (click)="addValue(attributeDefinition)">
+              <mat-icon class="fa fa-plus"></mat-icon>
+            </button>
+          </span>
+          <mat-list>
+            <ng-container *ngFor="let value of object[attributeDefinition.
+              propertyName.attribute]; let j = index">
+              <mat-list-item>
+                {{getStringRepresentation(j, attributeDefinition.propertyName.
+                  attribute)}}
+                <span class="flex-right-align">
+                  <button mat-icon-button matTooltip="Edit this value"
+                    [disabled]="isDisabled" (click)="editValue(j,
+                    attributeDefinition)">
+                    <mat-icon class="fa fa-edit"></mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Remove this value"
+                    [disabled]="isDisabled" (click)="removeValue(j,
+                    attributeDefinition.propertyName.attribute)">
+                    <mat-icon class="fa fa-trash"></mat-icon>
+                  </button>
+                </span>
+              </mat-list-item>
+            </ng-container>
+          </mat-list>
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-template #singleValuedBlock>
+      <ng-container [ngSwitch]="attributeDefinition.kind">
+        <ng-container *ngSwitchCase="'boolean'">
+          <mat-checkbox [(ngModel)]="object[attributeDefinition.propertyName.
+            attribute]" [disabled]="isDisabled" style="width: 100%;">
+            {{getAttributeRepresentation(attributeDefinition)}}
+          </mat-checkbox>
+        </ng-container>
+        <ng-container *ngSwitchCase="'number'">
+          <mat-form-field style="width: 100%;">
+            <input matInput type="number"
+              placeholder="{{getAttributeRepresentation(attributeDefinition)}}"
+              [(ngModel)]="object[attributeDefinition.propertyName.attribute]"
+              [disabled]="isDisabled"/>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'date'">
+          <mat-form-field style="width: 100%;">
+            <input matInput type="date"
+              placeholder="{{getAttributeRepresentation(
+              attributeDefinition)}}" [(ngModel)]="object[
+              attributeDefinition.propertyName.attribute]"
+              [disabled]="isDisabled"/>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'string'">
+          <mat-form-field style="width: 100%;">
+            <input matInput type="text"
+              placeholder="{{getAttributeRepresentation(
+              attributeDefinition)}}" [(ngModel)]="object[
+              attributeDefinition.propertyName.attribute]"
+              [disabled]="isDisabled"/>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'markdown'">
+          <ng-container *ngIf="isDisabled else editableBlock">
+            <label style="width: 100%;">
+              {{getAttributeRepresentation(attributeDefinition)}}:
+            </label>
+            <markdown [data]="object[attributeDefinition.propertyName.
+              attribute]">
+            </markdown>
+          </ng-container>
+          <ng-template #editableBlock>
+            <markdown-editor [value]="object[attributeDefinition.propertyName.
+              attribute]" [valueIdentifier]="getAttributeRepresentation(
+              attributeDefinition)" (valueChanged)="object[attributeDefinition.
+              propertyName.attribute] = $event">
+            </markdown-editor>
+            <br/>
+          </ng-template>
+        </ng-container>
+        <ng-container *ngSwitchCase="'state-editor'">
+          <label style="width: 40%;">
+            {{getAttributeRepresentation(attributeDefinition)}}:
+              {{object[attributeDefinition.propertyName.
+              attribute]}}&nbsp;
+          </label>
+          <mat-form-field style="width: 60%;">
+            <mat-select placeholder="Target" [(ngModel)]="object[
+              attributeDefinition.propertyName.attribute]"
+              [disabled]="(isDisabled || (getStateTransitionCandidates(
+              attributeDefinition).length === 0))">
+              <ng-container *ngFor="let transitionCandidateName of
+                getStateTransitionCandidates(attributeDefinition)">
+                <mat-option [value]="type.classProperties[
+                  attributeDefinition.propertyName.attribute].definition.
+                  properties.transition[transitionCandidateName].target">
+                  {{transitionCandidateName}}
+                </mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchCase="'user-selector'">
+          <mat-form-field style="width: 100%;">
+            <mat-select placeholder="{{getAttributeRepresentation(
+              attributeDefinition)}}" [(ngModel)]="object[attributeDefinition.
+              propertyName.attribute]" [disabled]="isDisabled">
+              <ng-container *ngFor="let username of usernames">
+                <mat-option [value]="username">
+                  {{username}}
+                </mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <div style="width: 100%; display: flex; flex-direction: row;">
+            <label style="width: 20%;">
+              {{getAttributeRepresentation(attributeDefinition)}}:&nbsp;
+            </label>
+            <ng-container *ngIf="object[attributeDefinition.propertyName.
+              attribute]">
+              <!--
+                Remove the "disabled" attribute below once ItemProxy
+                selection can be restricted by kind.
+              -->
+              <button mat-raised-button (click)="openObjectEditor(
+                attributeDefinition.propertyName.attribute)"
+                style="width: 60%;" [disabled]="true">
+                {{getStringRepresentation(undefined, attributeDefinition.
+                  propertyName.attribute)}}
+              </button>
+            </ng-container>
+            <span class="flex-right-align" style="width: 20%; display: flex;
+              flex-direction: row;">
+              <button mat-icon-button matTooltip="Select an object"
+                [disabled]="isDisabled" (click)="openObjectSelector(
+                attributeDefinition.propertyName.attribute)"
+                class="flex-right-align">
+                <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+              </button>
+              <button mat-icon-button
+                matTooltip="Remove the selection for {{attributeDefinition.
+                propertyName.attribute}}" [disabled]="(isDisabled || (object[
+                attributeDefinition.propertyName.attribute] == null))"
+                (click)="object[attributeDefinition.propertyName.attribute] =
+                undefined">
+                <mat-icon class="fa fa-times"></mat-icon>
+              </button>
+            </span>
+          </div>
+        </ng-container>
+      </ng-container>
+    </ng-template>
+  </ng-container>
+</div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
+    flex-direction: column;">
+    <span class="flex-right-align">
+      <button mat-raised-button (click)="close(true)">
+        Accept
+      </button>
+      <button mat-raised-button (click)="close(false)">
+        Cancel
+      </button>
+    </span>
+  </mat-dialog-actions>
+</ng-container>
