@@ -787,6 +787,11 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   public getHistoryFor(proxy: ItemProxy): Observable<Array<any>> {
+
+    this._cache.getHistory(proxy.item.id).then((history) => {
+      proxy.history = history;
+    });
+
     let emitReturningObservable: (message: string, data: any) => Observable<any> =
       bindCallback(this.socketService.getSocket().emit.bind(this.
         socketService.getSocket()));
@@ -796,9 +801,9 @@ export class ItemRepository {
         this._cache.getHistoryWithNewStyle(proxy.item.id).then((history) => {
           proxy.newHistoryNewStyle = history;
         });
-        this._cache.getHistory(proxy.item.id).then((history) => {
-          proxy.history = history;
-        });
+
+        // TODO: Determine why subscribers are changing the returned history
+        
         /* Return a copy of the history so that subscribers may modify the
         returned history, if desired. */
         return JSON.parse(JSON.stringify(proxy.history));
