@@ -35,8 +35,8 @@
               <span class="flex-right-align">
                 <button mat-icon-button
                   matTooltip="Add a value to {{attributeDefinition.
-                  propertyName.attribute}}" (click)="addValue(
-                  attributeDefinition)">
+                  propertyName.attribute}}" [disabled]="isDisabled"
+                  (click)="addValue(attributeDefinition)">
                   <mat-icon class="fa fa-plus"></mat-icon>
                 </button>
               </span>
