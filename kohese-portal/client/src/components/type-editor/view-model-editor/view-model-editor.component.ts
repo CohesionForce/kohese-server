@@ -121,7 +121,7 @@ export class ViewModelEditorComponent {
     });
   }
   
-  public colorChanged(color: string): void {
+  public colorSelected(color: string): void {
     let conflictingKindNames: Array<string> = [];
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
