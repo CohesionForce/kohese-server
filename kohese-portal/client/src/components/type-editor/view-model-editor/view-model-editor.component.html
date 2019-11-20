@@ -30,6 +30,12 @@
 </button>
 <br/>
 <br/>
+<mat-form-field style="width: 180px;">
+  <input matInput type="color" placeholder="Color" [disabled]="!editable"
+    [ngModel]="viewModel.color" (ngModelChange)="colorChanged($event)"
+    style="height: 40px; width: 180px;"/>
+</mat-form-field>
+<br/>
 <div style="height: 30%;">
   <div style="height: 50px; display: flex; flex-direction: row;">
     <h3>

@@ -121,6 +121,26 @@ export class ViewModelEditorComponent {
     });
   }
   
+  public colorChanged(color: string): void {
+    let conflictingKindNames: Array<string> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseView') && (itemProxy.item !== this.
+        _viewModel) && (itemProxy.item.color === color)) {
+        conflictingKindNames.push(itemProxy.item.modelName);
+      }
+    }, undefined);
+    
+    if (conflictingKindNames.length > 0) {
+      this._dialogService.openInformationDialog('Color In Use', 'This ' +
+        'color is already used for the following kinds:\n\t\t- ' +
+        conflictingKindNames.join('\n\t\t- '));
+    }
+    
+    this._viewModel.color = color;
+    this._changeDetectorRef.markForCheck();
+  }
+  
   public addTableDefinition(): void {
     this._dialogService.openInputDialog('Add Table Definition', '',
       DialogComponent.INPUT_TYPES.TEXT, 'Name', '', (input: any) => {
