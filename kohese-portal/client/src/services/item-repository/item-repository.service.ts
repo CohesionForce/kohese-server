@@ -792,12 +792,12 @@ export class ItemRepository {
         socketService.getSocket()));
     return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).pipe(
       map((response: any) => {
-        proxy.history = response.history;
-        this._cache.getHistory(proxy.item.id).then((history) => {
-          proxy.newHistory = history;
+        proxy.oldHistory = response.history;
+        this._cache.getHistoryWithNewStyle(proxy.item.id).then((history) => {
+          proxy.newHistoryNewStyle = history;
         });
-        this._cache.getHistoryWithOldStyle(proxy.item.id).then((history) => {
-          proxy.newHistoryOldStyle = history;
+        this._cache.getHistory(proxy.item.id).then((history) => {
+          proxy.history = history;
         });
         /* Return a copy of the history so that subscribers may modify the
         returned history, if desired. */

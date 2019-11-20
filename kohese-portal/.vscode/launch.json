@@ -52,6 +52,15 @@
       {
         "type": "node",
         "request": "launch",
+        "name": "Analyze FS: Backpack/Personal",
+        "program": "${workspaceFolder}/build/scripts/analyze-fs.js",
+        "args": [
+          "/home/dphillips/Backpack/Personal"
+        ]
+      },
+      {
+        "type": "node",
+        "request": "launch",
         "name": "(BROKEN) NPM Start",
         "runtimeExecutable": "npm",
         "runtimeArgs": [
@@ -77,26 +86,26 @@
         "port": 9229
       },
       {
-            "type": "node",
-            "request": "launch",
-            "name": "JN Test-IP",
-            "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
-            "args": [
-              "build/common/tests/unit/item-proxy-spec.js"
-            ],
-            "cwd": "${workspaceRoot}",
-            "sourceMaps": true
-        },
-        {
-              "type": "node",
-              "request": "launch",
-              "name": "JN Test-KDB",
-              "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
-              "args": [
-                "build/server/tests/integration/kdb-spec.js"
-              ],
-              "cwd": "${workspaceRoot}",
-              "sourceMaps": true
-          }
+        "type": "node",
+        "request": "launch",
+        "name": "JN Test-IP",
+        "runtimeExecutable": "jasmine-node",
+        "runtimeArgs": [
+          "build/common/tests/unit/item-proxy-spec.js"
+        ],
+        "cwd": "${workspaceRoot}",
+        "sourceMaps": true
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "JN Test-KDB",
+        "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
+        "args": [
+          "build/server/tests/integration/kdb-spec.js"
+        ],
+        "cwd": "${workspaceRoot}",
+        "sourceMaps": true
+      }
     ]
 }

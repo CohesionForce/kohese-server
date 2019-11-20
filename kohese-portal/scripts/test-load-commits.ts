@@ -64,24 +64,14 @@ async function diffHeadAndPrev() {
 //////////////////////////////////////////////////////////////////////////
 async function compareCommitDiff(refCommit : KoheseCommit) {
   try {
-    let itemCache : ItemCache = ItemCache.getItemCache();
-
     let prevCommitId = refCommit.parents[0];
 
     if (prevCommitId){
-      // await compareCommits(prevCommitId, refCommitId);
-      let refCommitClone = _.clone(refCommit);
+      console.log('$$$ Evaluating differences for commit: ' + refCommit.commitId);
       let diff = await refCommit.oldDiff();
-
-      let newDiff = JSON.parse(JSON.stringify(await refCommit.newDiff()));
+      let newDiff = await refCommit.newDiff();
       if (!_.isEqual(diff, newDiff)){
         console.log('*** New diff did not match: ' + refCommit.commitId);
-      }
-
-      let updatedRefCommitClone = _.clone(refCommit);
-      if (!_.isEqual(refCommitClone, updatedRefCommitClone)){
-        console.log('### Saving modified commit data');
-        itemCache.cacheKeyValuePair('kCommit', refCommit.commitId, refCommit);
       }
     }
 
@@ -113,7 +103,6 @@ async function compareCommits(earlierCommit, laterCommit){
   } catch (err) {
     console.log('*** Error');
     console.log(err);
-
   }
 }
 
@@ -408,7 +397,7 @@ async function comparehistory(itemId: ItemIdType) {
   let itemCache : ItemCache = ItemCache.getItemCache();
   console.log('$$$ Evaluating history: ' + itemId);
   let oldHistory = await getOldHistory(itemId);
-  let newHistory = await itemCache.getHistoryWithOldStyle(itemId);
+  let newHistory = await itemCache.getHistory(itemId);
   let historyDiff = ItemCache.compareObjects(oldHistory.history, newHistory);
   if (!historyDiff.match){
     console.log("*** History does not match: " + itemId);
@@ -420,6 +409,7 @@ async function comparehistory(itemId: ItemIdType) {
 
 //////////////////////////////////////////////////////////////////////////
 async function compareAllHistories() {
+  console.log('$$$ Comparing all histories');
   let itemCache = ItemCache.getItemCache();
   let historyMap = await itemCache.getHistoryMap();
   for (let itemId of Object.keys(historyMap)){
@@ -496,8 +486,8 @@ try {
       // await simulateClientSync();
 
       await diffEachCommit();
+      await diffEachCommit();
 
-      // await comparehistory('92fb0ee0-8727-11e6-bd34-510d6905e776');
       await compareAllHistories();
 
     } catch (err) {

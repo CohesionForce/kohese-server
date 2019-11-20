@@ -24,7 +24,7 @@ export class KoheseCommit {
   public repoTreeRoots: Workspace;
   // Derived Data
   private treeHashMap?: TreeHashMap;
-  private treeDifference?: TreeHashMapDifference;
+  private oldDifference?: TreeHashMapDifference;
 
   //////////////////////////////////////////////////////////////////////////
   constructor (commitId: string, commitData : KoheseCommit){
@@ -36,9 +36,6 @@ export class KoheseCommit {
       this.parents = commitData.parents;
     }
     this.repoTreeRoots = commitData.repoTreeRoots;
-    if (commitData.treeDifference){
-      this.treeDifference = commitData.treeDifference;
-    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -49,9 +46,6 @@ export class KoheseCommit {
       message: this.message,
       parents: this.parents,
       repoTreeRoots: this.repoTreeRoots,
-      // TODO: Add storage and distribution of treeDifference
-      // TODO: Need to determine trade off of transfer vs calc to/at client
-      treeDifference: this.treeDifference
     }
   }
 
@@ -63,8 +57,7 @@ export class KoheseCommit {
       this.treeHashMap = {};
       let treeHashEntryStack : Array<{id:string, treeId:TreeHashValueType}> = [];
       let reversedRootIds = Object.keys(this.repoTreeRoots).reverse();
-      for (let repoIdx in reversedRootIds){
-        let repoId = reversedRootIds[repoIdx];
+      for (let repoId of reversedRootIds){
         treeHashEntryStack.push({id:repoId, treeId:this.repoTreeRoots[repoId].treeHash});
       }
   
@@ -76,8 +69,7 @@ export class KoheseCommit {
           this.treeHashMap [mapEntry.id] = treeHashEntry;
   
           let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
-          for (let childIdx in reversedChildIds){
-            let childId = reversedChildIds[childIdx];
+          for (let childId of reversedChildIds){
             let treeId = treeHashEntry.childTreeHashes[childId];
             switch (treeId){
               case 'Repository-Mount':
@@ -113,19 +105,22 @@ export class KoheseCommit {
   //////////////////////////////////////////////////////////////////////////
   async oldDiff() : Promise<TreeHashMapDifference> {
 
-    if (!this.treeDifference){
+    if (!this.oldDifference){
       let parentCommits = await this.getParentCommits();
 
       let prevCommit = parentCommits[0];
-  
+
+      let thisCommitTHM : TreeHashMap = await this.getTreeHashMap();
+      let parentCommitTHM : TreeHashMap;
       if (prevCommit){
-        let thisCommitTHM = await this.getTreeHashMap();
-        let parentCommitTHM = await prevCommit.getTreeHashMap();
-        this.treeDifference = TreeHashMap.diff(parentCommitTHM, thisCommitTHM);
+        parentCommitTHM = await prevCommit.getTreeHashMap();
+      }  else {
+        parentCommitTHM = {};
       }
+      this.oldDifference = TreeHashMap.diff(parentCommitTHM, thisCommitTHM);
     }
 
-    return this.treeDifference;
+    return this.oldDifference;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -135,7 +130,17 @@ export class KoheseCommit {
 
     if (!prevCommit){
       let parentCommits = await this.getParentCommits();
-      prevCommit = parentCommits[0];
+      if(parentCommits[0]){
+        prevCommit = parentCommits[0];
+      } else {
+        prevCommit = <KoheseCommit>{
+          commitId: 'invalid',
+          time: 0,
+          author: 'invalid',
+          message: 'invalid',
+          repoTreeRoots: {}
+        }
+      }
     }
 
     let leftRoots : Array<ItemIdType> = Object.keys(prevCommit.repoTreeRoots);
@@ -323,8 +328,7 @@ export class KoheseCommit {
               // Now check it's children
               let childIds = Object.keys(addedItem.childTreeHashes);
               if (childIds.length > 0){
-                for(let idx in childIds){
-                  let childId = childIds[idx];
+                for(let childId of childIds){
                   childStack.push({id: childId, treeId: addedItem.childTreeHashes[childId]})
                 }
               }
@@ -368,8 +372,7 @@ export class KoheseCommit {
                 // Now check it's children
                 let childIds = Object.keys(deletedItem.childTreeHashes);
                 if (childIds.length > 0){
-                  for(let idx in childIds){
-                    let childId = childIds[idx];
+                  for(let childId of childIds){
                     childStack.push({id: childId, treeId: deletedItem.childTreeHashes[childId]})
                   }
                 }
@@ -541,7 +544,7 @@ export class ItemCache {
         numCommits: this.kCommitMap.size,
         numTrees: this.kTreeMap.size,
         numBlobs: this.blobMap.size,
-        cacheVerersion: this.metadata.get('cacheVersion')
+        cacheVersion: this.metadata.get('cacheVersion')
       },
       refMap : this.mapToObject(this.refMap),
       tagMap : this.mapToObject(this.tagMap),
@@ -746,7 +749,7 @@ export class ItemCache {
   
       this.historyMap = {};
       for (let commit of commitArray) {
-        let diff : TreeHashMapDifference = await commit.oldDiff();
+        let diff : TreeHashMapDifference = await commit.newDiff();
         if(diff){
           for (let itemId of Object.keys(diff.summary.itemAdded)) {
             let newTreeEntry = await this.getTree(diff.summary.itemAdded[itemId]);
@@ -793,7 +796,7 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async getHistory(forItemId: ItemIdType){
+  async getHistoryWithNewStyle(forItemId: ItemIdType){
 
     if (!this.historyMap){
       let hMap = await this.getHistoryMap();
@@ -821,9 +824,9 @@ export class ItemCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async getHistoryWithOldStyle(forItemId: ItemIdType){
+  async getHistory(forItemId: ItemIdType){
 
-    let newHistory = await this.getHistory(forItemId);
+    let newHistory = await this.getHistoryWithNewStyle(forItemId);
     let oldStyleHistory = [];
 
     for (let entry of newHistory){

@@ -70,8 +70,8 @@ export class ItemProxy {
   public dirty : boolean = false;
   private _vcStatus : VersionStatus = new VersionStatus();
   public history;
-  public newHistory;  // TODO: Remove this after testing is complete
-  public newHistoryOldStyle;  // TODO: Remove this after testing is complete
+  public newHistoryNewStyle;  // TODO: Remove this after testing is complete
+  public oldHistory;  // TODO: Remove this after testing is complete
   public type; // Used to store KoheseType.
 
   //////////////////////////////////////////////////////////////////////////
