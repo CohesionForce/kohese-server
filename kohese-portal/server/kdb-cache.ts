@@ -321,7 +321,7 @@ export class KDBCache extends LevelCache {
       });
       console.log('::: Found ' + this.numberOfRefs() + ' refs');
 
-      console.log('::: Storing cache data to level repository');
+      console.log('::: Storing loaded cache data to level repository');
       await this.saveAllPendingWrites();
       console.log('::: Finished storing cache data to level repository');
     } else {
@@ -516,8 +516,10 @@ export class KDBCache extends LevelCache {
         await kdbCache.addCachedObject('repoCommit', commitId, co);
         return kdbCache.indexCommit(repository, commits);
 
-      }).then(function() {
+      }).then(async function() {
         console.log('%%% Finished indexing a commit');
+        console.log('::: Storing new commit data to level repository');
+        await kdbCache.saveAllPendingWrites();
       }).catch(function (err) {
         console.log(err.stack);
       });

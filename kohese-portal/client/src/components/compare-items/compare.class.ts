@@ -4,27 +4,49 @@ import { ItemProxyComparison } from './item-proxy-comparison.class';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { ItemCache } from '../../../../common/src/item-cache';
-import { TreeHashMap,
-  TreeHashEntryDifference } from '../../../../common/src/tree-hash';
+import { TreeHashMap, TreeHashEntryDifference,  TreeHashMapDifference, ObjectHashValueType, ItemIdType} from '../../../../common/src/tree-hash';
+import * as _ from 'underscore';
 
 export class Compare {
   public static async compareCommits(baseCommitId: string, changeCommitId: string,
     dynamicTypesService: DynamicTypesService): Promise<Array<Comparison>> {
     let comparisons: Array<ItemProxyComparison> = [];
     let cache: ItemCache = ItemCache.getItemCache();
-    let baseTreeHashMap: TreeHashMap = await cache.getTreeHashMap(
-      baseCommitId);
-    let changeTreeHashMap: TreeHashMap = await cache.getTreeHashMap(
-      changeCommitId);
-    if (baseTreeHashMap && changeTreeHashMap) {
-      let diff: any = TreeHashMap.diff(baseTreeHashMap, changeTreeHashMap);
+    let baseCommit = await cache.getCommit(baseCommitId);
+    let changeCommit = await cache.getCommit(changeCommitId);
+
+    if (baseCommit && changeCommit) {
+      let diff: TreeHashMapDifference;
+      let changeCommitParents = await changeCommit.getParentCommits();
+      if (baseCommit === changeCommitParents[0]){
+        diff = await changeCommit.newDiff();
+      } else {
+        console.log('$$$ Base commit is not a parent: ' + baseCommitId + ' - ' + changeCommitId);
+        let baseTreeHashMap: TreeHashMap = await baseCommit.getTreeHashMap();
+        let changeTreeHashMap: TreeHashMap = await changeCommit.getTreeHashMap();
+        diff = TreeHashMap.diff(baseTreeHashMap, changeTreeHashMap);
+      }
+      let afterDiff = Date.now();
+
       if (!diff.match) {
-        for (let id in diff.details) {
-          let comparison: ItemProxyComparison = await Compare.compareItems(id,
-            baseTreeHashMap, id, changeTreeHashMap, dynamicTypesService);
+        for (let itemId in diff.details) {
+          let diffEntry: TreeHashEntryDifference = diff.details[itemId];
+
+          let baseBlobKind = diffEntry.left.kind;
+          let baseBlobOID = diffEntry.left.oid;
+          let changeBlobKind = diffEntry.right.kind;
+          let changeBlobOID = diffEntry.right.oid;
+          let beforeItemDiff = Date.now();
+          let comparison: ItemProxyComparison = await Compare.compareItems(itemId, baseBlobKind, baseBlobOID, 
+            itemId, changeBlobKind, changeBlobOID, dynamicTypesService);
+          let afterItemDiff = Date.now();
+          let itemDiffDelta = (afterItemDiff-beforeItemDiff)/1000;
+          if (itemDiffDelta > 1.0) {
+            // TODO: Need to determine how to reduce time required for large item diffs
+            console.log('### Processed diff for commit: ' + changeCommitId + ' - itemId: ' + itemId + ' - baseOID: ' + baseBlobOID + ' - changeOID ' + changeBlobOID + ' - took: ' + itemDiffDelta);
+          } 
           comparisons.push(comparison);
-          
-          let diffEntry: TreeHashEntryDifference = diff.details[id];
+
           if (diffEntry.contentChanged) {
             comparison.changeTypes.push(ChangeType.CONTENT_CHANGED);
           }
@@ -90,15 +112,15 @@ export class Compare {
     return comparisons;
   }
   
-  public static compareItems(baseId: string, baseTreeHashMap: TreeHashMap,
-    changeId: string, changeTreeHashMap: TreeHashMap, dynamicTypesService:
+  public static compareItems(baseId: ItemIdType, baseBlobKind: string, baseBlobOID: ObjectHashValueType,
+    changeId: string, changeBlobKind: string, changeBlobOID: ObjectHashValueType, dynamicTypesService:
     DynamicTypesService): Promise<ItemProxyComparison> {
     return new Promise<ItemProxyComparison>(async (resolve: (comparison:
       ItemProxyComparison) => void, reject: () => void) => {
       let itemCache: ItemCache = ItemCache.getItemCache();
       let baseItem: any;
-      if (baseTreeHashMap) {
-        baseItem = await itemCache.getBlob(baseTreeHashMap[baseId].oid);
+      if (baseBlobOID) {
+        baseItem = _.clone(await itemCache.getBlob(baseBlobOID));
         if (baseItem) {
           baseItem = JSON.parse(JSON.stringify(baseItem));
         } else {
@@ -107,7 +129,8 @@ export class Compare {
             name: 'Missing Item Version: ' + baseId
           };
         }
-        baseItem.kind = baseTreeHashMap[baseId].kind;
+        // TODO: Should not be storing kind in baseBlob
+        baseItem.kind = baseBlobKind;
       } else {
         let baseProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(baseId);
@@ -122,8 +145,8 @@ export class Compare {
       }
       
       let changeItem: any;
-      if (changeTreeHashMap) {
-        changeItem = await itemCache.getBlob(changeTreeHashMap[changeId].oid);
+      if (changeBlobOID) {
+        changeItem = _.clone(await itemCache.getBlob(changeBlobOID));
         if (changeItem) {
           changeItem = JSON.parse(JSON.stringify(changeItem));
         } else {
@@ -132,7 +155,8 @@ export class Compare {
             name: 'Missing Item Version: ' + changeId
           };
         }
-        changeItem.kind = changeTreeHashMap[changeId].kind;
+        // TODO: Should not be storing kind in changeBlob
+        changeItem.kind = changeBlobKind;
       } else {
         let changeProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(changeId);
@@ -151,16 +175,14 @@ export class Compare {
         changeItem, dynamicTypesService);
       comparison.adjustPropertyValue = async (propertyValue: string, comparisonObject:
         any) => {
+        // TODO: Need to remove restriction for only comparing items with UUID as id
         let uuidValueProperty: boolean = Comparison.UUID_REGULAR_EXPRESSION.
           test(propertyValue);
         if (uuidValueProperty) {
           let item: any;
           if (comparisonObject === baseItem) {
-            if (baseTreeHashMap) {
-              if (baseTreeHashMap[propertyValue]) {
-                item = await itemCache.getBlob(baseTreeHashMap[propertyValue].
-                  oid);
-              }
+            if (baseBlobOID) {
+              item = await itemCache.getBlob(baseBlobOID);
             } else {
               let proxy: ItemProxy = TreeConfiguration.getWorkingTree().
                 getProxyFor(propertyValue);
@@ -174,11 +196,8 @@ export class Compare {
               }
             }
           } else {
-            if (changeTreeHashMap) {
-              if (changeTreeHashMap[propertyValue]) {
-                item = await itemCache.getBlob(changeTreeHashMap[propertyValue].
-                  oid);
-              }
+            if (changeBlobOID) {
+              item = await itemCache.getBlob(changeBlobOID);
             } else {
               let proxy: ItemProxy = TreeConfiguration.getWorkingTree().
                 getProxyFor(propertyValue);
@@ -224,7 +243,10 @@ export class Compare {
         return propertyValue;
       };
   
-      await comparison.compare();
+      if(!_.isEqual(baseItem, changeItem)){
+        // Only compare the items if they are not the same
+        await comparison.compare();
+      }
       resolve(comparison);
     });
   }

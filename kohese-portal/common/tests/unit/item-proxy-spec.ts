@@ -1404,6 +1404,26 @@ it('Retrieve Delta Tree Hash Map', () => {
     'details': {
       'ROOT': {
         'match': false,
+        'left': {
+          'kind': 'Internal',
+          'oid': 'ba14baabb49cca43770ca92b36388169a2df5f6c',
+          'childTreeHashes': {
+            'Model-Definitions': 'Internal',
+            'NV-TOP': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
+            'View-Model-Definitions': 'Internal'
+          },
+          'treeHash': '7e840de1f00cfab5cbd80bcfe1cb28f652e9281a'
+        },
+        'right': {
+          'kind': 'Internal',
+          'oid': 'ba14baabb49cca43770ca92b36388169a2df5f6c',
+          'childTreeHashes': {
+            'Model-Definitions': 'Internal',
+            'NV-TOP': 'd556c2a797d86d518686a8f2395b7bf6fa888f9e',
+            'View-Model-Definitions': 'Internal'
+          },
+          'treeHash': 'a6fcdbfb3ff1ee289947268793bb231c37cfbc8a'
+        },
         'treeHashChanged': {
           'fromTreeId': '7e840de1f00cfab5cbd80bcfe1cb28f652e9281a',
           'toTreeId': 'a6fcdbfb3ff1ee289947268793bb231c37cfbc8a'
@@ -1418,6 +1438,26 @@ it('Retrieve Delta Tree Hash Map', () => {
       },
       'NV-TOP': {
         'match': false,
+        'left': {
+          'kind': 'Test',
+          'oid': '69631d8cdb357d06c2a3bb8a71bf5f96f941ab08',
+          'childTreeHashes': {
+            'A': 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
+            'B': 'e57da6530dffc225601f4b58b6dd839aae6bca3d',
+            'C': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e'
+          },
+          'treeHash': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8'
+        },
+        'right': {
+          'kind': 'Test',
+          'oid': '69631d8cdb357d06c2a3bb8a71bf5f96f941ab08',
+          'childTreeHashes': {
+            'A': '7f5c4f5a5de6ac07235090cc4854f5c9db2ac9e3',
+            'D': 'a292138764ab6ee895c6c9ba9699de22d224ba45',
+            'C': '51f07bc8e0eb82b241784709669f186aee2c3989'
+          },
+          'treeHash': 'd556c2a797d86d518686a8f2395b7bf6fa888f9e'
+        },
         'treeHashChanged': {
           'fromTreeId': 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
           'toTreeId': 'd556c2a797d86d518686a8f2395b7bf6fa888f9e'
@@ -1456,6 +1496,27 @@ it('Retrieve Delta Tree Hash Map', () => {
       },
       'A': {
         'match': false,
+        'left': {
+          'kind': 'Test',
+          'oid': '239ac47533ede73b9896ba578fdd0a775fd6297e',
+          'childTreeHashes': {
+            'AA': '38d2301582967345cc6c30e5df19359b757db4fb',
+            'AB': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
+            'AC': '1d76e2c4dbb6a464995ad802525021924c768088'
+          },
+          'treeHash': 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
+          'parentId': 'NV-TOP'
+        },
+        'right': {
+          'kind': 'Test',
+          'oid': '239ac47533ede73b9896ba578fdd0a775fd6297e',
+          'childTreeHashes': {
+            'AB': 'ddc3ea25293266ded6f267d7408bf37f6c19a3fe',
+            'AC': '1d76e2c4dbb6a464995ad802525021924c768088'
+          },
+          'treeHash': '7f5c4f5a5de6ac07235090cc4854f5c9db2ac9e3',
+          'parentId': 'NV-TOP'
+        },
         'treeHashChanged': {
           'fromTreeId': 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
           'toTreeId': '7f5c4f5a5de6ac07235090cc4854f5c9db2ac9e3'
@@ -1492,6 +1553,27 @@ it('Retrieve Delta Tree Hash Map', () => {
       },
       'AB': {
         'match': false,
+        'left': {
+          'kind': 'Test-Exclude',
+          'oid': 'aa9fa4c32ae23738be8c847304d5fccbc7823116',
+          'childTreeHashes': {
+            'ABA': '3182f87ce6dc32b512c7ac2b3bec95577a670b49',
+            'ABB': 'bc3f80b453f282d816d0450a16af385eb2fdcd8f'
+          },
+          'treeHash': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
+          'parentId': 'A'
+        },
+        'right': {
+          'kind': 'Test-Exclude',
+          'oid': 'aa9fa4c32ae23738be8c847304d5fccbc7823116',
+          'childTreeHashes': {
+            'AA': '53e3d45ccdeda75d7eeb98c080d8401900ed2174',
+            'ABA': '3182f87ce6dc32b512c7ac2b3bec95577a670b49',
+            'ABB': 'bc3f80b453f282d816d0450a16af385eb2fdcd8f'
+          },
+          'treeHash': 'ddc3ea25293266ded6f267d7408bf37f6c19a3fe',
+          'parentId': 'A'
+        },
         'treeHashChanged': {
           'fromTreeId': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
           'toTreeId': 'ddc3ea25293266ded6f267d7408bf37f6c19a3fe'
@@ -1517,6 +1599,20 @@ it('Retrieve Delta Tree Hash Map', () => {
       },
       'AA': {
         'match': false,
+        'left': {
+          'kind': 'Test',
+          'oid': '71cea569a1401108ea4ce2ebe40470ba536fc676',
+          'childTreeHashes': {},
+          'treeHash': '38d2301582967345cc6c30e5df19359b757db4fb',
+          'parentId': 'A'
+        },
+        'right': {
+          'kind': 'Test',
+          'oid': 'd9bd2c7ca658b470dc633e01eac973adb05ceb99',
+          'childTreeHashes': {},
+          'treeHash': '53e3d45ccdeda75d7eeb98c080d8401900ed2174',
+          'parentId': 'AB'
+        },
         'treeHashChanged': {
           'fromTreeId': '38d2301582967345cc6c30e5df19359b757db4fb',
           'toTreeId': '53e3d45ccdeda75d7eeb98c080d8401900ed2174'
@@ -1532,6 +1628,20 @@ it('Retrieve Delta Tree Hash Map', () => {
       },
       'C': {
         'match': false,
+        'left': {
+          'kind': 'Test',
+          'oid': '3cfa883acec0a529b941b02a57f4187bece8263d',
+          'childTreeHashes': {},
+          'treeHash': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
+          'parentId': 'NV-TOP'
+        },
+        'right': {
+          'kind': 'Test',
+          'oid': 'ba5a2c063c02084c658ab77309d6c25ce1e128e2',
+          'childTreeHashes': {},
+          'treeHash': '51f07bc8e0eb82b241784709669f186aee2c3989',
+          'parentId': 'NV-TOP'
+        },
         'treeHashChanged': {
           'fromTreeId': 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
           'toTreeId': '51f07bc8e0eb82b241784709669f186aee2c3989'

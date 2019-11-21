@@ -142,6 +142,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     let commits: Array<Commit> = [];
     let rootRow: TreeRow = this.buildRow(new Repository(this._repositoryProxy,
       commits));
+    let beforeTime = Date.now();
     for (let j: number = 0; j < sortedCommitArray.length; j++) {
       let commitObject: any = sortedCommitArray[j];
       let comparisons: Array<Comparison> = [];
@@ -157,6 +158,8 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         this.buildRow(comparisons[j]);
       }
     }
+    let afterTime = Date.now();
+    console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);
 
     this.rootSubject.next(rootRow.object);
   }
