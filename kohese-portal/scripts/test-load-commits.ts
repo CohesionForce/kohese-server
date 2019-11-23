@@ -1,6 +1,8 @@
 'use strict';
 import { ItemProxy } from '../common/src/item-proxy';
-import { ItemCache, CacheAnalysis, KoheseCommit } from '../common/src/item-cache';
+import { ItemCache } from '../common/src/item-cache';
+import { CacheAnalysis } from '../common/src/cache-analysis';
+import { KoheseCommit } from '../common/src/kohese-commit';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap, ItemIdType } from '../common/src/tree-hash';
 import _ from 'underscore';
