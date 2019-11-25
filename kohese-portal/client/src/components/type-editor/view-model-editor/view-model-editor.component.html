@@ -18,17 +18,23 @@
   </ng-template>
 </div>
 <label>
-  Icon:
+  Icon:&nbsp;
   <span>
     <mat-icon class="{{viewModel.icon}}">
     </mat-icon>
   </span>
+  &nbsp;
 </label>
-<button mat-raised-button (click)="openIconSelectionDialog()"
-  [disabled]="!editable">
-  Select Icon...
-</button>
-<br/>
+<mat-form-field style="width: 18px;">
+  <mat-select [disabled]="!editable" [ngModel]="viewModel.icon"
+    (ngModelChange)="iconSelected($event)">
+    <ng-container *ngFor="let icon of icons">
+      <mat-option [value]="icon">
+        <mat-icon class="{{icon}}"></mat-icon>
+      </mat-option>
+    </ng-container>
+  </mat-select>
+</mat-form-field>
 <br/>
 <div style="height: 30%;">
   <div style="height: 50px; display: flex; flex-direction: row;">

@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  ViewChild } from '@angular/core';
+  ViewChild, OnInit } from '@angular/core';
 import * as Uuid from 'uuid/v1';
 import { MatTable } from '@angular/material';
 
@@ -19,7 +19,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
   styleUrls: ['./view-model-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ViewModelEditorComponent {
+export class ViewModelEditorComponent implements OnInit {
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
@@ -53,6 +53,11 @@ export class ViewModelEditorComponent {
   }
   set editable(editable: boolean) {
     this._editable = editable;
+  }
+  
+  private _icons: Array<string>;
+  get icons() {
+    return this._icons;
   }
   
   @ViewChild('attributeTable')
@@ -97,6 +102,10 @@ export class ViewModelEditorComponent {
     ItemRepository) {
   }
   
+  public async ngOnInit(): Promise<void> {
+    this._icons = await this._itemRepository.getIcons();
+  }
+  
   public save(): void {
     this._itemRepository.upsertItem('KoheseView', this._viewModel);
     this._editable = false;
@@ -109,16 +118,24 @@ export class ViewModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public openIconSelectionDialog(): void {
-    this._dialogService.openComponentDialog(IconSelectorComponent, {
-      data: {}
-    }).afterClosed().subscribe((result: string) => {
-      if ('\0' !== result) {
-        this._viewModel.icon = result;
-        this._itemProxy.dirty = true;
-        this._changeDetectorRef.markForCheck();
+  public iconSelected(icon: string): void {
+    let conflictingKindNames: Array<string> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseView') && (itemProxy.item !== this.
+        _viewModel) && (itemProxy.item.icon === icon)) {
+        conflictingKindNames.push(itemProxy.item.modelName);
       }
-    });
+    }, undefined);
+    
+    if (conflictingKindNames.length > 0) {
+      this._dialogService.openInformationDialog('Icon In Use', 'This icon ' +
+        'is already used for the following kinds:\n\t\t- ' +
+        conflictingKindNames.join('\n\t\t- '));
+    }
+    
+    this._viewModel.icon = icon;
+    this._changeDetectorRef.markForCheck();
   }
   
   public addTableDefinition(): void {

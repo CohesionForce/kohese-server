@@ -627,6 +627,10 @@ export class ItemRepository {
       }
     });
   }
+  
+  public async getIcons(): Promise<Array<string>> {
+    return (await this.sendMessageToWorker('getIcons', {}, true)).data;
+  }
 
   fetchItem(proxy) {
     var promise = new Promise((resolve, reject) => {
