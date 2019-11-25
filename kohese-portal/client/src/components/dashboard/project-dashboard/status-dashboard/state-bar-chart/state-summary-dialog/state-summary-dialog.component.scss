@@ -1,3 +1,8 @@
+@import '../../../../../../app.component';
+
+/deep/ .datatable-row-detail {
+  overflow: auto !important;
+}
 
 .ngx-datatable.material {
 	background:#FFF;

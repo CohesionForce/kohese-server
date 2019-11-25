@@ -8,17 +8,20 @@ import { MaterialModule } from '../../../material.module'
 import { AssignmentDashboardComponent } from './assignment-dashboard.component';
 import { BehaviorSubject } from 'rxjs';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;
   let assignmentDashboardFixture : ComponentFixture<AssignmentDashboardComponent>;
   let dashboardSelectionStream = new BehaviorSubject<DashboardSelections>(DashboardSelections.OPEN_ASSIGNMENTS);
-  let assignmentListStream = new BehaviorSubject<Array<ItemProxy>>(new MockItemRepository().getRootProxy().children)
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -29,14 +32,18 @@ describe('Component: ', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        { provide: NavigationService, useClass: MockNavigationService }
+        { provide: NavigationService, useClass: MockNavigationService },
+        { provide: ItemRepository, useClass: MockItemRepository },
+        { provide: DialogService, useClass: MockDialogService }
       ]
     }).compileComponents();
 
     assignmentDashboardFixture = TestBed.createComponent(AssignmentDashboardComponent);
     assignmentDashboardComponent = assignmentDashboardFixture.componentInstance;
     assignmentDashboardComponent.dashboardSelectionStream = dashboardSelectionStream;
-    assignmentDashboardComponent.assignmentListStream = assignmentListStream;
+    assignmentDashboardComponent.assignmentListStream =
+      new BehaviorSubject<Array<ItemProxy>>([TreeConfiguration.getWorkingTree().
+      getProxyFor('Kurios Iesous')]);
 
     assignmentDashboardFixture.detectChanges();
 
