@@ -1,5 +1,5 @@
 import { ItemProxy } from './item-proxy';
-import { ItemCache, CacheAnalysis } from './item-cache';
+import { ItemCache } from './item-cache';
 import { Subject } from 'rxjs';
 
 import * as  _ from 'underscore';

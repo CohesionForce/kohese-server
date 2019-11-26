@@ -7,7 +7,7 @@ import { ItemProxy } from '../../common/src/item-proxy';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
 import { LevelCache } from '../../common/src/level-cache';
-import { Workspace } from '../../common/src/item-cache';
+import { Workspace } from '../../common/src/kohese-commit';
 
 let socket: SocketIOClient.Socket;
 let clientMap = {};
