@@ -17,25 +17,33 @@
     </button>
   </ng-template>
 </div>
-<label>
-  Icon:&nbsp;
-  <span>
-    <mat-icon class="{{viewModel.icon}}">
-    </mat-icon>
-  </span>
-  &nbsp;
-</label>
-<mat-form-field style="width: 18px;">
-  <mat-select [disabled]="!editable" [ngModel]="viewModel.icon"
-    (ngModelChange)="iconSelected($event)">
-    <ng-container *ngFor="let icon of icons">
-      <mat-option [value]="icon">
-        <mat-icon class="{{icon}}"></mat-icon>
-      </mat-option>
-    </ng-container>
-  </mat-select>
-</mat-form-field>
-<br/>
+<div>
+  <label>
+    Icon:
+  </label>
+  <br/>
+  <mat-form-field style="width: 100%;">
+    <input matInput type="text" placeholder="Filter" [disabled]="!editable"
+      (input)="filterChanged($event.target.value)"/>
+  </mat-form-field>
+  <div #iconList style="height: 300px; overflow: auto;">
+    <div style="column-count: 4;">
+      <ng-container *ngFor="let icon of getIcons()">
+        <button mat-button matTooltip="{{icon.name + ((icon.usages.length > 0) ?
+          (' - Used by the following kinds: ' + icon.usages.join(', ')): '')}}"
+          [ngClass]="{ 'highlight': (viewModel.icon === icon.iconString) }"
+          [disabled]="!editable" (click)="iconSelected(icon.iconString)"
+          style="width: 100%; text-align: left;" matBadge="{{icon.usages.
+          length}}" matBadgeHidden="(icon.usages.length === 0)"
+          matBadgePosition="above before">
+          <mat-icon class="{{icon.iconString}}"></mat-icon>
+          {{icon.name}}
+        </button>
+        <br/>
+      </ng-container>
+    </div>
+  </div>
+</div>
 <div style="height: 30%;">
   <div style="height: 50px; display: flex; flex-direction: row;">
     <h3>

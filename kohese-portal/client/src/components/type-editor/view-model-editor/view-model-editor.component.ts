@@ -13,6 +13,12 @@ import { FormatDefinition } from '../FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
+interface Icon {
+  name: string,
+  iconString: string,
+  usages: Array<string>
+}
+
 @Component({
   selector: 'view-model-editor',
   templateUrl: './view-model-editor.component.html',
@@ -55,10 +61,12 @@ export class ViewModelEditorComponent implements OnInit {
     this._editable = editable;
   }
   
-  private _icons: Array<string>;
-  get icons() {
-    return this._icons;
-  }
+  private _icons: Array<Icon>;
+  private _filter: string;
+  private _iconFilterTimeoutIdentifier: any;
+  
+  @ViewChild('iconList')
+  private _iconList: any;
   
   @ViewChild('attributeTable')
   private _attributeTable: MatTable<any>;
@@ -103,7 +111,45 @@ export class ViewModelEditorComponent implements OnInit {
   }
   
   public async ngOnInit(): Promise<void> {
-    this._icons = await this._itemRepository.getIcons();
+    let viewModels: Array<any> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === 'KoheseView') {
+        viewModels.push(itemProxy.item);
+      }
+    }, undefined);
+    
+    this._icons = (await this._itemRepository.getIcons()).sort().map(
+      (iconName: string) => {
+      let name: string = iconName.replace(/-(\S{1})/g, (match: string,
+        captureGroup: string, offset: number, source: string) => {
+        return ' ' + captureGroup.toUpperCase();
+      });
+      let iconString: string = 'fa fa-' + iconName;
+      return {
+        name: name.charAt(0).toUpperCase() + name.substring(1),
+        iconString: iconString,
+        usages: viewModels.filter((viewModel: any) => {
+          return ((viewModel !== this._viewModel) && (viewModel.icon ===
+            iconString));
+        }).map((viewModel: any) => {
+          return viewModel.modelName;
+        })
+      };
+    });
+    
+    let selectedIconIndex: number = this._icons.map((icon: Icon) => {
+      return icon.iconString;
+    }).indexOf(this._viewModel.icon);
+    /* Without using setTimeout to set scrollTop, the value of scrollTop
+    remained zero. */
+    setTimeout(() => {
+      // Each row should be 36px tall and there should be four columns.
+      this._iconList.nativeElement.scrollTop = (36 * (selectedIconIndex %
+        (Math.floor(this._icons.length + 4) / 4)));
+    }, 0);
+    
+    this._changeDetectorRef.markForCheck();
   }
   
   public save(): void {
@@ -116,6 +162,28 @@ export class ViewModelEditorComponent implements OnInit {
       getProxyFor(this._viewModel.id));
     this._editable = false;
     this._changeDetectorRef.markForCheck();
+  }
+  
+  public filterChanged(filter: string): void {
+    if (this._iconFilterTimeoutIdentifier) {
+      clearTimeout(this._iconFilterTimeoutIdentifier);
+    }
+    
+    this._iconFilterTimeoutIdentifier = setTimeout(() => {
+      this._filter = filter;      
+      this._changeDetectorRef.markForCheck();
+      this._iconFilterTimeoutIdentifier = undefined;
+    }, 700);
+  }
+  
+  public getIcons(): Array<Icon> {
+    if (this._filter) {
+      return this._icons.filter((icon: Icon) => {
+        return icon.name.toLowerCase().includes(this._filter.toLowerCase());
+      });
+    }
+    
+    return this._icons;
   }
   
   public iconSelected(icon: string): void {

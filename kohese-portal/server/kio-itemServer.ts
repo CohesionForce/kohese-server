@@ -482,8 +482,8 @@ function KIOItemServer(socket){
   
   socket.on('getIcons', (request: any, sendResponse: Function) => {
     fs.readFile(_ICONS_FILE_PATH, 'utf8', (error: any, data: string) => {
-      sendResponse(data.split('\n').filter((iconString: string) => {
-        return !!iconString;
+      sendResponse(data.split('\n').filter((iconName: string) => {
+        return !!iconName;
       }));
     });
   });
