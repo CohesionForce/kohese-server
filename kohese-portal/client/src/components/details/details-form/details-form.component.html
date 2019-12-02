@@ -60,11 +60,18 @@
               [options]="type.fields[property].views['form'].inputType.options[
               'options']" [required]="type.fields[property].required">
             </k-select>
-            <k-user-selector *ngSwitchCase="'user-selector'"
-              [formGroup]="formGroup" [fieldId]="property"
-              [fieldName]="type.fields[property].views['form'].displayName"
-              [required]="type.fields[property].required">
-            </k-user-selector>
+            <ng-container *ngSwitchCase="'user-selector'">
+              <mat-form-field style="width: 100%;">
+                <mat-select formControlName="{{property}}"
+                  placeholder="{{getAttributeRepresentation(property)}}">
+                  <ng-container *ngFor="let username of usernames">
+                    <mat-option [value]="username">
+                      {{username}}
+                    </mat-option>
+                  </ng-container>
+                </mat-select>
+              </mat-form-field>
+            </ng-container>
             <k-markdown *ngSwitchCase="'markdown'"
               [formGroup]="formGroup" [fieldId]="property"
               [fieldName]="type.fields[property].views['form'].displayName"
