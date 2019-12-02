@@ -1,6 +1,22 @@
 <div *ngFor="let column of columns" class="doc-column"[ngClass]="{'two-columns' : numColumns === 2, 'three-columns' : numColumns === 3}">
     <div *ngFor="let property of column.contents">
-        <div *ngIf="['text', 'user-selector','date'].includes(property.kind)">
+    <ng-container *ngIf="(property.kind === 'number')">
+      <mat-form-field style="width: 100%;">
+        <input matInput type="number" placeholder="{{property.hideLabel ? '' :
+          (property.customLabel ? property.customLabel : property.propertyName.
+          attribute)}}" [disabled]="!editable" [(ngModel)]="proxy.item[
+          property.propertyName.attribute]"/>
+      </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="(property.kind === 'date')">
+      <mat-form-field style="width: 100%;">
+        <input matInput type="date" placeholder="{{property.hideLabel ? '' :
+          (property.customLabel ? property.customLabel : property.propertyName.
+          attribute)}}" [disabled]="!editable" [(ngModel)]="proxy.item[
+          property.propertyName.attribute]"/>
+      </mat-form-field>
+    </ng-container>
+        <div *ngIf="['text', 'user-selector'].includes(property.kind)">
           <label *ngIf="!property.hideLabel && !property.customLabel"
             style="font-weight: bold;">
             {{property.propertyName.attribute}}:
