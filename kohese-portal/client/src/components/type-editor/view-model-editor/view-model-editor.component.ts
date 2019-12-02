@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  ViewChild, OnInit } from '@angular/core';
+  ViewChild } from '@angular/core';
 import * as Uuid from 'uuid/v1';
 import { MatTable } from '@angular/material';
 
@@ -25,7 +25,7 @@ interface Icon {
   styleUrls: ['./view-model-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ViewModelEditorComponent implements OnInit {
+export class ViewModelEditorComponent {
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
@@ -39,6 +39,48 @@ export class ViewModelEditorComponent implements OnInit {
     this._itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.
       _viewModel.id);
     this._editable = this._itemProxy.dirty;
+    
+    let viewModels: Array<any> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === 'KoheseView') {
+        viewModels.push(itemProxy.item);
+      }
+    }, undefined);
+    
+    this._itemRepository.getIcons().then((iconNames: Array<string>) => {
+      this._icons = iconNames.sort().map(
+        (iconName: string) => {
+        let name: string = iconName.replace(/-(\S{1})/g, (match: string,
+          captureGroup: string, offset: number, source: string) => {
+          return ' ' + captureGroup.toUpperCase();
+        });
+        let iconString: string = 'fa fa-' + iconName;
+        return {
+          name: name.charAt(0).toUpperCase() + name.substring(1),
+          iconString: iconString,
+          usages: viewModels.filter((viewModel: any) => {
+            return (viewModel.icon === iconString);
+          }).map((viewModel: any) => {
+            return viewModel.modelName;
+          })
+        };
+      });
+      
+      let selectedIconIndex: number = this._icons.map((icon: Icon) => {
+        return icon.iconString;
+      }).indexOf(this._viewModel.icon);
+      /* Without using setTimeout to set scrollTop, the value of scrollTop
+      remained zero. */
+      setTimeout(() => {
+        // Each row should be 36px tall and there should be four columns.
+        this._iconList.nativeElement.scrollTop = (36 * (selectedIconIndex %
+          (Math.floor(this._icons.length + 4) / 4)));
+      }, 0);
+      
+      this._changeDetectorRef.markForCheck();
+    });
+    
     this._attributes = [];
     for (let attributeName in this._viewModel.viewProperties) {
       let attribute: any = this._viewModel.viewProperties[attributeName];
@@ -108,48 +150,6 @@ export class ViewModelEditorComponent implements OnInit {
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dialogService: DialogService, private _itemRepository:
     ItemRepository) {
-  }
-  
-  public async ngOnInit(): Promise<void> {
-    let viewModels: Array<any> = [];
-    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
-      { includeOrigin: false }, (itemProxy: ItemProxy) => {
-      if (itemProxy.kind === 'KoheseView') {
-        viewModels.push(itemProxy.item);
-      }
-    }, undefined);
-    
-    this._icons = (await this._itemRepository.getIcons()).sort().map(
-      (iconName: string) => {
-      let name: string = iconName.replace(/-(\S{1})/g, (match: string,
-        captureGroup: string, offset: number, source: string) => {
-        return ' ' + captureGroup.toUpperCase();
-      });
-      let iconString: string = 'fa fa-' + iconName;
-      return {
-        name: name.charAt(0).toUpperCase() + name.substring(1),
-        iconString: iconString,
-        usages: viewModels.filter((viewModel: any) => {
-          return ((viewModel !== this._viewModel) && (viewModel.icon ===
-            iconString));
-        }).map((viewModel: any) => {
-          return viewModel.modelName;
-        })
-      };
-    });
-    
-    let selectedIconIndex: number = this._icons.map((icon: Icon) => {
-      return icon.iconString;
-    }).indexOf(this._viewModel.icon);
-    /* Without using setTimeout to set scrollTop, the value of scrollTop
-    remained zero. */
-    setTimeout(() => {
-      // Each row should be 36px tall and there should be four columns.
-      this._iconList.nativeElement.scrollTop = (36 * (selectedIconIndex %
-        (Math.floor(this._icons.length + 4) / 4)));
-    }, 0);
-    
-    this._changeDetectorRef.markForCheck();
   }
   
   public save(): void {

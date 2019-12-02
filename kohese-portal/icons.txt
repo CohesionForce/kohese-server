@@ -324,9 +324,9 @@ thermometer-quarter
 thermometer-empty
 thumb-tack
 thumbs-up
-thumbs-up-o
+thumbs-o-up
 thumbs-down
-thumbs-down-o
+thumbs-o-down
 ticket
 times-circle
 times-circle-o

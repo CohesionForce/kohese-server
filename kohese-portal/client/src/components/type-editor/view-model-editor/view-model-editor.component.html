@@ -33,11 +33,12 @@
           (' - Used by the following kinds: ' + icon.usages.join(', ')): '')}}"
           [ngClass]="{ 'highlight': (viewModel.icon === icon.iconString) }"
           [disabled]="!editable" (click)="iconSelected(icon.iconString)"
-          style="width: 100%; text-align: left;" matBadge="{{icon.usages.
-          length}}" matBadgeHidden="(icon.usages.length === 0)"
-          matBadgePosition="above before">
+          style="width: 100%; text-align: left;">
           <mat-icon class="{{icon.iconString}}"></mat-icon>
-          {{icon.name}}
+          <span matBadge="{{icon.usages.length}}" [matBadgeHidden]="(icon.
+            usages.length === 0)" matBadgeOverlap="false">
+            {{icon.name}}
+          </span>
         </button>
         <br/>
       </ng-container>
