@@ -132,21 +132,23 @@ export class PropertyRowComponent implements OnInit {
     this.property.customLabel = '';
     this.property.labelOrientation = 'Top';
     this.property.hideEmpty = false;
+    
     if (attributeObject.kind === this.kind.name) {
-      const viewProperty = TreeConfiguration.getWorkingTree().getProxyFor(
-        'view-' + attributeObject.kind.toLowerCase()).item.viewProperties[
-        attributeObject.attribute];
-      if (viewProperty) {
-        this.property.inputOptions = viewProperty.inputType;
-        console.log(viewProperty);
-      } else {
-        this.property.kind = 'read-only';
-      }
       delete this.property['tableDefinition'];
     } else {
-      this.property.inputOptions = null;
-      this.property.kind = '';
       this.property['tableDefinition'] = this._tableDefinitions[0].id;
+    }
+    
+    const viewProperty = TreeConfiguration.getWorkingTree().getProxyFor(
+      'view-' + TreeConfiguration.getWorkingTree().getProxyFor(attributeObject.
+      kind).item.classProperties[attributeObject.attribute].definedInKind.
+      toLowerCase()).item.viewProperties[attributeObject.attribute];
+    if (viewProperty) {
+      this.property.kind = viewProperty.inputType.type;
+      this.property.inputOptions = viewProperty.inputType;
+      console.log(viewProperty);
+    } else {
+      this.property.kind = 'read-only';
     }
     
     console.log(this.property.kind);

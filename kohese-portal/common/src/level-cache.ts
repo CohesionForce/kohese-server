@@ -1,4 +1,5 @@
-import { ItemCache, KoheseCommit } from './item-cache';
+import { ItemCache } from './item-cache';
+import { KoheseCommit } from './kohese-commit';
 
 import * as LevelUp_Import from 'levelup';
 import * as SubLevelDown_Import from 'subleveldown';

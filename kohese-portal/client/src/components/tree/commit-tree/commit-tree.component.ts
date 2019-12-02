@@ -14,7 +14,8 @@ import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, Action } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { ItemCache, KoheseCommit } from '../../../../../common/src/item-cache';
+import { ItemCache } from '../../../../../common/src/item-cache';
+import { KoheseCommit } from '../../../../../common/src/kohese-commit';
 import { Comparison, ChangeType } from '../../compare-items/comparison.class';
 import { ItemProxyComparison } from '../../compare-items/item-proxy-comparison.class';
 import { Compare } from '../../compare-items/compare.class';
@@ -142,6 +143,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     let commits: Array<Commit> = [];
     let rootRow: TreeRow = this.buildRow(new Repository(this._repositoryProxy,
       commits));
+    let beforeTime = Date.now();
     for (let j: number = 0; j < sortedCommitArray.length; j++) {
       let commitObject: any = sortedCommitArray[j];
       let comparisons: Array<Comparison> = [];
@@ -157,6 +159,8 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         this.buildRow(comparisons[j]);
       }
     }
+    let afterTime = Date.now();
+    console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);
 
     this.rootSubject.next(rootRow.object);
   }

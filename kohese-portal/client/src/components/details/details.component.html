@@ -84,6 +84,12 @@
                 <pre>{{relationIdMap | json}}</pre>
                 <h5>Version Status:</h5>
                 <pre>{{itemVCStatusJson}}</pre>
+                <h5>Old History:</h5>
+                <pre>{{itemProxy.oldHistory | json}}</pre>
+                <h5>New History (Old Style):</h5>
+                <pre>{{itemProxy.history | json}}</pre>
+                <h5>New History (With Details):</h5>
+                <pre>{{itemProxy.newHistoryNewStyle | json}}</pre>
             </mat-tab>
         </mat-tab-group>
     </div>

@@ -1,9 +1,12 @@
 'use strict';
 import { ItemProxy } from '../common/src/item-proxy';
-import { ItemCache, CacheAnalysis } from '../common/src/item-cache';
+import { ItemCache } from '../common/src/item-cache';
+import { CacheAnalysis } from '../common/src/cache-analysis';
+import { KoheseCommit } from '../common/src/kohese-commit';
 import { TreeConfiguration } from '../common/src/tree-configuration';
-import { TreeHashMap } from '../common/src/tree-hash';
+import { TreeHashMap, ItemIdType } from '../common/src/tree-hash';
 import _ from 'underscore';
+
 // let heapdump = require ('heapdump');
 
 var kdb = require('../server/kdb.js');
@@ -61,24 +64,23 @@ async function diffHeadAndPrev() {
 }
 
 //////////////////////////////////////////////////////////////////////////
-async function diffAllCommits(refCommitId) {
+async function compareCommitDiff(refCommit : KoheseCommit) {
   try {
-    let itemCache : ItemCache = ItemCache.getItemCache();
-
-    let refCommit = await itemCache.getCommit(refCommitId);
     let prevCommitId = refCommit.parents[0];
 
-    console.log('::: Ref Commit: ' + refCommitId);
-    console.log('::: Prev Commit: ' + prevCommitId);
-
     if (prevCommitId){
-      await compareCommits(prevCommitId, refCommitId);
-      await diffAllCommits(prevCommitId);
+      console.log('$$$ Evaluating differences for commit: ' + refCommit.commitId);
+      let diff = await refCommit.oldDiff();
+      let newDiff = await refCommit.newDiff();
+      if (!_.isEqual(diff, newDiff)){
+        console.log('*** New diff did not match: ' + refCommit.commitId);
+      }
     }
 
   } catch (err) {
     console.log('*** Error');
     console.log(err);
+    console.log(err.stack);
   }
 }
 
@@ -103,7 +105,6 @@ async function compareCommits(earlierCommit, laterCommit){
   } catch (err) {
     console.log('*** Error');
     console.log(err);
-
   }
 }
 
@@ -197,11 +198,16 @@ async function diffEachCommit() {
     let itemCache : ItemCache = ItemCache.getItemCache();
 
     let beforeTime = Date.now();
-    let currentCommit = await itemCache.getRef('HEAD');
+    let commitMap = itemCache.getCommits();
 
-    await diffAllCommits(currentCommit);
+    for (let commitId of Array.from(commitMap.keys())){
+      let commit : KoheseCommit = await itemCache.getCommit(commitId);
+      await compareCommitDiff(commit);
+    }
+
     let afterTime = Date.now();
 
+    itemCache.saveAllPendingWrites();
     deltaMessage('Time to diff all commits', beforeTime, afterTime);
 
   } catch (err) {
@@ -379,6 +385,41 @@ async function loadConfigForEachCommit() {
 }
 
 //////////////////////////////////////////////////////////////////////////
+async function getOldHistory(itemId: ItemIdType) : Promise<any> {
+  let promise = new Promise(function (resolve, reject){
+    kdb.kdbRepo.walkHistoryForFile(itemId, function (history){
+      resolve(history);
+    });  
+  });
+  return promise;
+}
+
+//////////////////////////////////////////////////////////////////////////
+async function comparehistory(itemId: ItemIdType) {
+  let itemCache : ItemCache = ItemCache.getItemCache();
+  console.log('$$$ Evaluating history: ' + itemId);
+  let oldHistory = await getOldHistory(itemId);
+  let newHistory = await itemCache.getHistory(itemId);
+  let historyDiff = ItemCache.compareObjects(oldHistory.history, newHistory);
+  if (!historyDiff.match){
+    console.log("*** History does not match: " + itemId);
+    console.log(JSON.stringify(historyDiff, null, '  '));
+  } else {
+    console.log('$$$ History matches: ' + itemId);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+async function compareAllHistories() {
+  console.log('$$$ Comparing all histories');
+  let itemCache = ItemCache.getItemCache();
+  let historyMap = await itemCache.getHistoryMap();
+  for (let itemId of Object.keys(historyMap)){
+    await comparehistory(itemId);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
 function deltaMessage(message, before, after) {
   console.log('^^^ ' + message + ': ' + (after-before)/1000);
 }
@@ -447,6 +488,9 @@ try {
       // await simulateClientSync();
 
       await diffEachCommit();
+      await diffEachCommit();
+
+      await compareAllHistories();
 
     } catch (err) {
       console.log('*** Error');

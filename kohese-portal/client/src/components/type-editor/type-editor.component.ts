@@ -87,6 +87,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           name: name,
           modelName: name,
           parentId: 'view-item',
+          icon: '',
+          color: '#000000',
           viewProperties: {},
           formatDefinitions: {},
           defaultFormatKey: formatDefinitionId,
