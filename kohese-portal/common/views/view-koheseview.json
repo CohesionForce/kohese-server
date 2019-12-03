@@ -1,0 +1,13 @@
+{
+  "id": "view-koheseview",
+  "name": "KoheseView View Model",
+  "parentId": "view-item",
+  "modelName": "KoheseView",
+  "icon": "",
+  "color": "#000000",
+  "viewProperties": {},
+  "formatDefinitions": {},
+  "defaultFormatKey": "",
+  "tableDefinitions": {},
+  "itemIds": []
+}

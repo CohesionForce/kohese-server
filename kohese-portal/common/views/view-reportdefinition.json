@@ -1,0 +1,48 @@
+{
+  "id": "view-reportdefinition",
+  "name": "ReportDefinition View Model",
+  "parentId": "view-item",
+  "modelName": "ReportDefinition",
+  "icon": "",
+  "color": "#000000",
+  "viewProperties": {},
+  "formatDefinitions": {
+    "260a0f00-15ec-11ea-97d2-3bae97d5d967": {
+      "id": "260a0f00-15ec-11ea-97d2-3bae97d5d967",
+      "name": "Format Definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "ReportDefinition",
+              "attribute": "name"
+            },
+            "hideLabel": false,
+            "labelOrientation": "Top",
+            "kind": "text"
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "ReportDefinition",
+                "attribute": "description"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "markdown"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "defaultFormatKey": "260a0f00-15ec-11ea-97d2-3bae97d5d967",
+  "tableDefinitions": {},
+  "itemIds": []
+}

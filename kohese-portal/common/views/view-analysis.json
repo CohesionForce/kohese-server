@@ -1,0 +1,48 @@
+{
+  "id": "view-analysis",
+  "name": "Analysis View Model",
+  "parentId": "",
+  "modelName": "Analysis",
+  "icon": "",
+  "color": "#000000",
+  "viewProperties": {
+    "id": {
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
+      "displayName": "ID"
+    }
+  },
+  "formatDefinitions": {
+    "2e6c7aa0-15d5-11ea-97d2-3bae97d5d967": {
+      "id": "2e6c7aa0-15d5-11ea-97d2-3bae97d5d967",
+      "name": "Format Definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "Analysis",
+              "attribute": "id"
+            },
+            "hideLabel": false,
+            "labelOrientation": "Top",
+            "kind": "text"
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": []
+        }
+      ]
+    }
+  },
+  "defaultFormatKey": "2e6c7aa0-15d5-11ea-97d2-3bae97d5d967",
+  "tableDefinitions": {},
+  "itemIds": []
+}

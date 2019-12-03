@@ -1,65 +1,49 @@
 {
-  "id": "view-internal",
-  "name": "Internal View Model",
+  "id": "view-koheseuser",
+  "name": "KoheseUser View Model",
   "parentId": "view-item",
-  "modelName": "Internal",
-  "icon": "fa fa-wrench",
+  "modelName": "KoheseUser",
+  "icon": "fa fa-user",
   "color": "#000000",
   "viewProperties": {
-    "name": {
+    "password": {
       "inputType": {
         "type": "text",
         "options": {
           "isMultiLine": false
         }
       },
-      "required": true,
-      "default": "",
-      "displayName": "Name"
+      "displayName": "Password"
     },
-    "description": {
-      "inputType": {
-        "type": "markdown",
-        "options": {}
-      },
-      "required": false,
-      "default": "",
-      "displayName": "Description"
-    },
-    "tags": {
+    "email": {
       "inputType": {
         "type": "text",
         "options": {
           "isMultiLine": false
         }
       },
-      "required": false,
-      "default": "",
-      "displayName": "Tags"
+      "displayName": "E-Mail Address"
     },
-    "parentId": {
+    "username": {
       "inputType": {
-        "type": "proxy-selector",
+        "type": "text",
         "options": {
-          "allowMultiSelect": false,
-          "type": "Item",
-          "useAdvancedSelector": false
+          "isMultiLine": false
         }
       },
-      "required": true,
-      "default": "ROOT",
-      "displayName": "Parent"
+      "displayName": "Username"
     }
   },
   "formatDefinitions": {
-    "89324a90-a7af-11e8-8662-71e48f0160fe": {
-      "name": "New definition ",
+    "2f3dd260-15eb-11ea-97d2-3bae97d5d967": {
+      "id": "2f3dd260-15eb-11ea-97d2-3bae97d5d967",
+      "name": "Format Definition",
       "header": {
         "kind": "header",
         "contents": [
           {
             "propertyName": {
-              "kind": "Internal",
+              "kind": "KoheseUser",
               "attribute": "name"
             },
             "hideLabel": false,
@@ -74,7 +58,7 @@
           "contents": [
             {
               "propertyName": {
-                "kind": "Internal",
+                "kind": "KoheseUser",
                 "attribute": "description"
               },
               "hideLabel": false,
@@ -83,11 +67,10 @@
             }
           ]
         }
-      ],
-      "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+      ]
     }
   },
-  "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "defaultFormatKey": "2f3dd260-15eb-11ea-97d2-3bae97d5d967",
   "tableDefinitions": {},
   "itemIds": []
 }
