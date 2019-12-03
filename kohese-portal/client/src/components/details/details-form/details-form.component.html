@@ -61,7 +61,7 @@
               'options']" [required]="type.fields[property].required">
             </k-select>
             <ng-container *ngSwitchCase="'user-selector'">
-              <mat-form-field style="width: 100%;">
+              <mat-form-field style="width: 100%; padding: 0px 10px 0px 10px;">
                 <mat-select formControlName="{{property}}"
                   placeholder="{{getAttributeRepresentation(property)}}">
                   <ng-container *ngFor="let username of usernames">
