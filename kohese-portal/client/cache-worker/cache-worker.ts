@@ -187,6 +187,13 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+      case 'getIcons':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (icons: Array<string>) => void, reject: () => void) => {
+          socket.emit('getIcons', {}, (icons: Array<string>) => {
+          resolve(icons);
+        }); }) });
+        break;
       case 'getUrlContent':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (contentObject: any) => void, reject: () => void) => {

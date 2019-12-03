@@ -18,6 +18,8 @@ const Path = require('path');
 const importer = require('./directory-ingest');
 var _ = require('underscore');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const _ICONS_FILE_PATH = Path.resolve(fs.realpathSync(__dirname), '..', '..',
+  'icons.txt');
 const _REPORTS_DIRECTORY_PATH = Path.resolve(fs.realpathSync(__dirname), '..',
   '..', 'reports');
 
@@ -477,6 +479,14 @@ function KIOItemServer(socket){
       sendResponse({error: 'history error'});
     }
 });
+  
+  socket.on('getIcons', (request: any, sendResponse: Function) => {
+    fs.readFile(_ICONS_FILE_PATH, 'utf8', (error: any, data: string) => {
+      sendResponse(data.split('\n').filter((iconName: string) => {
+        return !!iconName;
+      }));
+    });
+  });
 
   //////////////////////////////////////////////////////////////////////////
   //
