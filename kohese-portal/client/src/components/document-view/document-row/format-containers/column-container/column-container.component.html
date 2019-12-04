@@ -1,5 +1,11 @@
 <div *ngFor="let column of columns" class="doc-column"[ngClass]="{'two-columns' : numColumns === 2, 'three-columns' : numColumns === 3}">
     <div *ngFor="let property of column.contents">
+    <ng-container *ngIf="(property.kind === 'boolean')">
+      <mat-checkbox [disabled]="!editable" style="width: 100%;">
+        {{property.hideLabel ? '' : (property.customLabel ? property.
+          customLabel : property.propertyName.attribute)}}
+      </mat-checkbox>
+    </ng-container>
     <ng-container *ngIf="(property.kind === 'number')">
       <mat-form-field style="width: 100%;">
         <input matInput type="number" placeholder="{{property.hideLabel ? '' :

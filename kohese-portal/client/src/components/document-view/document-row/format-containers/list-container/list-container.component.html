@@ -35,6 +35,12 @@
     </k-table>
   </ng-container>
   <ng-template #notTable>
+    <ng-container *ngIf="(property.kind === 'boolean')">
+      <mat-checkbox [disabled]="!editable" style="width: 100%;">
+        {{property.hideLabel ? '' : (property.customLabel ? property.
+          customLabel : property.propertyName.attribute)}}
+      </mat-checkbox>
+    </ng-container>
     <ng-container *ngIf="(property.kind === 'number')">
       <mat-form-field style="width: 100%;">
         <input matInput type="number" placeholder="{{property.hideLabel ? '' :
