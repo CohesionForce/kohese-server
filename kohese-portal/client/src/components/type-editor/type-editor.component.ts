@@ -49,6 +49,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
             (treeConfiguration: TreeConfiguration) => {
             this._treeConfiguration = treeConfiguration;
             this.types = this.typeService.getKoheseTypes();
+            delete this.types['KoheseModel'];
+            delete this.types['KoheseView'];
             this._koheseTypeStream.next(this.types[Object.keys(this.
               types)[0]]);
             this._changeDetectorRef.markForCheck();

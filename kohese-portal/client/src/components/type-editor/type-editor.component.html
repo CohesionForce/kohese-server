@@ -36,16 +36,14 @@
               </data-model-editor>
             </ng-template>
           </mat-tab>
-          <ng-container *ngIf="(koheseTypeStream | async).viewModelProxy">
-            <mat-tab label="{{'Display' + ((koheseTypeStream | async).
-              viewModelProxy.dirty ? '*' : '')}}">
-              <ng-template matTabContent>
-                <view-model-editor [viewModel]="(koheseTypeStream | async).
-                  viewModelProxy.item">
-                </view-model-editor>
-              </ng-template>
-            </mat-tab>
-          </ng-container>
+          <mat-tab label="{{'Display' + ((koheseTypeStream | async).
+            viewModelProxy.dirty ? '*' : '')}}">
+            <ng-template matTabContent>
+              <view-model-editor [viewModel]="(koheseTypeStream | async).
+                viewModelProxy.item">
+              </view-model-editor>
+            </ng-template>
+          </mat-tab>
         </mat-tab-group>
       </ng-container>
     </div>
