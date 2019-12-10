@@ -117,10 +117,6 @@ export class DetailsComponent extends ProxyDetailsComponent
     return this.treeConfig.getProxyFor(id);
   }
 
-  getHistory = function (): void {
-    this.itemRepository.getHistoryFor(this.itemProxy);
-  };
-
   removeItem(proxy: ItemProxy): void {
     this.itemRepository.deleteItem(proxy, false)
       .then(function () {

@@ -23,6 +23,7 @@ import { PipesModule } from "../../pipes/pipes.module";
 import { UserInputModule } from '../user-input/user-input.module';
 import { DetailsDialogComponent } from "./details-dialog/details-dialog.component";
 import { TextEditorModule } from '../text-editor/text-editor.module';
+import { CompareItemsModule } from '../compare-items/compare-items.module';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { TextEditorModule } from '../text-editor/text-editor.module';
     UserInputModule,
     TreeModule.forRoot(),
     MarkdownModule,
-    TextEditorModule
+    TextEditorModule,
+    CompareItemsModule
   ],
   exports : [
     DetailsComponent,

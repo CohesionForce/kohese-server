@@ -7,7 +7,6 @@ import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { UserInputModule } from '../user-input/user-input.module';
-import { DetailsModule } from '../details/details.module';
 import { CompareItemsComponent } from './item-comparison/compare-items.component';
 import { CommitComparisonComponent } from './commit-comparison/commit-comparison.component';
 import { ChangeSummaryComponent } from './change-summary/change-summary.component';
@@ -25,7 +24,8 @@ import { ComparisonComponent } from './comparison.component';
     CommitComparisonComponent
   ],
   exports: [
-    ChangeSummaryComponent
+    ChangeSummaryComponent,
+    ComparisonComponent
   ],
   imports: [
     CommonModule,
@@ -34,8 +34,7 @@ import { ComparisonComponent } from './comparison.component';
     VirtualScrollModule,
     MaterialModule,
     PipesModule,
-    UserInputModule,
-    DetailsModule
+    UserInputModule
   ]
 })
 export class CompareItemsModule {
