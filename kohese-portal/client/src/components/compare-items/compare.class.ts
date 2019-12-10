@@ -9,7 +9,7 @@ import * as _ from 'underscore';
 
 export class Compare {
   public static async compareCommits(baseCommitId: string, changeCommitId: string,
-    dynamicTypesService: DynamicTypesService): Promise<Array<Comparison>> {
+    dynamicTypesService: DynamicTypesService, deferPropertyDiffs : boolean = false): Promise<Array<Comparison>> {
     let comparisons: Array<ItemProxyComparison> = [];
     let cache: ItemCache = ItemCache.getItemCache();
     let baseCommit = await cache.getCommit(baseCommitId);
@@ -26,7 +26,6 @@ export class Compare {
         let changeTreeHashMap: TreeHashMap = await changeCommit.getTreeHashMap();
         diff = TreeHashMap.diff(baseTreeHashMap, changeTreeHashMap);
       }
-      let afterDiff = Date.now();
 
       if (!diff.match) {
         for (let itemId in diff.details) {
@@ -38,7 +37,7 @@ export class Compare {
           let changeBlobOID = diffEntry.right.oid;
           let beforeItemDiff = Date.now();
           let comparison: ItemProxyComparison = await Compare.compareItems(itemId, baseBlobKind, baseBlobOID, 
-            itemId, changeBlobKind, changeBlobOID, dynamicTypesService);
+            itemId, changeBlobKind, changeBlobOID, dynamicTypesService, deferPropertyDiffs);
           let afterItemDiff = Date.now();
           let itemDiffDelta = (afterItemDiff-beforeItemDiff)/1000;
           if (itemDiffDelta > 1.0) {
@@ -114,7 +113,7 @@ export class Compare {
   
   public static compareItems(baseId: ItemIdType, baseBlobKind: string, baseBlobOID: ObjectHashValueType,
     changeId: string, changeBlobKind: string, changeBlobOID: ObjectHashValueType, dynamicTypesService:
-    DynamicTypesService): Promise<ItemProxyComparison> {
+    DynamicTypesService, deferPropertyDiffs : boolean = false): Promise<ItemProxyComparison> {
     return new Promise<ItemProxyComparison>(async (resolve: (comparison:
       ItemProxyComparison) => void, reject: () => void) => {
       let itemCache: ItemCache = ItemCache.getItemCache();
@@ -245,7 +244,7 @@ export class Compare {
   
       if(!_.isEqual(baseItem, changeItem)){
         // Only compare the items if they are not the same
-        await comparison.compare();
+        await comparison.compare(deferPropertyDiffs);
       }
       resolve(comparison);
     });

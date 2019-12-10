@@ -106,22 +106,37 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       if (treeConfigurationObject) {
         this._repositoryProxy = treeConfigurationObject.config.getRootProxy();
         let thisRef = this;
+
         this.buildRows().then(() => {
-          console.log('^^^ buildRows complete');
           thisRef._route.params.subscribe((parameters: Params) => {
             thisRef.showFocus();
           });
-
-          thisRef.initialize();
-
-          thisRef.showFocus();
         });
+
+        thisRef.initialize();
+        thisRef.showFocus();
       }
     });
   }
 
   public ngOnDestroy(): void {
     this._itemRepositorySubscription.unsubscribe();
+  }
+
+  private async buildRowsForCommit(commitObject : any, commits : Array<Commit>): Promise<void> {
+    const deferPropertyDiffs = true;
+    let comparisons: Array<Comparison> = [];
+    let commitRow: TreeRow = this.buildRow(new Commit(commitObject.oid,
+      commitObject.commit, comparisons));
+    commits.push(commitRow.object);
+    if (commitObject.commit.parents && commitObject.commit.parents[0]) {
+      comparisons.push(...await Compare.compareCommits(commitObject.commit.parents[
+        0], commitObject.oid, this._dynamicTypesService, deferPropertyDiffs));
+    }
+
+    for (let j: number = 0; j < comparisons.length; j++) {
+      this.buildRow(comparisons[j]);
+    }
   }
 
   private async buildRows(): Promise<void> {
@@ -143,26 +158,40 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     let commits: Array<Commit> = [];
     let rootRow: TreeRow = this.buildRow(new Repository(this._repositoryProxy,
       commits));
-    let beforeTime = Date.now();
-    for (let j: number = 0; j < sortedCommitArray.length; j++) {
-      let commitObject: any = sortedCommitArray[j];
-      let comparisons: Array<Comparison> = [];
-      let commitRow: TreeRow = this.buildRow(new Commit(commitObject.oid,
-        commitObject.commit, comparisons));
-      commits.push(commitRow.object);
-      if (commitObject.commit.parents && commitObject.commit.parents[0]) {
-        comparisons.push(...await Compare.compareCommits(commitObject.commit.parents[
-          0], commitObject.oid, this._dynamicTypesService));
-      }
-
-      for (let j: number = 0; j < comparisons.length; j++) {
-        this.buildRow(comparisons[j]);
-      }
-    }
-    let afterTime = Date.now();
-    console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);
 
     this.rootSubject.next(rootRow.object);
+
+    let beforeTime = Date.now();
+
+    sortedCommitArray.reverse();
+
+    let commitIteration = 0;
+    const yieldWithNoDelay = 0;
+
+    let thisComponent = this;
+    async function processCommit () : Promise<void> {
+      if (sortedCommitArray.length > 0) {
+        // console.log('^^^ Building rows for commit: ' + commitIteration);
+
+        let commitObject: any = sortedCommitArray.pop();
+        await thisComponent.buildRowsForCommit(commitObject, commits);
+  
+        thisComponent.rootSubject.next(rootRow.object);
+  
+        // thisComponent.showFocus();
+        thisComponent._changeDetectorRef.detectChanges();
+        commitIteration++;
+
+        if (sortedCommitArray.length) {
+          setTimeout(processCommit, yieldWithNoDelay);
+        } else {
+          let afterTime = Date.now();
+          console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);      
+        }
+      }
+    }
+
+    await processCommit();
   }
 
   protected getId(object: any): any {
