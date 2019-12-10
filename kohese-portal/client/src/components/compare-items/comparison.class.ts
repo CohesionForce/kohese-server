@@ -196,11 +196,11 @@ export class Comparison {
   //////////////////////////////////////////////////////////////////////////
   protected  replaceImage(inString: string) : String {
     let newString = new String(inString);
-    let base64RegEx = /(\!\[[^\]]*\]\(data:image\/[a-zA-Z]*;base64,)([^\)]*)(\))/;
+    let base64RegEx = /(\!\[[^\]]*\])(\(data:image\/[a-zA-Z]*;base64,)([^\)]*)(\))/;
     let hasImage = newString.match(base64RegEx);
     while (hasImage) {
-      let imageOID = this.calcBlobOID(hasImage[2]);
-      newString = newString.replace(base64RegEx,'(koid://' + imageOID +')');
+      let imageOID = this.calcBlobOID(hasImage[3]);
+      newString = newString.replace(base64RegEx,'$1(koid://' + imageOID +')');
       // console.log('^^^ Replacing image: ' + imageOID);
       hasImage = newString.match(base64RegEx);
     }

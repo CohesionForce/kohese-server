@@ -456,11 +456,11 @@ function calcBlobOID(forText) {
 //////////////////////////////////////////////////////////////////////////
 function replaceImage(inString: string) : String {
   let newString = new String(inString);
-  let base64RegEx = /(\!\[[^\]]*\]\(data:image\/[a-zA-Z]*;base64,)([^\)]*)(\))/;
+  let base64RegEx = /(\!\[[^\]]*\])(\(data:image\/[a-zA-Z]*;base64,)([^\)]*)(\))/;
   let hasImage = newString.match(base64RegEx);
   while (hasImage) {
-    let imageOID = calcBlobOID(hasImage[2]);
-    newString = newString.replace(base64RegEx,'(koid://' + imageOID + ')');
+    let imageOID = calcBlobOID(hasImage[3]);
+    newString = newString.replace(base64RegEx,'$1(koid://' + imageOID + ')');
     hasImage = newString.match(base64RegEx);
   }
   return newString;
