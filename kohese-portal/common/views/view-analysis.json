@@ -1,7 +1,7 @@
 {
   "id": "view-analysis",
   "name": "Analysis View Model",
-  "parentId": "",
+  "parentId": "View-Model-Definitions",
   "modelName": "Analysis",
   "icon": "",
   "color": "#000000",
