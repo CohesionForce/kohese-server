@@ -41,7 +41,7 @@ export class MockItemRepository {
     return this.mockRootProxy;
   }
 
-  public getHistoryFor(proxy: ItemProxy): Observable<Array<any>> {
+  public getHistoryFor(proxy: ItemProxy): Promise<any> {
     let historyObject: any = {
       author: 'Kurios Iesous',
       commit: 'Kurios Iesous',
@@ -49,7 +49,7 @@ export class MockItemRepository {
       date: 0
     };
     proxy.history = [historyObject];
-    return observableOf(JSON.parse(JSON.stringify(proxy.history)));
+    return Promise.resolve((JSON.parse(JSON.stringify(proxy.history))));
   }
 
   getProxyFor(id: string) {

@@ -447,39 +447,6 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getHistory', function(request, sendResponse){
-    var username = 'Unknown';
-    if (socket.koheseUser){
-      username = socket.koheseUser.username;
-    }
-
-    console.log('::: Getting history for ' + request.onId + ' for user ' + username);
-
-    let requestTime = Date.now();
-
-    let proxy = ItemProxy.getWorkingTree().getProxyFor(request.onId);
-
-    if (proxy && !proxy.history) {
-      // Note:  This call is synchronous
-      kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
-        if (history){
-          proxy.history = history;
-        }
-      });
-    }
-
-    if (proxy && proxy.history) {
-      let responseTime = Date.now();
-      console.log('+++ History for ' + request.onId);
-      console.log(JSON.stringify(proxy.history, null, '  '));
-      console.log('$$$ History response time: ' + (responseTime - requestTime)/1000);
-      sendResponse(proxy.history);
-    } else {
-      console.log('*** History error for ' + request.onId);
-      sendResponse({error: 'history error'});
-    }
-});
-  
   socket.on('getIcons', (request: any, sendResponse: Function) => {
     fs.readFile(_ICONS_FILE_PATH, 'utf8', (error: any, data: string) => {
       sendResponse(data.split('\n').filter((iconName: string) => {
