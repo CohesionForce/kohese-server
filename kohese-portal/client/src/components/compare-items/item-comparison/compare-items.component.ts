@@ -173,8 +173,7 @@ export class CompareItemsComponent implements OnInit {
     proxy: ItemProxy): Promise<Array<any>> {
     return new Promise<Array<any>>(async (resolve: (history:
       Array<any>) => void, reject: () => void) => {
-      let history: Array<any> = await this._itemRepository.getHistoryFor(proxy).
-        toPromise();
+      let history: Array<any> = await this._itemRepository.getHistoryFor(proxy);
       if (0 === proxy.vcStatus.statusArray.filter((status: string) => {
         return status.startsWith('WT');
       }).length && (history.length > 0)) {

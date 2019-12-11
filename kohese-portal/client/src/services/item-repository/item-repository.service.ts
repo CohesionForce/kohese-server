@@ -790,28 +790,15 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  public getHistoryFor(proxy: ItemProxy): Observable<Array<any>> {
+  public async getHistoryFor(proxy: ItemProxy): Promise<any> {
 
-    this._cache.getHistory(proxy.item.id).then((history) => {
-      proxy.history = history;
-    });
-
-    let emitReturningObservable: (message: string, data: any) => Observable<any> =
-      bindCallback(this.socketService.getSocket().emit.bind(this.
-        socketService.getSocket()));
-    return emitReturningObservable('Item/getHistory', { onId: proxy.item.id }).pipe(
-      map((response: any) => {
-        proxy.oldHistory = response.history;
-        this._cache.getHistoryWithNewStyle(proxy.item.id).then((history) => {
-          proxy.newHistoryNewStyle = history;
-        });
-
-        // TODO: Determine why subscribers are changing the returned history
-        
-        /* Return a copy of the history so that subscribers may modify the
-        returned history, if desired. */
-        return JSON.parse(JSON.stringify(proxy.history));
-      }));
+    proxy.history = await this._cache.getHistory(proxy.item.id);
+    proxy.newHistoryNewStyle = await this._cache.getHistoryWithNewStyle(proxy.item.id);
+    // TODO: Determine why subscribers are changing the returned history
+    
+    /* Return a copy of the history so that subscribers may modify the
+    returned history, if desired. */
+    return JSON.parse(JSON.stringify(proxy.history));
   }
 
   //////////////////////////////////////////////////////////////////////////

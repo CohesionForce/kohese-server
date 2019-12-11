@@ -71,7 +71,6 @@ export class ItemProxy {
   private _vcStatus : VersionStatus = new VersionStatus();
   public history;
   public newHistoryNewStyle;  // TODO: Remove this after testing is complete
-  public oldHistory;  // TODO: Remove this after testing is complete
   public type; // Used to store KoheseType.
 
   //////////////////////////////////////////////////////////////////////////
