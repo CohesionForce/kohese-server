@@ -149,7 +149,7 @@ export class CompareItemsComponent implements OnInit {
         (async () => {
           await Promise.all([baseProxyProcessingPromise,
             changeProxyProcessingPromise]);
-          this.compare();
+          await this.compare();
         })();
       }
     }

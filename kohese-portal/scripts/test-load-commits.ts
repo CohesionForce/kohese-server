@@ -6,6 +6,7 @@ import { KoheseCommit } from '../common/src/kohese-commit';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap, ItemIdType } from '../common/src/tree-hash';
 import _ from 'underscore';
+import * as JsDiff from 'diff';
 
 // let heapdump = require ('heapdump');
 
@@ -424,6 +425,87 @@ function deltaMessage(message, before, after) {
   console.log('^^^ ' + message + ': ' + (after-before)/1000);
 }
 
+import * as jsSHA_Import from 'jssha';
+
+//
+// Adjust for the differences in CommonJS and ES6 for jssha
+//
+let jsSHA;
+if (typeof(jsSHA_Import) === 'object') {
+  jsSHA = (<any>jsSHA_Import).default;
+} else {
+  jsSHA = jsSHA_Import;
+}
+
+function calcBlobOID(forText) {
+
+    // This function calculates a OID that is equivalaent to the one calculated
+    // natively by git.for the contents of a blob
+
+    var length = forText.length;
+
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
+
+    shaObj.update('blob ' + length + '\0' + forText);
+
+    var oid = shaObj.getHash('HEX');
+
+    return oid;
+  }
+
+//////////////////////////////////////////////////////////////////////////
+function replaceImage(inString: string) : String {
+  let newString = new String(inString);
+  let base64RegEx = /(\!\[[^\]]*\])(\(data:image\/[a-zA-Z]*;base64,)([^\)]*)(\))/;
+  let hasImage = newString.match(base64RegEx);
+  while (hasImage) {
+    let imageOID = calcBlobOID(hasImage[3]);
+    newString = newString.replace(base64RegEx,'$1(koid://' + imageOID + ')');
+    hasImage = newString.match(base64RegEx);
+  }
+  return newString;
+}
+
+//////////////////////////////////////////////////////////////////////////
+async function diffItemVersions(itemId) {
+  let itemCache = ItemCache.getItemCache();
+
+  console.log("::: Diff Item Versions for: " + itemId);
+  let history = await itemCache.getHistoryWithNewStyle(itemId);
+  // console.log(JSON.stringify(history, null, '  '));
+
+  for (let versionDiff of history){
+    let beforeTime = Date.now();
+
+    if (versionDiff.oldTreeEntry && versionDiff.newTreeEntry){
+      let oldOid = versionDiff.oldTreeEntry.oid;
+      let newOid = versionDiff.newTreeEntry.oid;
+      let oldBlob = await itemCache.getBlob(oldOid);
+      let newBlob = await itemCache.getBlob(newOid);
+  
+      let blobCompare = ItemCache.compareObjects(oldBlob, newBlob);
+    
+      // console.log('::: Blob Diff');
+      // console.log(JSON.stringify(blobCompare, null, '  '));
+  
+      for (let field in blobCompare.details.changed) {
+        console.log('::: Field Changed: ' + field);
+        let leftValue = blobCompare.details.changed[field].left;
+        let rightValue = blobCompare.details.changed[field].right;
+  
+        leftValue = replaceImage(leftValue);
+        rightValue = replaceImage(rightValue);
+        let fieldDiff = JsDiff.diffWords(leftValue, rightValue);
+        fieldDiff = JSON.parse(JSON.stringify(fieldDiff));
+        console.log(fieldDiff);
+      }  
+    }
+  
+    let afterTime = Date.now();
+    console.log('::: Diff time:  ' + itemId + ' - ' + (afterTime-beforeTime)/1000);  
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 async function simulateClientSync() {
 
@@ -487,10 +569,21 @@ try {
 
       // await simulateClientSync();
 
-      await diffEachCommit();
-      await diffEachCommit();
+      // await diffEachCommit();
 
-      await compareAllHistories();
+      // await compareAllHistories();
+
+      let itemCache : ItemCache = ItemCache.getItemCache();
+      let historyMap = await itemCache.getHistoryMap();
+
+      console.log("::: Begin full system diff");
+
+      let beforeTime = Date.now();
+      for (let itemId of Object.keys(historyMap)) {
+        await diffItemVersions(itemId);
+      }
+      let afterTime = Date.now();
+      console.log('::: Full diff time: ' + (afterTime-beforeTime)/1000);
 
     } catch (err) {
       console.log('*** Error');

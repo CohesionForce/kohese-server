@@ -96,6 +96,18 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy {
   
   public hasChanges(comparison: Comparison): boolean {
     let hasChanges: boolean = false;
+    if (comparison.propertyDiffDeferred) {
+      // Since this detection may occur more than once, only request the detail diff
+      // if it is not already in progess
+      if(!comparison.propertyDiffInProgress){
+        // console.log('^^^ Getting change detaila...');
+        comparison.compareProperties().then(() => {
+          // console.log('^^^ Got change detaila...');
+          this._changeDetectorRef.detectChanges();
+        });
+      }
+      return false;
+    }
     let properties: Array<Property> = Array.from(comparison.
       propertyComparisonMap.keys());
     for (let j: number = 0; j < properties.length; j++) {
