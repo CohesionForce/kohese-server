@@ -1,6 +1,5 @@
-import { Component, ChangeDetectionStrategy,
-  ChangeDetectorRef, OnInit, OnDestroy, EventEmitter,
-  Output } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy, EventEmitter,
+  Output, ViewRef} from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -177,16 +176,18 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
         await thisComponent.buildRowsForCommit(commitObject, commits);
   
         thisComponent.rootSubject.next(rootRow.object);
-  
-        // thisComponent.showFocus();
-        thisComponent._changeDetectorRef.detectChanges();
-        commitIteration++;
 
-        if (sortedCommitArray.length) {
-          setTimeout(processCommit, yieldWithNoDelay);
-        } else {
-          let afterTime = Date.now();
-          console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);      
+        if (thisComponent._changeDetectorRef && !(thisComponent._changeDetectorRef as ViewRef).destroyed) {
+          // The view still exists, so detectChanges and keep processing the commits
+          thisComponent._changeDetectorRef.detectChanges();
+          commitIteration++;
+  
+          if (sortedCommitArray.length) {
+            setTimeout(processCommit, yieldWithNoDelay);
+          } else {
+            let afterTime = Date.now();
+            console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);      
+          }  
         }
       }
     }
