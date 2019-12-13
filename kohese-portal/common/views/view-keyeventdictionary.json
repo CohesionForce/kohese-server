@@ -70,7 +70,9 @@
       "id": "606b9540-fb8b-11e9-8df2-e9413ca0bcbd"
     }
   },
-  "defaultFormatKey": "606b9540-fb8b-11e9-8df2-e9413ca0bcbd",
+  "defaultFormatKey": {
+    "document": "606b9540-fb8b-11e9-8df2-e9413ca0bcbd"
+  },
   "tableDefinitions": {
     "8446d010-fb8b-11e9-8df2-e9413ca0bcbd": {
       "id": "8446d010-fb8b-11e9-8df2-e9413ca0bcbd",

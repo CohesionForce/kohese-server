@@ -126,7 +126,9 @@
       "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
     }
   },
-  "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "defaultFormatKey": {
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+  },
   "tableDefinitions": {},
   "itemIds": []
 }

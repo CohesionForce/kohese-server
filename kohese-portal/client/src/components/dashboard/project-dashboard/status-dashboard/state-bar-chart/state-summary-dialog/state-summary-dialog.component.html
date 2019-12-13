@@ -44,8 +44,8 @@
               </mat-card-title>
               <mat-card-content style="background-color: white; color: black;">
                 <format-object-editor [type]="row.model.item"
-                  [object]="row.item" [disabled]="(editableSet.indexOf(
-                  row.item.id) === -1)">
+                  [object]="row.item" [formatDefinition]="getFormatDefinition(
+                  row)" [disabled]="(editableSet.indexOf(row.item.id) === -1)">
                 </format-object-editor>
               </mat-card-content>
             </mat-card>

@@ -70,7 +70,9 @@
       ]
     }
   },
-  "defaultFormatKey": "2f3dd260-15eb-11ea-97d2-3bae97d5d967",
+  "defaultFormatKey": {
+    "document": "2f3dd260-15eb-11ea-97d2-3bae97d5d967"
+  },
   "tableDefinitions": {},
   "itemIds": []
 }

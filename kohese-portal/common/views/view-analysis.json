@@ -42,7 +42,9 @@
       ]
     }
   },
-  "defaultFormatKey": "2e6c7aa0-15d5-11ea-97d2-3bae97d5d967",
+  "defaultFormatKey": {
+    "document": "2e6c7aa0-15d5-11ea-97d2-3bae97d5d967"
+  },
   "tableDefinitions": {},
   "itemIds": []
 }

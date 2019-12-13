@@ -1,7 +1,6 @@
 <div style="width: 100%; overflow: auto; padding: 7px;" [ngStyle]="{ 'height':
   isDialogInstance() ? '90%' : '100%' }">
-  <ng-container *ngFor="let container of viewModel.formatDefinitions[
-    viewModel.defaultFormatKey].containers">
+  <ng-container *ngFor="let container of formatDefinition.containers">
     <ng-container *ngIf="container.kind === 'list'">
       <ng-container *ngFor="let attributeDefinition of container.contents">
         <ng-container *ngIf="Array.isArray(TreeConfiguration.getWorkingTree().

@@ -4,7 +4,8 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from '../../details/details-dialog/details-dialog.component';
-import { FormatDefinition } from '../../type-editor/FormatDefinition.interface';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -165,5 +166,17 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
         }
     }
     return false;
+  }
+  
+   public getFormatDefinition(itemProxy: ItemProxy): FormatDefinition {
+    let viewModel: any = this.getViewModel(itemProxy);
+    let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
+      viewModel.defaultFormatKey[FormatDefinitionType.CARD]];
+    if (formatDefinition) {
+      return formatDefinition;
+    }
+    
+    return viewModel.formatDefinitions[viewModel.defaultFormatKey[
+      FormatDefinitionType.DOCUMENT]];
   }
 }
