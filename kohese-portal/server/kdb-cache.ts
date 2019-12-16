@@ -458,6 +458,7 @@ export class KDBCache extends LevelCache {
             if (head !== refHEAD){
               kdbCache.cacheRef('HEAD', refHEAD);
               kdbFS.storeJSONDoc(kdbCache.refsDirectory + '/HEAD.json', refHEAD);
+              await kdbCache.saveAllPendingWrites();
             }
           } catch (err) {
             console.log('*** Error while writing HEAD reference');
