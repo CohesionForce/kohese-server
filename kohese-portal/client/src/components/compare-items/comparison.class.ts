@@ -1,4 +1,15 @@
 import * as JsDiff from 'diff';
+import * as jsSHA_Import from 'jssha';
+
+//
+// Adjust for the differences in CommonJS and ES6 for jssha
+//
+let jsSHA;
+if (typeof(jsSHA_Import) === 'object') {
+  jsSHA = (<any>jsSHA_Import).default;
+} else {
+  jsSHA = jsSHA_Import;
+}
 
 export class Property {
   public constructor(public id: string, public name: string, public hidden:
@@ -14,6 +25,9 @@ export enum ChangeType {
 }
 
 export class Comparison {
+  public propertyDiffDeferred : boolean;
+  public propertyDiffInProgress : boolean;
+
   get baseObject() {
     return this._baseObject;
   }
@@ -44,7 +58,7 @@ export class Comparison {
   public constructor(private _baseObject: any, private _changeObject: any) {
   }
 
-  public async compare(): Promise<void> {
+  public async compare(deferPropertyDiffs : boolean = false): Promise<void> {
     let baseObjectProperties: Array<Property> = this.getProperties(this.
       _baseObject);
     for (let j: number = 0; j < baseObjectProperties.length; j++) {
@@ -69,34 +83,53 @@ export class Comparison {
       }
     }
 
-    let properties: Array<Property> = Array.from(this._propertyComparisonMap.
-      keys());
-    this._numberOfHiddenProperties = 0;
-    for (let j: number = 0; j < properties.length; j++) {
-      if (properties[j].hidden) {
-        this._numberOfHiddenProperties++;
+    if (!deferPropertyDiffs){
+      // Set propertyDiffDeferred to force a recalculate of property differences
+      this.propertyDiffDeferred = true;
+      await this.compareProperties();
+    } else {
+      this.propertyDiffDeferred = deferPropertyDiffs;
+    }
+  }
+
+  public async compareProperties() {
+    if (this.propertyDiffDeferred){
+      this.propertyDiffInProgress = true;
+      let properties: Array<Property> = Array.from(this._propertyComparisonMap.
+        keys());
+      this._numberOfHiddenProperties = 0;
+      for (let j: number = 0; j < properties.length; j++) {
+        if (properties[j].hidden) {
+          this._numberOfHiddenProperties++;
+        }
+  
+        let baseValue: any = this.getPropertyValue(properties[j], this.
+          _baseObject);
+        if (null == baseValue) {
+          baseValue = '';
+        }
+  
+        baseValue = await this.adjustPropertyValue(String(baseValue), this.
+          _baseObject);
+        baseValue = this.replaceImage(baseValue);
+  
+  
+        let changeValue: any = this.getPropertyValue(properties[j], this.
+          _changeObject);
+        if (null == changeValue) {
+          changeValue = '';
+        }
+  
+        changeValue = await this.adjustPropertyValue(String(changeValue), this.
+          _changeObject);
+        changeValue = this.replaceImage(changeValue);
+  
+        this._propertyComparisonMap.get(properties[j]).push(...JsDiff.
+          diffWords(baseValue, changeValue));
       }
 
-      let baseValue: any = this.getPropertyValue(properties[j], this.
-        _baseObject);
-      if (null == baseValue) {
-        baseValue = '';
-      }
-
-      baseValue = await this.adjustPropertyValue(String(baseValue), this.
-        _baseObject);
-
-      let changeValue: any = this.getPropertyValue(properties[j], this.
-        _changeObject);
-      if (null == changeValue) {
-        changeValue = '';
-      }
-
-      changeValue = await this.adjustPropertyValue(String(changeValue), this.
-        _changeObject);
-
-      this._propertyComparisonMap.get(properties[j]).push(...JsDiff.
-        diffWords(baseValue, changeValue));
+      this.propertyDiffDeferred = false;  
+      this.propertyDiffInProgress = false;
     }
   }
 
@@ -140,6 +173,38 @@ export class Comparison {
 
   protected getPropertyValue(property: Property, comparisonObject: any): any {
     return comparisonObject[property.id];
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////
+  protected calcBlobOID(forText) {
+
+    // This function calculates a OID that is equivalaent to the one calculated
+    // natively by git.for the contents of a blob
+
+    var length = forText.length;
+
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
+
+    shaObj.update('blob ' + length + '\0' + forText);
+
+    var oid = shaObj.getHash('HEX');
+
+    return oid;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  protected  replaceImage(inString: string) : String {
+    let newString = new String(inString);
+    let base64RegEx = /(\!\[[^\]]*\])(\(data:image\/[a-zA-Z]*;base64,)([^\)]*)(\))/;
+    let hasImage = newString.match(base64RegEx);
+    while (hasImage) {
+      let imageOID = this.calcBlobOID(hasImage[3]);
+      newString = newString.replace(base64RegEx,'$1(koid://' + imageOID +')');
+      // console.log('^^^ Replacing image: ' + imageOID);
+      hasImage = newString.match(base64RegEx);
+    }
+    return newString;
   }
 
   public async adjustPropertyValue(propertyValue: string, comparisonObject: any):

@@ -25,11 +25,24 @@ export class ListContainerComponent implements OnInit {
   
   @ViewChild('kTable')
   private _table: KTableComponent;
+  
+  private _usernames: Array<string> = [];
+  get usernames() {
+    return this._usernames;
+  }
 
   constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dialogService: DialogService) { }
 
   ngOnInit() {
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree({
+      includeOrigin: false
+    }, (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === 'KoheseUser') {
+        this._usernames.push(itemProxy.item.name);
+      }
+    });
+    this._usernames.sort();
   }
 
   stateChanged(stateName, value) {

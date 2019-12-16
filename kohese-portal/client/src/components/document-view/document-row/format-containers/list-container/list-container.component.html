@@ -35,7 +35,29 @@
     </k-table>
   </ng-container>
   <ng-template #notTable>
-    <div *ngIf="['text', 'user-selector','date'].includes(property.kind)">
+    <ng-container *ngIf="(property.kind === 'boolean')">
+      <mat-checkbox [disabled]="!editable" style="width: 100%;">
+        {{property.hideLabel ? '' : (property.customLabel ? property.
+          customLabel : property.propertyName.attribute)}}
+      </mat-checkbox>
+    </ng-container>
+    <ng-container *ngIf="(property.kind === 'number')">
+      <mat-form-field style="width: 100%;">
+        <input matInput type="number" placeholder="{{property.hideLabel ? '' :
+          (property.customLabel ? property.customLabel : property.propertyName.
+          attribute)}}" [disabled]="!editable" [(ngModel)]="proxy.item[
+          property.propertyName.attribute]"/>
+      </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="(property.kind === 'date')">
+      <mat-form-field style="width: 100%;">
+        <input matInput type="date" placeholder="{{property.hideLabel ? '' :
+          (property.customLabel ? property.customLabel : property.propertyName.
+          attribute)}}" [disabled]="!editable" [(ngModel)]="proxy.item[
+          property.propertyName.attribute]"/>
+      </mat-form-field>
+    </ng-container>
+    <div *ngIf="(property.kind === 'text')">
       <label *ngIf="!property.hideLabel && !property.customLabel"
         style="font-weight: bold;">
         {{property.propertyName.attribute}}:
@@ -60,6 +82,20 @@
     <div *ngIf="property.kind === 'state-editor'">
       <k-state-editor [itemProxy]="proxy" (stateChanged)="stateChanged($event.fieldName, $event.candidate)"></k-state-editor>
     </div>
+    <ng-container *ngIf="(property.kind === 'user-selector')">
+      <mat-form-field style="width: 100%;">
+        <mat-select placeholder="{{property.hideLabel ? '' : (property.
+          customLabel ? property.customLabel : property.propertyName.
+          attribute)}}" [disabled]="!editable" [(ngModel)]="proxy.item[
+          property.propertyName.attribute]">
+          <ng-container *ngFor="let username of usernames">
+            <mat-option [value]="username">
+              {{username}}
+            </mat-option>
+          </ng-container>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
     <div *ngIf="property.kind === 'select'">
       Select not implemented
       <!-- <label *ngIf="!property.hideLabel" style="font-weight: bold;">{{property.propertyName}} : </label> -->

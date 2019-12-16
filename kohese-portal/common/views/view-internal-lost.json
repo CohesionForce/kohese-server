@@ -1,7 +1,7 @@
 {
   "id": "view-internal-lost",
   "name": "Internal-Lost View Model",
-  "parentId": "View-Model-Definitions",
+  "parentId": "view-item",
   "modelName": "Internal-Lost",
   "icon": "fa fa-question",
   "color": "#000000",

@@ -18,6 +18,8 @@ const Path = require('path');
 const importer = require('./directory-ingest');
 var _ = require('underscore');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const _ICONS_FILE_PATH = Path.resolve(fs.realpathSync(__dirname), '..', '..',
+  'icons.txt');
 const _REPORTS_DIRECTORY_PATH = Path.resolve(fs.realpathSync(__dirname), '..',
   '..', 'reports');
 
@@ -445,38 +447,13 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getHistory', function(request, sendResponse){
-    var username = 'Unknown';
-    if (socket.koheseUser){
-      username = socket.koheseUser.username;
-    }
-
-    console.log('::: Getting history for ' + request.onId + ' for user ' + username);
-
-    let requestTime = Date.now();
-
-    let proxy = ItemProxy.getWorkingTree().getProxyFor(request.onId);
-
-    if (proxy && !proxy.history) {
-      // Note:  This call is synchronous
-      kdb.kdbRepo.walkHistoryForFile(request.onId, function(history){
-        if (history){
-          proxy.history = history;
-        }
-      });
-    }
-
-    if (proxy && proxy.history) {
-      let responseTime = Date.now();
-      console.log('+++ History for ' + request.onId);
-      console.log(JSON.stringify(proxy.history, null, '  '));
-      console.log('$$$ History response time: ' + (responseTime - requestTime)/1000);
-      sendResponse(proxy.history);
-    } else {
-      console.log('*** History error for ' + request.onId);
-      sendResponse({error: 'history error'});
-    }
-});
+  socket.on('getIcons', (request: any, sendResponse: Function) => {
+    fs.readFile(_ICONS_FILE_PATH, 'utf8', (error: any, data: string) => {
+      sendResponse(data.split('\n').filter((iconName: string) => {
+        return !!iconName;
+      }));
+    });
+  });
 
   //////////////////////////////////////////////////////////////////////////
   //

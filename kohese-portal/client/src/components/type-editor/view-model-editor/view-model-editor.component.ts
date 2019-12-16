@@ -13,6 +13,12 @@ import { FormatDefinition } from '../FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
+interface Icon {
+  name: string,
+  iconString: string,
+  usages: Array<string>
+}
+
 @Component({
   selector: 'view-model-editor',
   templateUrl: './view-model-editor.component.html',
@@ -33,6 +39,48 @@ export class ViewModelEditorComponent {
     this._itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.
       _viewModel.id);
     this._editable = this._itemProxy.dirty;
+    
+    let viewModels: Array<any> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === 'KoheseView') {
+        viewModels.push(itemProxy.item);
+      }
+    }, undefined);
+    
+    this._itemRepository.getIcons().then((iconNames: Array<string>) => {
+      this._icons = iconNames.sort().map(
+        (iconName: string) => {
+        let name: string = iconName.replace(/-(\S{1})/g, (match: string,
+          captureGroup: string, offset: number, source: string) => {
+          return ' ' + captureGroup.toUpperCase();
+        });
+        let iconString: string = 'fa fa-' + iconName;
+        return {
+          name: name.charAt(0).toUpperCase() + name.substring(1),
+          iconString: iconString,
+          usages: viewModels.filter((viewModel: any) => {
+            return (viewModel.icon === iconString);
+          }).map((viewModel: any) => {
+            return viewModel.modelName;
+          })
+        };
+      });
+      
+      let selectedIconIndex: number = this._icons.map((icon: Icon) => {
+        return icon.iconString;
+      }).indexOf(this._viewModel.icon);
+      /* Without using setTimeout to set scrollTop, the value of scrollTop
+      remained zero. */
+      setTimeout(() => {
+        // Each row should be 36px tall and there should be four columns.
+        this._iconList.nativeElement.scrollTop = (36 * (selectedIconIndex %
+          (Math.floor(this._icons.length + 4) / 4)));
+      }, 0);
+      
+      this._changeDetectorRef.markForCheck();
+    });
+    
     this._attributes = [];
     for (let attributeName in this._viewModel.viewProperties) {
       let attribute: any = this._viewModel.viewProperties[attributeName];
@@ -54,6 +102,13 @@ export class ViewModelEditorComponent {
   set editable(editable: boolean) {
     this._editable = editable;
   }
+  
+  private _icons: Array<Icon>;
+  private _filter: string;
+  private _iconFilterTimeoutIdentifier: any;
+  
+  @ViewChild('iconList')
+  private _iconList: any;
   
   @ViewChild('attributeTable')
   private _attributeTable: MatTable<any>;
@@ -109,16 +164,46 @@ export class ViewModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public openIconSelectionDialog(): void {
-    this._dialogService.openComponentDialog(IconSelectorComponent, {
-      data: {}
-    }).afterClosed().subscribe((result: string) => {
-      if ('\0' !== result) {
-        this._viewModel.icon = result;
-        this._itemProxy.dirty = true;
-        this._changeDetectorRef.markForCheck();
+  public filterChanged(filter: string): void {
+    if (this._iconFilterTimeoutIdentifier) {
+      clearTimeout(this._iconFilterTimeoutIdentifier);
+    }
+    
+    this._iconFilterTimeoutIdentifier = setTimeout(() => {
+      this._filter = filter;      
+      this._changeDetectorRef.markForCheck();
+      this._iconFilterTimeoutIdentifier = undefined;
+    }, 700);
+  }
+  
+  public getIcons(): Array<Icon> {
+    if (this._filter) {
+      return this._icons.filter((icon: Icon) => {
+        return icon.name.toLowerCase().includes(this._filter.toLowerCase());
+      });
+    }
+    
+    return this._icons;
+  }
+  
+  public iconSelected(icon: string): void {
+    let conflictingKindNames: Array<string> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseView') && (itemProxy.item !== this.
+        _viewModel) && (itemProxy.item.icon === icon)) {
+        conflictingKindNames.push(itemProxy.item.modelName);
       }
-    });
+    }, undefined);
+    
+    if (conflictingKindNames.length > 0) {
+      this._dialogService.openInformationDialog('Icon In Use', 'This icon ' +
+        'is already used for the following kinds:\n\t\t- ' +
+        conflictingKindNames.join('\n\t\t- '));
+    }
+    
+    this._viewModel.icon = icon;
+    this._changeDetectorRef.markForCheck();
   }
   
   public colorSelected(color: string): void {
