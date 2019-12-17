@@ -27,7 +27,7 @@
       "required": true
     },
     "defaultFormatKey" : {
-      "type": "string",
+      "type": "object",
       "required": true
     },
     "tableDefinitions": {

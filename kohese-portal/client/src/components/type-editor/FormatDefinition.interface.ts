@@ -6,3 +6,7 @@ export interface FormatDefinition {
   header: FormatContainer;
   containers: Array<FormatContainer>;
 }
+
+export enum FormatDefinitionType {
+  DOCUMENT = 'document', CARD = 'card'
+}

@@ -6,6 +6,7 @@ import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
+import { FormatDefinitionType } from './FormatDefinition.interface';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
@@ -93,7 +94,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           color: '#000000',
           viewProperties: {},
           formatDefinitions: {},
-          defaultFormatKey: formatDefinitionId,
+          defaultFormatKey: {},
           tableDefinitions: {}
         };
         viewModel.formatDefinitions[formatDefinitionId] = {
@@ -130,6 +131,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           ],
           'id': formatDefinitionId
         };
+        viewModel.defaultFormatKey[FormatDefinitionType.DOCUMENT] =
+          formatDefinitionId;
         let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
           upsertItem('KoheseView', viewModel);
 

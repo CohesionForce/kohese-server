@@ -91,7 +91,9 @@
       "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
     }
   },
-  "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "defaultFormatKey": {
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+  },
   "tableDefinitions": {
     "2d055090-f9e9-11e9-b7dd-656a0313eaea": {
       "id": "2d055090-f9e9-11e9-b7dd-656a0313eaea",

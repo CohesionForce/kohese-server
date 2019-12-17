@@ -6,6 +6,8 @@ import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -41,6 +43,16 @@ export class FormatObjectEditorComponent implements OnInit {
   set type(type: any) {
     this._type = type;
     this.object = this._object;
+  }
+  
+  private _formatDefinition: FormatDefinition;
+  get formatDefinition() {
+    return this._formatDefinition;
+  }
+  @Input('formatDefinition')
+  set formatDefinition(formatDefinition: FormatDefinition) {
+    this._formatDefinition = formatDefinition;
+    this._changeDetectorRef.markForCheck();
   }
   
   private _isDisabled: boolean = false;
@@ -90,9 +102,15 @@ export class FormatObjectEditorComponent implements OnInit {
     if (this.isDialogInstance()) {
       this._object = this._data['object'];
       this._type = this._data['type'];
+      this._formatDefinition = this._data['formatDefinition'];
     }
     
     this.object = this._object;
+    
+    if (!this._formatDefinition) {
+      this._formatDefinition = this._viewModel.formatDefinitions[this.
+        _viewModel.defaultFormatKey[FormatDefinitionType.DOCUMENT]];
+    }
     
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree({
       includeOrigin: false

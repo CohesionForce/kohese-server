@@ -3,8 +3,9 @@
     {{kindName}}: {{stateName}}
   </div>
     <ngx-datatable #proxyTable class="material expandable" [rows]="proxies" [columnMode]="'force'" [headerHeight]="50"
-      [footerHeight]="50" [rowHeight]="50" [scrollbarV]="true" style="height: 90%;">
-      <ngx-datatable-row-detail [rowHeight]="300" #myDetailRow>
+      [footerHeight]="50" [rowHeight]="50" style="height: 90%;
+      overflow-y: visible;">
+      <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
         <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
           <div style="padding-left:35px;">
             <mat-card [ngStyle]="{ 'background-color': color }"
@@ -44,8 +45,8 @@
               </mat-card-title>
               <mat-card-content style="background-color: white; color: black;">
                 <format-object-editor [type]="row.model.item"
-                  [object]="row.item" [disabled]="(editableSet.indexOf(
-                  row.item.id) === -1)">
+                  [object]="row.item" [formatDefinition]="getFormatDefinition(
+                  row)" [disabled]="(editableSet.indexOf(row.item.id) === -1)">
                 </format-object-editor>
               </mat-card-content>
             </mat-card>

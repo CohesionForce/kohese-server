@@ -147,9 +147,167 @@
         }
       ],
       "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    },
+    "1b91cfb0-1798-11ea-a725-0b882dea506f": {
+      "id": "1b91cfb0-1798-11ea-a725-0b882dea506f",
+      "name": "Card",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "Task",
+              "attribute": "name"
+            },
+            "hideLabel": false,
+            "hideEmpty": false,
+            "labelOrientation": "Top",
+            "kind": "text",
+            "inputOptions": {
+              "type": "text",
+              "options": {
+                "isMultiLine": false
+              }
+            },
+            "customLabel": ""
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "estimatedStart"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "date",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "date",
+                "options": {}
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "estimatedCompletion"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "date",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "date",
+                "options": {}
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "estimatedHoursEffort"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "remainingHoursEffort"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "actualHoursEffort"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "predecessors"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "proxy-selector",
+                "options": {
+                  "allowMultiSelect": true,
+                  "type": "Item",
+                  "useAdvancedSelector": false
+                }
+              },
+              "customLabel": "",
+              "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "taskState"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "state-editor",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "state-editor",
+                "options": {
+                  "options": [
+                    "Proposed",
+                    "Accepted",
+                    "In Work"
+                  ]
+                }
+              },
+              "customLabel": ""
+            }
+          ]
+        }
+      ]
     }
   },
-  "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "defaultFormatKey": {
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "card": "1b91cfb0-1798-11ea-a725-0b882dea506f"
+  },
   "tableDefinitions": {},
   "itemIds": []
 }

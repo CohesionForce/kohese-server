@@ -9,7 +9,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { IconSelectorComponent } from '../icon-selector/icon-selector.component';
 import { FormatPreviewComponent } from '../format-editor/format-preview/format-preview.component';
 import { TableDefinition } from '../TableDefinition.interface';
-import { FormatDefinition } from '../FormatDefinition.interface';
+import { FormatDefinition,
+  FormatDefinitionType } from '../FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
@@ -141,6 +142,10 @@ export class ViewModelEditorComponent {
   private _dataModel: any;
   get dataModel() {
     return this._dataModel;
+  }
+  
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
   }
   
   get Object() {
@@ -331,8 +336,17 @@ export class ViewModelEditorComponent {
     }).updateSize('70%', '70%');
   }
   
-  public setDefaultFormatDefinition(formatDefinitionId: string): void {
-    this._viewModel.defaultFormatKey = formatDefinitionId;
+  public setDefaultFormatDefinition(formatDefinitionType: FormatDefinitionType,
+    formatDefinitionId: string): void {
+    if ((formatDefinitionType !== FormatDefinitionType.DOCUMENT) &&
+      (formatDefinitionId === this._viewModel.defaultFormatKey[
+      formatDefinitionType])) {
+      delete this._viewModel.defaultFormatKey[formatDefinitionType];
+    } else {
+      this._viewModel.defaultFormatKey[formatDefinitionType] =
+        formatDefinitionId;
+    }
+    
     this._itemProxy.dirty = true;
     this._changeDetectorRef.markForCheck();
   }

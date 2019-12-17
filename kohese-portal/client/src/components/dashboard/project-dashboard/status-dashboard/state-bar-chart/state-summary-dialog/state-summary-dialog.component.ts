@@ -5,6 +5,8 @@ import { ItemRepository } from '../../../../../../services/item-repository/item-
 import { NavigationService } from '../../../../../../services/navigation/navigation.service';
 import { DialogService } from '../../../../../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from '../../../../../details/details-dialog/details-dialog.component';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../../../../type-editor/FormatDefinition.interface';
 import { ItemProxy } from './../../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../../common/src/tree-configuration';
 import { Component, OnInit } from '@angular/core';
@@ -98,5 +100,16 @@ export class StateSummaryDialogComponent implements OnInit {
   
   public navigate(itemProxy: ItemProxy): void {
     this._navigationService.addTab('Explore', { id: itemProxy.item.id });
+  }
+  
+  public getFormatDefinition(itemProxy: ItemProxy): FormatDefinition {
+    let viewModel: any = this.getViewModel(itemProxy);
+    let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
+      viewModel.defaultFormatKey[FormatDefinitionType.CARD]];
+    if (formatDefinition) {
+      return formatDefinition;
+    }
+    
+    return viewModel.formatDefinitions[FormatDefinitionType.DOCUMENT];
   }
 }
