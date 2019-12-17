@@ -219,9 +219,7 @@ export class KDBRepo {
                     filesCommitted: filePaths
                   };
                   return repo.getCommit(commitId).then(function (c) {
-                    // TODO Update Cache
                     return Promise.resolve(true);
-                    // return indexCommit(c);
                   });
                 });
               });
@@ -394,7 +392,7 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   static async pull(repositoryId, remoteName, signature) {
     var repository = repoList[repositoryId];
-    return fetch(repository, remoteName).then(function () {
+    return KDBRepo.fetch(repository, remoteName).then(function () {
       return KDBRepo.merge(repository, signature);
     });
   }
