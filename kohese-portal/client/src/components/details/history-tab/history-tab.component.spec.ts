@@ -1,5 +1,5 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
@@ -11,8 +11,8 @@ import { MockItem } from '../../../../mocks/data/MockItem';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { BehaviorSubject } from 'rxjs';
 
 describe('Component: History Tab', ()=>{
@@ -26,10 +26,10 @@ describe('Component: History Tab', ()=>{
          MaterialModule,
          BrowserAnimationsModule
          ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},
-        {provide: ItemRepository, useClass: MockItemRepository}
+        { provide: DynamicTypesService, useClass: MockDynamicTypesService }
       ]
     }).compileComponents();
 
