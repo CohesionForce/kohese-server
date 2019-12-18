@@ -7,8 +7,6 @@ let path = require('path');
 console.log('::: Begin KDB File Load');
 
 var kdbFS = require('./kdb-fs');
-var kdbRepo = require('./kdb-repo');
-module.exports.kdbRepo = kdbRepo;
 
 var kdbModel = require('./kdb-model');
 
@@ -18,6 +16,7 @@ import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { KoheseModel } from '../common/src/KoheseModel';
 import { KDBCache } from './kdb-cache';
+import { KDBRepo } from './kdb-repo';
 
 module.exports.ItemProxy = ItemProxy;
 
@@ -189,7 +188,7 @@ function storeModelInstance(proxy, isNewItem){
   console.log('>>> Repo storage: ' + repoStoragePath);
   var filePath = repoStoragePath + '/' + modelName + '/' + modelInstance.id + '.json';
 
-  var promise = Promise.resolve(true);
+  var promise : Promise<boolean|void> = Promise.resolve(true);
   if (modelName === 'Repository'){
     var parentRepo = proxy.parentProxy.getRepositoryProxy();
     var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
@@ -219,7 +218,7 @@ function storeModelInstance(proxy, isNewItem){
     if (isNewItem) {
       // eslint-disable-next-line no-unused-vars
       promise = createRepoStructure(repoStoragePath).then(function (repo) {
-        // Need to call create repo structure once that has been removed from validate
+        // TODO: Need to call create repo structure once that has been removed from validate
       });
     }
   } else {
@@ -245,7 +244,7 @@ function storeModelInstance(proxy, isNewItem){
 
     var repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
     repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
-    return kdbRepo.getItemStatus(ItemProxy.getWorkingTree().getRootProxy().item.id,
+    return KDBRepo.getItemStatus(ItemProxy.getWorkingTree().getRootProxy().item.id,
         repositoryPath);
   }).then((status) => {
     return status;
@@ -426,7 +425,7 @@ function createRepoStructure(repoDirPath) {
 
     checkAndCreateDir(repoDirPath);
 
-    return kdbRepo.initializeRepository(ItemProxy.getWorkingTree().getRootProxy().item.id, repoDirPath);
+    return KDBRepo.initializeRepository(ItemProxy.getWorkingTree().getRootProxy().item.id, repoDirPath);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -576,16 +575,14 @@ async function openRepositories(indexAndExit) {
 
   //Load corresponding git repositories
   var promises = [];
-  promises.push(kdbRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, koheseKDBDirPath));
-
-  index(rootProxy, false);
+  promises.push(KDBRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, koheseKDBDirPath));
 
   // Initialize nodegit repo-open promises
   for(let id in mountList) {
     if(mountList[id].mounted && mountList[id].repoStoragePath) {
       // eslint-disable-next-line no-unused-vars
       var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
-        //promises.push(kdbRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, proxy.repoPath));
+        //promises.push(KDBRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, proxy.repoPath));
         // TODO Once Repositories are version controlled separately,
         // index them here.
     }
@@ -608,16 +605,3 @@ async function openRepositories(indexAndExit) {
 
 }
 
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function index(proxy, overwrite) {
-  var repositoryPath = proxy.repoPath;
-  return kdbRepo.generateCommitHistoryIndices((repositoryPath.endsWith('Root.json') ?
-      path.dirname(repositoryPath) : repositoryPath), overwrite).then(function () {
-    console.log('::: Indexing of ' + proxy.item.name + ' complete.');
-    kdbRepo.loadCommitsFromIndex();
-    console.log('::: Loaded commits from index');
-  });
-}
-module.exports.index = index;

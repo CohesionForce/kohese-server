@@ -106,6 +106,17 @@
         ],
         "cwd": "${workspaceRoot}",
         "sourceMaps": true
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "JN Test-KDB-Repo",
+        "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
+        "args": [
+          "build/server/tests/unit/kdb-repo-spec.js"
+        ],
+        "cwd": "${workspaceRoot}",
+        "sourceMaps": true
       }
     ]
 }
