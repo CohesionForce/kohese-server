@@ -402,21 +402,19 @@ if (typeof(jsSHA_Import) === 'object') {
   jsSHA = jsSHA_Import;
 }
 
+//////////////////////////////////////////////////////////////////////////
 function calcBlobOID(forText) {
 
-    // This function calculates a OID that is equivalaent to the one calculated
-    // natively by git.for the contents of a blob
+  // This function calculates a OID that is equivalaent to the one calculated
+  // natively by git.for the contents of a blob
 
-    var length = forText.length;
+  var length = forText.length;
+  var shaObj = new jsSHA('SHA-1', 'TEXT');
+  shaObj.update('blob ' + length + '\0' + forText);
+  var oid = shaObj.getHash('HEX');
 
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-
-    shaObj.update('blob ' + length + '\0' + forText);
-
-    var oid = shaObj.getHash('HEX');
-
-    return oid;
-  }
+  return oid;
+}
 
 //////////////////////////////////////////////////////////////////////////
 function replaceImage(inString: string) : String {

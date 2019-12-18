@@ -67,6 +67,46 @@
   let pendingAnalysis = {};
   let analysisInProgress: boolean = false;
 
+  import * as jsSHA_Import from 'jssha';
+
+  //
+  // Adjust for the differences in CommonJS and ES6 for jssha
+  //
+  let jsSHA;
+  if (typeof(jsSHA_Import) === 'object') {
+    jsSHA = (<any>jsSHA_Import).default;
+  } else {
+    jsSHA = jsSHA_Import;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  function calcBlobOID(forText) {
+
+    // This function calculates a OID that is equivalaent to the one calculated
+    // natively by git.for the contents of a blob
+
+    var length = forText.length;
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
+    shaObj.update('blob ' + length + '\0' + forText);
+    var oid = shaObj.getHash('HEX');
+
+    return oid;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  function replaceImage(inString: string) : String {
+    let newString = new String(inString);
+    let base64RegEx = /(\!\[[^\]]*\])(\(data:image\/[a-zA-Z]*;base64,)([^\)]*)(\))/;
+    let hasImage = newString.match(base64RegEx);
+    while (hasImage) {
+      let imageOID = calcBlobOID(hasImage[3]);
+      newString = newString.replace(base64RegEx,'$1(koid://' + imageOID + ')');
+      hasImage = newString.match(base64RegEx);
+    }
+    return newString;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
   function queueAnalysisJSON(forProxy, cb) {
 
     let onId = forProxy.item.id;
@@ -91,6 +131,7 @@
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////
   function requestAnalysisJSON(forProxy) {
 
     let onId = forProxy.item.id;
@@ -113,7 +154,7 @@
     }
 
     if (instance.description) {
-      requestData.description = instance.description;
+      requestData.description = replaceImage(instance.description);
       analysis.raw.description = {};
     }
 
@@ -199,6 +240,7 @@
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////
   function performAnalysis (forModelKind, onId, cb){
 
     console.log('::: Preparing to analyze ' + forModelKind + ' ' + onId);
@@ -214,6 +256,7 @@
   }
   module.exports.performAnalysis = performAnalysis;
 
+  //////////////////////////////////////////////////////////////////////////
   function addPseudoChunkToSummary(onAnalysis, key, tokenIndex, nextToken){
     // Create a pseudo chunk to associate this token with
     var pseudoChunk = JSON.parse(JSON.stringify(nextToken));
@@ -224,6 +267,7 @@
     addTokenToSummary(onAnalysis, key, tokenIndex, nextToken);
   }
 
+  //////////////////////////////////////////////////////////////////////////
   function addChunkToSummary(onAnalysis, key, chunkIndex, nextChunk) {
     nextChunk.displayType = lookup[nextChunk.chunkType] + ' (' +
         nextChunk.chunkType + ')';
@@ -249,6 +293,7 @@
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////
   function addTokenToSummary(onAnalysis, key, tokenIndex, nextToken) {
     nextToken.displayType = lookup[nextToken.pos] + ' (' + nextToken.pos + ')';
     nextToken.displayId = key + '-Token-' + tokenIndex;
@@ -273,6 +318,7 @@
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////
   function consolidateAnalysis(onAnalysis) {
     onAnalysis.list = [];
     var nextChunk : any = {};
