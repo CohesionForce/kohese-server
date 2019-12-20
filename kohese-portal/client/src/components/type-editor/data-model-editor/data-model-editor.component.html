@@ -44,7 +44,8 @@
     $event; modifiedEventEmitter.emit()" [disabled]="!editable">
   </textarea>
 </mat-form-field>
-<ng-container *ngIf="!enclosingType">
+<!-- The latter condition is present for component initialization. -->
+<ng-container *ngIf="(!enclosingType && dataModel.localTypes)">
   <div style="width: 100%; display: flex; flex-direction: column;">
     <h3>
       Local Types
