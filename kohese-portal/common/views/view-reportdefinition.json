@@ -5,6 +5,7 @@
   "modelName": "ReportDefinition",
   "icon": "",
   "color": "#000000",
+  "localTypes": {},
   "viewProperties": {},
   "formatDefinitions": {
     "260a0f00-15ec-11ea-97d2-3bae97d5d967": {

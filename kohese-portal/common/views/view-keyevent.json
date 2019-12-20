@@ -8,6 +8,8 @@
   "modifiedOn": 1572489285633,
   "modelName": "KeyEvent",
   "icon": "fa fa-paper-plane",
+  "color": "#000000",
+  "localTypes": {},
   "viewProperties": {
     "EventName": {
       "displayName": "EventName",

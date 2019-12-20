@@ -5,6 +5,7 @@
   "modelName": "Issue",
   "icon": "fa fa-exclamation-circle",
   "color": "#ff0000",
+  "localTypes": {},
   "viewProperties": {
     "issueState": {
       "inputType": {

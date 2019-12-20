@@ -95,17 +95,8 @@ export class DynamicTypesService {
       this.koheseTypes[koheseTypeName] = intermediateObject[koheseTypeName];
     }
     
-    let localTypeNames: Array<string> = [];
-    
-    // Migration code
-    if (!dataModelProxy.item.localTypes) {
-      dataModelProxy.item.localTypes = [];
-    }
-    
-    for (let j: number = 0; j < dataModelProxy.item.localTypes.length; j++) {
-      localTypeNames.push(dataModelProxy.item.localTypes[j].name);
-    }
-    this._localTypeMap.set(dataModelProxy.item.name, localTypeNames);
+    this._localTypeMap.set(dataModelProxy.item.name, Object.keys(
+      dataModelProxy.item.localTypes));
     
     // Migration code
     if (viewModelProxyMap[dataModelProxy.item.id] && !viewModelProxyMap[

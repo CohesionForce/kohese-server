@@ -5,6 +5,7 @@
   "modelName": "Item",
   "icon": "fa fa-sticky-note",
   "color": "#000000",
+  "localTypes": {},
   "viewProperties": {
     "name": {
       "inputType": {

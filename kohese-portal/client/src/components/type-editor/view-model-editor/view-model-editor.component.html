@@ -1,21 +1,23 @@
 <div style="height: 50px; display: flex; flex-direction: row;">
-  <ng-container *ngIf="!editable else editableBlock">
-    <button mat-icon-button matTooltip="Edit display settings for this kind"
-      class="flex-right-align" (click)="editable = true">
-      <mat-icon class="fa fa-edit"></mat-icon>
-    </button>
+  <ng-container *ngIf="!isLocalType">
+    <ng-container *ngIf="!editable else editableBlock">
+      <button mat-icon-button matTooltip="Edit display settings for this kind"
+        class="flex-right-align" (click)="editable = true">
+        <mat-icon class="fa fa-edit"></mat-icon>
+      </button>
+    </ng-container>
+    <ng-template #editableBlock>
+      <!-- Leave the "save" button always enabled for now. -->
+      <button mat-icon-button matTooltip="Save display settings for this kind"
+        class="flex-right-align" (click)="save()">
+        <mat-icon class="fa fa-save"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Discard display changes to this kind"
+        (click)="discardChanges()">
+        <mat-icon class="fa fa-times"></mat-icon>
+      </button>
+    </ng-template>
   </ng-container>
-  <ng-template #editableBlock>
-    <!-- Leave the "save" button always enabled for now. -->
-    <button mat-icon-button matTooltip="Save display settings for this kind"
-      class="flex-right-align" (click)="save()">
-      <mat-icon class="fa fa-save"></mat-icon>
-    </button>
-    <button mat-icon-button matTooltip="Discard display changes to this kind"
-      (click)="discardChanges()">
-      <mat-icon class="fa fa-times"></mat-icon>
-    </button>
-  </ng-template>
 </div>
 <div style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">
   <label>
@@ -51,6 +53,30 @@
     style="height: 40px; width: 180px;"/>
 </mat-form-field>
 <br/>
+<ng-container *ngIf="!isLocalType">
+  <div style="width: 100%; display: flex; flex-direction: column;">
+    <h3>
+      Local Types
+    </h3>
+    <ng-container *ngFor="let localType of Object.values(viewModel.localTypes)">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title style="align-items: center;">
+            {{localType.name}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <!-- The use of hasUnsavedChanges below is bad but preferred over
+          changing API. -->
+          <view-model-editor [viewModel]="localType"
+            [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
+            emit()" [dataModel]="dataModel.localTypes[localType.name]">
+          </view-model-editor>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-container>
+  </div>
+</ng-container>
 <div>
   <div style="height: 50px; display: flex; flex-direction: row;">
     <h3>
@@ -171,8 +197,8 @@
       padding-right: 5px;">
       <mat-form-field style="width: 100%;">
         <input matInput type="text" [ngModel]="element.displayName"
-          (ngModelChange)="element.displayName = $event; itemProxy.dirty =
-          true" [disabled]="!editable"/>
+          (ngModelChange)="element.displayName = $event; modifiedEventEmitter.
+          emit()" [disabled]="!editable"/>
       </mat-form-field>
     </mat-cell>
   </ng-container>
@@ -184,8 +210,9 @@
     <mat-cell *matCellDef="let element" style="flex: 0 0 180px;">
       <mat-form-field style="width: 100%; padding: 0px 5px 0px 5px;">
         <mat-select [ngModel]="element.inputType.type"
-          (ngModelChange)="element.inputType.type = $event; itemProxy.dirty =
-          true" [disabled]="!editable" [compareWith]="areTypeValuesEqual">
+          (ngModelChange)="element.inputType.type = $event;
+          modifiedEventEmitter.emit()" [disabled]="!editable"
+          [compareWith]="areTypeValuesEqual">
           <mat-option *ngFor="let attributeType of getTypes(element.name)"
             [value]="getTypeValue(element.name, attributeType)">
             {{attributeType}}

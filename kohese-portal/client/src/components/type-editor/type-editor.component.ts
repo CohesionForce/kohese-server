@@ -82,7 +82,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           relations: {},
           acls: [],
           methods: [],
-          localTypes: []
+          localTypes: {}
         });
         let formatDefinitionId: string = (<any> Uuid).default();
         let viewModel: any = {
@@ -91,6 +91,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           parentId: 'view-item',
           icon: '',
           color: '#000000',
+          localTypes: {},
           viewProperties: {},
           formatDefinitions: {},
           defaultFormatKey: formatDefinitionId,

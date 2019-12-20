@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  ViewChild } from '@angular/core';
+  ViewChild, Output, EventEmitter } from '@angular/core';
 import * as Uuid from 'uuid/v1';
 import { MatTable } from '@angular/material';
 
@@ -33,12 +33,16 @@ export class ViewModelEditorComponent {
   @Input('viewModel')
   set viewModel(viewModel: any) {
     this._viewModel = viewModel;
-    this._dataModel = TreeConfiguration.getWorkingTree().getProxyFor(this.
-      _viewModel.modelName).item;
+    this._isLocalType = true;
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseView') && (itemProxy.item === this.
+        _viewModel)) {
+        this._isLocalType = false;
+      }
+    }, undefined);
     
-    this._itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.
-      _viewModel.id);
-    this._editable = this._itemProxy.dirty;
+    this._editable = this._hasUnsavedChanges;
     
     let viewModels: Array<any> = [];
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
@@ -90,9 +94,29 @@ export class ViewModelEditorComponent {
     }
   }
   
-  private _itemProxy: ItemProxy;
-  get itemProxy() {
-    return this._itemProxy;
+  private _hasUnsavedChanges: boolean = false;
+  get hasUnsavedChanges() {
+    return this._hasUnsavedChanges;
+  }
+  @Input('hasUnsavedChanges')
+  set hasUnsavedChanges(hasUnsavedChanges: boolean) {
+    this._hasUnsavedChanges = hasUnsavedChanges;
+    this.viewModel = this._viewModel;
+  }
+  
+  private _modifiedEventEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output('modified')
+  get modifiedEventEmitter() {
+    return this._modifiedEventEmitter;
+  }
+   
+  private _dataModel: any;
+  get dataModel() {
+    return this._dataModel;
+  }
+  @Input('dataModel')
+  set dataModel(dataModel: any) {
+    this._dataModel = dataModel;
   }
   
   private _editable: boolean = false;
@@ -101,6 +125,11 @@ export class ViewModelEditorComponent {
   }
   set editable(editable: boolean) {
     this._editable = editable;
+  }
+  
+  private _isLocalType: boolean = false;
+  get isLocalType() {
+    return this._isLocalType;
   }
   
   private _icons: Array<Icon>;
@@ -137,11 +166,6 @@ export class ViewModelEditorComponent {
       'Username': 'user-selector'
     }
   };
-  
-  private _dataModel: any;
-  get dataModel() {
-    return this._dataModel;
-  }
   
   get Object() {
     return Object;
@@ -245,7 +269,7 @@ export class ViewModelEditorComponent {
           }
         };
         
-        this._itemProxy.dirty = true;
+        this._modifiedEventEmitter.emit();
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -261,7 +285,7 @@ export class ViewModelEditorComponent {
     }).afterClosed().subscribe((name: any) => {
       if (name) {
         tableDefinition.name = name;
-        this._itemProxy.dirty = true;
+        this._modifiedEventEmitter.emit();
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -269,7 +293,7 @@ export class ViewModelEditorComponent {
   
   public removeTableDefinition(tableDefinitionId: string): void {
     delete this._viewModel.tableDefinitions[tableDefinitionId];
-    this._itemProxy.dirty = true;
+    this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
   }
   
@@ -300,7 +324,7 @@ export class ViewModelEditorComponent {
           containers: []
         };
         
-        this._itemProxy.dirty = true;
+        this._modifiedEventEmitter.emit();
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -316,7 +340,7 @@ export class ViewModelEditorComponent {
     }).afterClosed().subscribe((name: any) => {
       if (name) {
         formatDefinition.name = name;
-        this._itemProxy.dirty = true;
+        this._modifiedEventEmitter.emit();
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -333,7 +357,7 @@ export class ViewModelEditorComponent {
   
   public setDefaultFormatDefinition(formatDefinitionId: string): void {
     this._viewModel.defaultFormatKey = formatDefinitionId;
-    this._itemProxy.dirty = true;
+    this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
   }
   
@@ -345,7 +369,7 @@ export class ViewModelEditorComponent {
     
     delete this._viewModel.formatDefinitions[formatDefinitionId];
     
-    this._itemProxy.dirty = true;
+    this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
   }
   

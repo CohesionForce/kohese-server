@@ -1,32 +1,35 @@
 <div style="height: 50px; display: flex; flex-direction: row;">
-  <ng-container *ngIf="!editable else editableBlock">
-    <button mat-icon-button matTooltip="Edit structure settings for this kind"
-      class="flex-right-align" [disabled]="dataModel.isMetaModel"
-      (click)="editable = true">
-      <mat-icon class="fa fa-edit"></mat-icon>
-    </button>
+  <ng-container *ngIf="!enclosingType">
+    <ng-container *ngIf="!editable else editableBlock">
+      <button mat-icon-button matTooltip="Edit structure settings for this kind"
+        class="flex-right-align" [disabled]="dataModel.isMetaModel"
+        (click)="editable = true">
+        <mat-icon class="fa fa-edit"></mat-icon>
+      </button>
+    </ng-container>
+    <ng-template #editableBlock>
+      <button mat-icon-button matTooltip="Save structure settings for this kind"
+        class="flex-right-align" (click)="save()"
+        [disabled]="!hasUnsavedChanges">
+        <mat-icon class="fa fa-save"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Discard structure changes to this kind"
+        (click)="discardChanges()">
+        <mat-icon class="fa fa-times"></mat-icon>
+      </button>
+    </ng-template>
   </ng-container>
-  <ng-template #editableBlock>
-    <button mat-icon-button matTooltip="Save structure settings for this kind"
-      class="flex-right-align" (click)="save()" [disabled]="!itemProxy.dirty">
-      <mat-icon class="fa fa-save"></mat-icon>
-    </button>
-    <button mat-icon-button matTooltip="Discard structure changes to this kind"
-      (click)="discardChanges()">
-      <mat-icon class="fa fa-times"></mat-icon>
-    </button>
-  </ng-template>
 </div>
 <mat-form-field style="width: 100%;">
   <input matInput type="text" placeholder="Name" [ngModel]="dataModel.name"
-    (ngModelChange)="dataModel.name = $event; itemProxy.dirty = true"
+    (ngModelChange)="dataModel.name = $event; modifiedEventEmitter.emit()"
     [disabled]="!editable"/>
 </mat-form-field>
 <br/>
 <mat-form-field style="width: 100%;">
   <mat-select placeholder="Parent Type" [ngModel]="dataModel.base"
     (ngModelChange)="dataModel.base = $event; dataModel.parentId = $event;
-    itemProxy.dirty = true" [disabled]="!editable">
+    modifiedEventEmitter.emit()" [disabled]="!editable">
     <ng-container *ngFor="let kind of filteredKinds">
       <mat-option [value]="kind.name">
         {{kind.name}}
@@ -38,37 +41,44 @@
 <mat-form-field style="width: 100%;">
   <textarea matInput placeholder="Description" rows="3" cols="80"
     [ngModel]="dataModel.description" (ngModelChange)="dataModel.description =
-    $event; itemProxy.dirty = true" [disabled]="!editable">
+    $event; modifiedEventEmitter.emit()" [disabled]="!editable">
   </textarea>
 </mat-form-field>
-<div style="width: 100%; display: flex; flex-direction: column;">
-  <h3>
-    Local Types
-  </h3>
-  <span class="flex-right-align">
-    <button mat-icon-button matTooltip="Add a local type"
-      (click)="addLocalType()" [disabled]="!editable">
-      <mat-icon class="fa fa-plus"></mat-icon>
-    </button>
-  </span>
-  <mat-list>
-    <ng-container *ngFor="let localType of dataModel.localTypes">
-      <mat-list-item>
-        {{localType.name}}
-        <span class="flex-right-align">
-          <button mat-icon-button matTooltip="Edit this local type"
-            (click)="editLocalType(localType)" [disabled]="!editable">
-            <mat-icon class="fa fa-edit"></mat-icon>
-          </button>
+<ng-container *ngIf="!enclosingType">
+  <div style="width: 100%; display: flex; flex-direction: column;">
+    <h3>
+      Local Types
+    </h3>
+    <span class="flex-right-align">
+      <button mat-icon-button matTooltip="Add a local type"
+        (click)="addLocalType()" [disabled]="!editable">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+    </span>
+    <ng-container *ngFor="let localType of Object.values(dataModel.localTypes)">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title style="align-items: center;">
+            {{localType.name}}
+          </mat-panel-title>
           <button mat-icon-button matTooltip="Remove this local type"
-            (click)="removeLocalType(localType)" [disabled]="!editable">
+            (click)="removeLocalType(localType.name)" [disabled]="!editable"
+            class="flex-right-align">
             <mat-icon class="fa fa-trash"></mat-icon>
           </button>
-        </span>
-      </mat-list-item>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <!-- The use of hasUnsavedChanges below is bad but preferred over
+          changing API. -->
+          <data-model-editor [dataModel]="localType"
+            [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
+            emit()" [enclosingType]="dataModel">
+          </data-model-editor>
+        </ng-template>
+      </mat-expansion-panel>
     </ng-container>
-  </mat-list>
-</div>
+  </div>
+</ng-container>
 <div style="height: 50px; width: 100%; display: flex;
   flex-direction: row;">
   <h3>
@@ -122,7 +132,7 @@
         <mat-form-field style="width: 180px; padding: 0px 5px 0px 5px;">
           <mat-select placeholder="Reference Attribute"
             [ngModel]="element.relation" (ngModelChange)="element.
-            relation = $event; itemProxy.dirty = true"
+            relation = $event; modifiedEventEmitter.emit()"
             [compareWith]="areRelationsEqual" [disabled]="!editable">
             <mat-optgroup *ngFor="let typeName of (idAttributes | mapKey)"
               [label]="typeName">
@@ -156,7 +166,7 @@
     </mat-header-cell>
     <mat-cell *matCellDef="let element" style="flex: 0 0 80px;">
       <mat-checkbox [ngModel]="element.required" (ngModelChange)="element.
-        required = $event; itemProxy.dirty = true" [disabled]="!editable">
+        required = $event; modifiedEventEmitter.emit()" [disabled]="!editable">
       </mat-checkbox>
     </mat-cell>
   </ng-container>
@@ -167,7 +177,7 @@
     </mat-header-cell>
     <mat-cell *matCellDef="let element" style="flex: 0 0 80px;">
       <mat-checkbox [ngModel]="element.id" (ngModelChange)="element.id =
-        $event; itemProxy.dirty = true" [disabled]="!editable">
+        $event; modifiedEventEmitter.emit()" [disabled]="!editable">
       </mat-checkbox>
     </mat-cell>
   </ng-container>
@@ -178,8 +188,8 @@
     <mat-cell *matCellDef="let element">
       <mat-form-field style="width: 100%;">
         <input matInput type="text" [ngModel]="element.default"
-          (ngModelChange)="element.default = $event; itemProxy.dirty = true"
-          [disabled]="!editable"/>
+          (ngModelChange)="element.default = $event; modifiedEventEmitter.
+          emit()" [disabled]="!editable"/>
       </mat-form-field>
     </mat-cell>
   </ng-container>

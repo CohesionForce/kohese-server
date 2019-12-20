@@ -8,6 +8,8 @@
   "modifiedOn": 1572826394102,
   "modelName": "KeyEventDictionary",
   "icon": "fa fa-tasks",
+  "color": "#000000",
+  "localTypes": {},
   "viewProperties": {
     "KeyEvents": {
       "displayName": "KeyEvents",

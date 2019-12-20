@@ -5,6 +5,7 @@
   "modelName": "Task",
   "icon": "fa fa-tasks",
   "color": "#008000",
+  "localTypes": {},
   "viewProperties": {
     "taskState": {
       "inputType": {
