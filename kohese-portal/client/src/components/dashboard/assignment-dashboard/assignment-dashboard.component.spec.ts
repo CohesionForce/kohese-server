@@ -43,7 +43,7 @@ describe('Component: ', ()=>{
     assignmentDashboardComponent.dashboardSelectionStream = dashboardSelectionStream;
     assignmentDashboardComponent.assignmentListStream =
       new BehaviorSubject<Array<ItemProxy>>([TreeConfiguration.getWorkingTree().
-      getProxyFor('Kurios Iesous')]);
+      getProxyFor('test-uuid3')]);
 
     assignmentDashboardFixture.detectChanges();
 

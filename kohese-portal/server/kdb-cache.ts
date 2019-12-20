@@ -49,6 +49,7 @@ export class KDBCache extends LevelCache {
   public kTreeDirectory;
   public expandedRepoCommitDirectory;
   public hashmapDirectory;
+  private cacheLoaded : Boolean;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -64,6 +65,7 @@ export class KDBCache extends LevelCache {
     let levelDown = LevelDown(dbDirectory);
     super(levelDown);
 
+    this.cacheLoaded = false;
     this.repoCommitMap = new Map<string, any>();
     this.repoTreeMap = new Map<string, any>();
 
@@ -429,10 +431,13 @@ export class KDBCache extends LevelCache {
     // Load Cached Objects From Prior Runs
     var beforeTime = Date.now();
 
-    await this.loadCachedObjects();
-    var afterLoadCache = Date.now();
-    var deltaLoadTime = afterLoadCache-beforeTime;
-    console.log('::: Load time for cached objects in ' + this.repoPath + ': ' + deltaLoadTime/1000);
+    if (!this.cacheLoaded){
+      await this.loadCachedObjects();
+      this.cacheLoaded = true;
+      var afterLoadCache = Date.now();
+      var deltaLoadTime = afterLoadCache-beforeTime;
+      console.log('::: Load time for cached objects in ' + this.repoPath + ': ' + deltaLoadTime/1000);  
+    }
 
     beforeTime = Date.now();
 
@@ -458,6 +463,7 @@ export class KDBCache extends LevelCache {
             if (head !== refHEAD){
               kdbCache.cacheRef('HEAD', refHEAD);
               kdbFS.storeJSONDoc(kdbCache.refsDirectory + '/HEAD.json', refHEAD);
+              await kdbCache.saveAllPendingWrites();
             }
           } catch (err) {
             console.log('*** Error while writing HEAD reference');

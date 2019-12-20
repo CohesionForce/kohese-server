@@ -1,26 +1,45 @@
-<h4>History Tab</h4>
-
-<div style="width:20%; overflow:auto; display:inline-block;">
-  <label>Created by: {{itemProxy.item.createdBy}}</label>
-  <label>Created on: {{itemProxy.item.createdOn | date:'medium'}}</label>
-  <label>Modified by: {{itemProxy.item.modifiedBy}}</label>
-  <label>Modified on: {{itemProxy.item.modifiedOn | date:'medium'}}</label>
+<div style="height: 5%; display: flex; flex-direction: column;">
+  <label>
+    Created by {{proxyStream.getValue().item.createdBy}} on {{(proxyStream.
+      getValue().item.createdOn | date:'medium')}}
+  </label>
+  <label>
+    Last modified by {{proxyStream.getValue().item.modifiedBy}} on
+      {{(proxyStream.getValue().item.modifiedOn | date:'medium')}}
+  </label>
 </div>
-<div class="pull-right" style="width:78%; vertical-align: top; display:inline-block; overflow:auto">
-  <table>
-      <thead>
-        <th style="width:30%">Commit</th>
-        <th style="width:45%">Message</th>
-        <th style="width:10%">Author</th>
-        <th style="width:14%">Date</th>
-      </thead>
-      <tbody id="theDetailsBody">
-        <tr *ngFor="let record of itemProxy.history" style="vertical-align: top;">
-          <td>{{record.commit}}</td>
-          <td>{{record.message}}</td>
-          <td>{{record.author}}</td>
-          <td>{{record.date | date:'medium'}}</td>
-        </tr>
-      </tbody>
-  </table>
+<div style="height: 95%;">
+  <div style="height: 50px; display: flex; flex-direction: row;">
+    <button mat-icon-button matTooltip="Expand all versions"
+      class="flex-right-align" (click)="changeAllExpansionStates(true)">
+      <mat-icon class="fa fa-chevron-down"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Collapse all versions"
+      (click)="changeAllExpansionStates(false)">
+      <mat-icon class="fa fa-chevron-up"></mat-icon>
+    </button>
+  </div>
+  <div style="height: calc(100% - 50px); overflow: auto;">
+    <ng-container *ngFor="let version of versions">
+      <mat-expansion-panel (opened)="compare(version)">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{version.message}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <div style="display: flex; flex-direction: column;">
+            <label>
+              Produced By: {{version.author}}
+            </label>
+            <label>
+              Produced On: {{(version.date | date:'medium')}}
+            </label>
+            <comparison [comparison]="differenceMap.get(version.commit)">
+            </comparison>
+          </div>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-container>
+  </div>
 </div>

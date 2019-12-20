@@ -1,4 +1,5 @@
-const KdbRepo = require('./../../kdb-repo');
+import { KDBRepo }  from './../../kdb-repo';
+let KdbRepo = KDBRepo
 const Fs = require('fs');
 const Path = require('path');
 
@@ -221,6 +222,9 @@ describe('Test KDB Repository: ', function () {
         statusPromise = KdbRepo.getItemStatus(repositoryId, testFile2);
         statusPromise.then((status) => {
           expect(status).toEqual([]);
+          done();
+        }).catch((err) => {
+          expect(err.toString()).toEqual('Error: attempt to get status of nonexistent file \'' + testFile2 + '\'');
           done();
         });
       });

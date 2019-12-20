@@ -43,7 +43,9 @@
       ]
     }
   },
-  "defaultFormatKey": "dce35040-15da-11ea-97d2-3bae97d5d967",
+  "defaultFormatKey": {
+    "document": "dce35040-15da-11ea-97d2-3bae97d5d967"
+  },
   "tableDefinitions": {},
   "itemIds": []
 }

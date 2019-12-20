@@ -154,9 +154,194 @@
         }
       ],
       "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    },
+    "420b0560-1781-11ea-a38d-57607570dcb1": {
+      "id": "420b0560-1781-11ea-a38d-57607570dcb1",
+      "name": "Card",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "Action",
+              "attribute": "name"
+            },
+            "hideLabel": false,
+            "hideEmpty": false,
+            "labelOrientation": "Top",
+            "kind": "text",
+            "inputOptions": {
+              "type": "text",
+              "options": {
+                "isMultiLine": false
+              }
+            },
+            "customLabel": ""
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "estimatedStart"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "date",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "date",
+                "options": {}
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "estimatedCompletion"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "date",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "date",
+                "options": {}
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "estimatedHoursEffort"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "remainingHoursEffort"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "actualHoursEffort"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "predecessors"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "proxy-selector",
+                "options": {
+                  "allowMultiSelect": true,
+                  "type": "Item",
+                  "useAdvancedSelector": false
+                }
+              },
+              "customLabel": "",
+              "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
+            },
+            {
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "decisionState"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "state-editor",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "state-editor",
+                "options": {
+                  "options": [
+                    "Proposed",
+                    "In Analysis",
+                    "In Review"
+                  ]
+                }
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Action",
+                "attribute": "actionState"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "state-editor",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "state-editor",
+                "options": {
+                  "options": [
+                    "Proposed",
+                    "Assigned",
+                    "Accepted",
+                    "In Work",
+                    "Pending Reassign",
+                    "Pending Redisposition",
+                    "In Verification",
+                    "Verified",
+                    "Closed"
+                  ]
+                }
+              },
+              "customLabel": ""
+            }
+          ]
+        }
+      ]
     }
   },
-  "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "defaultFormatKey": {
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "card": "420b0560-1781-11ea-a38d-57607570dcb1"
+  },
   "tableDefinitions": {},
   "itemIds": []
 }

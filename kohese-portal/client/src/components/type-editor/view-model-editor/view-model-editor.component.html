@@ -150,11 +150,23 @@
             <mat-icon class="fa fa-search"></mat-icon>
           </button>
           <button mat-icon-button matTooltip="Make this format definition the
-            default for this kind" (click)="setDefaultFormatDefinition(
+            default document format definition for this kind"
+            (click)="setDefaultFormatDefinition(FormatDefinitionType.DOCUMENT,
             formatDefinition.id); $event.stopPropagation()"
             [disabled]="!editable">
             <mat-icon class="fa fa-star" [ngClass]="{ 'highlight-foreground':
-              (viewModel.defaultFormatKey === formatDefinition.id) }">
+              (viewModel.defaultFormatKey[FormatDefinitionType.DOCUMENT] ===
+              formatDefinition.id) }">
+            </mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Make this format definition the
+            default card format definition for this kind"
+            (click)="setDefaultFormatDefinition(FormatDefinitionType.CARD,
+            formatDefinition.id); $event.stopPropagation()"
+            [disabled]="!editable">
+            <mat-icon class="fa fa-star" [ngClass]="{ 'highlight-foreground':
+              (viewModel.defaultFormatKey[FormatDefinitionType.CARD] ===
+              formatDefinition.id) }">
             </mat-icon>
           </button>
           <button mat-icon-button matTooltip="Remove this format definition"

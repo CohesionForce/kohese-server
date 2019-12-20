@@ -5,6 +5,8 @@ import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
 import { ItemCache } from '../common/src/item-cache';
+import { KDBRepo } from './kdb-repo';
+import { KDBCache } from './kdb-cache';
 const MdToKohese = require('./md-to-kohese');
 
 var kio = require('./koheseIO');
@@ -421,7 +423,7 @@ function KIOItemServer(socket){
     var repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
     console.log('::: Getting status for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId);
 
-    kdb.kdbRepo.getStatus(request.repoId, function(status){
+    KDBRepo.getStatus(request.repoId, function(status){
       if (status) {
         var idStatusArray = [];
         for (var j = 0; j < status.length; j++) {
@@ -435,6 +437,8 @@ function KIOItemServer(socket){
           }
         }
 
+        console.log('::: Current status');
+        console.log(JSON.stringify(idStatusArray, null, '  '));
         sendResponse(idStatusArray);
       } else {
         console.log('*** Error (Returned from getStatus)');
@@ -956,7 +960,7 @@ function KIOItemServer(socket){
       var repositoryInformation = getRepositoryInformation(proxy);
 
       try {
-        await kdb.kdbRepo.add(repositoryInformation.repositoryProxy.item.id,
+        await KDBRepo.add(repositoryInformation.repositoryProxy.item.id,
           repositoryInformation.relativeFilePath);
       } catch (error) {
         console.log(error.stack);
@@ -980,7 +984,7 @@ function KIOItemServer(socket){
   socket.on('VersionControl/commit', function (request, sendResponse) {
     var idsArray = Array.from(request.proxyIds);
 
-    kdb.kdbRepo.commit(idsArray, request.username, request.email,
+    KDBRepo.commit(idsArray, request.username, request.email,
       request.message).then(function (commitIdMap) {
         let proxies = [];
         var returnMap = {};
@@ -1007,6 +1011,11 @@ function KIOItemServer(socket){
 
         updateStatus(proxies).then((statusMap) => {
           sendResponse(statusMap);
+        }).then(() => {
+          let kdbCache : KDBCache = <KDBCache>KDBCache.getItemCache();
+          kdbCache.updateCache().then(() => {
+            console.log('::: Updated Cache for commit');
+          });
         });
     }).catch(function (err) {
       console.log(err.stack);
@@ -1018,7 +1027,7 @@ function KIOItemServer(socket){
 
   socket.on('VersionControl/push', function (request, sendResponse) {
     var idsArray = Array.from(request.proxyIds);
-    kdb.kdbRepo.push(idsArray, request.remoteName, socket.koheseUser.username).
+    KDBRepo.push(idsArray, request.remoteName, socket.koheseUser.username).
       then(function (pushStatusMap) {
       sendResponse(pushStatusMap);
     }).catch(function (err) {
@@ -1030,7 +1039,7 @@ function KIOItemServer(socket){
   });
 
   socket.on('VersionControl/addRemote', function (request, sendResponse) {
-    kdb.kdbRepo.addRemote(request.proxyId, request.remoteName, request.url).
+    KDBRepo.addRemote(request.proxyId, request.remoteName, request.url).
       then(function (remoteName) {
       sendResponse(remoteName);
     }).catch(function (err) {
@@ -1042,7 +1051,7 @@ function KIOItemServer(socket){
   });
 
   socket.on('VersionControl/getRemotes', function (request, sendResponse) {
-    kdb.kdbRepo.getRemotes(request.proxyId).then(function (remoteNames) {
+    KDBRepo.getRemotes(request.proxyId).then(function (remoteNames) {
       sendResponse(remoteNames);
     }).catch(function (err) {
       console.log(err.stack);
@@ -1068,7 +1077,7 @@ function KIOItemServer(socket){
     }
 
     for (let repositoryId in repositoryPathMap) {
-      kdb.kdbRepo.reset(repositoryId, repositoryPathMap[repositoryId]).then(
+      KDBRepo.reset(repositoryId, repositoryPathMap[repositoryId]).then(
         // jshint -W083
         function () {
           updateStatus(proxies).then((statusMap) => {
@@ -1099,7 +1108,7 @@ function KIOItemServer(socket){
       // jshint -W083
       // eslint-disable-next-line no-unused-vars
       var evaluationPromise = new Promise((resolve, reject) => {
-        kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).then((status) => {
+        KDBRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).then((status) => {
 
           var isStaged = false;
           var hasUnstagedChanges = false;
@@ -1116,9 +1125,9 @@ function KIOItemServer(socket){
           // Unstage if the item is staged without additional changes
           if(isStaged && !hasUnstagedChanges){
             // Item is staged, but does not have changes, so it needs to be unstaged to revert it
-            kdb.kdbRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]).then(() => {
+            KDBRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]).then(() => {
               // file has been unstaged, need to retrieve updated status
-              kdb.kdbRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).
+              KDBRepo.getItemStatus(repositoryId, repositoryInformation.relativeFilePath).
                 then((statusAfterUnstage) => {
                   resolve(statusAfterUnstage);
                 }
@@ -1167,7 +1176,7 @@ function KIOItemServer(socket){
       // Checkout any remaining files
       var pendingCheckoutProxies = [];
       for (let repositoryId in repositoryPathMap) {
-        pendingCheckoutProxies.push(kdb.kdbRepo.checkout(repositoryId, repositoryPathMap[repositoryId], true));
+        pendingCheckoutProxies.push(KDBRepo.checkout(repositoryId, repositoryPathMap[repositoryId], true));
       }
 
       // Send response
@@ -1296,7 +1305,7 @@ function updateStatus(proxies) {
   var promises = [];
   for (let i = 0; i < proxies.length; i++) {
     var repositoryInformation = getRepositoryInformation(proxies[i]);
-    let promise = kdb.kdbRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
+    let promise = KDBRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
         repositoryInformation.relativeFilePath);
     promises.push(promise.then((status) => {
       statusMap[proxies[i].item.id] = status;

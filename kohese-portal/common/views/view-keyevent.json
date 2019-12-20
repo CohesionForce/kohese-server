@@ -153,7 +153,9 @@
       "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
     }
   },
-  "defaultFormatKey": "89324a90-a7af-11e8-8662-71e48f0160fe",
+  "defaultFormatKey": {
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+  },
   "tableDefinitions": {
     "b1090aa0-fb86-11e9-be56-311e0135452a": {
       "id": "b1090aa0-fb86-11e9-be56-311e0135452a",

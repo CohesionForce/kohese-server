@@ -386,41 +386,6 @@ async function loadConfigForEachCommit() {
 }
 
 //////////////////////////////////////////////////////////////////////////
-async function getOldHistory(itemId: ItemIdType) : Promise<any> {
-  let promise = new Promise(function (resolve, reject){
-    kdb.kdbRepo.walkHistoryForFile(itemId, function (history){
-      resolve(history);
-    });  
-  });
-  return promise;
-}
-
-//////////////////////////////////////////////////////////////////////////
-async function comparehistory(itemId: ItemIdType) {
-  let itemCache : ItemCache = ItemCache.getItemCache();
-  console.log('$$$ Evaluating history: ' + itemId);
-  let oldHistory = await getOldHistory(itemId);
-  let newHistory = await itemCache.getHistory(itemId);
-  let historyDiff = ItemCache.compareObjects(oldHistory.history, newHistory);
-  if (!historyDiff.match){
-    console.log("*** History does not match: " + itemId);
-    console.log(JSON.stringify(historyDiff, null, '  '));
-  } else {
-    console.log('$$$ History matches: ' + itemId);
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////
-async function compareAllHistories() {
-  console.log('$$$ Comparing all histories');
-  let itemCache = ItemCache.getItemCache();
-  let historyMap = await itemCache.getHistoryMap();
-  for (let itemId of Object.keys(historyMap)){
-    await comparehistory(itemId);
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////
 function deltaMessage(message, before, after) {
   console.log('^^^ ' + message + ': ' + (after-before)/1000);
 }
@@ -437,21 +402,19 @@ if (typeof(jsSHA_Import) === 'object') {
   jsSHA = jsSHA_Import;
 }
 
+//////////////////////////////////////////////////////////////////////////
 function calcBlobOID(forText) {
 
-    // This function calculates a OID that is equivalaent to the one calculated
-    // natively by git.for the contents of a blob
+  // This function calculates a OID that is equivalaent to the one calculated
+  // natively by git.for the contents of a blob
 
-    var length = forText.length;
+  var length = forText.length;
+  var shaObj = new jsSHA('SHA-1', 'TEXT');
+  shaObj.update('blob ' + length + '\0' + forText);
+  var oid = shaObj.getHash('HEX');
 
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-
-    shaObj.update('blob ' + length + '\0' + forText);
-
-    var oid = shaObj.getHash('HEX');
-
-    return oid;
-  }
+  return oid;
+}
 
 //////////////////////////////////////////////////////////////////////////
 function replaceImage(inString: string) : String {
@@ -532,6 +495,21 @@ async function simulateClientSync() {
 }
 
 //////////////////////////////////////////////////////////////////////////
+async function fullSystemDiff() {
+  let itemCache : ItemCache = ItemCache.getItemCache();
+  let historyMap = await itemCache.getHistoryMap();
+
+  console.log("::: Begin full system diff");
+
+  let beforeTime = Date.now();
+  for (let itemId of Object.keys(historyMap)) {
+    await diffItemVersions(itemId);
+  }
+  let afterTime = Date.now();
+  console.log('::: Full diff time: ' + (afterTime-beforeTime)/1000);
+}
+
+//////////////////////////////////////////////////////////////////////////
 // Main Processing
 //////////////////////////////////////////////////////////////////////////
 
@@ -571,19 +549,7 @@ try {
 
       // await diffEachCommit();
 
-      // await compareAllHistories();
-
-      let itemCache : ItemCache = ItemCache.getItemCache();
-      let historyMap = await itemCache.getHistoryMap();
-
-      console.log("::: Begin full system diff");
-
-      let beforeTime = Date.now();
-      for (let itemId of Object.keys(historyMap)) {
-        await diffItemVersions(itemId);
-      }
-      let afterTime = Date.now();
-      console.log('::: Full diff time: ' + (afterTime-beforeTime)/1000);
+      await fullSystemDiff();
 
     } catch (err) {
       console.log('*** Error');

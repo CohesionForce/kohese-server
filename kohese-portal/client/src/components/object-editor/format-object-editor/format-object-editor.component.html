@@ -1,7 +1,6 @@
 <div style="width: 100%; overflow: auto; padding: 7px;" [ngStyle]="{ 'height':
   isDialogInstance() ? '90%' : '100%' }">
-  <ng-container *ngFor="let container of viewModel.formatDefinitions[
-    viewModel.defaultFormatKey].containers">
+  <ng-container *ngFor="let container of formatDefinition.containers">
     <ng-container *ngIf="container.kind === 'list'">
       <ng-container *ngFor="let attributeDefinition of container.contents">
         <ng-container *ngIf="Array.isArray(TreeConfiguration.getWorkingTree().
@@ -120,26 +119,29 @@
               </ng-template>
             </ng-container>
             <ng-container *ngSwitchCase="'state-editor'">
-              <label style="width: 40%;">
-                {{getAttributeRepresentation(attributeDefinition)}}:
-                  {{object[attributeDefinition.propertyName.
-                  attribute]}}&nbsp;
-              </label>
-              <mat-form-field style="width: 60%;">
-                <mat-select placeholder="Target" [(ngModel)]="object[
-                  attributeDefinition.propertyName.attribute]"
-                  [disabled]="(isDisabled || (getStateTransitionCandidates(
-                  attributeDefinition).length === 0))">
-                  <ng-container *ngFor="let transitionCandidateName of
-                    getStateTransitionCandidates(attributeDefinition)">
-                    <mat-option [value]="type.classProperties[
-                      attributeDefinition.propertyName.attribute].definition.
-                      properties.transition[transitionCandidateName].target">
-                      {{transitionCandidateName}}
-                    </mat-option>
-                  </ng-container>
-                </mat-select>
-              </mat-form-field>
+              <div style="display: flex; flex-direction: row;">
+                <div style="display: flex; flex-direction: column;
+                  justify-content: center;">
+                  <label style="margin-bottom: unset;">
+                    {{getAttributeRepresentation(attributeDefinition)}}:
+                      {{object[attributeDefinition.propertyName.
+                      attribute]}}&nbsp;
+                  </label>
+                </div>
+                <ng-container *ngFor="let transitionCandidateName of
+                  getStateTransitionCandidates(attributeDefinition);
+                  let j = index">
+                  <button mat-raised-button [disabled]="isDisabled"
+                    style="margin: 0px 3px 0px 3px;"
+                    [ngStyle]="{ 'margin-left': ((j === 0) ? 'auto' : '') }"
+                    (click)="object[attributeDefinition.propertyName.
+                    attribute] = type.classProperties[attributeDefinition.
+                    propertyName.attribute].definition.properties.transition[
+                    transitionCandidateName].target">
+                    {{transitionCandidateName}}
+                  </button>
+                </ng-container>
+              </div>
             </ng-container>
             <ng-container *ngSwitchCase="'user-selector'">
               <mat-form-field style="width: 100%;">

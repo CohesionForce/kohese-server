@@ -36,3 +36,7 @@
 /deep/ datatable-body {
   height: 100;
 }
+
+/deep/ .ngx-datatable.fixed-row .datatable-scroll {
+  white-space: normal !important;
+}

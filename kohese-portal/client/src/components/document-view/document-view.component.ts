@@ -11,6 +11,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
+import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 
 import * as commonmark from 'commonmark';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';
@@ -158,7 +159,8 @@ implements OnInit, OnDestroy {
                 if (type) {
                   const vm = types[type].viewModelProxy;
                   if (vm && vm.item.formatDefinitions && vm.item.defaultFormatKey) {
-                    this.formatDefs[type] = vm.item.formatDefinitions[vm.item.defaultFormatKey];
+                    this.formatDefs[type] = vm.item.formatDefinitions[vm.item.
+                      defaultFormatKey[FormatDefinitionType.DOCUMENT]];
                   } else {
                     console.log('Format not defined for ' + type);
                   }
