@@ -44,42 +44,6 @@
     $event; modifiedEventEmitter.emit()" [disabled]="!editable">
   </textarea>
 </mat-form-field>
-<!-- The latter condition is present for component initialization. -->
-<ng-container *ngIf="(!enclosingType && dataModel.localTypes)">
-  <div style="width: 100%; display: flex; flex-direction: column;">
-    <h3>
-      Local Types
-    </h3>
-    <span class="flex-right-align">
-      <button mat-icon-button matTooltip="Add a local type"
-        (click)="addLocalType()" [disabled]="!editable">
-        <mat-icon class="fa fa-plus"></mat-icon>
-      </button>
-    </span>
-    <ng-container *ngFor="let localType of Object.values(dataModel.localTypes)">
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title style="align-items: center;">
-            {{localType.name}}
-          </mat-panel-title>
-          <button mat-icon-button matTooltip="Remove this local type"
-            (click)="removeLocalType(localType.name)" [disabled]="!editable"
-            class="flex-right-align">
-            <mat-icon class="fa fa-trash"></mat-icon>
-          </button>
-        </mat-expansion-panel-header>
-        <ng-template matExpansionPanelContent>
-          <!-- The use of hasUnsavedChanges below is bad but preferred over
-          changing API. -->
-          <data-model-editor [dataModel]="localType"
-            [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
-            emit()" [enclosingType]="dataModel">
-          </data-model-editor>
-        </ng-template>
-      </mat-expansion-panel>
-    </ng-container>
-  </div>
-</ng-container>
 <div style="height: 50px; width: 100%; display: flex;
   flex-direction: row;">
   <h3>
@@ -219,3 +183,39 @@
     'Is Required', 'Is Kind ID', 'Default Value', 'actions']">
   </mat-row>
 </mat-table>
+<!-- The latter condition is present for component initialization. -->
+<ng-container *ngIf="(!enclosingType && dataModel.localTypes)">
+  <div style="width: 100%; display: flex; flex-direction: column;">
+    <h3>
+      Local Types
+    </h3>
+    <span class="flex-right-align">
+      <button mat-icon-button matTooltip="Add a local type"
+        (click)="addLocalType()" [disabled]="!editable">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+    </span>
+    <ng-container *ngFor="let localType of Object.values(dataModel.localTypes)">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title style="align-items: center;">
+            {{localType.name}}
+          </mat-panel-title>
+          <button mat-icon-button matTooltip="Remove this local type"
+            (click)="removeLocalType(localType.name)" [disabled]="!editable"
+            class="flex-right-align">
+            <mat-icon class="fa fa-trash"></mat-icon>
+          </button>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <!-- The use of hasUnsavedChanges below is bad but preferred over
+          changing API. -->
+          <data-model-editor [dataModel]="localType"
+            [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
+            emit()" [enclosingType]="dataModel">
+          </data-model-editor>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-container>
+  </div>
+</ng-container>

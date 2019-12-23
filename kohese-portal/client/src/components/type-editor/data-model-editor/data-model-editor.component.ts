@@ -122,6 +122,9 @@ export class DataModelEditorComponent {
   }
   
   private _enclosingType: any;
+  get enclosingType() {
+    return this._enclosingType;
+  }
   @Input('enclosingType')
   set enclosingType(enclosingType: any) {
     this._enclosingType = enclosingType;
