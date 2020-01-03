@@ -3,45 +3,69 @@
   "name": "Item",
   "parentId": "Model-Definitions",
   "base": "PersistedModel",
-  "idInjection": true,
   "isMetaModel": true,
+  "idInjection": true,
   "invertItemOrder": true,
   "properties": {
     "id": {
       "type": "string",
       "id": true,
-      "defaultFn": "uuidV1"
+      "defaultFn": "uuidV1",
+      "name": "id"
     },
     "name": {
       "type": "string",
-      "required": true
+      "required": true,
+      "name": "name"
     },
     "tags": {
       "type": "string",
-      "required": false
+      "required": false,
+      "name": "tags"
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "name": "description"
     },
     "parentId": {
       "type": "string",
-      "default": ""
+      "default": "",
+      "name": "parentId"
     },
     "createdBy": {
-      "type": "string"
+      "type": "string",
+      "name": "createdBy"
     },
     "createdOn": {
-      "type": "number"
+      "type": "number",
+      "name": "createdOn"
     },
     "modifiedBy": {
-      "type": "string"
+      "type": "string",
+      "name": "modifiedBy"
     },
     "modifiedOn": {
-      "type": "number"
+      "type": "number",
+      "name": "modifiedOn"
     },
     "loadPending": {
       "type": "boolean",
-      "derived": true
+      "derived": true,
+      "name": "loadPending"
+    },
+    "children": {
+      "name": "children",
+      "derived": true,
+      "type": [
+        "Item"
+      ],
+      "required": false,
+      "default": "",
+      "id": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     }
   },
   "validations": [],
@@ -68,5 +92,6 @@
     }
   },
   "acls": [],
-  "methods": []
+  "methods": [],
+  "localTypes": []
 }

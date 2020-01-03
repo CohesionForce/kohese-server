@@ -15,7 +15,8 @@
       },
       "required": true,
       "default": "",
-      "displayName": "Name"
+      "displayName": "Name",
+      "name": "name"
     },
     "description": {
       "inputType": {
@@ -24,7 +25,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "Description"
+      "displayName": "Description",
+      "name": "description"
     },
     "tags": {
       "inputType": {
@@ -35,7 +37,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "Tags"
+      "displayName": "Tags",
+      "name": "tags"
     },
     "parentId": {
       "inputType": {
@@ -48,12 +51,21 @@
       },
       "required": true,
       "default": "ROOT",
-      "displayName": "Parent"
+      "displayName": "Parent",
+      "name": "parentId"
+    },
+    "children": {
+      "name": "children",
+      "displayName": "Children",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
     }
   },
   "formatDefinitions": {
     "89324a90-a7af-11e8-8662-71e48f0160fe": {
-      "name": "New definition ",
+      "name": "Default Item Format",
       "header": {
         "kind": "header",
         "contents": [
@@ -85,6 +97,64 @@
         }
       ],
       "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    },
+    "e17aebb0-2e42-11ea-845a-958260ba13c4": {
+      "id": "e17aebb0-2e42-11ea-845a-958260ba13c4",
+      "name": "Demo Children Table",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "Item",
+              "attribute": "name"
+            },
+            "hideLabel": true,
+            "hideEmpty": false,
+            "labelOrientation": "Top",
+            "kind": "text",
+            "inputOptions": {}
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "Item",
+                "attribute": "description"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "markdown",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "markdown",
+                "options": {}
+              },
+              "customLabel": ""
+            },
+            {
+              "propertyName": {
+                "kind": "Item",
+                "attribute": "children"
+              },
+              "hideLabel": false,
+              "labelOrientation": "Top",
+              "kind": "",
+              "hideEmpty": true,
+              "inputOptions": {
+                "type": "",
+                "options": {}
+              },
+              "customLabel": "",
+              "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
+            }
+          ]
+        }
+      ]
     }
   },
   "defaultFormatKey": {
@@ -95,7 +165,8 @@
       "id": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55",
       "name": "Item Table",
       "columns": [
-        "name"
+        "name",
+        "id"
       ],
       "expandedFormat": {
         "column1": [],

@@ -196,6 +196,8 @@ export class ItemProxy {
 
     if (proxy.children){
       proxy.sortChildren();
+    } else {
+      proxy.item.children = [];
     }
 
     proxy.calculateTreeHash();
@@ -327,6 +329,9 @@ export class ItemProxy {
           this.treeConfig.addIdMap(idKind, idName, this);
         }
       }
+
+      // Calculate derived children attribute
+      this.item.children = this.getOrderedChildIdsAsReferences();
     }
   }
 
@@ -379,6 +384,11 @@ export class ItemProxy {
         let foreignKeyDefn;
         if (typeof relationPropertyDefn.relation === 'object'){
           foreignKeyDefn = relationPropertyDefn.relation;
+        }
+
+        // Ignore foreign key definition for Item-> id
+        if (foreignKeyDefn && foreignKeyDefn.kind === "Item" && foreignKeyDefn.foreignKey === "id"){
+          continue;
         }
 
         if (this.item){
@@ -1261,6 +1271,10 @@ export class ItemProxy {
       ancestorProxy = ancestorProxy.parentProxy;
     }
 
+    // Update derived children attribute
+    this.item.children = this.getOrderedChildIdsAsReferences();
+
+    // Notify about change is not loading
     if(!this.treeConfig.loading){
       this.treeConfig.changeSubject.next({
         type: 'reference-added',
@@ -1307,6 +1321,10 @@ export class ItemProxy {
 
     this.calculateTreeHash();
 
+    // Update derived children attribute
+    this.item.children = this.getOrderedChildIdsAsReferences();
+
+    // Notify about change is not loading
     if(!this.treeConfig.loading){
       this.treeConfig.changeSubject.next({
         type: 'reference-removed',
@@ -1365,6 +1383,7 @@ export class ItemProxy {
       });
     }
     let orderAfterSort = this.getOrderedChildIds();
+    this.item.children = this.getOrderedChildIdsAsReferences();
     if (!_.isEqual(orderBeforeSort, orderAfterSort)){
       if (!this.treeConfig.loading){
         this.treeConfig.changeSubject.next({
@@ -1442,6 +1461,17 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getOrderedChildIdsAsReferences() {
+    var childIdRefs = [];
+    for (var i = 0; i < this.children.length; i++) {
+      childIdRefs.push({ id: this.children[i].item.id});
+    }
+    return childIdRefs;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   updateVCStatus (itemStatus : Array<string>) {
 
     this._vcStatus.updateStatus(itemStatus);
@@ -1499,13 +1529,19 @@ export class ItemProxy {
 
 
     // Ensure sort order is maintained
-    if(this.parentProxy){
+    if (this.parentProxy){
       this.parentProxy.sortChildren();
     }
-    if(itemIdsChanged){
+
+    if (itemIdsChanged){
       this.sortChildren();
     }
 
+
+    if (this.children.length === 0){
+      this.item.children = [];
+    }
+    
     // Determine if the parent changed
     var oldParentId = '';
     if (this.parentProxy) {
