@@ -5,6 +5,7 @@
   "modelName": "Action",
   "icon": "fa fa-paper-plane",
   "color": "#00008b",
+  "localTypes": {},
   "viewProperties": {
     "actionState": {
       "inputType": {

@@ -70,7 +70,8 @@ export class ObjectEditorComponent implements OnInit {
       } else {
         this._copy = {};
         for (let attributeName in this._attributes) {
-          if (this._attributes[attributeName].default != null) {
+          if ((this._attributes[attributeName].default != null) && (this.
+            _attributes[attributeName].default !== '')) {
             this._copy[attributeName] = this._attributes[attributeName].
               default;
           } else {
@@ -445,10 +446,9 @@ export class ObjectEditorComponent implements OnInit {
       type);
     let type: any;
     if (this._type.localTypes) {
-      for (let j: number = 0; j < this._type.localTypes.length; j++) {
-        let localType: any = this._type.localTypes[j];
-        if (localType.name === typeName) {
-          type = localType;
+      for (let localTypeName in this._type.localTypes) {
+        if (localTypeName === typeName) {
+          type = this._type.localTypes[localTypeName];
           break;
         }
       }

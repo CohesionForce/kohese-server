@@ -77,9 +77,9 @@ export class AttributeInsertionComponent {
     } else {
       if (element.value instanceof ItemProxy) {
         let item: any = (element.value as ItemProxy).item;
-        for (let j: number = 0; j < item.localTypes.length; j++) {
-          children.push(new Entry(item.localTypes[j].name, item.localTypes[
-            j]));
+        for (let localTypeName in item.localTypes) {
+          children.push(new Entry(localTypeName, item.localTypes[
+            localTypeName]));
         }
         
         for (let attributeName in item.classProperties) {

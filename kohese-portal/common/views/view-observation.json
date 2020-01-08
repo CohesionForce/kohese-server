@@ -5,6 +5,7 @@
   "modelName": "Observation",
   "icon": "fa fa-comment",
   "color": "#ffd700",
+  "localTypes": {},
   "viewProperties": {
     "observedBy": {
       "inputType": {

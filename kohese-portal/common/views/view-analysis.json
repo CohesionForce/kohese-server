@@ -5,6 +5,7 @@
   "modelName": "Analysis",
   "icon": "",
   "color": "#000000",
+  "localTypes": {},
   "viewProperties": {
     "id": {
       "inputType": {

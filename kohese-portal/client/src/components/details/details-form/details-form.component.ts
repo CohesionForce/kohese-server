@@ -523,11 +523,9 @@ export class DetailsFormComponent extends NavigatableComponent
       properties[attributeName].type);
     let type: any;
     if (this.type.dataModelProxy.item.localTypes) {
-      for (let j: number = 0; j < this.type.dataModelProxy.item.localTypes.
-        length; j++) {
-        let localType: any = this.type.dataModelProxy.item.localTypes[j];
-        if (localType.name === typeName) {
-          type = localType;
+      for (let localTypeName in this.type.dataModelProxy.item.localTypes) {
+        if (localTypeName === typeName) {
+          type = this.type.dataModelProxy.item.localTypes[localTypeName];
           break;
         }
       }

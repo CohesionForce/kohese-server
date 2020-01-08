@@ -560,10 +560,9 @@ export class FormatObjectEditorComponent implements OnInit {
       attributeName].definition.type);
     let type: any;
     if (this._type.localTypes) {
-      for (let j: number = 0; j < this._type.localTypes.length; j++) {
-        let localType: any = this._type.localTypes[j];
-        if (localType.name === typeName) {
-          type = localType;
+      for (let localTypeName in this._type.localTypes) {
+        if (localTypeName === typeName) {
+          type = this._type.localTypes[localTypeName];
           break;
         }
       }

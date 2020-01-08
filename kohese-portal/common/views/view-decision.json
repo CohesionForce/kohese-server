@@ -5,6 +5,7 @@
   "modelName": "Decision",
   "icon": "fa fa-gavel",
   "color": "#add8e6",
+  "localTypes": {},
   "viewProperties": {
     "decisionState": {
       "inputType": {

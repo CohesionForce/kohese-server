@@ -102,9 +102,7 @@
       "derived": true
     },
     "localTypes": {
-      "type": [
-        "object"
-      ],
+      "type": "object",
       "required": true
     }
   },

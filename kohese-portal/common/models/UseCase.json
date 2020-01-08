@@ -39,31 +39,48 @@
   "relations": {},
   "acls": [],
   "methods": [],
-  "localTypes": [
-    {
+  "localTypes": {
+    "FlowOfEvents": {
       "name": "FlowOfEvents",
+      "base": "Item",
+      "idInjection": true,
       "properties": {
-        "PreConditions": {
+        "Preconditions": {
+          "name": "Preconditions",
           "type": [
             "string"
-          ]
+          ],
+          "required": false,
+          "default": "",
+          "id": false
         },
-        "PostConditions": {
+        "Postconditions": {
+          "name": "Postconditions",
           "type": [
             "string"
-          ]
+          ],
+          "required": false,
+          "default": "",
+          "id": false
         },
         "Flow": {
+          "name": "Flow",
           "type": [
             "KeyEvent"
           ],
           "required": false,
+          "default": "",
+          "id": false,
           "relation": {
             "kind": "Item",
             "foreignKey": "id"
           }
         }
-      }
+      },
+      "validations": [],
+      "relations": {},
+      "acls": [],
+      "methods": []
     }
-  ]
+  }
 }

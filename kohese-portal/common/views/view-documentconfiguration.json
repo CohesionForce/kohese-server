@@ -5,6 +5,7 @@
   "modelName": "DocumentConfiguration",
   "icon": "fa fa-file",
   "color": "#ffa500",
+  "localTypes": {},
   "viewProperties": {},
   "tableDefinitions": {},
   "itemIds": []

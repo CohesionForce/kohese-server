@@ -5,6 +5,7 @@
   "modelName": "Project",
   "icon": "fa fa-pie-chart",
   "color": "#800080",
+  "localTypes": {},
   "viewProperties": {
     "projectItems": {
       "inputType": {

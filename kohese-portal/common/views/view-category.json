@@ -5,6 +5,7 @@
   "modelName": "Category",
   "icon": "",
   "color": "#000000",
+  "localTypes": {},
   "viewProperties": {},
   "formatDefinitions": {
     "dce35040-15da-11ea-97d2-3bae97d5d967": {

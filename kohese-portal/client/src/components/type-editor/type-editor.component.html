@@ -32,7 +32,9 @@
             dataModelProxy.dirty ? '*' : '')}}">
             <ng-template matTabContent>
               <data-model-editor [dataModel]="(koheseTypeStream | async).
-                dataModelProxy.item">
+                dataModelProxy.item" [hasUnsavedChanges]="(koheseTypeStream |
+                async).dataModelProxy.dirty" (modified)="koheseTypeStream.
+                getValue().dataModelProxy.dirty = true">
               </data-model-editor>
             </ng-template>
           </mat-tab>
@@ -40,7 +42,10 @@
             viewModelProxy.dirty ? '*' : '')}}">
             <ng-template matTabContent>
               <view-model-editor [viewModel]="(koheseTypeStream | async).
-                viewModelProxy.item">
+                viewModelProxy.item" [hasUnsavedChanges]="(koheseTypeStream |
+                async).viewModelProxy.dirty" (modified)="koheseTypeStream.
+                getValue().viewModelProxy.dirty = true"
+                [dataModel]="(koheseTypeStream | async).dataModelProxy.item">
               </view-model-editor>
             </ng-template>
           </mat-tab>

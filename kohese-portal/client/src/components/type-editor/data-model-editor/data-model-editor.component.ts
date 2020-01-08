@@ -1,12 +1,11 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  ViewChild } from '@angular/core';
+  ViewChild, Output, EventEmitter } from '@angular/core';
 import { MatTable } from '@angular/material';
 
 import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { LocalTypeEditorComponent } from '../local-type-editor/local-type-editor.component';
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -30,9 +29,10 @@ export class DataModelEditorComponent {
     this._attributeTypes = JSON.parse(JSON.stringify(this._fundamentalTypes));
     this._idAttributes = {};
     
-    for (let j: number = 0; j < this._dataModel.localTypes.length; j++) {
-      let localType: any = this._dataModel.localTypes[j];
-      this._attributeTypes[localType.name] = localType.name;
+    if (!this._enclosingType) {
+      for (let localTypeName in this._dataModel.localTypes) {
+        this._attributeTypes[localTypeName] = localTypeName;
+      }
     }
     
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
@@ -61,9 +61,7 @@ export class DataModelEditorComponent {
       return oneKind.name.localeCompare(anotherKind.name);
     });
     
-    this._itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(this.
-      _dataModel.id);
-    this._editable = this._itemProxy.dirty;
+    this._editable = this._hasUnsavedChanges;
     this._attributes = [];
     for (let attributeName in this._dataModel.properties) {
       let attribute: any = this._dataModel.properties[attributeName];
@@ -99,9 +97,20 @@ export class DataModelEditorComponent {
     return this._idAttributes;
   }
   
-  private _itemProxy: ItemProxy;
-  get itemProxy() {
-    return this._itemProxy;
+  private _hasUnsavedChanges: boolean = false;
+  get hasUnsavedChanges() {
+    return this._hasUnsavedChanges;
+  }
+  @Input('hasUnsavedChanges')
+  set hasUnsavedChanges(hasUnsavedChanges: boolean) {
+    this._hasUnsavedChanges = hasUnsavedChanges;
+    this.dataModel = this._dataModel;
+  }
+  
+  private _modifiedEventEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output('modified')
+  get modifiedEventEmitter() {
+    return this._modifiedEventEmitter;
   }
   
   private _editable: boolean = false;
@@ -110,6 +119,16 @@ export class DataModelEditorComponent {
   }
   set editable(editable: boolean) {
     this._editable = editable;
+  }
+  
+  private _enclosingType: any;
+  get enclosingType() {
+    return this._enclosingType;
+  }
+  @Input('enclosingType')
+  set enclosingType(enclosingType: any) {
+    this._enclosingType = enclosingType;
+    this.dataModel = this._dataModel;
   }
   
   @ViewChild('attributeTable')
@@ -130,7 +149,10 @@ export class DataModelEditorComponent {
   }
   
   public save(): void {
-    this._itemRepository.upsertItem('KoheseModel', this._dataModel).then(
+    let dataModel: any = (this._enclosingType ? this._enclosingType : this.
+      _dataModel);
+    
+    this._itemRepository.upsertItem('KoheseModel', dataModel).then(
       (itemProxy: ItemProxy) => {
       this._changeDetectorRef.markForCheck();
     });
@@ -144,71 +166,93 @@ export class DataModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public addLocalType(): void {
-    this._dialogService.openComponentDialog(LocalTypeEditorComponent, {
-      data: {
-        containingType: this._dataModel,
-        view: TreeConfiguration.getWorkingTree().getProxyFor('view-' + this.
-          _dataModel.name.toLowerCase()).item
-      },
-      disableClose: true
-    }).updateSize('90%', '90%').afterClosed().subscribe((localType: any) => {
-      if (localType) {
-        // Migration code
-        let localTypes: Array<any> = this._dataModel.localTypes;
-        if (!localTypes) {
-          localTypes = this._dataModel.localTypes = [];
-        }
+  public async addLocalType(): Promise<void> {
+    let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+      getProxyFor('view-' + this._dataModel.name.toLowerCase());
+    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
+      let response: any = await this._dialogService.openYesNoDialog(
+        'Display Modifications', 'All unsaved modifications to this kind ' +
+        'are to be saved if a local type is added to this kind. Do you want ' +
+        'to proceed?').toPromise();
+      if (!response) {
+        return;
+      }
+    }
+    
+    this._dialogService.openInputDialog('Add Local Type', '', DialogComponent.
+      INPUT_TYPES.TEXT, 'Name', 'Local Type', (input: any) => {
+      return !!input;
+    }).afterClosed().subscribe((name: string) => {
+      if (name) {
+        let dataModel: any = {
+          name: name,
+          base: 'Item',
+          idInjection: true,
+          properties: {},
+          validations: [],
+          relations: {},
+          acls: [],
+          methods: []
+        };
         
-        localTypes.push(localType);
-        this._dynamicTypesService.localTypeMap.get(this._dataModel.name).push(
-          localType.name);
+        let viewModel: any = {
+          name: name,
+          modelName: name,
+          icon: '',
+          color: '#000000',
+          viewProperties: {},
+          formatDefinitions: {},
+          defaultFormatKey: '',
+          tableDefinitions: {}
+        };
+
+        this._dataModel.localTypes[name] = dataModel;
+        viewModelProxy.item.localTypes[name] = viewModel;
         
-        this._itemProxy.dirty = true;
+        this.save();
+        this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+        
+        // Re-enter edit mode
+        this._editable = true;
+        
         this._changeDetectorRef.markForCheck();
       }
     });
   }
   
-  public editLocalType(localType: any): void {
-    this._dialogService.openComponentDialog(LocalTypeEditorComponent, {
-      data: {
-        type: localType,
-        containingType: this._dataModel,
-        view: TreeConfiguration.getWorkingTree().getProxyFor('view-' + this.
-          _dataModel.name.toLowerCase()).item
-      },
-      disableClose: true
-    }).updateSize('90%', '90%').afterClosed().subscribe((returnedLocalType:
+  public removeLocalType(name: string): void {
+    this._dialogService.openYesNoDialog('Remove ' + name, 'All ' +
+      'unsaved modifications to this kind are to be saved if this local ' +
+      'type is removed. Do you want to proceed?').subscribe((choiceValue:
       any) => {
-      if (returnedLocalType) {
-        this._itemProxy.dirty = true;
-        this._changeDetectorRef.markForCheck();
-      }
-    });
-  }
-  
-  public removeLocalType(localType: any): void {
-    this._dialogService.openYesNoDialog('Remove ' + localType.name,
-      'Are you sure that you want to remove ' + localType.name + '?').
-      subscribe((selection: any) => {
-      if (selection) {
-        let localTypes: Array<any> = this._dataModel.localTypes;
-        localTypes.splice(localTypes.indexOf(localType), 1);
-        let localTypeNames: Array<string> = this._dynamicTypesService.
-          localTypeMap.get(this._dataModel.name);
-        localTypeNames.splice(localTypeNames.indexOf(localType.name), 1);
+      if (choiceValue) {
+        let viewModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
+          'view-' + this._dataModel.name.toLowerCase()).item;
+        delete this._dataModel.localTypes[name];
+        delete viewModel.localTypes[name];
         
-        this._itemProxy.dirty = true;
+        this.save();
+        this._itemRepository.upsertItem('KoheseView', viewModel);
+        
+        // Re-enter edit mode
+        this._editable = true;
+        
         this._changeDetectorRef.markForCheck();
       }
     });
   }
   
   public async addAttribute(): Promise<void> {
-    let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-      getProxyFor('view-' + this._dataModel.name.toLowerCase());
-    if (this._itemProxy.dirty || viewModelProxy.dirty) {
+    let viewModelProxy: ItemProxy;
+    if (this._enclosingType) {
+      viewModelProxy = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._enclosingType.name.toLowerCase());
+    } else {
+      viewModelProxy = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._dataModel.name.toLowerCase());
+    }
+    
+    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
       let response: any = await this._dialogService.openYesNoDialog(
         'Display Modifications', 'All unsaved modifications to this kind ' +
         'are to be saved if an attribute is added to this kind. Do you want ' +
@@ -227,7 +271,9 @@ export class DataModelEditorComponent {
       if (attributeObject) {
         this._dataModel.properties[attributeObject.attributeName] =
           attributeObject.attribute;
-        viewModelProxy.item.viewProperties[attributeObject.attributeName] =
+        let viewModel: any = (this._enclosingType ? viewModelProxy.item.
+          localTypes[this._dataModel.name] : viewModelProxy.item);
+        viewModel.viewProperties[attributeObject.attributeName] =
           attributeObject.view;
         
         this.save();
@@ -347,7 +393,7 @@ export class DataModelEditorComponent {
     }
     
     attribute.name = name;
-    this._itemProxy.dirty = true;
+    this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
   }
   
@@ -366,7 +412,7 @@ export class DataModelEditorComponent {
     Promise<void> {
     let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('view-' + this._dataModel.name.toLowerCase());
-    if (this._itemProxy.dirty || viewModelProxy.dirty) {
+    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
       let response: any = await this._dialogService.openYesNoDialog(
         'Display Modifications', 'All unsaved modifications to this kind ' +
         'are to be saved if an attribute is added to this kind. Do you want ' +
@@ -434,7 +480,7 @@ export class DataModelEditorComponent {
         attribute.properties = data.stateMachine;
         attribute.default = data.defaultState;
         
-        this._itemProxy.dirty = true;
+        this._modifiedEventEmitter.emit();
       }
     });
   }
@@ -458,7 +504,7 @@ export class DataModelEditorComponent {
 
     attribute.type = type;
     
-    this._itemProxy.dirty = true;
+    this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
   }
   

@@ -154,10 +154,10 @@ export class AttributeEditorComponent implements OnInit {
   
   public ngOnInit(): void {
     if (this._data) {
+      this._type = this._data['type'];
       if (this._data['attribute']) {
         this._attributeName = this._data['attributeName'];
         this._attribute = this._data['attribute'];
-        this._type = this._data['type'];
         this._view = this._data['view'];
       }
       
@@ -183,9 +183,8 @@ export class AttributeEditorComponent implements OnInit {
       }
       
       if (koheseType.dataModelProxy.item === this._type) {
-        for (let j: number = 0; j < this._type.localTypes.length; j++) {
-          let localType: any = this._type.localTypes[j];
-          this._attributeTypes[localType.name] = localType.name;
+        for (let localTypeName in this._type.localTypes) {
+          this._attributeTypes[localTypeName] = localTypeName;
         }
       }
     }

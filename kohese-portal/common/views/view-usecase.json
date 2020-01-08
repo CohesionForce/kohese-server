@@ -8,13 +8,45 @@
   "modifiedOn": 1572491077359,
   "modelName": "UseCase",
   "icon": "fa fa-tasks",
+  "color": "#000000",
+  "localTypes": {
+    "FlowOfEvents": {
+      "name": "FlowOfEvents",
+      "modelName": "FlowOfEvents",
+      "icon": "",
+      "color": "#000000",
+      "viewProperties": {
+        "Preconditions": {
+          "name": "Preconditions",
+          "displayName": "Preconditions",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
+        "Postconditions": {
+          "name": "Postconditions",
+          "displayName": "Postconditions",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
+        "Flow": {
+          "name": "Flow",
+          "displayName": "Flow",
+          "inputType": {
+            "type": "",
+            "options": {}
+          }
+        }
+      },
+      "formatDefinitions": {},
+      "defaultFormatKey": "",
+      "tableDefinitions": {}
+    }
+  },
   "viewProperties": {
-    "Flow": {
-      "name": "Flow"
-    },
-    "PostConditions": {
-      "name": "PostConditions"
-    },
     "Actors": {
       "displayName": "Actors",
       "inputType": {

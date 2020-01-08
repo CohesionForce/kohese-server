@@ -5,6 +5,7 @@
   "modelName": "KoheseUser",
   "icon": "fa fa-user",
   "color": "#000000",
+  "localTypes": {},
   "viewProperties": {
     "password": {
       "inputType": {
