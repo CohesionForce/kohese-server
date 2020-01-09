@@ -74,7 +74,7 @@
               "kind": "Decision",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "labelOrientation": "Top",
             "kind": "text"
           }
@@ -89,7 +89,7 @@
                 "kind": "Decision",
                 "attribute": "description"
               },
-              "hideLabel": false,
+              "customLabel": "description",
               "labelOrientation": "Top",
               "kind": "markdown"
             }

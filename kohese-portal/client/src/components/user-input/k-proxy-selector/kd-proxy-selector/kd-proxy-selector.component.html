@@ -1,5 +1,5 @@
-<label *ngIf="!property.hideLabel" style="font-weight : bold;">
-  {{property.propertyName.attribute}}
+<label style="font-weight : bold;">
+  {{property.customLabel}}
 </label>
 <div *ngIf="!editable">
   <div *ngFor="let proxy of references ">

@@ -19,7 +19,7 @@
               "kind": "Category",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "labelOrientation": "Top",
             "kind": "text"
           }
@@ -34,7 +34,7 @@
                 "kind": "Category",
                 "attribute": "description"
               },
-              "hideLabel": false,
+              "customLabel": "description",
               "labelOrientation": "Top",
               "kind": "markdown"
             }

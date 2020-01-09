@@ -11,13 +11,15 @@ import { TreeViewModule } from '../tree/tree.module';
 import { ObjectEditorComponent } from './object-editor.component';
 import { DocumentConfigurationEditorComponent } from './document-configuration/document-configuration-editor.component';
 import { FormatObjectEditorComponent } from './format-object-editor/format-object-editor.component';
+import { FormatDefinitionEditorComponent } from './format-definition-editor/format-definition-editor.component';
 import { TableModule } from '../table/table.module';
 
 @NgModule({
   declarations: [
     ObjectEditorComponent,
     DocumentConfigurationEditorComponent,
-    FormatObjectEditorComponent
+    FormatObjectEditorComponent,
+    FormatDefinitionEditorComponent
   ],
   entryComponents: [
     ObjectEditorComponent,
@@ -36,7 +38,8 @@ import { TableModule } from '../table/table.module';
   ],
   exports: [
     ObjectEditorComponent,
-    FormatObjectEditorComponent
+    FormatObjectEditorComponent,
+    FormatDefinitionEditorComponent
   ]
 })
 export class ObjectEditorModule {

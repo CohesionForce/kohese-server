@@ -11,6 +11,7 @@ import { FormatPreviewComponent } from '../format-editor/format-preview/format-p
 import { TableDefinition } from '../TableDefinition.interface';
 import { FormatDefinition,
   FormatDefinitionType } from '../FormatDefinition.interface';
+import { FormatContainer } from '../FormatContainer.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
@@ -309,25 +310,41 @@ export class ViewModelEditorComponent {
     }).afterClosed().subscribe((name: any) => {
       if (name) {
         let id: string = (<any> Uuid).default();
-        this._viewModel.formatDefinitions[id] = {
+        let propertyNameObject: { kind: string, attribute: string} = {
+          kind: '',
+          attribute: ''
+        };
+        let viewModelEntry: any;
+        if (this._isLocalType) {
+          propertyNameObject.kind = this._dataModel.name;
+          propertyNameObject.attribute = Object.keys(this._dataModel.
+            properties)[0];
+          viewModelEntry = this._viewModel.viewProperties[propertyNameObject.
+            attribute].inputType;
+        } else {
+          propertyNameObject.kind = 'Item';
+          propertyNameObject.attribute = 'name';
+          viewModelEntry = TreeConfiguration.getWorkingTree().getProxyFor(
+            'view-item').item.viewProperties['name'].inputType;
+        }
+        
+        let formatDefinition: FormatDefinition = {
           id: id,
           name: name,
           header: {
             kind: 'header',
             contents: [{
-              propertyName: {
-                kind: 'Item',
-                attribute: 'name'
-              },
-              hideLabel: true,
+              propertyName: propertyNameObject,
+              customLabel: propertyNameObject.attribute,
               hideEmpty: false,
               labelOrientation: 'Top',
-              kind: 'text',
-              inputOptions: {}
+              kind: viewModelEntry.type,
+              inputOptions: viewModelEntry
             }]
           },
           containers: []
         };
+        this._viewModel.formatDefinitions[id] = formatDefinition;
         
         this._modifiedEventEmitter.emit();
         this._changeDetectorRef.markForCheck();
@@ -375,6 +392,39 @@ export class ViewModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
+  public mayRemoveFormatDefinition(formatDefinitionId: string): boolean {
+    if (this._isLocalType) {
+      TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+        { includeOrigin: false }, (itemProxy: ItemProxy) => {
+        if (itemProxy.kind === 'KoheseView') {
+          for (let id in itemProxy.item.formatDefinitions) {
+            let formatDefinition: FormatDefinition = itemProxy.item.
+              formatDefinitions[id];
+            if (formatDefinition.header.contents[0].formatDefinition ===
+              formatDefinitionId) {
+              return false;
+            }
+            
+            for (let j: number = 0; j < formatDefinition.containers.length;
+              j++) {
+              let formatContainer: FormatContainer = formatDefinition.
+                containers[j];
+              for (let k: number = 0; k < formatContainer.contents.length;
+                k++) {
+                if (formatContainer.contents[k].formatDefinition ===
+                  formatDefinitionId) {
+                  return false;
+                }
+              }
+            }
+          }
+        }
+      }, undefined);
+    }
+    
+    return true;
+  }
+  
   public removeFormatDefinition(formatDefinitionId: string): void {
     if (this._viewModel.defaultFormatKey === formatDefinitionId) {
       this._viewModel.defaultFormatKey = Object.keys(this._viewModel.
@@ -385,6 +435,22 @@ export class ViewModelEditorComponent {
     
     this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
+  }
+  
+  public getAttributes(): Array<any> {
+    if (this._isLocalType) {
+      return Object.values(this._dataModel.properties);
+    } else {
+      let attributes: Array<any> = [];
+      for (let attributeName in this._dataModel.classProperties) {
+        let attribute: any = this._dataModel.classProperties[attributeName].
+          definition;
+        attribute.name = attributeName;
+        attributes.push(attribute);
+      }
+      
+      return attributes;
+    }
   }
   
   public sortAttributes(columnId: string, sortDirection: string): void {

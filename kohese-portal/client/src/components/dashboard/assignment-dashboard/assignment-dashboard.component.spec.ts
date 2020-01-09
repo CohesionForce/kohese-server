@@ -1,5 +1,5 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
@@ -30,7 +30,7 @@ describe('Component: ', ()=>{
          MaterialModule,
          BrowserAnimationsModule
          ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: NavigationService, useClass: MockNavigationService },
         { provide: ItemRepository, useClass: MockItemRepository },

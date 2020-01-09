@@ -51,6 +51,10 @@ export class StateSummaryDialogComponent implements OnInit {
   get editableSet() {
     return this._editableSet;
   }
+  
+  get TreeConfiguration() {
+    return TreeConfiguration;
+  }
 
   constructor(@Inject(MAT_DIALOG_DATA) private data: any,
     private _itemRepository: ItemRepository, private _navigationService:
@@ -100,6 +104,17 @@ export class StateSummaryDialogComponent implements OnInit {
   
   public navigate(itemProxy: ItemProxy): void {
     this._navigationService.addTab('Explore', { id: itemProxy.item.id });
+  }
+  
+  public getAttributes(type: any): Array<any> {
+    let attributes: Array<any> = [];
+    for (let attributeName in type.classProperties) {
+      let attribute: any = type.classProperties[attributeName].definition;
+      attribute.name = attributeName;
+      attributes.push(attribute);
+    }
+    
+    return attributes;
   }
   
   public getFormatDefinition(itemProxy: ItemProxy): FormatDefinition {

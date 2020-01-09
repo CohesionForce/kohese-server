@@ -108,9 +108,9 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
                    kind: name,
                    attribute: 'name'
                  },
-                 'hideLabel': false,
                  'labelOrientation': 'Top',
-                 'kind': 'text'
+                 'kind': 'text',
+                 'customLabel': 'name'
                }
              ]
            },
@@ -123,9 +123,9 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
                      kind: name,
                      attribute: 'description'
                    },
-                   'hideLabel': false,
                    'labelOrientation': 'Top',
-                   'kind': 'markdown'
+                   'kind': 'markdown',
+                   'customLabel': 'description'
                 }
              ]
             }

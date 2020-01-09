@@ -88,7 +88,7 @@
         <ng-template matExpansionPanelContent>
           <!-- Handle local type selection -->
           <table-editor [tableDefinition]="tableDefinition" [kind]="dataModel"
-            [disabled]="!editable">
+            [attributes]="getAttributes()" [disabled]="!editable">
           </table-editor>
         </ng-template>
       </mat-expansion-panel>
@@ -120,11 +120,13 @@
             [disabled]="!editable">
             <mat-icon class="fa fa-i-cursor"></mat-icon>
           </button>
-          <button mat-icon-button matTooltip="Preview this format definition"
-            (click)="previewFormatDefinition(formatDefinition.id); $event.
-            stopPropagation()">
-            <mat-icon class="fa fa-search"></mat-icon>
-          </button>
+          <ng-container *ngIf="!isLocalType">
+            <button mat-icon-button matTooltip="Preview this format definition"
+              (click)="previewFormatDefinition(formatDefinition.id); $event.
+              stopPropagation()">
+              <mat-icon class="fa fa-search"></mat-icon>
+            </button>
+          </ng-container>
           <button mat-icon-button matTooltip="Make this format definition the
             default document format definition for this kind"
             (click)="setDefaultFormatDefinition(FormatDefinitionType.DOCUMENT,
@@ -147,15 +149,17 @@
           </button>
           <button mat-icon-button matTooltip="Remove this format definition"
             (click)="removeFormatDefinition(formatDefinition.id); $event.
-            stopPropagation()" [disabled]="(!editable || (Object.keys(
+            stopPropagation()" [disabled]="(!editable ||
+            !mayRemoveFormatDefinition(formatDefinition.id) || (Object.keys(
             viewModel.formatDefinitions).length === 1))">
             <mat-icon class="fa fa-trash"></mat-icon>
           </button>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <format-gui [format]="formatDefinition" [kind]="dataModel"
-            [disabled]="!editable">
-          </format-gui>
+          <format-definition-editor [formatDefinition]="formatDefinition"
+            [dataModel]="dataModel" [viewModel]="viewModel"
+            [attributes]="getAttributes()" [disabled]="!editable">
+          </format-definition-editor>
         </ng-template>
       </mat-expansion-panel>
     </ng-container>

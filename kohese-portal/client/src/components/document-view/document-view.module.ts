@@ -1,7 +1,4 @@
-import { ColumnContainerComponent } from './document-row/format-containers/column-container/column-container.component';
 import { UserInputModule } from './../user-input/user-input.module';
-import { HeaderContainerComponent } from './document-row/format-containers/header-container/header-container.component';
-import { ListContainerComponent } from './document-row/format-containers/list-container/list-container.component';
 import { DocumentRowComponent } from './document-row/document-row.component';
 import { TreeViewModule } from '../tree/tree.module';
 import { FullscreenDocumentComponent } from './fullscreen-document/fullscreen-document.component';
@@ -13,17 +10,16 @@ import { NgModule } from "@angular/core";
 import { DocumentViewComponent } from './document-view.component';
 import { CommonModule } from "@angular/common";
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 @NgModule({
   declarations: [
     DocumentViewComponent,
     CreationRowComponent,
     DocumentRowComponent,
-    FullscreenDocumentComponent,
-    ListContainerComponent,
-    HeaderContainerComponent,
-    ColumnContainerComponent
+    FullscreenDocumentComponent
   ],
   imports : [
     CommonModule,
@@ -34,11 +30,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
     FormsModule,
     ReactiveFormsModule,
     TreeViewModule,
-    UserInputModule
+    UserInputModule,
+    ObjectEditorModule
   ],
   exports : [
     DocumentViewComponent,
-    ListContainerComponent,
     DocumentRowComponent
   ]
 })

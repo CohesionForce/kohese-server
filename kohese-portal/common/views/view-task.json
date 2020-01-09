@@ -125,7 +125,7 @@
               "kind": "Task",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "labelOrientation": "Top",
             "kind": "text"
           }
@@ -140,7 +140,7 @@
                 "kind": "Task",
                 "attribute": "description"
               },
-              "hideLabel": false,
+              "customLabel": "description",
               "labelOrientation": "Top",
               "kind": "markdown"
             }
@@ -160,7 +160,7 @@
               "kind": "Task",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "hideEmpty": false,
             "labelOrientation": "Top",
             "kind": "text",
@@ -169,8 +169,7 @@
               "options": {
                 "isMultiLine": false
               }
-            },
-            "customLabel": ""
+            }
           }
         ]
       },
@@ -183,37 +182,35 @@
                 "kind": "Task",
                 "attribute": "estimatedStart"
               },
-              "hideLabel": false,
+              "customLabel": "estimatedStart",
               "labelOrientation": "Top",
               "kind": "date",
               "hideEmpty": false,
               "inputOptions": {
                 "type": "date",
                 "options": {}
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Task",
                 "attribute": "estimatedCompletion"
               },
-              "hideLabel": false,
+              "customLabel": "estimatedCompletion",
               "labelOrientation": "Top",
               "kind": "date",
               "hideEmpty": false,
               "inputOptions": {
                 "type": "date",
                 "options": {}
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Task",
                 "attribute": "estimatedHoursEffort"
               },
-              "hideLabel": false,
+              "customLabel": "estimatedHoursEffort",
               "labelOrientation": "Top",
               "kind": "number",
               "hideEmpty": false,
@@ -222,15 +219,14 @@
                 "options": {
                   "isMultiLine": false
                 }
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Task",
                 "attribute": "remainingHoursEffort"
               },
-              "hideLabel": false,
+              "customLabel": "remainingHoursEffort",
               "labelOrientation": "Top",
               "kind": "number",
               "hideEmpty": false,
@@ -239,15 +235,14 @@
                 "options": {
                   "isMultiLine": false
                 }
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Task",
                 "attribute": "actualHoursEffort"
               },
-              "hideLabel": false,
+              "customLabel": "actualHoursEffort",
               "labelOrientation": "Top",
               "kind": "number",
               "hideEmpty": false,
@@ -256,15 +251,14 @@
                 "options": {
                   "isMultiLine": false
                 }
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Task",
                 "attribute": "predecessors"
               },
-              "hideLabel": false,
+              "customLabel": "predecessors",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "hideEmpty": false,
@@ -276,7 +270,6 @@
                   "useAdvancedSelector": false
                 }
               },
-              "customLabel": "",
               "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
             },
             {
@@ -284,7 +277,7 @@
                 "kind": "Task",
                 "attribute": "taskState"
               },
-              "hideLabel": false,
+              "customLabel": "taskState",
               "labelOrientation": "Top",
               "kind": "state-editor",
               "hideEmpty": false,
@@ -297,8 +290,7 @@
                     "In Work"
                   ]
                 }
-              },
-              "customLabel": ""
+              }
             }
           ]
         }

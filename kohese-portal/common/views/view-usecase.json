@@ -83,7 +83,7 @@
               "kind": "UseCase",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "labelOrientation": "Top",
             "kind": "text"
           }
@@ -98,7 +98,7 @@
                 "kind": "UseCase",
                 "attribute": "description"
               },
-              "hideLabel": false,
+              "customLabel": "description",
               "labelOrientation": "Top",
               "kind": "markdown"
             },
@@ -107,15 +107,14 @@
                 "kind": "UseCase",
                 "attribute": "Actors"
               },
-              "hideLabel": false,
+              "customLabel": "Actors",
               "labelOrientation": "Top",
               "kind": "",
               "hideEmpty": false,
               "inputOptions": {
                 "type": "",
                 "options": {}
-              },
-              "customLabel": ""
+              }
             }
           ]
         }

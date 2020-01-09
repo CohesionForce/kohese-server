@@ -30,6 +30,8 @@ import {
 } from 'commonmark';
 import * as commonmark from 'commonmark';
 
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+
 @Component({
   selector: 'document-row',
   templateUrl: './document-row.component.html',
@@ -44,6 +46,10 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
   docReader: Parser;
   docWriter: HtmlRenderer;
   upsertComplete : Subject<any> = new Subject();
+  
+  get TreeConfiguration() {
+    return TreeConfiguration;
+  }
 
   constructor(private changeRef: ChangeDetectorRef,
               private itemRepository: ItemRepository,
@@ -87,6 +93,15 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     this.changeRef.markForCheck();
     // TODO fix this
   }
-
-
+  
+  public getAttributes(type: any): Array<any> {
+    let attributes: Array<any> = [];
+    for (let attributeName in type.classProperties) {
+      let attribute: any = type.classProperties[attributeName].definition;
+      attribute.name = attributeName;
+      attributes.push(attribute);
+    }
+    
+    return attributes;
+  }
 }

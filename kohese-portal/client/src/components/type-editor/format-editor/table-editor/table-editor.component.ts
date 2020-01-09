@@ -28,6 +28,15 @@ export class TableEditorComponent implements OnInit, OnDestroy {
     this._kind = kind;
   }
   
+  private _attributes: Array<any>;
+  get attributes() {
+    return this._attributes;
+  }
+  @Input('attributes')
+  set attributes(attributes: Array<any>) {
+    this._attributes = attributes;
+  }
+  
   private _isDisabled: boolean = false;
   get isDisabled() {
     return this._isDisabled;
@@ -82,10 +91,14 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   }
 
   addColumn() {
-    let attributeNames: Array<string> = Object.keys(this._kind.
-      classProperties).filter((attributeName: string) => {
-      return (this._tableDefinition.columns.indexOf(attributeName) === -1);
-    });
+    let attributeNames: Array<string> = [];
+    for (let j: number = 0; j < this._attributes.length; j++) {
+      if (this._tableDefinition.columns.indexOf(this._attributes[j].name) ===
+        -1) {
+        attributeNames.push(this._attributes[j].name);
+      }
+    }
+    
     this.dialogService.openSelectDialog('Add Column', '', 'Attribute',
       attributeNames[0], attributeNames).afterClosed().subscribe(
       (newColumn) => {
@@ -106,8 +119,10 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   }
 
   addExpandedProperty(colNum: number) {
-    let attributeNames: Array<string> = Object.keys(this._kind.
-      classProperties);
+    let attributeNames: Array<string> = this._attributes.map((attribute:
+      any) => {
+      return attribute.name;
+    });
     this.dialogService.openSelectDialog('Add Column', '', 'Attribute',
       attributeNames[0], attributeNames).afterClosed().subscribe((newProp) => {
         if (newProp) {

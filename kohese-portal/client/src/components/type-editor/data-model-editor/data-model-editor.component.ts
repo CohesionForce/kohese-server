@@ -188,7 +188,12 @@ export class DataModelEditorComponent {
           name: name,
           base: 'Item',
           idInjection: true,
-          properties: {},
+          properties: {
+            name: {
+              name: 'name',
+              type: 'string'
+            }
+          },
           validations: [],
           relations: {},
           acls: [],
@@ -200,7 +205,16 @@ export class DataModelEditorComponent {
           modelName: name,
           icon: '',
           color: '#000000',
-          viewProperties: {},
+          viewProperties: {
+            name: {
+              name: 'name',
+              displayName: 'Name',
+              inputType: {
+                type: 'text',
+                options: {}
+              }
+            }
+          },
           formatDefinitions: {},
           defaultFormatKey: '',
           tableDefinitions: {}

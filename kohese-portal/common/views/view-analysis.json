@@ -29,7 +29,7 @@
               "kind": "Analysis",
               "attribute": "id"
             },
-            "hideLabel": false,
+            "customLabel": "id",
             "labelOrientation": "Top",
             "kind": "text"
           }

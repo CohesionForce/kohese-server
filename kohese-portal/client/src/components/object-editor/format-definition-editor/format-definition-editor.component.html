@@ -1,0 +1,212 @@
+<ng-container *ngIf="dataModel.localTypes">
+  <div>
+    <h3>
+     Header
+    </h3>
+    <div style="display: flex; flex-direction: row;">
+      <mat-form-field style="width: 100%; padding: 0px 3px 0px 3px;">
+        <mat-select placeholder="Attribute" [disabled]="(isDisabled || true)"
+          [ngModel]="formatDefinition.header.contents[0].propertyName.
+          attribute" (ngModelChange)="attributeSelected($event,
+          formatDefinition.header.contents[0])">
+          <ng-container *ngFor="let attribute of getSelectableAttributes()">
+            <mat-option [value]="attribute.name">
+              {{attribute.name}}
+            </mat-option>
+          </ng-container>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="width: 100%; padding: 0px 3px 0px 3px;">
+        <input matInput type="text" placeholder="Label" [disabled]="isDisabled"
+          [(ngModel)]="formatDefinition.header.contents[0].customLabel"/>
+      </mat-form-field>
+      <mat-form-field style="width: 100%; padding: 0px 3px 0px 3px;">
+        <mat-select placeholder="Label Position" [disabled]="isDisabled"
+          [(ngModel)]="formatDefinition.header.contents[0].labelOrientation">
+          <mat-option [value]="'Top'">
+            Top
+          </mat-option>
+          <mat-option [value]="'Left'">
+            Left
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <ng-container *ngIf="formatDefinition.header.contents[0].
+        formatDefinition">
+        <mat-form-field style="width: 100%; padding: 0px 3px 0px 3px;">
+          <mat-select placeholder="Format Definition"
+            [(ngModel)]="formatDefinition.header.contents[0].formatDefinition">
+            <ng-container *ngFor="let localTypeFormatDefinition of
+              getLocalTypeFormatDefinitions(formatDefinition.header.contents[
+              0])">
+              <mat-option [value]="localTypeFormatDefinition.id">
+                {{localTypeFormatDefinition.name}}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+      </ng-container>
+      <ng-container *ngIf="isMultivaluedReferenceAttribute(formatDefinition.
+        header.contents[0])">
+        <mat-form-field style="width: 100%; padding: 0px 3px 0px 3px;">
+          <mat-select placeholder="Table Definition" [disabled]="isDisabled"
+            [(ngModel)]="formatDefinition.header.contents[0].tableDefinition">
+            <mat-option [value]="''">
+              None
+            </mat-option>
+            <ng-container *ngFor="let tableDefinition of getTableDefinitions(
+              formatDefinition.header.contents[0])">
+              <mat-option [value]="tableDefinition.id">
+                {{tableDefinition.name}}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>
+<div>
+  <div style="height: 50px; display: flex; flex-direction: row;">
+    <button mat-icon-button matTooltip="Add a vertical format container"
+      [disabled]="isDisabled" class="flex-right-align"
+      (click)="addFormatContainer(true)">
+      <mat-icon class="fa fa-arrows-v"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Add a horizontal format container"
+      [disabled]="isDisabled" (click)="addFormatContainer(false)">
+      <mat-icon class="fa fa-arrows-h"></mat-icon>
+    </button>
+  </div>
+  <div style="height: calc(100% - 50px);">
+    <ng-container *ngFor="let formatContainer of formatDefinition.
+      containers">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title style="align-items: center;">
+            {{(formatContainer.kind === 'list') ? 'Vertical' : 'Horizontal'}}: 
+              {{((formatContainer.contents.length > 0) ?
+              getFormatContainerPanelTitle(formatContainer) : 'Empty')}}
+          </mat-panel-title>
+          <button mat-icon-button matTooltip="Remove this format container"
+            class="flex-right-align" [disabled]="isDisabled"
+            (click)="removeFormatContainer(formatContainer)">
+            <mat-icon class="fa fa-times"></mat-icon>
+          </button>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <div style="height: 50px; display: flex; flex-direction: row;">
+            <button mat-icon-button matTooltip="Add an attribute"
+              [disabled]="isDisabled" class="flex-right-align"
+              (click)="addAttribute(formatContainer)">
+              <mat-icon class="fa fa-plus"></mat-icon>
+            </button>
+          </div>
+          <div style="height: calc(100% - 50px); display: flex; overflow:
+            auto;" [ngStyle]="{ 'flex-direction': ((formatContainer.kind ===
+            'list') ? 'column' : 'row') }">
+            <ng-container *ngFor="let propertyDefinition of formatContainer.
+              contents">
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="attribute-panel-header"
+                  style="align-items: center;" [ngStyle]="{ 'width': (
+                  (formatContainer.kind === 'column') ? '500px' : '100%') }">
+                  <mat-form-field style="width: 100%;">
+                    <mat-select placeholder="Attribute" [disabled]="isDisabled"
+                      [ngModel]="propertyDefinition.propertyName.attribute"
+                      (ngModelChange)="attributeSelected($event,
+                      propertyDefinition)" (click)="$event.stopPropagation()">
+                      <ng-container *ngFor="let attribute of
+                        getSelectableAttributes()">
+                        <mat-option [value]="attribute.name">
+                          {{attribute.name}}
+                        </mat-option>
+                      </ng-container>
+                    </mat-select>
+                  </mat-form-field>
+                  <button mat-icon-button matTooltip="Move this entry up"
+                    [disabled]="(isDisabled || !mayMove(formatContainer,
+                    propertyDefinition, true))" class="flex-right-align"
+                    (click)="move(formatContainer, propertyDefinition, true);
+                    $event.stopPropagation()">
+                    <mat-icon class="fa fa-arrow-up"></mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Move this entry down"
+                    [disabled]="(isDisabled || !mayMove(formatContainer,
+                    propertyDefinition, false))" (click)="move(formatContainer,
+                    propertyDefinition, false); $event.stopPropagation()">
+                    <mat-icon class="fa fa-arrow-down"></mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Remove this entry"
+                    [disabled]="isDisabled" (click)="removeAttribute(
+                    formatContainer, propertyDefinition); $event.
+                    stopPropagation()">
+                    <mat-icon class="fa fa-times"></mat-icon>
+                  </button>
+                </mat-expansion-panel-header>
+                <ng-template matExpansionPanelContent>
+                  <div style="display: flex; flex-direction: row;">
+                    <mat-form-field style="width: 100%; padding:
+                      0px 3px 0px 3px;">
+                      <input matInput type="text" placeholder="Label"
+                        [disabled]="isDisabled"
+                        [(ngModel)]="propertyDefinition.customLabel"/>
+                    </mat-form-field>
+                    <mat-form-field style="width: 100%; padding:
+                      0px 3px 0px 3px;">
+                      <mat-select placeholder="Label Position"
+                        [disabled]="isDisabled"
+                        [(ngModel)]="propertyDefinition.labelOrientation">
+                        <mat-option [value]="'Top'">
+                          Top
+                        </mat-option>
+                        <mat-option [value]="'Left'">
+                          Left
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <ng-container *ngIf="propertyDefinition.formatDefinition">
+                      <mat-form-field style="width: 100%; padding:
+                        0px 3px 0px 3px;">
+                        <mat-select placeholder="Format Definition"
+                          [(ngModel)]="propertyDefinition.formatDefinition">
+                          <ng-container
+                            *ngFor="let localTypeFormatDefinition of
+                              getLocalTypeFormatDefinitions(
+                              propertyDefinition)">
+                            <mat-option [value]="localTypeFormatDefinition.id">
+                              {{localTypeFormatDefinition.name}}
+                            </mat-option>
+                          </ng-container>
+                        </mat-select>
+                      </mat-form-field>
+                    </ng-container>
+                    <ng-container *ngIf="isMultivaluedReferenceAttribute(
+                      propertyDefinition)">
+                      <mat-form-field style="width: 100%; padding:
+                        0px 3px 0px 3px;">
+                        <mat-select placeholder="Table Definition"
+                          [disabled]="isDisabled"
+                          [(ngModel)]="propertyDefinition.tableDefinition">
+                          <mat-option [value]="''">
+                            None
+                          </mat-option>
+                          <ng-container *ngFor="let tableDefinition of
+                            getTableDefinitions(propertyDefinition)">
+                            <mat-option [value]="tableDefinition.id">
+                              {{tableDefinition.name}}
+                            </mat-option>
+                          </ng-container>
+                        </mat-select>
+                      </mat-form-field>
+                    </ng-container>
+                  </div>
+                </ng-template>
+              </mat-expansion-panel>
+            </ng-container>
+          </div>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-container>
+  </div>
+</div>
