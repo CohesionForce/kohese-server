@@ -10,7 +10,10 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { CompareItemsComponent,
   VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
@@ -136,24 +139,31 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             ReportSpecifications) => {
             let processItemProxy: (itemProxy: ItemProxy) => void = (itemProxy:
               ItemProxy) => {
-              let headingLevel: number = itemProxy.getDepthFromAncestor(
-                (object as ItemProxy));
-              for (let j: number = 0; j < headingLevel; j++) {
+              let viewModel: any = TreeConfiguration.getWorkingTree().
+                getProxyFor('view-' + itemProxy.kind.toLowerCase()).item;
+              // There should be a default document FormatDefinition.
+              let formatDefinition: FormatDefinition = viewModel.
+                formatDefinitions[viewModel.defaultFormatKey[
+                FormatDefinitionType.DOCUMENT]];
+              for (let j: number = 0; j < itemProxy.getDepthFromAncestor(
+                object as ItemProxy); j++) {
                 initialContent += '#';
               }
-              initialContent += ' ';
+              initialContent += '# ';
               
               if (reportSpecifications.addLinks) {
-                initialContent += ('[' + itemProxy.item.name + '](' + window.
+                initialContent += ('[' + itemProxy.item[formatDefinition.
+                  header.contents[0].propertyName.attribute] + '](' + window.
                   location.origin + LocationMap['Explore'].route + ';id=' +
                   itemProxy.item.id + ')\n\n');
               } else {
-                initialContent += (itemProxy.item.name + '\n\n');
+                initialContent += (itemProxy.item[formatDefinition.header.
+                  contents[0].propertyName.attribute] + '\n\n');
               }
               
-              if (itemProxy.item.description) {
-                initialContent += (itemProxy.item.description + '\n\n');
-              }
+              initialContent += this._itemRepository.getMarkdownRepresentation(
+                itemProxy.item, itemProxy.model.item, viewModel,
+                formatDefinition);
             };
             
             if (reportSpecifications.includeDescendants) {

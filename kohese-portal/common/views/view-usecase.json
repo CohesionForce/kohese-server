@@ -100,7 +100,11 @@
               },
               "customLabel": "description",
               "labelOrientation": "Top",
-              "kind": "markdown"
+              "kind": "markdown",
+              "inputOptions": {
+                "type": "markdown",
+                "options": {}
+              }
             },
             {
               "propertyName": {

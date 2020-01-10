@@ -10,6 +10,9 @@ import { ToastrService } from 'ngx-toastr';
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
+import { FormatDefinition } from '../../components/type-editor/FormatDefinition.interface';
+import { FormatContainer } from '../../components/type-editor/FormatContainer.interface';
+import { PropertyDefinition } from '../../components/type-editor/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
@@ -787,6 +790,150 @@ export class ItemRepository {
   public async removeReport(reportName: string): Promise<void> {
     return await this.sendMessageToWorker('removeReport',
       { reportName: reportName }, true);
+  }
+  
+  public getMarkdownRepresentation(koheseObject: any, dataModel: any,
+    viewModel: any, formatDefinition: FormatDefinition): string {
+    let representation: string = '';
+    for (let j: number = 0; j < formatDefinition.containers.length; j++) {
+      let formatContainer: FormatContainer = formatDefinition.containers[j];
+      if (formatContainer.kind === 'column') {
+        representation += '<table>';
+        let headerRow: string = '<tr>';
+        let bodyRow: string = '<tr>';
+        
+        for (let k: number = 0; k < formatContainer.contents.length; k++) {
+          let propertyDefinition: PropertyDefinition = formatContainer.
+            contents[k];
+          let value: any = koheseObject[propertyDefinition.propertyName.
+            attribute];
+          if (value) {
+            if (propertyDefinition.labelOrientation === 'Top') {
+              headerRow += ('<th>' + propertyDefinition.customLabel +
+                '</th>');
+            }
+            
+            if (!propertyDefinition.hideEmpty || ((Array.isArray(value) &&
+              value.length > 0) || value)) {
+              bodyRow += '<td>';
+              if (propertyDefinition.labelOrientation === 'Left') {
+                bodyRow += ('**' + propertyDefinition.customLabel + ':** ');
+              }
+              
+              if ((propertyDefinition.inputOptions.type === '') ||
+                (propertyDefinition.inputOptions.type === 'proxy-selector')) {
+                if (propertyDefinition.formatDefinition) {
+                  // Local type attribute
+                  let dataModelType: any = dataModel.properties[
+                    propertyDefinition.propertyName.attribute].type;
+                  let typeName: string = (Array.isArray(dataModelType) ?
+                    dataModelType[0] : dataModelType);
+                  bodyRow += this.getMarkdownRepresentation(value, dataModel.
+                    localTypes[typeName], viewModel.localTypes[typeName],
+                    viewModel.localTypes[typeName].formatDefinitions[
+                    propertyDefinition.formatDefinition]);
+                } else {
+                  // Global type attribute
+                  if (value) {
+                    let id: string;
+                    if (value.id) {
+                      id = value.id;
+                    } else {
+                      // Accommodation code
+                      id = value;
+                    }
+                    
+                    bodyRow += TreeConfiguration.getWorkingTree().getProxyFor(
+                      id).item.name;
+                  }
+                }
+              } else {
+                bodyRow += value;
+              }
+              
+              bodyRow += '\n\n</td>';
+            }
+          }
+        }
+          
+        representation += (headerRow + '</tr>' + bodyRow + '</tr>');
+        
+        representation += '</table>';
+      } else {
+        for (let k: number = 0; k < formatContainer.contents.length; k++) {
+          let propertyDefinition: PropertyDefinition = formatContainer.
+            contents[k];
+          let value: any = koheseObject[propertyDefinition.propertyName.
+            attribute];
+          if (value) {
+            if (!propertyDefinition.hideEmpty || ((Array.isArray(value) &&
+              (value.length > 0)) || value)) {
+              if (propertyDefinition.labelOrientation === 'Top') {
+                representation += ('**' + propertyDefinition.customLabel +
+                  '**\n\n');
+              } else {
+                representation += ('**' + propertyDefinition.customLabel +
+                  ':** ');
+              }
+              
+              if ((propertyDefinition.inputOptions.type === '') ||
+                (propertyDefinition.inputOptions.type === 'proxy-selector')) {
+                if (propertyDefinition.formatDefinition) {
+                  // Local type attribute
+                  let dataModelType: any = dataModel.properties[
+                    propertyDefinition.propertyName.attribute].type;
+                  let typeName: string = (Array.isArray(dataModelType) ?
+                    dataModelType[0] : dataModelType);
+                  representation += this.getMarkdownRepresentation(value,
+                    dataModel.localTypes[typeName], viewModel.localTypes[
+                    typeName], viewModel.localTypes[typeName].
+                    formatDefinitions[propertyDefinition.formatDefinition]);
+                } else {
+                  // Global type attribute
+                  if (value) {
+                    if (Array.isArray(value)) {
+                      let stringComponents: Array<string> = [];
+                      for (let l: number = 0; l < value.length; l++) {
+                        let arrayComponent: any = value[l];
+                        let id: string;
+                        if (arrayComponent.id) {
+                          id = arrayComponent.id;
+                        } else {
+                          // Accommodation code
+                          id = arrayComponent;
+                        }
+                        
+                        stringComponents.push(TreeConfiguration.
+                          getWorkingTree().getProxyFor(id).item.name);
+                      }
+                      
+                      representation += stringComponents.join(', ');
+                    } else {
+                      let id: string;
+                      if (value.id) {
+                        id = value.id;
+                      } else {
+                        // Accommodation code
+                        id = value;
+                      }
+                      
+                      representation += TreeConfiguration.getWorkingTree().
+                        getProxyFor(id).item.name;
+                    }
+                  }
+                }
+              } else {
+                representation += value;
+              }
+              
+              representation += '\n\n';
+            }
+          }
+        }
+      }
+    }
+    
+    return representation;
   }
 
   //////////////////////////////////////////////////////////////////////////
