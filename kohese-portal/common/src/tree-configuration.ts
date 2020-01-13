@@ -97,7 +97,7 @@ export class TreeConfiguration {
     for (let treeId in treeConfigMap){
       let treeConfig = treeConfigMap[treeId];
       for (let id in treeConfig.proxyHasDeferredModelAssociation){
-        let proxy = treeConfig.proxyHasDeferredModelAssociation[id];
+        let proxy : ItemProxy = treeConfig.proxyHasDeferredModelAssociation[id];
         proxy.setItemKind(proxy.kind);
         proxy.caclulateDerivedProperties();
         proxy.updateReferences();

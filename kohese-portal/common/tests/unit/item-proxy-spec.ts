@@ -822,7 +822,7 @@ describe('ItemProxy Test', function () {
 
     var obj1a = new ItemProxy('Test', object1a);
 
-    expect(Object.keys(obj1a.item)).toEqual(['id', 'name']);
+    expect(Object.keys(obj1a.item)).toEqual(['id', 'name', 'children']);
 
   });
 
