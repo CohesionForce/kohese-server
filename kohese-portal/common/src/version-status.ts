@@ -115,9 +115,9 @@ export class VersionStatus {
 
   //////////////////////////////////////////////////////////////////////////
   isNew() : boolean {
-    return (
-      (this.vcObject.Staged && this.vcObject.Staged === VersionControlSubState.NEW) ||
-      (this.vcObject.Unstaged && this.vcObject.Unstaged === VersionControlSubState.NEW));
+    return (this.vcArray.filter((status: string) => {
+      return status.endsWith('_NEW');
+    }).length > 0);
   }
 
   //////////////////////////////////////////////////////////////////////////

@@ -34,37 +34,51 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
 
   private _images: Array<Image> = [
     new Image(Comparison.getChangeIconString(ChangeType.CONTENT_CHANGED),
-      ChangeType.CONTENT_CHANGED, true, (object: any) => {
+      (object: any) => {
+      return ChangeType.CONTENT_CHANGED;
+    }, true, (object: any) => {
       return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
         changeTypes.indexOf(ChangeType.CONTENT_CHANGED)));
       }),
     new Image(Comparison.getChangeIconString(ChangeType.TYPE_CHANGED),
-      ChangeType.TYPE_CHANGED, true, (object: any) => {
+      (object: any) => {
+      return ChangeType.TYPE_CHANGED;
+    }, true, (object: any) => {
       return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
         changeTypes.indexOf(ChangeType.TYPE_CHANGED)));
       }),
     new Image(Comparison.getChangeIconString(ChangeType.PARENT_CHANGED),
-      ChangeType.PARENT_CHANGED, true, (object: any) => {
+      (object: any) => {
+      return ChangeType.PARENT_CHANGED;
+    }, true, (object: any) => {
       return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
         changeTypes.indexOf(ChangeType.PARENT_CHANGED)));
       }),
     new Image(Comparison.getChangeIconString(ChangeType.CHILD_ADDED),
-      ChangeType.CHILD_ADDED, true, (object: any) => {
+      (object: any) => {
+      return ChangeType.CHILD_ADDED;
+    }, true, (object: any) => {
       return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
         changeTypes.indexOf(ChangeType.CHILD_ADDED)));
       }),
     new Image(Comparison.getChangeIconString(ChangeType.CHILD_MODIFIED),
-      ChangeType.CHILD_MODIFIED, true, (object: any) => {
+      (object: any) => {
+      return ChangeType.CHILD_MODIFIED;
+    }, true, (object: any) => {
       return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
         changeTypes.indexOf(ChangeType.CHILD_MODIFIED)));
       }),
     new Image(Comparison.getChangeIconString(ChangeType.CHILD_REMOVED),
-      ChangeType.CHILD_REMOVED, true, (object: any) => {
+      (object: any) => {
+      return ChangeType.CHILD_REMOVED;
+    }, true, (object: any) => {
       return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
         changeTypes.indexOf(ChangeType.CHILD_REMOVED)));
       }),
     new Image(Comparison.getChangeIconString(ChangeType.CHILDREN_REORDERED),
-      ChangeType.CHILDREN_REORDERED, true, (object: any) => {
+      (object: any) => {
+      return ChangeType.CHILDREN_REORDERED;
+    }, true, (object: any) => {
       return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
         changeTypes.indexOf(ChangeType.CHILDREN_REORDERED)));
       })

@@ -55,16 +55,21 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   private _filterDelayIdentifier: any;
 
   private _images: Array<Image> = [
-    new Image('assets/icons/versioncontrol/dirty.ico', 'Unsaved Changes',
-      false, (object: any) => {
+    new Image('assets/icons/versioncontrol/dirty.ico', (object: any) => {
+      return 'Unsaved Changes';
+    }, false, (object: any) => {
       return (object as ItemProxy).dirty;
     }),
-    new Image('assets/icons/versioncontrol/unstaged.ico', 'Unstaged', false,
-      (object: any) => {
+    new Image('assets/icons/versioncontrol/unstaged.ico', (object: any) => {
+      return 'Unstaged' + ((object as ItemProxy).vcStatus.isNew() ? ' - New' :
+        '');
+    }, false, (object: any) => {
       return ((object as ItemProxy).vcStatus.isUnstaged());
     }),
-    new Image('assets/icons/versioncontrol/index-mod.ico', 'Staged', false,
-      (object: any) => {
+    new Image('assets/icons/versioncontrol/index-mod.ico', (object: any) => {
+      return 'Staged' + ((object as ItemProxy).vcStatus.isNew() ? ' - New' :
+        '');
+    }, false, (object: any) => {
       return ((object as ItemProxy).vcStatus.isStaged());
     })
   ];
