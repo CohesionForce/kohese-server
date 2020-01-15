@@ -381,6 +381,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
     return text;
   }
+  
+  protected getTags(object: any): Array<string> {
+    let item: any = (object as ItemProxy).item;
+    return (item.tags ? item.tags.split(',') : []);
+  }
 
   protected getIcon(object: any): string {
     let iconString: string = '';

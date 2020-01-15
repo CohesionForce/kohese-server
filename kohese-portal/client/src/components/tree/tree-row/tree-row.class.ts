@@ -56,6 +56,10 @@ export class TreeRow {
     return this._object.toString();
   }
   
+  public getTags(): Array<string> {
+    return [];
+  }
+  
   public getIcon(): string {
     // May be implemented externally
     return '';
