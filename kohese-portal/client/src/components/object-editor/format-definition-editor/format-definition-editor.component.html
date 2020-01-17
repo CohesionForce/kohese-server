@@ -176,6 +176,13 @@
                     propertyDefinition, false); $event.stopPropagation()">
                     <mat-icon class="fa fa-arrow-down"></mat-icon>
                   </button>
+                  <button mat-icon-button matTooltip="Suppress display of this
+                    attribute when its value is empty" [disabled]="isDisabled"
+                    [ngClass]="{ 'highlight': propertyDefinition.hideEmpty }"
+                    (click)="propertyDefinition.hideEmpty =
+                    !propertyDefinition.hideEmpty; $event.stopPropagation()">
+                    <mat-icon class="fa fa-eye-slash"></mat-icon>
+                  </button>
                   <button mat-icon-button matTooltip="Remove this entry"
                     [disabled]="isDisabled" (click)="removeAttribute(
                     formatContainer, propertyDefinition); $event.
