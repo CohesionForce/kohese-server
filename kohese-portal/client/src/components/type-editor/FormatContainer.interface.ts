@@ -1,6 +1,11 @@
 import { PropertyDefinition } from './PropertyDefinition.interface';
 
 export interface FormatContainer {
-  kind: string;
+  kind: FormatContainerKind;
   contents: Array<PropertyDefinition>;
+}
+
+export enum FormatContainerKind {
+  HEADER = 'header', VERTICAL = 'list', HORIZONTAL = 'column',
+    REVERSE_REFERENCE_TABLE = 'ReverseReferenceTable'
 }

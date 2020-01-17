@@ -1,10 +1,12 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
-  Input } from '@angular/core';
+  Input, OnInit } from '@angular/core';
 
 import { FormatDefinition } from '../../type-editor/FormatDefinition.interface';
-import { FormatContainer } from '../../type-editor/FormatContainer.interface';
+import { FormatContainer,
+  FormatContainerKind } from '../../type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
 import { TableDefinition } from '../../type-editor/TableDefinition.interface';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
 @Component({
@@ -13,7 +15,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
   styleUrls: ['./format-definition-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormatDefinitionEditorComponent {
+export class FormatDefinitionEditorComponent implements OnInit {
   private _formatDefinition: FormatDefinition;
   get formatDefinition() {
     return this._formatDefinition;
@@ -50,6 +52,11 @@ export class FormatDefinitionEditorComponent {
     this._attributes = attributes;
   }
   
+  private _referenceAttributes: { [kindName: string]: Array<any> } = {};
+  get referenceAttributes() {
+    return this._referenceAttributes;
+  }
+  
   private _isDisabled: boolean = false;
   get isDisabled() {
     return this._isDisabled;
@@ -59,7 +66,60 @@ export class FormatDefinitionEditorComponent {
     this._isDisabled = isDisabled;
   }
   
+  get FormatContainerKind() {
+    return FormatContainerKind;
+  }
+  
+  get Object() {
+    return Object;
+  }
+  
   public constructor(private _changeDetectorRef: ChangeDetectorRef) {
+  }
+  
+  public ngOnInit(): void {
+    let typeNames: Array<string> = [];
+    let dataModelItemProxy: ItemProxy = ({
+      item: this._dataModel
+    } as ItemProxy);
+    do {
+      typeNames.push(dataModelItemProxy.item.base);
+      dataModelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+        dataModelItemProxy.item.base);
+    } while (dataModelItemProxy);
+    
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === 'KoheseModel') {
+        for (let attributeName in itemProxy.item.properties) {
+          let attribute: any = itemProxy.item.properties[attributeName];
+          attribute.name = attributeName;
+          if (attribute.relation) {
+            let typeName: string = (Array.isArray(attribute.type) ?
+              attribute.type[0] : attribute.type);
+            if (typeNames.indexOf(typeName) !== -1) {
+              let kindAttributes: Array<any> = this._referenceAttributes[
+                itemProxy.item.name];
+              if (!kindAttributes) {
+                kindAttributes = [];
+                this._referenceAttributes[itemProxy.item.name] =
+                  kindAttributes;
+              }
+              
+              let attributeCopy: any = JSON.parse(JSON.stringify(attribute));
+              attributeCopy.containingType = itemProxy.item.name;
+              kindAttributes.push(attributeCopy);
+            }
+          }
+        }
+      }
+    }, undefined);
+  }
+  
+  public doesPropertyDefinitionMatchSelection(option: any, selection: any):
+    boolean {
+    return ((option.kind === selection.kind) && (option.attribute ===
+      selection.attribute));
   }
   
   public getSelectableAttributes(): Array<any> {
@@ -79,6 +139,9 @@ export class FormatDefinitionEditorComponent {
     PropertyDefinition): void {
     propertyDefinition.propertyName.attribute = attributeName;
     propertyDefinition.customLabel = attributeName;
+    propertyDefinition.hideEmpty = false;
+    propertyDefinition.tableDefinition = '';
+
     let viewModelEntry: any;
     if (this._dataModel.localTypes) {
       viewModelEntry = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
@@ -101,7 +164,6 @@ export class FormatDefinitionEditorComponent {
         delete propertyDefinition.formatDefinition;
       }
     }
-    propertyDefinition.tableDefinition = '';
     
     this._changeDetectorRef.markForCheck();
   }
@@ -114,18 +176,11 @@ export class FormatDefinitionEditorComponent {
     }).join(', ');
   }
   
-  public addFormatContainer(addVerticalContainer: boolean): void {
-    if (addVerticalContainer) {
-      this._formatDefinition.containers.push({
-        kind: 'list',
-        contents: []
-      });
-    } else {
-      this._formatDefinition.containers.push({
-        kind: 'column',
-        contents: []
-      });
-    }
+  public addFormatContainer(formatContainerKind: FormatContainerKind): void {
+    this._formatDefinition.containers.push({
+      kind: formatContainerKind,
+      contents: []
+    });
   }
   
   public removeFormatContainer(formatContainer: FormatContainer): void {
@@ -134,44 +189,66 @@ export class FormatDefinitionEditorComponent {
   }
   
   public addAttribute(formatContainer: FormatContainer): void {
-    let attribute: any;
-    let viewModelEntry: any;
-    let formatDefinitionId: string;
-    for (let j: number = 0; j < this._attributes.length; j++) {
-      viewModelEntry = this._viewModel.viewProperties[this._attributes[j].
-        name];
-      if (viewModelEntry) {
-        attribute = this._attributes[j];
-        
-        if (this._dataModel.localTypes) {
-          let typeName: string = (Array.isArray(attribute.type) ? attribute.
-            type[0] : attribute.type);
-          if (this._dataModel.localTypes[typeName]) {
-            let formatDefinitions: Array<FormatDefinition> = Object.values(
-              this._viewModel.localTypes[typeName].formatDefinitions);
-            if (formatDefinitions.length > 0) {
-              formatDefinitionId = formatDefinitions[0].id;
+    let propertyDefinition: PropertyDefinition;
+    if (formatContainer.kind === FormatContainerKind.
+      REVERSE_REFERENCE_TABLE) {
+      let attribute: any = this._referenceAttributes[Object.keys(this.
+        _referenceAttributes)[0]][0];
+      propertyDefinition = {
+        propertyName: {
+          kind: attribute.containingType,
+          attribute: attribute.name
+        },
+        customLabel: '',
+        labelOrientation: 'Top',
+        hideEmpty: false,
+        kind: '',
+        inputOptions: {},
+        formatDefinition: undefined,
+        tableDefinition: ''
+      };
+    } else {
+      let attribute: any;
+      let viewModelEntry: any;
+      let formatDefinitionId: string;
+      for (let j: number = 0; j < this._attributes.length; j++) {
+        viewModelEntry = this._viewModel.viewProperties[this._attributes[j].
+          name];
+        if (viewModelEntry) {
+          attribute = this._attributes[j];
+          
+          if (this._dataModel.localTypes) {
+            let typeName: string = (Array.isArray(attribute.type) ? attribute.
+              type[0] : attribute.type);
+            if (this._dataModel.localTypes[typeName]) {
+              let formatDefinitions: Array<FormatDefinition> = Object.values(
+                this._viewModel.localTypes[typeName].formatDefinitions);
+              if (formatDefinitions.length > 0) {
+                formatDefinitionId = formatDefinitions[0].id;
+              }
             }
           }
+          
+          break;
         }
-        
-        break;
       }
+      
+      propertyDefinition = {
+        propertyName: {
+          kind: this._dataModel.name,
+          attribute: attribute.name
+        },
+        customLabel: attribute.name,
+        labelOrientation: 'Top',
+        hideEmpty: false,
+        kind: viewModelEntry.inputType.type,
+        inputOptions: viewModelEntry.inputType,
+        formatDefinition: formatDefinitionId,
+        tableDefinition: ''
+      };
     }
     
-    formatContainer.contents.push({
-      propertyName: {
-        kind: this._dataModel.name,
-        attribute: attribute.name
-      },
-      customLabel: attribute.name,
-      labelOrientation: 'Top',
-      hideEmpty: false,
-      kind: viewModelEntry.inputType.type,
-      inputOptions: viewModelEntry.inputType,
-      formatDefinition: formatDefinitionId,
-      tableDefinition: ''
-    });
+    formatContainer.contents.push(propertyDefinition);
   }
   
   public getLocalTypeFormatDefinitions(propertyDefinition: PropertyDefinition):

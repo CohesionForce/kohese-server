@@ -11,7 +11,8 @@ import { FormatPreviewComponent } from '../format-editor/format-preview/format-p
 import { TableDefinition } from '../TableDefinition.interface';
 import { FormatDefinition,
   FormatDefinitionType } from '../FormatDefinition.interface';
-import { FormatContainer } from '../FormatContainer.interface';
+import { FormatContainer,
+  FormatContainerKind } from '../FormatContainer.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
@@ -332,7 +333,7 @@ export class ViewModelEditorComponent {
           id: id,
           name: name,
           header: {
-            kind: 'header',
+            kind: FormatContainerKind.HEADER,
             contents: [{
               propertyName: propertyNameObject,
               customLabel: propertyNameObject.attribute,
