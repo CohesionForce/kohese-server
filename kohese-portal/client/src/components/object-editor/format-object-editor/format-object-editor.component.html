@@ -1,12 +1,11 @@
 <div style="width: 100%; overflow: auto; padding: 7px;" [ngStyle]="{ 'height':
   isDialogInstance() ? '90%' : '100%' }">
   <ng-container *ngFor="let container of formatDefinition.containers">
-    <ng-container *ngIf="container.kind === 'list'">
+    <div style="display: flex;" [ngStyle]="{ 'flex-direction': ((container.
+      kind === 'list') ? 'column' : 'row') }">
       <ng-container *ngFor="let attributeDefinition of container.contents">
-        <ng-container *ngIf="Array.isArray(TreeConfiguration.getWorkingTree().
-          getProxyFor(attributeDefinition.propertyName.kind).item.
-          classProperties[attributeDefinition.propertyName.attribute].
-          definition.type) else singleValuedBlock">
+        <ng-container *ngIf="Array.isArray(getAttribute(attributeDefinition).
+          type) else singleValuedBlock">
           <ng-container *ngIf="attributeDefinition.tableDefinition else
             notTableBlock">
             <ng-container *ngIf="isKindAttribute(attributeDefinition) else
@@ -28,17 +27,17 @@
           </ng-container>
           <ng-template #notTableBlock>
             <div style="display: flex; flex-direction: column;">
-              <h3>
-                {{getAttributeRepresentation(attributeDefinition)}}
-              </h3>
-              <span class="flex-right-align">
-                <button mat-icon-button
-                  matTooltip="Add a value to {{attributeDefinition.
-                  propertyName.attribute}}" [disabled]="isDisabled"
+              <div style="display: flex; flex-direction: row;">
+                <h3>
+                  {{getAttributeRepresentation(attributeDefinition)}}
+                </h3>
+                <button mat-icon-button matTooltip="Add a value to
+                  {{attributeDefinition.propertyName.attribute}}"
+                  class="flex-right-align" [disabled]="isDisabled"
                   (click)="addValue(attributeDefinition)">
                   <mat-icon class="fa fa-plus"></mat-icon>
                 </button>
-              </span>
+              </div>
               <mat-list>
                 <ng-container *ngFor="let value of object[attributeDefinition.
                   propertyName.attribute]; let j = index">
@@ -135,9 +134,8 @@
                     style="margin: 0px 3px 0px 3px;"
                     [ngStyle]="{ 'margin-left': ((j === 0) ? 'auto' : '') }"
                     (click)="object[attributeDefinition.propertyName.
-                    attribute] = type.classProperties[attributeDefinition.
-                    propertyName.attribute].definition.properties.transition[
-                    transitionCandidateName].target">
+                    attribute] = getAttribute(attributeDefinition).properties.
+                    transition[transitionCandidateName].target">
                     {{transitionCandidateName}}
                   </button>
                 </ng-container>
@@ -158,47 +156,64 @@
               </mat-form-field>
             </ng-container>
             <ng-container *ngSwitchDefault>
-              <div style="width: 100%; display: flex; flex-direction: row;">
-                <label style="width: 20%;">
+              <ng-container *ngIf="getLocalType(attributeDefinition)
+                else globalTypeAttribute">
+                <label style="width: 100%;">
                   {{getAttributeRepresentation(attributeDefinition)}}:&nbsp;
                 </label>
-                <ng-container *ngIf="object[attributeDefinition.propertyName.
-                  attribute]">
-                  <!--
-                    Remove the "disabled" attribute below once ItemProxy
-                    selection can be restricted by kind.
-                  -->
-                  <button mat-raised-button (click)="openObjectEditor(
-                    attributeDefinition.propertyName.attribute)"
-                    style="width: 60%;" [disabled]="true">
-                    {{getStringRepresentation(undefined, attributeDefinition.
-                      propertyName.attribute)}}
-                  </button>
-                </ng-container>
-                <span class="flex-right-align" style="width: 20%;
-                  display: flex; flex-direction: row;">
-                  <button mat-icon-button matTooltip="Select an object"
-                    [disabled]="isDisabled" (click)="openObjectSelector(
-                    attributeDefinition.propertyName.attribute)"
-                    class="flex-right-align">
-                    <mat-icon class="fa fa-ellipsis-h"></mat-icon>
-                  </button>
-                  <button mat-icon-button
-                    matTooltip="Remove the selection for {{attributeDefinition.
-                    propertyName.attribute}}" [disabled]="(isDisabled ||
-                    (object[attributeDefinition.propertyName.attribute] ==
-                    null))" (click)="object[attributeDefinition.propertyName.
-                    attribute] = undefined">
-                    <mat-icon class="fa fa-times"></mat-icon>
-                  </button>
-                </span>
-              </div>
+                <br/>
+                <format-object-editor [type]="getLocalType(
+                  attributeDefinition)" [viewModel]="getLocalTypeViewModel(
+                  attributeDefinition)" [object]="object[attributeDefinition.
+                  propertyName.attribute]"
+                  [attributes]="getLocalTypeAttributes(attributeDefinition)"
+                  [formatDefinition]="getLocalTypeFormatDefinition(
+                  attributeDefinition)" [disabled]="isDisabled">
+                </format-object-editor>
+              </ng-container>
+              <ng-template #globalTypeAttribute>
+                <div style="width: 100%; display: flex; flex-direction: row;">
+                  <label style="width: 20%;">
+                    {{getAttributeRepresentation(attributeDefinition)}}:&nbsp;
+                  </label>
+                  <ng-container *ngIf="object[attributeDefinition.propertyName.
+                    attribute]">
+                    <!--
+                      Remove the "disabled" attribute below once ItemProxy
+                      selection can be restricted by kind.
+                    -->
+                    <button mat-raised-button (click)="openObjectEditor(
+                      attributeDefinition.propertyName.attribute)"
+                      style="width: 60%;" [disabled]="true">
+                      {{getStringRepresentation(undefined, attributeDefinition.
+                        propertyName.attribute)}}
+                    </button>
+                  </ng-container>
+                  <span class="flex-right-align" style="width: 20%;
+                    display: flex; flex-direction: row;">
+                    <button mat-icon-button matTooltip="Select an object"
+                      [disabled]="isDisabled" (click)="openObjectSelector(
+                      attributeDefinition.propertyName.attribute)"
+                      class="flex-right-align">
+                      <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+                    </button>
+                    <button mat-icon-button
+                      matTooltip="Remove the selection for
+                      {{attributeDefinition.propertyName.attribute}}"
+                      [disabled]="(isDisabled || (object[attributeDefinition.
+                      propertyName.attribute] == null))" (click)="object[
+                      attributeDefinition.propertyName.attribute] = undefined">
+                      <mat-icon class="fa fa-times"></mat-icon>
+                    </button>
+                  </span>
+                </div>
+              </ng-template>
             </ng-container>
           </ng-container>
         </ng-template>
         <br/>
       </ng-container>
-    </ng-container>
+    </div>
   </ng-container>
 </div>
 <ng-container *ngIf="isDialogInstance()">

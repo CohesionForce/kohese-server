@@ -11,6 +11,7 @@ import { ViewModelEditorComponent } from './view-model-editor/view-model-editor.
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { StateMachineEditorModule } from '../state-machine-editor/state-machine-editor.module';
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 import { AngularSplitModule } from 'angular-split';
 
@@ -33,7 +34,8 @@ import { AngularSplitModule } from 'angular-split';
     PipesModule,
     AngularSplitModule,
     StateMachineEditorModule,
-    FormatModule
+    FormatModule,
+    ObjectEditorModule
   ]
 })
 export class TypeEditorModule {

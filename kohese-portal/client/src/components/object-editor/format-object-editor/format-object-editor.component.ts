@@ -27,12 +27,6 @@ export class FormatObjectEditorComponent implements OnInit {
   @Input('object')
   set object(object: any) {
     this._object = object;
-    if (this._type) {
-      this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor(
-        'view-' + this._type.name.toLowerCase()).item;
-    }
-    
-    this._changeDetectorRef.markForCheck();
   }
   
   private _type: any;
@@ -42,7 +36,6 @@ export class FormatObjectEditorComponent implements OnInit {
   @Input('type')
   set type(type: any) {
     this._type = type;
-    this.object = this._object;
   }
   
   private _formatDefinition: FormatDefinition;
@@ -53,6 +46,15 @@ export class FormatObjectEditorComponent implements OnInit {
   set formatDefinition(formatDefinition: FormatDefinition) {
     this._formatDefinition = formatDefinition;
     this._changeDetectorRef.markForCheck();
+  }
+  
+  private _attributes: Array<any>;
+  get attributes() {
+    return this._attributes;
+  }
+  @Input('attributes')
+  set attributes(attributes: Array<any>) {
+    this._attributes = attributes;
   }
   
   private _isDisabled: boolean = false;
@@ -67,6 +69,10 @@ export class FormatObjectEditorComponent implements OnInit {
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
+  }
+  @Input('viewModel')
+  set viewModel(viewModel: any) {
+    this._viewModel = viewModel;
   }
   
   private _usernames: Array<string> = [];
@@ -127,6 +133,52 @@ export class FormatObjectEditorComponent implements OnInit {
       this) && this._data;
   }
   
+  public getAttribute(propertyDefinition: PropertyDefinition): any {
+    for (let j: number = 0; j < this._attributes.length; j++) {
+      if (this._attributes[j].name === propertyDefinition.propertyName.
+        attribute) {
+        return this._attributes[j];
+      }
+    }
+    
+    return undefined;
+  }
+  
+  public getLocalType(propertyDefinition: PropertyDefinition): any {
+    if (this._type.localTypes) {
+      let attribute: any = this.getAttribute(propertyDefinition);
+      let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
+        0] : attribute.type);
+      return this._type.localTypes[typeName];
+    }
+    
+    return undefined;
+  }
+  
+  public getLocalTypeViewModel(propertyDefinition: PropertyDefinition): any {
+    let attribute: any = this.getAttribute(propertyDefinition);
+    let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
+      0] : attribute.type);
+    return this._viewModel.localTypes[typeName];
+  }
+  
+  public getLocalTypeAttributes(propertyDefinition: PropertyDefinition):
+    Array<any> {
+    let attributes: Array<any> = [];
+    let localType: any = this.getLocalType(propertyDefinition);
+    for (let attributeName in localType.properties) {
+      attributes.push(localType.properties[attributeName]);
+    }
+    
+    return attributes;
+  }
+  
+  public getLocalTypeFormatDefinition(propertyDefinition: PropertyDefinition):
+    FormatDefinition {
+    return this.getLocalTypeViewModel(propertyDefinition).formatDefinitions[
+      propertyDefinition.formatDefinition];
+  }
+  
   public openObjectEditor(attributeName: string): void {
     let type: any = this.getType(attributeName);
     let isLocalTypeInstance: boolean = (Object.keys(this.
@@ -152,37 +204,21 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public openObjectSelector(attributeName: string): void {
     let type: any = this.getType(attributeName);
-    let isLocalTypeInstance: boolean = (Object.keys(this.
-      _dynamicTypesService.getKoheseTypes()).indexOf(type.name) === -1);
-    if (isLocalTypeInstance) {
-      this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
-        data: {
-          object: this._object[attributeName],
-          type: type
-        }
-      }).updateSize('90%', '90%').afterClosed().subscribe((result: any) => {
-        if (result) {
-          this._object[attributeName] = result.object;
-          this._changeDetectorRef.markForCheck();
-        }
-      });
-    } else {
-      this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
-        data: {
-          type: this.getTypeName(this._type.classProperties[attributeName].
-            definition.type),
-          selected: (this._object[attributeName] ? TreeConfiguration.
-            getWorkingTree().getProxyFor(this._object[attributeName].id) :
-            undefined)
-        }
-      }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
-        ItemProxy) => {
-        if (itemProxy) {
-          this._object[attributeName] = { id: itemProxy.item.id };
-          this._changeDetectorRef.markForCheck();
-        }
-      });
-    }
+    this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+      data: {
+        type: this.getTypeName(this._type.classProperties[attributeName].
+          definition.type),
+        selected: (this._object[attributeName] ? TreeConfiguration.
+          getWorkingTree().getProxyFor(this._object[attributeName].id) :
+          undefined)
+      }
+    }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
+      ItemProxy) => {
+      if (itemProxy) {
+        this._object[attributeName] = { id: itemProxy.item.id };
+        this._changeDetectorRef.markForCheck();
+      }
+    });
   }
   
   public addValue(attributeDefinition: PropertyDefinition): void {
@@ -195,8 +231,7 @@ export class FormatObjectEditorComponent implements OnInit {
     let attributeName: string = attributeDefinition.propertyName.attribute;
     const DIALOG_TITLE: string = 'Specify Value';
     let value: any = this._object[attributeName][index];
-    switch (this.getTypeName(this._type.classProperties[attributeName].
-      definition.type)) {
+    switch (this.getTypeName(this.getAttribute(attributeDefinition).type)) {
       case 'boolean':
         if (value == null) {
           value = false;
@@ -271,8 +306,8 @@ export class FormatObjectEditorComponent implements OnInit {
           ': ' + this._object[attributeName], 'Target', value, this.
           getStateTransitionCandidates(attributeDefinition).map(
           (transitionCandidateName: string) => {
-          return this._type.classProperties[attributeName].definition.
-            properties.transition[transitionCandidateName].target;
+          return this.getAttribute(attributeDefinition).properties.transition[
+            transitionCandidateName].target;
         })).afterClosed().subscribe((value: string) => {
           if (value) {
             this._object[attributeName].splice(index, 1, value);
@@ -302,8 +337,8 @@ export class FormatObjectEditorComponent implements OnInit {
           this._dialogService.openComponentDialog(
             ProxySelectorDialogComponent, {
             data: {
-              type: this.getTypeName(this._type.classProperties[attributeName].
-                definition.type),
+              type: this.getTypeName(this.getAttribute(attributeDefinition).
+                type),
               selected: (this._object[attributeName] ? TreeConfiguration.
                 getWorkingTree().getProxyFor(this._object[attributeName].id) :
                 undefined)
@@ -485,9 +520,7 @@ export class FormatObjectEditorComponent implements OnInit {
     string {
     return ((attributeDefinition.customLabel ? attributeDefinition.
       customLabel : attributeDefinition.propertyName.attribute) +
-      (TreeConfiguration.getWorkingTree().getProxyFor(attributeDefinition.
-      propertyName.kind).item.classProperties[attributeDefinition.propertyName.
-      attribute].definition.required ? '*' : ''));
+      (this.getAttribute(attributeDefinition).required ? '*' : ''));
   }
   
   public getStateTransitionCandidates(attributeDefinition: PropertyDefinition):
@@ -495,8 +528,7 @@ export class FormatObjectEditorComponent implements OnInit {
     let stateTransitionCandidates: Array<string> = [];
     let currentStateName: string = this._object[attributeDefinition.
       propertyName.attribute];
-    let stateMachine: any = this._type.classProperties[attributeDefinition.
-      propertyName.attribute].definition.properties;
+    let stateMachine: any = this.getAttribute(attributeDefinition).properties;
     for (let transitionName in stateMachine.transition) {
       if (stateMachine.transition[transitionName].source ===
         currentStateName) {

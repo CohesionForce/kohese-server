@@ -7,8 +7,8 @@
       <h3>
         Columns
       </h3>
-      <button mat-icon-button [disabled]="(Object.keys(kind.classProperties).
-        length === tableDefinition.columns.length)" class="flex-right-align"
+      <button mat-icon-button [disabled]="(attributes.length ===
+        tableDefinition.columns.length)" class="flex-right-align"
         (click)="addColumn()" [disabled]="isDisabled">
         <mat-icon class="fa fa-plus"></mat-icon>
       </button>

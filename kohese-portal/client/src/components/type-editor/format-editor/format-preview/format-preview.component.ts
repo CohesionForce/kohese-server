@@ -1,6 +1,7 @@
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { Component, OnInit, Optional, Inject, ElementRef } from '@angular/core';
 import { FormatDefinition } from '../../FormatDefinition.interface';
+import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 
 let textDefault = 'Example Text'
 
@@ -42,7 +43,7 @@ export class FormatPreviewComponent implements OnInit {
         description : "This is an example description"
       },
       kind : this.type.name,
-      model: this.type,
+      model: TreeConfiguration.getWorkingTree().getProxyFor(this.type.id),
       relations: {
         references: {},
         referencedBy: {}

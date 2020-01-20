@@ -38,6 +38,10 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   get editableSet() {
     return this._editableSet;
   }
+  
+  get TreeConfiguration() {
+    return TreeConfiguration;
+  }
 
   constructor(private navigationService : NavigationService,
     private changeRef : ChangeDetectorRef, private _itemRepository:
@@ -166,6 +170,17 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
         }
     }
     return false;
+  }
+  
+  public getAttributes(type: any): Array<any> {
+    let attributes: Array<any> = [];
+    for (let attributeName in type.classProperties) {
+      let attribute: any = type.classProperties[attributeName].definition;
+      attribute.name = attributeName;
+      attributes.push(attribute);
+    }
+    
+    return attributes;
   }
   
    public getFormatDefinition(itemProxy: ItemProxy): FormatDefinition {

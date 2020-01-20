@@ -58,7 +58,7 @@
               "kind": "KeyEvent",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "labelOrientation": "Top",
             "kind": "text"
           }
@@ -73,7 +73,7 @@
                 "kind": "KeyEvent",
                 "attribute": "description"
               },
-              "hideLabel": false,
+              "customLabel": "description",
               "labelOrientation": "Top",
               "kind": "markdown"
             },
@@ -82,7 +82,7 @@
                 "kind": "KeyEvent",
                 "attribute": "EventName"
               },
-              "hideLabel": false,
+              "customLabel": "EventName",
               "labelOrientation": "Top",
               "kind": "text",
               "hideEmpty": false,
@@ -96,7 +96,7 @@
                 "kind": "KeyEvent",
                 "attribute": "DetectionMechanism"
               },
-              "hideLabel": false,
+              "customLabel": "DetectionMechanism",
               "labelOrientation": "Top",
               "kind": "text",
               "hideEmpty": false,
@@ -110,7 +110,7 @@
                 "kind": "KeyEvent",
                 "attribute": "EventInputData"
               },
-              "hideLabel": false,
+              "customLabel": "EventInputData",
               "labelOrientation": "Top",
               "kind": "text",
               "hideEmpty": false,
@@ -124,7 +124,7 @@
                 "kind": "KeyEvent",
                 "attribute": "Responses"
               },
-              "hideLabel": false,
+              "customLabel": "Responses",
               "labelOrientation": "Top",
               "kind": "text",
               "hideEmpty": false,
@@ -138,7 +138,7 @@
                 "kind": "KeyEvent",
                 "attribute": "EventOutputData"
               },
-              "hideLabel": false,
+              "customLabel": "EventOutputData",
               "labelOrientation": "Top",
               "kind": "text",
               "hideEmpty": false,

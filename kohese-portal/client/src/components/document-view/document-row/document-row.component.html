@@ -22,13 +22,29 @@
       </div>
     </div>
     <div class="document-row">
-      <header-container [upsertComplete]="upsertComplete" [editable]="row.editable" [proxy]="docInfo.proxy" [header]="docInfo.format.header" [depth]="docInfo.depth" ></header-container>
-      <div *ngFor="let container of docInfo.format.containers">
-        <div [ngSwitch]="container.kind">
-          <column-container *ngSwitchCase="'column'" [numColumns]="container.numColumns" [proxy]="docInfo.proxy" [editable]="row.editable" [columns]="container.columns"></column-container>
-          <list-container *ngSwitchCase="'list'" [proxy]="docInfo.proxy" [editable]="row.editable" [contents]="container.contents"></list-container>
+      <ng-container *ngIf="row.editable else notEditable">
+        <div>
+          <mat-form-field style="width: 100%;">
+            <input matInput type="text" placeholder="{{docInfo.format.header.
+              contents[0].customLabel}}" [(ngModel)]="docInfo.proxy.item.
+              name"/>
+          </mat-form-field>
         </div>
-      </div>
+      </ng-container>
+      <ng-template #notEditable>
+        <label>
+          <span>{{docInfo.format.header.contents[0].customLabel}}</span>
+        </label>
+        <div [innerHTML]="'<h' + (docInfo.depth + 1) + '>' + docInfo.proxy.item.
+          name + '</h' + (docInfo.depth + 1) + '>'">
+        </div>
+      </ng-template>
+      <format-object-editor [type]="docInfo.proxy.model.item"
+        [viewModel]="TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        docInfo.proxy.kind.toLowerCase()).item" [object]="docInfo.proxy.item"
+        [attributes]="getAttributes(docInfo.proxy.model.item)"
+        [formatDefinition]="docInfo.format" [disabled]="!row.editable">
+      </format-object-editor>
     </div>
     <!-- <div class="document-row" *ngIf="row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}">
       <textarea matInput [(ngModel)]="docInfo.proxy.item.name"></textarea>

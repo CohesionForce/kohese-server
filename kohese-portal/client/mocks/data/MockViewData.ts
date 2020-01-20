@@ -56,6 +56,189 @@ export function MockViewData () {
   "createdOn": 1510596684590,
   "modifiedBy": "admin",
   "modifiedOn": 1517006598071,
+  "formatDefinitions": {
+    "89324a90-a7af-11e8-8662-71e48f0160fe": {
+      "name": "New definition ",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "Task",
+              "attribute": "name"
+            },
+            "customLabel": "name",
+            "labelOrientation": "Top",
+            "kind": "text"
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "description"
+              },
+              "customLabel": "description",
+              "labelOrientation": "Top",
+              "kind": "markdown"
+            }
+          ]
+        }
+      ],
+      "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    },
+    "1b91cfb0-1798-11ea-a725-0b882dea506f": {
+      "id": "1b91cfb0-1798-11ea-a725-0b882dea506f",
+      "name": "Card",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": {
+              "kind": "Task",
+              "attribute": "name"
+            },
+            "customLabel": "name",
+            "hideEmpty": false,
+            "labelOrientation": "Top",
+            "kind": "text",
+            "inputOptions": {
+              "type": "text",
+              "options": {
+                "isMultiLine": false
+              }
+            }
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "estimatedStart"
+              },
+              "customLabel": "estimatedStart",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "date",
+                "options": {}
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "estimatedCompletion"
+              },
+              "customLabel": "estimatedCompletion",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "date",
+                "options": {}
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "estimatedHoursEffort"
+              },
+              "customLabel": "estimatedHoursEffort",
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "remainingHoursEffort"
+              },
+              "customLabel": "remainingHoursEffort",
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "actualHoursEffort"
+              },
+              "customLabel": "actualHoursEffort",
+              "labelOrientation": "Top",
+              "kind": "number",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "number",
+                "options": {
+                  "isMultiLine": false
+                }
+              }
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "predecessors"
+              },
+              "customLabel": "predecessors",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "proxy-selector",
+                "options": {
+                  "allowMultiSelect": true,
+                  "type": "Item",
+                  "useAdvancedSelector": false
+                }
+              },
+              "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
+            },
+            {
+              "propertyName": {
+                "kind": "Task",
+                "attribute": "taskState"
+              },
+              "customLabel": "taskState",
+              "labelOrientation": "Top",
+              "kind": "state-editor",
+              "hideEmpty": false,
+              "inputOptions": {
+                "type": "state-editor",
+                "options": {
+                  "options": [
+                    "Proposed",
+                    "Accepted",
+                    "In Work"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
   "tableDefinitions": {
     "3b4d68d0-e603-11e9-bf30-55b2f7a3af55": {
       "id": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55",
@@ -70,6 +253,10 @@ export function MockViewData () {
         "column4": []
       }
     }
+  },
+  "defaultFormatKey": {
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "card": "1b91cfb0-1798-11ea-a725-0b882dea506f"
   },
   "itemIds": []
   }

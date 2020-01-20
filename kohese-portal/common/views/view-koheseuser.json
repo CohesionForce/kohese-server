@@ -47,7 +47,7 @@
               "kind": "KoheseUser",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "labelOrientation": "Top",
             "kind": "text"
           }
@@ -62,7 +62,7 @@
                 "kind": "KoheseUser",
                 "attribute": "description"
               },
-              "hideLabel": false,
+              "customLabel": "description",
               "labelOrientation": "Top",
               "kind": "markdown"
             }

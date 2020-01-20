@@ -131,7 +131,7 @@
               "kind": "Action",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "labelOrientation": "Top",
             "kind": "text"
           }
@@ -146,7 +146,7 @@
                 "kind": "Action",
                 "attribute": "description"
               },
-              "hideLabel": false,
+              "customLabel": "description",
               "labelOrientation": "Top",
               "kind": "markdown"
             }
@@ -166,7 +166,7 @@
               "kind": "Action",
               "attribute": "name"
             },
-            "hideLabel": false,
+            "customLabel": "name",
             "hideEmpty": false,
             "labelOrientation": "Top",
             "kind": "text",
@@ -175,8 +175,7 @@
               "options": {
                 "isMultiLine": false
               }
-            },
-            "customLabel": ""
+            }
           }
         ]
       },
@@ -189,37 +188,35 @@
                 "kind": "Action",
                 "attribute": "estimatedStart"
               },
-              "hideLabel": false,
+              "customLabel": "estimatedStart",
               "labelOrientation": "Top",
               "kind": "date",
               "hideEmpty": false,
               "inputOptions": {
                 "type": "date",
                 "options": {}
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Action",
                 "attribute": "estimatedCompletion"
               },
-              "hideLabel": false,
+              "customLabel": "estimatedCompletion",
               "labelOrientation": "Top",
               "kind": "date",
               "hideEmpty": false,
               "inputOptions": {
                 "type": "date",
                 "options": {}
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Action",
                 "attribute": "estimatedHoursEffort"
               },
-              "hideLabel": false,
+              "customLabel": "estimatedHoursEffort",
               "labelOrientation": "Top",
               "kind": "number",
               "hideEmpty": false,
@@ -228,15 +225,14 @@
                 "options": {
                   "isMultiLine": false
                 }
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Action",
                 "attribute": "remainingHoursEffort"
               },
-              "hideLabel": false,
+              "customLabel": "remainingHoursEffort",
               "labelOrientation": "Top",
               "kind": "number",
               "hideEmpty": false,
@@ -245,15 +241,14 @@
                 "options": {
                   "isMultiLine": false
                 }
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Action",
                 "attribute": "actualHoursEffort"
               },
-              "hideLabel": false,
+              "customLabel": "actualHoursEffort",
               "labelOrientation": "Top",
               "kind": "number",
               "hideEmpty": false,
@@ -262,15 +257,14 @@
                 "options": {
                   "isMultiLine": false
                 }
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Action",
                 "attribute": "predecessors"
               },
-              "hideLabel": false,
+              "customLabel": "predecessors",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "hideEmpty": false,
@@ -282,7 +276,6 @@
                   "useAdvancedSelector": false
                 }
               },
-              "customLabel": "",
               "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
             },
             {
@@ -290,7 +283,7 @@
                 "kind": "Action",
                 "attribute": "decisionState"
               },
-              "hideLabel": false,
+              "customLabel": "decisionState",
               "labelOrientation": "Top",
               "kind": "state-editor",
               "hideEmpty": false,
@@ -303,15 +296,14 @@
                     "In Review"
                   ]
                 }
-              },
-              "customLabel": ""
+              }
             },
             {
               "propertyName": {
                 "kind": "Action",
                 "attribute": "actionState"
               },
-              "hideLabel": false,
+              "customLabel": "actionState",
               "labelOrientation": "Top",
               "kind": "state-editor",
               "hideEmpty": false,
@@ -330,8 +322,7 @@
                     "Closed"
                   ]
                 }
-              },
-              "customLabel": ""
+              }
             }
           ]
         }
