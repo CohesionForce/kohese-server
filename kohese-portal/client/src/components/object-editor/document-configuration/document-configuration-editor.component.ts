@@ -52,7 +52,7 @@ export class DocumentConfigurationEditorComponent implements OnInit {
       this._copy = {
         name: 'Document Configuration',
         description: '',
-        tags: [],
+        tags: '',
         parentId: '',
         components: {},
         delineated: false

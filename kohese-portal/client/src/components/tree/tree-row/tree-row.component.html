@@ -24,6 +24,13 @@
   <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
     {{treeRow.getText()}}
   </span>
+  <ng-container *ngFor="let tag of treeRow.getTags()">
+    <span style="max-height: 40px; background: lightblue; border: 1px groove
+      lightblue; margin: 0px 3px 0px 3px; white-space: nowrap; overflow:
+      hidden; text-overflow: ellipsis;">
+      {{tag}}
+    </span>
+  </ng-container>
   <ng-container *ngFor="let image of images">
     <ng-container *ngIf="image.display(treeRow.object)">
       <ng-container *ngIf="image.displayAsIcon">

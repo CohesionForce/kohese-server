@@ -240,6 +240,9 @@ export abstract class Tree {
     row.getText = () => {
       return this.getText(object);
     };
+    row.getTags = () => {
+      return this.getTags(object);
+    };
     row.getIcon = () => {
       return this.getIcon(object);
     };
@@ -532,6 +535,10 @@ export abstract class Tree {
   protected abstract getText(object: any): string;
 
   protected abstract getIcon(object: any): string;
+  
+  protected getTags(object: any): Array<string> {
+    return [];
+  }
 
   protected preTreeTraversalActivity(): void {
     // Subclasses may override this function
