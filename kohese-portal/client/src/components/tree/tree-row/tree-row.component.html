@@ -27,12 +27,12 @@
   <ng-container *ngFor="let image of images">
     <ng-container *ngIf="image.display(treeRow.object)">
       <ng-container *ngIf="image.displayAsIcon">
-        <mat-icon class="{{image.path}}" matTooltip="{{image.text}}"
-          style="padding: 0px 3px;">
+        <mat-icon class="{{image.path}}" matTooltip="{{image.getText(treeRow.
+          object)}}" style="padding: 0px 3px;">
         </mat-icon>
       </ng-container>
       <ng-container *ngIf="!image.displayAsIcon">
-        <img src="{{image.path}}" title="{{image.text}}"
+        <img src="{{image.path}}" title="{{image.getText(treeRow.object)}}"
           style="padding: 0px 3px;"/>
       </ng-container>
     </ng-container>

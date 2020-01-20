@@ -67,8 +67,9 @@ export class TreeRowComponent implements OnInit {
 }
 
 export class Image {
-  public constructor(public path: string, public text: string,
-    public displayAsIcon: boolean, public display: (object: any) => boolean) {
+  public constructor(public path: string, public getText: (object:
+    any) => string, public displayAsIcon: boolean, public display: (object:
+    any) => boolean) {
   }
 }
 
