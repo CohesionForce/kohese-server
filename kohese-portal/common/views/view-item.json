@@ -77,7 +77,13 @@
             },
             "customLabel": "name",
             "labelOrientation": "Top",
-            "kind": "text"
+            "kind": "text",
+            "inputOptions": {
+              "type": "text",
+              "options": {
+                "isMultiLine": false
+              }
+            }
           }
         ]
       },
@@ -92,7 +98,11 @@
               },
               "customLabel": "description",
               "labelOrientation": "Top",
-              "kind": "markdown"
+              "kind": "markdown",
+              "inputOptions": {
+                "type": "markdown",
+                "options": {}
+              }
             }
           ]
         }

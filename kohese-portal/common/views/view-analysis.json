@@ -31,7 +31,13 @@
             },
             "customLabel": "id",
             "labelOrientation": "Top",
-            "kind": "text"
+            "kind": "text",
+            "inputOptions": {
+              "type": "text",
+              "options": {
+                "isMultiLine": false
+              }
+            }
           }
         ]
       },

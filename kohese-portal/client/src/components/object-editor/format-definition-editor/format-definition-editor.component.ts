@@ -79,6 +79,16 @@ export class FormatDefinitionEditorComponent {
     PropertyDefinition): void {
     propertyDefinition.propertyName.attribute = attributeName;
     propertyDefinition.customLabel = attributeName;
+    let viewModelEntry: any;
+    if (this._dataModel.localTypes) {
+      viewModelEntry = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._dataModel.classProperties[attributeName].definedInKind.
+        toLowerCase()).item.viewProperties[attributeName];
+    } else {
+      viewModelEntry = this._viewModel.viewProperties[attributeName];
+    }
+    propertyDefinition.kind = viewModelEntry.inputType.type;
+    propertyDefinition.inputOptions = viewModelEntry.inputType;
     if (this._dataModel.localTypes) {
       let dataModelType: any = this._dataModel.classProperties[attributeName].
         definition.type;
