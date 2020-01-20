@@ -3,6 +3,10 @@
   <ng-container *ngFor="let container of formatDefinition.containers">
     <ng-container *ngIf="(container.kind === FormatContainerKind.
       REVERSE_REFERENCE_TABLE) else notReverseReferencesTable">
+      <h3>
+        Reverse References For {{getReverseReferenceTableHeaderContent(
+          container)}}
+      </h3>
       <table_ [rows]="getReverseReferences(container)"
         [getName]="getReverseReferenceName" [columns]="['name']"
         [disabled]="true">
@@ -15,16 +19,20 @@
           <ng-container *ngIf="Array.isArray(getAttribute(attributeDefinition).
             type) else singleValuedBlock">
             <ng-container *ngIf="(!isDisabled || (!attributeDefinition.
-              hideEmpty || (object[attributeDefinition.propertyName.attribute] &&
-              (object[attributeDefinition.propertyName.attribute].length >
-              0))))">
+              hideEmpty || (object[attributeDefinition.propertyName.
+              attribute] && (object[attributeDefinition.propertyName.
+              attribute].length > 0))))">
               <ng-container *ngIf="attributeDefinition.tableDefinition else
                 notTableBlock">
+                <h3>
+                  {{getAttributeRepresentation(attributeDefinition)}}
+                </h3>
                 <table_ [rows]="getTableElements(attributeDefinition)"
                   [getName]="getTableElementName" [columns]="getTableColumns(
                   attributeDefinition)" [add]="getTableElementAdditionFunction(
-                  attributeDefinition)" [move]="getTableElementMovementFunction(
-                  attributeDefinition)" [remove]="getTableElementRemovalFunction(
+                  attributeDefinition)"
+                  [move]="getTableElementMovementFunction(attributeDefinition)"
+                  [remove]="getTableElementRemovalFunction(
                   attributeDefinition)" [disabled]="isDisabled">
                 </table_>
               </ng-container>
@@ -42,8 +50,9 @@
                     </button>
                   </div>
                   <mat-list>
-                    <ng-container *ngFor="let value of object[attributeDefinition.
-                      propertyName.attribute]; let j = index">
+                    <ng-container *ngFor="let value of object[
+                      attributeDefinition.propertyName.attribute]; let j =
+                      index">
                       <mat-list-item>
                         {{getStringRepresentation(j, attributeDefinition.
                           propertyName.attribute)}}
@@ -53,9 +62,10 @@
                             attributeDefinition)">
                             <mat-icon class="fa fa-edit"></mat-icon>
                           </button>
-                          <button mat-icon-button matTooltip="Remove this value"
-                            [disabled]="isDisabled" (click)="removeValue(j,
-                            attributeDefinition.propertyName.attribute)">
+                          <button mat-icon-button matTooltip="Remove this
+                            value" [disabled]="isDisabled"
+                            (click)="removeValue(j, attributeDefinition.
+                            propertyName.attribute)">
                             <mat-icon class="fa fa-trash"></mat-icon>
                           </button>
                         </span>
@@ -141,10 +151,11 @@
                       let j = index">
                       <button mat-raised-button [disabled]="isDisabled"
                         style="margin: 0px 3px 0px 3px;"
-                        [ngStyle]="{ 'margin-left': ((j === 0) ? 'auto' : '') }"
-                        (click)="object[attributeDefinition.propertyName.
-                        attribute] = getAttribute(attributeDefinition).properties.
-                        transition[transitionCandidateName].target">
+                        [ngStyle]="{ 'margin-left': ((j === 0) ? 'auto' :
+                        '') }" (click)="object[attributeDefinition.
+                        propertyName.attribute] = getAttribute(
+                        attributeDefinition).properties.transition[
+                        transitionCandidateName].target">
                         {{transitionCandidateName}}
                       </button>
                     </ng-container>
@@ -168,25 +179,29 @@
                   <ng-container *ngIf="getLocalType(attributeDefinition)
                     else globalTypeAttribute">
                     <label style="width: 100%;">
-                      {{getAttributeRepresentation(attributeDefinition)}}:&nbsp;
+                      {{getAttributeRepresentation(
+                        attributeDefinition)}}:&nbsp;
                     </label>
                     <br/>
                     <format-object-editor [type]="getLocalType(
                       attributeDefinition)" [viewModel]="getLocalTypeViewModel(
-                      attributeDefinition)" [object]="object[attributeDefinition.
-                      propertyName.attribute]"
-                      [attributes]="getLocalTypeAttributes(attributeDefinition)"
+                      attributeDefinition)" [object]="object[
+                      attributeDefinition.propertyName.attribute]"
+                      [attributes]="getLocalTypeAttributes(
+                      attributeDefinition)"
                       [formatDefinition]="getLocalTypeFormatDefinition(
                       attributeDefinition)" [disabled]="isDisabled">
                     </format-object-editor>
                   </ng-container>
                   <ng-template #globalTypeAttribute>
-                    <div style="width: 100%; display: flex; flex-direction: row;">
+                    <div style="width: 100%; display: flex; flex-direction:
+                      row;">
                       <label style="width: 20%;">
-                        {{getAttributeRepresentation(attributeDefinition)}}:&nbsp;
+                        {{getAttributeRepresentation(
+                          attributeDefinition)}}:&nbsp;
                       </label>
-                      <ng-container *ngIf="object[attributeDefinition.propertyName.
-                        attribute]">
+                      <ng-container *ngIf="object[attributeDefinition.
+                        propertyName.attribute]">
                         <!--
                           Remove the "disabled" attribute below once ItemProxy
                           selection can be restricted by kind.
@@ -194,8 +209,8 @@
                         <button mat-raised-button (click)="openObjectEditor(
                           attributeDefinition.propertyName.attribute)"
                           style="width: 60%;" [disabled]="true">
-                          {{getStringRepresentation(undefined, attributeDefinition.
-                            propertyName.attribute)}}
+                          {{getStringRepresentation(undefined,
+                            attributeDefinition.propertyName.attribute)}}
                         </button>
                       </ng-container>
                       <span class="flex-right-align" style="width: 20%;
@@ -209,9 +224,10 @@
                         <button mat-icon-button
                           matTooltip="Remove the selection for
                           {{attributeDefinition.propertyName.attribute}}"
-                          [disabled]="(isDisabled || (object[attributeDefinition.
-                          propertyName.attribute] == null))" (click)="object[
-                          attributeDefinition.propertyName.attribute] = undefined">
+                          [disabled]="(isDisabled || (object[
+                          attributeDefinition.propertyName.attribute] ==
+                          null))" (click)="object[attributeDefinition.
+                          propertyName.attribute] = undefined">
                           <mat-icon class="fa fa-times"></mat-icon>
                         </button>
                       </span>

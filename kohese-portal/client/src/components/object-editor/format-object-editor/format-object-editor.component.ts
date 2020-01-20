@@ -139,13 +139,21 @@ export class FormatObjectEditorComponent implements OnInit {
       this) && this._data;
   }
   
+  public getReverseReferenceTableHeaderContent(formatContainer:
+    FormatContainer): string {
+    return formatContainer.contents.map((propertyDefinition:
+      PropertyDefinition) => {
+      return propertyDefinition.propertyName.kind + '\'s ' +
+        propertyDefinition.propertyName.attribute;
+    }).join(', ');
+  }
+  
   public getReverseReferences(formatContainer: FormatContainer): Array<any> {
     let references: Array<any> = [];
     let reverseReferencesObject: any = TreeConfiguration.getWorkingTree().
       getProxyFor(this._object.id).relations.referencedBy;
     for (let j: number = 0; j < formatContainer.contents.length; j++) {
       let propertyDefinition: PropertyDefinition = formatContainer.contents[j];
-      
       if (reverseReferencesObject[propertyDefinition.propertyName.kind]) {
         references.push(...reverseReferencesObject[propertyDefinition.
           propertyName.kind][propertyDefinition.propertyName.attribute].map(
@@ -159,9 +167,6 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   public getReverseReferenceName(element: any): string {
-    //return ((element: any) => {
-    //  return element.name
-    //}).bind(this);
     return element.name;
   }
   

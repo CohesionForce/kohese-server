@@ -118,13 +118,17 @@
             FormatContainerKind.HORIZONTAL) ? 'row' : 'column') }">
             <ng-container *ngFor="let propertyDefinition of formatContainer.
               contents">
-              <mat-expansion-panel
+              <mat-expansion-panel #propertyDefinitionExpansionPanel
                 [hideToggle]="(formatContainer.kind === FormatContainerKind.
-                REVERSE_REFERENCE_TABLE)">
+                REVERSE_REFERENCE_TABLE)" (click)="(formatContainer.kind ===
+                FormatContainerKind.REVERSE_REFERENCE_TABLE) ?
+                propertyDefinitionExpansionPanel.toggle() : ''">
                 <mat-expansion-panel-header class="attribute-panel-header"
                   style="align-items: center;" [ngStyle]="{ 'width': (
                   (formatContainer.kind === FormatContainerKind.HORIZONTAL) ?
-                  '500px' : '100%') }">
+                  '500px' : '100%'), 'cursor': ((formatContainer.kind ===
+                  FormatContainerKind.REVERSE_REFERENCE_TABLE) ? 'default' :
+                  '') }">
                   <mat-form-field style="width: 100%;">
                     <ng-container *ngIf="(formatContainer.kind ===
                       FormatContainerKind.REVERSE_REFERENCE_TABLE) else
@@ -176,13 +180,16 @@
                     propertyDefinition, false); $event.stopPropagation()">
                     <mat-icon class="fa fa-arrow-down"></mat-icon>
                   </button>
-                  <button mat-icon-button matTooltip="Suppress display of this
-                    attribute when its value is empty" [disabled]="isDisabled"
-                    [ngClass]="{ 'highlight': propertyDefinition.hideEmpty }"
-                    (click)="propertyDefinition.hideEmpty =
-                    !propertyDefinition.hideEmpty; $event.stopPropagation()">
-                    <mat-icon class="fa fa-eye-slash"></mat-icon>
-                  </button>
+                  <ng-container *ngIf="(formatContainer.kind !==
+                    FormatContainerKind.REVERSE_REFERENCE_TABLE)">
+                    <button mat-icon-button matTooltip="Suppress display of this
+                      attribute when its value is empty" [disabled]="isDisabled"
+                      [ngClass]="{ 'highlight': propertyDefinition.hideEmpty }"
+                      (click)="propertyDefinition.hideEmpty =
+                      !propertyDefinition.hideEmpty; $event.stopPropagation()">
+                      <mat-icon class="fa fa-eye-slash"></mat-icon>
+                    </button>
+                  </ng-container>
                   <button mat-icon-button matTooltip="Remove this entry"
                     [disabled]="isDisabled" (click)="removeAttribute(
                     formatContainer, propertyDefinition); $event.
