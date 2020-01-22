@@ -8,6 +8,8 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatDefinition,
   FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+import { FormatContainer,
+  FormatContainerKind } from '../../type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -95,6 +97,10 @@ export class FormatObjectEditorComponent implements OnInit {
   get TreeConfiguration() {
     return TreeConfiguration;
   }
+  
+  get FormatContainerKind() {
+    return FormatContainerKind;
+  }
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
@@ -131,6 +137,37 @@ export class FormatObjectEditorComponent implements OnInit {
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
+  }
+  
+  public getReverseReferenceTableHeaderContent(formatContainer:
+    FormatContainer): string {
+    return formatContainer.contents.map((propertyDefinition:
+      PropertyDefinition) => {
+      return propertyDefinition.propertyName.kind + '\'s ' +
+        propertyDefinition.propertyName.attribute;
+    }).join(', ');
+  }
+  
+  public getReverseReferences(formatContainer: FormatContainer): Array<any> {
+    let references: Array<any> = [];
+    let reverseReferencesObject: any = TreeConfiguration.getWorkingTree().
+      getProxyFor(this._object.id).relations.referencedBy;
+    for (let j: number = 0; j < formatContainer.contents.length; j++) {
+      let propertyDefinition: PropertyDefinition = formatContainer.contents[j];
+      if (reverseReferencesObject[propertyDefinition.propertyName.kind]) {
+        references.push(...reverseReferencesObject[propertyDefinition.
+          propertyName.kind][propertyDefinition.propertyName.attribute].map(
+          (itemProxy: ItemProxy) => {
+          return itemProxy.item;
+        }));
+      }
+    }
+    
+    return references;
+  }
+  
+  public getReverseReferenceName(element: any): string {
+    return element.name;
   }
   
   public getAttribute(propertyDefinition: PropertyDefinition): any {
@@ -180,24 +217,17 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   public openObjectEditor(attributeName: string): void {
-    let type: any = this.getType(attributeName);
-    let isLocalTypeInstance: boolean = (Object.keys(this.
-      _dynamicTypesService.getKoheseTypes()).indexOf(type.name) === -1);
     let value: any = this._object[attributeName];
     this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
       data: {
-        object: ((!value || isLocalTypeInstance) ? value : TreeConfiguration.
-          getWorkingTree().getProxyFor(value.id).item),
-        type: type
+        object: (value ? TreeConfiguration.getWorkingTree().getProxyFor(value.
+          id).item : value),
+        type: this.getType(attributeName)
       },
       disableClose: true
     }).updateSize('80%', '80%').afterClosed().subscribe((result: any) => {
       if (result.object) {
-        if (isLocalTypeInstance) {
-          this._object[attributeName] = result.object;
-        } else {
-          this._itemRepository.upsertItem(result.type.name, result.object);
-        }
+        this._itemRepository.upsertItem(result.type.name, result.object);
       }
     });
   }
@@ -380,39 +410,14 @@ export class FormatObjectEditorComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  public isKindAttribute(attributeDefinition: PropertyDefinition): boolean {
-    let typeAttributeObject: any = this._type.classProperties[
-      attributeDefinition.propertyName.attribute];
-    return (typeAttributeObject && (typeAttributeObject.definedInKind ===
-      TreeConfiguration.getWorkingTree().getProxyFor(attributeDefinition.
-      propertyName.kind).item.classProperties[attributeDefinition.propertyName.
-      attribute].definedInKind));
-  }
-  
   public getTableElements(attributeDefinition: PropertyDefinition):
     Array<any> {
-    if (this.isKindAttribute(attributeDefinition)) {
-      if (this._object[attributeDefinition.propertyName.attribute]) {
-        return this._object[attributeDefinition.propertyName.attribute].map(
-          (reference: { id: string }) => {
-          return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
-            item;
-        });
-      }
-    } else {
-      let references: any = TreeConfiguration.getWorkingTree().getProxyFor(
-        this._object.id).relations.referencedBy[attributeDefinition.
-        propertyName.kind];
-      if (references) {
-        let upstreamKindAttributeReferences: Array<ItemProxy> =
-          references[attributeDefinition.propertyName.attribute];
-        if (upstreamKindAttributeReferences) {
-          return upstreamKindAttributeReferences.map((itemProxy:
-            ItemProxy) => {
-            return itemProxy.item;
-          });
-        }
-      }
+    if (this._object[attributeDefinition.propertyName.attribute]) {
+      return this._object[attributeDefinition.propertyName.attribute].map(
+        (reference: { id: string }) => {
+        return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
+          item;
+      });
     }
     
     return [];
@@ -588,28 +593,26 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   private getType(attributeName: string): any {
-    let typeName: string = this.getTypeName(this._type.classProperties[
-      attributeName].definition.type);
-    let type: any;
-    if (this._type.localTypes) {
-      for (let localTypeName in this._type.localTypes) {
-        if (localTypeName === typeName) {
-          type = this._type.localTypes[localTypeName];
-          break;
+    for (let j: number = 0; j < this._attributes.length; j++) {
+      if (this._attributes[j].name === attributeName) {
+        let typeName: string = this.getTypeName(this._attributes[j].type);
+        if (this._type.localTypes) {
+          for (let localTypeName in this._type.localTypes) {
+            if (localTypeName === typeName) {
+              return this._type.localTypes[localTypeName];
+            }
+          }
+        }
+        
+        let koheseTypes: any = this._dynamicTypesService.getKoheseTypes();
+        for (let koheseTypeName in koheseTypes) {
+          if (koheseTypeName === typeName) {
+            return koheseTypes[koheseTypeName].dataModelProxy.item;
+          }
         }
       }
     }
     
-    if (!type) {
-      let koheseTypes: any = this._dynamicTypesService.getKoheseTypes();
-      for (let koheseTypeName in koheseTypes) {
-        if (koheseTypeName === typeName) {
-          type = koheseTypes[koheseTypeName].dataModelProxy.item;
-          break;
-        }
-      }
-    }
-    
-    return type;
+    return undefined;
   }
 }
