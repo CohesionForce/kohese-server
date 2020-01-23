@@ -1,6 +1,6 @@
 import { ItemProxy } from '../common/src/item-proxy';
 
-var usersProxy;
+var usersProxy : ItemProxy;
 
 const SALT_WORK_FACTOR = 10;
 
@@ -40,7 +40,7 @@ function checkAndCreateUsersItem() {
     });
   } else {
     console.log('::: Users Item already exists');
-    console.log(JSON.stringify(usersProxy.item,null,'  '));
+    console.log(JSON.stringify(usersProxy.cloneItemAndStripDerived(),null,'  '));
   }
 
   checkAndCreateAdminAccount();

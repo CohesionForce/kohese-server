@@ -236,7 +236,7 @@ export class TreeConfiguration {
           let proxy = this.getProxyFor(missingBlobInfo.itemId);
           if(proxy.oid === oid){
             // console.log('%%% Proxy matches missing blob oid: ' + oid);
-            itemCache.cacheBlob(oid, JSON.parse(JSON.stringify(proxy.item)));
+            itemCache.cacheBlob(oid, JSON.parse(JSON.stringify(proxy.cloneItemAndStripDerived())));
           } else {
             console.log('*** Proxy does not match missing blob oid: ' + oid + ' - ' + proxy.oid);
           }
