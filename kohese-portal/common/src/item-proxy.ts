@@ -698,7 +698,7 @@ export class ItemProxy {
     let clone = this.cloneItem();
 
     // Determine if derived properiteis need to be stripped
-    if (!this.internal && this.model && this.model.item.derivedProperties && this.model.item.derivedProperties.length) {
+    if (this.model && this.model.item.derivedProperties && this.model.item.derivedProperties.length) {
       let derivedProperties = this.model.item.derivedProperties;
       for(let idx in derivedProperties){
         let key = derivedProperties[idx];
@@ -1549,6 +1549,11 @@ export class ItemProxy {
     }
 
     var newParentId = withItem.parentId || 'ROOT';
+
+    if (newParentId === 'ROOT' && this.item.id === 'ROOT' ){
+      // Prevent infinite loop when the ROOT is passed as part of sync
+      newParentId = oldParentId;
+    }
 
     if (oldParentId !== newParentId) {
       console.log('::: Parent Id changed from ' + oldParentId + ' to ' +

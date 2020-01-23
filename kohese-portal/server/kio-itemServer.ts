@@ -52,11 +52,12 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
       case 'update':
         kdb.storeModelInstance(change.proxy, change.type === 'create')
         .then(function (status) {
+          let proxy : ItemProxy = change.proxy;
           let createNotification = {
               type: change.type,
               kind: change.kind,
-              id: change.proxy.item.id,
-              item: change.proxy.item,
+              id: proxy.item.id,
+              item: proxy.cloneItemAndStripDerived(),
               status: status
           };
           kio.server.emit('Item/' + change.type, createNotification);
@@ -103,7 +104,7 @@ function KIOItemServer(socket){
     var proxy = ItemProxy.getWorkingTree().getProxyFor(request.id);
     sendResponse({
       kind: proxy.kind,
-      item: proxy.item
+      item: proxy.cloneItemAndStripDerived()
     });
     console.log('::: Sent findById response for ' + request.id);
   });
@@ -151,7 +152,7 @@ function KIOItemServer(socket){
         response.cache[proxy.kind] = {};
       }
       var kindCache = response.cache[proxy.kind];
-      kindCache[proxy.item.id] = JSON.stringify(proxy.item);
+      kindCache[proxy.item.id] = JSON.stringify(proxy.cloneItemAndStripDerived());
     }
 
     repoProxy.getChildByName('Model Definitions').visitChildren(null, (proxy) => {
@@ -365,7 +366,7 @@ function KIOItemServer(socket){
             response.cache[proxy.kind] = {};
           }
           var kindCache = response.cache[proxy.kind];
-          kindCache[proxy.item.id] = JSON.stringify(proxy.item);
+          kindCache[proxy.item.id] = JSON.stringify(proxy.cloneItemAndStripDerived());
         });
 
       } else {
@@ -390,13 +391,13 @@ function KIOItemServer(socket){
 
         thmCompare.addedItems.forEach((itemId) => {
           var proxy = ItemProxy.getWorkingTree().getProxyFor(itemId);
-          response.addItems.push({kind: proxy.kind, item: proxy.item});
+          response.addItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
 //          console.log(proxy.item);
         });
 
         thmCompare.changedItems.forEach((itemId) => {
           var proxy = ItemProxy.getWorkingTree().getProxyFor(itemId);
-          response.changeItems.push({kind: proxy.kind, item: proxy.item});
+          response.changeItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
 //          console.log(proxy.item);
         });
       }
@@ -504,7 +505,7 @@ function KIOItemServer(socket){
 
       sendResponse({
         kind: request.kind,
-        item: proxy.item
+        item: proxy.cloneItemAndStripDerived()
       });
 
       console.log('::: Sent Item/upsert response');
