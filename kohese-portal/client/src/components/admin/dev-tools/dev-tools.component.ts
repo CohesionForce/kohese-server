@@ -9,7 +9,6 @@ import { LogService } from '../../../services/log/log.service';
 })
 export class DevToolsComponent implements OnInit {
   logRegistry : Array<LoggingEventRecord>;
-  selectedLogEvents = {};
 
   constructor(private logService: LogService) { }
 
@@ -20,11 +19,12 @@ export class DevToolsComponent implements OnInit {
   }
 
   saveLogSelections() {
-    console.log(this.selectedLogEvents);
     this.logService.updateLogRegistry(this.logRegistry);
   }
-
-  selectEvent(logEvent : any) {
-    logEvent.active = !logEvent.active;
+  
+  public toggleAllConsoleMessagesSelected(select: boolean): void {
+    for (let j: number = 0; j < this.logRegistry.length; j++) {
+      this.logRegistry[j].active = select;
+    }
   }
 }

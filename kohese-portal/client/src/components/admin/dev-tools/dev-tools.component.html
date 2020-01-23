@@ -1,14 +1,32 @@
-<mat-tab-group>
+<div style="height: 50px; display: flex; flex-direction: row;">
+  <button mat-icon-button matTooltip="Save settings"
+    class="flex-right-align" (click)="saveLogSelections()">
+    <mat-icon class="fa fa-save"></mat-icon>
+  </button>
+</div>
+<mat-tab-group style="height: calc(100% - 50px);">
   <mat-tab label="Logging">
-    <mat-list style="height: 700px; overflow: auto; width: 50%">
-      <mat-list-item *ngFor="let logEvent of logRegistry" matTooltip="{{logEvent.definition.description}}" (click)="selectEvent(logEvent)">
-        {{logEvent.definition.name}}
-        <i *ngIf="logEvent.active" class="fa fa-check"></i>
-      </mat-list-item>
-    </mat-list>
-    <button mat-raised-button (click)="saveLogSelections()">
-      Save Log Selections
-    </button>
+    <div style="height: 50px; display: flex; flex-direction: row;">
+      <button mat-icon-button matTooltip="Select all console messages"
+        class="flex-right-align" (click)="toggleAllConsoleMessagesSelected(
+        true)">
+        <mat-icon class="fa fa-check-square-o"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Deselect all console messages"
+        (click)="toggleAllConsoleMessagesSelected(false)">
+        <mat-icon class="fa fa-square-o"></mat-icon>
+      </button>
+    </div>
+    <div style="height: calc(100% - 50px); display: flex; flex-direction:
+      column;">
+      <ng-container *ngFor="let consoleMessage of logRegistry">
+        <mat-checkbox [ngModel]="consoleMessage.active"
+          (ngModelChange)="consoleMessage.active = !consoleMessage.active"
+          style="margin-left: 3px;">
+          {{consoleMessage.definition.name}}
+        </mat-checkbox>
+      </ng-container>
+    </div>
   </mat-tab>
   <mat-tab label="Feature switch">
     Not yet implemented
