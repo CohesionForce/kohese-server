@@ -1,53 +1,49 @@
-<div>
-  <div mat-dialog-title class="project-dialog-title">
-    <span style="font-size: large">Project Selection</span>
-    <span class="pull-right">
-      <mat-checkbox *ngIf="historicalMode" (change)="toggleCurrentProjects($event.checked)">
-        Show Current Projects
-      </mat-checkbox>
-    </span>
+<div mat-dialog-title style="height: 60px; background-color: rgb(0, 0, 92);
+  color: whitesmoke; padding: 10px; position: sticky;">
+  <span style="font-size: large">Project Selection</span>
+  <span class="pull-right">
+    <mat-checkbox *ngIf="historicalMode" (change)="toggleCurrentProjects($event.checked)">
+      Show Current Projects
+    </mat-checkbox>
+  </span>
+</div>
+<div style="height: calc(100% - 120px); width: 100%; display: flex;
+  flex-direction: row;">
+  <div style="height: 100%; overflow: auto; flex: 1 1 20%;">
+    <mat-list>
+      <mat-list-item *ngFor="let project of projectList" (click)="selectProject(project)">
+        {{project.proxy.item.name}}
+        <mat-divider></mat-divider>
+      </mat-list-item>
+    </mat-list>
   </div>
-  <div style="height: 400px;">
-    <div id="projectSelectorContainer" style="height: 100%; width : 100%;">
-      <div class="project-list" style="height : 100%; overflow:auto; width: 20%;">
-        <mat-list>
-          <mat-list-item *ngFor="let project of projectList" (click)="selectProject(project)">
-            {{project.proxy.item.name}}
-            <mat-divider></mat-divider>
-          </mat-list-item>
-        </mat-list>
-      </div>
-      <div class="project-preview" style="height: 100%; overflow: auto; width: 70%;">
-        <mat-card *ngIf="selectedProject && !isMultiSelect">
-          <mat-card-title class="panel-heading">
-            <span>{{selectedProject.proxy.item.name}}</span>
-          </mat-card-title>
-          <mat-card-content>
-            <h5>Description :</h5> {{selectedProject.proxy.item.description}}
-            <h5>Project Items : </h5>
-            <div *ngFor="let projectItem of selectedProject.projectItems">
-              {{projectItem.item.name}}
-            </div>
-            <div *ngIf="historicalMode">
-              <h5>Items not yet created : </h5>
-              <div *ngFor="let lostItem of selectedProject.lostProjectItems">
-                {{lostItem.item.name}}
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </div>
+  <div style="height: 100%; overflow: auto; flex: 1 1 70%;">
+    <mat-card *ngIf="selectedProject && !isMultiSelect">
+      <mat-card-title class="panel-heading">
+        <span>{{selectedProject.proxy.item.name}}</span>
+      </mat-card-title>
+      <mat-card-content>
+        <h5>Description :</h5> {{selectedProject.proxy.item.description}}
+        <h5>Project Items : </h5>
+        <div *ngFor="let projectItem of selectedProject.projectItems">
+          {{projectItem.item.name}}
+        </div>
+        <div *ngIf="historicalMode">
+          <h5>Items not yet created : </h5>
+          <div *ngFor="let lostItem of selectedProject.lostProjectItems">
+            {{lostItem.item.name}}
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
-  <ng-container>
-    <div class="pull-right">
-      <mat-dialog-actions>
-        <button mat-raised-button (click)="closeDialog()">
-          Cancel
-        </button>
-        <button mat-raised-button (click)="confirmProject()">
-          Confirm
-        </button>
-      </mat-dialog-actions>
-    </div>
-  </ng-container>
+</div>
+<mat-dialog-actions style="height: 40px; display: flex; flex-direction: row;">
+  <button mat-raised-button class="flex-right-align"
+    (click)="confirmProject()">
+    Confirm
+  </button>
+  <button mat-raised-button (click)="closeDialog()">
+    Cancel
+  </button>
+</mat-dialog-actions>

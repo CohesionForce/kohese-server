@@ -10,9 +10,18 @@
   </h1>
 
 </div>
-<project-overview *ngIf="dashboardSelection === DashboardSelections.PROJECT_OVERVIEW"
-                  [projectStream]="projectStream"></project-overview>
-<user-statistics *ngIf="dashboardSelection === DashboardSelections.USER_STATISTICS"
-                  [projectStream]="projectStream"></user-statistics>
-<status-dashboard *ngIf="dashboardSelection === DashboardSelections.PROJECT_STATUS"
-                  [projectStream]="projectStream"></status-dashboard>
+<div style="height: calc(100% - 100px);">
+  <ng-container *ngIf="(projectStream | async)">
+    <ng-container [ngSwitch]="dashboardSelection">
+      <ng-container *ngSwitchCase="DashboardSelections.PROJECT_OVERVIEW">
+        <project-overview [projectStream]="projectStream"></project-overview>
+      </ng-container>
+      <ng-container *ngSwitchCase="DashboardSelections.USER_STATISTICS">
+        <user-statistics [projectStream]="projectStream"></user-statistics>
+      </ng-container>
+      <ng-container *ngSwitchCase="DashboardSelections.PROJECT_STATUS">
+        <status-dashboard [projectStream]="projectStream"></status-dashboard>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</div>

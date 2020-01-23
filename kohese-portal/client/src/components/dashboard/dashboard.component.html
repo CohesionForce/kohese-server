@@ -1,24 +1,30 @@
 <lens></lens>
-<div class="flex-grid" style="height : 100%">
+<div style="height: 100%; display: flex; flex-direction: row;">
   <dashboard-selector [user]="currentUser"
-                      (dashboardSelected)="dashboardSelected($event)"
-  ></dashboard-selector>
-  <div class="right-content" style="height : 100%">
-    <div *ngIf="selectedDashboard.dashboardType === DashboardTypes.ASSIGNMENT">
-      <assignment-dashboard [assignmentListStream]="assignmentListStream"
-                            [dashboardSelectionStream]="dashboardSelectionStream"></assignment-dashboard>
-    </div>
-    <div *ngIf="selectedDashboard.dashboard === DashboardSelections.USER_PREFERENCES && currentUser">
-      <user-dashboard [user]="currentUser"></user-dashboard>
-    </div>
-    <div *ngIf="selectedDashboard.dashboardType === DashboardTypes.PROJECT">
-      <project-dashboard [dashboardSelectionStream]="dashboardSelectionStream"
-                         (projectSelected)="onProjectSelected($event)"
-                         [savedProject]="selectedProject"></project-dashboard>
-    </div>
-    <div *ngIf="selectedDashboard.dashboardType === DashboardTypes.REPORT">
-      <report-dashboard [dashboardSelectionStream]="dashboardSelectionStream"></report-dashboard>
-    </div>
+    (dashboardSelected)="dashboardSelected($event)" style="flex: 0 0 20%;">
+  </dashboard-selector>
+  <div style="flex: 1 1 80%;">
+    <ng-container [ngSwitch]="selectedDashboard.dashboardType">
+      <ng-container *ngSwitchCase="DashboardTypes.ASSIGNMENT">
+        <assignment-dashboard [assignmentListStream]="assignmentListStream"
+          [dashboardSelectionStream]="dashboardSelectionStream">
+        </assignment-dashboard>
+      </ng-container>
+      <ng-container *ngSwitchCase="DashboardSelections.USER_PREFERENCES">
+        <user-dashboard [user]="currentUser"></user-dashboard>
+      </ng-container>
+      <ng-container *ngSwitchCase="DashboardTypes.PROJECT">
+        <project-dashboard
+          [dashboardSelectionStream]="dashboardSelectionStream"
+          (projectSelected)="onProjectSelected($event)"
+          [savedProject]="selectedProject">
+        </project-dashboard>
+      </ng-container>
+      <ng-container *ngSwitchCase="DashboardTypes.REPORT">
+        <report-dashboard
+          [dashboardSelectionStream]="dashboardSelectionStream">
+        </report-dashboard>
+      </ng-container>
+    </ng-container>
   </div>
 </div>
-

@@ -1,20 +1,4 @@
-.project-tree {
-  padding : 15px;
-  border : 1px solid rgb(68, 55, 55);
-  border-radius : 5px;
-  width: 20%;
-  display : inline-block;
-  height : 700px;
-  overflow : auto !important;
-}
-
-.activity-list {
-  padding : 15px;
-  width: 50%;
-  display: inline-block;
-  height : 700px;
-  overflow : hidden;
-}
+@import '../../../../app.component';
 
 virtual-scroll {
   height: 90%;
