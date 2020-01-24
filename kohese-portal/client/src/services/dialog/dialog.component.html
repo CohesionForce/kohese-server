@@ -45,11 +45,11 @@
 <mat-dialog-actions style="height: 10%; width: 100%;">
   <ng-container *ngIf="data.fieldName">
     <span class="dialog-actions">
-      <button mat-raised-button [disabled]="(data.validate ? !data.validate(
-        data.value) : false)" [mat-dialog-close]="data.value">
+      <button mat-button [disabled]="(data.validate ? !data.validate(data.
+        value) : false)" [mat-dialog-close]="data.value">
         Accept
       </button>
-      <button mat-raised-button [mat-dialog-close]="">
+      <button mat-button [mat-dialog-close]="">
         Cancel
       </button>
     </span>
@@ -57,7 +57,7 @@
   <ng-container *ngIf="!data.fieldName">
     <span class="dialog-actions">
       <button *ngFor="let label of data.buttonLabels; let j = index"
-        mat-raised-button [mat-dialog-close]="j">
+        mat-button [mat-dialog-close]="j">
         {{label}}
       </button>
     </span>

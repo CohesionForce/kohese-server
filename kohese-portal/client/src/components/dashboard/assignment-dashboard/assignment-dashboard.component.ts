@@ -92,8 +92,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     this._dialogService.openComponentDialog(DetailsDialogComponent, {
       data: {
         itemProxy: itemProxy
-      },
-      disableClose: true
+      }
     }).updateSize('90%', '90%');
   }
   

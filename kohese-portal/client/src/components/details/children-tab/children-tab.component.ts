@@ -102,7 +102,6 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   createChild () {
     let createConfig = {
-      disableClose : true,
       data : {
         saveEmitter : this.saveEmitter,
         parentId : this.itemProxy.item.id,

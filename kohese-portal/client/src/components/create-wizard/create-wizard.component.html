@@ -9,9 +9,11 @@
             (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
           </details-form>
         </mat-card-content>
-        <mat-card-actions>
+        <mat-card-actions style="display: flex; flex-direction: row;">
+          <button mat-button matStepperNext style="margin-left: auto;">
+            Next
+          </button>
           <button mat-button (click)="cancel()">Cancel</button>
-          <button mat-button matStepperNext>Next</button>
         </mat-card-actions>
       </mat-card>
     </div>
@@ -32,10 +34,15 @@
             !!!!!
           </div>
         </mat-card-content>
-        <mat-card-actions>
+        <mat-card-actions style="display: flex; flex-direction: row;">
+          <button mat-button (click)="clearError()" matStepperPrevious
+            style="margin-left: auto;">
+            Back
+          </button>
+          <button mat-button [disabled]="isDisabled" (click)="createItem()">
+            Create
+          </button>
           <button mat-button (click)="cancel()">Cancel</button>
-          <button mat-button (click)="clearError()" matStepperPrevious>Back</button>
-          <button mat-button [disabled]="isDisabled" (click)="createItem()">Create</button>
         </mat-card-actions>
       </mat-card>
     </div>

@@ -232,8 +232,7 @@ export class AttributeEditorComponent implements OnInit {
       data: {
         stateMachine: stateMachine,
         defaultState: this._attribute.default
-      },
-      disableClose: true
+      }
     }).updateSize('70%', '70%').afterClosed().subscribe((data: any) => {
       if (data) {
         this._attribute.properties = data.stateMachine;

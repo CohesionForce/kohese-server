@@ -279,8 +279,7 @@ export class DataModelEditorComponent {
     this._dialogService.openComponentDialog(AttributeEditorComponent, {
       data: {
         type: this._dataModel
-      },
-      disableClose: true
+      }
     }).afterClosed().subscribe((attributeObject: any) => {
       if (attributeObject) {
         this._dataModel.properties[attributeObject.attributeName] =
@@ -487,8 +486,7 @@ export class DataModelEditorComponent {
       data: {
         stateMachine: stateMachine,
         defaultState: attribute.default
-      },
-      disableClose: true
+      }
     }).updateSize('70%', '70%').afterClosed().subscribe((data: any) => {
       if (data) {
         attribute.properties = data.stateMachine;

@@ -1,5 +1,5 @@
-<div [ngStyle]="{ 'height': (isDialogInstance() ? '90%' : '100%') }"
-  style="overflow: auto;">
+<div [ngStyle]="{ 'height': (isDialogInstance() ? 'calc(100% - 40px)' :
+  '100%') }" style="overflow: auto;">
   <mat-form-field style="height: 10%; width: 100%;">
     <mat-select placeholder="Insertion Location"
       [(ngModel)]="attributeInsertionSpecification.insertionLocation">
@@ -84,19 +84,17 @@
   </split>
 </div>
 <ng-container *ngIf="isDialogInstance()">
-  <mat-dialog-actions style="height: 10%; display: flex;
-    flex-direction: column;">
-    <span class="flex-right-align">
-      <button mat-button matTooltip="Insert the selected attributes into the
-        document" [disabled]="Object.keys(attributeInsertionSpecification.
-        types).length === 0" (click)="matDialogRef.close(
-        attributeInsertionSpecification)">
-        Insert
-      </button>
-      <button mat-button matTooltip="Cancel the attribute insertion process"
-        (click)="matDialogRef.close(undefined)">
-        Cancel
-      </button>
-    </span>
+  <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
+    row;">
+    <button mat-button matTooltip="Insert the selected attributes into the
+      document" [disabled]="Object.keys(attributeInsertionSpecification.
+      types).length === 0" class="flex-right-align" (click)="matDialogRef.
+      close(attributeInsertionSpecification)">
+      Insert
+    </button>
+    <button mat-button matTooltip="Cancel the attribute insertion process"
+      (click)="matDialogRef.close(undefined)">
+      Cancel
+    </button>
   </mat-dialog-actions>
 </ng-container>

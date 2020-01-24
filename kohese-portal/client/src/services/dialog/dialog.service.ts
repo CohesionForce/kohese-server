@@ -69,6 +69,7 @@ export class DialogService {
   }
 
   openComponentDialog<T>(component: ComponentType<T> | TemplateRef<T>, config : any): MatDialogRef<T> {
+    config.disableClose = true;
     return this.dialog.open(component, config);
   }
 }

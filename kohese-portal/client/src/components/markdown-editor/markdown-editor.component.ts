@@ -98,7 +98,8 @@ export class MarkdownEditorComponent implements OnInit {
   }
   
   public openMarkdownInformationDialog(): void {
-    this._dialogService.openComponentDialog(MarkdownCheatSheetComponent, {});
+    this._dialogService.openComponentDialog(MarkdownCheatSheetComponent, {}).
+      updateSize('60%', '60%');
   }
   
   private formatValue(): void {

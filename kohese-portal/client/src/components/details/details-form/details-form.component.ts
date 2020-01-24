@@ -238,8 +238,7 @@ export class DetailsFormComponent extends NavigatableComponent
         object: ((!value || isLocalTypeInstance) ? value : TreeConfiguration.
           getWorkingTree().getProxyFor(value.id).item),
         type: type
-      },
-      disableClose: true
+      }
     }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
       any) => {
       if (returnedObject) {
@@ -431,8 +430,7 @@ export class DetailsFormComponent extends NavigatableComponent
               object: ((!value || isLocalTypeInstance) ? value :
                 TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
               type: type
-            },
-            disableClose: true
+            }
           }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
             any) => {
             if (returnedObject) {

@@ -35,8 +35,8 @@ export class KdMarkdownComponent implements OnInit {
   }
 
   showCheatSheet() {
-    this.dialogService.openComponentDialog(MarkdownCheatSheetComponent, {
-    });
+    this.dialogService.openComponentDialog(MarkdownCheatSheetComponent, {}).
+      updateSize('60%', '60%');
   }
   
   public updateValue(input: string): void {

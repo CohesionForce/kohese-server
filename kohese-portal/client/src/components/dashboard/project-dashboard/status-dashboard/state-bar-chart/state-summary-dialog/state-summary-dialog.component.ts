@@ -97,8 +97,7 @@ export class StateSummaryDialogComponent implements OnInit {
     this._dialogService.openComponentDialog(DetailsDialogComponent, {
       data: {
         itemProxy: itemProxy
-      },
-      disableClose: true
+      }
     }).updateSize('70%', '70%');
   }
   

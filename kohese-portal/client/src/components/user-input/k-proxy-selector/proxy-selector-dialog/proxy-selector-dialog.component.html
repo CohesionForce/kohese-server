@@ -1,22 +1,15 @@
-<div>
-  <div style="height: 400px; overflow: auto;">
-    <proxy-selector 
-      (proxySelected)="onProxySelected($event)"
-      [multiSelect]="multiSelect"
-      [proxyContext]="proxyContext"
-      [selection]="selected"></proxy-selector>
-  </div>
+<div style="height: calc(100% - 40px);">
+  <proxy-selector 
+    (proxySelected)="onProxySelected($event)"
+    [multiSelect]="multiSelect"
+    [proxyContext]="proxyContext"
+    [selection]="selected"></proxy-selector>
 </div>
-<ng-container>
-  <div class="pull-right">
-    <mat-dialog-actions>
-      <button mat-raised-button (click)="closeDialog()">
-        Cancel
-      </button>
-      <button mat-raised-button
-         (click)="selectProxy()">
-        Confirm
-      </button>
-    </mat-dialog-actions>
-  </div>
-</ng-container>
+<mat-dialog-actions style="height: 40px; display: flex; flex-direction: row;">
+  <button mat-button class="flex-right-align" (click)="selectProxy()">
+    Confirm
+  </button>
+  <button mat-button (click)="closeDialog()">
+    Cancel
+  </button>
+</mat-dialog-actions>

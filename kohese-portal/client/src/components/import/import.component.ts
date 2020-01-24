@@ -207,8 +207,7 @@ export class ImportComponent implements OnInit {
     this._dialogService.openComponentDialog(ParameterSpecifierComponent, {
       data: {
         parameters: this._selectedFileMap.get(file).parameters
-      },
-      disableClose: true
+      }
     }).updateSize('80%', '60%').afterClosed().subscribe((parameters: any) => {
       if (parameters) {
         this.updatePreviews();

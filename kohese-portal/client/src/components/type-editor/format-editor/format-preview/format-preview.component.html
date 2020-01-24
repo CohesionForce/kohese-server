@@ -1,9 +1,13 @@
-
-<div mat-dialog-title class="preview-format-title">
+<div mat-dialog-title class="preview-format-title" style="height: 45px;">
   <span style="font-size: large">Preview Format</span>
 </div>
-<button mat-button (click)="mockRow.editable = true" *ngIf="!mockRow.editable">Edit</button>
-<button mat-button (click)="mockRow.editable = false" *ngIf="mockRow.editable">Display</button>
-
-<document-row [row]="mockRow" [showActions]="false" style="height: 90%"[docInfo]="mockDocInfo">
-</document-row>
+<div style="height: calc(100% - 105px); overflow: auto;">
+  <document-row [row]="mockRow" [showActions]="false" [docInfo]="mockDocInfo">
+  </document-row>
+</div>
+<mat-dialog-actions style="height: 40px; display: flex; flex-direction: row;">
+  <button mat-button matTooltip="Close this window" class="flex-right-align"
+    [mat-dialog-close]="">
+    Close
+  </button>
+</mat-dialog-actions>

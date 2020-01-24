@@ -1,4 +1,4 @@
-<div class='dialog-container'>
+<div style="height: calc(100% - 40px);">
   <div class="title" [ngStyle]="{'background-color' : color}">
     {{kindName}}: {{stateName}}
   </div>
@@ -76,3 +76,9 @@
         </ngx-datatable-column>
     </ngx-datatable>
 </div>
+<mat-dialog-actions style="height: 40px; display: flex; flex-direction: row;">
+  <button mat-button matTooltip="Close this window" class="flex-right-align"
+    [mat-dialog-close]="">
+    Close
+  </button>
+</mat-dialog-actions>
