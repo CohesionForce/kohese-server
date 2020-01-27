@@ -4,31 +4,28 @@
     <mat-icon class="fa fa-save"></mat-icon>
   </button>
 </div>
-<mat-tab-group style="height: calc(100% - 50px);">
-  <mat-tab label="Logging">
-    <div style="height: 50px; display: flex; flex-direction: row;">
-      <button mat-icon-button matTooltip="Select all console messages"
-        class="flex-right-align" (click)="toggleAllConsoleMessagesSelected(
-        true)">
-        <mat-icon class="fa fa-check-square-o"></mat-icon>
-      </button>
-      <button mat-icon-button matTooltip="Deselect all console messages"
-        (click)="toggleAllConsoleMessagesSelected(false)">
-        <mat-icon class="fa fa-square-o"></mat-icon>
-      </button>
-    </div>
-    <div style="height: calc(100% - 50px); display: flex; flex-direction:
-      column;">
-      <ng-container *ngFor="let consoleMessage of logRegistry">
-        <mat-checkbox [ngModel]="consoleMessage.active"
-          (ngModelChange)="consoleMessage.active = !consoleMessage.active"
-          style="margin-left: 3px;">
-          {{consoleMessage.definition.name}}
+<div style="height: calc(100% - 50px); overflow: auto;">
+  <mat-table [dataSource]="logRegistry">
+    <ng-container matColumnDef="Console Message">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-checkbox [ngModel]="areAllConsoleMessagesSelected()"
+          (ngModelChange)="toggleAllConsoleMessagesSelected($event)"
+          style="margin-right: 7px;">
         </mat-checkbox>
-      </ng-container>
-    </div>
-  </mat-tab>
-  <mat-tab label="Feature switch">
-    Not yet implemented
-  </mat-tab>
-</mat-tab-group>
+        <h3>
+          Console Messages
+        </h3>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <mat-checkbox [ngModel]="element.active" (ngModelChange)="element.
+          active = !element.active" [disabled]="isDisabled" style="padding:
+          7px;">
+          {{element.definition.name}}
+        </mat-checkbox>
+      </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="['Console Message']; sticky: true">
+    </mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['Console Message']"></mat-row>
+  </mat-table>
+</div>

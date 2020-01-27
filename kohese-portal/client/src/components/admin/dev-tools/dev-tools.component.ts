@@ -22,6 +22,16 @@ export class DevToolsComponent implements OnInit {
     this.logService.updateLogRegistry(this.logRegistry);
   }
   
+  public areAllConsoleMessagesSelected(): boolean {
+    for (let j: number = 0; j < this.logRegistry.length; j++) {
+      if (!this.logRegistry[j].active) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
   public toggleAllConsoleMessagesSelected(select: boolean): void {
     for (let j: number = 0; j < this.logRegistry.length; j++) {
       this.logRegistry[j].active = select;
