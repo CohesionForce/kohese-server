@@ -19,34 +19,38 @@
     </ng-template>
   </ng-container>
 </div>
-<div style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">
-  <label>
-    Icon:
-  </label>
-  <br/>
-  <mat-form-field style="width: 100%;">
-    <input matInput type="text" placeholder="Filter" [disabled]="!editable"
-      (input)="filterChanged($event.target.value)"/>
-  </mat-form-field>
-  <div #iconList style="height: 300px; overflow: auto;">
-    <div style="column-count: 4;">
-      <ng-container *ngFor="let icon of getIcons()">
-        <button mat-button matTooltip="{{icon.name + ((icon.usages.length > 0) ?
-          (' - Used by the following kinds: ' + icon.usages.join(', ')): '')}}"
-          [ngClass]="{ 'highlight': (viewModel.icon === icon.iconString) }"
-          [disabled]="!editable" (click)="iconSelected(icon.iconString)"
-          style="width: 100%; text-align: left;">
-          <mat-icon class="{{icon.iconString}}"></mat-icon>
-          <span matBadge="{{icon.usages.length}}" [matBadgeHidden]="(icon.
-            usages.length === 0)" matBadgeOverlap="false">
-            {{icon.name}}
-          </span>
-        </button>
-        <br/>
-      </ng-container>
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    Icon:&nbsp;
+    <mat-icon class="{{viewModel.icon}}"></mat-icon>
+    &nbsp;{{getIconName(viewModel.icon.substring(6))}}
+  </mat-expansion-panel-header>
+  <ng-template matExpansionPanelContent>
+    <mat-form-field style="width: 100%;">
+      <input matInput type="text" placeholder="Filter" [disabled]="!editable"
+        (input)="filterChanged($event.target.value)"/>
+    </mat-form-field>
+    <div style="height: 300px; overflow: auto;">
+      <div style="column-count: 4;">
+        <ng-container *ngFor="let icon of getIcons()">
+          <button mat-button matTooltip="{{icon.name + ((icon.usages.length >
+            0) ? (' - Used by the following kinds: ' + icon.usages.join(
+            ', ')) : '')}}" [ngClass]="{ 'highlight': (viewModel.icon === icon.
+            iconString) }" [disabled]="!editable" (click)="iconSelected(icon.
+            iconString)" style="width: 100%; text-align: left;">
+            <mat-icon class="{{icon.iconString}}"></mat-icon>
+            <span matBadge="{{icon.usages.length}}" [matBadgeHidden]="(icon.
+              usages.length === 0)" matBadgeOverlap="false">
+              {{icon.name}}
+            </span>
+          </button>
+          <br/>
+        </ng-container>
+      </div>
     </div>
-  </div>
-</div>
+  </ng-template>
+</mat-expansion-panel>
+<br/>
 <mat-form-field style="width: 180px;">
   <input matInput type="color" placeholder="Color" [disabled]="!editable"
     [ngModel]="viewModel.color" (ngModelChange)="colorSelected($event)"
