@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core/";
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import { CreateWizardComponent } from './create-wizard.component';
 import { MaterialModule } from "../../material.module";
@@ -26,7 +26,6 @@ import { UserInputModule } from "../user-input/user-input.module";
     PipesModule,
     DetailsModule,
     BrowserAnimationsModule,
-    NoopAnimationsModule,
     UserInputModule
     
   ],
