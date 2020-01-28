@@ -1,5 +1,5 @@
 <div style="height: 100%; display: flex; flex-direction: row;">
-  <div style="flex: 1 1 60%;">
+  <div style="flex: 1 1 60%; overflow: auto;">
     <ng-container *ngFor="let assignment of sortedAssignmentList">
       <mat-card [ngStyle]="{ 'background-color': (getViewModel(
           assignment).color ? getViewModel(assignment).color : '#000000') }"
