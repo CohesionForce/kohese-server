@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service'
 import { AnalysisService } from '../../services/analysis/analysis.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
 import { BehaviorSubject ,  Subscription } from 'rxjs';
@@ -38,7 +39,8 @@ export class AnalysisComponent extends NavigatableComponent
   constructor(protected NavigationService: NavigationService,
     private route: ActivatedRoute,
     private ItemRepository: ItemRepository,
-    private AnalysisService: AnalysisService) {
+    private AnalysisService: AnalysisService, private _dialogService:
+    DialogService) {
     super(NavigationService);
     this.filterSubject = new BehaviorSubject({
       filter: '',
@@ -64,8 +66,15 @@ export class AnalysisComponent extends NavigatableComponent
             this.AnalysisService.fetchAnalysis(this.itemProxy).then(() => {
               this.proxyStream.next(this.itemProxy);
             },(error: any) => {
-              console.error(error);
+              this._dialogService.openInformationDialog('Analysis Error',
+                'An error occurred while attempting to analyze ' + this.
+                itemProxy.item.name + '.');
+              this.NavigationService.navigate('Explore', { id: params['id'] });
             });
+          } else {
+            this._dialogService.openInformationDialog('Invalid Reference',
+              'The Item indicated by the URL was not found.');
+            this.NavigationService.navigate('Explore', { id: '' });
           }
         }
       })

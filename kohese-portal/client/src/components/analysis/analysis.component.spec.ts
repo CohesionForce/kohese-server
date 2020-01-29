@@ -14,6 +14,8 @@ import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { AnalysisService } from '../../services/analysis/analysis.service';
 import { ActivatedRoute } from '@angular/router';
 import { MockAnalysisService } from '../../../mocks/services/MockAnalysisService';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 
@@ -33,6 +35,7 @@ describe('Component: Analysis', ()=>{
         {provide : NavigationService, useClass: MockNavigationService},
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: AnalysisService, useClass: MockAnalysisService},
+        { provide: DialogService, useClass: MockDialogService },
         {provide: ActivatedRoute, useValue:{
           params: from([{id: 1}]),
         }}
