@@ -1,21 +1,21 @@
 <div style="height: 100%; display: flex; flex-direction: row;">
-  <div [ngStyle]="{ 'flex': ((lostProjectItems.length > 0) ? '1 1 35%' :
-    '1 1 70%') }" style="height: 100%; padding: 15px; border: 1px solid rgb(68,
-    55, 55); border-radius: 5px;">
+  <div [ngStyle]="{ 'width': ((lostProjectItems.length > 0) ? '35%' : '70%') }"
+    style="height: 100%; padding: 15px; border: 1px solid rgb(68, 55, 55);
+    border-radius: 5px; display: flex; flex-direction: column;">
     <h4 style="position: sticky">Project Items:</h4>
     <tree-root [nodes]="projectItems" options="treeOptions" style="height:
-      calc(100% - 70px);">
+      calc(100% - 36px);">
       <ng-template #treeNodeTemplate let-node let-index="index">
         <td (click)="openProxyDetails(node.data)" matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
       </ng-template>
     </tree-root>
   </div>
-  <activity-feed [activityList]="activityList" style="height: 100%; flex:
-    1 1 30%;">
+  <activity-feed [activityList]="activityList" style="height: 100%; width:
+    30%;">
   </activity-feed>
   <ng-container *ngIf="(lostProjectItems.length > 0)">
     <div style="height: 100%; padding: 15px; border: 1px solid rgb(68, 55, 55);
-      border-radius: 5px; flex: 1 1 35%;">
+      border-radius: 5px; width: 35%;">
       <h4 style="position: sticky">Lost Items:</h4>
       <tree-root [nodes]="lostProjectItems" options="treeOptions">
          <ng-template #treeNodeTemplate let-node let-index="index">
