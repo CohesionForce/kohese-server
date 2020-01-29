@@ -191,6 +191,16 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this.rootMenuActions.unshift(produceReportAction);
     this.menuActions.unshift(produceReportAction);
     
+    let analyzeAction: Action = new Action('Analyze...', 'Analyze content ' +
+      'from this Item and its descendants', 'fa fa-search', (object: any) => {
+      return true;
+    }, (object: any) => {
+      this._navigationService.navigate('Analysis',
+        { id: (object as ItemProxy).item.id });
+    });
+    this.rootMenuActions.unshift(analyzeAction);
+    this.menuActions.unshift(analyzeAction);
+    
     let openAsDocumentAction: Action = new Action('Open As Document', 'Open ' +
       'this Item and its descendants as a document', 'fa fa-file-text-o',
       (object: any) => {

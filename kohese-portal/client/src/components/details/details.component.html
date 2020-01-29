@@ -35,14 +35,9 @@
         <!-- Nav tabs -->
         <mat-tab-group id="details-tabs">
             <mat-tab id="defaultTab" label="Document">
-               <button
-                      class= "btn btn-primary"
-                      (click)="navigate('Analysis',
-                                {id: itemProxy.item.id})">
-                      Analyze
-              </button>
-                <document-view [proxyStream]="proxyStream"
-                               [incrementalLoad]="true"></document-view>
+              <document-view [proxyStream]="proxyStream"
+                [incrementalLoad]="true">
+              </document-view>
             </mat-tab>
             <mat-tab label="{{((detailsFormGroup && detailsFormGroup.dirty) ?
               'Details*' : 'Details')}}">

@@ -15,7 +15,6 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
   @Input()
   projectStream: Observable<ProjectInfo>;
   projectStreamSub: Subscription;
-  project: ProjectInfo
 
   projectItems: Array<ItemProxy>;
   lostProjectItems : Array<ItemProxy>;
@@ -28,11 +27,8 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.projectStreamSub = this.projectStream.subscribe((newProject: ProjectInfo) => {
       if (newProject) {
-        // Reset bound table collections
-        this.projectItems = []
-        this.lostProjectItems = undefined;
-
-        this.project = newProject;
+        this.lostProjectItems = [];
+        
         this.projectItems = newProject.projectItems;
         if (newProject.lostProjectItems) {
           this.lostProjectItems = newProject.lostProjectItems;
