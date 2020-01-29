@@ -199,6 +199,7 @@ export class ImportComponent implements OnInit {
       }
     }
 
+    this._selectedFileMap.get(file).expanded = true;
     this._changeDetectorRef.markForCheck();
     return fileMapValue.preview;
   }
@@ -211,7 +212,7 @@ export class ImportComponent implements OnInit {
       disableClose: true
     }).updateSize('80%', '60%').afterClosed().subscribe((parameters: any) => {
       if (parameters) {
-        this.updatePreviews();
+        this.updateFile(file);
       }
     });
   }
@@ -251,26 +252,13 @@ export class ImportComponent implements OnInit {
     }
 
     fileMapValue.preview = '';
+    fileMapValue.expanded = false;
+    this._changeDetectorRef.markForCheck();
     this.retrieveImportPreview(file);
   }
 
   public removeFile(file: File): void {
     this._selectedFileMap.delete(file);
-    this._changeDetectorRef.markForCheck();
-  }
-
-  public updatePreviews(): void {
-    let selectedFileKeys: Array<File> = Array.from(this._selectedFileMap.
-      keys());
-    for (let j: number = 0; j < selectedFileKeys.length; j++) {
-      let fileMapValue: FileMapValue = this._selectedFileMap.get(
-        selectedFileKeys[j]);
-      if (fileMapValue.preview.length !== 0) {
-        fileMapValue.preview = '';
-        this.retrieveImportPreview(selectedFileKeys[j]);
-      }
-    }
-
     this._changeDetectorRef.markForCheck();
   }
 

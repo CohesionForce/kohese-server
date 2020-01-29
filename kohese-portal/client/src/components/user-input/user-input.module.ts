@@ -22,7 +22,7 @@ import { TreeModule } from 'angular-tree-component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/kd-proxy-selector.component';
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -50,8 +50,7 @@ import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform
     MarkdownModule.forChild(),
     TreeModule.forRoot(),
     PipesModule,
-    BrowserAnimationsModule,
-    NoopAnimationsModule
+    BrowserAnimationsModule
   ],
   exports: [
     KTextComponent,

@@ -4,3 +4,8 @@
   height: 300px;
   overflow: auto !important;
 }
+
+/deep/ .mat-expansion-panel-body {
+  height: 100%;
+  width: 100%;
+}

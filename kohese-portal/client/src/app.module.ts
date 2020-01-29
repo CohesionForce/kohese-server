@@ -24,7 +24,7 @@ import { AdminModule } from './components/admin/admin.module';
 import { CompareItemsModule } from './components/compare-items/compare-items.module';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExploreModule } from './components/explore/explore.module';
 import { ObjectEditorModule } from './components/object-editor/object-editor.module';
 import { NavigatorModule } from './components/navigator/navigator.module';
@@ -113,7 +113,6 @@ import { LensModule } from './components/lens/lens.module';
     LensModule,
     ReportGeneratorModule,
     ReportsModule,
-    NoopAnimationsModule,
     ImportModule,
     TextEditorModule,
     DocumentModule,

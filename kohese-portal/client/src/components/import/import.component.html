@@ -38,10 +38,8 @@
 <div style="height: 50%; width: 100%; overflow: auto;">
   <mat-accordion multi="true">
     <ng-container *ngFor="let file of Array.from(selectedFileMap.keys())">
-      <mat-expansion-panel [expanded]="selectedFileMap.get(file).expanded"
-        (opened)="retrieveImportPreview(file); selectedFileMap.get(file).
-        expanded = true" (closed)="selectedFileMap.get(file).expanded =
-        false;">
+      <mat-expansion-panel (opened)="retrieveImportPreview(file)"
+        (closed)="selectedFileMap.get(file).expanded = false;">
         <mat-expansion-panel-header>
           <mat-panel-title style="align-items: center;">
             {{file.name}}
@@ -65,7 +63,16 @@
           </span>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <markdown [data]="selectedFileMap.get(file).preview"></markdown>
+          <ng-container *ngIf="selectedFileMap.get(file).expanded else
+            retrievingPreview">
+            <markdown [data]="selectedFileMap.get(file).preview"></markdown>
+          </ng-container>
+          <ng-template #retrievingPreview>
+            <div style="height: 100%; width: 100%; display: flex;
+              justify-content: center; align-items: center;">
+              <mat-spinner mode="indeterminate"></mat-spinner>
+            </div>
+          </ng-template>
         </ng-template>
       </mat-expansion-panel>
     </ng-container>

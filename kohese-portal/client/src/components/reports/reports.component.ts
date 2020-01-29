@@ -6,6 +6,27 @@ import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
+class ReportPreview {
+  private _preview: string = '';
+  get preview() {
+    return this._preview;
+  }
+  set preview(preview: string) {
+    this._preview = preview;
+  }
+  
+  private _isExpanded: boolean = false;
+  get isExpanded() {
+    return this._isExpanded;
+  }
+  set isExpanded(isExpanded: boolean) {
+    this._isExpanded = isExpanded;
+  }
+  
+  public constructor() {
+  }
+}
+
 @Component({
   selector: 'reports',
   templateUrl: './reports.component.html',
@@ -14,7 +35,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 })
 
 export class ReportsComponent implements OnInit {
-  private _reports: Map<any, string> = new Map<any, string>();
+  private _reports: Map<any, ReportPreview> = new Map<any, ReportPreview>();
   get reports() {
     return this._reports;
   }
@@ -53,12 +74,14 @@ export class ReportsComponent implements OnInit {
   }
 
   public async retrieveSavedReportPreview(reportObject: any): Promise<void> {
-    if (this._reports.get(reportObject).length === 0) {
-      let reportPreview: string = await this._itemRepository.getReportPreview(
+    let reportPreview: ReportPreview = this._reports.get(reportObject);
+    if (reportPreview.preview.length === 0) {
+      reportPreview.preview = await this._itemRepository.getReportPreview(
         reportObject.name);
-      this._reports.set(reportObject, reportPreview);
-      this._changeDetectorRef.markForCheck();
     }
+    
+    reportPreview.isExpanded = true;
+    this._changeDetectorRef.markForCheck();
   }
 
   public async removeReport(reportName: string): Promise<void> {
@@ -76,7 +99,7 @@ export class ReportsComponent implements OnInit {
       Array<any>) => {
       this._reports.clear();
       for (let j: number = 0; j < reportObjects.length; j++) {
-        this._reports.set(reportObjects[j], '');
+        this._reports.set(reportObjects[j], new ReportPreview());
       }
 
       this._changeDetectorRef.markForCheck();

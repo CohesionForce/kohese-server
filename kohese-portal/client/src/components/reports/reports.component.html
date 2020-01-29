@@ -6,7 +6,8 @@
     <mat-accordion multi="true">
       <ng-container *ngFor="let reportObject of Array.from(reports.keys())">
         <mat-expansion-panel (opened)="retrieveSavedReportPreview(
-          reportObject)">
+          reportObject)" (closed)="reports.get(reportObject).isExpanded =
+          false;">
           <mat-expansion-panel-header>
             <mat-panel-title style="align-items: center;">
               {{reportObject.name}}
@@ -39,14 +40,23 @@
             </span>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
-            <ng-container *ngIf="reportObject.name.endsWith('.md') else
-              notMarkdownReport">
-              <pre
-                style="font-family: Roboto, 'Helvetica Neue', sans-serif;">{{reports.
-                get(reportObject)}}</pre>
+            <ng-container *ngIf="reports.get(reportObject).isExpanded else
+              retrievingPreview">
+              <ng-container *ngIf="reportObject.name.endsWith('.md') else
+                notMarkdownReport">
+                <pre style="font-family: Roboto, 'Helvetica Neue',
+                  sans-serif;">{{reports.get(reportObject).preview}}</pre>
+              </ng-container>
+              <ng-template #notMarkdownReport>
+                <markdown [data]="reports.get(reportObject).preview">
+                </markdown>
+              </ng-template>
             </ng-container>
-            <ng-template #notMarkdownReport>
-              <markdown [data]="reports.get(reportObject)"></markdown>
+            <ng-template #retrievingPreview>
+              <div style="height: 100%; width: 100%; display: flex;
+                justify-content: center; align-items: center;">
+                <mat-spinner mode="indeterminate"></mat-spinner>
+              </div>
             </ng-template>
           </ng-template>
         </mat-expansion-panel>

@@ -1,33 +1,43 @@
-<div style="height: 100%;" *ngIf="itemProxy && itemProxy.analysis">
-  <split direction="vertical">
-    <split-area [size]="50">
-      <split direction="horizontal">
-        <split-area [size]="50">
-          <term-view [proxyStream] = "proxyStream"
-                     [filterSubject] = "filterSubject"
-                     (filterUpdate)= "onFilter($event)"></term-view>
-        </split-area>
-        <split-area [size]="50">
-          <document-view
-            [proxyStream] = "proxyStream"
-            [filterSubject] = "filterSubject"
-            ></document-view>
-        </split-area>
-      </split>
-    </split-area>
-    <split-area [size]="50">
-      <split direction="horizontal">
-        <split-area [size]="50">
-          <phrase-view [proxyStream] = "proxyStream"
-                       [filterSubject] = "filterSubject"
-                       (filterUpdate)= "onFilter($event)"></phrase-view>
-        </split-area>
-        <split-area [size]="50">
-          <sentence-view [proxyStream] = "proxyStream"
-                         [filterSubject] = "filterSubject"
-                         (filterUpdate)= "onFilter($event)"></sentence-view>
-        </split-area>
-      </split>
-    </split-area>
-  </split>
-</div>
+<ng-container *ngIf="(itemProxy && itemProxy.analysis) else analyzing">
+  <div style="height: 100%;">
+    <split direction="vertical">
+      <split-area [size]="50">
+        <split direction="horizontal">
+          <split-area [size]="50">
+            <term-view [proxyStream]="proxyStream"
+              [filterSubject]="filterSubject" (filterUpdate)="onFilter(
+              $event)">
+            </term-view>
+          </split-area>
+          <split-area [size]="50">
+            <document-view [proxyStream]="proxyStream"
+              [filterSubject]="filterSubject">
+            </document-view>
+          </split-area>
+        </split>
+      </split-area>
+      <split-area [size]="50">
+        <split direction="horizontal">
+          <split-area [size]="50">
+            <phrase-view [proxyStream]="proxyStream"
+              [filterSubject]="filterSubject" (filterUpdate)="onFilter(
+              $event)">
+            </phrase-view>
+          </split-area>
+          <split-area [size]="50">
+            <sentence-view [proxyStream]="proxyStream"
+              [filterSubject]="filterSubject" (filterUpdate)="onFilter(
+              $event)">
+            </sentence-view>
+          </split-area>
+        </split>
+      </split-area>
+    </split>
+  </div>
+</ng-container>
+<ng-template #analyzing>
+  <div style="height: 100%; width: 100%; display: flex; justify-content:
+    center; align-items: center;">
+    <mat-spinner mode="indeterminate"></mat-spinner>
+  </div>
+</ng-template>
