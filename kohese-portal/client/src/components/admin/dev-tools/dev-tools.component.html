@@ -1,16 +1,31 @@
-<mat-tab-group>
-  <mat-tab label="Logging">
-    <mat-list style="height: 700px; overflow: auto; width: 50%">
-      <mat-list-item *ngFor="let logEvent of logRegistry" matTooltip="{{logEvent.definition.description}}" (click)="selectEvent(logEvent)">
-        {{logEvent.definition.name}}
-        <i *ngIf="logEvent.active" class="fa fa-check"></i>
-      </mat-list-item>
-    </mat-list>
-    <button mat-raised-button (click)="saveLogSelections()">
-      Save Log Selections
-    </button>
-  </mat-tab>
-  <mat-tab label="Feature switch">
-    Not yet implemented
-  </mat-tab>
-</mat-tab-group>
+<div style="height: 50px; display: flex; flex-direction: row;">
+  <button mat-icon-button matTooltip="Save settings"
+    class="flex-right-align" (click)="saveLogSelections()">
+    <mat-icon class="fa fa-save"></mat-icon>
+  </button>
+</div>
+<div style="height: calc(100% - 50px); overflow: auto;">
+  <mat-table [dataSource]="logRegistry">
+    <ng-container matColumnDef="Console Message">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-checkbox [ngModel]="areAllConsoleMessagesSelected()"
+          (ngModelChange)="toggleAllConsoleMessagesSelected($event)"
+          style="margin-right: 7px;">
+        </mat-checkbox>
+        <h3>
+          Console Messages
+        </h3>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <mat-checkbox [ngModel]="element.active" (ngModelChange)="element.
+          active = !element.active" [disabled]="isDisabled" style="padding:
+          7px;">
+          {{element.definition.name}}
+        </mat-checkbox>
+      </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="['Console Message']; sticky: true">
+    </mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['Console Message']"></mat-row>
+  </mat-table>
+</div>

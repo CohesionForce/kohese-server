@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MaterialModule } from '../../../material.module';
@@ -14,6 +15,7 @@ describe('DevToolsComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ DevToolsComponent ],
       imports: [
+        FormsModule,
         BrowserAnimationsModule,
         MaterialModule
       ],
