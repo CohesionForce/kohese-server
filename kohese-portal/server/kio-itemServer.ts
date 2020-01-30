@@ -858,11 +858,50 @@ function KIOItemServer(socket){
         
         if (request.format === 'application/vnd.openxmlformats-' +
           'officedocument.wordprocessingml.document') {
+          let intermediateFilePath: string = reportPath;
+          if (reportPath.endsWith('.docx')) {
+            intermediateFilePath = reportPath.substring(0, reportPath.length -
+              4) + 'odt';
+            await new Promise((resolve: () => void, reject: () => void) => {
+              fs.rename(reportPath, intermediateFilePath, (error: any) => {
+                if (error) {
+                  reject();
+                } else {
+                  resolve();
+                }
+              });
+            });
+          }
+          
           let sofficeProcess: any = child.spawn('soffice', ['--headless',
             '--convert-to', 'docx', '--outdir', _REPORTS_DIRECTORY_PATH,
-            reportPath], undefined);
+            intermediateFilePath], undefined);
           sofficeProcess.on('close', (exitCode: number) => {
-            sendResponse();
+            if (exitCode === 0) {
+              let convertedFilePath: string;
+              let lastPeriodIndex: number = intermediateFilePath.lastIndexOf(
+                '.');
+              if (lastPeriodIndex > -1) {
+                convertedFilePath = intermediateFilePath.substring(0,
+                  lastPeriodIndex + 1) + 'docx';
+              } else {
+                convertedFilePath = intermediateFilePath + '.docx';
+              }
+              
+              if (convertedFilePath === reportPath) {
+                sendResponse();
+              } else {
+                fs.rename(convertedFilePath, reportPath, (error: any) => {
+                  if (error) {
+                    sendResponse(undefined);
+                  } else {
+                    sendResponse();
+                  }
+                });
+              }
+            } else {
+              sendResponse(undefined);
+            }
           });
           sofficeProcess.on('error', (error: any) => {
             sendResponse(undefined);
