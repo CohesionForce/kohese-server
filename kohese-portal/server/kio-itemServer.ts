@@ -807,7 +807,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/generateReport', function(request, sendResponse) {
+  socket.on('Item/generateReport', async (request, sendResponse) => {
     let metaDataString: Array<string> = request.content.split('\n\n', 3);
     fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
       reportName), metaDataString.join('\n\n'), undefined);
@@ -815,29 +815,72 @@ function KIOItemServer(socket){
       fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.
         reportName), request.content, undefined);
     } else {
-      let format: string;
-      switch (request.format) {
-        case 'application/vnd.openxmlformats-officedocument.' +
-          'wordprocessingml.document':
-          format = 'docx';
-          break;
-        case 'application/vnd.oasis.opendocument.text':
-          format = 'odt';
-          break;
-        default:
-          format = 'html5';
-      }
-
-      let pandocProcess: any = child.spawnSync('pandoc', ['-f', 'commonmark',
-        '-t', format, '-s', '-o', Path.resolve(_REPORTS_DIRECTORY_PATH, request.
-        reportName)], { input: request.content });
-
-      if (pandocProcess.stdout) {
-        console.log(pandocProcess.stdout);
+      let pandocProcess: any = child.spawn('pandoc', ['-f', 'commonmark',
+        '-t', 'html', '-s'], undefined);
+      pandocProcess.stdin.write(request.content);
+      pandocProcess.stdin.end();
+      let reportContent: string = await new Promise<string>((resolve: (output:
+        string) => void, reject: () => void) => {
+        let output: string = '';
+        pandocProcess.stdout.on('data', (data: string) => {
+          output += data;
+        });
+        pandocProcess.on('close', (exitCode: number) => {
+          resolve(output);
+        });
+        pandocProcess.on('error', (error: any) => {
+          sendResponse(undefined);
+        });
+      });
+      
+      let reportPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH, request.
+        reportName);
+      if ((request.format === 'application/vnd.oasis.opendocument.' +
+        'text') || (request.format === 'application/vnd.openxmlformats-' +
+        'officedocument.wordprocessingml.document')) {
+        pandocProcess = child.spawn('pandoc', ['-f', 'html', '-t', 'odt',
+          '-s', '-o', reportPath], undefined);
+        pandocProcess.stdin.write(reportContent);
+        pandocProcess.stdin.end();
+        await new Promise<string>((resolve: () => void, reject:
+          () => void) => {
+          let output: string = '';
+          pandocProcess.stdout.on('data', (data: string) => {
+            output += data;
+          });
+          pandocProcess.on('close', (exitCode: number) => {
+            resolve();
+          });
+          pandocProcess.on('error', (error: any) => {
+            sendResponse(undefined);
+          });
+        });
+        
+        if (request.format === 'application/vnd.openxmlformats-' +
+          'officedocument.wordprocessingml.document') {
+          let sofficeProcess: any = child.spawn('soffice', ['--headless',
+            '--convert-to', 'docx', '--outdir', _REPORTS_DIRECTORY_PATH,
+            reportPath], undefined);
+          sofficeProcess.on('close', (exitCode: number) => {
+            sendResponse();
+          });
+          sofficeProcess.on('error', (error: any) => {
+            sendResponse(undefined);
+          });
+        } else {
+          sendResponse();
+        }
+      } else {
+        fs.writeFile(reportPath, reportContent, 'utf8', (error: any) => {
+          if (error) {
+            console.log(error);
+            sendResponse(error);
+          } else {
+            sendResponse();
+          }
+        });
       }
     }
-
-    sendResponse();
   });
 
 
