@@ -862,7 +862,8 @@ function KIOItemServer(socket){
           if (reportPath.endsWith('.docx')) {
             intermediateFilePath = reportPath.substring(0, reportPath.length -
               4) + 'odt';
-            await new Promise((resolve: () => void, reject: () => void) => {
+            await new Promise<void>((resolve: () => void, reject:
+              () => void) => {
               fs.rename(reportPath, intermediateFilePath, (error: any) => {
                 if (error) {
                   reject();
@@ -876,7 +877,17 @@ function KIOItemServer(socket){
           let sofficeProcess: any = child.spawn('soffice', ['--headless',
             '--convert-to', 'docx', '--outdir', _REPORTS_DIRECTORY_PATH,
             intermediateFilePath], undefined);
-          sofficeProcess.on('close', (exitCode: number) => {
+          sofficeProcess.on('close', async (exitCode: number) => {
+            await new Promise<void>((resolve: () => void, reject:
+              () => void) => {
+              fs.unlink(intermediateFilePath, (error: any) => {
+                if (error) {
+                  reject();
+                } else {
+                  resolve();
+                }
+              });
+            });
             if (exitCode === 0) {
               let convertedFilePath: string;
               let lastPeriodIndex: number = intermediateFilePath.lastIndexOf(
