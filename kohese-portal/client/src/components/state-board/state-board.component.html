@@ -1,0 +1,59 @@
+<div style="height: 50px; display: flex; flex-direction: row;">
+  <mat-form-field style="width: 70%;">
+    <mat-select placeholder="Kind" [(ngModel)]="selectedKind">
+      <ng-container *ngFor="let kind of getBoardKinds()">
+        <mat-option [value]="kind">
+          {{kind.name}}
+        </mat-option>
+      </ng-container>
+    </mat-select>
+  </mat-form-field>
+  <button mat-icon-button matTooltip="Save the selected Project"
+    style="margin-left: auto;" (click)="save()">
+    <mat-icon class="fa fa-save"></mat-icon>
+  </button>
+</div>
+<div style="height: calc(100% - 50px); overflow-x: auto; display: flex;
+  flex-direction: row;">
+  <ng-container *ngFor="let stateName of getStates()">
+    <div (dragover)="$event.preventDefault()" (drop)="$event.preventDefault();
+      cardDropped($event.dataTransfer.getData('id'), stateName)" style="height:
+      100%; width: 400px; min-width: 400px; margin: 0px 7px 0px 7px; display:
+      flex; flex-direction: column;">
+      <div style="height: 50px;">
+        <h3>
+          {{stateName}}
+        </h3>
+      </div>
+      <div style="height: calc(100% - 50px); overflow: auto; display: flex;
+        flex-direction: column;">
+        <ng-container *ngFor="let item of getStateItems(stateName)">
+          <mat-card draggable="true" (dragstart)="$event.dataTransfer.setData(
+            'id', item.id)" [ngStyle]="{ 'background-color': viewModel.color }"
+            style="color: whitesmoke; margin-bottom: 3px;">
+            <mat-card-title style="display: flex; flex-direction: row;">
+              <h3 matTooltip="{{item.name}}" style="white-space: nowrap;
+                overflow: hidden; text-overflow: ellipsis;">
+                <mat-icon class="{{viewModel.icon}}">
+                </mat-icon>
+                {{item.name}}
+              </h3>
+              <button mat-icon-button matTooltip="Display Item information"
+                style="margin-left: auto;" (click)="displayInformation(item)">
+                <mat-icon class="fa fa-search"></mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Navigate to this Item"
+                (click)="navigate(item)">
+                <mat-icon class="fa fa-arrow-right"></mat-icon>
+              </button>
+            </mat-card-title>
+            <mat-card-content style="overflow: hidden; display: -webkit-box;
+              -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+              {{item.description}}
+            </mat-card-content>
+          </mat-card>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+</div>

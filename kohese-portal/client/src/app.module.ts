@@ -48,6 +48,7 @@ import { EditorModule } from '@tinymce/tinymce-angular';
 import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
 import { LensModule } from './components/lens/lens.module';
+import { StateBoardModule } from './components/state-board/state-board.module';
 
 @NgModule({
   declarations: [
@@ -116,7 +117,8 @@ import { LensModule } from './components/lens/lens.module';
     ImportModule,
     TextEditorModule,
     DocumentModule,
-    CopyModule
+    CopyModule,
+    StateBoardModule
   ],
   bootstrap: [AppComponent]
 })
