@@ -62,6 +62,8 @@ export class AnalysisService {
         console.log('::: Retrieving analysis for ' + forProxy.item.id + ' - ' + forProxy.item.name);
         this.performAnalysis(forProxy).then(function (results) {
           resolve(results);
+        }).catch((error: any) => {
+          reject(error);
         });
       }
     });
