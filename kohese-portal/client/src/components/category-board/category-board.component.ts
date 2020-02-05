@@ -14,12 +14,12 @@ interface StateItems {
 }
 
 @Component({
-  selector: 'state-board',
-  templateUrl: './state-board.component.html',
-  styleUrls: ['./state-board.component.scss'],
+  selector: 'category-board',
+  templateUrl: './category-board.component.html',
+  styleUrls: ['./category-board.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StateBoardComponent {
+export class CategoryBoardComponent {
   private _project: any;
   get project() {
     return this._project;

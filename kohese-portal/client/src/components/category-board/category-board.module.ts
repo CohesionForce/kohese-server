@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { MatSelectModule, MatCardModule, MatButtonModule, MatIconModule,
   MatTooltipModule } from '@angular/material';
 
-import { StateBoardComponent } from './state-board.component';
+import { CategoryBoardComponent } from './category-board.component';
 import { DetailsModule } from '../details/details.module';
 
 @NgModule({
-  declarations: [StateBoardComponent],
+  declarations: [CategoryBoardComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -19,9 +19,9 @@ import { DetailsModule } from '../details/details.module';
     MatTooltipModule,
     DetailsModule
   ],
-  exports: [StateBoardComponent]
+  exports: [CategoryBoardComponent]
 })
-export class StateBoardModule {
+export class CategoryBoardModule {
   public constructor() {
   }
 }
