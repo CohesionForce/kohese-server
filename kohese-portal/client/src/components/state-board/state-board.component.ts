@@ -8,6 +8,11 @@ import { DetailsDialogComponent } from '../details/details-dialog/details-dialog
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
+interface StateItems {
+  stateName: string,
+  items: Array<any>
+}
+
 @Component({
   selector: 'state-board',
   templateUrl: './state-board.component.html',
@@ -40,6 +45,10 @@ export class StateBoardComponent {
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
+  }
+  
+  get changeDetectorRef() {
+    return this._changeDetectorRef;
   }
   
   get Object() {
@@ -80,46 +89,48 @@ export class StateBoardComponent {
     this._itemRepository.upsertItem('Project', this._project);
   }
   
-  public getStates(): Array<any> {
+  public getStateItems(): Array<StateItems> {
+    let stateItems: Array<StateItems> = [];
     for (let attributeName in this._selectedKind.properties) {
       if (this._selectedKind.properties[attributeName].type ===
         'StateMachine') {
-        return Object.keys(this._selectedKind.properties[attributeName].
-          properties.state);
-      }
-    }
-    
-    return [];
-  }
-  
-  public getStateItems(stateName: string): Array<any> {
-    let items: Array<any> = [];
-    let stateAttributeName: string;
-    for (let attributeName in this._selectedKind.properties) {
-      if (this._selectedKind.properties[attributeName].type ===
-        'StateMachine') {
-        stateAttributeName = attributeName;
+        for (let stateName in this._selectedKind.properties[attributeName].
+          properties.state) {
+          let stateEntry: StateItems = {
+            stateName: stateName,
+            items: []
+          };
+          stateItems.push(stateEntry);
+          
+          for (let j: number = 0; j < this._project.projectItems.length; j++) {
+            TreeConfiguration.getWorkingTree().getProxyFor(this._project.
+              projectItems[j].id).visitTree({ includeOrigin: true },
+              (itemProxy: ItemProxy) => {
+              if ((itemProxy.model.item === this._selectedKind) && (itemProxy.
+                item[attributeName] === stateName)) {
+                stateEntry.items.push(itemProxy.item);
+              }
+            }, undefined);
+          }
+        }
+        
         break;
       }
     }
     
-    for (let j: number = 0; j < this._project.projectItems.length; j++) {
-      TreeConfiguration.getWorkingTree().getProxyFor(this._project.
-        projectItems[j].id).visitTree({ includeOrigin: true }, (itemProxy:
-        ItemProxy) => {
-        if ((itemProxy.model.item === this._selectedKind) && (itemProxy.item[
-          stateAttributeName] === stateName)) {
-          items.push(itemProxy.item);
-        }
-      }, undefined);
-    }
-    
-    return items;
+    return stateItems;
+  }
+  
+  public getStateItemsIdentifier(index: number, element: any): string {
+    let stateItems: StateItems = (element as StateItems);
+    return stateItems.stateName + stateItems.items.map((item: any) => {
+      return item.id;
+    }).join('');
   }
   
   public cardDropped(droppedId: string, targetStateName: string): void {
-    let item: any = TreeConfiguration.getWorkingTree().getProxyFor(droppedId).
-      item;
+    let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      droppedId);
     let stateAttributeName: string;
     for (let attributeName in this._selectedKind.properties) {
       if (this._selectedKind.properties[attributeName].type ===
@@ -129,11 +140,8 @@ export class StateBoardComponent {
       }
     }
     
-    item[stateAttributeName] = targetStateName;
-    this._itemRepository.upsertItem(TreeConfiguration.getWorkingTree().
-      getProxyFor(item.id).kind, item);
-    
-    this._changeDetectorRef.markForCheck();
+    itemProxy.item[stateAttributeName] = targetStateName;
+    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
   }
   
   public displayInformation(item: any): void {
