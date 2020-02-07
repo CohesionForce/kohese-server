@@ -1,9 +1,19 @@
 <div style="height: 50px; display: flex; flex-direction: row;">
-  <mat-form-field style="width: 80%;">
+  <mat-form-field style="width: 40%; padding: 0px 3px 0px 3px;">
     <mat-select placeholder="Kind" [(ngModel)]="selectedKind">
       <ng-container *ngFor="let kind of getBoardKinds()">
         <mat-option [value]="kind">
           {{kind.name}}
+        </mat-option>
+      </ng-container>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field style="width: 40%; padding: 0px 3px 0px 3px;">
+    <mat-select placeholder="Attribute" [(ngModel)]="selectedAttribute">
+      <ng-container *ngFor="let classPropertiesAttribute of Object.values(
+        selectedKind.classProperties)">
+        <mat-option [value]="classPropertiesAttribute.definition">
+          {{classPropertiesAttribute.definition.name}}
         </mat-option>
       </ng-container>
     </mat-select>
@@ -15,23 +25,30 @@
 </div>
 <div style="height: calc(100% - 50px); overflow-x: auto; display: flex;
   flex-direction: row;">
-  <ng-container *ngFor="let stateItems of getStateItems(); trackBy:
-    getStateItemsIdentifier">
+  <ng-container *ngFor="let categoryItems of getCategoryItems(); trackBy:
+    getCategoryItemsIdentifier">
     <div (dragover)="$event.preventDefault(); changeDetectorRef.detach()"
       (drop)="$event.preventDefault(); cardDropped($event.dataTransfer.getData(
-      'id'), stateItems.stateName)" style="height: 100%; width: 400px;
+      'id'), categoryItems.category)" style="height: 100%; width: 400px;
       min-width: 400px; margin: 0px 7px 0px 7px; display: flex; flex-direction:
       column;">
       <div style="height: 50px;">
-        <h3>
-          {{stateItems.stateName}} ({{stateItems.items.length}})
+        <h3 matTooltip="{{getCategoryHeading(categoryItems)}}" style="display:
+          flex; flex-direction: row;">
+          <span style="width: 80%; white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis;">
+            {{getCategoryHeading(categoryItems)}}
+          </span>
+          <span style="margin-left: auto;">
+            ({{categoryItems.items.length}})
+          </span>
         </h3>
       </div>
       <div style="height: calc(100% - 50px); overflow: auto; display: flex;
         flex-direction: column;">
-        <ng-container *ngFor="let item of stateItems.items">
-          <mat-card draggable="true" (dragstart)="$event.dataTransfer.
-            setData('id', item.id)" (dragend)="changeDetectorRef.reattach();
+        <ng-container *ngFor="let item of categoryItems.items">
+          <mat-card draggable="mayDrag()" (dragstart)="$event.dataTransfer.
+            setData('s', item.id)" (dragend)="changeDetectorRef.reattach();
             changeDetectorRef.markForCheck()" [ngStyle]="{ 'background-color':
             viewModel.color }" style="flex: 0 0 170px; color: whitesmoke;
             margin-bottom: 3px;">

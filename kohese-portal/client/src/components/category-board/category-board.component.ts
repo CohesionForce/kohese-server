@@ -8,8 +8,8 @@ import { DetailsDialogComponent } from '../details/details-dialog/details-dialog
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
-interface StateItems {
-  stateName: string,
+interface CategoryItems {
+  category: string,
   items: Array<any>
 }
 
@@ -36,10 +36,24 @@ export class CategoryBoardComponent {
   }
   set selectedKind(selectedKind: any) {
     this._selectedKind = selectedKind;
+    for (let attributeName in this._selectedKind.classProperties) {
+      this._selectedKind.classProperties[attributeName].definition.name =
+        attributeName;
+    }
+    this._selectedAttribute = (<any> Object.values(this._selectedKind.
+      classProperties)[0]).definition;
     this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
       this._selectedKind.name.toLowerCase()).item;
     
     this._changeDetectorRef.markForCheck();
+  }
+  
+  private _selectedAttribute: any;
+  get selectedAttribute() {
+    return this._selectedAttribute;
+  }
+  set selectedAttribute(selectedAttribute: any) {
+    this._selectedAttribute = selectedAttribute;
   }
   
   private _viewModel: any;
@@ -68,12 +82,7 @@ export class CategoryBoardComponent {
         ItemProxy) => {
         let kind: any = itemProxy.model.item;
         if (kinds.indexOf(kind) === -1) {
-          for (let attributeName in kind.properties) {
-            if (kind.properties[attributeName].type === 'StateMachine') {
-              kinds.push(kind);
-              break;
-            }
-          }
+          kinds.push(kind);
         }
       }, undefined);
     }
@@ -89,58 +98,134 @@ export class CategoryBoardComponent {
     this._itemRepository.upsertItem('Project', this._project);
   }
   
-  public getStateItems(): Array<StateItems> {
-    let stateItems: Array<StateItems> = [];
-    for (let attributeName in this._selectedKind.properties) {
-      if (this._selectedKind.properties[attributeName].type ===
-        'StateMachine') {
-        for (let stateName in this._selectedKind.properties[attributeName].
-          properties.state) {
-          let stateEntry: StateItems = {
-            stateName: stateName,
+  public getCategoryItems(): Array<CategoryItems> {
+    let categoryItems: { [key: string]: CategoryItems } = {};
+    let attributeType: string = (Array.isArray(this._selectedAttribute.type) ?
+      this._selectedAttribute.type[0] : this._selectedAttribute.type)
+    if ((attributeType === 'StateMachine') || ((attributeType === 'string') &&
+      this._selectedAttribute.relation && (this._selectedAttribute.relation.
+      kind === 'KoheseUser'))) {
+      if (attributeType === 'StateMachine') {
+        for (let stateName in this._selectedAttribute.properties.state) {
+          let categoryEntry: CategoryItems = {
+            category: stateName,
             items: []
           };
-          stateItems.push(stateEntry);
-          
-          for (let j: number = 0; j < this._project.projectItems.length; j++) {
-            TreeConfiguration.getWorkingTree().getProxyFor(this._project.
-              projectItems[j].id).visitTree({ includeOrigin: true },
-              (itemProxy: ItemProxy) => {
-              if ((itemProxy.model.item === this._selectedKind) && (itemProxy.
-                item[attributeName] === stateName)) {
-                stateEntry.items.push(itemProxy.item);
-              }
-            }, undefined);
-          }
+          categoryItems[stateName] = categoryEntry;
         }
+      } else {
+        let userItems: Array<any> = [];
+        TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+          { includeOrigin: false }, (itemProxy: ItemProxy) => {
+          if (itemProxy.kind === 'KoheseUser') {
+            userItems.push(itemProxy.item);
+          }
+        }, undefined);
         
-        break;
+        userItems.sort((oneItem: any, anotherItem: any) => {
+          return oneItem.name.localeCompare(anotherItem.name);
+        });
+        
+        for (let j: number = 0; j < userItems.length; j++) {
+          categoryItems[userItems[j].name] = {
+            category: userItems[j].name,
+            items: []
+          };
+        }
+      }
+      
+      for (let j: number = 0; j < this._project.projectItems.length; j++) {
+        TreeConfiguration.getWorkingTree().getProxyFor(this._project.
+          projectItems[j].id).visitTree({ includeOrigin: true },
+          (itemProxy: ItemProxy) => {
+          if ((itemProxy.model.item === this._selectedKind) && (itemProxy.item[
+            this._selectedAttribute.name])) {
+            let categoryEntry: CategoryItems = categoryItems[itemProxy.item[
+              this._selectedAttribute.name]];
+            categoryEntry.items.push(itemProxy.item);
+          }
+        }, undefined);
+      }
+    } else {
+      for (let j: number = 0; j < this._project.projectItems.length; j++) {
+        TreeConfiguration.getWorkingTree().getProxyFor(this._project.
+          projectItems[j].id).visitTree({ includeOrigin: true },
+          (itemProxy: ItemProxy) => {
+          if ((itemProxy.model.item === this._selectedKind) && (itemProxy.
+            item[this._selectedAttribute.name])) {
+            let attributeAsString: string;
+            let attributeValue: any = itemProxy.item[this._selectedAttribute.
+              name];
+            if (typeof attributeValue === 'object') {
+              attributeAsString = JSON.stringify(attributeValue);
+            } else {
+              attributeAsString = String(attributeValue);
+            }
+            let categoryEntry: CategoryItems = categoryItems[attributeAsString];
+            if (!categoryEntry) {
+              categoryEntry = {
+                category: attributeAsString,
+                items: []
+              };
+              categoryItems[attributeAsString] = categoryEntry;
+            }
+            
+            categoryEntry.items.push(itemProxy.item);
+          }
+        }, undefined);
       }
     }
-    
-    return stateItems;
+      
+    return Object.values(categoryItems);
   }
   
-  public getStateItemsIdentifier(index: number, element: any): string {
-    let stateItems: StateItems = (element as StateItems);
-    return stateItems.stateName + stateItems.items.map((item: any) => {
+  public getCategoryItemsIdentifier(index: number, element: any): string {
+    let categoryItems: CategoryItems = (element as CategoryItems);
+    return categoryItems.category + categoryItems.items.map((item: any) => {
       return item.id;
     }).join('');
   }
   
-  public cardDropped(droppedId: string, targetStateName: string): void {
-    let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      droppedId);
-    let stateAttributeName: string;
-    for (let attributeName in this._selectedKind.properties) {
-      if (this._selectedKind.properties[attributeName].type ===
-        'StateMachine') {
-        stateAttributeName = attributeName;
-        break;
+  public getCategoryHeading(categoryItems: CategoryItems): string {
+    if (this._selectedAttribute.relation && (this._selectedAttribute.relation.
+      kind !== 'KoheseUser')) {
+      if (Array.isArray(this._selectedAttribute.type)) {
+        return (JSON.parse(categoryItems.category) as Array<any>).map(
+          (reference: { id: string }) => {
+          if (TreeConfiguration.getWorkingTree().getProxyFor(this.
+            _selectedAttribute.type[0])) {
+            return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
+              item.name;
+          } else {
+            return JSON.stringify(reference);
+          }
+        }).join(', ');
+      } else {
+        if (TreeConfiguration.getWorkingTree().getProxyFor(this.
+          _selectedAttribute.type)) {
+          return TreeConfiguration.getWorkingTree().getProxyFor(JSON.parse(
+            categoryItems.category).id).item.name;
+        } else {
+          return categoryItems.category;
+        }
       }
+    } else {
+      return categoryItems.category;
     }
-    
-    itemProxy.item[stateAttributeName] = targetStateName;
+  }
+  
+  public mayDrag(): boolean {
+    let attributeType: string = (Array.isArray(this._selectedAttribute.type) ?
+      this._selectedAttribute.type[0] : this._selectedAttribute.type);
+    return ((attributeType === 'StateMachine') || ((attributeType === 'string')
+      && this._selectedAttribute.relation && (this._selectedAttribute.relation.
+      kind === 'KoheseUser')));
+  }
+  
+  public cardDropped(id: string, targetCategory: string): void {
+    let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+      id);
+    itemProxy.item[this._selectedAttribute.name] = targetCategory;
     this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
   }
   
