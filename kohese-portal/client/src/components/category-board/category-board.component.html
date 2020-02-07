@@ -48,7 +48,7 @@
         flex-direction: column;">
         <ng-container *ngFor="let item of categoryItems.items">
           <mat-card draggable="mayDrag()" (dragstart)="$event.dataTransfer.
-            setData('s', item.id)" (dragend)="changeDetectorRef.reattach();
+            setData('id', item.id)" (dragend)="changeDetectorRef.reattach();
             changeDetectorRef.markForCheck()" [ngStyle]="{ 'background-color':
             viewModel.color }" style="flex: 0 0 170px; color: whitesmoke;
             margin-bottom: 3px;">
