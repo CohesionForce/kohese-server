@@ -222,6 +222,30 @@ export class CategoryBoardComponent {
       kind === 'KoheseUser')));
   }
   
+  public draggedOver(dragOverEvent: any, categoryItems: CategoryItems): void {
+    let mayDrop: boolean = false;
+    let currentState: string = dragOverEvent.dataTransfer.types[0];
+    if ((Array.isArray(this._selectedAttribute.type) ? this._selectedAttribute.
+      type[0] : this._selectedAttribute.type) === 'StateMachine') {
+      for (let transitionName in this._selectedAttribute.properties.transition) {
+        let transition: any = this._selectedAttribute.properties.transition[
+          transitionName];
+        if ((transition.source.toLowerCase() === currentState) && (transition.
+          target === categoryItems.category)) {
+          mayDrop = true;
+          break;
+        }
+      }
+    } else {
+      mayDrop = true;
+    }
+    
+    if (mayDrop) {
+      dragOverEvent.preventDefault();
+      dragOverEvent.currentTarget.style.border = 'dashed';
+    }
+  }
+  
   public cardDropped(id: string, targetCategory: string): void {
     let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       id);

@@ -27,11 +27,11 @@
   flex-direction: row;">
   <ng-container *ngFor="let categoryItems of getCategoryItems(); trackBy:
     getCategoryItemsIdentifier">
-    <div (dragover)="$event.preventDefault(); changeDetectorRef.detach()"
-      (drop)="$event.preventDefault(); cardDropped($event.dataTransfer.getData(
-      'id'), categoryItems.category)" style="height: 100%; width: 400px;
-      min-width: 400px; margin: 0px 7px 0px 7px; display: flex; flex-direction:
-      column;">
+    <div (dragover)="draggedOver($event, categoryItems)" (dragleave)="$event.
+      currentTarget.style.border = ''" (drop)="$event.preventDefault();
+      cardDropped($event.dataTransfer.getData($event.dataTransfer.types[0]),
+      categoryItems.category)" style="height: 100%; width: 400px; min-width:
+      400px; margin: 0px 7px 0px 7px; display: flex; flex-direction: column;">
       <div style="height: 50px;">
         <h3 matTooltip="{{getCategoryHeading(categoryItems)}}" style="display:
           flex; flex-direction: row;">
@@ -47,8 +47,10 @@
       <div style="height: calc(100% - 50px); overflow: auto; display: flex;
         flex-direction: column;">
         <ng-container *ngFor="let item of categoryItems.items">
-          <mat-card draggable="mayDrag()" (dragstart)="$event.dataTransfer.
-            setData('id', item.id)" (dragend)="changeDetectorRef.reattach();
+          <mat-card draggable="{{mayDrag(item)}}" (dragstart)="$event.
+            dataTransfer.setData(item[selectedAttribute.name], item.id);
+            $event.dataTransfer.dropEffect = 'move'; changeDetectorRef.
+            detach()" (dragend)="changeDetectorRef.reattach();
             changeDetectorRef.markForCheck()" [ngStyle]="{ 'background-color':
             viewModel.color }" style="flex: 0 0 170px; color: whitesmoke;
             margin-bottom: 3px;">
