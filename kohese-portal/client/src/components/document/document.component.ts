@@ -462,8 +462,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             includeDescendantsArray.splice(elementIndex, 1);
           }
         })]
-      },
-      disableClose: true
+      }
     }).updateSize('80%', '80%').afterClosed().subscribe((selection:
       Array<any>) => {
       if (selection) {
@@ -525,8 +524,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     this._dialogService.openComponentDialog(CopyComponent, {
       data: {
         allowDocumentAdditionSpecification: true
-      },
-      disableClose: true
+      }
     }).updateSize('40%', '40%').afterClosed().subscribe(
       async (copySpecifications: CopySpecifications) => {
       if (copySpecifications) {
@@ -665,8 +663,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             }
           });
         }
-      },
-      disableClose: true
+      }
     }).updateSize('80%', '80%').afterClosed().subscribe((selection:
       Array<any>) => {
       if (selection) {
@@ -1116,8 +1113,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     } else {
       this._dialogService.openComponentDialog(AttributeInsertionComponent, {
-        data: {},
-        disableClose: true
+        data: {}
       }).updateSize('90%', '90%').afterClosed().subscribe(
         (attributeInsertionSpecification: AttributeInsertionSpecification) => {
         if (attributeInsertionSpecification) {
@@ -1295,8 +1291,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
           content = content.substring(0, content.length - 2);
           return content;
         }
-      },
-      disableClose: true
+      }
     }).updateSize('40%', '40%');
   }
   
@@ -1353,8 +1348,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       this._dialogService.openComponentDialog(MergeComponent, {
         data: {
           differences: differences
-        },
-        disableClose: true
+        }
       }).updateSize('90%', '90%').afterClosed().subscribe((differences:
         Array<Difference>) => {
         if (differences) {

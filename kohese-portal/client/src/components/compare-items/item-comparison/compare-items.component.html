@@ -59,15 +59,15 @@
     Show Differences Only
   </mat-checkbox>
 </div>
-<div style="height: calc(100% - 154px); width: 100%;">
+<div style="height: calc(100% - 130px); width: 100%;">
   <comparison [comparison]="comparison"
     [showDifferencesOnlySubject]="showDifferencesOnlySubject">
   </comparison>
 </div>
 <ng-container *ngIf="dialogParameters">
-  <mat-dialog-actions style="height: 64px; width: 100%; display: flex;
+  <mat-dialog-actions style="height: 40px; width: 100%; display: flex;
     flex-direction: row;">
-    <button mat-raised-button [mat-dialog-close]="0" class="flex-right-align">
+    <button mat-button [mat-dialog-close]="0" class="flex-right-align">
       Close
     </button>
   </mat-dialog-actions>

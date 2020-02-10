@@ -7,7 +7,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'proxy-selector-dialog',
-  templateUrl : './proxy-selector-dialog.component.html'
+  templateUrl : './proxy-selector-dialog.component.html',
+  styleUrls: ['./proxy-selector-dialog.component.scss']
 })
 export class ProxySelectorDialogComponent implements OnInit, OnDestroy {
   /* Data */

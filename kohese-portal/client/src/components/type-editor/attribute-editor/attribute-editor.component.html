@@ -1,4 +1,5 @@
-<div style="width: 100%;" [ngStyle]="{ 'height': data ? '90%' : '100%' }">
+<div style="width: 100%;" [ngStyle]="{ 'height': data ? 'calc(100% - 40px)' :
+  '100%' }">
   <mat-form-field style="width: 100%; padding: 3px 3px;">
     <input matInput type="text" placeholder="Name"
       [(ngModel)]="attributeName"/>
@@ -81,15 +82,14 @@
   </div>
 </div>
 <ng-container *ngIf="data">
-  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
-    flex-direction: column;">
-    <span class="flex-right-align">
-      <button mat-raised-button [disabled]="!editable" (click)="close(true)">
-        Accept
-      </button>
-      <button mat-raised-button (click)="close(false)">
-        Cancel
-      </button>
-    </span>
+  <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
+    row;">
+    <button mat-button [disabled]="!editable" class="flex-right-align"
+      (click)="close(true)">
+      Accept
+    </button>
+    <button mat-button (click)="close(false)">
+      Cancel
+    </button>
   </mat-dialog-actions>
 </ng-container>

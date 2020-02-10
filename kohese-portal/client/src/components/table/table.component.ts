@@ -201,8 +201,7 @@ export class TableComponent implements OnInit {
             }
           });
         }
-      },
-      disableClose: true
+      }
     }).updateSize('80%', '80%').afterClosed().subscribe((selection:
       Array<any>) => {
       if (selection) {

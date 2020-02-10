@@ -22,17 +22,15 @@
     </mat-select>
   </mat-form-field>
   <br/>
-  <div style="height: 69%; width: 100%;">
+  <div style="height: calc(79% - 40px); width: 100%;">
     <change-summary [comparisonsSubject]="comparisonsSubject"></change-summary>
   </div>
   <ng-container *ngIf="data">
-    <mat-dialog-actions
-      style="height: 10%; width: 100%; display: flex; flex-direction: column;">
-      <span class="flex-right-align">
-        <button mat-raised-button [mat-dialog-close]="">
-          Close
-        </button>
-      </span>
+    <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
+      row;">
+      <button mat-button class="flex-right-align" [mat-dialog-close]="">
+        Close
+      </button>
     </mat-dialog-actions>
   </ng-container>
 </div>

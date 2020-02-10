@@ -184,8 +184,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             
             return initialContent;
           }
-        },
-        disableClose: true
+        }
       }).updateSize('40%', '40%');
     });
     this.rootMenuActions.unshift(produceReportAction);
@@ -220,8 +219,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this._dialogService.openComponentDialog(ImportComponent, {
         data: {
           parentId: (object as ItemProxy).item.id
-        },
-        disableClose: true
+        }
       }).updateSize('90%', '90%');
     });
     this.rootMenuActions.unshift(importAction);
@@ -235,8 +233,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this._dialogService.openComponentDialog(CreateWizardComponent, {
         data: {
           parentId: (object as ItemProxy).item.id
-        },
-        disableClose: true
+        }
       }).updateSize('90%', '90%');
     });
     this.rootMenuActions.unshift(addChildAction);

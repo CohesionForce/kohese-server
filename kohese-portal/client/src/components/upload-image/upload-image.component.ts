@@ -11,6 +11,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 // tslint:disable-next-line: component-selector
   selector: 'upload-image',
   templateUrl: './upload-image.component.html',
+  styleUrls: ['./upload-image.component.scss']
 })
 
 export class UploadImageComponent {

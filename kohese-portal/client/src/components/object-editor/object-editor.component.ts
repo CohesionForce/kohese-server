@@ -175,8 +175,7 @@ export class ObjectEditorComponent implements OnInit {
         object: ((!value || isLocalTypeInstance) ? value : TreeConfiguration.
           getWorkingTree().getProxyFor(value.id).item),
         type: type
-      },
-      disableClose: true
+      }
     }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
       any) => {
       if (returnedObject) {
@@ -339,8 +338,7 @@ export class ObjectEditorComponent implements OnInit {
               object: ((!value || isLocalTypeInstance) ? value :
                 TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
               type: type
-            },
-            disableClose: true
+            }
           }).updateSize('80%', '80%').afterClosed().subscribe((returnedObject:
             any) => {
             if (returnedObject) {

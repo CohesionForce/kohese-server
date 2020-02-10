@@ -223,8 +223,7 @@ export class FormatObjectEditorComponent implements OnInit {
         object: (value ? TreeConfiguration.getWorkingTree().getProxyFor(value.
           id).item : value),
         type: this.getType(attributeName)
-      },
-      disableClose: true
+      }
     }).updateSize('80%', '80%').afterClosed().subscribe((result: any) => {
       if (result.object) {
         this._itemRepository.upsertItem(result.type.name, result.object);
@@ -387,8 +386,7 @@ export class FormatObjectEditorComponent implements OnInit {
               object: ((!value || isLocalTypeInstance) ? value :
                 TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
               type: type
-            },
-            disableClose: true
+            }
           }).updateSize('80%', '80%').afterClosed().subscribe((result:
             any) => {
             if (result.object) {
@@ -449,8 +447,7 @@ export class FormatObjectEditorComponent implements OnInit {
               id);
           }),
           allowMultiSelect: true
-        },
-        disableClose: true
+        }
       }).updateSize('70%', '70%').afterClosed().toPromise();
       
       let rows: Array<any> = [];

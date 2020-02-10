@@ -14,19 +14,16 @@
   </button>
 </div>
 <ng-container *ngIf="data">
-  <div class="pull-right">
-    <mat-dialog-actions>
-      <button mat-raised-button [mat-dialog-close]="0">
-        Cancel
+  <mat-dialog-actions style="display: flex; flex-direction: row;">
+    <div matTooltip="Select a parent" [matTooltipDisabled]="!!selectedParent"
+      class="flex-right-align" style="padding-right: 16px;">
+      <button mat-button [mat-dialog-close]="1" [disabled]="!selectedParent"
+        (click)="uploadFile(fileInput)">
+        Upload
       </button>
-      <div matTooltip="Select a parent" [matTooltipDisabled]="!!selectedParent">
-        <button mat-raised-button [mat-dialog-close]="1" [disabled]="!selectedParent"
-          (click)="uploadFile(fileInput)">
-          Upload
-        </button>
-      </div>
-    </mat-dialog-actions>
-  </div>
+    </div>
+    <button mat-button [mat-dialog-close]="0">
+      Cancel
+    </button>
+  </mat-dialog-actions>
 </ng-container>
-
-
