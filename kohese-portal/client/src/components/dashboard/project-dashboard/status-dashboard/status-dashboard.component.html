@@ -1,5 +1,4 @@
-<h4 *ngIf="initialized">Project Status</h4>
-<mat-tab-group >
+<mat-tab-group style="height: 100%;">
   <mat-tab label="Table">
     <ng-template matTabContent>
       <div class="left-content" *ngIf="project">
@@ -44,6 +43,12 @@
   <mat-tab label="Chart">
     <ng-template matTabContent>
       <state-bar-chart [projectStream]="projectStream"></state-bar-chart>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="State Board">
+    <ng-template matTabContent>
+      <state-board [project]="(projectStream | async)?.proxy.item">
+      </state-board>
     </ng-template>
   </mat-tab>
 </mat-tab-group>

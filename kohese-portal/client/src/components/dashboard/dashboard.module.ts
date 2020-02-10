@@ -33,6 +33,7 @@ import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy
 import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
 import { ReportGeneratorModule } from '../report-generator/report-generator.module';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
+import { StateBoardModule } from '../state-board/state-board.module';
 
 @NgModule({
   declarations: [
@@ -77,7 +78,8 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     ReactiveFormsModule,
     NgxDatatableModule,
     ReportGeneratorModule,
-    ObjectEditorModule
+    ObjectEditorModule,
+    StateBoardModule
   ],
   exports : [
     DashboardComponent
