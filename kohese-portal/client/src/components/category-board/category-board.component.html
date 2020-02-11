@@ -18,8 +18,19 @@
       </ng-container>
     </mat-select>
   </mat-form-field>
+  <ng-container
+    *ngIf="isSelectedAttributeMultivaluedAndInstantaneouslyFinite()">
+    <div style="margin-left: auto; display: flex; flex-direction: column;
+      justify-content: center;">
+      <mat-checkbox [(ngModel)]="shouldGroupElements">
+        Group Elements
+      </mat-checkbox>
+    </div>
+  </ng-container>
   <button mat-icon-button matTooltip="Save the selected Project"
-    style="margin-left: auto;" (click)="save()">
+    (click)="save()" [ngStyle]="{ 'margin-left':
+    (isSelectedAttributeMultivaluedAndInstantaneouslyFinite() ? '' :
+    'auto') }">
     <mat-icon class="fa fa-save"></mat-icon>
   </button>
 </div>

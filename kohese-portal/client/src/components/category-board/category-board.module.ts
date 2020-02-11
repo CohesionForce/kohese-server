@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatSelectModule, MatCardModule, MatButtonModule, MatIconModule,
-  MatTooltipModule } from '@angular/material';
+import { MatSelectModule, MatCheckboxModule, MatCardModule, MatButtonModule,
+  MatIconModule, MatTooltipModule } from '@angular/material';
 
 import { CategoryBoardComponent } from './category-board.component';
 import { DetailsModule } from '../details/details.module';
@@ -13,6 +13,7 @@ import { DetailsModule } from '../details/details.module';
     CommonModule,
     FormsModule,
     MatSelectModule,
+    MatCheckboxModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
